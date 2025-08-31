@@ -149,7 +149,7 @@ describe('EmailInbox Component', () => {
     
     // Seleccionar un email
     const emailCheckbox = screen.getAllByRole('checkbox')[1]; // El primero es "Seleccionar todos"
-    fireEvent.click(emailCheckbox);
+    fireEvent.change(emailCheckbox, { target: { checked: true } });
     
     // Verificar que se ha seleccionado
     expect(emailCheckbox).toBeChecked();

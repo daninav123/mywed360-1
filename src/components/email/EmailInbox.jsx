@@ -221,6 +221,7 @@ export default function EmailInbox() {
                       type="checkbox"
                       role="checkbox"
                       checked={selectedIds.has(safeRender(email.id, ''))}
+                      onClick={(e) => e.stopPropagation()}
                       onChange={(e) => {
                         e.stopPropagation();
                         toggleSelect(safeRender(email.id, ''));
