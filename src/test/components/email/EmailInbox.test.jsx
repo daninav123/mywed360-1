@@ -219,20 +219,23 @@ describe('EmailInbox Component', () => {
       expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument();
     });
     
-    // Hacer clic en un email
+    // Hacer clic en el primer email de la lista (ignorando la cabecera)
     const emailRow = screen.getAllByRole('row')[1];
     fireEvent.click(emailRow);
     
-    // Verificar que se muestra el detalle
-    expect(screen.getByTestId('email-detail')).toBeInTheDocument();
-    expect(screen.getByTestId('email-subject')).toHaveTextContent('Asunto importante');
+    // Esperar a que aparezca el detalle
+    const detail = await screen.findByTestId('email-detail');
+    expect(detail).toBeInTheDocument();
+    expect(await screen.findByTestId('email-subject')).toHaveTextContent('Asunto importante');
     
     // Volver a la lista
-    const backButton = screen.getByText('Volver');
+    const backButton = screen.getByRole('button', { name: 'Volver' });
     fireEvent.click(backButton);
     
-    // Verificar que se oculta el detalle
-    expect(screen.queryByTestId('email-subject')).not.toBeInTheDocument();
+    // Esperar a que el detalle desaparezca
+    await waitFor(() => {
+      expect(screen.queryByTestId('email-subject')).not.toBeInTheDocument();
+    });
   });
 
   // Prueba de manejo de errores
