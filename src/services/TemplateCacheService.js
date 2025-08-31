@@ -249,6 +249,11 @@ export const initCache = () => {
  * @param {boolean} updateLocalStorage - Si es true, también actualiza localStorage
  */
 export const cacheAllTemplates = (templates, updateLocalStorage = true) => {
+  // Validación: asegurar que templates sea un array
+  if (!Array.isArray(templates)) {
+    console.warn('cacheAllTemplates: se esperaba un array', { templates });
+    return;
+  }
   // Guardar en caché de memoria
   memoryCache.allTemplates = templates;
   memoryCache.lastFetched = Date.now();

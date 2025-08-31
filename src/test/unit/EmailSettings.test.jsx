@@ -17,6 +17,11 @@ vi.mock('../../services/emailService', () => ({
 }));
 
 // Mock del componente TagsManager para aislarlo
+vi.mock('../../components/settings/WeddingAccountLink', () => ({
+  default: () => <div data-testid="wedding-link">WeddingAccountLink Mock</div>
+}));
+
+// Mock del componente TagsManager para aislarlo
 vi.mock('../../components/email/TagsManager', () => ({
   default: () => <div data-testid="tags-manager">Gestor de etiquetas (Mock)</div>
 }));
