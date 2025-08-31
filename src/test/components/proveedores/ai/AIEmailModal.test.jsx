@@ -128,10 +128,13 @@ describe('AIEmailModal', () => {
   it('muestra alerta de error si hook reporta error', () => {
     hookReturn = {
       ...baseHookState,
-      error: 'Error al enviar',
+      error: 'Algo salió mal',
     };
     renderModal();
     expect(screen.getByTestId('error-alert')).toBeInTheDocument();
-    expect(screen.getByText(/Error al enviar/i)).toBeInTheDocument();
+    // Se muestra el título fijo de la alerta
+    expect(screen.getByText('Error al enviar el email')).toBeInTheDocument();
+    // Y el mensaje que proviene del hook
+    expect(screen.getByText('Algo salió mal')).toBeInTheDocument();
   });
 });
