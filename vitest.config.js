@@ -8,12 +8,16 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   plugins: [react()],
   test: {
-    // DESHABILITAR COMPLETAMENTE TODOS LOS TESTS UNITARIOS
-    include: [], // No incluir ningún archivo de test
-    exclude: ['**/*'], // Excluir absolutamente todo
-    passWithNoTests: true, // No fallar si no hay tests
+    // Activar tests unitarios
+    include: [
+      'src/**/?(*.)+(test).[jt]s?(x)',
+      'src/**/?(*.)+(spec).[jt]s?(x)',
+    ],
+    exclude: ['node_modules/**'],
+    passWithNoTests: false,
     testTimeout: 30000,
     hookTimeout: 10000,
+    environment: 'jsdom',
     setupFiles: [],
     coverage: {
       provider: 'v8',

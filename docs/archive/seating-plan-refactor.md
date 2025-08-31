@@ -1,5 +1,7 @@
 # Refactorización del SeatingPlan
 
+> **Nota (2025-08-31):** Este documento es histórico. El componente legacy `SeatingPlan.jsx` ha sido eliminado y sustituido en producción por `SeatingPlanRefactored`. Las indicaciones aquí descritas quedan como referencia.
+
 ## Resumen
 
 Se ha refactorizado completamente el componente `SeatingPlan.jsx` (1572 líneas) dividiéndolo en componentes especializados y modulares para mejorar la mantenibilidad, performance y experiencia de usuario.

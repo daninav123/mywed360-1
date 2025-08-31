@@ -2,6 +2,7 @@ import express from 'express';
 import crypto from 'crypto';
 import { db } from '../db.js'; // Firestore
 import { analyzeEmail } from '../services/emailAnalysis.js';
+import { saveSupplierBudget } from '../services/budgetService.js';
 
 const router = express.Router();
 
@@ -76,6 +77,26 @@ router.post('/', (req, res) => {
           mailId: mailRef.id,
           createdAt: date,
         });
+
+        // Si la IA detecta presupuestos, guardarlos
+        if (insights?.budgets?.length) {
+          const weddingId = rcpt.split('@')[0] || 'unknown';
+          for (const b of insights.budgets) {
+            try {
+              await saveSupplierBudget({
+                weddingId,
+                supplierId: b.client || 'unknown',
+                description: subject,
+                amount: b.amount,
+                currency: b.currency || 'EUR',
+                status: 'pending',
+                emailId: mailRef.id,
+              });
+            } catch (saveErr) {
+              console.error('❌ Error guardando presupuesto IA:', saveErr);
+            }
+          }
+        }
       } catch (aiErr) {
         console.error('⚠️  Error analizando correo:', aiErr);
       }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ProveedorBudgets from './ProveedorBudgets.jsx';
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
@@ -256,6 +257,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
                   </div>
                 </div>
               </Card>
+              <ProveedorBudgets supplierId={provider.id} />
             </div>
           )}
           

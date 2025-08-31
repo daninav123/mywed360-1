@@ -46,6 +46,7 @@ import emailTemplatesRouter from './routes/email-templates.js';
 import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import weddingNewsRouter from './routes/wedding-news.js';
+import supplierBudgetRouter from './routes/supplier-budget.js';
 
 
 // Load environment variables (root .env)
@@ -114,6 +115,8 @@ app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
 app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
+// Presupuestos de proveedores (aceptar/rechazar)
+app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
