@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FolderSelectionModal from '../../../components/email/FolderSelectionModal';
 import userEvent from '@testing-library/user-event';
@@ -59,7 +59,7 @@ describe('FolderSelectionModal Component', () => {
     // Verificar elementos principales
     expect(screen.getByText('Título de prueba')).toBeInTheDocument();
     expect(screen.getByText('Descripción de prueba')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/buscar carpetas/i)).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText(/buscar carpetas/i)[0]).toBeInTheDocument();
     
     // Verificar que todas las carpetas se renderizan
     expect(screen.getByText('Importante')).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe('FolderSelectionModal Component', () => {
     );
     
     // Buscar una carpeta específica
-    const searchInput = screen.getByPlaceholderText(/buscar carpetas/i);
+    const searchInput = screen.getAllByPlaceholderText(/buscar carpetas/i)[0];
     await user.type(searchInput, 'Trabajo');
     
     // Verificar que solo se muestra la carpeta buscada
@@ -110,7 +110,7 @@ describe('FolderSelectionModal Component', () => {
     );
     
     // El input de búsqueda debería estar enfocado inicialmente
-    expect(screen.getByPlaceholderText(/buscar carpetas/i)).toHaveFocus();
+    await waitFor(() => expect(screen.getAllByPlaceholderText(/buscar carpetas/i)[0]).toHaveFocus());
     
     // Presionar Tab para mover el foco a la lista de carpetas
     await user.tab();
@@ -136,7 +136,7 @@ describe('FolderSelectionModal Component', () => {
       />
     );
     
-    const closeButton = screen.getByLabelText(/cerrar diálogo/i);
+    const closeButton = screen.getAllByLabelText(/cerrar diálogo/i)[0];
     fireEvent.click(closeButton);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });

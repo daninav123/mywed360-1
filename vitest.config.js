@@ -18,7 +18,7 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 10000,
     environment: 'jsdom',
-    setupFiles: [],
+    setupFiles: ['backend/vitest.setup.js'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json'],

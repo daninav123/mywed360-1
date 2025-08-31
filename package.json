@@ -64,6 +64,7 @@
     "lucide-react": "^0.268.0",
     "mailgun-js": "^0.22.0",
     "mailgun.js": "^12.0.3",
+    "handlebars": "^4.7.8",
     "openai": "^4.104.0",
     "pdfkit": "^0.17.1",
     "potrace": "^2.1.8",

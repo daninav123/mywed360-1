@@ -2,12 +2,26 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import EmailStats from '../../components/email/EmailStats';
 
 // Mocks para los servicios utilizados
 vi.mock('../../services/statsService', () => ({
   generateUserStats: vi.fn(),
   getUserStats: vi.fn()
+}));
+
+// Mock de chart.js para evitar dependencias de canvas
+vi.mock('chart.js', () => ({
+  Chart: { register: () => {} },
+  register: () => {},
+  CategoryScale: {},
+  LinearScale: {},
+  PointElement: {},
+  LineElement: {},
+  BarElement: {},
+  ArcElement: {},
+  Title: {},
+  Tooltip: {},
+  Legend: {},
 }));
 
 // Mocks para react-chartjs-2
@@ -18,6 +32,12 @@ vi.mock('react-chartjs-2', () => ({
   Doughnut: () => <div data-testid="doughnut-chart">Doughnut Chart</div>
 }));
 
+// Mock para emailMetricsService para evitar llamadas reales a Firestore
+vi.mock('../../services/emailMetricsService', () => ({
+  getDailyStats: vi.fn().mockResolvedValue([]),
+}));
+
+import EmailStats from '../../components/email/EmailStats';
 // Importamos las funciones después del mock para poder manipularlas
 import { generateUserStats, getUserStats } from '../../services/statsService';
 
@@ -184,8 +204,8 @@ describe('EmailStats', () => {
     // Verificar secciones principales
     await waitFor(() => {
       // Tarjetas de resumen
-      expect(screen.getByText('Correos enviados')).toBeInTheDocument();
-      expect(screen.getByText('Correos recibidos')).toBeInTheDocument();
+      expect(screen.getByText('Correos')).toBeInTheDocument();
+      expect(screen.getByText('Contactos')).toBeInTheDocument();
       expect(screen.getByText('Tasa de respuesta')).toBeInTheDocument();
       expect(screen.getByText('Tiempo medio de respuesta')).toBeInTheDocument();
       

@@ -42,10 +42,7 @@ const FolderSelectionModal = ({
   // Enfocar el campo de búsqueda cuando se abre el modal
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
-      // Pequeño retraso para asegurar que el DOM está listo
-      setTimeout(() => {
-        searchInputRef.current.focus();
-      }, 50);
+      searchInputRef.current.focus();
     }
   }, [isOpen]);
   

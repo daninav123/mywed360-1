@@ -1,4 +1,6 @@
-import { vi } from 'vitest';
+import { vi, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
 
 // Mock de base de datos Firestore para todas las pruebas
 vi.mock('./db.js', () => ({
@@ -20,3 +22,8 @@ vi.mock('axios', () => ({
 
 // Asegurar entorno de tests antes de que index.js se cargue
 process.env.NODE_ENV = 'test';
+
+// Limpiar el DOM después de cada prueba para evitar colisiones
+afterEach(() => {
+  cleanup();
+});
