@@ -21,8 +21,12 @@ vi.mock('../../../../hooks/useAuth', () => ({
 // Mock del componente Alert para simplificar assertions
 vi.mock('../../../../components/Alert', () => ({
   __esModule: true,
-  default: ({ type, children, 'data-testid': testId = `${type}-alert` }) => (
-    <div data-testid={testId}>{children}</div>
+  default: ({ type, title, message, children, 'data-testid': testId = `${type}-alert` }) => (
+    <div data-testid={testId}>
+      {title && <div>{title}</div>}
+      {message && <div>{message}</div>}
+      {children}
+    </div>
   ),
 }));
 
