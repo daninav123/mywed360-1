@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AIEmailModal from '../../../../components/proveedores/ai/AIEmailModal';
 
 // Mock del hook useAIProviderEmail
-vi.mock('../../../../hooks/useAIProviderEmail', () => ({
+vi.doMock('../../../../hooks/useAIProviderEmail', () => ({
   useAIProviderEmail: () => ({
     userEmail: 'usuario.test@lovenda.com',
     isSending: false,
@@ -88,7 +88,7 @@ describe('AIEmailModal', () => {
     let isSendingState = false;
     let setIsSent = null;
     
-    vi.mock('../../../../hooks/useAIProviderEmail', () => ({
+    vi.doMock('../../../../hooks/useAIProviderEmail', () => ({
       useAIProviderEmail: () => {
         const sendEmailMock = vi.fn().mockImplementation(async () => {
           isSendingState = true;
@@ -111,7 +111,8 @@ describe('AIEmailModal', () => {
     }), { virtual: true });
     
     // Modificar el componente para capturar el estado de isSent
-    vi.mock('../../../../components/proveedores/ai/AIEmailModal', () => {
+    // Mock del propio componente eliminado para evitar conflictos
+    /* vi.mock('../../../../components/proveedores/ai/AIEmailModal', () => {
       const ActualComponent = vi.requireActual('../../../../components/proveedores/ai/AIEmailModal').default;
       return {
         default: (props) => {
@@ -120,7 +121,7 @@ describe('AIEmailModal', () => {
           return <ActualComponent {...props} />;
         }
       };
-    }, { virtual: true });
+    */
     
     render(<AIEmailModal {...defaultProps} />);
     
@@ -140,7 +141,7 @@ describe('AIEmailModal', () => {
   
   it('muestra error cuando falla el envío de email', async () => {
     // Mock de useAIProviderEmail con error
-    vi.mock('../../../../hooks/useAIProviderEmail', () => ({
+    vi.doMock('../../../../hooks/useAIProviderEmail', () => ({
       useAIProviderEmail: () => ({
         userEmail: 'usuario.test@lovenda.com',
         isSending: false,
