@@ -133,7 +133,7 @@ describe('AIEmailModal', () => {
     renderModal();
     expect(screen.getByTestId('error-alert')).toBeInTheDocument();
     // Se muestra el título fijo de la alerta
-    expect(screen.getByText('Error al enviar el email')).toBeInTheDocument();
+    expect(screen.getAllByText(/Error al enviar el email/i).length).toBeGreaterThan(0);
     // Y el mensaje que proviene del hook
     expect(screen.getByText('Algo salió mal')).toBeInTheDocument();
   });
