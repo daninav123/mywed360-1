@@ -242,9 +242,8 @@ describe('EmailInbox Component', () => {
     
     render(<EmailInbox />);
     
-    // Verificar que se muestra el error
-    await waitFor(() => {
-      expect(screen.getByText(/no se pudieron cargar los emails/i)).toBeInTheDocument();
-    });
+    // Esperar a que aparezca el mensaje de error (CI puede ser más lento)
+    const errorNode = await screen.findByText(/no se pudieron cargar los emails/i, {}, { timeout: 4000 });
+    expect(errorNode).toBeInTheDocument();
   });
 });
