@@ -150,9 +150,12 @@ describe('EmailInbox Component', () => {
     // Seleccionar un email
     const emailCheckbox = screen.getAllByRole('checkbox')[1]; // El primero es "Seleccionar todos"
     fireEvent.change(emailCheckbox, { target: { checked: true } });
-    
-    // Verificar que se ha seleccionado
-    expect(emailCheckbox).toBeChecked();
+
+    // Esperar a que el estado se actualice y el botón se habilite
+    await waitFor(() => {
+      expect(emailCheckbox).toBeChecked();
+      expect(screen.getByText(/eliminar/i)).not.toBeDisabled();
+    });
     
     // Eliminar el email seleccionado
     const deleteButton = screen.getByText(/eliminar/i);
