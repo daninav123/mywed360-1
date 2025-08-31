@@ -11,7 +11,9 @@ class ErrorLogger {
       backend: { status: 'unknown', details: null },
       openai: { status: 'unknown', details: null },
       mailgun: { status: 'unknown', details: null },
-      environment: { status: 'unknown', details: null }
+      environment: { status: 'unknown', details: null },
+      auth: { status: 'unknown', details: null },
+      wedding: { status: 'unknown', details: null }
     };
     this.isInitialized = false;
     this.setupGlobalErrorHandlers();
@@ -130,6 +132,30 @@ class ErrorLogger {
         this.diagnostics.mailgun.status = 'error';
         this.diagnostics.mailgun.details = details;
       }
+    }
+  }
+
+  /**
+   * Actualiza la información de autenticación (usuario actual)
+   * @param {Object|null} info Información de usuario (uid, email, perfil, etc.)
+   */
+  setAuthInfo(info) {
+    if (info) {
+      this.diagnostics.auth = { status: 'success', details: info };
+    } else {
+      this.diagnostics.auth = { status: 'error', details: { message: 'Sin usuario autenticado' } };
+    }
+  }
+
+  /**
+   * Actualiza la información de la boda activa
+   * @param {Object|null} info Información sobre la boda y lista de bodas
+   */
+  setWeddingInfo(info) {
+    if (info && info.activeWedding) {
+      this.diagnostics.wedding = { status: 'success', details: info };
+    } else {
+      this.diagnostics.wedding = { status: 'warning', details: info || { message: 'Sin boda activa' } };
     }
   }
 

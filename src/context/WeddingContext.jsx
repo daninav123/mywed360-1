@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import errorLogger from '../utils/errorLogger';
 import { useAuth } from '../hooks/useAuthUnified';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -39,6 +40,19 @@ export default function WeddingProvider({ children }) {
   const [activeWedding, setActiveWeddingState] = useState(() => {
     return localStorage.getItem('lovenda_active_wedding') || '';
   });
+
+  // Actualizar diagnóstico cuando cambian bodas o la boda activa
+  useEffect(() => {
+    if (currentUser) {
+      errorLogger.setWeddingInfo({
+        count: weddings.length,
+        list: weddings.map(w => ({ id: w.id, name: w.name || w.slug || 'Boda' })),
+        activeWedding
+      });
+    } else {
+      errorLogger.setWeddingInfo(null);
+    }
+  }, [weddings, activeWedding, currentUser]);
 
   // Cargar lista de bodas del planner desde Firestore
   useEffect(() => {

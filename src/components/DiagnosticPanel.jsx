@@ -140,6 +140,24 @@ const DiagnosticPanel = () => {
             </div>
           </div>
 
+          {/* Contexto de usuario y boda */}
+          {diagnostics.auth?.details && (
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">👤 Sesión de Usuario</h3>
+              <pre className="text-sm whitespace-pre-wrap overflow-x-auto">
+                {JSON.stringify(diagnostics.auth.details, null, 2)}
+              </pre>
+            </div>
+          )}
+          {diagnostics.wedding?.details && (
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-semibold mb-2">💍 Boda Activa</h3>
+              <pre className="text-sm whitespace-pre-wrap overflow-x-auto">
+                {JSON.stringify(diagnostics.wedding.details, null, 2)}
+              </pre>
+            </div>
+          )}
+
           {/* Estado de servicios */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-4">🔧 Estado de Servicios</h3>

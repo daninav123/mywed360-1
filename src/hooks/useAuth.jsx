@@ -5,6 +5,7 @@
 
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { initReminderService, stopReminderService } from '../services/reminderService';
+import errorLogger from '../utils/errorLogger';
 import { setAuthContext as registerEmailAuthContext } from '../services/emailService';
 
 // Crear contexto de autenticación
@@ -99,6 +100,16 @@ export const AuthProvider = ({ children }) => {
     
     loadUserFromStorage();
   }, []);
+
+  // Actualizar diagnóstico de autenticación
+  useEffect(() => {
+    if (loading) return;
+    if (currentUser) {
+      errorLogger.setAuthInfo({ uid: currentUser.uid, email: currentUser.email, profile: userProfile });
+    } else {
+      errorLogger.setAuthInfo(null);
+    }
+  }, [loading, currentUser, userProfile]);
 
   // Iniciar o detener el servicio de recordatorios cuando cambie el perfil
   useEffect(() => {
