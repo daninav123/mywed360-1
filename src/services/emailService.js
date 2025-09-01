@@ -26,6 +26,55 @@ export const USE_BACKEND = !!BASE;
 const STORAGE_KEY = 'mywed360_mails';
 
 /**
+ * Rellena la bandeja con correos mock cuando aún no existen datos locales.
+ * Esto permite mostrar contenido incluso sin backend ni Mailgun.
+ * @param {string} userEmail Email del usuario actual
+ */
+function ensureMockEmails(userEmail) {
+  if (!userEmail) return;
+  const existing = loadLocal();
+  if (existing && existing.length) return; // Ya hay datos
+
+  const now = new Date().toISOString();
+  const mockEmails = [
+    {
+      id: uuid(),
+      from: 'info@mywed360.com',
+      to: userEmail,
+      subject: '¡Bienvenido a MyWed360!',
+      body: '<p>Esta es tu bandeja de entrada unificada. Disfruta de la plataforma.</p>',
+      date: now,
+      folder: 'inbox',
+      read: false,
+      attachments: []
+    },
+    {
+      id: uuid(),
+      from: userEmail,
+      to: 'planner@mywed360.com',
+      subject: 'Ejemplo de correo enviado',
+      body: 'Hola, este es un correo de prueba enviado desde tu nueva cuenta.',
+      date: now,
+      folder: 'sent',
+      read: true,
+      attachments: []
+    },
+    {
+      id: uuid(),
+      from: 'support@mywed360.com',
+      to: userEmail,
+      subject: 'Soporte MyWed360',
+      body: 'Estamos aquí para ayudarte con cualquier duda que tengas.',
+      date: now,
+      folder: 'inbox',
+      read: false,
+      attachments: []
+    }
+  ];
+  saveLocal(mockEmails);
+}
+
+/**
  * Obtiene el token de autenticación del usuario actual
  * @returns {Promise<string|null>} Token de autenticación o null
  */
@@ -192,6 +241,8 @@ export async function initEmailService(userProfile) {
   }
 
   console.log(`Servicio de email inicializado para: ${CURRENT_USER_EMAIL}`);
+  // Asegurar correos mock para desarrollo/offline
+  ensureMockEmails(CURRENT_USER_EMAIL);
   return CURRENT_USER_EMAIL;
 }
 
@@ -315,6 +366,15 @@ function mapMailgunEventsToMails(events, folder) {
 export async function getMails(folder = 'inbox') {
   if (!CURRENT_USER_EMAIL) {
     return { success: false, error: 'Servicio de email no inicializado' };
+  }
+
+  // ⚡️ Si existen correos locales, devolverlos directamente para una respuesta instantánea
+  const localMails = loadLocal();
+  if (localMails && localMails.length) {
+    if (folder === 'all') {
+      return [...localMails].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    }
+    return localMails.filter(m => m.folder === folder);
   }
 
   // Soporte para carpeta "all": combinar bandeja de entrada y enviados

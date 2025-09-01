@@ -52,12 +52,31 @@ const UnifiedEmail = () => {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) return;
+
+      // 1️⃣ Intentamos obtener el nombre de usuario personalizado
       const username = await getCurrentUsername();
+      let resolvedEmail;
+
       if (username) {
-        const email = `${username}@mywed360.com`;
-        setMyEmail(email);
-        await initEmailService({ uid: user.uid, emailUsername: username, myWed360Email: email });
+        // Caso ideal: el usuario ya tiene nombre configurado → nombre@mywed360.com
+        resolvedEmail = `${username}@mywed360.com`;
+        await initEmailService({
+          uid: user.uid,
+          emailUsername: username,
+          myWed360Email: resolvedEmail,
+          email: user.email,
+        });
+      } else {
+        // Fallback: usamos el email autenticado (ej. foo@gmail.com)
+        resolvedEmail = user.email;
+        await initEmailService({
+          uid: user.uid,
+          email: user.email,
+        });
       }
+
+      // Guardamos el email resuelto para activar la carga de correos
+      setMyEmail(resolvedEmail);
     });
     return () => unsub();
     // eslint-disable-next-line react-hooks/exhaustive-deps
