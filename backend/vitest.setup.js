@@ -64,6 +64,11 @@ vi.mock('../../../hooks/useAuth', () => authMock);
 vi.mock('@/hooks/useAuth', () => authMock);
 vi.mock('src/hooks/useAuth', () => authMock);
 
+// Hacer accesible useAuth como variable global para tests que no lo importan explícitamente
+// Esto evita ReferenceError "useAuth is not defined" en algunos archivos de prueba
+// eslint-disable-next-line no-undef
+globalThis.useAuth = authMock.useAuth;
+
 
 // Asegurar entorno de tests antes de que index.js se cargue
 process.env.NODE_ENV = 'test';
