@@ -35,6 +35,36 @@ vi.mock('axios', () => ({
   default: { get: vi.fn(() => Promise.resolve({ data: {} })) },
 }));
 
+// Mock de react-dnd para evitar necesidad de DragDropContext en tests
+vi.mock('react-dnd', () => ({
+  __esModule: true,
+  useDrag: () => [{ isDragging: false }, () => {}],
+  useDrop: () => [{ isOver: false }, () => {}],
+}));
+
+// Mock global de useAuth para tests que requieren AuthProvider
+const authMock = {
+  __esModule: true,
+  default: () => ({
+    currentUser: { uid: 'test', email: 'test@mock.com' },
+    isAuthenticated: true,
+    isLoading: false,
+    userProfile: { email: 'test@mock.com' },
+  }),
+  useAuth: () => ({
+    currentUser: { uid: 'test', email: 'test@mock.com' },
+    isAuthenticated: true,
+    isLoading: false,
+    userProfile: { email: 'test@mock.com' },
+  }),
+};
+vi.mock('../hooks/useAuth', () => authMock);
+vi.mock('../../hooks/useAuth', () => authMock);
+vi.mock('../../../hooks/useAuth', () => authMock);
+vi.mock('@/hooks/useAuth', () => authMock);
+vi.mock('src/hooks/useAuth', () => authMock);
+
+
 // Asegurar entorno de tests antes de que index.js se cargue
 process.env.NODE_ENV = 'test';
 
