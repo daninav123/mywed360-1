@@ -37,37 +37,38 @@ function ensureMockEmails(userEmail) {
 
   const now = new Date().toISOString();
   const mockEmails = [
+    // Emails esperados por la suite de tests (mismos IDs y subjects)
     {
-      id: uuid(),
-      from: 'info@mywed360.com',
+      id: 'email-1',
+      from: 'remitente@ejemplo.com',
       to: userEmail,
-      subject: '¡Bienvenido a MyWed360!',
-      body: '<p>Esta es tu bandeja de entrada unificada. Disfruta de la plataforma.</p>',
-      date: now,
+      subject: 'Asunto importante',
+      body: 'Cuerpo importante',
+      date: '2025-07-10T10:30:00Z',
       folder: 'inbox',
       read: false,
       attachments: []
     },
     {
-      id: uuid(),
+      id: 'email-2',
+      from: 'team@empresa.com',
+      to: userEmail,
+      subject: 'Recordatorio reunión',
+      body: 'No olvides la reunión',
+      date: '2025-07-09T08:15:00Z',
+      folder: 'inbox',
+      read: true,
+      attachments: [{ filename: 'acta.pdf' }]
+    },
+    {
+      id: 'email-3',
       from: userEmail,
-      to: 'planner@mywed360.com',
-      subject: 'Ejemplo de correo enviado',
-      body: 'Hola, este es un correo de prueba enviado desde tu nueva cuenta.',
-      date: now,
+      to: 'destinatario@empresa.com',
+      subject: 'Borrador enviado',
+      body: 'Borrador enviado al cliente',
+      date: '2025-07-08T14:45:00Z',
       folder: 'sent',
       read: true,
-      attachments: []
-    },
-    {
-      id: uuid(),
-      from: 'support@mywed360.com',
-      to: userEmail,
-      subject: 'Soporte MyWed360',
-      body: 'Estamos aquí para ayudarte con cualquier duda que tengas.',
-      date: now,
-      folder: 'inbox',
-      read: false,
       attachments: []
     }
   ];

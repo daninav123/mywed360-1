@@ -1,4 +1,10 @@
-import { vi, afterEach } from 'vitest';
+import { vi, afterEach, expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+// Registrar los matchers de Testing Library en Vitest
+expect.extend(matchers);
+
+// Importación de inicialización (mantener por compatibilidad)
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 
@@ -44,6 +50,7 @@ const emailServiceMock = {
   markAsRead: vi.fn(),
   sendMail: vi.fn(),
   createEmailAlias: vi.fn(),
+  setAuthContext: vi.fn(),
 };
 // Registrar mocks para las rutas más comunes (distintos niveles de anidamiento y casing)
 vi.mock('../services/EmailService', () => emailServiceMock);

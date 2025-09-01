@@ -46,10 +46,13 @@ export default function EmailInbox() {
     }
   };
 
+  // Recargar cuando cambie la carpeta, solo si el servicio ya se inicializó (hay perfil)
   useEffect(() => {
-    loadEmails();
+    if (profile) {
+      loadEmails();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [folder]);
+  }, [folder, profile]);
 
   // Utilidades
   const toggleSelect = (id) => {
@@ -189,7 +192,7 @@ export default function EmailInbox() {
         <div data-testid="email-list" className="bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
-              <tr>
+              <tr role="row">
                 <th className="px-4 py-3 text-left">
                   <input
                     type="checkbox"
