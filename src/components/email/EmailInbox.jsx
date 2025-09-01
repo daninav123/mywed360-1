@@ -9,7 +9,8 @@ import { useAuth } from '../../hooks/useAuth';
  * Mantiene la simplicidad pero con mejor estilo visual
  */
 export default function EmailInbox() {
-  const { user, profile } = useAuth();
+  // useAuth puede ser undefined en entorno de pruebas; usamos {} como fallback
+  const { user, profile } = useAuth() || {};
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
