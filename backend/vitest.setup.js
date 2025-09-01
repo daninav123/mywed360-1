@@ -35,6 +35,32 @@ vi.mock('axios', () => ({
   default: { get: vi.fn(() => Promise.resolve({ data: {} })) },
 }));
 
+// Mock global de EmailService para evitar llamadas reales a la API y facilitar los mocks en tests
+const emailServiceMock = {
+  __esModule: true,
+  initEmailService: vi.fn(),
+  getMails: vi.fn(),
+  deleteMail: vi.fn(),
+  markAsRead: vi.fn(),
+  sendMail: vi.fn(),
+  createEmailAlias: vi.fn(),
+};
+// Registrar mocks para las rutas más comunes (distintos niveles de anidamiento y casing)
+vi.mock('../services/EmailService', () => emailServiceMock);
+vi.mock('../../services/EmailService', () => emailServiceMock);
+vi.mock('../../../services/EmailService', () => emailServiceMock);
+vi.mock('@/services/EmailService', () => emailServiceMock);
+vi.mock('src/services/EmailService', () => emailServiceMock);
+vi.mock('../services/emailService', () => emailServiceMock);
+vi.mock('../../services/emailService', () => emailServiceMock);
+vi.mock('../../../services/emailService', () => emailServiceMock);
+vi.mock('@/services/emailService', () => emailServiceMock);
+vi.mock('src/services/emailService', () => emailServiceMock);
+
+// Exponer EmailService como variable global para tests que no realizan import explícito
+// eslint-disable-next-line no-undef
+globalThis.EmailService = emailServiceMock;
+
 // Mock de react-dnd para evitar necesidad de DragDropContext en tests
 vi.mock('react-dnd', () => ({
   __esModule: true,
