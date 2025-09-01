@@ -33,10 +33,13 @@ vi.mock('../../../components/Card', () => ({
 }));
 
 vi.mock('../../../components/Button', () => ({
+
   default: ({ children, onClick, ...props }) => (
     <button onClick={onClick} {...props}>{children}</button>
   )
 }));
+
+import EmailInbox from '../../../components/email/EmailInbox';
 
 describe('EmailInbox Component', () => {
   // Datos de ejemplo para las pruebas
