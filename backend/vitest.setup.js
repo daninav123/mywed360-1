@@ -15,6 +15,14 @@ vi.mock('firebase-admin', () => ({
   firestore: () => ({})
 }));
 
+// Mock global de Firebase config para evitar inicialización real
+vi.mock(/^.*firebaseConfig(?:\.js)?$/, () => ({
+  __esModule: true,
+  db: {},
+  auth: {},
+  firebaseReady: Promise.resolve()
+}));
+
 // Mock genérico de axios para evitar llamadas externas inesperadas
 vi.mock('axios', () => ({
   default: { get: vi.fn(() => Promise.resolve({ data: {} })) },

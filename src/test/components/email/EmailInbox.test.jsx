@@ -1,11 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import EmailInbox from '../../../components/email/EmailInbox';
-import * as EmailService from '../../../services/EmailService';
-import { useAuth } from '../../../hooks/useAuth';
-
-// Mocks necesarios
+// Mocks necesarios - deben declararse antes de importar el componente
 vi.mock('../../../hooks/useAuth', () => ({
   useAuth: vi.fn()
 }));
@@ -162,7 +158,10 @@ describe('EmailInbox Component', () => {
     fireEvent.click(deleteButton);
     
     // Verificar que se llama a la función de eliminar
-    expect(EmailService.deleteMail).toHaveBeenCalledWith('email-1');
+    await waitFor(() => {
+      expect(EmailService.deleteMail).toHaveBeenCalledTimes(1);
+      expect(EmailService.deleteMail.mock.calls[0][0]).toBe('email-1');
+    }, { timeout: 2000 });
     
     // Verificar que se actualiza la lista
     await waitFor(() => {
