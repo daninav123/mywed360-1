@@ -53,7 +53,6 @@ export const LazyChecklist = createLazyComponent(() => import('../../pages/Check
 
 // Componentes lazy para módulos de email
 export const LazyEmailInbox = createLazyComponent(() => import('../../pages/user/EmailInbox'));
-export const LazyMailboxPage = createLazyComponent(() => import('../../pages/MailboxPage'));
 export const LazyEmailStatistics = createLazyComponent(() => import('../../pages/user/EmailStatistics'));
 
 // Componentes lazy para administración

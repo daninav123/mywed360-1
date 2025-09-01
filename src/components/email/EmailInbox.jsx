@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getMails, deleteMail } from '../../services/EmailService';
+import { getMails, deleteMail, initEmailService } from '../../services/EmailService';
 import EmailDetail from './EmailDetail';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,7 +9,7 @@ import { useAuth } from '../../hooks/useAuth';
  * Mantiene la simplicidad pero con mejor estilo visual
  */
 export default function EmailInbox() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +18,17 @@ export default function EmailInbox() {
   const [sortState, setSortState] = useState('none'); // none | alpha | date
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [detailEmail, setDetailEmail] = useState(null);
+
+  // Inicializar servicio de email cuando tengamos perfil de usuario y recargar correos
+  useEffect(() => {
+    const initAndLoad = async () => {
+      await initEmailService(profile);
+      await loadEmails(); // Recargar una vez inicializado
+    };
+    if (profile) {
+      initAndLoad();
+    }
+  }, [profile]);
 
   // Cargar correos
   const loadEmails = async (targetFolder = folder) => {

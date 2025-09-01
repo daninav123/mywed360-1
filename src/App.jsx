@@ -19,7 +19,6 @@ import More from './pages/More';
 import Invitados from './pages/Invitados';
 import Proveedores from './pages/Proveedores';
 import UnifiedEmail from './pages/UnifiedEmail';
-import MailboxPage from './pages/MailboxPage';
 import EmailAdminDashboard from './components/admin/EmailAdminDashboard';
 import MetricsDashboard from './components/metrics/MetricsDashboard';
 import AdminRoutes from './routes/AdminRoutes';
@@ -200,7 +199,8 @@ function App() {
               {/* Bandeja unificada de emails */}
               <Route path="email" element={<UnifiedEmail />} />
               <Route path="email/inbox" element={<UnifiedEmail />} />
-              <Route path="buzon" element={<MailboxPage />} />
+              {/* Redirección para rutas legado */}
+              <Route path="buzon/*" element={<Navigate to="/email" replace />} />
               
               {/* Rutas de usuario */}
               <Route path="user/*" element={<UserRoutes />} />

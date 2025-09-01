@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Loader from '../components/ui/Loader';
 
 // Páginas de usuario
-import MailboxPage from '../pages/MailboxPage';
+import UnifiedEmail from '../pages/UnifiedEmail';
 import EmailStatistics from '../pages/user/EmailStatistics';
 import Proveedores from '../pages/Proveedores';
 import EmailSetup from '../pages/EmailSetup';
@@ -29,13 +29,15 @@ const UserRoutes = () => {
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<Navigate to="/user/dashboard" replace />} />
-        <Route path="/email" element={<MailboxPage />} />
+        <Route path="/email" element={<UnifiedEmail />} />
         {/** Alias para compatibilidad con enlaces antiguos */}
-        <Route path="/email/inbox" element={<MailboxPage />} />
+        <Route path="/email/inbox" element={<UnifiedEmail />} />
         <Route path="/email/stats" element={<EmailStatistics />} />
         <Route path="/email/setup" element={<EmailSetup />} />
         <Route path="/proveedores" element={<Proveedores />} />
         <Route path="/email/test" element={<MailgunTester />} />
+        {/* Redirección rutas legado */}
+        <Route path="/buzon/*" element={<Navigate to="/email" replace />} />
         <Route path="*" element={<Navigate to="/user/dashboard" replace />} />
       </Routes>
     </Suspense>

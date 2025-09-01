@@ -1,3 +1,7 @@
+/**
+ * DEPRECATED: Esta página ha quedado obsoleta. Usa `UnifiedEmail` (/email).
+ * Se mantiene temporalmente para compatibilidad con tests legacy.
+ */
 import { useEffect, useState, useCallback } from "react";
 import UsernameWizard from "../components/UsernameWizard";
 import useEmailUsername from "../hooks/useEmailUsername";

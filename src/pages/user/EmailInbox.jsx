@@ -1,3 +1,7 @@
+/**
+ * DEPRECATED: Esta bandeja avanzada ha quedado obsoleta. Usa `UnifiedEmail` (/email).
+ * Retenida temporalmente por compatibilidad con pruebas anteriores.
+ */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Inbox, Send, Trash, Edit, Search, RefreshCw, Filter, Tag, BarChart2, ArrowLeft, File } from 'lucide-react';
