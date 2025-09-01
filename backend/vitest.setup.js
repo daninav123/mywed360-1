@@ -43,20 +43,18 @@ vi.mock('react-dnd', () => ({
 }));
 
 // Mock global de useAuth para tests que requieren AuthProvider
+// Crear useAuth como vi.fn para que las pruebas puedan usar mockReturnValue y otras utilidades
+const useAuthMock = vi.fn(() => ({
+  currentUser: { uid: 'test', email: 'test@mock.com' },
+  isAuthenticated: true,
+  isLoading: false,
+  userProfile: { email: 'test@mock.com' },
+}));
+
 const authMock = {
   __esModule: true,
-  default: () => ({
-    currentUser: { uid: 'test', email: 'test@mock.com' },
-    isAuthenticated: true,
-    isLoading: false,
-    userProfile: { email: 'test@mock.com' },
-  }),
-  useAuth: () => ({
-    currentUser: { uid: 'test', email: 'test@mock.com' },
-    isAuthenticated: true,
-    isLoading: false,
-    userProfile: { email: 'test@mock.com' },
-  }),
+  default: useAuthMock,
+  useAuth: useAuthMock,
 };
 vi.mock('../hooks/useAuth', () => authMock);
 vi.mock('../../hooks/useAuth', () => authMock);
