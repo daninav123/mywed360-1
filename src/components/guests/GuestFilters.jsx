@@ -18,6 +18,7 @@ const GuestFilters = React.memo(({
   onAddGuest,
   onBulkInvite,
   onImportGuests,
+  onBulkAddGuests,
   onExportGuests,
   guestCount = 0,
   isLoading = false
@@ -60,6 +61,10 @@ const GuestFilters = React.memo(({
       onBulkInvite?.();
     }
   }, [onBulkInvite, guestCount]);
+
+  const handleBulkAdd = useCallback(() => {
+    onBulkAddGuests?.();
+  }, [onBulkAddGuests]);
 
   const handleImport = useCallback(() => {
     onImportGuests?.();
@@ -147,6 +152,16 @@ const GuestFilters = React.memo(({
         >
           <MessageSquare size={16} className="mr-2" />
           Invitaciones masivas
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleBulkAdd}
+          disabled={isLoading}
+          className="flex items-center"
+        >
+          <Plus size={16} className="mr-2" />
+          Alta masiva
         </Button>
 
         <Button

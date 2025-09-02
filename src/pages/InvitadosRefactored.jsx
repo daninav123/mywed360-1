@@ -4,6 +4,7 @@ import Modal from '../components/Modal';
 import GuestForm from '../components/guests/GuestForm';
 import GuestList from '../components/guests/GuestList';
 import GuestFilters from '../components/guests/GuestFilters';
+import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
 
@@ -36,6 +37,8 @@ const InvitadosRefactored = () => {
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [editingGuest, setEditingGuest] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [isBulkSaving, setIsBulkSaving] = useState(false);
 
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
@@ -89,6 +92,26 @@ const InvitadosRefactored = () => {
     setEditingGuest(null);
   };
 
+  // Alta masiva
+  const handleBulkAdd = () => {
+    setShowBulkModal(true);
+  };
+
+  const handleSaveBulk = async (guestRows) => {
+    setIsBulkSaving(true);
+    try {
+      for (const row of guestRows) {
+        await addGuest(row);
+      }
+      setShowBulkModal(false);
+    } catch (error) {
+      console.error('Error guardando invitados masivos:', error);
+      alert('Error inesperado al guardar invitados masivos');
+    } finally {
+      setIsBulkSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -130,6 +153,7 @@ const InvitadosRefactored = () => {
           onAddGuest={handleAddGuest}
           onBulkInvite={bulkInviteWhatsApp}
           onImportGuests={importFromContacts}
+          onBulkAddGuests={handleBulkAdd}
           onExportGuests={exportToCSV}
           guestCount={guests.length}
           isLoading={isLoading}
@@ -160,6 +184,20 @@ const InvitadosRefactored = () => {
             onSave={handleSaveGuest}
             onCancel={handleCancelModal}
             isLoading={isSaving}
+          />
+        </Modal>
+
+        {/* Modal de alta masiva */}
+        <Modal
+          open={showBulkModal}
+          onClose={() => setShowBulkModal(false)}
+          title="Alta masiva de invitados"
+          size="xl"
+        >
+          <GuestBulkGrid
+            onCancel={() => setShowBulkModal(false)}
+            onSave={handleSaveBulk}
+            isLoading={isBulkSaving}
           />
         </Modal>
       </div>
