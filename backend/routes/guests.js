@@ -24,13 +24,15 @@ const router = express.Router();
  * Body: { name: string, phone?: string, email?: string, eventId?: string }
  * Crea un invitado y devuelve link personalizado de RSVP.
  */
-router.post('/invite', async (req, res) => {
+// Ruta: POST /api/guests/:weddingId/invite
+router.post('/:weddingId/invite', async (req, res) => {
   try {
+    const { weddingId } = req.params;
     const { name, phone = '', email = '', eventId = 'default' } = req.body || {};
     if (!name) return res.status(400).json({ error: 'name-required' });
 
     const token = uuidv4();
-    const docRef = db.collection('guests').doc(token);
+    const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(token);
     await docRef.set({
       name,
       phone,
@@ -56,10 +58,11 @@ router.post('/invite', async (req, res) => {
  * GET /api/guests/:token
  * Devuelve datos del invitado (sin datos sensibles).
  */
-router.get('/:token', async (req, res) => {
+// Ruta: GET /api/guests/:weddingId/:token
+router.get('/:weddingId/:token', async (req, res) => {
   try {
-    const { token } = req.params;
-    const snap = await db.collection('guests').doc(token).get();
+    const { weddingId, token } = req.params;
+    const snap = await db.collection('weddings').doc(weddingId).collection('guests').doc(token).get();
     if (!snap.exists) return res.status(404).json({ error: 'not-found' });
     const data = snap.data();
     res.json({ name: data.name, status: data.status, companions: data.companions, allergens: data.allergens });
@@ -74,13 +77,14 @@ router.get('/:token', async (req, res) => {
  * Body: { status: 'accepted' | 'rejected', companions?: number, allergens?: string }
  * Actualiza la respuesta del invitado.
  */
-router.put('/:token', async (req, res) => {
+// Ruta: PUT /api/guests/:weddingId/:token
+router.put('/:weddingId/:token', async (req, res) => {
   try {
-    const { token } = req.params;
+    const { weddingId, token } = req.params;
     const { status, companions = 0, allergens = '' } = req.body || {};
     if (!['accepted', 'rejected'].includes(status)) return res.status(400).json({ error: 'invalid-status' });
 
-    const docRef = db.collection('guests').doc(token);
+    const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(token);
     await docRef.update({ status, companions, allergens, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
 
     res.json({ ok: true });
@@ -95,10 +99,11 @@ router.put('/:token', async (req, res) => {
  * Genera (o recupera) el enlace de RSVP para un invitado ya existente.
  * Devuelve { link, token }
  */
-router.post('/id/:docId/rsvp-link', async (req, res) => {
+// Ruta: POST /api/guests/:weddingId/id/:docId/rsvp-link
+router.post('/:weddingId/id/:docId/rsvp-link', async (req, res) => {
   try {
-    const { docId } = req.params;
-    const docRef = db.collection('guests').doc(docId);
+    const { weddingId, docId } = req.params;
+    const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(docId);
     const snap = await docRef.get();
     if (!snap.exists) return res.status(404).json({ error: 'not-found' });
 
