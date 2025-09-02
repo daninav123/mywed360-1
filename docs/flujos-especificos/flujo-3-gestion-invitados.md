@@ -8,8 +8,7 @@
 - [ ] **Selección de fuente**
   - Google Contacts (OAuth)
   - Apple Contacts (API)
-  - Outlook Contacts (Microsoft Graph)
-  - Archivo vCard (.vcf)
+ 
 
 - [ ] **Autorización**
   - Flujo OAuth para servicios en la nube

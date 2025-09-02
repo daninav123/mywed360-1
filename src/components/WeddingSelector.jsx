@@ -8,6 +8,8 @@ export default function WeddingSelector() {
   const location = useLocation();
   const { weddings, activeWedding, setActiveWedding } = useWedding();
 
+  if (!weddings || weddings.length <= 1) return null; // Solo mostrar si hay varias bodas
+
   return (
     <div className="mb-4 flex items-center space-x-2">
       <label className="text-sm font-medium" htmlFor="wedding-select">Boda:</label>

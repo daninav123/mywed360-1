@@ -65,8 +65,31 @@ export default function WeddingProvider({ children }) {
 
         const userWeddingsCol = collection(db, 'users', currentUser.uid, 'weddings');
 
-        const handleSnap = (snap) => {
-          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const { query, where, getDocs, setDoc, doc } = await import('firebase/firestore');
+
+        const handleSnap = async (snap) => {
+          let list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+          // Fallback: si el usuario aún no tiene subcolección poblada
+          if (list.length === 0) {
+            if (import.meta.env.DEV) console.debug('[WeddingContext] subcolección vacía, buscando por roles…');
+            const qPlanners = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', currentUser.uid));
+            const qOwners = query(collection(db, 'weddings'), where('ownerIds', 'array-contains', currentUser.uid));
+            const qAssist = query(collection(db, 'weddings'), where('assistantIds', 'array-contains', currentUser.uid));
+            const [plSnap, owSnap, asSnap] = await Promise.all([getDocs(qPlanners), getDocs(qOwners), getDocs(qAssist)]);
+            const map = new Map();
+            [plSnap, owSnap, asSnap].forEach(s => s.docs.forEach(d => map.set(d.id, d)));
+            list = [...map.values()].map(d => ({ id: d.id, ...d.data() }));
+
+            // Backfill subcolección
+            const promises = list.map(w => setDoc(doc(db,'users',currentUser.uid,'weddings', w.id), {
+              name: w.data?.name || w.name || 'Boda',
+              roles: ['unknown'],
+              updatedAt: Date.now()
+            }, { merge: true }));
+            await Promise.all(promises);
+          }
+
           if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l=>l.id));
           setWeddings(list);
           list.forEach(w => ensureFinance(w.id));

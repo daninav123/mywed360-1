@@ -177,31 +177,63 @@ const useGuests = () => {
   }, [deleteItem]);
 
   // Funciones de invitación
-  const inviteViaWhatsApp = useCallback((guest) => {
+  const inviteViaWhatsApp = useCallback(async (guest) => {
     const phone = utils.phoneClean(guest.phone);
     if (!phone) {
       alert('El invitado no tiene número de teléfono');
       return;
     }
-    
-    const message = encodeURIComponent(
-      `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`
-    );
-    
-    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-  }, [utils]);
 
-  const inviteViaEmail = useCallback((guest) => {
+    let link = '';
+    try {
+      const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {
+        method: 'POST'
+      });
+      if (resp.ok) {
+        const json = await resp.json();
+        link = json.link;
+      }
+    } catch (err) {
+      console.warn('No se pudo obtener enlace RSVP', err);
+    }
+
+    const text = link
+      ? `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
+      : `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+    const encoded = encodeURIComponent(text);
+    window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+  }, [utils, activeWedding]);
+
+  const inviteViaEmail = useCallback(async (guest) => {
     if (!guest.email) {
       alert('El invitado no tiene email');
       return;
     }
-    
+
+    let link = '';
+    try {
+      const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {
+        method: 'POST'
+      });
+      if (resp.ok) {
+        const json = await resp.json();
+        link = json.link;
+      }
+    } catch (err) {
+      console.warn('No se pudo obtener enlace RSVP', err);
+    }
+
     const subject = encodeURIComponent('Invitación a nuestra boda');
-    const body = encodeURIComponent(
-      `Hola ${guest.name},\n\nNos complace invitarte a nuestra boda. Esperamos contar contigo.\n\nPor favor confirma tu asistencia.\n\n¡Gracias!`
-    );
-    
+    const bodyLines = [
+      `Hola ${guest.name},`,
+      '',
+      'Nos complace invitarte a nuestra boda y sería un honor contar con tu presencia.',
+      link ? `Confirma tu asistencia haciendo clic aquí: ${link}` : 'Por favor confirma tu asistencia respondiendo a este mensaje.',
+      '',
+      '¡Gracias!'
+    ];
+    const body = encodeURIComponent(bodyLines.join('\n'));
+
     window.open(`mailto:${guest.email}?subject=${subject}&body=${body}`, '_blank');
   }, []);
 
@@ -224,7 +256,7 @@ const useGuests = () => {
         // Generar enlace RSVP si hay API disponible
         let rsvpLink = '';
         try {
-          const resp = await fetch(`/api/guests/id/${guest.id}/rsvp-link`, { 
+          const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, { 
             method: 'POST' 
           });
           if (resp.ok) {
