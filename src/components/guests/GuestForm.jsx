@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '../ui';
 import { Input } from '../ui';
 import useTranslations from '../../hooks/useTranslations';
@@ -22,6 +22,7 @@ const GuestForm = ({
     phone: guest?.phone || '',
     address: guest?.address || '',
     companion: guest?.companion || 0,
+    companionType: guest?.companionType || 'none',
     table: guest?.table || '',
     response: guest?.response || 'Pendiente',
     status: guest?.status || 'pending',
@@ -46,14 +47,21 @@ const GuestForm = ({
       newErrors.email = t('forms.invalidEmail');
     }
     
-    if (formData.phone && !/^[\d\s\+\-\(\)]+$/.test(formData.phone)) {
+    if (formData.phone && !/^\+[1-9]\d{7,14}$/.test(formData.phone.replace(/\s+/g, ''))) {
       newErrors.phone = t('forms.invalidPhone');
     }
     
     if (formData.companion < 0) {
       newErrors.companion = 'El número de acompañantes no puede ser negativo';
     }
-    
+
+    if (formData.companion > 0 && formData.companionType === 'none') {
+      newErrors.companionType = 'Selecciona el tipo de acompañante';
+    }
+    if (formData.companion === 0 && formData.companionType !== 'none') {
+      newErrors.companionType = 'Establece "Sin acompañante" o añade alguno';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData, t]);
@@ -100,6 +108,23 @@ const GuestForm = ({
     { value: 'confirmed', label: wedding.guestStatus('confirmed') },
     { value: 'declined', label: wedding.guestStatus('declined') }
   ];
+
+  // Autosave cada 30 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isLoading && validateForm()) {
+        const guestData = {
+          ...formData,
+          companion: parseInt(formData.companion, 10) || 0,
+          companionType: formData.companionType,
+          id: guest?.id || `guest-${Date.now()}`,
+          updatedAt: new Date().toISOString(),
+        };
+        onSave(guestData, { autosave: true });
+      }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [formData, isLoading, validateForm, onSave, guest]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -193,7 +218,7 @@ const GuestForm = ({
       </div>
 
       {/* Acompañantes y mesa */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t('guests.plusOne')}
@@ -210,6 +235,25 @@ const GuestForm = ({
           />
           {errors.companion && (
             <p className="text-red-500 text-xs mt-1">{errors.companion}</p>
+          )}
+        </div>
+
+        {/* Tipo de acompañante */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de acompañante</label>
+          <select
+            value={formData.companionType}
+            onChange={(e) => handleChange('companionType', e.target.value)}
+            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.companionType ? 'border-red-500' : ''}`}
+            disabled={isLoading}
+          >
+            <option value="none">Sin acompañante</option>
+            <option value="partner">Pareja</option>
+            <option value="child">Hijo/a(s)</option>
+            <option value="plus_one">+1</option>
+          </select>
+          {errors.companionType && (
+            <p className="text-red-500 text-xs mt-1">{errors.companionType}</p>
           )}
         </div>
 
