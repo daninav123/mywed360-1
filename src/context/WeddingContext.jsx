@@ -61,36 +61,23 @@ export default function WeddingProvider({ children }) {
       if (!currentUser) return; // espera a que cargue usuario
       try {
         const { db } = await import('../firebaseConfig');
-        const { collection, query, where, onSnapshot } = await import('firebase/firestore');
+        const { collection, onSnapshot } = await import('firebase/firestore');
 
-        const plannersQ = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', currentUser.uid));
-        const ownersQ = query(collection(db, 'weddings'), where('ownerIds', 'array-contains', currentUser.uid));
+        const userWeddingsCol = collection(db, 'users', currentUser.uid, 'weddings');
 
-        let plannerDocs = [];
-        let ownerDocs = [];
-
-        const merge = () => {
-          const map = new Map();
-          [...plannerDocs, ...ownerDocs].forEach((d) => map.set(d.id, { id: d.id, ...d.data() }));
-          const list = Array.from(map.values());
-          if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l => l.id));
+        const handleSnap = (snap) => {
+          const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l=>l.id));
           setWeddings(list);
-          // Asegurar finance/main en cada boda listada
           list.forEach(w => ensureFinance(w.id));
           if (!activeWedding && list.length) setActiveWeddingState(list[0].id);
         };
 
-        const unsub1 = onSnapshot(plannersQ, (snap) => {
-          if (import.meta.env.DEV) console.debug('[WeddingContext] planners snapshot', snap.size);
-          plannerDocs = snap.docs;
-          merge();
+        const unsub = onSnapshot(userWeddingsCol, (snap) => {
+          if (import.meta.env.DEV) console.debug('[WeddingContext] user weddings snapshot', snap.size);
+          handleSnap(snap);
         });
-        const unsub2 = onSnapshot(ownersQ, (snap) => {
-          if (import.meta.env.DEV) console.debug('[WeddingContext] owners snapshot', snap.size);
-          ownerDocs = snap.docs;
-          merge();
-        });
-        unsubscribe = () => { unsub1(); unsub2(); };
+        unsubscribe = () => unsub();
       } catch (err) {
         console.warn('No se pudo cargar bodas del planner:', err);
       }

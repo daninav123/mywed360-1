@@ -547,6 +547,70 @@ exports.syncBanquetTablesOnGuestWrite = functions.firestore
     }
   });
 
+// ------------------------------
+// Firestore trigger: sincronizar subcolección users/{uid}/weddings
+// ------------------------------
+exports.syncUserWeddingRefs = functions.firestore
+  .document('weddings/{weddingId}')
+  .onWrite(async (change, context) => {
+    const weddingId = context.params.weddingId;
+
+    // Si el documento se borra, eliminamos referencia en todos los usuarios
+    if (!change.after.exists) {
+      const before = change.before.data() || {};
+      const roles = ['ownerIds', 'plannerIds', 'assistantIds'];
+      const uids = new Set();
+      roles.forEach(r => (before[r] || []).forEach(uid => uids.add(uid)));
+      const batch = db.batch();
+      uids.forEach(uid => {
+        const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
+        batch.delete(ref);
+      });
+      await batch.commit();
+      console.log(`syncUserWeddingRefs: Eliminadas refs de boda ${weddingId} en ${uids.size} usuarios`);
+      return;
+    }
+
+    const after = change.after.data() || {};
+    const before = change.before.data() || {};
+    const roles = ['ownerIds', 'plannerIds', 'assistantIds'];
+
+    const uidRoleMap = new Map();
+    roles.forEach(role => {
+      (after[role] || []).forEach(uid => {
+        const prev = uidRoleMap.get(uid) || [];
+        uidRoleMap.set(uid, [...prev, role.replace('Ids','')]);
+      });
+    });
+    const newUids = new Set(uidRoleMap.keys());
+
+    // Detectar removidos
+    const prevUids = new Set();
+    roles.forEach(role => (before[role] || []).forEach(uid => prevUids.add(uid)));
+    const removed = [...prevUids].filter(uid => !newUids.has(uid));
+
+    const batch = db.batch();
+
+    // Añadir/actualizar docs para nuevos uids
+    uidRoleMap.forEach((rolesArr, uid) => {
+      const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
+      batch.set(ref, {
+        name: after.name || after.slug || 'Boda',
+        roles: rolesArr,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+
+    // Eliminar docs para uids quitados
+    removed.forEach(uid => {
+      const ref = db.collection('users').doc(uid).collection('weddings').doc(weddingId);
+      batch.delete(ref);
+    });
+
+    await batch.commit();
+    console.log(`syncUserWeddingRefs: Sincronizadas referencias de boda ${weddingId}`);
+  });
+
 exports.validateEmail = functions.https.onRequest((request, response) => {
   cors(request, response, async () => {
     try {
