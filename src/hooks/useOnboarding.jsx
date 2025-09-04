@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebaseConfig';
-import { useAuth } from './useAuthUnified';
+import { useWedding } from '../context/WeddingContext';
+import { useAuth } from './useAuth';
 
 /**
  * Hook personalizado para gestionar el estado del onboarding del usuario
@@ -14,6 +15,7 @@ import { useAuth } from './useAuthUnified';
  */
 export const useOnboarding = () => {
   const { currentUser } = useAuth();
+  const { weddings, activeWedding } = useWedding();
   // Si existe flag en localStorage, mostramos onboarding sí o sí
   const forceFlag = typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
   const [showOnboarding, setShowOnboarding] = useState(forceFlag);
@@ -61,6 +63,14 @@ export const useOnboarding = () => {
     
     return () => unsubscribe();
   }, [forceFlag]);
+
+  // Si ya hay una boda cargada, consideramos el onboarding completado
+  useEffect(() => {
+    if (!forceFlag && (weddings.length > 0 || activeWedding)) {
+      setShowOnboarding(false);
+      setOnboardingCompleted(true);
+    }
+  }, [forceFlag, weddings, activeWedding]);
 
   // Función para marcar el onboarding como completado
   const completeOnboarding = () => {

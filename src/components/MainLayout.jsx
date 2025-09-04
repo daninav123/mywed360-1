@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { useUserContext } from '../context/UserContext'; // Legacy - mantener durante migración
-import { useAuth } from '../hooks/useAuthUnified'; // Nuevo sistema
+import { useAuth } from '../hooks/useAuth';
 import Nav from './Nav';
 import ChatWidget from './ChatWidget';
 import DefaultAvatar from './DefaultAvatar';
@@ -10,15 +9,11 @@ import DarkModeToggle from './DarkModeToggle';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import { useOnboarding } from '../hooks/useOnboarding';
 import RoleBadge from './RoleBadge';
-import WeddingProvider from '../context/WeddingContext';
 import WeddingSelector from './WeddingSelector';
 import { useLocation } from 'react-router-dom';
 
 
 export default function MainLayout() {
-  // Sistema legacy (mantener durante migración)
-  const { logoUrl, logout: logoutLegacy } = useUserContext();
-  
   // Nuevo sistema unificado
   const { hasRole, userProfile, isLoading, logout: logoutUnified } = useAuth();
   
@@ -58,15 +53,12 @@ export default function MainLayout() {
 
   if (showOnboarding) {
     return (
-      <WeddingProvider>
         <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
           <OnboardingTutorial onComplete={completeOnboarding} />
         </div>
-      </WeddingProvider>
     );
   }
   return (
-    <WeddingProvider>
       <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
         <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
           {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge /> }
@@ -115,7 +107,7 @@ export default function MainLayout() {
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
                 <button 
-                  onClick={() => { logoutLegacy(); logoutUnified(); setOpenMenu(false); }} 
+                  onClick={() => { logoutUnified(); setOpenMenu(false); }} 
                   className="w-full text-left px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-md transition-colors flex items-center"
                 >
                   🚪 Cerrar sesión
@@ -132,6 +124,5 @@ export default function MainLayout() {
       <Nav />
         <ChatWidget />
     </div>
-  </WeddingProvider>
   );
 }

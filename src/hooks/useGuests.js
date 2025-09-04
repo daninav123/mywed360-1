@@ -8,10 +8,22 @@ import { saveData, loadData, subscribeSyncState, getSyncState } from '../service
  * Centraliza toda la lógica de invitados con performance mejorada
  */
 const useGuests = () => {
-  const { activeWedding } = useWedding();
+  // Manejo seguro del contexto de bodas
+  let activeWedding;
+  try {
+    const weddingContext = useWedding();
+    activeWedding = weddingContext?.activeWedding;
+  } catch (error) {
+    console.error('Error accediendo al contexto de bodas en useGuests:', error);
+    activeWedding = null;
+  }
   
-  // Datos de ejemplo para desarrollo
-  const sampleGuests = useMemo(() => [
+  // Datos de ejemplo para desarrollo (solo si VITE_ALLOW_SAMPLE_GUESTS === 'true')
+  const allowSamples = import.meta.env.VITE_ALLOW_SAMPLE_GUESTS === 'true';
+
+  const sampleGuests = useMemo(() => {
+    if (!allowSamples) return [];
+    return [
     { 
       id: 1, 
       name: 'Ana García', 
@@ -42,19 +54,30 @@ const useGuests = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-  ], []);
+  ];
+  }, [allowSamples]);
 
-  // Usar datos de ejemplo si no hay boda activa
+  // Usar datos de ejemplo solo si no hay boda activa y está habilitado allowSamples
   const fallbackGuests = activeWedding ? [] : sampleGuests;
   
+  // Debug: log para verificar activeWedding
+  useEffect(() => {
+    console.log('[useGuests] activeWedding:', activeWedding);
+    console.log('[useGuests] fallbackGuests length:', fallbackGuests.length);
+  }, [activeWedding, fallbackGuests]);
+  
   // Hook de colección con datos optimizados
-  const { 
-    data: guests, 
-    addItem, 
-    updateItem, 
+  // Obtenemos loading de la colección y lo exponemos como isLoading
+  const {
+    data: guests,
+    addItem,
+    updateItem,
     deleteItem,
-    isLoading 
+    loading: collectionLoading,
   } = useWeddingCollection('guests', activeWedding, fallbackGuests);
+
+  // Alias legible para el resto del hook/componentes
+  const isLoading = collectionLoading;
 
   // Estado de sincronización
   const [syncStatus, setSyncStatus] = useState(getSyncState());

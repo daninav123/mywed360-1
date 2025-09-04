@@ -9,6 +9,7 @@ const DiagnosticPanel = () => {
   const [diagnostics, setDiagnostics] = useState({});
   const [errors, setErrors] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [autoShown, setAutoShown] = useState(false);
   const [stats, setStats] = useState({});
 
   useEffect(() => {
@@ -39,11 +40,13 @@ const DiagnosticPanel = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Mostrar automáticamente si hay errores críticos
+  // Mostrar automáticamente si hay errores críticos (solo una vez)
   useEffect(() => {
     const hasErrors = Object.values(diagnostics).some(d => d.status === 'error');
-    if (hasErrors && !isVisible) {
+    if (hasErrors && !isVisible && !autoShown) {
       console.warn('🚨 Se detectaron errores críticos. Mostrando panel de diagnóstico...');
+      setIsVisible(true);
+      setAutoShown(true);
     }
   }, [diagnostics, isVisible]);
 

@@ -425,7 +425,11 @@ class ErrorLogger {
    * Imprime un reporte completo de diagnósticos en la consola
    */
   printDiagnosticsReport() {
-    console.clear();
+    if (!import.meta.env.DEV) {
+      console.clear();
+    } else {
+      console.log('—— (console.clear() omitido en DEV) ——');
+    }
     console.log('🔍 REPORTE DE DIAGNÓSTICOS MYWED360');
     console.log('=====================================');
     console.log('Timestamp:', new Date().toLocaleString());

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useUserContext } from '../context/UserContext'; // Legacy - mantener durante migración
-import { useAuth } from '../hooks/useAuthUnified'; // Nuevo sistema
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 export default function Login() {
@@ -10,16 +9,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [remember, setRemember] = useState(!!savedEmail);
-  // Sistema legacy (mantener durante migración)
-  const { login, isAuthenticated, loading } = useUserContext();
-  
   // Nuevo sistema unificado
   const { login: unifiedLogin, isAuthenticated: unifiedAuth, isLoading } = useAuth();
   
   // Usar el nuevo sistema como principal, con fallback al legacy
-  const authLogin = unifiedLogin || login;
-  const authStatus = unifiedAuth !== undefined ? unifiedAuth : isAuthenticated;
-  const authLoading = isLoading !== undefined ? isLoading : loading;
+  const authLogin = unifiedLogin;
+  const authStatus = unifiedAuth;
+  const authLoading = isLoading;
   const navigate = useNavigate();
   const location = useLocation();
 

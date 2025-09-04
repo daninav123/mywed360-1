@@ -3,14 +3,34 @@
 
 import { auth } from '../firebaseConfig';
 
+// Sistema de autenticación unificado (inyectado desde useAuth)
+let authContext = null;
+
+// Permite registrar el contexto de autenticación desde el proveedor
+export const setAuthContext = (context) => {
+  authContext = context;
+};
+
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:3001';
 
-// Obtiene el token de autenticación del usuario actual
+// Obtiene el token de autenticación del usuario actual (prioriza sistema unificado)
 async function getAuthToken() {
   try {
+    // 1) Priorizar el sistema de autenticación unificado
+    if (authContext && authContext.getIdToken) {
+      const token = await authContext.getIdToken();
+      if (token) return token;
+    }
+
+    // 2) Fallback: Firebase si está disponible
     const user = auth.currentUser;
-    if (user) {
+    if (user && user.getIdToken) {
       return await user.getIdToken();
+    }
+
+    // 3) Fallback: token mock si tenemos usuario en el contexto
+    if (authContext && authContext.currentUser) {
+      return `mock-${authContext.currentUser.uid}-${authContext.currentUser.email}`;
     }
     return null;
   } catch (error) {

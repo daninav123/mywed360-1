@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import errorLogger from '../utils/errorLogger';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { db, firebaseReady } from '../firebaseConfig';
 
 /**
  * Contexto para la boda activa que está gestionando el planner.
@@ -56,55 +56,106 @@ export default function WeddingProvider({ children }) {
 
   // Cargar lista de bodas del planner desde Firestore
   useEffect(() => {
-    let unsubscribe;
     async function listenWeddings() {
-      if (!currentUser) return; // espera a que cargue usuario
+      if (!currentUser) {
+        console.log('[WeddingContext] Sin usuario autenticado, limpiando bodas');
+        setWeddings([]);
+        return;
+      }
+      
       try {
-        const { db } = await import('../firebaseConfig');
-        const { collection, onSnapshot } = await import('firebase/firestore');
-
+        // Aseguramos que Firebase esté totalmente inicializado antes de usar Firestore
+        await firebaseReady;
+        const { collection, getDocs } = await import('firebase/firestore');
+        
+        // Cargar bodas desde la subcolección del usuario
         const userWeddingsCol = collection(db, 'users', currentUser.uid, 'weddings');
+        
+        console.log('[WeddingContext] Cargando bodas desde users/{uid}/weddings para:', currentUser.uid);
+        
+        let list = [];
+        const snap = await getDocs(userWeddingsCol);
+        list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        console.log('[WeddingContext] getDocs subcolección ->', list.length);
+        setWeddings(list);
 
-        const { query, where, getDocs, setDoc, doc } = await import('firebase/firestore');
-
-        const handleSnap = async (snap) => {
-          let list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-          // Fallback: si el usuario aún no tiene subcolección poblada
-          if (list.length === 0) {
-            if (import.meta.env.DEV) console.debug('[WeddingContext] subcolección vacía, buscando por roles…');
-            const qPlanners = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', currentUser.uid));
-            const qOwners = query(collection(db, 'weddings'), where('ownerIds', 'array-contains', currentUser.uid));
-            const qAssist = query(collection(db, 'weddings'), where('assistantIds', 'array-contains', currentUser.uid));
-            const [plSnap, owSnap, asSnap] = await Promise.all([getDocs(qPlanners), getDocs(qOwners), getDocs(qAssist)]);
-            const map = new Map();
-            [plSnap, owSnap, asSnap].forEach(s => s.docs.forEach(d => map.set(d.id, d)));
-            list = [...map.values()].map(d => ({ id: d.id, ...d.data() }));
-
-            // Backfill subcolección
-            const promises = list.map(w => setDoc(doc(db,'users',currentUser.uid,'weddings', w.id), {
-              name: w.data?.name || w.name || 'Boda',
-              roles: ['unknown'],
-              updatedAt: Date.now()
-            }, { merge: true }));
-            await Promise.all(promises);
+        // Fallback: si no hay bodas en subcolección, intentar recuperar la boda activa desde la subcolección
+        if (list.length === 0 && activeWedding) {
+          try {
+            const { doc: subDoc, getDoc: subGetDoc } = await import('firebase/firestore');
+            const wedRefSub = subDoc(db, 'users', currentUser.uid, 'weddings', activeWedding);
+            const wedSnapSub = await subGetDoc(wedRefSub);
+            if (wedSnapSub.exists()) {
+              list = [{ id: wedSnapSub.id, ...wedSnapSub.data() }];
+              console.log('[WeddingContext] Boda recuperada manualmente desde subcolección por activeWedding');
+            }
+          } catch (err) {
+            console.warn('[WeddingContext] No se pudo recuperar boda por activeWedding en subcolección:', err);
           }
+        }
 
-          if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l=>l.id));
-          setWeddings(list);
-          list.forEach(w => ensureFinance(w.id));
-          if (!activeWedding && list.length) setActiveWeddingState(list[0].id);
-        };
+        // Fallback adicional: si aún no hay bodas, buscar en colección principal por roles (legacy)
+        if (list.length === 0) {
+          // Intento adicional: si tenemos activeWedding en localStorage, recuperar manualmente ese doc
+          if (activeWedding) {
+            try {
+              const { doc: fDoc, getDoc: fGetDoc } = await import('firebase/firestore');
+              const wedRef = fDoc(db, 'weddings', activeWedding);
+              const wedSnap = await fGetDoc(wedRef);
+              if (wedSnap.exists()) {
+                list = [{ id: wedSnap.id, ...wedSnap.data() }];
+                console.log('[WeddingContext] Boda recuperada manualmente por activeWedding');
+              }
+            } catch (err) {
+              console.warn('[WeddingContext] No se pudo recuperar boda manualmente:', err);
+            }
+          }
+          const {
+            where,
+            query: fQuery,
+          } = await import('firebase/firestore');
+          const globalCol = collection(db, 'weddings');
+          const qLegacy = fQuery(globalCol, where('ownerIds', 'array-contains', currentUser.uid));
+          const qLegacy2 = fQuery(globalCol, where('plannerIds', 'array-contains', currentUser.uid));
+          const [snap1, snap2] = await Promise.all([getDocs(qLegacy), getDocs(qLegacy2)]);
+          const legacyList = [...snap1.docs, ...snap2.docs].map(d => ({ id: d.id, ...d.data() }));
+          list = legacyList;
+          if (legacyList.length) {
+            console.log('[WeddingContext] Bodas encontradas en colección global (legacy):', legacyList.length);
+          }
+        }
 
-        const unsub = onSnapshot(userWeddingsCol, (snap) => {
-          if (import.meta.env.DEV) console.debug('[WeddingContext] user weddings snapshot', snap.size);
-          handleSnap(snap);
-        });
-        unsubscribe = () => unsub();
-      } catch (err) {
-        console.warn('No se pudo cargar bodas del planner:', err);
+        // Ejecutar la carga inicial
+        if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l=>l.id));
+        setWeddings(list);
+        list.forEach(w => ensureFinance(w.id));
+
+        // Si la activeWedding no existe o no pertenece al usuario, seleccionamos la primera válida
+        const existsInList = list.some(w => w.id === activeWedding);
+        console.log('[WeddingContext] activeWedding actual:', activeWedding);
+        console.log('[WeddingContext] existsInList:', existsInList);
+        console.log('[WeddingContext] list.length:', list.length);
+        console.log('[WeddingContext] list IDs:', list.map(w => w.id));
+        
+        if (list.length > 0) {
+          if (!activeWedding || !existsInList) {
+            console.log('[WeddingContext] Estableciendo nueva activeWedding:', list[0].id);
+            // Persistimos también en localStorage para que quede sincronizado
+            setActiveWeddingState(list[0].id);
+            localStorage.setItem('lovenda_active_wedding', list[0].id);
+          } else {
+            console.log('[WeddingContext] activeWedding ya existe y es válida:', activeWedding);
+          }
+        } else {
+          console.log('[WeddingContext] No hay bodas disponibles');
+        }
+        
+      } catch (error) {
+        console.error('[WeddingContext] Error cargando bodas:', error);
+        setWeddings([]);
       }
     }
+    
     listenWeddings();
   }, [currentUser]);
 
@@ -119,3 +170,5 @@ export default function WeddingProvider({ children }) {
     </WeddingContext.Provider>
   );
 }
+
+export { WeddingProvider };

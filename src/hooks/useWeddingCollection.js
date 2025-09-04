@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { auth, db } from '../lib/firebase';
+import { auth, db, firebaseReady } from '../firebaseConfig';
 import {
   collection,
   addDoc,
@@ -32,13 +32,32 @@ const lsSet = (wid, name, data) => {
  * Soporta modo offline usando localStorage.
  */
 export const useWeddingCollection = (subName, weddingId, fallback = []) => {
-  const [data, setData] = useState(() => lsGet(weddingId, subName, fallback));
+  const [data, setData] = useState(() => {
+    try {
+      return lsGet(weddingId, subName, fallback);
+    } catch (error) {
+      console.error('Error inicializando datos desde localStorage:', error);
+      return fallback;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
+    let isMounted = true;
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
-      if (subName !== 'guests' || !weddingId || !auth.currentUser?.uid) return;
+      // Esperar inicialización completa de Firebase
+      await firebaseReady;
+      if (subName !== 'guests' || !weddingId) return;
+      
+      // Verificar auth de forma segura - usar auth de Firebase, no el contexto local
+      const firebaseUser = auth?.currentUser;
+      if (!firebaseUser?.uid) {
+        console.log('Usuario no autenticado en Firebase, omitiendo migración de invitados');
+        return;
+      }
+      
       try {
         const {
           getDocs,
@@ -53,29 +72,32 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
         const existingIds = new Set(destSnap.docs.map((d) => d.id));
 
         // 1) Invitados en sub-colección antigua users/{uid}/guests
-        const oldSnap = await getDocs(col(db, 'users', auth.currentUser.uid, 'guests'));
+        const oldSnap = await getDocs(col(db, 'users', firebaseUser.uid, 'guests'));
 
         const batch = writeBatch(db);
+        let writes = 0;
 
         oldSnap.forEach((docSnap) => {
           if (!existingIds.has(docSnap.id)) {
             batch.set(fDoc(destCol, docSnap.id), docSnap.data(), { merge: true });
+            writes++; // contar escritura
           }
         });
 
-        // 2) Invitados en documento legacy userGuests/{uid}
-        const legacyDocRef = fDoc(db, 'userGuests', auth.currentUser.uid);
+        // 2) Invitados en documento único users/{uid}/userGuests
+        const legacyDocRef = fDoc(db, 'users', firebaseUser.uid, 'userGuests');
         const legacyDocSnap = await getDoc(legacyDocRef);
         if (legacyDocSnap.exists()) {
           const legacyData = legacyDocSnap.data();
           const guestsArray = Array.isArray(legacyData?.guests) ? legacyData.guests : [];
           guestsArray.forEach((g) => {
             batch.set(fDoc(destCol), g, { merge: true }); // id aleatorio
+            writes++; // contar escritura
           });
         }
 
         // Si hay operaciones en cola, confirmamos
-        if (batch._mutations.length) {
+        if (writes > 0) {
           await batch.commit();
           console.log(`[migración] Invitados fusionados en weddings/${weddingId}/guests`);
         }
@@ -86,7 +108,16 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     migrateGuests();
     // Intento de migración automática de proveedores antiguos
     async function migrateSuppliers() {
-      if (subName !== 'suppliers' || !weddingId || !auth.currentUser?.uid) return;
+      // Esperar inicialización completa de Firebase
+      await firebaseReady;
+      if (subName !== 'suppliers' || !weddingId) return;
+            // Verificar auth de forma segura - usar auth de Firebase, no el contexto local
+        const firebaseUser = auth?.currentUser;
+        if (!firebaseUser?.uid) {
+          console.log('Usuario no autenticado en Firebase, omitiendo migración de proveedores');
+          return;
+        }
+      
       try {
         const {
           getDocs,
@@ -108,13 +139,15 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
         const oldSnap2 = await getDocs(oldCol2);
 
         const batch = writeBatch(db);
+        let writes = 0;
         [...oldSnap1.docs, ...oldSnap2.docs].forEach((docSnap) => {
           if (!existingIds.has(docSnap.id)) {
             batch.set(fDoc(destCol, docSnap.id), { ...docSnap.data(), migratedAt: serverTimestamp() }, { merge: true });
+          writes++; // contar escritura
           }
         });
 
-        if (batch._mutations.length) {
+        if (writes > 0) {
           await batch.commit();
           console.log(`[migración] Proveedores fusionados en weddings/${weddingId}/suppliers`);
         }
@@ -124,9 +157,14 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     }
     migrateSuppliers();
     if (!weddingId) {
+      // Sin boda activa: usamos fallback (puede ser datos de ejemplo)
+      setData(fallback);
       setLoading(false);
-      return; // sin boda activa
+      return;
     }
+
+    // Hay boda activa: limpiamos cualquier dato antiguo de ejemplo antes de escuchar Firestore
+    setData([]);
 
     let unsub = null;
     const listen = () => {
@@ -135,13 +173,34 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
       // máxima compatibilidad hacemos la consulta base sin orderBy y ordenamos luego en cliente.
       const colRef = collection(db, 'weddings', weddingId, ...subName.split('/'));
       const q = colRef;
+      console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
       unsub = onSnapshot(q, (snap) => {
         const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        console.log(`[useWeddingCollection] Datos recibidos:`, { sub: subName, wedding: weddingId, size: arr.length, data: arr });
         setData(arr);
         lsSet(weddingId, subName, arr);
         setLoading(false);
-      }, (err) => {
+      }, async (err) => {
         console.error(`Snapshot error ${subName}:`, err);
+        // Intento automático: si es permiso denegado, añadirse como planner y reintentar
+        if (err?.code === 'permission-denied' && auth.currentUser?.uid) {
+          try {
+            console.warn(`[auto-fix] Intentando añadirme como planner en ${weddingId}… (uid: ${auth.currentUser.uid})`);
+            const { doc: fDoc, updateDoc, arrayUnion } = await import('firebase/firestore');
+            const wedRef = fDoc(db, 'weddings', weddingId);
+            await updateDoc(wedRef, { plannerIds: arrayUnion(auth.currentUser.uid) });
+            console.log(`[auto-fix] Añadido ${auth.currentUser.uid} a plannerIds en ${weddingId}`);
+            // Cerrar listener anterior si existe
+            if (typeof unsub === 'function') try { unsub(); } catch(_) {}
+            // Dar más tiempo al backend para propagar reglas y reintentar
+            if (import.meta.env.DEV) console.debug('[useWeddingCollection] reintento de listener tras auto-fix en 3000ms', { sub: subName, wedding: weddingId });
+            setTimeout(() => listen(), 3000);
+            return;
+          } catch (permErr) {
+            console.warn('[auto-fix] Error añadiendo plannerIds:', permErr);
+          }
+        }
+        if (import.meta.env.DEV) console.debug('[useWeddingCollection] usando caché local por error en snapshot', { sub: subName, wedding: weddingId, code: err?.code });
         setData(lsGet(weddingId, subName, fallback));
         setLoading(false);
       });
@@ -149,12 +208,33 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
 
     // Si aún no hay weddingId, usa solo caché local
     if (!weddingId) {
-      setData(lsGet(weddingId, subName, fallback));
+      setData(fallback);
       setLoading(false);
       return;
     }
-    // Intentamos siempre escuchar Firestore; si falla por permisos usamos caché local
-    listen();
+
+    // Verificar que db esté disponible
+    if (!db) {
+      console.warn('Firebase db no está disponible, usando datos de fallback');
+      setData(fallback);
+      setLoading(false);
+      return;
+    }
+
+    // Verificar autenticación Firebase - si no hay usuario, intentar de todas formas
+    // ya que las reglas pueden permitir acceso público o el usuario puede autenticarse después
+    if (!auth?.currentUser) {
+      console.warn(`[useWeddingCollection] Sin usuario Firebase autenticado, intentando acceso a Firestore de todas formas para ${subName}`);
+    }
+
+    // Esperamos a que Firebase esté listo antes de iniciar el listener
+    firebaseReady
+      .then(() => listen())
+      .catch(err => {
+        console.error('[useWeddingCollection] Error en firebaseReady:', err);
+        setData(lsGet(weddingId, subName, fallback));
+        setLoading(false);
+      });
     return () => unsub && unsub();
   }, [subName, weddingId]);
 

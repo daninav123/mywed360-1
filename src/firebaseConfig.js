@@ -16,9 +16,14 @@ const firebaseConfig = {
 };
 
 // Variables globales de Firebase
-let app;
+// Inicialización inmediata para exponer 'app' y 'db' de forma síncrona
+let app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+let db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  cacheSizeBytes: 50 * 1024 * 1024,
+  ignoreUndefinedProperties: true,
+});
 let auth;
-let db;
 let analytics;
 
 // Configuración simplificada sin módulo de diagnóstico visual
@@ -71,7 +76,9 @@ const configurarListenerConexion = () => {
     onValue(estadoConexion, (snapshot) => {
       if (snapshot.val() === true) {
         console.log('Conectado a Firebase');
-        window.mostrarErrorUsuario?.(`Conectado a internet`, 3000);
+        if (window.mostrarErrorUsuario) {
+        window.mostrarErrorUsuario(`Conectado a internet`, 3000);
+      }
       } else {
         console.log('Desconectado de Firebase');
 
@@ -121,15 +128,16 @@ const inicializarFirebase = async () => {
       throw new Error(`Error al inicializar autenticación: ${authError.message}`);
     }
 
-    // Inicializar Firestore con mejores opciones para estabilidad de conexión
-    try {
-      db = initializeFirestore(app, {
-        experimentalForceLongPolling: true,
-        cacheSizeBytes: 50 * 1024 * 1024, // ~50 MB
-        ignoreUndefinedProperties: true,
-      });
-      console.log('✅ Firestore inicializado con configuración optimizada');
-    } catch (firestoreError) {
+    // Inicializar Firestore si aún no existe (ya se creó de forma síncrona al importar módulo)
+    if (!db) {
+      try {
+        db = initializeFirestore(app, {
+          experimentalForceLongPolling: true,
+          cacheSizeBytes: 50 * 1024 * 1024, // ~50 MB
+          ignoreUndefinedProperties: true,
+        });
+        console.log('✅ Firestore inicializado con configuración optimizada');
+      } catch (firestoreError) {
       // Si Firestore ya estaba inicializado (p.ej. por otro módulo), reutilizamos la instancia existente
       if (firestoreError?.message?.includes('has already been called')) {
         db = getFirestore(app);
@@ -144,7 +152,9 @@ const inicializarFirebase = async () => {
     try {
       await enableIndexedDbPersistence(db);
       console.log('Persistencia offline habilitada para Firestore');
-      window.mostrarNotificacion?.('Modo offline habilitado: puedes usar la aplicación sin conexión', 'info');
+      if (window.mostrarNotificacion) {
+      window.mostrarNotificacion('Modo offline habilitado: puedes usar la aplicación sin conexión', 'info');
+    }
     } catch (err) {
       if (err.code === 'failed-precondition') {
         // Múltiples pestañas abiertas, solo una puede usar persistencia
@@ -166,6 +176,7 @@ const inicializarFirebase = async () => {
     } catch (emulatorError) {
       console.warn('No se pudo configurar el emulador:', emulatorError);
     }
+  } // fin if (!db)
 
     // Probar la conexión con Firestore
     try {
@@ -178,7 +189,9 @@ const inicializarFirebase = async () => {
         const testDoc = doc(db, '_test_connection', 'test');
         await setDoc(testDoc, { test: new Date().toISOString() }, { merge: true });
         console.log('✅ Prueba de escritura en Firestore exitosa');
-        window.mostrarErrorUsuario?.(`✅ Conectado a Firebase correctamente`, 3000);
+        if (window.mostrarErrorUsuario) {
+        window.mostrarErrorUsuario(`✅ Conectado a Firebase correctamente`, 3000);
+      }
       } catch (writeError) {
         console.error('❌ Error al escribir en Firestore:', writeError);
         let errorMsg = 'Error al escribir en Firestore';
@@ -193,7 +206,9 @@ const inicializarFirebase = async () => {
           errorMsg = `Error al acceder a Firestore: ${writeError.message}`;
         }
         
-        window.mostrarErrorUsuario?.(errorMsg, 10000);
+        if (window.mostrarErrorUsuario) {
+        window.mostrarErrorUsuario(errorMsg, 10000);
+      }
       }
     } catch (error) {
       console.warn('❌ No se pudo conectar a Firestore, trabajando en modo fuera de línea:', error);
@@ -205,7 +220,9 @@ const inicializarFirebase = async () => {
         errorMsg = 'Problemas de red al conectar con Firebase. Verificando conexión...';
       }
       
-      window.mostrarErrorUsuario?.(errorMsg, 10000);
+      if (window.mostrarErrorUsuario) {
+        window.mostrarErrorUsuario(errorMsg, 10000);
+      }
     }
 
     // Inicializar Analytics solo en producción
@@ -225,14 +242,15 @@ const inicializarFirebase = async () => {
 
     // Configurar listener de conexión
     configurarListenerConexion();
-
   } catch (error) {
     console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined') {
-      window.mostrarErrorUsuario?.(
-        'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
-        0
-      );
+      if (window.mostrarErrorUsuario) {
+        window.mostrarErrorUsuario(
+          'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
+          0
+        );
+      }
     }
     throw error;
   }

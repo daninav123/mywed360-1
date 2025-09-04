@@ -2,10 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import UserProvider from './context/UserContext'; // Legacy - mantener durante migración
-import { useAuth } from './hooks/useAuthUnified';
-import { AuthProvider } from './hooks/useAuth'; // Importamos el AuthProvider legacy
-import AuthMigrationWrapper from './components/auth/AuthMigrationWrapper'; // Nuevo sistema de autenticación
+import { useAuth, AuthProvider } from './hooks/useAuth';
+import { WeddingProvider } from './context/WeddingContext';
 import MainLayout from './components/MainLayout';
 import EmailNotification from './components/EmailNotification';
 import Login from './pages/Login';
@@ -60,12 +58,9 @@ import './i18n';
 // Importar sistema de diagnóstico
 import DiagnosticPanel from './components/DiagnosticPanel';
 import errorLogger from './utils/errorLogger';
-import { useUserContext } from './context/UserContext';
 import './utils/consoleCommands';
 
 function ProtectedRoute() {
-  // Combina autenticación nueva y legacy
-  const { isAuthenticated: isAuthLegacy, loading: loadingLegacy } = useUserContext();
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,31 +72,23 @@ function ProtectedRoute() {
   React.useEffect(() => {
     if (hasRedirected.current) return;
 
-    const effectiveAuth = isAuthenticated || isAuthLegacy;
-    const effectiveLoading = isLoading ?? loadingLegacy;
-
-    if (!effectiveLoading && !effectiveAuth) {
+    if (!isLoading && !isAuthenticated) {
       // Evitar redirigir si ya estamos en /login o en la landing
       if (location.pathname !== '/login' && location.pathname !== '/') {
         hasRedirected.current = true;
         navigate('/login', { replace: true, state: { from: location } });
       }
     }
-  }, [isAuthenticated, isAuthLegacy, isLoading, loadingLegacy, location, navigate]);
+  }, [isAuthenticated, isLoading, location, navigate]);
 
-  const effectiveAuth = isAuthenticated || isAuthLegacy;
-  const effectiveLoading = isLoading ?? loadingLegacy;
-
-  if (effectiveLoading) {
+  if (isLoading) {
     return null; // spinner opcional
   }
 
-  if (!effectiveAuth) {
+  if (!isAuthenticated) {
     // La redirección ya se maneja de forma imperativa arriba
     return null;
   }
-
-
 
   return (
     <>
@@ -130,10 +117,9 @@ function App() {
     console.groupEnd();
   }, []);
   return (
-    <AuthMigrationWrapper>
-      <UserProvider>
-        <AuthProvider>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <AuthProvider>
+      <WeddingProvider>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         {/* Componente de notificaciones de correo - solo visible en rutas protegidas */}
         <Routes>
           <Route path="/" element={<Login />} />
@@ -217,10 +203,9 @@ function App() {
         </Routes>
         {/* Sistema de diagnóstico global */}
         <DiagnosticPanel />
-      </BrowserRouter>
-        </AuthProvider>
-      </UserProvider>
-    </AuthMigrationWrapper>
+            </BrowserRouter>
+          </WeddingProvider>
+    </AuthProvider>
   );
 }
 

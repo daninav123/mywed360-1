@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useUserContext } from '../context/UserContext'; // Legacy - mantener durante migración
-import { useAuth } from '../hooks/useAuthUnified'; // Nuevo sistema
+import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
 
 export default function Signup() {
@@ -8,14 +7,8 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('particular');
   const [error, setError] = useState('');
-  // Sistema legacy (mantener durante migración)
-  const { signup } = useUserContext();
-  
   // Nuevo sistema unificado
-  const { register } = useAuth();
-  
-  // Usar el nuevo sistema como principal, con fallback al legacy
-  const authSignup = register || signup;
+  const { register: authSignup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

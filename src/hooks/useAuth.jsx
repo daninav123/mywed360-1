@@ -7,6 +7,9 @@ import { useState, useEffect, createContext, useContext, useCallback } from 'rea
 import { initReminderService, stopReminderService } from '../services/reminderService';
 import errorLogger from '../utils/errorLogger';
 import { setAuthContext as registerEmailAuthContext } from '../services/emailService';
+import { setAuthContext as registerNotificationAuthContext } from '../services/notificationService';
+import { auth } from '../firebaseConfig';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);
@@ -21,84 +24,61 @@ export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Simular la carga del usuario al iniciar la aplicación
+  // Integrar con Firebase Auth real
   useEffect(() => {
-    // En una aplicación real, aquí verificaríamos la sesión actual
-    const loadUserFromStorage = () => {
-      try {
-        // Obtener datos de usuario de localStorage (simulación)
-        const savedUser = localStorage.getItem('lovenda_user');
-        const savedProfile = localStorage.getItem('lovenda_user_profile');
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      console.log('[useAuth] Firebase auth state changed:', firebaseUser?.email || 'No user');
+      
+      if (firebaseUser) {
+        // Usuario autenticado en Firebase
+        const user = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+        };
+        console.log('[useAuth] Usuario autenticado:', user.uid);
+        setCurrentUser(user);
         
-        if (savedUser) {
-          setCurrentUser(JSON.parse(savedUser));
-          
-          if (savedProfile) {
-          const savedUserObj = JSON.parse(savedUser);
-          let profileObj = JSON.parse(savedProfile);
-          // Si falta myWed360Email, sincronizar
-           if (!profileObj.myWed360Email && savedUserObj.email) {
-            // Generar alias usando los primeros 4 caracteres del email de login
-            const loginPrefix = savedUserObj.email.split('@')[0].slice(0,4).toLowerCase();
-            profileObj.myWed360Email = `${loginPrefix}@mywed360.com`;
-            localStorage.setItem('lovenda_user_profile', JSON.stringify(profileObj));
-          }
-          setUserProfile(profileObj);
-            setUserProfile(JSON.parse(savedProfile));
-          } else {
-            // Perfil por defecto si no existe
-            const defaultProfile = {
-              id: JSON.parse(savedUser).uid || 'user123',
-              name: 'Usuario Lovenda',
-              email: 'usuario@lovenda.app',
-              preferences: {
-                emailNotifications: true,
-                emailSignature: 'Enviado desde Lovenda',
-                theme: 'light',
-                remindersEnabled: true,
-                reminderDays: 3
-              }
-            };
-            setUserProfile(defaultProfile);
-            localStorage.setItem('lovenda_user_profile', JSON.stringify(defaultProfile));
-          }
+        // Crear o cargar perfil
+        const savedProfile = localStorage.getItem('lovenda_user_profile');
+        let profile;
+        
+        if (savedProfile) {
+          profile = JSON.parse(savedProfile);
         } else {
-          // Soporte para pruebas E2E con Cypress: detectar claves userEmail / isLoggedIn
-          const testEmail = localStorage.getItem('userEmail');
-          const isLoggedIn = localStorage.getItem('isLoggedIn');
-          if (isLoggedIn === 'true' && testEmail) {
-            const mockUser = {
-              uid: 'cypress-test',
-              email: testEmail,
-              displayName: testEmail.split('@')[0]
-            };
-            setCurrentUser(mockUser);
-            localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
-            // Crear perfil por defecto para la sesión de prueba
-            const defaultProfile = {
-              id: mockUser.uid,
-              name: mockUser.displayName,
-              email: mockUser.email,
-              preferences: {
-                emailNotifications: true,
-                emailSignature: 'Enviado desde Lovenda – Cypress',
-                theme: 'light',
-                remindersEnabled: false,
-                reminderDays: 3
-              }
-            };
-            setUserProfile(defaultProfile);
-            localStorage.setItem('lovenda_user_profile', JSON.stringify(defaultProfile));
-          }
+          profile = {
+            id: user.uid,
+            name: user.displayName || 'Usuario',
+            email: user.email,
+            preferences: {
+              emailNotifications: true,
+              emailSignature: 'Enviado desde MyWed360',
+              theme: 'light',
+              remindersEnabled: true,
+              reminderDays: 3
+            }
+          };
         }
-      } catch (error) {
-        console.error('Error al cargar usuario:', error);
-      } finally {
-        setLoading(false);
+        
+        // Generar myWed360Email si no existe
+        if (!profile.myWed360Email && user.email) {
+          const loginPrefix = user.email.split('@')[0].slice(0,4).toLowerCase();
+          profile.myWed360Email = `${loginPrefix}@mywed360.com`;
+        }
+        
+        setUserProfile(profile);
+        localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
+      } else {
+        // No hay usuario autenticado
+        console.log('[useAuth] No hay usuario Firebase autenticado');
+        setCurrentUser(null);
+        setUserProfile(null);
       }
-    };
+      
+      setLoading(false);
+    });
     
-    loadUserFromStorage();
+    return () => unsubscribe();
   }, []);
 
   // Actualizar diagnóstico de autenticación
@@ -130,26 +110,26 @@ export const AuthProvider = ({ children }) => {
    * @param {string} password - Contraseña
    * @returns {Promise<Object>} Resultado del inicio de sesión
    */
+  // -----------------------------
+  // LOGIN
+  // -----------------------------
   const login = async (email, password) => {
     try {
-      // Simulación de login (en implementación real conectaría con backend)
-      const mockUser = { 
-        uid: 'user123', 
-        email: email,
-        displayName: email.split('@')[0]
-      };
+      // Usar Firebase Auth real en lugar de mock
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
       
-      // Guardar en localStorage para mantener la sesión
-      localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
+      console.log('[useAuth] Login exitoso con Firebase Auth:', user.uid);
       
-      setCurrentUser(mockUser);
+      // El estado se actualiza automáticamente por onAuthStateChanged
+      // No necesitamos setCurrentUser aquí
       
       // Crear perfil por defecto si no existe
       if (!userProfile) {
         const defaultProfile = {
-          id: mockUser.uid,
-          name: mockUser.displayName || 'Usuario Lovenda',
-          email: mockUser.email,
+          id: user.uid,
+          name: user.displayName || 'Usuario Lovenda',
+          email: user.email,
           preferences: {
             emailNotifications: true,
             emailSignature: 'Enviado desde Lovenda',
@@ -162,7 +142,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('lovenda_user_profile', JSON.stringify(defaultProfile));
       }
       
-      return { success: true, user: mockUser };
+      return { success: true, user };
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       return { success: false, error: error.message };
@@ -210,13 +190,10 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = useCallback(async () => {
     try {
-      setCurrentUser(null);
-      setUserProfile(null);
-      localStorage.removeItem('lovenda_user');
+      await signOut(auth);
+      // El estado se limpia automáticamente por onAuthStateChanged
       localStorage.removeItem('lovenda_user_profile');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('isLoggedIn');
-      console.log(' Sesión cerrada correctamente');
+      console.log('✅ Sesión cerrada correctamente');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       throw error;
@@ -247,22 +224,26 @@ export const AuthProvider = ({ children }) => {
   // Valor del contexto que se proveerá a los componentes
   const value = {
     currentUser,
+    user: currentUser, // alias de compatibilidad
     userProfile,
     loading: isLoading,
     isLoading,
     isAuthenticated,
     login,
     logout,
-    updateUserProfile,
+    register,
     getIdToken,
-    // Alias para compatibilidad con código existente
-    user: currentUser,
-    profile: userProfile
+    updateUserProfile,
   };
 
   // Registrar el contexto en emailService para que pueda obtener el token
   useEffect(() => {
     registerEmailAuthContext({
+      currentUser,
+      getIdToken,
+    });
+    // Registrar también en notificationService
+    registerNotificationAuthContext({
       currentUser,
       getIdToken,
     });
@@ -287,5 +268,35 @@ export const useAuth = () => {
   return context;
 };
 
-// Exportación por defecto para consistencia con las importaciones actuales
+// -----------------------------
+  // REGISTER / SIGNUP
+  // -----------------------------
+  const register = async (email, password, role = 'particular') => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('[useAuth] Registro exitoso:', user.uid);
+      // Generar perfil inicial
+      const profile = {
+        id: user.uid,
+        name: email.split('@')[0],
+        email: user.email,
+        role,
+        preferences: {
+          emailNotifications: true,
+          theme: 'light'
+        }
+      };
+      setUserProfile(profile);
+      localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
+      return { success: true, user };
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  // -----------------------------
+  // CONTEXTO DE RETORNO
+  // -----------------------------
 export default useAuth;

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, db, firebaseReady } from '../firebaseConfig';
+import React, { createContext, useContext } from 'react';
+import { useAuth } from '../hooks/useAuth';
 import { setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 import {
   createUserWithEmailAndPassword,
@@ -15,6 +15,8 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
+// Stub de compatibilidad: reexporta datos del nuevo sistema de autenticación
+// Elimina la lógica legacy, simplificando su mantenimiento.
 const UserContext = createContext({
   user: null,
   isAuthenticated: false,
@@ -27,11 +29,34 @@ const UserContext = createContext({
 
 export const useUserContext = () => useContext(UserContext);
 
+// Provider vacío para mantener compatibilidad; no realiza lógica.
 export default function UserProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Obtenemos datos del nuevo sistema
+  const {
+    currentUser,
+    userProfile,
+    login,
+    logout,
+    updateUserProfile: updateProfile,
+    isAuthenticated,
+    isLoading: loading,
+  } = useAuth();
 
-  useEffect(() => {
+  // Derivar propiedades compatibles
+  const value = {
+    user: currentUser,
+    userName: userProfile?.name || userProfile?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0],
+    weddingName: localStorage.getItem('lovenda_active_wedding_name') || '',
+    progress: Number(localStorage.getItem('lovenda_progress') || 0),
+    logoUrl: userProfile?.logoUrl || '',
+    role: userProfile?.role || 'particular',
+    isAuthenticated,
+    loading,
+    login,
+    logout,
+    signup: () => Promise.reject(new Error('signup no implementado: usa register() en useAuth')), // placeholder
+    updateProfile,
+  };
     let unsubscribe;
     (async () => {
       await firebaseReady;
@@ -103,9 +128,20 @@ export default function UserProvider({ children }) {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, []);
+  // Devolvemos el proveedor con los valores derivados
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
+}
 
-  const signup = async (email, password, role = 'particular') => {
+/* Legacy methods eliminados, ya no se usan */
+
+/* eslint-disable */
+// Mantener exportaciones nominales para que el código existente compile incluso si no se usan
+action: null;
+/* eslint-enable */
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const newUser = userCredential.user;
     await setDoc(doc(db, 'users', newUser.uid), { role, email: newUser.email, createdAt: serverTimestamp() });

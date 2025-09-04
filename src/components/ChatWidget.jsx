@@ -5,7 +5,7 @@ import { MessageSquare } from 'lucide-react';
 import Spinner from './Spinner';
 import { getBackendBase } from '../utils/backendBase';
 import { toast } from 'react-toastify';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuthUnified';
 
 // --- Modo debug opcional ---
 // Actívalo desde la consola con: window.lovendaDebug = true
@@ -364,17 +364,8 @@ const sendMessage = async () => {
         toast.error('La IA está tardando demasiado. Reintentando con respuesta local...');
       }, 30000); // 30 segundos máximo para mejor UX
       
-      // Obtener token de autenticación usando el hook useAuth
-      let token = null;
-      if (getIdToken) {
-        token = await getIdToken();
-      } else if (user && user.getIdToken) {
-        // Fallback: Usuario real de Firebase
-        token = await user.getIdToken();
-      } else if (user && user.uid && user.email) {
-        // Fallback: Usuario mock/simulado
-        token = `mock-${user.uid}-${user.email}`;
-      }
+      // Obtener token de autenticación usando el sistema unificado
+      const token = getIdToken ? await getIdToken() : null;
       if (!token) {
         throw new Error('No se pudo generar el token de autenticación');
       }

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import { useUserContext } from '../context/UserContext'; // Legacy - mantener durante migración
-import { useAuth } from '../hooks/useAuthUnified'; // Nuevo sistema
+// import eliminado: useUserContext legacy
+import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
 import { Card } from './ui/Card';
 import { Progress } from './ui/Progress';
 import Nav from './Nav';
@@ -22,16 +22,18 @@ export default function HomePage() {
   const [guest, setGuest] = useState({name: '', side: 'novia', contact: ''});
   const [newMovement, setNewMovement] = useState({concept: '', amount: 0, date: '', type: 'expense'});
   const [activeModal, setActiveModal] = useState(null);
-  // Sistema legacy (mantener durante migración)
-  const { user, userName, weddingName, progress, logoUrl } = useUserContext();
-  
-  // Nuevo sistema unificado
+  // Hook de autenticación unificado
   const { hasRole, userProfile, currentUser } = useAuth();
   
-  // Usar el nuevo sistema para verificaciones de rol y datos de usuario
-  const role = userProfile?.role || user?.role;
-  const displayName = userProfile?.displayName || userName;
-  const email = currentUser?.email || user?.email;
+  // Derivados equivalentes al UserContext legacy
+  const role = userProfile?.role || 'particular';
+  const displayName = userProfile?.name || userProfile?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
+  const weddingName = localStorage.getItem('lovenda_active_wedding_name') || '';
+  const progress = Number(localStorage.getItem('lovenda_progress') || 0);
+  const logoUrl = userProfile?.logoUrl || '';
+  
+  // Datos derivados ya calculados más arriba
+  const email = currentUser?.email || '';
 
   // Si el usuario es Wedding Planner mostramos dashboard específico
   if (role === 'planner') {

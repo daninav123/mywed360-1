@@ -1,10 +1,12 @@
 /**
- * Hook de autenticación unificado para MyWed360
+ * DEPRECATED: Este archivo existe solo para compatibilidad. Reexporta useAuth y AuthProvider desde useAuth.jsx para MyWed360
  * Reemplaza y unifica UserContext.jsx y useAuth.jsx
  * Integra el servicio authService.js para funcionalidad avanzada
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+// Stub: reexportar useAuth y AuthProvider
+export { useAuth as default, useAuth, AuthProvider } from './useAuth';
+
 import authService, { AuthError } from '../services/authService';
 
 // Contexto de autenticación

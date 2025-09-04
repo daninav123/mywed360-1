@@ -1,11 +1,39 @@
 
-> boda-app@0.1.0 dev
-> vite --host --strictPort info
+> mywed360@0.1.0 dev
+> vite --host --port 5173
 
 
-  [32m[1mVITE[22m v4.5.14[39m  [2mready in [0m[1m345[22m[2m[0m ms[22m
+  [32m[1mVITE[22m v4.5.14[39m  [2mready in [0m[1m849[22m[2m[0m ms[22m
 
   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
   [32m➜[39m  [1mNetwork[22m: [36mhttp://187.33.157.13:[1m5173[22m/[39m
 [2m[32m  ➜[39m[22m[2m  press [22m[1mh[22m[2m to show help[22m
-[33m(!) Could not auto-determine entry point from rollupOptions or html files and there are no explicit optimizeDeps.include patterns. Skipping dependency pre-bundling.[39m
+Error: [31m  Failed to scan for dependencies from entries:
+  C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/index.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/email-direct-test.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/email-direct.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/email-test.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/enable-auth.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/mailgun-diagnostico.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/mailgun-report-2025-07-17T23-26-31-957Z.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/mailgun-simple-test.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/mailgun-test.html
+C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/public/offline.html
+
+  [39m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mUnexpected "catch"[0m
+
+    src/firebaseConfig.js:245:4:
+[37m      245 │   } [32mcatch[37m (error) {
+          ╵     [32m~~~~~[0m
+
+
+    at failureErrorWithLog (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1649:15)
+    at C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1058:25
+    at runOnEndCallbacks (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1484:45)
+    at buildResponseToResult (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1056:7)
+    at C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1068:9
+    at new Promise (<anonymous>)
+    at requestCallbacks.on-end (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:1067:54)
+    at handleRequest (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:729:19)
+    at handleIncomingPacket (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:755:7)
+    at Socket.readFromStdout (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\vite\node_modules\esbuild\lib\main.js:679:7)

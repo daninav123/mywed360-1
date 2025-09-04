@@ -6,6 +6,8 @@ import GuestList from '../components/guests/GuestList';
 import GuestFilters from '../components/guests/GuestFilters';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
+import { useWedding } from '../context/WeddingContext';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -20,9 +22,17 @@ import useTranslations from '../hooks/useTranslations';
  * - UX mejorada con indicadores de estado
  */
 function Invitados() {
+  // Estados para modales
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [editingGuest, setEditingGuest] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Hooks reales
   const { t } = useTranslations();
-  
-  // Hook personalizado para gestión de invitados
+  const { currentUser } = useAuth();
+  const { weddings, activeWedding } = useWedding();
+    
+  // Datos provenientes de Firebase mediante hooks
   const {
     guests,
     stats,
@@ -39,12 +49,7 @@ function Invitados() {
     exportToCSV,
     updateFilters
   } = useGuests();
-
-  // Estados para modales
-  const [showGuestModal, setShowGuestModal] = useState(false);
-  const [editingGuest, setEditingGuest] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
-
+                          
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
     setEditingGuest(null);
@@ -113,7 +118,7 @@ function Invitados() {
           
           {/* Indicador de sincronización */}
           <div className="flex items-center space-x-2">
-            {syncStatus.isOnline ? (
+            {syncStatus?.isOnline ? (
               <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full">
                 <Cloud size={16} className="mr-2" />
                 <span className="text-sm font-medium">Sincronizado</span>
@@ -129,9 +134,9 @@ function Invitados() {
 
         {/* Filtros y acciones */}
         <GuestFilters
-          searchTerm={filters.search}
-          statusFilter={filters.status}
-          tableFilter={filters.table}
+          searchTerm={filters?.search || ''}
+          statusFilter={filters?.status || ''}
+          tableFilter={filters?.table || ''}
           onSearchChange={(value) => updateFilters({ search: value })}
           onStatusFilterChange={(value) => updateFilters({ status: value })}
           onTableFilterChange={(value) => updateFilters({ table: value })}
@@ -139,16 +144,53 @@ function Invitados() {
           onBulkInvite={bulkInviteWhatsApp}
           onImportGuests={importFromContacts}
           onExportGuests={exportToCSV}
-          guestCount={guests.length}
+          guestCount={(guests?.length) || 0}
           isLoading={isLoading}
         />
 
+        {/* Debug info para verificar estado */}
+        {import.meta.env.DEV && (
+          <div className="bg-blue-50 p-4 rounded-lg text-sm">
+            <strong>Debug Info:</strong><br/>
+            - activeWedding: {activeWedding || 'null'}<br/>
+            - weddings count: {weddings?.length || 0}<br/>
+            - guests count: {guests?.length || 0}<br/>
+            - isLoading: {isLoading ? 'true' : 'false'}<br/>
+            - Firebase Auth: {window.auth?.currentUser?.email || 'No autenticado'}<br/>
+            - Usuario Context: {currentUser ? JSON.stringify({uid: currentUser.uid, email: currentUser.email}) : 'null'}<br/>
+            - Ruta Firestore: weddings/{activeWedding || 'null'}/guests<br/>
+            <button 
+              onClick={() => {
+                import('../firebaseConfig').then(({ auth }) => {
+                  import('firebase/auth').then(({ signInWithEmailAndPassword }) => {
+                    signInWithEmailAndPassword(auth, 'danielnavarrocampos@icloud.com', 'password123')
+                      .then(() => console.log('Login manual exitoso'))
+                      .catch(err => console.error('Login manual falló:', err));
+                  });
+                });
+              }}
+              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs"
+            >
+              Login Manual
+            </button>
+          </div>
+        )}
+
+        {/* Fallback temporal: sin bodas visibles para el usuario */}
+        {(!isLoading && Array.isArray(weddings) && weddings.length === 0) && (
+          <div className="text-sm text-gray-600">
+            {activeWedding
+              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.'
+              : 'No se encontraron bodas asociadas a tu cuenta. Crea o selecciona una boda para gestionar invitados.'}
+          </div>
+        )}
+
         {/* Lista de invitados */}
         <GuestList
-          guests={guests}
-          searchTerm={filters.search}
-          statusFilter={filters.status}
-          tableFilter={filters.table}
+          guests={guests || []}
+          searchTerm={filters?.search || ''}
+          statusFilter={filters?.status || ''}
+          tableFilter={filters?.table || ''}
           onEdit={handleEditGuest}
           onDelete={handleDeleteGuest}
           onInviteWhatsApp={inviteViaWhatsApp}

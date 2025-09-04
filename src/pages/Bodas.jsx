@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import WeddingFormModal from '../components/WeddingFormModal';
 import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
 
 
