@@ -5,7 +5,7 @@
       "title": "RSVP Scheduler (dryRun)",
       "status": "failed",
       "command": "node scripts/rsvpScheduler.cjs --dryRun=true --limit=50 --minIntervalMinutes=1440",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "HealthCheck failed at step test:unit (seating)"
     },
     {
@@ -13,7 +13,7 @@
       "title": "Validar reglas y archivos clave",
       "status": "failed",
       "command": "npm run validate:schemas",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "HealthCheck failed at step test:unit (seating)"
     },
     {
@@ -21,7 +21,7 @@
       "title": "Tests unitarios de reglas Firestore (seating)",
       "status": "failed",
       "command": "npm run test:unit -- src/__tests__/firestore.rules.seating.test.js",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -29,7 +29,7 @@
       "title": "E2E RSVP: confirmación por token",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js\"",
-      "attempts": 3,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     },
     {
@@ -37,7 +37,7 @@
       "title": "E2E RSVP: token inválido",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_invalid_token.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -45,7 +45,7 @@
       "title": "E2E RSVP: recordatorios automáticos",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_reminders.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -53,7 +53,7 @@
       "title": "E2E Seating: smoke básico",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_smoke.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -61,7 +61,7 @@
       "title": "E2E Seating: sin solapamientos",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_no_overlap.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -69,7 +69,7 @@
       "title": "E2E Seating: asignar y desasignar invitados",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_assign_unassign.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -77,7 +77,7 @@
       "title": "E2E Seating: límite de capacidad en mesa",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_capacity_limit.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -85,7 +85,7 @@
       "title": "E2E Seating: pasillo mínimo",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_aisle_min.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -93,7 +93,7 @@
       "title": "E2E Seating: obstáculos sin solape",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_obstacles_no_overlap.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -101,7 +101,7 @@
       "title": "E2E Seating: plantilla circular",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_template_circular.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -109,7 +109,7 @@
       "title": "E2E Seating: plantilla U/L/imperial",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_template_u_l_imperial.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -117,15 +117,15 @@
       "title": "E2E Seating: ajuste al lienzo (fit)",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_fit.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_seating_toasts",
       "title": "E2E Seating: mensajes/toasts de acciones",
-      "status": "failed",
+      "status": "in_progress",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_toasts.cy.js\"",
-      "attempts": 5,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
@@ -133,7 +133,7 @@
       "title": "E2E Email: envío de correo",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/send-email.cy.js\"",
-      "attempts": 5,
+      "attempts": 8,
       "lastError": "Task process exit code 1"
     },
     {
@@ -141,7 +141,7 @@
       "title": "E2E Email: lectura de correo",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/read-email.cy.js\"",
-      "attempts": 5,
+      "attempts": 8,
       "lastError": "Task process exit code 1"
     },
     {
@@ -149,15 +149,15 @@
       "title": "E2E Email: carpetas",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/folders-management.cy.js\"",
-      "attempts": 5,
+      "attempts": 8,
       "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_tags_filters",
       "title": "E2E Email: tags y filtros",
-      "status": "in_progress",
+      "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/tags-filters.cy.js\"",
-      "attempts": 4,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     },
     {
@@ -165,7 +165,7 @@
       "title": "E2E Email: proveedor IA",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/ai-provider-email.cy.js\"",
-      "attempts": 4,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     },
     {
@@ -173,7 +173,7 @@
       "title": "E2E Presupuesto: flujo básico",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/budget_flow.cy.js\"",
-      "attempts": 4,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     },
     {
@@ -181,7 +181,7 @@
       "title": "E2E Performance: email",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/performance/email-performance.cy.js\"",
-      "attempts": 3,
+      "attempts": 6,
       "lastError": "Task process exit code 1"
     },
     {
@@ -189,7 +189,7 @@
       "title": "Unit: Firestore rules (collections)",
       "status": "failed",
       "command": "npm run test:unit -- src/__tests__/firestore.rules.collections.test.js",
-      "attempts": 5,
+      "attempts": 8,
       "lastError": "Task process exit code 1"
     },
     {
@@ -197,7 +197,7 @@
       "title": "Unit: Firestore rules (exhaustive)",
       "status": "failed",
       "command": "npm run test:unit -- src/__tests__/firestore.rules.exhaustive.test.js",
-      "attempts": 4,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     },
     {
@@ -205,7 +205,7 @@
       "title": "Unit: Firestore rules (extended)",
       "status": "failed",
       "command": "npm run test:unit -- src/__tests__/firestore.rules.extended.test.js",
-      "attempts": 4,
+      "attempts": 7,
       "lastError": "Task process exit code 1"
     }
   ]

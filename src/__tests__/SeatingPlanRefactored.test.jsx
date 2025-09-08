@@ -5,11 +5,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import SeatingPlanRefactored from '../components/seating/SeatingPlanRefactored';
+// La importación del componente bajo prueba debe ir DESPUÉS de configurar los mocks
 
 // Mock de dependencias
-vi.mock('../hooks/useSeatingPlan', () => ({
-  useSeatingPlan: () => ({
+vi.mock('../hooks/useSeatingPlan', () => {
+  const mockFn = vi.fn(() => ({
     tab: 'ceremony',
     setTab: vi.fn(),
     syncStatus: { status: 'synced' },
@@ -42,8 +42,9 @@ vi.mock('../hooks/useSeatingPlan', () => ({
     exportPNG: vi.fn(),
     exportPDF: vi.fn(),
     saveHallDimensions: vi.fn()
-  })
-}));
+  }));
+  return { useSeatingPlan: mockFn };
+});
 
 vi.mock('../components/seating/SeatingPlanTabs', () => ({
   default: ({ activeTab, onTabChange }) => (
@@ -83,6 +84,8 @@ vi.mock('../components/seating/SeatingPlanSidebar', () => ({
 vi.mock('../components/seating/SeatingPlanModals', () => ({
   default: () => <div data-testid="seating-plan-modals" />
 }));
+
+import SeatingPlanRefactored from '../components/seating/SeatingPlanRefactored';
 
 describe('SeatingPlanRefactored Component', () => {
   beforeEach(() => {
@@ -127,10 +130,12 @@ describe('SeatingPlanRefactored Component', () => {
 
   it('should handle tab changes', () => {
     const mockSetTab = vi.fn();
-    
-    vi.mocked(require('../hooks/useSeatingPlan').useSeatingPlan).mockReturnValue({
-      ...require('../hooks/useSeatingPlan').useSeatingPlan(),
-      setTab: mockSetTab
+    const { useSeatingPlan } = require('../hooks/useSeatingPlan');
+    // Tomar el retorno por defecto del mock y sobreescribir setTab
+    const defaultReturn = useSeatingPlan();
+    useSeatingPlan.mockReturnValue({
+      ...defaultReturn,
+      setTab: mockSetTab,
     });
 
     render(<SeatingPlanRefactored />);

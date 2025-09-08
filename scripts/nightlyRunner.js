@@ -74,8 +74,14 @@ function getRunnableTaskIds(options = {}) {
   const statuses = ['pending'];
   if (includeFailed) statuses.push('failed');
   if (includeInProgress) statuses.push('in_progress');
+  const skipE2E = String(process.env.RUN_E2E || 'false') !== 'true';
   return tasks
     .filter((x) => statuses.includes(String(x.status || 'pending')))
+    .filter((x) => {
+      const cmd = String(x.command || '');
+      // Omitir specs E2E si RUN_E2E no está habilitado
+      return !(skipE2E && cmd.includes('cypress:run'));
+    })
     .map((x) => String(x.id));
 }
 
