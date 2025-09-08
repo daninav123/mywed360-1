@@ -71,3 +71,504 @@
 {"timestamp":"2025-09-08T17:50:16.879Z","action":"run","taskId":"unit_rules","cycle":1}
 {"timestamp":"2025-09-08T17:50:23.211Z","action":"task_end","taskId":"unit_rules","status":"error","exitCode":9}
 {"timestamp":"2025-09-08T17:50:23.213Z","action":"cycle_end","cycle":1,"progressed":false,"completed":0,"failures":1}
+{"timestamp":"2025-09-08T18:02:52.766Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T18:02:52.769Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T18:02:52.773Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:05:52.775Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T18:05:52.778Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:07:43.417Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T18:07:43.419Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T18:07:43.421Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:08:52.780Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T18:08:52.784Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:10:43.423Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T18:10:43.426Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:11:52.787Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T18:11:52.789Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:13:43.433Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T18:13:43.436Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:14:52.794Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T18:14:52.796Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:16:43.438Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T18:16:43.440Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:17:52.799Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T18:17:52.801Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:19:43.445Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T18:19:43.448Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:20:52.806Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T18:20:52.809Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:22:43.458Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T18:22:43.460Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:23:52.811Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T18:23:52.814Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:25:43.466Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T18:25:43.469Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:26:52.817Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T18:26:52.819Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:28:43.474Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T18:28:43.476Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:29:52.822Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T18:29:52.824Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:31:43.480Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T18:31:43.482Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:32:52.827Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T18:32:52.829Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:34:43.487Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T18:34:43.490Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:35:52.832Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T18:35:52.835Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:37:43.497Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T18:37:43.499Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:38:52.838Z","action":"cycle_start","cycle":13}
+{"timestamp":"2025-09-08T18:38:52.841Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:40:43.502Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T18:40:43.504Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:41:52.845Z","action":"cycle_start","cycle":14}
+{"timestamp":"2025-09-08T18:41:52.848Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:43:43.507Z","action":"cycle_start","cycle":13}
+{"timestamp":"2025-09-08T18:43:43.510Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:44:15.044Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T18:44:15.046Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T18:44:15.048Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:46:43.513Z","action":"cycle_start","cycle":14}
+{"timestamp":"2025-09-08T18:46:43.515Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:46:56.148Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T18:46:56.149Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T18:46:56.151Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:47:15.055Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T18:47:15.058Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:49:56.154Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T18:49:56.157Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:50:15.061Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T18:50:15.063Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:52:56.166Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T18:52:56.168Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:53:15.072Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T18:53:15.074Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:55:56.172Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T18:55:56.175Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:56:15.080Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T18:56:15.083Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:58:56.180Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T18:58:56.185Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T18:59:15.088Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T18:59:15.090Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:01:56.196Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T19:01:56.197Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:02:15.094Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T19:02:15.096Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:04:56.210Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T19:04:56.213Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:05:15.100Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T19:05:15.103Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:07:56.218Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T19:07:56.221Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:08:15.106Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T19:08:15.109Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:10:56.225Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T19:10:56.228Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:11:15.113Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T19:11:15.118Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:13:56.238Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T19:13:56.242Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:14:15.136Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T19:14:15.138Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:16:56.248Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T19:16:56.250Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:17:15.142Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T19:17:15.147Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:19:56.252Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T19:19:56.256Z","action":"run","taskId":"e2e_rsvp_confirm_token","cycle":12}
+{"timestamp":"2025-09-08T19:20:15.151Z","action":"cycle_start","cycle":13}
+{"timestamp":"2025-09-08T19:20:15.156Z","action":"run","taskId":"validate_schemas","cycle":13}
+{"timestamp":"2025-09-08T19:20:23.600Z","action":"task_end","taskId":"e2e_rsvp_confirm_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:20:23.602Z","action":"run","taskId":"e2e_rsvp_invalid_token","cycle":12}
+{"timestamp":"2025-09-08T19:20:43.071Z","action":"task_end","taskId":"e2e_rsvp_invalid_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:20:43.072Z","action":"run","taskId":"e2e_rsvp_reminders","cycle":12}
+{"timestamp":"2025-09-08T19:20:48.206Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:20:48.208Z","action":"run","taskId":"e2e_rsvp_invalid_token","cycle":13}
+{"timestamp":"2025-09-08T19:21:02.270Z","action":"task_end","taskId":"e2e_rsvp_reminders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:02.276Z","action":"run","taskId":"e2e_seating_smoke","cycle":12}
+{"timestamp":"2025-09-08T19:21:06.490Z","action":"task_end","taskId":"e2e_rsvp_invalid_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:06.499Z","action":"run","taskId":"e2e_rsvp_reminders","cycle":13}
+{"timestamp":"2025-09-08T19:21:20.894Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:20.895Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":12}
+{"timestamp":"2025-09-08T19:21:25.156Z","action":"task_end","taskId":"e2e_rsvp_reminders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:25.157Z","action":"run","taskId":"e2e_seating_smoke","cycle":13}
+{"timestamp":"2025-09-08T19:21:39.361Z","action":"task_end","taskId":"e2e_seating_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:39.362Z","action":"run","taskId":"e2e_seating_assign_unassign","cycle":12}
+{"timestamp":"2025-09-08T19:21:43.635Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:43.638Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":13}
+{"timestamp":"2025-09-08T19:21:57.637Z","action":"task_end","taskId":"e2e_seating_assign_unassign","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:21:57.638Z","action":"run","taskId":"e2e_seating_capacity_limit","cycle":12}
+{"timestamp":"2025-09-08T19:22:01.831Z","action":"task_end","taskId":"e2e_seating_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:01.833Z","action":"run","taskId":"e2e_seating_assign_unassign","cycle":13}
+{"timestamp":"2025-09-08T19:22:15.752Z","action":"task_end","taskId":"e2e_seating_capacity_limit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:15.753Z","action":"run","taskId":"e2e_seating_aisle_min","cycle":12}
+{"timestamp":"2025-09-08T19:22:20.586Z","action":"task_end","taskId":"e2e_seating_assign_unassign","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:20.587Z","action":"run","taskId":"e2e_seating_capacity_limit","cycle":13}
+{"timestamp":"2025-09-08T19:22:33.700Z","action":"task_end","taskId":"e2e_seating_aisle_min","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:33.702Z","action":"run","taskId":"e2e_seating_obstacles_no_overlap","cycle":12}
+{"timestamp":"2025-09-08T19:22:37.587Z","action":"task_end","taskId":"e2e_seating_capacity_limit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:37.588Z","action":"run","taskId":"e2e_seating_aisle_min","cycle":13}
+{"timestamp":"2025-09-08T19:22:50.788Z","action":"task_end","taskId":"e2e_seating_obstacles_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:50.789Z","action":"run","taskId":"e2e_seating_template_circular","cycle":12}
+{"timestamp":"2025-09-08T19:22:54.438Z","action":"task_end","taskId":"e2e_seating_aisle_min","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:22:54.439Z","action":"run","taskId":"e2e_seating_obstacles_no_overlap","cycle":13}
+{"timestamp":"2025-09-08T19:23:08.194Z","action":"task_end","taskId":"e2e_seating_template_circular","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:08.199Z","action":"run","taskId":"e2e_seating_template_u_l_imperial","cycle":12}
+{"timestamp":"2025-09-08T19:23:12.492Z","action":"task_end","taskId":"e2e_seating_obstacles_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:12.494Z","action":"run","taskId":"e2e_seating_template_circular","cycle":13}
+{"timestamp":"2025-09-08T19:23:27.082Z","action":"task_end","taskId":"e2e_seating_template_u_l_imperial","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:27.084Z","action":"run","taskId":"e2e_seating_fit","cycle":12}
+{"timestamp":"2025-09-08T19:23:31.739Z","action":"task_end","taskId":"e2e_seating_template_circular","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:31.742Z","action":"run","taskId":"e2e_seating_template_u_l_imperial","cycle":13}
+{"timestamp":"2025-09-08T19:23:45.227Z","action":"task_end","taskId":"e2e_seating_fit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:45.228Z","action":"run","taskId":"e2e_seating_toasts","cycle":12}
+{"timestamp":"2025-09-08T19:23:49.801Z","action":"task_end","taskId":"e2e_seating_template_u_l_imperial","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:23:49.803Z","action":"run","taskId":"e2e_seating_fit","cycle":13}
+{"timestamp":"2025-09-08T19:24:03.630Z","action":"task_end","taskId":"e2e_seating_toasts","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:03.631Z","action":"run","taskId":"e2e_email_send","cycle":12}
+{"timestamp":"2025-09-08T19:24:07.964Z","action":"task_end","taskId":"e2e_seating_fit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:07.967Z","action":"run","taskId":"e2e_seating_toasts","cycle":13}
+{"timestamp":"2025-09-08T19:24:21.664Z","action":"task_end","taskId":"e2e_email_send","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:21.666Z","action":"run","taskId":"e2e_email_read","cycle":12}
+{"timestamp":"2025-09-08T19:24:25.936Z","action":"task_end","taskId":"e2e_seating_toasts","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:25.938Z","action":"run","taskId":"e2e_email_send","cycle":13}
+{"timestamp":"2025-09-08T19:24:40.015Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:40.017Z","action":"run","taskId":"e2e_email_folders","cycle":12}
+{"timestamp":"2025-09-08T19:24:44.500Z","action":"task_end","taskId":"e2e_email_send","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:44.502Z","action":"run","taskId":"e2e_email_read","cycle":13}
+{"timestamp":"2025-09-08T19:24:58.099Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:24:58.100Z","action":"run","taskId":"e2e_email_tags_filters","cycle":12}
+{"timestamp":"2025-09-08T19:25:02.563Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:02.565Z","action":"run","taskId":"e2e_email_folders","cycle":13}
+{"timestamp":"2025-09-08T19:25:16.286Z","action":"task_end","taskId":"e2e_email_tags_filters","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:16.288Z","action":"run","taskId":"e2e_email_ai_provider","cycle":12}
+{"timestamp":"2025-09-08T19:25:20.507Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:20.508Z","action":"run","taskId":"e2e_email_tags_filters","cycle":13}
+{"timestamp":"2025-09-08T19:25:34.362Z","action":"task_end","taskId":"e2e_email_ai_provider","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:34.363Z","action":"run","taskId":"e2e_budget_flow","cycle":12}
+{"timestamp":"2025-09-08T19:25:38.748Z","action":"task_end","taskId":"e2e_email_tags_filters","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:38.749Z","action":"run","taskId":"e2e_email_ai_provider","cycle":13}
+{"timestamp":"2025-09-08T19:25:52.335Z","action":"task_end","taskId":"e2e_budget_flow","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:52.336Z","action":"run","taskId":"e2e_email_performance","cycle":12}
+{"timestamp":"2025-09-08T19:25:56.588Z","action":"task_end","taskId":"e2e_email_ai_provider","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:25:56.590Z","action":"run","taskId":"e2e_budget_flow","cycle":13}
+{"timestamp":"2025-09-08T19:26:10.141Z","action":"task_end","taskId":"e2e_email_performance","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:10.142Z","action":"run","taskId":"unit_rules_collections","cycle":12}
+{"timestamp":"2025-09-08T19:26:14.689Z","action":"task_end","taskId":"e2e_budget_flow","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:14.690Z","action":"run","taskId":"e2e_email_performance","cycle":13}
+{"timestamp":"2025-09-08T19:26:17.916Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:17.917Z","action":"run","taskId":"unit_rules_exhaustive","cycle":12}
+{"timestamp":"2025-09-08T19:26:27.236Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:27.238Z","action":"run","taskId":"unit_rules_extended","cycle":12}
+{"timestamp":"2025-09-08T19:26:33.968Z","action":"task_end","taskId":"e2e_email_performance","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:33.969Z","action":"run","taskId":"unit_rules_collections","cycle":13}
+{"timestamp":"2025-09-08T19:26:34.753Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:34.755Z","action":"cycle_end","cycle":12,"progressed":false,"completed":0,"failures":23}
+{"timestamp":"2025-09-08T19:26:41.261Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:41.262Z","action":"run","taskId":"unit_rules_exhaustive","cycle":13}
+{"timestamp":"2025-09-08T19:26:48.403Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:48.405Z","action":"run","taskId":"unit_rules_extended","cycle":13}
+{"timestamp":"2025-09-08T19:26:56.617Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:26:56.619Z","action":"cycle_end","cycle":13,"progressed":false,"completed":0,"failures":23}
+{"timestamp":"2025-09-08T19:27:24.803Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T19:27:24.807Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T19:27:24.808Z","action":"run","taskId":"validate_schemas","cycle":1}
+{"timestamp":"2025-09-08T19:27:56.286Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:27:56.287Z","action":"run","taskId":"e2e_rsvp_invalid_token","cycle":1}
+{"timestamp":"2025-09-08T19:28:15.763Z","action":"task_end","taskId":"e2e_rsvp_invalid_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:28:15.765Z","action":"run","taskId":"e2e_rsvp_reminders","cycle":1}
+{"timestamp":"2025-09-08T19:28:37.091Z","action":"task_end","taskId":"e2e_rsvp_reminders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:28:37.092Z","action":"run","taskId":"e2e_seating_smoke","cycle":1}
+{"timestamp":"2025-09-08T19:28:55.093Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:28:55.095Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:29:13.202Z","action":"task_end","taskId":"e2e_seating_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:29:13.203Z","action":"run","taskId":"e2e_seating_assign_unassign","cycle":1}
+{"timestamp":"2025-09-08T19:29:30.920Z","action":"task_end","taskId":"e2e_seating_assign_unassign","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:29:30.921Z","action":"run","taskId":"e2e_seating_capacity_limit","cycle":1}
+{"timestamp":"2025-09-08T19:29:48.646Z","action":"task_end","taskId":"e2e_seating_capacity_limit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:29:48.648Z","action":"run","taskId":"e2e_seating_aisle_min","cycle":1}
+{"timestamp":"2025-09-08T19:30:02.840Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T19:30:02.842Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T19:30:02.844Z","action":"run","taskId":"validate_schemas","cycle":1}
+{"timestamp":"2025-09-08T19:30:06.666Z","action":"task_end","taskId":"e2e_seating_aisle_min","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:30:06.667Z","action":"run","taskId":"e2e_seating_obstacles_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:30:25.623Z","action":"task_end","taskId":"e2e_seating_obstacles_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:30:25.624Z","action":"run","taskId":"e2e_seating_template_circular","cycle":1}
+{"timestamp":"2025-09-08T19:30:35.534Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:30:35.535Z","action":"run","taskId":"e2e_rsvp_invalid_token","cycle":1}
+{"timestamp":"2025-09-08T19:30:45.137Z","action":"task_end","taskId":"e2e_seating_template_circular","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:30:45.139Z","action":"run","taskId":"e2e_seating_template_u_l_imperial","cycle":1}
+{"timestamp":"2025-09-08T19:30:53.064Z","action":"task_end","taskId":"e2e_rsvp_invalid_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:30:53.065Z","action":"run","taskId":"e2e_rsvp_reminders","cycle":1}
+{"timestamp":"2025-09-08T19:31:02.855Z","action":"task_end","taskId":"e2e_seating_template_u_l_imperial","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:31:02.857Z","action":"run","taskId":"e2e_seating_fit","cycle":1}
+{"timestamp":"2025-09-08T19:31:10.985Z","action":"task_end","taskId":"e2e_rsvp_reminders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:31:10.986Z","action":"run","taskId":"e2e_seating_smoke","cycle":1}
+{"timestamp":"2025-09-08T19:31:20.850Z","action":"task_end","taskId":"e2e_seating_fit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:31:20.851Z","action":"run","taskId":"e2e_seating_toasts","cycle":1}
+{"timestamp":"2025-09-08T19:31:29.718Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:31:29.720Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:31:43.783Z","action":"task_end","taskId":"e2e_seating_toasts","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:31:43.785Z","action":"run","taskId":"e2e_email_send","cycle":1}
+{"timestamp":"2025-09-08T19:31:51.025Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T19:31:51.026Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T19:31:51.028Z","action":"run","taskId":"validate_schemas","cycle":1}
+{"timestamp":"2025-09-08T19:32:02.763Z","action":"task_end","taskId":"e2e_email_send","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:32:02.765Z","action":"run","taskId":"e2e_email_read","cycle":1}
+{"timestamp":"2025-09-08T19:32:23.545Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:32:23.555Z","action":"run","taskId":"e2e_rsvp_invalid_token","cycle":1}
+{"timestamp":"2025-09-08T19:32:23.625Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:32:23.626Z","action":"run","taskId":"e2e_email_folders","cycle":1}
+{"timestamp":"2025-09-08T19:32:42.982Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:32:42.984Z","action":"run","taskId":"e2e_email_tags_filters","cycle":1}
+{"timestamp":"2025-09-08T19:32:43.076Z","action":"task_end","taskId":"e2e_rsvp_invalid_token","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:32:43.077Z","action":"run","taskId":"e2e_rsvp_reminders","cycle":1}
+{"timestamp":"2025-09-08T19:33:02.684Z","action":"task_end","taskId":"e2e_email_tags_filters","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:33:02.685Z","action":"run","taskId":"e2e_email_ai_provider","cycle":1}
+{"timestamp":"2025-09-08T19:33:02.732Z","action":"task_end","taskId":"e2e_rsvp_reminders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:33:02.732Z","action":"run","taskId":"e2e_seating_smoke","cycle":1}
+{"timestamp":"2025-09-08T19:33:24.822Z","action":"task_end","taskId":"e2e_email_ai_provider","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:33:24.824Z","action":"run","taskId":"e2e_budget_flow","cycle":1}
+{"timestamp":"2025-09-08T19:33:26.235Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:33:26.237Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:33:45.221Z","action":"task_end","taskId":"e2e_budget_flow","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:33:45.222Z","action":"run","taskId":"e2e_email_performance","cycle":1}
+{"timestamp":"2025-09-08T19:33:48.130Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T19:33:48.131Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T19:33:48.133Z","action":"run","taskId":"validate_schemas","cycle":1}
+{"timestamp":"2025-09-08T19:34:04.827Z","action":"task_end","taskId":"e2e_email_performance","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:04.847Z","action":"run","taskId":"unit_rules_collections","cycle":1}
+{"timestamp":"2025-09-08T19:34:13.738Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:13.739Z","action":"run","taskId":"unit_rules_exhaustive","cycle":1}
+{"timestamp":"2025-09-08T19:34:21.161Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:21.162Z","action":"run","taskId":"e2e_seating_smoke","cycle":1}
+{"timestamp":"2025-09-08T19:34:24.948Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:24.949Z","action":"run","taskId":"unit_rules_extended","cycle":1}
+{"timestamp":"2025-09-08T19:34:33.566Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:33.568Z","action":"cycle_end","cycle":1,"progressed":false,"completed":0,"failures":23}
+{"timestamp":"2025-09-08T19:34:40.996Z","action":"task_end","taskId":"e2e_seating_smoke","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:40.998Z","action":"run","taskId":"e2e_seating_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:34:59.101Z","action":"task_end","taskId":"e2e_seating_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:34:59.102Z","action":"run","taskId":"e2e_seating_assign_unassign","cycle":1}
+{"timestamp":"2025-09-08T19:35:17.164Z","action":"task_end","taskId":"e2e_seating_assign_unassign","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:35:17.165Z","action":"run","taskId":"e2e_seating_capacity_limit","cycle":1}
+{"timestamp":"2025-09-08T19:35:34.593Z","action":"task_end","taskId":"e2e_seating_capacity_limit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:35:34.594Z","action":"run","taskId":"e2e_seating_aisle_min","cycle":1}
+{"timestamp":"2025-09-08T19:35:51.951Z","action":"task_end","taskId":"e2e_seating_aisle_min","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:35:51.953Z","action":"run","taskId":"e2e_seating_obstacles_no_overlap","cycle":1}
+{"timestamp":"2025-09-08T19:36:09.114Z","action":"task_end","taskId":"e2e_seating_obstacles_no_overlap","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:36:09.116Z","action":"run","taskId":"e2e_seating_template_circular","cycle":1}
+{"timestamp":"2025-09-08T19:36:26.445Z","action":"task_end","taskId":"e2e_seating_template_circular","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:36:26.447Z","action":"run","taskId":"e2e_seating_template_u_l_imperial","cycle":1}
+{"timestamp":"2025-09-08T19:36:44.257Z","action":"task_end","taskId":"e2e_seating_template_u_l_imperial","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:36:44.259Z","action":"run","taskId":"e2e_seating_fit","cycle":1}
+{"timestamp":"2025-09-08T19:37:02.257Z","action":"task_end","taskId":"e2e_seating_fit","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:37:02.258Z","action":"run","taskId":"e2e_seating_toasts","cycle":1}
+{"timestamp":"2025-09-08T19:37:20.238Z","action":"task_end","taskId":"e2e_seating_toasts","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:37:20.239Z","action":"run","taskId":"e2e_email_send","cycle":1}
+{"timestamp":"2025-09-08T19:37:33.571Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T19:37:33.573Z","action":"run","taskId":"e2e_email_read","cycle":2}
+{"timestamp":"2025-09-08T19:37:38.463Z","action":"task_end","taskId":"e2e_email_send","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:37:38.464Z","action":"run","taskId":"e2e_email_read","cycle":1}
+{"timestamp":"2025-09-08T19:37:52.439Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:37:52.440Z","action":"run","taskId":"e2e_email_folders","cycle":2}
+{"timestamp":"2025-09-08T19:37:56.975Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:37:56.976Z","action":"run","taskId":"e2e_email_folders","cycle":1}
+{"timestamp":"2025-09-08T19:38:11.290Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:11.291Z","action":"run","taskId":"e2e_email_ai_provider","cycle":2}
+{"timestamp":"2025-09-08T19:38:15.300Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:15.301Z","action":"run","taskId":"e2e_email_ai_provider","cycle":1}
+{"timestamp":"2025-09-08T19:38:30.714Z","action":"task_end","taskId":"e2e_email_ai_provider","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:30.716Z","action":"run","taskId":"e2e_budget_flow","cycle":2}
+{"timestamp":"2025-09-08T19:38:34.187Z","action":"task_end","taskId":"e2e_email_ai_provider","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:34.188Z","action":"run","taskId":"e2e_budget_flow","cycle":1}
+{"timestamp":"2025-09-08T19:38:49.977Z","action":"task_end","taskId":"e2e_budget_flow","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:49.979Z","action":"run","taskId":"unit_rules_collections","cycle":2}
+{"timestamp":"2025-09-08T19:38:53.586Z","action":"task_end","taskId":"e2e_budget_flow","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:53.589Z","action":"run","taskId":"unit_rules_collections","cycle":1}
+{"timestamp":"2025-09-08T19:38:59.341Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:38:59.342Z","action":"run","taskId":"unit_rules_exhaustive","cycle":2}
+{"timestamp":"2025-09-08T19:39:03.556Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:39:03.557Z","action":"run","taskId":"unit_rules_exhaustive","cycle":1}
+{"timestamp":"2025-09-08T19:39:09.115Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:39:09.118Z","action":"run","taskId":"unit_rules_extended","cycle":2}
+{"timestamp":"2025-09-08T19:39:13.223Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:39:13.243Z","action":"run","taskId":"unit_rules_extended","cycle":1}
+{"timestamp":"2025-09-08T19:39:19.808Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:39:19.811Z","action":"cycle_end","cycle":2,"progressed":false,"completed":0,"failures":30}
+{"timestamp":"2025-09-08T19:39:23.193Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:39:23.194Z","action":"cycle_end","cycle":1,"progressed":false,"completed":0,"failures":19}
+{"timestamp":"2025-09-08T19:42:19.814Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T19:42:19.817Z","action":"run","taskId":"e2e_email_folders","cycle":3}
+{"timestamp":"2025-09-08T19:42:23.063Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:42:23.197Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T19:42:23.066Z","action":"run","taskId":"unit_rules_collections","cycle":3}
+{"timestamp":"2025-09-08T19:42:23.229Z","action":"run","taskId":"unit_rules_collections","cycle":2}
+{"timestamp":"2025-09-08T19:42:36.610Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:42:36.612Z","action":"run","taskId":"unit_rules_exhaustive","cycle":2}
+{"timestamp":"2025-09-08T19:42:36.613Z","action":"task_end","taskId":"unit_rules_collections","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:42:36.614Z","action":"run","taskId":"unit_rules_exhaustive","cycle":3}
+{"timestamp":"2025-09-08T19:42:36.757Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"success"}
+{"timestamp":"2025-09-08T19:42:36.931Z","action":"run","taskId":"unit_rules_extended","cycle":3}
+{"timestamp":"2025-09-08T19:42:37.262Z","action":"task_end","taskId":"unit_rules_extended","status":"success"}
+{"timestamp":"2025-09-08T19:42:37.574Z","action":"cycle_end","cycle":3,"progressed":true,"completed":2,"failures":32}
+{"timestamp":"2025-09-08T19:42:47.120Z","action":"task_end","taskId":"unit_rules_exhaustive","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:42:47.121Z","action":"run","taskId":"unit_rules_extended","cycle":2}
+{"timestamp":"2025-09-08T19:42:56.786Z","action":"task_end","taskId":"unit_rules_extended","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T19:42:56.789Z","action":"cycle_end","cycle":2,"progressed":false,"completed":0,"failures":22}
+{"timestamp":"2025-09-08T19:45:37.598Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T19:45:37.601Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:45:56.795Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T19:45:56.795Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:48:37.606Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T19:48:37.609Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:48:56.797Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T19:48:56.800Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:51:37.613Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T19:51:37.615Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:51:56.802Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T19:51:56.805Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:54:37.619Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T19:54:37.622Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:54:56.815Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T19:54:56.818Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:57:56.826Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T19:57:56.831Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T19:58:38.034Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T19:58:38.036Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T19:58:38.038Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:00:56.836Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T20:00:56.841Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:01:08.181Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:01:08.183Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:01:08.186Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:01:38.041Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:01:38.044Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:04:08.188Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:04:08.190Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:04:38.064Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T20:04:38.069Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:07:08.194Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T20:07:08.197Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:07:38.071Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T20:07:38.074Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:10:08.199Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T20:10:08.201Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:10:38.077Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T20:10:38.080Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:13:08.204Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T20:13:08.206Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:13:38.083Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T20:13:38.087Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:15:19.873Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:15:19.876Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:15:19.878Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:16:08.208Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T20:16:08.210Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:16:38.090Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T20:16:38.093Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:18:19.882Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:18:19.885Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:19:08.215Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T20:19:08.218Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:19:38.107Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T20:19:38.111Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:21:19.888Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T20:21:19.891Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:22:08.222Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T20:22:08.225Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:22:38.117Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T20:22:38.120Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:24:19.893Z","action":"cycle_start","cycle":4}
+{"timestamp":"2025-09-08T20:24:19.896Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:25:08.228Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T20:25:08.233Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:25:15.984Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:25:15.986Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:25:15.989Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:25:38.124Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T20:25:38.129Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:27:19.905Z","action":"cycle_start","cycle":5}
+{"timestamp":"2025-09-08T20:27:19.908Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:28:08.237Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T20:28:08.241Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:28:15.992Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:28:15.995Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:28:38.134Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T20:28:38.136Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:30:19.912Z","action":"cycle_start","cycle":6}
+{"timestamp":"2025-09-08T20:30:19.913Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:31:08.246Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T20:31:08.249Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:31:15.998Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T20:31:16.002Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:31:24.078Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:31:24.080Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:31:24.082Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:31:38.137Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T20:31:38.139Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:33:19.917Z","action":"cycle_start","cycle":7}
+{"timestamp":"2025-09-08T20:33:19.919Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:33:51.372Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:33:51.375Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:33:51.378Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:34:08.251Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T20:34:08.254Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:36:19.923Z","action":"cycle_start","cycle":8}
+{"timestamp":"2025-09-08T20:36:19.927Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:36:51.381Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:36:51.384Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:37:08.264Z","action":"cycle_start","cycle":13}
+{"timestamp":"2025-09-08T20:37:08.299Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:37:12.521Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:37:12.523Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:37:12.525Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:37:58.107Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:37:58.109Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:37:58.112Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:39:19.930Z","action":"cycle_start","cycle":9}
+{"timestamp":"2025-09-08T20:39:19.933Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:40:07.148Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:40:07.151Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:40:07.153Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:40:08.306Z","action":"cycle_start","cycle":14}
+{"timestamp":"2025-09-08T20:40:08.308Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:41:26.081Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:41:26.082Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:41:26.087Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:42:19.676Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:42:19.677Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:42:19.682Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:42:19.937Z","action":"cycle_start","cycle":10}
+{"timestamp":"2025-09-08T20:42:19.939Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:42:59.358Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:42:59.360Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:42:59.362Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:43:08.311Z","action":"cycle_start","cycle":15}
+{"timestamp":"2025-09-08T20:43:08.314Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:45:18.922Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:45:18.924Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:45:18.928Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:45:19.940Z","action":"cycle_start","cycle":11}
+{"timestamp":"2025-09-08T20:45:19.943Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:46:08.314Z","action":"cycle_start","cycle":16}
+{"timestamp":"2025-09-08T20:46:08.316Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:48:18.932Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:48:18.936Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:48:19.945Z","action":"cycle_start","cycle":12}
+{"timestamp":"2025-09-08T20:48:19.947Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:49:08.319Z","action":"cycle_start","cycle":17}
+{"timestamp":"2025-09-08T20:49:08.323Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:50:43.034Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:50:43.037Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:50:43.040Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:50:56.752Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T20:50:56.754Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T20:50:56.755Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:53:56.760Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T20:53:56.763Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}
+{"timestamp":"2025-09-08T20:56:56.765Z","action":"cycle_start","cycle":3}
+{"timestamp":"2025-09-08T20:56:56.767Z","action":"idle","message":"Sin pendientes. Durmiendo 180s"}

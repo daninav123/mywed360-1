@@ -67,10 +67,16 @@ function readRoadmap() {
   }
 }
 
-function getPendingTaskIds() {
+function getRunnableTaskIds(options = {}) {
+  const { includeFailed = false, includeInProgress = false } = options;
   const roadmap = readRoadmap();
   const tasks = Array.isArray(roadmap.tasks) ? roadmap.tasks : [];
-  return tasks.filter((x) => (x.status || 'pending') === 'pending').map((x) => String(x.id));
+  const statuses = ['pending'];
+  if (includeFailed) statuses.push('failed');
+  if (includeInProgress) statuses.push('in_progress');
+  return tasks
+    .filter((x) => statuses.includes(String(x.status || 'pending')))
+    .map((x) => String(x.id));
 }
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
@@ -121,11 +127,13 @@ async function main() {
   const sleepSeconds = Math.max(10, Math.min(1800, parseInt(args.sleepSeconds || '180', 10)));
   const stopOnError = String(args.stopOnError || 'false') === 'true';
   const pushBranch = args.pushBranch || '';
+  const includeFailed = String(args.includeFailed || 'false') === 'true';
+  const includeInProgress = String(args.includeInProgress || 'false') === 'true';
 
   const start = Date.now();
   const deadline = start + durationHours * 3600 * 1000;
 
-  appendNightlyLog({ timestamp: ts(), action: 'start', durationHours, sleepSeconds, stopOnError, pushBranch: pushBranch || process.env.AUTO_PUSH_BRANCH || '' });
+  appendNightlyLog({ timestamp: ts(), action: 'start', durationHours, sleepSeconds, stopOnError, pushBranch: pushBranch || process.env.AUTO_PUSH_BRANCH || '', includeFailed, includeInProgress });
 
   let cycles = 0;
   let completed = 0;
@@ -136,14 +144,14 @@ async function main() {
     cycles += 1;
     appendNightlyLog({ timestamp: ts(), action: 'cycle_start', cycle: cycles });
     let progressed = false;
-    let pendings = getPendingTaskIds();
-    if (pendings.length === 0) {
+    let runnables = getRunnableTaskIds({ includeFailed, includeInProgress });
+    if (runnables.length === 0) {
       appendNightlyLog({ timestamp: ts(), action: 'idle', message: `Sin pendientes. Durmiendo ${sleepSeconds}s` });
       await sleep(sleepSeconds * 1000);
       continue;
     }
 
-    for (const nextId of pendings) {
+    for (const nextId of runnables) {
       if (attemptedThisCycle.has(nextId)) continue; // evitar loops en el mismo ciclo
       attemptedThisCycle.add(nextId);
       appendNightlyLog({ timestamp: ts(), action: 'run', taskId: nextId, cycle: cycles });
