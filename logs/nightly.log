@@ -937,3 +937,7 @@
 {"timestamp":"2025-09-08T22:36:33.194Z","action":"run","taskId":"e2e_email_read","cycle":5}
 {"timestamp":"2025-09-08T22:37:43.159Z","action":"task_end","taskId":"e2e_email_read","status":"error","exitCode":9}
 {"timestamp":"2025-09-08T22:37:43.161Z","action":"run","taskId":"e2e_email_folders","cycle":5}
+{"timestamp":"2025-09-08T22:39:37.064Z","action":"task_end","taskId":"e2e_email_folders","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T22:39:37.066Z","action":"run","taskId":"e2e_email_tags_filters","cycle":5}
+{"timestamp":"2025-09-08T22:41:03.420Z","action":"task_end","taskId":"e2e_email_tags_filters","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T22:41:03.421Z","action":"run","taskId":"e2e_email_ai_provider","cycle":5}

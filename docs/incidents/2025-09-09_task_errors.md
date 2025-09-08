@@ -478,3 +478,13 @@
 - **Error:** Task process exit code 4
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-08T22:39:36.961Z
+- **Tarea:** e2e_email_folders
+- **Error:** Task process exit code 7
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:41:03.342Z
+- **Tarea:** e2e_email_tags_filters
+- **Error:** Task process exit code 5
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

@@ -913,3 +913,9 @@
 {"timestamp":"2025-09-08T22:37:43.076Z","taskId":"e2e_email_read","error":"Task process exit code 4","attempt":10}
 {"timestamp":"2025-09-08T22:37:43.086Z","taskId":"e2e_email_read","action":"end","status":"error","attempt":10}
 {"timestamp":"2025-09-08T22:37:43.284Z","taskId":"e2e_email_folders","action":"start","attempt":10}
+{"timestamp":"2025-09-08T22:39:36.959Z","taskId":"e2e_email_folders","error":"Task process exit code 7","attempt":10}
+{"timestamp":"2025-09-08T22:39:36.965Z","taskId":"e2e_email_folders","action":"end","status":"error","attempt":10}
+{"timestamp":"2025-09-08T22:39:37.202Z","taskId":"e2e_email_tags_filters","action":"start","attempt":9}
+{"timestamp":"2025-09-08T22:41:03.341Z","taskId":"e2e_email_tags_filters","error":"Task process exit code 5","attempt":9}
+{"timestamp":"2025-09-08T22:41:03.347Z","taskId":"e2e_email_tags_filters","action":"end","status":"error","attempt":9}
+{"timestamp":"2025-09-08T22:41:03.530Z","taskId":"e2e_email_ai_provider","action":"start","attempt":9}

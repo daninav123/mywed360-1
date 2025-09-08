@@ -147,25 +147,25 @@
     {
       "id": "e2e_email_folders",
       "title": "E2E Email: carpetas",
-      "status": "in_progress",
+      "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/folders-management.cy.js\"",
       "attempts": 10,
-      "lastError": "Task process exit code 1"
+      "lastError": "Task process exit code 7"
     },
     {
       "id": "e2e_email_tags_filters",
       "title": "E2E Email: tags y filtros",
       "status": "failed",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/tags-filters.cy.js\"",
-      "attempts": 8,
-      "lastError": "Task process exit code 1"
+      "attempts": 9,
+      "lastError": "Task process exit code 5"
     },
     {
       "id": "e2e_email_ai_provider",
       "title": "E2E Email: proveedor IA",
-      "status": "failed",
+      "status": "in_progress",
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/ai-provider-email.cy.js\"",
-      "attempts": 8,
+      "attempts": 9,
       "lastError": "Task process exit code 1"
     },
     {
