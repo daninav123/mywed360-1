@@ -110,6 +110,16 @@ const EmailStats = ({ userId }) => {
     );
   }
 
+  // Garantizar estructuras con valores por defecto para seguridad
+  const emailCounts = stats.emailCounts ?? { total: 0, unread: 0 };
+  const contactAnalysis = stats.contactAnalysis ?? { totalContacts: 0, topContacts: [] };
+  const responseMetrics = stats.responseMetrics ?? { responseRate: 0, formattedAvgResponseTime: '' };
+  const activityMetrics = stats.activityMetrics ?? { today: 0, thisWeek: 0, dailyGraph: [] };
+  const tagDistribution = stats.tagDistribution ?? [];
+  const folderDistribution = stats.folderDistribution ?? { system: { inbox: 0, sent: 0, trash: 0 }, custom: [] };
+  const opens = stats.opens;
+  const clicks = stats.clicks;
+
   // Formateador de fechas para legibilidad
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -117,20 +127,21 @@ const EmailStats = ({ userId }) => {
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
-  // Datos para gráfico de actividad diaria
+  // Datos para gráfico de actividad diaria (con fallback seguro)
+  const dailyGraph = activityMetrics.dailyGraph;
   const activityData = {
-    labels: stats.activityMetrics.dailyGraph.map(day => formatDate(day.date)),
+    labels: dailyGraph.map(day => formatDate(day.date)),
     datasets: [
       {
         label: 'Recibidos',
-        data: stats.activityMetrics.dailyGraph.map(day => day.received),
+        data: dailyGraph.map(day => day.received ?? 0),
         backgroundColor: 'rgba(54, 162, 235, 0.5)',
         borderColor: 'rgb(54, 162, 235)',
         borderWidth: 1,
       },
       {
         label: 'Enviados',
-        data: stats.activityMetrics.dailyGraph.map(day => day.sent),
+        data: dailyGraph.map(day => day.sent ?? 0),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         borderColor: 'rgb(255, 99, 132)',
         borderWidth: 1,
@@ -161,39 +172,60 @@ const EmailStats = ({ userId }) => {
   };
 
   // Datos para gráfico circular de etiquetas
+  // Compatibilidad: si tagDistribution viene como objeto {labels, data}
+  const tagDistributionArray = Array.isArray(tagDistribution)
+    ? tagDistribution
+    : (tagDistribution.labels && Array.isArray(tagDistribution.labels)
+        ? tagDistribution.labels.map((name, idx) => ({ name, count: tagDistribution.data?.[idx] ?? 0, color: undefined }))
+        : []);
+  const tagSlice = tagDistributionArray.slice(0, 7);
   const tagData = {
-    labels: stats.tagDistribution.slice(0, 7).map(tag => tag.name),
+    labels: tagSlice.map(tag => tag.name),
     datasets: [{
       label: 'Correos',
-      data: stats.tagDistribution.slice(0, 7).map(tag => tag.count),
-      backgroundColor: stats.tagDistribution.slice(0, 7).map(tag => tag.color),
+      data: tagSlice.map(tag => tag.count),
+      backgroundColor: tagSlice.map(tag => tag.color ?? '#888888'),
       borderColor: '#ffffff',
       borderWidth: 1,
     }],
   };
 
   // Datos para gráfico circular de carpetas
+  // Compatibilidad alternativa: si folderDistribution es {labels, data}
+  let folderSystem = folderDistribution.system;
+  let folderCustom = folderDistribution.custom;
+  if (!folderSystem && folderDistribution.labels) {
+    // Mapear: asumimos índices 0 inbox, 1 sent, resto custom
+    const labels = folderDistribution.labels;
+    const data = folderDistribution.data || [];
+    folderSystem = {
+      inbox: data[0] ?? 0,
+      sent: data[1] ?? 0,
+      trash: 0,
+    };
+    folderCustom = labels.slice(2).map((name, idx) => ({ name, count: data[idx + 2] ?? 0 }));
+  }
   const folderData = {
     labels: [
       'Bandeja de entrada', 
       'Enviados', 
       'Papelera', 
-      ...stats.folderDistribution.custom.map(folder => folder.name)
+      ...folderCustom.map(folder => folder.name)
     ],
     datasets: [{
       label: 'Correos',
       data: [
-        stats.folderDistribution.system.inbox,
-        stats.folderDistribution.system.sent,
-        stats.folderDistribution.system.trash,
-        ...stats.folderDistribution.custom.map(folder => folder.count)
+        folderSystem.inbox,
+        folderSystem.sent,
+        folderSystem.trash,
+        ...folderCustom.map(folder => folder.count)
       ],
       backgroundColor: [
         '#4CAF50', // Verde para inbox
         '#2196F3', // Azul para enviados
         '#F44336', // Rojo para papelera
         // Colores para carpetas personalizadas
-        ...Array(stats.folderDistribution.custom.length)
+        ...Array(folderCustom.length)
           .fill()
           .map((_, i) => `hsl(${(i * 55) % 360}, 70%, 60%)`)
       ],
@@ -231,15 +263,15 @@ const EmailStats = ({ userId }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
         <StatCard 
           title="Correos" 
-          value={stats.emailCounts.total}
-          subtitle={`${stats.emailCounts.unread} sin leer`}
+          value={emailCounts.total}
+          subtitle={`${emailCounts.unread} sin leer`}
           icon={<Mail />}
           color="bg-blue-50 text-blue-600"
         />
         
         <StatCard 
           title="Contactos" 
-          value={stats.contactAnalysis.totalContacts}
+          value={contactAnalysis.totalContacts}
           subtitle="Proveedores únicos"
           icon={<User />}
           color="bg-green-50 text-green-600"
@@ -247,9 +279,9 @@ const EmailStats = ({ userId }) => {
         
         <StatCard 
           title="Tasa de respuesta" 
-          value={`${Math.round(stats.responseMetrics.responseRate * 100)}%`}
-          subtitle={stats.responseMetrics.formattedAvgResponseTime ? 
-            `Tiempo medio: ${stats.responseMetrics.formattedAvgResponseTime}` : 
+          value={`${Math.round(responseMetrics.responseRate * 100)}%`}
+          subtitle={responseMetrics.formattedAvgResponseTime ? 
+            `Tiempo medio de respuesta: ${responseMetrics.formattedAvgResponseTime}` : 
             'Sin datos de respuesta'}
           icon={<Clock />}
           color="bg-purple-50 text-purple-600"
@@ -257,24 +289,24 @@ const EmailStats = ({ userId }) => {
         
         <StatCard 
           title="Actividad" 
-          value={stats.activityMetrics.today}
-          subtitle={`${stats.activityMetrics.thisWeek} esta semana`}
+          value={activityMetrics.today}
+          subtitle={`${activityMetrics.thisWeek} esta semana`}
           icon={<Mail />}
           color="bg-amber-50 text-amber-600"
         />
-        {stats.opens !== undefined && (
+        {opens !== undefined && (
           <StatCard
             title="Aperturas"
-            value={stats.opens}
+            value={opens}
             subtitle="Total"
             icon={<Eye />}
             color="bg-cyan-50 text-cyan-600"
           />
         )}
-        {stats.clicks !== undefined && (
+        {clicks !== undefined && (
           <StatCard
             title="Clics"
-            value={stats.clicks}
+            value={clicks}
             subtitle="Total"
             icon={<MousePointerClick />}
             color="bg-yellow-50 text-yellow-600"
@@ -299,7 +331,7 @@ const EmailStats = ({ userId }) => {
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-4">Contactos frecuentes</h3>
           <div className="space-y-3">
-            {stats.contactAnalysis.topContacts.map((contact, index) => (
+            {contactAnalysis.topContacts.map((contact, index) => (
               <div key={index} className="flex items-center">
                 <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
                   {contact.name.charAt(0).toUpperCase()}
@@ -319,7 +351,7 @@ const EmailStats = ({ userId }) => {
               </div>
             ))}
             
-            {stats.contactAnalysis.topContacts.length === 0 && (
+            {contactAnalysis.topContacts.length === 0 && (
               <p className="text-center text-gray-500">
                 No hay datos de contactos disponibles
               </p>
@@ -351,7 +383,7 @@ const EmailStats = ({ userId }) => {
           </div>
           
           <div className="h-64">
-            {stats.tagDistribution.length > 0 ? (
+            {tagDistribution.length > 0 ? (
               <Doughnut 
                 data={tagData} 
                 options={chartOptions}
@@ -382,7 +414,7 @@ const EmailStats = ({ userId }) => {
 
       {/* Fecha de actualización */}
       <div className="text-xs text-gray-500 text-right mt-4">
-        Última actualización: {new Date(stats.lastUpdated).toLocaleString()}
+        Última actualización: {stats.lastUpdated ? new Date(stats.lastUpdated).toLocaleString() : 'N/D'}
       </div>
     </div>
   );

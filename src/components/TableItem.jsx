@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 import { ItemTypes } from './GuestItem';
 
@@ -8,16 +8,17 @@ const firstName = (str='?') => {
   const first = String(str).trim().split(/\s+/)[0] || '?';
   return first.length>8? first.slice(0,8)+'…' : first;
 };
-export default function TableItem({ table, scale, offset, onMove, onAssignGuest, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true }) {
+function TableItem({ table, scale, offset, onMove, onAssignGuest, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
-  const getLabel = (name='?') => {
+  const getLabel = useCallback((name='?') => {
     if (scale >= 1.5) {
       return firstName(name); // nombre (o parte) cuando hay zoom suficiente
     }
+
     // Iniciales (máx. 2) cuando está alejado
     const initials = String(name).trim().split(/\s+/).map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
     return initials || '?';
-  };
+  }, [scale]);
   const ref = useRef(null);
 
   // drop logic
@@ -32,14 +33,19 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
     e.stopPropagation();
     const start = { x: e.clientX, y: e.clientY };
     const orig = { x: table.x, y: table.y };
+    let lastPos = { x: orig.x, y: orig.y };
     const move = (ev) => {
       const dx = (ev.clientX - start.x) / scale;
       const dy = (ev.clientY - start.y) / scale;
-      onMove(table.id, { x: orig.x + dx, y: orig.y + dy });
+      lastPos = { x: orig.x + dx, y: orig.y + dy };
+      // Mover en vivo, sin resolver ni guardar historial
+      onMove(table.id, lastPos, { finalize: false });
     };
-    const up = () => {
+    const up = (ev) => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      // Finalizar movimiento: resolver colisiones y guardar en historial
+      onMove(table.id, lastPos, { finalize: true });
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
@@ -47,19 +53,19 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
 
   // Contar invitados asignados considerando acompañantes
   // Total de personas (invitado + acompañantes) asignadas a esta mesa
-  const guestCount = (() => {
+  const guestCount = useMemo(() => {
     // Conteo desde lista global de invitados (por id o nombre de mesa)
     const countFromGuests = guests.reduce((sum, g) => {
       const matches = (() => {
-      if (g.tableId !== undefined && g.tableId !== null) {
-        return String(g.tableId) === String(table.id);
-      }
-      if (g.table !== undefined && g.table !== null && String(g.table).trim() !== '') {
-        // puede ser nombre de mesa o número en string
-        return String(g.table).trim() === String(table.id) || (table.name && String(g.table).trim() === String(table.name));
-      }
-      return false;
-    })();
+        if (g.tableId !== undefined && g.tableId !== null) {
+          return String(g.tableId) === String(table.id);
+        }
+        if (g.table !== undefined && g.table !== null && String(g.table).trim() !== '') {
+          // puede ser nombre de mesa o número en string
+          return String(g.table).trim() === String(table.id) || (table.name && String(g.table).trim() === String(table.name));
+        }
+        return false;
+      })();
       if (!matches) return sum;
       const comp = parseInt(g.companion, 10) || 0;
       return sum + 1 + comp;
@@ -71,9 +77,9 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
     }
     // Conteo para ceremonia (un solo invitado por mesa)
     return table.guestId ? 1 : 0;
-  })();
+  }, [guests, table.id, table.name, table.assignedGuests, table.guestId]);
   // Lista de invitados asignados a esta mesa (ignoramos acompañantes para las iniciales)
-  const guestsList = (() => {
+  const guestsList = useMemo(() => {
     // Primero, obtenemos los invitados de la lista global
     const list = guests.filter(g => {
       if (g.tableId !== undefined && g.tableId !== null) {
@@ -113,7 +119,7 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
 
     // Sin assignedGuests: devolvemos la lista de invitados por mesa (puede estar vacía)
     return list;
-  })();
+  }, [guests, table.id, table.name, table.assignedGuests]);
   const seatDots = guestsList.length; // mostramos iniciales alrededor
   // Tamaño base: diámetro para circular o ancho/alto para rectangular
   const sizeX = table.shape === 'circle' ? (table.diameter || 60) : (table.width || 80);
@@ -127,17 +133,19 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
     width: sizeX * scale,
     height: sizeY * scale,
     backgroundColor: disabled ? '#e5e7eb' : '#fef3c7',
-    border: '2px solid #f59e0b',
+    border: selected ? '3px solid #2563eb' : '2px solid #f59e0b',
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: disabled ? 'not-allowed' : 'grab',
-    userSelect: 'none'
+    userSelect: 'none',
+    boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.25)' : 'none'
   };
 
   return (
     <div ref={node => {ref.current=node; drop(node);}} 
+      data-testid={`table-item-${table.id}`}
       style={{...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor}} 
       onPointerDown={disabled || !canMove ? undefined : handlePointerDown}
       onContextMenu={e=>{e.preventDefault(); onToggleEnabled(table.id);}}
@@ -148,6 +156,16 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
         className="absolute top-0 right-0 text-xs px-1 text-red-600">✖</button>
       {/* Contenido central opcional: solo mostramos el número de mesa pequeño */}
       <span style={{fontSize:14, fontWeight:'bold', pointerEvents:'none', color:'#374151'}}>{table.id}</span>
+      {/* Badge de ocupación: invitados contabilizados / capacidad (seats) */}
+      {table.seats != null && (
+        <div
+          className="absolute bottom-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold"
+          style={{ background:'#111827', color:'#fff', opacity:0.85 }}
+          title="Ocupación de la mesa"
+        >
+          {Math.max(0, Math.min(guestCount, table.seats))}/{table.seats}
+        </div>
+      )}
     {disabled && <div className="absolute inset-0 bg-white bg-opacity-50 rounded" />} 
       {/* seats */}
       {(() => {
@@ -157,7 +175,7 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
            const first = name.trim().split(/\s+/)[0] || '?';
            return first;
          }
-        if (table.shape === 'rect') {
+        if (table.shape === 'rectangle') {
            const cols = seatDots > 0 ? Math.ceil(seatDots / 2) : 0;
           return Array.from({ length: seatDots }).map((_, i) => {
             const isTop = i < cols;
@@ -225,3 +243,5 @@ export default function TableItem({ table, scale, offset, onMove, onAssignGuest,
     </div>
   );
 }
+
+export default React.memo(TableItem);

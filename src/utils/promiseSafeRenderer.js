@@ -3,6 +3,8 @@
  * Previene el error "Objects are not valid as a React child (found: [object Promise])"
  */
 
+import React from 'react';
+
 /**
  * Asegura que un valor no sea una Promesa antes de renderizarlo en JSX
  * @param {any} value - El valor a verificar

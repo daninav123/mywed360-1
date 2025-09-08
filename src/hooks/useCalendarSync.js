@@ -19,10 +19,10 @@ export const useCalendarSync = () => {
   // Cargar el estado de sincronización del usuario
   useEffect(() => {
     const loadSyncStatus = async () => {
-      if (!user?.uid) return;
+      if (!currentUser?.uid) return;
 
       try {
-        const userSyncRef = doc(db, 'calendarSync', user.uid);
+        const userSyncRef = doc(db, 'calendarSync', currentUser.uid);
         const syncDoc = await getDoc(userSyncRef);
         
         if (syncDoc.exists()) {
@@ -114,7 +114,7 @@ export const useCalendarSync = () => {
    * @param {Array} calendars - Calendarios seleccionados para sincronizar
    */
   const saveCalendarSyncConfig = async (calendars) => {
-    if (!user?.uid) {
+    if (!currentUser?.uid) {
       setError('Debes iniciar sesión para sincronizar calendarios');
       return;
     }
@@ -123,11 +123,11 @@ export const useCalendarSync = () => {
     setError(null);
     
     try {
-      const userSyncRef = doc(db, 'calendarSync', user.uid);
+      const userSyncRef = doc(db, 'calendarSync', currentUser.uid);
       await setDoc(userSyncRef, {
         syncedCalendars: calendars,
         lastSync: new Date().toISOString(),
-        userId: user.uid
+        userId: currentUser.uid
       }, { merge: true });
       
       setSyncedCalendars(calendars);
@@ -146,7 +146,7 @@ export const useCalendarSync = () => {
    * @returns {Promise<Array>} - Lista de eventos importados
    */
   const importEventsFromGoogle = async (calendarId = 'primary') => {
-    if (!user?.uid) {
+    if (!currentUser?.uid) {
       setError('Debes iniciar sesión para sincronizar eventos');
       return [];
     }
@@ -164,13 +164,13 @@ export const useCalendarSync = () => {
       
       for (const googleEvent of googleEvents) {
         const lovendaEvent = googleCalendarService.transformToLovendaEvent(googleEvent);
-        lovendaEvent.userId = user.uid;
+        lovendaEvent.userId = currentUser.uid;
         lovendaEvent.synced = true;
         lovendaEvent.source = 'google';
         
         // Verificar si ya existe por googleEventId
         const existingQuery = query(eventsRef, 
-          where('userId', '==', user.uid),
+          where('userId', '==', currentUser.uid),
           where('googleEventId', '==', googleEvent.id)
         );
         
@@ -189,7 +189,7 @@ export const useCalendarSync = () => {
       }
       
       // Actualizar fecha de última sincronización
-      const userSyncRef = doc(db, 'calendarSync', user.uid);
+      const userSyncRef = doc(db, 'calendarSync', currentUser.uid);
       await updateDoc(userSyncRef, {
         lastSync: new Date().toISOString()
       });
@@ -212,7 +212,7 @@ export const useCalendarSync = () => {
    * @returns {Promise<Array>} - Lista de eventos exportados
    */
   const exportEventsToGoogle = async (events, calendarId = 'primary') => {
-    if (!user?.uid) {
+    if (!currentUser?.uid) {
       setError('Debes iniciar sesión para sincronizar eventos');
       return [];
     }
@@ -241,17 +241,14 @@ export const useCalendarSync = () => {
               synced: true
             });
           }
-          
           exportedEvents.push(newGoogleEvent);
         }
       }
-      
       // Actualizar fecha de última sincronización
-      const userSyncRef = doc(db, 'calendarSync', user.uid);
+      const userSyncRef = doc(db, 'calendarSync', currentUser.uid);
       await updateDoc(userSyncRef, {
         lastSync: new Date().toISOString()
       });
-      
       setLastSync(new Date());
       setIsLoading(false);
       return exportedEvents;
@@ -269,7 +266,7 @@ export const useCalendarSync = () => {
    * @returns {Promise<Object>} - Resultado de la sincronización
    */
   const syncBidirectional = async (calendarId = 'primary') => {
-    if (!user?.uid) {
+    if (!currentUser?.uid) {
       setError('Debes iniciar sesión para sincronizar eventos');
       return { imported: [], exported: [] };
     }
@@ -284,7 +281,7 @@ export const useCalendarSync = () => {
       
       // 2. Obtener eventos de Lovenda
       const eventsRef = collection(db, 'tasks');
-      const lovendaEventsQuery = query(eventsRef, where('userId', '==', user.uid));
+      const lovendaEventsQuery = query(eventsRef, where('userId', '==', currentUser.uid));
       const lovendaEventsSnapshot = await getDocs(lovendaEventsQuery);
       const lovendaEvents = lovendaEventsSnapshot.docs.map(doc => ({
         id: doc.id,
@@ -294,7 +291,7 @@ export const useCalendarSync = () => {
       // 3. Procesamiento de eventos de Google
       for (const googleEvent of googleEvents) {
         const lovendaEvent = googleCalendarService.transformToLovendaEvent(googleEvent);
-        lovendaEvent.userId = user.uid;
+        lovendaEvent.userId = currentUser.uid;
         lovendaEvent.synced = true;
         lovendaEvent.source = 'google';
         
@@ -330,7 +327,7 @@ export const useCalendarSync = () => {
       const exportedEvents = await exportEventsToGoogle(eventsToExport, calendarId);
       
       // 5. Actualizar fecha de última sincronización
-      const userSyncRef = doc(db, 'calendarSync', user.uid);
+      const userSyncRef = doc(db, 'calendarSync', currentUser.uid);
       await updateDoc(userSyncRef, {
         lastSync: new Date().toISOString()
       });

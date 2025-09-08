@@ -7,11 +7,18 @@ import useTranslations from '../../hooks/useTranslations';
  * Lista optimizada de invitados con filtrado y acciones
  * Componente memoizado para mejor rendimiento
  */
+const statusCycle = (current) => {
+  if (current === 'pending' || current === 'Pendiente') return 'confirmed';
+  if (current === 'confirmed' || current === 'Sí') return 'declined';
+  return 'pending';
+};
+
 const GuestList = React.memo(({ 
   guests = [], 
   searchTerm = '', 
   statusFilter = '', 
   tableFilter = '',
+  onUpdateStatus,
   onEdit,
   onDelete,
   onInviteWhatsApp,
@@ -32,8 +39,8 @@ const GuestList = React.memo(({
         guest.status === statusFilter ||
         guest.response === statusFilter;
       
-      const matchesTable = !tableFilter || 
-        guest.table?.toString().includes(tableFilter);
+      const matchesTable = !tableFilter ||
+        (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
       
       return matchesSearch && matchesStatus && matchesTable;
     });
@@ -75,6 +82,11 @@ const GuestList = React.memo(({
   }, [onInviteEmail]);
 
   // Función para obtener el color del estado
+  const handleStatusToggle = useCallback((guest) => {
+    const next = statusCycle(guest.status || guest.response);
+    onUpdateStatus?.(guest, next);
+  }, [onUpdateStatus]);
+
   const getStatusColor = useCallback((status) => {
     switch (status) {
       case 'confirmed':
@@ -163,7 +175,7 @@ const GuestList = React.memo(({
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredGuests.map((guest) => (
-                    <tr key={guest.id} className="hover:bg-gray-50">
+                    <tr key={guest.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleEdit(guest)}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -188,9 +200,9 @@ const GuestList = React.memo(({
                         <div className="text-sm text-gray-500">{guest.phone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(guest.status || guest.response)}`}>
+                        <button type="button" onClick={() => handleStatusToggle(guest)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
                           {wedding.guestStatus(guest.status) || guest.response}
-                        </span>
+                        </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {guest.table || '-'}
@@ -249,7 +261,7 @@ const GuestList = React.memo(({
           {/* Vista móvil */}
           <div className="md:hidden space-y-4">
             {filteredGuests.map((guest) => (
-              <div key={guest.id} className="bg-white p-4 rounded-lg shadow-sm border">
+              <div key={guest.id} className="bg-white p-4 rounded-lg shadow-sm border cursor-pointer" onClick={() => handleEdit(guest)}>
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center">
                     <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
@@ -257,9 +269,9 @@ const GuestList = React.memo(({
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">{guest.name}</h3>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(guest.status || guest.response)}`}>
+                      <button type="button" onClick={() => handleStatusToggle(guest)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
                         {wedding.guestStatus(guest.status) || guest.response}
-                      </span>
+                      </button>
                     </div>
                   </div>
                 </div>

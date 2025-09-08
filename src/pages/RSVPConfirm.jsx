@@ -14,7 +14,7 @@ function RSVPConfirm() {
   useEffect(() => {
     const fetchGuest = async () => {
       try {
-        const res = await fetch(`/api/guests/${token}`);
+        const res = await fetch(`/api/rsvp/by-token/${token}`);
         if (!res.ok) throw new Error('Invitado no encontrado');
         const data = await res.json();
         setGuest(data);
@@ -33,7 +33,7 @@ function RSVPConfirm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/guests/${token}`, {
+      const res = await fetch(`/api/rsvp/by-token/${token}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, companions: Number(companions), allergens })

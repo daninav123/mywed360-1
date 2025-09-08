@@ -24,6 +24,7 @@ const GuestForm = ({
     companion: guest?.companion || 0,
     companionType: guest?.companionType || 'none',
     table: guest?.table || '',
+    companionGroupId: guest?.companionGroupId || '',
     response: guest?.response || 'Pendiente',
     status: guest?.status || 'pending',
     dietaryRestrictions: guest?.dietaryRestrictions || '',
@@ -238,7 +239,23 @@ const GuestForm = ({
           )}
         </div>
 
-        {/* Tipo de acompañante */}
+        {/* Grupo de acompañantes */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Grupo de acompañantes</label>
+          <div className="flex space-x-2">
+            <Input
+              value={formData.companionGroupId}
+              onChange={(e) => handleChange('companionGroupId', e.target.value)}
+              placeholder="group-12345"
+              disabled={isLoading}
+            />
+            <Button type="button" variant="secondary" disabled={isLoading}
+              onClick={() => handleChange('companionGroupId', `group-${Date.now()}`)}>
+              Generar
+            </Button>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de acompañante</label>
           <select

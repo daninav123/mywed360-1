@@ -46,6 +46,14 @@ router.post('/:weddingId/invite', async (req, res) => {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // Indexar token para búsqueda pública por token (ruta /api/rsvp)
+    await db.collection('rsvpTokens').doc(token).set({
+      weddingId,
+      guestId: token,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
     const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
     res.json({ token, link });
   } catch (err) {
@@ -116,6 +124,13 @@ router.post('/:weddingId/id/:docId/rsvp-link', async (req, res) => {
     }
 
     const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
+    // Indexar token -> (weddingId, guestId)
+    await db.collection('rsvpTokens').doc(token).set({
+      weddingId,
+      guestId: docId,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
     res.json({ token, link });
   } catch (err) {
     logger.error('rsvp-link-error', err);

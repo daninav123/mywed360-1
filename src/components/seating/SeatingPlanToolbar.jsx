@@ -8,16 +8,11 @@ import {
   Undo2, 
   Redo2, 
   Download, 
-  FileImage, 
-  Settings, 
   Grid, 
-  Users, 
   Maximize, 
   Palette,
-  Save,
   Cloud,
   CloudOff,
-  Zap
 } from 'lucide-react';
 
 const SeatingPlanToolbar = ({
@@ -26,13 +21,10 @@ const SeatingPlanToolbar = ({
   onRedo,
   canUndo,
   canRedo,
-  onExportPNG,
   onExportPDF,
   onOpenCeremonyConfig,
-  onOpenBanquetConfig,
   onOpenSpaceConfig,
   onOpenTemplates,
-  onAutoAssign,
   syncStatus,
   className = ""
 }) => {
@@ -99,7 +91,7 @@ const SeatingPlanToolbar = ({
             <span className="hidden sm:inline">Espacio</span>
           </button>
 
-          {tab === 'ceremony' ? (
+          {tab === 'ceremony' && (
             <button
               onClick={onOpenCeremonyConfig}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
@@ -107,15 +99,6 @@ const SeatingPlanToolbar = ({
             >
               <Grid className="h-4 w-4" />
               <span className="hidden sm:inline">Ceremonia</span>
-            </button>
-          ) : (
-            <button
-              onClick={onOpenBanquetConfig}
-              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title="Configurar banquete"
-            >
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Banquete</span>
             </button>
           )}
 
@@ -129,29 +112,8 @@ const SeatingPlanToolbar = ({
           </button>
         </div>
 
-        {/* Grupo: IA y Automatización */}
+        {/* Grupo: Exportación (solo PDF) */}
         <div className="flex items-center gap-1 border-r pr-3">
-          <button
-            onClick={onAutoAssign}
-            className="flex items-center gap-1 px-2 py-1 text-sm bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded hover:from-purple-600 hover:to-blue-600 transition-all"
-            title="Asignación automática con IA"
-          >
-            <Zap className="h-4 w-4" />
-            <span className="hidden sm:inline">Auto IA</span>
-          </button>
-        </div>
-
-        {/* Grupo: Exportación */}
-        <div className="flex items-center gap-1 border-r pr-3">
-          <button
-            onClick={onExportPNG}
-            className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title="Exportar como PNG"
-          >
-            <FileImage className="h-4 w-4" />
-            <span className="hidden sm:inline">PNG</span>
-          </button>
-          
           <button
             onClick={onExportPDF}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"

@@ -8,6 +8,8 @@ import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
 import { useWedding } from '../context/WeddingContext';
 import { useAuth } from '../hooks/useAuth';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
+import ContactsImporter from '../components/guests/ContactsImporter';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -93,6 +95,21 @@ function Invitados() {
     const result = await removeGuest(guest.id);
     if (!result.success) {
       alert(`Error eliminando invitado: ${result.error}`);
+    }
+  };
+
+  // Importar contactos seleccionados
+  const handleImportedGuests = async (importedGuests) => {
+    try {
+      if (!importedGuests || importedGuests.length === 0) return;
+      for (const guest of importedGuests) {
+        await addGuest(guest);
+      }
+      alert(`${importedGuests.length} invitados importados correctamente`);
+      setShowGuestModal(false);
+    } catch (error) {
+      console.error('Error importando invitados:', error);
+      alert('Ocurrió un error al importar los invitados');
     }
   };
 
@@ -205,12 +222,35 @@ function Invitados() {
           title={editingGuest ? 'Editar Invitado' : 'Añadir Invitado'}
           size="lg"
         >
-          <GuestForm
-            guest={editingGuest}
-            onSave={handleSaveGuest}
-            onCancel={handleCancelModal}
-            isLoading={isSaving}
-          />
+          {editingGuest ? (
+            <GuestForm
+              guest={editingGuest}
+              onSave={handleSaveGuest}
+              onCancel={handleCancelModal}
+              isLoading={isSaving}
+            />
+          ) : (
+            <Tabs defaultValue="manual">
+              <TabsList className="flex space-x-6 border-b mb-4">
+                <TabsTrigger value="manual" className="pb-2">Manual</TabsTrigger>
+                <TabsTrigger value="import" className="pb-2">Desde contactos</TabsTrigger>
+              </TabsList>
+              <TabsContent value="manual">
+                <GuestForm
+                  guest={null}
+                  onSave={handleSaveGuest}
+                  onCancel={handleCancelModal}
+                  isLoading={isSaving}
+                />
+              </TabsContent>
+              <TabsContent value="import" className="pt-2">
+                <ContactsImporter onImported={handleImportedGuests} />
+                <p className="text-xs text-gray-500 mt-3">
+                  Selecciona los contactos de tu agenda y se añadirán como invitados.
+                </p>
+              </TabsContent>
+            </Tabs>
+          )}
         </Modal>
       </div>
     </div>

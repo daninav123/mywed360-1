@@ -28,7 +28,7 @@ function detectEventsInChunk(text, subject, startIndex, chunkId) {
     const datePatterns = [
       // DD/MM/YYYY o DD-MM-YYYY
       {
-        regex: /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/g,
+        regex: /(\d{1,2})[/-](\d{1,2})[/-](\d{4})/g,
         parse: (match) => {
           const [_, day, month, year] = match;
           return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));

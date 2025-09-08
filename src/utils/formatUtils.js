@@ -81,7 +81,7 @@ export const formatPhone = (phone) => {
   if (!phone) return '';
   
   // Limpiar el teléfono
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  const cleanPhone = phone.replace(/[\s()-]/g, '');
   
   // Si empieza con +34, 0034 o 34, quitarlo
   let nationalPhone = cleanPhone;

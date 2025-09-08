@@ -159,6 +159,7 @@ const useGuests = () => {
   const addGuest = useCallback(async (guestData) => {
     try {
       const newGuest = {
+        companionGroupId: guestData.companionGroupId || '',
         ...guestData,
         id: guestData.id || `guest-${Date.now()}`,
         createdAt: new Date().toISOString(),
@@ -174,6 +175,9 @@ const useGuests = () => {
   }, [addItem]);
 
   const updateGuest = useCallback(async (guestId, updates) => {
+    // Buscar guest original para detectar cambio de mesa
+    const original = guests.find(g => g.id === guestId);
+    const originalTable = original?.table || '';
     try {
       const updatedGuest = {
         ...updates,
@@ -182,6 +186,16 @@ const useGuests = () => {
       };
       
       await updateItem(guestId, updatedGuest);
+
+      // Si cambió la mesa y pertenece a un grupo, actualizar acompañantes
+      if (updatedGuest.table !== originalTable && updatedGuest.companionGroupId) {
+        const companions = guests.filter(g => g.companionGroupId === updatedGuest.companionGroupId && g.id !== guestId);
+        if (companions.length) {
+          for (const comp of companions) {
+            await updateItem(comp.id, { table: updatedGuest.table, updatedAt: new Date().toISOString() });
+          }
+        }
+      }
       return { success: true, guest: updatedGuest };
     } catch (error) {
       console.error('Error actualizando invitado:', error);
@@ -261,7 +275,9 @@ const useGuests = () => {
   }, []);
 
   const bulkInviteWhatsApp = useCallback(async () => {
-    const guestsWithPhone = guests.filter(g => utils.phoneClean(g.phone));
+    // Recordatorios solo a pendientes
+    const guestsWithPhone = guests.filter(g =>
+      (g.status === 'pending' || g.response === 'Pendiente') && utils.phoneClean(g.phone));
     
     if (guestsWithPhone.length === 0) {
       alert('No hay invitados con número de teléfono');
@@ -299,6 +315,8 @@ const useGuests = () => {
         
         window.open(`https://wa.me/${phone}?text=${encodedMessage}`, '_blank');
         
+        // Registrar fecha de recordatorio
+        await updateItem(guest.id, { lastReminderAt: new Date().toISOString() });
         // Pequeña pausa entre invitaciones
         await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {

@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { X, Grid, Users, Maximize, Palette, Zap } from 'lucide-react';
+import { X, Grid, Users, Maximize, Palette } from 'lucide-react';
 
 const Modal = ({ isOpen, onClose, title, children, icon: Icon }) => {
   if (!isOpen) return null;
@@ -52,7 +52,10 @@ const SeatingPlanModals = ({
   onApplyTemplate,
   
   // Estado actual
-  hallSize
+  hallSize,
+  areas = [],
+  guests = [],
+  tables = []
 }) => {
   return (
     <>
@@ -106,6 +109,10 @@ const SeatingPlanModals = ({
         <TemplateSelector
           onApply={onApplyTemplate}
           onClose={onCloseTemplate}
+          guests={guests}
+          tables={tables}
+          hallSize={hallSize}
+          areas={areas}
         />
       </Modal>
     </>
@@ -302,11 +309,15 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
 
 // Formulario de configuración de espacio
 const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
-  const [dimensions, setDimensions] = React.useState(hallSize);
+  const [dimensions, setDimensions] = React.useState({
+    width: hallSize?.width ?? 1800,
+    height: hallSize?.height ?? 1200,
+    aisleMin: hallSize?.aisleMin ?? 80,
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(dimensions.width, dimensions.height);
+    onSave(dimensions.width, dimensions.height, parseInt(dimensions.aisleMin, 10) || 80);
     onClose();
   };
 
@@ -337,6 +348,19 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
         </div>
       </div>
 
+      <div>
+        <label className="block text-sm font-medium mb-1">Pasillo mínimo (cm)</label>
+        <input
+          type="number"
+          min="40"
+          max="300"
+          step="10"
+          value={dimensions.aisleMin}
+          onChange={(e) => setDimensions(prev => ({ ...prev, aisleMin: parseInt(e.target.value, 10) || 80 }))}
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
       <div className="bg-gray-50 p-3 rounded">
         <p className="text-sm text-gray-600">
           <strong>Área total:</strong> {(dimensions.width * dimensions.height / 10000).toFixed(1)} m²
@@ -363,29 +387,201 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
 };
 
 // Selector de plantillas
-const TemplateSelector = ({ onApply, onClose }) => {
+const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize = { width: 1800, height: 1200, aisleMin: 80 }, areas = [] }) => {
+  // Calcular necesidades a partir de datos reales
+  const guestCount = Array.isArray(guests)
+    ? guests.reduce((acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0), 0)
+    : 0;
+  const tableCount = Array.isArray(tables) ? tables.length : 0;
+  
+  // Boundary y dimensiones efectivas
+  const boundary = (() => {
+    const b = (areas || []).find(a => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3);
+    return b ? b.points : null;
+  })();
+  const bbox = (() => {
+    if (!boundary) return null;
+    const xs = boundary.map(p => p.x);
+    const ys = boundary.map(p => p.y);
+    return { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) };
+  })();
+  const centroid = (() => {
+    if (!boundary) return { x: (hallSize?.width||1800)/2, y: (hallSize?.height||1200)/2 };
+    let x = 0, y = 0; boundary.forEach(p => { x += p.x; y += p.y; });
+    const n = boundary.length || 1; return { x: x/n, y: y/n };
+  })();
+  const hallW = bbox ? Math.max(600, bbox.maxX - bbox.minX) : Math.max(600, hallSize?.width || 1800);
+  const hallH = bbox ? Math.max(400, bbox.maxY - bbox.minY) : Math.max(400, hallSize?.height || 1200);
+  const aisle = Math.max(40, Math.min(300, hallSize?.aisleMin ?? 80));
+
+  // Derivar forma y tamaño base de mesas actuales
+  const shapeCounts = tables.reduce((m,t)=>{ const s=(t?.shape||'rectangle'); m[s]=(m[s]||0)+1; return m; },{});
+  const defaultShape = (shapeCounts['circle']||0) > (shapeCounts['rectangle']||0) ? 'circle' : 'rectangle';
+  const baseDiameter = Math.max(50, Math.round(
+    (tables.map(t=>t?.diameter).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.diameter).filter(Boolean).length||1)) || 60
+  ));
+  const baseWidth = Math.max(60, Math.round(
+    (tables.map(t=>t?.width).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.width).filter(Boolean).length||1)) || 80
+  ));
+  const baseHeight = Math.max(50, Math.round(
+    (tables.map(t=>t?.height||t?.length).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.height||t?.length).filter(Boolean).length||1)) || 60
+  ));
+  const avgSeats = (() => {
+    if (!tableCount) return 8;
+    const seats = tables.map(t => parseInt(t?.seats, 10) || 0).filter(n => n > 0);
+    if (!seats.length) return 8;
+    const avg = Math.round(seats.reduce((a,b)=>a+b,0)/seats.length);
+    return Math.min(12, Math.max(6, avg));
+  })();
+
+  const suggestedBanquet = (() => {
+    const seatsPerTable = avgSeats || 8;
+    const neededTables = guestCount > 0 ? Math.ceil(guestCount / seatsPerTable) : Math.max(1, tableCount || 6);
+    const rows = Math.max(1, Math.floor(Math.sqrt(neededTables)));
+    const cols = Math.max(1, Math.ceil(neededTables / rows));
+    return { rows, cols, seats: seatsPerTable };
+  })();
+
+  const suggestedCeremony = (() => {
+    const totalChairs = Math.max(guestCount, 20);
+    const cols = Math.max(6, Math.round(Math.sqrt(totalChairs)));
+    const rows = Math.max(4, Math.ceil(totalChairs / cols));
+    return { rows, cols };
+  })();
+
+  // Helpers para construir arreglos de mesas
+  const buildGridTables = (rows, cols, shape = defaultShape) => {
+    const count = rows * cols;
+    const need = Math.max(count, guestCount ? Math.ceil(guestCount / avgSeats) : count);
+    const useCols = cols;
+    const useRows = Math.ceil(need / useCols);
+    const cellW = hallW / (useCols + 1);
+    const cellH = hallH / (useRows + 1);
+    const arr = [];
+    let id = 1;
+    for (let r = 0; r < useRows; r++) {
+      for (let c = 0; c < useCols; c++) {
+        if (arr.length >= need) break;
+        const cx = (c + 1) * cellW;
+        const cy = (r + 1) * cellH;
+        arr.push(shape === 'circle'
+          ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats }
+          : { id: id++, x: cx, y: cy, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats }
+        );
+      }
+    }
+    return arr;
+  };
+
+  const buildCircularRing = () => {
+    const need = guestCount ? Math.ceil(guestCount / avgSeats) : Math.max(tableCount || 6, 6);
+    const centerX = centroid.x, centerY = centroid.y;
+    const radius = Math.min(hallW, hallH) * 0.35;
+    const arr = [];
+    for (let i = 0; i < need; i++) {
+      const ang = (2 * Math.PI * i) / need;
+      const cx = centerX + radius * Math.cos(ang);
+      const cy = centerY + radius * Math.sin(ang);
+      arr.push({ id: i + 1, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats });
+    }
+    return arr;
+  };
+
+  const buildUShape = () => {
+    const segments = 3; // izquierda, abajo, derecha
+    const perSeg = Math.max(2, Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 10) / segments));
+    const gap = Math.min(200, Math.max(aisle + 40, Math.floor(hallW / (perSeg + 1))));
+    const arr = [];
+    let id = 1;
+    // Barra inferior
+    for (let i = 0; i < perSeg; i++) {
+      const x = (bbox ? bbox.minX : 0) + (i + 1) * gap;
+      const y = (bbox ? bbox.maxY : hallH) - 120;
+      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+    }
+    // Barra izquierda
+    for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
+      const x = (bbox ? bbox.minX : 0) + 120;
+      const y = (i + 1) * Math.min(200, Math.max(140, Math.floor(hallH / (perSeg / 2 + 2))));
+      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+    }
+    // Barra derecha
+    for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
+      const x = (bbox ? bbox.maxX : hallW) - 120;
+      const y = (i + 1) * Math.min(200, Math.max(140, Math.floor(hallH / (perSeg / 2 + 2))));
+      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+    }
+    return arr;
+  };
+
+  const buildLShape = () => {
+    const perSeg = Math.max(3, Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 8) / 2));
+    const gapX = Math.min(220, Math.max(aisle + 40, Math.floor(hallW / (perSeg + 1))));
+    const gapY = Math.min(220, Math.max(aisle + 40, Math.floor(hallH / (perSeg + 1))));
+    const arr = [];
+    let id = 1;
+    // Horizontal inferior
+    for (let i = 0; i < perSeg; i++) {
+      const x = (bbox ? bbox.minX : 0) + (i + 1) * gapX;
+      const y = (bbox ? bbox.maxY : hallH) - 120;
+      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+    }
+    // Vertical izquierda
+    for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
+      const x = (bbox ? bbox.minX : 0) + 120;
+      const y = (bbox ? bbox.maxY : hallH) - 120 - (i + 1) * gapY;
+      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+    }
+    return arr;
+  };
+
+  const buildImperial = () => {
+    const arr = [];
+    const width = Math.min(hallW * 0.85, Math.max(baseWidth * 2, 800));
+    const height = Math.max(baseHeight, 100);
+    const cx = centroid.x, cy = centroid.y;
+    arr.push({ id: 1, x: cx, y: cy, shape: 'rectangle', width, height, seats: Math.max(guestCount, avgSeats) });
+    return arr;
+  };
+
   const templates = [
     {
-      id: 'intimate',
-      name: 'Boda Íntima',
-      description: '50-80 invitados',
-      ceremony: { rows: 8, cols: 8 },
-      banquet: { rows: 2, cols: 3, seats: 8 }
+      id: 'suggested',
+      name: 'Sugerido por datos',
+      description: `${guestCount || 0} invitados • ${tableCount || 0} mesas • Banquete ~${suggestedBanquet.rows}×${suggestedBanquet.cols} de ${suggestedBanquet.seats}`,
+      banquet: suggestedBanquet,
+      ceremony: suggestedCeremony,
     },
     {
-      id: 'medium',
-      name: 'Boda Mediana',
-      description: '80-150 invitados',
-      ceremony: { rows: 12, cols: 10 },
-      banquet: { rows: 3, cols: 4, seats: 10 }
+      id: 'circle',
+      name: 'Distribución circular',
+      description: `Anillo central con ${avgSeats} asientos por mesa (forma redonda)`,
+      banquetTables: buildCircularRing(),
     },
     {
-      id: 'large',
-      name: 'Boda Grande',
-      description: '150+ invitados',
-      ceremony: { rows: 15, cols: 12 },
-      banquet: { rows: 4, cols: 5, seats: 12 }
-    }
+      id: 'u-shape',
+      name: 'Forma U',
+      description: 'Tres alas creando una U abierta',
+      banquetTables: buildUShape(),
+    },
+    {
+      id: 'l-shape',
+      name: 'Forma L',
+      description: 'Dos alas en ángulo',
+      banquetTables: buildLShape(),
+    },
+    {
+      id: 'imperial',
+      name: 'Mesa Imperial única',
+      description: `Una mesa central para ~${guestCount || avgSeats} comensales`,
+      banquetTables: buildImperial(),
+    },
+    {
+      id: 'fill-space',
+      name: 'Relleno según espacio',
+      description: `Cuadrícula adaptada a ${hallW/100|0}×${hallH/100|0} m`,
+      banquetTables: buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape),
+    },
   ];
 
   return (
@@ -394,23 +590,35 @@ const TemplateSelector = ({ onApply, onClose }) => {
         Selecciona una plantilla predefinida para comenzar rápidamente:
       </p>
       
-      {templates.map((template) => (
-        <div
-          key={template.id}
-          className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
-          onClick={() => {
-            onApply(template);
-            onClose();
-          }}
-        >
-          <h4 className="font-medium">{template.name}</h4>
-          <p className="text-sm text-gray-600 mb-2">{template.description}</p>
-          <div className="text-xs text-gray-500">
-            Ceremonia: {template.ceremony.rows}×{template.ceremony.cols} asientos • 
-            Banquete: {template.banquet.rows}×{template.banquet.cols} mesas de {template.banquet.seats}
+      {templates.map((template) => {
+        const cerText = template.ceremony
+          ? `Ceremonia: ${template.ceremony.rows}×${template.ceremony.cols} asientos`
+          : null;
+        const banqText = template.banquet
+          ? `Banquete: ${template.banquet.rows}×${template.banquet.cols} mesas de ${template.banquet.seats}`
+          : Array.isArray(template.banquetTables)
+            ? `Banquete: ${template.banquetTables.length} mesas`
+            : null;
+        const info = [cerText, banqText].filter(Boolean).join(' • ');
+        return (
+          <div
+            key={template.id}
+            className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+            onClick={() => {
+              onApply(template);
+              onClose();
+            }}
+          >
+            <h4 className="font-medium">{template.name}</h4>
+            <p className="text-sm text-gray-600 mb-2">{template.description}</p>
+            {info && (
+              <div className="text-xs text-gray-500">
+                {info}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
       
       <div className="flex gap-2 pt-4">
         <button

@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, memo } from 'react';
 
 
 
@@ -19,6 +19,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
     seats = [],
     scale = 1,
     offset = { x: 0, y: 0 },
+    selectedTable,
     addArea,
     onDeleteArea,
     moveTable,
@@ -88,6 +89,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           onDeleteArea={onDeleteArea}
           onUpdateArea={onUpdateArea}
           drawMode={internalDrawMode}
+          semanticDrawMode={drawMode}
         />
 
 {/* Sillas (solo ceremonia) */}
@@ -109,6 +111,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
             onSelect={onSelectTable}
             guests={guests}
             canMove={canMoveTables}
+            selected={selectedTable && selectedTable.id === t.id}
           />
         ))}
 
@@ -120,4 +123,4 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
   );
 });
 
-export default SeatingCanvas;
+export default memo(SeatingCanvas);

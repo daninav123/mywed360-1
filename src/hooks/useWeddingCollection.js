@@ -84,17 +84,13 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
           }
         });
 
-        // 2) Invitados en documento único users/{uid}/userGuests
-        const legacyDocRef = fDoc(db, 'users', firebaseUser.uid, 'userGuests');
-        const legacyDocSnap = await getDoc(legacyDocRef);
-        if (legacyDocSnap.exists()) {
-          const legacyData = legacyDocSnap.data();
-          const guestsArray = Array.isArray(legacyData?.guests) ? legacyData.guests : [];
-          guestsArray.forEach((g) => {
-            batch.set(fDoc(destCol), g, { merge: true }); // id aleatorio
-            writes++; // contar escritura
-          });
-        }
+        // 2) Invitados en colección legacy users/{uid}/userGuests (cada documento es un invitado)
+        const legacyCol = col(db, 'users', firebaseUser.uid, 'userGuests');
+        const legacySnap = await getDocs(legacyCol);
+        legacySnap.forEach((docSnap) => {
+          batch.set(fDoc(destCol, docSnap.id), { ...docSnap.data(), migratedAt: serverTimestamp() }, { merge: true });
+          writes++; // contar escritura
+        });
 
         // Si hay operaciones en cola, confirmamos
         if (writes > 0) {

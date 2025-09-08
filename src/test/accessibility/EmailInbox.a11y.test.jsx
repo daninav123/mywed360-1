@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { axe, formatViolations } from '../helpers/axeSetup';
 import EmailInbox from '../../components/email/EmailInbox';
@@ -70,8 +70,8 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
 
   it('no tiene violaciones de accesibilidad', async () => {
     // Esperar a que los datos se carguen
-    await vi.waitFor(() => {
-      expect(rendered.getByText('Bandeja de entrada')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Bandeja de entrada')).toBeInTheDocument();
     });
 
     // Ejecutar análisis de accesibilidad
@@ -87,8 +87,8 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
 
   it('mantiene la navegación por teclado funcional', async () => {
     // Esperar a que los datos se carguen
-    await vi.waitFor(() => {
-      expect(rendered.getByText('Bandeja de entrada')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Bandeja de entrada')).toBeInTheDocument();
     });
     
     // Verificar que los elementos interactivos son focusables y tienen roles adecuados
@@ -116,8 +116,8 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
 
   it('usa estructura semántica adecuada para la lista de emails', async () => {
     // Esperar a que los datos se carguen
-    await vi.waitFor(() => {
-      expect(rendered.getByText('Bandeja de entrada')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Bandeja de entrada')).toBeInTheDocument();
     });
     
     // Verificar estructura semántica
@@ -152,7 +152,7 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
     const { getByText: getByTextError } = render(<EmailInbox />, { wrapper: TestWrapper });
     
     // Verificar mensaje de error
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(getByTextError('Error al cargar correos')).toBeInTheDocument();
       expect(getByTextError('Error al cargar correos')).toHaveAttribute('aria-live', 'assertive');
     });
@@ -160,8 +160,8 @@ describe('Pruebas de accesibilidad para EmailInbox', () => {
 
   it('mantiene suficiente contraste en todos los elementos', async () => {
     // Esperar a que los datos se carguen
-    await vi.waitFor(() => {
-      expect(rendered.getByText('Bandeja de entrada')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Bandeja de entrada')).toBeInTheDocument();
     });
     
     // Realizar análisis específico para contraste

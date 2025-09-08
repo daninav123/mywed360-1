@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/Card';
@@ -224,18 +226,17 @@ export default function Proveedores() {
   };
 
   const rateProvider = (id, ratingValue) => {
-  const prov = providers.find(p => p.id === id);
-  if (!prov) return;
-  const newCount = (prov.ratingCount || 0) + 1;
-  const newRating = ((prov.rating || 0) * prov.ratingCount + ratingValue) / newCount;
-  setProviders(prev => prev.map(p => p.id === id ? { ...p, ratingCount: newCount, rating: newRating } : p));
-  updateProvider(id, { rating: newRating, ratingCount: newCount });
-    setProviders(prev => prev.map(p =>
-      p.id === id ? { ...p,
-        ratingCount: p.ratingCount + 1,
-        rating: (p.rating * p.ratingCount + ratingValue) / (p.ratingCount + 1)
-      } : p
-    ));
+    setProviders(prev => {
+      const prov = prev.find(p => p.id === id);
+      if (!prov) return prev;
+      const baseCount = prov.ratingCount || 0;
+      const baseRating = prov.rating || 0;
+      const newCount = baseCount + 1;
+      const newRating = ((baseRating * baseCount) + ratingValue) / newCount;
+      // Persistir en Firestore (best-effort)
+      try { updateProvider(id, { rating: newRating, ratingCount: newCount }); } catch {}
+      return prev.map(p => p.id === id ? { ...p, ratingCount: newCount, rating: newRating } : p);
+    });
   };
 
   // Verificar la operatividad de enlaces de proveedores

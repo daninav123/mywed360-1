@@ -33,9 +33,17 @@ service cloud.firestore {
         (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds) ||
         (get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds)
       );
+      // Para escrituras en general exigimos owner/planner. Adicionalmente,
+      // si el path objetivo es seatingPlan/banquet o seatingPlan/ceremony,
+      // validamos la estructura y el rango de config.aisleMin.
       allow write: if request.auth != null && (
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
-        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds)
+        (
+          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
+          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds)
+        ) && (
+          // document es el sufijo capturado por {document=**}, p.ej. "seatingPlan/banquet"
+          !(document.matches('^seatingPlan/(banquet|ceremony)$')) || isValidSeatingPlanDoc(document, request.resource.data)
+        )
       );
     }
     // Invitaciones ahora se almacenan como subcolección:
@@ -163,6 +171,44 @@ service cloud.firestore {
 
     function isCollaborator(wid) {
       return isOwner(wid) || isPlanner(wid) || isAssistant(wid);
+    }
+
+    // ---------------- SeatingPlan validations ----------------
+    function isValidConfig(cfg) {
+      return cfg.width is number && cfg.height is number &&
+             cfg.width > 0 && cfg.height > 0 &&
+             cfg.aisleMin is number && cfg.aisleMin >= 40 && cfg.aisleMin <= 300;
+    }
+
+    function listFieldValid(data, field) {
+      return !(data.keys().hasAny([field])) || (data[field] is list);
+    }
+
+    function isValidBanquetData(data) {
+      // Aceptar config anidado o plano para compatibilidad
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             (
+               (data.keys().hasAny(['config']) && isValidConfig(data.config)) ||
+               (
+                 // fallback compat: width/height/aisleMin en raíz
+                 (data.keys().hasAny(['width']) || data.keys().hasAny(['height']) || data.keys().hasAny(['aisleMin']))
+                 ? isValidConfig(data)
+                 : true
+               )
+             );
+    }
+
+    function isValidCeremonyData(data) {
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             listFieldValid(data, 'seats');
+    }
+
+    function isValidSeatingPlanDoc(path, data) {
+      // path esperado: "seatingPlan/banquet" o "seatingPlan/ceremony"
+      return (path.matches('^seatingPlan/banquet$') && isValidBanquetData(data)) ||
+             (path.matches('^seatingPlan/ceremony$') && isValidCeremonyData(data));
     }
   }
 }

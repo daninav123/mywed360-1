@@ -9,7 +9,7 @@ import React from 'react';
  * - offset: desplazamiento global {x,y}
  * - onToggleEnabled(id): callback al hacer click para (des)habilitar la silla
  */
-export default function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, onToggleEnabled }) {
+function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, onToggleEnabled }) {
   const size = 14; // tamaño base en px
   const s = size * scale;
   const { x, y, enabled, id, guestName } = seat;
@@ -51,3 +51,5 @@ export default function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, on
     </div>
   );
 }
+
+export default React.memo(ChairItem);

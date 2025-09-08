@@ -3,11 +3,13 @@
     "browser": true,
     "es2022": true,
     "node": true,
-    "jest": true
+    "jest": true,
+    "vitest": true
   },
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    "plugin:vitest/recommended"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -18,9 +20,14 @@
   },
   "plugins": [
     "react",
-    "react-hooks"
+    "react-hooks",
+    "vitest"
   ],
   "rules": {
+    "no-unused-vars": ["warn", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_"
+    }],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off"
   },

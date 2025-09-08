@@ -4,10 +4,13 @@
  */
 
 import React, { useState } from 'react';
+import TableEditor from './TableEditor';
+import GuestItem from '../GuestItem';
 import { 
   Settings, Users, Maximize2, RotateCcw, Move, Hand, 
   Pencil, Minus, Square, Zap, Search, UserPlus,
-  MousePointer, Edit3, Eraser, DoorOpen, Hexagon
+  MousePointer, Edit3, Eraser, DoorOpen, Hexagon,
+  Copy, Trash2
 } from 'lucide-react';
 
 const SeatingPlanSidebar = ({
@@ -21,6 +24,8 @@ const SeatingPlanSidebar = ({
   onDrawModeChange,
   onAssignGuest,
   onAutoAssign,
+  deleteTable,
+  duplicateTable,
   className = ""
 }) => {
   const [guestSearch, setGuestSearch] = useState('');
@@ -37,11 +42,15 @@ const SeatingPlanSidebar = ({
     { id: 'erase', label: 'Borrar', icon: Eraser }
   ];
 
-  // Filtrar invitados disponibles (sin asignar)
-  const availableGuests = guests.filter(guest => 
-    !guest.tableId && 
-    guest.name.toLowerCase().includes(guestSearch.toLowerCase())
-  );
+  // Filtrar invitados disponibles (sin asignar a mesa) con saneo defensivo
+  const availableGuests = guests.filter((guest) => {
+    const noTable = !guest?.table && !guest?.tableId;
+    const name = typeof guest?.name === 'string' ? guest.name : '';
+    const term = typeof guestSearch === 'string' ? guestSearch.toLowerCase() : '';
+    return noTable && name.toLowerCase().includes(term);
+  });
+
+  const pendingCount = guests.filter((g) => !g?.table && !g?.tableId).length;
 
   const assignedGuests = guests.filter(guest => 
     guest.tableId === selectedTable?.id
@@ -96,24 +105,13 @@ const SeatingPlanSidebar = ({
         )}
       </div>
 
-      {/* Asignación Automática */}
-      {tab === 'banquet' && (
-        <div className="px-4 py-3 border-b bg-gradient-to-r from-purple-50 to-blue-50">
-          <button
-            onClick={onAutoAssign}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded text-sm hover:from-purple-700 hover:to-blue-700 transition-all"
-          >
-            <Zap className="h-4 w-4" />
-            Asignación Automática IA
-          </button>
-        </div>
-      )}
+      {/* Asignación Automática: removida por requerimiento */}
 
       {/* Panel de Invitados Disponibles */}
       {tab === 'banquet' && (
         <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Invitados Disponibles</h4>
+            <h4 className="font-medium text-gray-900">Pendientes ({pendingCount})</h4>
             <button
               onClick={() => setShowAvailableGuests(!showAvailableGuests)}
               className="text-blue-600 hover:text-blue-700"
@@ -136,23 +134,15 @@ const SeatingPlanSidebar = ({
                 />
               </div>
               
-              {/* Lista de invitados disponibles */}
+              {/* Lista de invitados disponibles (drag source + click-assign) */}
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {availableGuests.length > 0 ? (
-                  availableGuests.slice(0, 10).map((guest) => (
-                    <div
+                  availableGuests.slice(0, 12).map((guest) => (
+                    <GuestItem
                       key={guest.id}
-                      className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded text-xs cursor-pointer hover:bg-green-100"
+                      guest={guest}
                       onClick={() => selectedTable && onAssignGuest?.(selectedTable.id, guest.id)}
-                    >
-                      <div>
-                        <div className="font-medium text-green-800">{guest.name}</div>
-                        {guest.side && (
-                          <div className="text-green-600 capitalize">{guest.side}</div>
-                        )}
-                      </div>
-                      <MousePointer className="h-3 w-3 text-green-600" />
-                    </div>
+                    />
                   ))
                 ) : (
                   <div className="text-center py-2 text-gray-500 text-xs">
@@ -183,7 +173,9 @@ const SeatingPlanSidebar = ({
             </div>
           </div>
 
-          {/* Contenido de Mesa Seleccionada */}
+          {/* Editor de Mesa */}
+            <TableEditor table={selectedTable} onChange={onTableDimensionChange} onClose={() => setShowAvailableGuests(false)} />
+            {/* Contenido de Mesa Seleccionada */}
           <div className="p-4 space-y-4">
             {/* Información básica */}
             <div className="space-y-3">
@@ -314,6 +306,24 @@ const SeatingPlanSidebar = ({
                   {showAvailableGuests ? 'Ocultar' : 'Mostrar'} Invitados
                 </button>
               )}
+
+              {/* Acciones de mesa: duplicar / eliminar */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  onClick={() => duplicateTable?.(selectedTable.id)}
+                  className="px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-1"
+                  title="Duplicar mesa"
+                >
+                  <Copy className="h-4 w-4" /> Duplicar
+                </button>
+                <button
+                  onClick={() => { if (window.confirm('¿Eliminar esta mesa?')) deleteTable?.(selectedTable.id); }}
+                  className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
+                  title="Eliminar mesa"
+                >
+                  <Trash2 className="h-4 w-4" /> Eliminar
+                </button>
+              </div>
             </div>
           </div>
         </>

@@ -7,7 +7,7 @@ import React, { useRef, useState, useEffect } from 'react';
  * Props:
  *   onFinalize(points) => called when user double-clicks / presses Finish to commit current stroke
  */
-export default function FreeDrawCanvas({ className = '', style = {}, strokeColor = '#3b82f6', scale = 1, offset = { x: 0, y: 0 }, areas = [], drawMode = 'free', onFinalize, onDeleteArea = () => {}, onUpdateArea = () => {} }) {
+function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6', scale = 1, offset = { x: 0, y: 0 }, areas = [], drawMode = 'free', semanticDrawMode, onFinalize, onDeleteArea = () => {}, onUpdateArea = () => {} }) {
   const svgRef = useRef(null);
   const [points, setPoints] = useState([]);
   const [drawing, setDrawing] = useState(false);
@@ -24,7 +24,7 @@ export default function FreeDrawCanvas({ className = '', style = {}, strokeColor
     if (prev === 'boundary' && drawMode !== 'boundary') {
       if (points.length >= 3) {
         const closed = [...points, points[0]]; // cerrar polígono
-        onFinalize && onFinalize(closed);
+        onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: closed });
       }
       // Limpiar estado temporal
       setPoints([]);
@@ -150,7 +150,7 @@ export default function FreeDrawCanvas({ className = '', style = {}, strokeColor
     if (drawMode === 'line') {
       const pt = toSvgPoint(e);
       const line = points.length === 2 ? points : [points[0], pt];
-      onFinalize && onFinalize(line);
+      onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: line });
       setPoints([]);
       setDrawing(false);
       // Reiniciar regla
@@ -160,7 +160,7 @@ export default function FreeDrawCanvas({ className = '', style = {}, strokeColor
     }
     if (drawMode === 'rect') {
       if (points.length >= 4) {
-        onFinalize && onFinalize(points);
+        onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points });
       }
       setPoints([]);
       startRef.current = null;
@@ -212,14 +212,17 @@ export default function FreeDrawCanvas({ className = '', style = {}, strokeColor
       {/* Áreas existentes */}
       <g transform={`translate(${offset.x} ${offset.y}) scale(${scale})`}>
         {areas.map((poly, idx) => {
-          console.log('FreeDrawCanvas - renderizando área:', idx, poly);
+          const pts = Array.isArray(poly) ? poly : (Array.isArray(poly?.points) ? poly.points : []);
+          const type = Array.isArray(poly) ? undefined : poly?.type;
+          console.log('FreeDrawCanvas - renderizando área:', idx, { type, points: pts });
           return (
             <path
               key={idx}
-              d={getPathD(poly)}
+              d={getPathD(pts)}
               stroke="#10b981"
               strokeWidth={2}
               fill="none"
+              data-area-type={type || 'poly'}
               onPointerDown={drawMode === 'erase' ? (e) => { e.stopPropagation(); onDeleteArea(idx); } : undefined}
               style={{ cursor: drawMode === 'erase' ? 'pointer' : 'default' }}
             />
@@ -258,52 +261,60 @@ export default function FreeDrawCanvas({ className = '', style = {}, strokeColor
       </g>
     </svg>
 
-      {/* Etiquetas persistentes de áreas existentes */}
-      {areas.map((poly, aIdx) => {
-        const segs = [];
-        for (let i = 0; i < poly.length - 1; i++) {
-          const p1 = poly[i];
-          const p2 = poly[i + 1];
-          const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-          const midX = (p1.x + p2.x) / 2 * scale + offset.x;
-          const midY = (p1.y + p2.y) / 2 * scale + offset.y;
-          segs.push({ p1, p2, length, midX, midY, idx: i });
-        }
-        return segs.map((seg) => (
-          <div
-            key={`s-${aIdx}-${seg.idx}`}
-            className="absolute pointer-events-auto text-[10px] bg-white bg-opacity-90 rounded px-1 cursor-pointer select-none"
-            style={{ left: seg.midX, top: seg.midY, transform: 'translate(-50%, -50%)' }}
-            title="Doble clic para ajustar longitud"
-            onDoubleClick={() => {
-              const currentM = (seg.length / 100).toFixed(2);
-              const val = window.prompt('Nueva longitud (m):', currentM);
-              if (!val) return;
-              const newLenCm = parseFloat(val) * 100;
-              if (!newLenCm || newLenCm <= 0) return;
-              const factor = newLenCm / seg.length;
-              const dx = seg.p2.x - seg.p1.x;
-              const dy = seg.p2.y - seg.p1.y;
-              const newP2 = { x: seg.p1.x + dx * factor, y: seg.p1.y + dy * factor };
-              const updated = [...poly];
-              updated[seg.idx + 1] = newP2;
-              onUpdateArea(aIdx, updated);
-            }}
-          >
-            {(seg.length / 100).toFixed(2)} m
-          </div>
-        ));
-      })}
-
-      {/* Etiqueta temporal de distancia (m) */}
-      {drawing && cursorPos && segLength != null && (
+    {/* Etiquetas persistentes de áreas existentes */}
+    {areas.map((poly, aIdx) => {
+      const basePts = Array.isArray(poly) ? poly : (Array.isArray(poly?.points) ? poly.points : []);
+      const segs = [];
+      for (let i = 0; i < basePts.length - 1; i++) {
+        const p1 = basePts[i];
+        const p2 = basePts[i + 1];
+        const length = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        const midX = ((p1.x + p2.x) / 2) * scale + offset.x;
+        const midY = ((p1.y + p2.y) / 2) * scale + offset.y;
+        segs.push({ p1, p2, length, midX, midY, idx: i });
+      }
+      return segs.map((seg) => (
         <div
-          className="absolute pointer-events-none text-[10px] bg-white bg-opacity-80 rounded px-1"
-          style={{ left: cursorPos.x + 10, top: cursorPos.y + 10 }}
+          key={`s-${aIdx}-${seg.idx}`}
+          className="absolute pointer-events-auto text-[10px] bg-white bg-opacity-90 rounded px-1 cursor-pointer select-none"
+          style={{ left: seg.midX, top: seg.midY, transform: 'translate(-50%, -50%)' }}
+          title="Doble clic para ajustar longitud"
+          onDoubleClick={() => {
+            const currentM = (seg.length / 100).toFixed(2);
+            const val = window.prompt('Nueva longitud (m):', currentM);
+            if (!val) return;
+            const newLenCm = parseFloat(val) * 100;
+            if (!newLenCm || newLenCm <= 0) return;
+            const factor = newLenCm / seg.length;
+            const dx = seg.p2.x - seg.p1.x;
+            const dy = seg.p2.y - seg.p1.y;
+            const newP2 = { x: seg.p1.x + dx * factor, y: seg.p1.y + dy * factor };
+            const updated = [...basePts];
+            updated[seg.idx + 1] = newP2;
+            if (Array.isArray(poly)) {
+              onUpdateArea(aIdx, updated);
+            } else {
+              onUpdateArea(aIdx, { ...poly, points: updated });
+            }
+          }}
         >
-          {(segLength / 100).toFixed(2)} m
+          {(seg.length / 100).toFixed(2)} m
         </div>
-      )}
+      ));
+    })}
+
+    {/* Etiqueta temporal de distancia (m) */}
+    {drawing && cursorPos && segLength != null && (
+      <div
+        className="absolute pointer-events-none text-[10px] bg-white bg-opacity-80 rounded px-1"
+        style={{ left: cursorPos.x + 10, top: cursorPos.y + 10 }}
+      >
+        {(segLength / 100).toFixed(2)} m
+      </div>
+    )}
     </div>
   );
+
 }
+
+export default React.memo(FreeDrawCanvasComp);

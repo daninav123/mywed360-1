@@ -214,7 +214,7 @@ export default function HomePage() {
         {/* Header */}
         <header className="relative z-10 p-6 flex justify-between items-center">
           <div className="space-y-1">
-            <h1 className="page-title">Bienvenidos, {weddingName}{weddingName && userName ? ' y ' : ''}{userName}</h1>
+            <h1 className="page-title">Bienvenidos, {weddingName}{weddingName && displayName ? ' y ' : ''}{displayName}</h1>
             <p className="text-4xl font-bold text-[color:var(--color-text)]">Cada detalle hace tu boda inolvidable</p>
           </div>
           <img

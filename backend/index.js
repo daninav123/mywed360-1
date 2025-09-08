@@ -18,6 +18,7 @@ if (fs.existsSync(secretEnvPath)) {
 import express from 'express';
 import cors from 'cors';
 import axios from 'axios';
+import { randomUUID } from 'crypto';
 // Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
 import {
   requireAuth,
@@ -31,6 +32,7 @@ import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
 import emailInsightsRouter from './routes/email-insights.js';
+import metricsSeatingRouter from './routes/metrics-seating.js';
 import notificationsRouter from './routes/notifications.js';
 import guestsRouter from './routes/guests.js';
 import rolesRouter from './routes/roles.js';
@@ -47,6 +49,7 @@ import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
+import rsvpRouter from './routes/rsvp.js';
 
 
 // Load environment variables (root .env)
@@ -80,9 +83,77 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Middleware de correlación: X-Request-ID en cada petición
+app.use((req, res, next) => {
+  try {
+    const incoming = req.headers['x-request-id'];
+    const id = (typeof incoming === 'string' && incoming.trim()) ? incoming.trim() : randomUUID();
+    req.id = id;
+    res.setHeader('X-Request-ID', id);
+  } catch {
+    // best-effort
+  }
+  next();
+});
+
+// Prometheus metrics (lazy load si está disponible)
+let metrics = {
+  loaded: false,
+  prom: null,
+  registry: null,
+  httpRequestsTotal: null,
+  httpRequestDuration: null,
+};
+
+async function ensureMetrics() {
+  if (metrics.loaded) return;
+  try {
+    const mod = await import('prom-client');
+    const prom = mod.default || mod;
+    const registry = new prom.Registry();
+    prom.collectDefaultMetrics({ register: registry });
+    const httpRequestsTotal = new prom.Counter({
+      name: 'http_requests_total',
+      help: 'Total de peticiones HTTP',
+      labelNames: ['method', 'route', 'status'],
+      registers: [registry],
+    });
+    const httpRequestDuration = new prom.Histogram({
+      name: 'http_request_duration_seconds',
+      help: 'Duración de peticiones HTTP en segundos',
+      labelNames: ['method', 'route', 'status'],
+      buckets: [0.05, 0.1, 0.2, 0.5, 1, 2, 5],
+      registers: [registry],
+    });
+    metrics = { loaded: true, prom, registry, httpRequestsTotal, httpRequestDuration };
+  } catch (e) {
+    // prom-client no está instalado; se omite sin romper
+    metrics.loaded = false;
+  }
+}
+
+// Middleware de métricas por petición (no-op si prom-client no está)
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint();
+  res.on('finish', () => {
+    if (!metrics.loaded) return;
+    try {
+      const end = process.hrtime.bigint();
+      const diffNs = Number(end - start);
+      const durationSec = diffNs / 1e9;
+      const method = req.method;
+      const route = (req.route && req.route.path) || req.path || (req.originalUrl ? req.originalUrl.split('?')[0] : 'unknown');
+      const status = String(res.statusCode || 0);
+      metrics.httpRequestsTotal.labels(method, route, status).inc(1);
+      metrics.httpRequestDuration.labels(method, route, status).observe(durationSec);
+    } catch {}
+  });
+  next();
+});
+
 // Middleware para registrar cada petición entrante
 app.use((req, _res, next) => {
-  logger.info(`${req.method} ${req.originalUrl}`);
+  logger.info(`[${req.id || 'n/a'}] ${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -90,9 +161,23 @@ app.use((req, _res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Endpoint de métricas (activa prom-client si está disponible)
+app.get('/metrics', async (_req, res) => {
+  try {
+    await ensureMetrics();
+    if (!metrics.loaded) return res.status(503).send('metrics unavailable');
+    res.setHeader('Content-Type', metrics.registry.contentType || 'text/plain');
+    const text = await metrics.registry.metrics();
+    res.status(200).send(text);
+  } catch (e) {
+    res.status(503).send('metrics error');
+  }
+});
+
 // Rutas públicas (sin autenticación)
 app.use('/api/mailgun/webhook', mailgunWebhookRouter); // Webhooks de Mailgun (verificación interna)
 app.use('/api/inbound/mailgun', mailgunInboundRouter); // Correos entrantes
+app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 
 // Rutas que requieren autenticación específica para correo
 app.use('/api/mail', requireMailAccess, mailRouter);
@@ -121,6 +206,7 @@ app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
 app.use('/api/test', simpleTestRouter);
+app.use('/api/metrics', metricsSeatingRouter);
 
 app.get('/', (_req, res) => {
   res.send({ status: 'ok', service: 'lovenda-backend' });

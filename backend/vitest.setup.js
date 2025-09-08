@@ -1,11 +1,8 @@
 import { vi, afterEach, expect } from 'vitest';
-import * as matchers from '@testing-library/jest-dom/matchers';
-
-// Registrar los matchers de Testing Library en Vitest
-expect.extend(matchers);
-
-// Importación de inicialización (mantener por compatibilidad)
+// Registrar matchers de Testing Library (jest-dom) para Vitest
 import '@testing-library/jest-dom/vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+expect.extend(matchers);
 import { cleanup } from '@testing-library/react';
 
 // Mock de base de datos Firestore para todas las pruebas
