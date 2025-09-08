@@ -410,3 +410,139 @@
 {"timestamp":"2025-09-08T19:42:47.223Z","taskId":"unit_rules_extended","action":"start","attempt":3}
 {"timestamp":"2025-09-08T19:42:56.695Z","taskId":"unit_rules_extended","error":"Task process exit code 1","attempt":3}
 {"timestamp":"2025-09-08T19:42:56.702Z","taskId":"unit_rules_extended","action":"end","status":"error","attempt":3}
+{"timestamp":"2025-09-08T21:19:59.273Z","taskId":"rsvp_scheduler_dryrun","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:20:36.164Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":4}
+{"timestamp":"2025-09-08T21:20:36.170Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:20:36.332Z","taskId":"validate_schemas","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:21:05.926Z","taskId":"validate_schemas","error":"HealthCheck failed at step test:unit (seating)","attempt":4}
+{"timestamp":"2025-09-08T21:21:05.932Z","taskId":"validate_schemas","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:21:06.088Z","taskId":"unit_rules","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:21:11.515Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:21:11.519Z","taskId":"unit_rules","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:21:11.668Z","taskId":"e2e_rsvp_confirm_token","action":"start","attempt":2}
+{"timestamp":"2025-09-08T21:21:38.215Z","taskId":"e2e_rsvp_confirm_token","error":"Task process exit code 1","attempt":2}
+{"timestamp":"2025-09-08T21:21:38.221Z","taskId":"e2e_rsvp_confirm_token","action":"end","status":"error","attempt":2}
+{"timestamp":"2025-09-08T21:21:38.407Z","taskId":"e2e_rsvp_invalid_token","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:21:55.274Z","taskId":"e2e_rsvp_invalid_token","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:21:55.279Z","taskId":"e2e_rsvp_invalid_token","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:21:55.464Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:22:12.409Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:22:12.419Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:22:12.605Z","taskId":"e2e_seating_smoke","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:22:29.123Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:22:29.127Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:22:29.312Z","taskId":"e2e_seating_no_overlap","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:22:45.734Z","taskId":"e2e_seating_no_overlap","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:22:45.739Z","taskId":"e2e_seating_no_overlap","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:22:45.915Z","taskId":"e2e_seating_assign_unassign","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:23:02.469Z","taskId":"e2e_seating_assign_unassign","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:23:02.474Z","taskId":"e2e_seating_assign_unassign","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:23:02.600Z","taskId":"e2e_seating_capacity_limit","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:23:19.077Z","taskId":"e2e_seating_capacity_limit","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:23:19.082Z","taskId":"e2e_seating_capacity_limit","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:23:19.252Z","taskId":"e2e_seating_aisle_min","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:23:35.731Z","taskId":"e2e_seating_aisle_min","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:23:35.737Z","taskId":"e2e_seating_aisle_min","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:23:35.891Z","taskId":"e2e_seating_obstacles_no_overlap","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:23:54.179Z","taskId":"e2e_seating_obstacles_no_overlap","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:23:54.184Z","taskId":"e2e_seating_obstacles_no_overlap","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:23:54.364Z","taskId":"e2e_seating_template_circular","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:24:10.599Z","taskId":"e2e_seating_template_circular","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:24:10.603Z","taskId":"e2e_seating_template_circular","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:24:10.772Z","taskId":"e2e_seating_template_u_l_imperial","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:24:26.965Z","taskId":"e2e_seating_template_u_l_imperial","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:24:26.970Z","taskId":"e2e_seating_template_u_l_imperial","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:24:27.104Z","taskId":"e2e_seating_fit","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:24:42.701Z","taskId":"e2e_seating_fit","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:24:42.706Z","taskId":"e2e_seating_fit","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:24:42.856Z","taskId":"e2e_seating_toasts","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:24:58.967Z","taskId":"e2e_seating_toasts","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:24:58.972Z","taskId":"e2e_seating_toasts","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:24:59.139Z","taskId":"e2e_email_send","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:25:16.212Z","taskId":"e2e_email_send","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:25:16.217Z","taskId":"e2e_email_send","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:25:16.373Z","taskId":"e2e_email_read","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:25:32.715Z","taskId":"e2e_email_read","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:25:32.720Z","taskId":"e2e_email_read","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:25:32.911Z","taskId":"e2e_email_folders","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:25:49.339Z","taskId":"e2e_email_folders","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:25:49.344Z","taskId":"e2e_email_folders","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:25:49.509Z","taskId":"e2e_email_tags_filters","action":"start","attempt":3}
+{"timestamp":"2025-09-08T21:26:05.644Z","taskId":"e2e_email_tags_filters","error":"Task process exit code 1","attempt":3}
+{"timestamp":"2025-09-08T21:26:05.649Z","taskId":"e2e_email_tags_filters","action":"end","status":"error","attempt":3}
+{"timestamp":"2025-09-08T21:26:05.808Z","taskId":"e2e_email_ai_provider","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:26:22.011Z","taskId":"e2e_email_ai_provider","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:26:22.016Z","taskId":"e2e_email_ai_provider","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:26:22.171Z","taskId":"e2e_budget_flow","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:26:38.613Z","taskId":"e2e_budget_flow","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:26:38.617Z","taskId":"e2e_budget_flow","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:26:38.774Z","taskId":"e2e_email_performance","action":"start","attempt":3}
+{"timestamp":"2025-09-08T21:26:56.064Z","taskId":"e2e_email_performance","error":"Task process exit code 1","attempt":3}
+{"timestamp":"2025-09-08T21:26:56.070Z","taskId":"e2e_email_performance","action":"end","status":"error","attempt":3}
+{"timestamp":"2025-09-08T21:26:56.211Z","taskId":"unit_rules_collections","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:27:03.090Z","taskId":"unit_rules_collections","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:27:03.096Z","taskId":"unit_rules_collections","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:27:03.253Z","taskId":"unit_rules_exhaustive","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:27:10.021Z","taskId":"unit_rules_exhaustive","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:27:10.025Z","taskId":"unit_rules_exhaustive","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:27:10.173Z","taskId":"unit_rules_extended","action":"start","attempt":4}
+{"timestamp":"2025-09-08T21:27:16.692Z","taskId":"unit_rules_extended","error":"Task process exit code 1","attempt":4}
+{"timestamp":"2025-09-08T21:27:16.696Z","taskId":"unit_rules_extended","action":"end","status":"error","attempt":4}
+{"timestamp":"2025-09-08T21:30:16.872Z","taskId":"rsvp_scheduler_dryrun","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:30:45.547Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":5}
+{"timestamp":"2025-09-08T21:30:45.551Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:30:45.706Z","taskId":"validate_schemas","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:31:15.158Z","taskId":"validate_schemas","error":"HealthCheck failed at step test:unit (seating)","attempt":5}
+{"timestamp":"2025-09-08T21:31:15.174Z","taskId":"validate_schemas","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:31:15.343Z","taskId":"unit_rules","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:31:20.556Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:31:20.560Z","taskId":"unit_rules","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:31:20.724Z","taskId":"e2e_rsvp_confirm_token","action":"start","attempt":3}
+{"timestamp":"2025-09-08T21:31:37.117Z","taskId":"e2e_rsvp_confirm_token","error":"Task process exit code 1","attempt":3}
+{"timestamp":"2025-09-08T21:31:37.121Z","taskId":"e2e_rsvp_confirm_token","action":"end","status":"error","attempt":3}
+{"timestamp":"2025-09-08T21:31:37.308Z","taskId":"e2e_rsvp_invalid_token","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:31:55.064Z","taskId":"e2e_rsvp_invalid_token","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:31:55.069Z","taskId":"e2e_rsvp_invalid_token","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:31:55.220Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:32:12.205Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:32:12.210Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:32:12.386Z","taskId":"e2e_seating_smoke","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:32:28.861Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:32:28.865Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:32:29.031Z","taskId":"e2e_seating_no_overlap","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:32:46.056Z","taskId":"e2e_seating_no_overlap","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:32:46.060Z","taskId":"e2e_seating_no_overlap","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:32:46.231Z","taskId":"e2e_seating_assign_unassign","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:33:02.828Z","taskId":"e2e_seating_assign_unassign","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:33:02.832Z","taskId":"e2e_seating_assign_unassign","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:33:02.987Z","taskId":"e2e_seating_capacity_limit","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:33:19.423Z","taskId":"e2e_seating_capacity_limit","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:33:19.427Z","taskId":"e2e_seating_capacity_limit","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:33:19.589Z","taskId":"e2e_seating_aisle_min","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:33:35.582Z","taskId":"e2e_seating_aisle_min","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:33:35.587Z","taskId":"e2e_seating_aisle_min","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:33:35.731Z","taskId":"e2e_seating_obstacles_no_overlap","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:33:52.187Z","taskId":"e2e_seating_obstacles_no_overlap","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:33:52.191Z","taskId":"e2e_seating_obstacles_no_overlap","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:33:52.350Z","taskId":"e2e_seating_template_circular","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:34:08.582Z","taskId":"e2e_seating_template_circular","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:34:08.587Z","taskId":"e2e_seating_template_circular","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:34:08.777Z","taskId":"e2e_seating_template_u_l_imperial","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:34:25.162Z","taskId":"e2e_seating_template_u_l_imperial","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:34:25.167Z","taskId":"e2e_seating_template_u_l_imperial","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:34:25.340Z","taskId":"e2e_seating_fit","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:34:41.680Z","taskId":"e2e_seating_fit","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:34:41.684Z","taskId":"e2e_seating_fit","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:34:41.840Z","taskId":"e2e_seating_toasts","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:34:58.194Z","taskId":"e2e_seating_toasts","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:34:58.198Z","taskId":"e2e_seating_toasts","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:34:58.352Z","taskId":"e2e_email_send","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:35:15.251Z","taskId":"e2e_email_send","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:35:15.258Z","taskId":"e2e_email_send","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:35:15.416Z","taskId":"e2e_email_read","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:35:31.895Z","taskId":"e2e_email_read","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:35:31.900Z","taskId":"e2e_email_read","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:35:32.068Z","taskId":"e2e_email_folders","action":"start","attempt":5}
+{"timestamp":"2025-09-08T21:35:48.654Z","taskId":"e2e_email_folders","error":"Task process exit code 1","attempt":5}
+{"timestamp":"2025-09-08T21:35:48.660Z","taskId":"e2e_email_folders","action":"end","status":"error","attempt":5}
+{"timestamp":"2025-09-08T21:35:48.815Z","taskId":"e2e_email_tags_filters","action":"start","attempt":4}

@@ -11,6 +11,35 @@ vi.mock('./db.js', () => ({
   db: { collection: () => ({}) },
 }));
 
+// Mock del SDK cliente de Firestore solo en entorno jsdom (evitar interferir con pruebas de reglas en entorno node)
+if (typeof window !== 'undefined') {
+  // Proporciona stubs seguros usados por los hooks/componentes (doc, collection, getDoc, onSnapshot, writeBatch, setDoc, getDocs)
+  vi.mock('firebase/firestore', () => ({
+    __esModule: true,
+    // Referencias ligeras con metadatos de ruta (para logs/debug si fuera necesario)
+    doc: (...segments) => ({ __type: 'doc', path: segments.join('/') }),
+    collection: (...segments) => ({ __type: 'collection', path: segments.join('/') }),
+    // Lecturas devolviendo valores vacíos de forma segura
+    getDoc: vi.fn(async () => ({ exists: () => false, data: () => ({}) })),
+    getDocs: vi.fn(async () => ({ docs: [] })),
+    // onSnapshot invoca callback de éxito con snapshot vacío y devuelve unsub no-op
+    onSnapshot: vi.fn((ref, onNext, onError) => {
+      try {
+        if (typeof onNext === 'function') {
+          // Ejecutar asíncrono para emular comportamiento real sin bloquear
+          setTimeout(() => onNext({ docs: [], data: () => ({}) }), 0);
+        }
+      } catch (e) {
+        if (typeof onError === 'function') onError(e);
+      }
+      return () => {};
+    }),
+    // Batches y escrituras como no-ops
+    writeBatch: () => ({ set: () => {}, commit: async () => {} }),
+    setDoc: vi.fn(async () => {}),
+  }));
+}
+
 // Mock de firebase-admin por seguridad
 vi.mock('firebase-admin', () => ({
   __esModule: true,
