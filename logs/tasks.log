@@ -68,3 +68,16 @@
 {"timestamp":"2025-09-08T17:37:30.441Z","taskId":"unit_rules","action":"start","attempt":1}
 {"timestamp":"2025-09-08T17:37:36.385Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":1}
 {"timestamp":"2025-09-08T17:37:36.390Z","taskId":"unit_rules","action":"end","status":"error","attempt":1}
+{"timestamp":"2025-09-08T17:40:00.698Z","taskId":"rsvp_scheduler_dryrun","action":"start","attempt":2}
+{"timestamp":"2025-09-08T17:40:31.176Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":2}
+{"timestamp":"2025-09-08T17:40:31.183Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":2}
+{"timestamp":"2025-09-08T17:40:31.408Z","taskId":"validate_schemas","action":"start","attempt":2}
+{"timestamp":"2025-09-08T17:41:02.426Z","taskId":"validate_schemas","error":"HealthCheck failed at step test:unit (seating)","attempt":2}
+{"timestamp":"2025-09-08T17:41:02.434Z","taskId":"validate_schemas","action":"end","status":"error","attempt":2}
+{"timestamp":"2025-09-08T17:41:02.613Z","taskId":"unit_rules","action":"start","attempt":2}
+{"timestamp":"2025-09-08T17:41:08.718Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":2}
+{"timestamp":"2025-09-08T17:41:08.725Z","taskId":"unit_rules","action":"end","status":"error","attempt":2}
+{"timestamp":"2025-09-08T17:44:08.933Z","taskId":"rsvp_scheduler_dryrun","action":"start","attempt":3}
+{"timestamp":"2025-09-08T17:44:39.850Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":3}
+{"timestamp":"2025-09-08T17:44:39.856Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":3}
+{"timestamp":"2025-09-08T17:44:40.070Z","taskId":"validate_schemas","action":"start","attempt":3}

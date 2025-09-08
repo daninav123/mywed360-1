@@ -113,3 +113,23 @@
 - **Error:** Task process exit code 1
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-08T17:40:31.179Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:41:02.429Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:41:08.720Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:44:39.852Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

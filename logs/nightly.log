@@ -53,3 +53,16 @@
 {"timestamp":"2025-09-08T17:37:30.206Z","action":"run","taskId":"unit_rules","cycle":2}
 {"timestamp":"2025-09-08T17:37:36.454Z","action":"task_end","taskId":"unit_rules","status":"error","exitCode":9}
 {"timestamp":"2025-09-08T17:37:36.456Z","action":"cycle_end","cycle":2,"progressed":false,"completed":0,"failures":6}
+{"timestamp":"2025-09-08T17:40:00.589Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T17:40:00.591Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T17:40:00.592Z","action":"run","taskId":"rsvp_scheduler_dryrun","cycle":1}
+{"timestamp":"2025-09-08T17:40:31.283Z","action":"task_end","taskId":"rsvp_scheduler_dryrun","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T17:40:31.284Z","action":"run","taskId":"validate_schemas","cycle":1}
+{"timestamp":"2025-09-08T17:41:02.502Z","action":"task_end","taskId":"validate_schemas","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T17:41:02.503Z","action":"run","taskId":"unit_rules","cycle":1}
+{"timestamp":"2025-09-08T17:41:08.800Z","action":"task_end","taskId":"unit_rules","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T17:41:08.803Z","action":"cycle_end","cycle":1,"progressed":false,"completed":0,"failures":3}
+{"timestamp":"2025-09-08T17:44:08.807Z","action":"cycle_start","cycle":2}
+{"timestamp":"2025-09-08T17:44:08.812Z","action":"run","taskId":"rsvp_scheduler_dryrun","cycle":2}
+{"timestamp":"2025-09-08T17:44:39.942Z","action":"task_end","taskId":"rsvp_scheduler_dryrun","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T17:44:39.944Z","action":"run","taskId":"validate_schemas","cycle":2}
