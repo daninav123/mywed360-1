@@ -53,3 +53,33 @@
 - **Error:** HealthCheck failed at step test:unit (seating)
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-08T17:26:52.834Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:27:18.959Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:27:24.017Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:30:54.431Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:31:24.838Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T17:31:30.795Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
