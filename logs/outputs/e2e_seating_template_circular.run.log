@@ -1,0 +1,164 @@
+[2025-09-08T23:09:05.745Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_template_circular.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_template_circular.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_template_circular.cy.js)                                      │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_template_circular.cy.js                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_template_circular.cy.js                                                 (1 of 1)
+
+
+  Seating Plan - Plantilla: Distribución circular
+    1) coloca las mesas aproximadamente en un anillo
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Plantilla: Distribución circular
+       coloca las mesas aproximadamente en un anillo:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_template_circular.cy.js:20:41)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_template_circular.cy.js                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_template_circular.cy.js\Seating Plan - Plantilla Distribución circu               
+     lar -- coloca las mesas aproximadamente en un anillo (failed).png                              
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_template_circular.cy.js          00:10        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54361/devtools/browser/8771242e-a709-4c3d-a862-b721767cc73f
+
+[EXIT 1]
+
+[2025-09-08T23:14:23.986Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_template_circular.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_template_circular.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_template_circular.cy.js)                                      │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_template_circular.cy.js                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_template_circular.cy.js                                                 (1 of 1)
+
+
+  Seating Plan - Plantilla: Distribución circular
+    1) coloca las mesas aproximadamente en un anillo
+
+
+  0 passing (11s)
+  1 failing
+
+  1) Seating Plan - Plantilla: Distribución circular
+       coloca las mesas aproximadamente en un anillo:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_template_circular.cy.js:20:41)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     11 seconds                                                                       │
+  │ Spec Ran:     seating_template_circular.cy.js                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_template_circular.cy.js\Seating Plan - Plantilla Distribución circu               
+     lar -- coloca las mesas aproximadamente en un anillo (failed).png                              
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_template_circular.cy.js          00:11        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:11        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:58736/devtools/browser/c82aaa57-6d8e-4990-94be-d59addacb690
+
+[EXIT 1]
+

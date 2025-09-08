@@ -488,3 +488,498 @@
 - **Error:** Task process exit code 5
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-08T22:41:52.638Z
+- **Tarea:** e2e_email_ai_provider
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:42:21.207Z
+- **Tarea:** e2e_budget_flow
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:43:46.172Z
+- **Tarea:** e2e_email_performance
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:43:54.100Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:01.329Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:04.512Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:10.101Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:33.938Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:39.512Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:44:56.286Z
+- **Tarea:** e2e_rsvp_confirm_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:45:42.546Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:46:03.143Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:46:30.400Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:46:56.827Z
+- **Tarea:** e2e_seating_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:47:24.854Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:47:38.194Z
+- **Tarea:** e2e_seating_capacity_limit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:47:42.225Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:48:06.881Z
+- **Tarea:** e2e_seating_aisle_min
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:48:13.925Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:48:19.905Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:48:35.916Z
+- **Tarea:** e2e_seating_obstacles_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:48:38.901Z
+- **Tarea:** e2e_rsvp_confirm_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:49:05.690Z
+- **Tarea:** e2e_seating_template_circular
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:49:32.839Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:49:34.361Z
+- **Tarea:** e2e_seating_template_u_l_imperial
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:49:54.994Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:50:02.438Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:50:24.980Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:50:33.120Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:50:58.971Z
+- **Tarea:** e2e_seating_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:51:30.757Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:51:39.638Z
+- **Tarea:** e2e_email_send
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:51:49.083Z
+- **Tarea:** e2e_seating_capacity_limit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:52:19.242Z
+- **Tarea:** e2e_seating_aisle_min
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:52:49.617Z
+- **Tarea:** e2e_seating_obstacles_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:52:55.809Z
+- **Tarea:** e2e_email_read
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:53:17.960Z
+- **Tarea:** e2e_seating_template_circular
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:53:48.852Z
+- **Tarea:** e2e_seating_template_u_l_imperial
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:54:27.101Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:54:57.648Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:54:58.259Z
+- **Tarea:** e2e_email_folders
+- **Error:** Task process exit code 7
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:56:00.918Z
+- **Tarea:** e2e_email_send
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:56:30.542Z
+- **Tarea:** e2e_email_tags_filters
+- **Error:** Task process exit code 5
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:57:20.304Z
+- **Tarea:** e2e_email_read
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:57:25.488Z
+- **Tarea:** e2e_email_ai_provider
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:57:55.553Z
+- **Tarea:** e2e_budget_flow
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:59:19.726Z
+- **Tarea:** e2e_email_folders
+- **Error:** Task process exit code 7
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:59:22.909Z
+- **Tarea:** e2e_email_performance
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:59:30.251Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:59:37.904Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T22:59:45.834Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:00:49.021Z
+- **Tarea:** e2e_email_tags_filters
+- **Error:** Task process exit code 5
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:01:40.725Z
+- **Tarea:** e2e_email_ai_provider
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:02:09.000Z
+- **Tarea:** e2e_budget_flow
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:03:22.202Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:03:50.544Z
+- **Tarea:** e2e_email_performance
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:03:50.612Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:03:56.816Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:03:58.603Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:04:06.668Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:04:14.717Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:04:16.623Z
+- **Tarea:** e2e_rsvp_confirm_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:05:07.247Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:05:29.404Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:05:56.557Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:06:24.575Z
+- **Tarea:** e2e_seating_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:06:51.860Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:07:10.194Z
+- **Tarea:** e2e_seating_capacity_limit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:07:51.833Z
+- **Tarea:** rsvp_scheduler_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:07:55.503Z
+- **Tarea:** e2e_seating_aisle_min
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:08:25.335Z
+- **Tarea:** validate_schemas
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:08:31.204Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:08:32.929Z
+- **Tarea:** e2e_seating_obstacles_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:08:53.767Z
+- **Tarea:** e2e_rsvp_confirm_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:09:05.750Z
+- **Tarea:** e2e_seating_template_circular
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:09:38.688Z
+- **Tarea:** e2e_seating_template_u_l_imperial
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:09:56.168Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:10:11.718Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:10:23.605Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:10:44.239Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:10:59.476Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:11:35.414Z
+- **Tarea:** e2e_seating_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:11:49.974Z
+- **Tarea:** e2e_email_send
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:12:08.179Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:12:32.708Z
+- **Tarea:** e2e_seating_capacity_limit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:13:05.606Z
+- **Tarea:** e2e_seating_aisle_min
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:13:09.773Z
+- **Tarea:** e2e_email_read
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:13:51.219Z
+- **Tarea:** e2e_seating_obstacles_no_overlap
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:14:23.990Z
+- **Tarea:** e2e_seating_template_circular
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:14:55.304Z
+- **Tarea:** e2e_seating_template_u_l_imperial
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:15:18.593Z
+- **Tarea:** e2e_email_folders
+- **Error:** Task process exit code 7
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:15:27.239Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:16:01.309Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:16:51.612Z
+- **Tarea:** e2e_email_tags_filters
+- **Error:** Task process exit code 5
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:17:05.571Z
+- **Tarea:** e2e_email_send
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:17:44.977Z
+- **Tarea:** e2e_email_ai_provider
+- **Error:** Task process exit code 3
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:18:19.896Z
+- **Tarea:** e2e_budget_flow
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:18:30.585Z
+- **Tarea:** e2e_email_read
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-08T23:46:06.415Z
+- **Tarea:** e2e_rsvp_confirm_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

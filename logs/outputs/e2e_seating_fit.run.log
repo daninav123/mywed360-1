@@ -1,0 +1,164 @@
+[2025-09-08T23:10:11.715Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_fit.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_fit.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_fit.cy.js)                                                    │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_fit.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_fit.cy.js                                                               (1 of 1)
+
+
+  Seating Plan - Fit to Content
+    1) ajusta escala y offset al contenido con el botón ⌂
+
+
+  0 passing (11s)
+  1 failing
+
+  1) Seating Plan - Fit to Content
+       ajusta escala y offset al contenido con el botón ⌂:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_fit.cy.js:7:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_fit.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_fit.cy.js\Seating Plan - Fit to Content -- ajusta escala y offset a               
+     l contenido con el botón ⌂ (failed).png                                                        
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_fit.cy.js                        00:10        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55316/devtools/browser/8d91930a-5a74-49f6-893b-db5ea7ec42fb
+
+[EXIT 1]
+
+[2025-09-08T23:15:27.235Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_fit.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_fit.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_fit.cy.js)                                                    │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_fit.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_fit.cy.js                                                               (1 of 1)
+
+
+  Seating Plan - Fit to Content
+    1) ajusta escala y offset al contenido con el botón ⌂
+
+
+  0 passing (12s)
+  1 failing
+
+  1) Seating Plan - Fit to Content
+       ajusta escala y offset al contenido con el botón ⌂:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_fit.cy.js:7:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     11 seconds                                                                       │
+  │ Spec Ran:     seating_fit.cy.js                                                                │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_fit.cy.js\Seating Plan - Fit to Content -- ajusta escala y offset a               
+     l contenido con el botón ⌂ (failed).png                                                        
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_fit.cy.js                        00:11        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:11        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:59545/devtools/browser/acf7e934-caeb-4453-8067-b99c966acce8
+
+[EXIT 1]
+

@@ -21,6 +21,7 @@ const LOG_DIR = path.join(repoRoot, 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'tasks.log');
 const ROADMAP_PATH = path.join(repoRoot, 'roadmap.json');
 const INCIDENTS_DIR = path.join(repoRoot, 'docs', 'incidents');
+const OUTPUT_DIR = path.join(LOG_DIR, 'outputs');
 
 function ts() { return new Date().toISOString(); }
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
@@ -59,14 +60,44 @@ function parseArgs() {
 
 function runCmd(cmd, opts = {}) {
   return new Promise((resolve) => {
-    // Cross-plat: usar shell
-    const child = spawn(cmd, { shell: true, cwd: opts.cwd || repoRoot, stdio: 'inherit' });
-    child.on('exit', (code) => resolve(code ?? 1));
-    child.on('error', () => resolve(1));
+    const logPath = opts.logPath;
+    try { ensureDir(OUTPUT_DIR); if (logPath) ensureDir(path.dirname(logPath)); } catch {}
+    const child = spawn(cmd, { shell: true, cwd: opts.cwd || repoRoot, stdio: ['ignore', 'pipe', 'pipe'] });
+    let outBuffer = '';
+    let errBuffer = '';
+    child.stdout.on('data', (d) => {
+      const s = d.toString();
+      outBuffer += s;
+      try { process.stdout.write(s); } catch {}
+    });
+    child.stderr.on('data', (d) => {
+      const s = d.toString();
+      errBuffer += s;
+      try { process.stderr.write(s); } catch {}
+    });
+    const flush = (code, err) => {
+      if (!logPath) return;
+      try {
+        const header = `[${ts()}] CMD: ${cmd}\n`;
+        const body = `${header}[STDOUT]\n${outBuffer}\n[STDERR]\n${errBuffer}${err ? `\n[ERROR]\n${String(err)}` : ''}\n[EXIT ${code}]\n\n`;
+        fs.appendFileSync(logPath, body, 'utf8');
+      } catch {}
+    };
+    child.on('exit', (code) => { flush(code ?? 1); resolve(code ?? 1); });
+    child.on('error', (e) => { flush(1, e?.message || e); resolve(1); });
   });
 }
 
-async function healthCheckWithRetries() {
+function enhanceCypressCommand(cmd) {
+  const isCypress = String(cmd).includes('cypress:run');
+  const hasBrowser = /--browser\s+\S+/i.test(String(cmd));
+  if (isCypress && !hasBrowser) {
+    return `${cmd} --browser edge --headless`;
+  }
+  return cmd;
+}
+
+async function healthCheckWithRetries(taskId = 'generic') {
   const seatingOnly = process.env.RUN_TASK_SEATING_ONLY === 'true';
   const testCmd = seatingOnly
     ? 'npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js'
@@ -83,7 +114,8 @@ async function healthCheckWithRetries() {
   for (const step of steps) {
     let attempt = 0;
     while (attempt < 3) {
-      const code = await runCmd(step.cmd);
+      const logName = `${String(taskId)}.health.${String(step.name).replace(/[^a-z0-9_-]+/gi, '_')}.attempt${attempt + 1}.log`;
+      const code = await runCmd(step.cmd, { logPath: path.join(OUTPUT_DIR, logName) });
       if (code === 0) break;
       attempt += 1;
       if (attempt >= 3) return { ok: false, failedStep: step.name };
@@ -162,10 +194,11 @@ async function main() {
   try {
     // Ejecutar acción
     if (task.command) {
-      runExit = await runCmd(task.command);
+      const cmd = enhanceCypressCommand(task.command);
+      runExit = await runCmd(cmd, { logPath: path.join(OUTPUT_DIR, `${String(task.id)}.run.log`) });
     } else if (task.script) {
       const cmd = `node ${task.script}`;
-      runExit = await runCmd(cmd);
+      runExit = await runCmd(cmd, { logPath: path.join(OUTPUT_DIR, `${String(task.id)}.run.log`) });
     } else {
       console.log('[runTask] Tarea sin command/script. Marcando como noop.');
       runExit = 0;
@@ -174,7 +207,7 @@ async function main() {
     if (runExit !== 0) throw new Error(`Task process exit code ${runExit}`);
 
     // Health check
-    const hc = await healthCheckWithRetries();
+    const hc = await healthCheckWithRetries(String(task.id));
     if (!hc.ok) throw new Error(`HealthCheck failed at step ${hc.failedStep}`);
 
     appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'success', attempt });

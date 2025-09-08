@@ -82,6 +82,13 @@ function getRunnableTaskIds(options = {}) {
       // Omitir specs E2E si RUN_E2E no está habilitado
       return !(skipE2E && cmd.includes('cypress:run'));
     })
+    // Ordenar por campo opcional 'order' (numérico ascendente). Los que no tengan 'order' van al final.
+    .sort((a, b) => {
+      const ao = Number.isFinite(Number(a.order)) ? Number(a.order) : Number.MAX_SAFE_INTEGER;
+      const bo = Number.isFinite(Number(b.order)) ? Number(b.order) : Number.MAX_SAFE_INTEGER;
+      if (ao !== bo) return ao - bo;
+      return 0;
+    })
     .map((x) => String(x.id));
 }
 

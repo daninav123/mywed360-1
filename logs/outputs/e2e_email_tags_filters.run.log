@@ -1,0 +1,118 @@
+[2025-09-08T23:16:51.606Z] CMD: npm run cypress:run -- --spec "cypress/e2e/email/tags-filters.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/email/tags-filters.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (tags-filters.cy.js)                                                   │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\e │
+  │                 mail\tags-filters.cy.js                                                        │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  tags-filters.cy.js                                                              (1 of 1)
+
+
+  Flujo de etiquetado y filtrado de correos
+    1) muestra correctamente las etiquetas disponibles
+    2) permite filtrar correos por etiqueta
+    3) permite agregar etiquetas a un correo
+    4) permite eliminar etiquetas de un correo
+    5) permite crear y aplicar nuevas etiquetas personalizadas
+
+
+  0 passing (1m)
+  5 failing
+
+  1) Flujo de etiquetado y filtrado de correos
+       muestra correctamente las etiquetas disponibles:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  2) Flujo de etiquetado y filtrado de correos
+       permite filtrar correos por etiqueta:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  3) Flujo de etiquetado y filtrado de correos
+       permite agregar etiquetas a un correo:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  4) Flujo de etiquetado y filtrado de correos
+       permite eliminar etiquetas de un correo:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  5) Flujo de etiquetado y filtrado de correos
+       permite crear y aplicar nuevas etiquetas personalizadas:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        5                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      5                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  5                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     1 minute, 10 seconds                                                             │
+  │ Spec Ran:     tags-filters.cy.js                                                               │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\tags-filters.cy.js\Flujo de etiquetado y filtrado de correos -- muestra cor               
+     rectamente las etiquetas disponibles (failed).png                                              
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\tags-filters.cy.js\Flujo de etiquetado y filtrado de correos -- permite fil               
+     trar correos por etiqueta (failed).png                                                         
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\tags-filters.cy.js\Flujo de etiquetado y filtrado de correos -- permite agr               
+     egar etiquetas a un correo (failed).png                                                        
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\tags-filters.cy.js\Flujo de etiquetado y filtrado de correos -- permite eli               
+     minar etiquetas de un correo (failed).png                                                      
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\tags-filters.cy.js\Flujo de etiquetado y filtrado de correos -- permite cre               
+     ar y aplicar nuevas etiquetas personalizadas (failed).png                                      
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  tags-filters.cy.js                       01:10        5        -        5        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     01:10        5        -        5        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:59868/devtools/browser/28f84180-1fd7-49e2-9387-9ccf94d327c0
+
+[EXIT 5]
+

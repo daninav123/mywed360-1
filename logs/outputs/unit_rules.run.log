@@ -1,0 +1,43 @@
+[2025-09-08T23:08:31.199Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m[32m 16[2mms[22m[39m
+   [2m[90m↓[39m[22m Firestore rules - seatingPlan (banquet/ceremony)[2m > [22mrechaza banquet con aisleMin < 40
+   [2m[90m↓[39m[22m Firestore rules - seatingPlan (banquet/ceremony)[2m > [22mpermite banquet válido con config anidado
+   [2m[90m↓[39m[22m Firestore rules - seatingPlan (banquet/ceremony)[2m > [22mpermite banquet válido con config plano (compat)
+   [2m[90m↓[39m[22m Firestore rules - seatingPlan (banquet/ceremony)[2m > [22mrechaza ceremony con seats no-list
+   [2m[90m↓[39m[22m Firestore rules - seatingPlan (banquet/ceremony)[2m > [22mpermite ceremony válido con seats list
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m5 skipped[39m[90m (5)[39m
+[2m   Start at [22m 01:08:28
+[2m   Duration [22m 2.42s[2m (transform 122ms, setup 496ms, collect 576ms, tests 16ms, environment 0ms, prepare 759ms)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.seating.test.js[2m > [22mFirestore rules - seatingPlan (banquet/ceremony)
+[31m[1mError[22m: The host and port of the firestore emulator must be specified. (You may wrap the test script with `firebase emulators:exec './your-test-script'` to enable automatic discovery, or specify manually via initializeTestEnvironment({firestore: {host, port}}).[39m
+[90m [2m❯[22m assertEmulatorRunning ../lovenda13123123%20-%20copia/node_modules/@firebase/rules-unit-testing/dist/esm/index.esm.js:[2m350:19[22m[39m
+[90m [2m❯[22m initializeTestEnvironment ../lovenda13123123%20-%20copia/node_modules/@firebase/rules-unit-testing/dist/esm/index.esm.js:[2m485:9[22m[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.seating.test.js:[2m27:46[22m[39m
+    [90m 25| [39m    [35mconst[39m rulesPath [33m=[39m path[33m.[39m[34mresolve[39m(__dirname[33m,[39m [32m'../../firestore.rules'[39m)[33m;[39m
+    [90m 26| [39m    [35mconst[39m rules [33m=[39m [35mawait[39m fs[33m.[39m[34mreadFile[39m(rulesPath[33m,[39m [32m'utf8'[39m)[33m;[39m
+    [90m 27| [39m    testEnv [33m=[39m [35mawait[39m [34minitializeTestEnvironment[39m({
+    [90m   | [39m                                             [31m^[39m
+    [90m 28| [39m      projectId[33m:[39m [32m'mywed360-rules-test'[39m[33m,[39m
+    [90m 29| [39m      firestore[33m:[39m { rules }[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[EXIT 1]
+

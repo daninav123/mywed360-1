@@ -12,5 +12,8 @@ module.exports = defineConfig({
     viewportHeight: 720,
     video: false,
     screenshotOnRunFailure: true,
+    env: {
+      BACKEND_BASE_URL: process.env.BACKEND_BASE_URL || process.env.VITE_BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com',
+    },
   },
 });

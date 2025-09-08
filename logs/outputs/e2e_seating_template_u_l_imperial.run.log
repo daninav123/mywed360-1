@@ -1,0 +1,170 @@
+[2025-09-08T23:09:38.683Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_template_u_l_imperial.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_template_u_l_imperial.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_template_u_l_imperial.cy.js)                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_template_u_l_imperial.cy.js                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_template_u_l_imperial.cy.js                                             (1 of 1)
+
+
+  Seating Plan - Plantillas U / L / Imperial
+    1) "before each" hook for "Forma U: mesas en tres bordes (izquierda, derecha e inferior)"
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Plantillas U / L / Imperial
+       "before each" hook for "Forma U: mesas en tres bordes (izquierda, derecha e inferior)":
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Seating Plan - Plantillas U...`
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_template_u_l_imperial.cy.js:25:41)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        3                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      2                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_template_u_l_imperial.cy.js                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_template_u_l_imperial.cy.js\Seating Plan - Plantillas U  L  Imperia               
+     l -- Forma U mesas en tres bordes (izquierda, derecha e inferior) -- before each               
+      hook (failed).png                                                                             
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_template_u_l_imperial.cy.js      00:10        3        -        1        -        2 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        3        -        1        -        2  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54828/devtools/browser/68bf1e5e-12d3-4d8a-b522-c634d1986dd5
+
+[EXIT 1]
+
+[2025-09-08T23:14:55.301Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_template_u_l_imperial.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_template_u_l_imperial.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_template_u_l_imperial.cy.js)                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_template_u_l_imperial.cy.js                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_template_u_l_imperial.cy.js                                             (1 of 1)
+
+
+  Seating Plan - Plantillas U / L / Imperial
+    1) "before each" hook for "Forma U: mesas en tres bordes (izquierda, derecha e inferior)"
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Plantillas U / L / Imperial
+       "before each" hook for "Forma U: mesas en tres bordes (izquierda, derecha e inferior)":
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Seating Plan - Plantillas U...`
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_template_u_l_imperial.cy.js:25:41)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        3                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      2                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_template_u_l_imperial.cy.js                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_template_u_l_imperial.cy.js\Seating Plan - Plantillas U  L  Imperia               
+     l -- Forma U mesas en tres bordes (izquierda, derecha e inferior) -- before each               
+      hook (failed).png                                                                             
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_template_u_l_imperial.cy.js      00:10        3        -        1        -        2 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        3        -        1        -        2  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:59155/devtools/browser/7dd145ed-ad6a-493c-bd6a-3919654ee406
+
+[EXIT 1]
+

@@ -11,6 +11,46 @@
 // Import cypress-file-upload plugin for attachFile command
 import 'cypress-file-upload';
 
+// Prefijo automático para llamadas a backend cuando se usa URL relativa '/api/*'
+// Lee Cypress.env('BACKEND_BASE_URL') definido en cypress.config.js o variables de entorno
+const __prefixApiUrl = (url) => {
+  try {
+    const backend = Cypress.env('BACKEND_BASE_URL');
+    if (backend && typeof url === 'string' && url.startsWith('/')) {
+      if (url.startsWith('/api/')) {
+        return backend.replace(/\/$/, '') + url;
+      }
+    }
+  } catch (_) {}
+  return url;
+};
+
+// Soporte de todas las firmas: request(url), request(options), request(method, url, body)
+Cypress.Commands.overwrite('request', (originalFn, ...args) => {
+  try {
+    // request(options)
+    if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
+      const opts = { ...args[0] };
+      if (opts.url) opts.url = __prefixApiUrl(opts.url);
+      return originalFn(opts);
+    }
+    // request(method, url, body)
+    if (
+      args.length >= 2 &&
+      typeof args[0] === 'string' &&
+      typeof args[1] === 'string'
+    ) {
+      const [method, url, body] = args;
+      return originalFn(method, __prefixApiUrl(url), body);
+    }
+    // request(url)
+    if (args.length === 1 && typeof args[0] === 'string') {
+      return originalFn(__prefixApiUrl(args[0]));
+    }
+  } catch (_) {}
+  return originalFn(...args);
+});
+
 //
 // -- This is a parent command --
 // Cypress.Commands.add('login', (email, password) => { ... })
