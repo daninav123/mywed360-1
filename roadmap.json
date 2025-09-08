@@ -19,9 +19,9 @@
     {
       "id": "unit_rules",
       "title": "Tests unitarios de reglas Firestore (seating)",
-      "status": "pending",
+      "status": "failed",
       "command": "npm run test:unit -- src/__tests__/firestore.rules.seating.test.js",
-      "attempts": 2,
+      "attempts": 3,
       "lastError": "Task process exit code 1"
     }
   ]

@@ -66,3 +66,8 @@
 {"timestamp":"2025-09-08T17:44:08.812Z","action":"run","taskId":"rsvp_scheduler_dryrun","cycle":2}
 {"timestamp":"2025-09-08T17:44:39.942Z","action":"task_end","taskId":"rsvp_scheduler_dryrun","status":"error","exitCode":9}
 {"timestamp":"2025-09-08T17:44:39.944Z","action":"run","taskId":"validate_schemas","cycle":2}
+{"timestamp":"2025-09-08T17:50:16.875Z","action":"start","durationHours":8,"sleepSeconds":180,"stopOnError":false,"pushBranch":"windows"}
+{"timestamp":"2025-09-08T17:50:16.877Z","action":"cycle_start","cycle":1}
+{"timestamp":"2025-09-08T17:50:16.879Z","action":"run","taskId":"unit_rules","cycle":1}
+{"timestamp":"2025-09-08T17:50:23.211Z","action":"task_end","taskId":"unit_rules","status":"error","exitCode":9}
+{"timestamp":"2025-09-08T17:50:23.213Z","action":"cycle_end","cycle":1,"progressed":false,"completed":0,"failures":1}

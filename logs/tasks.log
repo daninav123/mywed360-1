@@ -81,3 +81,6 @@
 {"timestamp":"2025-09-08T17:44:39.850Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":3}
 {"timestamp":"2025-09-08T17:44:39.856Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":3}
 {"timestamp":"2025-09-08T17:44:40.070Z","taskId":"validate_schemas","action":"start","attempt":3}
+{"timestamp":"2025-09-08T17:50:16.984Z","taskId":"unit_rules","action":"start","attempt":3}
+{"timestamp":"2025-09-08T17:50:23.112Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":3}
+{"timestamp":"2025-09-08T17:50:23.120Z","taskId":"unit_rules","action":"end","status":"error","attempt":3}
