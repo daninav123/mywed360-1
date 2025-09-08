@@ -50,3 +50,21 @@
 {"timestamp":"2025-09-08T17:31:25.012Z","taskId":"unit_rules","action":"start"}
 {"timestamp":"2025-09-08T17:31:30.794Z","taskId":"unit_rules","error":"Task process exit code 1"}
 {"timestamp":"2025-09-08T17:31:30.797Z","taskId":"unit_rules","action":"end","status":"error"}
+{"timestamp":"2025-09-08T17:32:19.698Z","taskId":"rsvp_scheduler_dryrun","action":"start"}
+{"timestamp":"2025-09-08T17:32:50.915Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)"}
+{"timestamp":"2025-09-08T17:32:50.920Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error"}
+{"timestamp":"2025-09-08T17:32:51.159Z","taskId":"validate_schemas","action":"start"}
+{"timestamp":"2025-09-08T17:33:22.745Z","taskId":"validate_schemas","error":"HealthCheck failed at step test:unit (seating)"}
+{"timestamp":"2025-09-08T17:33:22.750Z","taskId":"validate_schemas","action":"end","status":"error"}
+{"timestamp":"2025-09-08T17:33:23.003Z","taskId":"unit_rules","action":"start"}
+{"timestamp":"2025-09-08T17:33:28.919Z","taskId":"unit_rules","error":"Task process exit code 1"}
+{"timestamp":"2025-09-08T17:33:28.922Z","taskId":"unit_rules","action":"end","status":"error"}
+{"timestamp":"2025-09-08T17:36:29.140Z","taskId":"rsvp_scheduler_dryrun","action":"start","attempt":1}
+{"timestamp":"2025-09-08T17:37:00.081Z","taskId":"rsvp_scheduler_dryrun","error":"HealthCheck failed at step test:unit (seating)","attempt":1}
+{"timestamp":"2025-09-08T17:37:00.091Z","taskId":"rsvp_scheduler_dryrun","action":"end","status":"error","attempt":1}
+{"timestamp":"2025-09-08T17:37:00.333Z","taskId":"validate_schemas","action":"start","attempt":1}
+{"timestamp":"2025-09-08T17:37:30.121Z","taskId":"validate_schemas","error":"HealthCheck failed at step test:unit (seating)","attempt":1}
+{"timestamp":"2025-09-08T17:37:30.127Z","taskId":"validate_schemas","action":"end","status":"error","attempt":1}
+{"timestamp":"2025-09-08T17:37:30.441Z","taskId":"unit_rules","action":"start","attempt":1}
+{"timestamp":"2025-09-08T17:37:36.385Z","taskId":"unit_rules","error":"Task process exit code 1","attempt":1}
+{"timestamp":"2025-09-08T17:37:36.390Z","taskId":"unit_rules","action":"end","status":"error","attempt":1}

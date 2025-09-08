@@ -145,7 +145,17 @@ async function main() {
   if (!task) task = tasks.find((t) => (t.status || 'pending') === 'pending');
   if (!task) { console.log('[runTask] No hay tareas pending'); return; }
 
-  const start = { timestamp: ts(), taskId: String(task.id), action: 'start' };
+  // Localizar índice y actualizar intentos/estado
+  const idx = tasks.findIndex((t) => t.id === task.id);
+  if (idx >= 0) {
+    const prevAttempts = parseInt(tasks[idx].attempts || 0, 10) || 0;
+    tasks[idx].attempts = prevAttempts + 1;
+    tasks[idx].status = 'in_progress';
+    writeRoadmap({ ...roadmap, tasks });
+  }
+
+  const attempt = (idx >= 0 ? (tasks[idx].attempts || 1) : 1);
+  const start = { timestamp: ts(), taskId: String(task.id), action: 'start', attempt };
   appendLog(start);
 
   let runExit = 0;
@@ -167,20 +177,30 @@ async function main() {
     const hc = await healthCheckWithRetries();
     if (!hc.ok) throw new Error(`HealthCheck failed at step ${hc.failedStep}`);
 
-    appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'success' });
+    appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'success', attempt });
 
     // Marcar tarea como completed en roadmap.json
-    const idx = tasks.findIndex((t) => t.id === task.id);
     if (idx >= 0) {
       tasks[idx].status = 'completed';
       writeRoadmap({ ...roadmap, tasks });
     }
   } catch (e) {
-    appendLog({ timestamp: ts(), taskId: String(task.id), error: e?.message || String(e) });
+    appendLog({ timestamp: ts(), taskId: String(task.id), error: e?.message || String(e), attempt });
     await writeIncident(String(task.id), e?.message || String(e));
     await notifySlack(`:rotating_light: Task ${task.id} falló: ${e?.message || e}`);
     await notifyEmail(`Task ${task.id} falló`, `Detalles: ${e?.message || e}`);
-    appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'error' });
+    // Actualizar roadmap según número de intentos
+    if (idx >= 0) {
+      const attempts = parseInt(tasks[idx].attempts || 1, 10) || 1;
+      tasks[idx].lastError = e?.message || String(e);
+      if (attempts >= 3) {
+        tasks[idx].status = 'failed';
+      } else {
+        tasks[idx].status = 'pending';
+      }
+      writeRoadmap({ ...roadmap, tasks });
+    }
+    appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'error', attempt });
     process.exitCode = 1;
   }
 }

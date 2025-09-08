@@ -4,19 +4,25 @@
       "id": "rsvp_scheduler_dryrun",
       "title": "RSVP Scheduler (dryRun)",
       "status": "pending",
-      "command": "node scripts/rsvpScheduler.cjs --dryRun=true --limit=50 --minIntervalMinutes=1440"
+      "command": "node scripts/rsvpScheduler.cjs --dryRun=true --limit=50 --minIntervalMinutes=1440",
+      "attempts": 1,
+      "lastError": "HealthCheck failed at step test:unit (seating)"
     },
     {
       "id": "validate_schemas",
       "title": "Validar reglas y archivos clave",
       "status": "pending",
-      "command": "npm run validate:schemas"
+      "command": "npm run validate:schemas",
+      "attempts": 1,
+      "lastError": "HealthCheck failed at step test:unit (seating)"
     },
     {
       "id": "unit_rules",
       "title": "Tests unitarios de reglas Firestore (seating)",
       "status": "pending",
-      "command": "npm run test:unit -- src/__tests__/firestore.rules.seating.test.js"
+      "command": "npm run test:unit -- src/__tests__/firestore.rules.seating.test.js",
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     }
   ]
 }
