@@ -983,3 +983,93 @@
 - **Error:** Task process exit code 1
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-09T00:06:42.087Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:11:20.009Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:14:19.988Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:20:32.114Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:28:48.785Z
+- **Tarea:** e2e_rsvp_invalid_token
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:39:17.750Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:41:29.027Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:45:41.631Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:46:14.445Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:47:37.207Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:48:27.547Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:49:51.316Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:50:51.051Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:52:02.957Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:52:36.357Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:53:31.187Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:54:13.840Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:54:53.708Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

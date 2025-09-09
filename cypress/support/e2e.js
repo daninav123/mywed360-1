@@ -25,7 +25,9 @@ import './commands';
 beforeEach(() => {
   const backend = Cypress.env('BACKEND_BASE_URL') || '';
   const isProdBackend = /onrender\.com/i.test(backend);
-  if (!isProdBackend) return;
+  const stubRsvp = (Cypress.env('STUB_RSVP') === true || Cypress.env('STUB_RSVP') === 'true');
+  // Solo aplicar stubs cuando explicitamente se solicite y el backend apunte a producción
+  if (!isProdBackend || !stubRsvp) return;
 
   // 1) Asegurar planner (aceptamos 401 en test, pero devolvemos 401 estable)
   cy.intercept('POST', '/api/rsvp/dev/ensure-planner', (req) => {

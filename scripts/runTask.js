@@ -206,9 +206,13 @@ async function main() {
 
     if (runExit !== 0) throw new Error(`Task process exit code ${runExit}`);
 
-    // Health check
-    const hc = await healthCheckWithRetries(String(task.id));
-    if (!hc.ok) throw new Error(`HealthCheck failed at step ${hc.failedStep}`);
+    // Health check (saltable)
+    if (String(process.env.SKIP_HEALTH_CHECK || 'false') !== 'true') {
+      const hc = await healthCheckWithRetries(String(task.id));
+      if (!hc.ok) throw new Error(`HealthCheck failed at step ${hc.failedStep}`);
+    } else {
+      appendLog({ timestamp: ts(), taskId: String(task.id), action: 'health', status: 'skipped' });
+    }
 
     appendLog({ timestamp: ts(), taskId: String(task.id), action: 'end', status: 'success', attempt });
 

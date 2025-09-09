@@ -174,3 +174,1147 @@ DevTools listening on ws://127.0.0.1:55505/devtools/browser/1ee56b4f-d55e-4320-9
 
 [EXIT 1]
 
+[2025-09-09T00:39:17.747Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:12:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:53443/devtools/browser/caedfbfa-c469-4d52-8bb4-30e6bd978a4a
+
+[EXIT 1]
+
+[2025-09-09T00:41:29.024Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:12:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:53718/devtools/browser/5a464e34-9880-457a-b90e-5c894e5edf41
+
+[EXIT 1]
+
+[2025-09-09T00:45:41.627Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54184/devtools/browser/0be0ba93-7821-41b7-9fc6-c3d3d72d389b
+
+[EXIT 1]
+
+[2025-09-09T00:46:14.441Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54359/devtools/browser/ef9ac823-b5d7-4612-a3a8-4e1b286411a3
+
+[EXIT 1]
+
+[2025-09-09T00:47:37.205Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54591/devtools/browser/4e3c1245-33ad-46a8-b3f2-7e1617e68f9a
+
+[EXIT 1]
+
+[2025-09-09T00:48:27.543Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54786/devtools/browser/adfc0faa-d9f6-4c1a-96a9-2ba728f440e5
+
+[EXIT 1]
+
+[2025-09-09T00:49:51.313Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55009/devtools/browser/14bdd99f-f303-4a74-bed0-1a40eea1e391
+
+[EXIT 1]
+
+[2025-09-09T00:50:51.046Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55214/devtools/browser/e4ad4af4-0fdd-462e-b8e1-a7111f43f6f4
+
+[EXIT 1]
+
+[2025-09-09T00:52:02.953Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55431/devtools/browser/5cdcfe87-1a38-4d5a-9ea5-d1abf503509d
+
+[EXIT 1]
+
+[2025-09-09T00:52:36.354Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55600/devtools/browser/9f261aee-e674-4f56-aa22-1668db41730d
+
+[EXIT 1]
+
+[2025-09-09T00:53:31.184Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55799/devtools/browser/a86775f2-c4c0-43a0-afbf-0146ac225fd6
+
+[EXIT 1]
+
+[2025-09-09T00:54:13.838Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:55984/devtools/browser/be2db43d-5f80-4e32-bda4-3e957248fd17
+
+[EXIT 1]
+
+[2025-09-09T00:54:53.705Z] CMD: npm run cypress:run -- --spec "cypress/e2e/rsvp/rsvp_reminders.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/rsvp/rsvp_reminders.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (rsvp_reminders.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\r │
+  │                 svp\rsvp_reminders.cy.js                                                       │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  rsvp_reminders.cy.js                                                            (1 of 1)
+
+
+  RSVP - Recordatorios por email (protegido)
+    1) crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun
+
+
+  0 passing (5s)
+  1 failing
+
+  1) RSVP - Recordatorios por email (protegido)
+       crea planner mock, genera invitado pendiente y ejecuta reminders en dryRun:
+
+      Timed out retrying after 4000ms
+      + expected - actual
+
+      -404
+      +[ 200, 401 ]
+      
+      at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_reminders.cy.js:46:21)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     4 seconds                                                                        │
+  │ Spec Ran:     rsvp_reminders.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\rsvp_reminders.cy.js\RSVP - Recordatorios por email (protegido) -- crea pla               
+     nner mock, genera invitado pendiente y ejecuta reminders en dryRun (failed).png                
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  rsvp_reminders.cy.js                     00:04        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:04        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:56164/devtools/browser/8fffe7ea-da93-471f-9df4-8a62ff1415d5
+
+[EXIT 1]
+

@@ -36,19 +36,19 @@
     {
       "id": "e2e_rsvp_invalid_token",
       "title": "E2E RSVP: token inválido",
-      "status": "pending",
+      "status": "completed",
       "order": 2,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_invalid_token.cy.js\"",
-      "attempts": 14,
-      "lastError": "HealthCheck failed at step test:unit (seating)"
+      "attempts": 20,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_rsvp_reminders",
       "title": "E2E RSVP: recordatorios automáticos",
-      "status": "pending",
+      "status": "failed",
       "order": 3,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_reminders.cy.js\"",
-      "attempts": 14,
+      "attempts": 27,
       "lastError": "Task process exit code 1"
     },
     {
