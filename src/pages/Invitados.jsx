@@ -10,6 +10,8 @@ import { useWedding } from '../context/WeddingContext';
 import { useAuth } from '../hooks/useAuth';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
 import ContactsImporter from '../components/guests/ContactsImporter';
+import GuestBulkGrid from '../components/guests/GuestBulkGrid';
+import { Button } from '../components/ui';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -28,6 +30,8 @@ function Invitados() {
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [editingGuest, setEditingGuest] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [showRsvpModal, setShowRsvpModal] = useState(false);
 
   // Hooks reales
   const { t } = useTranslations();
@@ -49,7 +53,8 @@ function Invitados() {
     bulkInviteWhatsApp,
     importFromContacts,
     exportToCSV,
-    updateFilters
+    updateFilters,
+    utils
   } = useGuests();
                           
   // Manejar apertura de modal para nuevo invitado
@@ -102,14 +107,167 @@ function Invitados() {
   const handleImportedGuests = async (importedGuests) => {
     try {
       if (!importedGuests || importedGuests.length === 0) return;
+      // Deduplicación por email/teléfono
+      const existingEmails = new Set((guests || []).map(g => utils.normalize(g?.email || '')));
+      const existingPhones = new Set((guests || []).map(g => utils.phoneClean(g?.phone || '')));
+
+      let added = 0;
+      let skipped = 0;
       for (const guest of importedGuests) {
-        await addGuest(guest);
+        const emailKey = utils.normalize(guest?.email || '');
+        const phoneKey = utils.phoneClean(guest?.phone || '');
+        if ((emailKey && existingEmails.has(emailKey)) || (phoneKey && existingPhones.has(phoneKey))) {
+          skipped++;
+          continue;
+        }
+        await addGuest({
+          companionGroupId: guest?.companionGroupId || '',
+          ...guest,
+        });
+        if (emailKey) existingEmails.add(emailKey);
+        if (phoneKey) existingPhones.add(phoneKey);
+        added++;
       }
-      alert(`${importedGuests.length} invitados importados correctamente`);
+      alert(`${added} invitados importados correctamente${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
       alert('Ocurrió un error al importar los invitados');
+    }
+  };
+
+  // Abrir alta masiva
+  const handleOpenBulkAdd = () => setShowBulkModal(true);
+
+  // Guardar alta masiva desde grid
+  const handleBulkSave = async (rows) => {
+    try {
+      if (!rows || rows.length === 0) {
+        setShowBulkModal(false);
+        return;
+      }
+      const existingEmails = new Set((guests || []).map(g => utils.normalize(g?.email || '')));
+      const existingPhones = new Set((guests || []).map(g => utils.phoneClean(g?.phone || '')));
+
+      let added = 0;
+      let skipped = 0;
+      for (const r of rows) {
+        const emailKey = utils.normalize(r?.email || '');
+        const phoneKey = utils.phoneClean(r?.phone || '');
+        if ((emailKey && existingEmails.has(emailKey)) || (phoneKey && existingPhones.has(phoneKey))) {
+          skipped++;
+          continue;
+        }
+        const payload = {
+          name: r?.name || '',
+          email: r?.email || '',
+          phone: r?.phone || '',
+          address: r?.address || '',
+          companion: parseInt(r?.companion, 10) || parseInt(r?.companions, 10) || 0,
+          companionType: (parseInt(r?.companions, 10) || parseInt(r?.companion, 10) || 0) > 0 ? 'plus_one' : 'none',
+          companionGroupId: '',
+          table: r?.table || '',
+          response: 'Pendiente',
+          status: 'pending',
+          dietaryRestrictions: r?.dietaryRestrictions || '',
+          notes: r?.notes || 'Alta masiva',
+        };
+        await addGuest(payload);
+        if (emailKey) existingEmails.add(emailKey);
+        if (phoneKey) existingPhones.add(phoneKey);
+        added++;
+      }
+      alert(`${added} invitados añadidos${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
+      setShowBulkModal(false);
+    } catch (err) {
+      console.error('Error en alta masiva:', err);
+      alert('Ocurrió un error al procesar la alta masiva');
+    }
+  };
+
+  const handleCancelBulkModal = () => setShowBulkModal(false);
+
+  // Abrir/cerrar resumen RSVP
+  const handleOpenRsvpSummary = () => setShowRsvpModal(true);
+  const handleCloseRsvpSummary = () => setShowRsvpModal(false);
+
+  // Imprimir PDF simple (nombre completo y mesa) para confirmados
+  const handlePrintRsvpPdf = () => {
+    try {
+      const confirmedGuests = (guests || [])
+        .filter(g => g.status === 'confirmed' || g.response === 'Sí')
+        .map(g => ({ name: g.name || '', table: g.table || '' }));
+
+      // Ordenar por mesa y nombre
+      confirmedGuests.sort((a, b) => {
+        const ta = String(a.table || '').toLowerCase();
+        const tb = String(b.table || '').toLowerCase();
+        if (ta === tb) return (a.name || '').localeCompare(b.name || '');
+        return ta.localeCompare(tb);
+      });
+
+      const win = window.open('', '_blank');
+      if (!win) return;
+      const title = 'Listado confirmados - Nombre y Mesa';
+      const date = new Date().toLocaleString();
+
+      const rowsHtml = confirmedGuests.map((g, idx) => `
+        <tr>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${idx + 1}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${g.name}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #eee; text-align:center;">${g.table || '-'}</td>
+        </tr>
+      `).join('');
+
+      const html = `<!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <title>${title}</title>
+            <style>
+              body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color: #111827; }
+              h1 { font-size: 18px; margin: 0; }
+              .sub { font-size: 12px; color: #6B7280; margin-top: 2px; }
+              table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+              thead th { text-align: left; border-bottom: 2px solid #111827; padding: 6px 8px; }
+              @media print { .no-print { display: none; } }
+            </style>
+          </head>
+          <body>
+            <div style="display:flex; justify-content: space-between; align-items: baseline;">
+              <div>
+                <h1>${title}</h1>
+                <div class="sub">Generado: ${date}</div>
+              </div>
+              <div class="no-print">
+                <button onclick="window.print()" style="padding:6px 10px; border:1px solid #e5e7eb; background:#fff; cursor:pointer;">Imprimir / Guardar PDF</button>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nombre completo</th>
+                  <th style="text-align:center;">Mesa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </body>
+        </html>`;
+
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+      // Opcional: lanzar print automático tras cargar
+      win.onload = () => {
+        try { win.print(); } catch (_) {}
+      };
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+      alert('No se pudo generar el documento de impresión');
     }
   };
 
@@ -160,7 +318,9 @@ function Invitados() {
           onAddGuest={handleAddGuest}
           onBulkInvite={bulkInviteWhatsApp}
           onImportGuests={importFromContacts}
+          onBulkAddGuests={handleOpenBulkAdd}
           onExportGuests={exportToCSV}
+          onOpenRsvpSummary={handleOpenRsvpSummary}
           guestCount={(guests?.length) || 0}
           isLoading={isLoading}
         />
@@ -251,6 +411,79 @@ function Invitados() {
               </TabsContent>
             </Tabs>
           )}
+        </Modal>
+
+        {/* Modal de alta masiva */}
+        <Modal
+          open={showBulkModal}
+          onClose={handleCancelBulkModal}
+          title="Alta masiva de invitados"
+          size="lg"
+        >
+          <GuestBulkGrid
+            onCancel={handleCancelBulkModal}
+            onSave={handleBulkSave}
+            isLoading={isSaving}
+          />
+        </Modal>
+
+        {/* Modal Resumen RSVP */}
+        <Modal
+          open={showRsvpModal}
+          onClose={handleCloseRsvpSummary}
+          title="Resumen RSVP"
+          size="lg"
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-2xl font-bold text-blue-600">{stats?.total || 0}</div>
+                <div className="text-sm text-gray-600">Total invitados</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-2xl font-bold text-green-600">{stats?.confirmed || 0}</div>
+                <div className="text-sm text-gray-600">Confirmados</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</div>
+                <div className="text-sm text-gray-600">Pendientes</div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-2xl font-bold text-red-600">{stats?.declined || 0}</div>
+                <div className="text-sm text-gray-600">Rechazados</div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border overflow-hidden">
+              <div className="px-4 py-3 border-b font-medium">Confirmados (Nombre y Mesa)</div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Nombre</th>
+                      <th className="px-3 py-2 text-center">Mesa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(guests || [])
+                      .filter(g => g.status === 'confirmed' || g.response === 'Sí')
+                      .sort((a, b) => String(a.table || '').localeCompare(String(b.table || '')) || String(a.name || '').localeCompare(String(b.name || '')))
+                      .map(g => (
+                        <tr key={g.id} className="border-t">
+                          <td className="px-3 py-2">{g.name}</td>
+                          <td className="px-3 py-2 text-center">{g.table || '-'}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={handleCloseRsvpSummary}>Cerrar</Button>
+              <Button onClick={handlePrintRsvpPdf}>Imprimir / PDF</Button>
+            </div>
+          </div>
         </Modal>
       </div>
     </div>

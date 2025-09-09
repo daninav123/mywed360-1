@@ -88,6 +88,41 @@ Cypress.Commands.add('navigateToEmailInbox', () => {
 });
 
 // Comando para crear y enviar un correo electrónico
+
+// ======== Seating helpers =========
+// Cierra el panel de diagnóstico si está visible
+Cypress.Commands.add('closeDiagnostic', () => {
+  cy.get('body').then(($body) => {
+    const hasModal = $body.find('div.fixed.inset-0').length > 0;
+    if (hasModal) {
+      // Intentar cerrar por el botón × del header del panel
+      cy.contains('h2', 'Panel de Diagnóstico MyWed360', { timeout: 1000 })
+        .parents('div')
+        .first()
+        .parent() // header container
+        .within(() => {
+          cy.contains('button', '×').click({ force: true });
+        });
+    } else {
+      // Fallback: si por alguna razón el modal está visible pero el selector falla, usa el botón flotante
+      cy.get('button[title="Panel de Diagnóstico"]', { timeout: 500 })
+        .then(($btn) => {
+          if ($btn && $btn.is(':visible')) cy.wrap($btn).click({ force: true });
+        })
+        .catch(() => {});
+    }
+  });
+});
+
+// Inyecta un contexto mínimo de boda para que SeatingPlanRefactored renderice la toolbar
+Cypress.Commands.add('mockWeddingMinimal', () => {
+  cy.window().then((win) => {
+    win.__MOCK_WEDDING__ = {
+      weddings: [{ id: 'w1', name: 'Demo Wedding' }],
+      activeWedding: { id: 'w1', name: 'Demo Wedding' },
+    };
+  });
+});
 Cypress.Commands.add('sendEmail', (recipient, subject, body) => {
   // Navegar al formulario de composición
   cy.get('[data-testid="compose-button"]').click();

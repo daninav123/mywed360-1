@@ -134,3 +134,149 @@ DevTools listening on ws://127.0.0.1:58046/devtools/browser/3de2276f-fb5d-4c8d-9
 
 [EXIT 7]
 
+[2025-09-09T14:13:01.572Z] CMD: npm run cypress:run -- --spec "cypress/e2e/email/folders-management.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/email/folders-management.cy.js --browser edge --headless
+
+
+Warning: We failed to trash the existing run results.
+
+This error will not affect or change the exit code.
+
+Error: Command failed: C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\trash\lib\win-trash.exe C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screenshots\performance
+
+    at ChildProcess.exithandler (node:child_process:419:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1091:16)
+    at Process.onexit (node:internal/child_process:302:5)
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (folders-management.cy.js)                                             │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\e │
+  │                 mail\folders-management.cy.js                                                  │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  folders-management.cy.js                                                        (1 of 1)
+
+
+  Flujo de gestión de carpetas de correo
+    1) muestra correctamente las carpetas en el panel lateral
+    2) permite cambiar entre carpetas y muestra los correos correspondientes
+    3) permite crear carpetas personalizadas
+    4) permite mover correos entre carpetas
+    5) permite eliminar carpetas personalizadas
+    6) no permite eliminar carpetas del sistema
+    7) permite vaciar la carpeta de papelera
+
+
+  0 passing (2m)
+  7 failing
+
+  1) Flujo de gestión de carpetas de correo
+       muestra correctamente las carpetas en el panel lateral:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  2) Flujo de gestión de carpetas de correo
+       permite cambiar entre carpetas y muestra los correos correspondientes:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  3) Flujo de gestión de carpetas de correo
+       permite crear carpetas personalizadas:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  4) Flujo de gestión de carpetas de correo
+       permite mover correos entre carpetas:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  5) Flujo de gestión de carpetas de correo
+       permite eliminar carpetas personalizadas:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  6) Flujo de gestión de carpetas de correo
+       no permite eliminar carpetas del sistema:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  7) Flujo de gestión de carpetas de correo
+       permite vaciar la carpeta de papelera:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        7                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      7                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  7                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     1 minute, 32 seconds                                                             │
+  │ Spec Ran:     folders-management.cy.js                                                         │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- muestra                
+     correctamente las carpetas en el panel lateral (failed).png                                    
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- permite                
+     cambiar entre carpetas y muestra los correos correspondientes (failed).png                     
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- permite                
+     crear carpetas personalizadas (failed).png                                                     
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- permite                
+     mover correos entre carpetas (failed).png                                                      
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- permite                
+     eliminar carpetas personalizadas (failed).png                                                  
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- no permi               
+     te eliminar carpetas del sistema (failed).png                                                  
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\folders-management.cy.js\Flujo de gestión de carpetas de correo -- permite                
+     vaciar la carpeta de papelera (failed).png                                                     
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  folders-management.cy.js                 01:32        7        -        7        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     01:32        7        -        7        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:64553/devtools/browser/e5d35b67-6519-4536-82a1-485efefca639
+
+[EXIT 7]
+

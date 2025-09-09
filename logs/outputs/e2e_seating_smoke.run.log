@@ -490,3 +490,522 @@ DevTools listening on ws://127.0.0.1:61151/devtools/browser/2703443b-e555-40da-a
 
 [EXIT 1]
 
+[2025-09-09T01:39:50.658Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_smoke.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_smoke.cy.js)                                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_smoke.cy.js                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_smoke.cy.js                                                             (1 of 1)
+
+
+  Seating Plan - Smoke E2E
+    1) renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Smoke E2E
+       renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_smoke.cy.js:15:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     9 seconds                                                                        │
+  │ Spec Ran:     seating_smoke.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_smoke.cy.js\Seating Plan - Smoke E2E -- renderiza, genera layout ví               
+     a Plantillas, dibuja área y undoredo sin romper (failed).png                                   
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_smoke.cy.js                      00:09        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:09        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:63723/devtools/browser/9fbe69eb-d631-411e-b318-999a787ce151
+
+[EXIT 1]
+
+[2025-09-09T01:56:37.191Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_smoke.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_smoke.cy.js)                                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_smoke.cy.js                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_smoke.cy.js                                                             (1 of 1)
+
+
+  Seating Plan - Smoke E2E
+    1) renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper
+
+
+  0 passing (11s)
+  1 failing
+
+  1) Seating Plan - Smoke E2E
+       renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper:
+     CypressError: Timed out retrying after 4050ms: `cy.click()` failed because the page updated while this command was executing. Cypress tried to locate elements based on this query:
+
+> <button..flex-1.flex.items-center.justify-center.gap-2.px-4.py-3.text-sm.font-medium.transition-all.text-gray-600.hover:text-gray-900.hover:bg-gray-50.>
+
+We initially found matching element(s), but while waiting for them to become actionable, they disappeared from the page. Common situations why this happens:
+  - Your JS framework re-rendered asynchronously
+  - Your app code reacted to an event firing and removed the element
+
+You can typically solve this by breaking up a chain. For example, rewrite:
+
+> `cy.get('button').click().click()`
+
+to
+
+> `cy.get('button').as('btn').click()`
+> `cy.get('@btn').click()`
+
+https://on.cypress.io/element-has-detached-from-dom
+      at retryActionability (http://localhost:5173/__cypress/runner/cypress_runner.js:113331:74)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise.attempt.Promise.try (http://localhost:5173/__cypress/runner/cypress_runner.js:4338:29)
+      at whenStable (http://localhost:5173/__cypress/runner/cypress_runner.js:143744:68)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:143685:14)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:5173/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:5173/__cypress/runner/cypress_runner.js:1724:18)
+      at Promise._fulfill (http://localhost:5173/__cypress/runner/cypress_runner.js:1668:18)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:5473:46)
+  From Your Spec Code:
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_smoke.cy.js:14:59)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_smoke.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_smoke.cy.js\Seating Plan - Smoke E2E -- renderiza, genera layout ví               
+     a Plantillas, dibuja área y undoredo sin romper (failed).png                                   
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_smoke.cy.js                      00:10        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:49471/devtools/browser/48c9f1b7-6b41-43b2-b647-1ce2dca16fc8
+
+[EXIT 1]
+
+[2025-09-09T02:03:00.590Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_smoke.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_smoke.cy.js)                                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_smoke.cy.js                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_smoke.cy.js                                                             (1 of 1)
+
+Oops...we found an error preparing this test file:
+
+  > cypress\e2e\seating\seating_smoke.cy.js
+
+The error was:
+
+Error: Webpack Compilation Error
+Module build failed (from ../../../AppData/Local/Cypress/Cache/13.17.0/Cypress/resources/app/node_modules/babel-loader/lib/index.js):
+SyntaxError: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\seating\seating_smoke.cy.js: Unexpected token (41:0)
+
+  39 |     cy.get('button[title="Plantillas"], button[title="Configurar ceremonia"], button[title="Exportar como PDF"]').should('exist');
+  40 |   });
+> 41 | });
+     | ^
+  42 |
+    at handle (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\@cypress\webpack-preprocessor\dist\index.js:212:23)
+    at finalCallback (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:441:32)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:505:17
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\HookWebpackError.js:68:3
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at Cache.storeBuildDependencies (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Cache.js:122:37)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:501:19
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:498:23
+    at Compiler.emitRecords (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:919:5)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:490:11
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:885:14
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:882:27
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:2818:7
+    at done (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:3522:9)
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:736:33
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:61:14
+    at FSReqCallback.oncomplete (node:fs:188:23)
+
+This occurred while Cypress was compiling and bundling your test code. This is usually caused by:
+
+- A missing file or dependency
+- A syntax error in the file or one of its dependencies
+
+Fix the error in your code and re-run your tests.
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        0                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     seating_smoke.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_smoke.cy.js                        0ms        -        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                       0ms        -        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:50908/devtools/browser/4a23abc5-795d-43aa-a371-df3e14fff3ce
+
+[EXIT 1]
+
+[2025-09-09T02:16:51.787Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_smoke.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_smoke.cy.js)                                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_smoke.cy.js                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_smoke.cy.js                                                             (1 of 1)
+
+Oops...we found an error preparing this test file:
+
+  > cypress\e2e\seating\seating_smoke.cy.js
+
+The error was:
+
+Error: Webpack Compilation Error
+Module build failed (from ../../../AppData/Local/Cypress/Cache/13.17.0/Cypress/resources/app/node_modules/babel-loader/lib/index.js):
+SyntaxError: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\seating\seating_smoke.cy.js: Unexpected token (41:0)
+
+  39 |     cy.get('button[title="Plantillas"], button[title="Configurar ceremonia"], button[title="Exportar como PDF"]').should('exist');
+  40 |   });
+> 41 | });
+     | ^
+  42 |
+    at handle (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\@cypress\webpack-preprocessor\dist\index.js:212:23)
+    at finalCallback (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:441:32)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:505:17
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\HookWebpackError.js:68:3
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at Cache.storeBuildDependencies (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Cache.js:122:37)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:501:19
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:498:23
+    at Compiler.emitRecords (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:919:5)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:490:11
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:885:14
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:882:27
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:2818:7
+    at done (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:3522:9)
+    at alreadyWritten (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:714:8)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:802:19
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\graceful-fs\graceful-fs.js:123:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:123:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:123:16
+    at FSReqCallback.readFileAfterClose [as oncomplete] (node:internal/fs/read/context:68:3)
+
+This occurred while Cypress was compiling and bundling your test code. This is usually caused by:
+
+- A missing file or dependency
+- A syntax error in the file or one of its dependencies
+
+Fix the error in your code and re-run your tests.
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        0                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     seating_smoke.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_smoke.cy.js                        0ms        -        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                       0ms        -        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:52973/devtools/browser/499c3225-35d6-4ebc-8a10-b967f9f3afc0
+
+[EXIT 1]
+
+[2025-09-09T02:26:05.812Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_smoke.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_smoke.cy.js)                                                  │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_smoke.cy.js                                                     │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_smoke.cy.js                                                             (1 of 1)
+
+Oops...we found an error preparing this test file:
+
+  > cypress\e2e\seating\seating_smoke.cy.js
+
+The error was:
+
+Error: Webpack Compilation Error
+Module build failed (from ../../../AppData/Local/Cypress/Cache/13.17.0/Cypress/resources/app/node_modules/babel-loader/lib/index.js):
+SyntaxError: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\seating\seating_smoke.cy.js: Unexpected token (41:0)
+
+  39 |     cy.get('button[title="Plantillas"], button[title="Configurar ceremonia"], button[title="Exportar como PDF"]').should('exist');
+  40 |   });
+> 41 | });
+     | ^
+  42 |
+    at handle (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\@cypress\webpack-preprocessor\dist\index.js:212:23)
+    at finalCallback (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:441:32)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:505:17
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\HookWebpackError.js:68:3
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at Cache.storeBuildDependencies (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Cache.js:122:37)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:501:19
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:498:23
+    at Compiler.emitRecords (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:919:5)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:490:11
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:885:14
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:882:27
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:2818:7
+    at done (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\neo-async\async.js:3522:9)
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\HookCodeFactory.js:33:10), <anonymous>:6:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\tapable\lib\Hook.js:18:14)
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\webpack\lib\Compiler.js:736:33
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:143:16
+    at C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\@packages\server\node_modules\graceful-fs\graceful-fs.js:61:14
+    at FSReqCallback.oncomplete (node:fs:188:23)
+
+This occurred while Cypress was compiling and bundling your test code. This is usually caused by:
+
+- A missing file or dependency
+- A syntax error in the file or one of its dependencies
+
+Fix the error in your code and re-run your tests.
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        0                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  0                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     0 seconds                                                                        │
+  │ Spec Ran:     seating_smoke.cy.js                                                              │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_smoke.cy.js                        0ms        -        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                       0ms        -        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54473/devtools/browser/abd9959f-8fda-44af-93b7-29c787371e30
+
+[EXIT 1]
+

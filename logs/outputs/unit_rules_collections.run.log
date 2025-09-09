@@ -1,0 +1,456 @@
+[2025-09-09T12:25:14.883Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 14[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:25:10
+[2m   Duration [22m 3.96s[2m (transform 182ms, setup 549ms, collect 602ms, tests 14ms, environment 1.46s, prepare 687ms)[22m
+
+
+[STDERR]
+[2m14:25:13[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:25:49.607Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 15[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:25:45
+[2m   Duration [22m 3.72s[2m (transform 181ms, setup 514ms, collect 575ms, tests 15ms, environment 1.37s, prepare 607ms)[22m
+
+
+[STDERR]
+[2m14:25:48[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:26:24.814Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 17[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:26:20
+[2m   Duration [22m 3.71s[2m (transform 142ms, setup 474ms, collect 566ms, tests 17ms, environment 1.43s, prepare 644ms)[22m
+
+
+[STDERR]
+[2m14:26:23[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:26:59.230Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 16[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:26:54
+[2m   Duration [22m 3.87s[2m (transform 174ms, setup 550ms, collect 577ms, tests 16ms, environment 1.53s, prepare 673ms)[22m
+
+
+[STDERR]
+[2m14:26:58[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:27:34.273Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 17[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:27:30
+[2m   Duration [22m 3.82s[2m (transform 169ms, setup 503ms, collect 569ms, tests 17ms, environment 1.46s, prepare 614ms)[22m
+
+
+[STDERR]
+[2m14:27:33[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:28:00.638Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 17[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:27:56
+[2m   Duration [22m 4.09s[2m (transform 164ms, setup 578ms, collect 627ms, tests 17ms, environment 1.51s, prepare 662ms)[22m
+
+
+[STDERR]
+[2m14:27:59[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:28:37.660Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 18[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:28:32
+[2m   Duration [22m 4.19s[2m (transform 202ms, setup 595ms, collect 696ms, tests 18ms, environment 1.50s, prepare 747ms)[22m
+
+
+[STDERR]
+[2m14:28:36[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T12:29:13.349Z] CMD: npm run test:unit -- src/__tests__/firestore.rules.collections.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/firestore.rules.collections.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [31m❯[39m src/__tests__/firestore.rules.collections.test.js [2m([22m[2m7 tests[22m[2m | [22m[33m7 skipped[39m[2m)[22m[32m 14[2mms[22m[39m
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mOwner can CREATE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant cannot WRITE guest
+   [2m[90m↓[39m[22m guests subcollection rules[2m > [22mAssistant CAN READ guest
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mPlanner can WRITE table
+   [2m[90m↓[39m[22m seatingPlan subcollection rules[2m > [22mAssistant cannot WRITE table
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mOwner can WRITE supplier
+   [2m[90m↓[39m[22m suppliers subcollection rules[2m > [22mUnauthenticated cannot READ supplier
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [33m7 skipped[39m[90m (7)[39m
+[2m   Start at [22m 14:29:08
+[2m   Duration [22m 3.96s[2m (transform 210ms, setup 540ms, collect 629ms, tests 14ms, environment 1.45s, prepare 599ms)[22m
+
+
+[STDERR]
+[2m14:29:12[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: Module "fs" has been externalized for browser compatibility, imported by "C:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia/src/__tests__/firestore.rules.collections.test.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
+  Plugin: [35mvite:resolve[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: readFileSync is not a function[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m10:17[22m[39m
+    [90m  8| [39m
+    [90m  9| [39m[34mbeforeAll[39m([35masync[39m () [33m=>[39m {
+    [90m 10| [39m  const rules = readFileSync(new URL('../../firestore.rules', import.m…
+    [90m   | [39m                [31m^[39m
+    [90m 11| [39m  testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, f…
+    [90m 12| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/firestore.rules.collections.test.js[2m [ src/__tests__/firestore.rules.collections.test.js ][22m
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'cleanup')[39m
+[36m [2m❯[22m src/__tests__/firestore.rules.collections.test.js:[2m44:17[22m[39m
+    [90m 42| [39m
+    [90m 43| [39m[34mafterAll[39m([35masync[39m () [33m=>[39m {
+    [90m 44| [39m  [35mawait[39m testEnv[33m.[39m[34mcleanup[39m()[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 45| [39m})[33m;[39m
+    [90m 46| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[EXIT 1]
+

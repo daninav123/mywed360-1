@@ -1,12 +1,17 @@
+// @vitest-environment node
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
+const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
+
 let testEnv;
 const PROJECT_ID = 'mywed360-test-collections';
 
 beforeAll(async () => {
+  if (!RUN_FIRESTORE_RULES) return;
   const rules = readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8');
   testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, firestore: { rules } });
 
@@ -41,14 +46,16 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await testEnv.cleanup();
+  if (testEnv?.cleanup) {
+    await testEnv.cleanup();
+  }
 });
 
 const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
 
 // ---------- Guests ----------
 
-describe('guests subcollection rules', () => {
+describeIf('guests subcollection rules', () => {
   test('Owner can CREATE guest', async () => {
     const db = getFirestore(ctx('owner1').app);
     const guestRef = doc(db, 'weddings', 'w1', 'guests', 'g2');
@@ -70,7 +77,7 @@ describe('guests subcollection rules', () => {
 
 // ---------- seatingPlan ----------
 
-describe('seatingPlan subcollection rules', () => {
+describeIf('seatingPlan subcollection rules', () => {
   test('Planner can WRITE table', async () => {
     const db = getFirestore(ctx('planner1').app);
     const tableRef = doc(db, 'weddings', 'w1', 'seatingPlan', 'table2');
@@ -86,7 +93,7 @@ describe('seatingPlan subcollection rules', () => {
 
 // ---------- suppliers ----------
 
-describe('suppliers subcollection rules', () => {
+describeIf('suppliers subcollection rules', () => {
   test('Owner can WRITE supplier', async () => {
     const db = getFirestore(ctx('owner1').app);
     const suppRef = doc(db, 'weddings', 'w1', 'suppliers', 's2');

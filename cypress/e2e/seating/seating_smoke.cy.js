@@ -2,10 +2,16 @@ describe('Seating Plan - Smoke E2E', () => {
   it('renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper', () => {
     // Visitar raíz y navegar vía history API para evitar problemas de fallback de SPA
     cy.visit('/');
+    cy.mockWeddingMinimal();
+    cy.closeDiagnostic();
     cy.window().then((win) => {
       win.history.pushState({}, '', '/invitados/seating');
       win.dispatchEvent(new win.PopStateEvent('popstate'));
     });
+    // Cerrar panel diagnóstico si se vuelve a mostrar tras el cambio de ruta
+    cy.closeDiagnostic();
+    // Esperar a que la toolbar esté disponible
+    cy.get('button[title="Plantillas"], button[title="Configurar ceremonia"], button[title="Configurar espacio"]', { timeout: 20000 }).should('be.visible');
 
     // Tabs visibles
     cy.contains('button', 'Ceremonia', { timeout: 10000 }).should('be.visible');

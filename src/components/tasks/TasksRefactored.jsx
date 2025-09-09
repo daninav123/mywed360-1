@@ -11,16 +11,32 @@ import { GanttChart } from './GanttTasks';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import { Calendar } from 'react-big-calendar';
+import { awardPoints } from '../../services/GamificationService';
 
 // Importar hooks de Firestore
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
 import { useWedding } from '../../context/WeddingContext';
 
-// Función helper para cargar datos de Firestore de forma segura
+// Función helper para cargar datos de Firestore de forma segura con fallbacks
 const loadFirestoreData = async (path) => {
   try {
-    // Esta función no usa hooks, solo carga datos
-    const data = await loadData(path);
+    let data = null;
+    // Soportar rutas conocidas con docPath para obtener campos correctos
+    if (path.endsWith('/weddingInfo')) {
+      // Intentamos cargar el campo 'weddingInfo' desde el documento de la boda
+      data = await loadData('weddingInfo', { docPath: path });
+      if (!data || typeof data !== 'object') {
+        // Fallback: cargar perfil completo y extraer weddingInfo
+        const profile = await loadData('lovendaProfile', { collection: 'userProfiles' });
+        data = (profile && profile.weddingInfo) ? profile.weddingInfo : (profile || {});
+      }
+    } else if (path.endsWith('/tasksCompleted')) {
+      // Documento que guarda tareas completadas como mapa
+      data = await loadData('tasksCompleted', { docPath: path });
+    } else {
+      // Fallback genérico: usar la clave tal cual (localStorage / users/{uid})
+      data = await loadData(path);
+    }
     return data || {};
   } catch (error) {
     console.error('Error cargando datos de Firestore:', error);
@@ -112,6 +128,87 @@ export default function Tasks() {
       end: new Date(meeting.end)
     });
   }, [addMeetingFS]);
+
+  // Generación automática de timeline si está vacío
+  useEffect(() => {
+    if (!activeWedding) return;
+    // Evitar regenerar si ya se generó para esta boda
+    const flagKey = `lovenda_timeline_generated_${activeWedding}`;
+    if (localStorage.getItem(flagKey) === 'true') return;
+
+    const alreadyHasItems = Array.isArray(tasksState) && tasksState.length > 0 || Array.isArray(meetingsState) && meetingsState.length > 0;
+    if (alreadyHasItems) return;
+
+    (async () => {
+      try {
+        const info = await loadFirestoreData(`weddings/${activeWedding}/weddingInfo`);
+        const dateRaw = info?.weddingDate || info?.date; // distintos esquemas
+        const baseDate = dateRaw ? new Date(dateRaw) : null;
+        if (!baseDate || isNaN(baseDate.getTime())) return;
+
+        const addMonths = (d, delta) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + delta); return x; };
+
+        // Definición mínima de tareas base (M1)
+        const plan = [
+          { monthsBefore: 12, title: 'Reservar lugar de celebración', category: 'LUGAR' },
+          { monthsBefore: 9,  title: 'Contratar fotógrafo', category: 'FOTOGRAFO' },
+          { monthsBefore: 9,  title: 'Contratar catering', category: 'COMIDA' },
+          { monthsBefore: 6,  title: 'Enviar Save the Date', category: 'INVITADOS' },
+          { monthsBefore: 6,  title: 'Vestuario: iniciar pruebas', category: 'VESTUARIO' },
+          { monthsBefore: 3,  title: 'Enviar invitaciones', category: 'PAPELERIA' },
+          { monthsBefore: 1,  title: 'Confirmar asistentes y mesas', category: 'INVITADOS' },
+          { monthsBefore: 1,  title: 'Prueba de menú con catering', category: 'COMIDA' },
+        ];
+
+        // Evitar duplicados por título si el usuario ya añadió algo manualmente
+        const existingTitles = new Set([
+          ...(Array.isArray(tasksState) ? tasksState.map(t => (t?.title || t?.name || '').toLowerCase()) : []),
+          ...(Array.isArray(meetingsState) ? meetingsState.map(m => (m?.title || '').toLowerCase()) : []),
+        ]);
+
+        for (const item of plan) {
+          const start = addMonths(baseDate, -item.monthsBefore);
+          const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // 2h por defecto
+          const title = item.title;
+          if (existingTitles.has(title.toLowerCase())) continue;
+          // Para simplicidad: crear como tarea Gantt (largo plazo) o evento puntual
+          // Heurística: hitos clave como eventos, resto como tareas largas de ~15 días
+          const milestoneTitles = ['Enviar Save the Date', 'Enviar invitaciones', 'Confirmar asistentes y mesas'];
+          if (milestoneTitles.includes(title)) {
+            // Evento puntual (calendario)
+            await addMeetingFS({ title, start, end, category: item.category });
+          } else {
+            // Tarea de largo plazo (Gantt) de 15 días
+            const endTask = new Date(start.getTime() + 15 * 24 * 60 * 60 * 1000);
+            await addTaskFS({
+              id: `auto-${item.monthsBefore}-${Date.now()}`,
+              name: title,
+              title,
+              desc: '',
+              start,
+              end: endTask,
+              category: item.category,
+              type: 'task',
+              progress: 0,
+              isDisabled: false,
+              dependencies: []
+            });
+          }
+        }
+
+        localStorage.setItem(flagKey, 'true');
+        // Otorgar puntos de gamificación por crear timeline automáticamente (no intrusivo)
+        try {
+          await awardPoints(activeWedding, 'create_timeline', { source: 'auto' });
+        } catch (e) {
+          // best-effort; no bloquear si falla
+          console.warn('Gamification awardPoints falló:', e?.message || e);
+        }
+      } catch (err) {
+        console.warn('No se pudo generar timeline automático:', err?.message);
+      }
+    })();
+  }, [activeWedding, tasksState, meetingsState, addMeetingFS, addTaskFS]);
 
   // Estado para tareas completadas (inicial vacío, se cargará asíncronamente)
   const [completed, setCompleted] = useState({});

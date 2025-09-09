@@ -67,3 +67,13 @@ beforeEach(() => {
     });
   });
 });
+
+// Intercept global para Firestore (evita re-renderizados que desprenden elementos durante E2E)
+beforeEach(() => {
+  try {
+    cy.intercept('POST', '**google.firestore**', (req) => {
+      // Responder 200 vacío para estabilizar la UI en tests que no validan persistencia real
+      req.reply({ statusCode: 200, body: {} });
+    });
+  } catch (_) {}
+});

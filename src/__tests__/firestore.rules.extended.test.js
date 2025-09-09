@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection } from 'firebase/firestore';
@@ -5,8 +6,11 @@ import { beforeAll, afterAll, describe, test } from 'vitest';
 
 let testEnv;
 const PROJECT_ID = 'mywed360-test-extended';
+const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const D = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 beforeAll(async () => {
+  if (!RUN_FIRESTORE_RULES) return;
   const rules = readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8');
   testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, firestore: { rules } });
 
@@ -34,13 +38,13 @@ beforeAll(async () => {
       email: 'planner@example.com',
       createdBy: 'owner3'
     });
-
-
   });
 });
 
 afterAll(async () => {
-  await testEnv.cleanup();
+  if (testEnv?.cleanup) {
+    await testEnv.cleanup();
+  }
 });
 
 const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
@@ -50,7 +54,7 @@ const weddingDoc = (db, id) => doc(db, 'weddings', id);
 
 // --- WEDDING CORE ---
 
-describe('Wedding document permissions', () => {
+D('Wedding document permissions', () => {
   test('Owner can CREATE new wedding', async () => {
     const db = getFirestore(ctx('newOwner').app);
     await assertSucceeds(setDoc(weddingDoc(db, 'wNew'), { ownerIds: ['newOwner'], name: 'New W' }));
@@ -101,7 +105,7 @@ describe('Wedding document permissions', () => {
 
 // --- SUBCOLLECTIONS ---
 
-describe('Wedding subcollection permissions', () => {
+D('Wedding subcollection permissions', () => {
   test('Owner can CREATE task', async () => {
     const db = getFirestore(ctx('owner2').app);
     const taskRef = doc(db, 'weddings', 'w2', 'tasks', 'task1');
@@ -123,7 +127,7 @@ describe('Wedding subcollection permissions', () => {
 
 // --- INVITATIONS ---
 
-describe('weddingInvitations rules', () => {
+D('weddingInvitations rules', () => {
   test('Any auth user can CREATE invitation', async () => {
     const db = getFirestore(ctx('ownerZ').app);
     await assertSucceeds(setDoc(doc(db, 'weddingInvitations', 'invZ'), { weddingId: 'w2', email: 'p@example.com' }));

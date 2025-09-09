@@ -102,8 +102,8 @@ function runOneTask(taskId) {
     const runFallback = () => {
       if (triedFallback) return;
       triedFallback = true;
-      const codeStr = 'import(\"./scripts/runTask.js\")';
-      const fallbackArgs = taskId ? ['-e', codeStr, `--id=${taskId}`] : ['-e', codeStr];
+      const codeStr = 'import("./scripts/runTask.js")';
+      const fallbackArgs = taskId ? ['-e', codeStr, '--', `--id=${taskId}`] : ['-e', codeStr];
       const child2 = spawn(process.execPath, fallbackArgs, { cwd: repoRoot, stdio: 'inherit' });
       child2.on('exit', (code2) => resolve(code2 ?? 1));
       child2.on('error', () => resolve(1));

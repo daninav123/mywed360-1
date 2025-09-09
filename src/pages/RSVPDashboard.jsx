@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useWedding } from '../context/WeddingContext';
+import { evaluateTrigger } from '../services/AutomationRulesService';
+import { addNotification } from '../services/notificationService';
 
 export default function RSVPDashboard() {
   const { activeWedding } = useWedding();
@@ -15,6 +17,33 @@ export default function RSVPDashboard() {
     });
     return unsub;
   }, [activeWedding]);
+
+  // Evaluación discreta de reglas de automatización para RSVP (sin cambios visuales)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!activeWedding) return;
+        if (!stats || !stats.deadline) return;
+        const resp = await evaluateTrigger(activeWedding, { type: 'rsvp_deadline', deadline: stats.deadline });
+        const actions = Array.isArray(resp?.actions) ? resp.actions : [];
+        for (const a of actions) {
+          if (cancelled) break;
+          if (a.type === 'send_notification' && a.template === 'rsvp_reminder') {
+            // Crear notificación persistente (no altera diseño)
+            await addNotification({
+              type: 'info',
+              message: 'Recordatorio RSVP: la fecha límite está próxima',
+              action: 'viewRSVP'
+            });
+          }
+        }
+      } catch (_) {
+        // best-effort
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [activeWedding, stats?.deadline]);
 
   if (!activeWedding) {
     return <div className="p-6">Selecciona una boda para ver el dashboard de RSVP.</div>;

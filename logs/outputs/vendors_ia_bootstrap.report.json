@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-09-09T12:29:50.209Z",
+  "type": "vendors_ia_bootstrap",
+  "checks": {
+    "docs": {
+      "flujoProveedoresIA": true
+    },
+    "backendRoutes": {
+      "aiSuppliers": true,
+      "aiAssign": true,
+      "aiImage": true,
+      "mailgunWebhook": true
+    },
+    "frontendHints": {
+      "seatingToolbar": true,
+      "useSeatingPlanHook": true
+    },
+    "suggestions": [
+      "Definir esquema /weddings/{weddingId}/vendors con estados (empty/contacted/quoted/contracted/rejected)",
+      "Esqueleto de componentes: VendorDashboard.jsx, ServiceCards.jsx, VendorSearch.jsx, AIEmailGenerator.jsx, ResponseAnalyzer.jsx, VendorComparison.jsx",
+      "Plantillas IA en backend (Mailgun/Send) y análisis inbound (webhook ya existente)"
+    ]
+  },
+  "summary": "Dry run OK. Informe de puntos de integración generado."
+}

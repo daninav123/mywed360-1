@@ -50,6 +50,11 @@ import instagramWallRouter from './routes/instagram-wall.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import rsvpRouter from './routes/rsvp.js';
+import automationRouter from './routes/automation.js';
+import legalDocsRouter from './routes/legal-docs.js';
+import signatureRouter from './routes/signature.js';
+import contactsRouter from './routes/contacts.js';
+import gamificationRouter from './routes/gamification.js';
 
 
 // Load environment variables (root .env)
@@ -202,6 +207,12 @@ app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser 
 app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
+// Nuevos módulos transversales
+app.use('/api/automation', automationRouter);
+app.use('/api/legal-docs', requireAuth, legalDocsRouter);
+app.use('/api/signature', requireAuth, signatureRouter);
+app.use('/api/contacts', requireAuth, contactsRouter);
+app.use('/api/gamification', requireAuth, gamificationRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

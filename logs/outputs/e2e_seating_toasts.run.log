@@ -326,3 +326,473 @@ DevTools listening on ws://127.0.0.1:61411/devtools/browser/0b82b451-d2d5-4ea4-9
 
 [EXIT 1]
 
+[2025-09-09T01:40:17.439Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_toasts.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_toasts.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_toasts.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_toasts.cy.js                                                            (1 of 1)
+
+
+  Seating Plan - Toasts E2E
+    1) muestra toast al guardar dimensiones del espacio
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Toasts E2E
+       muestra toast al guardar dimensiones del espacio:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'Configurar Espacio' within the selector: 'h3' but never did.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_toasts.cy.js:12:44)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     9 seconds                                                                        │
+  │ Spec Ran:     seating_toasts.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_toasts.cy.js\Seating Plan - Toasts E2E -- muestra toast al guardar                
+     dimensiones del espacio (failed).png                                                           
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_toasts.cy.js                     00:09        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:09        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:63990/devtools/browser/5cf72ebc-0881-4fcc-9b01-e79a7a56ce53
+
+[EXIT 1]
+
+[2025-09-09T01:57:04.335Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_toasts.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_toasts.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_toasts.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_toasts.cy.js                                                            (1 of 1)
+
+
+  Seating Plan - Toasts E2E
+    1) muestra toast al guardar dimensiones del espacio
+
+
+  0 passing (11s)
+  1 failing
+
+  1) Seating Plan - Toasts E2E
+       muestra toast al guardar dimensiones del espacio:
+     CypressError: Timed out retrying after 4050ms: `cy.click()` failed because the page updated while this command was executing. Cypress tried to locate elements based on this query:
+
+> <button.flex.items-center.gap-1.px-2.py-1.text-sm.rounded.hover:bg-gray-100>
+
+We initially found matching element(s), but while waiting for them to become actionable, they disappeared from the page. Common situations why this happens:
+  - Your JS framework re-rendered asynchronously
+  - Your app code reacted to an event firing and removed the element
+
+You can typically solve this by breaking up a chain. For example, rewrite:
+
+> `cy.get('button').click().click()`
+
+to
+
+> `cy.get('button').as('btn').click()`
+> `cy.get('@btn').click()`
+
+https://on.cypress.io/element-has-detached-from-dom
+      at retryActionability (http://localhost:5173/__cypress/runner/cypress_runner.js:113331:74)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise.attempt.Promise.try (http://localhost:5173/__cypress/runner/cypress_runner.js:4338:29)
+      at whenStable (http://localhost:5173/__cypress/runner/cypress_runner.js:143744:68)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:143685:14)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:5173/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:5173/__cypress/runner/cypress_runner.js:1724:18)
+      at Promise._fulfill (http://localhost:5173/__cypress/runner/cypress_runner.js:1668:18)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:5473:46)
+  From Your Spec Code:
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_toasts.cy.js:13:90)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     11 seconds                                                                       │
+  │ Spec Ran:     seating_toasts.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_toasts.cy.js\Seating Plan - Toasts E2E -- muestra toast al guardar                
+     dimensiones del espacio (failed).png                                                           
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_toasts.cy.js                     00:11        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:11        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:49738/devtools/browser/1422bf34-89a5-4542-956e-bd8e0067f558
+
+[EXIT 1]
+
+[2025-09-09T02:03:29.703Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_toasts.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_toasts.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_toasts.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_toasts.cy.js                                                            (1 of 1)
+
+
+  Seating Plan - Toasts E2E
+    1) muestra toast al guardar dimensiones del espacio
+
+
+  0 passing (12s)
+  1 failing
+
+  1) Seating Plan - Toasts E2E
+       muestra toast al guardar dimensiones del espacio:
+     AssertionError: Timed out retrying after 4000ms: Expected to find content: 'Configurar Espacio' within the selector: 'h3' but never did.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_toasts.cy.js:14:44)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     11 seconds                                                                       │
+  │ Spec Ran:     seating_toasts.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_toasts.cy.js\Seating Plan - Toasts E2E -- muestra toast al guardar                
+     dimensiones del espacio (failed).png                                                           
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_toasts.cy.js                     00:11        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:11        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:51039/devtools/browser/f184dd4f-95ea-47b5-a0f8-5eb55a3512d5
+
+[EXIT 1]
+
+[2025-09-09T02:17:18.975Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_toasts.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_toasts.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_toasts.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_toasts.cy.js                                                            (1 of 1)
+
+
+  Seating Plan - Toasts E2E
+    1) muestra toast al guardar dimensiones del espacio
+
+
+  0 passing (11s)
+  1 failing
+
+  1) Seating Plan - Toasts E2E
+       muestra toast al guardar dimensiones del espacio:
+     CypressError: Timed out retrying after 4050ms: `cy.click()` failed because the page updated while this command was executing. Cypress tried to locate elements based on this query:
+
+> <button.flex.items-center.gap-1.px-2.py-1.text-sm.rounded.hover:bg-gray-100>
+
+We initially found matching element(s), but while waiting for them to become actionable, they disappeared from the page. Common situations why this happens:
+  - Your JS framework re-rendered asynchronously
+  - Your app code reacted to an event firing and removed the element
+
+You can typically solve this by breaking up a chain. For example, rewrite:
+
+> `cy.get('button').click().click()`
+
+to
+
+> `cy.get('button').as('btn').click()`
+> `cy.get('@btn').click()`
+
+https://on.cypress.io/element-has-detached-from-dom
+      at retryActionability (http://localhost:5173/__cypress/runner/cypress_runner.js:113331:74)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise.attempt.Promise.try (http://localhost:5173/__cypress/runner/cypress_runner.js:4338:29)
+      at whenStable (http://localhost:5173/__cypress/runner/cypress_runner.js:143744:68)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:143685:14)
+      at tryCatcher (http://localhost:5173/__cypress/runner/cypress_runner.js:1830:23)
+      at Promise._settlePromiseFromHandler (http://localhost:5173/__cypress/runner/cypress_runner.js:1542:31)
+      at Promise._settlePromise (http://localhost:5173/__cypress/runner/cypress_runner.js:1599:18)
+      at Promise._settlePromise0 (http://localhost:5173/__cypress/runner/cypress_runner.js:1644:10)
+      at Promise._settlePromises (http://localhost:5173/__cypress/runner/cypress_runner.js:1724:18)
+      at Promise._fulfill (http://localhost:5173/__cypress/runner/cypress_runner.js:1668:18)
+      at <unknown> (http://localhost:5173/__cypress/runner/cypress_runner.js:5473:46)
+  From Your Spec Code:
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_toasts.cy.js:13:90)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     11 seconds                                                                       │
+  │ Spec Ran:     seating_toasts.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_toasts.cy.js\Seating Plan - Toasts E2E -- muestra toast al guardar                
+     dimensiones del espacio (failed).png                                                           
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_toasts.cy.js                     00:11        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:11        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:53076/devtools/browser/177da038-031f-4b7b-a2d8-8fb2948e1172
+
+[EXIT 1]
+
+[2025-09-09T02:26:26.706Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_toasts.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_toasts.cy.js)                                                 │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_toasts.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_toasts.cy.js                                                            (1 of 1)
+
+
+  Seating Plan - Toasts E2E
+    1) muestra toast al guardar dimensiones del espacio
+
+
+  0 passing (6s)
+  1 failing
+
+  1) Seating Plan - Toasts E2E
+       muestra toast al guardar dimensiones del espacio:
+     TypeError: cy.get(...).then(...).catch is not a function
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:112:15)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     5 seconds                                                                        │
+  │ Spec Ran:     seating_toasts.cy.js                                                             │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_toasts.cy.js\Seating Plan - Toasts E2E -- muestra toast al guardar                
+     dimensiones del espacio (failed).png                                                           
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_toasts.cy.js                     00:05        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:05        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:54597/devtools/browser/4dcd9b71-5b0d-4626-8c24-6b105f99d1ff
+
+[EXIT 1]
+

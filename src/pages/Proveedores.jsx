@@ -5,13 +5,15 @@ import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { useWedding } from '../context/WeddingContext';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useWeddingCollection from '../hooks/useWeddingCollection';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
-import { loadTrackingRecords, createTrackingRecord, updateTrackingStatus, TRACKING_STATUS } from '../services/EmailTrackingService';
+import { loadTrackingRecords, createTrackingRecord, updateTrackingStatus, TRACKING_STATUS, getTrackingNeedingFollowup } from '../services/EmailTrackingService';
 import PageWrapper from '../components/PageWrapper';
-import { Plus, Search, RefreshCcw, Star, Eye, Edit2, Trash2, Calendar, Clock, Download, MapPin } from 'lucide-react';
+import { Plus, Search, RefreshCcw, Star, Eye, Edit2, Trash2, Calendar, Clock, Download, MapPin, AlertTriangle } from 'lucide-react';
+import Spinner from '../components/ui/Spinner';
 import Toast from '../components/Toast';
+import { awardPoints } from '../services/GamificationService';
 
 export default function Proveedores() {
   // Indicar si hay boda activa
@@ -85,6 +87,72 @@ export default function Proveedores() {
   // Estado de sincronización
   const [syncStatus, setSyncStatus] = useState(getSyncState());
 
+  // Award de gamificación discreto por estado de proveedores (no cambia UI)
+  useEffect(() => {
+    if (!weddingId) return;
+    if (!Array.isArray(providers) || providers.length === 0) return;
+    const key = `gam_award_contact_${weddingId}`;
+    let awarded = [];
+    try { awarded = JSON.parse(localStorage.getItem(key) || '[]'); } catch {}
+    const awardedSet = new Set(awarded);
+    (async () => {
+      for (const p of providers) {
+        try {
+          if (!p || !p.id) continue;
+          if (!(p.status === 'Contactado' || p.status === 'Confirmado' || p.status === 'Seleccionado')) continue;
+          const k = String(p.id);
+          if (awardedSet.has(k)) continue; // evitar duplicados
+          await awardPoints(weddingId, 'contact_provider', { providerId: p.id, status: p.status });
+          awardedSet.add(k);
+        } catch (e) {
+          // best-effort
+        }
+      }
+      try { localStorage.setItem(key, JSON.stringify(Array.from(awardedSet))); } catch {}
+    })();
+  }, [weddingId, providers]);
+
+  // Cargar configuración de tarjetas de servicios por boda (persistente)
+  useEffect(() => {
+    let cancelled = false;
+    if (!weddingId) return;
+    (async () => {
+      try {
+        // 1) Intento local por boda
+        const localKey = `wantedServices_${weddingId}`;
+        const local = localStorage.getItem(localKey);
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (!cancelled && Array.isArray(parsed)) {
+            setWantedServices(parsed);
+            return; // corto: preferimos local inmediato
+          }
+        }
+        // 2) Intento nube (Firestore) usando SyncService con doc de la boda
+        const cloud = await loadData('wantedServices', { docPath: `weddings/${weddingId}` });
+        if (!cancelled && Array.isArray(cloud)) {
+          setWantedServices(cloud);
+        }
+      } catch (err) {
+        console.warn('No se pudieron cargar wantedServices:', err?.message);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [weddingId]);
+
+  // Guardar configuración de tarjetas cuando cambie
+  useEffect(() => {
+    if (!weddingId) return;
+    try {
+      const localKey = `wantedServices_${weddingId}`;
+      localStorage.setItem(localKey, JSON.stringify(wantedServices));
+      // Best-effort al cloud sin notificación (guardar en el doc de la boda)
+      saveData('wantedServices', wantedServices, { docPath: `weddings/${weddingId}`, showNotification: false });
+    } catch (err) {
+      console.warn('No se pudieron guardar wantedServices:', err?.message);
+    }
+  }, [wantedServices, weddingId]);
+
   // Eliminar proveedor
   const removeProvider = async (id) => {
     // Obtener proveedor a eliminar (para conocer su link)
@@ -130,7 +198,35 @@ export default function Proveedores() {
     };
     
     loadTracking();
+    window.addEventListener('lovenda-suppliers', loadTracking);
+    return () => window.removeEventListener('lovenda-suppliers', loadTracking);
   }, []);
+
+  // Programar recordatorios automáticos (seguimiento) como reuniones en el calendario
+  useEffect(() => {
+    try {
+      const needing = getTrackingNeedingFollowup(3) || [];
+      needing.forEach(record => {
+        // Evitar duplicados con flag en localStorage
+        const flagKey = `lovenda_followup_${record.id}`;
+        if (localStorage.getItem(flagKey) === 'done') return;
+        // Construir cita de seguimiento para mañana a las 10:00 por 30 min
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 10, 0, 0);
+        const end = new Date(start.getTime() + 30 * 60 * 1000);
+        const title = `Seguimiento proveedor: ${record.providerName || 'Proveedor'}`;
+        const desc = `Revisar respuesta a: ${record.subject || ''}`;
+        // Despachar evento para que TasksRefactored cree la reunión en Firestore
+        window.dispatchEvent(new CustomEvent('lovenda-tasks', {
+          detail: { meeting: { title, start, end, desc, category: 'PROVEEDORES' } }
+        }));
+        // Marcar como programado
+        localStorage.setItem(flagKey, 'done');
+      });
+    } catch (err) {
+      console.warn('Auto seguimiento proveedores: error programando recordatorios', err);
+    }
+  }, [trackingRecords]);
 
   // Cargar proveedores encontrados por la IA (usando SyncService) y escuchar cambios
   useEffect(() => {
@@ -476,14 +572,186 @@ const handleAiSearch = async (e) => {
   const markServiceAsContracted = (serviceName) => {
     const serviceId = serviceName.toLowerCase().replace(/\s+/g, '-');
     updateWantedService(serviceId, { contracted: true });
+    // Persistencia gestionada por el useEffect de wantedServices
   };
 
   // Obtener progreso de contratación
   const getContractingProgress = () => {
     const required = wantedServices.filter(s => s.required);
-    const contracted = required.filter(s => s.contracted);
-    return { contracted: contracted.length, total: required.length };
+    const contractedServices = new Set(
+      providers
+        .filter(p => p && (p.status === 'Confirmado' || p.status === 'Seleccionado'))
+        .map(p => p.service)
+    );
+    const contractedCount = required.filter(s => contractedServices.has(s.name) || s.contracted).length;
+    return { contracted: contractedCount, total: required.length };
   };
+
+  // Mantener sincronizado el flag contracted según proveedores confirmados/seleccionados
+  useEffect(() => {
+    if (!Array.isArray(wantedServices) || wantedServices.length === 0) return;
+    const confirmed = new Set(
+      providers
+        .filter(p => p && (p.status === 'Confirmado' || p.status === 'Seleccionado'))
+        .map(p => p.service)
+    );
+    const updated = wantedServices.map(s => {
+      const contracted = confirmed.has(s.name);
+      return contracted === !!s.contracted ? s : { ...s, contracted };
+    });
+    // Comprobar cambios superficiales para evitar loops
+    const changed = updated.some((s, i) => s !== wantedServices[i]);
+    if (changed) setWantedServices(updated);
+  }, [providers]);
+
+  // Comparativa no intrusiva: cálculo de matchScore y matchReasons
+  useEffect(() => {
+    if (!weddingId || !Array.isArray(providers) || providers.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const profile = await loadData('lovendaProfile', { defaultValue: {}, collection: 'userProfiles' });
+        const prefs = {
+          location: profile?.weddingInfo?.celebrationPlace || profile?.celebrationPlace || profile?.location || '',
+          style: profile?.weddingInfo?.style || profile?.style || ''
+        };
+        const budgetByService = {};
+        (wantedServices || []).forEach(s => {
+          if (s && s.name && typeof s.budget === 'number' && s.budget > 0) {
+            budgetByService[s.name] = s.budget;
+          }
+        });
+
+        const respondedByEmail = new Set(
+          (trackingRecords || [])
+            .filter(r => r?.status === TRACKING_STATUS.RESPONDED)
+            .map(r => (r.providerEmail || '').toLowerCase())
+            .filter(Boolean)
+        );
+
+        const parsePrice = (price) => {
+          if (!price || typeof price !== 'string') return null;
+          const nums = price.match(/\d+[.,]?\d*/g);
+          if (!nums || nums.length === 0) return null;
+          if (nums.length >= 2) {
+            const a = parseFloat(nums[0].replace(',', '.'));
+            const b = parseFloat(nums[1].replace(',', '.'));
+            return Math.round((a + b) / 2);
+          }
+          return parseFloat(nums[0].replace(',', '.'));
+        };
+
+        const normalize = (str) => (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        const updated = providers.map(p => {
+          let score = 0;
+          const reasons = [];
+
+          const isRequired = (wantedServices || []).some(ws => ws.name === p.service && ws.required);
+          score += isRequired ? 20 : 10;
+          if (isRequired) reasons.push('Servicio esencial');
+
+          const loc = normalize(p?.location || '');
+          const wloc = normalize(prefs.location || '');
+          if (loc && wloc) {
+            if (loc.includes(wloc) || wloc.includes(loc)) { score += 20; reasons.push('Coincidencia de ubicación'); }
+            else { score += 5; }
+          }
+
+          const budget = budgetByService[p.service] || null;
+          const price = parsePrice(p.priceRange);
+          if (budget && price) {
+            const diff = Math.abs(price - budget);
+            if (diff <= budget * 0.2) { score += 25; reasons.push('Precio acorde al presupuesto'); }
+            else if (diff <= budget * 0.5) { score += 15; reasons.push('Precio cercano al presupuesto'); }
+            else { score += 5; reasons.push('Precio fuera de presupuesto'); }
+          } else if (budget) {
+            score += 5; // sin precio, poco aporte
+          }
+
+          const rating = p.rating || 0;
+          score += Math.min(20, Math.round(rating * 4));
+          if (rating >= 4) reasons.push('Buena valoración');
+
+          if (p.link && /^https?:\/\//.test(p.link)) score += 5;
+
+          const emailLower = (p.email || '').toLowerCase();
+          if (emailLower && respondedByEmail.has(emailLower)) { score += 10; reasons.push('Ha respondido al email'); }
+
+          if (p.status === 'Contactado') score += 3;
+          if (p.status === 'Seleccionado') score += 8;
+          if (p.status === 'Confirmado') score += 15;
+
+          if (score > 100) score = 100;
+
+          if (p.matchScore !== score || JSON.stringify(p.matchReasons || []) !== JSON.stringify(reasons)) {
+            return { ...p, matchScore: score, matchReasons: reasons };
+          }
+          return p;
+        });
+
+        // Detectar cambios
+        const changed = providers.some((p, i) => p.matchScore !== updated[i].matchScore);
+        if (!cancelled && changed) {
+          setProviders(updated);
+          // Persistir best-effort en Firestore para proveedores con id estable
+          for (let i = 0; i < updated.length; i++) {
+            const prov = updated[i];
+            if (prov?.id && !String(prov.id).startsWith('web-')) {
+              try {
+                await updateProvider(prov.id, { matchScore: prov.matchScore, matchReasons: prov.matchReasons });
+              } catch (e) {
+                console.warn('Persistencia matchScore falló:', e?.message);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Comparativa local de proveedores falló:', err?.message);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [providers, wantedServices, weddingId, trackingRecords]);
+
+  // Oferta contextual de Wedding Planner (no intrusiva, solo toast)
+  useEffect(() => {
+    if (!weddingId) return;
+    (async () => {
+      try {
+        const shownKey = `wp_offer_shown_${weddingId}`;
+        if (localStorage.getItem(shownKey) === '1') return;
+
+        const profile = await loadData('lovendaProfile', { defaultValue: {}, collection: 'userProfiles' });
+        const dateStr = profile?.weddingInfo?.weddingDate || profile?.weddingDate || profile?.weddingInfo?.date || '';
+        let daysLeft = 9999;
+        if (dateStr) {
+          const d = new Date(dateStr);
+          const now = new Date();
+          daysLeft = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+        }
+
+        const required = (wantedServices || []).filter(s => s.required);
+        const confirmed = new Set(
+          providers
+            .filter(p => p && (p.status === 'Confirmado' || p.status === 'Seleccionado'))
+            .map(p => p.service)
+        );
+        const contractedCount = required.filter(s => confirmed.has(s.name) || s.contracted).length;
+        const ratio = required.length > 0 ? contractedCount / required.length : 1;
+
+        // Triggers: boda < 90 días y menos del 50% de servicios esenciales contratados
+        if (daysLeft <= 90 && ratio < 0.5) {
+          setToast({
+            message: 'Quedan menos de 3 meses y aún hay servicios esenciales sin contratar. ¿Necesitas ayuda de un Wedding Planner? Puedo ayudarte a coordinarlo.',
+            type: 'info'
+          });
+          localStorage.setItem(shownKey, '1');
+        }
+      } catch (err) {
+        console.warn('Oferta Wedding Planner no disponible:', err?.message);
+      }
+    })();
+  }, [weddingId, wantedServices, providers]);
 
   // Búsqueda directa usando OpenAI cuando la API backend no responde
   const fetchOpenAi = async () => {
@@ -1757,7 +2025,7 @@ ${bride} y ${groom}`;
                     >
                       {isSyncingEmails ? (
                         <>
-                          <Spinner size="small" className="mr-1" />
+                          <Spinner size="sm" className="mr-1" />
                           Sincronizando...
                         </>
                       ) : (

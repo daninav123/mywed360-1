@@ -1,0 +1,2220 @@
+[2025-09-09T13:13:23.653Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 109[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 19[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 77[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:13:19
+[2m   Duration [22m 3.65s[2m (transform 269ms, setup 1.04s, collect 741ms, tests 109ms, environment 1.59s, prepare 1.35s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:14:40.646Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 130[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 28[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 5[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 4[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 4[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 79[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 4[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:14:36
+[2m   Duration [22m 3.77s[2m (transform 331ms, setup 1.11s, collect 742ms, tests 130ms, environment 1.57s, prepare 1.41s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:15:54.823Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 81[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 17[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 54[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:15:51
+[2m   Duration [22m 3.29s[2m (transform 289ms, setup 964ms, collect 734ms, tests 81ms, environment 1.50s, prepare 1.28s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:17:10.382Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 104[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 18[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 71[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:17:06
+[2m   Duration [22m 3.61s[2m (transform 309ms, setup 1.01s, collect 733ms, tests 104ms, environment 1.54s, prepare 1.38s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:18:26.907Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 89[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 20[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 55[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:18:22
+[2m   Duration [22m 3.78s[2m (transform 273ms, setup 1.07s, collect 793ms, tests 89ms, environment 1.67s, prepare 1.41s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:49:10.023Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 108[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 20[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 75[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:49:05
+[2m   Duration [22m 3.91s[2m (transform 299ms, setup 1.03s, collect 772ms, tests 108ms, environment 1.63s, prepare 1.61s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:53:18.817Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 105[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 22[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 65[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 5[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:53:14
+[2m   Duration [22m 3.59s[2m (transform 357ms, setup 1.09s, collect 787ms, tests 105ms, environment 1.54s, prepare 1.20s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T13:57:27.186Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 100[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 17[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 67[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 15:57:22
+[2m   Duration [22m 3.71s[2m (transform 282ms, setup 1.03s, collect 826ms, tests 100ms, environment 1.77s, prepare 1.29s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:00:31.299Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 131[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 22[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 92[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:00:26
+[2m   Duration [22m 4.08s[2m (transform 309ms, setup 1.14s, collect 850ms, tests 131ms, environment 1.72s, prepare 1.68s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:01:59.719Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 106[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 19[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 74[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:01:55
+[2m   Duration [22m 4.09s[2m (transform 325ms, setup 1.19s, collect 800ms, tests 106ms, environment 1.82s, prepare 1.48s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:06:35.925Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 112[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 21[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 4[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 73[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:06:31
+[2m   Duration [22m 3.84s[2m (transform 298ms, setup 1.07s, collect 759ms, tests 112ms, environment 1.64s, prepare 1.41s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:09:10.244Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 101[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 18[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 69[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:09:05
+[2m   Duration [22m 4.00s[2m (transform 291ms, setup 989ms, collect 786ms, tests 101ms, environment 1.63s, prepare 1.54s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:17:12.137Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 100[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 20[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 64[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:17:07
+[2m   Duration [22m 4.04s[2m (transform 270ms, setup 1.06s, collect 796ms, tests 100ms, environment 1.72s, prepare 1.92s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:21:46.818Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 107[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 21[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 65[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 9[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:21:42
+[2m   Duration [22m 3.87s[2m (transform 290ms, setup 1.02s, collect 763ms, tests 107ms, environment 1.66s, prepare 1.45s)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+
+[2025-09-09T14:26:22.398Z] CMD: npm run test:unit -- src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+[STDOUT]
+
+> mywed360@0.1.0 test:unit
+> vitest run src/__tests__/SeatingPlanRefactored.test.jsx src/__tests__/useSeatingPlan*.test.jsx src/__tests__/firestore.rules.seating.test.js
+
+
+[1m[46m RUN [49m[22m [36mv3.2.4 [39m[90mC:/Users/Administrator/Documents/Lovenda/lovenda13123123 - copia[39m
+
+ [2m[90m↓[39m[22m src/__tests__/firestore.rules.seating.test.js [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [31m❯[39m src/__tests__/SeatingPlanRefactored.test.jsx [2m([22m[2m6 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[32m 105[2mms[22m[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render all main components[39m[32m 19[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould have proper layout structure[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area[39m[32m 3[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area[39m[32m 2[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould handle tab changes[39m[32m 70[2mms[22m[39m
+[31m     → Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m   [31m×[31m SeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly[39m[32m 4[2mms[22m[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+[31m     → act(...) is not supported in production builds of React.[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[33m1 skipped[39m[90m (2)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[33m5 skipped[39m[90m (11)[39m
+[2m   Start at [22m 16:26:18
+[2m   Duration [22m 3.92s[2m (transform 265ms, setup 1.05s, collect 803ms, tests 105ms, environment 1.71s, prepare 462ms)[22m
+
+
+[STDERR]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m96:5[22m[39m
+    [90m 94| [39m
+    [90m 95| [39m  [34mit[39m([32m'should render all main components'[39m[33m,[39m () [33m=>[39m {
+    [90m 96| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 97| [39m
+    [90m 98| [39m    expect(screen.getAllByTestId('seating-plan-tabs')[0]).not.toBeNull…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render all main components
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/pure.js:[2m307:28[22m[39m
+[90m [2m❯[22m Proxy.cleanup node_modules/@testing-library/react/dist/pure.js:[2m303:22[22m[39m
+[36m [2m❯[22m backend/vitest.setup.js:[2m135:3[22m[39m
+    [90m133| [39m[90m// Limpiar el DOM después de cada prueba para evitar colisiones[39m
+    [90m134| [39m[34mafterEach[39m(() [33m=>[39m {
+    [90m135| [39m  [34mcleanup[39m()[33m;[39m
+    [90m   | [39m  [31m^[39m
+    [90m136| [39m})[33m;[39m
+    [90m137| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould have proper layout structure
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m106:5[22m[39m
+    [90m104| [39m
+    [90m105| [39m  [34mit[39m([32m'should have proper layout structure'[39m[33m,[39m () [33m=>[39m {
+    [90m106| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m107| [39m    const container = document.querySelector('div.h-full.flex.flex-col…
+    [90m108| [39m    [34mexpect[39m(container)[33m.[39mnot[33m.[39m[34mtoBeNull[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render tabs and toolbar in header area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m112:5[22m[39m
+    [90m110| [39m
+    [90m111| [39m  [34mit[39m([32m'should render tabs and toolbar in header area'[39m[33m,[39m () [33m=>[39m {
+    [90m112| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m113| [39m
+    [90m114| [39m    [35mconst[39m tabs [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-tabs'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould render canvas and sidebar in main content area
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m122:5[22m[39m
+    [90m120| [39m
+    [90m121| [39m  [34mit[39m([32m'should render canvas and sidebar in main content area'[39m[33m,[39m () [33m=>[39m {
+    [90m122| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m123| [39m
+    [90m124| [39m    [35mconst[39m canvas [33m=[39m screen[33m.[39m[34mgetAllByTestId[39m([32m'seating-plan-canvas'[39m)[[34m0[39m][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould handle tab changes
+[31m[1mError[22m: Cannot find module 'C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\firebaseConfig' imported from C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\hooks\useSeatingPlan.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/SeatingPlanRefactored.test.jsx[2m > [22mSeatingPlanRefactored Component[2m > [22mshould integrate with all subcomponents correctly
+[31m[1mError[22m: act(...) is not supported in production builds of React.[39m
+[90m [2m❯[22m X node_modules/react/cjs/react.production.min.js:[2m19:136[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m Proxy.render node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/SeatingPlanRefactored.test.jsx:[2m148:5[22m[39m
+    [90m146| [39m
+    [90m147| [39m  [34mit[39m([32m'should integrate with all subcomponents correctly'[39m[33m,[39m () [33m=>[39m {
+    [90m148| [39m    [34mrender[39m([33m<[39m[33mSeatingPlanRefactored[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m149| [39m
+    [90m150| [39m    [90m// Verificar que todos los componentes están presentes[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯[22m[39m
+
+
+[EXIT 1]
+

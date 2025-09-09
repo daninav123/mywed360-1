@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-09-09T12:24:56.127Z",
+  "type": "rsvp_dashboard_dryrun",
+  "checks": {
+    "docs": {
+      "flujoRSVP": true
+    },
+    "frontend": {
+      "rsvpConfirm": true,
+      "acceptInvitation": true
+    },
+    "e2e": {
+      "rsvpConfirmByTokenSpec": true,
+      "rsvpInvalidTokenSpec": true,
+      "rsvpRemindersSpec": true
+    },
+    "backend": {
+      "emailService": true,
+      "mailgunWebhook": true
+    },
+    "suggestions": [
+      "Añadir dashboard de seguimiento RSVP con métricas en tiempo real (/rsvp/stats)",
+      "Implementar recordatorios programados (cron en backend o Cloud Functions) y plantillas de email",
+      "Integrar con Seating y Catering para actualizar conteos al confirmar",
+      "Cubrir confirmaciones grupales y roles de colaboradores"
+    ]
+  },
+  "summary": "Dry run OK. Revisa las sugerencias y los specs E2E presentes para priorizar el dashboard y recordatorios."
+}

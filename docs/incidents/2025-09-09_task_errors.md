@@ -1158,3 +1158,718 @@
 - **Error:** Task process exit code 1
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-09T01:39:50.661Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:40:17.442Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:40:50.830Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:42:16.063Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:56:37.193Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:57:04.337Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:57:35.974Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:58:17.718Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:03:00.593Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:03:29.705Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:04:02.817Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:04:46.603Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:16:51.790Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:17:18.977Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:17:50.903Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:18:28.395Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:26:05.815Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:26:26.710Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:26:58.873Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T02:27:35.182Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:22:34.797Z
+- **Tarea:** prep_vendors_ia_bootstrap
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:22:59.637Z
+- **Tarea:** prep_rsvp_dashboard_dryrun
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:23:24.757Z
+- **Tarea:** prep_notifications_audit
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:23:50.045Z
+- **Tarea:** impl_vendors_ia_scaffold
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:24:15.581Z
+- **Tarea:** impl_rsvp_scaffold
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:24:40.451Z
+- **Tarea:** impl_notifications_scaffold
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:07.758Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:14.888Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:21.441Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:27.894Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:43.224Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:49.609Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:25:56.395Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:03.589Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:18.507Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:24.817Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:31.140Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:37.515Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:52.707Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:26:59.233Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:06.186Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:12.879Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:27.768Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:34.276Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:40.782Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:27:53.716Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:00.641Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:07.914Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:15.125Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:30.423Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:37.664Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:44.764Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:28:51.436Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:29:06.609Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:29:13.352Z
+- **Tarea:** unit_rules_collections
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:29:20.553Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:29:27.639Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:29:43.044Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:51:53.139Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:00.447Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:07.906Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:23.133Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:29.914Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:36.504Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:51.894Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:52:58.328Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:04.861Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:19.969Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:26.696Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:33.223Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:48.655Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:53:55.697Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:02.965Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:18.158Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:24.734Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:31.227Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:46.554Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:53.412Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:54:59.987Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:15.165Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:21.865Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:28.698Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:43.571Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:50.509Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:55:57.323Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:12.221Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:19.374Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:25.966Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:41.171Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:47.503Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:56:54.004Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:09.041Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:15.695Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:22.209Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:37.304Z
+- **Tarea:** unit_rules
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:44.020Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T12:57:50.615Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:13:42.317Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:14:12.719Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:14:19.121Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:14:57.993Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:15:27.609Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:15:34.089Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:16:12.412Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:16:42.422Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:16:48.993Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:17:28.776Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:17:58.801Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:18:05.472Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:18:44.863Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:19:13.073Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:19:19.464Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:49:28.784Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:49:59.904Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:50:06.992Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:53:37.536Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:54:08.148Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:54:15.345Z
+- **Tarea:** unit_rules_extended
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:57:45.991Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:58:16.510Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T13:58:46.491Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:00:50.355Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:02:19.728Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:02:53.453Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:03:24.123Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:06:54.449Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:07:24.621Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:07:54.823Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:09:29.352Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:10:40.227Z
+- **Tarea:** e2e_email_read
+- **Error:** Task process exit code 4
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:11:12.459Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:13:01.576Z
+- **Tarea:** e2e_email_folders
+- **Error:** Task process exit code 7
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:13:32.430Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:13:59.480Z
+- **Tarea:** e2e_budget_flow
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:17:31.201Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:18:02.940Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:18:34.317Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:22:06.110Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:22:37.817Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:23:10.015Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:26:41.486Z
+- **Tarea:** unit_rules
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:27:13.104Z
+- **Tarea:** unit_rules_exhaustive
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T14:27:44.610Z
+- **Tarea:** unit_rules_extended
+- **Error:** HealthCheck failed at step test:unit (seating)
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

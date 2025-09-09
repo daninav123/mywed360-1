@@ -20,6 +20,7 @@ const GuestFilters = React.memo(({
   onImportGuests,
   onBulkAddGuests,
   onExportGuests,
+  onOpenRsvpSummary,
   guestCount = 0,
   isLoading = false
 }) => {
@@ -73,6 +74,10 @@ const GuestFilters = React.memo(({
   const handleExport = useCallback(() => {
     onExportGuests?.();
   }, [onExportGuests]);
+
+  const handleOpenRsvp = useCallback(() => {
+    onOpenRsvpSummary?.();
+  }, [onOpenRsvpSummary]);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
@@ -182,6 +187,14 @@ const GuestFilters = React.memo(({
         >
           <Download size={16} className="mr-2" />
           {t('guests.exportGuests')}
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleOpenRsvp}
+          disabled={isLoading}
+        >
+          Resumen RSVP
         </Button>
       </div>
 

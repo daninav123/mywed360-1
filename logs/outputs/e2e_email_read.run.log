@@ -216,3 +216,122 @@ DevTools listening on ws://127.0.0.1:61141/devtools/browser/3424f8be-1ed0-4c80-8
 
 [EXIT 4]
 
+[2025-09-09T14:10:40.222Z] CMD: npm run cypress:run -- --spec "cypress/e2e/email/read-email.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/email/read-email.cy.js --browser edge --headless
+
+
+Warning: We failed to trash the existing run results.
+
+This error will not affect or change the exit code.
+
+Error: Command failed: C:\Users\Administrator\AppData\Local\Cypress\Cache\13.17.0\Cypress\resources\app\node_modules\trash\lib\win-trash.exe C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screenshots\performance
+
+    at ChildProcess.exithandler (node:child_process:419:12)
+    at ChildProcess.emit (node:events:514:28)
+    at maybeClose (node:internal/child_process:1091:16)
+    at Process.onexit (node:internal/child_process:302:5)
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (read-email.cy.js)                                                     │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\e │
+  │                 mail\read-email.cy.js                                                          │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  read-email.cy.js                                                                (1 of 1)
+
+
+  Flujo de recepción y lectura de correos
+    1) muestra la lista de correos en la bandeja de entrada
+    2) permite abrir y leer un correo electrónico
+    3) permite descargar adjuntos de un correo
+    4) muestra correctamente el estado de correos leídos/no leídos
+
+
+  0 passing (54s)
+  4 failing
+
+  1) Flujo de recepción y lectura de correos
+       muestra la lista de correos en la bandeja de entrada:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  2) Flujo de recepción y lectura de correos
+       permite abrir y leer un correo electrónico:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  3) Flujo de recepción y lectura de correos
+       permite descargar adjuntos de un correo:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+  4) Flujo de recepción y lectura de correos
+       muestra correctamente el estado de correos leídos/no leídos:
+     AssertionError: Timed out retrying after 10000ms: Expected to find element: `[data-testid="email-list"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/support/commands.js:87:59)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        4                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      4                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  4                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     53 seconds                                                                       │
+  │ Spec Ran:     read-email.cy.js                                                                 │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\read-email.cy.js\Flujo de recepción y lectura de correos -- muestra la list               
+     a de correos en la bandeja de entrada (failed).png                                             
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\read-email.cy.js\Flujo de recepción y lectura de correos -- permite abrir y               
+      leer un correo electrónico (failed).png                                                       
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\read-email.cy.js\Flujo de recepción y lectura de correos -- permite descarg               
+     ar adjuntos de un correo (failed).png                                                          
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\read-email.cy.js\Flujo de recepción y lectura de correos -- muestra correct               
+     amente el estado de correos leídosno leídos (failed).png                                       
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  read-email.cy.js                         00:53        4        -        4        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:53        4        -        4        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:64059/devtools/browser/da9e9317-297a-4a0b-94f7-1440e97136dd
+
+[EXIT 4]
+

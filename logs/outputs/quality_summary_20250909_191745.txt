@@ -1,0 +1,4 @@
+test_unit ExitCode=1 Duration=161s Log=logs\outputs\test_unit_20250909_191745.log
+lint ExitCode=2 Duration=3s Log=logs\outputs\lint_20250909_191745.log
+validate_schemas ExitCode=0 Duration=1s Log=logs\outputs\validate_schemas_20250909_191745.log
+OVERALL=1

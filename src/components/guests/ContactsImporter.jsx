@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { UploadCloud, Check, X } from 'lucide-react';
 import { Button, Input } from '../ui';
@@ -11,6 +11,7 @@ const ContactsImporterFixed = ({ onImported }) => {
   const [step, setStep] = useState('form'); // 'form' | 'review'
   const [table, setTable] = useState('');
   const [rows, setRows] = useState([]);
+  const fileInputRef = useRef(null);
 
   const updateField = (idx, key, value) => {
     setRows(prev => {
@@ -52,6 +53,99 @@ const ContactsImporterFixed = ({ onImported }) => {
     } catch (err) {
       console.error(err);
       alert('Error al acceder a los contactos.');
+    }
+  };
+
+  // Importación desde CSV (opcional)
+  const handleImportCSVClick = () => fileInputRef.current?.click();
+
+  const parseCSV = (text) => {
+    // Parser básico para CSV sencillo (campos separados por coma, comillas opcionales)
+    const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(Boolean);
+    if (lines.length === 0) return [];
+    const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const headers = rawHeaders.map(h => h.toLowerCase());
+
+    const mapKey = (h) => {
+      if (h.includes('name') || h.includes('nombre')) return 'name';
+      if (h.includes('mail') || h === 'email') return 'email';
+      if (h.includes('tel') || h.includes('phone') || h.includes('telefono')) return 'phone';
+      if (h.includes('mesa') || h === 'table') return 'table';
+      if (h.includes('acompan') || h.includes('compan')) return 'companion';
+      if (h.includes('diet') || h.includes('restric')) return 'dietaryRestrictions';
+      if (h.includes('nota') || h === 'notes') return 'notes';
+      if (h.includes('group')) return 'companionGroupId';
+      return h; // sin mapa, mantener
+    };
+
+    const mappedHeaders = headers.map(mapKey);
+
+    const data = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      // Split simple por comas (soporta comillas básicas)
+      const cols = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let c = 0; c < line.length; c++) {
+        const ch = line[c];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          cols.push(cur.trim());
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      cols.push(cur.trim());
+
+      if (cols.every(v => v === '')) continue;
+      const obj = {};
+      mappedHeaders.forEach((key, idx) => {
+        const val = (cols[idx] || '').replace(/^"|"$/g, '');
+        obj[key] = val;
+      });
+      data.push(obj);
+    }
+    return data;
+  };
+
+  const handleCSVSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseCSV(text);
+      if (!parsed.length) {
+        alert('El CSV no contiene filas válidas');
+        return;
+      }
+      // Normalizar y preparar preview
+      const now = Date.now();
+      const imported = parsed.map((r, i) => ({
+        id: `csv-${now}-${i}`,
+        name: r.name || 'Sin nombre',
+        email: r.email || '',
+        phone: r.phone || '',
+        address: r.address || '',
+        companion: parseInt(r.companion, 10) || 0,
+        table: r.table || table || '',
+        response: 'Pendiente',
+        status: 'pending',
+        dietaryRestrictions: r.dietaryRestrictions || '',
+        notes: r.notes || 'Importado desde CSV',
+        companionGroupId: r.companionGroupId || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+      setRows(imported);
+      setStep('review');
+    } catch (err) {
+      console.error('Error leyendo CSV:', err);
+      alert('No se pudo leer el archivo CSV');
+    } finally {
+      e.target.value = '';
     }
   };
 
@@ -106,6 +200,14 @@ const ContactsImporterFixed = ({ onImported }) => {
         <UploadCloud size={16} />
         <span>Seleccionar contactos</span>
       </Button>
+      <div>
+        <input ref={fileInputRef} type="file" accept=".csv" onChange={handleCSVSelected} className="hidden" />
+        <Button variant="outline" onClick={handleImportCSVClick} className="flex items-center space-x-2">
+          <UploadCloud size={16} />
+          <span>Importar CSV</span>
+        </Button>
+        <p className="text-xs text-gray-500 mt-2">Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId</p>
+      </div>
     </div>
   );
 };

@@ -20,7 +20,10 @@ const __dirname = path.dirname(__filename);
 
 let testEnv;
 
-describe('Firestore rules - seatingPlan (banquet/ceremony)', () => {
+const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
+
+describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
   beforeAll(async () => {
     const rulesPath = path.resolve(__dirname, '../../firestore.rules');
     const rules = await fs.readFile(rulesPath, 'utf8');

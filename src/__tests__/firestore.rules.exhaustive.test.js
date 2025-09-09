@@ -1,12 +1,17 @@
+// @vitest-environment node
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
+const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const D = RUN_FIRESTORE_RULES ? describe : describe.skip;
+
 let testEnv;
 const PROJECT_ID = 'mywed360-test-exhaustive';
 
 beforeAll(async () => {
+  if (!RUN_FIRESTORE_RULES) return;
   const rules = readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8');
   testEnv = await initializeTestEnvironment({ projectId: PROJECT_ID, firestore: { rules } });
 
@@ -36,7 +41,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await testEnv.cleanup();
+  if (testEnv?.cleanup) {
+    await testEnv.cleanup();
+  }
 });
 
 const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
@@ -51,7 +58,7 @@ const COLLECTIONS = [
   'tasksCompleted'
 ];
 
-describe.each(COLLECTIONS)('%s subcollection permissions', (col) => {
+D.each(COLLECTIONS)('%s subcollection permissions', (col) => {
   const newId = col + 'New';
 
   test('Owner can WRITE', async () => {
@@ -79,7 +86,7 @@ describe.each(COLLECTIONS)('%s subcollection permissions', (col) => {
   });
 });
 
-describe('weddingInfo doc permissions', () => {
+D('weddingInfo doc permissions', () => {
   test('Owner can UPDATE weddingInfo', async () => {
     const db = getFirestore(ctx('ownerX').app);
     const ref = doc(db, 'weddings', 'wX', 'weddingInfo');
@@ -93,7 +100,7 @@ describe('weddingInfo doc permissions', () => {
   });
 });
 
-describe('users profile rules', () => {
+D('users profile rules', () => {
   test('User can UPDATE own profile', async () => {
     const db = getFirestore(ctx('plannerX').app);
     await assertSucceeds(setDoc(doc(db, 'users', 'plannerX'), { bio: 'hello' }, { merge: true }));
@@ -110,7 +117,7 @@ describe('users profile rules', () => {
   });
 });
 
-describe('wedding delete permissions', () => {
+D('wedding delete permissions', () => {
   test('Only owner or planner can DELETE wedding', async () => {
     const dbOwner = getFirestore(ctx('ownerX').app);
     await assertSucceeds(deleteDoc(doc(dbOwner, 'weddings', 'wX')));

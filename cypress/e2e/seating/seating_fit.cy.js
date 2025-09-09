@@ -1,10 +1,18 @@
 describe('Seating Plan - Fit to Content', () => {
   it('ajusta escala y offset al contenido con el botón ⌂', () => {
-    cy.visit('/invitados/seating');
+    // Evitar problemas de fallback de SPA: cargar raíz y navegar con history API
+    cy.visit('/');
+    cy.mockWeddingMinimal();
+    cy.closeDiagnostic();
+    cy.window().then((win) => {
+      win.history.pushState({}, '', '/invitados/seating');
+      win.dispatchEvent(new win.PopStateEvent('popstate'));
+    });
 
-    // Ir a Banquete y generar una disposición usando Plantillas
+    // Esperar toolbar y luego ir a Banquete y generar una disposición usando Plantillas
+    cy.get('button[title="Plantillas"], button[title="Configurar ceremonia"], button[title="Configurar espacio"]', { timeout: 20000 }).should('be.visible');
     cy.contains('button', 'Banquete', { timeout: 10000 }).should('be.visible').click();
-    cy.get('button[title="Plantillas"]').click();
+    cy.get('button[title="Plantillas"]', { timeout: 10000 }).should('be.visible').click();
     cy.contains('h3', 'Plantillas').should('be.visible');
     cy.contains('Boda Mediana').click();
 

@@ -35,7 +35,8 @@ const SeatingPlanRefactored = () => {
     updateArea,
     deleteTable,
     duplicateTable,
-    applyBanquetTables
+    applyBanquetTables,
+    autoAssignGuests
   } = useSeatingPlan();
 
   // Valores seguros para evitar crashes por undefined
@@ -214,6 +215,47 @@ const SeatingPlanRefactored = () => {
         startY: 160
       });
     }
+
+    // Asignación automática no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
+    setTimeout(async () => {
+      try {
+        const res = await autoAssignGuests();
+        if (res?.ok) {
+          const msg = res.method === 'backend'
+            ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+            : `Asignación automática: ${res.assigned} invitado(s)`;
+          toast.info(msg);
+        } else if (res?.error) {
+          toast.warn(`Autoasignación: ${res.error}`);
+        }
+      } catch (e) {
+        // Silencioso para no molestar al usuario; solo log
+        console.warn('Auto-assign error', e);
+      }
+    }, 50);
+  };
+
+  // Generación desde modal de banquete seguida de autoasignación (silencioso a nivel de UI)
+  const handleGenerateBanquetLayoutWithAssign = (config) => {
+    try {
+      generateBanquetLayout(config);
+    } finally {
+      setTimeout(async () => {
+        try {
+          const res = await autoAssignGuests();
+          if (res?.ok) {
+            const msg = res.method === 'backend'
+              ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+              : `Asignación automática: ${res.assigned} invitado(s)`;
+            toast.info(msg);
+          } else if (res?.error) {
+            toast.warn(`Autoasignación: ${res.error}`);
+          }
+        } catch (e) {
+          console.warn('Auto-assign error', e);
+        }
+      }, 50);
+    }
   };
 
   // No-op defensivo para habilitar/deshabilitar elementos desde el canvas
@@ -310,7 +352,7 @@ const SeatingPlanRefactored = () => {
         onCloseSpaceConfig={handleCloseSpaceConfig}
         onCloseTemplate={handleCloseTemplates}
         onGenerateSeatGrid={generateSeatGrid}
-        onGenerateBanquetLayout={generateBanquetLayout}
+        onGenerateBanquetLayout={handleGenerateBanquetLayoutWithAssign}
         onSaveHallDimensions={async (w,h,aisle) => { try { await saveHallDimensions(w,h,aisle); toast.success('Dimensiones guardadas'); } catch(e){ toast.error('Error guardando dimensiones'); } }}
         onApplyTemplate={handleApplyTemplate}
         areas={safeAreas}
