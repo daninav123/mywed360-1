@@ -1274,3 +1274,58 @@
 {"timestamp":"2025-09-09T00:54:32.818Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":27}
 {"timestamp":"2025-09-09T00:54:53.707Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":27}
 {"timestamp":"2025-09-09T00:54:53.712Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":27}
+{"timestamp":"2025-09-09T00:57:42.025Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":28}
+{"timestamp":"2025-09-09T00:58:03.171Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":28}
+{"timestamp":"2025-09-09T00:58:03.177Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":28}
+{"timestamp":"2025-09-09T00:58:31.447Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":29}
+{"timestamp":"2025-09-09T00:58:52.091Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":29}
+{"timestamp":"2025-09-09T00:58:52.099Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":29}
+{"timestamp":"2025-09-09T00:59:59.016Z","taskId":"e2e_seating_smoke","action":"start","attempt":15}
+{"timestamp":"2025-09-09T01:00:30.721Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":15}
+{"timestamp":"2025-09-09T01:00:30.728Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":15}
+{"timestamp":"2025-09-09T01:01:49.098Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":30}
+{"timestamp":"2025-09-09T01:02:11.753Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":30}
+{"timestamp":"2025-09-09T01:02:11.767Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":30}
+{"timestamp":"2025-09-09T01:03:56.025Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":31}
+{"timestamp":"2025-09-09T01:04:17.253Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":31}
+{"timestamp":"2025-09-09T01:04:17.260Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":31}
+{"timestamp":"2025-09-09T01:07:14.066Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":32}
+{"timestamp":"2025-09-09T01:07:34.880Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":32}
+{"timestamp":"2025-09-09T01:07:34.887Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":32}
+{"timestamp":"2025-09-09T01:07:35.011Z","taskId":"e2e_seating_smoke","action":"start","attempt":16}
+{"timestamp":"2025-09-09T01:08:00.918Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":16}
+{"timestamp":"2025-09-09T01:08:00.923Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":16}
+{"timestamp":"2025-09-09T01:08:01.065Z","taskId":"e2e_seating_toasts","action":"start","attempt":13}
+{"timestamp":"2025-09-09T01:08:26.059Z","taskId":"e2e_seating_toasts","error":"Task process exit code 1","attempt":13}
+{"timestamp":"2025-09-09T01:08:26.064Z","taskId":"e2e_seating_toasts","action":"end","status":"error","attempt":13}
+{"timestamp":"2025-09-09T01:08:26.199Z","taskId":"e2e_seating_fit","action":"start","attempt":13}
+{"timestamp":"2025-09-09T01:08:51.822Z","taskId":"e2e_seating_fit","error":"Task process exit code 1","attempt":13}
+{"timestamp":"2025-09-09T01:08:51.828Z","taskId":"e2e_seating_fit","action":"end","status":"error","attempt":13}
+{"timestamp":"2025-09-09T01:08:51.946Z","taskId":"e2e_seating_assign_unassign","action":"start","attempt":15}
+{"timestamp":"2025-09-09T01:09:10.796Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":33}
+{"timestamp":"2025-09-09T01:09:31.420Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":33}
+{"timestamp":"2025-09-09T01:09:31.426Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":33}
+{"timestamp":"2025-09-09T01:09:47.065Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":34}
+{"timestamp":"2025-09-09T01:10:07.956Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":34}
+{"timestamp":"2025-09-09T01:10:07.962Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":34}
+{"timestamp":"2025-09-09T01:11:58.017Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":35}
+{"timestamp":"2025-09-09T01:12:19.833Z","taskId":"e2e_rsvp_reminders","error":"Task process exit code 1","attempt":35}
+{"timestamp":"2025-09-09T01:12:19.840Z","taskId":"e2e_rsvp_reminders","action":"end","status":"error","attempt":35}
+{"timestamp":"2025-09-09T01:14:05.045Z","taskId":"e2e_seating_smoke","action":"start","attempt":17}
+{"timestamp":"2025-09-09T01:14:31.633Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":17}
+{"timestamp":"2025-09-09T01:14:31.639Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":17}
+{"timestamp":"2025-09-09T01:23:43.286Z","taskId":"e2e_rsvp_reminders","action":"start","attempt":36}
+{"timestamp":"2025-09-09T01:24:05.046Z","taskId":"e2e_rsvp_reminders","action":"health","status":"skipped"}
+{"timestamp":"2025-09-09T01:24:05.047Z","taskId":"e2e_rsvp_reminders","action":"end","status":"success","attempt":36}
+{"timestamp":"2025-09-09T01:24:07.385Z","taskId":"e2e_seating_smoke","action":"start","attempt":18}
+{"timestamp":"2025-09-09T01:24:32.929Z","taskId":"e2e_seating_smoke","error":"Task process exit code 1","attempt":18}
+{"timestamp":"2025-09-09T01:24:32.938Z","taskId":"e2e_seating_smoke","action":"end","status":"error","attempt":18}
+{"timestamp":"2025-09-09T01:24:33.916Z","taskId":"e2e_seating_toasts","action":"start","attempt":14}
+{"timestamp":"2025-09-09T01:24:59.680Z","taskId":"e2e_seating_toasts","error":"Task process exit code 1","attempt":14}
+{"timestamp":"2025-09-09T01:24:59.690Z","taskId":"e2e_seating_toasts","action":"end","status":"error","attempt":14}
+{"timestamp":"2025-09-09T01:25:00.551Z","taskId":"e2e_seating_fit","action":"start","attempt":14}
+{"timestamp":"2025-09-09T01:25:27.091Z","taskId":"e2e_seating_fit","error":"Task process exit code 1","attempt":14}
+{"timestamp":"2025-09-09T01:25:27.097Z","taskId":"e2e_seating_fit","action":"end","status":"error","attempt":14}
+{"timestamp":"2025-09-09T01:25:27.838Z","taskId":"e2e_seating_assign_unassign","action":"start","attempt":16}
+{"timestamp":"2025-09-09T01:25:54.398Z","taskId":"e2e_seating_assign_unassign","error":"Task process exit code 1","attempt":16}
+{"timestamp":"2025-09-09T01:25:54.404Z","taskId":"e2e_seating_assign_unassign","action":"end","status":"error","attempt":16}

@@ -1,7 +1,11 @@
 describe('Seating Plan - Smoke E2E', () => {
   it('renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper', () => {
-    // Visitar la ruta protegida (bypass activo en modo Cypress)
-    cy.visit('/invitados/seating');
+    // Visitar raíz y navegar vía history API para evitar problemas de fallback de SPA
+    cy.visit('/');
+    cy.window().then((win) => {
+      win.history.pushState({}, '', '/invitados/seating');
+      win.dispatchEvent(new win.PopStateEvent('popstate'));
+    });
 
     // Tabs visibles
     cy.contains('button', 'Ceremonia', { timeout: 10000 }).should('be.visible');

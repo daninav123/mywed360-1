@@ -1073,3 +1073,88 @@
 - **Error:** Task process exit code 1
 - **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
 
+### 2025-09-09T00:58:03.172Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T00:58:52.093Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:00:30.723Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:02:11.754Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:04:17.254Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:07:34.881Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:08:00.919Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:08:26.060Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:08:51.823Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:09:31.422Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:10:07.958Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:12:19.835Z
+- **Tarea:** e2e_rsvp_reminders
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:14:31.635Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:24:32.932Z
+- **Tarea:** e2e_seating_smoke
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:24:59.683Z
+- **Tarea:** e2e_seating_toasts
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:25:27.092Z
+- **Tarea:** e2e_seating_fit
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+
+### 2025-09-09T01:25:54.400Z
+- **Tarea:** e2e_seating_assign_unassign
+- **Error:** Task process exit code 1
+- **Acciones:** Reintentos x3, health-check fallido, notificaciones enviadas.
+

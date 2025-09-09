@@ -45,19 +45,19 @@
     {
       "id": "e2e_rsvp_reminders",
       "title": "E2E RSVP: recordatorios automáticos",
-      "status": "failed",
+      "status": "completed",
       "order": 3,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_reminders.cy.js\"",
-      "attempts": 27,
+      "attempts": 36,
       "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_seating_smoke",
       "title": "E2E Seating: smoke básico",
-      "status": "pending",
+      "status": "failed",
       "order": 4,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_smoke.cy.js\"",
-      "attempts": 14,
+      "attempts": 18,
       "lastError": "Task process exit code 1"
     },
     {
@@ -71,10 +71,10 @@
     {
       "id": "e2e_seating_assign_unassign",
       "title": "E2E Seating: asignar y desasignar invitados",
-      "status": "pending",
+      "status": "failed",
       "order": 5,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_assign_unassign.cy.js\"",
-      "attempts": 14,
+      "attempts": 16,
       "lastError": "Task process exit code 1"
     },
     {
@@ -120,19 +120,19 @@
     {
       "id": "e2e_seating_fit",
       "title": "E2E Seating: ajuste al lienzo (fit)",
-      "status": "pending",
+      "status": "failed",
       "order": 6,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_fit.cy.js\"",
-      "attempts": 12,
+      "attempts": 14,
       "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_seating_toasts",
       "title": "E2E Seating: mensajes/toasts de acciones",
-      "status": "pending",
+      "status": "failed",
       "order": 7,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_toasts.cy.js\"",
-      "attempts": 12,
+      "attempts": 14,
       "lastError": "Task process exit code 1"
     },
     {

@@ -162,3 +162,85 @@ DevTools listening on ws://127.0.0.1:56940/devtools/browser/9cb377d9-2c5f-4f94-a
 
 [EXIT 1]
 
+[2025-09-09T01:25:54.396Z] CMD: npm run cypress:run -- --spec "cypress/e2e/seating/seating_assign_unassign.cy.js" --browser edge --headless
+[STDOUT]
+
+> mywed360@0.1.0 cypress:run
+> cypress run --spec cypress/e2e/seating/seating_assign_unassign.cy.js --browser edge --headless
+
+
+
+====================================================================================================
+
+  (Run Starting)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Cypress:        13.17.0                                                                        │
+  │ Browser:        Edge 140 (headless)                                                            │
+  │ Node Version:   v22.16.0 (C:\Program Files\nodejs\node.exe)                                    │
+  │ Specs:          1 found (seating_assign_unassign.cy.js)                                        │
+  │ Searched:       C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\e2e\s │
+  │                 eating\seating_assign_unassign.cy.js                                           │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+                                                                                                    
+  Running:  seating_assign_unassign.cy.js                                                   (1 of 1)
+
+
+  Seating Plan - Asignar y Desasignar
+    1) asigna por click desde Pendientes y desasigna con botón de mesa
+
+
+  0 passing (10s)
+  1 failing
+
+  1) Seating Plan - Asignar y Desasignar
+       asigna por click desde Pendientes y desasigna con botón de mesa:
+     AssertionError: Timed out retrying after 4000ms: Expected to find element: `button[title="Plantillas"]`, but never found it.
+      at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_assign_unassign.cy.js:7:7)
+
+
+
+
+  (Results)
+
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ Tests:        1                                                                                │
+  │ Passing:      0                                                                                │
+  │ Failing:      1                                                                                │
+  │ Pending:      0                                                                                │
+  │ Skipped:      0                                                                                │
+  │ Screenshots:  1                                                                                │
+  │ Video:        false                                                                            │
+  │ Duration:     10 seconds                                                                       │
+  │ Spec Ran:     seating_assign_unassign.cy.js                                                    │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  (Screenshots)
+
+  -  C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\cypress\screens     (1256x627)
+     hots\seating_assign_unassign.cy.js\Seating Plan - Asignar y Desasignar -- asigna               
+      por click desde Pendientes y desasigna con botón de mesa (failed).png                         
+
+
+====================================================================================================
+
+  (Run Finished)
+
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped  
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ×  seating_assign_unassign.cy.js            00:10        1        -        1        -        - │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ×  1 of 1 failed (100%)                     00:10        1        -        1        -        -  
+
+
+[STDERR]
+
+DevTools listening on ws://127.0.0.1:61947/devtools/browser/957cb0ca-8506-4ed3-8ef1-fc2922173b19
+
+[EXIT 1]
+
