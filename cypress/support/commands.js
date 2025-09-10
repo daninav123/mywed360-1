@@ -123,6 +123,16 @@ Cypress.Commands.add('mockWeddingMinimal', () => {
     };
   });
 });
+
+// Limpia el estado local del Seating (localStorage) para tests aislados
+Cypress.Commands.add('resetSeatingLS', () => {
+  cy.window().then((win) => {
+    try {
+      const keys = Object.keys(win.localStorage || {});
+      keys.filter((k) => k.startsWith('seatingPlan:')).forEach((k) => win.localStorage.removeItem(k));
+    } catch (_) {}
+  });
+});
 Cypress.Commands.add('sendEmail', (recipient, subject, body) => {
   // Navegar al formulario de composición
   cy.get('[data-testid="compose-button"]').click();

@@ -23,19 +23,17 @@ import './commands';
 // (p.ej., /api/rsvp/dev/*). Si BACKEND_BASE_URL apunta al backend en producción, stubear estos
 // endpoints para que los E2E no dependan de un servidor dev local.
 beforeEach(() => {
-  const backend = Cypress.env('BACKEND_BASE_URL') || '';
-  const isProdBackend = /onrender\.com/i.test(backend);
   const stubRsvp = (Cypress.env('STUB_RSVP') === true || Cypress.env('STUB_RSVP') === 'true');
-  // Solo aplicar stubs cuando explicitamente se solicite y el backend apunte a producción
-  if (!isProdBackend || !stubRsvp) return;
+  // Aplicar stubs cuando explicitamente se solicite, sin depender del backend
+  if (!stubRsvp) return;
 
   // 1) Asegurar planner (aceptamos 401 en test, pero devolvemos 401 estable)
-  cy.intercept('POST', '/api/rsvp/dev/ensure-planner', (req) => {
+  cy.intercept('POST', '**/api/rsvp/dev/ensure-planner', (req) => {
     req.reply({ statusCode: 401, body: { error: 'auth-required' } });
   });
 
   // 2) Crear invitado con token (dev)
-  cy.intercept('POST', '/api/rsvp/dev/create', (req) => {
+  cy.intercept('POST', '**/api/rsvp/dev/create', (req) => {
     const token = 'stub-token-123';
     const weddingId = (req.body && req.body.weddingId) || 'test-wedding-reminders';
     req.reply({
@@ -51,7 +49,7 @@ beforeEach(() => {
   });
 
   // 3) Consulta pública por token
-  cy.intercept('GET', /\/api\/rsvp\/by-token\/.+/, (req) => {
+  cy.intercept('GET', /.*\/api\/rsvp\/by-token\/.+/, (req) => {
     req.reply({
       statusCode: 200,
       body: { name: 'Invitado Recordatorio', status: 'pending', companions: 0, allergens: '' }
@@ -59,7 +57,7 @@ beforeEach(() => {
   });
 
   // 4) Ejecutar recordatorios (dryRun)
-  cy.intercept('POST', '/api/rsvp/reminders', (req) => {
+  cy.intercept('POST', '**/api/rsvp/reminders', (req) => {
     const weddingId = (req.body && req.body.weddingId) || 'test-wedding-reminders';
     req.reply({
       statusCode: 200,
@@ -68,9 +66,11 @@ beforeEach(() => {
   });
 });
 
-// Intercept global para Firestore (evita re-renderizados que desprenden elementos durante E2E)
+// Intercept global para Firestore (opcional: habilitar solo si STUB_FIRESTORE=true)
 beforeEach(() => {
   try {
+    const stubFs = Cypress.env('STUB_FIRESTORE') === true || Cypress.env('STUB_FIRESTORE') === 'true';
+    if (!stubFs) return;
     cy.intercept('POST', '**google.firestore**', (req) => {
       // Responder 200 vacío para estabilizar la UI en tests que no validan persistencia real
       req.reply({ statusCode: 200, body: {} });

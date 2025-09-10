@@ -287,6 +287,7 @@ const SeatingPlanRefactored = () => {
           canUndo={canUndo} canRedo={canRedo}
           onExportPDF={exportPDF}
           onOpenCeremonyConfig={handleOpenCeremonyConfig}
+          onOpenBanquetConfig={handleOpenBanquetConfig}
           onOpenSpaceConfig={handleOpenSpaceConfig}
           onOpenTemplates={handleOpenTemplates}
           syncStatus={syncStatus}

@@ -1,0 +1,146 @@
+// Servicio de WhatsApp – integra envío por API (backend) y utilidades de deeplink
+
+let authContext = null;
+
+export const setAuthContext = (context) => {
+  authContext = context || null;
+};
+
+const BASE = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_URL || '';
+const DEFAULT_CC = (import.meta.env.VITE_DEFAULT_COUNTRY_CODE || '').replace('+','');
+
+async function getAuthToken() {
+  try {
+    if (authContext && authContext.getIdToken) {
+      try {
+        const t = await authContext.getIdToken(true);
+        if (t) return t;
+      } catch {}
+      return await authContext.getIdToken();
+    }
+    // Fallback Firebase directo si el contexto no está disponible
+    try {
+      const mod = await import('../firebaseConfig');
+      const { auth } = mod;
+      const u = auth?.currentUser;
+      if (u?.getIdToken) {
+        try { const t = await u.getIdToken(true); if (t) return t; } catch {}
+        return await u.getIdToken();
+      }
+      if (u?.uid && u?.email) return `mock-${u.uid}-${u.email}`; // compat con backend en dev
+    } catch {}
+  } catch {}
+  return null;
+}
+
+export function toE164(phone) {
+  if (!phone) return null;
+  let p = String(phone).replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+  if (p.startsWith('00')) p = '+' + p.slice(2);
+  if (!p.startsWith('+')) {
+    if (DEFAULT_CC) p = `+${DEFAULT_CC}${p}`; else p = `+${p}`;
+  }
+  return p;
+}
+
+export function waDeeplink(phoneE164, text) {
+  const t = encodeURIComponent(text || '');
+  const ph = (phoneE164 || '').replace(/^\+/, '');
+  return `https://wa.me/${ph}?text=${t}`;
+}
+
+export async function sendText({ to, message, weddingId, guestId, templateId = null, scheduleAt = null, metadata = {} }) {
+  try {
+    const token = await getAuthToken();
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
+    if (import.meta.env.DEV) console.log('[whatsappService] sendText →', { url, hasAuth: !!token, to, hasMessage: !!message, base });
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ to, message, weddingId, guestId, templateId, scheduleAt, metadata })
+    });
+    const json = await res.json().catch(() => ({}));
+    if (import.meta.env.DEV) console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
+    if (!res.ok || json.success === false) {
+      const msg = json?.error || `HTTP ${res.status}`;
+      return { success: false, error: msg };
+    }
+    return json;
+  } catch (e) {
+    if (import.meta.env.DEV) console.warn('[whatsappService] sendText exception', e);
+    return { success: false, error: e.message || 'error' };
+  }
+}
+
+export async function getProviderStatus() {
+  try {
+    const token = await getAuthToken();
+    const headers = {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const url = base ? `${base}/api/whatsapp/provider-status` : `/api/whatsapp/provider-status`;
+    const res = await fetch(url, { headers });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) return { success: false, configured: false, error: json?.error || `HTTP ${res.status}` };
+    return json;
+  } catch (e) {
+    return { success: false, configured: false, error: e.message || 'error' };
+  }
+}
+
+export async function schedule(items = [], scheduledAt) {
+  try {
+    const token = await getAuthToken();
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const url = base ? `${base}/api/whatsapp/schedule` : `/api/whatsapp/schedule`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ items, scheduledAt })
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json.success === false) {
+      const msg = json?.error || `HTTP ${res.status}`;
+      return { success: false, error: msg };
+    }
+    return json;
+  } catch (e) {
+    return { success: false, error: e.message || 'error' };
+  }
+}
+
+export async function getMetrics({ weddingId, from, to, groupBy = 'day' } = {}) {
+  try {
+    const token = await getAuthToken();
+    const headers = {
+      'Accept': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const params = new URLSearchParams();
+    if (weddingId) params.append('weddingId', weddingId);
+    if (from) params.append('from', from);
+    if (to) params.append('to', to);
+    if (groupBy) params.append('groupBy', groupBy);
+    const url = (base ? `${base}` : '') + `/api/whatsapp/metrics?` + params.toString();
+    const res = await fetch(url, { headers });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json.success === false) {
+      const msg = json?.error || `HTTP ${res.status}`;
+      return { success: false, error: msg };
+    }
+    return json;
+  } catch (e) {
+    return { success: false, error: e.message || 'error' };
+  }
+}

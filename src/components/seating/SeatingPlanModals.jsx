@@ -553,6 +553,13 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       ceremony: suggestedCeremony,
     },
     {
+      id: 'medium-wedding',
+      name: 'Boda Mediana',
+      description: 'Disposición estándar para boda mediana (3×4 mesas, 8 asientos)',
+      banquet: { rows: 3, cols: 4, seats: 8 },
+      ceremony: { rows: 10, cols: 12 },
+    },
+    {
       id: 'circle',
       name: 'Distribución circular',
       description: `Anillo central con ${avgSeats} asientos por mesa (forma redonda)`,

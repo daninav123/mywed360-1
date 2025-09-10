@@ -55,6 +55,7 @@ import legalDocsRouter from './routes/legal-docs.js';
 import signatureRouter from './routes/signature.js';
 import contactsRouter from './routes/contacts.js';
 import gamificationRouter from './routes/gamification.js';
+import whatsappRouter from './routes/whatsapp.js';
 
 
 // Load environment variables (root .env)
@@ -213,6 +214,7 @@ app.use('/api/legal-docs', requireAuth, legalDocsRouter);
 app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
+app.use('/api/whatsapp', whatsappRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

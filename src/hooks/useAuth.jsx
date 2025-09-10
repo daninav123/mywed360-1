@@ -8,6 +8,7 @@ import { initReminderService, stopReminderService } from '../services/reminderSe
 import errorLogger from '../utils/errorLogger';
 import { setAuthContext as registerEmailAuthContext } from '../services/emailService';
 import { setAuthContext as registerNotificationAuthContext } from '../services/notificationService';
+import { setAuthContext as registerWhatsappAuthContext } from '../services/whatsappService';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -244,6 +245,11 @@ export const AuthProvider = ({ children }) => {
     });
     // Registrar también en notificationService
     registerNotificationAuthContext({
+      currentUser,
+      getIdToken,
+    });
+    // Registrar en whatsappService para poder autenticar llamadas
+    registerWhatsappAuthContext({
       currentUser,
       getIdToken,
     });

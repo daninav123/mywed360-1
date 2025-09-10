@@ -71,6 +71,8 @@ function ProtectedRoute() {
 
   // Efecto para manejar redirección imperativa y evitar bucles
   React.useEffect(() => {
+    // No aplicar redirecciones en entorno Cypress (E2E)
+    if (typeof window !== 'undefined' && window.Cypress) return;
     if (hasRedirected.current) return;
 
     if (!isLoading && !isAuthenticated) {

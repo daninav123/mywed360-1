@@ -22,16 +22,22 @@ const GuestFilters = React.memo(({
   onExportGuests,
   onOpenRsvpSummary,
   guestCount = 0,
-  isLoading = false
+  isLoading = false,
+  // selección múltiple
+  selectedCount = 0,
+  onSendSelectedApi,
+  onSendSelectedMobile,
+  onSendSelectedBroadcast,
+  onScheduleSelected,
 }) => {
   const { t, wedding } = useTranslations();
 
   // Opciones de estado para el filtro
   const statusOptions = [
     { value: '', label: 'Todos los estados' },
-    { value: 'pending', label: wedding.guestStatus('pending') },
-    { value: 'confirmed', label: wedding.guestStatus('confirmed') },
-    { value: 'declined', label: wedding.guestStatus('declined') }
+    { value: 'pending', label: wedding?.guestStatus?.('pending') || 'Pendiente' },
+    { value: 'confirmed', label: wedding?.guestStatus?.('confirmed') || 'Confirmado' },
+    { value: 'declined', label: wedding?.guestStatus?.('declined') || 'Rechazado' }
   ];
 
   // Manejar cambios en los filtros
@@ -196,6 +202,48 @@ const GuestFilters = React.memo(({
         >
           Resumen RSVP
         </Button>
+
+        {/* Envío/Programación para seleccionados */}
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
+          <Button
+            variant="outline"
+            onClick={() => onSendSelectedApi?.()}
+            disabled={isLoading || selectedCount === 0}
+            className="flex items-center"
+            title="Enviar por WhatsApp (API) a seleccionados"
+          >
+            <MessageSquare size={16} className="mr-2" />
+            Enviar seleccionados (API)
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onSendSelectedMobile?.()}
+            disabled={isLoading || selectedCount === 0}
+            className="flex items-center"
+            title="Abrir WhatsApp (móvil personal) para seleccionados"
+          >
+            <MessageSquare size={16} className="mr-2" />
+            Enviar seleccionados (Móvil)
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onSendSelectedBroadcast?.()}
+            disabled={isLoading || selectedCount === 0}
+            className="flex items-center"
+            title="Enviar un único mensaje mediante lista de difusión (móvil personal)"
+          >
+            Difusión (Móvil)
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onScheduleSelected?.()}
+            disabled={isLoading || selectedCount === 0}
+            title="Programar envío por WhatsApp (API)"
+          >
+            Programar (API)
+          </Button>
+        </div>
       </div>
 
       {/* Indicador de carga */}

@@ -35,9 +35,12 @@ async function ensureFinance(weddingId){
 }
 
 export default function WeddingProvider({ children }) {
-  const [weddings, setWeddings] = useState([]);
+  const isCypress = typeof window !== 'undefined' && !!window.Cypress;
+  const mock = (typeof window !== 'undefined' && window.__MOCK_WEDDING__) || null;
+  const [weddings, setWeddings] = useState(() => (isCypress && Array.isArray(mock?.weddings)) ? mock.weddings : []);
   const { currentUser } = useAuth();
   const [activeWedding, setActiveWeddingState] = useState(() => {
+    if (isCypress && mock?.activeWedding?.id) return mock.activeWedding.id;
     return localStorage.getItem('lovenda_active_wedding') || '';
   });
 
@@ -54,9 +57,20 @@ export default function WeddingProvider({ children }) {
     }
   }, [weddings, activeWedding, currentUser]);
 
-  // Cargar lista de bodas del planner desde Firestore
+  // Cargar lista de bodas del planner desde Firestore (omitido en Cypress con mock)
   useEffect(() => {
     async function listenWeddings() {
+      // Bypass completo en entorno Cypress si se inyectó mock
+      if (isCypress && mock) {
+        try {
+          if (Array.isArray(mock.weddings)) setWeddings(mock.weddings);
+          if (mock.activeWedding?.id) {
+            setActiveWeddingState(mock.activeWedding.id);
+            localStorage.setItem('lovenda_active_wedding', mock.activeWedding.id);
+          }
+        } catch (_) {}
+        return;
+      }
       if (!currentUser) {
         console.log('[WeddingContext] Sin usuario autenticado, limpiando bodas');
         setWeddings([]);

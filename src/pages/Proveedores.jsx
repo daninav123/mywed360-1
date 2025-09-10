@@ -5,7 +5,7 @@ import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { useWedding } from '../context/WeddingContext';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import useWeddingCollection from '../hooks/useWeddingCollection';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { loadTrackingRecords, createTrackingRecord, updateTrackingStatus, TRACKING_STATUS, getTrackingNeedingFollowup } from '../services/EmailTrackingService';

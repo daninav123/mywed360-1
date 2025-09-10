@@ -23,6 +23,7 @@ const SeatingPlanToolbar = ({
   canRedo,
   onExportPDF,
   onOpenCeremonyConfig,
+  onOpenBanquetConfig,
   onOpenSpaceConfig,
   onOpenTemplates,
   syncStatus,
@@ -99,6 +100,17 @@ const SeatingPlanToolbar = ({
             >
               <Grid className="h-4 w-4" />
               <span className="hidden sm:inline">Ceremonia</span>
+            </button>
+          )}
+
+          {tab === 'banquet' && (
+            <button
+              onClick={onOpenBanquetConfig}
+              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+              title="Configurar banquete"
+            >
+              <Grid className="h-4 w-4" />
+              <span className="hidden sm:inline">Banquete</span>
             </button>
           )}
 

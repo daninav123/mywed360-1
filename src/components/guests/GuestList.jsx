@@ -23,44 +23,63 @@ const GuestList = React.memo(({
   onDelete,
   onInviteWhatsApp,
   onInviteEmail,
-  isLoading = false
+  isLoading = false,
+  // selección múltiple
+  selectedIds = [],
+  onToggleSelect,
+  onToggleSelectAll,
 }) => {
   const { t, wedding, format } = useTranslations();
+  const safeWedding = wedding || { guestStatus: (s) => s };
+
+  // Defensivos por si llegan props mal formadas
+  const safeGuests = Array.isArray(guests) ? guests : [];
+  const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
 
   // Filtrado optimizado con useMemo
   const filteredGuests = useMemo(() => {
-    return guests.filter(guest => {
-      const matchesSearch = !searchTerm || 
-        guest.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        guest.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        guest.phone?.includes(searchTerm);
-      
-      const matchesStatus = !statusFilter || 
-        guest.status === statusFilter ||
-        guest.response === statusFilter;
-      
-      const matchesTable = !tableFilter ||
-        (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
-      
-      return matchesSearch && matchesStatus && matchesTable;
-    });
-  }, [guests, searchTerm, statusFilter, tableFilter]);
+    try {
+      return safeGuests.filter(guest => {
+        const matchesSearch = !searchTerm || 
+          guest.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          guest.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          guest.phone?.includes(searchTerm);
+        
+        const matchesStatus = !statusFilter || 
+          guest.status === statusFilter ||
+          guest.response === statusFilter;
+        
+        const matchesTable = !tableFilter ||
+          (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
+        
+        return matchesSearch && matchesStatus && matchesTable;
+      });
+    } catch (e) {
+      if (import.meta.env.DEV) console.error('[GuestList] filter error', e);
+      return [];
+    }
+  }, [safeGuests, searchTerm, statusFilter, tableFilter]);
 
   // Estadísticas memoizadas
   const stats = useMemo(() => {
-    const confirmed = guests.filter(g => g.status === 'confirmed' || g.response === 'Sí').length;
-    const pending = guests.filter(g => g.status === 'pending' || g.response === 'Pendiente').length;
-    const declined = guests.filter(g => g.status === 'declined' || g.response === 'No').length;
-    const totalCompanions = guests.reduce((sum, g) => sum + (parseInt(g.companion, 10) || 0), 0);
-    
-    return {
-      total: guests.length,
-      confirmed,
-      pending,
-      declined,
-      totalAttendees: confirmed + totalCompanions
-    };
-  }, [guests]);
+    try {
+      const confirmed = safeGuests.filter(g => g.status === 'confirmed' || g.response === 'Sí').length;
+      const pending = safeGuests.filter(g => g.status === 'pending' || g.response === 'Pendiente').length;
+      const declined = safeGuests.filter(g => g.status === 'declined' || g.response === 'No').length;
+      const totalCompanions = safeGuests.reduce((sum, g) => sum + (parseInt(g.companion, 10) || 0), 0);
+      
+      return {
+        total: safeGuests.length,
+        confirmed,
+        pending,
+        declined,
+        totalAttendees: confirmed + totalCompanions
+      };
+    } catch (e) {
+      if (import.meta.env.DEV) console.error('[GuestList] stats error', e);
+      return { total: 0, confirmed: 0, pending: 0, declined: 0, totalAttendees: 0 };
+    }
+  }, [safeGuests]);
 
   // Funciones de acción memoizadas
   const handleEdit = useCallback((guest) => {
@@ -73,16 +92,19 @@ const GuestList = React.memo(({
     }
   }, [onDelete]);
 
-  const handleWhatsApp = useCallback((guest) => {
+  const handleWhatsApp = useCallback((guest, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
     onInviteWhatsApp?.(guest);
   }, [onInviteWhatsApp]);
 
-  const handleEmail = useCallback((guest) => {
+  const handleEmail = useCallback((guest, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
     onInviteEmail?.(guest);
   }, [onInviteEmail]);
 
   // Función para obtener el color del estado
-  const handleStatusToggle = useCallback((guest) => {
+  const handleStatusToggle = useCallback((guest, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
     const next = statusCycle(guest.status || guest.response);
     onUpdateStatus?.(guest, next);
   }, [onUpdateStatus]);
@@ -99,6 +121,10 @@ const GuestList = React.memo(({
         return 'text-yellow-600 bg-yellow-100';
     }
   }, []);
+
+  // Cálculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
+  const selectedSet = new Set(safeSelectedIds);
+  const allVisibleSelected = filteredGuests.length > 0 && filteredGuests.every(g => selectedSet.has(g.id));
 
   if (isLoading) {
     return (
@@ -153,6 +179,20 @@ const GuestList = React.memo(({
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <input
+                        type="checkbox"
+                        aria-label="Seleccionar todos"
+                        checked={allVisibleSelected}
+                        onChange={(e) => {
+                          if (onToggleSelectAll) {
+                            const ids = filteredGuests.map(g => g.id);
+                            onToggleSelectAll(ids, e.target.checked);
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Invitado
                     </th>
@@ -176,6 +216,15 @@ const GuestList = React.memo(({
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredGuests.map((guest) => (
                     <tr key={guest.id} className="cursor-pointer hover:bg-gray-50" onClick={() => handleEdit(guest)}>
+                      <td className="px-4 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          aria-label={`Seleccionar ${guest.name}`}
+                          checked={selectedSet.has(guest.id)}
+                          onChange={(e) => onToggleSelect?.(guest.id, e.target.checked)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -200,8 +249,8 @@ const GuestList = React.memo(({
                         <div className="text-sm text-gray-500">{guest.phone}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <button type="button" onClick={() => handleStatusToggle(guest)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
-                          {wedding.guestStatus(guest.status) || guest.response}
+                        <button type="button" onClick={(e) => handleStatusToggle(guest, e)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
+                          {wedding?.guestStatus?.(guest.status) || guest.response}
                         </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -216,7 +265,7 @@ const GuestList = React.memo(({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleWhatsApp(guest)}
+                              onClick={(e) => handleWhatsApp(guest, e)}
                               title="Invitar por WhatsApp"
                             >
                               <MessageCircle size={16} />
@@ -226,7 +275,7 @@ const GuestList = React.memo(({
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleEmail(guest)}
+                              onClick={(e) => handleEmail(guest, e)}
                               title="Invitar por email"
                             >
                               <Mail size={16} />
@@ -235,7 +284,7 @@ const GuestList = React.memo(({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleEdit(guest)}
+                            onClick={(e) => { e.stopPropagation(); handleEdit(guest); }}
                             title="Editar invitado"
                           >
                             <Edit2 size={16} />
@@ -243,7 +292,7 @@ const GuestList = React.memo(({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleDelete(guest)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(guest); }}
                             title="Eliminar invitado"
                             className="text-red-600 hover:text-red-700"
                           >
@@ -269,10 +318,18 @@ const GuestList = React.memo(({
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-900">{guest.name}</h3>
-                      <button type="button" onClick={() => handleStatusToggle(guest)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
-                        {wedding.guestStatus(guest.status) || guest.response}
+                      <button type="button" onClick={(e) => handleStatusToggle(guest, e)} className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer ${getStatusColor(guest.status || guest.response)}`}>
+                        {wedding?.guestStatus?.(guest.status) || guest.response}
                       </button>
                     </div>
+                  </div>
+                  <div className="pl-2" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Seleccionar ${guest.name}`}
+                      checked={selectedSet.has(guest.id)}
+                      onChange={(e) => onToggleSelect?.(guest.id, e.target.checked)}
+                    />
                   </div>
                 </div>
                 
@@ -305,7 +362,7 @@ const GuestList = React.memo(({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleWhatsApp(guest)}
+                      onClick={(e) => handleWhatsApp(guest, e)}
                     >
                       <MessageCircle size={16} />
                     </Button>
@@ -314,7 +371,7 @@ const GuestList = React.memo(({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEmail(guest)}
+                      onClick={(e) => handleEmail(guest, e)}
                     >
                       <Mail size={16} />
                     </Button>
@@ -322,14 +379,14 @@ const GuestList = React.memo(({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleEdit(guest)}
+                    onClick={(e) => { e.stopPropagation(); handleEdit(guest); }}
                   >
                     <Edit2 size={16} />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(guest)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(guest); }}
                     className="text-red-600 hover:text-red-700"
                   >
                     <Trash2 size={16} />

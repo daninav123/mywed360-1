@@ -117,21 +117,33 @@ class ErrorLogger {
    */
   updateDiagnosticsFromError(type, details) {
     if (type === 'Network Error' || type === 'HTTP Error') {
-      const url = details.url || '';
-      
-      if (url.includes('firestore') || url.includes('firebase')) {
-        this.diagnostics.firebase.status = 'error';
-        this.diagnostics.firebase.details = details;
-      } else if (url.includes('render.com') || url.includes('localhost:3001')) {
-        this.diagnostics.backend.status = 'error';
-        this.diagnostics.backend.details = details;
-      } else if (url.includes('openai') || url.includes('api.openai.com')) {
-        this.diagnostics.openai.status = 'error';
-        this.diagnostics.openai.details = details;
-      } else if (url.includes('mailgun')) {
-        this.diagnostics.mailgun.status = 'error';
-        this.diagnostics.mailgun.details = details;
-      }
+      let urlStr = '';
+      try {
+        const raw = details?.url;
+        if (typeof raw === 'string') {
+          urlStr = raw;
+        } else if (raw && typeof raw === 'object') {
+          // Puede ser un objeto Request
+          urlStr = raw.url || String(raw);
+        }
+      } catch {}
+      urlStr = String(urlStr || '');
+
+      try {
+        if (urlStr.includes('firestore') || urlStr.includes('firebase')) {
+          this.diagnostics.firebase.status = 'error';
+          this.diagnostics.firebase.details = details;
+        } else if (urlStr.includes('render.com') || urlStr.includes('localhost:3001') || urlStr.includes('localhost:4004')) {
+          this.diagnostics.backend.status = 'error';
+          this.diagnostics.backend.details = details;
+        } else if (urlStr.includes('openai') || urlStr.includes('api.openai.com')) {
+          this.diagnostics.openai.status = 'error';
+          this.diagnostics.openai.details = details;
+        } else if (urlStr.includes('mailgun')) {
+          this.diagnostics.mailgun.status = 'error';
+          this.diagnostics.mailgun.details = details;
+        }
+      } catch {}
     }
   }
 
