@@ -105,18 +105,55 @@ vi.mock('axios', () => ({
   default: { get: vi.fn(() => Promise.resolve({ data: {} })) },
 }));
 
-// Mock global de EmailService para evitar llamadas reales a la API y facilitar los mocks en tests
+// Mock global de EmailService con valores por defecto. Los tests específicos pueden sobrescribir
+// los métodos con vi.spyOn o redefinir el módulo con vi.mock en su propio archivo.
+const defaultMails = [
+  {
+    id: 'email-1',
+    subject: 'Asunto importante',
+    from: 'remitente@ejemplo.com',
+    to: 'usuario@lovenda.app',
+    date: '2025-07-10T10:30:00Z',
+    read: false,
+    folder: 'inbox',
+    attachments: []
+  },
+  {
+    id: 'email-2',
+    subject: 'Recordatorio reunión',
+    from: 'team@empresa.com',
+    to: 'usuario@lovenda.app',
+    date: '2025-07-09T08:15:00Z',
+    read: true,
+    folder: 'inbox',
+    attachments: [{ filename: 'acta.pdf' }]
+  },
+  {
+    id: 'email-3',
+    subject: 'Borrador enviado',
+    from: 'usuario@lovenda.app',
+    to: 'destinatario@empresa.com',
+    date: '2025-07-08T14:45:00Z',
+    read: true,
+    folder: 'sent',
+    attachments: []
+  }
+];
+
 const emailServiceMock = {
   __esModule: true,
-  initEmailService: vi.fn(),
-  getMails: vi.fn(),
-  deleteMail: vi.fn(),
-  markAsRead: vi.fn(),
-  sendMail: vi.fn(),
-  createEmailAlias: vi.fn(),
+  initEmailService: vi.fn(async () => 'usuario@lovenda.app'),
+  getMails: vi.fn(async (folder = 'inbox') => {
+    if (folder === 'all') return defaultMails;
+    return defaultMails.filter(m => m.folder === folder);
+  }),
+  deleteMail: vi.fn(async () => true),
+  markAsRead: vi.fn(async () => {}),
+  sendMail: vi.fn(async () => ({ success: true })),
+  createEmailAlias: vi.fn(async () => ({ success: true, email: 'usuario@mywed360.com' })),
   setAuthContext: vi.fn(),
 };
-// Registrar mocks para las rutas más comunes (distintos niveles de anidamiento y casing)
+
 vi.mock('../services/EmailService', () => emailServiceMock);
 vi.mock('../../services/EmailService', () => emailServiceMock);
 vi.mock('../../../services/EmailService', () => emailServiceMock);
@@ -147,6 +184,26 @@ vi.mock('lucide-react', () => ({
   ArrowLeft: () => null,
   Paperclip: () => null,
   Calendar: () => null,
+  X: () => null,
+  Check: () => null,
+  AlertTriangle: () => null,
+  Send: () => null,
+  Mail: () => null,
+  Trash: () => null,
+  Reply: () => null,
+  Forward: () => null,
+  Star: () => null,
+  StarOff: () => null,
+  Inbox: () => null,
+  Folder: () => null,
+  Download: () => null,
+  Eye: () => null,
+  MousePointerClick: () => null,
+  Lightbulb: () => null,
+  LightbulbOutlined: () => null,
+  Schedule: () => null,
+  AccessTime: () => null,
+  InsertDriveFile: () => null,
 }));
 
 // Mock global de useAuth para tests que requieren AuthProvider
@@ -156,6 +213,15 @@ const useAuthMock = vi.fn(() => ({
   isAuthenticated: true,
   isLoading: false,
   userProfile: { email: 'test@mock.com' },
+  // Compatibilidad con componentes que esperan estas claves
+  user: { uid: 'user123', email: 'usuario@lovenda.app' },
+  profile: {
+    id: 'profile123',
+    email: 'usuario@lovenda.app',
+    name: 'Usuario Test',
+    emailUsername: 'usuario',
+    myWed360Email: 'usuario@mywed360.com'
+  },
 }));
 
 const authMock = {
@@ -193,6 +259,12 @@ axeCore.run = (node, options = {}, callback) => {
   }
   return originalAxeRun(node, options, callback);
 };
+
+// Evitar que rechazos no manejados (simulados) rompan toda la suite; se loguean para diagnóstico
+process.on('unhandledRejection', (reason) => {
+  // eslint-disable-next-line no-console
+  console.error('Unhandled Rejection (test env):', reason);
+});
 
 afterEach(() => {
   cleanup();

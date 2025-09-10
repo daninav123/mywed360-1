@@ -29,6 +29,22 @@ vi.mock('@testing-library/react', async () => {
   };
 });
 
+// Unificar mock del servicio de emails por ruta absoluta. Así, cualquier import
+// relativo que apunte a src/services/EmailService.js (tanto desde componentes
+// como desde tests) comparte el mismo mock y las mismas funciones espía.
+vi.mock('/src/services/EmailService.js', () => {
+  return {
+    __esModule: true,
+    initEmailService: vi.fn(),
+    getMails: vi.fn(),
+    deleteMail: vi.fn(),
+    markAsRead: vi.fn(),
+    sendMail: vi.fn(),
+    createEmailAlias: vi.fn(),
+    setAuthContext: vi.fn(),
+  };
+});
+
 // Limpieza automática después de cada prueba
 afterEach(() => {
   cleanup();
