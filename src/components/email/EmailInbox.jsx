@@ -114,6 +114,8 @@ export default function EmailInbox() {
 
   return (
     <div className="space-y-4">
+      {/* Heading oculto para accesibilidad */}
+      <h2 className="sr-only">Bandeja de entrada</h2>
       {/* Header con información del usuario */}
       {user?.email && (
         <div className="bg-blue-50 p-3 rounded-lg">

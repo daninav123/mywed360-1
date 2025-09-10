@@ -39,7 +39,8 @@ vi.mock('lucide-react', () => ({
   Inbox: () => <div data-testid="inbox-icon">📥</div>,
   Send: () => <div data-testid="sent-icon">📤</div>,
   Folder: () => <div data-testid="folder-icon">📁</div>,
-  Plus: () => <div data-testid="plus-icon">+</div>
+  Plus: () => <div data-testid="plus-icon">+</div>,
+  ArrowLeft: () => <div data-testid="arrowleft-icon">←</div>
 }));
 
 // Datos de ejemplo
