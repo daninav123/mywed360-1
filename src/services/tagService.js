@@ -155,7 +155,7 @@ export const deleteTag = (userId, tagId) => {
     return true;
   } catch (error) {
     console.error('Error al eliminar etiqueta:', error);
-    return false;
+    throw error;
   }
 };
 
