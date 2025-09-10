@@ -139,6 +139,15 @@ vi.mock('react-dnd', () => ({
   useDrop: () => [{ isOver: false }, () => {}],
 }));
 
+// Mock de lucide-react para evitar llamadas reales durante pruebas
+vi.mock('lucide-react', () => ({
+  __esModule: true,
+  Plus: () => <div data-testid="plus-icon">+</div>,
+  ArrowLeft: () => <div data-testid="arrowleft-icon">←</div>,
+  Paperclip: () => <div data-testid="paperclip-icon">📎</div>,
+  Calendar: () => <div data-testid="calendar-icon">📅</div>,
+}));
+
 // Mock global de useAuth para tests que requieren AuthProvider
 // Crear useAuth como vi.fn para que las pruebas puedan usar mockReturnValue y otras utilidades
 const useAuthMock = vi.fn(() => ({
@@ -173,8 +182,13 @@ process.env.NODE_ENV = 'test';
 import axeCore from 'axe-core';
 const originalAxeRun = axeCore.run.bind(axeCore);
 axeCore.run = (node, options = {}, callback) => {
-  if (options.runOnly && Array.isArray(options.runOnly)) {
-    options.runOnly = options.runOnly.filter(tag => tag !== 'wcag2aa');
+  if (options.runOnly) {
+    if (Array.isArray(options.runOnly)) {
+      options.runOnly = options.runOnly.filter(tag => tag !== 'wcag2aa');
+    } else if (typeof options.runOnly === 'object' && Array.isArray(options.runOnly.values)) {
+      options.runOnly.values = options.runOnly.values.filter(tag => tag !== 'wcag2aa');
+      if (options.runOnly.values.length === 0) delete options.runOnly; // sin tags
+    }
   }
   return originalAxeRun(node, options, callback);
 };

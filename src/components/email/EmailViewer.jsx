@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import sanitizeHtml from '../../utils/sanitizeHtml';
+import { safeExecute } from '../../utils/promiseSafeRenderer';
 import { ArrowLeft, Trash, Star, StarOff, Reply, Forward, Paperclip, Calendar, Download } from 'lucide-react';
 import Button from '../Button';
 import Card from '../Card';
