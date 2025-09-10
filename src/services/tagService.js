@@ -87,17 +87,27 @@ export const createTag = (userId, tagName, color = '#64748b') => {
 
     // Verificar duplicado exacto (case-insensitive) entre sistema y personalizadas
     const allTags = [...SYSTEM_TAGS, ...tags];
-    const duplicate = allTags.some(t => t.name.toLowerCase() === tagName.toLowerCase());
-    if (duplicate) {
-      throw new Error('Ya existe una etiqueta con ese nombre');
+    // Si existe duplicado, generar nombre con sufijo incremental " (n)"
+    let finalName = tagName.trim();
+    if (!finalName) {
+      throw new Error('El nombre de la etiqueta no puede estar vacío');
+    }
+    const baseLower = finalName.toLowerCase();
+    let counter = 0;
+    // Buscar siguiente número libre
+    while (allTags.some(t => t.name.toLowerCase() === (counter === 0 ? baseLower : `${baseLower} (${counter})`))) {
+      counter += 1;
+    }
+    if (counter > 0) {
+      finalName = `${finalName} (${counter})`;
     }
 
     // Crear nueva etiqueta
     const newTag = {
       id: uuidv4(),
-      name: tagName,
-      color: color,
-      createdAt: new Date().toISOString()
+      name: finalName,
+      color,
+      createdAt: new Date().toISOString(),
     };
 
     // Guardar etiquetas actualizadas

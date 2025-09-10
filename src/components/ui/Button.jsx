@@ -32,6 +32,7 @@ export default function Button({
     outline: "bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700",
     ghost: "bg-transparent hover:bg-gray-100 text-gray-700",
     destructive: "bg-red-600 hover:bg-red-700 text-white",
+    danger: "bg-red-600 hover:bg-red-700 text-white",
     link: "bg-transparent underline-offset-4 hover:underline text-blue-600 hover:text-blue-800"
   };
   
@@ -40,12 +41,12 @@ export default function Button({
     xs: "text-xs px-2 py-1 rounded",
     sm: "text-sm px-3 py-1.5 rounded",
     md: "text-sm px-4 py-2 rounded-md",
-    lg: "text-base px-5 py-2.5 rounded-md",
+    lg: "text-lg px-5 py-2.5 rounded-md",
     xl: "text-lg px-6 py-3 rounded-md"
   };
   
   // Estado deshabilitado
-  const disabledClasses = disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : "cursor-pointer";
+  const disabledClasses = disabled ? "disabled:opacity-60 opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer";
 
   // Juntar todas las clases
   const buttonClasses = [
@@ -61,6 +62,7 @@ export default function Button({
       type={type}
       className={buttonClasses}
       disabled={disabled}
+      aria-disabled={disabled}
       onClick={onClick}
       {...props}
     >

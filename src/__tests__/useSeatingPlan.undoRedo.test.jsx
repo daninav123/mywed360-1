@@ -31,12 +31,13 @@ const mockPdfInstance = { addImage: vi.fn(), addPage: vi.fn(), save: vi.fn() };
 vi.mock('jspdf', () => ({ default: vi.fn(() => mockPdfInstance) }));
 
 // Helper para simular un <a> click sin manipular el DOM real
+const originalCreateElement = document.createElement;
 const createElementSpy = vi.spyOn(document, 'createElement');
 createElementSpy.mockImplementation((tag) => {
   if (tag === 'a') {
     return { click: vi.fn() };
   }
-  return document.createElement(tag);
+  return originalCreateElement.call(document, tag);
 });
 
 describe('useSeatingPlan Hook – undo/redo & export', () => {
