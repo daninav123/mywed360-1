@@ -39,9 +39,9 @@ export default function Button({
   // Tamaños
   const sizeClasses = {
     xs: "text-xs px-2 py-1 rounded",
-    sm: "text-sm px-3 py-1.5 rounded",
+    sm: "px-3 py-1.5 text-sm rounded",
     md: "text-sm px-4 py-2 rounded-md",
-    lg: "text-lg px-5 py-2.5 rounded-md",
+    lg: "px-5 py-2.5 text-lg rounded-md",
     xl: "text-lg px-6 py-3 rounded-md"
   };
   

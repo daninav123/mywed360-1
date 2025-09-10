@@ -169,6 +169,16 @@ globalThis.useAuth = authMock.useAuth;
 process.env.NODE_ENV = 'test';
 
 // Limpiar el DOM después de cada prueba para evitar colisiones
+// Parche para jest-axe: eliminar tag runOnly desconocido "wcag2aa" que no existe en axe-core v4
+import axeCore from 'axe-core';
+const originalAxeRun = axeCore.run.bind(axeCore);
+axeCore.run = (node, options = {}, callback) => {
+  if (options.runOnly && Array.isArray(options.runOnly)) {
+    options.runOnly = options.runOnly.filter(tag => tag !== 'wcag2aa');
+  }
+  return originalAxeRun(node, options, callback);
+};
+
 afterEach(() => {
   cleanup();
 });
