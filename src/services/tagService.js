@@ -132,7 +132,7 @@ export const deleteTag = (userId, tagId) => {
     // Si es etiqueta del sistema, no se puede eliminar -> false
     const isSystemTag = SYSTEM_TAGS.some(tag => tag.id === tagId);
     if (isSystemTag) {
-      return false;
+      throw new Error('No se pueden eliminar etiquetas del sistema');
     }
 
     const tags = getCustomTags(userId);
@@ -220,8 +220,7 @@ export const addTagToEmail = (userId, emailId, tagId) => {
     }
 
     if (!tagExists) {
-      // Etiqueta inexistente
-      return false;
+      throw new Error('La etiqueta especificada no existe');
     }
     
     // Obtener mapeo actual
@@ -233,12 +232,11 @@ export const addTagToEmail = (userId, emailId, tagId) => {
     }
     
     // Verificar si la etiqueta ya está asignada
-    if (mapping[emailId].includes(tagId)) {
-      return false; // Duplicado, no guardar ni modificar
+    if (!mapping[emailId].includes(tagId)) {
+      mapping[emailId].push(tagId);
+      // Guardar mapeo actualizado
+      saveEmailTagsMapping(userId, mapping);
     }
-    mapping[emailId].push(tagId);
-    // Guardar mapeo actualizado
-    saveEmailTagsMapping(userId, mapping);
     return true;
   } catch (error) {
     console.error('Error al asignar etiqueta a correo:', error);

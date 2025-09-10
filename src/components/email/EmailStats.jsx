@@ -73,7 +73,7 @@ const EmailStats = ({ userId }) => {
       setStats(userStats);
       // Cargar métricas diarias para aperturas / clics
       const daily = await getDailyStats(userId, 30);
-      setDailyStats(daily);
+      setDailyStats(Array.isArray(daily) ? daily : []);
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
       setError('No se pudieron cargar las estadísticas');
@@ -149,12 +149,13 @@ const EmailStats = ({ userId }) => {
     ]
   };
 
+    const safeDaily = Array.isArray(dailyStats) ? dailyStats : [];
     const openClickData = {
-    labels: dailyStats.map(day => formatDate(day.date)),
+    labels: safeDaily.map(day => formatDate(day.date)),
     datasets: [
       {
         label: 'Aperturas',
-        data: dailyStats.map(day => day.opens || 0),
+        data: safeDaily.map(day => day.opens || 0),
         backgroundColor: 'rgba(75, 192, 192, 0.5)',
         borderColor: 'rgb(75, 192, 192)',
         borderWidth: 1,
@@ -162,7 +163,7 @@ const EmailStats = ({ userId }) => {
       },
       {
         label: 'Clics',
-        data: dailyStats.map(day => day.clicks || 0),
+        data: safeDaily.map(day => day.clicks || 0),
         backgroundColor: 'rgba(255, 206, 86, 0.5)',
         borderColor: 'rgb(255, 206, 86)',
         borderWidth: 1,
