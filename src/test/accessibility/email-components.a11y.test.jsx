@@ -44,15 +44,19 @@ vi.mock('../../services/tagService', () => ({
   deleteTag: vi.fn(() => Promise.resolve(true))
 }));
 
-// Mock para iconos
+// Mock para iconos (incluir todos los usados por EmailComposer)
 vi.mock('lucide-react', () => ({
   Plus: () => <div data-testid="plus-icon">+</div>,
   Trash: () => <div data-testid="trash-icon">×</div>,
+  Trash2: () => <div data-testid="trash2-icon">×</div>,
   X: () => <div data-testid="x-icon">×</div>,
   Tags: () => <div data-testid="tags-icon">Tags</div>,
   Tag: () => <div data-testid="tag-icon">Tag</div>,
   Paperclip: () => <div data-testid="paperclip-icon">Attach</div>,
-  Send: () => <div data-testid="send-icon">Send</div>
+  Send: () => <div data-testid="send-icon">Send</div>,
+  AlertCircle: () => <div data-testid="alert-icon">!</div>,
+  CheckCircle: () => <div data-testid="check-icon">✓</div>,
+  ChevronDown: () => <div data-testid="chevron-down-icon">∨</div>,
 }));
 
 // Componente de Button mockeado

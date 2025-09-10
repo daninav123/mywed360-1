@@ -8,6 +8,9 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Estabilizar ejecución en Windows: evitar colgados de workers/threads
+    pool: 'forks',
+    maxThreads: 1,
     // Activar tests unitarios
     include: [
       'src/**/?(*.)+(test).[jt]s?(x)',

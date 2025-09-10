@@ -2,14 +2,9 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import EmailComposer from '../../components/email/EmailComposer';
-import { useAuth } from '../../hooks/useAuth';
 
-// Mock de los hooks y servicios
-vi.mock('../../hooks/useAuth', () => ({
-  useAuth: vi.fn()
-}));
-
+// Mock de los hooks y servicios (deben declararse ANTES de importar los módulos a testear)
+vi.mock('../../hooks/useAuth', () => ({ useAuth: vi.fn() }));
 vi.mock('../../services/EmailService', () => ({
   initEmailService: vi.fn().mockReturnValue('usuario@lovenda.com'),
   getEmailTemplates: vi.fn().mockResolvedValue([
@@ -18,6 +13,10 @@ vi.mock('../../services/EmailService', () => ({
   ]),
   sendEmail: vi.fn().mockResolvedValue({ success: true })
 }));
+
+// Importar después de declarar los mocks
+import { useAuth } from '../../hooks/useAuth';
+import EmailComposer from '../../components/email/EmailComposer';
 
 describe('EmailComposer', () => {
   // Props por defecto

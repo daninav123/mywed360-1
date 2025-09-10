@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs'
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import { Button } from '../components/ui';
+import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
 
@@ -35,6 +36,7 @@ function Invitados() {
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showRsvpModal, setShowRsvpModal] = useState(false);
   const [showWhatsModal, setShowWhatsModal] = useState(false);
+  const [showWhatsBatch, setShowWhatsBatch] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -145,6 +147,10 @@ function Invitados() {
       alert(`Error eliminando invitado: ${result.error}`);
     }
   };
+
+  // Abrir modal de envío masivo WhatsApp
+  const openWhatsBatch = () => setShowWhatsBatch(true);
+  const closeWhatsBatch = () => setShowWhatsBatch(false);
 
   // Selección múltiple
   const handleToggleSelect = (id, checked) => {
@@ -502,7 +508,12 @@ function Invitados() {
           onSendSelectedMobile={handleSendSelectedMobile}
           onSendSelectedBroadcast={handleSendSelectedBroadcast}
           onScheduleSelected={handleScheduleSelected}
-        />
+          />
+
+        {/* Botón envío masivo WhatsApp */}
+        <div className="flex justify-end">
+          <Button onClick={openWhatsBatch}>WhatsApp masivo</Button>
+        </div>
 
         {/* Debug info para verificar estado */}
         {import.meta.env.DEV && (
@@ -667,6 +678,17 @@ function Invitados() {
             </div>
           </div>
         </Modal>
+
+        {/* Modal envío masivo WhatsApp */}
+        <WhatsAppSender
+          open={showWhatsBatch}
+          onClose={closeWhatsBatch}
+          guests={guests || []}
+          weddingId={activeWedding}
+          onBatchCreated={(res)=>{
+            alert(`Lote creado con ${res.items?.length || 0} mensajes`);
+          }}
+        />
 
         {/* Modal WhatsApp con dos pestañas (móvil personal / API) */}
         <WhatsAppModal

@@ -179,6 +179,56 @@ router.post('/send', requireAuth, async (req, res) => {
   }
 });
 
+// Crear lote de mensajes (no envía todavía)  
+// POST /api/whatsapp/batch  { weddingId, guestIds:[], messageTemplate }
+router.post('/batch', requireAuth, async (req, res) => {
+  try {
+    const { weddingId, guestIds = [], messageTemplate = '' } = req.body || {};
+    if (!weddingId || !Array.isArray(guestIds) || guestIds.length === 0) {
+      return res.status(400).json({ success: false, error: 'weddingId y guestIds requeridos' });
+    }
+
+    // Helper simple → E.164 (solo España por demo)
+    const toE164 = (num = '') => {
+      try {
+        let n = String(num).replace(/[^0-9]/g, '');
+        if (n.startsWith('34')) n = n; // ya incluye país
+        else if (n.length === 9) n = '34' + n;
+        return '+' + n;
+      } catch { return null; }
+    };
+
+    // Fetch guests en lote
+    const col = admin.firestore().collection('weddings').doc(weddingId).collection('guests');
+    const items = [];
+    for (const gid of guestIds) {
+      const snap = await col.doc(gid).get();
+      if (!snap.exists) continue;
+      const g = snap.data() || {};
+      const phone = toE164(g.phone || '');
+      if (!phone) continue;
+      const msg = (messageTemplate || '').replace('{guestName}', g.name || '');
+      items.push({ guestId: gid, phone, message: msg });
+    }
+
+    if (!items.length) return res.status(400).json({ success: false, error: 'No hay teléfonos válidos' });
+
+    const batchId = 'wh-' + Date.now();
+    // Opcional: guardar colección batch resumen
+    await admin.firestore().collection('whatsapp_batches').doc(batchId).set({
+      weddingId,
+      createdBy: req.user?.uid || 'unknown',
+      count: items.length,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return res.json({ success: true, batchId, items });
+  } catch (e) {
+    logger.error('[whatsapp] /batch error:', e);
+    res.status(500).json({ success: false, error: e.message || 'error' });
+  }
+});
+
 // Programación de envíos (en cola) — no envía inmediatamente
 router.post('/schedule', requireAuth, async (req, res) => {
   try {

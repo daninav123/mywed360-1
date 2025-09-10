@@ -105,48 +105,13 @@ vi.mock('axios', () => ({
   default: { get: vi.fn(() => Promise.resolve({ data: {} })) },
 }));
 
-// Mock global de EmailService con valores por defecto. Los tests específicos pueden sobrescribir
-// los métodos con vi.spyOn o redefinir el módulo con vi.mock en su propio archivo.
-const defaultMails = [
-  {
-    id: 'email-1',
-    subject: 'Asunto importante',
-    from: 'remitente@ejemplo.com',
-    to: 'usuario@lovenda.app',
-    date: '2025-07-10T10:30:00Z',
-    read: false,
-    folder: 'inbox',
-    attachments: []
-  },
-  {
-    id: 'email-2',
-    subject: 'Recordatorio reunión',
-    from: 'team@empresa.com',
-    to: 'usuario@lovenda.app',
-    date: '2025-07-09T08:15:00Z',
-    read: true,
-    folder: 'inbox',
-    attachments: [{ filename: 'acta.pdf' }]
-  },
-  {
-    id: 'email-3',
-    subject: 'Borrador enviado',
-    from: 'usuario@lovenda.app',
-    to: 'destinatario@empresa.com',
-    date: '2025-07-08T14:45:00Z',
-    read: true,
-    folder: 'sent',
-    attachments: []
-  }
-];
-
-const emailServiceMock = {
+// Stub global de EmailService para pruebas que referencian `EmailService` directamente.
+// No se mockea el módulo importado; el componente EmailInbox leerá este objeto vía shim.
+// eslint-disable-next-line no-undef
+globalThis.EmailService = {
   __esModule: true,
   initEmailService: vi.fn(async () => 'usuario@lovenda.app'),
-  getMails: vi.fn(async (folder = 'inbox') => {
-    if (folder === 'all') return defaultMails;
-    return defaultMails.filter(m => m.folder === folder);
-  }),
+  getMails: vi.fn(async () => []),
   deleteMail: vi.fn(async () => true),
   markAsRead: vi.fn(async () => {}),
   sendMail: vi.fn(async () => ({ success: true })),
@@ -154,20 +119,8 @@ const emailServiceMock = {
   setAuthContext: vi.fn(),
 };
 
-vi.mock('../services/EmailService', () => emailServiceMock);
-vi.mock('../../services/EmailService', () => emailServiceMock);
-vi.mock('../../../services/EmailService', () => emailServiceMock);
-vi.mock('@/services/EmailService', () => emailServiceMock);
-vi.mock('src/services/EmailService', () => emailServiceMock);
-vi.mock('../services/emailService', () => emailServiceMock);
-vi.mock('../../services/emailService', () => emailServiceMock);
-vi.mock('../../../services/emailService', () => emailServiceMock);
-vi.mock('@/services/emailService', () => emailServiceMock);
-vi.mock('src/services/emailService', () => emailServiceMock);
-
-// Exponer EmailService como variable global para tests que no realizan import explícito
-// eslint-disable-next-line no-undef
-globalThis.EmailService = emailServiceMock;
+// No definimos mocks globales de EmailService aquí para evitar conflictos con
+// los mocks específicos de cada test.
 
 // Mock de react-dnd para evitar necesidad de DragDropContext en tests
 vi.mock('react-dnd', () => ({
@@ -176,35 +129,17 @@ vi.mock('react-dnd', () => ({
   useDrop: () => [{ isOver: false }, () => {}],
 }));
 
-// Mock de lucide-react para evitar llamadas reales durante pruebas
-vi.mock('lucide-react', () => ({
-  __esModule: true,
-  // Stubs simples que devuelven null, sin JSX para evitar errores de parser
-  Plus: () => null,
-  ArrowLeft: () => null,
-  Paperclip: () => null,
-  Calendar: () => null,
-  X: () => null,
-  Check: () => null,
-  AlertTriangle: () => null,
-  Send: () => null,
-  Mail: () => null,
-  Trash: () => null,
-  Reply: () => null,
-  Forward: () => null,
-  Star: () => null,
-  StarOff: () => null,
-  Inbox: () => null,
-  Folder: () => null,
-  Download: () => null,
-  Eye: () => null,
-  MousePointerClick: () => null,
-  Lightbulb: () => null,
-  LightbulbOutlined: () => null,
-  Schedule: () => null,
-  AccessTime: () => null,
-  InsertDriveFile: () => null,
-}));
+// Mock ultra-ligero de lucide-react: Proxy que retorna un componente Stub para cualquier export
+// Evita importaciones pesadas del módulo real que pueden colgar workers en Windows.
+vi.mock('lucide-react', () => {
+  const Stub = () => null;
+  return new Proxy(
+    { __esModule: true, default: Stub },
+    {
+      get: (target, prop) => (prop in target ? target[prop] : Stub),
+    }
+  );
+});
 
 // Mock global de useAuth para tests que requieren AuthProvider
 // Crear useAuth como vi.fn para que las pruebas puedan usar mockReturnValue y otras utilidades
@@ -224,10 +159,12 @@ const useAuthMock = vi.fn(() => ({
   },
 }));
 
+const AuthProviderMock = ({ children }) => children;
 const authMock = {
   __esModule: true,
   default: useAuthMock,
   useAuth: useAuthMock,
+  AuthProvider: AuthProviderMock,
 };
 vi.mock('../hooks/useAuth', () => authMock);
 vi.mock('../../hooks/useAuth', () => authMock);
