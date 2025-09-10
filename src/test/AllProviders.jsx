@@ -4,9 +4,10 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 /*
- * Componente contenedor que envuelve el árbol de pruebas con los Providers
- * necesarios para la mayoría de los componentes: React-Router, MUI Theme y
- * AuthContext.  De este modo evitamos repetir envoltorios en cada test.
+ * Wrapper de pruebas con los providers globales usados por la mayoría
+ * de componentes de UI: React Router y tema de MUI.
+ * Nota: no incluye AuthProvider; las pruebas que lo requieran deben mockear/useAuth
+ * o envolver explícitamente con su propio provider.
  */
 const theme = createTheme();
 

@@ -80,6 +80,9 @@ vi.mock('lucide-react', () => {
 
 // Mockear localStorage
 beforeAll(() => {
+  // Solo en entorno jsdom (frontend). En backend (node) 'window' no existe.
+  if (typeof window === 'undefined') return;
+
   // Implementación de localStorage para pruebas
   const localStorageMock = {
     getItem: vi.fn(),
@@ -87,18 +90,18 @@ beforeAll(() => {
     removeItem: vi.fn(),
     clear: vi.fn(),
     key: vi.fn(),
-    length: 0
+    length: 0,
   };
-  
+
   Object.defineProperty(window, 'localStorage', {
     value: localStorageMock,
-    writable: true
+    writable: true,
   });
-  
+
   // Mock para matchMedia que es usado por algunos componentes
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: vi.fn().mockImplementation(query => ({
+    value: vi.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,

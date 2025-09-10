@@ -11,40 +11,62 @@ export default defineConfig({
     // Estabilizar ejecución en Windows: evitar colgados de workers/threads
     pool: 'forks',
     maxThreads: 1,
-    // Activar tests unitarios
+
+    // Ámbitos de tests: frontend + backend
     include: [
-      'src/**/?(*.)+(test).[jt]s?(x)',
-      'src/**/?(*.)+(spec).[jt]s?(x)',
+      'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+      'backend/**/*.{test,spec}.{js,ts}',
     ],
-    exclude: ['node_modules/**'],
+    exclude: ['**/node_modules/**', '**/dist/**'],
     passWithNoTests: false,
     testTimeout: 30000,
     hookTimeout: 10000,
-    environment: 'jsdom',
+
+    // Entornos por ruta: jsdom para src, node para backend
     globals: true,
-    // Reporters: salida por consola y JUnit a archivo junit.xml
+    environment: 'jsdom',
+    environmentMatchGlobs: [
+      ['src/**', 'jsdom'],
+      ['backend/**', 'node'],
+    ],
+
+    // Reporters: consola + JUnit
     reporters: [
       'default',
       ['junit', { outputFile: 'junit.xml', suiteName: 'vitest', useShortPaths: true }],
     ],
-    setupFiles: ['backend/vitest.setup.js'],
+
+    // Setups para front (src) y mocks globales controlados
+    setupFiles: ['src/test/setup.js', 'backend/vitest.setup.js'],
+
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json'],
       reportsDirectory: './coverage',
       all: false,
-      exclude: ['**/*'], // Excluir todo de coverage también
+      // Excluir únicamente artefactos y utilidades, no toda la base
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/coverage/**',
+        '**/cypress/**',
+        '**/logs/**',
+        'src/test/**',
+        'backend/vitest.setup.js',
+      ],
       thresholds: {
         lines: 0,
         functions: 0,
         branches: 0,
         statements: 0,
-      }
-    }
+      },
+    },
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      // Permitir imports absolutos tipo 'src/...'
+      'src': resolve(__dirname, './src'),
     },
   },
 });

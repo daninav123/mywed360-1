@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Paperclip, Send, AlertCircle, Plus, Trash2, CheckCircle, ChevronDown } from 'lucide-react';
+import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-react';
 import Button from '../Button';
 import Card from '../Card';
 import * as EmailService from '../../services/EmailService';
-import { safeExecute } from '../SafeRenderer';
-import { safeRender, ensureNotPromise, safeDangerouslySetInnerHTML } from '../../utils/promiseSafeRenderer';
+import { safeRender } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
 
 /**
