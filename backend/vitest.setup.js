@@ -142,10 +142,11 @@ vi.mock('react-dnd', () => ({
 // Mock de lucide-react para evitar llamadas reales durante pruebas
 vi.mock('lucide-react', () => ({
   __esModule: true,
-  Plus: () => <div data-testid="plus-icon">+</div>,
-  ArrowLeft: () => <div data-testid="arrowleft-icon">←</div>,
-  Paperclip: () => <div data-testid="paperclip-icon">📎</div>,
-  Calendar: () => <div data-testid="calendar-icon">📅</div>,
+  // Stubs simples que devuelven null, sin JSX para evitar errores de parser
+  Plus: () => null,
+  ArrowLeft: () => null,
+  Paperclip: () => null,
+  Calendar: () => null,
 }));
 
 // Mock global de useAuth para tests que requieren AuthProvider
