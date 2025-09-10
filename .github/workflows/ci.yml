@@ -49,7 +49,7 @@ jobs:
           npm ci --engine-strict
 
       - name: Run tests
-        run: npm run test:run -- --coverage --reporter junit
+        run: npm run test:run -- --coverage
 
       - name: Upload coverage
         if: success()

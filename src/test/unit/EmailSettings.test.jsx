@@ -55,9 +55,6 @@ describe('EmailSettings', () => {
       alias: 'nuevo.alias',
       email: 'nuevo.alias@lovenda.com'
     });
-    
-    // Mock para setTimeout
-    vi.useFakeTimers();
   });
   
   afterEach(() => {
@@ -116,12 +113,10 @@ describe('EmailSettings', () => {
       emailAlias: 'nuevo.alias'
     });
     
-    // Avanzar el tiempo para verificar que el mensaje de éxito desaparece
-    vi.advanceTimersByTime(3000);
-    
+    // Esperar a que el setTimeout interno o lógica equivalente oculten el mensaje
     await waitFor(() => {
       expect(screen.queryByText('¡Tu dirección de correo ha sido actualizada con éxito!')).not.toBeInTheDocument();
-    });
+    }, { timeout: 4000 });
   });
   
   it('muestra error cuando el alias no es válido', async () => {

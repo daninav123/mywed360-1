@@ -13,7 +13,7 @@ vi.mock('./db.js', () => ({
 
 // Mock del SDK cliente de Firestore solo en entorno jsdom (evitar interferir con pruebas de reglas en entorno node)
 if (typeof window !== 'undefined') {
-  // Proporciona stubs seguros usados por los hooks/componentes (doc, collection, getDoc, onSnapshot, writeBatch, setDoc, getDocs)
+  // Proporciona stubs seguros usados por los hooks/componentes
   vi.mock('firebase/firestore', () => ({
     __esModule: true,
     // Referencias ligeras con metadatos de ruta (para logs/debug si fuera necesario)
@@ -34,17 +34,55 @@ if (typeof window !== 'undefined') {
       }
       return () => {};
     }),
-    // Batches y escrituras como no-ops
+    // Operaciones básicas como no-ops
     writeBatch: () => ({ set: () => {}, commit: async () => {} }),
     setDoc: vi.fn(async () => {}),
+    addDoc: vi.fn(async () => ({ id: 'test-doc-id' })),
+    updateDoc: vi.fn(async () => {}),
+    deleteDoc: vi.fn(async () => {}),
+    orderBy: vi.fn(() => ({})),
+    query: vi.fn((ref) => ref),
+    serverTimestamp: vi.fn(() => new Date()),
+    arrayUnion: (...vals) => ({ __op: 'arrayUnion', vals }),
   }));
 }
 
-// Mock de firebase-admin por seguridad
-vi.mock('firebase-admin', () => ({
+// Mock de firebase-admin por seguridad (soporta initializeApp, apps, credential, firestore y FieldValue)
+vi.mock('firebase-admin', () => {
+  const firestoreFn = vi.fn(() => ({
+    collection: vi.fn(() => ({
+      doc: vi.fn(() => ({
+        set: vi.fn(async () => {}),
+        get: vi.fn(async () => ({ exists: false, data: () => ({}) })),
+        update: vi.fn(async () => {}),
+      })),
+      where: vi.fn(() => ({ get: vi.fn(async () => ({ empty: true, docs: [] })) })),
+      select: vi.fn(() => ({ get: vi.fn(async () => ({ forEach: () => {} })) })),
+      get: vi.fn(async () => ({ forEach: () => {} })),
+    })),
+    doc: vi.fn(() => ({ set: vi.fn(async () => {}), update: vi.fn(async () => {}) })),
+  }));
+  // Emular FieldValue en namespace firestore (admin.firestore.FieldValue.serverTimestamp())
+  firestoreFn.FieldValue = { serverTimestamp: () => new Date() };
+  return {
+    __esModule: true,
+    default: {
+      apps: [],
+      initializeApp: vi.fn(() => {}),
+      credential: { applicationDefault: vi.fn(() => ({})) },
+      firestore: firestoreFn,
+    },
+  };
+});
+
+// Mock de twilio para evitar llamadas reales durante pruebas
+vi.mock('twilio', () => ({
   __esModule: true,
-  default: { firestore: () => ({}) },
-  firestore: () => ({})
+  default: (sid, token) => ({
+    messages: {
+      create: vi.fn(async ({ body }) => ({ sid: 'SM_test', status: 'queued', body })),
+    },
+  }),
 }));
 
 // Mock global de Firebase config (compatibilidad con distintas rutas)

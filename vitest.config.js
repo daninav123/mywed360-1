@@ -19,6 +19,11 @@ export default defineConfig({
     hookTimeout: 10000,
     environment: 'jsdom',
     globals: true,
+    // Reporters: salida por consola y JUnit a archivo junit.xml
+    reporters: [
+      'default',
+      ['junit', { outputFile: 'junit.xml', suiteName: 'vitest', useShortPaths: true }],
+    ],
     setupFiles: ['backend/vitest.setup.js'],
     coverage: {
       provider: 'v8',

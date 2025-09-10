@@ -21,7 +21,7 @@ describe('ComposeEmailModal', () => {
   };
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    // No usar fake timers globalmente: interfiere con waitFor de Testing Library
     vi.clearAllMocks();
   });
 
@@ -96,14 +96,14 @@ describe('ComposeEmailModal', () => {
       attachments: []
     });
     
-    // Verificar mensaje de éxito y cierre del modal
+    // Verificar mensaje de éxito y posterior cierre del modal
     await waitFor(() => {
       expect(screen.getByText(/enviado con éxito/i)).toBeInTheDocument();
     });
-    
-    // El modal debe cerrarse después del tiempo establecido
-    vi.advanceTimersByTime(1500);
-    expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    // Esperar a que el setTimeout interno cierre el modal (sin fake timers)
+    await waitFor(() => {
+      expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
+    }, { timeout: 2500 });
   });
 
   it('muestra error cuando falla el envío', async () => {
