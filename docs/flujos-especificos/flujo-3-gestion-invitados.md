@@ -392,3 +392,14 @@
 - Print provider API
 - PDF generation service
 - RSVP tracking service
+
+## Estado de Implementación
+
+### Completado
+- Documentación del flujo y pasos detallados
+
+### En Desarrollo
+- Definición/validación de componentes y servicios asociados
+
+### Pendiente
+- Verificación contra la implementación real y marcado granular por componente

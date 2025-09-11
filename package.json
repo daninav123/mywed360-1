@@ -27,7 +27,8 @@
     "ensure:finance": "node scripts/ensureFinanceAll.js",
     "validate:schemas": "node scripts/validateSchemas.js",
     "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",
-    "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000"
+    "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000",
+    "fix:mails:from": "node backend/scripts/fixMailFrom.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

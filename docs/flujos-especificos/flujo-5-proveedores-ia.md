@@ -410,3 +410,13 @@ físico por 300€ adicionales..."
 - Vendor database/API
 - Calendar integration para reuniones
 - Payment processing para contrataciones
+## Estado de Implementación
+
+### Completado
+- Documento base del flujo de proveedores con IA
+
+### En Desarrollo
+- Definición de integraciones y componentes de UI
+
+### Pendiente
+- Contrastar con la implementación y marcar entregables por módulo

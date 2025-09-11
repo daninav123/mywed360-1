@@ -31,6 +31,8 @@ const STORAGE_KEY = 'mywed360_mails';
  * @param {string} userEmail Email del usuario actual
  */
 function ensureMockEmails(userEmail) {
+  // No generar mocks si hay backend o Mailgun configurados
+  if (USE_BACKEND || USE_MAILGUN) return;
   if (!userEmail) return;
   const existing = loadLocal();
   if (existing && existing.length) return; // Ya hay datos
@@ -482,8 +484,10 @@ export async function getMails(folder = 'inbox') {
   if (USE_BACKEND) {
     try {
       const now = Date.now();
-      if (now < backendDisabledUntil) {
-        // Saltar intento durante backoff
+      // No apliques backoff si no hay datos locales y necesitamos backend para pintar la bandeja
+      const hasLocalData = Array.isArray(loadLocal()) && loadLocal().length > 0;
+      if (now < backendDisabledUntil && hasLocalData) {
+        // Saltar intento durante backoff solo si tenemos algo local que mostrar
         return [];
       }
       // Añadir timeout para evitar cuelgues

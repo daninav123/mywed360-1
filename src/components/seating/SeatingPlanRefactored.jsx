@@ -41,6 +41,10 @@ const SeatingPlanRefactored = () => {
     autoAssignGuests
   } = useSeatingPlan();
 
+  // Mostrar/ocultar mesas
+  const [showTables, setShowTables] = React.useState(true);
+  const toggleShowTables = () => setShowTables(s => !s);
+
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
   const safeTables = Array.isArray(tables) ? tables : [];
@@ -316,6 +320,8 @@ const SeatingPlanRefactored = () => {
           onOpenSpaceConfig={handleOpenSpaceConfig}
           onOpenTemplates={handleOpenTemplates}
           syncStatus={syncStatus}
+          showTables={showTables}
+          onToggleShowTables={toggleShowTables}
         />
       </div>
 
@@ -345,7 +351,7 @@ const SeatingPlanRefactored = () => {
           <SeatingPlanCanvas
             tab={tab}
             areas={safeAreas}
-            tables={safeTables}
+            tables={showTables ? safeTables : []}
             seats={safeSeats}
             hallSize={safeHallSize}
             selectedTable={selectedTable}

@@ -7,11 +7,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import useTranslations from '../../hooks/useTranslations';
 import { 
   Undo2, 
-  Redo2, 
-  Download, 
-  Grid, 
-  Maximize, 
+  Redo2,
+  Download,
+  Grid,
+  Maximize,
   Palette,
+  Eye,
+  EyeOff,
   Cloud,
   CloudOff,
 } from 'lucide-react';
@@ -30,11 +32,14 @@ const SeatingPlanToolbar = ({
   onOpenSpaceConfig,
   onOpenTemplates,
   syncStatus,
+  showTables = true,
+  onToggleShowTables,
   className = ""
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const exportRef = useRef(null);
   const { t } = useTranslations();
+  const [showTablesLocal, setShowTablesLocal] = useState(showTables);
 
   // Cierre por click-away
   useEffect(() => {
@@ -114,15 +119,29 @@ const SeatingPlanToolbar = ({
           </button>
         </div>
 
+        {/* Grupo: Visibilidad */}
+        <div className="flex items-center gap-1 border-r pr-3">
+          <button
+            onClick={handleToggleTables}
+            className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+            title={showTablesLocal ? t('seating.toolbar.hideTables',{defaultValue:'Ocultar mesas'}) : t('seating.toolbar.showTables',{defaultValue:'Mostrar mesas'})}
+          >
+            {showTablesLocal ? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}
+            <span className="hidden sm:inline">
+              {showTablesLocal ? t('seating.toolbar.hideTables',{defaultValue:'Mesas'}) : t('seating.toolbar.showTables',{defaultValue:'Mesas'})}
+            </span>
+          </button>
+        </div>
+
         {/* Grupo: Configuración */}
         <div className="flex items-center gap-1 border-r pr-3">
           <button
             onClick={onOpenSpaceConfig}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title={t('seating.toolbar.spaceConfig')}
+            title={t('seating.toolbar.spaceConfig',{defaultValue:'Configurar espacio'})}
           >
             <Maximize className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('seating.toolbar.space')}</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.space',{defaultValue:'Espacio'})}</span>
           </button>
 
           {tab === 'ceremony' && (

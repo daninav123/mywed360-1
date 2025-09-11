@@ -59,6 +59,17 @@ Valida que:
 - Aparecen elementos de silla (`div[aria-label^="Silla"]`).
 - Al hacer click en una silla, cambia el estilo (borde dashed), validando el toggle de habilitado.
 
+## Estado de Implementación
+
+### Completado
+- Documentación de ejecución y especificaciones de pruebas E2E
+
+### En Desarrollo
+- Ampliación de cobertura de casos y escenarios edge
+
+### Pendiente
+- Integración en pipeline de CI y reporte automático
+
 ### 3) seating_toasts.cy.js (Toasts)
 Valida que:
 - Guardar “Configurar Espacio” muestra toast “Dimensiones guardadas”.

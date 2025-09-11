@@ -395,3 +395,14 @@ const trackChatMetrics = async (interaction) => {
 - Detección de frustración del usuario
 
 Este flujo convierte el ChatWidget existente en un asistente virtual completo y contextual que mejora significativamente la experiencia del usuario en MyWed360.
+
+## Estado de Implementación
+
+### Completado
+- Documento base del flujo y casos de uso
+
+### En Desarrollo
+- Diseño de prompts, contexto y métricas de éxito
+
+### Pendiente
+- Implementación del asistente y validación en la app

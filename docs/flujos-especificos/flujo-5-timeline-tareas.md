@@ -304,3 +304,13 @@
 - Notification service (email, SMS, push)
 - OpenAI para generación de tareas y sugerencias
 - Reminder scheduling service
+## Estado de Implementación
+
+### Completado
+- Lineamientos del flujo y estructura de tareas
+
+### En Desarrollo
+- Sincronización con componentes `Tasks.jsx` / `TasksRefactored.jsx`
+
+### Pendiente
+- Integraciones avanzadas (dependencias, recordatorios, notificaciones)
