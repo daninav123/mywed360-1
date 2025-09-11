@@ -23,6 +23,7 @@ function Perfil() {
     planner: '',
     helpers: '',
     email: '',
+    whatsNumber: '',
     password: '',
   });
   const [weddingInfo, setWeddingInfo] = useState({
@@ -176,7 +177,7 @@ function Perfil() {
         const userSnap = await getDoc(doc(db, 'users', uid));
         if (userSnap.exists()) {
           const d = userSnap.data();
-          if (d.account) setAccount(d.account);
+          if (d.account) setAccount(prev=>({ ...prev, ...d.account }));
           if (d.subscription) setSubscription(d.subscription);
           if (d.billing) setBilling(d.billing);
         }
@@ -246,6 +247,7 @@ function Perfil() {
           <Input label="Wedding planner vinculada" name="planner" value={account.planner} onChange={handleAccountChange} />
           <Input label="Ayudantes vinculados" name="helpers" value={account.helpers} onChange={handleAccountChange} />
           <Input label="Correo electrónico" name="email" type="email" value={account.email} onChange={handleAccountChange} />
+          <Input label="Número WhatsApp personal" name="whatsNumber" placeholder="+34xxxxxxxxx" value={account.whatsNumber} onChange={handleAccountChange} />
           <Input label="Reestablecer contraseña" name="password" type="password" value={account.password} onChange={handleAccountChange} />
         </div>
         <div className="text-right">

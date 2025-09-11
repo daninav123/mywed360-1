@@ -29,6 +29,7 @@ const GuestFilters = React.memo(({
   onSendSelectedMobile,
   onSendSelectedBroadcast,
   onScheduleSelected,
+  showApiButtons = true,
 }) => {
   const { t, wedding } = useTranslations();
 
@@ -206,54 +207,56 @@ const GuestFilters = React.memo(({
         {/* Envío/Programación para seleccionados */}
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
-          <Button
-            variant="outline"
-            onClick={() => onSendSelectedApi?.()}
-            disabled={isLoading || selectedCount === 0}
-            className="flex items-center"
-            title="Enviar por WhatsApp (API) a seleccionados"
-          >
-            <MessageSquare size={16} className="mr-2" />
-            Enviar seleccionados (API)
-          </Button>
+
+          {/* Botones API: visibles solo si showApiButtons */}
+          {showApiButtons && (
+            <>
+              <Button
+                variant="outline"
+                onClick={() => onSendSelectedApi?.()}
+                disabled={isLoading || selectedCount === 0}
+                className="flex items-center"
+                title="Enviar por WhatsApp (API) a seleccionados"
+              >
+                <MessageSquare size={16} className="mr-2" />
+                Enviar seleccionados (API)
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => onScheduleSelected?.()}
+                disabled={isLoading || selectedCount === 0}
+                title="Programar envío por WhatsApp (API)"
+              >
+                Programar (API)
+              </Button>
+            </>
+          )}
+
+          {/* Botones Extensión: siempre visibles */}
           <Button
             variant="outline"
             onClick={() => onSendSelectedMobile?.()}
             disabled={isLoading || selectedCount === 0}
             className="flex items-center"
-            title="Abrir WhatsApp (móvil personal) para seleccionados"
+            title="Enviar mediante extensión WhatsApp Web"
           >
             <MessageSquare size={16} className="mr-2" />
-            Enviar seleccionados (Móvil)
+            Enviar seleccionados (Extensión)
           </Button>
+
           <Button
             variant="outline"
             onClick={() => onSendSelectedBroadcast?.()}
             disabled={isLoading || selectedCount === 0}
             className="flex items-center"
-            title="Enviar un único mensaje mediante lista de difusión (móvil personal)"
+            title="Difusión con número personal"
           >
-            Difusión (Móvil)
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => onScheduleSelected?.()}
-            disabled={isLoading || selectedCount === 0}
-            title="Programar envío por WhatsApp (API)"
-          >
-            Programar (API)
+            Difusión (Extensión)
           </Button>
         </div>
       </div>
-
-      {/* Indicador de carga */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-2">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-          <span className="text-sm text-gray-600">Actualizando...</span>
-        </div>
-      )}
-    </div>
+      </div>
   );
 });
 

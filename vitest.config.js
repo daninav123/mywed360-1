@@ -8,8 +8,8 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   plugins: [react()],
   test: {
-    // Estabilizar ejecución en Windows: evitar colgados de workers/threads
-    pool: 'forks',
+    // Estabilizar ejecución en Windows: usar threads en vez de forks
+    pool: 'threads',
     maxThreads: 1,
 
     // Ámbitos de tests: frontend + backend

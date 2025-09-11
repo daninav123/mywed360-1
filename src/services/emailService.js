@@ -686,6 +686,12 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
   if (subject.length > 255) {
     subject = subject.slice(0, 255);
   }
+  // Normalizar asunto vacío a etiqueta accesible
+  subject = (subject || '').trim();
+  if (subject === '') subject = '(Sin asunto)';
+
+  // Validar adjuntos (lanzará si exceden límites)
+  validateAttachments(attachments);
   // Sanitizar body
   body = sanitizeHtml(body);
 

@@ -156,6 +156,7 @@ const EmailDetail = ({ email, onBack, onReply, onDelete, onMoveToFolder, folders
               size={isSmallScreen ? "xs" : "sm"} 
               onClick={() => onDelete && onDelete(email.id)}
               title="Eliminar"
+              aria-label="Eliminar"
               className="flex items-center"
             >
               <Trash size={isSmallScreen ? 14 : 16} />

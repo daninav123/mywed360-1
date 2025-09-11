@@ -101,6 +101,10 @@ export const createTag = (userId, tagName, color = '#64748b') => {
     if (counter > 0) {
       finalName = `${finalName} (${counter})`;
     }
+    // Limitar longitud a 50 caracteres para estabilidad en UI/tests
+    if (finalName.length > 50) {
+      finalName = finalName.slice(0, 50);
+    }
 
     // Crear nueva etiqueta
     const newTag = {

@@ -38,7 +38,8 @@ export const _getStorage = () => {
 
 export const loadJson = (key, defaultValue = null) => {
   try {
-    const raw = _getStorage().getItem(key);
+    const store = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : _getStorage();
+    const raw = store.getItem(key);
     if (!raw) return defaultValue;
     return JSON.parse(raw);
   } catch (error) {
@@ -55,7 +56,8 @@ export const loadJson = (key, defaultValue = null) => {
  */
 export const saveJson = (key, value) => {
   try {
-    _getStorage().setItem(key, JSON.stringify(value));
+    const store = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : _getStorage();
+    store.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {
     console.error(`storage.saveJson error for key ${key}:`, error);
@@ -69,7 +71,8 @@ export const saveJson = (key, value) => {
  */
 export const removeKey = (key) => {
   try {
-    _getStorage().removeItem(key);
+    const store = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : _getStorage();
+    store.removeItem(key);
   } catch (error) {
     console.error(`storage.removeKey error for key ${key}:`, error);
   }
