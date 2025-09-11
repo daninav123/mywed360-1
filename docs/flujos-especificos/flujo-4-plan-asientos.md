@@ -1,5 +1,18 @@
 # 4. Flujo de Plan de Asientos (Detallado)
 
+## Flujo recomendado de trabajo
+
+A continuación se detalla el orden sugerido para crear correctamente un plano de asientos sin problemas de colisiones:
+
+1. **Definir el lienzo** (dimensiones generales del salón).  
+2. **Dibujar el perímetro** exacto del espacio, incluyendo rincones o formas irregulares.  
+3. **Añadir obstáculos** fijos (columnas, barras, escenarios, puertas) dentro del perímetro.  
+4. **Insertar y posicionar las mesas** (o generarlas automáticamente).  
+
+> Seguir este flujo garantiza que las mesas se generen únicamente en zonas válidas y evita que más tarde sea necesario recolocarlas por colisiones.
+
+---
+
 ## 4.1 Configuración del Lienzo
 **Objetivo:** Definir el tamaño del lienzo y crear el espacio con formas geométricas
 

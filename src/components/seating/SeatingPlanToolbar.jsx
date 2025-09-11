@@ -37,6 +37,10 @@ const SeatingPlanToolbar = ({
   className = ""
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const handleToggleTables = () => {
+    if (onToggleShowTables) onToggleShowTables();
+    setShowTablesLocal(s => !s);
+  };
   const exportRef = useRef(null);
   const { t } = useTranslations();
   const [showTablesLocal, setShowTablesLocal] = useState(showTables);
