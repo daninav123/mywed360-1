@@ -20,6 +20,8 @@ i18n
   .init({
     // Idioma por defecto
     fallbackLng: 'es',
+    // Idioma inicial por defecto (si no hay preferencia en localStorage)
+    lng: (typeof window !== 'undefined' && localStorage.getItem('i18nextLng')) || 'es',
     
     // Idiomas soportados
     supportedLngs: ['es', 'en', 'fr'],

@@ -111,6 +111,11 @@ export const saveData = async (key, data, userOptions = {}) => {
 
 // Carga datos con prioridad a Firestore si está online, sino de localStorage
 export const loadData = async (key, userOptions = {}) => {
+  // Sanear docPath: si es impar (colección) no puede usarse con doc()
+  if (userOptions?.docPath && userOptions.docPath.split('/').length % 2 === 1) {
+    console.warn('[SyncService] docPath inválido (segmentos impares), se usará sólo localStorage:', userOptions.docPath);
+    userOptions = { ...userOptions, firestore: false }; // fuerza fallback
+  }
   const options = {
     firestore: true, // Intentar cargar de Firestore?
     collection: 'users', // Colección en Firestore (doc users/{uid})

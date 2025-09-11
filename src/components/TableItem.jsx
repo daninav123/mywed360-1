@@ -46,6 +46,7 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
       dy: (startLocal.y - centerLocal.y) / scale,
     };
     let lastPos = { x: table.x ?? 0, y: table.y ?? 0 };
+    let moved = false;
     const move = (ev) => {
       // Convertir puntero actual a coords locales y luego a mundo
       const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
@@ -56,20 +57,26 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
       lastPos = { x: pointerWorld.x - grabWorld.dx, y: pointerWorld.y - grabWorld.dy };
       // Mover en vivo, sin resolver ni guardar historial
       onMove(table.id, lastPos, { finalize: false });
+      moved = true;
     };
     const up = (ev) => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
-      // Calcular posición final usando el evento de pointerup por si no hubo pointermove
-      const containerRect = containerRef?.current?.getBoundingClientRect?.() || (ref.current?.offsetParent || ref.current?.parentElement)?.getBoundingClientRect?.() || { left: 0, top: 0 };
-      const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
-      const pointerWorld = {
-        x: (local.x - (offset?.x ?? 0)) / scale,
-        y: (local.y - (offset?.y ?? 0)) / scale,
-      };
-      const finalPos = { x: pointerWorld.x - grabWorld.dx, y: pointerWorld.y - grabWorld.dy };
-      // Finalizar movimiento: resolver colisiones y guardar en historial
-      onMove(table.id, finalPos, { finalize: true });
+      // Usar la última posición calculada si hubo movimiento; si no, calcular desde pointerup
+      if (moved) {
+        onMove(table.id, lastPos, { finalize: true });
+      } else {
+        // Calcular posición final usando el evento de pointerup por si no hubo pointermove
+        const containerRect = containerRef?.current?.getBoundingClientRect?.() || (ref.current?.offsetParent || ref.current?.parentElement)?.getBoundingClientRect?.() || { left: 0, top: 0 };
+        const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
+        const pointerWorld = {
+          x: (local.x - (offset?.x ?? 0)) / scale,
+          y: (local.y - (offset?.y ?? 0)) / scale,
+        };
+        const finalPos = { x: pointerWorld.x - grabWorld.dx, y: pointerWorld.y - grabWorld.dy };
+        // Finalizar movimiento: resolver colisiones y guardar en historial
+        onMove(table.id, finalPos, { finalize: true });
+      }
       try { ref.current?.releasePointerCapture?.(ev.pointerId); } catch(_) {}
     };
     window.addEventListener('pointermove', move);

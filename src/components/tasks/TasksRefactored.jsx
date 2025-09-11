@@ -58,7 +58,7 @@ export default function Tasks() {
     updateItem: updateTaskFS,
     deleteItem: deleteTaskFS,
     loading: tasksLoading,
-  } = useFirestoreCollection(`weddings/${activeWedding}/tasks`, []);
+  } = useFirestoreCollection('tasks', []);
 
   const {
     data: meetingsState,
@@ -66,7 +66,7 @@ export default function Tasks() {
     updateItem: updateMeetingFS,
     deleteItem: deleteMeetingFS,
     loading: meetingsLoading,
-  } = useFirestoreCollection(`weddings/${activeWedding}/meetings`, []);
+  } = useFirestoreCollection('meetings', []);
 
   const {
     data: completedDocs,
@@ -74,7 +74,7 @@ export default function Tasks() {
     updateItem: updateCompletedFS,
     deleteItem: deleteCompletedFS,
     loading: completedLoading,
-  } = useFirestoreCollection(`weddings/${activeWedding}/tasksCompleted`, []);
+  } = useFirestoreCollection('tasksCompleted', []);
 
   // --- Ya no se requiere estado local ni carga inicial mediante loadData; los hooks de Firestore se encargan ---
   const dataLoadedRef = useRef(false);

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { auth } from '../firebaseConfig';
 
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:4004';
 
@@ -14,7 +15,10 @@ export default function EmailInsights({ mailId }) {
     (async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${BASE}/api/email-insights/${mailId}`);
+        const user = auth?.currentUser;
+        const token = user && user.getIdToken ? await user.getIdToken() : null;
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await fetch(`${BASE}/api/email-insights/${mailId}`, { headers });
         const json = await res.json();
         if (!ignore) setInsights(json);
       } catch (err) {
