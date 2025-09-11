@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
+import { post as apiPost } from '../../services/apiClient';
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import SeatingPlanTabs    from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
@@ -149,10 +150,8 @@ const SeatingPlanRefactored = () => {
               : `Capacidad insuficiente: necesitas ${needed} asiento(s) y quedan ${remaining}`;
             // Métrica: asignación bloqueada por capacidad (best-effort, no bloqueante)
             try {
-              fetch('/api/metrics/seating', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ event: 'assign', result: 'blocked', tab })
+              apiPost('/api/metrics/seating', {
+                body: JSON.stringify({ event: 'assign', result: 'blocked', tab }),
               }).catch(() => {});
             } catch {}
             toast.error(msg);
@@ -162,11 +161,7 @@ const SeatingPlanRefactored = () => {
         moveGuest(guestId, tableId);
         // Métrica: asignación exitosa (best-effort, no bloqueante)
         try {
-          fetch('/api/metrics/seating', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'assign', result: 'success', tab })
-          }).catch(() => {});
+          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
         } catch {}
         toast.success('Invitado asignado a la mesa');
         return;
@@ -175,11 +170,7 @@ const SeatingPlanRefactored = () => {
         // fallback: intentar asignar igualmente
         moveGuest(guestId, tableId);
         try {
-          fetch('/api/metrics/seating', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ event: 'assign', result: 'success', tab })
-          }).catch(() => {});
+          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
         } catch {}
         toast.success('Invitado asignado a la mesa');
         return;
@@ -245,6 +236,8 @@ const SeatingPlanRefactored = () => {
     // Asignación automática no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
     setTimeout(async () => {
       try {
+        const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
+        if (!enableAutoAssign) return;
         const res = await autoAssignGuests();
         if (res?.ok) {
           const msg = res.method === 'backend'
@@ -268,6 +261,8 @@ const SeatingPlanRefactored = () => {
     } finally {
       setTimeout(async () => {
         try {
+          const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
+          if (!enableAutoAssign) return;
           const res = await autoAssignGuests();
           if (res?.ok) {
             const msg = res.method === 'backend'

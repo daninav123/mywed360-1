@@ -137,3 +137,4 @@ Notas:
 - Próximos pasos recomendados:
   - Añadir un test para asignación/ desasignación de invitados con drag & drop y botón ×.
   - Validar guardado/recuperación de dimensiones al recargar página (requiere mocks o backend real y datos de usuario).
+

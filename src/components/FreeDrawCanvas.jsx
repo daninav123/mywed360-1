@@ -1,8 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-// Snap al primer punto para autocierre de perímetro
-const SNAP_PX = 10;
-
 /**
  * FreeDrawCanvas
  * Simple freehand drawing canvas that captures pointer strokes, smooths them with Chaikin algorithm,
@@ -14,7 +11,6 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
   const svgRef = useRef(null);
   const [points, setPoints] = useState([]);
   const [drawing, setDrawing] = useState(false);
-  const [nearStart, setNearStart] = useState(false);
   // Estado para mostrar la regla mientras se dibuja
   const [cursorPos, setCursorPos] = useState(null); // posición del cursor dentro del SVG
   const [segLength, setSegLength] = useState(null); // longitud del segmento actual en cm

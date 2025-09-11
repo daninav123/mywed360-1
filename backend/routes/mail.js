@@ -197,7 +197,6 @@ router.post('/', requireMailAccess, async (req, res) => {
       console.warn('Fallback a simulación de correo...');
     }
     
-    }
     // Registro en carpeta 'sent' para el remitente (siempre guardamos en DB)
     const sentRef = await db.collection('mails').add({
       from: from,

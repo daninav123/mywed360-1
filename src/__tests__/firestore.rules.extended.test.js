@@ -32,8 +32,8 @@ beforeAll(async () => {
       name: 'Wedding 3'
     });
 
-    // Invitation doc
-    await setDoc(doc(db, 'weddingInvitations', 'inv123'), {
+    // Invitation doc (as subcollection of wedding)
+    await setDoc(doc(db, 'weddings', 'w3', 'weddingInvitations', 'inv123'), {
       weddingId: 'w3',
       email: 'planner@example.com',
       createdBy: 'owner3'
@@ -127,16 +127,15 @@ D('Wedding subcollection permissions', () => {
 
 // --- INVITATIONS ---
 
-D('weddingInvitations rules', () => {
-  test('Any auth user can CREATE invitation', async () => {
-    const db = getFirestore(ctx('ownerZ').app);
-    await assertSucceeds(setDoc(doc(db, 'weddingInvitations', 'invZ'), { weddingId: 'w2', email: 'p@example.com' }));
+D('weddingInvitations rules (as subcollection)', () => {
+  test('Any owner/planner can CREATE invitation under their wedding', async () => {
+    const db = getFirestore(ctx('owner2').app);
+    await assertSucceeds(setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invZ'), { weddingId: 'w2', email: 'p@example.com' }));
   });
 
   test('Unauthenticated cannot CREATE invitation', async () => {
     const db = getFirestore(ctx(null).app);
-    await assertFails(setDoc(doc(db, 'weddingInvitations', 'invNo'), { weddingId: 'w2' }));
+    await assertFails(setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invNo'), { weddingId: 'w2' }));
   });
 });
-
 

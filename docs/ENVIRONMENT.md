@@ -9,6 +9,7 @@ Frontend (Vite):
 - `VITE_MAILGUN_API_KEY` (ideal mover a backend)
 - `VITE_BACKEND_BASE_URL` (p. ej. https://mywed360-backend.onrender.com)
 - `FRONTEND_PORT` (opcional; usado por Cypress)
+- `VITE_ENABLE_AUTO_ASSIGN` (opcional; 'true' para habilitar auto‑asignación en Seating)
 
 Testing E2E:
 - `CYPRESS_BASE_URL` (opcional)

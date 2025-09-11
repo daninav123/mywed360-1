@@ -156,3 +156,48 @@
 **Próxima revisión**: 2025-09-15  
 **Responsable**: Equipo de Desarrollo MyWed360  
 **Documentación**: 18 flujos específicos + sistema de roles técnico + planes de suscripción
+
+## Plan de Sprints (8 semanas)
+
+Notas:
+- Duración: 4 sprints de 2 semanas.
+- Objetivo: estabilizar core (Seating/RSVP/Tasks), luego IA/Contratos.
+- E2E claves deben pasar en CI al final de cada sprint.
+
+### Sprint 1 (Semanas 1–2) — Estabilización Core
+- Seating Plan: hardening + E2E verdes (smoke, fit, toasts, assign/unassign, capacity/aisle, templates).
+- Firestore Rules: “self‑planner” + invitaciones como subcolección + tests verdes.
+- RSVP: by‑token (GET/PUT), generación `rsvp-link`, recordatorios básicos.
+- Métricas: envío desde UI con `apiClient`.
+
+Entregables:
+- E2E seating: `seating_smoke`, `seating_fit`, `seating_toasts`, `seating_assign_unassign`, `seating_capacity_limit`, `seating_aisle_min`, `seating_template_*`.
+- Unit rules: extended/exhaustive verdes.
+- E2E RSVP: confirmación por token verde.
+
+### Sprint 2 (Semanas 3–4) — Tareas/Notificaciones/Email
+- Tasks/Checklist avanzado: dependencias, recordatorios, UX; ICS export estable.
+- Notificaciones: CRUD estable con auth; hooks UI consolidados.
+- Email: E2E enviar/leer/carpetas; plantillas base.
+
+Entregables:
+- E2E email: `send-email`, `read-email`, `folders-management`.
+- Budget flow E2E básico.
+
+### Sprint 3 (Semanas 5–6) — Diseño Web IA + Multi‑Bodas
+- IA Diseño Web: pipeline básico de generación (prompts → preview), historial simple.
+- Multi‑bodas: UX final, `BodaDetalle` desde Firestore (sin mocks).
+
+Entregables:
+- Generación básica funcionando en entorno dev.
+- Navegación planner multi‑boda estable.
+
+### Sprint 4 (Semanas 7–8) — Contratos/Docs + Gamificación + IA Asistente (proto)
+- Contratos/Docs: plantillas y gestión documental; firma externa opcional (post‑MVP).
+- Gamificación: puntos, hitos básicos vinculados a eventos.
+- IA Asistente: prototipo contextual con prompts mínimos y guardrails.
+
+Entregables:
+- Contratos CRUD y templates operativos.
+- Eventos de gamificación en Tasks/Timeline.
+- Chat IA mínimo funcional.

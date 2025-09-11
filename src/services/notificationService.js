@@ -2,6 +2,7 @@
 // Notification: { id, type, message, date, read, providerId?, trackingId?, dueDate?, action? }
 
 import { auth } from '../firebaseConfig';
+import { get as apiGet, post as apiPost, del as apiDel, post } from './apiClient';
 
 // Sistema de autenticación unificado (inyectado desde useAuth)
 let authContext = null;
@@ -48,7 +49,7 @@ async function authHeader(base = {}) {
 export async function getNotifications() {
   try {
     const headers = await authHeader();
-    const res = await fetch(`${BASE}/api/notifications`, { headers });
+    const res = await apiGet('/api/notifications', { headers });
     if (!res.ok) throw new Error('Error fetching notifications');
     return res.json();
   } catch (error) {
@@ -62,10 +63,7 @@ export async function addNotification(notification) {
   const { type = 'info', message, providerId, trackingId, dueDate, action } = notification;
   
   try {
-    const res = await fetch(`${BASE}/api/notifications`, {
-      method: 'POST',
-      headers: await authHeader({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ 
+    const res = await apiPost('/api/notifications', { 
         type, 
         message, 
         providerId, 
@@ -74,8 +72,7 @@ export async function addNotification(notification) {
         action,
         date: new Date().toISOString(),
         read: false
-      }),
-    });
+      }, { headers: await authHeader({}) });
     
     if (!res.ok) throw new Error('Error adding notification');
     const notif = await res.json();
@@ -113,7 +110,7 @@ export async function markNotificationRead(id) {
 export async function deleteNotification(id) {
   try {
     const headers = await authHeader();
-    const res = await fetch(`${BASE}/api/notifications/${id}`, { method: 'DELETE', headers });
+    const res = await apiDel(`/api/notifications/${id}`, { headers });
     if (!res.ok) throw new Error('Error deleting notification');
     // Eliminar también de localStorage por si acaso
     deleteLocalNotification(id);
