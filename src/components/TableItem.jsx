@@ -8,7 +8,7 @@ const firstName = (str='?') => {
   const first = String(str).trim().split(/\s+/)[0] || '?';
   return first.length>8? first.slice(0,8)+'…' : first;
 };
-function TableItem({ table, scale, offset, onMove, onAssignGuest, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false }) {
+function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
   const getLabel = useCallback((name='?') => {
     if (scale >= 1.5) {
@@ -31,21 +31,46 @@ function TableItem({ table, scale, offset, onMove, onAssignGuest, onToggleEnable
 
   const handlePointerDown = (e) => {
     e.stopPropagation();
-    const start = { x: e.clientX, y: e.clientY };
-    const orig = { x: table.x, y: table.y };
-    let lastPos = { x: orig.x, y: orig.y };
+    try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch(_) {}
+    // Rect del contenedor (canvas) para convertir de viewport a coords locales
+    const containerRect = containerRef?.current?.getBoundingClientRect?.() || (ref.current?.offsetParent || ref.current?.parentElement)?.getBoundingClientRect?.() || { left: 0, top: 0 };
+    const startLocal = { x: e.clientX - containerRect.left, y: e.clientY - containerRect.top };
+    // Centro de la mesa en coordenadas locales (px dentro del canvas)
+    const centerLocal = {
+      x: ((table.x ?? 0) * scale) + (offset?.x ?? 0),
+      y: ((table.y ?? 0) * scale) + (offset?.y ?? 0),
+    };
+    // Vector de agarre en coordenadas de mundo: desde centro de mesa a puntero (local) al inicio
+    const grabWorld = {
+      dx: (startLocal.x - centerLocal.x) / scale,
+      dy: (startLocal.y - centerLocal.y) / scale,
+    };
+    let lastPos = { x: table.x ?? 0, y: table.y ?? 0 };
     const move = (ev) => {
-      const dx = (ev.clientX - start.x) / scale;
-      const dy = (ev.clientY - start.y) / scale;
-      lastPos = { x: orig.x + dx, y: orig.y + dy };
+      // Convertir puntero actual a coords locales y luego a mundo
+      const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
+      const pointerWorld = {
+        x: (local.x - (offset?.x ?? 0)) / scale,
+        y: (local.y - (offset?.y ?? 0)) / scale,
+      };
+      lastPos = { x: pointerWorld.x - grabWorld.dx, y: pointerWorld.y - grabWorld.dy };
       // Mover en vivo, sin resolver ni guardar historial
       onMove(table.id, lastPos, { finalize: false });
     };
     const up = (ev) => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      // Calcular posición final usando el evento de pointerup por si no hubo pointermove
+      const containerRect = containerRef?.current?.getBoundingClientRect?.() || (ref.current?.offsetParent || ref.current?.parentElement)?.getBoundingClientRect?.() || { left: 0, top: 0 };
+      const local = { x: ev.clientX - containerRect.left, y: ev.clientY - containerRect.top };
+      const pointerWorld = {
+        x: (local.x - (offset?.x ?? 0)) / scale,
+        y: (local.y - (offset?.y ?? 0)) / scale,
+      };
+      const finalPos = { x: pointerWorld.x - grabWorld.dx, y: pointerWorld.y - grabWorld.dy };
       // Finalizar movimiento: resolver colisiones y guardar en historial
-      onMove(table.id, lastPos, { finalize: true });
+      onMove(table.id, finalPos, { finalize: true });
+      try { ref.current?.releasePointerCapture?.(ev.pointerId); } catch(_) {}
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);

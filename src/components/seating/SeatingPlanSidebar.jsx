@@ -53,7 +53,7 @@ const SeatingPlanSidebar = ({
     return noTable && name.toLowerCase().includes(term);
   });
 
-  const pendingCount = guests.filter((g) => !g?.table && !g?.tableId).length;
+  const pendingCount = availableGuests.length;
 
   const assignedGuests = guests.filter(guest => 
     guest.tableId === selectedTable?.id

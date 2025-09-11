@@ -4,9 +4,6 @@
  */
 
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { TouchBackend } from 'react-dnd-touch-backend';
 import SeatingCanvas from '../../features/seating/SeatingCanvas';
 
 const SeatingPlanCanvas = ({
@@ -32,10 +29,8 @@ const SeatingPlanCanvas = ({
   canvasRef,
   className = ""
 }) => {
-  // Detectar si es dispositivo táctil
-  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const backend = useMemo(() => (isTouchDevice ? TouchBackend : HTML5Backend), [isTouchDevice]);
-  
+  // DnDProvider se gestiona en el componente padre (SeatingPlanRefactored)
+
   // Estado local de zoom/offset
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -199,78 +194,76 @@ const SeatingPlanCanvas = ({
   }, [handleWheel, handlePointerDown, handlePointerMove, handlePointerUp]);
   
   return (
-    <DndProvider backend={backend}>
-      <div className={`relative bg-gray-50 border rounded-lg overflow-hidden ${className}`}>
-        {/* Canvas principal */}
-        <div
-          ref={canvasRef}
-          className="w-full h-full min-h-[600px] relative cursor-crosshair"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '20px 20px'
-          }}
-        >
-          {/* Componente SeatingCanvas existente */}
-          <SeatingCanvas
-            tab={tab}
-            areas={areas}
-            tables={tables}
-            seats={seats}
-            hallSize={hallSize}
-            selectedTable={selectedTable}
-            onSelectTable={onSelectTable}
-            onAssignGuest={onAssignGuest}
-            onToggleEnabled={onToggleEnabled}
-            addArea={onAddArea}
-            onAddTable={onAddTable}
-            drawMode={drawMode}
-            canPan={drawMode === 'pan'}
-            canMoveTables={drawMode === 'move'}
-            moveTable={moveTable}
-            onToggleSeat={onToggleSeat}
-            guests={guests}
-            scale={scale}
-            offset={offset}
-            onDeleteArea={onDeleteArea}
-            onUpdateArea={onUpdateArea}
-          />
-          
-          {/* Indicadores de dimensiones del salón y pasillo mínimo */}
-          <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs text-gray-600">
-            <div>{(hallSize.width/100).toFixed(1)} × {(hallSize.height/100).toFixed(1)} m</div>
-            <div>Pasillo: {(hallSize.aisleMin ?? 80)} cm</div>
-          </div>
-          
-          {/* Controles de zoom */}
-          <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-            <button
-              onClick={() => setScale((s) => Math.min(3, s + 0.1))}
-              className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
-              title="Zoom in"
-            >
-              +
-            </button>
-            <button
-              onClick={() => setScale((s) => Math.max(minScale, s - 0.1))}
-              className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
-              title="Zoom out"
-            >
-              −
-            </button>
-            <button
-              onClick={fitToContent}
-              className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
-              title="Ajustar a pantalla"
-            >
-              ⌂
-            </button>
-          </div>
+    <div className={`relative bg-gray-50 border rounded-lg overflow-hidden ${className}`}>
+      {/* Canvas principal */}
+      <div
+        ref={canvasRef}
+        className="w-full h-full min-h-[600px] relative cursor-crosshair"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '20px 20px'
+        }}
+      >
+        {/* Componente SeatingCanvas existente */}
+        <SeatingCanvas
+          tab={tab}
+          areas={areas}
+          tables={tables}
+          seats={seats}
+          hallSize={hallSize}
+          selectedTable={selectedTable}
+          onSelectTable={onSelectTable}
+          onAssignGuest={onAssignGuest}
+          onToggleEnabled={onToggleEnabled}
+          addArea={onAddArea}
+          onAddTable={onAddTable}
+          drawMode={drawMode}
+          canPan={drawMode === 'pan'}
+          canMoveTables={drawMode === 'move'}
+          moveTable={moveTable}
+          onToggleSeat={onToggleSeat}
+          guests={guests}
+          scale={scale}
+          offset={offset}
+          onDeleteArea={onDeleteArea}
+          onUpdateArea={onUpdateArea}
+        />
+        
+        {/* Indicadores de dimensiones del salón y pasillo mínimo */}
+        <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs text-gray-600">
+          <div>{(hallSize.width/100).toFixed(1)} × {(hallSize.height/100).toFixed(1)} m</div>
+          <div>Pasillo: {(hallSize.aisleMin ?? 80)} cm</div>
+        </div>
+        
+        {/* Controles de zoom */}
+        <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+          <button
+            onClick={() => setScale((s) => Math.min(3, s + 0.1))}
+            className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
+            title="Zoom in"
+          >
+            +
+          </button>
+          <button
+            onClick={() => setScale((s) => Math.max(minScale, s - 0.1))}
+            className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
+            title="Zoom out"
+          >
+            −
+          </button>
+          <button
+            onClick={fitToContent}
+            className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
+            title="Ajustar a pantalla"
+          >
+            ⌂
+          </button>
         </div>
       </div>
-    </DndProvider>
+    </div>
   );
 };
 

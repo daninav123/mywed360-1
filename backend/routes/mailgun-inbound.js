@@ -20,7 +20,10 @@ function verifyMailgunSignature(timestamp, token, signature, apiKey) {
 }
 
 router.post('/', (req, res) => {
-  const apiKey = process.env.MAILGUN_API_KEY || process.env.VITE_MAILGUN_API_KEY;
+  const apiKey = process.env.MAILGUN_SIGNING_KEY 
+    || process.env.MAILGUN_WEBHOOK_SIGNING_KEY 
+    || process.env.MAILGUN_API_KEY 
+    || process.env.VITE_MAILGUN_API_KEY;
 
   // Extraer datos de cabecera common para la firma
   const { timestamp, token, signature } = req.body;
@@ -68,6 +71,41 @@ router.post('/', (req, res) => {
         read: false,
         via: 'mailgun'
       });
+
+      // Ensure the global mail doc contains its ID for cross-collection syncing
+      try {
+        await db.collection('mails').doc(mailRef.id).update({ id: mailRef.id });
+      } catch (e) {
+        // best-effort only
+      }
+
+      // Also store a copy under the owning user's subcollection if we can resolve by email
+      try {
+        const userSnap = await db.collection('users')
+          .where('myWed360Email', '==', rcpt)
+          .limit(1)
+          .get();
+        if (!userSnap.empty) {
+          const uid = userSnap.docs[0].id;
+          await db.collection('users')
+            .doc(uid)
+            .collection('mails')
+            .doc(mailRef.id)
+            .set({
+              id: mailRef.id,
+              from: sender,
+              to: rcpt,
+              subject,
+              body: bodyContent,
+              date,
+              folder: 'inbox',
+              read: false,
+              via: 'mailgun'
+            });
+        }
+      } catch (subErr) {
+        console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
+      }
 
       // Análisis IA automático
       try {

@@ -26,7 +26,8 @@
     "e2e:open": "start-server-and-test dev http://localhost:5173 cypress:open",
     "ensure:finance": "node scripts/ensureFinanceAll.js",
     "validate:schemas": "node scripts/validateSchemas.js",
-    "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows"
+    "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",
+    "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

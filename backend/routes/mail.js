@@ -57,7 +57,36 @@ router.get('/', requireMailAccess, async (req, res) => {
   try {
     const { folder = 'inbox', user } = req.query;
 
-    // Construir la consulta base por carpeta
+    // Si se especifica usuario, intentar leer primero desde la subcoleccion del usuario
+    if (user) {
+      try {
+        let uid = null;
+        // Intentar resolver por myWed360Email y, si no, por email normal
+        const byAlias = await db.collection('users').where('myWed360Email', '==', user).limit(1).get();
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', user).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          let uq = db.collection('users').doc(uid).collection('mails').where('folder', '==', folder);
+          let udata = [];
+          try {
+            const usnap = await uq.orderBy('date', 'desc').get();
+            udata = usnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          } catch (uerr) {
+            const usnap = await uq.get();
+            udata = usnap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (new Date(b.date || 0)) - (new Date(a.date || 0)));
+          }
+          return res.json(udata);
+        }
+      } catch (resolveErr) {
+        // continuar con coleccion global si no se puede resolver
+      }
+    }
+
+    // Construir la consulta base por carpeta (coleccion global)
     let query = db.collection('mails').where('folder', '==', folder);
 
     // Si se especifica usuario, filtrar por destinatario o remitente según la carpeta
@@ -108,9 +137,11 @@ router.get('/', requireMailAccess, async (req, res) => {
 // POST /api/mail  { to, subject, body }
 router.post('/', requireMailAccess, async (req, res) => {
   try {
-    const { to, subject, body } = req.body;
+    const { to, subject, body, recordOnly, from: fromBody } = req.body;
     const date = new Date().toISOString();
-    const from = 'yo@lovenda.app';
+    const profile = req.userProfile || {};
+    const computedFrom = fromBody || profile.myWed360Email || profile.email;
+    const from = computedFrom || 'no-reply@mywed360.com';
     
     // Configurar el objeto de datos para Mailgun
     const mailData = {
@@ -164,6 +195,7 @@ router.post('/', requireMailAccess, async (req, res) => {
       console.warn('Fallback a simulación de correo...');
     }
     
+    }
     // Registro en carpeta 'sent' para el remitente (siempre guardamos en DB)
     const sentRef = await db.collection('mails').add({
       from: from,
@@ -174,9 +206,31 @@ router.post('/', requireMailAccess, async (req, res) => {
       folder: 'sent',
       read: true,
     });
+    try { await db.collection('mails').doc(sentRef.id).update({ id: sentRef.id }); } catch {}
+
+    // Intentar guardar copia en subcoleccion del remitente
+    if (!recordOnly) {
+    try {
+      const uid = req.user?.uid;
+      if (uid) {
+        await db.collection('users').doc(uid).collection('mails').doc(sentRef.id).set({
+          id: sentRef.id,
+          from,
+          to,
+          subject,
+          body,
+          date,
+          folder: 'sent',
+          read: true,
+          via: 'backend'
+        });
+      }
+    } catch (e) {
+      console.warn('No se pudo registrar el enviado en subcoleccion del usuario:', e?.message || e);
+    }
 
     // Registro en carpeta 'inbox' para el destinatario (sin leer)
-    await db.collection('mails').add({
+    const inboxRef = await db.collection('mails').add({
       from: from,
       to,
       subject,
@@ -185,6 +239,34 @@ router.post('/', requireMailAccess, async (req, res) => {
       folder: 'inbox',
       read: false,
     });
+    try { await db.collection('mails').doc(inboxRef.id).update({ id: inboxRef.id }); } catch {}
+
+    // Intentar guardar copia en subcoleccion del destinatario si pertenece a un usuario
+    try {
+      let uid = null;
+      const byAlias = await db.collection('users').where('myWed360Email', '==', to).limit(1).get();
+      if (!byAlias.empty) {
+        uid = byAlias.docs[0].id;
+      } else {
+        const byLogin = await db.collection('users').where('email', '==', to).limit(1).get();
+        if (!byLogin.empty) uid = byLogin.docs[0].id;
+      }
+      if (uid) {
+        await db.collection('users').doc(uid).collection('mails').doc(inboxRef.id).set({
+          id: inboxRef.id,
+          from,
+          to,
+          subject,
+          body,
+          date,
+          folder: 'inbox',
+          read: false,
+          via: 'backend'
+        });
+      }
+    } catch (e) {
+      console.warn('No se pudo registrar el inbox en subcoleccion del destinatario:', e?.message || e);
+    }
 
     res.status(201).json({ id: sentRef.id, to, subject, body, date, folder: 'sent', read: true, from: from });
   } catch (err) {
@@ -205,8 +287,30 @@ router.patch('/:id/read', requireMailAccess, async (req, res) => {
     const docRef = db.collection('mails').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return res.status(404).json({ error: 'Not found' });
+    const data = doc.data();
     await docRef.update({ read: true });
-    res.json({ id, ...doc.data(), read: true });
+
+    // Propagar cambio a subcolección del usuario propietario (inbox -> to, sent -> from)
+    try {
+      const targetEmail = (data.folder === 'sent') ? data.from : data.to;
+      if (targetEmail) {
+        let uid = null;
+        const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          await db.collection('users').doc(uid).collection('mails').doc(id).set({ read: true }, { merge: true });
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo propagar read a subcolección de usuario:', e?.message || e);
+    }
+
+    res.json({ id, ...data, read: true });
   } catch (err) {
     console.error('Error en PATCH /api/mail/:id/read:', err);
     res.status(503).json({ success: false, message: 'Fallo actualizando mail', error: err?.message || String(err) });
@@ -220,9 +324,30 @@ router.post('/:id/read', requireMailAccess, async (req, res) => {
     const docRef = db.collection('mails').doc(id);
     const doc = await docRef.get();
     if (!doc.exists) return res.status(404).json({ error: 'Not found' });
+    const data = doc.data();
     await docRef.update({ read: true });
-    const updated = (await docRef.get()).data();
-    res.json({ id, ...updated, read: true });
+
+    // Propagar a subcolección
+    try {
+      const targetEmail = (data.folder === 'sent') ? data.from : data.to;
+      if (targetEmail) {
+        let uid = null;
+        const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          await db.collection('users').doc(uid).collection('mails').doc(id).set({ read: true }, { merge: true });
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo propagar read (POST) a subcolección de usuario:', e?.message || e);
+    }
+
+    res.json({ id, ...data, read: true });
   } catch (err) {
     console.error('Error en POST /api/mail/:id/read:', err);
     res.status(503).json({ success: false, message: 'Fallo actualizando mail', error: err?.message || String(err) });
@@ -233,7 +358,32 @@ router.post('/:id/read', requireMailAccess, async (req, res) => {
 router.delete('/:id', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    await db.collection('mails').doc(id).delete();
+    const docRef = db.collection('mails').doc(id);
+    const snap = await docRef.get();
+    const data = snap.exists ? snap.data() : null;
+    await docRef.delete();
+
+    // Intentar eliminar la copia en subcolección de usuario si existe
+    try {
+      if (data) {
+        const targetEmail = (data.folder === 'sent') ? data.from : data.to;
+        if (targetEmail) {
+          let uid = null;
+          const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
+          if (!byAlias.empty) {
+            uid = byAlias.docs[0].id;
+          } else {
+            const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
+            if (!byLogin.empty) uid = byLogin.docs[0].id;
+          }
+          if (uid) {
+            await db.collection('users').doc(uid).collection('mails').doc(id).delete();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo eliminar de subcolección de usuario:', e?.message || e);
+    }
     res.status(204).end();
   } catch (err) {
     console.error('Error en DELETE /api/mail/:id:', err);

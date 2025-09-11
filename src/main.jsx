@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// Asegurar inicialización de i18n antes de cualquier uso de useTranslation
+import './i18n';
 import App from './App';
 import ErrorBoundary from './components/debug/ErrorBoundary';
 import './debug/setupDebug';

@@ -539,6 +539,13 @@ export async function getMails(folder = 'inbox') {
             console.warn('No se pudo descubrir dirección alternativa:', e);
           }
         }
+        // Si carpeta es 'sent' y ya hay locales, combinar evitando duplicados
+        if (folder === 'sent' && collectedSent.length > 0) {
+          const byId = new Map();
+          [...json, ...collectedSent].forEach(m => byId.set(m.id || `${m.from}-${m.to}-${m.date}`, m));
+          const merged = Array.from(byId.values()).sort((a,b) => new Date(b.date||0)-new Date(a.date||0));
+          return merged;
+        }
         return json;
       }
       // Si el backend responde pero success es false, lanzamos para caer al fallback
@@ -747,6 +754,25 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
       // Actualizar caché en memoria para que la UI refleje inmediatamente el nuevo correo
       const cachedSent = emailCache.getEmails('sent') || [];
       emailCache.setEmails('sent', [mailSent, ...cachedSent]);
+
+      // Registrar en backend (solo registro) para que aparezca en Firestore sin reenviar
+      try {
+        if (USE_BACKEND && BASE) {
+          await fetch(`${BASE}/api/mail`, {
+            method: 'POST',
+            headers: await authHeader({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({
+              from: CURRENT_USER_EMAIL,
+              to,
+              subject,
+              body,
+              recordOnly: true
+            })
+          });
+        }
+      } catch (e) {
+        console.warn('[sendMail] No se pudo registrar en backend (recordOnly):', e);
+      }
        
       console.log(`💾 [${sendId}] Email guardado en localStorage y caché (folder: sent)`);
       return { success: true, ...mailSent };
@@ -759,7 +785,7 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
   // Backend fallback
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/emails`, {
+      const res = await fetch(`${BASE}/api/mail`, {
         method: 'POST',
         headers: await authHeader({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ 

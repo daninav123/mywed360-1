@@ -2,6 +2,8 @@
  * SeatingPlan refactorizado – Componente principal
  */
 import React, { useEffect } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import SeatingPlanTabs    from './SeatingPlanTabs';
@@ -51,11 +53,14 @@ const SeatingPlanRefactored = () => {
   /* ---- atajos Ctrl/Cmd + Z / Y ---- */
   useEffect(() => {
     const h = (e) => {
-      const meta = navigator.platform.includes('Mac') ? e.metaKey : e.ctrlKey;
-      if (!meta) return;
-      const k = e.key.toLowerCase();
-      if (k === 'z') { e.preventDefault(); undo(); }
-      if (k === 'y') { e.preventDefault(); redo(); }
+      try {
+        const platform = (typeof navigator !== 'undefined' && typeof navigator.platform === 'string') ? navigator.platform : '';
+        const meta = platform.includes('Mac') ? !!e?.metaKey : !!e?.ctrlKey;
+        if (!meta) return;
+        const k = (typeof e?.key === 'string') ? e.key.toLowerCase() : '';
+        if (k === 'z') { e.preventDefault(); undo(); }
+        if (k === 'y') { e.preventDefault(); redo(); }
+      } catch (_) {}
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
@@ -64,18 +69,21 @@ const SeatingPlanRefactored = () => {
   // Atajos de teclado para herramientas: 1=pan,2=move,3=boundary,4=door,5=obstacle,6=aisle
   useEffect(() => {
     const onKey = (e) => {
-      // Evitar atajos cuando se escribe en inputs/textarea/select
-      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-      if (['input','textarea','select'].includes(tag) || e.isComposing) return;
-      switch (e.key) {
-        case '1': setDrawMode('pan'); break;
-        case '2': setDrawMode('move'); break;
-        case '3': setDrawMode('boundary'); break;
-        case '4': setDrawMode('door'); break;
-        case '5': setDrawMode('obstacle'); break;
-        case '6': setDrawMode('aisle'); break;
-        default: break;
-      }
+      try {
+        // Evitar atajos cuando se escribe en inputs/textarea/select
+        const tag = (e?.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (['input','textarea','select'].includes(tag) || e?.isComposing) return;
+        const key = typeof e?.key === 'string' ? e.key : '';
+        switch (key) {
+          case '1': setDrawMode('pan'); break;
+          case '2': setDrawMode('move'); break;
+          case '3': setDrawMode('boundary'); break;
+          case '4': setDrawMode('door'); break;
+          case '5': setDrawMode('obstacle'); break;
+          case '6': setDrawMode('aisle'); break;
+          default: break;
+        }
+      } catch (_) {}
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -84,14 +92,16 @@ const SeatingPlanRefactored = () => {
   // Backspace: eliminar mesa seleccionada (con confirmación)
   useEffect(() => {
     const onKey = (e) => {
-      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-      if (['input','textarea','select'].includes(tag) || e.isComposing) return;
-      if (e.key === 'Backspace' && selectedTable) {
-        e.preventDefault();
-        if (window.confirm('¿Eliminar la mesa seleccionada?')) {
-          deleteTable(selectedTable.id);
+      try {
+        const tag = (e?.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (['input','textarea','select'].includes(tag) || e?.isComposing) return;
+        if (e?.key === 'Backspace' && selectedTable) {
+          e.preventDefault();
+          if (window.confirm('¿Eliminar la mesa seleccionada?')) {
+            deleteTable(selectedTable.id);
+          }
         }
-      }
+      } catch (_) {}
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -190,6 +200,18 @@ const SeatingPlanRefactored = () => {
     }
   };
 
+  // Desasignar un invitado concreto
+  const handleUnassignGuest = (guestId) => {
+    try {
+      if (!guestId) return;
+      moveGuest(guestId, null);
+      toast.info('Invitado desasignado');
+    } catch (e) {
+      console.warn('Unassign single guest error', e);
+      toast.error('No se pudo desasignar el invitado');
+    }
+  };
+
   // Aplicación de plantillas (evita fallo si se usa el modal de plantillas)
   const handleApplyTemplate = (template) => {
     if (template?.ceremony) {
@@ -268,6 +290,7 @@ const SeatingPlanRefactored = () => {
   const banquetCount  = safeTables.length;
 
   return (
+    <DndProvider backend={HTML5Backend}>
     <div className="h-full flex flex-col bg-gray-50">
       {/* Tabs */}
       <div className="flex-shrink-0 p-4 pb-0">
@@ -365,6 +388,7 @@ const SeatingPlanRefactored = () => {
         tables={safeTables}
       />
     </div>
+    </DndProvider>
   );
 };
 

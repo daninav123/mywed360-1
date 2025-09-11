@@ -1,4 +1,4 @@
-import React, { forwardRef, memo } from 'react';
+import React, { forwardRef, memo, useRef } from 'react';
 
 
 
@@ -39,8 +39,9 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
     onUpdateArea = () => {}, 
     hallSize = null,
   },
-  containerRef,
+  _forwardedRef,
 ) {
+  const containerRef = useRef(null);
   // Mapear drawMode externo a valores aceptados por FreeDrawCanvas
   const internalDrawMode =
     drawMode === 'boundary' ? 'boundary'  // Usar el nuevo modo boundary
@@ -104,6 +105,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
             table={t}
             scale={scale}
             offset={offset}
+            containerRef={containerRef}
             onMove={moveTable}
             onAssignGuest={onAssignGuest}
             onToggleEnabled={onToggleEnabled}
