@@ -1,8 +1,11 @@
-import React, { useCallback } from 'react';
-import { Search, Filter, Download, Upload, Plus, MessageSquare } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { Search, Filter, Plus, MessageSquare } from 'lucide-react';
 import { Button } from '../ui';
 import { Input } from '../ui';
 import useTranslations from '../../hooks/useTranslations';
+import wh from '../../utils/whDebug';
+import { getInviteTemplate, setInviteTemplate } from '../../services/MessageTemplateService';
+import InviteTemplateModal from '../whatsapp/InviteTemplateModal';
 
 /**
  * Componente de filtros y acciones para la lista de invitados
@@ -17,18 +20,12 @@ const GuestFilters = React.memo(({
   onTableFilterChange,
   onAddGuest,
   onBulkInvite,
-  onImportGuests,
-  onBulkAddGuests,
-  onExportGuests,
   onOpenRsvpSummary,
   guestCount = 0,
   isLoading = false,
   // selección múltiple
   selectedCount = 0,
   onSendSelectedApi,
-  onSendSelectedMobile,
-  onSendSelectedBroadcast,
-  onScheduleSelected,
   showApiButtons = true,
 }) => {
   const { t, wedding } = useTranslations();
@@ -59,34 +56,29 @@ const GuestFilters = React.memo(({
     onAddGuest?.();
   }, [onAddGuest]);
 
-  const handleBulkInvite = useCallback(() => {
+  const handleBulkInviteApi = useCallback(() => {
+    wh('UI – BulkInvite click', { guestCount });
     if (guestCount === 0) {
       alert('No hay invitados para enviar invitaciones');
+      wh('UI – BulkInvite cancel: sin invitados');
       return;
     }
-    
-    if (window.confirm(`¿Enviar invitaciones masivas a ${guestCount} invitados?`)) {
-      onBulkInvite?.();
-    }
-  }, [onBulkInvite, guestCount]);
+    onBulkInvite?.();
+  }, [guestCount, onBulkInvite]);
 
-  const handleBulkAdd = useCallback(() => {
-    onBulkAddGuests?.();
-  }, [onBulkAddGuests]);
-
-  const handleImport = useCallback(() => {
-    onImportGuests?.();
-  }, [onImportGuests]);
-
-  const handleExport = useCallback(() => {
-    onExportGuests?.();
-  }, [onExportGuests]);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
 
   const handleOpenRsvp = useCallback(() => {
     onOpenRsvpSummary?.();
   }, [onOpenRsvpSummary]);
 
+  const handleEditTemplate = useCallback(() => {
+    try { wh('UI – EditTemplate open'); } catch {}
+    setShowTemplateModal(true);
+  }, []);
+
   return (
+    <>
     <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
       {/* Título y contador */}
       <div className="flex justify-between items-center">
@@ -158,42 +150,13 @@ const GuestFilters = React.memo(({
       <div className="flex flex-wrap gap-3 pt-4 border-t">
         <Button
           variant="outline"
-          onClick={handleBulkInvite}
+          onClick={handleBulkInviteApi}
           disabled={isLoading || guestCount === 0}
           className="flex items-center"
+          title="Enviar invitaciones a todos los invitados vía WhatsApp API"
         >
           <MessageSquare size={16} className="mr-2" />
-          Invitaciones masivas
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleBulkAdd}
-          disabled={isLoading}
-          className="flex items-center"
-        >
-          <Plus size={16} className="mr-2" />
-          Alta masiva
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleImport}
-          disabled={isLoading}
-          className="flex items-center"
-        >
-          <Upload size={16} className="mr-2" />
-          {t('guests.importGuests')}
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleExport}
-          disabled={isLoading || guestCount === 0}
-          className="flex items-center"
-        >
-          <Download size={16} className="mr-2" />
-          {t('guests.exportGuests')}
+          Invitaciones masivas (API)
         </Button>
 
         <Button
@@ -204,59 +167,41 @@ const GuestFilters = React.memo(({
           Resumen RSVP
         </Button>
 
+        <Button
+          variant="outline"
+          onClick={handleEditTemplate}
+          disabled={isLoading}
+        >
+          Editar mensaje (API)
+        </Button>
+
         {/* Envío/Programación para seleccionados */}
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
 
-          {/* Botones API: visibles solo si showApiButtons */}
           {showApiButtons && (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => onSendSelectedApi?.()}
-                disabled={isLoading || selectedCount === 0}
-                className="flex items-center"
-                title="Enviar por WhatsApp (API) a seleccionados"
-              >
-                <MessageSquare size={16} className="mr-2" />
-                Enviar seleccionados (API)
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => onScheduleSelected?.()}
-                disabled={isLoading || selectedCount === 0}
-                title="Programar envío por WhatsApp (API)"
-              >
-                Programar (API)
-              </Button>
-            </>
+            <Button
+              variant="outline"
+              onClick={() => onSendSelectedApi?.()}
+              disabled={isLoading || selectedCount === 0}
+              className="flex items-center"
+            >
+              <MessageSquare size={16} className="mr-2" />
+              Enviar seleccionados (API)
+            </Button>
           )}
-
-          {/* Botones Extensión: siempre visibles */}
-          <Button
-            variant="outline"
-            onClick={() => onSendSelectedMobile?.()}
-            disabled={isLoading || selectedCount === 0}
-            className="flex items-center"
-            title="Enviar mediante extensión WhatsApp Web"
-          >
-            <MessageSquare size={16} className="mr-2" />
-            Enviar seleccionados (Extensión)
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => onSendSelectedBroadcast?.()}
-            disabled={isLoading || selectedCount === 0}
-            className="flex items-center"
-            title="Difusión con número personal"
-          >
-            Difusión (Extensión)
-          </Button>
         </div>
       </div>
-      </div>
+    </div>
+    <InviteTemplateModal
+      open={showTemplateModal}
+      onClose={() => setShowTemplateModal(false)}
+      onSaved={() => {
+        setShowTemplateModal(false);
+        alert('Plantilla actualizada');
+      }}
+    />
+    </>
   );
 });
 

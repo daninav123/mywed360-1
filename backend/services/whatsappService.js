@@ -28,7 +28,9 @@ async function ensureTwilio() {
     const twilio = mod.default || mod;
     twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
   }
-  return { client: twilioClient, from: `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}` };
+  const rawFrom = process.env.TWILIO_WHATSAPP_FROM || '';
+  const from = rawFrom.startsWith('whatsapp:') ? rawFrom : `whatsapp:${rawFrom}`;
+  return { client: twilioClient, from };
 }
 
 export function toE164(phone, defaultCountryCode = '') {
@@ -262,8 +264,9 @@ async function logInbound({ sid, fromE164, toE164, body, weddingId, guestId, waI
   }
 }
 
-export async function handleIncomingMessage(payload) {
+export async function handleIncomingMessage(payload, opts = {}) {
   try {
+    const reply = typeof opts.replyFn === 'function' ? opts.replyFn : replyWhatsApp;
     const fromRaw = payload.From || payload.from;
     const body = payload.Body || payload.body || '';
     const waId = payload.WaId || payload.WAID || null;
@@ -282,7 +285,7 @@ export async function handleIncomingMessage(payload) {
     if (!session) {
       // Sin sesión conocida: pedir identificación
       const msg = 'Hola, no pudimos identificar tu invitación. Responde con "AYUDA" para asistencia o espera a recibir un mensaje de invitación para iniciar el cuestionario.';
-      try { await replyWhatsApp(fromE164, msg); } catch {}
+      try { await reply(fromE164, msg); } catch {}
       return;
     }
 
@@ -305,28 +308,28 @@ export async function handleIncomingMessage(payload) {
         // Actualizar invitado como confirmado (compat con UI + RSVP)
         await updateGuestDoc({ weddingId, guestId, patch: { status: 'confirmed', status_rsvp: 'accepted', response: 'Sí' } });
         await updateSession({ state: 'awaiting_companions', lastPrompt: 'ask_companions' });
-        await replyWhatsApp(fromE164, '¡Genial! ¿Vendrás con acompañantes? Responde únicamente con un número (0 si vienes sin acompañante).');
+        await reply(fromE164, '¡Genial! ¿Vendrás con acompañantes? Responde únicamente con un número (0 si vienes sin acompañante).');
         return;
       }
       if (yn === 'no') {
         await updateGuestDoc({ weddingId, guestId, patch: { status: 'declined', status_rsvp: 'rejected', response: 'No', companions: 0, companion: 0 } });
         await updateSession({ state: 'completed', lastPrompt: 'completed' });
-        await replyWhatsApp(fromE164, 'Gracias por responder. Hemos registrado que no podrás asistir. Si cambia tu situación, avísanos.');
+        await reply(fromE164, 'Gracias por responder. Hemos registrado que no podrás asistir. Si cambia tu situación, avísanos.');
         return;
       }
-      await replyWhatsApp(fromE164, 'Por favor responde "Sí" o "No" (también puedes responder 1 para Sí o 2 para No).');
+      await reply(fromE164, 'Por favor responde "Sí" o "No" (también puedes responder 1 para Sí o 2 para No).');
       return;
     }
 
     if (state === 'awaiting_companions') {
       const n = parseCompanions(body);
       if (n === null) {
-        await replyWhatsApp(fromE164, 'No entendí el número de acompañantes. Responde solo con un número (0, 1, 2, ...).');
+        await reply(fromE164, 'No entendí el número de acompañantes. Responde solo con un número (0, 1, 2, ...).');
         return;
       }
       await updateGuestDoc({ weddingId, guestId, patch: { companions: n, companion: n } });
       await updateSession({ state: 'awaiting_allergens', lastPrompt: 'ask_allergens', companions: n });
-      await replyWhatsApp(fromE164, '¿Alguna restricción alimentaria o alergia? Responde "ninguna" si no tienes.');
+      await reply(fromE164, '¿Alguna restricción alimentaria o alergia? Responde "ninguna" si no tienes.');
       return;
     }
 
@@ -340,13 +343,45 @@ export async function handleIncomingMessage(payload) {
       // Mensaje de cierre con resumen
       const n = session.companions ?? 0;
       const resumen = `¡Gracias! Hemos registrado tu confirmación${n ? ` con ${n} acompañante(s)` : ''}${allergens ? ` y alergias/restricciones: ${allergens}` : ''}.`;
-      await replyWhatsApp(fromE164, resumen);
+      await reply(fromE164, resumen);
       return;
     }
 
     // Estado idle o desconocido
-    await replyWhatsApp(fromE164, 'Hola, ya hemos registrado tu respuesta. Si necesitas cambiar algo, responde "AYUDA".');
+    await reply(fromE164, 'Hola, ya hemos registrado tu respuesta. Si necesitas cambiar algo, responde "AYUDA".');
   } catch (e) {
     logger.error('[whatsappService] handleIncomingMessage error:', e);
+  }
+}
+
+// Helper para modo test: crea sesión si no existe
+export async function ensureTestSession({ phoneE164, weddingId = null, guestId = null, rsvpFlow = true }) {
+  try {
+    if (!phoneE164) return false;
+    const docId = sessionDocIdFromPhone(phoneE164);
+    const ref = admin.firestore().collection('whatsapp_sessions').doc(docId);
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const snap = await ref.get();
+    const base = {
+      phoneE164,
+      weddingId: weddingId || null,
+      guestId: guestId || null,
+      provider: 'test',
+      updatedAt: now,
+    };
+    if (!snap.exists) {
+      await ref.set({
+        ...base,
+        state: rsvpFlow ? 'awaiting_accept' : 'idle',
+        lastPrompt: rsvpFlow ? 'ask_accept' : null,
+        createdAt: now,
+      }, { merge: true });
+    } else {
+      await ref.set({ ...base }, { merge: true });
+    }
+    return true;
+  } catch (e) {
+    logger.warn('[whatsappService] ensureTestSession error:', e?.message || e);
+    return false;
   }
 }

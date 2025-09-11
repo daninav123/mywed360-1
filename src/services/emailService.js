@@ -371,7 +371,8 @@ export async function getMails(folder = 'inbox') {
 
   // ⚡️ Si existen correos locales, devolverlos directamente para una respuesta instantánea
   const localMails = loadLocal();
-  if (localMails && localMails.length) {
+  const canUseLocalOnly = !USE_BACKEND && !USE_MAILGUN;
+  if (canUseLocalOnly && localMails && localMails.length) {
     if (folder === 'all') {
       return [...localMails].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
     }
@@ -403,7 +404,8 @@ export async function getMails(folder = 'inbox') {
     collectedSent.push(...localMails);
   }
   
-  if (USE_MAILGUN) {
+  const isInternalRecipient = Boolean(CURRENT_USER_EMAIL && CURRENT_USER_EMAIL.endsWith(`@${MAILGUN_DOMAIN}`));
+  if (USE_MAILGUN && isInternalRecipient && !USE_BACKEND) {
     try {
       if (folder === 'sent') {
         // Eventos "accepted" representan mensajes enviados correctamente
@@ -682,6 +684,11 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
   if (recipients.length > 50) {
     return { success: false, error: 'demasiados destinatarios' };
   }
+  // Validar formato básico de email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!recipients.every(r => emailRegex.test(r))) {
+    throw new Error('Dirección no válida');
+  }
   // Limitar asunto a 255 caracteres (truncar si es necesario)
   if (subject.length > 255) {
     subject = subject.slice(0, 255);
@@ -763,9 +770,10 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
           attachments
         }),
       });
-            if (!res.ok) {
+      if (!res.ok) {
         const message = `Error HTTP ${res.status}`;
-        return { success: false, error: message };
+        // Forzar fallback a localStorage
+        throw new Error(message);
       }
       const jsonBackend = await res.json();
 
@@ -833,7 +841,7 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
   }
   
   saveLocal(mails);
-  return { success: true, ...mailSent };
+  return { success: true, usingFallback: true, ...mailSent };
 }
 
 // Alias para compatibilidad con componentes y tests que usan sendEmail

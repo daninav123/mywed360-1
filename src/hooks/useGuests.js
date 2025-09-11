@@ -3,6 +3,9 @@ import { useWedding } from '../context/WeddingContext';
 import useWeddingCollection from './useWeddingCollection';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { sendText as sendWhatsAppText, toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
+import { renderInviteMessage } from '../services/MessageTemplateService';
+import wh from '../utils/whDebug';
+
 import { ensureExtensionAvailable, sendBatchMessages, sendBroadcastMessages } from '../services/whatsappBridge';
 
 /**
@@ -252,9 +255,6 @@ const useGuests = () => {
       alert('No hay invitados seleccionados con teléfono válido');
       return { success: true, opened: 0 };
     }
-    if (!window.confirm(`Se abrirá WhatsApp en una pestaña/ventana por cada invitado (${targets.length}). ¿Continuar?`)) {
-      return { success: false, cancelled: true };
-    }
     let opened = 0;
     for (const guest of targets) {
       try {
@@ -345,8 +345,8 @@ const useGuests = () => {
 
     // Mensaje diseñado para flujo conversacional sin enlaces
     const message = (customMessage && customMessage.trim())
-      ? customMessage
-      : `¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`;
+      ? customMessage.trim()
+      : renderInviteMessage(guest.name || '');
 
     const to = toE164Frontend(phone);
     const result = await sendWhatsAppText({
@@ -408,12 +408,7 @@ const useGuests = () => {
       return;
     }
     
-    if (!window.confirm(
-      `Se abrirá WhatsApp en una pestaña por cada invitado (${guestsWithPhone.length} invitados). ¿Continuar?`
-    )) {
-      return;
-    }
-    
+    // Eliminamos confirm para evitar cancelaciones inesperadas
     for (const guest of guestsWithPhone) {
       try {
         // Generar enlace RSVP si hay API disponible
@@ -449,12 +444,14 @@ const useGuests = () => {
 
   // Envío por API (número de la app) — masivo a pendientes
   const bulkInviteWhatsAppApi = useCallback(async () => {
+    wh('Bulk API – inicio');
     const targets = guests.filter(g => (g.status === 'pending' || g.response === 'Pendiente') && utils.phoneClean(g.phone));
     if (targets.length === 0) {
       alert('No hay invitados pendientes con número de teléfono');
+      wh('Bulk API – sin targets');
       return;
     }
-    if (!window.confirm(`Se enviarán mensajes de WhatsApp desde el número de la app a ${targets.length} invitados. ¿Continuar?`)) return;
+    // Eliminamos confirm para evitar cancelaciones inesperadas
     let ok = 0, fail = 0;
     for (const g of targets) {
       try {
@@ -463,31 +460,23 @@ const useGuests = () => {
         await new Promise(r => setTimeout(r, 400));
       } catch { fail++; }
     }
+    wh('Bulk API – fin', { ok, fail, total: targets.length });
     alert(`WhatsApp API – Envíos completados. Éxitos: ${ok}, Fallos: ${fail}`);
   }, [guests, utils, inviteViaWhatsAppApi]);
 
   // Envío por API a una selección de invitados (selectedIds)
   const inviteSelectedWhatsAppApi = useCallback(async (selectedIds = [], customMessage) => {
     try {
-      if (import.meta.env.DEV) console.log('[useGuests] inviteSelectedWhatsAppApi()', { selectedIdsLength: (selectedIds || []).length });
+      wh('Selected API – inicio', { selectedIdsLength: (selectedIds || []).length });
       const setIds = new Set(selectedIds || []);
       const targets = guests.filter(g => setIds.has(g.id) && utils.phoneClean(g.phone));
-      if (import.meta.env.DEV) console.log('[useGuests] inviteSelectedWhatsAppApi targets', { count: targets.length });
+      wh('Selected API – targets', { count: targets.length });
       if (targets.length === 0) {
         alert('No hay invitados seleccionados con número de teléfono');
+        wh('Selected API – sin targets');
         return { success: true, ok: 0, fail: 0 };
       }
-      let proceed = true;
-      try {
-        proceed = window.confirm(`Se enviarán mensajes de WhatsApp (API) a ${targets.length} invitado(s). ¿Continuar?`);
-      } catch (e) {
-        // Algunos navegadores pueden bloquear confirm en ciertos contextos; seguimos adelante para no bloquear el flujo
-        proceed = true;
-      }
-      if (!proceed) {
-        if (import.meta.env.DEV) console.log('[useGuests] inviteSelectedWhatsAppApi cancelado por el usuario');
-        return { success: false, cancelled: true };
-      }
+      // Eliminamos confirm para evitar cancelaciones inesperadas
       let ok = 0, fail = 0;
       for (const g of targets) {
         try {
@@ -495,14 +484,14 @@ const useGuests = () => {
           if (r?.success) ok++; else fail++;
           await new Promise(r => setTimeout(r, 300));
         } catch (err) {
-          if (import.meta.env.DEV) console.warn('[useGuests] inviteSelectedWhatsAppApi error invitado', g?.id, err);
+          wh('Selected API – error invitado', { guestId: g?.id, error: String(err?.message || err) });
           fail++;
         }
       }
-      if (import.meta.env.DEV) console.log('[useGuests] inviteSelectedWhatsAppApi fin', { ok, fail });
+      wh('Selected API – fin', { ok, fail });
       return { success: true, ok, fail };
     } catch (e) {
-      if (import.meta.env.DEV) console.warn('[useGuests] inviteSelectedWhatsAppApi exception', e);
+      wh('Selected API – exception', { error: String(e?.message || e) });
       return { success: false, error: e?.message || 'error' };
     }
   }, [guests, utils, inviteViaWhatsAppApi]);

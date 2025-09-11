@@ -148,6 +148,26 @@ function Invitados() {
     }
   };
 
+  // Envío masivo API para todos los invitados (usado por GuestFilters)
+  const bulkInviteAllApi = async () => {
+    try {
+      if (!guests || guests.length === 0) { alert('No hay invitados'); return; }
+      const ids = guests.filter(g => g.phone).map(g => g.id);
+      if (!ids.length) { alert('Los invitados no tienen teléfonos válidos'); return; }
+      const confirm = window.confirm(`¿Enviar invitaciones vía WhatsApp API a ${ids.length} invitados?`);
+      if (!confirm) return;
+      const res = await inviteSelectedWhatsAppApi(ids);
+      if (res?.success) {
+        alert(`Envío completado. Éxitos: ${res.ok || 0}, Fallos: ${res.fail || 0}`);
+      } else {
+        alert('Error en envío masivo: ' + (res?.error || 'desconocido'));
+      }
+    } catch (e) {
+      console.warn('bulkInviteAllApi error:', e);
+      alert('Error en envío masivo API');
+    }
+  };
+
   // Abrir modal de envío masivo WhatsApp
   const openWhatsBatch = () => setShowWhatsBatch(true);
   const closeWhatsBatch = () => setShowWhatsBatch(false);
@@ -496,24 +516,13 @@ function Invitados() {
           onStatusFilterChange={(value) => updateFilters({ status: value })}
           onTableFilterChange={(value) => updateFilters({ table: value })}
           onAddGuest={handleAddGuest}
-          onBulkInvite={bulkInviteWhatsApp}
-          onImportGuests={importFromContacts}
-          onBulkAddGuests={handleOpenBulkAdd}
-          onExportGuests={exportToCSV}
+          onBulkInvite={bulkInviteWhatsAppApi}
           onOpenRsvpSummary={handleOpenRsvpSummary}
-          guestCount={(guests?.length) || 0}
+          guestCount={guests?.length || 0}
           isLoading={isLoading}
           selectedCount={selectedIds.length}
           onSendSelectedApi={handleSendSelectedApi}
-          onSendSelectedMobile={handleSendSelectedMobile}
-          onSendSelectedBroadcast={handleSendSelectedBroadcast}
-          onScheduleSelected={handleScheduleSelected}
-          />
-
-        {/* Botón envío masivo WhatsApp */}
-        <div className="flex justify-end">
-          <Button onClick={openWhatsBatch}>WhatsApp masivo</Button>
-        </div>
+        />
 
         {/* Debug info para verificar estado */}
         {import.meta.env.DEV && (

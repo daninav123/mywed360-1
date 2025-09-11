@@ -25,7 +25,7 @@ const SeatingPlanRefactored = () => {
     addArea, addTable,
     undo, redo, canUndo, canRedo,
     generateSeatGrid, generateBanquetLayout,
-    exportPDF,
+    exportPDF, exportPNG, exportCSV,
     saveHallDimensions,
     drawMode, setDrawMode,
     moveTable,
@@ -286,6 +286,8 @@ const SeatingPlanRefactored = () => {
           onUndo={undo} onRedo={redo}
           canUndo={canUndo} canRedo={canRedo}
           onExportPDF={exportPDF}
+          onExportPNG={exportPNG}
+          onExportCSV={exportCSV}
           onOpenCeremonyConfig={handleOpenCeremonyConfig}
           onOpenBanquetConfig={handleOpenBanquetConfig}
           onOpenSpaceConfig={handleOpenSpaceConfig}
@@ -308,6 +310,7 @@ const SeatingPlanRefactored = () => {
             drawMode={drawMode}
             onDrawModeChange={setDrawMode}
             onAssignGuest={handleAssignGuest}
+            onUnassignGuest={handleUnassignGuest}
             deleteTable={deleteTable}
             duplicateTable={duplicateTable}
             className="h-full"

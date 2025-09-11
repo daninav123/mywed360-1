@@ -2,7 +2,7 @@ import express from 'express';
 import logger from '../logger.js';
 import admin from 'firebase-admin';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { sendWhatsAppText, updateDeliveryStatusFromTwilio, providerStatus, handleIncomingMessage } from '../services/whatsappService.js';
+import { sendWhatsAppText, updateDeliveryStatusFromTwilio, providerStatus, handleIncomingMessage, ensureTestSession, toE164 } from '../services/whatsappService.js';
 
 const router = express.Router();
 
@@ -13,6 +13,58 @@ router.get('/provider-status', (req, res) => {
     res.json({ success: true, ...status });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ----- MODO TEST (sin número verificado) -----
+// Crea/actualiza sesión de invitación para un teléfono y guest concretos
+// POST /api/whatsapp/test/session  { phone, weddingId, guestId }
+router.post('/test/session', requireAuth, async (req, res) => {
+  try {
+    const { phone, weddingId, guestId } = req.body || {};
+    if (!phone || !weddingId || !guestId) {
+      return res.status(400).json({ success: false, error: 'phone, weddingId y guestId son requeridos' });
+    }
+    const e164 = toE164(phone, process.env.DEFAULT_COUNTRY_CODE || '');
+    if (!e164) return res.status(400).json({ success: false, error: 'phone inválido' });
+    const ok = await ensureTestSession({ phoneE164: e164, weddingId, guestId, rsvpFlow: true });
+    if (!ok) return res.status(500).json({ success: false, error: 'no se pudo crear sesión' });
+    res.json({ success: true, phoneE164: e164 });
+  } catch (e) {
+    logger.error('[whatsapp] /test/session error:', e);
+    res.status(500).json({ success: false, error: e.message || 'error' });
+  }
+});
+
+// Simula un mensaje entrante desde WhatsApp sin pasar por Twilio
+// POST /api/whatsapp/test/inbound  { phone, body }
+router.post('/test/inbound', requireAuth, async (req, res) => {
+  try {
+    const { phone, body } = req.body || {};
+    if (!phone || !body) return res.status(400).json({ success: false, error: 'phone y body requeridos' });
+    const e164 = toE164(phone, process.env.DEFAULT_COUNTRY_CODE || '');
+    if (!e164) return res.status(400).json({ success: false, error: 'phone inválido' });
+
+    const replies = [];
+    const replyFn = async (toE164, message) => {
+      replies.push({ toE164, body: message });
+      try {
+        await admin.firestore().collection('mensajeria_test_replies').add({
+          to: toE164,
+          body: message,
+          created_at: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        const sessId = (toE164 || '').replace(/^\+/, '');
+        await admin.firestore().collection('whatsapp_sessions').doc(sessId).set({ lastTestReply: message, lastReplyAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } catch {}
+    };
+
+    const payload = { From: `whatsapp:${e164}`, Body: String(body || '') }; // forma Twilio-like
+    await handleIncomingMessage(payload, { replyFn });
+    res.json({ success: true, replies });
+  } catch (e) {
+    logger.error('[whatsapp] /test/inbound error:', e);
+    res.status(500).json({ success: false, error: e.message || 'error' });
   }
 });
 

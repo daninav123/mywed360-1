@@ -3,7 +3,8 @@
  * Interfaz mejorada con iconos claros y mejor UX
  */
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 import { 
   Undo2, 
   Redo2, 
@@ -22,6 +23,8 @@ const SeatingPlanToolbar = ({
   canUndo,
   canRedo,
   onExportPDF,
+  onExportPNG,
+  onExportCSV,
   onOpenCeremonyConfig,
   onOpenBanquetConfig,
   onOpenSpaceConfig,
@@ -29,6 +32,36 @@ const SeatingPlanToolbar = ({
   syncStatus,
   className = ""
 }) => {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportRef = useRef(null);
+  const { t } = useTranslations();
+
+  // Cierre por click-away
+  useEffect(() => {
+    const onClickAway = (e) => {
+      if (exportRef.current && !exportRef.current.contains(e.target)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickAway);
+    return () => document.removeEventListener('mousedown', onClickAway);
+  }, []);
+
+  // Atajos de teclado: E (toggle), Escape (cerrar)
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+      if (['input','textarea','select'].includes(tag)) return;
+      const k = String(e.key || '').toLowerCase();
+      if (k === 'e') {
+        setShowExportMenu((s) => !s);
+      } else if (k === 'escape') {
+        setShowExportMenu(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const getSyncIcon = () => {
     switch (syncStatus?.status) {
       case 'syncing':
@@ -64,20 +97,20 @@ const SeatingPlanToolbar = ({
             onClick={onUndo}
             disabled={!canUndo}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Deshacer (Ctrl+Z)"
+            title={t('seating.toolbar.undoTooltip', { defaultValue: 'Deshacer (Ctrl+Z)' })}
           >
             <Undo2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Deshacer</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.undo')}</span>
           </button>
           
           <button
             onClick={onRedo}
             disabled={!canRedo}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Rehacer (Ctrl+Y)"
+            title={t('seating.toolbar.redoTooltip', { defaultValue: 'Rehacer (Ctrl+Y)' })}
           >
             <Redo2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Rehacer</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.redo')}</span>
           </button>
         </div>
 
@@ -86,20 +119,20 @@ const SeatingPlanToolbar = ({
           <button
             onClick={onOpenSpaceConfig}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title="Configurar espacio"
+            title={t('seating.toolbar.spaceConfig')}
           >
             <Maximize className="h-4 w-4" />
-            <span className="hidden sm:inline">Espacio</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.space')}</span>
           </button>
 
           {tab === 'ceremony' && (
             <button
               onClick={onOpenCeremonyConfig}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title="Configurar ceremonia"
+              title={t('seating.toolbar.ceremonyConfig')}
             >
               <Grid className="h-4 w-4" />
-              <span className="hidden sm:inline">Ceremonia</span>
+              <span className="hidden sm:inline">{t('seating.toolbar.ceremony')}</span>
             </button>
           )}
 
@@ -107,33 +140,57 @@ const SeatingPlanToolbar = ({
             <button
               onClick={onOpenBanquetConfig}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title="Configurar banquete"
+              title={t('seating.toolbar.banquetConfig')}
             >
               <Grid className="h-4 w-4" />
-              <span className="hidden sm:inline">Banquete</span>
+              <span className="hidden sm:inline">{t('seating.toolbar.banquet')}</span>
             </button>
           )}
 
           <button
             onClick={onOpenTemplates}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title="Plantillas"
+            title={t('seating.toolbar.templates')}
           >
             <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">Plantillas</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.templates')}</span>
           </button>
         </div>
 
-        {/* Grupo: Exportación (solo PDF) */}
-        <div className="flex items-center gap-1 border-r pr-3">
+        {/* Grupo: Exportación (menú) */}
+        <div ref={exportRef} className="flex items-center gap-1 border-r pr-3 relative">
           <button
-            onClick={onExportPDF}
+            onClick={() => setShowExportMenu((s) => !s)}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title="Exportar como PDF"
+            title={t('seating.toolbar.export')}
+            aria-haspopup="menu"
+            aria-expanded={showExportMenu}
           >
             <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">PDF</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.export')}</span>
           </button>
+          {showExportMenu && (
+            <div role="menu" className="absolute top-full right-0 mt-1 w-36 bg-white border rounded shadow z-10">
+              <button
+                onClick={() => { onExportPDF?.(); setShowExportMenu(false); }}
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              >
+                {t('seating.export.pdf', { defaultValue: 'PDF' })}
+              </button>
+              <button
+                onClick={() => { onExportPNG?.(); setShowExportMenu(false); }}
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              >
+                {t('seating.export.png', { defaultValue: 'PNG' })}
+              </button>
+              <button
+                onClick={() => { onExportCSV?.(); setShowExportMenu(false); }}
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              >
+                {t('seating.export.csv', { defaultValue: 'CSV' })}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Estado de sincronización */}

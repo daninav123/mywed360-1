@@ -4,11 +4,30 @@
 // Si el backend aún no está implementado, resolvemos con un mock para seguir
 // avanzando en el frontend.
 
+const BASE = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_URL || '';
+
 export async function sendBatch({ weddingId, guestIds, messageTemplate }) {
+  // Intenta obtener token Firebase para cabecera Authorization
+  async function getAuthToken() {
+    try {
+      const mod = await import('../firebaseConfig');
+      const { auth } = mod;
+      const u = auth?.currentUser;
+      if (u?.getIdToken) {
+        try { const t = await u.getIdToken(true); if (t) return t; } catch {}
+        return await u.getIdToken();
+      }
+    } catch {}
+    return null;
+  }
   try {
-    const res = await fetch('/api/whatsapp/batch', {
+    const token = await getAuthToken();
+    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const url = base ? `${base}/api/whatsapp/batch` : '/api/whatsapp/batch';
+    const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ weddingId, guestIds, messageTemplate }),
     });
 

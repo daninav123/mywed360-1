@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 import TableEditor from './TableEditor';
 import GuestItem from '../GuestItem';
 import { 
@@ -23,23 +24,25 @@ const SeatingPlanSidebar = ({
   drawMode = 'pan',
   onDrawModeChange,
   onAssignGuest,
+  onUnassignGuest,
   onAutoAssign,
   deleteTable,
   duplicateTable,
   className = ""
 }) => {
+  const { t } = useTranslations();
   const [guestSearch, setGuestSearch] = useState('');
   const [showAvailableGuests, setShowAvailableGuests] = useState(false);
   
   // Herramientas de dibujo específicas para banquete
   const drawingTools = [
-    { id: 'pan', label: 'Navegar', icon: Hand },
-    { id: 'move', label: 'Mover mesas', icon: Move },
-    { id: 'boundary', label: 'Perímetro', icon: Square },
-    { id: 'door', label: 'Puertas', icon: DoorOpen },
-    { id: 'obstacle', label: 'Obstáculos', icon: Hexagon },
-    { id: 'aisle', label: 'Pasillos', icon: Minus },
-    { id: 'erase', label: 'Borrar', icon: Eraser }
+    { id: 'pan', label: t('seating.tools.pan'), icon: Hand },
+    { id: 'move', label: t('seating.tools.moveTables'), icon: Move },
+    { id: 'boundary', label: t('seating.tools.boundary'), icon: Square },
+    { id: 'door', label: t('seating.tools.doors'), icon: DoorOpen },
+    { id: 'obstacle', label: t('seating.tools.obstacles'), icon: Hexagon },
+    { id: 'aisle', label: t('seating.tools.aisles'), icon: Minus },
+    { id: 'erase', label: t('seating.tools.erase'), icon: Eraser }
   ];
 
   // Filtrar invitados disponibles (sin asignar a mesa) con saneo defensivo
@@ -60,7 +63,7 @@ const SeatingPlanSidebar = ({
     <div className={`bg-white border rounded-lg overflow-hidden ${className}`}>
       {/* Herramientas de Dibujo */}
       <div className="bg-gray-50 px-4 py-3 border-b">
-        <h3 className="font-medium text-gray-900 mb-3">Herramientas</h3>
+        <h3 className="font-medium text-gray-900 mb-3">{t('seating.sidebar.tools')}</h3>
         <div className="grid grid-cols-2 gap-2">
           {drawingTools.map((tool) => {
             const Icon = tool.icon;
@@ -85,22 +88,22 @@ const SeatingPlanSidebar = ({
         {/* Instrucciones de uso */}
         {drawMode === 'boundary' && (
           <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
-            <strong>Perímetro:</strong> Haz clic para añadir puntos. Doble clic para cerrar el polígono.
+            <strong>{t('seating.tools.boundary')}:</strong> {t('seating.hints.boundary')}
           </div>
         )}
         {drawMode === 'obstacle' && (
           <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded text-xs text-orange-800">
-            <strong>Obstáculos:</strong> Arrastra para crear rectángulos (columnas, decoraciones).
+            <strong>{t('seating.tools.obstacles')}:</strong> {t('seating.hints.obstacle')}
           </div>
         )}
         {drawMode === 'door' && (
           <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
-            <strong>Puertas:</strong> Arrastra para marcar entradas y salidas.
+            <strong>{t('seating.tools.doors')}:</strong> {t('seating.hints.door')}
           </div>
         )}
         {drawMode === 'aisle' && (
           <div className="mt-3 p-2 bg-purple-50 border border-purple-200 rounded text-xs text-purple-800">
-            <strong>Pasillos:</strong> Arrastra para crear líneas de circulación.
+            <strong>{t('seating.tools.aisles')}:</strong> {t('seating.hints.aisle')}
           </div>
         )}
       </div>
@@ -111,7 +114,7 @@ const SeatingPlanSidebar = ({
       {tab === 'banquet' && (
         <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Pendientes ({pendingCount})</h4>
+            <h4 className="font-medium text-gray-900">{t('seating.sidebar.pending', { count: pendingCount })}</h4>
             <button
               onClick={() => setShowAvailableGuests(!showAvailableGuests)}
               className="text-blue-600 hover:text-blue-700"
@@ -127,7 +130,7 @@ const SeatingPlanSidebar = ({
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar invitados..."
+                  placeholder={t('seating.sidebar.searchGuests')}
                   value={guestSearch}
                   onChange={(e) => setGuestSearch(e.target.value)}
                   className="w-full pl-7 pr-3 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -146,7 +149,7 @@ const SeatingPlanSidebar = ({
                   ))
                 ) : (
                   <div className="text-center py-2 text-gray-500 text-xs">
-                    {guestSearch ? 'No se encontraron invitados' : 'Todos los invitados están asignados'}
+                    {guestSearch ? t('seating.sidebar.noResults') : t('seating.sidebar.allAssigned')}
                   </div>
                 )}
               </div>
@@ -161,12 +164,12 @@ const SeatingPlanSidebar = ({
           <div className="bg-gray-50 px-4 py-3 border-b">
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-gray-900">
-                {selectedTable.name || `Mesa ${selectedTable.id}`}
+                {selectedTable.name || t('seating.sidebar.tableDefault', { id: selectedTable.id })}
               </h3>
               <button
                 onClick={() => onConfigureTable?.(selectedTable)}
                 className="p-1 hover:bg-gray-200 rounded"
-                title="Configurar mesa"
+                title={t('seating.sidebar.configureTable')}
               >
                 <Settings className="h-4 w-4" />
               </button>
@@ -180,21 +183,21 @@ const SeatingPlanSidebar = ({
             {/* Información básica */}
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Tipo:</span>
+                <span className="text-gray-600">{t('seating.sidebar.type')}:</span>
                 <span className="font-medium capitalize">
-                  {tab === 'ceremony' ? 'Ceremonia' : 'Banquete'}
+                  {tab === 'ceremony' ? t('seating.toolbar.ceremony') : t('seating.toolbar.banquet')}
                 </span>
               </div>
               
               {tab === 'banquet' && (
                 <>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Asientos:</span>
+                    <span className="text-gray-600">{t('seating.sidebar.seats')}:</span>
                     <span className="font-medium">{selectedTable.seats || 8}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Forma:</span>
+                    <span className="text-gray-600">{t('seating.sidebar.shape')}:</span>
                     <button
                       onClick={onToggleTableShape}
                       className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
@@ -212,13 +215,13 @@ const SeatingPlanSidebar = ({
               <div className="space-y-3">
                 <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1">
                   <Maximize2 className="h-4 w-4" />
-                  Dimensiones
+                  {t('seating.sidebar.dimensions')}
                 </h4>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">
-                      Ancho (cm)
+                      {t('seating.sidebar.widthCm')}
                     </label>
                     <input
                       type="number"
@@ -232,7 +235,7 @@ const SeatingPlanSidebar = ({
                   
                   <div>
                     <label className="block text-xs text-gray-600 mb-1">
-                      Largo (cm)
+                      {t('seating.sidebar.lengthCm')}
                     </label>
                     <input
                       type="number"
@@ -251,7 +254,7 @@ const SeatingPlanSidebar = ({
             <div className="space-y-3">
               <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1">
                 <Users className="h-4 w-4" />
-                Invitados Asignados ({assignedGuests.length})
+                {t('seating.sidebar.assignedGuests', { count: assignedGuests.length })}
               </h4>
               
               {assignedGuests.length > 0 ? (
@@ -271,9 +274,13 @@ const SeatingPlanSidebar = ({
                       </div>
                       
                       <button
-                        onClick={() => onAssignGuest?.(selectedTable.id, null)}
+                        onClick={() => {
+                          if (window.confirm(`Quitar a ${guest.name} de la mesa?`)) {
+                            onUnassignGuest?.(guest.id);
+                          }
+                        }}
                         className="text-red-500 hover:text-red-700 text-xs font-bold"
-                        title="Quitar invitado"
+                        title={t('seating.sidebar.removeGuest')}
                       >
                         ×
                       </button>
@@ -283,8 +290,8 @@ const SeatingPlanSidebar = ({
               ) : (
                 <div className="text-center py-4 text-gray-500">
                   <Users className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-xs">No hay invitados asignados</p>
-                  <p className="text-xs mt-1">Usa el panel de arriba para asignar</p>
+                  <p className="text-xs">{t('seating.sidebar.noAssigned')}</p>
+                  <p className="text-xs mt-1">{t('seating.sidebar.usePanelToAssign')}</p>
                 </div>
               )}
             </div>
@@ -295,7 +302,7 @@ const SeatingPlanSidebar = ({
                 onClick={() => onConfigureTable?.(selectedTable)}
                 className="w-full px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
               >
-                Configurar Mesa
+                {t('seating.sidebar.configureTable')}
               </button>
               
               {tab === 'banquet' && (
@@ -303,7 +310,7 @@ const SeatingPlanSidebar = ({
                   onClick={() => setShowAvailableGuests(!showAvailableGuests)}
                   className="w-full px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
                 >
-                  {showAvailableGuests ? 'Ocultar' : 'Mostrar'} Invitados
+                  {showAvailableGuests ? t('common.hide') : t('common.show')} {t('seating.sidebar.guests')}
                 </button>
               )}
 
@@ -312,16 +319,16 @@ const SeatingPlanSidebar = ({
                 <button
                   onClick={() => duplicateTable?.(selectedTable.id)}
                   className="px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-1"
-                  title="Duplicar mesa"
+                  title={t('seating.sidebar.duplicateTable')}
                 >
-                  <Copy className="h-4 w-4" /> Duplicar
+                  <Copy className="h-4 w-4" /> {t('common.duplicate')}
                 </button>
                 <button
                   onClick={() => { if (window.confirm('¿Eliminar esta mesa?')) deleteTable?.(selectedTable.id); }}
                   className="px-3 py-2 border border-red-300 text-red-600 rounded text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-1"
-                  title="Eliminar mesa"
+                  title={t('seating.sidebar.deleteTable')}
                 >
-                  <Trash2 className="h-4 w-4" /> Eliminar
+                  <Trash2 className="h-4 w-4" /> {t('common.delete')}
                 </button>
               </div>
             </div>

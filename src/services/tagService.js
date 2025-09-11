@@ -63,7 +63,12 @@ export const getUserTags = (userId) => {
  */
 export const getCustomTags = (userId) => {
   try {
-    // Refrescar siempre desde storage para consistencia en tests
+    // Priorizar caché en memoria si existe y tiene datos
+    const cached = runtimeCustomTags[userId];
+    if (Array.isArray(cached) && cached.length) {
+      return cached;
+    }
+    // Si no hay caché, leer desde storage
     const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
     const fromStorage = loadJson(storageKey, []);
     runtimeCustomTags[userId] = fromStorage; // cache interna
