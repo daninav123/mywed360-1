@@ -80,7 +80,7 @@
 
 ### 📱 **BAJA PRIORIDAD (6+ meses)**
 
-#### 8. **Sistema de Notificaciones Push Avanzado** ✅ **50% IMPLEMENTADO**
+#### 8. **Sistema de Notificaciones push Avanzado** ✅ **50% IMPLEMENTADO**
 **Estado**: Centro básico implementado, necesita expansión
 - ✅ **Completado**: NotificationCenter.jsx funcional
 - ✅ **Completado**: Estructura básica de notificaciones
@@ -95,7 +95,7 @@
 - **Pendiente**: Asistente virtual completo y análisis predictivo
 - **Tiempo estimado**: 12-15 semanas
 
-#### 10. **Sistema de Colaboración y Dashboard Avanzado** ❌ **15% IMPLEMENTADO**
+#### 10. **Sistema de Colaboración y DashboarD�avanzado** ❌ **15% IMPLEMENTADO**
 **Estado**: Componentes básicos creados
 - ✅ **Completado**: PlannerDashboard.jsx básico
 - ✅ **Completado**: Estructura de permisos básica
@@ -131,9 +131,19 @@
 4. RSVP inteligente con confirmaciones automáticas
 
 ### Próximo Trimestre
-1. Sistema de notificaciones push avanzado
+1. Sistema de Notificaciones push avanzado
 2. IA y automatización completa
 3. Colaboración en tiempo real y analytics
+
+## Cierre de Gaps Transversales
+
+- Cliente API unificado: migrar servicios restantes (email, inbox, AI, provider search) a `apiClient` con `Authorization` opcional (Sprint 2).
+- WhatsApp provider: definir health real o fallback para `/api/whatsapp/provider-status` y añadir healthcheck (Sprint 1).
+- CI/CD gates: Sprint 1 (unit rules + seating smoke + `roadmapOrder --check` en PR). Sprint 2 (añadir E2E email/budget en develop).
+- A11y/i18n: auditoría y fixes en vistas core (Seating, Invitados, Tasks, Email) (Sprint 2).
+- Performance/Observabilidad: Lighthouse CI, budget de bundle (<2MB), monitorización de errores (Sprint 2–4).
+- Seating Auto‑IA: E2E específico con `VITE_ENABLE_AUTO_ASSIGN=true` y documentación (Sprint 1–2).
+- Legal/compliance: plantillas por jurisdicción y evaluación firma electrónica (Sprint 4).
 
 ## Consideraciones Técnicas
 
@@ -148,7 +158,7 @@
 - Microservicios para funcionalidades complejas
 - CDN para assets estáticos
 - Cache distribuido para performance
-- Monitoreo y observabilidad avanzados
+- Monitoreo y observabilidaD�avanzados
 
 ---
 
@@ -201,3 +211,5 @@ Entregables:
 - Contratos CRUD y templates operativos.
 - Eventos de gamificación en Tasks/Timeline.
 - Chat IA mínimo funcional.
+
+

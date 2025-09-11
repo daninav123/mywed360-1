@@ -1,0 +1,75 @@
+[2025-09-11 22:19:47][INFO] Monitor iniciado. Proyecto: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia, Puerto: 5173, AutoFix: True, KillConflicts: True
+[2025-09-11 22:19:50][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:19:52][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:19:54][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:19:57][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:19:59][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:01][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:04][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:06][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:08][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:11][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:13][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:15][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:18][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:20][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:22][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:25][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:28][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:30][ERROR] Excepción en bucle: No se puede sobrescribir la variable Pid porque es de solo lectura o constante.
+[2025-09-11 22:20:42][INFO] Monitor iniciado. Proyecto: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia, Puerto: 5173, AutoFix: True, KillConflicts: True
+[2025-09-11 22:20:43][WARN] Deteniendo proceso en puerto 5173: PID=10684, Nombre=node
+[2025-09-11 22:20:44][WARN] Proceso conflictivo en 5173 detenido (node:10684).
+[2025-09-11 22:20:46][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222046.log)
+[2025-09-11 22:21:12][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:21:12][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:21:14][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222114.log)
+[2025-09-11 22:21:40][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:21:40][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:21:42][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222142.log)
+[2025-09-11 22:22:07][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:22:07][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:22:10][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222210.log)
+[2025-09-11 22:22:35][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:22:35][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:22:37][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222237.log)
+[2025-09-11 22:23:03][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:23:03][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:23:05][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222305.log)
+[2025-09-11 22:23:30][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:23:30][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:23:32][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222332.log)
+[2025-09-11 22:23:58][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:23:58][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:24:00][WARN] Deteniendo proceso en puerto 5173: PID=7640, Nombre=node
+[2025-09-11 22:24:01][WARN] Proceso conflictivo en 5173 detenido (node:7640).
+[2025-09-11 22:24:03][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222403.log)
+[2025-09-11 22:24:15][INFO] Servidor escuchando en 5173 (PID=15940). Reinicios: 8
+[2025-09-11 22:24:18][WARN] Deteniendo proceso en puerto 5173: PID=15940, Nombre=node
+[2025-09-11 22:24:18][WARN] Proceso conflictivo en 5173 detenido (node:15940).
+[2025-09-11 22:24:21][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222421.log)
+[2025-09-11 22:24:38][INFO] Servidor escuchando en 5173 (PID=18528). Reinicios: 1
+[2025-09-11 22:24:41][WARN] Deteniendo proceso en puerto 5173: PID=18528, Nombre=node
+[2025-09-11 22:24:41][WARN] Proceso conflictivo en 5173 detenido (node:18528).
+[2025-09-11 22:24:44][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222444.log)
+[2025-09-11 22:25:09][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:25:09][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:25:11][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222511.log)
+[2025-09-11 22:25:37][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:25:37][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:25:40][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222540.log)
+[2025-09-11 22:26:06][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:26:06][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:26:08][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222608.log)
+[2025-09-11 22:26:37][INFO] Monitor iniciado. Proyecto: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia, Puerto: 5173, AutoFix: True, KillConflicts: False
+[2025-09-11 22:26:38][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222638.log)
+[2025-09-11 22:27:04][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:27:04][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:27:07][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222707.log)
+[2025-09-11 22:27:32][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:27:32][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:27:34][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222734.log)
+[2025-09-11 22:28:00][WARN] El servidor no comenzó a escuchar en 5173 en 25s
+[2025-09-11 22:28:00][INFO] Sin corrección automática aplicable. Reintentando tras breve espera…
+[2025-09-11 22:28:02][INFO] Iniciando servidor: npm run dev (log: C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\logs\monitor\dev-20250911-222802.log)
+[2025-09-11 22:28:07][INFO] Servidor escuchando en 5173 (PID=19736). Reinicios: 4

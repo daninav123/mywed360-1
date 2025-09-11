@@ -1,0 +1,200 @@
+    const { from, to, subject, message } = req.body;
+    
+    if (!from || !to || !subject || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Todos los campos son obligatorios (from, to, subject, message)' 
+      });
+    }
+    
+    console.log('Verificando remitente:', from);
+    
+    // Extraer el nombre de usuario de la dirección de correo
+    const fromUser = from.split('@')[0];
+    const emailDomain = from.split('@')[1];
+    
+    // Verificar que sea un correo de mywed360.com
+    if (!emailDomain || emailDomain !== 'mywed360.com') {
+      return res.status(400).json({
+        success: false,
+        message: 'El remitente debe ser una dirección de correo de mywed360.com'
+      });
+    }
+    
+    try {
+      // Intentaremos varios métodos para resolver el problema
+      let result = null;
+      let successMethod = null;
+      let errorMessages = [];
+      
+      // Crear diferentes formatos de remitente para probar
+      const fromFormatted = `${fromUser.charAt(0).toUpperCase() + fromUser.slice(1)} <${from}>`;  // Nombre <email@dominio.com>
+      const fromWithDomain = `${from.replace('@', '@mg.')}`;  // email@mg.dominio.com
+      
+      console.log('Intentando varios formatos y configuraciones...');
+      console.log('1. Dirección original:', from);
+      console.log('2. Formato con nombre:', fromFormatted);
+      console.log('3. Dirección con mg subdomain:', fromWithDomain);
+      
+      // Opciones a probar en secuencia
+      const attemptOptions = [
+        // Intento 1: Config base con dirección original
+        {
+          client: mailgun,
+          data: {
+            from: from,
+            to: to,
+            subject: `[Prueba 1] ${subject}`,
+            text: message,
+            html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>`
+          },
+          description: 'Dirección original con dominio base'
+        },
+        // Intento 2: Config base con formato nombre <email>
+        {
+          client: mailgun,
+          data: {
+            from: fromFormatted,
+            to: to,
+            subject: `[Prueba 2] ${subject}`,
+            text: message,
+            html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>`
+          },
+          description: 'Formato con nombre con dominio base'
+        },
+        // Intento 3: Config alternativa con dirección original
+        {
+          client: mailgunAlt,
+          data: {
+            from: from,
+            to: to,
+            subject: `[Prueba 3] ${subject}`,
+            text: message,
+            html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>`
+          },
+          description: 'Dirección original con dominio de envío'
+        },
+        // Intento 4: Config alternativa con formato nombre <email>
+        {
+          client: mailgunAlt,
+          data: {
+            from: fromFormatted,
+            to: to,
+            subject: `[Prueba 4] ${subject}`,
+            text: message,
+            html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${message.replace(/\n/g, '<br>')}</div>`
+          },
+          description: 'Formato con nombre con dominio de envío'
+        }
+      ];
+      
+      // Intentar cada opción en secuencia hasta que una funcione
+      for (let i = 0; i < attemptOptions.length; i++) {
+        const attempt = attemptOptions[i];
+        console.log(`\nIntento #${i + 1}: ${attempt.description}`);
+        console.log('Configuración:', {
+          from: attempt.data.from,
+          domain: attempt.client.domain
+        });
+        
+        try {
+          result = await attempt.client.messages().send(attempt.data);
+          successMethod = attempt.description;
+          console.log(`\n¡ÉXITO! Método ${i + 1} funcionó: ${attempt.description}`);
+          break; // Sal del bucle si tuvo éxito
+        } catch (attemptError) {
+          console.error(`Error en intento #${i + 1}:`, attemptError.message);
+          errorMessages.push({ 
+            method: attempt.description, 
+            error: attemptError.message, 
+            status: attemptError.statusCode || 'desconocido' 
+          });
+        }
+      }
+      
+      // Si ninguno tuvo éxito, guardar los detalles de error y lanzar una excepción
+      if (!result) {
+        console.error('\n=========== RESUMEN DE ERRORES ===========');
+        console.error(`Todos los intentos fallaron para remitente: ${from}`);
+        errorMessages.forEach((error, index) => {
+          console.error(`Intento #${index + 1} (${error.method}): ${error.error} (Status: ${error.status})`);
+        });
+        console.error('=======================================');
+        
+        // Guardar los errores en la base de datos para analisis
+        try {
+          await db.collection('mail_config').doc('error_logs').set({
+            lastErrors: errorMessages,
+            timestamp: new Date(),
+            from: from,
+            to: to
+          }, { merge: true });
+        } catch (dbError) {
+          console.error('No se pudieron guardar los errores en la BD:', dbError);
+        }
+        
+        // Realizar diagnóstico adicional
+        console.log('\n=== DIAGNÓSTICO ADICIONAL ===');
+        const forbiddenErrors = errorMessages.filter(e => e.error.includes('Forbidden') || e.status === 403);
+        if (forbiddenErrors.length > 0) {
+          console.log('Detectado problema de permisos/autorización. Verifica:');
+          console.log('1. El dominio debe estar verificado en Mailgun');
+          console.log('2. El remitente debe estar autorizado');
+          console.log('3. La API key debe tener permisos suficientes');
+        }
+        
+        const authErrors = errorMessages.filter(e => e.status === 401 || e.error.includes('Unauthorized'));
+        if (authErrors.length > 0) {
+          console.log('Detectado problema de autenticación. Verifica:');
+          console.log('1. La API key es válida y no ha expirado');
+          console.log('2. La API key tiene acceso a la región EU');
+        }
+        
+        // Incluir datos más detallados en la excepción
+        throw { 
+          message: 'Todos los métodos de envío fallaron', 
+          details: errorMessages,
+          diagnostic: {
+            forbiddenIssues: forbiddenErrors.length > 0,
+            authIssues: authErrors.length > 0
+          }
+        };
+      }
+      
+      // Registrar el correo en la base de datos y los detalles del método exitoso
+      const newEmail = {
+        from: from,
+        to: to,
+        subject: subject,
+        body: message,
+        date: new Date(),
+        status: 'sent',
+        folder: 'sent',
+        isRead: true,
+        personalEmail: true, // Marcar como correo enviado desde dirección personalizada
+        sendMethod: successMethod // Registrar qué método funcionó
+      };
+      
+      await db.collection('mails').add(newEmail);
+      
+      // Guardar la configuración exitosa para referencia futura
+      await db.collection('mail_config').doc('successful_config').set({
+        method: successMethod,
+        timestamp: new Date(),
+        details: {
+          from: typeof result.from === 'string' ? result.from : JSON.stringify(result.from),
+          domain: typeof result.domain === 'string' ? result.domain : 'no disponible'
+        }
+      }, { merge: true });
+      
+      return res.status(200).json({
+        success: true,
+        message: `Email de prueba enviado correctamente usando el método: ${successMethod}`,
+        data: {
+          mailgunResponse: result,
+          successMethod: successMethod
+        }
+      });
+    } catch (mailgunError) {
+      console.error('Error de Mailgun:', mailgunError);
+      

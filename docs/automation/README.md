@@ -17,7 +17,7 @@ Consulta `.env.example` para una lista de campos.
 
 Archivo: `scripts/runTask.js`
 
-- Lee `roadmap.json`
+- Lee `roadmap.json` (si existen `sprint`, `priority` o `blockedBy`, el runner puede ordenar por sprint y prioridad y omitir tareas bloqueadas hasta que sus dependencias estén completadas)
 - Ejecuta la primera tarea con `status=pending` o la indicada por `--id`
 - Registra logs JSONL en `logs/tasks.log`:
   - `{timestamp, taskId, action: 'start'}`
@@ -98,6 +98,10 @@ Plantilla por entrada:
 ---
 
 ## 5) Consejos
-- Mantén `roadmap.json` con `status=pending|in_progress|completed` para priorizar la ejecución automática.
+- Mantén `roadmap.json` con `status=pending|in_progress|completed`.
+- Opcional: añade `sprint` (número), `priority` (número; menor = más prioritario) y `blockedBy` (array de ids) para facilitar ejecución ordenada y respetar dependencias.
+- Script helper: `node scripts/roadmapOrder.js --check|--write` para validar o reordenar el roadmap según estos criterios.
 - Revisa `.env.example` para Slack/SMTP y completa tus credenciales en `.env` o variables del sistema.
 - El backend ya expone `GET /metrics` (si `prom-client` está instalado) y `GET /health`.
+
+

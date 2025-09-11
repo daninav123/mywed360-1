@@ -11,6 +11,7 @@
     "dev": "vite --host --port 5173 --strictPort",
     "build": "vite build",
     "preview": "vite preview --host --port 5173 --strictPort",
+    "monitor": "powershell -ExecutionPolicy Bypass -File ./scripts/monitor-5173.ps1 -AutoFix",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --max-warnings 0",
     "lint:fix": "npm run lint -- --fix",
     "test": "vitest run",

@@ -1,5 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 
+// Distancia (px) para detectar clic cerca del primer punto y cerrar el perímetro
+const SNAP_PX = 20;
+
+
 /**
  * FreeDrawCanvas
  * Simple freehand drawing canvas that captures pointer strokes, smooths them with Chaikin algorithm,
@@ -11,6 +15,7 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
   const svgRef = useRef(null);
   const [points, setPoints] = useState([]);
   const [drawing, setDrawing] = useState(false);
+  const [nearStart, setNearStart] = useState(false);
   // Estado para mostrar la regla mientras se dibuja
   const [cursorPos, setCursorPos] = useState(null); // posición del cursor dentro del SVG
   const [segLength, setSegLength] = useState(null); // longitud del segmento actual en cm
@@ -73,7 +78,23 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
       return;
     }
     if (drawMode === 'boundary') {
-      // Modo perímetro: siempre agregar punto, mantener drawing activo
+      // Autocierre: si clic cerca del primer vértice y al menos 3 puntos
+    if (points.length >= 3) {
+      const svgRect = svgRef.current.getBoundingClientRect();
+      const first = points[0];
+      const firstPx = {
+        x: first.x * scale + offset.x + svgRect.left,
+        y: first.y * scale + offset.y + svgRect.top,
+      };
+      const dist = Math.hypot(e.clientX - firstPx.x, e.clientY - firstPx.y);
+      if (dist < SNAP_PX) {
+        onFinalize && onFinalize({ type: 'boundary', points: [...points, points[0]] });
+        setPoints([]);
+        setDrawing(false);
+        return;
+      }
+    }
+    // Modo perímetro: siempre agregar punto, mantener drawing activo
       if (points.length === 0) {
         setDrawing(true);
         setPoints([pt]);

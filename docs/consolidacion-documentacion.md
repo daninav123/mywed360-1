@@ -99,3 +99,6 @@ La diferencia clave es:
 - **`flujos-usuario.md`** = Especificación técnica para desarrolladores
 
 Ambos son necesarios pero sirven audiencias diferentes.
+
+
+

@@ -196,6 +196,8 @@ router.post('/', requireMailAccess, async (req, res) => {
       // Si falla el envío real, continuamos con la simulación para mantener la funcionalidad
       console.warn('Fallback a simulación de correo...');
     }
+    // Cerrar el bloque if (!recordOnly) que envía correo real
+    }
     
     // Registro en carpeta 'sent' para el remitente (siempre guardamos en DB)
     const sentRef = await db.collection('mails').add({
@@ -228,6 +230,8 @@ router.post('/', requireMailAccess, async (req, res) => {
       }
     } catch (e) {
       console.warn('No se pudo registrar el enviado en subcoleccion del usuario:', e?.message || e);
+    }
+    // Cerrar el bloque if (!recordOnly) que guarda en subcolección del remitente
     }
 
     // Registro en carpeta 'inbox' para el destinatario (sin leer)
@@ -270,7 +274,8 @@ router.post('/', requireMailAccess, async (req, res) => {
     }
 
     res.status(201).json({ id: sentRef.id, to, subject, body, date, folder: 'sent', read: true, from: from });
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Error en POST /api/mail:', err);
     res.status(503).json({ 
       success: false,
