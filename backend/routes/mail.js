@@ -152,6 +152,8 @@ router.post('/', requireMailAccess, async (req, res) => {
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${body.replace(/\n/g, '<br>')}</div>`
     };
     
+    // Enviar por Mailgun solo cuando no sea un registro "solo BD"
+    if (!recordOnly) {
     try {
       // Crear clientes Mailgun de forma perezosa
       const { mailgun, mailgunAlt } = createMailgunClients();
