@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Mail, Clock, CheckCircle, Eye, XCircle, ExternalLink, Calendar } from 'lucide-react';
-import Button from '../../../components/Button';
-import Card from '../../../components/Card';
+import Button from '../../../components/ui/Button';
+import Card from '../../../components/ui/Card';
 
 /**
  * @typedef {import('./EmailTrackingList').EmailTrackingItem} EmailTrackingItem
@@ -312,3 +312,4 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 };
 
 export default TrackingModal;
+

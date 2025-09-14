@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
-// import eliminado: useUserContext legacy
+// import anterior eliminado: useUserContext
 import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
 import { Card } from './ui/Card';
 import { Progress } from './ui/Progress';
@@ -25,7 +25,7 @@ export default function HomePage() {
   // Hook de autenticación unificado
   const { hasRole, userProfile, currentUser } = useAuth();
   
-  // Derivados equivalentes al UserContext legacy
+  // Derivados equivalentes al antiguo UserContext
   const role = userProfile?.role || 'particular';
   const displayName = userProfile?.name || userProfile?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
   const weddingName = localStorage.getItem('lovenda_active_wedding_name') || '';

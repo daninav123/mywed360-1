@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
@@ -509,3 +509,4 @@ export default function BodaDetalle() {
     </div>
   );
 }
+

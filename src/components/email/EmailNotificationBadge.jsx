@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { getMails, initEmailService } from '../../services/emailService';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 
 /**
  * Componente que muestra un badge con notificaciones de nuevos correos
@@ -71,3 +71,4 @@ const EmailNotificationBadge = () => {
 };
 
 export default EmailNotificationBadge;
+

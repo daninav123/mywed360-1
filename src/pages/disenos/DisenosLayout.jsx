@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 
 // Pestañas iniciales para la sección Diseños
 const tabs = [
@@ -63,3 +63,4 @@ const DisenosLayout = React.memo(() => {
 });
 
 export default DisenosLayout;
+

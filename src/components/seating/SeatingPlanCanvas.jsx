@@ -134,9 +134,25 @@ const SeatingPlanCanvas = ({
   // Handlers de eventos del canvas
   const handleWheel = useCallback((e) => {
     e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.1 : -0.1;
-    setScale((s) => Math.max(minScale, Math.min(3, s + delta)));
-  }, [minScale]);
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    setScale((prevScale) => {
+      const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      let nextScale = prevScale * zoomFactor;
+      nextScale = Math.max(minScale, Math.min(3, nextScale));
+      const scaleRatio = nextScale / prevScale;
+
+      setOffset((prevOffset) => ({
+        x: mouseX - (mouseX - prevOffset.x) * scaleRatio,
+        y: mouseY - (mouseY - prevOffset.y) * scaleRatio,
+      }));
+
+      return nextScale;
+    });
+  }, [minScale, canvasRef]);
   
   const handlePointerDown = useCallback((e) => {
     if (drawMode !== 'pan') return;
@@ -204,7 +220,8 @@ const SeatingPlanCanvas = ({
             linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
           `,
-          backgroundSize: '20px 20px'
+          backgroundSize: '20px 20px',
+          backgroundColor:'#f3f4f6',
         }}
       >
         {/* Componente SeatingCanvas existente */}

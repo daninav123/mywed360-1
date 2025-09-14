@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import ProveedorBudgets from './ProveedorBudgets.jsx';
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -306,3 +306,4 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
+

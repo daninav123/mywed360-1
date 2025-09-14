@@ -21,6 +21,7 @@ import EmailAdminDashboard from './components/admin/EmailAdminDashboard';
 import MetricsDashboard from './components/metrics/MetricsDashboard';
 import AdminRoutes from './routes/AdminRoutes';
 import UserRoutes from './routes/UserRoutes';
+import WhatsAppMetrics from './components/whatsapp/WhatsAppMetrics';
 
 import Perfil from './pages/Perfil';
 import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored';
@@ -183,7 +184,9 @@ function App() {
 
                {/* Panel de administración con monitoreo de caché */}
                <Route path="admin/*" element={<AdminRoutes />} />
-               <Route path="email-admin" element={<EmailAdminDashboard />} />
+              <Route path="email-admin" element={<EmailAdminDashboard />} />
+              {/* Métricas de WhatsApp */}
+              <Route path="whatsapp/metrics" element={<WhatsAppMetrics />} />
 
                {/* Herramientas de desarrollo (duplicado dentro del layout, sólo si está activado por env) */}
                {enableDev && <Route path="dev/seed-guests" element={<DevSeedGuests />} />}

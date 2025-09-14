@@ -3,7 +3,7 @@ import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { Plus, Download, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import Toast from '../components/Toast';
 import PageWrapper from '../components/PageWrapper';
-import Card from '../components/Card';
+import Card from '../components/ui/Card';
 
 export default function Contratos() {
   const sampleContracts = [
@@ -247,3 +247,4 @@ function ContractItem({ contract, isSelected, onToggle }) {
     </div>
   );
 }
+

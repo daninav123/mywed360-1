@@ -69,7 +69,7 @@ export default function EmailNotification() {
   }
   
   return (
-    <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border-l-4 border-blue-500 animate-bounce-once">
+    <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border-l-4 border-blue-500 animate-bounce-once" onClick={() => { try { setShowNotification(false); navigate('/email'); } catch(e){ console.error('No se pudo navegar al buzón', e);} }}>
       <div className="flex items-center">
         <div className="mr-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

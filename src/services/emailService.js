@@ -5,6 +5,7 @@
 // Estructura Mail: { id, from, to, subject, body, date, folder, read, attachments }
 
 import { auth } from '../firebaseConfig';
+import { get as apiGet, post as apiPost, del as apiDel } from './apiClient';
 // Sistema de autenticación unificado
 let authContext = null;
 
@@ -297,17 +298,12 @@ async function fetchMailgunEvents(userEmail, eventType = 'delivered') {
     const functionsBase = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 'https://us-central1-lovenda-98c77.cloudfunctions.net';
 
     const endpointUrl = backendBase && token
-      ? `${backendBase}/api/mailgun/events?${params.toString()}`
+      ? `/api/mailgun/events?${params.toString()}`
       : `${functionsBase}/getMailgunEvents?${params.toString()}`;
 
-    const response = await fetch(endpointUrl, {
-      method: 'GET',
-      signal: controller.signal,
-      headers: {
-        'Accept': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      }
-    });
+    const response = endpointUrl.startsWith('/api/')
+      ? await apiGet(endpointUrl, { auth: true })
+      : await fetch(endpointUrl, { method: 'GET', signal: controller.signal, headers: { 'Accept': 'application/json' } });
     
     clearTimeout(timeoutId);
     
@@ -443,14 +439,7 @@ export async function getMails(folder = 'inbox') {
           if (!token) {
             console.log('⏳ emailService: token no disponible todavía, se omitirá llamada al backend');
           } else {
-            const headers = {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            };
-            
-            const res = await fetch(`${backendUrl}/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, {
-              headers
-            });
+            const res = await apiGet(`/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { auth: true });
             
             if (res.ok) {
               const json = await res.json();
@@ -492,17 +481,22 @@ export async function getMails(folder = 'inbox') {
       }
       // Añadir timeout para evitar cuelgues
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const TIMEOUT_MS = 15000; // aumentar timeout por latencia en Render
+      const timeoutId = setTimeout(() => {
+        try {
+          controller.abort('Request timeout after ' + TIMEOUT_MS + 'ms');
+        } catch (e) {
+          controller.abort();
+        }
+      }, TIMEOUT_MS);
 
       // Incluir token de Firebase para pasar middleware requireMailAccess
-      const token = await getAuthToken();
-      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-
-      const res = await fetch(
-        `${BASE}/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`,
-        { signal: controller.signal, headers }
-      );
-      clearTimeout(timeoutId);
+      let res;
+      try {
+        res = await apiGet(`/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { auth: true });
+      } finally {
+        clearTimeout(timeoutId);
+      }
       if (!res.ok) {
         console.warn(`Backend /api/mail devolvió ${res.status}. Activando backoff ${BACKEND_BACKOFF_MS}ms`);
         backendDisabledUntil = Date.now() + BACKEND_BACKOFF_MS;
@@ -515,7 +509,7 @@ export async function getMails(folder = 'inbox') {
         // intentar descubrir dirección correcta a partir de cualquier correo existente.
         if (folder === 'inbox' && json.length === 0 && CURRENT_USER_EMAIL && CURRENT_USER_EMAIL.startsWith('usuario')) {
           try {
-            const altRes = await fetch(`${BASE}/api/mail?folder=inbox`, { headers: await authHeader() }); // sin filtro user
+            const altRes = await apiGet(`/api/mail?folder=inbox`, { auth: true }); // sin filtro user
             if (altRes.ok) {
               const allMails = await altRes.json();
               const myMail = allMails.find(m => m.to && m.to.endsWith(`@${MAILGUN_DOMAIN}`));
@@ -533,7 +527,7 @@ export async function getMails(folder = 'inbox') {
                 }
                 CURRENT_USER_EMAIL = newAddr;
                 // Reintentar obtener mails con la dirección correcta
-                const retry = await fetch(`${BASE}/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { headers: await authHeader() });
+                const retry = await apiGet(`/api/mail?folder=${encodeURIComponent(folder)}&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { auth: true });
                 if (retry.ok) {
                   return await retry.json();
                 }
@@ -557,8 +551,13 @@ export async function getMails(folder = 'inbox') {
       backendDisabledUntil = Date.now() + BACKEND_BACKOFF_MS;
       return [];
     } catch (error) {
-      console.error('Error con backend, usando localStorage:', error);
-      backendDisabledUntil = Date.now() + BACKEND_BACKOFF_MS;
+      if (error && (error.name === 'AbortError' || (typeof error.message === 'string' && error.message.toLowerCase().includes('abort')))) {
+        console.warn('Timeout consultando backend /api/mail, usando fallback local:', error);
+        // No activar backoff en caso de timeout
+      } else {
+        console.error('Error con backend, usando localStorage:', error);
+        backendDisabledUntil = Date.now() + BACKEND_BACKOFF_MS;
+      }
       // Fallback a localStorage si falla el backend
     }
   }
@@ -569,7 +568,7 @@ export async function getMails(folder = 'inbox') {
     if (USE_BACKEND && collectedSent.length === 0) {
       try {
         const backendMails = await (async () => {
-          const res = await fetch(`${BASE}/api/mail?folder=sent&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { headers: await authHeader() });
+          const res = await apiGet(`/api/mail?folder=sent&user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { auth: true });
           if (res.ok) {
             return await res.json();
           }
@@ -762,17 +761,13 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
       // Registrar en backend (solo registro) para que aparezca en Firestore sin reenviar
       try {
         if (USE_BACKEND && BASE) {
-          await fetch(`${BASE}/api/mail`, {
-            method: 'POST',
-            headers: await authHeader({ 'Content-Type': 'application/json' }),
-            body: JSON.stringify({
-              from: CURRENT_USER_EMAIL,
-              to,
-              subject,
-              body,
-              recordOnly: true
-            })
-          });
+          await apiPost(`/api/mail`, {
+            from: CURRENT_USER_EMAIL,
+            to,
+            subject,
+            body,
+            recordOnly: true
+          }, { auth: true });
         }
       } catch (e) {
         console.warn('[sendMail] No se pudo registrar en backend (recordOnly):', e);
@@ -789,17 +784,13 @@ export async function sendMail({ to, subject = '', body = '', attachments = [] }
   // Backend fallback
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/mail`, {
-        method: 'POST',
-        headers: await authHeader({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ 
-          from: CURRENT_USER_EMAIL,
-          to, 
-          subject, 
-          body,
-          attachments
-        }),
-      });
+      const res = await apiPost(`/api/mail`, { 
+        from: CURRENT_USER_EMAIL,
+        to, 
+        subject, 
+        body,
+        attachments
+      }, { auth: true });
       if (!res.ok) {
         const message = `Error HTTP ${res.status}`;
         // Forzar fallback a localStorage
@@ -883,7 +874,7 @@ export async function sendEmail(options) {
 export async function getMail(id) {
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/mail/${id}`, { headers: await authHeader() });
+      const res = await apiGet(`/api/mail/${id}`, { auth: true });
       if (!res.ok) {
         let json;
         try { json = await res.json(); } catch (_) {}
@@ -918,7 +909,7 @@ export async function markAsRead(id) {
   // Si hay backend disponible, priorizarlo siempre
   if (BASE) {
     try {
-      const res = await fetch(`${BASE}/api/mail/${id}/read`, { method: 'POST', headers: await authHeader() });
+      const res = await apiPost(`/api/mail/${id}/read`, null, { auth: true });
       if (!res.ok) throw new Error('Error marcar leído');
       const json = await res.json();
       return json.success ? json : { success: true };
@@ -938,7 +929,7 @@ export async function deleteMail(id) {
   // Intentar siempre backend primero
   if (BASE) {
     try {
-      const res = await fetch(`${BASE}/api/mail/${id}`, { method: 'DELETE', headers: await authHeader() });
+      const res = await apiDel(`/api/mail/${id}`, { auth: true });
       if (!res.ok) throw new Error('Error eliminando mail');
       return { success: true };
     } catch (err) {
@@ -983,7 +974,7 @@ export async function getEmailTemplates(bypassCache = false) {
   // Intentar cargar del backend si está disponible
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/email-templates?user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { headers: await authHeader() });
+      const res = await apiGet(`/api/email-templates?user=${encodeURIComponent(CURRENT_USER_EMAIL)}`, { auth: true });
       if (res.ok) {
         templates = await res.json();
         // Guardar en caché para futuras solicitudes
@@ -1054,14 +1045,10 @@ export async function saveEmailTemplate(template) {
   // Intentar guardar en el backend si está disponible
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/email-templates`, {
-        method: 'POST',
-        headers: await authHeader({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({
-          template,
-          user: CURRENT_USER_EMAIL
-        })
-      });
+      const res = await apiPost(`/api/email-templates`, {
+        template,
+        user: CURRENT_USER_EMAIL
+      }, { auth: true });
       
       if (res.ok) {
         savedTemplate = await res.json();
@@ -1136,11 +1123,7 @@ export async function deleteEmailTemplate(templateId) {
   // Intentar eliminar en backend si está disponible
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/email-templates/${templateId}`, {
-        method: 'DELETE',
-        headers: await authHeader({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ user: CURRENT_USER_EMAIL })
-      });
+      const res = await apiDel(`/api/email-templates/${templateId}`, { auth: true });
       
       if (res.ok) {
         success = true;

@@ -4,7 +4,7 @@ import { AlertCircle, Paperclip } from 'lucide-react';
 import Button from '../Button';
 import Card from '../Card';
 import * as EmailService from '../../services/emailService';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 
 /**
@@ -160,3 +160,4 @@ const ComposeEmail = () => {
 };
 
 export default ComposeEmail;
+

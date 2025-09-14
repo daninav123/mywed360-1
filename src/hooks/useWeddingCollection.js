@@ -45,8 +45,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
   useEffect(() => {
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
     let isMounted = true;
+    const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS !== 'false';
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
+      if (!ENABLE_LEGACY_FALLBACKS) return; // desactivado por flag
       // Esperar inicialización completa de Firebase
       await firebaseReady;
       if (subName !== 'guests' || !weddingId) return;
@@ -104,6 +106,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     migrateGuests();
     // Intento de migración automática de proveedores antiguos
     async function migrateSuppliers() {
+      if (!ENABLE_LEGACY_FALLBACKS) return; // desactivado por flag
       // Esperar inicialización completa de Firebase
       await firebaseReady;
       if (subName !== 'suppliers' || !weddingId) return;

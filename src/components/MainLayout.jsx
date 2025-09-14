@@ -45,8 +45,8 @@ export default function MainLayout() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
+          <p className="text-[color:var(--color-text)]/70">Cargando...</p>
         </div>
       </div>
     );
@@ -71,46 +71,47 @@ export default function MainLayout() {
           <div className="relative" data-user-menu>
             <div 
               onClick={() => setOpenMenu(!openMenu)} 
-              className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 hover:ring-blue-300 ${
-                openMenu ? 'ring-2 ring-blue-500 bg-blue-50' : 'bg-gray-100 hover:bg-gray-200'
+              className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
+                openMenu ? 'ring-2 bg-[var(--color-accent)]/20' : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent)]/20'
               } flex items-center justify-center`}
               title="Menú de usuario"
+              style={{ '--tw-ring-color': 'var(--color-primary)' }}
             >
-              <DefaultAvatar className="w-6 h-6 text-gray-600" />
+              <DefaultAvatar className="w-6 h-6 text-[color:var(--color-text)]/70" />
             </div>
             {openMenu && (
-              <div className="absolute right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-1 space-y-1 min-w-[200px] z-50">
+              <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text)]/15 rounded-lg shadow-lg p-1 space-y-1 min-w-[200px] z-50">
                 <Link 
                   to="/perfil" 
                   onClick={() => setOpenMenu(false)} 
-                  className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
                   👤 Perfil
                 </Link>
                 <Link 
                   to="/notificaciones" 
                   onClick={() => setOpenMenu(false)} 
-                  className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
                   🔔 Notificaciones
                 </Link>
                 <Link 
                   to="/email" 
                   onClick={() => setOpenMenu(false)} 
-                  className="flex items-center px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+                  className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
                   📧 Buzón de Emails
                 </Link>
-                <div className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                <div className="px-3 py-2 hover:bg-[var(--color-accent)]/20 rounded-md transition-colors">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">🌙 Modo oscuro</span>
                     <DarkModeToggle className="ml-2" />
                   </div>
                 </div>
-                <div className="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+                <div className="border-t border-[color:var(--color-text)]/15 my-1"></div>
                 <button 
                   onClick={() => { logoutUnified(); setOpenMenu(false); }} 
-                  className="w-full text-left px-3 py-2 text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-md transition-colors flex items-center"
+                  className="w-full text-left px-3 py-2 text-sm text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded-md transition-colors flex items-center"
                 >
                   🚪 Cerrar sesión
                 </button>

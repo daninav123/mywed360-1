@@ -15,8 +15,8 @@ import {
   Legend,
 } from 'chart.js';
 import { RefreshCw, Mail, Clock, User, Tag, Folder, Eye, MousePointerClick } from 'lucide-react';
-import Button from '../Button';
-import Card from '../Card';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 import { generateUserStats, getUserStats } from '../../services/statsService';
 import { getDailyStats } from '../../services/emailMetricsService';
 

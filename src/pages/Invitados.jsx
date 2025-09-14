@@ -21,7 +21,7 @@ import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminado código legacy (597 líneas → 140 líneas)
+ * - Eliminada complejidad anterior (597 líneas → 140 líneas)
  * - Arquitectura modular con componentes especializados
  * - Hook personalizado useGuests para lógica centralizada
  * - Memoización y optimización de re-renders

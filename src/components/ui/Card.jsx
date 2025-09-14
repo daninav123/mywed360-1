@@ -1,11 +1,9 @@
 import React from 'react';
 
 function Card({ children, className = '', ...props }) {
-  // Estilo unificado: fondo semitransparente y blur de fondo
-
-    return (
+  return (
     <div
-      className={`bg-white rounded-xl shadow-md border border-gray-200 p-6 ${className}`}
+      className={`rounded-xl shadow-md border p-6 bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text)]/15 ${className}`}
       {...props}
     >
       {children}

@@ -1,16 +1,23 @@
 import React from 'react';
-function Progress({ value, max=100, variant='primary', className = '' }) {
-  const getColor = () => {
-    switch(variant) {
-      case 'success': return 'bg-pastel-green';
-      case 'primary': return 'bg-pastel-blue';
-      case 'destructive': return 'bg-pastel-pink';
-      default: return 'bg-gray-300';
+function Progress({ value, max = 100, variant = 'primary', className = '' }) {
+  const getBarClass = () => {
+    switch (variant) {
+      case 'success':
+        return 'bg-[var(--color-success)]';
+      case 'destructive':
+      case 'danger':
+        return 'bg-[var(--color-danger)]';
+      case 'primary':
+      default:
+        return 'bg-[var(--color-primary)]';
     }
   };
   return (
-    <div className={`group cursor-pointer w-full bg-gray-200 rounded-full overflow-visible ${className}`}>
-      <div className={`${getColor()} transition-transform duration-200 ease-in-out transform origin-bottom group-hover:scale-y-110`} style={{ width: `${(value/max)*100}%`, height: '100%' }} />
+    <div className={`group cursor-pointer w-full rounded-full overflow-visible bg-gray-200 ${className}`}>
+      <div
+        className={`${getBarClass()} transition-transform duration-200 ease-in-out transform origin-bottom group-hover:scale-y-110`}
+        style={{ width: `${(value / max) * 100}%`, height: '100%' }}
+      />
     </div>
   );
 }

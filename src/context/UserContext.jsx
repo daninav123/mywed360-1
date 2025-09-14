@@ -16,7 +16,7 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 // Stub de compatibilidad: reexporta datos del nuevo sistema de autenticación
-// Elimina la lógica legacy, simplificando su mantenimiento.
+// Elimina la lógica anterior, simplificando su mantenimiento.
 const UserContext = createContext({
   user: null,
   isAuthenticated: false,
@@ -232,3 +232,4 @@ action: null;
     </UserContext.Provider>
   );
 }
+

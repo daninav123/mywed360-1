@@ -176,7 +176,7 @@ const GlobalSearch = () => {
   const handleSelectResult = (item) => {
     switch (item.type) {
       case 'email':
-        navigate(`/buzon/${item.id}`);
+        navigate(`/email#${item.id}`);
         break;
       case 'event':
         navigate(`/calendario/evento/${item.id}`);

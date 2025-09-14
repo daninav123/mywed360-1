@@ -1,61 +1,50 @@
 import React from 'react';
 
 /**
- * Componente Button personalizado 
- * Ofrece diferentes variantes y tamaños
- * 
- * @component
- * @example
- * ```jsx
- * <Button variant="primary" size="md" onClick={handleClick}>Click me</Button>
- * ```
+ * Componente Button con variantes basadas en tokens CSS
+ * Usa --color-primary, --color-text, --color-surface, --color-danger
  */
 export default function Button({
   children,
-  variant = "primary",
-  size = "md",
-  className = "",
+  variant = 'primary',
+  size = 'md',
+  className = '',
   disabled = false,
   onClick,
-  type = "button",
+  type = 'button',
   startIcon,
   leftIcon,
   ...props
 }) {
-  // Clases base
-  const baseClasses = "inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2";
-  
-  // Variantes
-  const variantClasses = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white",
-    secondary: "bg-gray-100 hover:bg-gray-200 text-gray-900",
-    outline: "bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700",
-    ghost: "bg-transparent hover:bg-gray-100 text-gray-700",
-    destructive: "bg-red-600 hover:bg-red-700 text-white",
-    danger: "bg-red-600 hover:bg-red-700 text-white",
-    link: "bg-transparent underline-offset-4 hover:underline text-blue-600 hover:text-blue-800"
-  };
-  
-  // Tamaños
-  const sizeClasses = {
-    xs: "text-xs px-2 py-1 rounded",
-    sm: "px-3 py-1.5 text-sm rounded",
-    md: "text-sm px-4 py-2 rounded-md",
-    lg: "px-5 py-2.5 text-lg rounded-md",
-    xl: "text-lg px-6 py-3 rounded-md"
-  };
-  
-  // Estado deshabilitado
-  const disabledClasses = disabled ? "disabled:opacity-60 opacity-60 cursor-not-allowed pointer-events-none" : "cursor-pointer";
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md';
 
-  // Juntar todas las clases
+  const variantClasses = {
+    primary: 'bg-[var(--color-primary)] text-white hover:brightness-95',
+    secondary: 'bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/15 hover:bg-[var(--color-accent)]/20',
+    outline: 'bg-transparent border border-[color:var(--color-text)]/25 text-[color:var(--color-text)] hover:bg-[var(--color-accent)]/10',
+    ghost: 'bg-transparent text-[color:var(--color-text)] hover:bg-[var(--color-accent)]/10',
+    destructive: 'bg-[var(--color-danger)] text-white hover:brightness-90',
+    danger: 'bg-[var(--color-danger)] text-white hover:brightness-90',
+    link: 'bg-transparent underline-offset-4 hover:underline text-[var(--color-primary)] hover:brightness-110'
+  };
+
+  const sizeClasses = {
+    xs: 'text-xs px-2 py-1',
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'text-sm px-4 py-2',
+    lg: 'px-5 py-2.5 text-base',
+    xl: 'text-lg px-6 py-3'
+  };
+
+  const disabledClasses = disabled ? 'opacity-60 cursor-not-allowed pointer-events-none' : 'cursor-pointer';
+
   const buttonClasses = [
     baseClasses,
     variantClasses[variant] || variantClasses.primary,
     sizeClasses[size] || sizeClasses.md,
     disabledClasses,
     className
-  ].join(" ");
+  ].join(' ');
 
   return (
     <button
@@ -64,11 +53,11 @@ export default function Button({
       disabled={disabled}
       aria-disabled={disabled}
       onClick={onClick}
+      // Asegurar color del foco acorde al tema
+      style={{ '--tw-ring-color': 'var(--color-primary)' }}
       {...props}
     >
-      { (startIcon || leftIcon) && <span className="mr-2">{startIcon || leftIcon}</span>}
+      {(startIcon || leftIcon) && <span className="mr-2">{startIcon || leftIcon}</span>}
       {children}
     </button>
-  );
-}
-
+  );}

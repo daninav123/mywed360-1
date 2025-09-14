@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import Button from '../../../components/Button';
+import Button from '../../../components/ui/Button';
 import { useAIProviderEmail } from '../../../hooks/useAIProviderEmail';
 import Alert from '../../../components/Alert';
 

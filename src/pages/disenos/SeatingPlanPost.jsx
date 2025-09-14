@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 import { loadData } from '../../services/SyncService';
 import { useWedding } from '../../context/WeddingContext';
 import useWeddingCollection from '../../hooks/useWeddingCollection';
@@ -99,3 +99,4 @@ export default function SeatingPlanPost() {
     </div>
   );
 }
+

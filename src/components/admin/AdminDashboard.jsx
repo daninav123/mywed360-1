@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 import { Grid, Card, CardContent, CardHeader, Typography, Box, Chip, Avatar } from '@mui/material';
 import { 
   Users, 

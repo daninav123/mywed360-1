@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { trackInteraction } from '../services/inspirationService';
 import { fetchWall } from '../services/wallService';
 import { saveData, loadData } from '../services/SyncService';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import Spinner from '../components/Spinner';
 import InspirationGallery from '../components/gallery/InspirationGallery';
 import SearchBar from '../components/SearchBar';
@@ -127,6 +127,7 @@ export default function Inspiration() {
     </div>
   );
 }
+
 
 
 

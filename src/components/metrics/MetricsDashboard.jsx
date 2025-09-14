@@ -11,8 +11,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
          LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { RefreshCw, Filter, ChevronDown, Download } from 'lucide-react';
-import Card from '../Card';
-import Button from '../Button';
+import Card from '../ui/Card';
+import Button from '../ui/Button';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 

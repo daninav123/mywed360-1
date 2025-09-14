@@ -11,7 +11,7 @@ import {
   Mail
 } from 'lucide-react';
 import { Button } from '../components/ui';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * Layout principal para la sección de administración

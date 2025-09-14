@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
-import Card from '../components/Card';
-import Button from '../components/Button';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 import { useWedding } from '../context/WeddingContext';
 import { useParams, useNavigate } from 'react-router-dom';
 import useWeddingCollection from '../hooks/useWeddingCollection';
@@ -14,6 +14,7 @@ import { Plus, Search, RefreshCcw, Star, Eye, Edit2, Trash2, Calendar, Clock, Do
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/Toast';
 import { awardPoints } from '../services/GamificationService';
+import { post as apiPost } from '../services/apiClient';
 
 export default function Proveedores() {
   // Indicar si hay boda activa
@@ -481,18 +482,14 @@ const handleAiSearch = async (e) => {
       // Extraer ubicación de la boda
       const weddingLocation = extractWeddingLocation(profileData);
       
-      // Si tenemos API de backend, intentamos usarla primero
-      const res = await fetch('/api/ai-suppliers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: aiQuery,
-          service: serviceFilter,
-          budget: budgetRange,
-          profile: profileData,
-          location: weddingLocation // Añadir explícitamente la ubicación
-        })
-      });
+      // Si tenemos API de backend, intentamos usarla primero (apiClient + auth)
+      const res = await apiPost('/api/ai-suppliers', {
+        query: aiQuery,
+        service: serviceFilter,
+        budget: budgetRange,
+        profile: profileData,
+        location: weddingLocation // Añadir explícitamente la ubicación
+      }, { auth: true });
       
       let data = [];
       if (res.ok) {
@@ -510,7 +507,7 @@ const handleAiSearch = async (e) => {
           window.dispatchEvent(new Event('lovenda-suppliers'));
         });
       } else {
-        // Si la ruta no existe o responde vacío, usar OpenAI directamente
+        // Si la ruta no existe o responde vacío, usar OpenAI directamente si está habilitado
         await fetchOpenAi();
         return;
       }
@@ -753,7 +750,7 @@ const handleAiSearch = async (e) => {
     })();
   }, [weddingId, wantedServices, providers]);
 
-  // Búsqueda directa usando OpenAI cuando la API backend no responde
+  // Búsqueda directa usando OpenAI cuando la API backend no responde (controlado por flag)
   const fetchOpenAi = async () => {
     // VALIDACIÓN MEJORADA: Garantizar que tenemos al menos un criterio de búsqueda
     if (!aiQuery && !serviceFilter) {
@@ -761,7 +758,14 @@ const handleAiSearch = async (e) => {
       setAiLoading(false);
       return;
     }
-    
+    // Respetar flag de seguridad para deshabilitar fallback directo
+    const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+    if (!allowDirect) {
+      setToast({ message: 'Fallback directo a OpenAI deshabilitado en esta instancia.', type: 'error' });
+      setAiLoading(false);
+      return;
+    }
+
     // IMPORTANTE: Siempre garantizar que tenemos un tipo de servicio definido
     const servicioSeleccionado = serviceFilter || 
                                (aiQuery.toLowerCase().includes('fotograf') ? 'Fotografía' : 
@@ -2676,4 +2680,6 @@ ${bride} y ${groom}`;
     </PageWrapper>
   );
 }
+
+
 

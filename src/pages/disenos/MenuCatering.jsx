@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 import { saveData, loadData } from '../../services/SyncService';
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 
@@ -92,3 +92,4 @@ export default function MenuCatering() {
     </div>
   );
 }
+

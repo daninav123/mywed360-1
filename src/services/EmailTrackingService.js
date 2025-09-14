@@ -1,5 +1,6 @@
 // EmailTrackingService.js - Servicio para el seguimiento de respuestas de proveedores
 import { saveData, loadData } from './SyncService';
+import { addTagToEmail, SYSTEM_TAGS } from './tagService';
 
 const TRACKING_STORAGE_KEY = 'lovenda_email_tracking';
 
@@ -249,6 +250,6 @@ export function detectProviderResponse(email, providers) {
 }
 
 // Marcar un correo relacionado con un proveedor
-export function tagProviderEmail(emailId, providerId) {
+export function tagProviderEmail_old(emailId, providerId) {
   // Implementación pendiente - requiere integración con EmailService
 }

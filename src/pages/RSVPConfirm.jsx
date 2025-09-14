@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { get as apiGet, put as apiPut } from '../services/apiClient';
 
 function RSVPConfirm() {
   const { token } = useParams();
@@ -14,7 +15,7 @@ function RSVPConfirm() {
   useEffect(() => {
     const fetchGuest = async () => {
       try {
-        const res = await fetch(`/api/rsvp/by-token/${token}`);
+        const res = await apiGet(`/api/rsvp/by-token/${token}`);
         if (!res.ok) throw new Error('Invitado no encontrado');
         const data = await res.json();
         setGuest(data);
@@ -33,11 +34,7 @@ function RSVPConfirm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`/api/rsvp/by-token/${token}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, companions: Number(companions), allergens })
-      });
+      const res = await apiPut(`/api/rsvp/by-token/${token}`, { status, companions: Number(companions), allergens });
       if (!res.ok) throw new Error('Error enviando respuesta');
       toast.success('¡Respuesta registrada!');
       setSubmitted(true);

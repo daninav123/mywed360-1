@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
 import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
-import Card from '../components/Card';
+import Card from '../components/ui/Card';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 
 export default function Invitaciones() {
@@ -251,3 +251,4 @@ export default function Invitaciones() {
     </Card>
   );
 }
+

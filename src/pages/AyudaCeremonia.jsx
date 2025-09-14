@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { MessageSquare, Clock, RefreshCcw } from 'lucide-react';
 import PageWrapper from '../components/PageWrapper';
 
@@ -124,3 +124,4 @@ export default function AyudaCeremonia() {
     </PageWrapper>
   );
 }
+

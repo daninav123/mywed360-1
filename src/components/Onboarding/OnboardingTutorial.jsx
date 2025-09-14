@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
 import { googleCalendarService } from '../../services/GoogleCalendarService';
@@ -433,3 +433,4 @@ const OnboardingTutorial = ({ onComplete }) => {
 };
 
 export default OnboardingTutorial;
+

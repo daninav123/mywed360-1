@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { Search, RefreshCcw } from 'lucide-react';
 import ProveedorCard from './ProveedorCard';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -242,3 +242,4 @@ const ProveedorList = ({
 };
 
 export default ProveedorList;
+

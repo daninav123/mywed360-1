@@ -15,7 +15,7 @@ export default function PageWrapper({ title, actions = null, className = '', chi
     <div className={`p-4 md:p-6 space-y-8 ${className}`}>
       {(title || actions) && (
         <div className="flex items-center justify-between flex-wrap gap-2">
-          {title && <h1 className="text-2xl font-bold text-gray-800 mr-auto">{title}</h1>}
+          {title && <h1 className="text-2xl font-bold text-[color:var(--color-text)] mr-auto">{title}</h1>}
           {actions && <div className="flex gap-2">{actions}</div>}
         </div>
       )}

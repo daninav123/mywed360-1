@@ -9,6 +9,11 @@
   --color-text: #1f2937;
   --color-primary: #8ACBFF;
   --color-accent: #FFE4F2;
+  /* Extended tokens */
+  --color-success: #22c55e; /* green-500 */
+  --color-warning: #f59e0b; /* amber-500 */
+  --color-danger: #ef4444;  /* red-500 */
+  --radius-md: 0.75rem;
 }
 .dark {
   --color-bg: #1f2937;
@@ -16,6 +21,9 @@
   --color-text: #f3f4f6;
   --color-primary: #2563eb;
   --color-accent: #db2777;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
 }
 
 

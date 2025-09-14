@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
 // Variable mutable para cambiar el rol entre tests
@@ -15,6 +16,12 @@ vi.mock('../../context/UserContext', () => ({
 vi.mock('../../context/AuthContext', () => ({
   __esModule: true,
   AuthProvider: ({ children }) => <>{children}</>,
+}));
+
+vi.mock('../../hooks/useAuth', () => ({
+  __esModule: true,
+  default: () => ({ userProfile: { role: mockRole }, hasRole: () => false }),
+  useAuth: () => ({ userProfile: { role: mockRole }, hasRole: () => false }),
 }));
 
 import Nav from '../Nav.jsx';
@@ -36,7 +43,11 @@ describe('Nav – visibilidad según rol', () => {
     ['ayudante', ['Tareas', 'Protocolo', 'Más']],
   ])('muestra %p correctamente', (role, expected) => {
     mockRole = role;
-    render(<Nav />);
+    render(
+      <MemoryRouter>
+        <Nav />
+      </MemoryRouter>
+    );
     expect(getLabels()).toEqual(expected);
   });
 });

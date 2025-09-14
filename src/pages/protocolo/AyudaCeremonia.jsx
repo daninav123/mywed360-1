@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '../../components/ui';
 import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 
 const AyudaCeremonia = () => {
   const { currentUser } = useAuth();
@@ -531,3 +531,4 @@ const AyudaCeremonia = () => {
 };
 
 export default AyudaCeremonia;
+

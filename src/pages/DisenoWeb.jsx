@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 export default function DisenoWeb() {
   const { currentUser } = useAuth();
@@ -417,3 +417,4 @@ export default function DisenoWeb() {
     </div>
   );
 }
+

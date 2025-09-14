@@ -88,8 +88,8 @@ export default function BudgetManager({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Gestión de Presupuesto</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Gestión de Presupuesto</h2>
+          <p className="text-sm text-[color:var(--color-text)]/70">
             Organiza y controla el presupuesto por categorías
           </p>
         </div>
@@ -105,44 +105,44 @@ export default function BudgetManager({
       <Card className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-primary)]/15 rounded-full mx-auto mb-3">
+              <Target className="w-6 h-6 text-[var(--color-primary)]" />
             </div>
-            <p className="text-sm font-medium text-gray-600">Presupuesto Total</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(budget.total)}</p>
+            <p className="text-sm font-medium text-[color:var(--color-text)]/70">Presupuesto Total</p>
+            <p className="text-2xl font-bold text-[color:var(--color-text)]">{formatCurrency(budget.total)}</p>
           </div>
           
           <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-green-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-success)]/15 rounded-full mx-auto mb-3">
+              <Target className="w-6 h-6 text-[color:var(--color-success)]" />
             </div>
-            <p className="text-sm font-medium text-gray-600">Presupuestado</p>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalBudgeted)}</p>
+            <p className="text-sm font-medium text-[color:var(--color-text)]/70">Presupuestado</p>
+            <p className="text-2xl font-bold text-[color:var(--color-success)]">{formatCurrency(totalBudgeted)}</p>
           </div>
           
           <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-red-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-danger)]/15 rounded-full mx-auto mb-3">
+              <Target className="w-6 h-6 text-[color:var(--color-danger)]" />
             </div>
-            <p className="text-sm font-medium text-gray-600">Gastado</p>
-            <p className="text-2xl font-bold text-red-600">{formatCurrency(totalSpent)}</p>
+            <p className="text-sm font-medium text-[color:var(--color-text)]/70">Gastado</p>
+            <p className="text-2xl font-bold text-[color:var(--color-danger)]">{formatCurrency(totalSpent)}</p>
           </div>
         </div>
 
         {/* Barra de progreso general */}
         <div className="mt-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+          <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
             <span>Progreso del presupuesto</span>
             <span>{budget.total > 0 ? ((totalSpent / budget.total) * 100).toFixed(1) : 0}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-300 ${
                 totalSpent > budget.total 
-                  ? 'bg-red-500' 
+                  ? 'bg-[var(--color-danger)]' 
                   : totalSpent > budget.total * 0.8 
-                  ? 'bg-orange-500' 
-                  : 'bg-green-500'
+                  ? 'bg-[var(--color-warning)]' 
+                  : 'bg-[var(--color-success)]'
               }`}
               style={{ 
                 width: `${Math.min((totalSpent / budget.total) * 100, 100)}%` 
@@ -154,8 +154,8 @@ export default function BudgetManager({
 
       {/* Lista de categorías */}
       <Card className="overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Categorías de Presupuesto</h3>
+        <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10">
+          <h3 className="text-lg font-medium text-[color:var(--color-text)]">Categorías de Presupuesto</h3>
         </div>
         
         {budgetUsage.length === 0 ? (
@@ -166,16 +166,16 @@ export default function BudgetManager({
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-[color:var(--color-text)]/10">
             {budgetUsage.map((category, index) => (
               <div key={index} className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <h4 className="text-lg font-medium text-gray-900">
+                    <h4 className="text-lg font-medium text-[color:var(--color-text)]">
                       {category.name}
                     </h4>
                     {category.percentage >= 100 && (
-                      <div className="flex items-center text-red-600 bg-red-50 px-2 py-1 rounded-full">
+                      <div className="flex items-center text-[color:var(--color-danger)] bg-[var(--color-danger)]/10 px-2 py-1 rounded-full">
                         <AlertTriangle size={14} className="mr-1" />
                         <span className="text-xs font-medium">Excedido</span>
                       </div>
@@ -185,13 +185,13 @@ export default function BudgetManager({
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleEditCategory(category, index)}
-                      className="text-blue-600 hover:text-blue-800 p-1"
+                      className="text-[var(--color-primary)] hover:brightness-110 p-1"
                     >
                       <Edit3 size={16} />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(index, category.name)}
-                      className="text-red-600 hover:text-red-800 p-1"
+                      className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -200,21 +200,21 @@ export default function BudgetManager({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-gray-600">Presupuestado</p>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="text-sm text-[color:var(--color-text)]/70">Presupuestado</p>
+                    <p className="text-lg font-semibold text-[color:var(--color-text)]">
                       {formatCurrency(category.amount)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Gastado</p>
-                    <p className="text-lg font-semibold text-red-600">
+                    <p className="text-sm text-[color:var(--color-text)]/70">Gastado</p>
+                    <p className="text-lg font-semibold text-[color:var(--color-danger)]">
                       {formatCurrency(category.spent)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Restante</p>
+                    <p className="text-sm text-[color:var(--color-text)]/70">Restante</p>
                     <p className={`text-lg font-semibold ${
-                      category.remaining >= 0 ? 'text-green-600' : 'text-red-600'
+                      category.remaining >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'
                     }`}>
                       {formatCurrency(category.remaining)}
                     </p>
@@ -223,18 +223,18 @@ export default function BudgetManager({
 
                 {/* Barra de progreso de la categoría */}
                 <div>
-                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
                     <span>Progreso</span>
                     <span>{category.percentage.toFixed(1)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-300 ${
                         category.percentage >= 100 
-                          ? 'bg-red-500' 
+                          ? 'bg-[var(--color-danger)]' 
                           : category.percentage >= 75 
-                          ? 'bg-orange-500' 
-                          : 'bg-green-500'
+                          ? 'bg-[var(--color-warning)]' 
+                          : 'bg-[var(--color-success)]'
                       }`}
                       style={{ 
                         width: `${Math.min(category.percentage, 100)}%` 
@@ -309,3 +309,4 @@ export default function BudgetManager({
     </div>
   );
 }
+

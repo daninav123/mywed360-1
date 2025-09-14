@@ -12,7 +12,7 @@ export default function Login() {
   // Nuevo sistema unificado
   const { login: unifiedLogin, isAuthenticated: unifiedAuth, isLoading } = useAuth();
   
-  // Usar el nuevo sistema como principal, con fallback al legacy
+  // Usar el nuevo sistema como principal, con fallback básico
   const authLogin = unifiedLogin;
   const authStatus = unifiedAuth;
   const authLoading = isLoading;

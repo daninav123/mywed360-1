@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { saveData, loadData } from '../../services/SyncService';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 import UploadImageCard from '../../components/UploadImageCard';
 
 import { useWedding } from '../../context/WeddingContext';
@@ -97,3 +97,4 @@ export default function Logo() {
     </div>
   );
 }
+

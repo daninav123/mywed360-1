@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
 import Spinner from './Spinner';
+import { post as apiPost } from '../services/apiClient';
 
 export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   const { activeWedding } = useWedding();
@@ -112,19 +113,15 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       
       const formattedLocation = locationInfo || 'Valencia';
       
-      // Intentar realizar la búsqueda a través del API proxy
+      // Intentar realizar la búsqueda a través del API proxy (apiClient, con auth opcional)
       try {
-        const res = await fetch('/api/ai-suppliers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            query: aiQuery, 
-            service: serviceFilter, 
-            budget: budgetRange, 
-            profile: profile,
-            location: formattedLocation
-          })
-        });
+        const res = await apiPost('/api/ai-suppliers', {
+          query: aiQuery,
+          service: serviceFilter,
+          budget: budgetRange,
+          profile: profile,
+          location: formattedLocation,
+        }, { auth: true });
         
         let data = [];
         if (res.ok) {
@@ -146,7 +143,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         console.error("Error en solicitud API:", err);
       }
       
-      // Si la solicitud API falló o no devolvió resultados, usar OpenAI directamente
+      // Si la solicitud API falló o no devolvió resultados, usar OpenAI directamente (si está habilitado)
       await fetchOpenAi();
     } catch (err) {
       console.error("Error general:", err);
@@ -159,8 +156,16 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     }
   }, [aiQuery, activeWedding, serviceFilter, budgetRange, verifyProviderLinks]);
 
-  // Función para buscar proveedores usando OpenAI directamente
+  // Función para buscar proveedores usando OpenAI directamente (solo si está permitido por flag)
   const fetchOpenAi = async () => {
+    const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+    if (!allowDirect) {
+      setToast({
+        message: 'Búsqueda IA vía backend no disponible y fallback directo deshabilitado.',
+        type: 'error',
+      });
+      return;
+    }
     try {
       let profile = {};
         if (activeWedding) {

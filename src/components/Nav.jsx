@@ -142,7 +142,7 @@ function Nav() {
   // Hook de traducciones
   const { t } = useTranslations();
   
-  // Usar el nuevo sistema para el rol, con fallback al legacy
+  // Usar el nuevo sistema para el rol, con fallback básico
   const role = userProfile?.role || 'owner';
   const navItems = React.useMemo(() => getNavItems(role, t), [role, t]);
   

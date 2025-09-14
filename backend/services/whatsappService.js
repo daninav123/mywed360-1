@@ -150,9 +150,27 @@ export async function updateDeliveryStatusFromTwilio(payload) {
 
 export function providerStatus() {
   const provider = (process.env.WHATSAPP_PROVIDER || 'twilio').toLowerCase();
-  if (provider !== 'twilio') return { configured: false, provider };
-  const ok = Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_WHATSAPP_FROM);
-  return { configured: ok, provider };
+  if (provider !== 'twilio') {
+    return {
+      success: true,
+      configured: false,
+      provider,
+      fallback: 'deeplink',
+      details: 'Proveedor no soportado en esta instancia',
+    };
+  }
+  const missing = [];
+  if (!process.env.TWILIO_ACCOUNT_SID) missing.push('TWILIO_ACCOUNT_SID');
+  if (!process.env.TWILIO_AUTH_TOKEN) missing.push('TWILIO_AUTH_TOKEN');
+  if (!process.env.TWILIO_WHATSAPP_FROM) missing.push('TWILIO_WHATSAPP_FROM');
+  const ok = missing.length === 0;
+  return {
+    success: true,
+    configured: ok,
+    provider,
+    missingEnv: missing,
+    fallback: ok ? null : 'deeplink',
+  };
 }
 
 // ----------------- Conversación entrante (RSVP) -----------------

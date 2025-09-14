@@ -108,8 +108,9 @@ export default function WeddingProvider({ children }) {
           }
         }
 
-        // Fallback adicional: si aún no hay bodas, buscar en colección principal por roles (legacy)
-        if (list.length === 0) {
+        // Fallback adicional controlado por flag: buscar en colección principal por roles (legacy)
+        const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS !== 'false';
+        if (list.length === 0 && ENABLE_LEGACY_FALLBACKS) {
           // Intento adicional: si tenemos activeWedding en localStorage, recuperar manualmente ese doc
           if (activeWedding) {
             try {

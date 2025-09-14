@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
+import { put as apiPut } from '../services/apiClient';
 
 /**
  * Hook para escuchar los presupuestos de un proveedor específico.
@@ -37,11 +38,7 @@ export default function useSupplierBudgets(supplierId) {
   // Aceptar o rechazar
   const updateBudgetStatus = useCallback(async (budgetId, action) => {
     try {
-      const resp = await fetch(`/api/weddings/${activeWedding}/suppliers/${supplierId}/budget`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, budgetId }),
-      });
+      const resp = await apiPut(`/api/weddings/${activeWedding}/suppliers/${supplierId}/budget`, { action, budgetId }, { auth: true });
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error || 'Error');
       return { success: true };

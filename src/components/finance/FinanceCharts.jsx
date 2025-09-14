@@ -87,8 +87,8 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{label}</p>
+        <div className="p-3 border rounded-lg shadow-lg bg-[var(--color-surface)] border-[color:var(--color-text)]/15">
+          <p className="font-medium text-[color:var(--color-text)]">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: {formatCurrency(entry.value)}
@@ -104,8 +104,8 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900">Análisis Financiero</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Análisis Financiero</h2>
+        <p className="text-sm text-[color:var(--color-text)]/70">
           Visualizaciones y tendencias de tus finanzas de boda
         </p>
       </div>
@@ -113,22 +113,22 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
       {/* Estadísticas principales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4 text-center">
-          <p className="text-sm text-gray-600">Total Transacciones</p>
-          <p className="text-2xl font-bold text-gray-900">{transactions.length}</p>
+          <p className="text-sm text-[color:var(--color-text)]/70">Total Transacciones</p>
+          <p className="text-2xl font-bold text-[color:var(--color-text)]">{transactions.length}</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-sm text-gray-600">Categorías Activas</p>
+          <p className="text-sm text-[color:var(--color-text)]/70">Categorías Activas</p>
           <p className="text-2xl font-bold text-blue-600">{budgetUsage.length}</p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-sm text-gray-600">Eficiencia Presupuesto</p>
-          <p className="text-2xl font-bold text-green-600">
+          <p className="text-sm text-[color:var(--color-text)]/70">Eficiencia Presupuesto</p>
+          <p className="text-2xl font-bold text-[color:var(--color-success)]">
             {stats.totalBudget > 0 ? Math.round((1 - stats.totalSpent / stats.totalBudget) * 100) : 0}%
           </p>
         </Card>
         <Card className="p-4 text-center">
-          <p className="text-sm text-gray-600">Balance Proyectado</p>
-          <p className={`text-2xl font-bold ${stats.currentBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className="text-sm text-[color:var(--color-text)]/70">Balance Proyectado</p>
+          <p className={`text-2xl font-bold ${stats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
             {formatCurrency(stats.currentBalance)}
           </p>
         </Card>
@@ -137,7 +137,7 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Gráfico de barras: Presupuesto vs Gastado */}
         <Card className="p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             Presupuesto vs Gastado por Categoría
           </h3>
           <div className="h-80">
@@ -163,7 +163,7 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
         {/* Gráfico circular: Distribución de gastos */}
         <Card className="p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             Distribución de Gastos por Categoría
           </h3>
           <div className="h-80">
@@ -191,7 +191,7 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
         {/* Gráfico de líneas: Tendencia mensual */}
         <Card className="p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             Tendencia Mensual de Ingresos y Gastos
           </h3>
           <div className="h-80">
@@ -231,7 +231,7 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
         {/* Gráfico de barras: Progreso del presupuesto */}
         <Card className="p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
             Progreso del Presupuesto por Categoría
           </h3>
           <div className="h-80">
@@ -254,15 +254,15 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
       {/* Resumen de insights */}
       <Card className="p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
           Insights Financieros
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Categoría con mayor gasto */}
           {expenseDistribution.length > 0 && (
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h4 className="font-medium text-red-800 mb-2">Mayor Gasto</h4>
-              <p className="text-sm text-red-700">
+            <div className="p-4 rounded-lg bg-[var(--color-danger)]/10">
+              <h4 className="font-medium text-[color:var(--color-danger)] mb-2">Mayor Gasto</h4>
+              <p className="text-sm text-[color:var(--color-danger)]/90">
                 <span className="font-medium">{expenseDistribution[0].name}</span>
                 <br />
                 {formatCurrency(expenseDistribution[0].value)}
@@ -272,9 +272,9 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
           {/* Categoría más eficiente */}
           {budgetUsage.length > 0 && (
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h4 className="font-medium text-green-800 mb-2">Más Eficiente</h4>
-              <p className="text-sm text-green-700">
+            <div className="p-4 rounded-lg bg-[var(--color-success)]/10">
+              <h4 className="font-medium text-[color:var(--color-success)] mb-2">Más Eficiente</h4>
+              <p className="text-sm text-[color:var(--color-success)]/90">
                 {(() => {
                   const mostEfficient = budgetUsage
                     .filter(cat => cat.amount > 0)
@@ -293,9 +293,9 @@ export default function FinanceCharts({ transactions, budgetUsage, stats }) {
 
           {/* Tendencia del mes */}
           {monthlyTrend.length > 0 && (
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Tendencia Actual</h4>
-              <p className="text-sm text-blue-700">
+            <div className="p-4 rounded-lg bg-[var(--color-primary)]/10">
+              <h4 className="font-medium text-[var(--color-primary)] mb-2">Tendencia Actual</h4>
+              <p className="text-sm text-[var(--color-primary)]/90">
                 {(() => {
                   const lastMonth = monthlyTrend[monthlyTrend.length - 1];
                   const trend = lastMonth.balance >= 0 ? 'Positiva' : 'Negativa';

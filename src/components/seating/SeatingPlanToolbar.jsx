@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Componente Toolbar modernizado para el plan de asientos
  * Interfaz mejorada con iconos claros y mejor UX
  */
@@ -16,6 +16,7 @@ import {
   EyeOff,
   Cloud,
   CloudOff,
+  Trash,
 } from 'lucide-react';
 
 const SeatingPlanToolbar = ({
@@ -31,6 +32,8 @@ const SeatingPlanToolbar = ({
   onOpenBanquetConfig,
   onOpenSpaceConfig,
   onOpenTemplates,
+  onAutoAssign,
+  onClearBanquet,
   syncStatus,
   showTables = true,
   onToggleShowTables,
@@ -91,32 +94,34 @@ const SeatingPlanToolbar = ({
       case 'synced':
         return 'Sincronizado';
       case 'error':
-        return 'Error de sincronización';
+        return 'Error de Sincronización';
       default:
-        return 'Sin conexión';
+        return 'Sin conexiÃ³n';
     }
   };
 
   return (
-    <div className={`bg-white border rounded-lg shadow-sm ${className}`}>
+    <div className={`bg-white border rounded-lg shadow-sm ${className}`} role="toolbar" aria-label="Seating toolbar">
       <div className="flex flex-wrap items-center gap-2 p-3">
         {/* Grupo: Historial */}
         <div className="flex items-center gap-1 border-r pr-3">
-          <button
+          <button type="button" data-testid="undo-btn"
             onClick={onUndo}
             disabled={!canUndo}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             title={t('seating.toolbar.undoTooltip', { defaultValue: 'Deshacer (Ctrl+Z)' })}
+            aria-label={t('seating.toolbar.undoTooltip', { defaultValue: 'Deshacer (Ctrl+Z)' })}
           >
             <Undo2 className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.undo')}</span>
           </button>
           
-          <button
+          <button type="button" data-testid="redo-btn"
             onClick={onRedo}
             disabled={!canRedo}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             title={t('seating.toolbar.redoTooltip', { defaultValue: 'Rehacer (Ctrl+Y)' })}
+            aria-label={t('seating.toolbar.redoTooltip', { defaultValue: 'Rehacer (Ctrl+Y)' })}
           >
             <Redo2 className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.redo')}</span>
@@ -125,10 +130,12 @@ const SeatingPlanToolbar = ({
 
         {/* Grupo: Visibilidad */}
         <div className="flex items-center gap-1 border-r pr-3">
-          <button
+          <button type="button"
             onClick={handleToggleTables}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
             title={showTablesLocal ? t('seating.toolbar.hideTables',{defaultValue:'Ocultar mesas'}) : t('seating.toolbar.showTables',{defaultValue:'Mostrar mesas'})}
+            aria-pressed={showTablesLocal}
+            aria-label={showTablesLocal ? t('seating.toolbar.hideTables',{defaultValue:'Ocultar mesas'}) : t('seating.toolbar.showTables',{defaultValue:'Mostrar mesas'})}
           >
             {showTablesLocal ? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}
             <span className="hidden sm:inline">
@@ -139,20 +146,22 @@ const SeatingPlanToolbar = ({
 
         {/* Grupo: Configuración */}
         <div className="flex items-center gap-1 border-r pr-3">
-          <button
+          <button type="button" data-testid="space-config-btn"
             onClick={onOpenSpaceConfig}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
             title={t('seating.toolbar.spaceConfig',{defaultValue:'Configurar espacio'})}
+            aria-label={t('seating.toolbar.spaceConfig',{defaultValue:'Configurar espacio'})}
           >
             <Maximize className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.space',{defaultValue:'Espacio'})}</span>
           </button>
 
           {tab === 'ceremony' && (
-            <button
+            <button type="button" data-testid="ceremony-config-btn"
               onClick={onOpenCeremonyConfig}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
               title={t('seating.toolbar.ceremonyConfig')}
+              aria-label={t('seating.toolbar.ceremonyConfig')}
             >
               <Grid className="h-4 w-4" />
               <span className="hidden sm:inline">{t('seating.toolbar.ceremony')}</span>
@@ -160,53 +169,69 @@ const SeatingPlanToolbar = ({
           )}
 
           {tab === 'banquet' && (
-            <button
-              onClick={onOpenBanquetConfig}
-              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title={t('seating.toolbar.banquetConfig')}
+            <button type="button" data-testid="clear-banquet-btn"
+              onClick={onClearBanquet}
+              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-red-50 text-red-600"
+              title={t('seating.toolbar.clearBanquet', { defaultValue: 'Vaciar plano' })}
+              aria-label={t('seating.toolbar.clearBanquet', { defaultValue: 'Vaciar plano' })}
             >
-              <Grid className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('seating.toolbar.banquet')}</span>
+              <Trash className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('seating.toolbar.clear',{defaultValue:'Vaciar'})}</span>
             </button>
           )}
 
-          <button
+          {tab === 'banquet' && onAutoAssign && import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true' && (
+            <button type="button" data-testid="auto-assign-btn"
+              onClick={onAutoAssign}
+              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+              title="Auto-asignar invitados"
+              aria-label="Auto-asignar invitados"
+            >
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">Auto-asignar</span>
+            </button>
+          )}
+
+          
+          <button type="button" data-testid="templates-btn"
             onClick={onOpenTemplates}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
             title={t('seating.toolbar.templates')}
+            aria-label={t('seating.toolbar.templates')}
           >
             <Palette className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.templates')}</span>
           </button>
         </div>
 
-        {/* Grupo: Exportación (menú) */}
+        {/* Grupo: Exportación (menÃº) */}
         <div ref={exportRef} className="flex items-center gap-1 border-r pr-3 relative">
-          <button
+          <button type="button" data-testid="export-menu-btn"
             onClick={() => setShowExportMenu((s) => !s)}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
             title={t('seating.toolbar.export')}
             aria-haspopup="menu"
             aria-expanded={showExportMenu}
+            aria-label={t('seating.toolbar.export')}
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.export')}</span>
           </button>
           {showExportMenu && (
             <div role="menu" className="absolute top-full right-0 mt-1 w-36 bg-white border rounded shadow z-10">
-              <button
+              <button type="button" data-testid="export-pdf"
                 onClick={() => { onExportPDF?.(); setShowExportMenu(false); }}
                 className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
               >
                 {t('seating.export.pdf', { defaultValue: 'PDF' })}
               </button>
-              <button
+              <button type="button" data-testid="export-png"
                 onClick={() => { onExportPNG?.(); setShowExportMenu(false); }}
                 className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
               >
                 {t('seating.export.png', { defaultValue: 'PNG' })}
               </button>
-              <button
+              <button type="button" data-testid="export-csv"
                 onClick={() => { onExportCSV?.(); setShowExportMenu(false); }}
                 className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
               >
@@ -216,7 +241,7 @@ const SeatingPlanToolbar = ({
           )}
         </div>
 
-        {/* Estado de sincronización */}
+        {/* Estado de Sincronización */}
         <div className="flex items-center gap-2 ml-auto">
           <div className="flex items-center gap-1 text-xs text-gray-600">
             {getSyncIcon()}
@@ -225,7 +250,7 @@ const SeatingPlanToolbar = ({
         </div>
       </div>
 
-      {/* Barra de progreso de sincronización */}
+      {/* Barra de progreso de Sincronización */}
       {syncStatus?.status === 'syncing' && (
         <div className="h-1 bg-gray-200">
           <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }} />
@@ -236,3 +261,4 @@ const SeatingPlanToolbar = ({
 };
 
 export default React.memo(SeatingPlanToolbar);
+

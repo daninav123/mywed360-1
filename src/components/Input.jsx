@@ -14,7 +14,7 @@ const Input = React.forwardRef(({
       {label && (
         <label 
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1"
         >
           {label}
         </label>
@@ -22,15 +22,18 @@ const Input = React.forwardRef(({
       <input
         id={inputId}
         ref={ref}
-        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-          error ? 'border-red-500' : 'border-gray-300'
-        }`}
+        className={`w-full px-3 py-2 rounded-md shadow-sm border focus:outline-none focus:ring-2 ${
+          error 
+            ? 'border-[var(--color-danger)]' 
+            : 'border-[color:var(--color-text)]/20'
+        } bg-[var(--color-surface)] text-[color:var(--color-text)]`}
         aria-invalid={!!error}
         aria-describedby={error ? `${inputId}-error` : undefined}
+        style={{ '--tw-ring-color': error ? 'var(--color-danger)' : 'var(--color-primary)' }}
         {...props}
       />
       {error && (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-600" role="alert">
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-[color:var(--color-danger)]" role="alert">
           {error}
         </p>
       )}

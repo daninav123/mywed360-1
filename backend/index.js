@@ -56,6 +56,7 @@ import signatureRouter from './routes/signature.js';
 import contactsRouter from './routes/contacts.js';
 import gamificationRouter from './routes/gamification.js';
 import whatsappRouter from './routes/whatsapp.js';
+import gdprRouter from './routes/gdpr.js';
 
 
 // Load environment variables (root .env)
@@ -215,6 +216,7 @@ app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
 app.use('/api/whatsapp', whatsappRouter);
+app.use('/api/gdpr', gdprRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
@@ -226,8 +228,19 @@ app.get('/', (_req, res) => {
 });
 
 // Health check explícito para plataformas de despliegue
-app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok' });
+app.get('/health', async (_req, res) => {
+  try {
+    let whatsapp = { configured: false, provider: 'unknown' };
+    try {
+      const mod = await import('./services/whatsappService.js');
+      if (mod && typeof mod.providerStatus === 'function') {
+        whatsapp = mod.providerStatus();
+      }
+    } catch {}
+    res.status(200).json({ status: 'ok', whatsapp });
+  } catch {
+    res.status(200).json({ status: 'ok' });
+  }
 });
 
 app.get('/api/transactions', async (req, res) => {

@@ -4,7 +4,7 @@ import { Sparkles, Plus, Settings } from 'lucide-react';
 
 // Firebase
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc, getFirestore } from 'firebase/firestore';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { db } from '../lib/firebase';
 
 // Componentes
@@ -479,3 +479,4 @@ const GestionProveedores = () => {
 };
 
 export default GestionProveedores;
+

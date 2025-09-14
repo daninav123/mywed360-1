@@ -46,8 +46,8 @@ export default function ContributionSettings({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Configuración de Aportaciones</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Configuración de Aportaciones</h2>
+          <p className="text-sm text-[color:var(--color-text)]/70">
             Configura las aportaciones y estima los ingresos esperados
           </p>
         </div>
@@ -66,12 +66,12 @@ export default function ContributionSettings({
         <div className="space-y-6">
           {/* Aportaciones iniciales */}
           <Card className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               Aportaciones Iniciales
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Persona A (€)
                 </label>
                 <input
@@ -80,12 +80,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.initA}
                   onChange={(e) => handleChange('initA', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Persona B (€)
                 </label>
                 <input
@@ -94,13 +94,13 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.initB}
                   onChange={(e) => handleChange('initB', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Total inicial: <span className="font-medium text-gray-900">{formatCurrency(initialTotal)}</span>
+              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
+                <p className="text-sm text-[color:var(--color-text)]/70">
+                  Total inicial: <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(initialTotal)}</span>
                 </p>
               </div>
             </div>
@@ -108,12 +108,12 @@ export default function ContributionSettings({
 
           {/* Aportaciones mensuales */}
           <Card className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               Aportaciones Mensuales
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Persona A (€/mes)
                 </label>
                 <input
@@ -122,12 +122,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.monthlyA}
                   onChange={(e) => handleChange('monthlyA', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Persona B (€/mes)
                 </label>
                 <input
@@ -136,13 +136,13 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.monthlyB}
                   onChange={(e) => handleChange('monthlyB', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Total mensual: <span className="font-medium text-gray-900">{formatCurrency(monthlyTotal)}</span>
+              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
+                <p className="text-sm text-[color:var(--color-text)]/70">
+                  Total mensual: <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(monthlyTotal)}</span>
                 </p>
               </div>
             </div>
@@ -150,12 +150,12 @@ export default function ContributionSettings({
 
           {/* Aportaciones extras */}
           <Card className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               Aportaciones Extras
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Total extras (familia, otros ingresos) (€)
                 </label>
                 <input
@@ -164,10 +164,10 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.extras}
                   onChange={(e) => handleChange('extras', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
                   Incluye regalos de familia, aportaciones de padres, etc.
                 </p>
               </div>
@@ -176,12 +176,12 @@ export default function ContributionSettings({
 
           {/* Estimación de regalos */}
           <Card className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               Estimación de Regalos
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Regalo estimado por invitado (€)
                 </label>
                 <input
@@ -190,12 +190,12 @@ export default function ContributionSettings({
                   step="0.01"
                   value={localContributions.giftPerGuest}
                   onChange={(e) => handleChange('giftPerGuest', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
                   Número de invitados
                 </label>
                 <div className="flex space-x-2">
@@ -204,7 +204,7 @@ export default function ContributionSettings({
                     min="0"
                     value={localContributions.guestCount}
                     onChange={(e) => handleChange('guestCount', e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2  focus:border-transparent"
                     placeholder="0"
                   />
                   <Button
@@ -216,13 +216,13 @@ export default function ContributionSettings({
                     <Users size={16} />
                   </Button>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
                   Haz clic en el icono para cargar automáticamente desde tu lista de invitados
                 </p>
               </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-sm text-gray-600">
-                  Total estimado en regalos: <span className="font-medium text-gray-900">{formatCurrency(expectedGifts)}</span>
+              <div className="pt-2 border-t border-[color:var(--color-text)]/10">
+                <p className="text-sm text-[color:var(--color-text)]/70">
+                  Total estimado en regalos: <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(expectedGifts)}</span>
                 </p>
               </div>
             </div>
@@ -230,9 +230,9 @@ export default function ContributionSettings({
 
           {/* Botones de acción */}
           {hasChanges && (
-            <Card className="p-4 bg-blue-50 border-blue-200">
+            <Card className="p-4 bg-[var(--color-primary)]/10 border-blue-200">
               <div className="flex justify-between items-center">
-                <p className="text-sm text-blue-800">
+                <p className="text-sm text-[var(--color-primary)]">
                   Tienes cambios sin guardar
                 </p>
                 <div className="flex space-x-2">
@@ -253,69 +253,69 @@ export default function ContributionSettings({
           {/* Resumen de ingresos esperados */}
           <Card className="p-6">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                <Calculator className="w-5 h-5 text-green-600" />
+              <div className="flex items-center justify-center w-10 h-10 bg-[var(--color-success)]/15 rounded-full">
+                <Calculator className="w-5 h-5 text-[color:var(--color-success)]" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-[color:var(--color-text)]">
                   Resumen de Ingresos Esperados
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[color:var(--color-text)]/70">
                   Proyección total basada en tus configuraciones
                 </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Aportaciones iniciales</span>
-                <span className="font-medium text-gray-900">{formatCurrency(initialTotal)}</span>
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
+                <span className="text-sm text-[color:var(--color-text)]/70">Aportaciones iniciales</span>
+                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(initialTotal)}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Aportaciones mensuales</span>
-                <span className="font-medium text-gray-900">{formatCurrency(monthlyTotal)}</span>
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
+                <span className="text-sm text-[color:var(--color-text)]/70">Aportaciones mensuales</span>
+                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(monthlyTotal)}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Aportaciones extras</span>
-                <span className="font-medium text-gray-900">{formatCurrency(localContributions.extras)}</span>
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
+                <span className="text-sm text-[color:var(--color-text)]/70">Aportaciones extras</span>
+                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(localContributions.extras)}</span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Regalos estimados</span>
-                <span className="font-medium text-gray-900">{formatCurrency(expectedGifts)}</span>
+              <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
+                <span className="text-sm text-[color:var(--color-text)]/70">Regalos estimados</span>
+                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(expectedGifts)}</span>
               </div>
               <div className="flex justify-between items-center py-3 bg-green-50 px-4 rounded-lg">
                 <span className="font-medium text-green-800">Total Esperado</span>
-                <span className="text-xl font-bold text-green-600">{formatCurrency(totalExpectedIncome)}</span>
+                <span className="text-xl font-bold text-[color:var(--color-success)]">{formatCurrency(totalExpectedIncome)}</span>
               </div>
             </div>
           </Card>
 
           {/* Consejos y recomendaciones */}
           <Card className="p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               Consejos Financieros
             </h3>
-            <div className="space-y-3 text-sm text-gray-600">
+            <div className="space-y-3 text-sm text-[color:var(--color-text)]/70">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
                   <strong>Fondo de emergencia:</strong> Considera reservar un 10-15% del presupuesto total para gastos imprevistos.
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
                   <strong>Regalos conservadores:</strong> Es mejor subestimar los regalos de boda que sobreestimarlos.
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
                   <strong>Seguimiento regular:</strong> Revisa y actualiza estas proyecciones mensualmente.
                 </p>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
                   <strong>Aportaciones equilibradas:</strong> Mantén un balance justo entre las aportaciones de ambas personas.
                 </p>
@@ -327,3 +327,4 @@ export default function ContributionSettings({
     </div>
   );
 }
+

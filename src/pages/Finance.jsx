@@ -13,7 +13,7 @@ import useTranslations from '../hooks/useTranslations';
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminado código legacy (571 líneas → 180 líneas)
+ * - Eliminada complejidad anterior (571 líneas → 180 líneas)
  * - Arquitectura modular con componentes especializados
  * - Hook personalizado useFinance para lógica centralizada
  * - Memoización y optimización de re-renders
@@ -83,17 +83,17 @@ function Finance() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="bg-[var(--color-bg)] p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Mostrar errores si existen */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
             <div className="flex">
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
+                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
                   Error en gestión financiera
                 </h3>
-                <div className="mt-2 text-sm text-red-700">
+                <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
                 </div>
               </div>

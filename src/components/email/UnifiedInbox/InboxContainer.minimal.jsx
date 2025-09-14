@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../hooks/useAuthUnified';
+import { useAuth } from '../../../hooks/useAuth';
 
 /**
  * Versión mínima de InboxContainer para debugging
@@ -85,3 +85,4 @@ const InboxContainerMinimal = () => {
 };
 
 export default InboxContainerMinimal;
+

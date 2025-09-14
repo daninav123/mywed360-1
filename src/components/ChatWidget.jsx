@@ -5,7 +5,7 @@ import { MessageSquare } from 'lucide-react';
 import Spinner from './Spinner';
 import { getBackendBase } from '../utils/backendBase';
 import { toast } from 'react-toastify';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 // --- Modo debug opcional ---
 // Actívalo desde la consola con: window.lovendaDebug = true

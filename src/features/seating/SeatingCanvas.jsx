@@ -70,13 +70,16 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           <div
             style={{
               position:'absolute',
-              left:0,
-              top:0,
-              width: hallSize.width * scale,
-              height: hallSize.height * scale,
-              border:'2px dashed #6b7280',
-              backgroundColor:'rgba(255,255,255,0.6)',
-              pointerEvents:'none'
+              left: 0,
+              top: 0,
+              width: hallSize.width,
+              height: hallSize.height,
+              border: '3px dashed #4b5563',
+              background: '#ffffff',
+              transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+              transformOrigin: 'top left',
+                                          pointerEvents: 'none',
+                            zIndex: 0,
             }}
           />
         )}

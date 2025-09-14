@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 
 // Definición estática de las pestañas para evitar recreaciones
 const tabs = [
@@ -76,3 +76,4 @@ const ProtocoloLayout = React.memo(() => {
 });
 
 export default ProtocoloLayout;
+

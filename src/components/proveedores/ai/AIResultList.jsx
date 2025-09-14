@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Check, Plus, ArrowRight, Loader2, Mail } from 'lucide-react';
-import Button from '../../../components/Button';
-import Card from '../../../components/Card';
+import Button from '../../../components/ui/Button';
+import Card from '../../../components/ui/Card';
 
 /**
  * @typedef {import('../../../hooks/useAISearch').AISearchResult} AISearchResult

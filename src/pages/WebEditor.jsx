@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { Plus, Trash, Zap } from 'lucide-react';
 
 /*
@@ -212,3 +212,4 @@ export default function WebEditor() {
     </div>
   );
 }
+

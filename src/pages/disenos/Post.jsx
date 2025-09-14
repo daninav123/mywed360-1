@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 import { loadData } from '../../services/SyncService';
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 
@@ -92,3 +92,4 @@ export default function PostDiseno() {
     </div>
   );
 }
+

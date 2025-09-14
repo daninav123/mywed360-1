@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -394,3 +394,4 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
 };
 
 export default ProveedorForm;
+

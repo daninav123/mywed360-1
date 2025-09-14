@@ -5,7 +5,7 @@ import { Button } from '../../components/ui';
 import { Clock, Calendar, CheckCircle, Circle, Trash2, PenLine as Edit2, Save, Plus, AlertTriangle } from 'lucide-react';
 import { db } from '../../firebaseConfig';
 import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, query, where, orderBy } from 'firebase/firestore';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 
 const Checklist = () => {
   const { currentUser } = useAuth();
@@ -535,3 +535,4 @@ const Checklist = () => {
 };
 
 export default Checklist;
+

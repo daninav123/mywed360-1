@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, Plus, Edit, Trash, X, Check, Circle } from 'lucide-react';
 import Button from '../Button';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 import { 
   getUserTags,
   getCustomTags, 
@@ -256,3 +256,4 @@ const TagsManager = ({ onClose }) => {
 };
 
 export default TagsManager;
+

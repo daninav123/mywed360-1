@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
-import Card from '../components/Card';
-import Button from '../components/Button';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 import { Plus, Sparkles } from 'lucide-react';
 
 // Importar componentes modulares
@@ -17,7 +17,7 @@ import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 // Importar hooks personalizados
 import useProveedores from '../hooks/useProveedores';
 import useAISearch from '../hooks/useAISearch';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 const Proveedores = () => {
   // Diagnóstico: verificar que la versión nueva se carga en el navegador
@@ -321,3 +321,6 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
+
+

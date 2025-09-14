@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, RefreshCw, LogOut, Shield, Clock, Wifi, WifiOff } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useAuth, useAuthError } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 
 /**
  * Modal de reautenticación

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../../components/Card';
+import Card from '../../components/ui/Card';
 import { Plus, Trash2 } from 'lucide-react';
 import { saveData, loadData } from '../../services/SyncService';
 import SyncIndicator from '../../components/SyncIndicator';
@@ -149,3 +149,4 @@ export default function MenuDiseno() {
     </div>
   );
 }
+

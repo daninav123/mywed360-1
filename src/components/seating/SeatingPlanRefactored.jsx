@@ -39,6 +39,7 @@ const SeatingPlanRefactored = () => {
     deleteTable,
     duplicateTable,
     applyBanquetTables,
+    clearBanquetLayout,
     autoAssignGuests
   } = useSeatingPlan();
 
@@ -254,6 +255,22 @@ const SeatingPlanRefactored = () => {
     }, 50);
   };
 
+  const handleAutoAssignClick = async () => {
+    try {
+      const res = await autoAssignGuests();
+      if (res?.ok) {
+        const msg = res.method === 'backend'
+          ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+          : `Asignación automática: ${res.assigned} invitado(s)`;
+        toast.info(msg);
+      } else if (res?.error) {
+        toast.warn(`Auto-asignación: ${res.error}`);
+      }
+    } catch (e) {
+      toast.error('Error en auto-asignación');
+    }
+  };
+
   // Generación desde modal de banquete seguida de autoasignación (silencioso a nivel de UI)
   const handleGenerateBanquetLayoutWithAssign = (config) => {
     try {
@@ -313,6 +330,8 @@ const SeatingPlanRefactored = () => {
           onOpenCeremonyConfig={handleOpenCeremonyConfig}
           onOpenBanquetConfig={handleOpenBanquetConfig}
           onOpenSpaceConfig={handleOpenSpaceConfig}
+          onAutoAssign={handleAutoAssignClick}
+          onClearBanquet={clearBanquetLayout}
           onOpenTemplates={handleOpenTemplates}
           syncStatus={syncStatus}
           showTables={showTables}

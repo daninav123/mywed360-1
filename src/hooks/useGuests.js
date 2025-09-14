@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { post as apiPost } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
 import useWeddingCollection from './useWeddingCollection';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
@@ -229,9 +230,7 @@ const useGuests = () => {
 
     let link = '';
     try {
-      const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {
-        method: 'POST'
-      });
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -260,7 +259,7 @@ const useGuests = () => {
       try {
         let link = '';
         try {
-          const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, { method: 'POST' });
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
           if (resp.ok) { const json = await resp.json(); link = json.link; }
         } catch {}
         const message = customMessage && customMessage.trim() ? customMessage : (
@@ -296,7 +295,7 @@ const useGuests = () => {
       // Generar enlace RSVP si es posible
       let link = '';
       try {
-        const resp = await fetch(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, { method: 'POST' });
+        const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {});
         if (resp.ok) { const json = await resp.json(); link = json.link; }
       } catch {}
       const msg = `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`;
@@ -373,9 +372,7 @@ const useGuests = () => {
 
     let link = '';
     try {
-      const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {
-        method: 'POST'
-      });
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -414,9 +411,7 @@ const useGuests = () => {
         // Generar enlace RSVP si hay API disponible
         let rsvpLink = '';
         try {
-          const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, { 
-            method: 'POST' 
-          });
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
           if (resp.ok) {
             const { link } = await resp.json();
             rsvpLink = link;
@@ -505,7 +500,7 @@ const useGuests = () => {
     }
     let link = '';
     try {
-      const resp = await fetch(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, { method: 'POST' });
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -648,3 +643,5 @@ const useGuests = () => {
 };
 
 export default useGuests;
+
+

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Eye, Edit2, Trash2, Calendar, Star, MapPin } from 'lucide-react';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -231,3 +231,4 @@ export default React.memo(ProveedorCard, (prevProps, nextProps) => {
     prevProps.isSelected === nextProps.isSelected
   );
 });
+

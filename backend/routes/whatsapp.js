@@ -16,6 +16,28 @@ router.get('/provider-status', (req, res) => {
   }
 });
 
+// Healthcheck simple del módulo de WhatsApp
+// Devuelve siempre 200 con información básica de estado y fallback
+router.get('/health', (req, res) => {
+  try {
+    const status = providerStatus();
+    res.status(200).json({
+      success: true,
+      service: 'whatsapp',
+      time: new Date().toISOString(),
+      status,
+    });
+  } catch (e) {
+    res.status(200).json({
+      success: false,
+      service: 'whatsapp',
+      time: new Date().toISOString(),
+      error: e?.message || 'unknown',
+      status: { configured: false, provider: process.env.WHATSAPP_PROVIDER || 'unknown', fallback: 'deeplink' },
+    });
+  }
+});
+
 // ----- MODO TEST (sin número verificado) -----
 // Crea/actualiza sesión de invitación para un teléfono y guest concretos
 // POST /api/whatsapp/test/session  { phone, weddingId, guestId }

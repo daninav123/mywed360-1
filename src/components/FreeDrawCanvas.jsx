@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import useTranslations from '../hooks/useTranslations';
 
 // Distancia (px) para detectar clic cerca del primer punto y cerrar el perímetro
 const SNAP_PX = 20;
@@ -19,10 +20,106 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
   // Estado para mostrar la regla mientras se dibuja
   const [cursorPos, setCursorPos] = useState(null); // posición del cursor dentro del SVG
   const [segLength, setSegLength] = useState(null); // longitud del segmento actual en cm
+  const [segAngleDeg, setSegAngleDeg] = useState(null); // ángulo con tramo previo
+  const lastDirRef = useRef(null);
   const startRef = useRef(null);
+  const rafRef = useRef(null);
+  const pendingEventRef = useRef(null);
+  const { t } = useTranslations ? useTranslations() : { t: (k, d) => (d && d.defaultValue) || k };
 
   // Detectar cambio de herramienta para guardar perímetro automáticamente
   const prevDrawModeRef = useRef(drawMode);
+  // Listener global de Tab para fijar longitud exacta
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Tab' && drawing && drawMode === 'boundary') {
+        e.preventDefault();
+        if (segLength == null) return;
+        const val = window.prompt('Longitud exacta (m):', (segLength/100).toFixed(2));
+        if (!val) return;
+        const lenCm = parseFloat(val)*100;
+        if(!lenCm || lenCm<=0) return;
+        // Dirección actual
+        const dir = lastDirRef.current;
+        if(!dir) return;
+        const last = points[points.length-1];
+        const newPt = { x: last.x + dir.x*lenCm, y: last.y + dir.y*lenCm };
+        setPoints(prev => [...prev, newPt]);
+        setSegLength(lenCm);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [drawing, drawMode, segLength, points]);
+
+  // Atajos de teclado: Enter (finalizar), Escape (cancelar), Ctrl+Z/Backspace/Delete (deshacer)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        if (drawMode === 'boundary' && points.length >= 3) {
+          e.preventDefault();
+          onFinalize && onFinalize({ type: 'boundary', points: [...points, points[0]] });
+          setPoints([]);
+          setDrawing(false);
+          setNearStart(false);
+          setCursorPos(null);
+          setSegLength(null);
+          return;
+        }
+        if ((drawMode === 'free' || drawMode === 'curve') && points.length > 2) {
+          e.preventDefault();
+          const smoothed = smooth(points);
+          onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: smoothed });
+          setPoints([]);
+          setDrawing(false);
+          setCursorPos(null);
+          setSegLength(null);
+          return;
+        }
+        if (drawMode === 'line' && points.length >= 2) {
+          e.preventDefault();
+          onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: [points[0], points[points.length-1]] });
+          setPoints([]);
+          setDrawing(false);
+          setCursorPos(null);
+          setSegLength(null);
+          return;
+        }
+        if (drawMode === 'rect' && points.length >= 4) {
+          e.preventDefault();
+          onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points });
+          setPoints([]);
+          startRef.current = null;
+          setDrawing(false);
+          setCursorPos(null);
+          setSegLength(null);
+          return;
+        }
+      }
+
+      if (e.key === 'Escape' && drawing) {
+        e.preventDefault();
+        setPoints([]);
+        setDrawing(false);
+        setNearStart(false);
+        setCursorPos(null);
+        setSegLength(null);
+        return;
+      }
+
+      const isUndoKey = (e.ctrlKey || e.metaKey) && (e.key.toLowerCase?.() === 'z');
+      if ((isUndoKey || e.key === 'Backspace' || e.key === 'Delete') && points.length > 0) {
+        if (drawMode === 'boundary' || drawMode === 'free' || drawMode === 'curve' || drawMode === 'line' || drawMode === 'rect') {
+          e.preventDefault();
+          setPoints(prev => prev.slice(0, -1));
+          return;
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [drawing, drawMode, points, onFinalize, semanticDrawMode]);
+
   useEffect(() => {
     const prev = prevDrawModeRef.current;
     // Si salimos del modo 'boundary', guardar el perímetro en curso
@@ -34,18 +131,33 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
       // Limpiar estado temporal
       setPoints([]);
       setDrawing(false);
+      setNearStart(false);
     }
     prevDrawModeRef.current = drawMode;
   }, [drawMode]);
 
-  const toSvgPoint = (e) => {
+  const toSvgPointRaw = (e) => {
     const svg = svgRef.current;
     const rect = svg.getBoundingClientRect();
-    // adjust for current transform
     return {
       x: (e.clientX - rect.left - offset.x) / scale,
       y: (e.clientY - rect.top - offset.y) / scale,
     };
+  };
+
+  // Devuelve punto con snapping a ejes H/V si Shift está pulsado
+  const toSvgPoint = (e, prev) => {
+    const raw = toSvgPointRaw(e);
+    if (!e.shiftKey || !prev) return raw;
+    const dx = raw.x - prev.x;
+    const dy = raw.y - prev.y;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      // Horizontal
+      return { x: raw.x, y: prev.y };
+    } else {
+      // Vertical
+      return { x: prev.x, y: raw.y };
+    }
   };
 
   // Chaikin smoothing – one iteration
@@ -70,7 +182,7 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
 
   const handlePointerDown = (e) => {
     e.preventDefault();
-    const pt = toSvgPoint(e);
+    const pt = toSvgPoint(e, points[points.length-1]);
     
     if (drawMode === 'line') {
       setDrawing(true);
@@ -91,6 +203,7 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
         onFinalize && onFinalize({ type: 'boundary', points: [...points, points[0]] });
         setPoints([]);
         setDrawing(false);
+        setNearStart(false);
         return;
       }
     }
@@ -116,38 +229,63 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
     }
   };
 
-  const handlePointerMove = (e) => {
+  const processPointerMove = (e) => {
+    const lastRef = points.length ? points[points.length-1] : null;
     // Actualizar posición del cursor relativa al SVG
     const svg = svgRef.current;
     const rect = svg.getBoundingClientRect();
     setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
 
     // Punto actual en coordenadas de dibujo (cm)
-    const curPt = toSvgPoint(e);
+    const curPt = toSvgPoint(e, lastRef);
     // Punto previo para calcular distancia
     const prevPt = points.length ? points[points.length - 1] : curPt;
     const dx = curPt.x - prevPt.x;
     const dy = curPt.y - prevPt.y;
-    setSegLength(Math.sqrt(dx * dx + dy * dy));
+    const l = Math.sqrt(dx*dx+dy*dy);
+    setSegLength(l);
+    //Actualizar ángulo
+    if(points.length>1){
+      const prevVec = { x: points[points.length-1].x - points[points.length-2].x, y: points[points.length-1].y - points[points.length-2].y };
+      const curVec = { x: curPt.x - points[points.length-1].x, y: curPt.y - points[points.length-1].y };
+      const ang = Math.acos((prevVec.x*curVec.x+prevVec.y*curVec.y)/(Math.hypot(prevVec.x,prevVec.y)*Math.hypot(curVec.x,curVec.y)));
+      if(!Number.isNaN(ang)) setSegAngleDeg((ang*180/Math.PI));
+    } else {
+      setSegAngleDeg(null);
+    }
+    // Direccion unitaria ultima
+    if(l>0){ lastDirRef.current = { x: dx/l, y: dy/l}; }
+
+    // Actualizar indicador de cercanía al primer punto (para realce visual)
+    if (drawMode === 'boundary') {
+      if (points.length > 0) {
+        const distPx = Math.hypot(curPt.x - points[0].x, curPt.y - points[0].y) * scale;
+        setNearStart(distPx < SNAP_PX);
+      } else {
+        setNearStart(false);
+      }
+    } else {
+      setNearStart(false);
+    }
 
     if (!drawing) return;
     
     if (drawMode === 'line') {
-      const pt = toSvgPoint(e);
+      const pt = toSvgPoint(e, points[points.length-1]);
       setPoints(prev => (prev.length === 1 ? [prev[0], pt] : [prev[0], pt]));
       return;
     }
     if (drawMode === 'boundary') {
       // En modo perímetro, mostrar línea de preview al cursor
       if (points.length > 0) {
-        const pt = toSvgPoint(e);
+        const pt = toSvgPoint(e, points[points.length-1]);
         // No modificar los puntos existentes, solo mostrar preview
         // El preview se maneja en el render
       }
       return;
     }
     if (drawMode === 'rect') {
-      const cur = toSvgPoint(e);
+      const cur = toSvgPoint(e, startRef.current);
       const start = startRef.current;
       if (!start) return;
       const rectPts = [
@@ -161,15 +299,28 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
       return;
     }
     if (drawMode === 'free' || drawMode === 'curve') {
-      const pt = toSvgPoint(e);
-      setPoints(prev => [...prev, pt]);
+      const pt = toSvgPoint(e, points[points.length-1]);
+      // Límite de puntos para evitar degradación de performance
+      setPoints(prev => (prev.length > 4000 ? [...prev.slice(-4000), pt] : [...prev, pt]));
     }
+  };
+
+  const handlePointerMove = (e) => {
+    // Throttle via requestAnimationFrame
+    pendingEventRef.current = e;
+    if (rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const ev = pendingEventRef.current;
+      pendingEventRef.current = null;
+      if (ev) processPointerMove(ev);
+    });
   };
 
   const handlePointerUp = (e) => {
     if (!drawing) return;
     if (drawMode === 'line') {
-      const pt = toSvgPoint(e);
+      const pt = toSvgPoint(e, points[points.length-1]);
       const line = points.length === 2 ? points : [points[0], pt];
       onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: line });
       setPoints([]);
@@ -198,8 +349,13 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
     setSegLength(null);
   };
 
+  const handlePointerCancel = () => {
+    setDrawing(false);
+    setCursorPos(null);
+    setSegLength(null);
+  };
+
   const handleDoubleClick = () => {
-    console.log('FreeDrawCanvas - handleDoubleClick:', { drawMode, pointsLength: points.length });
     if (drawMode === 'boundary') {
       // Cerrar visualmente el polígono pero NO guardar; se guardará al cambiar de herramienta
       if (points.length >= 3) {
@@ -212,10 +368,56 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
     if (drawMode === 'free' || drawMode === 'curve') {
       if (points.length > 2) {
         const smoothed = smooth(points);
-        onFinalize && onFinalize(smoothed);
+        onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: smoothed });
         setPoints([]);
       }
     }
+  };
+
+  const handleFinalizeClick = () => {
+    if (drawMode === 'boundary' && points.length >= 3) {
+      onFinalize && onFinalize({ type: 'boundary', points: [...points, points[0]] });
+      setPoints([]);
+      setDrawing(false);
+      setNearStart(false);
+      setCursorPos(null);
+      setSegLength(null);
+      return;
+    }
+    if ((drawMode === 'free' || drawMode === 'curve') && points.length > 2) {
+      const smoothed = smooth(points);
+      onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: smoothed });
+      setPoints([]);
+      setDrawing(false);
+      setCursorPos(null);
+      setSegLength(null);
+      return;
+    }
+    if (drawMode === 'line' && points.length >= 2) {
+      onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: [points[0], points[points.length-1]] });
+      setPoints([]);
+      setDrawing(false);
+      setCursorPos(null);
+      setSegLength(null);
+      return;
+    }
+    if (drawMode === 'rect' && points.length >= 4) {
+      onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points });
+      setPoints([]);
+      startRef.current = null;
+      setDrawing(false);
+      setCursorPos(null);
+      setSegLength(null);
+      return;
+    }
+  };
+
+  const handleCancelClick = () => {
+    setPoints([]);
+    setDrawing(false);
+    setNearStart(false);
+    setCursorPos(null);
+    setSegLength(null);
   };
 
   return (
@@ -227,6 +429,7 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       onDoubleClick={handleDoubleClick}
       onContextMenu={(e) => e.preventDefault()}
     >
@@ -235,7 +438,6 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
         {areas.map((poly, idx) => {
           const pts = Array.isArray(poly) ? poly : (Array.isArray(poly?.points) ? poly.points : []);
           const type = Array.isArray(poly) ? undefined : poly?.type;
-          console.log('FreeDrawCanvas - renderizando área:', idx, { type, points: pts });
           return (
             <path
               key={idx}
@@ -260,7 +462,7 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
             key={idx}
             cx={point.x}
             cy={point.y}
-            r={3}
+            r={idx === 0 && nearStart ? 6 : 3}
             fill={strokeColor}
             opacity={0.8}
           />
@@ -325,12 +527,44 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
     })}
 
     {/* Etiqueta temporal de distancia (m) */}
-    {drawing && cursorPos && segLength != null && (
+    {cursorPos && segLength != null && (drawMode === 'boundary' || drawing) && (
+
       <div
         className="absolute pointer-events-none text-[10px] bg-white bg-opacity-80 rounded px-1"
+        aria-live="polite"
         style={{ left: cursorPos.x + 10, top: cursorPos.y + 10 }}
       >
-        {(segLength / 100).toFixed(2)} m
+        {(segLength / 100).toFixed(2)} m{segAngleDeg!=null && <span className="ml-1">{segAngleDeg.toFixed(0)}°</span>}
+      </div>
+    )}
+
+    {/* Controles de finalizar/cancelar accesibles */}
+    {(drawing || points.length > 0) && (
+      <div className="absolute bottom-3 right-3 flex gap-2">
+        <button
+          type="button"
+          onClick={handleCancelClick}
+          className="px-2 py-1 text-xs rounded border bg-white hover:bg-gray-50"
+          aria-label={t('freedraw.cancel', { defaultValue: 'Cancelar dibujo' })}
+        >
+          {t('freedraw.cancelShort', { defaultValue: 'Cancelar' })}
+        </button>
+        <button
+          type="button"
+          onClick={handleFinalizeClick}
+          className="px-2 py-1 text-xs rounded border bg-blue-600 text-white hover:bg-blue-700"
+          aria-label={t('freedraw.finish', { defaultValue: 'Finalizar y guardar dibujo' })}
+          disabled={
+            !(
+              (drawMode === 'boundary' && points.length >= 3) ||
+              ((drawMode === 'free' || drawMode === 'curve') && points.length > 2) ||
+              (drawMode === 'line' && points.length >= 2) ||
+              (drawMode === 'rect' && points.length >= 4)
+            )
+          }
+        >
+          {t('freedraw.finishShort', { defaultValue: 'Finalizar' })}
+        </button>
       </div>
     )}
     </div>

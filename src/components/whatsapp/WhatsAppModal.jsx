@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+﻿import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
 import { Button } from '../ui';
 import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
-import { getProviderStatus, toE164, waDeeplink } from '../../services/whatsappService';
+import { getProviderStatus, getHealth, getMetrics, toE164, waDeeplink } from '../../services/whatsappService';
 
 /**
- * Modal de Envío por WhatsApp
- * - Pestaña 1: Móvil personal (deeplink)
- * - Pestaña 2: Número de la app (API WhatsApp Business)
+ * Modal de EnvÃ­o por WhatsApp
+ * - PestaÃ±a 1: MÃ³vil personal (deeplink)
+ * - PestaÃ±a 2: NÃºmero de la app (API WhatsApp Business)
  */
 export default function WhatsAppModal({
   open,
@@ -23,6 +23,10 @@ export default function WhatsAppModal({
   const [useBusinessApp, setUseBusinessApp] = useState(false);
   const [provider, setProvider] = useState({ configured: false, provider: 'twilio' });
   const [loadingProvider, setLoadingProvider] = useState(false);
+  const [health, setHealth] = useState(null);
+  const [showMetrics, setShowMetrics] = useState(false);
+  const [metrics, setMetrics] = useState(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
 
   useEffect(() => {
     setMessage(defaultMessage || buildDefaultMessage(guest));
@@ -35,13 +39,15 @@ export default function WhatsAppModal({
       setProvider({ configured: !!s.configured, provider: s.provider || 'twilio' });
     }).catch(() => setProvider({ configured: false, provider: 'twilio' }))
       .finally(() => setLoadingProvider(false));
+    // Cargar health (no bloqueante)
+    getHealth().then(setHealth).catch(() => setHealth(null));
   }, [open]);
 
   const canSend = !!guest && !!guest.phone;
 
   function buildDefaultMessage(g) {
-    if (!g) return '¡Hola! Queremos invitarte a nuestra boda. ¿Puedes confirmar tu asistencia?';
-    return `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+    if (!g) return 'Â¡Hola! Queremos invitarte a nuestra boda. Â¿Puedes confirmar tu asistencia?';
+    return `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
   }
 
   const deeplinkHref = useMemo(() => {
@@ -76,7 +82,7 @@ export default function WhatsAppModal({
   const handleSendApi = useCallback(async () => {
     if (!canSend) return;
     if (!provider.configured) {
-      alert('El proveedor de WhatsApp API aún no está configurado.');
+      alert('El proveedor de WhatsApp API aÃºn no estÃ¡ configurado.');
       return;
     }
     await onSendApi?.(guest, message);
@@ -92,23 +98,23 @@ export default function WhatsAppModal({
             <MessageSquare size={18} />
             <h3 className="font-semibold">Enviar por WhatsApp</h3>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">×</button>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">Ã—</button>
         </div>
 
         <div className="p-4">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="flex space-x-6 border-b mb-4">
               <TabsTrigger value="personal" className="pb-2 flex items-center gap-2">
-                <Smartphone size={16} /> Móvil personal
+                <Smartphone size={16} /> MÃ³vil personal
               </TabsTrigger>
               <TabsTrigger value="api" className="pb-2 flex items-center gap-2">
-                <Send size={16} /> Número de la app
+                <Send size={16} /> NÃºmero de la app
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4">
               <p className="text-sm text-gray-600">
-                Se abrirá WhatsApp en tu dispositivo con el mensaje preparado. Podrás confirmar el envío manualmente.
+                Se abrirÃ¡ WhatsApp en tu dispositivo con el mensaje preparado. PodrÃ¡s confirmar el envÃ­o manualmente.
               </p>
 
               <div>
@@ -133,12 +139,33 @@ export default function WhatsAppModal({
             <TabsContent value="api" className="space-y-4">
               <div className="flex items-center justify-between text-sm">
                 <div className={provider.configured ? 'text-green-600' : 'text-orange-600'}>
+                <div className={provider.configured ? 'text-green-600' : 'text-orange-600'}>
                   Estado del proveedor: {loadingProvider ? 'Comprobando…' : (provider.configured ? 'Configurado' : 'No configurado')}
                 </div>
-                <div className="flex items-center gap-2 text-gray-500">
                   <Settings size={14} /> {provider.provider?.toUpperCase?.() || 'TWILIO'}
                 </div>
               </div>
+              {health && (
+                <div className="text-xs text-gray-600">
+                  Health: {health.success ? 'OK' : 'Degradado'} {health.status?.fallback ? `(fallback: ${health.status.fallback})` : ''}
+                </div>
+              <div className="text-xs">
+                <button className="underline" onClick={async()=>{ try { setLoadingMetrics(true); const res = await getMetrics({}); setMetrics(res); } finally { setLoadingMetrics(false); setShowMetrics(s=>!s); } }}>Ver métricas</button>
+                {showMetrics && (
+                  <div className="mt-2 border rounded p-2 bg-gray-50">
+                    {loadingMetrics ? (
+                      <div>Cargando métricas…</div>
+                    ) : metrics ? (
+                      <div className="text-[11px] text-gray-700">
+                        <div>Total: {metrics.total || 0}</div>
+                        <div>Entrega: {Math.round((metrics.rates?.deliveryRate||0)*100)}%</div>
+                        <div>Lectura: {Math.round((metrics.rates?.readRate||0)*100)}%</div>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium mb-1">Mensaje</label>
@@ -154,6 +181,11 @@ export default function WhatsAppModal({
                 <Button onClick={handleSendApi} disabled={!canSend || !provider.configured}>Enviar a este invitado</Button>
                 <Button variant="outline" onClick={onSendApiBulk} title="Enviar a invitados pendientes (API)">Masivo: pendientes</Button>
               </div>
+              {!provider.configured && (
+                <div className="mt-2 text-xs text-gray-500">
+                  Nota: El proveedor API no estÃ¡ listo. Puedes usar la pestaÃ±a "MÃ³vil personal" (deeplink) como alternativa.
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -161,3 +193,4 @@ export default function WhatsAppModal({
     </div>
   );
 }
+

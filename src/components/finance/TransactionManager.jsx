@@ -130,8 +130,8 @@ export default function TransactionManager({
       {/* Header con acciones */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Transacciones</h2>
-          <p className="text-sm text-gray-600">
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Transacciones</h2>
+          <p className="text-sm text-[color:var(--color-text)]/70">
             {stats.count} transacciones • Balance: {formatCurrency(stats.balance)}
           </p>
         </div>
@@ -166,13 +166,13 @@ export default function TransactionManager({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Búsqueda */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--color-text)]/40" />
             <input
               type="text"
               placeholder="Buscar por concepto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20"
             />
           </div>
 
@@ -180,7 +180,7 @@ export default function TransactionManager({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20"
           >
             <option value="">Todos los tipos</option>
             <option value="income">Ingresos</option>
@@ -191,7 +191,7 @@ export default function TransactionManager({
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20"
           >
             <option value="">Todas las categorías</option>
             {categories.map(category => (
@@ -218,7 +218,7 @@ export default function TransactionManager({
       <Card className="overflow-hidden">
         {filteredTransactions.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500">No hay transacciones que mostrar</p>
+            <p className="text-[color:var(--color-text)]/60">No hay transacciones que mostrar</p>
             <Button
               className="mt-4"
               onClick={handleAddTransaction}
@@ -232,38 +232,38 @@ export default function TransactionManager({
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Fecha
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Concepto
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Categoría
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Tipo
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Monto
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-[var(--color-surface)] divide-y divide-[color:var(--color-text)]/10">
                 {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={transaction.id} className="hover:bg-[var(--color-accent)]/10">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]">
                       {formatDate(transaction.date)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-[color:var(--color-text)]">
                       <div className="max-w-xs truncate">
                         {transaction.concept || transaction.description || 'Sin concepto'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         {transaction.category || 'Sin categoría'}
                       </span>
@@ -271,14 +271,14 @@ export default function TransactionManager({
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         transaction.type === 'income' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
+                          ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' 
+                          : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'
                       }`}>
                         {transaction.type === 'income' ? 'Ingreso' : 'Gasto'}
                       </span>
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${
-                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                      transaction.type === 'income' ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount || 0))}
                     </td>
@@ -286,13 +286,13 @@ export default function TransactionManager({
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={() => handleEditTransaction(transaction)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-[var(--color-primary)] hover:brightness-110"
                         >
                           <Edit3 size={16} />
                         </button>
                         <button
                           onClick={() => handleDeleteTransaction(transaction)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-[color:var(--color-danger)] hover:brightness-110"
                         >
                           <Trash2 size={16} />
                         </button>

@@ -196,7 +196,7 @@ const NotificationCenter = () => {
       
       switch (notification.action) {
         case 'viewEmail':
-          navigate(`/buzon/${notification.emailId}`);
+          navigate(`/email#${notification.emailId}`);
           break;
         case 'viewEvent':
           navigate(`/calendario/evento/${notification.eventId}`);

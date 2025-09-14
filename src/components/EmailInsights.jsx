@@ -1,12 +1,15 @@
-import { useEffect, useState, useRef } from 'react';
-import { auth } from '../firebaseConfig';
+﻿import { useEffect, useState, useRef, useCallback } from 'react';
+import { get as apiGet, post as apiPost } from '../services/apiClient';
+import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
+import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
 
-const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:4004';
-
-export default function EmailInsights({ mailId }) {
+export default function EmailInsights({ mailId, userId, email }) {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
-  // Para evitar despachar varias veces la misma reunión
+  const [analyzing, setAnalyzing] = useState(false);
+  const [classification, setClassification] = useState(null);
+  const [applying, setApplying] = useState(false);
+  // Para evitar despachar varias veces la misma Reunión
   const dispatchedRef = useRef(false);
 
   useEffect(() => {
@@ -15,10 +18,7 @@ export default function EmailInsights({ mailId }) {
     (async () => {
       setLoading(true);
       try {
-        const user = auth?.currentUser;
-        const token = user && user.getIdToken ? await user.getIdToken() : null;
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await fetch(`${BASE}/api/email-insights/${mailId}`, { headers });
+        const res = await apiGet(`/api/email-insights/${mailId}`, { auth: true });
         const json = await res.json();
         if (!ignore) setInsights(json);
       } catch (err) {
@@ -31,7 +31,65 @@ export default function EmailInsights({ mailId }) {
     return () => { ignore = true; };
   }, [mailId]);
 
-  // Despachar reuniones solo una vez cuando se reciban
+  const analyzeNow = useCallback(async () => {
+    if (!mailId || analyzing) return;
+    setAnalyzing(true);
+    try {
+      await apiPost('/api/email-insights/analyze', { mailId }, { auth: true });
+      // Refrescar insights tras analizar
+      const res = await apiGet(`/api/email-insights/${mailId}`, { auth: true });
+      const json = await res.json();
+      setInsights(json);
+    } catch (err) {
+      console.error('Error Analizando…
+    } finally {
+      setAnalyzing(false);
+    }
+  }, [mailId, analyzing]);
+
+  // ClasificaciÃ³n local simple (heurÃ­stica)
+  const classifyLocal = useCallback(() => {
+    try {
+      const text = `${email?.subject || ''} \n ${email?.body || ''}`.toLowerCase();
+      const tags = [];
+      let folder = null;
+      if (/presupuesto|budget|factura|pago/.test(text)) { tags.push('Presupuesto'); folder = folder || 'Finanzas'; }
+      if (/contrato|firma|acuerdo/.test(text)) { tags.push('Contrato'); folder = folder || 'Contratos'; }
+      if (/fot[oÃ³]grafo|catering|m[Ãºu]sica|dj|flor/i.test(text)) { tags.push('Proveedor'); folder = folder || 'Proveedores'; }
+      if (/invitaci[Ã³o]n|rsvp|confirmaci[Ã³o]n/.test(text)) { tags.push('InvitaciÃ³n'); folder = folder || 'RSVP'; }
+      return { tags: Array.from(new Set(tags)), folder };
+    } catch { return { tags: [], folder: null }; }
+  }, [email]);
+
+  useEffect(() => {
+    if (!email) return;
+    setClassification(classifyLocal());
+  }, [email, classifyLocal]);
+
+  const applyClassification = useCallback(() => {
+    if (!userId || !mailId || !classification) return;
+    setApplying(true);
+    try {
+      if (classification.folder) {
+        const existing = getUserFolders(userId);
+        let folder = existing.find(f => f.name.toLowerCase() === classification.folder.toLowerCase());
+        if (!folder) {
+          folder = createFolder(userId, classification.folder);
+        }
+        if (folder?.id) assignEmailToFolder(userId, mailId, folder.id);
+      }
+      if (classification.tags && classification.tags.length) {
+        const allTags = getUserTags(userId);
+        classification.tags.forEach(tagName => {
+          let tag = allTags.find(t => t.name.toLowerCase() === tagName.toLowerCase() || t.id === tagName);
+          if (!tag) { try { tag = createTag(userId, tagName); } catch {} }
+          if (tag?.id) { try { addTagToEmail(userId, mailId, tag.id); } catch {} }
+        });
+      }
+    } finally { setApplying(false); }
+  }, [userId, mailId, classification]);
+
+  // Despachar Reuniónes solo una vez cuando se reciban
   useEffect(() => {
   if (!insights || dispatchedRef.current) return;
   if (insights.meetings && insights.meetings.length > 0) {
@@ -49,7 +107,7 @@ export default function EmailInsights({ mailId }) {
         };
         window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }));
       } catch (err) {
-        console.warn('No se pudo despachar reunión:', err);
+        console.warn('No se pudo despachar Reunión:', err);
       }
     });
   }
@@ -59,7 +117,32 @@ export default function EmailInsights({ mailId }) {
   if (!mailId) return null;
   if (loading) return <p className="text-sm text-gray-500">Cargando IA…</p>;
   if (!insights || Object.keys(insights).length === 0)
-    return <p className="text-sm text-gray-500">Sin acciones detectadas.</p>;
+    return (
+      <div className="mt-6 border-t pt-4">
+        <p className="text-sm text-gray-500 mb-2">Sin acciones detectadas.</p>
+        <button
+          onClick={analyzeNow}
+          disabled={analyzing}
+          className={`text-sm rounded border px-3 py-1 ${analyzing ? 'opacity-60' : 'hover:bg-gray-50'}`}
+        >
+          {analyzing ? 'Analizando…
+        </button>
+        {classification && (classification.tags?.length || classification.folder) && (
+          <div className="mt-3 text-xs text-gray-700">
+            <div>Sugerencias de clasificación:</div>
+            {classification.folder && <div>Carpeta: <span className="font-medium">{classification.folder}</span></div>}
+            {classification.tags?.length > 0 && <div>Tags: {classification.tags.join(', ')}</div>}
+            {userId && (
+              <button
+                onClick={applyClassification}
+                disabled={applying}
+                className={`mt-2 text-xs rounded border px-2 py-1 ${applying ? 'opacity-60' : 'hover:bg-gray-50'}`}
+              >{applying ? 'Aplicando…
+            )}
+          </div>
+        )}
+      </div>
+    );
 
   const { tasks = [], meetings = [], budgets = [], contracts = [] } = insights;
 
@@ -78,12 +161,48 @@ export default function EmailInsights({ mailId }) {
         </section>
       )}
 
+      {/* Acciones rápidas */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+          onClick={() => {
+            try {
+              const defaultTitle = (tasks && tasks[0]?.title) || (email?.subject ? `Tarea: ${email.subject}` : 'Tarea de email');
+              const title = prompt('Título de la tarea', defaultTitle);
+              if (!title) return;
+              const task = { title, due: tasks && tasks[0]?.due ? tasks[0].due : null };
+              window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { task } }));
+            } catch (_) {}
+          }}
+        >Crear tarea</button>
+        <button
+          className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+          onClick={() => {
+            try {
+              let startIso = null;
+              if (meetings && meetings[0]) {
+                const s = meetings[0].start || meetings[0].date || meetings[0].when;
+                const d = s ? new Date(s) : null;
+                startIso = d && !isNaN(d.getTime()) ? d.toISOString() : null;
+              }
+              if (!startIso) {
+                const now = new Date();
+                startIso = new Date(now.getTime() + 30 * 60 * 1000).toISOString();
+              }
+              const endIso = new Date(new Date(startIso).getTime() + 60 * 60 * 1000).toISOString();
+              const meeting = { title: email?.subject ? `Reunión: ${email.subject}` : 'Reunión', start: startIso, end: endIso };
+              window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }));
+            } catch (_) {}
+          }}
+        >Añadir Reunión</button>
+      </div>
+
       {meetings.length > 0 && (
         <section className="mb-3">
-          <h4 className="font-medium">Reuniones</h4>
+          <h4 className="font-medium">Reuniónes</h4>
           <ul className="list-disc list-inside text-sm">
             {meetings.map((m, i) => (
-              <li key={i}>{m.title} — {m.date}</li>
+              <li key={i}>{m.title} â€” {m.date}</li>
             ))}
           </ul>
         </section>
@@ -105,7 +224,7 @@ export default function EmailInsights({ mailId }) {
           <h4 className="font-medium">Contratos</h4>
           <ul className="list-disc list-inside text-sm">
             {contracts.map((c, i) => (
-              <li key={i}>{c.party} — {c.type} ({c.action})</li>
+              <li key={i}>{c.party} â€” {c.type} ({c.action})</li>
             ))}
           </ul>
         </section>
@@ -113,3 +232,7 @@ export default function EmailInsights({ mailId }) {
     </div>
   );
 }
+
+
+
+

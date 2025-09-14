@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, X, Plus, Check } from 'lucide-react';
 import Button from '../Button';
-import { useAuth } from '../../hooks/useAuthUnified';
+import { useAuth } from '../../hooks/useAuth';
 import { 
   getUserTags, 
   getEmailTagsDetails, 
@@ -9,6 +9,7 @@ import {
   removeTagFromEmail 
 } from '../../services/tagService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import { post as apiPost, get as apiGet, del as apiDel } from '../../services/apiClient';
 
 /**
  * Componente para gestionar etiquetas de un correo electrónico
@@ -37,19 +38,13 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
     if (!currentUser || !emailId) return;
     
     try {
-      // Llamar a backend
-      try {
-        await fetch(`/api/email/${emailId}/tag`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tagId })
-        });
-      } catch(_) {}
+      // Llamar a backend (best-effort)
+      try { await apiPost(`/api/email/${emailId}/tag`, { tagId }, { auth: true }); } catch(_) {}
 
       // Sincronizar - obtener detalles actualizados del correo
       let updatedTags = [];
       try {
-        const res = await fetch(`/api/email/${emailId}`);
+        const res = await apiGet(`/api/email/${emailId}`, { auth: true });
         if (res.ok) {
           const json = await res.json();
           updatedTags = json.data?.tagsDetails || json.data?.tags || [];
@@ -75,17 +70,13 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
     if (!currentUser || !emailId) return;
     
     try {
-      // Llamar a backend
-      try {
-        await fetch(`/api/email/${emailId}/tag/${tagId}`, {
-          method: 'DELETE'
-        });
-      } catch(_) {}
+      // Llamar a backend (best-effort)
+      try { await apiDel(`/api/email/${emailId}/tag/${tagId}`, { auth: true }); } catch(_) {}
 
       // Obtener detalles actualizados
       let updatedTags = [];
       try {
-        const res = await fetch(`/api/email/${emailId}`);
+        const res = await apiGet(`/api/email/${emailId}`, { auth: true });
         if (res.ok) {
           const json = await res.json();
           updatedTags = json.data?.tagsDetails || json.data?.tags || [];
@@ -187,3 +178,4 @@ const EmailTagsManager = ({ emailId, onTagsChange }) => {
 };
 
 export default EmailTagsManager;
+

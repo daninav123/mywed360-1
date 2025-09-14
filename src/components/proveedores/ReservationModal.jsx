@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, Mail, CheckCircle } from 'lucide-react';
-import Button from '../../components/Button';
-import Card from '../../components/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 
 /**
@@ -371,3 +371,4 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 };
 
 export default ReservationModal;
+

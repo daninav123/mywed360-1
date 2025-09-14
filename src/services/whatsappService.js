@@ -144,3 +144,19 @@ export async function getMetrics({ weddingId, from, to, groupBy = 'day' } = {}) 
     return { success: false, error: e.message || 'error' };
   }
 }
+
+export async function getHealth() {
+  try {
+    const token = await getAuthToken();
+    const headers = {
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+    const base = BASE ? BASE.replace(/\/$/, '') : '';
+    const url = base ? `${base}/api/whatsapp/health` : `/api/whatsapp/health`;
+    const res = await fetch(url, { headers });
+    const json = await res.json().catch(() => ({ success: false }));
+    return { ok: res.ok, ...json };
+  } catch (e) {
+    return { ok: false, success: false, error: e?.message || 'error' };
+  }
+}

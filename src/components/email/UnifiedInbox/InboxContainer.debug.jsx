@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../../hooks/useAuthUnified';
+import { useAuth } from '../../../hooks/useAuth';
 
 /**
  * InboxContainer de debug para aislar el error
@@ -45,3 +45,4 @@ const InboxContainerDebug = () => {
 };
 
 export default InboxContainerDebug;
+

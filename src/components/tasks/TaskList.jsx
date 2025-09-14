@@ -14,8 +14,8 @@ const TaskList = ({
     .slice(0, maxItems) : [];
     
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col">
-      <div className="p-4 border-b border-gray-200">
+    <div className="rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">
+      <div className="p-4 border-b border-[color:var(--color-text)]/10">
         <h2 className="text-xl font-semibold">Próximas Tareas</h2>
         <div className="flex flex-wrap gap-2 mt-2">
           {Object.entries(categories).map(([key, cat]) => (
@@ -49,7 +49,7 @@ const TaskList = ({
                 />
                 <div className="flex-1">
                   <div className="font-medium mb-1">{event.title}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-[color:var(--color-text)]/60">
                     {event.start.toLocaleDateString('es-ES', { 
                       day: 'numeric', 
                       month: 'short',
@@ -58,7 +58,7 @@ const TaskList = ({
                     })}
                   </div>
                   {event.desc && (
-                    <div className="text-sm text-gray-600 mt-1 line-clamp-2">{event.desc}</div>
+                    <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">{event.desc}</div>
                   )}
                 </div>
               </div>
@@ -66,7 +66,7 @@ const TaskList = ({
           );
         })}
         {sortedTasks.length === 0 && (
-          <div className="text-center py-4 text-gray-500">
+          <div className="text-center py-4 text-[color:var(--color-text)]/60">
             No hay próximas tareas programadas
           </div>
         )}

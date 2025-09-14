@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, X, Sparkles } from 'lucide-react';
-import Button from '../../../components/Button';
+import Button from '../../../components/ui/Button';
 import AIResultList from './AIResultList';
 
 /**
