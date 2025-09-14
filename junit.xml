@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest" tests="2" failures="2" errors="0" time="0.1983512">
+    <testsuite name="src/components/__tests__/FreeDrawCanvas.test.jsx" timestamp="2025-09-14T17:54:38.838Z" hostname="dani" tests="2" failures="2" errors="0" skipped="0" time="0.1983512">
+        <testcase classname="src/components/__tests__/FreeDrawCanvas.test.jsx" name="FreeDrawCanvas &gt; finalizes free draw with object payload on double click" time="0.1529487">
+            <system-err>
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+            </system-err>
+            <failure message="expected &quot;spy&quot; to be called 1 times, but got 0 times" type="AssertionError">
+AssertionError: expected &quot;spy&quot; to be called 1 times, but got 0 times
+ ❯ src/components/__tests__/FreeDrawCanvas.test.jsx:32:24
+            </failure>
+        </testcase>
+        <testcase classname="src/components/__tests__/FreeDrawCanvas.test.jsx" name="FreeDrawCanvas &gt; finalizes boundary on Enter with closed polygon" time="0.0396384">
+            <system-err>
+Warning: Received NaN for the `cx` attribute. If this is expected, cast the value to a string.
+    at circle
+    at g
+    at svg
+    at div
+    at FreeDrawCanvasComp (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\components\FreeDrawCanvas.jsx:9:31)
+    at DefaultPropsProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/DefaultPropsProvider/DefaultPropsProvider.js:9:3)
+    at RtlProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/RtlProvider/index.js:8:3)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/private-theming/esm/ThemeProvider/ThemeProvider.js:33:5)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/ThemeProvider/ThemeProvider.js:49:5)
+    at ThemeProviderNoVars (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/material/esm/styles/ThemeProviderNoVars.js:8:10)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/material/esm/styles/ThemeProvider.js:9:3)
+    at Router (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at BrowserRouter (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\react-router-dom\dist\umd\react-router-dom.development.js:695:7)
+    at AllProviders (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\test\AllProviders.jsx:13:25)
+Warning: Received NaN for the `cy` attribute. If this is expected, cast the value to a string.
+    at circle
+    at g
+    at svg
+    at div
+    at FreeDrawCanvasComp (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\components\FreeDrawCanvas.jsx:9:31)
+    at DefaultPropsProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/DefaultPropsProvider/DefaultPropsProvider.js:9:3)
+    at RtlProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/RtlProvider/index.js:8:3)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/private-theming/esm/ThemeProvider/ThemeProvider.js:33:5)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/system/esm/ThemeProvider/ThemeProvider.js:49:5)
+    at ThemeProviderNoVars (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/material/esm/styles/ThemeProviderNoVars.js:8:10)
+    at ThemeProvider (file:///C:/Users/Administrator/Documents/Lovenda/lovenda13123123%20-%20copia/node_modules/@mui/material/esm/styles/ThemeProvider.js:9:3)
+    at Router (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at BrowserRouter (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\node_modules\react-router-dom\dist\umd\react-router-dom.development.js:695:7)
+    at AllProviders (C:\Users\Administrator\Documents\Lovenda\lovenda13123123 - copia\src\test\AllProviders.jsx:13:25)
+
+            </system-err>
+            <failure message="expected NaN to be close to NaN, received difference is NaN, but expected 0.005" type="AssertionError">
+AssertionError: expected NaN to be close to NaN, received difference is NaN, but expected 0.005
+ ❯ src/components/__tests__/FreeDrawCanvas.test.jsx:70:21
+            </failure>
+        </testcase>
+    </testsuite>
+</testsuites>

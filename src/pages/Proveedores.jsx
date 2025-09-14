@@ -10,6 +10,7 @@ import useWeddingCollection from '../hooks/useWeddingCollection';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { loadTrackingRecords, createTrackingRecord, updateTrackingStatus, TRACKING_STATUS, getTrackingNeedingFollowup } from '../services/EmailTrackingService';
 import PageWrapper from '../components/PageWrapper';
+import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 import { Plus, Search, RefreshCcw, Star, Eye, Edit2, Trash2, Calendar, Clock, Download, MapPin, AlertTriangle } from 'lucide-react';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/Toast';
@@ -68,6 +69,8 @@ export default function Proveedores() {
   const [selected, setSelected] = useState([]);
   const [showAiModal, setShowAiModal] = useState(false);
   const [aiResults, setAiResults] = useState([]);
+  const [showAIEmailModal, setShowAIEmailModal] = useState(false);
+  const [aiSelectedResult, setAiSelectedResult] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [budgetRange, setBudgetRange] = useState('');
   const [showDetail, setShowDetail] = useState(false);
@@ -2337,7 +2340,16 @@ ${bride} y ${groom}`;
                                   body: `Hola,\n\nEstoy interesado en sus servicios de ${r.service || 'proveedor'} para mi boda.\n\n¿Podrían proporcionarme más información sobre disponibilidad y precios?\n\nGracias,`
                                 };
                                 // Simular apertura de modal de email
-                                setToast({ message: 'Funcionalidad de email en desarrollo', type: 'info' });
+                                setAiSelectedResult({
+                                  id: r.id || r.link || `ai-${idx}`,
+                                  name: r.name || r.title || 'Proveedor',
+                                  email: r.email,
+                                  service: r.service || serviceFilter || 'Proveedor',
+                                  location: r.location,
+                                  price: r.priceRange,
+                                  aiSummary: r.aiSummary,
+                                });
+                                setShowAIEmailModal(true);
                               }} className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 rounded" data-testid="email-provider-btn">
                                 Email
                               </button>
@@ -2462,6 +2474,16 @@ ${bride} y ${groom}`;
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal de Email IA */}
+      {showAIEmailModal && aiSelectedResult && (
+        <AIEmailModal
+          isOpen={showAIEmailModal}
+          onClose={() => { setShowAIEmailModal(false); setAiSelectedResult(null); }}
+          aiResult={aiSelectedResult}
+          searchQuery={aiQuery || ''}
+        />
       )}
 
       {/* Modal Añadir Proveedor */}

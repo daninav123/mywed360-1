@@ -138,35 +138,48 @@ export default function WhatsAppModal({
 
             <TabsContent value="api" className="space-y-4">
               <div className="flex items-center justify-between text-sm">
-                <div className={provider.configured ? 'text-green-600' : 'text-orange-600'}>
-                <div className={provider.configured ? 'text-green-600' : 'text-orange-600'}>
+                <div>
                   Estado del proveedor: {loadingProvider ? 'Comprobando…' : (provider.configured ? 'Configurado' : 'No configurado')}
                 </div>
-                  <Settings size={14} /> {provider.provider?.toUpperCase?.() || 'TWILIO'}
-                </div>
+                <Settings size={14} /> {provider.provider?.toUpperCase?.() || 'TWILIO'}
               </div>
-              {health && (<>
-                <div className="text-xs text-gray-600">
-                  Health: {health.success ? 'OK' : 'Degradado'} {health.status?.fallback ? `(fallback: ${health.status.fallback})` : ''}
-                </div>
-              <div className="text-xs">
-                <button className="underline" onClick={async()=>{ try { setLoadingMetrics(true); const res = await getMetrics({}); setMetrics(res); } finally { setLoadingMetrics(false); setShowMetrics(s=>!s); } }}>Ver métricas</button>
-                {showMetrics && (
-                  <div className="mt-2 border rounded p-2 bg-gray-50">
-                    {loadingMetrics ? (
-                      <div>Cargando métricas…</div>
-                    ) : metrics ? (
-                      <div className="text-[11px] text-gray-700">
-                        <div>Total: {metrics.total || 0}</div>
-                        <div>Entrega: {Math.round((metrics.rates?.deliveryRate||0)*100)}%</div>
-                        <div>Lectura: {Math.round((metrics.rates?.readRate||0)*100)}%</div>
-                      </div>
-                    ) : null}
+              {health && (
+                <div>
+                  <div className="text-xs text-gray-600">
+                    Health: {health.success ? 'OK' : 'Degradado'} {health.status?.fallback ? `(fallback: ${health.status.fallback})` : ''}
                   </div>
-                )}
-              </div>
+                  <div className="text-xs">
+                    <button
+                      className="underline"
+                      onClick={async () => {
+                        try {
+                          setLoadingMetrics(true);
+                          const res = await getMetrics({});
+                          setMetrics(res);
+                        } finally {
+                          setLoadingMetrics(false);
+                          setShowMetrics((s) => !s);
+                        }
+                      }}
+                    >
+                      Ver métricas
+                    </button>
+                    {showMetrics && (
+                      <div className="mt-2 border rounded p-2 bg-gray-50">
+                        {loadingMetrics ? (
+                          <div>Cargando métricas…</div>
+                        ) : metrics ? (
+                          <div className="text-[11px] text-gray-700">
+                            <div>Total: {metrics.total || 0}</div>
+                            <div>Entrega: {Math.round((metrics.rates?.deliveryRate || 0) * 100)}%</div>
+                            <div>Lectura: {Math.round((metrics.rates?.readRate || 0) * 100)}%</div>
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
-
               <div>
                 <label className="block text-sm font-medium mb-1">Mensaje</label>
                 <textarea
@@ -183,7 +196,7 @@ export default function WhatsAppModal({
               </div>
               {!provider.configured && (
                 <div className="mt-2 text-xs text-gray-500">
-                  Nota: El proveedor API no estÃ¡ listo. Puedes usar la pestaÃ±a "MÃ³vil personal" (deeplink) como alternativa.
+                  Nota: El proveedor API no está listo. Puedes usar la pestaña "Móvil personal" (deeplink) como alternativa.
                 </div>
               )}
             </TabsContent>

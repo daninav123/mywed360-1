@@ -11,6 +11,7 @@ import ProveedorCard from '../components/proveedores/ProveedorCard';
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ReservationModal from '../components/proveedores/ReservationModal';
 import AISearchModal from '../components/proveedores/ai/AISearchModal';
+import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 
@@ -58,6 +59,7 @@ const Proveedores = () => {
   const {
     results: aiResults,
     loading: aiLoading,
+    lastQuery: aiLastQuery,
     searchProviders,
     clearResults
   } = useAISearch();
@@ -70,6 +72,8 @@ const Proveedores = () => {
   const [showAISearchModal, setShowAISearchModal] = useState(false);
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [showAIEmailModal, setShowAIEmailModal] = useState(false);
+  const [aiSelectedResult, setAiSelectedResult] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
   const [currentTrackingItem, setCurrentTrackingItem] = useState(null);
   const [trackingFilter, setTrackingFilter] = useState('todos');
@@ -118,6 +122,9 @@ const Proveedores = () => {
     } else if (action === 'select') {
       addProvider({...provider, status: 'Seleccionado'});
       setShowAISearchModal(false);
+    } else if (action === 'email') {
+      setAiSelectedResult(provider);
+      setShowAIEmailModal(true);
     }
   };
 
@@ -274,6 +281,15 @@ const Proveedores = () => {
           onSelect={handleAISelect}
           isLoading={aiLoading}
         />
+
+        {showAIEmailModal && aiSelectedResult && (
+          <AIEmailModal
+            isOpen={showAIEmailModal}
+            onClose={() => { setShowAIEmailModal(false); setAiSelectedResult(null); }}
+            aiResult={aiSelectedResult}
+            searchQuery={aiLastQuery || ''}
+          />
+        )}
 
         {/* Modal de reserva */}
         {showReservationModal && selectedProvider && (

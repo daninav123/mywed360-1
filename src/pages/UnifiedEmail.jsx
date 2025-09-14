@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import UsernameWizard from "../components/UsernameWizard";
 import useEmailUsername from "../hooks/useEmailUsername";
 import Button from "../components/ui/Button";
@@ -7,6 +7,9 @@ import { onAuthStateChanged } from "firebase/auth";
 import Spinner from "../components/ui/Spinner";
 import Alert from "../components/ui/Alert";
 import { getMails, initEmailService, markAsRead, deleteMail, sendMail } from "../services/emailService";
+import { detectProviderResponse } from "../services/EmailTrackingService";
+import { useWedding } from "../context/WeddingContext";
+import useWeddingCollection from "../hooks/useWeddingCollection";
 import EmailInsights from "../components/EmailInsights";
 import sanitizeHtml from "../utils/sanitizeHtml";
 import { getUserFolders, assignEmailToFolder } from "../services/folderService";
@@ -35,6 +38,9 @@ const UnifiedEmail = () => {
 
   const [userId, setUserId] = useState(null);
   const [customFolders, setCustomFolders] = useState([]);
+  // Proveedores de la boda activa para detección de respuestas
+  const { activeWedding } = useWedding();
+  const { data: providers } = useWeddingCollection('suppliers', activeWedding, []);
 
   const fetchEmails = useCallback(async () => {
     if (!myEmail) return;
@@ -55,6 +61,41 @@ const UnifiedEmail = () => {
       setLoading(false);
     }
   }, [myEmail, folder]);
+
+  // Detectar respuestas de proveedores automáticamente al cambiar lista de emails
+  useEffect(() => {
+    try {
+      if (!emails || emails.length === 0) return;
+      // Si no hay proveedores cargados aún, esperar
+      if (!providers || providers.length === 0) return;
+
+      const processedKey = 'lovenda_provider_response_checked';
+      const processed = new Set(JSON.parse(localStorage.getItem(processedKey) || '[]'));
+      let changed = false;
+
+      emails.forEach((email) => {
+        if (!email?.id) return;
+        if (processed.has(email.id)) return;
+        // Sólo consideramos emails de entrada
+        if (email.folder && email.folder !== 'inbox') return;
+        const updated = detectProviderResponse(email, providers);
+        if (updated) {
+          changed = true;
+        }
+        processed.add(email.id);
+      });
+
+      if (processed.size) {
+        localStorage.setItem(processedKey, JSON.stringify(Array.from(processed)));
+      }
+      if (changed) {
+        // Avisar a la UI que hay cambios de tracking
+        try { window.dispatchEvent(new Event('lovenda-tracking-updated')); } catch {}
+      }
+    } catch (e) {
+      console.warn('UnifiedEmail: error detectando respuesta de proveedor', e);
+    }
+  }, [emails, providers]);
 
   // Obtener email del usuario en cuanto Firebase estÃ© listo
   useEffect(() => {
@@ -212,7 +253,7 @@ const UnifiedEmail = () => {
               }`}
               onClick={() => setFolder("inbox")}
             >
-              ðŸ“¥ Recibidos
+              📥 Recibidos
             </button>
             <button
               className={`block w-full rounded px-3 py-2 text-left text-sm ${
@@ -222,7 +263,7 @@ const UnifiedEmail = () => {
               }`}
               onClick={() => setFolder("sent")}
             >
-              ðŸ“¤ Enviados
+              📤 Enviados
             </button>
           </nav>
         </aside>
@@ -237,9 +278,10 @@ const UnifiedEmail = () => {
             emptyMessage={search || onlyUnread || onlyWithAttachments ? 'No hay correos que coincidan' : 'No hay correos'}
             onToggleRead={handleToggleRead}
             onDelete={handleDelete}
-            folders={customFolders} userId={userId}
+            folders={customFolders}
+            userId={userId}
             onMoveToFolder={handleMoveToFolder}
-\n            userId={userId}\n          />
+          />
           {loading && (
             <div className="flex items-center justify-center p-4">
               <Spinner size="sm" />
@@ -260,7 +302,10 @@ const UnifiedEmail = () => {
               onMarkRead={handleMarkRead}
               onDelete={handleDelete}
               onCompose={(initial) => { setComposeInitial(initial); setShowCompose(true); }}
-\n              folders={customFolders}\n              onMoveToFolder={handleMoveToFolder}\n              userId={userId}\n            />
+              folders={customFolders}
+              onMoveToFolder={handleMoveToFolder}
+              userId={userId}
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-gray-500">
               Selecciona un correo para verlo aquí
@@ -339,7 +384,7 @@ const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 
                 </div>
                 <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
                   <span className="truncate">{mail.sender || mail.from}</span>
-                  {Array.isArray(mail.attachments) && mail.attachments.length > 0 && <span title="Adjuntos">ðŸ“Ž</span>}
+                  {Array.isArray(mail.attachments) && mail.attachments.length > 0 && <span title="Adjuntos">📎</span>}
                 </div>
                 {(() => {
                   const tds = userId ? getEmailTagsDetails(userId, mail.id) : [];
@@ -351,6 +396,7 @@ const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 
                     </div>
                   ) : null;
                 })()}
+              </div>
             </div>
             {/* Acciones rÃ¡pidas al hover, dentro del item (scope correcto) */}
             <div className="absolute right-2 top-2 hidden gap-1 sm:flex sm:opacity-0 sm:transition-opacity sm:duration-150 sm:group-hover:opacity-100">
@@ -467,7 +513,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
         <div className="mb-4">
           <div className="mb-2 flex items-center justify-between">
             <div className="text-sm font-medium text-gray-700">Adjuntos ({mail.attachments.length})</div>
-            <Button size="sm" variant="ghost" onClick={() => { try { mail.attachments.forEach((att, i) => downloadAttachment(att, i)); } catch(e) { console.error('Descarga múltiple falló
+            <Button size="sm" variant="ghost" onClick={() => { try { mail.attachments.forEach((att, i) => downloadAttachment(att, i)); } catch (e) { console.error('Descarga múltiple falló', e); } }}>Descargar todo</Button>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {mail.attachments.map((att, i) => (
@@ -602,7 +648,6 @@ const ChipToggle = ({ active, onClick, label }) => (
     {label}
   </button>
 );
-
 
 
 

@@ -35,6 +35,7 @@ const SeatingPlanCanvas = ({
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [minScale, setMinScale] = useState(0.3);
+  const [isPanning, setIsPanning] = useState(false);
 
   // Fit to content: calcula bounding box en coordenadas "mundo" y ajusta escala/offset
   const fitToContent = useCallback(() => {
@@ -154,8 +155,28 @@ const SeatingPlanCanvas = ({
     });
   }, [minScale, canvasRef]);
   
+  // Zoom util para atajos de teclado
+  const zoomAt = useCallback((factor) => {
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    setScale((prevScale) => {
+      let nextScale = prevScale * factor;
+      nextScale = Math.max(minScale, Math.min(3, nextScale));
+      const scaleRatio = nextScale / prevScale;
+      setOffset((prevOffset) => ({
+        x: cx - (cx - prevOffset.x) * scaleRatio,
+        y: cy - (cy - prevOffset.y) * scaleRatio,
+      }));
+      return nextScale;
+    });
+  }, [minScale, canvasRef]);
+  
   const handlePointerDown = useCallback((e) => {
     if (drawMode !== 'pan') return;
+    e.preventDefault();
+    setIsPanning(true);
     const start = { x: e.clientX, y: e.clientY };
     const startOffset = { ...offset };
     let rafId = null;
@@ -178,18 +199,28 @@ const SeatingPlanCanvas = ({
       if (rafId != null) { window.cancelAnimationFrame(rafId); rafId = null; }
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      setIsPanning(false);
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
   }, [drawMode, offset]);
   
+  // No necesitamos manejar move/up aquí porque el drag de pan
+  // se gestiona con listeners globales registrados en pointerdown.
+  // Aun así, dejamos handlers defensivos para prevenir scroll/gestos
+  // inesperados cuando el modo no es pan.
   const handlePointerMove = useCallback((e) => {
-    // Lógica de movimiento
-  }, []);
+    if (drawMode !== 'pan') return;
+    // El movimiento real está gestionado por los listeners añadidos en pointerdown.
+    // Evitamos que el navegador haga selección de texto u otros gestos.
+    e.preventDefault();
+  }, [drawMode]);
   
-  const handlePointerUp = useCallback(() => {
-    // Lógica de fin de interacción
-  }, []);
+  const handlePointerUp = useCallback((e) => {
+    if (drawMode !== 'pan') return;
+    e.preventDefault();
+    // Los listeners globales creados en pointerdown eliminan su propio estado.
+  }, [drawMode]);
   
   // Configurar eventos del canvas
   useEffect(() => {
@@ -208,13 +239,41 @@ const SeatingPlanCanvas = ({
       canvas.removeEventListener('pointerup', handlePointerUp);
     };
   }, [handleWheel, handlePointerDown, handlePointerMove, handlePointerUp]);
+
+  // Ajuste inicial para encajar contenido al cargar
+  useEffect(() => {
+    // Evitar sobrescribir zoom del usuario: solo al montar o si no hay contenido
+    try {
+      if (!areas?.length && !tables?.length && !seats?.length) return;
+      fitToContent();
+      // eslint-disable-next-line no-empty
+    } catch (_) {}
+    // Ejecutar solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Atajos de teclado para zoom: Ctrl/Cmd + '+', '-', '0'
+  useEffect(() => {
+    const onKey = (e) => {
+      try {
+        const meta = e?.metaKey || e?.ctrlKey;
+        if (!meta) return;
+        const k = String(e?.key || '').toLowerCase();
+        if (k === '=' || k === '+') { e.preventDefault(); zoomAt(1.1); }
+        else if (k === '-')        { e.preventDefault(); zoomAt(0.9); }
+        else if (k === '0')        { e.preventDefault(); fitToContent(); }
+      } catch (_) {}
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [zoomAt, fitToContent]);
   
   return (
     <div className={`relative bg-gray-50 border rounded-lg overflow-hidden ${className}`}>
       {/* Canvas principal */}
       <div
         ref={canvasRef}
-        className="w-full h-full min-h-[600px] relative cursor-crosshair"
+        className="w-full h-full min-h-[600px] relative"
         style={{
           backgroundImage: `
             linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
@@ -222,6 +281,12 @@ const SeatingPlanCanvas = ({
           `,
           backgroundSize: '20px 20px',
           backgroundColor:'#f3f4f6',
+          cursor: (
+            drawMode === 'pan' ? (isPanning ? 'grabbing' : 'grab') :
+            drawMode === 'move' ? 'move' :
+            drawMode === 'erase' ? 'not-allowed' :
+            'crosshair'
+          ),
         }}
       >
         {/* Componente SeatingCanvas existente */}

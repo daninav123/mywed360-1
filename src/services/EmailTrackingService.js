@@ -1,6 +1,7 @@
 // EmailTrackingService.js - Servicio para el seguimiento de respuestas de proveedores
 import { saveData, loadData } from './SyncService';
 import { addTagToEmail, SYSTEM_TAGS } from './tagService';
+import { auth } from '../firebaseConfig';
 
 const TRACKING_STORAGE_KEY = 'lovenda_email_tracking';
 
@@ -251,5 +252,14 @@ export function detectProviderResponse(email, providers) {
 
 // Marcar un correo relacionado con un proveedor
 export function tagProviderEmail_old(emailId, providerId) {
-  // Implementación pendiente - requiere integración con EmailService
+  try {
+    const profile = (() => { try { return JSON.parse(localStorage.getItem('lovenda_user_profile') || '{}'); } catch { return {}; } })();
+    const uid = (auth && auth.currentUser && auth.currentUser.uid) || profile.uid || 'local';
+    // Etiqueta del sistema: 'provider'
+    addTagToEmail(uid, emailId, 'provider');
+    return true;
+  } catch (err) {
+    console.warn('tagProviderEmail_old: fallo al etiquetar correo como proveedor', err);
+    return false;
+  }
 }

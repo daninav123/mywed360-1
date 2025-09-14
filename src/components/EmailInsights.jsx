@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
@@ -41,7 +41,7 @@ export default function EmailInsights({ mailId, userId, email }) {
       const json = await res.json();
       setInsights(json);
     } catch (err) {
-      console.error('Error Analizando…
+      console.error('Error analizando:', err);
     } finally {
       setAnalyzing(false);
     }
@@ -125,7 +125,7 @@ export default function EmailInsights({ mailId, userId, email }) {
           disabled={analyzing}
           className={`text-sm rounded border px-3 py-1 ${analyzing ? 'opacity-60' : 'hover:bg-gray-50'}`}
         >
-          {analyzing ? 'Analizando…
+          {analyzing ? 'Analizando…' : 'Analizar ahora'}
         </button>
         {classification && (classification.tags?.length || classification.folder) && (
           <div className="mt-3 text-xs text-gray-700">
@@ -137,7 +137,9 @@ export default function EmailInsights({ mailId, userId, email }) {
                 onClick={applyClassification}
                 disabled={applying}
                 className={`mt-2 text-xs rounded border px-2 py-1 ${applying ? 'opacity-60' : 'hover:bg-gray-50'}`}
-              >{applying ? 'Aplicando…
+              >
+                {applying ? 'Aplicando…' : 'Aplicar sugerencias'}
+              </button>
             )}
           </div>
         )}
