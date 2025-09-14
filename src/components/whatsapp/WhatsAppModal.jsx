@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
 import { Button } from '../ui';
 import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
@@ -145,7 +145,7 @@ export default function WhatsAppModal({
                   <Settings size={14} /> {provider.provider?.toUpperCase?.() || 'TWILIO'}
                 </div>
               </div>
-              {health && (
+              {health && (<>
                 <div className="text-xs text-gray-600">
                   Health: {health.success ? 'OK' : 'Degradado'} {health.status?.fallback ? `(fallback: ${health.status.fallback})` : ''}
                 </div>
