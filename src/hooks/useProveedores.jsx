@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { db } from '../lib/firebase';
+import { db } from '../firebaseConfig';
 import { 
   collection, 
   getDocs, 
@@ -14,6 +14,7 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { useAuth } from './useAuth';
+import { useWedding } from '../context/WeddingContext';
 
 /**
  * @typedef {Object} Provider
@@ -84,6 +85,13 @@ export const useProveedores = () => {
   const [tab, setTab] = useState('all'); // 'all', 'reserved', 'favorite'
   
   const { user } = useAuth();
+  const { activeWedding } = useWedding();
+
+  const getCollectionPath = useCallback(() => {
+    if (activeWedding) return `weddings/${activeWedding}/suppliers`;
+    if (user?.uid) return `usuarios/${user.uid}/proveedores`;
+    return null;
+  }, [activeWedding, user]);
   
   /**
    * Cargar proveedores desde Firestore
@@ -94,15 +102,23 @@ export const useProveedores = () => {
     setLoading(true);
     
     try {
-      const proveedoresRef = collection(db, `usuarios/${user.uid}/proveedores`);
-      const q = query(proveedoresRef, orderBy('created', 'desc'));
-      const snapshot = await getDocs(q);
-      
-      const loadedProviders = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        date: doc.data().date ? new Date(doc.data().date.toDate()).toISOString().split('T')[0] : ''
-      }));
+      const path = getCollectionPath();
+      if (!path) { setLoading(false); return; }
+      const proveedoresRef = collection(db, path);
+      const snapshot = await getDocs(proveedoresRef);
+      const toIso = (d) => {
+        try {
+          if (!d) return '';
+          if (typeof d?.toDate === 'function') return new Date(d.toDate()).toISOString().split('T')[0];
+          return new Date(d).toISOString().split('T')[0];
+        } catch { return ''; }
+      };
+      const loadedProviders = snapshot.docs.map(d => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
+        .sort((a,b) => {
+          const ac = a.created?.seconds || a.createdAt?.seconds || 0;
+          const bc = b.created?.seconds || b.createdAt?.seconds || 0;
+          return bc - ac;
+        });
       
       setProviders(loadedProviders);
       applyFilters(loadedProviders);
@@ -112,7 +128,7 @@ export const useProveedores = () => {
       setError('No se pudieron cargar los proveedores. Inténtalo de nuevo más tarde.');
       setLoading(false);
     }
-  }, [user]);
+  }, [user, getCollectionPath]);
   
   /**
    * Aplicar filtros a los proveedores
@@ -186,14 +202,17 @@ export const useProveedores = () => {
    */
   const addProvider = useCallback(async (providerData) => {
     if (!user) return null;
-    
+
     try {
-      const proveedoresRef = collection(db, `usuarios/${user.uid}/proveedores`);
+      const path = getCollectionPath();
+      if (!path) return null;
+      const proveedoresRef = collection(db, path);
       
       // Añadir campos de timestamp
       const providerWithTimestamp = {
         ...providerData,
         created: serverTimestamp(),
+        createdAt: serverTimestamp(),
         updated: serverTimestamp(),
         date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null
       };
@@ -216,16 +235,18 @@ export const useProveedores = () => {
       setError('No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.');
       return null;
     }
-  }, [user, providers, applyFilters]);
+  }, [user, providers, applyFilters, getCollectionPath]);
   
   /**
    * Actualizar un proveedor existente
    */
   const updateProvider = useCallback(async (providerId, providerData) => {
     if (!user) return false;
-    
+
     try {
-      const providerRef = doc(db, `usuarios/${user.uid}/proveedores`, providerId);
+      const path = getCollectionPath();
+      if (!path) return false;
+      const providerRef = doc(db, path, providerId);
       
       // Añadir campo de timestamp de actualización
       const providerWithTimestamp = {
@@ -243,7 +264,7 @@ export const useProveedores = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, getCollectionPath]);
   
   /**
    * Eliminar un proveedor
@@ -262,18 +283,24 @@ export const useProveedores = () => {
     // firestore update
     if(user){
       try{
-        const providerRef = doc(db, `usuarios/${user.uid}/proveedores`, providerId);
-        await updateDoc(providerRef, { reservations: newReservations, updated: serverTimestamp() });
+        const path = getCollectionPath();
+        if (path) {
+          const providerRef = doc(db, path, providerId);
+          await updateDoc(providerRef, { reservations: newReservations, updated: serverTimestamp() });
+        }
       }catch(err){ console.error('Error al guardar reserva', err);}  }
     return true;
-  }, [providers, user, applyFilters]);
+  }, [providers, user, applyFilters, getCollectionPath]);
 
   const deleteProvider = useCallback(async (providerId) => {
     if (!user) return false;
-    
+
     try {
-      const providerRef = doc(db, `usuarios/${user.uid}/proveedores`, providerId);
-      await deleteDoc(providerRef);
+      const path = getCollectionPath();
+      if (path) {
+        const providerRef = doc(db, path, providerId);
+        await deleteDoc(providerRef);
+      }
       
       // Actualizar estado local
       setProviders(prev => prev.filter(p => p.id !== providerId));
@@ -293,7 +320,7 @@ export const useProveedores = () => {
       setError('No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.');
       return false;
     }
-  }, [user, providers, selectedProvider, applyFilters]);
+  }, [user, providers, selectedProvider, applyFilters, getCollectionPath]);
   
   /**
    * Seleccionar/deseleccionar un proveedor de la lista
@@ -308,10 +335,13 @@ export const useProveedores = () => {
     // actualizar firestore
     if(user){
       try{
-        const providerRef = doc(db, `usuarios/${user.uid}/proveedores`, providerId);
-        await updateDoc(providerRef, { favorite: newFav, updated: serverTimestamp() });
+        const path = getCollectionPath();
+        if (path) {
+          const providerRef = doc(db, path, providerId);
+          await updateDoc(providerRef, { favorite: newFav, updated: serverTimestamp() });
+        }
       }catch(err){ console.error('Error al marcar favorito', err);}  }
-  }, [providers, user, applyFilters]);
+  }, [providers, user, applyFilters, getCollectionPath]);
 
   const toggleSelectProvider = useCallback((providerId) => {
     setSelectedProviderIds(prev => {

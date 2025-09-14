@@ -119,11 +119,23 @@ router.post('/', (req, res) => {
         // Si la IA detecta presupuestos, guardarlos
         if (insights?.budgets?.length) {
           const weddingId = rcpt.split('@')[0] || 'unknown';
+          // Intentar deducir supplierId por email remitente
+          let supplierIdGuess = null;
+          try {
+            const supSnap = await db
+              .collection('weddings')
+              .doc(weddingId)
+              .collection('suppliers')
+              .where('email', '==', sender)
+              .limit(1)
+              .get();
+            if (!supSnap.empty) supplierIdGuess = supSnap.docs[0].id;
+          } catch {}
           for (const b of insights.budgets) {
             try {
               await saveSupplierBudget({
                 weddingId,
-                supplierId: b.client || 'unknown',
+                supplierId: b.client || supplierIdGuess || 'unknown',
                 description: subject,
                 amount: b.amount,
                 currency: b.currency || 'EUR',

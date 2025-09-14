@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import React, { createRef } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 
 // Mock SeatingCanvas to surface scale/offset for assertions
 vi.mock('../../../features/seating/SeatingCanvas', () => ({
@@ -99,5 +99,40 @@ describe('SeatingPlanCanvas interactions', () => {
     expect(scale3).toBeGreaterThan(0.35);
     expect(scale3).toBeLessThan(0.5);
   });
-});
 
+  it('zooms with wheel events on the canvas element', async () => {
+    const ref = createRef();
+    render(<SeatingPlanCanvas {...baseProps()} drawMode="pan" canvasRef={ref} />);
+
+    const mc = () => screen.getByTestId('mock-seating-canvas');
+    const canvas = ref.current;
+    expect(canvas).toBeTruthy();
+
+    const s0 = parseFloat(mc().getAttribute('data-scale'));
+    // Zoom in (deltaY < 0)
+    fireEvent.wheel(canvas, { deltaY: -120, clientX: 100, clientY: 80 });
+    const s1 = parseFloat(mc().getAttribute('data-scale'));
+    expect(s1).toBeGreaterThan(s0);
+
+    // Zoom out (deltaY > 0)
+    fireEvent.wheel(canvas, { deltaY: 120, clientX: 100, clientY: 80 });
+    const s2 = parseFloat(mc().getAttribute('data-scale'));
+    expect(s2).toBeLessThanOrEqual(s1);
+  });
+
+  it('fits to content on mount when content exists', async () => {
+    const ref = createRef();
+    const props = baseProps();
+    // Supply some content to trigger fitToContent effect
+    props.tables = [{ id: 1, x: 200, y: 150, width: 120, height: 80, shape: 'rectangle', seats: 6 }];
+    render(<SeatingPlanCanvas {...props} drawMode="pan" canvasRef={ref} />);
+
+    const mc = () => screen.getByTestId('mock-seating-canvas');
+
+    await waitFor(() => {
+      const scale = parseFloat(mc().getAttribute('data-scale'));
+      expect(scale).toBeGreaterThan(0.35);
+      expect(scale).toBeLessThan(0.5); // ~0.4 given hall 1800x1200 and view 800x600
+    });
+  });
+});

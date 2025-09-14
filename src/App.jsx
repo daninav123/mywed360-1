@@ -6,6 +6,7 @@ import { useAuth, AuthProvider } from './hooks/useAuth';
 import { WeddingProvider } from './context/WeddingContext';
 import MainLayout from './components/MainLayout';
 import EmailNotification from './components/EmailNotification';
+import Loader from './components/ui/Loader';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
@@ -27,6 +28,9 @@ import Perfil from './pages/Perfil';
 import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored';
 import Invitaciones from './pages/Invitaciones';
 import Contratos from './pages/Contratos';
+import Protocolo from './pages/Protocolo';
+import InvitadosRefactored from './pages/InvitadosRefactored';
+import ProveedoresNuevo from './pages/ProveedoresNuevo';
 
 import ProtocoloLayout from './pages/protocolo/ProtocoloLayout';
 import MomentosEspeciales from './pages/protocolo/MomentosEspeciales';
@@ -42,6 +46,7 @@ import MenuDiseno from './pages/disenos/Menu';
 import SeatingPlanPost from './pages/disenos/SeatingPlanPost';
 import MenuCatering from './pages/disenos/MenuCatering';
 import PapelesNombres from './pages/disenos/PapelesNombres';
+import PostDiseno from './pages/disenos/Post';
 import Ideas from './pages/Ideas';
 import Inspiration from './pages/Inspiration';
 import Blog from './pages/Blog';
@@ -61,6 +66,10 @@ import './i18n';
 import DiagnosticPanel from './components/DiagnosticPanel';
 import errorLogger from './utils/errorLogger';
 import './utils/consoleCommands';
+
+// Lazy legacy/páginas pesadas
+const BuzonLegacy = React.lazy(() => import('./pages/Buzon_fixed_complete'));
+import { LazyInvitationDesigner, LazyGestionProveedores } from './components/performance/LazyComponentLoader';
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -161,14 +170,25 @@ function App() {
               <Route path="invitados" element={<Invitados />} />
               <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
               <Route path="invitados/invitaciones" element={<Invitaciones />} />
+              <Route path="invitados/refactored" element={<InvitadosRefactored />} />
               <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
               <Route path="proveedores" element={<Proveedores />} />
               <Route path="proveedores/contratos" element={<Contratos />} />
+              <Route path="proveedores/gestion" element={<LazyGestionProveedores />} />
+              <Route path="proveedores/nuevo" element={<ProveedoresNuevo />} />
 
               {/* Rutas de Protocolo */}
               <Route path="protocolo" element={<ProtocoloLayout />}>
                 <Route index element={<Navigate to="momentos-especiales" replace />} />
                 <Route path="momentos-especiales" element={<MomentosEspeciales />} />
+                <Route path="timing" element={<Timing />} />
+                <Route path="checklist" element={<Checklist />} />
+                <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
+              </Route>
+              {/* Protocolo legacy (estructura antigua con tabs locales) */}
+              <Route path="protocolo-legacy" element={<Protocolo />}>
+                <Route index element={<Navigate to="momentos" replace />} />
+                <Route path="momentos" element={<MomentosEspeciales />} />
                 <Route path="timing" element={<Timing />} />
                 <Route path="checklist" element={<Checklist />} />
                 <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
@@ -181,6 +201,7 @@ function App() {
                <Route path="ideas" element={<Ideas />} />
               <Route path="inspiracion" element={<Inspiration />} />
               <Route path="blog" element={<Blog />} />
+              <Route path="invitaciones/designer" element={<LazyInvitationDesigner />} />
 
                {/* Panel de administración con monitoreo de caché */}
                <Route path="admin/*" element={<AdminRoutes />} />
@@ -193,20 +214,29 @@ function App() {
                {enableDev && <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />}
 
                {/* Rutas Diseños */}
-               <Route path="disenos" element={<DisenosLayout />}>
-                 <Route index element={<Navigate to="invitaciones" replace />} />
-                 <Route path="invitaciones" element={<DisenosInvitaciones />} />
-                 <Route path="logo" element={<DisenosLogo />} />
-                 <Route path="menu" element={<MenuDiseno />} />
-                 <Route path="seating-plan" element={<SeatingPlanPost />} />
-                 <Route path="menu-catering" element={<MenuCatering />} />
-                 <Route path="papeles-nombres" element={<PapelesNombres />} />
-               </Route>
+                <Route path="disenos" element={<DisenosLayout />}>
+                  <Route index element={<Navigate to="invitaciones" replace />} />
+                  <Route path="invitaciones" element={<DisenosInvitaciones />} />
+                  <Route path="logo" element={<DisenosLogo />} />
+                  <Route path="menu" element={<MenuDiseno />} />
+                  <Route path="seating-plan" element={<SeatingPlanPost />} />
+                  <Route path="menu-catering" element={<MenuCatering />} />
+                  <Route path="papeles-nombres" element={<PapelesNombres />} />
+                  <Route path="post" element={<PostDiseno />} />
+                </Route>
               <Route path="more" element={<More />} />
               
               {/* Bandeja unificada de emails */}
               <Route path="email" element={<UnifiedEmail />} />
               <Route path="email/inbox" element={<UnifiedEmail />} />
+              <Route
+                path="email/legacy"
+                element={
+                  <React.Suspense fallback={<Loader />}>
+                    <BuzonLegacy />
+                  </React.Suspense>
+                }
+              />
               {/* Redirección para rutas legado */}
               <Route path="buzon/*" element={<Navigate to="/email" replace />} />
               

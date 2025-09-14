@@ -3,6 +3,8 @@ import ProveedorBudgets from './ProveedorBudgets.jsx';
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import { post as apiPost } from '../../services/apiClient';
+import { useWedding } from '../../context/WeddingContext';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -23,6 +25,48 @@ import Card from '../../components/ui/Card';
  */
 const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab }) => {
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
+  const { activeWedding } = useWedding();
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState(null);
+
+  const handleGenerateContract = async () => {
+    if (!activeWedding) return;
+    setGenerating(true);
+    setGenError(null);
+    try {
+      const payload = {
+        weddingId: activeWedding,
+        payload: {
+          type: 'provider_contract',
+          subtype: 'basic',
+          title: `Contrato Proveedor - ${provider?.name || 'Proveedor'}`,
+          data: {
+            supplierId: provider?.id,
+            supplierName: provider?.name,
+            service: provider?.service,
+            contact: provider?.contact,
+            email: provider?.email,
+            phone: provider?.phone,
+          }
+        },
+        saveMeta: true,
+      };
+      const res = await apiPost('/api/legal-docs/generate', payload, { auth: true });
+      const json = await res.json();
+      if (!res.ok || !json?.success) throw new Error(json?.error || 'error');
+      const b64 = json?.document?.pdfBase64;
+      if (b64) {
+        const win = window.open();
+        if (win) {
+          win.document.write(`<iframe src="data:application/pdf;base64,${b64}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+        }
+      }
+    } catch (e) {
+      setGenError('No se pudo generar el contrato');
+    } finally {
+      setGenerating(false);
+    }
+  };
   
   // Renderizar estrellas para calificación
   const renderRatingStars = (currentRating, interactive = false) => {
@@ -258,6 +302,17 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
                 </div>
               </Card>
               <ProveedorBudgets supplierId={provider.id} />
+              <Card>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-medium">Documentos</h3>
+                    {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
+                  </div>
+                  <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
+                    {generating ? 'Generando…' : 'Generar contrato proveedor'}
+                  </Button>
+                </div>
+              </Card>
             </div>
           )}
           

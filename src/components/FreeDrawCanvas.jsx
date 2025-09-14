@@ -138,10 +138,21 @@ function FreeDrawCanvasComp({ className = '', style = {}, strokeColor = '#3b82f6
 
   const toSvgPointRaw = (e) => {
     const svg = svgRef.current;
+    // Fallback defensivo para tests/SSR o durante unmount
+    if (!svg || typeof svg.getBoundingClientRect !== 'function') {
+      const cx = typeof e?.clientX === 'number' ? e.clientX : 0;
+      const cy = typeof e?.clientY === 'number' ? e.clientY : 0;
+      const sc = typeof scale === 'number' && scale > 0 ? scale : 1;
+      const ox = offset && typeof offset.x === 'number' ? offset.x : 0;
+      const oy = offset && typeof offset.y === 'number' ? offset.y : 0;
+      return { x: (cx - ox) / sc, y: (cy - oy) / sc };
+    }
     const rect = svg.getBoundingClientRect();
+    const cx = typeof e?.clientX === 'number' ? e.clientX : rect.left;
+    const cy = typeof e?.clientY === 'number' ? e.clientY : rect.top;
     return {
-      x: (e.clientX - rect.left - offset.x) / scale,
-      y: (e.clientY - rect.top - offset.y) / scale,
+      x: (cx - rect.left - offset.x) / scale,
+      y: (cy - rect.top - offset.y) / scale,
     };
   };
 
