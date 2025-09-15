@@ -105,6 +105,34 @@ export const AuthProvider = ({ children }) => {
     return () => stopReminderService();
   }, [loading, userProfile]);
   
+  // -----------------------------
+  // REGISTER / SIGNUP
+  // -----------------------------
+  const register = useCallback(async (email, password, role = 'particular') => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('[useAuth] Registro exitoso:', user.uid);
+      // Generar perfil inicial
+      const profile = {
+        id: user.uid,
+        name: email.split('@')[0],
+        email: user.email,
+        role,
+        preferences: {
+          emailNotifications: true,
+          theme: 'light'
+        }
+      };
+      setUserProfile(profile);
+      localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
+      return { success: true, user };
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      return { success: false, error: error.message };
+    }
+  }, []);
+  
   /**
    * Iniciar sesión con email y contraseña
    * @param {string} email - Email del usuario
@@ -273,36 +301,4 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// -----------------------------
-  // REGISTER / SIGNUP
-  // -----------------------------
-  const register = async (email, password, role = 'particular') => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log('[useAuth] Registro exitoso:', user.uid);
-      // Generar perfil inicial
-      const profile = {
-        id: user.uid,
-        name: email.split('@')[0],
-        email: user.email,
-        role,
-        preferences: {
-          emailNotifications: true,
-          theme: 'light'
-        }
-      };
-      setUserProfile(profile);
-      localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
-      return { success: true, user };
-    } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  // -----------------------------
-  // CONTEXTO DE RETORNO
-  // -----------------------------
 export default useAuth;

@@ -2720,21 +2720,4 @@ ${bride} y ${groom}`;
   );
 }
 
-
-  // Detectar retorno de pago (Stripe) y actualizar estado del proveedor
-  useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const status = params.get('payment');
-      const pid = localStorage.getItem('lastCheckoutProviderId');
-      if (status === 'success' && pid) {
-        updateProvider(pid, { status: 'Señal pagada' });
-        localStorage.removeItem('lastCheckoutProviderId');
-      }
-      if ((status === 'cancel' || status === 'canceled') && pid) {
-        // Limpia el marcador si fue cancelado
-        localStorage.removeItem('lastCheckoutProviderId');
-      }
-    } catch {}
-  }, []);
-
+

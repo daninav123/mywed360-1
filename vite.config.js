@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       react: path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom')
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
     },
     dedupe: ['react', 'react-dom']
   },
@@ -94,6 +94,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // Ejecutar en un solo hilo para evitar conflictos de tinypool en algunos entornos (Windows/Node 22)
+    threads: false,
     setupFiles: ['./src/test/setup.js'],
     coverage: {
       reporter: ['text', 'json', 'html'],

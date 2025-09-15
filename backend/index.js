@@ -65,6 +65,7 @@ import pushRouter from './routes/push.js';
 import paymentsRouter from './routes/payments.js';
 import paymentsWebhookRouter from './routes/payments-webhook.js';
 import healthRouter from './routes/health.js';
+import calendarFeedRouter from './routes/calendar-feed.js';
 
 
 // Load environment variables (root .env)
@@ -236,6 +237,7 @@ app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
+app.use('/api/calendar', calendarFeedRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

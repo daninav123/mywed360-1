@@ -64,6 +64,7 @@ import ImageTracer from 'imagetracerjs';
 import PDFDocument from 'pdfkit';
 import SVGtoPDF from 'svg-to-pdfkit';
 import stream from 'stream';
+import potrace from 'potrace';
 
 /**
  * POST /api/ai-image/vector-pdf
@@ -122,6 +123,104 @@ router.post('/vector-pdf', async (req, res) => {
   } catch (err) {
     logger.error('vector-color-pdf error', err);
     res.status(500).json({ error: 'vector-color-pdf-failed', details: err?.message || 'unknown' });
+  }
+});
+
+// ---------- SVG vectorization (returns raw SVG) ----------
+/**
+ * POST /api/ai-image/vectorize-svg
+ * Body: { url: string, options?: ImageTracerOptions }
+ * Returns: { svg: string }
+ */
+router.post('/vectorize-svg', async (req, res) => {
+  const { url, options } = req.body || {};
+  if (!url) return res.status(400).json({ error: 'url required' });
+  try {
+    const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
+    const buf = Buffer.from(imgResp.data);
+
+    // Load in canvas to get ImageData for ImageTracer
+    const img = await loadImage(buf);
+    const canvas = createCanvas(img.width, img.height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+
+    const svgString = ImageTracer.imagedataToSVG(imageData, {
+      // Reasonable defaults; can be overridden by options
+      numberofcolors: 32,
+      strokewidth: 1,
+      ltres: 0.1,
+      qtres: 0.1,
+      ...options,
+    });
+
+    res.json({ svg: svgString });
+  } catch (err) {
+    logger.error('vectorize-svg error', err);
+    res.status(500).json({ error: 'vectorize-svg-failed', details: err?.message || 'unknown' });
+  }
+});
+
+// ---------- SVG -> PDF (edited SVG to print-ready PDF) ----------
+/**
+ * POST /api/ai-image/svg-to-pdf
+ * Body: { svg: string, widthMm?: number, heightMm?: number }
+ * Returns: application/pdf
+ */
+router.post('/svg-to-pdf', async (req, res) => {
+  try {
+    const { svg, widthMm = 210, heightMm = 297 } = req.body || {};
+    if (!svg || typeof svg !== 'string') {
+      return res.status(400).json({ error: 'svg required' });
+    }
+
+    const ptPerMm = 72 / 25.4;
+    const widthPt = widthMm * ptPerMm;
+    const heightPt = heightMm * ptPerMm;
+
+    const doc = new PDFDocument({ size: [widthPt, heightPt], margin: 0 });
+    const chunks = [];
+    doc.on('data', (c) => chunks.push(c));
+    doc.on('end', () => {
+      const pdfBuf = Buffer.concat(chunks);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=design-edited.pdf');
+      res.send(pdfBuf);
+    });
+
+    SVGtoPDF(doc, svg, 0, 0, { width: widthPt, height: heightPt });
+    doc.end();
+  } catch (err) {
+    logger.error('svg-to-pdf error', err);
+    res.status(500).json({ error: 'svg-to-pdf-failed', details: err?.message || 'unknown' });
+  }
+});
+
+// ---------- Monochrome vectorization (Potrace) ----------
+/**
+ * POST /api/ai-image/vectorize-mono
+ * Body: { url: string, threshold?: number, color?: string, background?: string }
+ * Returns: { svg: string }
+ */
+router.post('/vectorize-mono', async (req, res) => {
+  const { url, threshold = 128, color = '#000000', background = 'transparent' } = req.body || {};
+  if (!url) return res.status(400).json({ error: 'url required' });
+  try {
+    const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
+    const buf = Buffer.from(imgResp.data);
+
+    const svg = await new Promise((resolve, reject) => {
+      potrace.trace(buf, { threshold, color, background }, (err, outSvg) => {
+        if (err) return reject(err);
+        resolve(outSvg);
+      });
+    });
+
+    return res.json({ svg });
+  } catch (err) {
+    logger.error('vectorize-mono error', err);
+    res.status(500).json({ error: 'vectorize-mono-failed', details: err?.message || 'unknown' });
   }
 });
 

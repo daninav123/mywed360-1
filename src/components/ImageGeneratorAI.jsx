@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { saveData, loadData } from '../services/SyncService';
 import Spinner from './Spinner';
 import { jsPDF } from 'jspdf';
@@ -13,6 +14,7 @@ import { Wand2, RefreshCcw, Download, FileDown } from 'lucide-react';
  * @param {Function} props.onImageGenerated - Callback cuando se genera una imagen
  */
 const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerated = () => {} }) => {
+  const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [generatedImages, setGeneratedImages] = useState([]);
@@ -320,6 +322,13 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
                     loading="lazy"
                   />
                   <div className="absolute top-2 right-2 flex space-x-2">
+                    <button
+                      onClick={() => navigate(`/disenos/vector-editor?image=${encodeURIComponent(image.url)}&category=${encodeURIComponent(category)}`)}
+                      className="bg-white/80 p-2 rounded-full hover:bg-white"
+                      title="Editar (vector)"
+                    >
+                      ✏️
+                    </button>
                     <button
                       onClick={() => downloadImage(image.url)}
                       className="bg-white/80 p-2 rounded-full hover:bg-white"

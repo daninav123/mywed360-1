@@ -40,7 +40,18 @@ const logoTemplates = [
 
 export default function Logo() {
   const { activeWedding } = useWedding();
-  const [hex, setHex] = useState(() => loadData('logoColor', { defaultValue: '#FF69B4', collection: 'userLogo' }));
+  const [hex, setHex] = useState('#FF69B4');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = await loadData('logoColor', { defaultValue: '#FF69B4', collection: 'userLogo' });
+        if (typeof stored === 'string') setHex(stored);
+      } catch {
+        /* ignore */
+      }
+    })();
+  }, []);
 
   const handleColor = (e) => {
     setHex(e.target.value);

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
-import { googleCalendarService } from '../../services/GoogleCalendarService';
 import { db } from '../../firebaseConfig';
 import { ChevronRight, ChevronLeft, Check, Calendar, Users, ShoppingBag, Settings, Image } from 'lucide-react';
 
@@ -330,7 +329,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       
 
 
-      // Crear evento en calendario si hay fecha de boda
+      /* Crear evento en calendario si hay fecha de boda
       if (profileData.fecha) {
         try {
           // Asegurar autenticación con Google; si el usuario no concede, se ignora
@@ -354,6 +353,7 @@ const OnboardingTutorial = ({ onComplete }) => {
           console.error('No se pudo crear evento en el calendario:', calErr);
         }
       }
+      */
 
       // Llamar al callback cuando se completa
       onComplete && onComplete();

@@ -15,81 +15,61 @@ import Bodas from './pages/Bodas';
 import BodaDetalle from './pages/BodaDetalle';
 import Finance from './pages/Finance';
 import More from './pages/More';
-const Invitados = React.lazy(() => import('./pages/Invitados'));
-// Lazy-loaded heavy routes/components
-const Proveedores = React.lazy(() => import('./pages/Proveedores'));
-const UnifiedEmail = React.lazy(() => import('./pages/UnifiedEmail'));
-const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
+import Invitados from './pages/Invitados';
+import Proveedores from './pages/Proveedores';
+import UnifiedEmail from './pages/UnifiedEmail';
+import EmailAdminDashboard from './components/admin/EmailAdminDashboard';
 import ComposeEmail from './components/email/ComposeEmail';
 import EmailStatistics from './pages/user/EmailStatistics';
 import MailgunTester from './components/email/MailgunTester';
 import EmailSetup from './pages/EmailSetup';
-const MetricsDashboard = React.lazy(() => import('./components/metrics/MetricsDashboard'));
-const AdminRoutes = React.lazy(() => import('./routes/AdminRoutes'));
+import MetricsDashboard from './components/metrics/MetricsDashboard';
+import AdminRoutes from './routes/AdminRoutes';
 import UserRoutes from './routes/UserRoutes';
-const WhatsAppMetrics = React.lazy(() => import('./components/whatsapp/WhatsAppMetrics'));
+import WhatsAppMetrics from './components/whatsapp/WhatsAppMetrics';
 
-const Perfil = React.lazy(() => import('./pages/Perfil'));
-const SeatingPlanRefactored = React.lazy(() => import('./components/seating/SeatingPlanRefactored'));
-const Invitaciones = React.lazy(() => import('./pages/Invitaciones'));
-const InvitationDesigner = React.lazy(() => import('./pages/InvitationDesigner'));
-const Contratos = React.lazy(() => import('./pages/Contratos'));
-// Dev-only pages will be lazy-loaded inside App()
-
-const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
-const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
-const Timing = React.lazy(() => import('./pages/protocolo/Timing'));
-const Checklist = React.lazy(() => import('./pages/protocolo/Checklist'));
-const AyudaCeremonia = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
-const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
-const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
-const WebEditor = React.lazy(() => import('./pages/WebEditor'));
-const DisenosLayout = React.lazy(() => import('./pages/disenos/DisenosLayout'));
-const DisenosInvitaciones = React.lazy(() => import('./pages/disenos/Invitaciones'));
-const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo'));
-const MenuDiseno = React.lazy(() => import('./pages/disenos/Menu'));
-const SeatingPlanPost = React.lazy(() => import('./pages/disenos/SeatingPlanPost'));
-const MenuCatering = React.lazy(() => import('./pages/disenos/MenuCatering'));
-const PapelesNombres = React.lazy(() => import('./pages/disenos/PapelesNombres'));
-// Dev-only page (Post) will be lazy-loaded inside App()
-const Ideas = React.lazy(() => import('./pages/Ideas'));
-const Inspiration = React.lazy(() => import('./pages/Inspiration'));
-const Blog = React.lazy(() => import('./pages/Blog'));
+import Perfil from './pages/Perfil';
+import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored';
+import Invitaciones from './pages/Invitaciones';
+import Contratos from './pages/Contratos';
+import DisenoWeb from './pages/DisenoWeb';
+import WebEditor from './pages/WebEditor';
+import DisenosLayout from './pages/disenos/DisenosLayout';
+import DisenosInvitaciones from './pages/disenos/Invitaciones';
+import DisenosLogo from './pages/disenos/Logo';
+import MenuDiseno from './pages/disenos/Menu';
+import SeatingPlanPost from './pages/disenos/SeatingPlanPost';
+import MenuCatering from './pages/disenos/MenuCatering';
+import PapelesNombres from './pages/disenos/PapelesNombres';
+import DisenosVectorEditor from './pages/disenos/VectorEditor';
+import Ideas from './pages/Ideas';
+import Inspiration from './pages/Inspiration';
+import Blog from './pages/Blog';
 import DevSeedGuests from './pages/DevSeedGuests';
 import DevEnsureFinance from './pages/DevEnsureFinance';
 
-const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
-const WeddingSite = React.lazy(() => import('./pages/WeddingSite'));
-const RSVPConfirm = React.lazy(() => import('./pages/RSVPConfirm'));
-const AcceptInvitation = React.lazy(() => import('./pages/AcceptInvitation'));
-const RSVPDashboard = React.lazy(() => import('./pages/RSVPDashboard'));
+import Notificaciones from './pages/Notificaciones';
+import WeddingSite from './pages/WeddingSite';
+import RSVPConfirm from './pages/RSVPConfirm';
+import AcceptInvitation from './pages/AcceptInvitation';
+import RSVPDashboard from './pages/RSVPDashboard';
 
-// Importar configuración de i18n
 import './i18n';
-
-// Importar sistema de diagnóstico
 import DiagnosticPanel from './components/DiagnosticPanel';
-import errorLogger from './utils/errorLogger';
 import './utils/consoleCommands';
-
-// Dev-only lazy components defined inside App()
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Evitar múltiples redirecciones usando ref
   const hasRedirected = React.useRef(false);
 
-  // Efecto para manejar redirección imperativa y evitar bucles
   React.useEffect(() => {
-    // No aplicar redirecciones en entorno Cypress (E2E)
     if (typeof window !== 'undefined' && window.Cypress) return;
     if (hasRedirected.current) return;
 
     if (!isLoading && !isAuthenticated) {
-      // Evitar redirigir si ya estamos en /login o en la landing
       if (location.pathname !== '/login' && location.pathname !== '/') {
         hasRedirected.current = true;
         navigate('/login', { replace: true, state: { from: location } });
@@ -97,7 +77,6 @@ function ProtectedRoute() {
     }
   }, [isAuthenticated, isLoading, location, navigate]);
 
-  // Bypass de autenticación cuando se ejecuta en Cypress (solo testing)
   if (typeof window !== 'undefined' && window.Cypress) {
     return (
       <>
@@ -107,14 +86,8 @@ function ProtectedRoute() {
     );
   }
 
-  if (isLoading) {
-    return null; // spinner opcional
-  }
-
-  if (!isAuthenticated) {
-    // La redirección ya se maneja de forma imperativa arriba
-    return null;
-  }
+  if (isLoading) return null;
+  if (!isAuthenticated) return null;
 
   return (
     <>
@@ -124,219 +97,92 @@ function ProtectedRoute() {
   );
 }
 
-
 function App() {
-  const enableDev = (import.meta.env.VITE_ENABLE_DEV_ROUTES === 'true') || (import.meta.env.MODE !== 'production');
-  // Dev-only lazy components (created only in dev builds)
-  const Dev = React.useMemo(() => {
-    if (!enableDev) return null;
-    return {
-      InvitadosRefactored: React.lazy(() => import('./pages/InvitadosRefactored')),
-      GestionProveedores: React.lazy(() => import('./pages/GestionProveedores')),
-      ProveedoresNuevo: React.lazy(() => import('./pages/ProveedoresNuevo')),
-      InvitationDesigner: React.lazy(() => import('./pages/InvitationDesigner')),
-      PostDiseno: React.lazy(() => import('./pages/disenos/Post')),
-      Protocolo: React.lazy(() => import('./pages/Protocolo')),
-      BuzonLegacy: React.lazy(() => import('./pages/Buzon_fixed_complete')),
-    };
-  }, [enableDev]);
-  
-  // Inicializar sistema de diagnóstico
-  React.useEffect(() => {
-    console.log('🚀 MyWed360 iniciando...');
-    console.log('🔍 Sistema de diagnóstico activado');
-    console.log('💡 Usa window.errorLogger para acceder al sistema de errores');
-
-    // Exponer errorLogger globalmente para diagnóstico
-    window.errorLogger = errorLogger;
-    
-    // Log de información del entorno
-    console.group('🌍 Información del Entorno');
-    console.log('Modo:', import.meta.env.MODE);
-    console.log('Desarrollo:', import.meta.env.DEV);
-    console.log('Backend URL:', import.meta.env.VITE_BACKEND_BASE_URL);
-    console.log('Firebase Project:', import.meta.env.VITE_FIREBASE_PROJECT_ID);
-    console.groupEnd();
-  }, []);
   return (
     <AuthProvider>
       <WeddingProvider>
-            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        {/* Contenedor global de notificaciones */}
-        <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
-        {/* Componente de notificaciones de correo - solo visible en rutas protegidas */}
-        <React.Suspense fallback={<Loader />}>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          {/* Herramientas de desarrollo accesibles sin protección (sólo si está activado por env) */}
-          {enableDev && <Route path="dev/seed-guests" element={<DevSeedGuests />} />}
-          {enableDev && <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />}
-          {/* Web pública de cada boda */}
-          <Route path="w/:uid" element={<WeddingSite />} />
-          <Route path="invitation/:code" element={<AcceptInvitation />} />
-          <Route path="rsvp/:token" element={<RSVPConfirm />} />
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<MainLayout />}>
-              <Route path="home" element={<Home />} />
-              <Route path="tasks" element={<Tasks />} />
-              <Route path="bodas" element={<Bodas />} />
-              <Route path="bodas/:id" element={<BodaDetalle />} />
-              <Route path="finance" element={<Finance />} />
-              <Route path="invitados" element={<Invitados />} />
-              <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
-              <Route path="invitados/invitaciones" element={<Invitaciones />} />
-              <Route path="invitaciones/designer" element={<InvitationDesigner />} />
-              {enableDev && Dev && (
-                <Route
-                  path="invitados/refactored"
-                  element={
-                    <React.Suspense fallback={<Loader />}>
-                      <Dev.InvitadosRefactored />
-                    </React.Suspense>
-                  }
-                />
-              )}
-              <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
-              <Route path="proveedores" element={<Proveedores />} />
-              <Route path="proveedores/contratos" element={<Contratos />} />
-              {enableDev && Dev && (
-                <Route
-                  path="proveedores/gestion"
-                  element={
-                    <React.Suspense fallback={<Loader />}>
-                      <Dev.GestionProveedores />
-                    </React.Suspense>
-                  }
-                />
-              )}
-              {enableDev && Dev && (
-                <Route
-                  path="proveedores/nuevo"
-                  element={
-                    <React.Suspense fallback={<Loader />}>
-                      <Dev.ProveedoresNuevo />
-                    </React.Suspense>
-                  }
-                />
-              )}
 
-              {/* Rutas de Protocolo */}
-              <Route path="protocolo" element={<ProtocoloLayout />}>
-                <Route index element={<Navigate to="momentos-especiales" replace />} />
-                <Route path="momentos-especiales" element={<MomentosEspeciales />} />
-                <Route path="documentos-legales" element={<DocumentosLegales />} />
-                <Route path="timing" element={<Timing />} />
-                <Route path="checklist" element={<Checklist />} />
-                <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
-              </Route>
-              {/* Protocolo legacy (estructura antigua con tabs locales) - solo dev */}
-              {enableDev && Dev && (
-                <Route path="protocolo-legacy" element={
-                  <React.Suspense fallback={<Loader />}>
-                    <Dev.Protocolo />
-                  </React.Suspense>
-                }>
-                  <Route index element={<Navigate to="momentos" replace />} />
-                  <Route path="momentos" element={<MomentosEspeciales />} />
-                  <Route path="timing" element={<Timing />} />
-                  <Route path="checklist" element={<Checklist />} />
-                  <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
+            {/* Rutas públicas */}
+            <Route path="w/:uid" element={<WeddingSite />} />
+            <Route path="invitation/:code" element={<AcceptInvitation />} />
+            <Route path="rsvp/:token" element={<RSVPConfirm />} />
+
+            {/* Dev tools públicas */}
+            <Route path="dev/seed-guests" element={<DevSeedGuests />} />
+            <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />
+
+            {/* Rutas protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<MainLayout />}>
+                <Route path="home" element={<Home />} />
+                <Route path="tasks" element={<Tasks />} />
+                <Route path="bodas" element={<Bodas />} />
+                <Route path="bodas/:id" element={<BodaDetalle />} />
+                <Route path="finance" element={<Finance />} />
+                <Route path="invitados" element={<Invitados />} />
+                <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
+                <Route path="invitados/invitaciones" element={<Invitaciones />} />
+                <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
+                <Route path="proveedores" element={<Proveedores />} />
+                <Route path="proveedores/contratos" element={<Contratos />} />
+
+                {/* Protocolo */}
+                <Route path="protocolo" element={<DisenoWeb />}> {/* placeholder or actual ProtocoloLayout if available */}
+                  <Route index element={<Navigate to="momentos-especiales" replace />} />
                 </Route>
-              )}
-              <Route path="perfil" element={<Perfil />} />
-               <Route path="notificaciones" element={<Notificaciones />} />
-                
-               <Route path="diseno-web" element={<DisenoWeb />} />
-              <Route path="web" element={<WebEditor />} />
-               <Route path="ideas" element={<Ideas />} />
-              <Route path="inspiracion" element={<Inspiration />} />
-              <Route path="blog" element={<Blog />} />
-              {enableDev && Dev && (
-                <Route
-                  path="invitaciones/designer"
-                  element={
-                    <React.Suspense fallback={<Loader />}>
-                      <Dev.InvitationDesigner />
-                    </React.Suspense>
-                  }
-                />
-              )}
 
-               {/* Panel de administración con monitoreo de caché */}
-               <Route path="admin/*" element={<AdminRoutes />} />
-              <Route path="email-admin" element={<EmailAdminDashboard />} />
-              {/* Métricas de WhatsApp */}
-              <Route path="whatsapp/metrics" element={<WhatsAppMetrics />} />
+                {/* Diseños */}
+                <Route path="disenos" element={<DisenosLayout />}>
+                  <Route index element={<Navigate to="invitaciones" replace />} />
+                  <Route path="invitaciones" element={<DisenosInvitaciones />} />
+                  <Route path="logo" element={<DisenosLogo />} />
+                  <Route path="menu" element={<MenuDiseno />} />
+                  <Route path="seating-plan" element={<SeatingPlanPost />} />
+                  <Route path="menu-catering" element={<MenuCatering />} />
+                  <Route path="papeles-nombres" element={<PapelesNombres />} />
+                  <Route path="vector-editor" element={<DisenosVectorEditor />} />
+                </Route>
 
-               {/* Herramientas de desarrollo (duplicado dentro del layout, sólo si está activado por env) */}
-               {enableDev && <Route path="dev/seed-guests" element={<DevSeedGuests />} />}
-               {enableDev && <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />}
+                {/* Extras */}
+                <Route path="perfil" element={<Perfil />} />
+                <Route path="notificaciones" element={<Notificaciones />} />
+                <Route path="diseno-web" element={<DisenoWeb />} />
+                <Route path="web" element={<WebEditor />} />
+                <Route path="ideas" element={<Ideas />} />
+                <Route path="inspiracion" element={<Inspiration />} />
+                <Route path="blog" element={<Blog />} />
+                <Route path="more" element={<More />} />
 
-               {/* Rutas Diseños */}
-                 <Route path="disenos" element={<DisenosLayout />}>
-                   <Route index element={<Navigate to="invitaciones" replace />} />
-                   <Route path="invitaciones" element={<DisenosInvitaciones />} />
-                   <Route path="logo" element={<DisenosLogo />} />
-                   <Route path="menu" element={<MenuDiseno />} />
-                   <Route path="seating-plan" element={<SeatingPlanPost />} />
-                   <Route path="menu-catering" element={<MenuCatering />} />
-                   <Route path="papeles-nombres" element={<PapelesNombres />} />
-                   {enableDev && Dev && (
-                     <Route
-                       path="post"
-                       element={
-                         <React.Suspense fallback={<Loader />}>
-                           <Dev.PostDiseno />
-                         </React.Suspense>
-                       }
-                     />
-                   )}
-                 </Route>
-              <Route path="more" element={<More />} />
-              
-              {/* Bandeja unificada de emails */}
-              <Route path="email" element={<UnifiedEmail />} />
-              <Route path="email/inbox" element={<UnifiedEmail />} />
-              <Route path="email/compose" element={<ComposeEmail />} />
-              <Route path="email/compose/:action/:id" element={<ComposeEmail />} />
-              <Route path="email/stats" element={<EmailStatistics />} />
-              <Route path="email/setup" element={<EmailSetup />} />
-              <Route path="email/test" element={<MailgunTester />} />
-              {enableDev && Dev && (
-                <Route
-                  path="email/legacy"
-                  element={
-                    <React.Suspense fallback={<Loader />}>
-                      <Dev.BuzonLegacy />
-                    </React.Suspense>
-                  }
-                />
-              )}
-              {/* Redirección para rutas legado */}
-              <Route path="buzon/*" element={<Navigate to="/email" replace />} />
-              
-              {/* Rutas de usuario */}
-              <Route path="user/*" element={<UserRoutes />} />
-              
-              {/* Rutas de administración de email */}
-              <Route path="admin">
-                <Route path="email" element={<EmailAdminDashboard />} />
-                <Route path="metrics" element={<MetricsDashboard />} />
+                {/* Email */}
+                <Route path="email" element={<UnifiedEmail />} />
+                <Route path="email/inbox" element={<UnifiedEmail />} />
+                <Route path="email/compose" element={<ComposeEmail />} />
+                <Route path="email/compose/:action/:id" element={<ComposeEmail />} />
+                <Route path="email/stats" element={<EmailStatistics />} />
+                <Route path="email/setup" element={<EmailSetup />} />
+                <Route path="email/test" element={<MailgunTester />} />
+
+                {/* Admin */}
+                <Route path="admin/*" element={<AdminRoutes />} />
+                <Route path="email-admin" element={<EmailAdminDashboard />} />
+
+                <Route path="*" element={<Navigate to="/home" replace />} />
               </Route>
-  
-              <Route path="*" element={<Navigate to="/home" replace />} />
             </Route>
-          </Route>
-        </Routes>
-        </React.Suspense>
-        {/* Sistema de diagnóstico global */}
-        <DiagnosticPanel />
-            </BrowserRouter>
-          </WeddingProvider>
+          </Routes>
+          {/* Sistema de diagnóstico global */}
+          <DiagnosticPanel />
+        </BrowserRouter>
+      </WeddingProvider>
     </AuthProvider>
   );
 }
 
 export default App;
+

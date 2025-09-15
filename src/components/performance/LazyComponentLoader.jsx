@@ -47,7 +47,7 @@ export const createLazyComponent = (importFunction, options = {}) => {
 export const LazyTasks = createLazyComponent(() => import('../../pages/Tasks'));
 export const LazyFinance = createLazyComponent(() => import('../../pages/Finance'));
 export const LazyGestionProveedores = createLazyComponent(() => import('../../pages/GestionProveedores'));
-export const LazySeatingPlan = createLazyComponent(() => import('../../components/seating/SeatingPlanRefactored'));
+export const LazySeatingPlan = createLazyComponent(() => import('../../components/seating/SeatingPlanRefactored.jsx'));
 export const LazyInvitationDesigner = createLazyComponent(() => import('../../pages/InvitationDesigner'));
 export const LazyChecklist = createLazyComponent(() => import('../../pages/Checklist'));
 

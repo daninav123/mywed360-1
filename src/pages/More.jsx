@@ -10,7 +10,7 @@ export default function More() {
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushBusy, setPushBusy] = useState(false);
   const pfInvitados = () => prefetchModule('Invitados', () => import('./Invitados'));
-  const pfSeating = () => prefetchModule('SeatingPlanRefactored', () => import('../components/seating/SeatingPlanRefactored'));
+  const pfSeating = () => prefetchModule('SeatingPlanRefactored', () => import('../components/seating/SeatingPlanRefactored.jsx'));
   const pfProveedores = () => prefetchModule('Proveedores', () => import('./Proveedores'));
   const pfContratos = () => prefetchModule('Contratos', () => import('./Contratos'));
   const pfProtocolo = () => prefetchModule('ProtocoloLayout', () => import('./protocolo/ProtocoloLayout'));

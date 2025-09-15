@@ -1,298 +1,79 @@
-import React, { useState, useEffect } from 'react';
-import { useCalendarSync } from '../../hooks/useCalendarSync';
-import { Button, Spinner, Alert, Badge } from '../../components/ui';
-import { Calendar, RefreshCw, Link2, Check, AlertTriangle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button, Spinner } from '../../components/ui';
+import { Calendar } from 'lucide-react';
+import { get as apiGet } from '../../services/apiClient';
 
-/**
- * Componente para sincronización bidireccional de calendarios
- */
-const CalendarSync = ({ onEventsImported }) => {
-  const { 
-    isLoading, 
-    isAuthenticated, 
-    syncedCalendars, 
-    lastSync,
-    error, 
-    authenticate, 
-    logout, 
-    getAvailableCalendars,
-    saveCalendarSyncConfig,
-    importEventsFromGoogle,
-    exportEventsToGoogle,
-    syncBidirectional 
-  } = useCalendarSync();
-  
-  const [availableCalendars, setAvailableCalendars] = useState([]);
-  const [selectedCalendars, setSelectedCalendars] = useState([]);
-  const [syncStatus, setSyncStatus] = useState({ imported: 0, exported: 0 });
-  const [showConfig, setShowConfig] = useState(false);
-  const hasKeys = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID && import.meta.env.VITE_GOOGLE_API_KEY);
-  
-  // Cargar calendarios cuando el usuario se autentique
-  useEffect(() => {
-    const loadCalendars = async () => {
-      if (isAuthenticated) {
-        const calendars = await getAvailableCalendars();
-        setAvailableCalendars(calendars);
-        setSelectedCalendars(syncedCalendars.map(cal => cal.id));
+// Calendario: Suscripción iCal/ICS sin OAuth ni API de Google
+const CalendarSync = () => {
+  const [feed, setFeed] = useState(null);
+  const [loadingFeed, setLoadingFeed] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleGetFeed = async () => {
+    try {
+      setLoadingFeed(true);
+      setError(null);
+      const res = await apiGet('/api/calendar/token', { auth: true });
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Debes iniciar sesión para generar tu enlace de calendario');
+        }
+        const txt = await res.text().catch(() => '');
+        throw new Error(`No se pudo obtener el enlace (${res.status}). ${txt || ''}`.trim());
       }
-    };
-    
-    loadCalendars();
-  }, [isAuthenticated, syncedCalendars]);
-  
-  // Manejar cambio de selección de calendario
-  const handleCalendarToggle = (calendar) => {
-    setSelectedCalendars(prev => {
-      if (prev.includes(calendar.id)) {
-        return prev.filter(id => id !== calendar.id);
-      } else {
-        return [...prev, calendar.id];
-      }
-    });
-  };
-  
-  // Guardar configuración de calendarios seleccionados
-  const handleSaveConfig = async () => {
-    const selected = availableCalendars.filter(cal => selectedCalendars.includes(cal.id));
-    await saveCalendarSyncConfig(selected);
-    setShowConfig(false);
-  };
-  
-  // Sincronizar eventos bidireccionales
-  const handleSync = async () => {
-    if (syncedCalendars.length === 0) {
-      setShowConfig(true);
-      return;
+      const data = await res.json();
+      if (data?.ok) setFeed(data);
+    } catch (e) {
+      console.error('calendar token error', e);
+      setError(e?.message || 'No se pudo obtener el enlace. Inténtalo de nuevo.');
+      setFeed(null);
+    } finally {
+      setLoadingFeed(false);
     }
-    
-    setSyncStatus({ imported: 0, exported: 0 });
-    
-    for (const calendar of syncedCalendars) {
-      const result = await syncBidirectional(calendar.id);
-      setSyncStatus(prev => ({
-        imported: prev.imported + result.imported.length,
-        exported: prev.exported + result.exported.length
-      }));
-      
-      if (result.imported.length > 0 && onEventsImported) {
-        onEventsImported(result.imported);
-      }
-    }
-  };
-  
-  // Formatear fecha para mostrar
-  const formatDate = (date) => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 my-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold flex items-center">
           <Calendar size={20} className="mr-2 text-blue-500" />
-          Sincronización de Calendario
+          Añadir a tu Calendario
         </h3>
-        
-        {lastSync && (
-          <div className="flex items-center text-sm text-gray-500">
-            <Clock size={14} className="mr-1" />
-            Última sincronización: {formatDate(lastSync)}
-          </div>
-        )}
+        <Button size="xs" variant="secondary" onClick={handleGetFeed} disabled={loadingFeed}>
+          {feed ? 'Actualizar enlace' : 'Obtener enlace'}
+          {loadingFeed && <Spinner size="sm" className="ml-2" />}
+        </Button>
       </div>
-      
       {error && (
-        <Alert type="error" className="mb-4">
-          <AlertTriangle size={16} className="mr-2" />
-          {error}
-        </Alert>
+        <div className="text-sm text-red-600 mb-2">{error}</div>
       )}
-      
-      {/* Estado de conexión */}
-      <div className="flex items-center mb-4">
-        <div className="mr-4">
-          {isAuthenticated ? (
-            <Badge type="success" className="flex items-center">
-              <Check size={14} className="mr-1" /> Conectado
-            </Badge>
-          ) : (
-            <Badge type="warning" className="flex items-center">
-              <Link2 size={14} className="mr-1" /> No conectado
-            </Badge>
-          )}
-        </div>
-        
-        <div className="ml-auto">
-          {isAuthenticated ? (
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={logout} 
-              disabled={isLoading}
-            >
-              Desconectar
-            </Button>
-          ) : (
-            <Button 
-              size="sm" 
-              variant="primary" 
-              onClick={authenticate} 
-              disabled={isLoading || !hasKeys}
-            >
-              Conectar con Google Calendar
-              {isLoading && <Spinner size="sm" className="ml-2" />}
-            </Button>
-          )}
-        </div>
-      </div>
-      {!hasKeys && (
-        <Alert type="warning" className="mb-4">
-          Falta configurar VITE_GOOGLE_CLIENT_ID y VITE_GOOGLE_API_KEY. Cuando las definas, podrás conectar Google Calendar.
-        </Alert>
-      )}
-      
-      {/* Panel de calendarios */}
-      {isAuthenticated && (
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-md font-medium">
-              Calendarios ({syncedCalendars.length})
-            </h4>
-            
-            <Button 
-              size="xs" 
-              variant="secondary" 
-              onClick={() => setShowConfig(!showConfig)}
-            >
-              {showConfig ? 'Ocultar' : 'Configurar'}
-            </Button>
-          </div>
-          
-          {/* Lista de calendarios configurados */}
-          {!showConfig && syncedCalendars.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {syncedCalendars.map(calendar => (
-                <div 
-                  key={calendar.id} 
-                  className="flex items-center p-2 rounded border text-sm"
-                  style={{ 
-                    borderColor: calendar.backgroundColor || '#ccc',
-                    backgroundColor: `${calendar.backgroundColor}10` || '#f9f9f9'
-                  }}
-                >
-                  <div 
-                    className="w-3 h-3 rounded-full mr-2" 
-                    style={{ backgroundColor: calendar.backgroundColor || '#ccc' }}
-                  />
-                  <span className="truncate">{calendar.summary}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Panel de configuración de calendarios */}
-          {showConfig && (
-            <div className="border rounded p-3 bg-gray-50">
-              <p className="text-sm text-gray-600 mb-2">
-                Selecciona los calendarios que deseas sincronizar:
-              </p>
-              
-              {isLoading ? (
-                <div className="flex justify-center p-4">
-                  <Spinner />
-                </div>
-              ) : (
-                <>
-                  <div className="max-h-48 overflow-y-auto mb-3">
-                    {availableCalendars.length > 0 ? (
-                      availableCalendars.map(calendar => (
-                        <div key={calendar.id} className="flex items-center mb-2">
-                          <input
-                            type="checkbox"
-                            id={calendar.id}
-                            checked={selectedCalendars.includes(calendar.id)}
-                            onChange={() => handleCalendarToggle(calendar)}
-                            className="mr-2"
-                          />
-                          <label 
-                            htmlFor={calendar.id} 
-                            className="flex items-center cursor-pointer"
-                          >
-                            <div 
-                              className="w-3 h-3 rounded-full mr-2" 
-                              style={{ backgroundColor: calendar.backgroundColor || '#ccc' }}
-                            />
-                            <span>{calendar.summary}</span>
-                            {calendar.primary && (
-                              <Badge type="info" className="ml-2 text-xs">Principal</Badge>
-                            )}
-                          </label>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-sm italic">
-                        No se encontraron calendarios
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => setShowConfig(false)}
-                      className="mr-2"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="primary" 
-                      onClick={handleSaveConfig}
-                      disabled={selectedCalendars.length === 0}
-                    >
-                      Guardar configuración
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-          
-          {/* Botón de sincronización y estado */}
-          <div className="mt-4 flex justify-between items-center">
-            <div>
-              {(syncStatus.imported > 0 || syncStatus.exported > 0) && (
-                <div className="text-sm">
-                  <Badge type="success" className="mr-2">
-                    {syncStatus.imported} eventos importados
-                  </Badge>
-                  <Badge type="info">
-                    {syncStatus.exported} eventos exportados
-                  </Badge>
-                </div>
-              )}
-            </div>
-            
-            <Button
-              variant="primary"
-              onClick={handleSync}
-              disabled={isLoading || syncedCalendars.length === 0}
-              className="flex items-center"
-            >
-              <RefreshCw size={16} className={`mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-              Sincronizar ahora
-              {isLoading && <Spinner size="sm" className="ml-2" />}
-            </Button>
-          </div>
+      {!feed ? (
+        <p className="text-xs text-gray-600">Pulsa “Obtener enlace” para suscribirte mediante iCal/ICS sin permisos adicionales.</p>
+      ) : (
+        <div className="flex flex-wrap gap-2 items-center">
+          <a
+            className="px-3 py-1 rounded bg-blue-600 text-white text-sm"
+            href={feed.webcalUrl}
+            title="Suscribirse (Apple Calendar, iOS, macOS, Outlook)"
+          >
+            Suscribirse (Apple/Outlook)
+          </a>
+          <a
+            className="px-3 py-1 rounded bg-green-600 text-white text-sm"
+            href={`https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(feed.webcalUrl)}`}
+            target="_blank" rel="noreferrer"
+          >
+            Añadir a Google Calendar
+          </a>
+          <button
+            className="px-3 py-1 rounded border text-sm"
+            onClick={() => navigator.clipboard.writeText(feed.feedUrl)}
+          >
+            Copiar URL ICS
+          </button>
+          <span className="text-xs text-gray-500">
+            El enlace mantiene tus eventos siempre actualizados en tu calendario.
+          </span>
         </div>
       )}
     </div>

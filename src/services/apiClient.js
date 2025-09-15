@@ -23,8 +23,13 @@ async function buildHeaders(opts = {}) {
 function url(path) {
   if (!path) throw new Error('Empty path');
   if (path.startsWith('http')) return path;
-  if (path.startsWith('/')) return `${BASE}${path}`;
-  return `${BASE}/${path}`;
+  // Si hay BASE configurado (Render u otro), usarlo SIEMPRE para rutas relativas
+  if (BASE) {
+    if (path.startsWith('/')) return `${BASE}${path}`;
+    return `${BASE}/${path}`;
+  }
+  // Sin BASE: usar mismo origen (Vite proxy gestiona /api en dev)
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 export async function get(path, opts = {}) {
@@ -46,4 +51,3 @@ export async function del(path, opts = {}) {
   const res = await fetch(url(path), { method: 'DELETE', headers: await buildHeaders(opts) });
   return res;
 }
-

@@ -6,7 +6,6 @@ import { Cloud, CloudOff, RefreshCw, Download } from 'lucide-react';
 // Importar componentes separados
 import ErrorBoundary from './ErrorBoundary';
 import { downloadAllICS } from './CalendarUtils';
-import GoogleCalendar from '../../services/GoogleCalendarService';
 import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents';
 import { GanttChart } from './GanttTasks';
 import TaskForm from './TaskForm';
@@ -648,31 +647,7 @@ export default function Tasks() {
             >
               Nueva Tarea
             </button>
-            <button
-              onClick={async () => {
-                try {
-                  await GoogleCalendar.loadClient();
-                  if (!GoogleCalendar.isAuthenticated()) {
-                    await GoogleCalendar.signIn();
-                  }
-                  const promises = (safeEvents || []).slice(0, 100).map(evt => GoogleCalendar.createEvent({
-                    title: evt.title,
-                    desc: evt.desc,
-                    start: evt.start instanceof Date ? evt.start : new Date(evt.start),
-                    end: evt.end instanceof Date ? evt.end : new Date(evt.end),
-                    category: evt.category || 'OTROS'
-                  }));
-                  await Promise.allSettled(promises);
-                  alert('Eventos sincronizados con Google Calendar');
-                } catch (e) {
-                  console.error('Sync Google Calendar error', e);
-                  alert('No se pudo sincronizar con Google Calendar');
-                }
-              }}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-            >
-              Sincronizar Google
-            </button>
+            
             <button
               onClick={() => downloadAllICS(safeEvents)}
               className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
