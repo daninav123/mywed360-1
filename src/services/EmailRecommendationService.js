@@ -3,7 +3,7 @@
  * de efectividad de correos electrónicos
  */
 import AIEmailTrackingService from './AIEmailTrackingService';
-import { EMAIL_TAGS } from './emailTrackingService';
+import { EMAIL_TAGS } from './EmailTrackingService';
 
 class EmailRecommendationService {
   constructor() {

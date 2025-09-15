@@ -2,7 +2,7 @@
  * Servicio especializado para el seguimiento y análisis de efectividad de correos
  * generados mediante búsqueda AI de proveedores.
  */
-import { EMAIL_TAGS } from './emailTrackingService';
+import { EMAIL_TAGS } from './EmailTrackingService';
 
 class AIEmailTrackingService {
   /**
