@@ -64,6 +64,7 @@ import gdprRouter from './routes/gdpr.js';
 import pushRouter from './routes/push.js';
 import paymentsRouter from './routes/payments.js';
 import paymentsWebhookRouter from './routes/payments-webhook.js';
+import healthRouter from './routes/health.js';
 
 
 // Load environment variables (root .env)
@@ -234,6 +235,7 @@ app.use('/api/gdpr', gdprRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
+app.use('/api/health', healthRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
