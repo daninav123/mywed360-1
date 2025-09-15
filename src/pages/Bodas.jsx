@@ -10,7 +10,7 @@ import { useWedding } from '../context/WeddingContext';
 
 
 export default function Bodas() {
-  const { currentUser } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const { setActiveWedding } = useWedding();
   const [weddings, setWeddings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function Bodas() {
         banquetPlace: values.banquetPlace || '',
         createdAt: serverTimestamp(),
         ownerIds: [],
-        plannerIds: [user.uid],
+        plannerIds: [currentUser.uid],
         assistantIds: [],
         progress: 0,
         active: true,
@@ -48,8 +48,8 @@ export default function Bodas() {
   };
 
   useEffect(() => {
-    if (!user?.uid) return;
-    const q = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', user.uid));
+    if (!currentUser?.uid) return;
+    const q = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', currentUser.uid));
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
@@ -91,7 +91,7 @@ export default function Bodas() {
 
     });
     return () => unsub();
-  }, [user]);
+  }, [currentUser]);
 
     const today = new Date();
   const activeWeddings = weddings.filter((w) => {
@@ -114,7 +114,7 @@ export default function Bodas() {
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Mis Bodas</h1>
-        {user?.role === 'planner' && (
+        {userProfile?.role === 'planner' && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded shadow"

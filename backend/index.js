@@ -28,6 +28,8 @@ import {
 
 import mailRouter from './routes/mail.js';
 import mailOpsRouter from './routes/mail-ops.js';
+import mailStatsRouter from './routes/mail-stats.js';
+import mailSearchRouter from './routes/mail-search.js';
 import aiRouter from './routes/ai.js';
 import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
@@ -194,6 +196,8 @@ app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 // Rutas que requieren autenticación específica para correo
 app.use('/api/mail', requireMailAccess, mailRouter);
 app.use('/api/mail', mailOpsRouter);
+app.use('/api/mail', mailStatsRouter);
+app.use('/api/mail', mailSearchRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
 
 // IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)

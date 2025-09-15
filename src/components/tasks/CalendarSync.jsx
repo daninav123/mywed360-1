@@ -26,6 +26,7 @@ const CalendarSync = ({ onEventsImported }) => {
   const [selectedCalendars, setSelectedCalendars] = useState([]);
   const [syncStatus, setSyncStatus] = useState({ imported: 0, exported: 0 });
   const [showConfig, setShowConfig] = useState(false);
+  const hasKeys = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID && import.meta.env.VITE_GOOGLE_API_KEY);
   
   // Cargar calendarios cuando el usuario se autentique
   useEffect(() => {
@@ -144,7 +145,7 @@ const CalendarSync = ({ onEventsImported }) => {
               size="sm" 
               variant="primary" 
               onClick={authenticate} 
-              disabled={isLoading}
+              disabled={isLoading || !hasKeys}
             >
               Conectar con Google Calendar
               {isLoading && <Spinner size="sm" className="ml-2" />}
@@ -152,6 +153,11 @@ const CalendarSync = ({ onEventsImported }) => {
           )}
         </div>
       </div>
+      {!hasKeys && (
+        <Alert type="warning" className="mb-4">
+          Falta configurar VITE_GOOGLE_CLIENT_ID y VITE_GOOGLE_API_KEY. Cuando las definas, podrás conectar Google Calendar.
+        </Alert>
+      )}
       
       {/* Panel de calendarios */}
       {isAuthenticated && (

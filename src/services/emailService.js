@@ -173,15 +173,44 @@ export async function searchEmails(term = '') {
   const q = String(term).trim().toLowerCase();
   if (!q) return [];
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
-    if (!res.ok) throw new Error(`searchEmails ${res.status}`);
-    const items = await res.json();
-    return (Array.isArray(items) ? items : []).map((m) => ({
-      id: m.id || m._id || m.messageId || String(m.date || m.time || Date.now()),
-      subject: m.subject || '(Sin asunto)',
-      from: m.from || m.sender || m.fromEmail || '',
-      date: m.date || m.createdAt || new Date().toISOString(),
-    }));
+    try {
+      const res = await fetch(`${BASE}/api/mail/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
+      if (res.ok) {
+        const items = await res.json();
+        return (Array.isArray(items) ? items : []).map((m) => ({
+          id: m.id || m._id || m.messageId || String(m.date || m.time || Date.now()),
+          subject: m.subject || '(Sin asunto)',
+          from: m.from || m.sender || m.fromEmail || '',
+          date: m.date || m.createdAt || new Date().toISOString(),
+        }));
+      }
+      throw new Error(`searchEmails ${res.status}`);
+    } catch (e) {
+      try {
+        const [inbox, sent] = await Promise.all([
+          getMails('inbox').catch(() => []),
+          getMails('sent').catch(() => []),
+        ]);
+        const base = [
+          ...(Array.isArray(inbox) ? inbox : []),
+          ...(Array.isArray(sent) ? sent : []),
+        ];
+        return base
+          .filter((m) => {
+            const hay = `${m.subject || ''} ${m.body || ''} ${m.from || ''} ${m.to || ''}`.toLowerCase();
+            return hay.includes(q);
+          })
+          .slice(0, 20)
+          .map((m) => ({
+            id: m.id || String(m.date || Date.now()),
+            subject: m.subject || '(Sin asunto)',
+            from: m.from || '',
+            date: m.date || new Date().toISOString(),
+          }));
+      } catch {
+        // fall through to memory fallback
+      }
+    }
   }
   return memoryStore.mails
     .filter((m) => {
@@ -196,17 +225,20 @@ export async function searchEvents(term = '') {
   const q = String(term).trim().toLowerCase();
   if (!q) return [];
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/events/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
-    if (!res.ok) throw new Error(`searchEvents ${res.status}`);
-    const items = await res.json();
-    return (Array.isArray(items) ? items : []).map((e) => ({
-      id: e.id || e._id || String(e.start || Date.now()),
-      title: e.title || e.name || 'Evento',
-      dateTime: e.dateTime || e.start || e.startsAt || new Date().toISOString(),
-      location: e.location || e.place || '',
-    }));
+    try {
+      const res = await fetch(`${BASE}/api/events/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
+      if (!res.ok) throw new Error(`searchEvents ${res.status}`);
+      const items = await res.json();
+      return (Array.isArray(items) ? items : []).map((e) => ({
+        id: e.id || e._id || String(e.start || Date.now()),
+        title: e.title || e.name || 'Evento',
+        dateTime: e.dateTime || e.start || e.startsAt || new Date().toISOString(),
+        location: e.location || e.place || '',
+      }));
+    } catch {
+      return [];
+    }
   }
-  // Sin backend, no tenemos eventos globales disponibles
   return [];
 }
 

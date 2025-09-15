@@ -3,6 +3,7 @@ import { Card, CardContent, Tabs, Tab, Button, Box, Typography, Menu, MenuItem, 
 // Eliminando importación problemática de @mui/icons-material
 // Vamos a usar alternativas simples de texto para los íconos
 import { performanceMonitor } from '../../services/PerformanceMonitor';
+import { get as apiGet } from '../../services/apiClient';
 import MetricsDashboard from './MetricsDashboard';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,32 +37,24 @@ function EmailAdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simular carga de datos de estadísticas
+    // Cargar datos de estadísticas
     const loadStats = async () => {
       setIsLoading(true);
       
       try {
-        // En producción, estos datos vendrían de una API
-        // Por ahora generamos datos de ejemplo
-        
-        // Estadísticas de correos
-        setEmailStats({
-          totalAccounts: 120,
-          activeToday: 45,
-          totalSent: 876,
-          totalReceived: 1243,
-          averageResponseTime: 43, // minutos
-          topSenders: [
-            { email: 'maria@lovenda.com', count: 56 },
-            { email: 'juan@lovenda.com', count: 42 },
-            { email: 'ana@lovenda.com', count: 38 }
-          ],
-          topDomains: [
-            { domain: 'gmail.com', count: 356 },
-            { domain: 'hotmail.com', count: 189 },
-            { domain: 'outlook.com', count: 132 }
-          ]
-        });
+        // Stats básicas de correo desde backend
+        let core = { total: 0, unread: 0, byFolder: {} };
+        try {
+          const res = await apiGet('/api/mail/stats', { auth: true });
+          if (res.ok) core = await res.json();
+        } catch {}
+        setEmailStats((prev) => ({
+          ...prev,
+          totalSent: (core.byFolder && core.byFolder.sent) || 0,
+          totalReceived: (core.byFolder && core.byFolder.inbox) || 0,
+          activeToday: prev.activeToday || 0,
+          totalAccounts: prev.totalAccounts || 0,
+        }));
         
         // Estadísticas de feedback
         setFeedbackStats({

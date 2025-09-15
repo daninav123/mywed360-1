@@ -56,4 +56,35 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 });
 
+// GET /api/events/search?q=term
+// Devuelve una lista limitada de eventos coincidentes (título/lugar)
+router.get('/search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').toString().trim().toLowerCase();
+    if (!q || q.length < 2) return res.json([]);
+
+    let snap;
+    try {
+      snap = await db.collection('events').orderBy('date', 'desc').limit(300).get();
+    } catch (_) {
+      snap = await db.collection('events').limit(300).get();
+    }
+
+    const out = [];
+    snap.docs.forEach((d) => {
+      const data = d.data() || {};
+      const title = data.title || data.name || '';
+      const location = data.location || data.place || '';
+      const hay = `${title} ${location}`.toLowerCase();
+      if (hay.includes(q)) {
+        out.push({ id: d.id, title: title || 'Evento', dateTime: data.date || data.dateTime || data.start || null, location });
+      }
+    });
+    res.json(out.slice(0, 50));
+  } catch (err) {
+    logger.error('events-search-error', err);
+    res.status(500).json({ error: 'events-search-failed' });
+  }
+});
+
 export default router;

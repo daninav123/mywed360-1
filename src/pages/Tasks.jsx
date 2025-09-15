@@ -1,6 +1,7 @@
 import React from 'react';
 import ErrorBoundary from '../components/tasks/ErrorBoundary';
 import TasksRefactored from '../components/tasks/TasksRefactored';
+import CalendarSync from '../components/tasks/CalendarSync';
 import './Tasks.css';
 
 /**
@@ -14,6 +15,8 @@ export default function Tasks() {
   // Simplemente devolvemos el componente refactorizado
   return (
     <ErrorBoundary>
+      {/* Panel de sincronización de calendario (Google) */}
+      <CalendarSync />
       <TasksRefactored />
     </ErrorBoundary>
   );

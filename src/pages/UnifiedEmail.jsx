@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Spinner from "../components/ui/Spinner";
 import Alert from "../components/ui/Alert";
 import { uploadEmailAttachments } from "../services/storageUploadService";
-import { getMails, initEmailService, markAsRead, deleteMail, sendMail } from "../services/emailService";
+import { getMails, initEmailService, markAsRead, markAsUnread, deleteMail, sendMail, setFolder } from "../services/emailService";
 import EmailRecommendationService from "../services/EmailRecommendationService";
 import { detectProviderResponse } from "../services/EmailTrackingService";
 import { useWedding } from "../context/WeddingContext";
@@ -51,9 +51,7 @@ const UnifiedEmail = () => {
   // Helper local para marcar como NO leído en backend
   const markAsUnreadApi = async (id) => {
     try {
-      const base = import.meta.env.VITE_BACKEND_BASE_URL || '';
-      if (!base) throw new Error('Sin backend');
-      await fetch(`${base}/api/mail/${id}/unread`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      await markAsUnread(id);
     } catch (_) { /* fallback local ya aplicado en UI */ }
   };
   const fetchEmails = useCallback(async () => {
@@ -202,13 +200,18 @@ const UnifiedEmail = () => {
     }
   };
 
-  const handleMoveToFolder = (mail, folderId) => {
+  const handleMoveToFolder = async (mail, folderId) => {
     try {
       if (!userId || !mail?.id || !folderId) return;
       const ok = assignEmailToFolder(userId, mail.id, folderId);
       if (ok) {
         console.log("Correo movido a carpeta");
       }
+      // Best-effort: reflejar en backend
+      try {
+        // Persistir como carpeta personalizada en backend para excluir de inbox
+        await setFolder(mail.id, `custom:${folderId}`);
+      } catch {}
     } catch (e) {
       console.error("Error moviendo correo a carpeta", e);
     }
