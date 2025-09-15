@@ -48,6 +48,8 @@
         "@mui/icons-material": "^7.3.2",
         "@mui/material": "^7.1.2",
         "@mui/utils": "^7.1.1",
+        "express-rate-limit": "^7.3.1",
+        "helmet": "^7.1.0",
         "@mui/x-date-pickers": "^8.5.3",
         "@myno_21/pinterest-scraper": "^1.0.4",
         "@tailwindcss/forms": "^0.5.10",

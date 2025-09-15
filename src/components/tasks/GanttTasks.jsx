@@ -1,5 +1,6 @@
 import React from 'react';
 import { Gantt, ViewMode } from 'gantt-task-react';
+import 'gantt-task-react/dist/index.css';
 
 // Datos iniciales para el diagrama Gantt
 export const initialTasks = [

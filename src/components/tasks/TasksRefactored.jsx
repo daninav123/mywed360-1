@@ -605,13 +605,6 @@ export default function Tasks() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
-      <style>{` 
-        ._1nBOt > *:nth-child(n+2),
-        ._34SS0 > *:nth-child(n+2) {
-          display: none !important;
-        }
-        /* Se eliminan las reglas de flex personalizadas que afectaban al grid del calendario */
-      `}</style>
       
       <div className="flex items-center justify-between">
         <h1 className="page-title">Gestión de Tareas</h1>
