@@ -17,11 +17,24 @@ const router = express.Router();
  * Devuelve: { url }
  */
 router.post('/', async (req, res) => {
-  const { prompt, size = '1024x1024', quality = 'hd' } = req.body || {};
-
-  if (!prompt || typeof prompt !== 'string') {
-    return res.status(400).json({ error: 'prompt required' });
-  }
+  let { prompt, size = '1024x1024', quality = 'hd' } = req.body || {};
+  // Validación opcional con Zod
+  try {
+    const mod = await import('zod').catch(() => null);
+    if (mod) {
+      const z = mod.z || mod.default;
+      const schema = z.object({
+        prompt: z.string().min(1).max(2000),
+        size: z.enum(['1024x1024','1792x1024','1024x1792']).optional().default('1024x1024'),
+        quality: z.enum(['standard','hd']).optional().default('hd'),
+      });
+      const parsed = schema.safeParse({ prompt, size, quality });
+      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      ({ prompt, size, quality } = parsed.data);
+    } else {
+      if (!prompt || typeof prompt !== 'string') return res.status(400).json({ error: 'prompt required' });
+    }
+  } catch {}
   if (!OPENAI_API_KEY) {
     return res.status(500).json({ error: 'OPENAI_API_KEY missing' });
   }
@@ -72,8 +85,24 @@ import potrace from 'potrace';
  * Devuelve PDF vectorial listo para imprenta.
  */
 router.post('/vector-pdf', async (req, res) => {
-  const { url, widthMm = 210, heightMm = 297, dpi = 300 } = req.body || {};
-  if (!url) return res.status(400).json({ error: 'url required' });
+  let { url, widthMm = 210, heightMm = 297, dpi = 300 } = req.body || {};
+  try {
+    const mod = await import('zod').catch(()=>null);
+    if (mod) {
+      const z = mod.z || mod.default;
+      const schema = z.object({
+        url: z.string().url(),
+        widthMm: z.number().min(10).max(2000).optional().default(210),
+        heightMm: z.number().min(10).max(2000).optional().default(297),
+        dpi: z.number().min(72).max(1200).optional().default(300),
+      });
+      const parsed = schema.safeParse({ url, widthMm, heightMm, dpi });
+      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      ({ url, widthMm, heightMm, dpi } = parsed.data);
+    } else {
+      if (!url) return res.status(400).json({ error: 'url required' });
+    }
+  } catch {}
   try {
     // 1. Descargar la imagen (puede ser PNG o JPEG)
     const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
@@ -133,8 +162,19 @@ router.post('/vector-pdf', async (req, res) => {
  * Returns: { svg: string }
  */
 router.post('/vectorize-svg', async (req, res) => {
-  const { url, options } = req.body || {};
-  if (!url) return res.status(400).json({ error: 'url required' });
+  let { url, options } = req.body || {};
+  try {
+    const mod = await import('zod').catch(()=>null);
+    if (mod){
+      const z = mod.z || mod.default;
+      const schema = z.object({ url: z.string().url(), options: z.record(z.any()).optional() });
+      const parsed = schema.safeParse({ url, options });
+      if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+      ({ url, options } = parsed.data);
+    } else {
+      if (!url) return res.status(400).json({ error: 'url required' });
+    }
+  } catch {}
   try {
     const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
     const buf = Buffer.from(imgResp.data);
@@ -170,10 +210,23 @@ router.post('/vectorize-svg', async (req, res) => {
  */
 router.post('/svg-to-pdf', async (req, res) => {
   try {
-    const { svg, widthMm = 210, heightMm = 297 } = req.body || {};
-    if (!svg || typeof svg !== 'string') {
-      return res.status(400).json({ error: 'svg required' });
-    }
+    let { svg, widthMm = 210, heightMm = 297 } = req.body || {};
+    try {
+      const mod = await import('zod').catch(()=>null);
+      if (mod) {
+        const z = mod.z || mod.default;
+        const schema = z.object({
+          svg: z.string().min(10),
+          widthMm: z.number().min(10).max(2000).optional().default(210),
+          heightMm: z.number().min(10).max(2000).optional().default(297),
+        });
+        const parsed = schema.safeParse({ svg, widthMm, heightMm });
+        if (!parsed.success) return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i=>i.message).join('; ') });
+        ({ svg, widthMm, heightMm } = parsed.data);
+      } else {
+        if (!svg || typeof svg !== 'string') return res.status(400).json({ error: 'svg required' });
+      }
+    } catch {}
 
     const ptPerMm = 72 / 25.4;
     const widthPt = widthMm * ptPerMm;

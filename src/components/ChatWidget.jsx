@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { MessageSquare } from 'lucide-react';
 import Spinner from './Spinner';
 import { getBackendBase } from '../utils/backendBase';
+import { post as apiPost } from '../services/apiClient';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 
@@ -370,16 +371,7 @@ const sendMessage = async () => {
         throw new Error('No se pudo generar el token de autenticación');
       }
       
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ text: input, history }),
-        signal: controller.signal
-      });
+      const response = await apiPost('/api/ai/parse-dialog', { text: input, history }, { auth: true });
       
       clearTimeout(timeoutId);
       chatDebug('Duración petición IA:', (performance.now() - fetchStart).toFixed(0), 'ms');

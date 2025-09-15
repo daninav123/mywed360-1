@@ -102,7 +102,26 @@ router.get('/debug-env', (req, res) => {
 // Body: { text: "free form conversation" }
 // Returns: { extracted: {...} }
 router.post('/parse-dialog', async (req, res) => {
-  const { text, history = [] } = req.body;
+  let { text, history = [] } = req.body || {};
+  // Validación opcional con Zod si está disponible; fallback básico
+  try {
+    const mod = await import('zod').catch(() => null);
+    if (mod) {
+      const z = mod.z || mod.default;
+      const schema = z.object({
+        text: z.string().min(1).max(5000),
+        history: z.array(z.object({ role: z.string().optional(), content: z.string() })).optional().default([]),
+      });
+      const parsed = schema.safeParse({ text, history });
+      if (!parsed.success) {
+        return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i => i.message).join('; ') });
+      }
+      ({ text, history } = parsed.data);
+    } else {
+      if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
+      if (!Array.isArray(history)) history = [];
+    }
+  } catch {}
   logger.info('↪️  parse-dialog recibido', { textLen: text.length, historyLen: history.length });
   if (!text) return res.status(400).json({ error: 'text required' });
 
