@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProveedorBudgets from './ProveedorBudgets.jsx';
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -28,6 +29,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
   const { activeWedding } = useWedding();
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState(null);
+  const navigate = useNavigate();
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -66,6 +68,23 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
     } finally {
       setGenerating(false);
     }
+  };
+
+  const handleOpenLegalDocs = () => {
+    const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
+    navigate('/protocolo/documentos-legales', {
+      state: {
+        prefill: {
+          type: 'provider_contract',
+          title,
+          providerName: provider?.name || '',
+          service: provider?.service || '',
+          eventDate: provider?.date || '',
+          amount: provider?.priceRange || '',
+          region: 'ES',
+        }
+      }
+    });
   };
   
   // Renderizar estrellas para calificación
@@ -308,9 +327,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
                     <h3 className="text-lg font-medium">Documentos</h3>
                     {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
                   </div>
-                  <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
-                    {generating ? 'Generando…' : 'Generar contrato proveedor'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={handleOpenLegalDocs} variant="outline">
+                      Crear contrato en Documentos
+                    </Button>
+                    <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
+                      {generating ? 'Generando…' : 'Generar ahora'}
+                    </Button>
+                  </div>
                 </div>
               </Card>
             </div>

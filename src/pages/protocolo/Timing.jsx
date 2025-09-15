@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import PageWrapper from '../../components/PageWrapper';
@@ -157,3 +157,4 @@ const Timing = () => {
 };
 
 export default Timing;
+

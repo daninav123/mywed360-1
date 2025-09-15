@@ -295,3 +295,12 @@ export default function Buzon() {
         return new Date(b.lastUpdated) - new Date(a.lastUpdated);
       }
     });
+
+  // Fallback UI para build en producción; esta vista es legacy y sólo se usa en dev
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-semibold">Buzón Legacy</h1>
+      <p className="text-gray-600">Esta vista está deshabilitada en producción.</p>
+    </div>
+  );
+}

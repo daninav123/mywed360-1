@@ -293,4 +293,25 @@
     "draft": "Brouillon",
     "published": "Publié"
   }
+  ,
+  "inspiration": {
+    "alt": "inspiration",
+    "altWithTags": "inspiration : {{tags}}",
+    "aria": "Image d'inspiration",
+    "ariaWithTags": "Image d'inspiration : {{tags}}",
+    "addFav": "Ajouter aux favoris",
+    "removeFav": "Retirer des favoris"
+  },
+  "compose": {
+    "toField": "Champ destinataire",
+    "subjectField": "Champ objet",
+    "ccField": "Champ CC",
+    "bccField": "Champ CCI",
+    "insertQuickReply": "Insérer une réponse suggérée"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simuler des rappels",
+    "send": "Envoyer des rappels"
+  }
 }

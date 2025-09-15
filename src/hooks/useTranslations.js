@@ -97,12 +97,22 @@ const useTranslations = () => {
   const wedding = {
     // Formatear estado de invitado
     guestStatus: (status) => {
+      // Normalizar variantes provenientes de backend/UI
+      const norm = (s) => {
+        if (!s) return 'pending';
+        const x = String(s).toLowerCase();
+        if (x === 'accepted' || x === 'confirmado' || x === 'confirmed') return 'confirmed';
+        if (x === 'rejected' || x === 'rechazado' || x === 'declined') return 'declined';
+        if (x === 'pending' || x === 'pendiente') return 'pending';
+        return x;
+      };
+      const key = norm(status);
       const statusMap = {
         confirmed: translate('guests.confirmed'),
         pending: translate('guests.pending'),
         declined: translate('guests.declined')
       };
-      return statusMap[status] || status;
+      return statusMap[key] || status;
     },
 
     // Formatear prioridad de tarea

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCcw } from 'lucide-react';
 import ProveedorCard from './ProveedorCard';
 import Button from '../../components/ui/Button';
@@ -111,6 +112,25 @@ const ProveedorList = ({
         return true;
       });
   }, [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, tab, selected]);
+
+  const navigate = useNavigate();
+
+  const handleCreateContract = (provider) => {
+    const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
+    navigate('/protocolo/documentos-legales', {
+      state: {
+        prefill: {
+          type: 'provider_contract',
+          title,
+          providerName: provider?.name || '',
+          service: provider?.service || '',
+          eventDate: provider?.date || '',
+          amount: provider?.priceRange || '',
+          region: 'ES',
+        }
+      }
+    });
+  };
 
   return (
     <div className="w-full">
@@ -229,6 +249,7 @@ const ProveedorList = ({
               onToggleSelect={() => toggleSelect(provider.id)}
               onViewDetail={() => handleViewDetail(provider)}
               onToggleFavorite={toggleFavorite}
+              onCreateContract={handleCreateContract}
             />
           ))
         ) : (

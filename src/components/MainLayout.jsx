@@ -5,6 +5,7 @@ import Nav from './Nav';
 import ChatWidget from './ChatWidget';
 import DefaultAvatar from './DefaultAvatar';
 import GlobalSearch from './GlobalSearch';
+import { prefetchModule } from '../utils/prefetch';
 import DarkModeToggle from './DarkModeToggle';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -14,6 +15,9 @@ import { useLocation } from 'react-router-dom';
 
 
 export default function MainLayout() {
+  const prefetchNotificaciones = React.useCallback(() => {
+    try { import("../pages/Notificaciones"); } catch {}
+  }, []);
   // Nuevo sistema unificado
   const { hasRole, userProfile, isLoading, logout: logoutUnified } = useAuth();
   
@@ -26,6 +30,11 @@ export default function MainLayout() {
   const isPlanner = userProfile && hasRole ? hasRole('planner') : false;
   const showWeddingSelector = isPlanner && !hideSelector;
   const { showOnboarding, completeOnboarding } = useOnboarding();
+
+  // Prefetch helpers for lazy routes (email)
+  const prefetchEmail = React.useCallback(() => {
+    prefetchModule('UnifiedEmail', () => import('../pages/UnifiedEmail'));
+  }, []);
 
   // Cerrar menú al hacer click fuera
   useEffect(() => {
@@ -91,6 +100,9 @@ export default function MainLayout() {
                 <Link 
                   to="/notificaciones" 
                   onClick={() => setOpenMenu(false)} 
+                  onMouseEnter={prefetchNotificaciones}
+                  onFocus={prefetchNotificaciones}
+                  onTouchStart={prefetchNotificaciones}
                   className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
                   🔔 Notificaciones
@@ -98,6 +110,9 @@ export default function MainLayout() {
                 <Link 
                   to="/email" 
                   onClick={() => setOpenMenu(false)} 
+                  onMouseEnter={prefetchEmail}
+                  onFocus={prefetchEmail}
+                  onTouchStart={prefetchEmail}
                   className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
                   📧 Buzón de Emails

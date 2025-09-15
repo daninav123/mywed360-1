@@ -3,14 +3,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Loader from '../components/ui/Loader';
 
 // Páginas de usuario
-import UnifiedEmail from '../pages/UnifiedEmail';
-import EmailStatistics from '../pages/user/EmailStatistics';
-import Proveedores from '../pages/Proveedores';
-import EmailSetup from '../pages/EmailSetup';
-import MailgunTester from '../components/email/MailgunTester';
+// Rutas de email y proveedores centralizadas en App.jsx para evitar duplicados
 
 // Carga perezosa (lazy loading) de componentes para mejor rendimiento
-const EmailSetupLazy = lazy(() => import('../pages/EmailSetup'));
+// const EmailSetupLazy = lazy(() => import('../pages/EmailSetup'));
 
 // Componente para mostrar durante la carga
 const LoadingFallback = () => (
@@ -29,13 +25,7 @@ const UserRoutes = () => {
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<Navigate to="/user/dashboard" replace />} />
-        <Route path="/email" element={<UnifiedEmail />} />
-        {/** Alias para compatibilidad con enlaces antiguos */}
-        <Route path="/email/inbox" element={<UnifiedEmail />} />
-        <Route path="/email/stats" element={<EmailStatistics />} />
-        <Route path="/email/setup" element={<EmailSetup />} />
-        <Route path="/proveedores" element={<Proveedores />} />
-        <Route path="/email/test" element={<MailgunTester />} />
+        {/** Rutas de email/proveedores se definen en App.jsx */}
         {/* Redirección rutas legado */}
         <Route path="/buzon/*" element={<Navigate to="/email" replace />} />
         <Route path="*" element={<Navigate to="/user/dashboard" replace />} />

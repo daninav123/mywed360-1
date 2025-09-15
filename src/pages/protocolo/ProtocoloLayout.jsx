@@ -5,6 +5,7 @@ import Card from '../../components/ui/Card';
 // Definición estática de las pestañas para evitar recreaciones
 const tabs = [
   { path: 'momentos-especiales', label: 'Momentos Especiales' },
+  { path: 'documentos-legales', label: 'Documentos Legales' },
 ];
 
 // Componente memoizado para evitar renders innecesarios

@@ -66,7 +66,7 @@ export async function sendEmail(options) {
         replyTo,
         // No se pueden enviar archivos binarios directamente, se necesita un enfoque diferente para adjuntos
         // En producción, deberías subir los archivos a Cloud Storage y pasar las URLs
-        attachments: attachments ? attachments.map(a => ({ name: a.name })) : []
+        attachments: attachments ? attachments.map(a => ({ name: a.name || a.filename, url: a.url })) : []
       })
     });
     
@@ -227,3 +227,4 @@ export async function getMailEvents(emailAddress, eventType = 'delivered', limit
     throw error;
   }
 }
+

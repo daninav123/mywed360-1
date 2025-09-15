@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/ui/Button';
 import { getNotifications, markNotificationRead, deleteNotification } from '../services/notificationService';
+import { isSupported as pushSupported, subscribe as pushSubscribe, unsubscribe as pushUnsubscribe, sendTest as pushTest } from '../services/PushService';
 
 const typeColors = {
   success: 'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/40 text-[color:var(--color-success)]',
@@ -12,6 +13,7 @@ const typeColors = {
 export default function Notificaciones() {
   const [filter, setFilter] = useState('all');
   const [items, setItems] = useState([]);
+  const [pushEnabled, setPushEnabled] = useState(false);
 
   const refresh = async () => setItems(await getNotifications());
 
@@ -20,6 +22,13 @@ export default function Notificaciones() {
     const handler = () => refresh();
     window.addEventListener('lovenda-notif', handler);
     return () => window.removeEventListener('lovenda-notif', handler);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (!pushSupported()) return;
+      try { setPushEnabled(!!(await navigator.serviceWorker.ready).pushManager); } catch {}
+    })();
   }, []);
 
   const filtered = items.filter((n) => (filter === 'unread' ? !n.read : true));
@@ -42,6 +51,23 @@ export default function Notificaciones() {
           Sin leer
         </button>
       </div>
+
+      {pushSupported() && (
+        <div className="flex items-center gap-2 mt-2">
+          <button
+            onClick={async ()=>{ try { await pushSubscribe(); alert('Suscripción push activada'); } catch(e){ alert('No se pudo activar push'); } }}
+            className="px-3 py-1 rounded bg-green-600 text-white"
+          >Activar Push</button>
+          <button
+            onClick={async ()=>{ try { await pushUnsubscribe(); alert('Suscripción push desactivada'); } catch(e){ alert('No se pudo desactivar'); } }}
+            className="px-3 py-1 rounded bg-gray-200"
+          >Desactivar Push</button>
+          <button
+            onClick={async ()=>{ const ok = await pushTest(); alert(ok ? 'Test enviado' : 'Fallo en test'); }}
+            className="px-3 py-1 rounded bg-blue-600 text-white"
+          >Probar Push</button>
+        </div>
+      )}
 
       <div className="bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 rounded divide-y divide-[color:var(--color-text)]/10">
         {filtered.length === 0 && <p className="p-4 text-[color:var(--color-text)]/60">No hay notificaciones.</p>}

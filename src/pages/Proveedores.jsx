@@ -12,6 +12,7 @@ import { loadTrackingRecords, createTrackingRecord, updateTrackingStatus, TRACKI
 import PageWrapper from '../components/PageWrapper';
 import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 import { Plus, Search, RefreshCcw, Star, Eye, Edit2, Trash2, Calendar, Clock, Download, MapPin, AlertTriangle } from 'lucide-react';
+import { checkoutProviderDeposit } from '../services/PaymentService';
 import Spinner from '../components/ui/Spinner';
 import Toast from '../components/Toast';
 import { awardPoints } from '../services/GamificationService';
@@ -2154,6 +2155,21 @@ ${bride} y ${groom}`;
                 >
                   <Calendar className="h-6 w-6 text-green-600 mb-1" />
                   <span className="text-xs">Reservar</span>
+                </button>
+
+                {/* Acción rápida: Pagar señal (Stripe si está configurado) */}
+                <button
+                  className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex flex-col items-center justify-center"
+                  onClick={async ()=>{
+                    try {
+                      await checkoutProviderDeposit({ providerId: detailProvider.id, providerName: detailProvider.name, amount: 100, currency: 'EUR' });
+                    } catch (e) {
+                      alert('Pago no disponible (Stripe no configurado)');
+                    }
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-emerald-600 mb-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="1.5" d="M12 1v22M5 6h9a5 5 0 010 10H5z"/></svg>
+                  <span className="text-xs">Pagar señal</span>
                 </button>
                 
                 {/* Acción rápida: Plantillas */}

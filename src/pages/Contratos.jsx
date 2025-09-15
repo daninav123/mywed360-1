@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { Plus, Download, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import Toast from '../components/Toast';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/ui/Card';
+import { useAuth } from '../hooks/useAuth';
+import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
 
 export default function Contratos() {
+  const { currentUser } = useAuth();
+  const uid = currentUser?.uid || 'guest';
   const sampleContracts = [
     { id: 1, provider: 'Eventos Catering', type: 'Catering', signedDate: '2025-04-01', serviceDate: '2025-06-10', status: 'Vigente', docUrl: '#' },
     { id: 2, provider: 'Flores y Diseño', type: 'Flores', signedDate: '2025-03-15', serviceDate: '2025-06-12', status: 'Vigente', docUrl: '#' },
@@ -15,12 +19,22 @@ export default function Contratos() {
   const [selected, setSelected] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [toast, setToast] = useState(null);
-  const initialContract = { provider: '', type: '', signedDate: '', serviceDate: '', status: '', docUrl: '' };
+  const initialContract = { provider: '', type: '', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
   const [newContract, setNewContract] = useState(initialContract);
 
   const handleAddContract = async e => {
     e.preventDefault();
-    const contractObj = { id: `ct${Date.now()}`, ...newContract, docUrl: newContract.docUrl || '#' };
+    let docUrl = newContract.docUrl || '#';
+    try {
+      if (newContract.docFile) {
+        const uploaded = await uploadFiles([newContract.docFile], uid, 'contracts');
+        if (uploaded && uploaded[0]?.url) docUrl = uploaded[0].url;
+      }
+    } catch (err) {
+      console.warn('Upload contrato falló, usando URL temporal');
+    }
+    const { docFile, ...rest } = newContract;
+    const contractObj = { id: `ct${Date.now()}`, ...rest, docUrl };
     await addContract(contractObj);
     setNewContract(initialContract);
     setShowAddModal(false);
@@ -41,7 +55,22 @@ export default function Contratos() {
   };
 
   const exportSelected = () => {
-    console.log('Export contracts:', selected);
+    try {
+      const rows = [['id','provider','type','signedDate','serviceDate','status','docUrl']];
+      contracts.filter(c => selected.includes(c.id)).forEach(c => {
+        rows.push([c.id, c.provider, c.type, c.signedDate, c.serviceDate, c.status, c.docUrl]);
+      });
+      const csv = rows.map(r => r.map(x => `"${String(x||'').replace(/"/g,'""')}"`).join(',')).join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'contratos.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export CSV error', e);
+    }
   };
 
   const actionButtons = (
@@ -101,7 +130,7 @@ export default function Contratos() {
                 <th className="p-2">Fecha de firma</th>
                 <th className="p-2">Fecha de servicio</th>
                 <th className="p-2">Estado</th>
-                <th className="p-2">Documento</th>
+                <th className="p-2">documento</th>
               </tr>
             </thead>
             <tbody>
@@ -196,13 +225,13 @@ export default function Contratos() {
                 <option value="Expirado">Expirado</option>
               </select>
               <div>
-                <label className="block mb-1">Documento</label>
+                <label className="block mb-1">documento</label>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
                   onChange={e => {
                     const file = e.target.files[0];
-                    setNewContract({ ...newContract, docUrl: URL.createObjectURL(file) });
+                    setNewContract({ ...newContract, docFile: file, docUrl: file ? URL.createObjectURL(file) : '' });
                   }}
                   className="w-full"
                 />
@@ -247,4 +276,5 @@ function ContractItem({ contract, isSelected, onToggle }) {
     </div>
   );
 }
+
 

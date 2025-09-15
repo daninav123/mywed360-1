@@ -18,6 +18,7 @@ const GuestList = React.memo(({
   searchTerm = '', 
   statusFilter = '', 
   tableFilter = '',
+  groupFilter = '',
   onUpdateStatus,
   onEdit,
   onDelete,
@@ -52,20 +53,24 @@ const GuestList = React.memo(({
         const matchesTable = !tableFilter ||
           (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
         
-        return matchesSearch && matchesStatus && matchesTable;
+        const matchesGroup = !groupFilter ||
+          (guest.group && String(guest.group).toLowerCase() === String(groupFilter).toLowerCase()) ||
+          (guest.companionGroupId && String(guest.companionGroupId).toLowerCase() === String(groupFilter).toLowerCase());
+        
+        return matchesSearch && matchesStatus && matchesTable && matchesGroup;
       });
     } catch (e) {
       if (import.meta.env.DEV) console.error('[GuestList] filter error', e);
       return [];
     }
-  }, [safeGuests, searchTerm, statusFilter, tableFilter]);
+  }, [safeGuests, searchTerm, statusFilter, tableFilter, groupFilter]);
 
   // Estadísticas memoizadas
   const stats = useMemo(() => {
     try {
-      const confirmed = safeGuests.filter(g => g.status === 'confirmed' || g.response === 'Sí').length;
-      const pending = safeGuests.filter(g => g.status === 'pending' || g.response === 'Pendiente').length;
-      const declined = safeGuests.filter(g => g.status === 'declined' || g.response === 'No').length;
+      const confirmed = safeGuests.filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted' || g.response === 'Sí'; }).length;
+      const pending = safeGuests.filter(g => { const s = String(g.status || '').toLowerCase(); if (s === 'confirmed' || s === 'accepted') return false; if (s === 'declined' || s === 'rejected') return false; return s === 'pending' || !s || g.response === 'Pendiente'; }).length;
+      const declined = safeGuests.filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'declined' || s === 'rejected' || g.response === 'No'; }).length;
       const totalCompanions = safeGuests.reduce((sum, g) => sum + (parseInt(g.companion, 10) || 0), 0);
       
       return {
@@ -110,11 +115,14 @@ const GuestList = React.memo(({
   }, [onUpdateStatus]);
 
   const getStatusColor = useCallback((status) => {
-    switch (status) {
+    const s = String(status || '').toLowerCase();
+    switch (s) {
       case 'confirmed':
+      case 'accepted':
       case 'Sí':
         return 'text-green-600 bg-green-100';
       case 'declined':
+      case 'rejected':
       case 'No':
         return 'text-red-600 bg-red-100';
       default:

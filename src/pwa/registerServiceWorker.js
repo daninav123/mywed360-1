@@ -2,5 +2,18 @@
 // Se usa el helper virtual para un registro sencillo con actualización automática
 import { registerSW } from 'virtual:pwa-register';
 
-// immediate: true para registrar en cuanto se pueda
-registerSW({ immediate: true });
+// Registrar y ejecutar limpieza de adjuntos compartidos
+registerSW({
+  immediate: true,
+  onRegistered(swReg) {
+    try {
+      const sendCleanup = () => {
+        const msg = { type: 'CLEANUP_SHARES' };
+        if (swReg?.active) swReg.active.postMessage(msg);
+      };
+      // Intento inicial y a los 5s para asegurar que el SW está activo
+      sendCleanup();
+      setTimeout(sendCleanup, 5000);
+    } catch {}
+  }
+});

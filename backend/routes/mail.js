@@ -137,7 +137,8 @@ router.get('/', requireMailAccess, async (req, res) => {
 // POST /api/mail  { to, subject, body }
 router.post('/', requireMailAccess, async (req, res) => {
   try {
-    const { to, subject, body, recordOnly, from: fromBody } = req.body;
+    const { to, subject, body, recordOnly, from: fromBody, attachments: rawAttachments } = req.body;
+    const attachments = Array.isArray(rawAttachments) ? rawAttachments.map(a => ({ filename: a.filename || a.name || null, name: a.name || a.filename || null, size: a.size || 0, url: a.url || null })) : [];
     const date = new Date().toISOString();
     const profile = req.userProfile || {};
     const computedFrom = fromBody || profile.myWed360Email || profile.email;
@@ -152,11 +153,73 @@ router.post('/', requireMailAccess, async (req, res) => {
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${body.replace(/\n/g, '<br>')}</div>`
     };
     
+
+    // Preparar adjuntos si hay URLs
+    let attachmentObjects = [];
+    try {
+      const mgForAttachment = (typeof mailgun !== "undefined" && mailgun) ? mailgun : ((typeof mailgunAlt !== "undefined" && mailgunAlt) ? mailgunAlt : null);
+      if (mgForAttachment && Array.isArray(attachments) && attachments.length) {
+        for (const att of attachments) {
+          if (!att) continue;
+          let filename = att.filename || att.name || "adjunto";
+          if (att.url) {
+            try {
+              const resp = await axios.get(att.url, { responseType: "arraybuffer" });
+              const buf = Buffer.from(resp.data);
+              const Att = mgForAttachment.Attachment || mgForAttachment.Attachment;
+              if (Att) {
+                attachmentObjects.push(new Att({ data: buf, filename }));
+              } else {
+                attachmentObjects.push({ data: buf, filename });
+              }
+            } catch (e) {
+              console.warn("No se pudo descargar adjunto para enviar:", filename, e?.message || e);
+            }
+          }
+        }
+        if (attachmentObjects.length) {
+          mailData.attachment = attachmentObjects;
+        }
+      }
+    } catch (attErr) {
+      console.warn("Error preparando adjuntos:", attErr?.message || attErr);
+    }
+
     // Enviar por Mailgun solo cuando no sea un registro "solo BD"
     if (!recordOnly) {
     try {
       // Crear clientes Mailgun de forma perezosa
       const { mailgun, mailgunAlt } = createMailgunClients();
+      // Preparar adjuntos si hay URLs
+      let attachmentObjects = [];
+      try {
+        const mgForAttachment = (typeof mailgun !== "undefined" && mailgun) ? mailgun : ((typeof mailgunAlt !== "undefined" && mailgunAlt) ? mailgunAlt : null);
+        if (mgForAttachment && Array.isArray(attachments) && attachments.length) {
+          for (const att of attachments) {
+            if (!att) continue;
+            let filename = att.filename || att.name || "adjunto";
+            if (att.url) {
+              try {
+                const resp = await axios.get(att.url, { responseType: "arraybuffer" });
+                const buf = Buffer.from(resp.data);
+                const Att = mgForAttachment.Attachment || mgForAttachment.Attachment;
+                if (Att) {
+                  attachmentObjects.push(new Att({ data: buf, filename }));
+                } else {
+                  attachmentObjects.push({ data: buf, filename });
+                }
+              } catch (e) {
+                console.warn("No se pudo descargar adjunto para enviar:", filename, e?.message || e);
+              }
+            }
+          }
+          if (attachmentObjects.length) {
+            mailData.attachment = attachmentObjects;
+          }
+        }
+      } catch (attErr) {
+        console.warn("Error preparando adjuntos:", attErr?.message || attErr);
+      }
 
       // Si no hay configuraciÃ³n, omitir envÃ­o real y continuar
       if (!mailgun) {
@@ -208,6 +271,7 @@ router.post('/', requireMailAccess, async (req, res) => {
       date,
       folder: 'sent',
       read: true,
+      attachments: attachments,
     });
     try { await db.collection('mails').doc(sentRef.id).update({ id: sentRef.id }); } catch {}
 
@@ -224,7 +288,8 @@ router.post('/', requireMailAccess, async (req, res) => {
           body,
           date,
           folder: 'sent',
-          read: true,
+      read: true,
+      attachments: attachments,
           via: 'backend'
         });
       }
@@ -243,6 +308,7 @@ router.post('/', requireMailAccess, async (req, res) => {
       date,
       folder: 'inbox',
       read: false,
+      attachments: attachments,
     });
     try { await db.collection('mails').doc(inboxRef.id).update({ id: inboxRef.id }); } catch {}
 
@@ -265,7 +331,8 @@ router.post('/', requireMailAccess, async (req, res) => {
           body,
           date,
           folder: 'inbox',
-          read: false,
+      read: false,
+      attachments: attachments,
           via: 'backend'
         });
       }
@@ -690,3 +757,79 @@ router.post('/test-personal-email', requireMailAccess, async (req, res) => {
 });
 
 export default router;
+
+
+// PATCH /api/mail/:id/unread
+router.patch('/:id/unread', requireMailAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const docRef = db.collection('mails').doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Not found' });
+    const data = doc.data();
+    await docRef.update({ read: false });
+
+    // Propagar cambio a subcolección del usuario propietario (inbox -> to, sent -> from)
+    try {
+      const targetEmail = (data.folder === 'sent') ? data.from : data.to;
+      if (targetEmail) {
+        let uid = null;
+        const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          await db.collection('users').doc(uid).collection('mails').doc(id).set({ read: false }, { merge: true });
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo propagar unread a subcolección de usuario:', e?.message || e);
+    }
+
+    res.json({ id, ...data, read: false });
+  } catch (err) {
+    console.error('Error en PATCH /api/mail/:id/unread:', err);
+    res.status(503).json({ success: false, message: 'Fallo actualizando mail', error: err?.message || String(err) });
+  }
+});
+
+// Compatibilidad: también aceptar POST para marcar como no leído
+router.post('/:id/unread', requireMailAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const docRef = db.collection('mails').doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return res.status(404).json({ error: 'Not found' });
+    const data = doc.data();
+    await docRef.update({ read: false });
+
+    // Propagar a subcolección
+    try {
+      const targetEmail = (data.folder === 'sent') ? data.from : data.to;
+      if (targetEmail) {
+        let uid = null;
+        const byAlias = await db.collection('users').where('myWed360Email', '==', targetEmail).limit(1).get();
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', targetEmail).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          await db.collection('users').doc(uid).collection('mails').doc(id).set({ read: false }, { merge: true });
+        }
+      }
+    } catch (e) {
+      console.warn('No se pudo propagar unread (POST) a subcolección de usuario:', e?.message || e);
+    }
+
+    res.json({ id, ...data, read: false });
+  } catch (err) {
+    console.error('Error en POST /api/mail/:id/unread:', err);
+    res.status(503).json({ success: false, message: 'Fallo actualizando mail', error: err?.message || String(err) });
+  }
+});
+

@@ -15,6 +15,7 @@ import { Button } from '../components/ui';
 import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
+import GroupManager from '../components/guests/GroupManager';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -39,6 +40,7 @@ function Invitados() {
   const [showWhatsBatch, setShowWhatsBatch] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [showGroupManager, setShowGroupManager] = useState(false);
 
   // Hooks reales
   const { t } = useTranslations();
@@ -70,6 +72,18 @@ function Invitados() {
     updateFilters,
     utils
   } = useGuests();
+
+  // Opciones únicas de grupo (group o companionGroupId)
+  const groupOptions = React.useMemo(() => {
+    try {
+      const set = new Set();
+      (guests || []).forEach(g => {
+        if (g.group) set.add(String(g.group));
+        if (g.companionGroupId) set.add(String(g.companionGroupId));
+      });
+      return Array.from(set).sort((a,b)=>String(a).localeCompare(String(b)));
+    } catch { return []; }
+  }, [guests]);
                           
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
@@ -145,6 +159,21 @@ function Invitados() {
     const result = await removeGuest(guest.id);
     if (!result.success) {
       alert(`Error eliminando invitado: ${result.error}`);
+    }
+  };
+
+  // Actualizar estado desde la lista (mapea al esquema del backend RSVP)
+  const handleUpdateStatus = async (guest, nextStatus) => {
+    try {
+      const map = { confirmed: 'accepted', declined: 'rejected', pending: 'pending' };
+      const status = map[nextStatus] || String(nextStatus || '').toLowerCase();
+      const res = await updateGuest(guest.id, { status });
+      if (!res?.success) {
+        alert('No se pudo actualizar el estado');
+      }
+    } catch (e) {
+      console.warn('Error actualizando estado:', e);
+      alert('Error actualizando estado del invitado');
     }
   };
 
@@ -303,6 +332,10 @@ function Invitados() {
     setWhatsGuest(null);
   };
 
+  // Abrir gestor de grupos
+  const openGroupManager = () => setShowGroupManager(true);
+  const closeGroupManager = () => setShowGroupManager(false);
+
   // Importar contactos seleccionados
   const handleImportedGuests = async (importedGuests) => {
     try {
@@ -395,7 +428,7 @@ function Invitados() {
   const handlePrintRsvpPdf = () => {
     try {
       const confirmedGuests = (guests || [])
-        .filter(g => g.status === 'confirmed' || g.response === 'Sí')
+        .filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted' || g.response === 'Sí'; })
         .map(g => ({ name: g.name || '', table: g.table || '' }));
 
       // Ordenar por mesa y nombre
@@ -512,9 +545,12 @@ function Invitados() {
           searchTerm={filters?.search || ''}
           statusFilter={filters?.status || ''}
           tableFilter={filters?.table || ''}
+          groupFilter={filters?.group || ''}
+          groupOptions={groupOptions}
           onSearchChange={(value) => updateFilters({ search: value })}
           onStatusFilterChange={(value) => updateFilters({ status: value })}
           onTableFilterChange={(value) => updateFilters({ table: value })}
+          onGroupFilterChange={(value) => updateFilters({ group: value })}
           onAddGuest={handleAddGuest}
           onBulkInvite={bulkInviteWhatsAppApi}
           onOpenRsvpSummary={handleOpenRsvpSummary}
@@ -522,6 +558,9 @@ function Invitados() {
           isLoading={isLoading}
           selectedCount={selectedIds.length}
           onSendSelectedApi={handleSendSelectedApi}
+          onScheduleSelected={handleScheduleSelected}
+          onSendSelectedBroadcast={handleSendSelectedBroadcast}
+          onOpenGroupManager={openGroupManager}
         />
 
         {/* Debug info para verificar estado */}
@@ -567,6 +606,8 @@ function Invitados() {
           searchTerm={filters?.search || ''}
           statusFilter={filters?.status || ''}
           tableFilter={filters?.table || ''}
+          groupFilter={filters?.group || ''}
+          onUpdateStatus={handleUpdateStatus}
           onEdit={handleEditGuest}
           onDelete={handleDeleteGuest}
           onInviteWhatsApp={openWhatsModalForGuest}
@@ -590,6 +631,7 @@ function Invitados() {
               onSave={handleSaveGuest}
               onCancel={handleCancelModal}
               isLoading={isSaving}
+              groupOptions={groupOptions}
             />
           ) : (
             <Tabs defaultValue="manual">
@@ -603,6 +645,7 @@ function Invitados() {
                   onSave={handleSaveGuest}
                   onCancel={handleCancelModal}
                   isLoading={isSaving}
+                  groupOptions={groupOptions}
                 />
               </TabsContent>
               <TabsContent value="import" className="pt-2">
@@ -643,15 +686,15 @@ function Invitados() {
                 <div className="text-sm text-gray-600">Total invitados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-green-600">{stats?.confirmed || 0}</div>
+                <div className="text-2xl font-bold text-green-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted'; }).length}</div>
                 <div className="text-sm text-gray-600">Confirmados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</div>
+                <div className="text-2xl font-bold text-yellow-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === '' || s === 'pending'; }).length}</div>
                 <div className="text-sm text-gray-600">Pendientes</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-red-600">{stats?.declined || 0}</div>
+                <div className="text-2xl font-bold text-red-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'declined' || s === 'rejected'; }).length}</div>
                 <div className="text-sm text-gray-600">Rechazados</div>
               </div>
             </div>
@@ -668,7 +711,7 @@ function Invitados() {
                   </thead>
                   <tbody>
                     {(guests || [])
-                      .filter(g => g.status === 'confirmed' || g.response === 'Sí')
+                      .filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted' || g.response === 'Sí'; })
                       .sort((a, b) => String(a.table || '').localeCompare(String(b.table || '')) || String(a.name || '').localeCompare(String(b.name || '')))
                       .map(g => (
                         <tr key={g.id} className="border-t">
@@ -716,6 +759,44 @@ function Invitados() {
           }}
           onSendApiBulk={async () => {
             try { await bulkInviteWhatsAppApi(); } catch {}
+          }}
+        />
+
+        {/* Gestor de Grupos */}
+        <GroupManager
+          open={showGroupManager}
+          onClose={closeGroupManager}
+          guests={guests || []}
+          selectedIds={selectedIds}
+          onAssignGroup={async (groupName) => {
+            try {
+              const setIds = new Set(selectedIds);
+              const targets = (guests || []).filter(g => setIds.has(g.id));
+              for (const g of targets) {
+                await updateGuest(g.id, { group: groupName });
+                // Propagar a companions del mismo grupo de acompañantes si aplica
+                if (g.companionGroupId) {
+                  const companions = (guests || []).filter(x => x.companionGroupId === g.companionGroupId && x.id !== g.id);
+                  for (const c of companions) { await updateGuest(c.id, { group: groupName }); }
+                }
+              }
+              alert(`Asignado grupo "${groupName}" a ${targets.length} invitado(s).`);
+              closeGroupManager();
+            } catch (e) { alert('Error asignando grupo'); }
+          }}
+          onRenameGroup={async (from, to) => {
+            try {
+              const targets = (guests || []).filter(g => String(g.group || '') === String(from));
+              for (const g of targets) { await updateGuest(g.id, { group: to }); }
+              alert(`Grupo renombrado: ${from} → ${to} (${targets.length} invitados actualizados)`);
+            } catch (e) { alert('Error renombrando grupo'); }
+          }}
+          onMergeGroups={async (from, to) => {
+            try {
+              const targets = (guests || []).filter(g => String(g.group || '') === String(from));
+              for (const g of targets) { await updateGuest(g.id, { group: to }); }
+              alert(`Fusionados ${targets.length} invitado(s) de "${from}" en "${to}".`);
+            } catch (e) { alert('Error fusionando grupos'); }
           }}
         />
       </div>

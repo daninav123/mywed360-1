@@ -49,7 +49,14 @@ if (typeof window !== 'undefined') {
  */
 
 import errorLogger from './errorLogger';
-import diagnosticService from '../services/diagnosticService';
+// Carga perezosa para evitar doble import (estático + dinámico)
+let __diagnosticSvc = null;
+async function getDiagnosticService() {
+  if (__diagnosticSvc) return __diagnosticSvc;
+  const mod = await import('../services/diagnosticService');
+  __diagnosticSvc = mod.default || mod;
+  return __diagnosticSvc;
+}
 
 class ConsoleCommands {
   constructor() {
@@ -80,8 +87,11 @@ class ConsoleCommands {
       
       // Acceso directo a servicios
       logger: errorLogger,
-      diagnostic: diagnosticService
+      diagnostic: undefined
     };
+
+    // Cargar servicio en background y exponerlo cuando esté listo
+    getDiagnosticService().then((svc) => { try { window.mywed.diagnostic = svc; } catch {} });
 
     // Mostrar mensaje de bienvenida
     this.showWelcomeMessage();
@@ -106,6 +116,7 @@ Comandos disponibles:
     console.log('🔍 Ejecutando diagnóstico completo...');
     
     try {
+      const diagnosticService = await getDiagnosticService();
       const results = await diagnosticService.runFullDiagnostic();
       
       console.group('📊 RESULTADOS DEL DIAGNÓSTICO COMPLETO');
@@ -134,6 +145,7 @@ Comandos disponibles:
     console.log('📧 Diagnosticando sistema de emails...');
     
     try {
+      const diagnosticService = await getDiagnosticService();
       const result = await diagnosticService.diagnoseEmailSystem();
       
       console.group('📧 DIAGNÓSTICO DE EMAILS');
@@ -154,6 +166,7 @@ Comandos disponibles:
     console.log('🤖 Diagnosticando chat IA...');
     
     try {
+      const diagnosticService = await getDiagnosticService();
       const result = await diagnosticService.diagnoseAIChat();
       
       console.group('🤖 DIAGNÓSTICO DE IA');
@@ -173,6 +186,7 @@ Comandos disponibles:
     console.log('🔥 Diagnosticando Firebase...');
     
     try {
+      const diagnosticService = await getDiagnosticService();
       const result = await diagnosticService.diagnoseFirebase();
       
       console.group('🔥 DIAGNÓSTICO DE FIREBASE');

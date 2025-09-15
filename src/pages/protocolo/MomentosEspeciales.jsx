@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Music, Edit2, Play, Plus, Trash2, Search as SearchIcon, X, ExternalLink, ChevronUp, ChevronDown } from 'lucide-react';
+import { Music, Edit2, Play, Plus, Trash2, Search as SearchIcon, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { Card } from '../../components/ui';
 import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
@@ -7,8 +7,8 @@ import useSpecialMoments from '../../hooks/useSpecialMoments';
 
 const MomentosEspeciales = () => {
   // Hook para manejar los momentos especiales
-  const { moments, addMoment, updateMoment, removeMoment, reorderMoment, moveMoment, duplicateMoment } = useSpecialMoments();
-  
+  const { moments, addMoment, updateMoment, removeMoment, reorderMoment, duplicateMoment } = useSpecialMoments();
+
   // Estados para las pestañas y búsqueda
   const [activeTab, setActiveTab] = useState('ceremonia');
   const [search, setSearch] = useState('');
@@ -27,18 +27,12 @@ const MomentosEspeciales = () => {
   // Búsqueda de canciones usando la API de iTunes
   const handleSearch = async () => {
     const term = search.trim();
-    if (!term) {
-      setResults([]);
-      return;
-    }
-    
+    if (!term) { setResults([]); return; }
     setLoadingSearch(true);
     setErrorSearch(null);
-    
     try {
       const resp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=15`);
       const data = await resp.json();
-      
       if (Array.isArray(data.results)) {
         const mapped = data.results.map(r => ({ id: r.trackId, name: `${r.trackName} - ${r.artistName}` }));
         setResults(mapped);
@@ -57,36 +51,27 @@ const MomentosEspeciales = () => {
   // Añadir nuevo momento al bloque activo
   const handleAddMoment = () => {
     const nextOrder = (moments[activeTab]?.length || 0) + 1;
-    addMoment(activeTab, { 
-      order: nextOrder, 
-      title: `Nuevo momento ${nextOrder}`, 
-      song: '',
-      time: ''
-    });
+    addMoment(activeTab, { order: nextOrder, title: `Nuevo momento ${nextOrder}`, song: '', time: '' });
   };
 
   return (
     <PageWrapper title="Momentos Especiales">
       <div className="space-y-6">
         <p className="text-gray-600">Planifica cada instante clave de tu gran día con la música y el momento adecuados.</p>
-        
+
         {/* Pestañas unificadas */}
         <div className="border-b flex gap-4">
           {TABS.map(tab => (
             <button
               key={tab.key}
               className={`pb-2 -mb-px font-medium ${activeTab === tab.key ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}
-              onClick={() => {
-                setActiveTab(tab.key);
-                setResults([]);
-                setSearch('');
-              }}
+              onClick={() => { setActiveTab(tab.key); setResults([]); setSearch(''); }}
             >
               {tab.label}
             </button>
           ))}
         </div>
-        
+
         {/* Contenido de la pestaña activa */}
         <Card className="space-y-5 p-5">
           {/* Buscador de canciones */}
@@ -113,17 +98,14 @@ const MomentosEspeciales = () => {
             <div className="border rounded-md overflow-hidden">
               <div className="bg-gray-50 p-2 border-b text-sm font-medium">
                 Resultados
-                <button 
-                  onClick={() => setResults([])} 
-                  className="float-right text-gray-500 hover:text-gray-700"
-                >
+                <button onClick={() => setResults([])} className="float-right text-gray-500 hover:text-gray-700">
                   <X size={16} />
                 </button>
               </div>
               <ul className="divide-y">
                 {results.map(song => (
                   <li key={song.id} className="p-2 hover:bg-blue-50">
-                    <button 
+                    <button
                       className="w-full text-left flex justify-between items-center"
                       onClick={() => {
                         if (!moments[activeTab]?.length) {
@@ -152,15 +134,11 @@ const MomentosEspeciales = () => {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <h3 className="font-medium">{TABS.find(t => t.key === activeTab)?.label || 'Momentos'}</h3>
-              <Button
-                onClick={handleAddMoment}
-                className="py-1 px-3 text-sm flex items-center gap-1"
-              >
-                <Plus size={14} />
-                Añadir momento
+              <Button onClick={handleAddMoment} className="py-1 px-3 text-sm flex items-center gap-1">
+                <Plus size={14} /> Añadir momento
               </Button>
             </div>
-            
+
             <div className="space-y-3">
               {moments[activeTab]?.length ? (
                 moments[activeTab]
@@ -176,7 +154,7 @@ const MomentosEspeciales = () => {
                             onChange={e => updateMoment(activeTab, moment.id, { ...moment, title: e.target.value })}
                             placeholder="Título del momento"
                           />
-                          
+
                           <div className="mt-2 flex flex-wrap gap-2">
                             <div className="flex-1 min-w-[200px]">
                               <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
@@ -190,7 +168,7 @@ const MomentosEspeciales = () => {
                                 placeholder="Nombre de la canción"
                               />
                             </div>
-                            
+
                             <div className="w-24">
                               <div className="text-xs text-gray-500 mb-1">Duración</div>
                               <input
@@ -205,24 +183,24 @@ const MomentosEspeciales = () => {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <button 
+                          <button
                             onClick={() => removeMoment(activeTab, moment.id)}
                             className="text-gray-400 hover:text-red-500 p-1"
                             title="Eliminar"
                           >
                             <Trash2 size={16} />
                           </button>
-                          
-                          <button 
+
+                          <button
                             onClick={() => duplicateMoment(activeTab, moment.id)}
                             className="text-gray-400 hover:text-blue-500 p-1"
                             title="Duplicar"
                           >
                             <Edit2 size={16} />
                           </button>
-                          
+
                           {idx > 0 && (
-                            <button 
+                            <button
                               onClick={() => reorderMoment(activeTab, moment.id, 'up')}
                               className="text-gray-400 hover:text-blue-600 p-1"
                               title="Mover arriba"
@@ -230,9 +208,9 @@ const MomentosEspeciales = () => {
                               <ChevronUp size={16} />
                             </button>
                           )}
-                          
+
                           {idx < moments[activeTab].length - 1 && (
-                            <button 
+                            <button
                               onClick={() => reorderMoment(activeTab, moment.id, 'down')}
                               className="text-gray-400 hover:text-blue-600 p-1"
                               title="Mover abajo"
@@ -259,3 +237,4 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
+

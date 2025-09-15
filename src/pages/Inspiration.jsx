@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { trackInteraction } from '../services/inspirationService';
 import { fetchWall } from '../services/wallService';
 import { saveData, loadData } from '../services/SyncService';
@@ -9,7 +9,7 @@ import SearchBar from '../components/SearchBar';
 
 export default function Inspiration() {
   const { currentUser } = useAuth();
-  const userId = currentUser?.id || 'anon';
+  const userId = currentUser?.uid || 'anon';
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -28,18 +28,26 @@ export default function Inspiration() {
     if (node) observer.current.observe(node);
   }, [loading]);
 
-  // Obtener tags preferidos basados en favoritos guardados
+  // Obtener tags preferidos basados en favoritos guañados
   useEffect(() => {
     (async () => {
-      const favs = await loadData('ideasPhotos', { firestore: false, fallbackToLocal: true });
+      const favs = await loadData('ideasPhotos', {
+        firestore: !!currentUser,
+        collection: 'userIdeas',
+        fallbackToLocal: true,
+      });
       if(Array.isArray(favs)){
         const counts = {};
         favs.forEach(p => (p.tags||[]).forEach(t => {counts[t]=(counts[t]||0)+1;}));
         const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([t])=>t);
         setPrefTags(sorted.slice(0,5));
+        // Notificar a componentes que escuchan cambios de localStorage en otras pestañas
+        try {
+          window.dispatchEvent(new StorageEvent('storage', { key: 'ideasPhotos' }));
+        } catch {}
       }
     })();
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     if(selectedTag==='favs') return; // No cargar muro cuando estamos en pestaña favoritos
@@ -47,7 +55,7 @@ export default function Inspiration() {
       setLoading(true);
       const newItems = await fetchWall(page, query);
       setItems((prev) => {
-        const merged = [...prev, ...newItems];
+        const merged = [...prev, ...newItems.filter(it => !prev.some(p => p.id === it.id))];
         // Personalización: boost posts que incluyan tags preferidos
         const score = (item)=> (item.tags||[]).some(t=>prefTags.includes(t)) ? 1 : 0;
         return merged.sort((a,b)=> score(b)-score(a));
@@ -58,8 +66,12 @@ export default function Inspiration() {
   }, [page, query, selectedTag]);
 
   const handleSave = async (item) => {
-    // Cargar estado actual de favoritos desde almacenamiento local
-    const current = await loadData('ideasPhotos', { firestore: false, fallbackToLocal: true }) || [];
+    // Cargar estado actual de favoritos (Firestore si autenticado)
+    const current = await loadData('ideasPhotos', {
+      firestore: !!currentUser,
+      collection: 'userIdeas',
+      fallbackToLocal: true,
+    }) || [];
     const exists = Array.isArray(current) && current.some(p => p.id === item.id);
     let next;
     if (exists) {
@@ -74,13 +86,17 @@ export default function Inspiration() {
         setPrefTags([...prefTags, ...newTags].slice(0, 5));
       }
     }
-    // Guardar array resultante (solo local en modo invitado)
-    await saveData('ideasPhotos', next, { collection: 'userIdeas', firestore: false, showNotification: false });
+    // Guardar array resultante (Firestore si autenticado; siempre actualiza localStorage)
+    await saveData('ideasPhotos', next, {
+      collection: 'userIdeas',
+      firestore: !!currentUser,
+      showNotification: false,
+    });
     // Si estamos en la pestaña de favoritos, refrescar inmediatamente el listado
     if (selectedTag === 'favs') {
       setItems(next);
     }
-    // Tracking de interacción (marcado estrella)
+    // Tracking de interacción (mañado estrella)
     trackInteraction(userId, item, 0, true);
   };
 
@@ -99,7 +115,11 @@ export default function Inspiration() {
   const handleTag = async (tag)=>{
     setSelectedTag(tag);
     if(tag==='favs'){
-      const favs = await loadData('ideasPhotos', { firestore: false, fallbackToLocal: true });
+      const favs = await loadData('ideasPhotos', {
+        firestore: !!currentUser,
+        collection: 'userIdeas',
+        fallbackToLocal: true,
+      });
       setItems(Array.isArray(favs)?favs:[]);
       setPage(1);
       return;
@@ -127,6 +147,7 @@ export default function Inspiration() {
     </div>
   );
 }
+
 
 
 

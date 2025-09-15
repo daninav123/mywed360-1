@@ -31,6 +31,19 @@ export default function EmailInsights({ mailId, userId, email }) {
     return () => { ignore = true; };
   }, [mailId]);
 
+  // Si no hay insights y hay clave OpenAI en cliente, intentar análisis automático una vez
+  useEffect(() => {
+    try {
+      if (!mailId) return;
+      if (insights && Object.keys(insights).length > 0) return;
+      const hasKey = !!import.meta.env.VITE_OPENAI_API_KEY;
+      if (!hasKey) return;
+      // Evita bucle: lanzar una sola vez
+      if (!analyzing) analyzeNow();
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mailId, insights]);
+
   const analyzeNow = useCallback(async () => {
     if (!mailId || analyzing) return;
     setAnalyzing(true);
@@ -47,7 +60,7 @@ export default function EmailInsights({ mailId, userId, email }) {
     }
   }, [mailId, analyzing]);
 
-  // ClasificaciÃ³n local simple (heurÃ­stica)
+  // Clasificación local simple (heurística)
   const classifyLocal = useCallback(() => {
     try {
       const text = `${email?.subject || ''} \n ${email?.body || ''}`.toLowerCase();
@@ -55,8 +68,8 @@ export default function EmailInsights({ mailId, userId, email }) {
       let folder = null;
       if (/presupuesto|budget|factura|pago/.test(text)) { tags.push('Presupuesto'); folder = folder || 'Finanzas'; }
       if (/contrato|firma|acuerdo/.test(text)) { tags.push('Contrato'); folder = folder || 'Contratos'; }
-      if (/fot[oÃ³]grafo|catering|m[Ãºu]sica|dj|flor/i.test(text)) { tags.push('Proveedor'); folder = folder || 'Proveedores'; }
-      if (/invitaci[Ã³o]n|rsvp|confirmaci[Ã³o]n/.test(text)) { tags.push('InvitaciÃ³n'); folder = folder || 'RSVP'; }
+      if (/fot[oó]grafo|catering|m[úu]sica|dj|flor/i.test(text)) { tags.push('Proveedor'); folder = folder || 'Proveedores'; }
+      if (/invitaci[óo]n|rsvp|confirmaci[óo]n/.test(text)) { tags.push('Invitación'); folder = folder || 'RSVP'; }
       return { tags: Array.from(new Set(tags)), folder };
     } catch { return { tags: [], folder: null }; }
   }, [email]);

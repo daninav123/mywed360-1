@@ -3,17 +3,27 @@
  * Proporciona funcionalidad offline y caché inteligente
  */
 
+import { precacheAndRoute } from 'workbox-precaching';
+// Inyección de precache (vite-plugin-pwa injectManifest)
+// self.__WB_MANIFEST será reemplazado en build con la lista de assets
+precacheAndRoute(self.__WB_MANIFEST || []);
+
 const CACHE_NAME = 'mywed360-v1.0.0';
 const STATIC_CACHE = 'mywed360-static-v1';
 const DYNAMIC_CACHE = 'mywed360-dynamic-v1';
 const API_CACHE = 'mywed360-api-v1';
+// Share Target storage
+const SHARE_DB_NAME = 'lovenda-share-target';
+const SHARE_STORE = 'shares';
+const SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 
 // Recursos estáticos para cachear inmediatamente
 const STATIC_ASSETS = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
-  '/manifest.json',
+  '/manifest.webmanifest', // legado
+  '/app.webmanifest',
   '/offline.html'
 ];
 
@@ -48,6 +58,8 @@ self.addEventListener('install', (event) => {
       })
       .then(() => {
         console.log('[SW] Service Worker instalado correctamente');
+        // Ejecutar limpieza de compartidos antiguos en instalación
+        try { cleanupOldShares(); } catch (e) {}
         return self.skipWaiting();
       })
       .catch((error) => {
@@ -89,6 +101,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+
+  // Web Share Target (POST con archivos)
+  if (url.pathname === '/email/compose' && request.method === 'POST') {
+    event.respondWith(handleShareTargetRequest(event));
+    return;
+  }
   
   // Ignorar peticiones que no sean GET
   if (request.method !== 'GET') {
@@ -106,6 +124,140 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirstStrategy(request, DYNAMIC_CACHE));
   }
 });
+
+// Push notifications
+self.addEventListener('push', (event) => {
+  try {
+    let data = {};
+    try {
+      data = event.data ? (event.data.json ? event.data.json() : JSON.parse(event.data.text())) : {};
+    } catch {
+      data = { title: 'MyWed360', body: event.data?.text() };
+    }
+    const title = data.title || 'MyWed360';
+    const options = {
+      body: data.body || 'Tienes una nueva notificación',
+      icon: '/icon-192.png',
+      badge: '/badge-72.png',
+      data: { url: data.url || '/' }
+    };
+    event.waitUntil(self.registration.showNotification(title, options));
+  } catch {}
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
+});
+
+// ----- Web Share Target helpers -----
+async function handleShareTargetRequest(event) {
+  try {
+    const formData = await event.request.formData();
+    const files = formData.getAll('files') || [];
+    const title = formData.get('title') || formData.get('subject') || '';
+    const text = formData.get('text') || formData.get('body') || '';
+    const url = formData.get('url') || '';
+
+    const shareId = (self.crypto && self.crypto.randomUUID) ? self.crypto.randomUUID() : String(Date.now());
+    await saveSharedFiles(shareId, files);
+
+    const qs = new URLSearchParams();
+    qs.set('shareId', shareId);
+    if (title) qs.set('subject', title);
+    const bodyCombined = [text, url].filter(Boolean).join('\n');
+    if (bodyCombined) qs.set('body', bodyCombined);
+
+    const redirectUrl = `/email/compose?${qs.toString()}`;
+    return Response.redirect(redirectUrl, 303);
+  } catch (err) {
+    console.error('[SW] Error manejando share_target:', err);
+    return new Response('Error al compartir', { status: 500 });
+  }
+}
+
+function openShareDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(SHARE_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(SHARE_STORE)) {
+        db.createObjectStore(SHARE_STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveSharedFiles(shareId, files) {
+  const db = await openShareDB();
+  const tx = db.transaction(SHARE_STORE, 'readwrite');
+  const store = tx.objectStore(SHARE_STORE);
+  const payload = {
+    id: shareId,
+    createdAt: Date.now(),
+    files: await Promise.all((files || []).map(async (f) => ({
+      name: f.name || 'archivo',
+      type: f.type || 'application/octet-stream',
+      lastModified: f.lastModified || Date.now(),
+      size: f.size || 0,
+      blob: f
+    })))
+  };
+  store.put(payload);
+  await new Promise((res, rej) => {
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+    tx.onabort = () => rej(tx.error);
+  });
+  db.close();
+}
+
+async function cleanupOldShares() {
+  try {
+    const db = await openShareDB();
+    const tx = db.transaction(SHARE_STORE, 'readwrite');
+    const store = tx.objectStore(SHARE_STORE);
+    const threshold = Date.now() - SHARE_TTL_MS;
+    let removed = 0;
+    await new Promise((resolve, reject) => {
+      const req = store.openCursor();
+      req.onsuccess = (ev) => {
+        const cursor = ev.target.result;
+        if (cursor) {
+          const val = cursor.value;
+          if (!val?.createdAt || val.createdAt < threshold) {
+            cursor.delete();
+            removed++;
+          }
+          cursor.continue();
+        } else {
+          resolve();
+        }
+      };
+      req.onerror = () => reject(req.error);
+    });
+    await new Promise((res, rej) => {
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+      tx.onabort = () => rej(tx.error);
+    });
+    db.close();
+    return removed;
+  } catch (e) {
+    console.warn('[SW] cleanupOldShares error', e);
+    return 0;
+  }
+}
 
 /**
  * Estrategia Cache First - Ideal para recursos estáticos
@@ -250,6 +402,13 @@ self.addEventListener('message', (event) => {
     case 'CLEAR_CACHE':
       clearAllCaches().then(() => {
         event.ports[0].postMessage({ type: 'CACHE_CLEARED' });
+      });
+      break;
+    case 'CLEANUP_SHARES':
+      cleanupOldShares().then((removed) => {
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ type: 'SHARES_CLEANED', removed });
+        }
       });
       break;
       

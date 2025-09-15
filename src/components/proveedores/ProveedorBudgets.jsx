@@ -1,7 +1,7 @@
 import React from 'react';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
 import Button from '../Button';
-import Card from '../Card';
+import Card from '../ui/Card';
 
 /**
  * Listado de presupuestos de un proveedor con botones de aceptar/rechazar.

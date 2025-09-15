@@ -47,6 +47,7 @@ import simpleTestRouter from './routes/simple-test.js';
 import emailTemplatesRouter from './routes/email-templates.js';
 import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
+import imageProxyRouter from './routes/image-proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import rsvpRouter from './routes/rsvp.js';
@@ -57,6 +58,8 @@ import contactsRouter from './routes/contacts.js';
 import gamificationRouter from './routes/gamification.js';
 import whatsappRouter from './routes/whatsapp.js';
 import gdprRouter from './routes/gdpr.js';
+import pushRouter from './routes/push.js';
+import paymentsRouter from './routes/payments.js';
 
 
 // Load environment variables (root .env)
@@ -206,6 +209,10 @@ app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
 app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
+// Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
+app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);
+// Proxy de imágenes externas (evita hotlink+cors)
+app.use('/api/image-proxy', imageProxyRouter);
 app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
@@ -217,6 +224,8 @@ app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
 app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/gdpr', gdprRouter);
+app.use('/api/push', pushRouter);
+app.use('/api/payments', paymentsRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

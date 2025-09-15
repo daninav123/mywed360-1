@@ -1,36 +1,53 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { saveData, loadData } from '../services/SyncService';
 import SyncIndicator from '../components/SyncIndicator';
+import { useAuth } from '../hooks/useAuth';
+import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
 
 export default function Ideas() {
-  
+  const { currentUser } = useAuth();
+  const uid = currentUser?.uid || 'guest';
+  const useFirestore = !!currentUser;
+
   const [view, setView] = useState('notes');
-  const [notes, setNotes] = useState(()=>{
-    return loadData('ideasNotes', { defaultValue: [], collection: 'userIdeas' });
-  }); // {folder, text}
+  const [notes, setNotes] = useState([]); // {folder, text}
   const [noteText, setNoteText] = useState('');
-  const [folders, setFolders] = useState(()=>{
-    const stored = loadData('ideasFolders', { defaultValue: null, collection: 'userIdeas' });
-    return stored || ['General'];
-  });
+  const [folders, setFolders] = useState(['General']);
   const [currentFolder, setCurrentFolder] = useState('General');
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState([]); // [{ url, name, size }]
+  const [loading, setLoading] = useState(true);
   const textareaRef = useRef(null);
 
-  // Si la URL incluye #nueva, enfocamos el textarea automáticamente
-  useEffect(()=>{
-    saveData('ideasNotes', notes, {
-      collection: 'userIdeas',
-      showNotification: false
-    });
-  },[notes]);
-  
-  useEffect(()=>{
-    saveData('ideasFolders', folders, {
-      collection: 'userIdeas',
-      showNotification: false
-    });
-  },[folders]);
+  // Carga inicial (Firestore si autenticado, Local si no)
+  useEffect(() => {
+    (async () => {
+      try {
+        const [loadedNotes, loadedFolders, loadedPhotos] = await Promise.all([
+          loadData('ideasNotes', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true }) ,
+          loadData('ideasFolders', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true }),
+          loadData('ideasUserPhotos', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true })
+        ]);
+        setNotes(Array.isArray(loadedNotes) ? loadedNotes : []);
+        const f = Array.isArray(loadedFolders) && loadedFolders.length ? loadedFolders : ['General'];
+        setFolders(f);
+        setCurrentFolder(f.includes('General') ? 'General' : f[0]);
+        setPhotos(Array.isArray(loadedPhotos) ? loadedPhotos : []);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uid]);
+
+  // Persistencia reactiva de notas y carpetas
+  useEffect(() => {
+    if (loading) return;
+    saveData('ideasNotes', notes, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+  }, [notes, useFirestore, loading]);
+  useEffect(() => {
+    if (loading) return;
+    saveData('ideasFolders', folders, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+  }, [folders, useFirestore, loading]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.hash === '#nueva') {
@@ -104,13 +121,26 @@ export default function Ideas() {
           <input
             type="file"
             accept="image/*"
-            onChange={e => {
-              const file = e.target.files[0];
-              if (file) setPhotos(prev => [...prev, URL.createObjectURL(file)]);
+            multiple
+            onChange={async e => {
+              const files = Array.from(e.target.files || []);
+              if (!files.length) return;
+              // Reutilizamos el uploader de adjuntos con una ruta separada lldave (userId)
+              const uploaded = await uploadFilesToStorage(files, uid, 'ideas');
+              const mapped = uploaded.map(u => ({ url: u.url, name: u.filename, size: u.size }));
+              const next = [...photos, ...mapped];
+              setPhotos(next);
+              await saveData('ideasUserPhotos', next, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+              e.target.value = '';
             }}
           />
           <div className="mt-4 grid grid-cols-3 gap-2">
-            {photos.map((p,i) => (<img key={i} src={p} alt={`Foto ${i}`} className="w-full h-32 object-cover rounded" />))}
+            {photos.map((p,i) => (
+              <div key={i} className="relative">
+                <img src={p.url} alt={p.name || `Foto ${i}`} className="w-full h-32 object-cover rounded" />
+                <div className="absolute bottom-1 left-1 right-1 text-[10px] bg-black/40 text-white px-1 py-0.5 rounded truncate">{p.name || `Foto ${i+1}`}</div>
+              </div>
+            ))}
           </div>
         </div>
       )}

@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import LanguageSelector from './ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
+import { prefetchModule } from '../utils/prefetch';
 
 // Devuelve los ítems de navegación según rol
 function getNavItems(role, t) {
@@ -150,6 +151,14 @@ function Nav() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Prefetch for lazy routes on hover
+  const prefetchForPath = React.useCallback((path) => {
+    try {
+      // Solo prefetch de rutas lazy para evitar warnings de Vite
+      if (path.startsWith('/protocolo')) prefetchModule('ProtocoloLayout', () => import('../pages/protocolo/ProtocoloLayout'));
+    } catch {}
+  }, []);
+
   return (
     <nav className='fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-50'>
       {/* Navegación principal */}
@@ -160,6 +169,9 @@ function Nav() {
             <button
               key={idx}
               onClick={() => navigate(path)}
+              onMouseEnter={() => prefetchForPath(path)}
+              onFocus={() => prefetchForPath(path)}
+              onTouchStart={() => prefetchForPath(path)}
               className='relative'
             >
               <motion.span

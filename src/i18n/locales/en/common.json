@@ -293,4 +293,25 @@
     "draft": "Draft",
     "published": "Published"
   }
+  ,
+  "inspiration": {
+    "alt": "inspiration",
+    "altWithTags": "inspiration: {{tags}}",
+    "aria": "Inspiration image",
+    "ariaWithTags": "Inspiration image: {{tags}}",
+    "addFav": "Add to favorites",
+    "removeFav": "Remove from favorites"
+  },
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simulate reminders",
+    "send": "Send reminders"
+  }
 }

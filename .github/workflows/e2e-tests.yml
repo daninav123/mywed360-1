@@ -61,7 +61,7 @@ jobs:
           npm cache clean --force
           npm ci --engine-strict
 
-      - name: Start dev server and run Cypress tests
+      - name: Start dev server and run Cypress tests (email + seating)
         uses: cypress-io/github-action@v5
         with:
           start: npm run start:ci
@@ -69,7 +69,7 @@ jobs:
           wait-on-timeout: 180
           browser: electron
           record: false
-          spec: cypress/e2e/email/*.cy.js
+          spec: 'cypress/e2e/email/*.cy.js,cypress/e2e/seating/**/*.cy.js'
 
       - name: Upload screenshots on failure
         uses: actions/upload-artifact@v4

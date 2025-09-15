@@ -11,7 +11,8 @@ const GuestForm = ({
   guest = null, 
   onSave, 
   onCancel, 
-  isLoading = false 
+  isLoading = false,
+  groupOptions = [],
 }) => {
   const { t, wedding } = useTranslations();
   
@@ -21,6 +22,7 @@ const GuestForm = ({
     email: guest?.email || '',
     phone: guest?.phone || '',
     address: guest?.address || '',
+    group: guest?.group || '',
     companion: guest?.companion || 0,
     companionType: guest?.companionType || 'none',
     table: guest?.table || '',
@@ -92,13 +94,13 @@ const GuestForm = ({
     }
     
     // Preparar datos para guardar
-    const guestData = {
-      ...formData,
-      companion: parseInt(formData.companion, 10) || 0,
-      id: guest?.id || `guest-${Date.now()}`,
-      createdAt: guest?.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+      const guestData = {
+        ...formData,
+        companion: parseInt(formData.companion, 10) || 0,
+        id: guest?.id || `guest-${Date.now()}`,
+        createdAt: guest?.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
     
     onSave(guestData);
   }, [formData, validateForm, onSave, guest]);
@@ -216,6 +218,27 @@ const GuestForm = ({
           placeholder="Dirección completa (opcional)"
           disabled={isLoading}
         />
+      </div>
+
+      {/* Grupo / Categoría */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Grupo / Categoría</label>
+        <Input
+          type="text"
+          value={formData.group}
+          onChange={(e) => handleChange('group', e.target.value)}
+          list="guest-group-options"
+          placeholder="Ej. Familia novia, Amigos, Trabajo"
+          disabled={isLoading}
+        />
+        {Array.isArray(groupOptions) && groupOptions.length > 0 && (
+          <datalist id="guest-group-options">
+            {groupOptions.map((opt) => (
+              <option key={String(opt)} value={String(opt)} />
+            ))}
+          </datalist>
+        )}
+        <p className="text-xs text-gray-500 mt-1">Este campo permite filtrar y gestionar grupos.</p>
       </div>
 
       {/* Acompañantes y mesa */}

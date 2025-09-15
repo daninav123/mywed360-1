@@ -1,4 +1,4 @@
-﻿{
+{
     "name":  "mywed360",
     "version":  "0.1.0",
     "private":  true,
@@ -26,8 +26,14 @@
                     "test:email-coverage":  "node scripts/email-coverage-report.js",
                     "cypress:open":  "cypress open",
                     "cypress:run":  "cypress run",
+                    "cypress:run:seating": "cypress run --spec \"cypress/e2e/seating/**/*.cy.js\" --config video=false",
+                    "cypress:open:seating": "cypress open --e2e --config specPattern=cypress/e2e/seating/**/*.cy.js",
+                    "cypress:cache:clear:win": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$p=Join-Path $env:LOCALAPPDATA 'Cypress/Cache'; if(Test-Path $p){ Remove-Item -Recurse -Force $p }; Write-Host 'Cypress cache cleared'\"",
+                    "cypress:install": "cypress install",
                     "e2e":  "start-server-and-test dev http://localhost:5173 cypress:run",
+                    "e2e:ci": "start-server-and-test start:ci http://localhost:5173 cypress:run",
                     "e2e:open":  "start-server-and-test dev http://localhost:5173 cypress:open",
+                    "e2e:seating": "start-server-and-test dev http://localhost:5173 cypress:run:seating",
                     "ensure:finance":  "node scripts/ensureFinanceAll.js",
                     "validate:schemas":  "node scripts/validateSchemas.js",
                     "nightly":  "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",

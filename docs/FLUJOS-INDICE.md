@@ -27,7 +27,7 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 | 15 | flujo-15-contratos-documentos.md | Contratos y Documentos | Sí (en curso) |
 | 16 | flujo-16-asistente-virtual-ia.md | Asistente Virtual con IA | No (pendiente) |
 | 17 | flujo-17-gamificacion-progreso.md | Gamificación y Progreso | No (pendiente) |
-| 18 | flujo-18-generador-documentos-legales.md | Generador de Documentos Legales | No (pendiente) |
+| 18 | flujo-18-generador-documentos-legales.md | Generador de Documentos Legales | Sí (en curso) |
 
 ## Convenciones de numeración
 
@@ -45,4 +45,3 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 ---
 
 > Última actualización: 2025-09-11
-

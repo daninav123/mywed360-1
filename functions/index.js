@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const cors = require('cors')({ origin: true });
 const fetch = require('node-fetch');
+let FormDataLib = null;
+try { FormDataLib = require('form-data'); } catch (_) { FormDataLib = null; }
 const admin = require('firebase-admin');
 // Inicializar Admin SDK solo una vez
 if (!admin.apps?.length) {
@@ -108,26 +110,59 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
       }
       
       // Construir formData para Mailgun
-      const formData = new URLSearchParams();
-      formData.append('from', from);
-      formData.append('to', to);
-      formData.append('subject', subject);
-      
-      if (body) formData.append('text', body);
-      if (html) formData.append('html', html);
-      
-      // Crear autenticaciÃ³n Basic para Mailgun
+            // Crear autenticación Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
-      
-      // Hacer solicitud a Mailgun API
-      const mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${auth}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData
-      });
+
+      // Si hay adjuntos, usar multipart/form-data con descarga de URLs
+      const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
+      let mailgunResponse;
+      if (hasAttachments && FormDataLib) {
+        const form = new FormDataLib();
+        form.append('from', from);
+        form.append('to', to);
+        form.append('subject', subject);
+        if (body) form.append('text', body);
+        if (html) form.append('html', html);
+
+        for (const att of attachments) {
+          if (!att) continue;
+          const filename = att.filename || att.name || 'attachment';
+          if (att.url) {
+            try {
+              const resp = await fetch(att.url);
+              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              const buf = Buffer.from(await resp.arrayBuffer());
+              form.append('attachment', buf, { filename });
+            } catch (e) {
+              console.warn('No se pudo adjuntar archivo desde URL:', filename, e?.message || e);
+            }
+          }
+        }
+
+        mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            ...form.getHeaders()
+          },
+          body: form
+        });
+      } else {
+        const formData = new URLSearchParams();
+        formData.append('from', from);
+        formData.append('to', to);
+        formData.append('subject', subject);
+        if (body) formData.append('text', body);
+        if (html) formData.append('html', html);
+        mailgunResponse = await fetch(`${MAILGUN_BASE_URL}/${MAILGUN_DOMAIN}/messages`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData.toString()
+        });
+      };
       
       if (!mailgunResponse.ok) {
         const errorText = await mailgunResponse.text();
@@ -648,3 +683,6 @@ exports.validateEmail = functions.https.onRequest((request, response) => {
     }
   });
 });
+
+
+

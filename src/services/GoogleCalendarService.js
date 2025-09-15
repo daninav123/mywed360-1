@@ -322,5 +322,8 @@ class GoogleCalendarService {
   }
 }
 
-// Exportar singleton
-export const googleCalendarService = new GoogleCalendarService();
+// Exportar instancia lista para usar y la clase por si se requiere avanzada
+const googleCalendarService = new GoogleCalendarService();
+export default googleCalendarService;
+// Exponer también como export nombrado sin redeclarar
+export { GoogleCalendarService, googleCalendarService };

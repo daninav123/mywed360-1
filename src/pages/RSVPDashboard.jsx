@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebaseConfig';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
+import { post as apiPost } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
 import { evaluateTrigger } from '../services/AutomationRulesService';
 import { addNotification } from '../services/notificationService';
@@ -8,6 +9,9 @@ import { addNotification } from '../services/notificationService';
 export default function RSVPDashboard() {
   const { activeWedding } = useWedding();
   const [stats, setStats] = useState(null);
+  const [pendingGuests, setPendingGuests] = useState([]);
+  const [loadingPending, setLoadingPending] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     if (!activeWedding) return;
@@ -16,6 +20,28 @@ export default function RSVPDashboard() {
       setStats(snap.exists() ? snap.data() : null);
     });
     return unsub;
+  }, [activeWedding]);
+
+  // Cargar lista de pendientes (mejor en vivo con onSnapshot)
+  useEffect(() => {
+    if (!activeWedding) return;
+    setLoadingPending(true);
+    const q = query(collection(db, 'weddings', activeWedding, 'guests'));
+    const unsub = onSnapshot(q, (snap) => {
+      try {
+        const items = [];
+        snap.forEach(d => {
+          const g = d.data() || {};
+          const s = String(g.status || '').toLowerCase();
+          const isPending = (!s || s === 'pending') && !(s === 'confirmed' || s === 'accepted') && !(s === 'declined' || s === 'rejected');
+          if (isPending) items.push({ id: d.id, ...g });
+        });
+        setPendingGuests(items);
+      } finally {
+        setLoadingPending(false);
+      }
+    }, () => setLoadingPending(false));
+    return () => unsub();
   }, [activeWedding]);
 
   // Evaluación discreta de reglas de automatización para RSVP (sin cambios visuales)
@@ -90,6 +116,73 @@ export default function RSVPDashboard() {
               </ul>
             </div>
           )}
+
+          {/* Pendientes y Recordatorios */}
+          <div className="border rounded p-4 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-semibold">Pendientes de responder</h2>
+              <div className="flex gap-2">
+                <button
+                  className="px-3 py-1 border rounded text-sm"
+                  disabled={!activeWedding || sending}
+                  onClick={async () => {
+                    if (!activeWedding) return;
+                    setSending(true);
+                    try {
+                      const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: true }, { auth: true });
+                      const json = await res.json().catch(()=>({}));
+                      alert(`Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`);
+                    } catch (e) {
+                      alert('Error simulando recordatorios');
+                    } finally { setSending(false); }
+                  }}
+                >Simular recordatorios</button>
+                <button
+                  className="px-3 py-1 border rounded bg-blue-600 text-white text-sm"
+                  disabled={!activeWedding || sending}
+                  onClick={async () => {
+                    if (!activeWedding) return;
+                    const ok = window.confirm('¿Enviar recordatorios por email a pendientes?');
+                    if (!ok) return;
+                    setSending(true);
+                    try {
+                      const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: false }, { auth: true });
+                      const json = await res.json().catch(()=>({}));
+                      alert(`Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`);
+                    } catch (e) {
+                      alert('Error enviando recordatorios');
+                    } finally { setSending(false); }
+                  }}
+                >Enviar recordatorios</button>
+              </div>
+            </div>
+            {loadingPending ? (
+              <div className="text-gray-600">Cargando pendientes…</div>
+            ) : pendingGuests.length === 0 ? (
+              <div className="text-gray-600">Sin pendientes ahora mismo.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Nombre</th>
+                      <th className="px-3 py-2 text-left">Email</th>
+                      <th className="px-3 py-2 text-left">Teléfono</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingGuests.map(g => (
+                      <tr key={g.id} className="border-t">
+                        <td className="px-3 py-2">{g.name || '-'}</td>
+                        <td className="px-3 py-2">{g.email || '-'}</td>
+                        <td className="px-3 py-2">{g.phone || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

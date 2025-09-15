@@ -15,9 +15,12 @@ const GuestFilters = React.memo(({
   searchTerm,
   statusFilter,
   tableFilter,
+  groupFilter,
+  groupOptions = [],
   onSearchChange,
   onStatusFilterChange,
   onTableFilterChange,
+  onGroupFilterChange,
   onAddGuest,
   onBulkInvite,
   onOpenRsvpSummary,
@@ -26,6 +29,9 @@ const GuestFilters = React.memo(({
   // selección múltiple
   selectedCount = 0,
   onSendSelectedApi,
+  onScheduleSelected,
+  onSendSelectedBroadcast,
+  onOpenGroupManager,
   showApiButtons = true,
 }) => {
   const { t, wedding } = useTranslations();
@@ -103,7 +109,7 @@ const GuestFilters = React.memo(({
       </div>
 
       {/* Filtros de búsqueda */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Búsqueda por texto */}
         <div className="relative">
           <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -143,6 +149,21 @@ const GuestFilters = React.memo(({
             onChange={handleTableChange}
             disabled={isLoading}
           />
+        </div>
+
+        {/* Filtro por grupo */}
+        <div>
+          <select
+            value={groupFilter || ''}
+            onChange={(e) => onGroupFilterChange?.(e.target.value)}
+            disabled={isLoading}
+            className="w-full pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+          >
+            <option value="">Todos los grupos</option>
+            {groupOptions.map(opt => (
+              <option key={String(opt)} value={String(opt)}>{String(opt)}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -190,6 +211,36 @@ const GuestFilters = React.memo(({
               Enviar seleccionados (API)
             </Button>
           )}
+
+          {showApiButtons && (
+            <Button
+              variant="outline"
+              onClick={() => onScheduleSelected?.()}
+              disabled={isLoading || selectedCount === 0}
+            >
+              Programar seleccionados
+            </Button>
+          )}
+
+          {showApiButtons && (
+            <Button
+              variant="outline"
+              onClick={() => onSendSelectedBroadcast?.()}
+              disabled={isLoading || selectedCount === 0}
+              title="Enviar por difusión (requiere extensión)"
+            >
+              Difusión (extensión)
+            </Button>
+          )}
+
+          <Button
+            variant="outline"
+            onClick={() => onOpenGroupManager?.()}
+            disabled={isLoading}
+            title="Gestionar grupos y asignar"
+          >
+            Asignar / Grupos
+          </Button>
         </div>
       </div>
     </div>

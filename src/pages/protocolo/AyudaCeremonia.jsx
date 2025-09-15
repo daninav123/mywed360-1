@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card } from '../../components/ui';
 import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
@@ -137,7 +137,7 @@ const AyudaCeremonia = () => {
           </nav>
         </div>
 
-      {/* Contenido de las pestañas */}
+      {/* Contenido de las Pestañas */}
       {activeTab === 'lecturas' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Lista de lecturas */}
@@ -531,4 +531,5 @@ const AyudaCeremonia = () => {
 };
 
 export default AyudaCeremonia;
+
 

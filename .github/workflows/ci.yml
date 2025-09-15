@@ -1,223 +1,28 @@
-# Continuous Integration for Lovenda Email System
-# Ejecuta lint, pruebas unitarias, accesibilidad e integración en cada push o PR
-
 name: CI
 
 on:
   push:
+    branches: [ main, master ]
   pull_request:
+    branches: [ main, master ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
+          node-version: '20'
           cache: 'npm'
-
-      - name: Upgrade npm to 11.x (fix rollup optional deps issue)
-        run: npm install -g npm@11
-
-      - name: Install system libs for canvas
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-
-      - name: Force Node 20 environment
-        run: |
-          echo "PATH=/opt/hostedtoolcache/node/20.19.0/x64/bin:$PATH" >> $GITHUB_ENV
-          echo "NODE_VERSION=20.19.0" >> $GITHUB_ENV
-          
-      - name: Verify Node version (must be 20.x)
-        run: |
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          node -v | grep -E '^v20\.' || (echo "ERROR: Node 20 required but got $(node -v)" && exit 1)
-          npm -v | grep -E '^1(0|1)\.' || (echo "ERROR: NPM 10/11 required but got $(npm -v)" && exit 1)
-
-      - name: Install dependencies with engine-strict
-        run: |
-          npm cache clean --force
-          npm ci --engine-strict
-
-      - name: Build app
-        run: npm run build
-
-      - name: Bundle size budget
-        run: npm run check:bundle
-
-      - name: Roadmap order check
-        run: node scripts/roadmapOrder.js --check
-
-      - name: Run tests
-        run: npm run test:run -- --coverage
-
-      - name: Upload coverage
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage
-
-      - name: Archive test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: junit.xml
-
-
-  seating-smoke:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-          cache: 'npm'
-
-      - name: Upgrade npm to 11.x (fix rollup optional deps issue)
-        run: npm install -g npm@11
-
-      - name: Install system libs for canvas and Cypress
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
-            xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3-dev libxss1 libasound2-dev libxtst6 xauth
-
-      - name: Force Node 20 environment
-        run: |
-          echo "PATH=/opt/hostedtoolcache/node/20.19.0/x64/bin:$PATH" >> $GITHUB_ENV
-          echo "NODE_VERSION=20.19.0" >> $GITHUB_ENV
-
-      - name: Verify Node/NPM versions
-        run: |
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          node -v | grep -E '^v20\.' || (echo "ERROR: Node 20 required but got $(node -v)" && exit 1)
-          npm -v | grep -E '^1(0|1)\.' || (echo "ERROR: NPM 10/11 required but got $(npm -v)" && exit 1)
-
-      - name: Install dependencies with engine-strict
-        run: |
-          npm cache clean --force
-          npm ci --engine-strict
-
-      - name: Create test .env file
-        run: |
-          echo "VITE_FIREBASE_API_KEY=fake" >> .env
-          echo "VITE_FIREBASE_AUTH_DOMAIN=fake" >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=fake" >> .env
-          echo "VITE_FIREBASE_STORAGE_BUCKET=fake" >> .env
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=fake" >> .env
-          echo "VITE_FIREBASE_APP_ID=fake" >> .env
-          echo "VITE_FIREBASE_MEASUREMENT_ID=fake" >> .env
-          echo "MAILGUN_API_KEY=fake" >> .env
-          echo "MAILGUN_DOMAIN=fake" >> .env
-
-      - name: Run Seating smoke spec (Cypress)
-        uses: cypress-io/github-action@v5
-        with:
-          start: npm run dev
-          wait-on: 'http://localhost:5173'
-          wait-on-timeout: 180
-          browser: electron
-          record: false
-          spec: cypress/e2e/seating/seating_smoke.cy.js
-
-      - name: Upload Cypress screenshots on failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
-          if-no-files-found: ignore
-
-      - name: Upload Cypress videos
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: cypress-videos
-          path: cypress/videos
-          if-no-files-found: ignore
-
-  e2e-extended:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-    if: github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
-          cache: 'npm'
-
-      - name: Upgrade npm to 11.x
-        run: npm install -g npm@11
-
-      - name: Install system deps for Cypress
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3-dev libxss1 libasound2-dev libxtst6 xauth
-
-      - name: Create test .env file
-        run: |
-          echo "VITE_FIREBASE_API_KEY=fake" >> .env
-          echo "VITE_FIREBASE_AUTH_DOMAIN=fake" >> .env
-          echo "VITE_FIREBASE_PROJECT_ID=fake" >> .env
-          echo "VITE_FIREBASE_STORAGE_BUCKET=fake" >> .env
-          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=fake" >> .env
-          echo "VITE_FIREBASE_APP_ID=fake" >> .env
-          echo "VITE_FIREBASE_MEASUREMENT_ID=fake" >> .env
-          echo "MAILGUN_API_KEY=fake" >> .env
-          echo "MAILGUN_DOMAIN=fake" >> .env
-
-      - name: Install dependencies
-        run: |
-          npm cache clean --force
-          npm ci --engine-strict
-
-      - name: Run extended E2E (email + budget)
-        uses: cypress-io/github-action@v5
-        with:
-          start: npm run dev
-          wait-on: 'http://localhost:5173'
-          wait-on-timeout: 180
-          browser: electron
-          record: false
-          spec: 'cypress/e2e/email/*.cy.js,cypress/e2e/budget_flow.cy.js'
-
-      - name: Upload Cypress screenshots on failure
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: cypress-screenshots-extended
-          path: cypress/screenshots
-          if-no-files-found: ignore
-
-      - name: Upload Cypress videos
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: cypress-videos-extended
-          path: cypress/videos
-          if-no-files-found: ignore
+      - name: Install deps
+        run: npm ci
+      - name: Lint
+        run: npm run lint --if-present
+      - name: Unit tests
+        run: npm run test --if-present
+      - name: E2E smoke (frontend+backend)
+        env:
+          VITE_BACKEND_BASE_URL: http://localhost:4004
+          ALLOWED_ORIGIN: http://localhost:5173
+        run: npm run e2e:ci

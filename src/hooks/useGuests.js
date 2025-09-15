@@ -152,12 +152,28 @@ const useGuests = () => {
       g.dietaryRestrictions && g.dietaryRestrictions.trim()
     ).length;
 
+    // Normalización de estados (UI/Backend)
+    const c2 = guests.filter(g => {
+      const s = String(g.status || '').toLowerCase();
+      return s === 'confirmed' || s === 'accepted' || g.response === 'Sí' || g.response === 'S��';
+    }).length;
+    const d2 = guests.filter(g => {
+      const s = String(g.status || '').toLowerCase();
+      return s === 'declined' || s === 'rejected' || g.response === 'No';
+    }).length;
+    const p2 = guests.filter(g => {
+      const s = String(g.status || '').toLowerCase();
+      if (s === 'confirmed' || s === 'accepted') return false;
+      if (s === 'declined' || s === 'rejected') return false;
+      return s === 'pending' || !s || g.response === 'Pendiente';
+    }).length;
+
     return {
       total: guests.length,
-      confirmed,
-      pending,
-      declined,
-      totalAttendees: confirmed + totalCompanions,
+      confirmed: c2,
+      pending: p2,
+      declined: d2,
+      totalAttendees: c2 + totalCompanions,
       withDietaryRestrictions
     };
   }, [guests]);
@@ -299,7 +315,7 @@ const useGuests = () => {
         if (resp.ok) { const json = await resp.json(); link = json.link; }
       } catch {}
       const msg = `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`;
-      const to = toE164(g.phone);
+      const to = toE164Frontend(g.phone);
       if (to) items.push({ to, message: msg, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
     }
     if (!items.length) {

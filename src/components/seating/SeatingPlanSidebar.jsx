@@ -36,13 +36,13 @@ const SeatingPlanSidebar = ({
   
   // Herramientas de dibujo específicas para banquete
   const drawingTools = [
-    { id: 'pan', label: t('seating.tools.pan'), icon: Hand },
-    { id: 'move', label: t('seating.tools.moveTables'), icon: Move },
-    { id: 'boundary', label: t('seating.tools.boundary'), icon: Square },
-    { id: 'door', label: t('seating.tools.doors'), icon: DoorOpen },
-    { id: 'obstacle', label: t('seating.tools.obstacles'), icon: Hexagon },
-    { id: 'aisle', label: t('seating.tools.aisles'), icon: Minus },
-    { id: 'erase', label: t('seating.tools.erase'), icon: Eraser }
+    { id: 'pan',       label: t('seating.tools.pan',         { defaultValue: 'Panorámica' }),      icon: Hand },
+    { id: 'move',      label: t('seating.tools.moveTables',  { defaultValue: 'Mover mesas' }),     icon: Move },
+    { id: 'boundary',  label: t('seating.tools.boundary',    { defaultValue: 'Perímetro' }),       icon: Square },
+    { id: 'door',      label: t('seating.tools.doors',       { defaultValue: 'Puertas' }),         icon: DoorOpen },
+    { id: 'obstacle',  label: t('seating.tools.obstacles',   { defaultValue: 'Obstáculos' }),      icon: Hexagon },
+    { id: 'aisle',     label: t('seating.tools.aisles',      { defaultValue: 'Pasillos' }),        icon: Minus },
+    { id: 'erase',     label: t('seating.tools.erase',       { defaultValue: 'Borrar' }),          icon: Eraser }
   ];
 
   // Filtrar invitados disponibles (sin asignar a mesa) con saneo defensivo
@@ -114,12 +114,15 @@ const SeatingPlanSidebar = ({
       {tab === 'banquet' && (
         <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">{t('seating.sidebar.pending', { count: pendingCount })}</h4>
+            <h4 className="font-medium text-gray-900">
+              {t('seating.sidebar.pending', { count: pendingCount, defaultValue: `Pendientes (${pendingCount})` })}
+            </h4>
             <button
               onClick={() => setShowAvailableGuests(!showAvailableGuests)}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
             >
               <UserPlus className="h-4 w-4" />
+              {showAvailableGuests ? 'Ocultar Invitados' : 'Mostrar Invitados'}
             </button>
           </div>
           

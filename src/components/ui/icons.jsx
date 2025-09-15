@@ -7,8 +7,7 @@ export {
   PlusCircle as PlusCircleIcon,
   Tag as TagIcon,
   Bell as BellIcon,
-  CircleAlert as ExclamationCircleIcon,
+  AlertCircle as ExclamationCircleIcon,
   Paperclip as PaperclipIcon,
   X as XIcon
 } from 'lucide-react';
-

@@ -4,8 +4,11 @@ import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
 import Card from '../components/ui/Card';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { useWedding } from '../context/WeddingContext';
+import { post as apiPost } from '../services/apiClient';
 
 export default function Invitaciones() {
+  const { activeWedding } = useWedding();
   // Estado de sincronización
   const [syncStatus, setSyncStatus] = useState(getSyncState());
 
@@ -15,11 +18,11 @@ export default function Invitaciones() {
     return () => unsubscribe();
   }, []);
   
-  const [aiPrompt, setAiPrompt] = useState(() => loadData('invitationAiPrompt', { defaultValue: '', collection: 'userInvitations' }));
+  const [aiPrompt, setAiPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
   const [toast, setToast] = useState(null);
-  const [showPreview, setShowPreview] = useState(() => loadData('invitationShowPreview', { defaultValue: false, collection: 'userInvitations' }));
+  const [showPreview, setShowPreview] = useState(false);
   const handleAiGenerate = async () => {
     if (!aiPrompt) return;
     setLoading(true);
@@ -51,31 +54,55 @@ export default function Invitaciones() {
       setLoading(false);
     }
   };  
-  const handleSaveDraft = () => {
+  const handleSaveDraft = async () => {
     const draft = { aiPrompt, panel, filterCategory, filterColor, filterFont, step, generatedText };
-    saveData('invitationDraft', draft, {
+    await saveData('invitationDraft', draft, {
       collection: 'userInvitations',
       showNotification: true
     });
     setToast({ message: 'Borrador guardado', type: 'success' });
   };
-  const handleDuplicateDesign = () => {
+  const handleDuplicateDesign = async () => {
     const draftKey = `invitationDraft_${Date.now()}`;
     const data = { aiPrompt, panel, filterCategory, filterColor, filterFont, step, generatedText };
-    saveData(draftKey, data, {
+    await saveData(draftKey, data, {
       collection: 'userInvitations',
       showNotification: false
     });
     setToast({ message: 'Diseño duplicado', type: 'success' });
   };
-  const [panel, setPanel] = useState(() => loadData('invitationPanel', { defaultValue: 'invitation', collection: 'userInvitations' })); // 'invitation' o 'envelope'
-  const [filterCategory, setFilterCategory] = useState(() => loadData('invitationFilterCategory', { defaultValue: '', collection: 'userInvitations' }));
-  const [filterColor, setFilterColor] = useState(() => loadData('invitationFilterColor', { defaultValue: '', collection: 'userInvitations' }));
-  const [filterFont, setFilterFont] = useState(() => loadData('invitationFilterFont', { defaultValue: '', collection: 'userInvitations' }));
-  const [step, setStep] = useState(() => {
-    const savedStep = loadData('invitationStep', { defaultValue: '1', collection: 'userInvitations' });
-    return parseInt(savedStep) || 1;
-  });
+  const [panel, setPanel] = useState('invitation'); // 'invitation' o 'envelope'
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterColor, setFilterColor] = useState('');
+  const [filterFont, setFilterFont] = useState('');
+  const [step, setStep] = useState(1);
+
+  // Carga inicial asíncrona de borrador/preferencias
+  useEffect(() => {
+    (async () => {
+      try {
+        const [p, pnl, fc, fcol, ff, st, gen, prev] = await Promise.all([
+          loadData('invitationAiPrompt', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationPanel', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationFilterCategory', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationFilterColor', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationFilterFont', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationStep', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationGeneratedText', { collection: 'userInvitations', fallbackToLocal: true }),
+          loadData('invitationShowPreview', { collection: 'userInvitations', fallbackToLocal: true }),
+        ]);
+        if (typeof p === 'string') setAiPrompt(p);
+        if (pnl) setPanel(pnl);
+        if (typeof fc === 'string') setFilterCategory(fc);
+        if (typeof fcol === 'string') setFilterColor(fcol);
+        if (typeof ff === 'string') setFilterFont(ff);
+        const stNum = parseInt(st, 10);
+        if (!isNaN(stNum) && stNum >= 1 && stNum <= 4) setStep(stNum);
+        if (typeof gen === 'string') setGeneratedText(gen);
+        if (typeof prev === 'boolean') setShowPreview(prev);
+      } catch {}
+    })();
+  }, []);
 
   // Ejemplo de plantillas
   const templates = [
@@ -89,16 +116,15 @@ export default function Invitaciones() {
     (filterColor ? t.color === filterColor : true) &&
     (filterFont ? t.font === filterFont : true)
   );
-  useEffect(() => {
-    saveData('invitationAiPrompt', aiPrompt, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationPanel', panel, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationFilterCategory', filterCategory, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationFilterColor', filterColor, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationFilterFont', filterFont, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationStep', step.toString(), { collection: 'userInvitations', showNotification: false });
-    saveData('invitationGeneratedText', generatedText, { collection: 'userInvitations', showNotification: false });
-    saveData('invitationShowPreview', showPreview, { collection: 'userInvitations', showNotification: false });
-  }, [aiPrompt, panel, filterCategory, filterColor, filterFont, step, generatedText, showPreview]);
+  // Persistencia silenciosa por campo
+  useEffect(() => { saveData('invitationAiPrompt', aiPrompt, { collection: 'userInvitations', showNotification: false }); }, [aiPrompt]);
+  useEffect(() => { saveData('invitationPanel', panel, { collection: 'userInvitations', showNotification: false }); }, [panel]);
+  useEffect(() => { saveData('invitationFilterCategory', filterCategory, { collection: 'userInvitations', showNotification: false }); }, [filterCategory]);
+  useEffect(() => { saveData('invitationFilterColor', filterColor, { collection: 'userInvitations', showNotification: false }); }, [filterColor]);
+  useEffect(() => { saveData('invitationFilterFont', filterFont, { collection: 'userInvitations', showNotification: false }); }, [filterFont]);
+  useEffect(() => { saveData('invitationStep', String(step), { collection: 'userInvitations', showNotification: false }); }, [step]);
+  useEffect(() => { saveData('invitationGeneratedText', generatedText, { collection: 'userInvitations', showNotification: false }); }, [generatedText]);
+  useEffect(() => { saveData('invitationShowPreview', showPreview, { collection: 'userInvitations', showNotification: false }); }, [showPreview]);
 
   // Indicador de sincronización
   const SyncIndicator = () => (
@@ -227,6 +253,38 @@ export default function Invitaciones() {
           </button>
         </section>
       )}
+      {/* Envío masivo/Recordatorios RSVP */}
+      {step === 4 && (
+        <section className="border rounded p-4 space-y-3 mt-3">
+          <h2 className="text-lg font-semibold">RSVP</h2>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              disabled={!activeWedding || loading}
+              onClick={async ()=>{
+                try {
+                  setLoading(true);
+                  const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: true }, { auth: true });
+                  const json = await res.json().catch(()=>({}));
+                  setToast({ message: `Simulación: candidatos=${json.attempted||0}, enviados=${json.sent||0}`, type: 'info' });
+                } catch { setToast({ message: 'Error simulando recordatorios', type: 'error' }); } finally { setLoading(false); }
+              }}
+              className="bg-gray-200 px-3 py-1 rounded"
+            >Simular recordatorios</button>
+            <button
+              disabled={!activeWedding || loading}
+              onClick={async ()=>{
+                try {
+                  setLoading(true);
+                  const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: false }, { auth: true });
+                  const json = await res.json().catch(()=>({}));
+                  setToast({ message: `Enviados: ${json.sent||0}`, type: 'success' });
+                } catch { setToast({ message: 'Error enviando recordatorios', type: 'error' }); } finally { setLoading(false); }
+              }}
+              className="bg-blue-600 text-white px-3 py-1 rounded"
+            >Enviar recordatorios</button>
+          </div>
+        </section>
+      )}
       {showPreview && generatedText && (
         <section className="border rounded p-4 bg-gray-50 mt-4">
           <h3 className="text-lg font-semibold">Preview de Invitación</h3>
@@ -238,10 +296,10 @@ export default function Invitaciones() {
         <section className="border rounded p-4">
           <h2 className="text-lg font-semibold">Opciones Avanzadas</h2>
           <div className="flex gap-2 mt-2">
-            <button className="bg-gray-200 px-3 py-1 rounded flex items-center">
+            <button onClick={handleSaveDraft} className="bg-gray-200 px-3 py-1 rounded flex items-center">
               <Save size={16} className="mr-2" />Guardar Borrador
             </button>
-            <button className="bg-gray-200 px-3 py-1 rounded flex items-center">
+            <button onClick={handleDuplicateDesign} className="bg-gray-200 px-3 py-1 rounded flex items-center">
               <Copy size={16} className="mr-2" />Duplicar Diseño
             </button>
           </div>

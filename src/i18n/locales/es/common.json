@@ -293,4 +293,25 @@
     "draft": "Borrador",
     "published": "Publicado"
   }
+  ,
+  "inspiration": {
+    "alt": "inspiración",
+    "altWithTags": "inspiración: {{tags}}",
+    "aria": "Imagen de inspiración",
+    "ariaWithTags": "Imagen de inspiración: {{tags}}",
+    "addFav": "Añadir a favoritos",
+    "removeFav": "Quitar de favoritos"
+  },
+  "compose": {
+    "toField": "Campo destinatario",
+    "subjectField": "Campo asunto",
+    "ccField": "Campo con copia",
+    "bccField": "Campo con copia oculta",
+    "insertQuickReply": "Insertar respuesta sugerida"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simular recordatorios",
+    "send": "Enviar recordatorios"
+  }
 }

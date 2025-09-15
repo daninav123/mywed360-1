@@ -21,7 +21,7 @@ import Card from '../../components/ui/Card';
  * @param {Function} props.onReserve - Función para reservar una cita con el proveedor
  * @returns {React.ReactElement} Componente de tarjeta de proveedor
  */
-const ProveedorCard = ({ provider, isSelected, onToggleSelect, onViewDetail, onEdit, onDelete, onReserve, onToggleFavorite }) => {
+const ProveedorCard = ({ provider, isSelected, onToggleSelect, onViewDetail, onEdit, onDelete, onReserve, onToggleFavorite, onCreateContract }) => {
   // Función para mostrar estrellas de calificación
   const renderRating = (rating, count) => {
     const stars = [];
@@ -181,6 +181,17 @@ const ProveedorCard = ({ provider, isSelected, onToggleSelect, onViewDetail, onE
           <Eye size={16} className="mr-1" /> Ver
         </Button>
         
+        {onCreateContract && (
+          <Button
+            onClick={() => onCreateContract?.(provider)}
+            variant="outline"
+            size="sm"
+            className="flex-1"
+          >
+            Contrato
+          </Button>
+        )}
+
         {onEdit && (
           <Button 
             onClick={() => onEdit?.(provider)} 

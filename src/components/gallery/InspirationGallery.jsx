@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+﻿import React, { useState, useMemo, useEffect } from 'react';
 import { Star, StarOff, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Ejemplo estático: en producción vendrá de API o CMS
 const BASE_TAGS = ['favs','ceremonia','decoración','cóctel','banquete','disco','flores','vestido','pastel','fotografía','inspiration'];
@@ -8,6 +9,7 @@ const BASE_TAGS = ['favs','ceremonia','decoración','cóctel','banquete','disco'
 const DEFAULT_IMAGES = [];
 
 export default function InspirationGallery({ images = [], onSave = () => {}, onView = () => {}, lastItemRef = null, onTagClick = () => {}, activeTag = 'all' }) {
+  const { t } = useTranslation('common');
   const [filter, setFilter] = useState(activeTag);
   const [favorites, setFavorites] = useState([]); // ids de favoritos
   const [lightbox, setLightbox] = useState(null); // id
@@ -76,14 +78,35 @@ export default function InspirationGallery({ images = [], onSave = () => {}, onV
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {filtered.map((img, idx) => (
           <div key={`${img.id}_${idx}`} ref={idx===filtered.length-1 ? lastItemRef : null} className="relative group cursor-pointer" onClick={()=>{setLightbox(img.id); onView(img);}}>
-            <img src={img.url}
-                 alt="inspiration"
-                 className="w-full aspect-square object-cover rounded-lg"
-                 loading="lazy"
-                 referrerPolicy="no-referrer" />
+            <img
+              src={img.thumb || img.url}
+              onError={e => {
+                // Manejo robusto de errores de carga de imagen
+                const attempted = e.target.getAttribute('data-attempt') || 'thumb';
+                // Evitar bucle infinito configurando onerror una sola vez
+                if (attempted === 'thumb' && img.url && e.target.src !== img.url) {
+                  e.target.setAttribute('data-attempt', 'url');
+                  e.target.src = img.url;
+                } else if (attempted === 'url' && img.original_url && e.target.src !== img.original_url) {
+                  e.target.setAttribute('data-attempt', 'original');
+                  e.target.src = img.original_url;
+                } else {
+                  // Último intento fallido, remover onError para evitar loops y mostrar placeholder
+                  e.target.onerror = null;
+                  // Opcional: establece un placeholder local genérico
+                  e.target.src = '/badge-72.png';
+                }
+              }}
+              alt={(img.tags && img.tags.length ? `inspiración: ${img.tags.join(', ')}` : 'inspiración')}
+              aria-label={(img.tags && img.tags.length ? `Imagen de inspiración: ${img.tags.join(', ')}` : 'Imagen de inspiración')}
+              className="w-full aspect-square object-cover rounded-lg"
+              loading="lazy"
+              referrerPolicy="no-referrer"
+            />
             <button
               onClick={e=>{e.stopPropagation();toggleFav(img.id); onSave(img);}}
               className="absolute top-1 right-1 text-white drop-shadow-md"
+              aria-label={favorites.includes(img.id)?'Quitar de favoritos':'Añadir a favoritos'}
             >
               {favorites.includes(img.id)?<Star size={18} fill="#facc15"/>:<StarOff size={18} />}
             </button>
@@ -103,3 +126,5 @@ export default function InspirationGallery({ images = [], onSave = () => {}, onV
     </div>
   );
 }
+
+

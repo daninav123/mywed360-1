@@ -15,49 +15,54 @@ import Bodas from './pages/Bodas';
 import BodaDetalle from './pages/BodaDetalle';
 import Finance from './pages/Finance';
 import More from './pages/More';
-import Invitados from './pages/Invitados';
-import Proveedores from './pages/Proveedores';
-import UnifiedEmail from './pages/UnifiedEmail';
-import EmailAdminDashboard from './components/admin/EmailAdminDashboard';
-import MetricsDashboard from './components/metrics/MetricsDashboard';
-import AdminRoutes from './routes/AdminRoutes';
+const Invitados = React.lazy(() => import('./pages/Invitados'));
+// Lazy-loaded heavy routes/components
+const Proveedores = React.lazy(() => import('./pages/Proveedores'));
+const UnifiedEmail = React.lazy(() => import('./pages/UnifiedEmail'));
+const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
+import ComposeEmail from './components/email/ComposeEmail';
+import EmailStatistics from './pages/user/EmailStatistics';
+import MailgunTester from './components/email/MailgunTester';
+import EmailSetup from './pages/EmailSetup';
+const MetricsDashboard = React.lazy(() => import('./components/metrics/MetricsDashboard'));
+const AdminRoutes = React.lazy(() => import('./routes/AdminRoutes'));
 import UserRoutes from './routes/UserRoutes';
-import WhatsAppMetrics from './components/whatsapp/WhatsAppMetrics';
+const WhatsAppMetrics = React.lazy(() => import('./components/whatsapp/WhatsAppMetrics'));
 
-import Perfil from './pages/Perfil';
-import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored';
-import Invitaciones from './pages/Invitaciones';
-import Contratos from './pages/Contratos';
-import Protocolo from './pages/Protocolo';
-import InvitadosRefactored from './pages/InvitadosRefactored';
-import ProveedoresNuevo from './pages/ProveedoresNuevo';
+const Perfil = React.lazy(() => import('./pages/Perfil'));
+const SeatingPlanRefactored = React.lazy(() => import('./components/seating/SeatingPlanRefactored'));
+const Invitaciones = React.lazy(() => import('./pages/Invitaciones'));
+const InvitationDesigner = React.lazy(() => import('./pages/InvitationDesigner'));
+const Contratos = React.lazy(() => import('./pages/Contratos'));
+// Dev-only pages will be lazy-loaded inside App()
 
-import ProtocoloLayout from './pages/protocolo/ProtocoloLayout';
-import MomentosEspeciales from './pages/protocolo/MomentosEspeciales';
-import Timing from './pages/protocolo/Timing';
-import Checklist from './pages/protocolo/Checklist';
-import AyudaCeremonia from './pages/protocolo/AyudaCeremonia';
-import DisenoWeb from './pages/DisenoWeb';
-import WebEditor from './pages/WebEditor';
-import DisenosLayout from './pages/disenos/DisenosLayout';
-import DisenosInvitaciones from './pages/disenos/Invitaciones';
-import DisenosLogo from './pages/disenos/Logo';
-import MenuDiseno from './pages/disenos/Menu';
-import SeatingPlanPost from './pages/disenos/SeatingPlanPost';
-import MenuCatering from './pages/disenos/MenuCatering';
-import PapelesNombres from './pages/disenos/PapelesNombres';
-import PostDiseno from './pages/disenos/Post';
-import Ideas from './pages/Ideas';
-import Inspiration from './pages/Inspiration';
-import Blog from './pages/Blog';
+const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
+const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
+const Timing = React.lazy(() => import('./pages/protocolo/Timing'));
+const Checklist = React.lazy(() => import('./pages/protocolo/Checklist'));
+const AyudaCeremonia = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
+const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
+const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
+const WebEditor = React.lazy(() => import('./pages/WebEditor'));
+const DisenosLayout = React.lazy(() => import('./pages/disenos/DisenosLayout'));
+const DisenosInvitaciones = React.lazy(() => import('./pages/disenos/Invitaciones'));
+const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo'));
+const MenuDiseno = React.lazy(() => import('./pages/disenos/Menu'));
+const SeatingPlanPost = React.lazy(() => import('./pages/disenos/SeatingPlanPost'));
+const MenuCatering = React.lazy(() => import('./pages/disenos/MenuCatering'));
+const PapelesNombres = React.lazy(() => import('./pages/disenos/PapelesNombres'));
+// Dev-only page (Post) will be lazy-loaded inside App()
+const Ideas = React.lazy(() => import('./pages/Ideas'));
+const Inspiration = React.lazy(() => import('./pages/Inspiration'));
+const Blog = React.lazy(() => import('./pages/Blog'));
 import DevSeedGuests from './pages/DevSeedGuests';
 import DevEnsureFinance from './pages/DevEnsureFinance';
 
-import Notificaciones from './pages/Notificaciones';
-import WeddingSite from './pages/WeddingSite';
-import RSVPConfirm from './pages/RSVPConfirm';
-import AcceptInvitation from './pages/AcceptInvitation';
-import RSVPDashboard from './pages/RSVPDashboard';
+const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
+const WeddingSite = React.lazy(() => import('./pages/WeddingSite'));
+const RSVPConfirm = React.lazy(() => import('./pages/RSVPConfirm'));
+const AcceptInvitation = React.lazy(() => import('./pages/AcceptInvitation'));
+const RSVPDashboard = React.lazy(() => import('./pages/RSVPDashboard'));
 
 // Importar configuración de i18n
 import './i18n';
@@ -67,9 +72,7 @@ import DiagnosticPanel from './components/DiagnosticPanel';
 import errorLogger from './utils/errorLogger';
 import './utils/consoleCommands';
 
-// Lazy legacy/páginas pesadas
-const BuzonLegacy = React.lazy(() => import('./pages/Buzon_fixed_complete'));
-import { LazyInvitationDesigner, LazyGestionProveedores } from './components/performance/LazyComponentLoader';
+// Dev-only lazy components defined inside App()
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -124,6 +127,19 @@ function ProtectedRoute() {
 
 function App() {
   const enableDev = (import.meta.env.VITE_ENABLE_DEV_ROUTES === 'true') || (import.meta.env.MODE !== 'production');
+  // Dev-only lazy components (created only in dev builds)
+  const Dev = React.useMemo(() => {
+    if (!enableDev) return null;
+    return {
+      InvitadosRefactored: React.lazy(() => import('./pages/InvitadosRefactored')),
+      GestionProveedores: React.lazy(() => import('./pages/GestionProveedores')),
+      ProveedoresNuevo: React.lazy(() => import('./pages/ProveedoresNuevo')),
+      InvitationDesigner: React.lazy(() => import('./pages/InvitationDesigner')),
+      PostDiseno: React.lazy(() => import('./pages/disenos/Post')),
+      Protocolo: React.lazy(() => import('./pages/Protocolo')),
+      BuzonLegacy: React.lazy(() => import('./pages/Buzon_fixed_complete')),
+    };
+  }, [enableDev]);
   
   // Inicializar sistema de diagnóstico
   React.useEffect(() => {
@@ -149,6 +165,7 @@ function App() {
         {/* Contenedor global de notificaciones */}
         <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
         {/* Componente de notificaciones de correo - solo visible en rutas protegidas */}
+        <React.Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
@@ -170,29 +187,64 @@ function App() {
               <Route path="invitados" element={<Invitados />} />
               <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
               <Route path="invitados/invitaciones" element={<Invitaciones />} />
-              <Route path="invitados/refactored" element={<InvitadosRefactored />} />
+              <Route path="invitaciones/designer" element={<InvitationDesigner />} />
+              {enableDev && Dev && (
+                <Route
+                  path="invitados/refactored"
+                  element={
+                    <React.Suspense fallback={<Loader />}>
+                      <Dev.InvitadosRefactored />
+                    </React.Suspense>
+                  }
+                />
+              )}
               <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
               <Route path="proveedores" element={<Proveedores />} />
               <Route path="proveedores/contratos" element={<Contratos />} />
-              <Route path="proveedores/gestion" element={<LazyGestionProveedores />} />
-              <Route path="proveedores/nuevo" element={<ProveedoresNuevo />} />
+              {enableDev && Dev && (
+                <Route
+                  path="proveedores/gestion"
+                  element={
+                    <React.Suspense fallback={<Loader />}>
+                      <Dev.GestionProveedores />
+                    </React.Suspense>
+                  }
+                />
+              )}
+              {enableDev && Dev && (
+                <Route
+                  path="proveedores/nuevo"
+                  element={
+                    <React.Suspense fallback={<Loader />}>
+                      <Dev.ProveedoresNuevo />
+                    </React.Suspense>
+                  }
+                />
+              )}
 
               {/* Rutas de Protocolo */}
               <Route path="protocolo" element={<ProtocoloLayout />}>
                 <Route index element={<Navigate to="momentos-especiales" replace />} />
                 <Route path="momentos-especiales" element={<MomentosEspeciales />} />
+                <Route path="documentos-legales" element={<DocumentosLegales />} />
                 <Route path="timing" element={<Timing />} />
                 <Route path="checklist" element={<Checklist />} />
                 <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
               </Route>
-              {/* Protocolo legacy (estructura antigua con tabs locales) */}
-              <Route path="protocolo-legacy" element={<Protocolo />}>
-                <Route index element={<Navigate to="momentos" replace />} />
-                <Route path="momentos" element={<MomentosEspeciales />} />
-                <Route path="timing" element={<Timing />} />
-                <Route path="checklist" element={<Checklist />} />
-                <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
-              </Route>
+              {/* Protocolo legacy (estructura antigua con tabs locales) - solo dev */}
+              {enableDev && Dev && (
+                <Route path="protocolo-legacy" element={
+                  <React.Suspense fallback={<Loader />}>
+                    <Dev.Protocolo />
+                  </React.Suspense>
+                }>
+                  <Route index element={<Navigate to="momentos" replace />} />
+                  <Route path="momentos" element={<MomentosEspeciales />} />
+                  <Route path="timing" element={<Timing />} />
+                  <Route path="checklist" element={<Checklist />} />
+                  <Route path="ayuda-ceremonia" element={<AyudaCeremonia />} />
+                </Route>
+              )}
               <Route path="perfil" element={<Perfil />} />
                <Route path="notificaciones" element={<Notificaciones />} />
                 
@@ -201,7 +253,16 @@ function App() {
                <Route path="ideas" element={<Ideas />} />
               <Route path="inspiracion" element={<Inspiration />} />
               <Route path="blog" element={<Blog />} />
-              <Route path="invitaciones/designer" element={<LazyInvitationDesigner />} />
+              {enableDev && Dev && (
+                <Route
+                  path="invitaciones/designer"
+                  element={
+                    <React.Suspense fallback={<Loader />}>
+                      <Dev.InvitationDesigner />
+                    </React.Suspense>
+                  }
+                />
+              )}
 
                {/* Panel de administración con monitoreo de caché */}
                <Route path="admin/*" element={<AdminRoutes />} />
@@ -214,29 +275,45 @@ function App() {
                {enableDev && <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />}
 
                {/* Rutas Diseños */}
-                <Route path="disenos" element={<DisenosLayout />}>
-                  <Route index element={<Navigate to="invitaciones" replace />} />
-                  <Route path="invitaciones" element={<DisenosInvitaciones />} />
-                  <Route path="logo" element={<DisenosLogo />} />
-                  <Route path="menu" element={<MenuDiseno />} />
-                  <Route path="seating-plan" element={<SeatingPlanPost />} />
-                  <Route path="menu-catering" element={<MenuCatering />} />
-                  <Route path="papeles-nombres" element={<PapelesNombres />} />
-                  <Route path="post" element={<PostDiseno />} />
-                </Route>
+                 <Route path="disenos" element={<DisenosLayout />}>
+                   <Route index element={<Navigate to="invitaciones" replace />} />
+                   <Route path="invitaciones" element={<DisenosInvitaciones />} />
+                   <Route path="logo" element={<DisenosLogo />} />
+                   <Route path="menu" element={<MenuDiseno />} />
+                   <Route path="seating-plan" element={<SeatingPlanPost />} />
+                   <Route path="menu-catering" element={<MenuCatering />} />
+                   <Route path="papeles-nombres" element={<PapelesNombres />} />
+                   {enableDev && Dev && (
+                     <Route
+                       path="post"
+                       element={
+                         <React.Suspense fallback={<Loader />}>
+                           <Dev.PostDiseno />
+                         </React.Suspense>
+                       }
+                     />
+                   )}
+                 </Route>
               <Route path="more" element={<More />} />
               
               {/* Bandeja unificada de emails */}
               <Route path="email" element={<UnifiedEmail />} />
               <Route path="email/inbox" element={<UnifiedEmail />} />
-              <Route
-                path="email/legacy"
-                element={
-                  <React.Suspense fallback={<Loader />}>
-                    <BuzonLegacy />
-                  </React.Suspense>
-                }
-              />
+              <Route path="email/compose" element={<ComposeEmail />} />
+              <Route path="email/compose/:action/:id" element={<ComposeEmail />} />
+              <Route path="email/stats" element={<EmailStatistics />} />
+              <Route path="email/setup" element={<EmailSetup />} />
+              <Route path="email/test" element={<MailgunTester />} />
+              {enableDev && Dev && (
+                <Route
+                  path="email/legacy"
+                  element={
+                    <React.Suspense fallback={<Loader />}>
+                      <Dev.BuzonLegacy />
+                    </React.Suspense>
+                  }
+                />
+              )}
               {/* Redirección para rutas legado */}
               <Route path="buzon/*" element={<Navigate to="/email" replace />} />
               
@@ -253,6 +330,7 @@ function App() {
             </Route>
           </Route>
         </Routes>
+        </React.Suspense>
         {/* Sistema de diagnóstico global */}
         <DiagnosticPanel />
             </BrowserRouter>

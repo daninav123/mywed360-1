@@ -96,7 +96,7 @@ const SeatingPlanToolbar = ({
       case 'error':
         return 'Error de Sincronización';
       default:
-        return 'Sin conexiÃ³n';
+        return 'Sin conexión';
     }
   };
 
@@ -160,11 +160,23 @@ const SeatingPlanToolbar = ({
             <button type="button" data-testid="ceremony-config-btn"
               onClick={onOpenCeremonyConfig}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title={t('seating.toolbar.ceremonyConfig')}
-              aria-label={t('seating.toolbar.ceremonyConfig')}
+              title={t('seating.toolbar.ceremonyConfig', { defaultValue: 'Configurar ceremonia' })}
+              aria-label={t('seating.toolbar.ceremonyConfig', { defaultValue: 'Configurar ceremonia' })}
             >
               <Grid className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('seating.toolbar.ceremony')}</span>
+              <span className="hidden sm:inline">{t('seating.toolbar.ceremony', { defaultValue: 'Ceremonia' })}</span>
+            </button>
+          )}
+
+          {tab === 'banquet' && (
+            <button type="button" data-testid="banquet-config-btn"
+              onClick={onOpenBanquetConfig}
+              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+              title={t('seating.toolbar.banquetConfig', { defaultValue: 'Configurar banquete' })}
+              aria-label={t('seating.toolbar.banquetConfig', { defaultValue: 'Configurar banquete' })}
+            >
+              <Grid className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('seating.toolbar.banquet', { defaultValue: 'Banquete' })}</span>
             </button>
           )}
 
@@ -196,15 +208,15 @@ const SeatingPlanToolbar = ({
           <button type="button" data-testid="templates-btn"
             onClick={onOpenTemplates}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title={t('seating.toolbar.templates')}
+            title={t('seating.toolbar.templates', { defaultValue: 'Plantillas' })}
             aria-label={t('seating.toolbar.templates')}
           >
             <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('seating.toolbar.templates')}</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.templates', { defaultValue: 'Plantillas' })}</span>
           </button>
         </div>
 
-        {/* Grupo: Exportación (menÃº) */}
+        {/* Grupo: Exportación (menú) */}
         <div ref={exportRef} className="flex items-center gap-1 border-r pr-3 relative">
           <button type="button" data-testid="export-menu-btn"
             onClick={() => setShowExportMenu((s) => !s)}
