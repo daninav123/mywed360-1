@@ -168,6 +168,7 @@ export default function RSVPDashboard() {
                       <th className="px-3 py-2 text-left">Nombre</th>
                       <th className="px-3 py-2 text-left">Email</th>
                       <th className="px-3 py-2 text-left">Teléfono</th>
+                      <th className="px-3 py-2 text-left">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -176,6 +177,23 @@ export default function RSVPDashboard() {
                         <td className="px-3 py-2">{g.name || '-'}</td>
                         <td className="px-3 py-2">{g.email || '-'}</td>
                         <td className="px-3 py-2">{g.phone || '-'}</td>
+                        <td className="px-3 py-2">
+                          <button
+                            className="px-2 py-1 border rounded"
+                            onClick={async () => {
+                              try {
+                                const res = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
+                                const json = await res.json().catch(()=>({}));
+                                const link = json.link || `${window.location.origin}/rsvp/${json.token}`;
+                                await navigator.clipboard.writeText(link);
+                                alert('Enlace RSVP copiado');
+                              } catch (e) {
+                                console.error(e);
+                                alert('No se pudo generar/copiar el enlace');
+                              }
+                            }}
+                          >Copiar link</button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

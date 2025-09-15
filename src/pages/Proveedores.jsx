@@ -2162,7 +2162,8 @@ ${bride} y ${groom}`;
                   className="p-2 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 flex flex-col items-center justify-center"
                   onClick={async ()=>{
                     try {
-                      await checkoutProviderDeposit({ providerId: detailProvider.id, providerName: detailProvider.name, amount: 100, currency: 'EUR' });
+                      localStorage.setItem('lastCheckoutProviderId', detailProvider.id);
+                      await checkoutProviderDeposit({ providerId: detailProvider.id, providerName: detailProvider.name, amount: 100, currency: 'EUR', weddingId });
                     } catch (e) {
                       alert('Pago no disponible (Stripe no configurado)');
                     }
@@ -2720,4 +2721,20 @@ ${bride} y ${groom}`;
 }
 
 
+  // Detectar retorno de pago (Stripe) y actualizar estado del proveedor
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('payment');
+      const pid = localStorage.getItem('lastCheckoutProviderId');
+      if (status === 'success' && pid) {
+        updateProvider(pid, { status: 'Señal pagada' });
+        localStorage.removeItem('lastCheckoutProviderId');
+      }
+      if ((status === 'cancel' || status === 'canceled') && pid) {
+        // Limpia el marcador si fue cancelado
+        localStorage.removeItem('lastCheckoutProviderId');
+      }
+    } catch {}
+  }, []);
 

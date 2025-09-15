@@ -14,6 +14,9 @@ export default function Notificaciones() {
   const [filter, setFilter] = useState('all');
   const [items, setItems] = useState([]);
   const [pushEnabled, setPushEnabled] = useState(false);
+  const [prefs, setPrefs] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pushPrefs') || '{}'); } catch { return {}; }
+  });
 
   const refresh = async () => setItems(await getNotifications());
 
@@ -30,6 +33,11 @@ export default function Notificaciones() {
       try { setPushEnabled(!!(await navigator.serviceWorker.ready).pushManager); } catch {}
     })();
   }, []);
+
+  // Guardar preferencias
+  useEffect(() => {
+    try { localStorage.setItem('pushPrefs', JSON.stringify(prefs)); } catch {}
+  }, [prefs]);
 
   const filtered = items.filter((n) => (filter === 'unread' ? !n.read : true));
 
@@ -68,6 +76,26 @@ export default function Notificaciones() {
           >Probar Push</button>
         </div>
       )}
+
+      {/* Preferencias granulares */}
+      <div className="border rounded p-3">
+        <h2 className="font-semibold mb-2">Preferencias de Push</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+          {[
+            { key: 'email', label: 'Correos nuevos/importantes' },
+            { key: 'rsvp', label: 'RSVP y recordatorios' },
+            { key: 'tasks', label: 'Tareas y reuniones' },
+            { key: 'providers', label: 'Proveedores y pagos' },
+            { key: 'legal', label: 'Contratos/Documentos' },
+          ].map(opt => (
+            <label key={opt.key} className="flex items-center gap-2">
+              <input type="checkbox" checked={!!prefs[opt.key]} onChange={(e)=> setPrefs(prev => ({ ...prev, [opt.key]: e.target.checked }))} />
+              <span>{opt.label}</span>
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-gray-500 mt-2">Estas preferencias se guardan en este dispositivo y podrán usarse para filtrar alertas en próximas versiones del backend.</p>
+      </div>
 
       <div className="bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 rounded divide-y divide-[color:var(--color-text)]/10">
         {filtered.length === 0 && <p className="p-4 text-[color:var(--color-text)]/60">No hay notificaciones.</p>}

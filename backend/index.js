@@ -27,6 +27,7 @@ import {
 } from './middleware/authMiddleware.js';
 
 import mailRouter from './routes/mail.js';
+import mailOpsRouter from './routes/mail-ops.js';
 import aiRouter from './routes/ai.js';
 import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
@@ -60,6 +61,7 @@ import whatsappRouter from './routes/whatsapp.js';
 import gdprRouter from './routes/gdpr.js';
 import pushRouter from './routes/push.js';
 import paymentsRouter from './routes/payments.js';
+import paymentsWebhookRouter from './routes/payments-webhook.js';
 
 
 // Load environment variables (root .env)
@@ -191,6 +193,7 @@ app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 
 // Rutas que requieren autenticación específica para correo
 app.use('/api/mail', requireMailAccess, mailRouter);
+app.use('/api/mail', mailOpsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
 
 // IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
@@ -226,6 +229,7 @@ app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/gdpr', gdprRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/payments', paymentsWebhookRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

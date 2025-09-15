@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/checkout', async (req, res) => {
   try {
-    const { amount, currency = 'EUR', description = 'Pago', metadata = {} } = req.body || {};
+    const { amount, currency = 'EUR', description = 'Pago', weddingId = null, metadata = {} } = req.body || {};
     const cents = Math.max(100, Math.floor(Number(amount) * 100));
     const STRIPE_KEY = process.env.STRIPE_SECRET_KEY;
     if (!STRIPE_KEY) {
@@ -26,7 +26,7 @@ router.post('/checkout', async (req, res) => {
       line_items: [{ price_data: { currency: currency.toLowerCase(), product_data: { name: description }, unit_amount: cents }, quantity: 1 }],
       success_url: (process.env.FRONTEND_BASE_URL || 'http://localhost:5173') + '/proveedores?payment=success',
       cancel_url: (process.env.FRONTEND_BASE_URL || 'http://localhost:5173') + '/proveedores?payment=cancel',
-      metadata,
+      metadata: { ...metadata, weddingId: weddingId || metadata.weddingId || '' },
     });
     return res.json({ url: session.url });
   } catch (e) {
@@ -36,4 +36,3 @@ router.post('/checkout', async (req, res) => {
 });
 
 export default router;
-

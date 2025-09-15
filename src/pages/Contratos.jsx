@@ -18,9 +18,13 @@ export default function Contratos() {
   // selected state keeps ids locally
   const [selected, setSelected] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [toast, setToast] = useState(null);
   const initialContract = { provider: '', type: '', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
   const [newContract, setNewContract] = useState(initialContract);
+  const [editContract, setEditContract] = useState(initialContract);
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
 
   const handleAddContract = async e => {
     e.preventDefault();
@@ -131,6 +135,7 @@ export default function Contratos() {
                 <th className="p-2">Fecha de servicio</th>
                 <th className="p-2">Estado</th>
                 <th className="p-2">documento</th>
+                <th className="p-2">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -146,20 +151,38 @@ export default function Contratos() {
                       onChange={() => toggleSelect(c.id)}
                     />
                   </td>
+                  <td className="p-2">
+                    <div className="flex gap-2">
+                      <button className="px-2 py-1 border rounded" onClick={() => { setEditContract(c); setShowEditModal(true); }}>Editar</button>
+                      <button className="px-2 py-1 border rounded" onClick={async () => {
+                        const clone = { ...c, id: `ct${Date.now()}` };
+                        await addContract(clone);
+                        setToast({ message: 'Contrato duplicado', type: 'success' });
+                      }}>Duplicar</button>
+                    </div>
+                  </td>
                   <td className="p-2">{c.provider}</td>
                   <td className="p-2">{c.type}</td>
                   <td className="p-2">{c.signedDate}</td>
                   <td className="p-2">{c.serviceDate}</td>
                   <td className="p-2">{c.status}</td>
                   <td className="p-2">
-                    <a
-                      href={c.docUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-blue-600"
-                    >
-                      <Eye size={16} className="mr-1" /> Ver
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={c.docUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-blue-600"
+                      >
+                        <Eye size={16} className="mr-1" /> Ver
+                      </a>
+                      {c.docUrl && c.docUrl.toLowerCase().includes('.pdf') && (
+                        <button
+                          className="px-2 py-1 border rounded text-xs"
+                          onClick={()=>{ setPdfUrl(c.docUrl); setShowPdfModal(true); }}
+                        >Abrir</button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -241,6 +264,43 @@ export default function Contratos() {
                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Guardar</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow w-96">
+            <h2 className="text-xl font-semibold mb-4">Editar Contrato</h2>
+            <form onSubmit={async (e)=>{ e.preventDefault(); await updateContract(editContract.id, editContract); setShowEditModal(false); setToast({ message: 'Contrato actualizado', type: 'success' }); }} className="space-y-3">
+              <input type="text" placeholder="Proveedor" value={editContract.provider} onChange={e=>setEditContract({ ...editContract, provider: e.target.value })} className="w-full border rounded px-2 py-1" required />
+              <input type="text" placeholder="Tipo de contrato" value={editContract.type} onChange={e=>setEditContract({ ...editContract, type: e.target.value })} className="w-full border rounded px-2 py-1" required />
+              <input type="date" value={editContract.signedDate} onChange={e=>setEditContract({ ...editContract, signedDate: e.target.value })} className="w-full border rounded px-2 py-1" required />
+              <input type="date" value={editContract.serviceDate} onChange={e=>setEditContract({ ...editContract, serviceDate: e.target.value })} className="w-full border rounded px-2 py-1" required />
+              <select value={editContract.status} onChange={e=>setEditContract({ ...editContract, status: e.target.value })} className="w-full border rounded px-2 py-1">
+                <option value="Vigente">Vigente</option>
+                <option value="Expirado">Expirado</option>
+                <option value="Señal pagada">Señal pagada</option>
+              </select>
+              <div className="flex justify-end gap-2">
+                <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Guardar cambios</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showPdfModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-white rounded shadow-lg w-[90vw] max-w-3xl h-[85vh] relative">
+            <div className="flex items-center justify-between p-3 border-b">
+              <div className="font-semibold">Documento</div>
+              <button className="px-2 py-1 border rounded" onClick={()=> setShowPdfModal(false)}>Cerrar</button>
+            </div>
+            <div className="w-full h-[calc(85vh-48px)]">
+              <iframe title="PDF" src={pdfUrl} className="w-full h-full" />
+            </div>
           </div>
         </div>
       )}

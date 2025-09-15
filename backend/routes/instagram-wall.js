@@ -251,14 +251,21 @@ router.post('/', async (req, res) => {
       discoverPexels(page, searchQuery),
       discoverPinterestPromise,
     ]);
-    let posts = [...unsplash, ...pexels, ...pinterest]; // Usar únicamente resultados de Pinterest para asegurar temática
+    let posts = [...unsplash, ...pexels, ...pinterest]; // resultados agregados
+    // Si no alcanza un mínimo razonable, rellenar con placeholders para evitar que el frontend quede vacío
+    if (posts.length < 8) {
+      const extras = picsumPlaceholders(page, query, 12 - posts.length);
+      posts = posts.concat(extras);
+    }
 
     // --- Nueva lógica de filtrado nupcial ligero ---
     const WEDDING_RE = /(wedding|boda|bridal|bride|groom|novia|novio|ceremony|reception|matrimonio|casamiento)/i;
-    posts = posts.filter((p)=>{
+    const prelim = posts.filter((p)=>{
       const text = `${p.description||''} ${p.alt||''} ${p.permalink||''}`.toLowerCase();
       return WEDDING_RE.test(text);
     });
+    // Si el filtrado deja muy pocos resultados (<8), relajamos la restricción y usamos la lista original
+    posts = prelim.length >= 8 ? prelim : posts;
 
     // Asignar categoría inferida si falta, se usa para mostrar badge en frontend
     posts = posts.map((p)=>{

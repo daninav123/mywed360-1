@@ -100,17 +100,20 @@ export async function fetchWall(page = 1, query = 'wedding') {
   const lastRequest = localStorage.getItem(lastRequestKey);
   const now = Date.now();
 
-  // Si falló hace menos de 30 minutos, usar datos demo directamente
-  if (lastFailure && (now - parseInt(lastFailure)) < 30 * 60 * 1000) {
-    console.log('wallService: usando datos demo (circuit breaker activo)');
-    return DEMO_IMAGES;
+  // Si estamos en desarrollo, no aplicamos circuit-breaker; siempre reintentamos.
+  if (!import.meta.env.PROD) {
+    localStorage.removeItem(lastFailureKey);
+  } else {
+    // Si falló hace menos de 30 minutos, usar datos demo directamente
+    if (lastFailure && (now - parseInt(lastFailure)) < 30 * 60 * 1000) {
+      console.log('wallService: usando datos demo (circuit breaker activo)');
+      return DEMO_IMAGES;
+    }
   }
 
-  // Evitar requests duplicados en menos de 1 segundo (React Strict Mode)
-  if (lastRequest && (now - parseInt(lastRequest)) < 1000) {
-    console.log('wallService: request duplicado evitado, usando datos demo');
-    return DEMO_IMAGES;
-  }
+  // Permitir solicitudes duplicadas; React 18 Strict Mode monta/desmonta componentes causando dobles peticiones.
+  // Si el backend está caído activaremos igualmente el circuit-breaker mediante lastFailureKey.
+
 
   // Marcar timestamp del request
   localStorage.setItem(lastRequestKey, now.toString());
@@ -127,9 +130,19 @@ export async function fetchWall(page = 1, query = 'wedding') {
         throw e;
       }
     }
-    let data = resp.data.map(normalize).filter(Boolean);
-    // Filtra dominios que suelen bloquear hot-link incluso tras proxy
-    data = data.filter(p => !/(pinimg|pinterest)\./i.test(p.original_url || ''));
+    let data = (resp && resp.data ? resp.data : []).map(normalize).filter(Boolean);
+    // Permitir imágenes de Pinterest y dominios pinimg siempre que se hayan proxificado correctamente.
+    // Solo descartamos si la URL proxificada aún apunta al dominio bloqueado (lo que indicaría un fallo en el proxy).
+    data = data.filter(p => {
+      const origBlocked = /(pinimg|pinterest)\./i.test(p.original_url || '');
+      const proxiedOk = p.url && p.url.startsWith(`${API_BASE}/api/image-proxy`);
+      // Si es dominio bloqueado pero está proxificado, se acepta.
+      if (origBlocked && proxiedOk) return true;
+      // Si no es dominio bloqueado, se acepta.
+      if (!origBlocked) return true;
+      // Si es dominio bloqueado y no está proxificado, se descarta.
+      return false;
+    });
     // Limpiar flag de fallo si la request fue exitosa
     localStorage.removeItem(lastFailureKey);
     return data.length ? data : DEMO_IMAGES;

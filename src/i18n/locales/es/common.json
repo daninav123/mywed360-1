@@ -282,6 +282,9 @@
     "dateFormat": "dd/mm/yyyy",
     "timeFormat": "HH:mm"
   },
+  "common": {
+    "all": "Todos"
+  },
   "status": {
     "active": "Activo",
     "inactive": "Inactivo",
