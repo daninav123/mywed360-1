@@ -459,11 +459,8 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          if (taskData.long) {
-            await addMeetingFS(taskData);
-          } else {
-            await addTaskFS(taskData);
-          }
+          // Nueva reunión (evento puntual del calendario)
+          await addMeetingFS(taskData);
         }
       }
       

@@ -3,6 +3,7 @@ import Card from '../../components/ui/Card';
 import { Plus, Trash2 } from 'lucide-react';
 import { saveData, loadData } from '../../services/SyncService';
 import SyncIndicator from '../../components/SyncIndicator';
+import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 
 const initialState = () => {
   try {

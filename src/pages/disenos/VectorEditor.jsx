@@ -11,6 +11,7 @@ const stImport = () => import('firebase/storage');
 export default function VectorEditorPage() {
   const [params] = useSearchParams();
   const imageUrl = params.get('image');
+  const svgUrl = params.get('svg');
   const [svg, setSvg] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,6 +55,49 @@ export default function VectorEditorPage() {
     if (imageUrl) doVectorize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageUrl]);
+
+  // Cargar SVG existente si se pasa ?svg=...
+  useEffect(() => {
+    let ignore = false;
+    const load = async () => {
+      if (!svgUrl) return;
+      setLoading(true);
+      setError('');
+      try {
+        const res = await fetch(svgUrl);
+        const text = await res.text();
+        if (!ignore) setSvg(text);
+      } catch (e) {
+        console.error('Cargar SVG error', e);
+        if (!ignore) setError('No se pudo cargar el SVG');
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+    load();
+    return () => { ignore = true; };
+  }, [svgUrl]);
+
+  // Paleta por boda (branding)
+  const [palette, setPalette] = useState(["#1d4ed8","#dc2626","#0ea5e9","#22c55e","#f59e0b","#a855f7","#111827","#ffffff"]);
+  useEffect(() => {
+    const loadBrand = async () => {
+      if (!activeWedding) return;
+      try {
+        await firebaseReady;
+        const { doc, getDoc } = await fsImport();
+        const ref = doc(db, 'weddings', activeWedding, 'branding', 'main');
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (Array.isArray(data.palette) && data.palette.length) {
+            setPalette(data.palette);
+          }
+        }
+      } catch (e) { console.warn('No se pudo cargar paleta', e); }
+    };
+    loadBrand();
+  }, [activeWedding]);
 
   return (
     <div className="p-4 space-y-4">
@@ -154,12 +198,50 @@ export default function VectorEditorPage() {
         </div>
       )}
 
+      {/* Paleta de marca (editable) */}
+      {activeWedding && (
+        <div className="bg-white border rounded p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold">Paleta de la boda</h3>
+            <button
+              className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+              onClick={async ()=>{
+                try {
+                  await firebaseReady;
+                  const { doc, setDoc, serverTimestamp } = await fsImport();
+                  const ref = doc(db, 'weddings', activeWedding, 'branding', 'main');
+                  await setDoc(ref, { palette, updatedAt: serverTimestamp() }, { merge: true });
+                  alert('Paleta guardada');
+                } catch (e) { console.error(e); alert('No se pudo guardar la paleta'); }
+              }}
+            >
+              Guardar paleta
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-3 items-center">
+            {palette.map((c, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input type="color" value={c} onChange={(e)=>{
+                  const val = e.target.value;
+                  setPalette(prev => prev.map((p,j)=> j===i ? val : p));
+                }} className="w-10 h-8 p-0 border rounded" />
+                <input type="text" value={c} onChange={(e)=>{
+                  const val = e.target.value;
+                  setPalette(prev => prev.map((p,j)=> j===i ? val : p));
+                }} className="border rounded p-1 w-28 text-sm" />
+              </div>
+            ))}
+            <button className="px-2 py-1 border rounded" onClick={()=>setPalette(prev=>[...prev, '#000000'])}>+ color</button>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>
       )}
 
       {svg ? (
-        <VectorEditor ref={editorRef} svg={svg} />
+        <VectorEditor ref={editorRef} svg={svg} palette={palette} />
       ) : canVectorize && !loading ? (
         <div className="text-sm text-gray-600">No hay SVG disponible aún.</div>
       ) : null}

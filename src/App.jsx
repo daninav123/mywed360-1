@@ -29,7 +29,7 @@ import UserRoutes from './routes/UserRoutes';
 import WhatsAppMetrics from './components/whatsapp/WhatsAppMetrics';
 
 import Perfil from './pages/Perfil';
-import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored';
+import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored.jsx';
 import Invitaciones from './pages/Invitaciones';
 import Contratos from './pages/Contratos';
 import DisenoWeb from './pages/DisenoWeb';
@@ -42,6 +42,7 @@ import SeatingPlanPost from './pages/disenos/SeatingPlanPost';
 import MenuCatering from './pages/disenos/MenuCatering';
 import PapelesNombres from './pages/disenos/PapelesNombres';
 import DisenosVectorEditor from './pages/disenos/VectorEditor';
+import MisDisenos from './pages/disenos/MisDisenos';
 import Ideas from './pages/Ideas';
 import Inspiration from './pages/Inspiration';
 import Blog from './pages/Blog';
@@ -147,6 +148,7 @@ function App() {
                   <Route path="menu-catering" element={<MenuCatering />} />
                   <Route path="papeles-nombres" element={<PapelesNombres />} />
                   <Route path="vector-editor" element={<DisenosVectorEditor />} />
+                  <Route path="mis-disenos" element={<MisDisenos />} />
                 </Route>
 
                 {/* Extras */}
@@ -185,4 +187,3 @@ function App() {
 }
 
 export default App;
-

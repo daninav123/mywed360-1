@@ -7,7 +7,7 @@ import React, { useEffect, useMemo, useRef, useState, forwardRef, useImperativeH
  *  - svg: string (raw <svg>...</svg>)
  *  - onExport?: ({ svgString, blob }) => void
  */
-const VectorEditor = forwardRef(function VectorEditor({ svg, onExport }, ref) {
+const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette = [] }, ref) {
   const containerRef = useRef(null);
   const [ready, setReady] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null); // index within live path NodeList
@@ -15,6 +15,8 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport }, ref) {
   const [stroke, setStroke] = useState('#000000');
   const [strokeWidth, setStrokeWidth] = useState(1);
   const [zoom, setZoom] = useState(1);
+  const [applyTarget, setApplyTarget] = useState('fill'); // 'fill' | 'stroke'
+  const [applyAllOfSame, setApplyAllOfSame] = useState(false);
 
   // Inject SVG content into container
   useEffect(() => {
@@ -77,6 +79,26 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport }, ref) {
     if (selectedIndex == null || !paths[selectedIndex]) return;
     const node = paths[selectedIndex];
     mutate(node);
+  };
+
+  const applyColor = (color) => {
+    if (!color) return;
+    const paths = getPaths();
+    if (selectedIndex == null || !paths[selectedIndex]) return;
+    const node = paths[selectedIndex];
+    const targetAttr = applyTarget === 'stroke' ? 'stroke' : 'fill';
+    const prevColor = node.getAttribute(targetAttr) || '';
+    if (applyAllOfSame) {
+      paths.forEach((p) => {
+        const cur = p.getAttribute(targetAttr) || '';
+        if (cur.toLowerCase() === prevColor.toLowerCase()) {
+          p.setAttribute(targetAttr, color);
+        }
+      });
+    } else {
+      node.setAttribute(targetAttr, color);
+    }
+    if (targetAttr === 'fill') setFill(color); else setStroke(color);
   };
 
   const handleFillChange = (e) => {
@@ -175,12 +197,39 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport }, ref) {
         </div>
         <div className="space-y-2">
           <div className="text-sm text-gray-600">Capa seleccionada: {selectedIndex != null ? selectedIndex+1 : 'ninguna'}</div>
+          <div className="flex items-center gap-2 text-xs">
+            <span>Aplicar a:</span>
+            <label className="inline-flex items-center gap-1">
+              <input type="radio" name="applyTarget" checked={applyTarget==='fill'} onChange={()=>setApplyTarget('fill')} />
+              Relleno
+            </label>
+            <label className="inline-flex items-center gap-1">
+              <input type="radio" name="applyTarget" checked={applyTarget==='stroke'} onChange={()=>setApplyTarget('stroke')} />
+              Trazo
+            </label>
+          </div>
           <label className="block text-sm">Relleno</label>
           <input type="color" value={fill} onChange={handleFillChange} className="w-10 h-8 p-0 border rounded" />
           <label className="block text-sm mt-2">Trazo</label>
           <input type="color" value={stroke} onChange={handleStrokeChange} className="w-10 h-8 p-0 border rounded" />
           <label className="block text-sm mt-2">Grosor</label>
           <input type="number" value={strokeWidth} min={0} step={0.5} onChange={handleStrokeWidth} className="w-full border rounded p-1" />
+          {Array.isArray(palette) && palette.length > 0 && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Paleta</span>
+                <label className="text-xs flex items-center gap-1">
+                  <input type="checkbox" checked={applyAllOfSame} onChange={(e)=>setApplyAllOfSame(e.target.checked)} />
+                  Reemplazar mismo color
+                </label>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {palette.map((c,i)=> (
+                  <button key={i} title={c} onClick={()=>applyColor(c)} className="w-6 h-6 rounded border" style={{ backgroundColor: c }} />
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex gap-2 mt-2">
             <button className="px-3 py-1 border rounded" onClick={handleDelete} disabled={selectedIndex==null}>Eliminar</button>
           </div>

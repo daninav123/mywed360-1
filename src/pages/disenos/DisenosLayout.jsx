@@ -10,6 +10,7 @@ const tabs = [
   { path: 'seating-plan', label: 'Seating Plan' },
   { path: 'menu-catering', label: 'Menú Catering' },
   { path: 'papeles-nombres', label: 'Papeles Nombres' },
+  { path: 'mis-disenos', label: 'Mis diseños' },
 ];
 
 const DisenosLayout = React.memo(() => {
