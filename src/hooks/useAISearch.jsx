@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
+import { post as apiPost } from '../services/apiClient';
 
 /**
  * @typedef {Object} AISearchResult
@@ -53,6 +54,18 @@ export const useAISearch = () => {
     setError(null);
 
     try {
+      // Intentar backend primero (Render/local)
+      try {
+        const res = await apiPost('/api/ai-suppliers', { query }, { auth: true });
+        if (res && res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length) {
+            setResults(data);
+            setLoading(false);
+            return data;
+          }
+        }
+      } catch {}
       // Simular una llamada a una API de IA
       // En una implementación real, esto sería una llamada a una API como OpenAI
       // Ejemplo:

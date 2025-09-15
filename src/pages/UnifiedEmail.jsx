@@ -53,7 +53,7 @@ const UnifiedEmail = () => {
     try {
       const base = import.meta.env.VITE_BACKEND_BASE_URL || '';
       if (!base) throw new Error('Sin backend');
-      await fetch(`${base}/api/mail/${id}/unread`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+      await fetch(`${base}/api/mail/${id}/unread`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
     } catch (_) { /* fallback local ya aplicado en UI */ }
   };
   const fetchEmails = useCallback(async () => {
@@ -598,7 +598,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
           )}
           {/* Gestión de etiquetas */}
           <div className="flex items-center gap-1">
-            <select className="border rounded px-2 py-1 text-xs" defaultValue="" onChange={(e)=>{ const tid=e.target.value; if(!tid) return; try { addTagToEmail(userId||'', mail.id, tid); window.dispatchEvent(new Event('lovenda-email-tags')); } catch(_){} e.target.value=''; }}>
+            <select className="border rounded px-2 py-1 text-xs" defaultValue="" onChange={async (e)=>{ const tid=e.target.value; if(!tid) return; try { addTagToEmail(userId||'', mail.id, tid); try { await updateMailTags(mail.id, { add: [tid] }); } catch {} window.dispatchEvent(new Event('lovenda-email-tags')); } catch(_){} e.target.value=''; }}>
               <option value="">Añadir etiqueta…</option>
               {getUserTags(userId||'').map(t => (<option key={t.id} value={t.id}>{t.name}</option>))}
             </select>

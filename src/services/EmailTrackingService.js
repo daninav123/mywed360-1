@@ -183,7 +183,7 @@ export function updateTrackingWithResponse(email) {
 }
 
 // Actualizar estado de un registro de seguimiento
-export function updateTrackingStatus(recordId, status, notes = null) {
+export function updateTrackingStatus(recordId, status, notes = null, dueDate = undefined) {
   const trackingRecords = loadTrackingRecords();
   
   const updatedRecords = trackingRecords.map(record => {
@@ -191,7 +191,8 @@ export function updateTrackingStatus(recordId, status, notes = null) {
       return {
         ...record,
         status,
-        notes: notes !== null ? notes : record.notes
+        notes: notes !== null ? notes : record.notes,
+        dueDate: typeof dueDate !== 'undefined' ? dueDate : record.dueDate
       };
     }
     return record;

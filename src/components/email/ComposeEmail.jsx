@@ -5,6 +5,7 @@ import { AlertCircle, Paperclip } from 'lucide-react';
 import Button from '../Button';
 import Card from '../ui/Card';
 import * as EmailService from '../../services/emailService';
+import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { useAuth } from '../../hooks/useAuth';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 
@@ -134,7 +135,10 @@ const ComposeEmail = () => {
 
     setSending(true);
     try {
-      await EmailService.sendMail({ to, cc, bcc, subject, body, attachments });
+      const uploaded = attachments && attachments.length
+        ? await uploadEmailAttachments(attachments, (profile && profile.id) || 'anon')
+        : [];
+      await EmailService.sendMail({ to, cc, bcc, subject, body, attachments: uploaded.length ? uploaded : attachments });
       // Mostrar mensaje de éxito
       setSentSuccess(true);
       // Redirigir tras breve demora

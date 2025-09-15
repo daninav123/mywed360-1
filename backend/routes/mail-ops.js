@@ -47,3 +47,28 @@ router.post('/:id/tags', requireMailAccess, async (req, res) => {
 
 export default router;
 
+// DELETE /api/mail/:id  -> Eliminar mensaje
+router.delete('/:id', requireMailAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'id-required' });
+
+    // Eliminar del buzón global
+    await db.collection('mails').doc(id).delete();
+
+    // Eliminar de subcolección del usuario si aplica
+    try {
+      const uid = req.user?.uid;
+      if (uid) {
+        await db.collection('users').doc(uid).collection('mails').doc(id).delete();
+      }
+    } catch (_) {
+      // best-effort
+    }
+
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('DELETE /api/mail/:id', e);
+    res.status(500).json({ error: 'delete-mail-failed' });
+  }
+});

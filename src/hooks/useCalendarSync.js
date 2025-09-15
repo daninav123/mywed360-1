@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { googleCalendarService } from '../services/GoogleCalendarService';
 import { collection, doc, setDoc, getDoc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { useAuth } from './useAuthUnified';
+import { useAuth } from './useAuth';
 
 /**
  * Hook personalizado para gestionar la sincronización bidireccional con Google Calendar

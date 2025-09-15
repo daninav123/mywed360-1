@@ -5,6 +5,9 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { _getStorage, loadJson, saveJson } from '../utils/storage.js';
+import { updateMailTags as updateMailTagsBackend } from './emailService';
+import { db } from '../firebaseConfig';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Caché en memoria para tests y runtime rápido
 const runtimeCustomTags = {};
@@ -29,6 +32,7 @@ export const SYSTEM_TAGS = [
  * @returns {Array} - Array de objetos de etiqueta
  */
 export const getUserTags = (userId) => {
+  try { refreshTagsFromCloud(userId); } catch {}
   const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
   try {
     const storage = _getStorage();
@@ -189,6 +193,7 @@ const saveUserTags = (userId, tags) => {
  */
 const getEmailTagsMapping = (userId) => {
   try {
+    try { refreshTagsMappingFromCloud(userId); } catch {}
     const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
     return loadJson(storageKey, {});
   } catch (error) {
@@ -207,6 +212,36 @@ const saveEmailTagsMapping = (userId, mapping) => {
   const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
   saveJson(storageKey, mapping);
 };
+
+// Refrescos desde nube (no bloqueantes)
+async function refreshTagsFromCloud(userId) {
+  try {
+    if (!db || !userId) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailTags');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() || {};
+    if (Array.isArray(data.tags)) {
+      runtimeCustomTags[userId] = data.tags;
+      const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
+      saveJson(storageKey, data.tags);
+    }
+  } catch {}
+}
+
+async function refreshTagsMappingFromCloud(userId) {
+  try {
+    if (!db || !userId) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailTagsMapping');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() || {};
+    if (data.mapping && typeof data.mapping === 'object') {
+      const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
+      saveJson(storageKey, data.mapping);
+    }
+  } catch {}
+}
 
 /**
  * Asignar una etiqueta a un correo
@@ -245,6 +280,8 @@ export const addTagToEmail = (userId, emailId, tagId) => {
       mapping[emailId].push(tagId);
       // Guardar mapeo actualizado
       saveEmailTagsMapping(userId, mapping);
+      // Espejo en backend (best‑effort)
+      try { updateMailTagsBackend(emailId, { add: [tagId] }); } catch {}
     }
     return true;
   } catch (error) {
@@ -278,6 +315,8 @@ export const removeTagFromEmail = (userId, emailId, tagId) => {
     }
     // Guardar mapeo actualizado
     saveEmailTagsMapping(userId, mapping);
+    // Espejo en backend (best‑effort)
+    try { updateMailTagsBackend(emailId, { remove: [tagId] }); } catch {}
     return true;
   } catch (error) {
     console.error('Error al quitar etiqueta de correo:', error);

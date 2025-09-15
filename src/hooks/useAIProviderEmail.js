@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useProviderEmail } from './useProviderEmail';
-import EmailService from '../services/emailService';
+import * as EmailService from '../services/emailService';
 import EmailTemplateService from '../services/EmailTemplateService';
 
 /**
@@ -112,9 +112,8 @@ export const useAIProviderEmail = () => {
       const subject = options.subject || generateAISubject(aiResult);
       const body = options.body || generateAIEmailBody(aiResult, searchQuery);
       
-      // Registrar actividad de AI para análisis
-      const emailService = new EmailService();
-      emailService.logAIEmailActivity(aiResult.id, searchQuery);
+      // Registrar actividad de AI para análisis (best-effort local)
+      try { EmailService.logAIEmailActivity(aiResult.id, searchQuery); } catch {}
       
       // Registrar el uso de la plantilla para análisis
       const templateService = new EmailTemplateService();

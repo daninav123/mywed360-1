@@ -3,7 +3,7 @@
  * Previene el error "Objects are not valid as a React child (found: [object Promise])"
  */
 
-import React from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 /**
  * Asegura que un valor no sea una Promesa antes de renderizarlo en JSX
@@ -87,7 +87,7 @@ export function safeDangerouslySetInnerHTML(htmlContent) {
  * @returns {Array} - [value, setValue] donde value nunca será una Promesa
  */
 export function useSafeState(initialValue) {
-  const [state, setState] = React.useState(ensureNotPromise(initialValue));
+  const [state, setState] = useState(ensureNotPromise(initialValue));
   
   const setSafeState = (newValue) => {
     setState(ensureNotPromise(newValue));

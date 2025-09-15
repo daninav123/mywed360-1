@@ -5,6 +5,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { _getStorage } from '../utils/storage.js';
+import { db } from '../firebaseConfig';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Clave para almacenamiento local
 const FOLDERS_STORAGE_KEY = 'lovenda_email_folders';
@@ -17,6 +19,8 @@ const EMAIL_FOLDER_MAPPING_KEY = 'lovenda_email_folder_mapping';
  */
 export const getUserFolders = (userId) => {
   try {
+    // Best‑effort: refrescar desde Firestore sin bloquear
+    try { refreshFoldersFromCloud(userId); } catch {}
     // Formato de clave: lovenda_email_folders_[userId]
     const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
     const foldersJson = _getStorage().getItem(storageKey);
@@ -150,6 +154,8 @@ export const deleteFolder = (userId, folderId) => {
 const saveUserFolders = (userId, folders) => {
   const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(folders));
+  // Espejo en Firestore (best‑effort)
+  try { mirrorFoldersToCloud(userId, folders); } catch {}
 };
 
 /**
@@ -160,6 +166,8 @@ const saveUserFolders = (userId, folders) => {
  */
 const getEmailFolderMapping = (userId) => {
   try {
+    // Best‑effort: refrescar desde Firestore sin bloquear
+    try { refreshFolderMappingFromCloud(userId); } catch {}
     const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
     const mappingJson = _getStorage().getItem(storageKey);
     
@@ -183,7 +191,54 @@ const getEmailFolderMapping = (userId) => {
 const saveEmailFolderMapping = (userId, mapping) => {
   const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(mapping));
+  // Espejo en Firestore (best‑effort)
+  try { mirrorFolderMappingToCloud(userId, mapping); } catch {}
 };
+
+async function mirrorFoldersToCloud(userId, folders) {
+  try {
+    if (!userId || !db) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailFolders');
+    await setDoc(ref, { folders, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch {}
+}
+
+async function mirrorFolderMappingToCloud(userId, mapping) {
+  try {
+    if (!userId || !db) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailFolderMapping');
+    await setDoc(ref, { mapping, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch {}
+}
+
+// Refrescos desde nube (no bloqueantes)
+async function refreshFoldersFromCloud(userId) {
+  try {
+    if (!db || !userId) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailFolders');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() || {};
+    if (Array.isArray(data.folders)) {
+      const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
+      _getStorage().setItem(storageKey, JSON.stringify(data.folders));
+    }
+  } catch {}
+}
+
+async function refreshFolderMappingFromCloud(userId) {
+  try {
+    if (!db || !userId) return;
+    const ref = doc(db, 'users', userId, 'settings', 'emailFolderMapping');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    const data = snap.data() || {};
+    if (data.mapping && typeof data.mapping === 'object') {
+      const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
+      _getStorage().setItem(storageKey, JSON.stringify(data.mapping));
+    }
+  } catch {}
+}
 
 /**
  * Asignar un correo a una carpeta

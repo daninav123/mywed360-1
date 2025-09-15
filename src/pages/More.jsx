@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Users, Briefcase, Clock, User, Layers } from 'lucide-react';
 import { prefetchModule } from '../utils/prefetch';
+import * as Push from '../services/PushService';
 
 export default function More() {
   const [openMenu, setOpenMenu] = useState(null);
+  const [pushSupported, setPushSupported] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
   const pfInvitados = () => prefetchModule('Invitados', () => import('./Invitados'));
   const pfSeating = () => prefetchModule('SeatingPlanRefactored', () => import('../components/seating/SeatingPlanRefactored'));
   const pfProveedores = () => prefetchModule('Proveedores', () => import('./Proveedores'));
@@ -15,6 +19,63 @@ export default function More() {
   const pfIdeas = () => prefetchModule('Ideas', () => import('./Ideas'));
   const pfInspiration = () => prefetchModule('Inspiration', () => import('./Inspiration'));
   const pfBlog = () => prefetchModule('Blog', () => import('./Blog'));
+
+  // --- Prefetch grouped menus (evita error de función no definida) ---
+  const pfInvitadosMenu = () => {
+    pfInvitados();
+    pfSeating();
+  };
+  const pfProveedoresMenu = () => {
+    pfProveedores();
+    pfContratos();
+  };
+  const pfProtocoloMenu = () => {
+    pfProtocolo();
+  };
+  const pfExtrasMenu = () => {
+    pfDisenoWeb();
+    pfDisenos();
+    pfIdeas();
+    pfInspiration();
+    pfBlog();
+  };
+  // --- Push notifications setup ---
+  useEffect(() => {
+    try {
+      const sup = Push.isSupported();
+      setPushSupported(sup);
+      if (sup) {
+        Push.getSubscription()
+          .then((sub) => setPushEnabled(!!sub))
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (!pushSupported) return;
+    setPushBusy(true);
+    try {
+      if (pushEnabled) {
+        await Push.unsubscribe();
+        setPushEnabled(false);
+      } else {
+        await Push.subscribe();
+        setPushEnabled(true);
+      }
+    } catch (e) {
+      console.warn('Push toggle error', e);
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
+  const handleTestPush = async () => {
+    try {
+      await Push.sendTest();
+    } catch {}
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-8">
       {/* Header */}
@@ -80,6 +141,32 @@ export default function More() {
               <Link to="/ideas" className="block px-4 py-2 hover:bg-gray-100">Ideas</Link>
               <Link to="/inspiracion" className="block px-4 py-2 hover:bg-gray-100">Galería de Inspiración</Link>
               <Link to="/blog" className="block px-4 py-2 hover:bg-gray-100">Blog</Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Notificaciones Push */}
+      <div className="bg-white rounded shadow p-4 mt-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold mb-1">Notificaciones Push</h2>
+            <p className="text-sm text-gray-600">
+              {pushSupported ? 'Recibe avisos de nuevos correos y eventos.' : 'Este navegador no soporta notificaciones push.'}
+            </p>
+          </div>
+          {pushSupported && (
+            <div className="flex gap-2">
+              <button
+                className={`px-3 py-1 rounded ${pushEnabled ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'} ${pushBusy ? 'opacity-60' : ''}`}
+                onClick={handleTogglePush}
+                disabled={pushBusy}
+              >
+                {pushEnabled ? 'Desactivar' : 'Activar'}
+              </button>
+              <button className="px-3 py-1 rounded border" onClick={handleTestPush} disabled={!pushEnabled || pushBusy}>
+                Probar
+              </button>
             </div>
           )}
         </div>
