@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { post as apiPost } from '../services/apiClient';
 
 /**
  * VectorEditor
@@ -161,11 +162,7 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
     const content = serializeSvg();
     if (!content) return;
     try {
-      const res = await fetch('/api/ai-image/svg-to-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ svg: content })
-      });
+      const res = await apiPost('/api/ai-image/svg-to-pdf', { svg: content }, { auth: true });
       if (!res.ok) throw new Error('SVG to PDF failed');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

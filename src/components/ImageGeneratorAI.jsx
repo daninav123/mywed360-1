@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { post as apiPost } from '../services/apiClient';
 import { useNavigate } from 'react-router-dom';
 import { saveData, loadData } from '../services/SyncService';
 import Spinner from './Spinner';
@@ -66,12 +67,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
     try {
       // Si tenemos un proxy API, lo usamos
       try {
-        const res = await fetch('/api/ai-image', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
-        });
-
+        const res = await apiPost('/api/ai-image', { prompt }, { auth: true });
         if (res.ok) {
           const data = await res.json();
           if (data && data.url) {
@@ -201,11 +197,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
   // Descargar como PDF vectorial listo para impresión
   const downloadVectorPdf = async (imageUrl, fileName) => {
     try {
-      const res = await fetch('/api/ai-image/vector-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: imageUrl })
-      });
+      const res = await apiPost('/api/ai-image/vector-pdf', { url: imageUrl }, { auth: true });
       if (!res.ok) throw new Error('Error generando PDF');
 
       const blob = await res.blob();

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ViewMode } from 'gantt-task-react';
+import { serverTimestamp } from 'firebase/firestore';
 import { subscribeSyncState, getSyncState, loadData } from '../../services/SyncService';
 import { Cloud, CloudOff, RefreshCw, Download } from 'lucide-react';
 
@@ -429,7 +430,8 @@ export default function Tasks() {
         desc: formData.desc,
         start: startDate,
         end: endDate,
-        category: category
+        category: category,
+        ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
       
       // Añadir/actualizar según sea una tarea de largo plazo o una reunión
@@ -441,7 +443,8 @@ export default function Tasks() {
           progress: 0,
           type: 'task',
           isDisabled: false,
-          dependencies: []
+          dependencies: [],
+          createdAt: serverTimestamp()
         };
         
         if (editingId) {
@@ -460,7 +463,7 @@ export default function Tasks() {
           }
         } else {
           // Nueva reunión (evento puntual del calendario)
-          await addMeetingFS(taskData);
+          await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
         }
       }
       
@@ -501,7 +504,10 @@ export default function Tasks() {
     if (!date) return null;
     
     let validDate = date;
-    if (!(date instanceof Date)) {
+    // Aceptar Timestamp de Firestore
+    if (date && typeof date.toDate === 'function') {
+      validDate = date.toDate();
+    } else if (!(date instanceof Date)) {
       try {
         validDate = new Date(date);
       } catch (e) {

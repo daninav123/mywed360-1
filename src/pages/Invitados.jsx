@@ -16,6 +16,7 @@ import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
 import GroupManager from '../components/guests/GroupManager';
+import { post as apiPost } from '../services/apiClient';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -295,7 +296,7 @@ function Invitados() {
         // Generar enlace RSVP si es posible
         let link = '';
         try {
-          const resp = await fetch(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, { method: 'POST' });
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
           if (resp.ok) { const json = await resp.json(); link = json.link; }
         } catch {}
         const msg = link

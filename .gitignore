@@ -14,6 +14,23 @@ serviceAccount.json
 .DS_Store
 
 backend/logs/
+logs/
+coverage/
+
+# Logs y reportes locales
+*.log
+*.log.*
+debug_*.txt
+temp_*.txt
+vite_output.txt
+vitest_output.txt
+eslint_*.json
+eslint_summary.txt
+lint_errors.json
+junit.xml
+server-log.txt
+emulator-debug.log
+pglite-debug.log
 
 # Cypress artifacts
 cypress/screenshots/

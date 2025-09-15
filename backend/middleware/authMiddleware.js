@@ -115,7 +115,10 @@ const extractToken = (req) => {
 const verifyFirebaseToken = async (token) => {
   // BYPASS TEMPORAL PARA DESARROLLO: Aceptar tokens mock del sistema de autenticación actual
   // Permitir bypass con tokens mock si ALLOW_MOCK_TOKENS está habilitado (por defecto true en desarrollo)
-  const allowMock = process.env.ALLOW_MOCK_TOKENS !== 'false';
+  // Por seguridad: por defecto desactivar en producción. Se puede forzar con ALLOW_MOCK_TOKENS=true
+  const allowMock = (process.env.ALLOW_MOCK_TOKENS
+    ? process.env.ALLOW_MOCK_TOKENS !== 'false'
+    : (process.env.NODE_ENV !== 'production'));
   if (allowMock && token && token.startsWith('mock-')) {
     console.log('[AuthMiddleware] Usando bypass de desarrollo para token mock');
     // Extraer datos del token mock (formato: mock-{uid}-{email})

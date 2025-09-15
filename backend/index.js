@@ -17,6 +17,8 @@ if (fs.existsSync(secretEnvPath)) {
 }
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 // Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
@@ -90,14 +92,43 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 4004; // Render inyec
 
 const app = express();
 
-// Configurar CORS para permitir credenciales y origen configurable por entorno
+// Seguridad básica
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
+// Configurar CORS por allowlist (coma-separado)
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:5173';
+const ALLOWED_ORIGINS = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
-  origin: ALLOWED_ORIGIN,
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Rate limiting global y por rutas costosas
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_MAX || 1000),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
+
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: Number(process.env.RATE_LIMIT_AI_MAX || 60),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/ai', aiLimiter);
+app.use('/api/ai-image', aiLimiter);
+app.use('/api/ai-suppliers', aiLimiter);
 
 // Middleware de correlación: X-Request-ID en cada petición
 app.use((req, res, next) => {
@@ -318,9 +349,17 @@ app.get('/api/transactions', async (req, res) => {
 });
 
 // Middleware de manejo de errores
-app.use((err, _req, res, _next) => {
-  logger.error(err.stack || err);
-  res.status(500).json({ error: 'Internal server error' });
+app.use((err, req, res, _next) => {
+  try {
+    const requestId = req?.id || null;
+    const status = Number(err?.status || err?.statusCode || 500);
+    const code = String(err?.code || 'internal_error');
+    const message = String(err?.message || 'Internal server error');
+    logger.error(`[${requestId || 'n/a'}] ${req?.method || ''} ${req?.originalUrl || ''} -> ${status} ${code}`, err);
+    res.status(status).json({ success: false, error: { code, message }, requestId });
+  } catch (e) {
+    res.status(500).json({ success: false, error: { code: 'internal_error', message: 'Internal server error' } });
+  }
 });
 
 // Captura de errores globales para que se muestren en CMD
