@@ -28,6 +28,7 @@ const SeatingPlanSidebar = ({
   onAutoAssign,
   deleteTable,
   duplicateTable,
+  globalMaxSeats = 0,
   className = ""
 }) => {
   const { t } = useTranslations();
@@ -180,7 +181,7 @@ const SeatingPlanSidebar = ({
           </div>
 
           {/* Editor de Mesa */}
-            <TableEditor table={selectedTable} onChange={onTableDimensionChange} onClose={() => setShowAvailableGuests(false)} />
+            <TableEditor table={selectedTable} globalMaxSeats={globalMaxSeats} onChange={onTableDimensionChange} onClose={() => setShowAvailableGuests(false)} />
             {/* Contenido de Mesa Seleccionada */}
           <div className="p-4 space-y-4">
             {/* Información básica */}

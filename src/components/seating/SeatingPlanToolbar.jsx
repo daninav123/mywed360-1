@@ -17,6 +17,15 @@ import {
   Cloud,
   CloudOff,
   Trash,
+  Ruler,
+  Magnet,
+  RotateCcw,
+  RotateCw,
+  Image as ImageIcon,
+  Columns,
+  Rows,
+  AlertTriangle,
+  Users,
 } from 'lucide-react';
 
 const SeatingPlanToolbar = ({
@@ -32,19 +41,39 @@ const SeatingPlanToolbar = ({
   onOpenBanquetConfig,
   onOpenSpaceConfig,
   onOpenTemplates,
+  onOpenBackground,
   onAutoAssign,
   onClearBanquet,
   syncStatus,
   showTables = true,
   onToggleShowTables,
+  // Vista avanzada
+  showRulers = false,
+  onToggleRulers,
+  snapEnabled = false,
+  onToggleSnap,
+  gridStep = 20,
+  onExportSVG,
+  showSeatNumbers = false,
+  onToggleSeatNumbers,
+  onRotateLeft,
+  onRotateRight,
+  onAlign,
+  onDistribute,
+  validationsEnabled = true,
+  onToggleValidations,
+  globalMaxSeats = 0,
+  onOpenCapacity,
   className = ""
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showAlignMenu, setShowAlignMenu] = useState(false);
   const handleToggleTables = () => {
     if (onToggleShowTables) onToggleShowTables();
     setShowTablesLocal(s => !s);
   };
   const exportRef = useRef(null);
+  const alignRef = useRef(null);
   const { t } = useTranslations();
   const [showTablesLocal, setShowTablesLocal] = useState(showTables);
 
@@ -53,6 +82,9 @@ const SeatingPlanToolbar = ({
     const onClickAway = (e) => {
       if (exportRef.current && !exportRef.current.contains(e.target)) {
         setShowExportMenu(false);
+      }
+      if (alignRef.current && !alignRef.current.contains(e.target)) {
+        setShowAlignMenu(false);
       }
     };
     document.addEventListener('mousedown', onClickAway);
@@ -142,6 +174,51 @@ const SeatingPlanToolbar = ({
               {showTablesLocal ? t('seating.toolbar.hideTables',{defaultValue:'Mesas'}) : t('seating.toolbar.showTables',{defaultValue:'Mesas'})}
             </span>
           </button>
+          {/* Regla */}
+          <button type="button"
+            onClick={onToggleRulers}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${showRulers ? 'text-blue-700' : ''}`}
+            title={showRulers ? 'Ocultar reglas' : 'Mostrar reglas'}
+            aria-pressed={showRulers}
+            aria-label={showRulers ? 'Ocultar reglas' : 'Mostrar reglas'}
+          >
+            <Ruler className="h-4 w-4"/>
+            <span className="hidden sm:inline">Reglas</span>
+          </button>
+
+          {/* Snap a cuadrícula */}
+          <button type="button"
+            onClick={onToggleSnap}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${snapEnabled ? 'text-blue-700' : ''}`}
+            title={snapEnabled ? `Snap: ${gridStep} cm` : 'Activar snap a cuadrícula'}
+            aria-pressed={snapEnabled}
+            aria-label={snapEnabled ? `Desactivar snap (${gridStep} cm)` : 'Activar snap a cuadrícula'}
+          >
+            <Magnet className="h-4 w-4"/>
+            <span className="hidden sm:inline">Snap</span>
+          </button>
+
+          {/* Numeración */}
+          <button type="button"
+            onClick={onToggleSeatNumbers}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${showSeatNumbers ? 'text-blue-700' : ''}`}
+            title={showSeatNumbers ? 'Ocultar numeración' : 'Mostrar numeración'}
+            aria-pressed={showSeatNumbers}
+          >
+            <Rows className="h-4 w-4" />
+            <span className="hidden sm:inline">Números</span>
+          </button>
+
+          {/* Validaciones en vivo */}
+          <button type="button"
+            onClick={onToggleValidations}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${validationsEnabled ? 'text-blue-700' : ''}`}
+            title={validationsEnabled ? 'Desactivar validaciones' : 'Activar validaciones'}
+            aria-pressed={validationsEnabled}
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <span className="hidden sm:inline">Check</span>
+          </button>
         </div>
 
         {/* Grupo: Configuración */}
@@ -181,6 +258,18 @@ const SeatingPlanToolbar = ({
           )}
 
           {tab === 'banquet' && (
+            <button type="button"
+              onClick={onOpenCapacity}
+              className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+              title={`Capacidad global: ${globalMaxSeats || '—'}`}
+              aria-label="Definir capacidad global"
+            >
+              <Users className="h-4 w-4" />
+              <span className="hidden sm:inline">Cap: {globalMaxSeats || '—'}</span>
+            </button>
+          )}
+
+          {tab === 'banquet' && (
             <button type="button" data-testid="clear-banquet-btn"
               onClick={onClearBanquet}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-red-50 text-red-600"
@@ -214,6 +303,49 @@ const SeatingPlanToolbar = ({
             <Palette className="h-4 w-4" />
             <span className="hidden sm:inline">{t('seating.toolbar.templates', { defaultValue: 'Plantillas' })}</span>
           </button>
+
+          {/* Fondo */}
+          <button type="button"
+            onClick={onOpenBackground}
+            className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+            title="Configurar fondo"
+            aria-label="Configurar fondo"
+          >
+            <ImageIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Fondo</span>
+          </button>
+
+          {/* Rotación rápida */}
+          {tab === 'banquet' && (
+            <>
+              <button type="button" onClick={onRotateLeft} className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100" title="Rotar -5°"><RotateCcw className="h-4 w-4" /><span className="hidden sm:inline">-5°</span></button>
+              <button type="button" onClick={onRotateRight} className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100" title="Rotar +5°"><RotateCw className="h-4 w-4" /><span className="hidden sm:inline">+5°</span></button>
+            </>
+          )}
+
+          {/* Alinear / Distribuir */}
+          {tab === 'banquet' && (
+            <div ref={alignRef} className="relative">
+              <button type="button" onClick={()=>setShowAlignMenu(s=>!s)} className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100" title="Alinear/Distribuir">
+                <Columns className="h-4 w-4" />
+                <span className="hidden sm:inline">Alinear</span>
+              </button>
+              {showAlignMenu && (
+                <div className="absolute top-full left-0 mt-1 bg-white border rounded shadow z-10 text-sm">
+                  <div className="px-3 py-1 font-medium text-gray-600">Alinear</div>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','start'); setShowAlignMenu(false);}}>Izquierda</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','center'); setShowAlignMenu(false);}}>Centro X</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','end'); setShowAlignMenu(false);}}>Derecha</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','start'); setShowAlignMenu(false);}}>Arriba</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','center'); setShowAlignMenu(false);}}>Centro Y</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','end'); setShowAlignMenu(false);}}>Abajo</button>
+                  <div className="px-3 py-1 font-medium text-gray-600 border-t">Distribuir</div>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('x'); setShowAlignMenu(false);}}>Horizontal</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('y'); setShowAlignMenu(false);}}>Vertical</button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Grupo: Exportación (menú) */}
@@ -248,6 +380,12 @@ const SeatingPlanToolbar = ({
                 className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
               >
                 {t('seating.export.csv', { defaultValue: 'CSV' })}
+              </button>
+              <button type="button" data-testid="export-svg"
+                onClick={() => { onExportSVG?.(); setShowExportMenu(false); }}
+                className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+              >
+                SVG
               </button>
             </div>
           )}

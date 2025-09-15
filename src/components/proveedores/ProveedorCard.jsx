@@ -1,5 +1,5 @@
 import React from 'react';
-import { Eye, Edit2, Trash2, Calendar, Star, MapPin } from 'lucide-react';
+import { Eye, Edit2, Trash2, Calendar, Star, MapPin, Users } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 
@@ -109,6 +109,11 @@ const ProveedorCard = ({ provider, isSelected, onToggleSelect, onViewDetail, onE
             {provider.status}
           </span>
           <span className="text-sm font-medium text-gray-500">{provider.service}</span>
+          {provider.groupName && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 inline-flex items-center gap-1" title={`Grupo: ${provider.groupName}`}>
+              <Users size={12} /> {provider.groupName}
+            </span>
+          )}
         </div>
         
         {provider.contact && (

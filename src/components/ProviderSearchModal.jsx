@@ -158,7 +158,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
 
   // Función para buscar proveedores usando OpenAI directamente (solo si está permitido por flag)
   const fetchOpenAi = async () => {
-    const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+    const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
     if (!allowDirect) {
       setToast({
         message: 'Búsqueda IA vía backend no disponible y fallback directo deshabilitado.',

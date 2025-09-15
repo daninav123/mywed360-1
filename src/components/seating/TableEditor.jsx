@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TableEditor({ table, onChange, onClose }) {
+export default function TableEditor({ table, onChange, onClose, globalMaxSeats = 0 }) {
   if (!table) return null;
 
   const handleInput = (field) => (e) => {
@@ -39,6 +39,22 @@ export default function TableEditor({ table, onChange, onClose }) {
           min="1"
           value={table.seats || 8}
           onChange={handleInput('seats')}
+          className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+        />
+        <p className="mt-1 text-[11px] text-gray-500">
+          Capacidad efectiva: {parseInt(table.seats,10) || globalMaxSeats || '—'}
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-xs text-gray-600 mb-1">Rotación (°)</label>
+        <input
+          type="number"
+          min="-180"
+          max="180"
+          step="1"
+          value={table.angle || 0}
+          onChange={handleInput('angle')}
           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
         />
       </div>

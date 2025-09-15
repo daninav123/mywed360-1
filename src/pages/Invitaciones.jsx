@@ -28,6 +28,8 @@ export default function Invitaciones() {
     setLoading(true);
     setToast(null);
     try {
+      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuración');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {

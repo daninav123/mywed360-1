@@ -16,6 +16,7 @@ const SeatingPlanCanvas = ({
   onSelectTable,
   onTableDimensionChange,
   onAssignGuest,
+  onAssignGuestSeat,
   onToggleEnabled,
   onAddArea,
   onAddTable,
@@ -27,7 +28,13 @@ const SeatingPlanCanvas = ({
   drawMode = 'pan',
   onDrawModeChange,
   canvasRef,
-  className = ""
+  className = "",
+  showRulers = false,
+  gridStep = 20,
+  selectedIds = [],
+  showSeatNumbers = false,
+  background = null,
+  globalMaxSeats = 0,
 }) => {
   // DnDProvider se gestiona en el componente padre (SeatingPlanRefactored)
 
@@ -275,11 +282,8 @@ const SeatingPlanCanvas = ({
         ref={canvasRef}
         className="w-full h-full min-h-[600px] relative"
         style={{
-          backgroundImage: `
-            linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '20px 20px',
+          backgroundImage: 'none',
+          backgroundSize: 'auto',
           backgroundColor:'#f3f4f6',
           cursor: (
             drawMode === 'pan' ? (isPanning ? 'grabbing' : 'grab') :
@@ -299,6 +303,7 @@ const SeatingPlanCanvas = ({
           selectedTable={selectedTable}
           onSelectTable={onSelectTable}
           onAssignGuest={onAssignGuest}
+          onAssignGuestSeat={onAssignGuestSeat}
           onToggleEnabled={onToggleEnabled}
           addArea={onAddArea}
           onAddTable={onAddTable}
@@ -312,7 +317,62 @@ const SeatingPlanCanvas = ({
           offset={offset}
           onDeleteArea={onDeleteArea}
           onUpdateArea={onUpdateArea}
+          gridStep={gridStep}
+          selectedIds={selectedIds}
+          showSeatNumbers={showSeatNumbers}
+          background={background}
+          globalMaxSeats={globalMaxSeats}
         />
+
+        {/* Reglas superiores e izquierda */}
+        {showRulers && (
+          <>
+            <div className="absolute top-0 left-0 h-6 w-full bg-white/90 border-b border-gray-200 pointer-events-none" aria-hidden="true">
+              {(() => {
+                const el = canvasRef?.current;
+                const width = el?.getBoundingClientRect?.().width || 0;
+                const ticks = [];
+                const stepCm = Math.max(10, gridStep);
+                const startCm = Math.floor((-offset.x) / (scale*stepCm)) * stepCm;
+                for (let cm = startCm; cm <= (width - offset.x) / scale + stepCm; cm += stepCm) {
+                  const x = cm * scale + offset.x;
+                  const isMajor = (cm % 100) === 0;
+                  ticks.push(
+                    <div key={`rt-${cm}`} className="absolute" style={{ left: x, top: 0 }}>
+                      <div style={{ height: isMajor ? 12 : 8, width: 1, background:'#9ca3af' }} />
+                      {isMajor && (
+                        <div className="text-[10px] text-gray-600" style={{ transform:'translate(-50%,0)', marginTop: -1 }}>{(cm/100).toFixed(0)}m</div>
+                      )}
+                    </div>
+                  );
+                }
+                return ticks;
+              })()}
+            </div>
+            <div className="absolute top-0 left-0 w-6 h-full bg-white/90 border-r border-gray-200 pointer-events-none" aria-hidden="true">
+              {(() => {
+                const el = canvasRef?.current;
+                const height = el?.getBoundingClientRect?.().height || 0;
+                const ticks = [];
+                const stepCm = Math.max(10, gridStep);
+                const startCm = Math.floor((-offset.y) / (scale*stepCm)) * stepCm;
+                for (let cm = startCm; cm <= (height - offset.y) / scale + stepCm; cm += stepCm) {
+                  const y = cm * scale + offset.y;
+                  const isMajor = (cm % 100) === 0;
+                  ticks.push(
+                    <div key={`cl-${cm}`} className="absolute" style={{ top: y, left: 0 }}>
+                      <div style={{ width: isMajor ? 12 : 8, height: 1, background:'#9ca3af' }} />
+                      {isMajor && (
+                        <div className="text-[10px] text-gray-600" style={{ transform:'translate(0,-50%) rotate(-90deg)', transformOrigin:'left top' }}>{(cm/100).toFixed(0)}m</div>
+                      )}
+                    </div>
+                  );
+                }
+                return ticks;
+              })()}
+            </div>
+          </>
+        )}
         
         {/* Indicadores de dimensiones del salón y pasillo mínimo */}
         <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs text-gray-600">

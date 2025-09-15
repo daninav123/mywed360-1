@@ -253,6 +253,10 @@ class DiagnosticService {
    */
   async testOpenAIConfig() {
     try {
+      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      if (!allowDirect) {
+        return { status: 'warning', message: 'OpenAI directo deshabilitado (usa backend /api/ai)', details: {} };
+      }
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
       
       if (!apiKey) {

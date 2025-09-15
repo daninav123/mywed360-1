@@ -1120,6 +1120,8 @@ const handleAiSearch = async (e) => {
   - location: Ubicación y política de desplazamiento
   - coverage: Área geográfica atendida (INCLUIR EXPLÍCITAMENTE ${formattedLocation ? formattedLocation.split(',')[0] : 'la ubicación requerida'})`;
       
+      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuración');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {

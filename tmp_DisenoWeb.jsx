@@ -16,13 +16,8 @@ export default function DisenoWeb() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState('personalizada');
+  const [publishEnabled, setPublishEnabled] = useState(true);
   const [publishSlug, setPublishSlug] = useState('');
-  const [slugSuggestions, setSlugSuggestions] = useState([]);
-  const [publicUrl, setPublicUrl] = useState('');
-  const [showQR, setShowQR] = useState(false);
-  const [checkingSlug, setCheckingSlug] = useState(false);
-  const [slugAvailable, setSlugAvailable] = useState(null); // true | false | null
-  const [slugError, setSlugError] = useState('');
   
   // Plantillas predefinidas
   const templates = {
@@ -66,72 +61,6 @@ export default function DisenoWeb() {
       } catch(e){ console.error(e);} 
     })();
   },[uid]);
-
-  // Construir sugerencias de slug a partir del perfil
-  useEffect(()=>{
-    function toSlug(s){
-      return String(s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-    }
-    function firstWord(s){ return String(s||'').trim().split(/\s+/)[0] || ''; }
-    function yyyymmdd(d){ try{ const dt=new Date(d); return `${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,'0')}${String(dt.getDate()).padStart(2,'0')}` }catch{ return ''}}
-    try{
-      const bFull = profile?.brideInfo?.nombre || profile?.brideName || profile?.bride || '';
-      const gFull = profile?.groomInfo?.nombre || profile?.groomName || profile?.groom || '';
-      const b = firstWord(bFull);
-      const g = firstWord(gFull);
-      const date = profile?.ceremonyInfo?.fecha || profile?.date;
-      const d = yyyymmdd(date || Date.now());
-      const year = (d||'').slice(0,4);
-      const s1 = [toSlug(b), toSlug(g), d].filter(Boolean).join('-'); // novia-novio-fecha
-      const s2 = [toSlug(g), toSlug(b), d].filter(Boolean).join('-'); // novio-novia-fecha
-      const s3 = [toSlug(b), toSlug(g)].filter(Boolean).join('-'); // sin fecha
-      const s4 = [toSlug(g), toSlug(b)].filter(Boolean).join('-'); // sin fecha invertido
-      const bi = (b||'').slice(0,1), gi = (g||'').slice(0,1);
-      const s5 = [toSlug(`${bi}${gi}`), d].filter(Boolean).join('-'); // iniciales+fecha
-      const s6 = [toSlug(`${bi}${gi}`), year].filter(Boolean).join('-'); // iniciales+año
-      const list = Array.from(new Set([s1,s2,s3,s4,s5,s6].filter(Boolean)));
-      setSlugSuggestions(list);
-      if (!publishSlug && list.length) setPublishSlug(list[0]);
-    } catch {}
-  },[profile]);
-
-  // Validación + disponibilidad del slug (en vivo)
-  useEffect(()=>{
-    const reserved = new Set(['www','api','mg','mail','cdn','static','assets','admin']);
-    const valid = (s) => /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(s);
-    let timer;
-    setSlugError('');
-    setSlugAvailable(null);
-    if (!publishSlug) return;
-    if (!valid(publishSlug)) { setSlugError('Slug inválido'); return; }
-    if (reserved.has(publishSlug)) { setSlugError('Slug reservado'); return; }
-    setCheckingSlug(true);
-    timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/public/weddings/${encodeURIComponent(publishSlug)}`);
-        if (res.status === 404) {
-          // puede ser not-found (libre) o expired
-          try {
-            const data = await res.json();
-            if (data?.error === 'expired') {
-              setSlugAvailable(false); // ocupado (expirado pero utilizado)
-            } else {
-              setSlugAvailable(true);
-            }
-          } catch { setSlugAvailable(true); }
-        } else if (res.status === 403 || res.ok) {
-          setSlugAvailable(false);
-        } else {
-          setSlugAvailable(null);
-        }
-      } catch {
-        setSlugAvailable(null);
-      } finally {
-        setCheckingSlug(false);
-      }
-    }, 400);
-    return () => timer && clearTimeout(timer);
-  }, [publishSlug]);
 
   const generateWeb = async () => {
     if (!prompt.trim()) return;
@@ -287,12 +216,11 @@ export default function DisenoWeb() {
       // Publicación por boda (si hay boda activa)
       if (activeWedding) {
         try {
-          const res = await apiPost(`/api/public/weddings/${encodeURIComponent(activeWedding)}/publish`, { html, slug: publishSlug || undefined }, { auth: true });
+          const res = await apiPost(`/api/public/weddings/${encodeURIComponent(activeWedding)}/publish`, { html, enabled: publishEnabled, slug: publishSlug || undefined }, { auth: true });
           if (res.ok) {
             const data = await res.json();
             if (data?.publicPath) {
-              const url = data?.publicUrl || (window.location.origin + data.publicPath);
-              setPublicUrl(url);
+              const url = data?.publicUrl || data.publicPath;
               alert(`¡Página publicada! URL pública: ${url}`);
             } else {
               alert('¡Página publicada!');
@@ -466,47 +394,11 @@ export default function DisenoWeb() {
                 placeholder="mi-boda-ana-luis"
                 className="border rounded px-3 py-2 text-sm"
               />
-              {publishSlug && (
-                <span className="text-sm">
-                  {checkingSlug ? 'Comprobando…' : slugError ? (
-                    <span className="text-red-600">{slugError}</span>
-                  ) : slugAvailable === true ? (
-                    <span className="text-green-600">Disponible</span>
-                  ) : slugAvailable === false ? (
-                    <span className="text-red-600">Ocupado</span>
-                  ) : null}
-                </span>
-              )}
             </div>
-            {slugSuggestions.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>Sugerencias:</span>
-                {slugSuggestions.map((s)=> (
-                  <button key={s} onClick={()=>setPublishSlug(s)} className={`px-2 py-1 rounded border ${publishSlug===s? 'bg-blue-50 border-blue-400':'border-gray-300 hover:border-blue-300'}`}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-            {slugSuggestions.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>Sugerencias:</span>
-                {slugSuggestions.map((s)=> (
-                  <button key={s} onClick={()=>setPublishSlug(s)} className={`px-2 py-1 rounded border ${publishSlug===s? 'bg-blue-50 border-blue-400':'border-gray-300 hover:border-blue-300'}`}>
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-            <button disabled={Boolean(slugError) || slugAvailable === false}
-              onClick={async()=>{
-                const url = publicUrl || (publishSlug ? `${window.location.origin}/p/${encodeURIComponent(publishSlug)}` : '');
-                if (!url) return;
-                try { await navigator.clipboard.writeText(url); alert('Enlace copiado'); } catch { alert(url); }
-              }}
-              className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded"
-            >Copiar enlace</button>
-            <button onClick={()=>setShowQR(true)} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Mostrar QR</button>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="checkbox" checked={publishEnabled} onChange={(e)=>setPublishEnabled(e.target.checked)} />
+              Habilitar página pública
+            </label>
             <button 
               onClick={() => {
                 const blob = new Blob([html], { type: 'text/html' });
@@ -528,19 +420,6 @@ export default function DisenoWeb() {
               <span>Descargar HTML</span>
             </button>
           </div>
-          {showQR && (
-            <div className="mt-4 p-4 border rounded inline-block">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-sm text-gray-600">QR de la web pública</div>
-                <button onClick={()=>setShowQR(false)} className="text-gray-500 hover:text-gray-700">Cerrar</button>
-              </div>
-              {(() => {
-                const url = publicUrl || (publishSlug ? `${window.location.origin}/p/${encodeURIComponent(publishSlug)}` : '');
-                const qr = url ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}` : '';
-                return qr ? <img src={qr} alt="QR" width={220} height={220} /> : null;
-              })()}
-            </div>
-          )}
         </div>
       )}
 

@@ -50,6 +50,9 @@ export const GanttChart = ({
     );
   }
 
+  const handleClick = (task) => {
+    if (typeof onTaskClick === 'function') onTaskClick(task);
+  };
   return (
     <Gantt
       tasks={cleanTasks}
@@ -64,7 +67,9 @@ export const GanttChart = ({
       barBackgroundColor="#a5b4fc"
       barBackgroundSelectedColor="#818cf8"
       todayColor="rgba(252,165,165,0.2)"
-      onClick={onTaskClick}
+      onClick={handleClick}
+      onSelect={(task)=>handleClick(task)}
+      onDoubleClick={(task)=>handleClick(task)}
     />
   );
 };

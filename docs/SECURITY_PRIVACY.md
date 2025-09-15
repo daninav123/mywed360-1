@@ -24,3 +24,8 @@
 - Trazabilidad de errores sin PII.
 - Procedimiento de comunicación y mitigación.
 
+## Protecciones contra abuso
+- Rate limiting por usuario (Firebase `uid`) en rutas de IA.
+  - Por defecto: 60 solicitudes/min en `NODE_ENV=production`; 0 en otros entornos.
+  - Configurable con `RATE_LIMIT_AI_MAX` (poner `0` para desactivar).
+  - Si no hay `uid`, se aplica fallback por IP. `trust proxy` está habilitado para entornos detrás de proxy (Render).

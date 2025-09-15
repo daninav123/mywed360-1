@@ -54,6 +54,7 @@ import WeddingSite from './pages/WeddingSite';
 import RSVPConfirm from './pages/RSVPConfirm';
 import AcceptInvitation from './pages/AcceptInvitation';
 import RSVPDashboard from './pages/RSVPDashboard';
+import PublicWedding from './pages/PublicWedding';
 
 import './i18n';
 import DiagnosticPanel from './components/DiagnosticPanel';
@@ -111,6 +112,7 @@ function App() {
 
             {/* Rutas públicas */}
             <Route path="w/:uid" element={<WeddingSite />} />
+            <Route path="p/:slug" element={<PublicWedding />} />
             <Route path="invitation/:code" element={<AcceptInvitation />} />
             <Route path="rsvp/:token" element={<RSVPConfirm />} />
 

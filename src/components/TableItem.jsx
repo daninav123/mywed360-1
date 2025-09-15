@@ -8,7 +8,7 @@ const firstName = (str='?') => {
   const first = String(str).trim().split(/\s+/)[0] || '?';
   return first.length>8? first.slice(0,8)+'…' : first;
 };
-function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false }) {
+function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, onAssignGuestSeat, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false, showNumbers = false, danger = false, dangerReason = '', globalMaxSeats = 0 }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
   const getLabel = useCallback((name='?') => {
     if (scale >= 1.5) {
@@ -22,12 +22,46 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
   const ref = useRef(null);
 
   // drop logic
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [{ isOver, client }, drop] = useDrop(() => ({
     accept: ItemTypes.GUEST,
     canDrop: () => table.enabled !== false && !table.guestId,
-    drop: (item) => onAssignGuest(table.id, item.id),
-    collect: (monitor) => ({ isOver: monitor.isOver() }),
+    drop: (item, monitor) => {
+      const clientOffset = monitor.getClientOffset();
+      if (clientOffset && typeof onAssignGuestSeat === 'function' && (parseInt(table.seats,10)||0) > 0) {
+        const seatIdx = computeSeatIndexFromPointer(clientOffset);
+        if (Number.isInteger(seatIdx)) return onAssignGuestSeat(table.id, seatIdx, item.id);
+      }
+      onAssignGuest(table.id, item.id);
+    },
+    collect: (monitor) => ({ isOver: monitor.isOver(), client: monitor.getClientOffset() }),
   }), [table.id]);
+
+  const computeSeatIndexFromPointer = (clientOffset) => {
+    const rect = containerRef?.current?.getBoundingClientRect?.() || (ref.current?.offsetParent || ref.current?.parentElement)?.getBoundingClientRect?.();
+    if (!rect) return null;
+    const px = clientOffset.x - rect.left;
+    const py = clientOffset.y - rect.top;
+    const cx = ((table.x ?? 0) * scale) + (offset?.x ?? 0);
+    const cy = ((table.y ?? 0) * scale) + (offset?.y ?? 0);
+    const seats = parseInt(table.seats,10) || 0;
+    if (seats <= 0) return null;
+    if (table.shape === 'circle') {
+      const ang = Math.atan2(py - cy, px - cx);
+      const step = (Math.PI * 2) / seats;
+      let idx = Math.round((ang < 0 ? ang + Math.PI * 2 : ang) / step) % seats;
+      return idx;
+    }
+    // rectangular: proyectar a filas superior/inferior
+    const width = (table.width || 80) * scale;
+    const height = (table.height || table.length || 60) * scale;
+    const left = cx - width/2;
+    const top = cy - height/2;
+    const cols = Math.max(1, Math.ceil(seats / 2));
+    const relX = Math.max(0, Math.min(1, (px - left) / width));
+    const col = Math.min(cols-1, Math.max(0, Math.round(relX * (cols - 1))));
+    const topSide = Math.abs(py - top) < Math.abs(py - (top + height));
+    return topSide ? col : (cols + col);
+  };
 
   const handlePointerDown = (e) => {
     e.stopPropagation();
@@ -165,14 +199,16 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
     width: sizeX * scale,
     height: sizeY * scale,
     backgroundColor: disabled ? '#e5e7eb' : '#fef3c7',
-    border: selected ? '3px solid #2563eb' : '2px solid #f59e0b',
+    border: selected ? '3px solid #2563eb' : (danger ? '2px solid #ef4444' : '2px solid #f59e0b'),
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: disabled ? 'not-allowed' : 'grab',
     userSelect: 'none',
-    boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.25)' : 'none'
+    boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.25)' : 'none',
+    transform: `rotate(${table.angle || 0}deg)`,
+    transformOrigin: 'center center'
   };
 
   return (
@@ -181,7 +217,7 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
       style={{...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor}} 
       onPointerDown={disabled || !canMove ? undefined : handlePointerDown}
       onContextMenu={e=>{e.preventDefault(); onToggleEnabled(table.id);}}
-      onClick={(e)=>{e.stopPropagation(); onSelect && onSelect(table.id);}}
+      onClick={(e)=>{e.stopPropagation(); onSelect && onSelect(table.id, !!e.shiftKey);}}
       onDoubleClick={()=>onOpenConfig(table)}> 
       <button 
         onClick={(e)=>{e.stopPropagation(); onAssignGuest(table.id, null);}}
@@ -192,10 +228,10 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
       {table.seats != null && (
         <div
           className="absolute bottom-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold"
-          style={{ background:'#111827', color:'#fff', opacity:0.85 }}
+          style={{ background:(()=>{ const cap=(parseInt(table.seats,10)||globalMaxSeats||0); return cap>0 && guestCount>cap ? '#ef4444' : '#111827'; })(), color:'#fff', opacity:0.9 }}
           title="Ocupación de la mesa"
         >
-          {Math.max(0, Math.min(guestCount, table.seats))}/{table.seats}
+          {guestCount}/{parseInt(table.seats,10) || globalMaxSeats || '—'}
         </div>
       )}
     {disabled && <div className="absolute inset-0 bg-white bg-opacity-50 rounded" />} 
@@ -268,6 +304,38 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
                 top: sy - 12,
               }}
             >{getLabel(guestsList[i]?.name || guestsList[i]?.nombre || '')}</div>
+          );
+        });
+      })()}
+
+      {/* Numeración de asientos opcional */}
+      {showNumbers && table.seats && table.seats > 0 && (() => {
+        const seats = table.seats;
+        const centerX = (sizeX * scale) / 2;
+        const centerY = (sizeY * scale) / 2;
+        if (table.shape === 'rectangle') {
+          const cols = Math.ceil(seats / 2);
+          return Array.from({ length: seats }).map((_, i) => {
+            const isTop = i < cols;
+            const idx = isTop ? i : i - cols;
+            const px = (sizeX * scale) / (cols + 1) * (idx + 1);
+            const off = 4 * scale;
+            const py = isTop ? off : (sizeY * scale - off);
+            return (
+              <div key={`n-${i}`}
+                style={{ position:'absolute', left: px-6, top: py-6, width:12, height:12, borderRadius:2, background:'#111827', color:'#fff', fontSize:8, display:'flex', alignItems:'center', justifyContent:'center', opacity:0.8 }}
+                title={`Asiento ${i+1}`}
+              >{i+1}</div>
+            );
+          });
+        }
+        return Array.from({ length: seats }).map((_, i) => {
+          const ang = (Math.PI * 2 * i) / seats;
+          const r = (Math.max(sizeX,sizeY) * scale) / 2 - 6 * scale;
+          const sx = centerX + Math.cos(ang) * r;
+          const sy = centerY + Math.sin(ang) * r;
+          return (
+            <div key={`n-${i}`} style={{ position:'absolute', left: sx-6, top: sy-6, width:12, height:12, borderRadius:2, background:'#111827', color:'#fff', fontSize:8, display:'flex', alignItems:'center', justifyContent:'center', opacity:0.8 }} title={`Asiento ${i+1}`}>{i+1}</div>
           );
         });
       })()}

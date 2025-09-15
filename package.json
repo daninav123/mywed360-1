@@ -7,7 +7,8 @@
         "node": ">=20.0.0",
         "npm": ">=10.0.0"
     },
-    "scripts": {
+  "scripts": {
+        "postinstall": "npm --prefix backend install",
         "start": "node backend/index.js",
         "backend:ci": "node backend/index.js",
         "frontend:ci": "vite --host --port 5173 --strictPort",

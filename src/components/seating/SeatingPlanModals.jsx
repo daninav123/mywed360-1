@@ -37,25 +37,32 @@ const SeatingPlanModals = ({
   ceremonyConfigOpen,
   banquetConfigOpen,
   spaceConfigOpen,
+  backgroundOpen,
+  capacityOpen,
   templateOpen,
   
   // Handlers de cierre
   onCloseCeremonyConfig,
   onCloseBanquetConfig,
   onCloseSpaceConfig,
+  onCloseBackground,
+  onCloseCapacity,
   onCloseTemplate,
   
   // Handlers de configuración
   onGenerateSeatGrid,
   onGenerateBanquetLayout,
   onSaveHallDimensions,
+  onSaveBackground,
+  onSaveCapacity,
   onApplyTemplate,
   
   // Estado actual
   hallSize,
   areas = [],
   guests = [],
-  tables = []
+  tables = [],
+  background = null
 }) => {
   return (
     <>
@@ -69,6 +76,30 @@ const SeatingPlanModals = ({
         <CeremonyConfigForm
           onGenerate={onGenerateSeatGrid}
           onClose={onCloseCeremonyConfig}
+        />
+      </Modal>
+
+      {/* Modal de capacidad global */}
+      <Modal
+        isOpen={!!capacityOpen}
+        onClose={onCloseCapacity}
+        title="Capacidad Global"
+        icon={Users}
+      >
+        <CapacityForm onSave={onSaveCapacity} onClose={onCloseCapacity} />
+      </Modal>
+
+      {/* Modal de fondo/plano */}
+      <Modal
+        isOpen={!!backgroundOpen}
+        onClose={onCloseBackground}
+        title="Fondo del salón"
+        icon={Maximize}
+      >
+        <BackgroundForm
+          background={background}
+          onSave={onSaveBackground}
+          onClose={onCloseBackground}
         />
       </Modal>
 
@@ -640,3 +671,89 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
 };
 
 export default SeatingPlanModals;
+
+// Formulario de fondo calibrado
+const BackgroundForm = ({ background, onSave, onClose }) => {
+  const [dataUrl, setDataUrl] = React.useState(background?.dataUrl || '');
+  const [widthM, setWidthM] = React.useState(background?.widthCm ? background.widthCm/100 : 18);
+  const [opacity, setOpacity] = React.useState(background?.opacity ?? 0.5);
+
+  const onFile = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { setDataUrl(String(e.target?.result || '')); };
+    reader.readAsDataURL(file);
+  };
+
+  const submit = (e) => {
+    e.preventDefault();
+    const widthCm = Math.max(100, Math.round((parseFloat(widthM) || 18) * 100));
+    onSave?.({ dataUrl, widthCm, opacity: Math.max(0, Math.min(1, parseFloat(opacity))) });
+    onClose?.();
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Imagen de fondo</label>
+        <input type="file" accept="image/*" onChange={(e)=> onFile(e.target.files?.[0])} className="w-full text-sm" />
+        {dataUrl && (
+          <img src={dataUrl} alt="preview" className="mt-2 max-h-40 object-contain border rounded" />
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Ancho real (m)</label>
+          <input
+            type="number"
+            min="1"
+            max="200"
+            step="0.1"
+            value={widthM}
+            onChange={(e)=> setWidthM(e.target.value)}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Opacidad</label>
+          <input
+            type="number"
+            min="0"
+            max="1"
+            step="0.05"
+            value={opacity}
+            onChange={(e)=> setOpacity(e.target.value)}
+            className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
+        <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+      </div>
+    </form>
+  );
+};
+
+// Formulario de capacidad global
+const CapacityForm = ({ onSave, onClose }) => {
+  const [max, setMax] = React.useState(8);
+  const submit = (e) => {
+    e.preventDefault();
+    const n = Math.max(1, parseInt(max, 10) || 0);
+    onSave?.(n);
+    onClose?.();
+  };
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Máximo invitados por mesa</label>
+        <input type="number" min="1" max="100" value={max} onChange={(e)=> setMax(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
+        <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+      </div>
+    </form>
+  );
+};

@@ -160,7 +160,7 @@ function Nav() {
   }, []);
 
   return (
-    <nav className='fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-50'>
+    <nav className='fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30'>
       {/* Navegación principal */}
       <div className='flex justify-around flex-1'>
         {navItems.map(({ path, label }, idx) => {

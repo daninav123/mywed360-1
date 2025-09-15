@@ -32,6 +32,7 @@ function Perfil() {
     banquetPlace: '',
     schedule: '',
     giftAccount: '',
+    weddingDate: '',
     numGuests: '',
   });
   // Campo de texto amplio para notas importantes de la boda
@@ -193,7 +194,8 @@ function Perfil() {
               banquetPlace: wi.banquetPlace || '',
               schedule: wi.schedule || '',
               giftAccount: wi.giftAccount || '',
-              numGuests: wi.numGuests || '',
+              weddingDate: wi.weddingDate || '',
+          numGuests: wi.numGuests || '',
             });
             if (wi.importantInfo) setImportantInfo(wi.importantInfo);
           }
@@ -263,6 +265,7 @@ function Perfil() {
           <Input label="Lugar de la celebración" name="celebrationPlace" value={weddingInfo.celebrationPlace} onChange={handleWeddingChange} />
           <Input label="Lugar del banquete" name="banquetPlace" value={weddingInfo.banquetPlace} onChange={handleWeddingChange} />
           <Input label="Horario" name="schedule" value={weddingInfo.schedule} onChange={handleWeddingChange} />
+          <Input label="Fecha de la boda" name="weddingDate" type="date" value={weddingInfo.weddingDate} onChange={handleWeddingChange} />
           <Input label="Cuenta de regalos" name="giftAccount" value={weddingInfo.giftAccount} onChange={handleWeddingChange} />
           <Input label="Número de invitados" name="numGuests" type="number" value={weddingInfo.numGuests} readOnly />
         </div>

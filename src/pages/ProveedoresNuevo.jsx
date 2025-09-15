@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -14,6 +14,7 @@ import AISearchModal from '../components/proveedores/ai/AISearchModal';
 import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
+import useSupplierGroups from '../hooks/useSupplierGroups';
 
 // Importar hooks personalizados
 import useProveedores from '../hooks/useProveedores';
@@ -21,7 +22,7 @@ import useAISearch from '../hooks/useAISearch';
 import { useAuth } from '../hooks/useAuth';
 
 const Proveedores = () => {
-  // Diagnóstico: verificar que la versión nueva se carga en el navegador
+  // DiagnÃ³stico: verificar que la versiÃ³n nueva se carga en el navegador
   console.log('%c[Lovenda] ProveedoresNuevo cargado', 'color: #10B981; font-weight: bold;');
   // Obtener funcionalidad de los hooks personalizados
   const {
@@ -65,8 +66,9 @@ const Proveedores = () => {
   } = useAISearch();
 
   const { user } = useAuth();
+  const { groups } = useSupplierGroups();
 
-  // Estado local para modales y pestañas
+  // Estado local para modales y pestaÃ±as
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [showEditProviderForm, setShowEditProviderForm] = useState(false);
   const [showAISearchModal, setShowAISearchModal] = useState(false);
@@ -85,7 +87,7 @@ const Proveedores = () => {
     }
   }, [user, loadProviders]);
 
-  // Funciones para manejar la visualización de modales
+  // Funciones para manejar la visualizaciÃ³n de modales
   const handleViewDetail = (provider) => {
     setSelectedProvider(provider);
     setActiveTab('info');
@@ -139,15 +141,15 @@ const Proveedores = () => {
   };
 
   const handleDeleteProvider = async (providerId) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
+    if (window.confirm('Â¿EstÃ¡s seguro de que deseas eliminar este proveedor?')) {
       await deleteProvider(providerId);
     }
   };
 
   const handleSubmitReservation = async (reservationData) => {
-    // En una implementación real, esto guardaría la reserva en la base de datos
+    // En una implementaciÃ³n real, esto guardarÃ­a la reserva en la base de datos
     console.log('Reserva creada:', reservationData);
-    // Actualizar el estado del proveedor a 'Contactado' si no está ya confirmado/seleccionado
+    // Actualizar el estado del proveedor a 'Contactado' si no estÃ¡ ya confirmado/seleccionado
     if (selectedProvider && 
         selectedProvider.status !== 'Confirmado' && 
         selectedProvider.status !== 'Seleccionado') {
@@ -172,11 +174,11 @@ const Proveedores = () => {
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
+          <h1 className="text-2xl font-bold">GestiÃ³n de Proveedores</h1>
           
           <div className="flex space-x-2">
             <Button onClick={handleOpenAISearch} className="flex items-center">
-              <Sparkles size={16} className="mr-1" /> Búsqueda IA
+              <Sparkles size={16} className="mr-1" /> BÃºsqueda IA
             </Button>
             <Button onClick={handleNewProvider} className="flex items-center">
               <Plus size={16} className="mr-1" /> Nuevo Proveedor
@@ -214,7 +216,7 @@ const Proveedores = () => {
               clearFilters={clearFilters}
               handleViewDetail={handleViewDetail}
               tab={tab}
-              setTab={setTab}
+              setTab={setTab}\n              highlightGroupId={highlightGroupId}
               selected={selectedProviderIds}
               toggleSelect={toggleSelectProvider}
               toggleFavorite={toggleFavoriteProvider}
@@ -232,7 +234,7 @@ const Proveedores = () => {
                       Deseleccionar todo
                     </Button>
                     <Button size="sm">
-                      Acción masiva
+                      AcciÃ³n masiva
                     </Button>
                   </div>
                 </div>
@@ -249,10 +251,11 @@ const Proveedores = () => {
             onEdit={handleEditProvider}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            onOpenGroups={() => setTab('groups')}
           />
         )}
 
-        {/* Modal para añadir nuevo proveedor */}
+        {/* Modal para aÃ±adir nuevo proveedor */}
         {showNewProviderForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <ProveedorForm
@@ -273,7 +276,7 @@ const Proveedores = () => {
           </div>
         )}
 
-        {/* Modal de búsqueda con IA */}
+        {/* Modal de bÃºsqueda con IA */}
         <AISearchModal
           isOpen={showAISearchModal}
           onClose={() => setShowAISearchModal(false)}
@@ -317,10 +320,20 @@ const Proveedores = () => {
               {selectedProviderIds.map(pid => {
                 const provider = providers.find(p => p.id === pid);
                 if(!provider) return null;
+                // inyectar nombre de grupo si estÃ¡ en grupos
+                let groupName = provider.groupName;
+                if (!groupName && Array.isArray(groups)) {
+                  for (const g of groups) {
+                    if (Array.isArray(g.memberIds) && g.memberIds.includes(pid)) {
+                      groupName = g.name || '';
+                      break;
+                    }
+                  }
+                }
                 return (
                   <ProveedorCard
                     key={pid}
-                    provider={provider}
+                    provider={{ ...provider, groupName }}
                     isSelected={true}
                     onToggleSelect={() => toggleSelectProvider(pid)}
                     onViewDetail={() => handleViewDetail(provider)}
@@ -337,6 +350,7 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
 
 
 

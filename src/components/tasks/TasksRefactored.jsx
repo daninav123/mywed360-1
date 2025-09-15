@@ -655,7 +655,7 @@ export default function Tasks() {
       </div>
       
       {/* Componente para el diagrama Gantt */}
-      <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
+      <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg relative z-[60]">
         <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
         <div className="h-96 overflow-x-auto overflow-y-hidden mb-4 border border-gray-100 rounded-lg min-w-[600px]">
           {safeGanttTasks && safeGanttTasks.length > 0 ? (

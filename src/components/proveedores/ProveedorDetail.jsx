@@ -6,6 +6,8 @@ import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { post as apiPost } from '../../services/apiClient';
 import { useWedding } from '../../context/WeddingContext';
+import useSupplierGroups from '../../hooks/useSupplierGroups';
+import Toast from '../Toast';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -24,12 +26,17 @@ import { useWedding } from '../../context/WeddingContext';
  * @param {Function} props.setActiveTab - Función para cambiar la pestaña activa
  * @returns {React.ReactElement} Componente de detalle de proveedor
  */
-const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab }) => {
+const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const { activeWedding } = useWedding();
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState(null);
   const navigate = useNavigate();
+
+  const { removeMember } = useSupplierGroups();
+  const [removing, setRemoving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [groupCleared, setGroupCleared] = useState(false);
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -182,11 +189,21 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
               {/* Información principal */}
               <Card>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-wrap gap-2">
                     <span className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}>
                       {provider.status}
                     </span>
                     <span className="ml-2 text-gray-500">{provider.service}</span>
+                    {!!provider.groupName && !groupCleared && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenGroups?.(provider.groupId)}
+                        className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
+                        title={`Ir al grupo: ${provider.groupName}`}
+                      >
+                        Grupo: {provider.groupName}
+                      </button>
+                    )}
                   </div>
                   {onEdit && (
                     <Button 
@@ -195,6 +212,29 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
                       size="sm"
                     >
                       <Edit2 size={16} className="mr-1" /> Editar
+                    </Button>
+                  )}
+                  {provider.groupId && (
+                    <Button
+                      onClick={async () => {
+                        if (removing) return;
+                        const ok = window.confirm('¿Quitar este proveedor del grupo?');
+                        if (!ok) return;
+                        try {
+                          setRemoving(true);
+                          await removeMember(provider.groupId, provider.id);
+                          setGroupCleared(true);
+                          setToast({ type: 'success', message: 'Proveedor quitado del grupo' });
+                        } finally {
+                          setRemoving(false);
+                        }
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="ml-2 text-red-600 border-red-200 hover:bg-red-50"
+                      disabled={removing}
+                    >
+                      {removing ? 'Quitando…' : 'Quitar del grupo'}
                     </Button>
                   )}
                 </div>
@@ -373,6 +413,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab })
         </div>
       </div>
     </div>
+    {toast && (
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(null)}
+        duration={2500}
+      />
+    )}
   );
 };
 

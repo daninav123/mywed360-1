@@ -94,6 +94,15 @@ Endpoints robustecidos (Zod opcional) en `backend/routes/rsvp.js`:
   - `SMTP_*`, `ALERT_EMAIL_*` (alertas email)
   - Resto de variables existentes (Firebase, Mailgun, etc.)
 
+### CORS y Rate Limiting (IA)
+- `ALLOWED_ORIGIN`: lista de orígenes permitidos separada por comas. Debe coincidir exactamente con `window.location.origin` del frontend. Ejemplo producción: `https://app.tu-dominio.com,https://www.tu-dominio.com`.
+- `RATE_LIMIT_AI_MAX`: solicitudes por minuto para rutas de IA (por usuario autenticado). Por defecto: 60/min en `NODE_ENV=production` y 0 en el resto. Pon `0` para desactivar.
+- El limitador cuenta por `uid` (Firebase) si existe; si no, cae a IP. `app.set('trust proxy', 1)` ya está activo para Render.
+
+### OpenAI directo en frontend (solo local)
+- `VITE_ENABLE_DIRECT_OPENAI`: cuando es `true`, el frontend puede usar la API de OpenAI directamente con `VITE_OPENAI_API_KEY` para pruebas locales.
+- En producción, mantenerlo ausente o `false` para forzar el uso del backend `/api/ai` y no exponer claves.
+
 ---
 
 ## Notas

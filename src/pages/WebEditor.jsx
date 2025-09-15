@@ -75,6 +75,8 @@ export default function WebEditor() {
   // --- AI helpers ---
   const suggestStory = async () => {
     if (aiLoading) return;
+    const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+    if (!allowDirect) { alert('OpenAI directo deshabilitado (usa backend).'); return; }
     if (!import.meta.env.VITE_OPENAI_API_KEY) { alert('Falta la clave de OpenAI'); return; }
     setAiLoading(true);
     try {
@@ -103,6 +105,8 @@ export default function WebEditor() {
 
   const suggestSchedule = async () => {
     if (aiLoading) return;
+    const allowDirect2 = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+    if (!allowDirect2) { alert('OpenAI directo deshabilitado (usa backend).'); return; }
     if (!import.meta.env.VITE_OPENAI_API_KEY) { alert('Falta la clave de OpenAI'); return; }
     setAiLoading(true);
     try {

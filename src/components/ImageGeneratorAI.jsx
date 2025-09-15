@@ -80,6 +80,8 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       }
 
       // Si no hay proxy o falló, usamos OpenAI directamente
+      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      if (!allowDirect) throw new Error('Direct OpenAI disabled by config');
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {

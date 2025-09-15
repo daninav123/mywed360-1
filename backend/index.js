@@ -36,6 +36,7 @@ import aiRouter from './routes/ai.js';
 import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
+import aiSongsRouter from './routes/ai-songs.js';
 import emailInsightsRouter from './routes/email-insights.js';
 import metricsSeatingRouter from './routes/metrics-seating.js';
 import notificationsRouter from './routes/notifications.js';
@@ -54,6 +55,7 @@ import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
+import publicWeddingRouter from './routes/public-wedding.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
 import rsvpRouter from './routes/rsvp.js';
 import automationRouter from './routes/automation.js';
@@ -91,6 +93,8 @@ if (!process.env.OPENAI_API_KEY) {
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4004; // Render inyecta PORT, 4004 por defecto para desarrollo local
 
 const app = express();
+// Detrás de proxy (Render) para que express-rate-limit use IP correcta
+app.set('trust proxy', 1);
 
 // Seguridad básica
 app.use(helmet({
@@ -111,24 +115,31 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate limiting global y por rutas costosas
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_MAX || 1000),
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(globalLimiter);
-
-const aiLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: Number(process.env.RATE_LIMIT_AI_MAX || 60),
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api/ai', aiLimiter);
-app.use('/api/ai-image', aiLimiter);
-app.use('/api/ai-suppliers', aiLimiter);
+// Rate limiting: por defecto 120/min en producción, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
+const AI_RATE_LIMIT_MAX = process.env.RATE_LIMIT_AI_MAX
+  ? Number(process.env.RATE_LIMIT_AI_MAX)
+  : (process.env.NODE_ENV === 'production' ? 60 : 0);
+if (AI_RATE_LIMIT_MAX > 0) {
+  const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: AI_RATE_LIMIT_MAX,
+    standardHeaders: true,
+    legacyHeaders: false,
+    // Limitar por usuario autenticado (uid); fallback a IP
+    keyGenerator: (req, _res) => {
+      try {
+        const uid = req?.user?.uid || req?.userProfile?.uid;
+        if (uid) return `uid:${uid}`;
+      } catch {}
+      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      return `ip:${ip}`;
+    },
+    message: { success: false, error: { code: 'rate_limit', message: 'Too many requests' } },
+  });
+  app.use('/api/ai', aiLimiter);
+  app.use('/api/ai-image', aiLimiter);
+  app.use('/api/ai-suppliers', aiLimiter);
+}
 
 // Middleware de correlación: X-Request-ID en cada petición
 app.use((req, res, next) => {
@@ -248,12 +259,15 @@ app.use('/api/ai-image', requireAuth, aiImageRouter);
 app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
 app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
+app.use('/api/ai-songs', requireAuth, aiSongsRouter);
 app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
 // Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
 app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);
 // Proxy de imágenes externas (evita hotlink+cors)
 app.use('/api/image-proxy', imageProxyRouter);
 app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
+// Public wedding site (GET public, POST publish with auth context)
+app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 // Nuevos módulos transversales
@@ -346,6 +360,39 @@ app.get('/api/transactions', async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Error fetching transactions' });
   }
+});
+
+// Serve public wedding site by subdomain, if configured
+// Requires DNS: wildcard CNAME like *.sites.yourdomain -> backend
+// Set PUBLIC_SITES_BASE_DOMAIN=sites.yourdomain
+app.get('*', async (req, res, next) => {
+  try {
+    const base = (process.env.PUBLIC_SITES_BASE_DOMAIN || '').toLowerCase();
+    if (!base) return next();
+    const host = (req.headers.host || '').toLowerCase();
+    // Ignore API and health/metrics paths
+    if (req.path.startsWith('/api') || req.path.startsWith('/metrics') || req.path === '/health') return next();
+    if (!host.endsWith(base)) return next();
+    const sub = host.slice(0, -base.length).replace(/\.$/, '');
+    if (!sub || sub.includes(':')) return next();
+    // Exclusion list: comma-separated env PUBLIC_SITES_EXCLUDED_SUBDOMAINS
+    const excluded = (process.env.PUBLIC_SITES_EXCLUDED_SUBDOMAINS || 'www,api,mail,mg,cdn,static,assets,admin').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    if (excluded.includes(sub)) return next();
+    // Lazy import to avoid circular
+    const mod = await import('./routes/public-wedding.js');
+    const html = await (mod.getHtmlForWeddingIdOrSlug ? mod.getHtmlForWeddingIdOrSlug(sub) : null);
+    if (!html) return next();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  } catch (e) {
+    return next();
+  }
+});
+
+// 404 JSON handler
+app.use((req, res) => {
+  const id = req?.id || null;
+  res.status(404).json({ success: false, error: { code: 'not_found', message: 'Not found' }, requestId: id });
 });
 
 // Middleware de manejo de errores

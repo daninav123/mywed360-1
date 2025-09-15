@@ -17,7 +17,7 @@ const SeatingPlanRefactored = () => {
   /* ---- estado / funciones principales ---- */
   const {
     tab, setTab, syncStatus, hallSize, areas, tables, seats,
-    selectedTable, guests,
+    selectedTable, selectedIds, guests,
     ceremonyConfigOpen, setCeremonyConfigOpen,
     banquetConfigOpen,  setBanquetConfigOpen,
     spaceConfigOpen,    setSpaceConfigOpen,
@@ -28,24 +28,52 @@ const SeatingPlanRefactored = () => {
     addArea, addTable,
     undo, redo, canUndo, canRedo,
     generateSeatGrid, generateBanquetLayout,
-    exportPDF, exportPNG, exportCSV,
+    exportPDF, exportPNG, exportCSV, exportSVG,
     saveHallDimensions,
     drawMode, setDrawMode,
     moveTable,
+    rotateSelected, alignSelected, distributeSelected,
     toggleSeatEnabled,
     moveGuest,
+    moveGuestToSeat,
     deleteArea,
     updateArea,
     deleteTable,
     duplicateTable,
     applyBanquetTables,
     clearBanquetLayout,
-    autoAssignGuests
+    autoAssignGuests,
+    // preferencias de lienzo
+    snapToGrid, setSnapToGrid, gridStep,
+    validationsEnabled, setValidationsEnabled,
+    globalMaxSeats, saveGlobalMaxGuests,
+    background, setBackground, saveBackground
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
   const [showTables, setShowTables] = React.useState(true);
   const toggleShowTables = () => setShowTables(s => !s);
+  // Mostrar/ocultar reglas
+  const [showRulers, setShowRulers] = React.useState(true);
+  // Modal de fondo
+  const [backgroundOpen, setBackgroundOpen] = React.useState(false);
+  // Modal de capacidad global
+  const [capacityOpen, setCapacityOpen] = React.useState(false);
+  // Mostrar numeración de asientos
+  const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
+  // handler para fondo rápido (prompt)
+  const handleOpenBackgroundQuick = () => {
+    try {
+      const url = window.prompt('URL de imagen (o data URL):');
+      if (!url) return;
+      const widthStr = window.prompt('Ancho real en metros:', '18');
+      const widthM = Math.max(1, parseFloat(widthStr || '18'));
+      const opacityStr = window.prompt('Opacidad (0-1):', '0.5');
+      const opacity = Math.max(0, Math.min(1, parseFloat(opacityStr || '0.5')));
+      setBackground({ dataUrl: url, widthCm: Math.round(widthM * 100), opacity });
+      toast.success('Fondo actualizado');
+    } catch (_) {}
+  };
 
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
@@ -112,6 +140,21 @@ const SeatingPlanRefactored = () => {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedTable, deleteTable]);
+
+  // Atajos de rotación: Q/E para -5°/+5°
+  useEffect(() => {
+    const onKey = (e) => {
+      try {
+        const tag = (e?.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (['input','textarea','select'].includes(tag) || e?.isComposing) return;
+        const k = String(e?.key || '').toLowerCase();
+        if (k === 'q') { e.preventDefault(); rotateSelected(-5); }
+        if (k === 'e') { e.preventDefault(); rotateSelected(5); }
+      } catch (_) {}
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [rotateSelected]);
 
   /* ---- handlers ---- */
   const handleOpenCeremonyConfig = () => setCeremonyConfigOpen(true);
@@ -327,15 +370,32 @@ const SeatingPlanRefactored = () => {
           onExportPDF={exportPDF}
           onExportPNG={exportPNG}
           onExportCSV={exportCSV}
+          onExportSVG={exportSVG}
           onOpenCeremonyConfig={handleOpenCeremonyConfig}
           onOpenBanquetConfig={handleOpenBanquetConfig}
           onOpenSpaceConfig={handleOpenSpaceConfig}
+          onOpenBackground={() => setBackgroundOpen(true)}
           onAutoAssign={handleAutoAssignClick}
           onClearBanquet={clearBanquetLayout}
           onOpenTemplates={handleOpenTemplates}
           syncStatus={syncStatus}
           showTables={showTables}
           onToggleShowTables={toggleShowTables}
+          showRulers={showRulers}
+          onToggleRulers={() => setShowRulers(v => !v)}
+          snapEnabled={!!snapToGrid}
+          onToggleSnap={() => setSnapToGrid(v => !v)}
+          gridStep={gridStep}
+          showSeatNumbers={showSeatNumbers}
+          onToggleSeatNumbers={() => setShowSeatNumbers(v => !v)}
+          onRotateLeft={() => rotateSelected(-5)}
+          onRotateRight={() => rotateSelected(5)}
+          onAlign={(axis, mode) => alignSelected(axis, mode)}
+          onDistribute={(axis) => distributeSelected(axis)}
+          validationsEnabled={validationsEnabled}
+          onToggleValidations={() => setValidationsEnabled(v => !v)}
+          globalMaxSeats={globalMaxSeats}
+          onOpenCapacity={() => setCapacityOpen(true)}
         />
       </div>
 
@@ -356,13 +416,14 @@ const SeatingPlanRefactored = () => {
             onUnassignGuest={handleUnassignGuest}
             deleteTable={deleteTable}
             duplicateTable={duplicateTable}
+            globalMaxSeats={globalMaxSeats}
             className="h-full"
           />
         </div>
 
         {/* Canvas */}
         <div className="flex-1">
-          <SeatingPlanCanvas
+        <SeatingPlanCanvas
             tab={tab}
             areas={safeAreas}
             tables={showTables ? safeTables : []}
@@ -381,10 +442,20 @@ const SeatingPlanRefactored = () => {
             moveTable={moveTable}
             onToggleSeat={toggleSeatEnabled}
             onAssignGuest={handleAssignGuest}
-            guests={safeGuests}
-            onDeleteArea={deleteArea}
-            onUpdateArea={updateArea}
-          />
+            onAssignGuestSeat={(tableId, seatIdx, guestId) => {
+              try { moveGuestToSeat(guestId, tableId, seatIdx); toast.success(`Invitado a asiento ${seatIdx+1}`); } catch(_) { handleAssignGuest(tableId, guestId); }
+            }}
+          guests={safeGuests}
+          onDeleteArea={deleteArea}
+          onUpdateArea={updateArea}
+          showRulers={showRulers}
+          gridStep={gridStep}
+          selectedIds={selectedIds}
+          showSeatNumbers={showSeatNumbers}
+          background={background}
+          globalMaxSeats={globalMaxSeats}
+          validationsEnabled={validationsEnabled}
+        />
         </div>
       </div>
 
@@ -394,18 +465,25 @@ const SeatingPlanRefactored = () => {
         banquetConfigOpen={banquetConfigOpen}
         spaceConfigOpen={spaceConfigOpen}
         templateOpen={templateOpen}
+        backgroundOpen={backgroundOpen}
+        capacityOpen={capacityOpen}
         onCloseCeremonyConfig={handleCloseCeremonyConfig}
         onCloseBanquetConfig={handleCloseBanquetConfig}
         onCloseSpaceConfig={handleCloseSpaceConfig}
+        onCloseBackground={()=> setBackgroundOpen(false)}
+        onCloseCapacity={()=> setCapacityOpen(false)}
         onCloseTemplate={handleCloseTemplates}
         onGenerateSeatGrid={generateSeatGrid}
         onGenerateBanquetLayout={handleGenerateBanquetLayoutWithAssign}
         onSaveHallDimensions={async (w,h,aisle) => { try { await saveHallDimensions(w,h,aisle); toast.success('Dimensiones guardadas'); } catch(e){ toast.error('Error guardando dimensiones'); } }}
         onApplyTemplate={handleApplyTemplate}
+        onSaveCapacity={async (n) => { try { await saveGlobalMaxGuests(n); toast.success('Capacidad global guardada'); } catch(e){ toast.error('Error guardando capacidad'); } }}
+        onSaveBackground={async (bg) => { try { await saveBackground(bg); toast.success('Fondo actualizado'); } catch(e){ toast.error('Error guardando fondo'); } }}
         areas={safeAreas}
         hallSize={safeHallSize}
         guests={safeGuests}
         tables={safeTables}
+        background={background}
       />
     </div>
     </DndProvider>
@@ -413,3 +491,4 @@ const SeatingPlanRefactored = () => {
 };
 
 export default SeatingPlanRefactored;
+

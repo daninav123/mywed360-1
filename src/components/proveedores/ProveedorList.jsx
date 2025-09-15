@@ -1,9 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, RefreshCcw } from 'lucide-react';
 import ProveedorCard from './ProveedorCard';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import useSupplierGroups from '../../hooks/useSupplierGroups';
+import GroupCreateModal from './GroupCreateModal';
+import ProveedorGroupCard from './ProveedorGroupCard';
+import GroupSuggestions from './GroupSuggestions';
+import useGroupBudgets from '../../hooks/useGroupBudgets';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -115,6 +120,49 @@ const ProveedorList = ({
 
   const navigate = useNavigate();
 
+  // Grupos manuales: unificar/separar tarjetas
+  const { groups, loading: loadingGroups, dissolveGroup, createGroup } = useSupplierGroups();
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showSelectedSug, setShowSelectedSug] = useState(false);
+  const [hideGrouped, setHideGrouped] = useState(false);
+
+  const groupMemberIds = useMemo(() => {
+    const set = new Set();
+    (groups || []).forEach((g) => (g.memberIds || []).forEach((id) => set.add(id)));
+    return set;
+  }, [groups]);
+
+  const groupNameByMemberId = useMemo(() => {
+    const map = new Map();
+    (groups || []).forEach((g) => (g.memberIds || []).forEach((id) => map.set(id, g.name || '')));
+    return map;
+  }, [groups]);
+
+  const providersToShow = useMemo(() => {
+    if (!hideGrouped) return filteredProviders;
+    return filteredProviders.filter((p) => !groupMemberIds.has(p.id));
+  }, [filteredProviders, hideGrouped, groupMemberIds]);
+
+  const visibleGroups = useMemo(() => {
+    const idsInList = new Set(filteredProviders.map((p) => p.id));
+    return (groups || []).filter((g) => (g.memberIds || []).some((id) => idsInList.has(id)));
+  }, [groups, filteredProviders]);
+
+  const handleCreateGroup = async ({ name, notes }) => {
+    const toGroup = selected.filter(Boolean);
+    if (toGroup.length < 2) return;
+    const res = await createGroup({ name, notes, memberIds: toGroup });
+    if (res?.success) {
+      setShowGroupModal(false);
+      // limpiar selección tras agrupar
+      toGroup.forEach((id) => toggleSelect(id));
+    }
+  };
+
+  // Sugerencias para la selección actual (sin necesidad de crear grupo)
+  const selectedProviders = useMemo(() => providers.filter((p) => selected.includes(p.id)), [providers, selected]);
+  const { budgetsBySupplier: selectedBudgets } = useGroupBudgets(selected);
+
   const handleCreateContract = (provider) => {
     const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
     navigate('/protocolo/documentos-legales', {
@@ -209,12 +257,61 @@ const ProveedorList = ({
         </div>
         
         {/* Botones de acción para filtros */}
-        <div className="flex justify-end space-x-2">
-          <Button onClick={clearFilters} variant="outline" size="sm">
-            <RefreshCcw size={16} className="mr-1" /> Limpiar filtros
-          </Button>
+        <div className="flex justify-between items-center space-x-2">
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={hideGrouped}
+                onChange={(e) => setHideGrouped(e.target.checked)}
+              />
+              Ocultar agrupados
+            </label>
+            {selected.length > 0 ? `${selected.length} seleccionado(s)` : 'Sin selecciones'}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowGroupModal(true)}
+              variant="primary"
+              size="sm"
+              disabled={selected.length < 2}
+            >
+              Unificar seleccionados
+            </Button>
+            <Button
+              onClick={() => setShowSelectedSug(true)}
+              variant="outline"
+              size="sm"
+              disabled={selected.length < 1}
+            >
+              Sugerencias
+            </Button>
+            <Button onClick={clearFilters} variant="outline" size="sm">
+              <RefreshCcw size={16} className="mr-1" /> Limpiar filtros
+            </Button>
+          </div>
         </div>
       </Card>
+ 
+      {tab === 'groups' && visibleGroups.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {visibleGroups.map((g) => (
+            <ProveedorGroupCard
+              key={g.id}
+              group={g}
+              providers={filteredProviders}
+              onDissolve={async (gid) => await dissolveGroup(gid)}
+              onViewMember={(p) => handleViewDetail?.(p)}
+            />
+          ))}
+        </div>
+      )}
+      {tab === 'groups' && visibleGroups.length === 0 && (
+        <div className="col-span-full text-center py-8 text-gray-500">
+          No hay grupos. Selecciona 2+ proveedores y pulsa “Unificar seleccionados”.
+        </div>
+      )}
 
       {/* Selector de pestaña */}
       <div className="flex border-b border-gray-200 mb-4">
@@ -236,28 +333,48 @@ const ProveedorList = ({
         >
           Favoritos
         </button>
+        <button
+          className={`py-2 px-4 ${tab === 'groups' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+          onClick={() => setTab('groups')}
+        >
+          Grupos
+        </button>
       </div>
 
       {/* Lista de proveedores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredProviders.length > 0 ? (
-          filteredProviders.map(provider => (
-            <ProveedorCard
-              key={provider.id}
-              provider={provider}
-              isSelected={selected.includes(provider.id)}
-              onToggleSelect={() => toggleSelect(provider.id)}
-              onViewDetail={() => handleViewDetail(provider)}
-              onToggleFavorite={toggleFavorite}
-              onCreateContract={handleCreateContract}
-            />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8 text-gray-500">
-            No hay proveedores que coincidan con los filtros aplicados.
-          </div>
-        )}
-      </div>
+      {tab !== 'groups' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {providersToShow.length > 0 ? (
+            providersToShow.map(provider => (
+              <ProveedorCard
+                key={provider.id}
+                provider={{ ...provider, groupName: provider.groupName ?? groupNameByMemberId.get(provider.id) }}
+                isSelected={selected.includes(provider.id)}
+                onToggleSelect={() => toggleSelect(provider.id)}
+                onViewDetail={() => handleViewDetail(provider)}
+                onToggleFavorite={toggleFavorite}
+                onCreateContract={handleCreateContract}
+              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              No hay proveedores que coincidan con los filtros aplicados.
+            </div>
+          )}
+        </div>
+      )}
+      <GroupCreateModal
+        open={showGroupModal}
+        onClose={() => setShowGroupModal(false)}
+        onConfirm={handleCreateGroup}
+      />
+      <GroupSuggestions
+        open={showSelectedSug}
+        onClose={() => setShowSelectedSug(false)}
+        group={{ id: 'selected', name: 'Selección actual', memberIds: selected }}
+        providers={selectedProviders}
+        budgetsBySupplier={selectedBudgets}
+      />
     </div>
   );
 };
