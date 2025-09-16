@@ -106,7 +106,8 @@ export default function Tasks() {
   });
   
   const [columnWidthState] = useState(65);
-  const listCellWidth = '155px';
+  // Ocultar completamente la lista izquierda del Gantt
+  const listCellWidth = 0;
 
   // Manejar eventos de calendario externos
   useEffect(() => {
@@ -548,6 +549,23 @@ export default function Tasks() {
 
     // Ordenar eventos por fecha para uso posterior (listas, etc.)
     const sortedTasks = [...safeEvents].sort((a, b) => a.start - b.start);
+
+  // Solo tareas puntuales (no procesos) para la lista: normalizar solo meetings
+  const safeMeetings = (Array.isArray(meetingsState) ? meetingsState : [])
+    .filter(event => event !== null && event !== undefined)
+    .map(event => {
+      if (!event.start || !event.end) return null;
+      const start = validateAndNormalizeDate(event.start);
+      const end = validateAndNormalizeDate(event.end);
+      if (!start || !end) return null;
+      return {
+        ...event,
+        start,
+        end,
+        title: event.title || event.name || 'Sin título',
+      };
+    })
+    .filter(Boolean);
 
   // Filtro específico para tareas del componente Gantt
   const taskIdSet = new Set(Array.isArray(tasksState) ? tasksState.filter(Boolean).map(t => t?.id).filter(Boolean) : []);
@@ -1130,7 +1148,7 @@ export default function Tasks() {
         <h2 className="text-xl font-semibold mb-4">Listado de Tareas</h2>
         <div className="w-full">
           <TaskList 
-            tasks={safeEvents} 
+            tasks={safeMeetings} 
             onTaskClick={(event) => {
               setEditingId(event.id);
               setFormData({

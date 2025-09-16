@@ -62,7 +62,8 @@ const SeatingPlanModals = ({
   areas = [],
   guests = [],
   tables = [],
-  background = null
+  background = null,
+  globalMaxSeats = 0
 }) => {
   return (
     <>
@@ -86,7 +87,7 @@ const SeatingPlanModals = ({
         title="Capacidad Global"
         icon={Users}
       >
-        <CapacityForm onSave={onSaveCapacity} onClose={onCloseCapacity} />
+        <CapacityForm onSave={onSaveCapacity} onClose={onCloseCapacity} initialMax={globalMaxSeats} />
       </Modal>
 
       {/* Modal de fondo/plano */}
@@ -736,8 +737,8 @@ const BackgroundForm = ({ background, onSave, onClose }) => {
 };
 
 // Formulario de capacidad global
-const CapacityForm = ({ onSave, onClose }) => {
-  const [max, setMax] = React.useState(8);
+const CapacityForm = ({ onSave, onClose, initialMax = 8 }) => {
+  const [max, setMax] = React.useState(initialMax || 8);
   const submit = (e) => {
     e.preventDefault();
     const n = Math.max(1, parseInt(max, 10) || 0);

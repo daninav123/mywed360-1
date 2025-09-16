@@ -57,6 +57,19 @@ class ErrorLogger {
       try {
         const response = await originalFetch(...args);
         if (!response.ok) {
+          try {
+            const reqUrl = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+            const method = args[1]?.method || 'GET';
+            const isPublicWeddingCheck = method === 'GET' && reqUrl.includes('/api/public/weddings/');
+            const isBenignAsset404 = response.status === 404 && /\/logo\.png(\?|$)/.test(reqUrl || '');
+            // Silenciar 404/403 esperados por comprobación de slug público y assets benignos
+            if (isPublicWeddingCheck && (response.status === 404 || response.status === 403)) {
+              return response;
+            }
+            if (isBenignAsset404) {
+              return response;
+            }
+          } catch {}
           this.logError('HTTP Error', {
             url: args[0],
             status: response.status,

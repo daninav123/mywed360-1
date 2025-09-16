@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import MainLayout from '../components/layout/MainLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -6,7 +7,6 @@ import { Plus, Sparkles } from 'lucide-react';
 
 // Importar componentes modulares
 import ProveedorList from '../components/proveedores/ProveedorList';
-import ProveedorDetail from '../components/proveedores/ProveedorDetail';
 import ProveedorCard from '../components/proveedores/ProveedorCard';
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ReservationModal from '../components/proveedores/ReservationModal';
@@ -15,6 +15,8 @@ import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 import useSupplierGroups from '../hooks/useSupplierGroups';
+import BulkStatusModal from '../components/proveedores/BulkStatusModal';
+import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorModal';
 
 // Importar hooks personalizados
 import useProveedores from '../hooks/useProveedores';
@@ -22,7 +24,7 @@ import useAISearch from '../hooks/useAISearch';
 import { useAuth } from '../hooks/useAuth';
 
 const Proveedores = () => {
-  // DiagnÃ³stico: verificar que la versiÃ³n nueva se carga en el navegador
+  // Diagnóstico: verificar que la versión nueva se carga en el navegador
   console.log('%c[Lovenda] ProveedoresNuevo cargado', 'color: #10B981; font-weight: bold;');
   // Obtener funcionalidad de los hooks personalizados
   const {
@@ -49,6 +51,7 @@ const Proveedores = () => {
     setSelectedProvider,
     loadProviders,
     addProvider,
+    addReservation,
     updateProvider,
     deleteProvider,
     toggleFavoriteProvider,
@@ -68,7 +71,7 @@ const Proveedores = () => {
   const { user } = useAuth();
   const { groups } = useSupplierGroups();
 
-  // Estado local para modales y pestaÃ±as
+  // Estado local para modales y pestañas
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [showEditProviderForm, setShowEditProviderForm] = useState(false);
   const [showAISearchModal, setShowAISearchModal] = useState(false);
@@ -77,8 +80,11 @@ const Proveedores = () => {
   const [showAIEmailModal, setShowAIEmailModal] = useState(false);
   const [aiSelectedResult, setAiSelectedResult] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
+  const [showBulkStatus, setShowBulkStatus] = useState(false);
+  const [showDupModal, setShowDupModal] = useState(false);
   const [currentTrackingItem, setCurrentTrackingItem] = useState(null);
   const [trackingFilter, setTrackingFilter] = useState('todos');
+  const [highlightGroupId, setHighlightGroupId] = useState(null);
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -87,7 +93,7 @@ const Proveedores = () => {
     }
   }, [user, loadProviders]);
 
-  // Funciones para manejar la visualizaciÃ³n de modales
+  // Funciones para manejar la visualización de modales
   const handleViewDetail = (provider) => {
     setSelectedProvider(provider);
     setActiveTab('info');
@@ -141,15 +147,15 @@ const Proveedores = () => {
   };
 
   const handleDeleteProvider = async (providerId) => {
-    if (window.confirm('Â¿EstÃ¡s seguro de que deseas eliminar este proveedor?')) {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
       await deleteProvider(providerId);
     }
   };
 
   const handleSubmitReservation = async (reservationData) => {
-    // En una implementaciÃ³n real, esto guardarÃ­a la reserva en la base de datos
+    // En una implementación real, esto guardaría la reserva en la base de datos
     console.log('Reserva creada:', reservationData);
-    // Actualizar el estado del proveedor a 'Contactado' si no estÃ¡ ya confirmado/seleccionado
+    // Actualizar el estado del proveedor a 'Contactado' si no está ya confirmado/seleccionado
     if (selectedProvider && 
         selectedProvider.status !== 'Confirmado' && 
         selectedProvider.status !== 'Seleccionado') {
@@ -174,11 +180,11 @@ const Proveedores = () => {
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">GestiÃ³n de Proveedores</h1>
+          <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
           
           <div className="flex space-x-2">
             <Button onClick={handleOpenAISearch} className="flex items-center">
-              <Sparkles size={16} className="mr-1" /> BÃºsqueda IA
+              <Sparkles size={16} className="mr-1" /> Búsqueda IA
             </Button>
             <Button onClick={handleNewProvider} className="flex items-center">
               <Plus size={16} className="mr-1" /> Nuevo Proveedor
@@ -216,7 +222,8 @@ const Proveedores = () => {
               clearFilters={clearFilters}
               handleViewDetail={handleViewDetail}
               tab={tab}
-              setTab={setTab}\n              highlightGroupId={highlightGroupId}
+              setTab={setTab}
+              highlightGroupId={highlightGroupId}
               selected={selectedProviderIds}
               toggleSelect={toggleSelectProvider}
               toggleFavorite={toggleFavoriteProvider}
@@ -233,9 +240,8 @@ const Proveedores = () => {
                     <Button variant="outline" size="sm" onClick={clearSelection}>
                       Deseleccionar todo
                     </Button>
-                    <Button size="sm">
-                      AcciÃ³n masiva
-                    </Button>
+                    <Button size="sm" onClick={()=>setShowBulkStatus(true)}>Cambiar estado</Button>
+                    <Button size="sm" variant="outline" onClick={()=>setShowDupModal(true)}>Duplicados</Button>
                   </div>
                 </div>
               </Card>
@@ -243,19 +249,23 @@ const Proveedores = () => {
           </div>
         )}
 
-        {/* Vista detallada de proveedor */}
+        {/* Vista detallada simple (temporal) */}
         {selectedProvider && (
-          <ProveedorDetail
-            provider={selectedProvider}
-            onClose={handleCloseDetail}
-            onEdit={handleEditProvider}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onOpenGroups={() => setTab('groups')}
-          />
+          <Card className="p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold">{selectedProvider.name}</h2>
+              <Button variant="outline" onClick={handleCloseDetail}>Cerrar</Button>
+            </div>
+            <div className="space-y-1 text-sm text-gray-700">
+              {selectedProvider.service && <p><strong>Servicio:</strong> {selectedProvider.service}</p>}
+              {selectedProvider.email && <p><strong>Email:</strong> {selectedProvider.email}</p>}
+              {selectedProvider.phone && <p><strong>Teléfono:</strong> {selectedProvider.phone}</p>}
+              {selectedProvider.snippet && <p className="text-gray-600">{selectedProvider.snippet}</p>}
+            </div>
+          </Card>
         )}
 
-        {/* Modal para aÃ±adir nuevo proveedor */}
+        {/* Modal para añadir nuevo proveedor */}
         {showNewProviderForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
             <ProveedorForm
@@ -276,7 +286,7 @@ const Proveedores = () => {
           </div>
         )}
 
-        {/* Modal de bÃºsqueda con IA */}
+        {/* Modal de búsqueda con IA */}
         <AISearchModal
           isOpen={showAISearchModal}
           onClose={() => setShowAISearchModal(false)}
@@ -293,6 +303,35 @@ const Proveedores = () => {
             searchQuery={aiLastQuery || ''}
           />
         )}
+
+        <BulkStatusModal
+          open={showBulkStatus}
+          onClose={()=>setShowBulkStatus(false)}
+          onApply={async (newStatus) => {
+            for (const pid of selectedProviderIds) {
+              const p = providers.find(x => x.id === pid);
+              if (!p) continue;
+              await updateProvider(pid, { ...p, status: newStatus });
+            }
+            // No limpiamos la selección automáticamente
+          }}
+        />
+
+        <DuplicateDetectorModal
+          open={showDupModal}
+          onClose={()=>setShowDupModal(false)}
+          providers={providers}
+          onMerge={async (group, primaryId) => {
+            if (!Array.isArray(group) || group.length < 2) return;
+            const primary = group.find(x => x.id === primaryId) || group[0];
+            const others = group.filter(x => x.id !== primary.id);
+            const aliases = Array.from(new Set([...(primary.aliases||[]), ...others.map(o=>o.email).filter(Boolean)]));
+            await updateProvider(primary.id, { ...primary, aliases });
+            for (const o of others) {
+              await deleteProvider(o.id);
+            }
+          }}
+        />
 
         {/* Modal de reserva */}
         {showReservationModal && selectedProvider && (
@@ -320,7 +359,7 @@ const Proveedores = () => {
               {selectedProviderIds.map(pid => {
                 const provider = providers.find(p => p.id === pid);
                 if(!provider) return null;
-                // inyectar nombre de grupo si estÃ¡ en grupos
+                // inyectar nombre de grupo si está en grupos
                 let groupName = provider.groupName;
                 if (!groupName && Array.isArray(groups)) {
                   for (const g of groups) {
@@ -350,6 +389,7 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
 
 
 

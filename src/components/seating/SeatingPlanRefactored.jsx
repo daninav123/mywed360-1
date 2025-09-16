@@ -484,6 +484,7 @@ const SeatingPlanRefactored = () => {
         guests={safeGuests}
         tables={safeTables}
         background={background}
+        globalMaxSeats={globalMaxSeats}
       />
     </div>
     </DndProvider>
@@ -491,4 +492,7 @@ const SeatingPlanRefactored = () => {
 };
 
 export default SeatingPlanRefactored;
+
+
+
 

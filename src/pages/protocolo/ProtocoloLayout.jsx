@@ -3,9 +3,10 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Card from '../../components/ui/Card';
 
 // Definición estática de las pestañas para evitar recreaciones
+// Nota: 'Documentos Legales' se muestra como página independiente en el submenú,
+// por eso NO aparece como pestaña aquí.
 const tabs = [
   { path: 'momentos-especiales', label: 'Momentos Especiales' },
-  { path: 'documentos-legales', label: 'Documentos Legales' },
 ];
 
 // Componente memoizado para evitar renders innecesarios

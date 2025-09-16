@@ -1,49 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card } from '../components/ui';
-import { Button } from '../components/ui';
-import { Input } from '../components/ui';
+import React, { useEffect, useState } from 'react';
+import { Card, Button, Input } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
+import { useWedding } from '../context/WeddingContext';
 import useRoles from '../hooks/useRoles';
-import { Users, X } from 'lucide-react';
-
-import { auth, db } from '../firebaseConfig'; // respaldo para UID
-import 'react-toastify/dist/ReactToastify.css';
-import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService';
-import { subscribeSyncState, getSyncState } from '../services/SyncService';
+import { Users, X, Music, CheckCircle2, Link2 } from 'lucide-react';
+import { get as apiGet } from '../services/apiClient';
+import { loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { auth, db } from '../firebaseConfig';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService';
 
-// ---------------------- NUEVO PERFIL -----------------------
 function Perfil() {
   const [subscription, setSubscription] = useState('free');
-  const [account, setAccount] = useState({
-    name: '',
-    linkedAccount: '',
-    planner: '',
-    helpers: '',
-    email: '',
-    whatsNumber: '',
-    password: '',
-  });
-  const [weddingInfo, setWeddingInfo] = useState({
-    coupleName: '',
-    celebrationPlace: '',
-    banquetPlace: '',
-    schedule: '',
-    giftAccount: '',
-    weddingDate: '',
-    numGuests: '',
-  });
-  // Campo de texto amplio para notas importantes de la boda
+  const [account, setAccount] = useState({ name: '', linkedAccount: '', planner: '', helpers: '', email: '', whatsNumber: '', password: '' });
+  const [weddingInfo, setWeddingInfo] = useState({ coupleName: '', celebrationPlace: '', banquetPlace: '', schedule: '', giftAccount: '', weddingDate: '', numGuests: '' });
   const [importantInfo, setImportantInfo] = useState('');
   const [syncStatus, setSyncStatus] = useState(getSyncState());
   const [plannerEmail, setPlannerEmail] = useState('');
   const [inviteLink, setInviteLink] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
+  const [spotifyStatus, setSpotifyStatus] = useState({ connected: false, loading: false });
+  const [musicPrefs, setMusicPrefs] = useState({ languages: ['es'], genres: [], decades: [] });
+  const [billing, setBilling] = useState({ fullName: '', address: '', zip: '', city: '', state: '', country: '', dni: '' });
+  const [lastSavedAt, setLastSavedAt] = useState(null);
 
-  // Sincronizar número de invitados automáticamente
-  // Escucha cambios en la lista de invitados en tiempo real
+  const { userProfile, user: authUser } = useAuth();
+  const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
+  const { activeWedding } = useWedding();
+  const weddingId = activeWedding || userProfile?.weddingId || '';
+  const { roles: collaborators, loading: rolesLoading, assignRole, removeRole } = useRoles(weddingId);
+
+  // Actualiza número de invitados (con muestra local si no hay datos)
   useEffect(() => {
     function updateGuestCount() {
       let guests = [];
@@ -53,293 +41,265 @@ function Perfil() {
       } catch { guests = null; }
       if (!guests) {
         guests = [
-          { id: 1, name: 'Ana García', phone: '123456789', address: 'Calle Sol 1', companion: 1, table: '5', response: 'Sí' },
-          { id: 2, name: 'Luis Martínez', phone: '987654321', address: 'Av. Luna 3', companion: 0, table: '', response: 'Pendiente' },
+          { id: 1, name: 'Ana Garc\u00EDa', phone: '123456789', address: 'Calle Sol 1', companion: 1, table: '5', response: 'S\u00ED' },
+          { id: 2, name: 'Luis Mart\u00EDnez', phone: '987654321', address: 'Av. Luna 3', companion: 0, table: '', response: 'Pendiente' },
         ];
       }
-      const total = guests.reduce((acc, g) => acc + 1 + (parseInt(g.companion)||0), 0);
+      const total = guests.reduce((acc, g) => acc + 1 + (parseInt(g.companion) || 0), 0);
       setWeddingInfo(w => ({ ...w, numGuests: total }));
     }
-    updateGuestCount(); // inicial
+    updateGuestCount();
     window.addEventListener('lovenda-guests', updateGuestCount);
     return () => window.removeEventListener('lovenda-guests', updateGuestCount);
-   }, []);
+  }, []);
 
-  // Escucha notas importantes agregadas desde el chat
+  // Notas importantes (desde eventos externos)
   useEffect(() => {
     function updateNotes() {
-      setImportantInfo(loadData('importantNotes'));
+      const p = loadData('importantNotes');
+      if (p && typeof p.then === 'function') p.then(val => setImportantInfo(val ?? ''));
+      else setImportantInfo(p ?? '');
     }
     window.addEventListener('lovenda-important-note', updateNotes);
     return () => window.removeEventListener('lovenda-important-note', updateNotes);
   }, []);
 
-  const [billing, setBilling] = useState({
-    fullName: '',
-    address: '',
-    zip: '',
-    city: '',
-    state: '',
-    country: '',
-    dni: '',
-  });
-
-  const { userProfile, user: authUser } = useAuth();
-  // UID de respaldo usando Firebase Auth (en caso de que useAuth no tenga usuario)
-  const fallbackUid = authUser?.uid || auth.currentUser?.uid || null;
-  const weddingId = userProfile?.weddingId || '';
-  const { roles: collaborators, loading: rolesLoading, assignRole, removeRole } = useRoles(weddingId);
-
-  const handleAccountChange = (e) => setAccount({ ...account, [e.target.name]: e.target.value });
-  const handleWeddingChange = (e) => setWeddingInfo({ ...weddingInfo, [e.target.name]: e.target.value });
-  const handleBillingChange = (e) => setBilling({ ...billing, [e.target.name]: e.target.value });
+  const handleAccountChange = (e) => setAccount(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleWeddingChange = (e) => setWeddingInfo(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleBillingChange = (e) => setBilling(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleCreateInvite = async () => {
-
     if (!plannerEmail) return;
     let wid = weddingId;
     const effectiveUid = fallbackUid;
-  if (!wid && !effectiveUid) {
-      toast.error('Tu sesión aún no está lista. Espera unos segundos e inténtalo de nuevo.');
-      return;
-    }
+    if (!wid && !effectiveUid) { toast.error('Tu sesi\u00F3n a\u00FAn no est\u00E1 lista. Int\u00E9ntalo de nuevo.'); return; }
     if (!wid) {
-      // intentar obtener la boda directamente de Firestore por owner
       wid = await getWeddingIdForOwner(effectiveUid);
-      if (!wid) {
-        toast.error('No se encontró tu boda. Completa el tutorial o contacta soporte.');
-        return;
-      }
+      if (!wid) { toast.error('No se encontr\u00F3 tu boda.'); return; }
     }
     try {
       setInviteLoading(true);
       const code = await invitePlanner(wid, plannerEmail.trim().toLowerCase());
       const link = `${window.location.origin}/invitation/${code}`;
       setInviteLink(link);
-      try {
-        await navigator.clipboard.writeText(link);
-        toast.success('Enlace copiado al portapapeles');
-      } catch {
-        toast.success('Enlace generado');
-      }
+      try { await navigator.clipboard.writeText(link); toast.success('Enlace copiado'); } catch { toast.success('Enlace generado'); }
       setPlannerEmail('');
-    } catch (err) {
-      console.error(err);
-      toast.error('Error creando invitación');
-    } finally {
-      setInviteLoading(false);
-    }
+    } catch (err) { console.error(err); toast.error('Error creando invitaci\u00F3n'); }
+    finally { setInviteLoading(false); }
   };
 
   const saveProfile = async () => {
     const uid = fallbackUid;
-    if (!uid) {
-      toast.error('No se pudo determinar tu usuario.');
-      return;
-    }
-
+    if (!uid) { toast.error('No se pudo determinar tu usuario'); return; }
+    // Validaciones rápidas
     try {
-      // 1. Datos globales del usuario
-      await setDoc(
-        doc(db, 'users', uid),
-        {
-          account,
-          subscription,
-          billing,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-
-      // 2. Datos específicos de la boda
-      if (weddingId) {
-        await updateDoc(doc(db, 'weddings', weddingId), {
-          weddingInfo: { ...weddingInfo, importantInfo },
-        });
+      if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
+        toast.error('Correo electrónico inválido');
+        return;
       }
-
+      if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
+        toast.error('WhatsApp debe tener formato internacional, e.g. +349XXXXXXXX');
+        return;
+      }
+      if (weddingInfo.weddingDate) {
+        const d = new Date(weddingInfo.weddingDate);
+        if (isNaN(d.getTime())) { toast.error('Fecha de boda inválida'); return; }
+      }
+    } catch {}
+    try {
+      await setDoc(doc(db, 'users', uid), { account, subscription, billing, musicPreferences: musicPrefs, updatedAt: serverTimestamp() }, { merge: true });
+      try { localStorage.setItem('lovenda_music_prefs', JSON.stringify(musicPrefs)); } catch {}
+      if (weddingId) await updateDoc(doc(db, 'weddings', weddingId), { weddingInfo: { ...weddingInfo, importantInfo } });
       toast.success('Perfil guardado');
-    } catch (error) {
-      console.error('Error guardando perfil:', error);
-      toast.error('Error al guardar el perfil');
-    }
+      try { setLastSavedAt(new Date()); } catch {}
+    } catch (e) { console.error(e); toast.error('Error al guardar el perfil'); }
   };
 
   useEffect(() => {
-    // Suscribirse a cambios en el estado de sincronización
     const unsubscribe = subscribeSyncState(setSyncStatus);
-    
-    // Cargar datos con la nueva estrategia híbrida
     const loadProfileData = async () => {
       const uid = fallbackUid;
       if (!uid) return;
       try {
-        // Datos globales
         const userSnap = await getDoc(doc(db, 'users', uid));
         if (userSnap.exists()) {
           const d = userSnap.data();
-          if (d.account) setAccount(prev=>({ ...prev, ...d.account }));
+          if (d.account) setAccount(prev => ({ ...prev, ...d.account }));
           if (d.subscription) setSubscription(d.subscription);
           if (d.billing) setBilling(d.billing);
+          if (d.musicPreferences) {
+            setMusicPrefs(prev => ({ ...prev, ...d.musicPreferences }));
+            try { localStorage.setItem('lovenda_music_prefs', JSON.stringify(d.musicPreferences)); } catch {}
+          }
+          try {
+            if (d.updatedAt && typeof d.updatedAt.toDate === 'function') {
+              setLastSavedAt(d.updatedAt.toDate());
+            }
+          } catch {}
         }
-
-        // Datos de la boda
         if (weddingId) {
           const wedSnap = await getDoc(doc(db, 'weddings', weddingId));
           if (wedSnap.exists() && wedSnap.data().weddingInfo) {
             const wi = wedSnap.data().weddingInfo;
             setWeddingInfo({
-              coupleName: wi.coupleName || '',
-              celebrationPlace: wi.celebrationPlace || '',
-              banquetPlace: wi.banquetPlace || '',
-              schedule: wi.schedule || '',
-              giftAccount: wi.giftAccount || '',
-              weddingDate: wi.weddingDate || '',
-          numGuests: wi.numGuests || '',
+              coupleName: wi.coupleName || '', celebrationPlace: wi.celebrationPlace || '', banquetPlace: wi.banquetPlace || '',
+              schedule: wi.schedule || '', giftAccount: wi.giftAccount || '', weddingDate: wi.weddingDate || '', numGuests: wi.numGuests || ''
             });
             if (wi.importantInfo) setImportantInfo(wi.importantInfo);
           }
         }
-      } catch (error) {
-        console.error('Error cargando datos del perfil:', error);
-        toast.error('Error al cargar el perfil');
-      }
+      } catch (e) { console.error('Error cargando perfil', e); toast.error('Error al cargar el perfil'); }
     };
-    
+    try { const raw = localStorage.getItem('lovenda_music_prefs'); if (raw) setMusicPrefs(prev => ({ ...prev, ...JSON.parse(raw) })); } catch {}
     loadProfileData();
-    
+    (async () => { try { setSpotifyStatus(s => ({ ...s, loading: true })); const res = await apiGet('/api/spotify/status', { auth: true }); const ok = res.ok && (await res.json())?.connected; setSpotifyStatus({ connected: !!ok, loading: false }); } catch { setSpotifyStatus({ connected: false, loading: false }); } })();
     return () => unsubscribe();
-  }, []);
+  }, [weddingId]);
 
   return (
     <div className="space-y-6 p-4 max-w-3xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Perfil</h1>
-        
-        {/* Indicador de estado de sincronización */}
-        <div className="flex items-center text-sm">
-          <div className={`w-3 h-3 rounded-full mr-2 ${
-            !syncStatus.isOnline ? 'bg-red-500' : 
-            syncStatus.isSyncing ? 'bg-yellow-500' :
-            syncStatus.pendingChanges ? 'bg-orange-500' : 'bg-green-500'
-          }`}></div>
-          <span>
-            {!syncStatus.isOnline ? 'Sin conexión (modo offline)' : 
-             syncStatus.isSyncing ? 'Sincronizando...' : 
-             syncStatus.pendingChanges ? 'Cambios pendientes' : 'Sincronizado'}
-          </span>
+        <div className="flex items-center text-sm gap-3">
+          <div className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-red-500' : syncStatus.isSyncing ? 'bg-yellow-500' : syncStatus.pendingChanges ? 'bg-orange-500' : 'bg-green-500'}`}></div>
+          <span>{!syncStatus.isOnline ? 'Sin conexi\u00F3n (modo offline)' : syncStatus.isSyncing ? 'Sincronizando...' : syncStatus.pendingChanges ? 'Cambios pendientes' : 'Sincronizado'}</span>
+          {lastSavedAt && (
+            <span className="text-gray-500">{'Último guardado: '} {new Date(lastSavedAt).toLocaleString()}</span>
+          )}
         </div>
       </div>
 
-      {/* Suscripción */}
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">Tipo de suscripción</h2>
+        <h2 className="text-lg font-medium">{'Tipo de suscripci\u00F3n'}</h2>
         <div className="flex gap-4">
           <Button variant={subscription === 'free' ? 'primary' : 'outline'} onClick={() => setSubscription('free')}>Gratis</Button>
           <Button variant={subscription === 'premium' ? 'primary' : 'outline'} onClick={() => setSubscription('premium')}>Premium</Button>
         </div>
       </Card>
 
-      {/* Información de la cuenta */}
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">Información de la cuenta</h2>
+        <h2 className="text-lg font-medium flex items-center gap-2"><Music className="w-5 h-5" /> Preferencias musicales</h2>
+        <div className="flex items-center justify-between gap-3 p-2 bg-gray-50 rounded">
+          <div className="text-sm">
+            <div className="font-medium">Spotify</div>
+            <div className="text-gray-600 flex items-center gap-2">{spotifyStatus.connected ? <><CheckCircle2 className="w-4 h-4 text-green-600" /> Conectado</> : 'No conectado'}</div>
+          </div>
+          <div>
+            {spotifyStatus.connected ? (
+              <span className="text-xs text-gray-500">Listo para personalizar recomendaciones</span>
+            ) : (
+              <Button onClick={() => { const ret = encodeURIComponent(window.location.origin + '/perfil'); window.location.href = `/api/spotify/login?return=${ret}`; }} disabled={spotifyStatus.loading}>
+                {spotifyStatus.loading ? 'Comprobando...' : (<span className="flex items-center gap-1"><Link2 className="w-4 h-4" /> Conectar Spotify</span>)}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <div className="text-sm font-medium mb-1">Idiomas</div>
+            <div className="flex flex-wrap gap-2">
+              {['es','en','it','fr','pt'].map(lang => (
+                <label key={lang} className={`text-xs border rounded px-2 py-1 cursor-pointer ${musicPrefs.languages.includes(lang)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                  <input type="checkbox" className="hidden" checked={musicPrefs.languages.includes(lang)} onChange={(e)=>{
+                    setMusicPrefs(prev => { const set = new Set(prev.languages); e.target.checked ? set.add(lang) : set.delete(lang); return { ...prev, languages: Array.from(set) }; });
+                  }} />
+                  {lang.toUpperCase()}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm font-medium mb-1">{'G\u00E9neros'}</div>
+            <div className="flex flex-wrap gap-2">
+              {['pop','rock','jazz','latino','cl\u00E1sica','indie','r&b','electr\u00F3nica'].map(genre => (
+                <label key={genre} className={`text-xs border rounded px-2 py-1 cursor-pointer ${musicPrefs.genres.includes(genre)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                  <input type="checkbox" className="hidden" checked={musicPrefs.genres.includes(genre)} onChange={(e)=>{
+                    setMusicPrefs(prev => { const set = new Set(prev.genres); e.target.checked ? set.add(genre) : set.delete(genre); return { ...prev, genres: Array.from(set) }; });
+                  }} />
+                  {genre}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm font-medium mb-1">{'D\u00E9cadas'}</div>
+            <div className="flex flex-wrap gap-2">
+              {['70s','80s','90s','2000s','2010s','actual'].map(dec => (
+                <label key={dec} className={`text-xs border rounded px-2 py-1 cursor-pointer ${musicPrefs.decades.includes(dec)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                  <input type="checkbox" className="hidden" checked={musicPrefs.decades.includes(dec)} onChange={(e)=>{
+                    setMusicPrefs(prev => { const set = new Set(prev.decades); e.target.checked ? set.add(dec) : set.delete(dec); return { ...prev, decades: Array.from(set) }; });
+                  }} />
+                  {dec}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="text-right"><Button onClick={saveProfile}>Guardar preferencias</Button></div>
+      </Card>
+
+      <Card className="space-y-4">
+        <h2 className="text-lg font-medium">{'Informaci\u00F3n de la cuenta'}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre" name="name" value={account.name} onChange={handleAccountChange} />
           <Input label="Cuenta vinculada" name="linkedAccount" value={account.linkedAccount} onChange={handleAccountChange} />
           <Input label="Wedding planner vinculada" name="planner" value={account.planner} onChange={handleAccountChange} />
           <Input label="Ayudantes vinculados" name="helpers" value={account.helpers} onChange={handleAccountChange} />
-          <Input label="Correo electrónico" name="email" type="email" value={account.email} onChange={handleAccountChange} />
-          <Input label="Número WhatsApp personal" name="whatsNumber" placeholder="+34xxxxxxxxx" value={account.whatsNumber} onChange={handleAccountChange} />
-          <Input label="Reestablecer contraseña" name="password" type="password" value={account.password} onChange={handleAccountChange} />
+          <Input label={'Correo electr\u00F3nico'} name="email" type="email" value={account.email} onChange={handleAccountChange} />
+          <Input label={'N\u00FAmero WhatsApp personal'} name="whatsNumber" placeholder="+34xxxxxxxxx" value={account.whatsNumber} onChange={handleAccountChange} />
+          <Input label={'Reestablecer contrase\u00F1a'} name="password" type="password" value={account.password} onChange={handleAccountChange} />
         </div>
-        <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
-        </div>
+        <div className="text-right"><Button onClick={saveProfile}>Guardar</Button></div>
       </Card>
 
-      {/* Información de la boda */}
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">Información de la boda</h2>
+        <h2 className="text-lg font-medium">{'Informaci\u00F3n de la boda'}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre de la pareja" name="coupleName" value={weddingInfo.coupleName} onChange={handleWeddingChange} />
-          <Input label="Lugar de la celebración" name="celebrationPlace" value={weddingInfo.celebrationPlace} onChange={handleWeddingChange} />
+          <Input label={'Lugar de la celebraci\u00F3n'} name="celebrationPlace" value={weddingInfo.celebrationPlace} onChange={handleWeddingChange} />
           <Input label="Lugar del banquete" name="banquetPlace" value={weddingInfo.banquetPlace} onChange={handleWeddingChange} />
           <Input label="Horario" name="schedule" value={weddingInfo.schedule} onChange={handleWeddingChange} />
           <Input label="Fecha de la boda" name="weddingDate" type="date" value={weddingInfo.weddingDate} onChange={handleWeddingChange} />
           <Input label="Cuenta de regalos" name="giftAccount" value={weddingInfo.giftAccount} onChange={handleWeddingChange} />
-          <Input label="Número de invitados" name="numGuests" type="number" value={weddingInfo.numGuests} readOnly />
+          <Input label={'N\u00FAmero de invitados'} name="numGuests" type="number" value={weddingInfo.numGuests} readOnly />
         </div>
-        <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
-        </div>
+        <div className="text-right"><Button onClick={saveProfile}>Guardar</Button></div>
       </Card>
 
-      {/* Información importante de la boda */}
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">Información importante de la boda</h2>
-        <textarea
-          className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Datos o detalles clave que la IA o el usuario quieran guardar (ej.: alergias, proveedores críticos, horarios especiales, etc.)"
-          value={importantInfo}
-          onChange={(e)=>setImportantInfo(e.target.value)}
-        />
-        <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
-        </div>
+        <h2 className="text-lg font-medium">{'Informaci\u00F3n importante de la boda'}</h2>
+        <textarea className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder={'Datos o detalles clave (alergias, proveedores cr\u00EDticos, horarios especiales, etc.)'} value={importantInfo} onChange={(e)=>setImportantInfo(e.target.value)} />
+        <div className="text-right"><Button onClick={saveProfile}>Guardar</Button></div>
       </Card>
 
-      {/* Colaboradores */}
       <Card className="space-y-4">
         <h2 className="text-lg font-medium flex items-center"><Users className="w-5 h-5 mr-2" />Colaboradores</h2>
-          {/* Invitación a wedding planner */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
-            <Input
-              placeholder="Email del planner"
-              value={plannerEmail}
-              onChange={(e)=>setPlannerEmail(e.target.value)}
-              className="flex-1"
-            />
-            <Button onClick={handleCreateInvite} disabled={inviteLoading || !plannerEmail}>
-              {inviteLoading ? 'Creando...' : 'Crear enlace'}
-            </Button>
-          </div>
-          {inviteLink && (
-            <p className="text-sm text-green-700 break-all mb-4 select-all">
-              Enlace generado: <span className="underline">{inviteLink}</span>
-            </p>
-          )}
+        <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
+          <Input placeholder="Email del planner" value={plannerEmail} onChange={(e)=>setPlannerEmail(e.target.value)} className="flex-1" />
+          <Button onClick={handleCreateInvite} disabled={inviteLoading || !plannerEmail}>{inviteLoading ? 'Creando...' : 'Crear enlace'}</Button>
+        </div>
+        {inviteLink && (<p className="text-sm text-green-700 break-all mb-4 select-all">Enlace generado: <span className="underline">{inviteLink}</span></p>)}
         {rolesLoading ? (
           <p>Cargando...</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b">
-                <th className="text-left p-2">Usuario</th>
-                <th className="text-left p-2">Rol</th>
-                <th className="p-2 text-center">Acciones</th>
-              </tr>
+              <tr className="border-b"><th className="text-left p-2">Usuario</th><th className="text-left p-2">Rol</th><th className="p-2 text-center">Acciones</th></tr>
             </thead>
             <tbody>
               {collaborators.map(c => (
-                <tr key={c.uid} className="border-b">
-                  <td className="p-2">{c.email || c.uid}</td>
+                <tr key={c.userId || c.uid} className="border-b">
+                  <td className="p-2">{c.email || c.userId || c.uid}</td>
                   <td className="p-2">
-                    <select
-                      value={c.role}
-                      onChange={(e)=>assignRole(c.uid, e.target.value)}
-                      disabled={c.role==='owner'}
-                      className="border rounded px-2 py-1 text-sm">
+                    <select value={c.role} onChange={(e)=>assignRole(c.userId || c.uid, e.target.value)} disabled={c.role==='owner'} className="border rounded px-2 py-1 text-sm">
                       <option value="owner">Pareja</option>
                       <option value="planner">Wedding Planner</option>
                       <option value="helper">Ayudante</option>
                     </select>
                   </td>
                   <td className="p-2 text-center">
-                    {c.role!=='owner' && (
-                      <button onClick={()=>removeRole(c.uid)} className="text-red-500 hover:text-red-700">
-                        <X size={16} />
-                      </button>
-                    )}
+                    {c.role!=='owner' && (<button onClick={()=>removeRole(c.userId || c.uid)} className="text-red-500 hover:text-red-700"><X size={16} /></button>)}
                   </td>
                 </tr>
               ))}
@@ -348,25 +308,21 @@ function Perfil() {
         )}
       </Card>
 
-      {/* Datos de facturación */}
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">Datos de facturación</h2>
+        <h2 className="text-lg font-medium">{'Datos de facturaci\u00F3n'}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre completo" name="fullName" value={billing.fullName} onChange={handleBillingChange} />
-          <Input label="Dirección" name="address" value={billing.address} onChange={handleBillingChange} />
+          <Input label={'Direcci\u00F3n'} name="address" value={billing.address} onChange={handleBillingChange} />
           <Input label="CP" name="zip" value={billing.zip} onChange={handleBillingChange} />
           <Input label="Localidad" name="city" value={billing.city} onChange={handleBillingChange} />
           <Input label="Provincia" name="state" value={billing.state} onChange={handleBillingChange} />
-          <Input label="País" name="country" value={billing.country} onChange={handleBillingChange} />
+          <Input label={'Pa\u00EDs'} name="country" value={billing.country} onChange={handleBillingChange} />
           <Input label="DNI" name="dni" value={billing.dni} onChange={handleBillingChange} />
         </div>
-        <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
-        </div>
+        <div className="text-right"><Button onClick={saveProfile}>Guardar</Button></div>
       </Card>
     </div>
   );
 }
 
 export default Perfil;
-

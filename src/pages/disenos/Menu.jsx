@@ -5,6 +5,7 @@ import { saveData, loadData } from '../../services/SyncService';
 import SyncIndicator from '../../components/SyncIndicator';
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
 
+const defaultMenu = { entradas: [], principales: [], postres: [], bebidas: [] };
 const initialState = () => {
   try {
     return loadData('menuDesigner', { 
@@ -48,9 +49,22 @@ const menuTemplates = [
 
 export default function MenuDiseno() {
   
-  const [menu, setMenu] = useState(initialState);
+  const [menu, setMenu] = useState(defaultMenu);
   const [course, setCourse] = useState('entradas');
   const [dish, setDish] = useState('');
+  useEffect(() => {
+    (async () => {
+      try {
+        const loaded = await loadData('menuDesigner', {
+          defaultValue: defaultMenu,
+          collection: 'userMenus'
+        });
+        if (loaded && typeof loaded === 'object') setMenu(loaded);
+      } catch (error) {
+        console.error('Error al cargar el diseño del menú:', error);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     saveData('menuDesigner', menu, {

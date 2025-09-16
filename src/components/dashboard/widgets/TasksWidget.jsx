@@ -1,28 +1,70 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
 
-const SAMPLE_TASKS = [
-  { id: 1, title: 'Reservar salón', dueDate: '2023-12-15', priority: 'high', completed: false },
-  { id: 2, title: 'Contratar fotógrafo', dueDate: '2023-12-20', priority: 'high', completed: false },
-  { id: 3, title: 'Elegir menú', dueDate: '2024-01-10', priority: 'medium', completed: true },
-  { id: 4, title: 'Enviar invitaciones', dueDate: '2024-01-30', priority: 'low', completed: false },
-];
+// Devuelve prioridad calculada según cercanía de la fecha
+const computePriority = (startDate) => {
+  try {
+    const now = new Date();
+    const diffDays = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 7) return 'high';
+    if (diffDays <= 21) return 'medium';
+    return 'low';
+  } catch (_) {
+    return 'low';
+  }
+};
+
+const normalizeDate = (d) => {
+  if (!d) return null;
+  if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+  if (typeof d?.toDate === 'function') {
+    const conv = d.toDate();
+    return isNaN(conv.getTime()) ? null : conv;
+  }
+  const parsed = new Date(d);
+  return isNaN(parsed.getTime()) ? null : parsed;
+};
 
 export const TasksWidget = ({ config }) => {
-  const filteredTasks = config.showCompleted 
-    ? SAMPLE_TASKS 
-    : SAMPLE_TASKS.filter(task => !task.completed);
+  const { data: meetings = [] } = useFirestoreCollection('meetings', []);
 
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
-    if (config.sortBy === 'priority') {
-      const priorityOrder = { high: 1, medium: 2, low: 3 };
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
-    } else if (config.sortBy === 'title') {
-      return a.title.localeCompare(b.title);
-    } else {
-      // Default: sort by due date
-      return new Date(a.dueDate) - new Date(b.dueDate);
-    }
-  });
+  const items = useMemo(() => {
+    const mapped = (Array.isArray(meetings) ? meetings : [])
+      .map((m) => {
+        const start = normalizeDate(m.start);
+        const end = normalizeDate(m.end) || start;
+        if (!start) return null;
+        const title = m.title || m.name || 'Sin título';
+        const completed = Boolean(m.completed);
+        const priority = m.priority || computePriority(start);
+        return {
+          id: m.id,
+          title,
+          dueDate: start,
+          endDate: end,
+          completed,
+          priority,
+        };
+      })
+      .filter(Boolean)
+      // solo futuras o de hoy
+      .filter((t) => t.dueDate >= new Date());
+
+    const filtered = config?.showCompleted ? mapped : mapped.filter((t) => !t.completed);
+
+    const sorted = [...filtered].sort((a, b) => {
+      const sortBy = config?.sortBy || 'date';
+      if (sortBy === 'priority') {
+        const order = { high: 1, medium: 2, low: 3 };
+        return (order[a.priority] || 99) - (order[b.priority] || 99);
+      }
+      if (sortBy === 'title') {
+        return a.title.localeCompare(b.title);
+      }
+      return a.dueDate - b.dueDate;
+    });
+    return sorted;
+  }, [meetings, config?.showCompleted, config?.sortBy]);
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -36,8 +78,8 @@ export const TasksWidget = ({ config }) => {
   return (
     <div className="h-full">
       <div className="space-y-2">
-        {sortedTasks.length > 0 ? (
-          sortedTasks.map(task => (
+        {items.length > 0 ? (
+          items.map(task => (
             <div 
               key={task.id} 
               className={`p-2 rounded border ${
@@ -55,7 +97,7 @@ export const TasksWidget = ({ config }) => {
                   <div className={`flex justify-between ${task.completed ? 'line-through' : ''}`}>
                     <span>{task.title}</span>
                     <span className="text-sm text-gray-500">
-                      {new Date(task.dueDate).toLocaleDateString('es-ES', {
+                      {task.dueDate.toLocaleDateString('es-ES', {
                         day: '2-digit',
                         month: 'short'
                       })}

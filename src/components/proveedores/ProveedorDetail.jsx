@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProveedorBudgets from './ProveedorBudgets.jsx';
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 import { post as apiPost } from '../../services/apiClient';
 import { useWedding } from '../../context/WeddingContext';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import Toast from '../Toast';
+import Modal from '../Modal';
+import RFQModal from './RFQModal';
+import useSupplierRFQHistory from '../../hooks/useSupplierRFQHistory';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -37,6 +40,10 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [removing, setRemoving] = useState(false);
   const [toast, setToast] = useState(null);
   const [groupCleared, setGroupCleared] = useState(false);
+  const [rfqOpen, setRfqOpen] = useState(false);
+  const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
+  const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
+  const [preview, setPreview] = useState({ open: false, url: '', type: '' });
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -79,7 +86,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
   const handleOpenLegalDocs = () => {
     const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
-    navigate('/protocolo/documentos-legales', {
+    navigate('/protocolo/documentos', {
       state: {
         prefill: {
           type: 'provider_contract',
@@ -129,6 +136,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   };
 
+  const formatDateTime = (ts) => {
+    if (!ts) return '';
+    try {
+      const d = typeof ts?.toDate === 'function' ? ts.toDate() : new Date(ts);
+      return d.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+    } catch (_) { return ''; }
+  };
+
   // Color según estado del proveedor
   const getStatusColor = (status) => {
     switch (status) {
@@ -146,12 +161,61 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header con título y botón de cierre */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold">{provider.name}</h2>
-          <button 
+    <Fragment>
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          {/* Header con título y botón de cierre */}
+          <div className="flex justify-between items-center p-4 border-b">
+            <h2 className="text-xl font-semibold">{provider.name}</h2>
+            <button 
+              onClick={onClose} 
+              className="text-gray-500 hover:text-gray-700"
+              aria-label="Cerrar"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          
+          {/* Pestañas de navegación */}
+          <div className="flex border-b">
+            <button
+              className={`py-2 px-4 ${activeTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('info')}
+            >
+              Información
+            </button>
+            <button
+              className={`py-2 px-4 ${activeTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('communications')}
+            >
+              Comunicaciones
+            </button>
+            <button
+              className={`py-2 px-4 ${activeTab === 'tracking' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('tracking')}
+            >
+              Seguimiento
+            </button>
+          </div>
+          
+          {/* Contenido principal con scroll */}
+          <div className="overflow-y-auto p-4 flex-1">
+            {activeTab === 'info' && (
+              <div className="space-y-6">
+                {/* Información principal */}
+                <Card>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center flex-wrap gap-2">
+                      <span className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}>
+                        {provider.status}
+                      </span>
+                      <span className="ml-2 text-gray-500">{provider.service}</span>
+                      {!!provider.groupName && !groupCleared && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenGroups?.(provider.groupId)}
+                          className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
+                          title={`Ir al grupo: ${provider.groupName}`}
             onClick={onClose} 
             className="text-gray-500 hover:text-gray-700"
             aria-label="Cerrar"
@@ -234,7 +298,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       className="ml-2 text-red-600 border-red-200 hover:bg-red-50"
                       disabled={removing}
                     >
-                      {removing ? 'Quitando…' : 'Quitar del grupo'}
+                      {removing ? 'Quitando⬦' : 'Quitar del grupo'}
                     </Button>
                   )}
                 </div>
@@ -372,10 +436,63 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       Crear contrato en Documentos
                     </Button>
                     <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
-                      {generating ? 'Generando…' : 'Generar ahora'}
+                      {generating ? 'Generando⬦' : 'Generar ahora'}
                     </Button>
                   </div>
                 </div>
+              </Card>
+              {/* RFQ enviados */}
+              <Card>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-medium">RFQ enviados</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={async () => {
+                        if (!activeWedding || !provider?.id) return;
+                        try {
+                          const res = await apiPost(`/api/supplier-portal/weddings/${activeWedding}/suppliers/${provider.id}/portal-token`, {}, { auth: true });
+                          const json = await res.json();
+                          if (json?.url) {
+                            try { await navigator.clipboard?.writeText?.(json.url); } catch {}
+                            setToast({ type: 'success', message: 'Enlace del portal copiado' });
+                          } else {
+                            setToast({ type: 'info', message: 'Token generado' });
+                          }
+                        } catch (e) {
+                          setToast({ type: 'error', message: 'No se pudo generar el enlace del portal' });
+                        }
+                      }}
+                    >
+                      Portal proveedor
+                    </Button>
+                    <Button
+                    variant="outline"
+                    onClick={() => { setRfqDefaults({ subject: `Solicitud de presupuesto - ${provider?.service || ''}`.trim(), body: '' }); setRfqOpen(true); }}
+                  >
+                    Enviar nuevo
+                  </Button>
+                  </div>
+                </div>
+                {rfqLoading ? (
+                  <p className="text-sm text-gray-500">Cargando...</p>
+                ) : rfqHistory.length === 0 ? (
+                  <p className="text-sm text-gray-500">Sin RFQs previos.</p>
+                ) : (
+                  <ul className="divide-y">
+                    {rfqHistory.map((r) => (
+                      <li key={r.id} className="py-2 flex items-center justify-between">
+                        <div>
+                          <p className="font-medium truncate max-w-[28rem]" title={r.subject}>{r.subject || 'Sin asunto'}</p>
+                          <p className="text-xs text-gray-600">{r.email || provider?.email} · {formatDateTime(r.sentAt)}</p>
+                        </div>
+                        <Button size="sm" variant="outline" onClick={() => { setRfqDefaults({ subject: r.subject || '', body: r.body || '' }); setRfqOpen(true); }}>
+                          Reenviar
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </Card>
             </div>
           )}
@@ -421,6 +538,27 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         duration={2500}
       />
     )}
+    {preview.open && (
+      <Modal open={preview.open} onClose={() => setPreview({ open: false, url: '', type: '' })} title="Vista previa">
+        <div className="min-h-[60vh]">
+          {preview.type === 'image' ? (
+            <img src={preview.url} alt="preview" className="max-h-[70vh] mx-auto" />
+          ) : preview.type === 'pdf' ? (
+            <iframe src={preview.url} className="w-full h-[70vh]" title="PDF" />
+          ) : (
+            <a href={preview.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Abrir en nueva pestaña</a>
+          )}
+        </div>
+      </Modal>
+    )}
+    <RFQModal
+      open={rfqOpen}
+      onClose={() => setRfqOpen(false)}
+      providers={[provider]}
+      defaultSubject={rfqDefaults.subject}
+      defaultBody={rfqDefaults.body}
+    />
+    </>
   );
 };
 
@@ -433,4 +571,6 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
+
+
 

@@ -2,24 +2,20 @@ import React from 'react';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
 
-// Datos iniciales para el diagrama Gantt
-export const initialTasks = [
-  { start: new Date(2025,0,1), end: new Date(2025,2,31), name: 'Buscar lugar de la boda', id: '1', type: 'task', category: 'LUGAR', progress: 20, isDisabled: false, dependencies: [] },
-  { start: new Date(2025,3,1), end: new Date(2025,4,15), name: 'Buscar fotógrafo', id: '2', type: 'task', category: 'FOTOGRAFO', progress: 10, isDisabled: false, dependencies: [] },
-  { start: new Date(2025,3,1), end: new Date(2025,5,15), name: 'Diseño de invitaciones', id: '3', type: 'task', category: 'PAPELERIA', progress: 0, isDisabled: false, dependencies: [] },
-  { start: new Date(2025,5,1), end: new Date(2025,5,30), name: 'Buscar vestido de novia', id: '4', type: 'task', category: 'VESTUARIO', progress: 0, isDisabled: false, dependencies: [] },
-  { start: new Date(2025,5,1), end: new Date(2025,5,30), name: 'Buscar catering', id: '5', type: 'task', category: 'COMIDA', progress: 0, isDisabled: false, dependencies: [] },
-  { start: new Date(2025,5,15), end: new Date(2025,6,15), name: 'Enviar invitaciones', id: '6', type: 'task', category: 'INVITADOS', progress: 0, isDisabled: false, dependencies: ['3'] },
-];
-
 // Componente para el diagrama Gantt
 export const GanttChart = ({ 
   tasks = [], 
   onTaskClick,
   viewMode = ViewMode.Month, 
-  listCellWidth = '155px',
+  listCellWidth = 0,
   columnWidth = 65 
 }) => {
+  // Tooltip simple que muestra solo el nombre del proceso
+  const NameOnlyTooltip = ({ task }) => (
+    <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: 6, padding: 8, boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}>
+      <div style={{ fontWeight: 600 }}>{task.name}</div>
+    </div>
+  );
   // Garantizar que las tareas estén bien formadas y sin valores vacíos
   // Normalizar fechas y filtrar tareas inválidas
   const normalizeDate = (d) => {
@@ -60,6 +56,8 @@ export const GanttChart = ({
       listCellWidth={listCellWidth}
       columnWidth={columnWidth}
       locale="es"
+      fontSize="12px"
+      TooltipContent={NameOnlyTooltip}
       barFill={60}
       barCornerRadius={4}
       barProgressColor="#4f46e5"

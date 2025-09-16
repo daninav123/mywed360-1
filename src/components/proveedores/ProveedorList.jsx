@@ -9,6 +9,9 @@ import GroupCreateModal from './GroupCreateModal';
 import ProveedorGroupCard from './ProveedorGroupCard';
 import GroupSuggestions from './GroupSuggestions';
 import useGroupBudgets from '../../hooks/useGroupBudgets';
+import RFQModal from './RFQModal';
+import CompareSelectedModal from './CompareSelectedModal';
+import FilterPresets from './FilterPresets';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -57,6 +60,7 @@ const ProveedorList = ({
   handleViewDetail,
   tab,
   setTab,
+  highlightGroupId,
   selected,
   toggleFavorite,
   ratingMin,
@@ -125,6 +129,10 @@ const ProveedorList = ({
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [showSelectedSug, setShowSelectedSug] = useState(false);
   const [hideGrouped, setHideGrouped] = useState(false);
+  const [highlightedGroupId, setHighlightedGroupId] = useState(null);
+  const [openRFQ, setOpenRFQ] = useState(false);
+  const [openCompare, setOpenCompare] = useState(false);
+  const [portalOnly, setPortalOnly] = useState(false);
 
   const groupMemberIds = useMemo(() => {
     const set = new Set();
@@ -139,9 +147,13 @@ const ProveedorList = ({
   }, [groups]);
 
   const providersToShow = useMemo(() => {
-    if (!hideGrouped) return filteredProviders;
-    return filteredProviders.filter((p) => !groupMemberIds.has(p.id));
-  }, [filteredProviders, hideGrouped, groupMemberIds]);
+    let list = filteredProviders;
+    if (hideGrouped) list = list.filter((p) => !groupMemberIds.has(p.id));
+    if (portalOnly) {
+      list = list.filter((p) => p.portalLastSubmitAt || p.portalAvailability);
+    }
+    return list;
+  }, [filteredProviders, hideGrouped, portalOnly, groupMemberIds]);
 
   const visibleGroups = useMemo(() => {
     const idsInList = new Set(filteredProviders.map((p) => p.id));
@@ -162,10 +174,28 @@ const ProveedorList = ({
   // Sugerencias para la selección actual (sin necesidad de crear grupo)
   const selectedProviders = useMemo(() => providers.filter((p) => selected.includes(p.id)), [providers, selected]);
   const { budgetsBySupplier: selectedBudgets } = useGroupBudgets(selected);
+  const portalCount = useMemo(() => (providers || []).filter((p) => p.portalLastSubmitAt || p.portalAvailability).length, [providers]);
+
+  // Efecto: resaltar y hacer scroll al grupo
+  React.useEffect(() => {
+    if (tab !== 'groups' || !highlightGroupId) return;
+    setHighlightedGroupId(highlightGroupId);
+  }, [tab, highlightGroupId]);
+
+  React.useEffect(() => {
+    if (tab !== 'groups' || !highlightedGroupId) return;
+    const id = `group-${highlightedGroupId}`;
+    const el = typeof document !== 'undefined' ? document.getElementById(id) : null;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    const t = setTimeout(() => setHighlightedGroupId(null), 3000);
+    return () => clearTimeout(t);
+  }, [tab, highlightedGroupId, visibleGroups]);
 
   const handleCreateContract = (provider) => {
     const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
-    navigate('/protocolo/documentos-legales', {
+    navigate('/protocolo/documentos', {
       state: {
         prefill: {
           type: 'provider_contract',
@@ -183,7 +213,25 @@ const ProveedorList = ({
   return (
     <div className="w-full">
       <Card className="mb-5">
-        <h2 className="text-xl font-semibold mb-4">Filtros</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Filtros</h2>
+          <span className="text-sm text-gray-600">Respuestas portal: {portalCount}</span>
+        </div>
+        <div className="mb-4">
+          <FilterPresets
+            filters={{ searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, hideGrouped }}
+            applyFilters={(f) => {
+              setSearchTerm(f.searchTerm || '');
+              setServiceFilter(f.serviceFilter || '');
+              setStatusFilter(f.statusFilter || '');
+              setDateFrom(f.dateFrom || '');
+              setDateTo(f.dateTo || '');
+              setRatingMin(typeof f.ratingMin === 'number' ? f.ratingMin : 0);
+              setTab(f.tab || 'all');
+              setHideGrouped(!!f.hideGrouped);
+            }}
+          />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           {/* Búsqueda por texto */}
           <div className="relative">
@@ -268,6 +316,15 @@ const ProveedorList = ({
               />
               Ocultar agrupados
             </label>
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={portalOnly}
+                onChange={(e) => setPortalOnly(e.target.checked)}
+              />
+              Solo respuestas portal
+            </label>
             {selected.length > 0 ? `${selected.length} seleccionado(s)` : 'Sin selecciones'}
           </div>
           <div className="flex gap-2">
@@ -278,6 +335,22 @@ const ProveedorList = ({
               disabled={selected.length < 2}
             >
               Unificar seleccionados
+            </Button>
+            <Button
+              onClick={() => setOpenCompare(true)}
+              variant="outline"
+              size="sm"
+              disabled={selected.length < 1}
+            >
+              Comparar
+            </Button>
+            <Button
+              onClick={() => setOpenRFQ(true)}
+              variant="outline"
+              size="sm"
+              disabled={selected.length < 1}
+            >
+              Solicitar presupuesto
             </Button>
             <Button
               onClick={() => setShowSelectedSug(true)}
@@ -297,19 +370,21 @@ const ProveedorList = ({
       {tab === 'groups' && visibleGroups.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {visibleGroups.map((g) => (
-            <ProveedorGroupCard
-              key={g.id}
-              group={g}
-              providers={filteredProviders}
-              onDissolve={async (gid) => await dissolveGroup(gid)}
-              onViewMember={(p) => handleViewDetail?.(p)}
-            />
+            <div key={g.id} id={`group-${g.id}`}>
+              <ProveedorGroupCard
+                group={g}
+                providers={filteredProviders}
+                onDissolve={async (gid) => await dissolveGroup(gid)}
+                onViewMember={(p) => handleViewDetail?.(p)}
+                highlighted={g.id === highlightedGroupId}
+              />
+            </div>
           ))}
         </div>
       )}
       {tab === 'groups' && visibleGroups.length === 0 && (
         <div className="col-span-full text-center py-8 text-gray-500">
-          No hay grupos. Selecciona 2+ proveedores y pulsa “Unificar seleccionados”.
+          No hay grupos. Selecciona 2+ proveedores y pulsa "Unificar seleccionados".
         </div>
       )}
 
@@ -374,10 +449,22 @@ const ProveedorList = ({
         group={{ id: 'selected', name: 'Selección actual', memberIds: selected }}
         providers={selectedProviders}
         budgetsBySupplier={selectedBudgets}
+      />      <RFQModal
+        open={openRFQ}
+        onClose={() => setOpenRFQ(false)}
+        providers={selectedProviders}
+      />
+      <CompareSelectedModal
+        open={openCompare}
+        onClose={() => setOpenCompare(false)}
+        providers={selectedProviders}
       />
     </div>
   );
 };
 
 export default ProveedorList;
+
+
+
 

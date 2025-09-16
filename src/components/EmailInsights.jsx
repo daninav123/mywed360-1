@@ -217,7 +217,7 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Reuniónes</h4>
           <ul className="list-disc list-inside text-sm">
             {meetings.map((m, i) => (
-              <li key={i}>{m.title} â€” {m.date}</li>
+              <li key={i}>{m.title} — {m.date}</li>
             ))}
           </ul>
         </section>
@@ -239,7 +239,7 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Contratos</h4>
           <ul className="list-disc list-inside text-sm">
             {contracts.map((c, i) => (
-              <li key={i}>{c.party} â€” {c.type} ({c.action})</li>
+              <li key={i}>{c.party} — {c.type} ({c.action})</li>
             ))}
           </ul>
         </section>

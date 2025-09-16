@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
-import { Users, Split, Eye, Lightbulb, X, Edit2, Check, XCircle } from 'lucide-react';
+import { Users, Split, Eye, Lightbulb, X, Edit2, Check, XCircle, Scissors, AlertCircle } from 'lucide-react';
 import useGroupBudgets from '../../hooks/useGroupBudgets';
 import GroupSuggestions from './GroupSuggestions';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
+import GroupAllocationModal from './GroupAllocationModal';
 
 /**
  * Tarjeta que representa un grupo manual de proveedores unificados
@@ -21,6 +22,7 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
   );
   const { budgetsBySupplier, loading } = useGroupBudgets(group.memberIds || []);
   const { removeMember, updateGroup } = useSupplierGroups();
+  const [openAlloc, setOpenAlloc] = useState(false);
 
   const totalRange = useMemo(() => {
     // muestra de coste aproximado si hay amounts
@@ -33,6 +35,24 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
     const max = Math.max(...amounts);
     return min === max ? `${min} €` : `${min}–${max} €`;
   }, [budgetsBySupplier]);
+
+  const conflicts = useMemo(() => {
+    // detectar solapes simples por misma fecha (YYYY-MM-DD) en reservas
+    const dateMap = new Map();
+    let overlap = false;
+    members.forEach((m) => {
+      const res = Array.isArray(m.reservations) ? m.reservations : [];
+      res.forEach((r) => {
+        const d = (r?.date || r?.fecha || '').toString().slice(0,10);
+        if (!d) return;
+        const arr = dateMap.get(d) || [];
+        arr.push(m.name || m.id);
+        dateMap.set(d, arr);
+        if (arr.length > 1) overlap = true;
+      });
+    });
+    return { overlap, dates: Array.from(dateMap.entries()).filter(([,v]) => v.length>1) };
+  }, [members]);
 
   return (
     <Card className={`bg-indigo-50 border-indigo-200 ${highlighted ? 'ring-2 ring-indigo-400 shadow-lg' : ''}`}>
@@ -123,6 +143,9 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
       </div>
       <div className="mt-3 text-sm text-indigo-900">
         {loading ? 'Leyendo presupuestos…' : totalRange ? `Rango de presupuestos detectado: ${totalRange}` : 'Sin presupuestos detectados aún'}
+        {conflicts.overlap && (
+          <div className="mt-2 text-sm text-red-700 flex items-center gap-1"><AlertCircle size={14}/> Posibles solapes en fechas ({conflicts.dates.map(d=>d[0]).join(', ')})</div>
+        )}
       </div>
 
       {openSug && (
@@ -134,6 +157,19 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
           budgetsBySupplier={budgetsBySupplier}
         />
       )}
+      {openAlloc && (
+        <GroupAllocationModal
+          open={openAlloc}
+          onClose={() => setOpenAlloc(false)}
+          group={group}
+          providers={members}
+        />
+      )}
+      <div className="mt-3 flex justify-end">
+        <Button size="sm" variant="outline" onClick={() => setOpenAlloc(true)}>
+          <Scissors size={16} className="mr-1" /> Dividir alcance
+        </Button>
+      </div>
     </Card>
   );
 }

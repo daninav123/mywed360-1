@@ -42,16 +42,34 @@ export const saveData = async (key, data, userOptions = {}) => {
         
         let docRef;
         if (options.docPath) {
-          docRef = doc(db, options.docPath);
-        } else if (options.collection === 'userProfile') {
-          const wid = localStorage.getItem('lovenda_active_wedding');
-          if (wid) {
-            docRef = doc(db, 'weddings', wid, 'weddingInfo');
-          } else {
-            docRef = doc(db, 'users', user.uid);
+          try {
+            const parts = String(options.docPath).split('/').filter(Boolean);
+            if (parts.length % 2 === 0) {
+              // Ruta a documento válida
+              docRef = doc(db, ...parts);
+            } else if (parts.length > 2) {
+              // Intento de corrección: tratar el último segmento como nombre de campo y usar el padre como documento
+              const parentParts = parts.slice(0, -1);
+              if (parentParts.length % 2 === 0) {
+                docRef = doc(db, ...parentParts);
+              }
+            }
+          } catch (e) {
+            console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
           }
-        } else {
-          docRef = doc(db, options.collection, user.uid);
+        }
+        if (!docRef) {
+          if (options.collection === 'userProfile') {
+            const wid = localStorage.getItem('lovenda_active_wedding');
+            if (wid) {
+              // Guardar como campo dentro del documento principal de la boda
+              docRef = doc(db, 'weddings', wid);
+            } else {
+              docRef = doc(db, 'users', user.uid);
+            }
+          } else {
+            docRef = doc(db, options.collection, user.uid);
+          }
         }
         
         try {
@@ -111,11 +129,6 @@ export const saveData = async (key, data, userOptions = {}) => {
 
 // Carga datos con prioridad a Firestore si está online, sino de localStorage
 export const loadData = async (key, userOptions = {}) => {
-  // Sanear docPath: si es impar (colección) no puede usarse con doc()
-  if (userOptions?.docPath && userOptions.docPath.split('/').length % 2 === 1) {
-    console.warn('[SyncService] docPath inválido (segmentos impares), se usará sólo localStorage:', userOptions.docPath);
-    userOptions = { ...userOptions, firestore: false }; // fuerza fallback
-  }
   const options = {
     firestore: true, // Intentar cargar de Firestore?
     collection: 'users', // Colección en Firestore (doc users/{uid})
@@ -136,18 +149,33 @@ export const loadData = async (key, userOptions = {}) => {
         
         try {
           let docRef;
-        if (options.docPath) {
-          docRef = doc(db, options.docPath);
-        } else if (options.collection === 'userProfile') {
-          const wid = localStorage.getItem('lovenda_active_wedding');
-          if (wid) {
-            docRef = doc(db, 'weddings', wid, 'weddingInfo');
-          } else {
-            docRef = doc(db, 'users', user.uid);
+          if (options.docPath) {
+            try {
+              const parts = String(options.docPath).split('/').filter(Boolean);
+              if (parts.length % 2 === 0) {
+                docRef = doc(db, ...parts);
+              } else if (parts.length > 2) {
+                const parentParts = parts.slice(0, -1);
+                if (parentParts.length % 2 === 0) {
+                  docRef = doc(db, ...parentParts);
+                }
+              }
+            } catch (e) {
+              console.warn('[SyncService] docPath inválido, usando fallback:', options.docPath, e);
+            }
           }
-        } else {
-          docRef = doc(db, options.collection, user.uid);
-        }
+          if (!docRef) {
+            if (options.collection === 'userProfile') {
+              const wid = localStorage.getItem('lovenda_active_wedding');
+              if (wid) {
+                docRef = doc(db, 'weddings', wid);
+              } else {
+                docRef = doc(db, 'users', user.uid);
+              }
+            } else {
+              docRef = doc(db, options.collection, user.uid);
+            }
+          }
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists() && docSnap.data()[key] !== undefined) {

@@ -1,4 +1,5 @@
 // Express backend for Lovenda
+
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
 //   Health check at /
@@ -11,7 +12,7 @@ import path from 'path';
 const secretEnvPath = '/etc/secrets/app.env';
 if (fs.existsSync(secretEnvPath)) {
   dotenv.config({ path: secretEnvPath });
-  console.log('✅ Variables de entorno cargadas desde secret file', secretEnvPath);
+  console.log('�S& Variables de entorno cargadas desde secret file', secretEnvPath);
 } else {
   dotenv.config(); // fallback a .env local
 }
@@ -55,8 +56,9 @@ import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
 import imageProxyRouter from './routes/image-proxy.js';
 import weddingNewsRouter from './routes/wedding-news.js';
-import publicWeddingRouter from './routes/public-wedding.js';
+import supplierPortalRouter from './routes/supplier-portal.js';
 import supplierBudgetRouter from './routes/supplier-budget.js';
+import publicWeddingRouter from './routes/public-wedding.js';
 import rsvpRouter from './routes/rsvp.js';
 import automationRouter from './routes/automation.js';
 import legalDocsRouter from './routes/legal-docs.js';
@@ -70,6 +72,7 @@ import paymentsRouter from './routes/payments.js';
 import paymentsWebhookRouter from './routes/payments-webhook.js';
 import healthRouter from './routes/health.js';
 import calendarFeedRouter from './routes/calendar-feed.js';
+import spotifyRouter from './routes/spotify.js';
 
 
 // Load environment variables (root .env)
@@ -82,12 +85,12 @@ if (result.error) {
   result = dotenv.config({ path: parentEnvPath });
 }
 if (result.error) {
-  console.warn('⚠️  .env file not found at', envPath);
+  console.warn('�a�️  .env file not found at', envPath);
 } else {
-  console.log('✅ .env loaded from', envPath);
+  console.log('�S& .env loaded from', envPath);
 }
 if (!process.env.OPENAI_API_KEY) {
-  console.warn('⚠️  OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
+  console.warn('�a�️  OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
 }
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4004; // Render inyecta PORT, 4004 por defecto para desarrollo local
@@ -269,7 +272,9 @@ app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser púb
 // Public wedding site (GET public, POST publish with auth context)
 app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
-app.use('/api/weddings', requireAuth, supplierBudgetRouter);
+  app.use('/api/weddings', requireAuth, supplierBudgetRouter);
+  // Supplier portal (public entry by token, handled inside router)
+  app.use('/api/supplier-portal', supplierPortalRouter);
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
 app.use('/api/legal-docs', requireAuth, legalDocsRouter);
@@ -283,6 +288,7 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
+app.use('/api/spotify', spotifyRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
@@ -424,3 +430,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
+
+
+

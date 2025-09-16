@@ -28,7 +28,7 @@
     "pdfkit": "^0.17.1",
     "svg-to-pdfkit": "^0.1.8",
     "twilio": "^4.22.0",
-    "@myno_21/pinterest-scraper": "^2.0.4"
+    "@myno_21/pinterest-scraper": "^1.0.4"
   },
   "devDependencies": {
     "concurrently": "^8.0.1",

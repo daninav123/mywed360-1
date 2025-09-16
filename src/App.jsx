@@ -15,46 +15,52 @@ import Bodas from './pages/Bodas';
 import BodaDetalle from './pages/BodaDetalle';
 import Finance from './pages/Finance';
 import More from './pages/More';
-import Invitados from './pages/Invitados';
-import Proveedores from './pages/Proveedores';
-import UnifiedEmail from './pages/UnifiedEmail';
-import EmailAdminDashboard from './components/admin/EmailAdminDashboard';
-import ComposeEmail from './components/email/ComposeEmail';
-import EmailStatistics from './pages/user/EmailStatistics';
-import MailgunTester from './components/email/MailgunTester';
-import EmailSetup from './pages/EmailSetup';
-import MetricsDashboard from './components/metrics/MetricsDashboard';
+const Invitados = React.lazy(() => import('./pages/Invitados'));
+import Proveedores from './pages/ProveedoresNuevo';
+// Lazy load de páginas pesadas para reducir bundle inicial
+const UnifiedEmail = React.lazy(() => import('./pages/UnifiedEmail'));
+const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
+const ComposeEmail = React.lazy(() => import('./components/email/ComposeEmail'));
+const EmailStatistics = React.lazy(() => import('./pages/user/EmailStatistics'));
+const MailgunTester = React.lazy(() => import('./components/email/MailgunTester'));
+const EmailSetup = React.lazy(() => import('./pages/EmailSetup'));
 import AdminRoutes from './routes/AdminRoutes';
-import UserRoutes from './routes/UserRoutes';
-import WhatsAppMetrics from './components/whatsapp/WhatsAppMetrics';
 
 import Perfil from './pages/Perfil';
-import SeatingPlanRefactored from './components/seating/SeatingPlanRefactored.jsx';
+const SeatingPlanRefactored = React.lazy(() => import('./components/seating/SeatingPlanRefactored.jsx'));
 import Invitaciones from './pages/Invitaciones';
-import Contratos from './pages/Contratos';
-import DisenoWeb from './pages/DisenoWeb';
+const Contratos = React.lazy(() => import('./pages/Contratos'));
+const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
+// Protocolo
+const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
+const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
+const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
+const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
+const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
+const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
 import WebEditor from './pages/WebEditor';
-import DisenosLayout from './pages/disenos/DisenosLayout';
-import DisenosInvitaciones from './pages/disenos/Invitaciones';
-import DisenosLogo from './pages/disenos/Logo';
-import MenuDiseno from './pages/disenos/Menu';
-import SeatingPlanPost from './pages/disenos/SeatingPlanPost';
-import MenuCatering from './pages/disenos/MenuCatering';
-import PapelesNombres from './pages/disenos/PapelesNombres';
-import DisenosVectorEditor from './pages/disenos/VectorEditor';
-import MisDisenos from './pages/disenos/MisDisenos';
-import Ideas from './pages/Ideas';
-import Inspiration from './pages/Inspiration';
-import Blog from './pages/Blog';
+const DisenosLayout = React.lazy(() => import('./pages/disenos/DisenosLayout'));
+const DisenosInvitaciones = React.lazy(() => import('./pages/disenos/Invitaciones'));
+const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo'));
+const MenuDiseno = React.lazy(() => import('./pages/disenos/Menu'));
+const SeatingPlanPost = React.lazy(() => import('./pages/disenos/SeatingPlanPost'));
+const MenuCatering = React.lazy(() => import('./pages/disenos/MenuCatering'));
+const PapelesNombres = React.lazy(() => import('./pages/disenos/PapelesNombres'));
+const DisenosVectorEditor = React.lazy(() => import('./pages/disenos/VectorEditor'));
+const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
+const Ideas = React.lazy(() => import('./pages/Ideas'));
+const Inspiration = React.lazy(() => import('./pages/Inspiration'));
+const Blog = React.lazy(() => import('./pages/Blog'));
 import DevSeedGuests from './pages/DevSeedGuests';
 import DevEnsureFinance from './pages/DevEnsureFinance';
 
-import Notificaciones from './pages/Notificaciones';
+const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
 import WeddingSite from './pages/WeddingSite';
 import RSVPConfirm from './pages/RSVPConfirm';
 import AcceptInvitation from './pages/AcceptInvitation';
 import RSVPDashboard from './pages/RSVPDashboard';
 import PublicWedding from './pages/PublicWedding';
+import SupplierPortal from './pages/SupplierPortal';
 
 import './i18n';
 import DiagnosticPanel from './components/DiagnosticPanel';
@@ -105,6 +111,7 @@ function App() {
       <WeddingProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
+          <React.Suspense fallback={<div className="flex items-center justify-center min-h-screen"><Loader className="w-10 h-10" /><span className="ml-3 text-lg">Cargando...</span></div>}>
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
@@ -113,6 +120,7 @@ function App() {
             {/* Rutas públicas */}
             <Route path="w/:uid" element={<WeddingSite />} />
             <Route path="p/:slug" element={<PublicWedding />} />
+            <Route path="supplier/:token" element={<SupplierPortal />} />
             <Route path="invitation/:code" element={<AcceptInvitation />} />
             <Route path="rsvp/:token" element={<RSVPConfirm />} />
 
@@ -136,8 +144,15 @@ function App() {
                 <Route path="proveedores/contratos" element={<Contratos />} />
 
                 {/* Protocolo */}
-                <Route path="protocolo" element={<DisenoWeb />}> {/* placeholder or actual ProtocoloLayout if available */}
+                <Route path="protocolo" element={<ProtocoloLayout />}>
                   <Route index element={<Navigate to="momentos-especiales" replace />} />
+                  <Route path="momentos-especiales" element={<MomentosEspeciales />} />
+                  <Route path="timing" element={<ProtocoloTiming />} />
+                  <Route path="checklist" element={<ProtocoloChecklist />} />
+                  <Route path="ayuda-ceremonia" element={<ProtocoloAyuda />} />
+                  <Route path="documentos" element={<DocumentosLegales />} />
+                  {/* Legacy path redirect to the new one */}
+                  <Route path="documentos-legales" element={<Navigate to="documentos" replace />} />
                 </Route>
 
                 {/* Diseños */}
@@ -181,6 +196,7 @@ function App() {
             </Route>
           </Routes>
           {/* Sistema de diagnóstico global */}
+          </React.Suspense>
           <DiagnosticPanel />
         </BrowserRouter>
       </WeddingProvider>

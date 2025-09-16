@@ -146,7 +146,7 @@ export default function useSupplierGroups() {
   );
 
   const updateGroup = useCallback(
-    async (groupId, { name, notes }) => {
+    async (groupId, { name, notes, targetBudget }) => {
       if (!activeWedding || !groupId) return { success: false, error: 'Missing params' };
       try {
         const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
@@ -155,7 +155,9 @@ export default function useSupplierGroups() {
         const data = snap.data();
         const newName = typeof name === 'string' ? name : data?.name || '';
         const newNotes = typeof notes === 'string' ? notes : data?.notes || '';
-        await updateDoc(gRef, { name: newName, notes: newNotes, updatedAt: serverTimestamp() });
+        const payload = { name: newName, notes: newNotes, updatedAt: serverTimestamp() };
+        if (typeof targetBudget === 'number') payload.targetBudget = targetBudget;
+        await updateDoc(gRef, payload);
         // Propagar cambio de nombre a miembros
         const memberIds = Array.isArray(data?.memberIds) ? data.memberIds : [];
         await Promise.all(

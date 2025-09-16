@@ -258,6 +258,16 @@ export const AuthProvider = ({ children }) => {
     loading: isLoading,
     isLoading,
     isAuthenticated,
+    // Roles básicos desde el perfil (compatibilidad con MainLayout)
+    hasRole: ((...roles) => {
+      try {
+        const currentRole = userProfile?.role || 'particular';
+        if (!roles || roles.length === 0) return !!currentRole;
+        return roles.some(r => r === currentRole);
+      } catch {
+        return false;
+      }
+    }),
     login,
     logout,
     register,

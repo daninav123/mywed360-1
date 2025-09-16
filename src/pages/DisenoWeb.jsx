@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../hooks/useAuth';
-import { post as apiPost } from '../services/apiClient';
+import { post as apiPost, get as apiGet } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
 
 export default function DisenoWeb() {
@@ -108,7 +108,7 @@ export default function DisenoWeb() {
     setCheckingSlug(true);
     timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/public/weddings/${encodeURIComponent(publishSlug)}`);
+        const res = await apiGet(`/api/public/weddings/${encodeURIComponent(publishSlug)}`);
         if (res.status === 404) {
           // puede ser not-found (libre) o expired
           try {

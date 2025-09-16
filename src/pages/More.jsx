@@ -116,8 +116,8 @@ export default function More() {
         <div className="relative">
           <button onClick={() => setOpenMenu(openMenu==='protocolo'?null:'protocolo')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
             <Clock size={32} className="text-blue-600 mb-2" />
-            <h2 className="font-semibold mb-1">Protocolo</h2>
-            <p className="text-sm text-gray-600">Momentos especiales, Timing y Checklist</p>
+          <h2 className="font-semibold mb-1">Protocolo</h2>
+            <p className="text-sm text-gray-600">Momentos especiales, Timing, Checklist y Documentos legales</p>
           </button>
           {openMenu==='protocolo' && (
             <div className="absolute bg-white border border-gray-200 rounded shadow mt-2 w-full z-10" onMouseEnter={pfProtocoloMenu} onFocus={pfProtocoloMenu} onTouchStart={pfProtocoloMenu}>
@@ -125,6 +125,7 @@ export default function More() {
               <Link to="/protocolo/timing" className="block px-4 py-2 hover:bg-gray-100">Timing</Link>
               <Link to="/protocolo/checklist" className="block px-4 py-2 hover:bg-gray-100">Checklist</Link>
               <Link to="/protocolo/ayuda-ceremonia" className="block px-4 py-2 hover:bg-gray-100">Ayuda Ceremonia</Link>
+              <Link to="/protocolo/documentos" className="block px-4 py-2 hover:bg-gray-100">Documentos</Link>
             </div>
           )}
         </div>

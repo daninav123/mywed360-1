@@ -91,7 +91,7 @@ const TaskForm = ({
               checked={formData.long} 
               onChange={e => setFormData({...formData, long: e.target.checked})} 
             /> 
-            <span>Largo plazo (Gantt)</span>
+            <span>Proceso (Gantt)</span>
           </label>
         </div>
         <div className="flex justify-end space-x-2">

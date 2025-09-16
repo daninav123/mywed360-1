@@ -20,11 +20,15 @@ const SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 // Recursos estáticos para cachear inmediatamente
 const STATIC_ASSETS = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.webmanifest', // legado
+  // Manifest servido desde public
   '/app.webmanifest',
-  '/offline.html'
+  // PWA fallback
+  '/offline.html',
+  // Iconos usados por notificaciones e instalación
+  '/icon-192.png',
+  '/icon-512.png',
+  '/badge-72.png',
+  '/logo-app.png'
 ];
 
 // Rutas de API que se pueden cachear

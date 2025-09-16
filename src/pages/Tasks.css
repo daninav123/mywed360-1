@@ -1,32 +1,20 @@
-/* Hide first column (task name) in Gantt header and body */
-/* Hide first column (task name) in Gantt header and body */
-._3_ygE > ._1nBOt > ._WuQ0f:first-child,
-._3ZbQT > ._34SS0 > ._3lLk3:first-child {
+/* Mostrar la columna de Nombre y ocultar las columnas From/To */
+/* Header: ocultar 2ª y 3ª columnas */
+._3_ygE > ._1nBOt > ._WuQ0f:nth-child(2),
+._3_ygE > ._1nBOt > ._WuQ0f:nth-child(3) {
+  display: none !important;
+}
+/* Body: ocultar 2ª y 3ª columnas */
+._3ZbQT > ._34SS0 > ._3lLk3:nth-child(2),
+._3ZbQT > ._34SS0 > ._3lLk3:nth-child(3) {
   display: none !important;
 }
 
-/* Additional Gantt layout tweaks */
-/* Shift chart left to remove blank list column */
-._3T42e {
-  position: relative;
-  left: -40px;
-  width: calc(100% + 40px);
-  overflow-x: hidden;
-}
-/* Hide internal list scroll area */
-._1eT-t {
-  display: none !important;
-}
-/* Adjust header text size and overflow to prevent overlap */
+/* Ajustes de layout y legibilidad */
+/* Ajustar tamaño de texto del header para evitar solapes */
 ._9w8d5, ._2q1Kt {
   font-size: 0.75rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-}
-
-/* Shift header and body tables left to align bars and remove blank list column */
-._3_ygE, ._3ZbQT {
-  margin-left: -40px !important;
-  width: calc(100% + 40px) !important;
 }
