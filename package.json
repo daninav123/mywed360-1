@@ -41,7 +41,9 @@
         "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",
         "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000",
         "fix:mails:from": "node backend/scripts/fixMailFrom.js",
-        "check:bundle": "node scripts/bundleBudget.js --maxBytes=2000000"
+        "check:bundle": "node scripts/bundleBudget.js --maxBytes=2000000",
+        "format": "prettier --write .",
+        "prepare": "husky install"
     },
     "dependencies": {
         "@emotion/react": "^11.14.0",
@@ -140,9 +142,18 @@
         "vite": "^4.5.14",
         "vite-plugin-pwa": "^0.16.7",
         "vitest": "^0.34.6",
-        "wait-on": "^8.0.4"
+        "wait-on": "^8.0.4",
+        "husky": "^9.1.6",
+        "lint-staged": "^15.2.10",
+        "prettier": "^3.3.3"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "^4.46.4"
+    },
+    "lint-staged": {
+      "*.{js,jsx,ts,tsx,json,css,md}": [
+        "eslint --fix",
+        "prettier --write"
+      ]
     }
 }

@@ -1,22 +1,22 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import useFinance from '../../../hooks/useFinance';
 
-const SAMPLE_BUDGET = {
-  total: 25000,
-  spent: 18500,
-  remaining: 6500,
-  categories: [
-    { name: 'Salón', budget: 10000, spent: 10000 },
-    { name: 'Catering', budget: 8000, spent: 6500 },
-    { name: 'Fotografía', budget: 3000, spent: 2000 },
-    { name: 'Vestuario', budget: 2000, spent: 0 },
-    { name: 'Decoración', budget: 2000, spent: 0 },
-  ]
-};
-
-export const BudgetWidget = ({ config }) => {
+export const BudgetWidget = ({ config = {} }) => {
   const { currency = '€' } = config;
-  const { total, spent, remaining, categories } = SAMPLE_BUDGET;
-  const percentageSpent = Math.round((spent / total) * 100);
+  const { stats, budgetUsage } = useFinance();
+
+  const { total, spent, remaining, categories } = useMemo(() => {
+    const total = Number(stats?.totalBudget || 0);
+    const spent = Number(stats?.totalSpent || 0);
+    const remaining = Math.max(total - spent, 0);
+    // Mapear categorías desde budgetUsage
+    const categories = Array.isArray(budgetUsage)
+      ? budgetUsage.map((c) => ({ name: c.name, budget: c.amount, spent: c.spent }))
+      : [];
+    return { total, spent, remaining, categories };
+  }, [stats, budgetUsage]);
+
+  const percentageSpent = total > 0 ? Math.round((spent / total) * 100) : 0;
   const percentageRemaining = 100 - percentageSpent;
 
   return (
@@ -79,9 +79,9 @@ export const BudgetWidget = ({ config }) => {
       </div>
 
       <div className="mt-4 text-right">
-        <button className="text-sm text-blue-600 hover:text-blue-800">
+        <a href="/finance#budget" className="text-sm text-blue-600 hover:text-blue-800">
           Ver presupuesto detallado →
-        </button>
+        </a>
       </div>
     </div>
   );

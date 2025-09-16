@@ -13,7 +13,21 @@ import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService'
 function Perfil() {
   const [subscription, setSubscription] = useState('free');
   const [account, setAccount] = useState({ name: '', linkedAccount: '', planner: '', helpers: '', email: '', whatsNumber: '', password: '' });
-  const [weddingInfo, setWeddingInfo] = useState({ coupleName: '', celebrationPlace: '', banquetPlace: '', schedule: '', giftAccount: '', weddingDate: '', numGuests: '' });
+  const [weddingInfo, setWeddingInfo] = useState({
+    coupleName: '',
+    celebrationPlace: '',
+    celebrationAddress: '',
+    banquetPlace: '',
+    receptionAddress: '',
+    schedule: '',
+    weddingDate: '',
+    rsvpDeadline: '',
+    giftAccount: '',
+    transportation: '',
+    weddingStyle: '',
+    colorScheme: '',
+    numGuests: ''
+  });
   const [importantInfo, setImportantInfo] = useState('');
   const [syncStatus, setSyncStatus] = useState(getSyncState());
   const [plannerEmail, setPlannerEmail] = useState('');
@@ -136,8 +150,19 @@ function Perfil() {
           if (wedSnap.exists() && wedSnap.data().weddingInfo) {
             const wi = wedSnap.data().weddingInfo;
             setWeddingInfo({
-              coupleName: wi.coupleName || '', celebrationPlace: wi.celebrationPlace || '', banquetPlace: wi.banquetPlace || '',
-              schedule: wi.schedule || '', giftAccount: wi.giftAccount || '', weddingDate: wi.weddingDate || '', numGuests: wi.numGuests || ''
+              coupleName: wi.coupleName || '',
+              celebrationPlace: wi.celebrationPlace || '',
+              celebrationAddress: wi.celebrationAddress || '',
+              banquetPlace: wi.banquetPlace || '',
+              receptionAddress: wi.receptionAddress || '',
+              schedule: wi.schedule || '',
+              weddingDate: wi.weddingDate || '',
+              rsvpDeadline: wi.rsvpDeadline || '',
+              giftAccount: wi.giftAccount || '',
+              transportation: wi.transportation || '',
+              weddingStyle: wi.weddingStyle || '',
+              colorScheme: wi.colorScheme || '',
+              numGuests: wi.numGuests || ''
             });
             if (wi.importantInfo) setImportantInfo(wi.importantInfo);
           }
@@ -171,7 +196,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium flex items-center gap-2"><Music className="w-5 h-5" /> Preferencias musicales</h2>
+        <h2 className="text-lg font-medium flex items-center gap-2">Preferencias musicales</h2>
 
         <div className="p-2">
           <p className="text-sm text-gray-600">
@@ -200,10 +225,16 @@ function Perfil() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre de la pareja" name="coupleName" value={weddingInfo.coupleName} onChange={handleWeddingChange} />
           <Input label={'Lugar de la celebraci\u00F3n'} name="celebrationPlace" value={weddingInfo.celebrationPlace} onChange={handleWeddingChange} />
+          <Input label={'Direcci\u00F3n de la celebraci\u00F3n'} name="celebrationAddress" value={weddingInfo.celebrationAddress} onChange={handleWeddingChange} />
           <Input label="Lugar del banquete" name="banquetPlace" value={weddingInfo.banquetPlace} onChange={handleWeddingChange} />
-          <Input label="Horario" name="schedule" value={weddingInfo.schedule} onChange={handleWeddingChange} />
+          <Input label={'Direcci\u00F3n del banquete'} name="receptionAddress" value={weddingInfo.receptionAddress} onChange={handleWeddingChange} />
+          <Input label={'Horario (ceremonia/recepci\u00F3n)'} name="schedule" value={weddingInfo.schedule} onChange={handleWeddingChange} />
           <Input label="Fecha de la boda" name="weddingDate" type="date" value={weddingInfo.weddingDate} onChange={handleWeddingChange} />
+          <Input label={'Fecha l\u00EDmite RSVP'} name="rsvpDeadline" type="date" value={weddingInfo.rsvpDeadline} onChange={handleWeddingChange} />
           <Input label="Cuenta de regalos" name="giftAccount" value={weddingInfo.giftAccount} onChange={handleWeddingChange} />
+          <Input label={'Transporte / alojamiento'} name="transportation" value={weddingInfo.transportation} onChange={handleWeddingChange} />
+          <Input label={'Estilo de la boda'} name="weddingStyle" value={weddingInfo.weddingStyle} onChange={handleWeddingChange} />
+          <Input label={'Paleta de colores (web)'} name="colorScheme" placeholder="Blanco y dorado" value={weddingInfo.colorScheme} onChange={handleWeddingChange} />
           <Input label={'N\u00FAmero de invitados'} name="numGuests" type="number" value={weddingInfo.numGuests} readOnly />
         </div>
         <div className="text-right"><Button onClick={saveProfile}>Guardar</Button></div>
@@ -268,5 +299,6 @@ function Perfil() {
 }
 
 export default Perfil;
+
 
 

@@ -7,11 +7,23 @@ const TaskList = ({
   onTaskClick,
   maxItems = 8
 }) => {
-  const sortedTasks = Array.isArray(tasks) ? tasks
-    .filter(e => e && e.start instanceof Date) // Verificar que sean tareas válidas
-    .sort((a, b) => a.start - b.start)
-    .filter(e => e.start >= new Date())
-    .slice(0, maxItems) : [];
+  const sortedTasks = Array.isArray(tasks) ? (() => {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    // De-duplicar por id (evita claves duplicadas durante actualizaciones optimistas)
+    const byId = new Map();
+    tasks.forEach((e) => {
+      if (!e || !(e.start instanceof Date)) return;
+      const key = e.id ?? `${e.title}-${e.start?.toISOString?.() ?? ''}`;
+      if (!byId.has(key)) byId.set(key, e);
+    });
+    return Array.from(byId.values())
+      .filter(e => e && e.start instanceof Date) // Verificar que sean tareas válidas
+      .sort((a, b) => a.start - b.start)
+      // Mostrar tareas desde hoy (inclusivo), aunque la hora ya haya pasado
+      .filter(e => e.start >= todayStart)
+      .slice(0, maxItems);
+  })() : [];
     
   return (
     <div className="rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">

@@ -4,7 +4,7 @@ import { Users, RefreshCw, Calculator } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatUtils';
 
 /**
- * Componente para configuración de aportaciones y regalos
+ * Componente para configuraciÃ³n de aportaciones y regalos
  * Permite configurar aportaciones iniciales, mensuales y estimaciones de regalos
  */
 export default function ContributionSettings({ 
@@ -15,6 +15,21 @@ export default function ContributionSettings({
 }) {
   const [localContributions, setLocalContributions] = useState(contributions);
   const [hasChanges, setHasChanges] = useState(false);
+
+  // Mantener el formulario sincronizado con los datos reales (Firestore)
+  // cuando cambie la prop contributions desde el hook useFinance
+  React.useEffect(() => {
+    setLocalContributions(contributions || {
+      initA: 0,
+      initB: 0,
+      monthlyA: 0,
+      monthlyB: 0,
+      extras: 0,
+      giftPerGuest: 0,
+      guestCount: 0,
+    });
+    setHasChanges(false);
+  }, [contributions]);
 
   // Manejar cambios en los campos
   const handleChange = (field, value) => {
@@ -35,7 +50,7 @@ export default function ContributionSettings({
     setHasChanges(false);
   };
 
-  // Cálculos en tiempo real
+  // CÃ¡lculos en tiempo real
   const monthlyTotal = localContributions.monthlyA + localContributions.monthlyB;
   const initialTotal = localContributions.initA + localContributions.initB;
   const expectedGifts = localContributions.giftPerGuest * localContributions.guestCount;
@@ -46,7 +61,7 @@ export default function ContributionSettings({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Configuración de Aportaciones</h2>
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">ConfiguraciÃ³n de Aportaciones</h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
             Configura las aportaciones y estima los ingresos esperados
           </p>
@@ -62,7 +77,7 @@ export default function ContributionSettings({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Formulario de configuración */}
+        {/* Formulario de configuraciÃ³n */}
         <div className="space-y-6">
           {/* Aportaciones iniciales */}
           <Card className="p-6">
@@ -72,7 +87,7 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Persona A (€)
+                  Persona A (â‚¬)
                 </label>
                 <input
                   type="number"
@@ -86,7 +101,7 @@ export default function ContributionSettings({
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Persona B (€)
+                  Persona B (â‚¬)
                 </label>
                 <input
                   type="number"
@@ -114,7 +129,7 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Persona A (€/mes)
+                  Persona A (â‚¬/mes)
                 </label>
                 <input
                   type="number"
@@ -128,7 +143,7 @@ export default function ContributionSettings({
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Persona B (€/mes)
+                  Persona B (â‚¬/mes)
                 </label>
                 <input
                   type="number"
@@ -156,7 +171,7 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Total extras (familia, otros ingresos) (€)
+                  Total extras (familia, otros ingresos) (â‚¬)
                 </label>
                 <input
                   type="number"
@@ -174,15 +189,15 @@ export default function ContributionSettings({
             </div>
           </Card>
 
-          {/* Estimación de regalos */}
+          {/* EstimaciÃ³n de regalos */}
           <Card className="p-6">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
-              Estimación de Regalos
+              EstimaciÃ³n de Regalos
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Regalo estimado por invitado (€)
+                  Regalo estimado por invitado (â‚¬)
                 </label>
                 <input
                   type="number"
@@ -196,7 +211,7 @@ export default function ContributionSettings({
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  Número de invitados
+                  NÃºmero de invitados
                 </label>
                 <div className="flex space-x-2">
                   <input
@@ -217,7 +232,7 @@ export default function ContributionSettings({
                   </Button>
                 </div>
                 <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
-                  Haz clic en el icono para cargar automáticamente desde tu lista de invitados
+                  Haz clic en el icono para cargar automÃ¡ticamente desde tu lista de invitados
                 </p>
               </div>
               <div className="pt-2 border-t border-[color:var(--color-text)]/10">
@@ -228,7 +243,7 @@ export default function ContributionSettings({
             </div>
           </Card>
 
-          {/* Botones de acción */}
+          {/* Botones de acciÃ³n */}
           {hasChanges && (
             <Card className="p-4 bg-[var(--color-primary)]/10 border-blue-200">
               <div className="flex justify-between items-center">
@@ -261,7 +276,7 @@ export default function ContributionSettings({
                   Resumen de Ingresos Esperados
                 </h3>
                 <p className="text-sm text-[color:var(--color-text)]/70">
-                  Proyección total basada en tus configuraciones
+                  ProyecciÃ³n total basada en tus configuraciones
                 </p>
               </div>
             </div>
@@ -317,7 +332,7 @@ export default function ContributionSettings({
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
-                  <strong>Aportaciones equilibradas:</strong> Mantén un balance justo entre las aportaciones de ambas personas.
+                  <strong>Aportaciones equilibradas:</strong> MantÃ©n un balance justo entre las aportaciones de ambas personas.
                 </p>
               </div>
             </div>

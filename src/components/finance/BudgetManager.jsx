@@ -5,8 +5,8 @@ import { formatCurrency } from '../../utils/formatUtils';
 import Modal from '../Modal';
 
 /**
- * Componente para gestión de presupuesto y categorías
- * Permite crear, editar y eliminar categorías de presupuesto
+ * Componente para Gestion de presupuesto y categorias
+ * Permite crear, editar y eliminar categorias de presupuesto
  */
 export default function BudgetManager({ 
   budget, 
@@ -19,46 +19,46 @@ export default function BudgetManager({
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(-1);
-  const [newCategory, setNewCategory] = useState({ name: '', amount: '' });
+  const [newCategory, setnewCategory] = useState({ name: '', amount: '' });
 
-  // Manejar apertura de modal para nueva categoría
+  // Manejar apertura de modal para nueva categoria
   const handleAddCategory = () => {
     setEditingCategory(null);
     setEditingCategoryIndex(-1);
-    setNewCategory({ name: '', amount: '' });
+    setnewCategory({ name: '', amount: '' });
     setShowCategoryModal(true);
   };
 
-  // Manejar apertura de modal para editar categoría
+  // Manejar apertura de modal para editar categoria
   const handleEditCategory = (category, index) => {
     setEditingCategory(category);
     setEditingCategoryIndex(index);
-    setNewCategory({ name: category.name, amount: category.amount.toString() });
+    setnewCategory({ name: category.name, amount: category.amount.toString() });
     setShowCategoryModal(true);
   };
 
-  // Manejar guardado de categoría
+  // Manejar guardado de categoria
   const handleSaveCategory = () => {
     const amount = Number(newCategory.amount);
     
     if (!newCategory.name.trim()) {
-      alert('El nombre de la categoría es obligatorio');
+      alert('El nombre de la categoria es obligatorio');
       return;
     }
     
     if (isNaN(amount) || amount < 0) {
-      alert('El monto debe ser un número válido');
+      alert('El monto debe ser un nÃƒÆ’Ã‚Âºmero vÃƒÆ’Ã‚Â¡lido');
       return;
     }
 
     if (editingCategory) {
-      // Editar categoría existente
+      // Editar categoria existente
       onUpdateCategory(editingCategoryIndex, { 
         name: newCategory.name.trim(), 
         amount 
       });
     } else {
-      // Agregar nueva categoría
+      // Agregar nueva categoria
       const result = onAddCategory(newCategory.name.trim(), amount);
       if (!result.success) {
         alert(result.error);
@@ -69,12 +69,12 @@ export default function BudgetManager({
     setShowCategoryModal(false);
     setEditingCategory(null);
     setEditingCategoryIndex(-1);
-    setNewCategory({ name: '', amount: '' });
+    setnewCategory({ name: '', amount: '' });
   };
 
-  // Manejar eliminación de categoría
+  // Manejar eliminaciÃƒÆ’Ã‚Â³n de categoria
   const handleDeleteCategory = (index, categoryName) => {
-    if (window.confirm(`¿Estás seguro de eliminar la categoría "${categoryName}"?`)) {
+    if (window.confirm(`Ãƒâ€šÃ‚Â¿EstÃƒÆ’Ã‚Â¡s seguro de eliminar la categoria "${categoryName}"?`)) {
       onRemoveCategory(index);
     }
   };
@@ -88,16 +88,16 @@ export default function BudgetManager({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Gestión de Presupuesto</h2>
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Gestion de Presupuesto</h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
-            Organiza y controla el presupuesto por categorías
+            Organiza y controla el presupuesto por categorias
           </p>
         </div>
         <Button
           leftIcon={<Plus size={16} />}
           onClick={handleAddCategory}
         >
-          Nueva Categoría
+          Nueva categoria
         </Button>
       </div>
 
@@ -152,17 +152,17 @@ export default function BudgetManager({
         </div>
       </Card>
 
-      {/* Lista de categorías */}
+      {/* Lista de categorias */}
       <Card className="overflow-hidden">
         <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)]">Categorías de Presupuesto</h3>
+          <h3 className="text-lg font-medium text-[color:var(--color-text)]">categorias de Presupuesto</h3>
         </div>
         
         {budgetUsage.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500 mb-4">No hay categorías de presupuesto</p>
+            <p className="text-gray-500 mb-4">No hay categorias de presupuesto</p>
             <Button onClick={handleAddCategory} leftIcon={<Plus size={16} />}>
-              Crear primera categoría
+              Crear primera categoria
             </Button>
           </div>
         ) : (
@@ -221,7 +221,7 @@ export default function BudgetManager({
                   </div>
                 </div>
 
-                {/* Barra de progreso de la categoría */}
+                {/* Barra de progreso de la categoria */}
                 <div>
                   <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
                     <span>Progreso</span>
@@ -248,41 +248,41 @@ export default function BudgetManager({
         )}
       </Card>
 
-      {/* Modal para agregar/editar categoría */}
+      {/* Modal para agregar/editar categoria */}
       <Modal
         open={showCategoryModal}
         onClose={() => {
           setShowCategoryModal(false);
           setEditingCategory(null);
           setEditingCategoryIndex(-1);
-          setNewCategory({ name: '', amount: '' });
+          setnewCategory({ name: '', amount: '' });
         }}
-        title={editingCategory ? 'Editar Categoría' : 'Nueva Categoría'}
+        title={editingCategory ? 'Editar categoria' : 'Nueva categoria'}
       >
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre de la categoría
+              Nombre de la categoria
             </label>
             <input
               type="text"
               value={newCategory.name}
-              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              placeholder="Ej: Catering, Música, Flores..."
+              onChange={(e) => setnewCategory({ ...newCategory, name: e.target.value })}
+              placeholder="Ej: Catering, MÃƒÆ’Ã‚Âºsica, Flores..."
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Presupuesto asignado (€)
+              Presupuesto asignado (ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬)
             </label>
             <input
               type="number"
               step="0.01"
               min="0"
               value={newCategory.amount}
-              onChange={(e) => setNewCategory({ ...newCategory, amount: e.target.value })}
+              onChange={(e) => setnewCategory({ ...newCategory, amount: e.target.value })}
               placeholder="0.00"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -295,13 +295,13 @@ export default function BudgetManager({
                 setShowCategoryModal(false);
                 setEditingCategory(null);
                 setEditingCategoryIndex(-1);
-                setNewCategory({ name: '', amount: '' });
+                setnewCategory({ name: '', amount: '' });
               }}
             >
               Cancelar
             </Button>
             <Button onClick={handleSaveCategory}>
-              {editingCategory ? 'Actualizar' : 'Crear'} Categoría
+              {editingCategory ? 'Actualizar' : 'Crear'} categoria
             </Button>
           </div>
         </div>

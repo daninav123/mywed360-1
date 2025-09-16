@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ViewMode } from 'gantt-task-react';
-import { serverTimestamp } from 'firebase/firestore';
+import { serverTimestamp, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { db as clientDb, auth as clientAuth } from '../../firebaseConfig';
+import { db } from '../../firebaseConfig';
 import { subscribeSyncState, getSyncState, loadData } from '../../services/SyncService';
 import { Cloud, CloudOff, RefreshCw, Download } from 'lucide-react';
 
@@ -450,13 +452,24 @@ export default function Tasks() {
           createdAt: serverTimestamp()
         };
         
+        let savedId = editingId;
         if (editingId) {
           await updateTaskFS(editingId, ganttTask);
         } else {
-          await addTaskFS(ganttTask);
+          const saved = await addTaskFS(ganttTask);
+          savedId = saved?.id || taskData.id;
         }
+        // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
+        try {
+          const uid = clientAuth?.currentUser?.uid;
+          if (uid && clientDb && (savedId || editingId)) {
+            const mirrorId = savedId || editingId;
+            await setDoc(doc(clientDb, 'users', uid, 'tasks', mirrorId), { ...ganttTask, id: mirrorId }, { merge: true });
+          }
+        } catch (_) {}
       } else {
         // Para el calendario
+        let savedId = editingId;
         if (editingId) {
           // Buscar primero en tareas Gantt
           if (tasksState.some(t => t.id === editingId)) {
@@ -466,8 +479,19 @@ export default function Tasks() {
           }
         } else {
           // Nueva reunión (evento puntual del calendario)
-          await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
+          const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
+          savedId = saved?.id || taskData.id;
         }
+        // Espejo opcional para feeds antiguos que leen users/{uid}/meetings
+        try {
+          const uid = clientAuth?.currentUser?.uid;
+          if (uid && clientDb) {
+            const mirrorId = savedId || editingId || taskData.id;
+            if (mirrorId) {
+              await setDoc(doc(clientDb, 'users', uid, 'meetings', mirrorId), { ...taskData, id: mirrorId }, { merge: true });
+            }
+          }
+        } catch (_) {}
       }
       
       // Cerrar modal y limpiar
@@ -479,29 +503,39 @@ export default function Tasks() {
   };
 
   // Eliminar una tarea
-  const handleDeleteTask = async () => {
+  const handleDeleteTask = () => {
     try {
-      if (!editingId) return;
-      if (!(typeof window !== 'undefined' ? window.confirm('¿Estás seguro de querer eliminar esta tarea?') : true)) return;
-      const existsInTasks = Array.isArray(tasksState) && tasksState.some(t => t?.id === editingId);
-      const existsInMeetings = Array.isArray(meetingsState) && meetingsState.some(m => m?.id === editingId);
-
-      if (existsInTasks) {
-        await deleteTaskFS(editingId);
-      }
-      if (existsInMeetings) {
-        await deleteMeetingFS(editingId);
-      }
-      // Si no podemos determinar, probar ambas (por compatibilidad)
-      if (!existsInTasks && !existsInMeetings) {
-        try { await deleteTaskFS(editingId); } catch (_) {}
-        try { await deleteMeetingFS(editingId); } catch (_) {}
+      console.log('[Tasks] Eliminar clicado', { editingId, isProcess: !!formData.long });
+      if (!editingId) {
+        closeModal();
+        return;
       }
 
+      // Cerrar el modal de forma optimista primero
       closeModal();
+
+      // Ejecutar las eliminaciones en background (ambas colecciones + hooks)
+      const ops = [];
+      if (activeWedding && db) {
+        ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
+        ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'meetings', editingId)));
+      }
+      // Borrado espejo en users/{uid}/...
+      try {
+        const uid = clientAuth?.currentUser?.uid;
+        if (uid && clientDb) {
+          ops.push(deleteDoc(doc(clientDb, 'users', uid, 'tasks', editingId)));
+          ops.push(deleteDoc(doc(clientDb, 'users', uid, 'meetings', editingId)));
+        }
+      } catch (_) {}
+      ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
+      ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
+      Promise.allSettled(ops)
+        .then(() => console.log('[Tasks] Eliminación completada', editingId))
+        .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
-      alert('No se pudo eliminar. Revisa tu conexión o permisos.');
+      try { closeModal(); } catch (_) {}
     }
   };
 
@@ -510,9 +544,8 @@ export default function Tasks() {
     setCompleted(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Procesar eventos para despliegue seguro - asegurando que tasksState sea un array
+  // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
   const allEvents = [
-    ...(Array.isArray(tasksState) ? tasksState.map(t => ({ ...t, title: t.name || t.title })) : []),
     ...(Array.isArray(meetingsState) ? meetingsState : [])
   ];
 
@@ -567,7 +600,7 @@ export default function Tasks() {
     const sortedTasks = [...safeEvents].sort((a, b) => a.start - b.start);
 
   // Solo tareas puntuales (no procesos) para la lista: normalizar solo meetings
-  const safeMeetings = (Array.isArray(meetingsState) ? meetingsState : [])
+  const safeMeetingsRaw = (Array.isArray(meetingsState) ? meetingsState : [])
     .filter(event => event !== null && event !== undefined)
     .map(event => {
       if (!event.start || !event.end) return null;
@@ -582,6 +615,18 @@ export default function Tasks() {
       };
     })
     .filter(Boolean);
+  // De-duplicar por id para evitar claves repetidas en la lista
+  const safeMeetings = (() => {
+    const seen = new Set();
+    const unique = [];
+    for (const ev of safeMeetingsRaw) {
+      const key = ev.id || `${ev.title}-${ev.start?.toISOString?.() ?? ''}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      unique.push(ev);
+    }
+    return unique;
+  })();
 
   // Filtro específico para tareas del componente Gantt
   const taskIdSet = new Set(Array.isArray(tasksState) ? tasksState.filter(Boolean).map(t => t?.id).filter(Boolean) : []);
@@ -677,13 +722,6 @@ export default function Tasks() {
             >
               Nueva Tarea
             </button>
-            
-            <button
-              onClick={() => downloadAllICS(safeEvents)}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
-            >
-              Descargar ICS
-            </button>
           </div>
         </div>
       </div>
@@ -691,7 +729,7 @@ export default function Tasks() {
       {/* Componente para el diagrama Gantt */}
       <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
-        <div className="overflow-x-auto mb-4 border border-gray-100 rounded-lg min-w-[600px]">
+        <div className="overflow-x-auto mb-4 border border-gray-100 rounded-lg min-w-[600px]" style={{ minHeight: (Array.isArray(safeGanttTasks) ? safeGanttTasks.length : 0) * rowHeight + 60 }}>
           {safeGanttTasks && safeGanttTasks.length > 0 ? (
             <GanttChart 
               tasks={safeGanttTasks} 
@@ -974,7 +1012,7 @@ export default function Tasks() {
               `}</style>
               <Calendar
                 localizer={localizer}
-                events={safeEvents}
+                events={safeMeetings}
                 date={calendarDate}
                 onNavigate={date => setCalendarDate(date)}
                 startAccessor="start"
@@ -1118,13 +1156,13 @@ export default function Tasks() {
                 width: 100%;
               }
             `}</style>
-            <Calendar
-              localizer={localizer}
-              events={safeEvents}
-              date={calendarDate}
-              onNavigate={date => setCalendarDate(date)}
-              startAccessor="start"
-              endAccessor="end"
+              <Calendar
+                localizer={localizer}
+                events={safeMeetings}
+                date={calendarDate}
+                onNavigate={date => setCalendarDate(date)}
+                startAccessor="start"
+                endAccessor="end"
               views={{
                 month: true,
                 week: true,

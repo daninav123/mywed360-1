@@ -174,7 +174,8 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
       const q = colRef;
       console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
       unsub = onSnapshot(q, (snap) => {
-        const arr = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        // Asegurar que el id del documento prevalezca sobre cualquier campo id dentro de los datos
+        const arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
         console.log(`[useWeddingCollection] Datos recibidos:`, { sub: subName, wedding: weddingId, size: arr.length, data: arr });
         setData(arr);
         lsSet(weddingId, subName, arr);

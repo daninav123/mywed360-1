@@ -5,9 +5,19 @@ import { requireAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Asegurar Firebase Admin inicializado (backend ya lo hace, pero por seguridad)
+// Asegurar Firebase Admin inicializado (con soporte de credenciales por variable de entorno)
 if (!admin.apps.length) {
-  try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch {}
+  try {
+    const sa = process.env.FIREBASE_SERVICE_ACCOUNT ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) : null;
+    if (sa && sa.project_id && sa.client_email && sa.private_key) {
+      admin.initializeApp({ credential: admin.credential.cert(sa) });
+    } else {
+      admin.initializeApp({ credential: admin.credential.applicationDefault() });
+    }
+  } catch (e) {
+    console.warn('[calendar] admin init fallback applicationDefault:', e?.message || e);
+    try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch {}
+  }
 }
 
 const db = () => admin.firestore();
@@ -47,19 +57,24 @@ function icsEscape(str = '') {
 }
 
 // Construir ICS a partir de eventos [{ id, title, desc, start, end, location }]
-function buildICS({ events = [], prodId = '-//Lovenda//Calendar Feed//ES' }) {
+function buildICS({ events = [], prodId = '-//Lovenda//Calendar Feed//ES', calName = 'Lovenda' }) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     `PRODID:${prodId}`,
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
+    `X-WR-CALNAME:${icsEscape(calName)}`,
+    'X-WR-TIMEZONE:UTC',
+    'REFRESH-INTERVAL;VALUE=DURATION:PT15M',
+    'X-PUBLISHED-TTL:PT15M',
   ];
 
   const now = toICSDate(new Date());
   for (const ev of events) {
     if (!ev?.start || !ev?.end) continue;
-    const uid = `${ev.googleEventId || ev.id || Math.random().toString(36).slice(2)}@lovenda`;
+    const uidCore = `${ev.googleEventId || ev.id || Math.random().toString(36).slice(2)}`;
+    const uid = `${uidCore}@lovenda`;
     const isLongTask = ev.type === 'task' || ev.long === true;
 
     const summary = icsEscape(ev.title || ev.name || 'Evento');
@@ -69,6 +84,7 @@ function buildICS({ events = [], prodId = '-//Lovenda//Calendar Feed//ES' }) {
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${uid}`);
     lines.push(`DTSTAMP:${now}`);
+    lines.push(`LAST-MODIFIED:${now}`);
     if (isLongTask) {
       // Evento de día completo, multi-día. DTEND es exclusivo (+1 día)
       const startDate = toICSDateValue(ev.start);
@@ -132,7 +148,7 @@ function verifyToken(token, secret) {
 router.get('/token', requireAuth, async (req, res) => {
   try {
     const uid = req.user?.uid || req.user?.id;
-    const weddingId = req.userProfile?.activeWedding || req.user?.weddingId || null;
+    let weddingId = req.query.weddingId || req.userProfile?.activeWedding || req.user?.weddingId || null;
     if (!uid) return res.status(401).json({ ok: false, error: 'auth-required' });
 
     const secret = process.env.CALENDAR_FEED_SECRET || 'dev-calendar-secret';
@@ -141,9 +157,14 @@ router.get('/token', requireAuth, async (req, res) => {
 
     const inferred = `${req.protocol}://${req.get('host')}`;
     const base = process.env.PUBLIC_BASE_URL || process.env.ALLOWED_ORIGIN || process.env.FRONTEND_BASE_URL || inferred;
-    const backendBase = process.env.BACKEND_BASE_URL || process.env.RENDER_EXTERNAL_URL || base || inferred;
+    // Preferir URL pública del backend si está disponible, incluyendo la variante VITE_ usada en dev
+    const backendBase = process.env.BACKEND_BASE_URL 
+      || process.env.VITE_BACKEND_BASE_URL 
+      || process.env.RENDER_EXTERNAL_URL 
+      || base 
+      || inferred;
     const httpsBase = backendBase.replace(/^http:\/\//, 'https://');
-    const feedUrl = `${httpsBase}/api/calendar/feed/${encodeURIComponent(token)}`;
+    const feedUrl = `${httpsBase}/api/calendar/feed/${encodeURIComponent(token)}${weddingId ? `?wid=${encodeURIComponent(weddingId)}` : ''}`;
     const webcalUrl = feedUrl.replace(/^https:\/\//, 'webcal://').replace(/^http:\/\//, 'webcal://');
 
     return res.json({ ok: true, token, feedUrl, webcalUrl });
@@ -172,7 +193,7 @@ router.get('/feed/:token', async (req, res) => {
     const decoded = verifyToken(token, secret);
     if (!decoded || !decoded.uid) return res.status(404).send('not found');
     const uid = decoded.uid;
-    const weddingId = decoded.weddingId || null;
+    const weddingId = decoded.weddingId || req.query.wid || null;
 
     // Cargar eventos de la boda (reuniones + tareas)
     const events = [];

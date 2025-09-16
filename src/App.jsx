@@ -14,6 +14,7 @@ import Tasks from './pages/Tasks';
 import Bodas from './pages/Bodas';
 import BodaDetalle from './pages/BodaDetalle';
 import Finance from './pages/Finance';
+import BankConnect from './pages/BankConnect.jsx';
 import More from './pages/More';
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 import Proveedores from './pages/ProveedoresNuevo';
@@ -137,6 +138,7 @@ function App() {
                 <Route path="bodas" element={<Bodas />} />
                 <Route path="bodas/:id" element={<BodaDetalle />} />
                 <Route path="finance" element={<Finance />} />
+                <Route path="finance/bank-connect" element={<BankConnect />} />
                 <Route path="invitados" element={<Invitados />} />
                 <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
                 <Route path="invitados/invitaciones" element={<Invitaciones />} />

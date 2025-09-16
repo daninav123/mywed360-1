@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, firebaseReady } from '../lib/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
@@ -53,19 +53,103 @@ export default function DisenoWeb() {
     }
   };
 
-  // Cargar datos de perfil y versiones al montar
+  // Cargar datos de perfil (usuario + boda activa) y versiones
   useEffect(()=>{
     if(!uid) return;
     (async ()=>{
       try {
-        const snap = await getDoc(doc(db,'users',uid));
-        if(snap.exists()) setProfile(snap.data().weddingInfo || {});
-        // cargar versiones
-        const colSnap = await getDocs(collection(db,'users',uid,'generatedPages'));
-        setVersions(colSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt?.seconds - a.createdAt?.seconds));
-      } catch(e){ console.error(e);} 
+        // Asegurar Firebase listo (defensivo)
+        try { await firebaseReady; } catch {}
+
+        // 1) Cargar datos del usuario (contacto, preferencias)
+        let userData = {};
+        try {
+          const userSnap = await getDoc(doc(db,'users',uid));
+          if (userSnap.exists()) userData = userSnap.data() || {};
+        } catch (e) { console.warn('No se pudo cargar users/{uid}', e); }
+
+        // 2) Cargar datos de la boda activa (weddingInfo guardado desde Perfil.jsx)
+        let weddingInfo = {};
+        if (activeWedding) {
+          try {
+            const wedSnap = await getDoc(doc(db,'weddings',activeWedding));
+            if (wedSnap.exists()) {
+              const d = wedSnap.data() || {};
+              if (d.weddingInfo) weddingInfo = d.weddingInfo || {};
+            }
+          } catch (e) { console.warn('No se pudo cargar weddings/{activeWedding}', e); }
+        }
+
+        // 3) Normalizar en un 
+        //    objeto con la forma esperada por el generador y los slugs
+        const normalize = (userDoc = {}, wi = {}) => {
+          // Separar nombres si vienen juntos ("Ana y Luis")
+          const couple = String(wi.coupleName || '').trim();
+          let brideName = '';
+          let groomName = '';
+          if (couple) {
+            const parts = couple.split(/\s+y\s+|\s*&\s*|\s*\/\s*|\s*-\s*|,\s*/i).filter(Boolean);
+            if (parts.length >= 2) {
+              [brideName, groomName] = [parts[0], parts[1]];
+            } else {
+              brideName = couple;
+              groomName = '';
+            }
+          }
+
+          // Horarios: en Perfil.jsx hay un único "schedule"; lo usamos en ambos como fallback
+          const schedule = wi.schedule || '';
+
+          // Contacto del usuario
+          const contactEmail = userDoc?.account?.email || userDoc?.email || '';
+          const contactPhone = userDoc?.account?.whatsNumber || userDoc?.phone || '';
+
+          // Estilo si existiera en el doc (defensivo)
+          const weddingStyle = wi.weddingStyle || userDoc?.weddingStyle || 'Clásico';
+          const colorScheme = wi.colorScheme || userDoc?.colorScheme || 'Blanco y dorado';
+          const additionalInfo = [wi.importantInfo, wi.giftAccount].filter(Boolean).join(' | ');
+
+          return {
+            brideInfo: { nombre: brideName },
+            groomInfo: { nombre: groomName },
+            ceremonyInfo: {
+              fecha: wi.weddingDate || '',
+              hora: schedule || '',
+              lugar: wi.celebrationPlace || '',
+              direccion: wi.celebrationAddress || ''
+            },
+            receptionInfo: {
+              hora: schedule || '',
+              lugar: wi.banquetPlace || '',
+              direccion: wi.receptionAddress || ''
+            },
+            transportationInfo: { detalles: wi.transportation || '' },
+            rsvpInfo: { fecha: wi.rsvpDeadline || '' },
+            contactEmail,
+            contactPhone,
+            weddingStyle,
+            colorScheme,
+            additionalInfo
+          };
+        };
+
+        const normalized = normalize(userData, weddingInfo);
+        setProfile(normalized);
+
+        // 4) Cargar versiones históricas (usuario + boda)
+        const colSnapUser = await getDocs(collection(db,'users',uid,'generatedPages'));
+        let items = colSnapUser.docs.map(d=>({id:d.id, scope:'user', ...d.data()}));
+        if (activeWedding) {
+          try {
+            const colSnapWed = await getDocs(collection(db,'weddings',activeWedding,'generatedPages'));
+            items = items.concat(colSnapWed.docs.map(d=>({id:d.id, scope:'wedding', ...d.data()})));
+          } catch (e) { console.warn('No se pudieron cargar versiones por boda', e); }
+        }
+        items.sort((a,b)=> (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+        setVersions(items);
+      } catch(e){ console.error('Error cargando datos de diseño web', e);} 
     })();
-  },[uid]);
+  },[uid, activeWedding]);
 
   // Construir sugerencias de slug a partir del perfil
   useEffect(()=>{
@@ -146,8 +230,80 @@ export default function DisenoWeb() {
         return;
       }
       if(!import.meta.env.VITE_OPENAI_API_KEY){
-        // Fallback de demo si no hay clave
-        const demo = `<html><head><style>body{font-family:sans-serif;padding:2rem}</style></head><body><h1>${prompt}</h1><p>Ejemplo de web generada (sin IA).</p></body></html>`;
+        // Fallback: generar una web básica con los datos del perfil sin IA
+        const safe = (v) => (v || '').toString();
+        const b = safe(weddingInfo.bride);
+        const g = safe(weddingInfo.groom);
+        const names = [b,g].filter(Boolean).join(' y ');
+        const palette = safe(weddingInfo.colorScheme) || 'Blanco y dorado';
+        const styleTitle = safe(weddingInfo.weddingStyle) || 'Clásico';
+        const ceremony = [safe(weddingInfo.ceremonyLocation), safe(weddingInfo.ceremonyTime)].filter(Boolean).join(' · ');
+        const reception = [safe(weddingInfo.receptionVenue), safe(weddingInfo.receptionTime)].filter(Boolean).join(' · ');
+        const date = safe(weddingInfo.date);
+        const extra = safe(weddingInfo.additionalInfo);
+        const contact = [safe(weddingInfo.contactEmail), safe(weddingInfo.contactPhone)].filter(Boolean).join(' · ');
+        const demo = `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${names ? `${names} · Web de boda` : 'Nuestra boda'}</title>
+    <style>
+      :root{ --primary:#b5812d; --text:#222; --muted:#666 }
+      *{box-sizing:border-box}
+      body{font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:0; color:var(--text); background:#fff}
+      header{padding:48px 16px; text-align:center; border-bottom:1px solid #eee}
+      h1{margin:0; font-size: clamp(28px, 5vw, 44px)}
+      h2{margin:0 0 8px; font-size: 20px}
+      .subtitle{color:var(--muted); margin-top:8px}
+      .container{max-width:920px; margin:0 auto; padding:24px 16px}
+      .grid{display:grid; grid-template-columns: 1fr; gap:16px}
+      @media(min-width:768px){ .grid{ grid-template-columns: 1fr 1fr } }
+      .card{border:1px solid #eee; border-radius:12px; padding:16px}
+      .pill{display:inline-block; padding:4px 10px; border-radius:999px; background:#faf5ee; color:#8a5b20; font-size:12px}
+      .highlight{color: var(--primary)}
+      footer{border-top:1px solid #eee; text-align:center; padding:24px; color:var(--muted); font-size:14px}
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="pill">Estilo: ${styleTitle} · Paleta: ${palette}</div>
+      <h1>${names || 'Nuestra boda'}</h1>
+      ${date ? `<div class="subtitle">${date}</div>` : ''}
+    </header>
+    <main class="container">
+      <section class="grid">
+        <div class="card">
+          <h2>La ceremonia</h2>
+          <div>${ceremony || 'Pronto más detalles'}</div>
+          ${weddingInfo.ceremonyAddress ? `<div class="subtitle">${safe(weddingInfo.ceremonyAddress)}</div>` : ''}
+        </div>
+        <div class="card">
+          <h2>La recepción</h2>
+          <div>${reception || 'Pronto más detalles'}</div>
+          ${weddingInfo.receptionAddress ? `<div class="subtitle">${safe(weddingInfo.receptionAddress)}</div>` : ''}
+        </div>
+      </section>
+      <section class="grid">
+        <div class="card">
+          <h2>Transporte y alojamiento</h2>
+          <div>${safe(weddingInfo.transportation) || 'Pronto más detalles'}</div>
+        </div>
+        <div class="card">
+          <h2>Regalos y notas</h2>
+          <div>${extra || '¡Vuestra presencia es el mejor regalo!'}</div>
+        </div>
+      </section>
+      <section class="card" style="margin-top:16px">
+        <h2>Contacto</h2>
+        <div>${contact || '—'}</div>
+      </section>
+    </main>
+    <footer>
+      <span class="highlight">Gracias</span> por acompañarnos en este día.
+    </footer>
+  </body>
+</html>`;
         setHtml(demo);
         return;
       }
@@ -283,7 +439,19 @@ export default function DisenoWeb() {
     try{
       // Guardado legacy por usuario
       await setDoc(doc(db,'users',uid), { generatedHtml: html }, { merge:true });
-      await addDoc(collection(db,'users',uid,'generatedPages'), { html, createdAt: serverTimestamp(), prompt });
+      await addDoc(
+        collection(db,'users',uid,'generatedPages'), 
+        { html, createdAt: serverTimestamp(), prompt, slug: publishSlug || null }
+      );
+      // Guardado por boda si hay activeWedding
+      if (activeWedding) {
+        try {
+          await addDoc(
+            collection(db,'weddings',activeWedding,'generatedPages'),
+            { html, createdAt: serverTimestamp(), prompt, slug: publishSlug || null, author: uid }
+          );
+        } catch (e) { console.warn('No se pudo guardar versión por boda', e); }
+      }
       // Publicación por boda (si hay boda activa)
       if (activeWedding) {
         try {
@@ -309,9 +477,17 @@ export default function DisenoWeb() {
       } else {
         alert('Página guardada. No hay boda activa para publicar públicamente.');
       }
-      // recargar versiones
-      const colSnap = await getDocs(collection(db,'users',uid,'generatedPages'));
-      setVersions(colSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.createdAt?.seconds - a.createdAt?.seconds));
+      // recargar versiones (usuario + boda)
+      const colSnapUser = await getDocs(collection(db,'users',uid,'generatedPages'));
+      let items = colSnapUser.docs.map(d=>({id:d.id, scope:'user', ...d.data()}));
+      if (activeWedding) {
+        try {
+          const colSnapWed = await getDocs(collection(db,'weddings',activeWedding,'generatedPages'));
+          items = items.concat(colSnapWed.docs.map(d=>({id:d.id, scope:'wedding', ...d.data()})));
+        } catch (e) { console.warn('No se pudieron recargar versiones por boda', e); }
+      }
+      items.sort((a,b)=> (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+      setVersions(items);
     }catch(e){ console.error(e); alert('Error al publicar'); }
   };
 
@@ -327,6 +503,48 @@ export default function DisenoWeb() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Diseño Web de Boda</h1>
       
+      {/* Resumen de datos detectados del perfil/boda */}
+      {profile && (
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-3">Datos del perfil aplicados</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
+            {(() => {
+              const bride = profile?.brideInfo?.nombre?.trim();
+              const groom = profile?.groomInfo?.nombre?.trim();
+              const couple = [bride, groom].filter(Boolean).join(' y ');
+              return couple ? (<div><span className="text-gray-500">Pareja: </span>{couple}</div>) : null;
+            })()}
+            {profile?.ceremonyInfo?.fecha && (
+              <div><span className="text-gray-500">Fecha: </span>{profile.ceremonyInfo.fecha}</div>
+            )}
+            {(profile?.ceremonyInfo?.lugar || profile?.ceremonyInfo?.hora) && (
+              <div>
+                <span className="text-gray-500">Ceremonia: </span>
+                {[profile?.ceremonyInfo?.lugar, profile?.ceremonyInfo?.hora].filter(Boolean).join(' · ')}
+              </div>
+            )}
+            {(profile?.receptionInfo?.lugar || profile?.receptionInfo?.hora) && (
+              <div>
+                <span className="text-gray-500">Recepción: </span>
+                {[profile?.receptionInfo?.lugar, profile?.receptionInfo?.hora].filter(Boolean).join(' · ')}
+              </div>
+            )}
+            {(profile?.contactEmail || profile?.contactPhone) && (
+              <div className="sm:col-span-2">
+                <span className="text-gray-500">Contacto: </span>
+                {[profile?.contactEmail, profile?.contactPhone].filter(Boolean).join(' · ')}
+              </div>
+            )}
+            {profile?.additionalInfo && (
+              <div className="sm:col-span-2">
+                <span className="text-gray-500">Info adicional: </span>
+                {profile.additionalInfo}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Selección de plantillas */}
       <div className="bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Selecciona un estilo para tu web</h2>

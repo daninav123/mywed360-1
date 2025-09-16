@@ -47,68 +47,10 @@ const UserManagement = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   
-  // Cargar usuarios de muestra
+  // Datos reales: sin mocks (queda lista vacía por defecto hasta tener backend)
   useEffect(() => {
-    // En un entorno real, estos datos vendrían de una API
-    const mockUsers = [
-      {
-        id: 1,
-        name: 'Ana García',
-        email: 'ana.garcia@lovenda.com',
-        role: 'admin',
-        status: 'active',
-        createdAt: '2023-01-15',
-        lastLogin: '2023-09-28'
-      },
-      {
-        id: 2,
-        name: 'Juan Pérez',
-        email: 'juan.perez@lovenda.com',
-        role: 'user',
-        status: 'active',
-        createdAt: '2023-02-05',
-        lastLogin: '2023-09-27'
-      },
-      {
-        id: 3,
-        name: 'María López',
-        email: 'maria.lopez@lovenda.com',
-        role: 'provider',
-        status: 'active',
-        createdAt: '2023-03-12',
-        lastLogin: '2023-09-25'
-      },
-      {
-        id: 4,
-        name: 'Carlos Ruiz',
-        email: 'carlos.ruiz@lovenda.com',
-        role: 'user',
-        status: 'inactive',
-        createdAt: '2023-04-18',
-        lastLogin: '2023-08-15'
-      },
-      {
-        id: 5,
-        name: 'Laura Fernández',
-        email: 'laura.fernandez@lovenda.com',
-        role: 'provider',
-        status: 'pending',
-        createdAt: '2023-05-22',
-        lastLogin: null
-      },
-      {
-        id: 6,
-        name: 'Pedro Martínez',
-        email: 'pedro.martinez@lovenda.com',
-        role: 'user',
-        status: 'active',
-        createdAt: '2023-06-30',
-        lastLogin: '2023-09-26'
-      }
-    ];
-    
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
+    setUsers([]);
+    setFilteredUsers([]);
   }, []);
   
   // Filtrar usuarios

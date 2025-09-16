@@ -15,6 +15,7 @@ import { fetchWall } from '../services/wallService';
 import { fetchWeddingNews } from '../services/blogService';
 
 import PlannerDashboard from './PlannerDashboard';
+import useFinance from '../hooks/useFinance';
 
 export default function HomePage() {
   // Todo se maneja con modales locales
@@ -166,30 +167,23 @@ export default function HomePage() {
     }
   }, []);
 
-  const financeMetrics = useMemo(() => {
-    try {
-      const movements = JSON.parse(localStorage.getItem('quickMovements') || '[]');
-      const spent = movements.filter(m => m.type !== 'income').reduce((sum, m) => sum + (m.amount || 0), 0);
-      return { movements, spent };
-    } catch {
-      return { movements: [], spent: 0 };
-    }
-  }, []);
-  const budgetTotal = 15000; // placeholder
+  const { stats: financeStats } = useFinance();
+  const financeSpent = Number(financeStats?.totalSpent || 0);
+  const budgetTotal = Number(financeStats?.totalBudget || 0);
 
   const statsNovios = useMemo(() => [
     { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `€${financeMetrics.spent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
+    { label: 'Presupuesto gastado', value: `€${financeSpent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
     { label: 'Proveedores contratados', value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`, icon: User },
     { label: 'Tareas completadas', value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`, icon: Calendar },
-  ], [guestsMetrics, financeMetrics, providersMetrics, tasksMetrics, budgetTotal]);
+  ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
 
   const statsPlanner = useMemo(() => [
     { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
     { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
     { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `€${financeMetrics.spent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
-  ], [guestsMetrics, financeMetrics, providersMetrics, tasksMetrics, budgetTotal]);
+    { label: 'Presupuesto gastado', value: `€${financeSpent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
+  ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
 
   const statsCommon = useMemo(() => 
     role === 'particular' ? statsNovios : statsPlanner,

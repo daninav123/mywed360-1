@@ -1,11 +1,12 @@
 ﻿import React, { useState } from 'react';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
-import { Plus, Download, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import Toast from '../components/Toast';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
+import { useProveedores } from '../hooks/useProveedores';
 
 export default function Contratos() {
   const { currentUser } = useAuth();
@@ -25,6 +26,11 @@ export default function Contratos() {
   const [editContract, setEditContract] = useState(initialContract);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
+  // Generación de contratos genéricos
+  const [showGenericModal, setShowGenericModal] = useState(false);
+  const [selectedProvidersForGen, setSelectedProvidersForGen] = useState([]);
+  const [genericForm, setGenericForm] = useState({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente' });
+  const { providers = [], loading: providersLoading } = useProveedores();
 
   const handleAddContract = async e => {
     e.preventDefault();
@@ -77,6 +83,42 @@ export default function Contratos() {
     }
   };
 
+  const toggleProviderForGen = (id) => {
+    setSelectedProvidersForGen(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const handleGenerateGenericContracts = async (e) => {
+    e.preventDefault();
+    try {
+      const picked = providers.filter(p => selectedProvidersForGen.includes(p.id));
+      if (!picked.length) {
+        setToast({ message: 'Selecciona al menos un proveedor', type: 'warning' });
+        return;
+      }
+      for (let i = 0; i < picked.length; i++) {
+        const p = picked[i];
+        const contractObj = {
+          id: `ct${Date.now()}_${i}`,
+          provider: p?.name || 'Proveedor',
+          type: (genericForm.type || '').trim() || p?.service || 'Genérico',
+          signedDate: genericForm.signedDate || '',
+          serviceDate: genericForm.serviceDate || '',
+          status: genericForm.status || 'Vigente',
+          docUrl: '#',
+        };
+        // eslint-disable-next-line no-await-in-loop
+        await addContract(contractObj);
+      }
+      setShowGenericModal(false);
+      setSelectedProvidersForGen([]);
+      setGenericForm({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente' });
+      setToast({ message: 'Contratos generados', type: 'success' });
+    } catch (err) {
+      console.error('Error generando contratos genéricos', err);
+      setToast({ message: 'Error al generar contratos', type: 'error' });
+    }
+  };
+
   const actionButtons = (
     <>
       <button
@@ -84,6 +126,12 @@ export default function Contratos() {
         className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
       >
         <Plus size={16} className="mr-2" /> Añadir Contrato
+      </button>
+      <button
+        onClick={() => setShowGenericModal(true)}
+        className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
+      >
+        <FileText size={16} className="mr-2" /> Generar contratos
       </button>
       <button
         onClick={exportSelected}
@@ -108,6 +156,12 @@ export default function Contratos() {
               className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
             >
               <Plus size={16} className="mr-2" /> Añadir Contrato
+            </button>
+            <button
+              onClick={() => setShowGenericModal(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
+            >
+              <FileText size={16} className="mr-2" /> Generar contratos
             </button>
             <button
               onClick={exportSelected}
@@ -285,6 +339,88 @@ export default function Contratos() {
               <div className="flex justify-end gap-2">
                 <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
                 <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Guardar cambios</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showGenericModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow w-[90vw] max-w-3xl">
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <FileText size={18} className="mr-2" /> Generar contratos genéricos
+            </h2>
+            <form onSubmit={handleGenerateGenericContracts} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Tipo de contrato</label>
+                  <input
+                    type="text"
+                    value={genericForm.type}
+                    onChange={e => setGenericForm({ ...genericForm, type: e.target.value })}
+                    className="w-full border rounded px-2 py-1"
+                    placeholder="Genérico / Catering / Foto..."
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Estado</label>
+                  <select
+                    value={genericForm.status}
+                    onChange={e => setGenericForm({ ...genericForm, status: e.target.value })}
+                    className="w-full border rounded px-2 py-1"
+                  >
+                    <option value="Vigente">Vigente</option>
+                    <option value="Expirado">Expirado</option>
+                    <option value="Señal pagada">Señal pagada</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Fecha de firma</label>
+                  <input
+                    type="date"
+                    value={genericForm.signedDate}
+                    onChange={e => setGenericForm({ ...genericForm, signedDate: e.target.value })}
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">Fecha de servicio</label>
+                  <input
+                    type="date"
+                    value={genericForm.serviceDate}
+                    onChange={e => setGenericForm({ ...genericForm, serviceDate: e.target.value })}
+                    className="w-full border rounded px-2 py-1"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium">Selecciona proveedores</label>
+                <div className="border rounded max-h-64 overflow-auto divide-y">
+                  {providersLoading ? (
+                    <div className="p-3 text-sm text-gray-500">Cargando proveedores...</div>
+                  ) : providers.length ? (
+                    providers.map(p => (
+                      <label key={p.id} className="flex items-center gap-3 p-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedProvidersForGen.includes(p.id)}
+                          onChange={() => toggleProviderForGen(p.id)}
+                        />
+                        <div>
+                          <div className="font-medium">{p.name || 'Proveedor'}</div>
+                          <div className="text-xs text-gray-500">{p.service || 'Servicio'}</div>
+                        </div>
+                      </label>
+                    ))
+                  ) : (
+                    <div className="p-3 text-sm text-gray-500">No hay proveedores disponibles.</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button type="button" onClick={() => setShowGenericModal(false)} className="px-4 py-2 bg-gray-200 rounded">Cancelar</button>
+                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Generar</button>
               </div>
             </form>
           </div>

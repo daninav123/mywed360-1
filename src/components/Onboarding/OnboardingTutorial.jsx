@@ -19,6 +19,7 @@ const OnboardingTutorial = ({ onComplete }) => {
     presupuesto: '',
     imagen: ''
   });
+  // Paso de timing se implementará más adelante
   const [loading, setLoading] = useState(false);
 
   // Carga datos del perfil si existen
@@ -322,6 +323,8 @@ const OnboardingTutorial = ({ onComplete }) => {
       };
 
       await setDoc(doc(db, 'weddings', wid, 'weddingInfo'), weddingInfoPayload, { merge: true });
+
+      // Timing automático se implementará más adelante
 
       // Marcar onboarding completado en users/{uid}
       const profileRef = doc(db, 'users', currentUser.uid);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Card, Button } from '../ui';
 import { Plus, Edit3, Trash2, Download, Upload, Search, Filter } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatUtils';
@@ -6,7 +6,7 @@ import Modal from '../Modal';
 import TransactionForm from './TransactionForm';
 
 /**
- * Componente para gestión de transacciones
+ * Componente para gestiÃƒÆ’Ã‚Â³n de transacciones
  * Incluye lista, filtros, formularios y acciones masivas
  */
 export default function TransactionManager({ 
@@ -23,6 +23,67 @@ export default function TransactionManager({
   const [categoryFilter, setCategoryFilter] = useState('');
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [showBankModal, setShowBankModal] = useState(false);
+  const [bankId, setBankId] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const fileInputRef = useRef(null);
+  const [csvLoading, setCsvLoading] = useState(false);
+
+  const handleClickImportCSV = () => fileInputRef.current?.click();
+
+  const parseCSV = (text) => {
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (lines.length === 0) return [];
+    const header = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const idx = {
+      date: header.findIndex(h => /fecha|date/.test(h)),
+      desc: header.findIndex(h => /concepto|descripcion|descripciÃƒÂ³n|description/.test(h)),
+      amount: header.findIndex(h => /importe|monto|amount/.test(h)),
+      type: header.findIndex(h => /tipo|type/.test(h)),
+      category: header.findIndex(h => /categoria|categorÃƒÂ­a|category/.test(h)),
+    };
+    const out = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(',');
+      if (!cols.some(c => c && c.trim())) continue;
+      const rawAmount = Number((cols[idx.amount] || '').replace(/[^0-9.-]/g, '')) || 0;
+      let type = cols[idx.type]?.toLowerCase() || '';
+      if (!type) type = rawAmount < 0 ? 'expense' : 'income';
+      if (type.includes('gasto') || type === 'expense') type = 'expense';
+      if (type.includes('ingreso') || type === 'income') type = 'income';
+      out.push({
+        date: (cols[idx.date] || '').slice(0, 10),
+        concept: cols[idx.desc] || '',
+        amount: Math.abs(rawAmount),
+        type,
+        category: cols[idx.category] || 'OTROS',
+        source: 'csv',
+      });
+    }
+    return out;
+  };
+
+  const handleCSVSelected = useCallback(async (e) => {
+    try {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setCsvLoading(true);
+      const text = await file.text();
+      const rows = parseCSV(text);
+      for (const row of rows) {
+        // eslint-disable-next-line no-await-in-loop
+        await onCreateTransaction(row);
+      }
+      alert(`Importadas ${rows.length} transacciones del CSV`);
+    } catch (err) {
+      console.error('CSV import error', err);
+      alert('No se pudo importar el CSV');
+    } finally {
+      setCsvLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, [onCreateTransaction]);
 
   // Transacciones filtradas
   const filteredTransactions = useMemo(() => {
@@ -36,13 +97,13 @@ export default function TransactionManager({
     });
   }, [transactions, searchTerm, typeFilter, categoryFilter]);
 
-  // Categorías únicas para el filtro
+  // CategorÃƒÆ’Ã‚Â­as ÃƒÆ’Ã‚Âºnicas para el filtro
   const categories = useMemo(() => {
     const uniqueCategories = [...new Set(transactions.map(t => t.category).filter(Boolean))];
     return uniqueCategories.sort();
   }, [transactions]);
 
-  // Estadísticas de transacciones filtradas
+  // EstadÃƒÆ’Ã‚Â­sticas de transacciones filtradas
   const stats = useMemo(() => {
     const totalIncome = filteredTransactions
       .filter(t => t.type === 'income')
@@ -60,19 +121,19 @@ export default function TransactionManager({
     };
   }, [filteredTransactions]);
 
-  // Manejar apertura de modal para nueva transacción
+  // Manejar apertura de modal para nueva transacciÃƒÆ’Ã‚Â³n
   const handleAddTransaction = () => {
     setEditingTransaction(null);
     setShowTransactionModal(true);
   };
 
-  // Manejar apertura de modal para editar transacción
+  // Manejar apertura de modal para editar transacciÃƒÆ’Ã‚Â³n
   const handleEditTransaction = (transaction) => {
     setEditingTransaction(transaction);
     setShowTransactionModal(true);
   };
 
-  // Manejar guardado de transacción
+  // Manejar guardado de transacciÃƒÆ’Ã‚Â³n
   const handleSaveTransaction = async (transactionData) => {
     try {
       let result;
@@ -89,24 +150,24 @@ export default function TransactionManager({
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error guardando transacción:', error);
-      alert('Error inesperado al guardar la transacción');
+      console.error('Error guardando transacciÃƒÆ’Ã‚Â³n:', error);
+      alert('Error inesperado al guardar la transacciÃƒÆ’Ã‚Â³n');
     }
   };
 
-  // Manejar eliminación de transacción
+  // Manejar eliminaciÃƒÆ’Ã‚Â³n de transacciÃƒÆ’Ã‚Â³n
   const handleDeleteTransaction = async (transaction) => {
-    if (window.confirm(`¿Estás seguro de eliminar la transacción "${transaction.concept}"?`)) {
+    if (window.confirm(`Ãƒâ€šÃ‚Â¿EstÃƒÆ’Ã‚Â¡s seguro de eliminar la transacciÃƒÆ’Ã‚Â³n "${transaction.concept}"?`)) {
       const result = await onDeleteTransaction(transaction.id);
       if (!result.success) {
-        alert(`Error eliminando transacción: ${result.error}`);
+        alert(`Error eliminando transacciÃƒÆ’Ã‚Â³n: ${result.error}`);
       }
     }
   };
 
   // Exportar transacciones a CSV
   const handleExportCSV = () => {
-    const headers = ['Fecha', 'Concepto', 'Tipo', 'Categoría', 'Monto'];
+    const headers = ['Fecha', 'Concepto', 'Tipo', 'CategorÃƒÆ’Ã‚Â­a', 'Monto'];
     const csvData = [
       headers.join(','),
       ...filteredTransactions.map(t => [
@@ -132,7 +193,7 @@ export default function TransactionManager({
         <div>
           <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Transacciones</h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
-            {stats.count} transacciones • Balance: {formatCurrency(stats.balance)}
+            {stats.count} transacciones ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢ Balance: {formatCurrency(stats.balance)}
           </p>
         </div>
         
@@ -140,10 +201,18 @@ export default function TransactionManager({
           <Button
             variant="outline"
             leftIcon={<Upload size={16} />}
-            onClick={onImportBank}
+            onClick={() => setShowBankModal(true)}
             disabled={isLoading}
           >
-            Importar Banco
+            Conectar Banco (Nordigen)
+          </Button>
+          <Button
+            variant="outline"
+            leftIcon={<Upload size={16} />}
+            onClick={handleClickImportCSV}
+            disabled={isLoading || csvLoading}
+          >
+            Importar CSV
           </Button>
           <Button
             variant="outline"
@@ -156,7 +225,7 @@ export default function TransactionManager({
             leftIcon={<Plus size={16} />}
             onClick={handleAddTransaction}
           >
-            Nueva Transacción
+            Nueva TransacciÃƒÆ’Ã‚Â³n
           </Button>
         </div>
       </div>
@@ -164,7 +233,7 @@ export default function TransactionManager({
       {/* Filtros */}
       <Card className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Búsqueda */}
+          {/* BÃƒÆ’Ã‚Âºsqueda */}
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--color-text)]/40" />
             <input
@@ -187,13 +256,13 @@ export default function TransactionManager({
             <option value="expense">Gastos</option>
           </select>
 
-          {/* Filtro por categoría */}
+          {/* Filtro por categorÃƒÆ’Ã‚Â­a */}
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20"
           >
-            <option value="">Todas las categorías</option>
+            <option value="">Todas las categorÃƒÆ’Ã‚Â­as</option>
             {categories.map(category => (
               <option key={category} value={category}>{category}</option>
             ))}
@@ -214,6 +283,15 @@ export default function TransactionManager({
         </div>
       </Card>
 
+      {/* Input oculto para CSV manual */}
+      <input
+        type="file"
+        accept=".csv,text/csv"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleCSVSelected}
+      />
+
       {/* Lista de transacciones */}
       <Card className="overflow-hidden">
         {filteredTransactions.length === 0 ? (
@@ -224,7 +302,7 @@ export default function TransactionManager({
               onClick={handleAddTransaction}
               leftIcon={<Plus size={16} />}
             >
-              Crear primera transacción
+              Crear primera transacciÃƒÆ’Ã‚Â³n
             </Button>
           </div>
         ) : (
@@ -239,7 +317,7 @@ export default function TransactionManager({
                     Concepto
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
-                    Categoría
+                    CategorÃƒÆ’Ã‚Â­a
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
                     Tipo
@@ -265,7 +343,7 @@ export default function TransactionManager({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        {transaction.category || 'Sin categoría'}
+                        {transaction.category || 'Sin categorÃƒÆ’Ã‚Â­a'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -306,14 +384,73 @@ export default function TransactionManager({
         )}
       </Card>
 
-      {/* Modal de formulario de transacción */}
+      {/* Modal de formulario de transacciÃƒÆ’Ã‚Â³n */}
+
+
+      {/* Modal de importaciÃƒÂ³n bancaria */}
+      <Modal
+        open={showBankModal}
+        onClose={() => setShowBankModal(false)}
+        title="Importar movimientos bancarios"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Bank ID (cuenta)</label>
+              <input
+                type="text"
+                value={bankId}
+                onChange={(e) => setBankId(e.target.value)}
+                placeholder="e.g. 1234abcd"
+                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-gray-300"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Desde</label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-gray-300"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Hasta</label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-gray-300"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowBankModal(false)}>Cancelar</Button>
+            <Button
+              onClick={async () => {
+                try {
+                  const res = await onImportBank({ bankId: bankId || undefined, from: dateFrom || undefined, to: dateTo || undefined });
+                  if (!res?.success) alert(res?.error || 'No se pudieron importar movimientos');
+                  else setShowBankModal(false);
+                } catch (e) {
+                  alert('Error importando movimientos');
+                }
+              }}
+              disabled={isLoading}
+            >
+              Importar
+            </Button>
+          </div>
+          <p className="text-xs text-gray-500">Requiere configurar `VITE_BANK_API_BASE_URL`, `VITE_BANK_API_KEY` (frontend) y `NORDIGEN_*` en el backend.</p>
+        </div>
+      </Modal>
       <Modal
         open={showTransactionModal}
         onClose={() => {
           setShowTransactionModal(false);
           setEditingTransaction(null);
         }}
-        title={editingTransaction ? 'Editar Transacción' : 'Nueva Transacción'}
+        title={editingTransaction ? 'Editar TransacciÃƒÆ’Ã‚Â³n' : 'Nueva TransacciÃƒÆ’Ã‚Â³n'}
         size="lg"
       >
         <TransactionForm

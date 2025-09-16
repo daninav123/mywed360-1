@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+﻿import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, getFirestore, connectFirestoreEmulator, doc, setDoc, enableIndexedDbPersistence } from 'firebase/firestore';
+import { initializeFirestore, getFirestore, connectFirestoreEmulator, doc, setDoc, enableIndexedDbPersistence, enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getDatabase, ref, onValue } from 'firebase/database';
 
@@ -102,10 +102,14 @@ const inicializarFirebase = async () => {
 
     // Persistencia offline
     try {
-      await enableIndexedDbPersistence(db);
+            if (typeof enableMultiTabIndexedDbPersistence === 'function') {
+        await enableMultiTabIndexedDbPersistence(db);
+      } else {
+        await enableIndexedDbPersistence(db);
+      }
     } catch (err) {
       if (err.code === 'failed-precondition') {
-        console.warn('La persistencia offline no está disponible en múltiples pestañas abiertas');
+        console.warn('No se pudo habilitar multi‑tab (otra pestaña es dueña). Intentando modo single‑tab...'); try { await enableIndexedDbPersistence(db); } catch {}
       } else if (err.code === 'unimplemented') {
         console.warn('Este navegador no soporta persistencia offline');
       } else {
@@ -183,3 +187,4 @@ const firebaseReady = inicializarFirebase().catch((error) => {
 });
 
 export { auth, db, analytics, firebaseReady };
+

@@ -32,6 +32,15 @@ server-log.txt
 emulator-debug.log
 pglite-debug.log
 
+# Extra temporales y depuración
+*debug*.txt
+*dev*.txt
+build*.txt
+modal_test_output.txt
+new_debug.txt
+temp_*.js
+temp_*.jsx
+
 # Cypress artifacts
 cypress/screenshots/
 cypress/videos/

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Briefcase, AlertCircle, CheckSquare, Building2 } from 'lucide-react';
 import { Card } from './ui/Card';
+import { useWedding } from '../context/WeddingContext';
+import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 
 // Tarjeta reutilizable
 const DashCard = ({ to, icon: Icon, title, count }) => (
@@ -22,11 +24,13 @@ export default function PlannerDashboard() {
    * Panel para Wedding Planner alineado visualmente con el Dashboard particular.
    * Se envuelve en un contenedor con paddings y ancho máximo, igual que el Dashboard estándar.
    */
-  // Por ahora valores mock; después se consultarán del backend/Firestore
-  const activeWeddings = 2;
-  const alerts = 3;
-  const pendingTasks = 5;
-  const suppliers = 12;
+  const { weddings, activeWedding } = useWedding();
+  const { data: meetings = [] } = useFirestoreCollection('meetings', []);
+  const { data: suppliersList = [] } = useFirestoreCollection('suppliers', []);
+  const activeWeddings = Array.isArray(weddings) ? weddings.length : 0;
+  const alerts = 0; // pendiente de implementar alertas reales
+  const pendingTasks = Array.isArray(meetings) ? meetings.filter(m => !m.completed).length : 0;
+  const suppliers = Array.isArray(suppliersList) ? suppliersList.length : 0;
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">

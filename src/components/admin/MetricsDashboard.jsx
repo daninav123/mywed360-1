@@ -62,12 +62,24 @@ function MetricsDashboard() {
           }
         }
         
-        // Usar métricas remotas si están disponibles, sino las locales
-        setMetrics(remoteMetrics || localMetrics || generateMockMetrics());
+        // Usar métricas remotas si están disponibles, sino las locales (sin mocks)
+        setMetrics(remoteMetrics || localMetrics || {
+          timeSeriesData: [],
+          performanceData: {},
+          errorData: [],
+          usageData: [],
+          timestamp: Date.now(),
+        });
       } catch (err) {
         console.error('Error al cargar métricas:', err);
-        setError('No se pudieron cargar las métricas. Usando datos de ejemplo.');
-        setMetrics(generateMockMetrics());
+        setError('No se pudieron cargar las métricas.');
+        setMetrics({
+          timeSeriesData: [],
+          performanceData: {},
+          errorData: [],
+          usageData: [],
+          timestamp: Date.now(),
+        });
       } finally {
         setIsLoading(false);
       }
@@ -80,56 +92,7 @@ function MetricsDashboard() {
     return () => clearInterval(intervalId);
   }, [selectedTimeframe]);
   
-  // Generar datos de ejemplo para desarrollo y demostración
-  const generateMockMetrics = () => {
-    const now = Date.now();
-    const dayInMs = 24 * 60 * 60 * 1000;
-    
-    // Generar datos para los últimos 7 días
-    const timeSeriesData = Array.from({ length: 7 }).map((_, i) => {
-      const date = new Date(now - (6 - i) * dayInMs);
-      return {
-        date: date.toISOString().split('T')[0],
-        emailSent: Math.floor(Math.random() * 25) + 5,
-        emailReceived: Math.floor(Math.random() * 30) + 10,
-        searchCount: Math.floor(Math.random() * 40) + 20,
-        notificationsRendered: Math.floor(Math.random() * 100) + 50,
-        eventsDetected: Math.floor(Math.random() * 8) + 1,
-      };
-    });
-    
-    // Datos de rendimiento
-    const performanceData = {
-      emailProcessing: Math.floor(Math.random() * 500) + 100,
-      searchPerformance: Math.floor(Math.random() * 300) + 50,
-      notificationsRendering: Math.floor(Math.random() * 100) + 20,
-      eventDetection: Math.floor(Math.random() * 800) + 200,
-    };
-    
-    // Datos de errores
-    const errorData = [
-      { name: 'Email', value: Math.floor(Math.random() * 5) },
-      { name: 'Búsqueda', value: Math.floor(Math.random() * 3) },
-      { name: 'Notificaciones', value: Math.floor(Math.random() * 2) },
-      { name: 'Detección de eventos', value: Math.floor(Math.random() * 1) },
-    ];
-    
-    // Datos de uso
-    const usageData = [
-      { name: 'Email enviados', value: Math.floor(Math.random() * 100) + 50 },
-      { name: 'Email recibidos', value: Math.floor(Math.random() * 150) + 70 },
-      { name: 'Búsquedas', value: Math.floor(Math.random() * 80) + 30 },
-      { name: 'Eventos detectados', value: Math.floor(Math.random() * 30) + 10 },
-    ];
-    
-    return {
-      timeSeriesData,
-      performanceData,
-      errorData,
-      usageData,
-      timestamp: now,
-    };
-  };
+  // Eliminado: generación de datos mock
   
   // Procesar los datos de rendimiento para el gráfico de barras
   const processedPerformanceData = useMemo(() => {

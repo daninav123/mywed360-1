@@ -9,21 +9,21 @@ import useFinance from '../hooks/useFinance';
 import useTranslations from '../hooks/useTranslations';
 
 /**
- * Página de gestión financiera completamente refactorizada
+ * PÃ¡gina de Gestion financiera completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (571 líneas → 180 líneas)
+ * - Eliminada complejidad anterior (571 lÃ­neas â†’ 180 lÃ­neas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useFinance para lógica centralizada
- * - Memoización y optimización de re-renders
- * - Integración con sistema i18n
- * - UX mejorada con tabs y navegación clara
+ * - Hook personalizado useFinance para lÃ³gica centralizada
+ * - MemoizaciÃ³n y optimizaciÃ³n de re-renders
+ * - IntegraciÃ³n con sistema i18n
+ * - UX mejorada con tabs y navegaciÃ³n clara
  */
 function Finance() {
   const { t } = useTranslations();
   
-  // Hook personalizado para gestión financiera
+  // Hook personalizado para Gestion financiera
   const {
     // Estados
     syncStatus,
@@ -33,7 +33,7 @@ function Finance() {
     budget,
     transactions,
     
-    // Cálculos
+    // CÃ¡lculos
     stats,
     budgetUsage,
     
@@ -43,6 +43,7 @@ function Finance() {
     addBudgetCategory,
     updateBudgetCategory,
     removeBudgetCategory,
+    updateTotalBudget,
     createTransaction,
     updateTransaction,
     deleteTransaction,
@@ -53,22 +54,22 @@ function Finance() {
   // Estado para tabs activo
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Detectar URL hash para abrir modal específico
+  // Detectar URL hash para abrir modal especÃ­fico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager manejará la apertura del modal
+      // El TransactionManager manejarÃ¡ la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar número de invitados al montar el componente
+  // Cargar nÃºmero de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores después de 5 segundos
+  // Limpiar errores despuÃ©s de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -76,10 +77,11 @@ function Finance() {
     }
   }, [error, clearError]);
 
-  // Manejar actualización de presupuesto total
+  // Manejar actualizaciÃ³n de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
-    // Esta funcionalidad se puede implementar cuando sea necesaria
-    console.log('Actualizar presupuesto total:', newTotal);
+    if (typeof newTotal === 'string') newTotal = Number(newTotal);
+    if (Number.isNaN(newTotal) || newTotal < 0) return;
+    updateTotalBudget(newTotal);
   };
 
   return (
@@ -91,7 +93,7 @@ function Finance() {
             <div className="flex">
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
-                  Error en gestión financiera
+                  Error en Gestion financiera
                 </h3>
                 <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
@@ -101,14 +103,14 @@ function Finance() {
           </div>
         )}
 
-        {/* Navegación por tabs */}
+        {/* NavegaciÃ³n por tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Resumen</TabsTrigger>
             <TabsTrigger value="transactions">Transacciones</TabsTrigger>
             <TabsTrigger value="budget">Presupuesto</TabsTrigger>
             <TabsTrigger value="contributions">Aportaciones</TabsTrigger>
-            <TabsTrigger value="analytics">Análisis</TabsTrigger>
+            <TabsTrigger value="analytics">Analisis</TabsTrigger>
           </TabsList>
 
           {/* Tab: Resumen general */}
@@ -120,7 +122,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Gestión de transacciones */}
+          {/* Tab: Gestion de transacciones */}
           <TabsContent value="transactions" className="space-y-6">
             <TransactionManager
               transactions={transactions}
@@ -132,7 +134,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Gestión de presupuesto */}
+          {/* Tab: Gestion de presupuesto */}
           <TabsContent value="budget" className="space-y-6">
             <BudgetManager
               budget={budget}
@@ -144,7 +146,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Configuración de aportaciones */}
+          {/* Tab: ConfiguraciÃ³n de aportaciones */}
           <TabsContent value="contributions" className="space-y-6">
             <ContributionSettings
               contributions={contributions}
@@ -154,7 +156,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Análisis y gráficos */}
+          {/* Tab: Analisis y grÃ¡ficos */}
           <TabsContent value="analytics" className="space-y-6">
             <FinanceCharts
               transactions={transactions}

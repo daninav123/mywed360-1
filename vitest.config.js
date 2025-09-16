@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     // Estabilizar ejecución en Windows: usar threads en vez de forks
     pool: 'threads',
+    minThreads: 1,
     maxThreads: 1,
 
     // Ámbitos de tests: frontend + backend

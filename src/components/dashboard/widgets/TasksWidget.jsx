@@ -47,8 +47,12 @@ export const TasksWidget = ({ config }) => {
         };
       })
       .filter(Boolean)
-      // solo futuras o de hoy
-      .filter((t) => t.dueDate >= new Date());
+      // Solo desde hoy (00:00) en adelante
+      .filter((t) => {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        return t.dueDate >= todayStart;
+      });
 
     const filtered = config?.showCompleted ? mapped : mapped.filter((t) => !t.completed);
 

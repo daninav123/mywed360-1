@@ -1,14 +1,24 @@
-import React from 'react';
-
-const SAMPLE_GUESTS = [
-  { id: 1, name: 'Ana García', email: 'ana@example.com', rsvp: 'confirmed', group: 'Familia' },
-  { id: 2, name: 'Carlos López', email: 'carlos@example.com', rsvp: 'pending', group: 'Amigos' },
-  { id: 3, name: 'María Rodríguez', email: 'maria@example.com', rsvp: 'confirmed', group: 'Familia' },
-  { id: 4, name: 'David Martínez', email: 'david@example.com', rsvp: 'declined', group: 'Trabajo' },
-];
+import React, { useMemo } from 'react';
+import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
 
 export const GuestListWidget = ({ config }) => {
-  const filteredGuests = [...SAMPLE_GUESTS];
+  const { data: guests = [] } = useFirestoreCollection('guests', []);
+  const filteredGuests = useMemo(() => {
+    const base = Array.isArray(guests) ? guests.map(g => ({
+      id: g.id,
+      name: g.name || g.fullName || g.nombre || 'Invitado',
+      email: g.email || g.mail || '',
+      rsvp: g.rsvp || g.attendance || 'pending',
+      group: g.group || g.category || 'General'
+    })) : [];
+    const res = [...base];
+    if (config?.sortBy === 'name') {
+      res.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (config?.sortBy === 'group') {
+      res.sort((a, b) => a.group.localeCompare(b.group) || a.name.localeCompare(b.name));
+    }
+    return res;
+  }, [guests, config?.sortBy]);
   
   if (config.sortBy === 'name') {
     filteredGuests.sort((a, b) => a.name.localeCompare(b.name));
@@ -38,13 +48,13 @@ export const GuestListWidget = ({ config }) => {
         </div>
         <div className="flex space-x-1">
           <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-            {filteredGuests.filter(g => g.rsvp === 'confirmed').length} Sí
+            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'confirmed').length} Sí
           </span>
           <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-            {filteredGuests.filter(g => g.rsvp === 'pending').length} Pendiente
+            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'pending').length} Pendiente
           </span>
           <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">
-            {filteredGuests.filter(g => g.rsvp === 'declined').length} No
+            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'declined').length} No
           </span>
         </div>
       </div>

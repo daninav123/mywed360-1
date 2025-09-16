@@ -1,4 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
+import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /*
   Hook: useSpecialMoments
@@ -42,20 +45,74 @@ function load() {
 }
 
 export default function useSpecialMoments() {
+  const { activeWedding } = useWedding();
   const [moments, setMoments] = useState(load);
+  const lastRemoteRef = useRef(null);
+  const unsubRef = useRef(null);
 
-  // Persistir en localStorage
+  // Persistir en localStorage y Firestore (si hay boda activa)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(moments));
-    window.dispatchEvent(new Event('moments-updated'));
-  }, [moments]);
+    // LocalStorage siempre
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(moments));
+      window.dispatchEvent(new Event('moments-updated'));
+    } catch {}
 
-  // Escuchar cambios desde otras pestañas/componentes
+    // Firestore: evitar loops comparando con último snapshot remoto
+    const json = (() => { try { return JSON.stringify(moments); } catch { return null; } })();
+    if (!activeWedding || !json) return;
+    if (lastRemoteRef.current === json) return; // Sin cambios efectivos respecto a remoto
+
+    (async () => {
+      try {
+        const ref = doc(db, 'weddings', activeWedding, 'specialMoments', 'main');
+        await setDoc(ref, { ...moments, updatedAt: serverTimestamp() }, { merge: true });
+      } catch (e) {
+        console.warn('No se pudieron guardar Momentos Especiales en Firestore:', e?.message || e);
+      }
+    })();
+  }, [moments, activeWedding]);
+
+  // Escuchar cambios desde otras pestañas/componentes y Firestore
   useEffect(() => {
     const handler = () => setMoments(load());
     window.addEventListener('moments-updated', handler);
     return () => window.removeEventListener('moments-updated', handler);
   }, []);
+
+  // Suscribirse a Firestore para sincronización en vivo
+  useEffect(() => {
+    if (!activeWedding) {
+      // Si no hay boda activa, cancelar cualquier suscripción previa
+      if (unsubRef.current) {
+        try { unsubRef.current(); } catch {}
+        unsubRef.current = null;
+      }
+      return;
+    }
+
+    const ref = doc(db, 'weddings', activeWedding, 'specialMoments', 'main');
+    const unsub = onSnapshot(ref, (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data() || {};
+      // El documento guarda el objeto directamente con claves de bloques
+      const { updatedAt, ...payload } = data;
+      try {
+        const json = JSON.stringify(payload);
+        lastRemoteRef.current = json;
+      } catch {
+        lastRemoteRef.current = null;
+      }
+      setMoments((prev) => ({ ...prev, ...payload }));
+    });
+    unsubRef.current = unsub;
+    return () => {
+      if (unsubRef.current) {
+        try { unsubRef.current(); } catch {}
+        unsubRef.current = null;
+      }
+    };
+  }, [activeWedding]);
 
   const addMoment = useCallback((blockId, moment) => {
     setMoments(prev => {
@@ -76,7 +133,7 @@ export default function useSpecialMoments() {
   const updateMoment = useCallback((blockId, momentId, changes) => {
     setMoments(prev => {
       const next = { ...prev };
-      next[blockId] = prev[blockId].map(m => m.id === momentId ? { ...m, ...changes } : m);
+      next[blockId] = (prev[blockId] || []).map(m => m.id === momentId ? { ...m, ...changes } : m);
       return next;
     });
   }, []);

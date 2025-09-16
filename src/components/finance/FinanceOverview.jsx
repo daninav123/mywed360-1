@@ -5,7 +5,7 @@ import { formatCurrency } from '../../utils/formatUtils';
 
 /**
  * Componente de resumen general de finanzas
- * Muestra estadísticas clave, balance y estado de sincronización
+ * Muestra estadÃ­sticas clave, balance y estado de sincronizaciÃ³n
  */
 export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
   const getBudgetStatusColor = (percentage) => {
@@ -20,20 +20,48 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
     return <CheckCircle size={16} />;
   };
 
+  // Fallback inteligente: priorizar Total Esperado (aportaciones),
+  // si no hay, usar presupuesto total definido, y si tampoco, la suma de Categorias
+  const fallbackTotal = Array.isArray(budgetUsage)
+    ? budgetUsage.reduce((sum, c) => sum + (Number(c.amount) || 0), 0)
+    : 0;
+  const expected = Number(stats?.expectedIncome || 0);
+  const budgetTotal = Number(stats?.totalBudget || 0);
+  const effectiveTotal = expected > 0
+    ? expected
+    : (budgetTotal > 0 ? budgetTotal : fallbackTotal);
+  const budgetPercent = effectiveTotal > 0
+    ? (Number(stats?.totalSpent || 0) / effectiveTotal) * 100
+    : 0;
+
+  const safeStats = {
+    totalBudget: Number(stats?.totalBudget || 0),
+    totalSpent: Number(stats?.totalSpent || 0),
+    totalIncome: Number(stats?.totalIncome || 0),
+    currentBalance: Number(stats?.currentBalance || 0),
+    expectedIncome: Number(stats?.expectedIncome || 0),
+    budgetUsagePercentage: Number(stats?.budgetUsagePercentage || 0),
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header con estado de sincronización */}
+      {/* Header con estado de sincronizaciÃ³n */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-[color:var(--color-text)]">
-            Gestión Financiera
+            Gestion Financiera
           </h1>
           <p className="text-[color:var(--color-text)]/70 mt-1">
             Control completo de presupuesto y gastos de tu boda
           </p>
+          {syncStatus?.lastSyncTime && (
+            <p className="text-xs text-[color:var(--color-text)]/50 mt-1">
+              Ãšltima sincronizaciÃ³n: {new Date(syncStatus.lastSyncTime).toLocaleString()}
+            </p>
+          )}
         </div>
         
-        {/* Indicador de sincronización */}
+        {/* Indicador de sincronizaciÃ³n */}
         <div className="flex items-center space-x-2">
           {syncStatus.isOnline ? (
             <div className="flex items-center text-[color:var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
@@ -43,13 +71,13 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
           ) : (
             <div className="flex items-center text-[color:var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
               <CloudOff size={16} className="mr-2" />
-              <span className="text-sm font-medium">Sin conexión</span>
+              <span className="text-sm font-medium">Sin conexion</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Tarjetas de estadísticas principales */}
+      {/* Tarjetas de estadÃ­sticas principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Presupuesto total */}
         <Card className="p-6">
@@ -57,7 +85,7 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
             <div>
               <p className="text-sm font-medium text-[color:var(--color-text)]/70">Presupuesto Total</p>
               <p className="text-2xl font-bold text-[color:var(--color-text)]">
-                {formatCurrency(stats.totalBudget)}
+                {formatCurrency(effectiveTotal)}
               </p>
             </div>
             <div className="p-3 bg-[var(--color-primary)]/15 rounded-full">
@@ -72,10 +100,10 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
             <div>
               <p className="text-sm font-medium text-[color:var(--color-text)]/70">Total Gastado</p>
               <p className="text-2xl font-bold text-[color:var(--color-danger)]">
-                {formatCurrency(stats.totalSpent)}
+                {formatCurrency(safeStats.totalSpent)}
               </p>
               <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
-                {stats.budgetUsagePercentage.toFixed(1)}% del presupuesto
+                {budgetPercent.toFixed(1)}% del presupuesto
               </p>
             </div>
             <div className="p-3 bg-[var(--color-danger)]/10 rounded-full">
@@ -89,12 +117,12 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-[color:var(--color-text)]/70">Balance Actual</p>
-              <p className={`text-2xl font-bold ${stats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
-                {formatCurrency(stats.currentBalance)}
+              <p className={`text-2xl font-bold ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
+                {formatCurrency(safeStats.currentBalance)}
               </p>
             </div>
-            <div className={`p-3 rounded-full ${stats.currentBalance >= 0 ? 'bg-[var(--color-success)]/10' : 'bg-[var(--color-danger)]/10'}`}>
-              {stats.currentBalance >= 0 ? (
+            <div className={`p-3 rounded-full ${safeStats.currentBalance >= 0 ? 'bg-[var(--color-success)]/10' : 'bg-[var(--color-danger)]/10'}`}>
+              {safeStats.currentBalance >= 0 ? (
                 <CheckCircle className="w-6 h-6 text-[color:var(--color-success)]" />
               ) : (
                 <AlertTriangle className="w-6 h-6 text-[color:var(--color-danger)]" />
@@ -109,7 +137,7 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
             <div>
               <p className="text-sm font-medium text-[color:var(--color-text)]/70">Ingresos Esperados</p>
               <p className="text-2xl font-bold text-[color:var(--color-success)]">
-                {formatCurrency(stats.expectedIncome)}
+                {formatCurrency(safeStats.expectedIncome)}
               </p>
             </div>
             <div className="p-3 bg-[var(--color-success)]/10 rounded-full">
@@ -132,7 +160,7 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
                   .map((cat, index) => (
                     <p key={index} className="text-sm text-[color:var(--color-warning)]/90">
                       <span className="font-medium">{cat.name}</span>: {cat.percentage.toFixed(1)}% utilizado
-                      {cat.percentage >= 100 && ' (¡Presupuesto excedido!)'}
+                      {cat.percentage >= 100 && ' (Â¡Presupuesto excedido!)'}
                     </p>
                   ))
                 }
@@ -142,10 +170,10 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
         </Card>
       )}
 
-      {/* Resumen de categorías */}
+      {/* Resumen de Categorias */}
       <Card className="p-6">
         <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-4">
-          Estado del Presupuesto por Categorías
+          Estado del Presupuesto por Categorias
         </h3>
         <div className="space-y-3">
           {budgetUsage.map((category, index) => (
@@ -156,7 +184,7 @@ export default function FinanceOverview({ stats, syncStatus, budgetUsage }) {
                     {category.name}
                   </span>
                   <span className="text-sm text-[color:var(--color-text)]/60">
-                    {formatCurrency(category.spent)} / {formatCurrency(category.amount)}
+                    {formatCurrency(category.spent)} / {formatCurrency(Categoriamount)}
                   </span>
                 </div>
                 <div className="w-full rounded-full h-2 bg-[color:var(--color-text)]/10">

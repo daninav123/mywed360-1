@@ -1,32 +1,29 @@
-import React, { useState, useEffect } from 'react';
-
-import MainLayout from '../components/layout/MainLayout';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { Plus, Sparkles } from 'lucide-react';
 
-// Importar componentes modulares
+// Componentes
 import ProveedorList from '../components/proveedores/ProveedorList';
 import ProveedorCard from '../components/proveedores/ProveedorCard';
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ReservationModal from '../components/proveedores/ReservationModal';
 import AISearchModal from '../components/proveedores/ai/AISearchModal';
 import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
-
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
-import useSupplierGroups from '../hooks/useSupplierGroups';
 import BulkStatusModal from '../components/proveedores/BulkStatusModal';
 import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorModal';
+import WantedServicesModal from '../components/proveedores/WantedServicesModal';
 
-// Importar hooks personalizados
+// Hooks
 import useProveedores from '../hooks/useProveedores';
 import useAISearch from '../hooks/useAISearch';
 import { useAuth } from '../hooks/useAuth';
+import useSupplierGroups from '../hooks/useSupplierGroups';
+import { loadData, saveData } from '../services/SyncService';
+import { useWedding } from '../context/WeddingContext';
 
 const Proveedores = () => {
-  // Diagnóstico: verificar que la versión nueva se carga en el navegador
-  console.log('%c[Lovenda] ProveedoresNuevo cargado', 'color: #10B981; font-weight: bold;');
-  // Obtener funcionalidad de los hooks personalizados
   const {
     providers,
     filteredProviders,
@@ -57,21 +54,15 @@ const Proveedores = () => {
     toggleFavoriteProvider,
     toggleSelectProvider,
     clearSelection,
-    clearFilters
+    clearFilters,
   } = useProveedores();
 
-  const {
-    results: aiResults,
-    loading: aiLoading,
-    lastQuery: aiLastQuery,
-    searchProviders,
-    clearResults
-  } = useAISearch();
-
+  const { results: aiResults, loading: aiLoading, lastQuery: aiLastQuery, searchProviders } = useAISearch();
   const { user } = useAuth();
   const { groups } = useSupplierGroups();
+  const { activeWedding } = useWedding();
 
-  // Estado local para modales y pestañas
+  // Estado UI
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [showEditProviderForm, setShowEditProviderForm] = useState(false);
   const [showAISearchModal, setShowAISearchModal] = useState(false);
@@ -82,128 +73,110 @@ const Proveedores = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [showBulkStatus, setShowBulkStatus] = useState(false);
   const [showDupModal, setShowDupModal] = useState(false);
-  const [currentTrackingItem, setCurrentTrackingItem] = useState(null);
-  const [trackingFilter, setTrackingFilter] = useState('todos');
-  const [highlightGroupId, setHighlightGroupId] = useState(null);
 
-  // Cargar datos iniciales
+  // Servicios deseados
+  const [wantedServices, setWantedServices] = useState([]);
+  const [showWantedModal, setShowWantedModal] = useState(false);
+
+  const normalizedWanted = useMemo(() => {
+    return (wantedServices || [])
+      .map((s) => (typeof s === 'string' ? { id: s, name: s } : s))
+      .filter((s) => s && (s.name || s.id));
+  }, [wantedServices]);
+
+  // Cargar proveedores
+  useEffect(() => { if (user) loadProviders(); }, [user, loadProviders]);
+
+  // Cargar servicios deseados por boda
   useEffect(() => {
-    if (user) {
-      loadProviders();
-    }
-  }, [user, loadProviders]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await loadData('wantedServices', { docPath: activeWedding ? `weddings/${activeWedding}` : undefined, fallbackToLocal: true });
+        if (!cancelled && Array.isArray(data)) setWantedServices(data);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [activeWedding]);
 
-  // Funciones para manejar la visualización de modales
-  const handleViewDetail = (provider) => {
-    setSelectedProvider(provider);
-    setActiveTab('info');
+  const saveWanted = async (list) => {
+    setWantedServices(list);
+    try { await saveData('wantedServices', list, { docPath: activeWedding ? `weddings/${activeWedding}` : undefined, showNotification: false }); } catch {}
+    setShowWantedModal(false);
   };
 
-  const handleNewProvider = () => {
-    setShowNewProviderForm(true);
-  };
+  const missingServices = useMemo(() => {
+    const confirmed = new Set(
+      (providers || [])
+        .filter((p) => ['Confirmado','Seleccionado'].includes(p.status))
+        .map((p) => p.service)
+        .filter(Boolean)
+    );
+    return normalizedWanted.filter((s) => !confirmed.has(s.name || s.id));
+  }, [providers, normalizedWanted]);
 
-  const handleEditProvider = () => {
-    setShowEditProviderForm(true);
-  };
-
-  const handleReserveProvider = (provider) => {
-    setSelectedProvider(provider);
-    setShowReservationModal(true);
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedProvider(null);
-  };
-
-  const handleOpenAISearch = () => {
-    setShowAISearchModal(true);
-  };
+  // Handlers
+  const handleViewDetail = (provider) => { setSelectedProvider(provider); setActiveTab('info'); };
+  const handleNewProvider = () => setShowNewProviderForm(true);
+  const handleEditProvider = () => setShowEditProviderForm(true);
+  const handleReserveProvider = (provider) => { setSelectedProvider(provider); setShowReservationModal(true); };
+  const handleCloseDetail = () => setSelectedProvider(null);
+  const handleOpenAISearch = () => setShowAISearchModal(true);
 
   const handleAISelect = (provider, action) => {
-    if (action === 'view') {
-      setSelectedProvider(provider);
-      setShowAISearchModal(false);
-    } else if (action === 'add') {
-      addProvider(provider);
-      setShowAISearchModal(false);
-    } else if (action === 'select') {
-      addProvider({...provider, status: 'Seleccionado'});
-      setShowAISearchModal(false);
-    } else if (action === 'email') {
-      setAiSelectedResult(provider);
-      setShowAIEmailModal(true);
-    }
+    if (action === 'view') { setSelectedProvider(provider); setShowAISearchModal(false); }
+    else if (action === 'add') { addProvider(provider); setShowAISearchModal(false); }
+    else if (action === 'select') { addProvider({ ...provider, status: 'Seleccionado' }); setShowAISearchModal(false); }
+    else if (action === 'email') { setAiSelectedResult(provider); setShowAIEmailModal(true); }
   };
 
   const handleSubmitProvider = async (providerData) => {
-    if (showEditProviderForm && selectedProvider) {
-      await updateProvider(selectedProvider.id, providerData);
-      setShowEditProviderForm(false);
-    } else {
-      await addProvider(providerData);
-      setShowNewProviderForm(false);
-    }
-  };
-
-  const handleDeleteProvider = async (providerId) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
-      await deleteProvider(providerId);
-    }
+    if (showEditProviderForm && selectedProvider) { await updateProvider(selectedProvider.id, providerData); setShowEditProviderForm(false); }
+    else { await addProvider(providerData); setShowNewProviderForm(false); }
   };
 
   const handleSubmitReservation = async (reservationData) => {
-    // En una implementación real, esto guardaría la reserva en la base de datos
-    console.log('Reserva creada:', reservationData);
-    // Actualizar el estado del proveedor a 'Contactado' si no está ya confirmado/seleccionado
-    if (selectedProvider && 
-        selectedProvider.status !== 'Confirmado' && 
-        selectedProvider.status !== 'Seleccionado') {
-      // Guardar reserva en Firestore y estado local
+    if (selectedProvider && !['Confirmado','Seleccionado'].includes(selectedProvider.status)) {
       await addReservation(selectedProvider.id, reservationData);
-
-      await updateProvider(selectedProvider.id, { 
-        ...selectedProvider, 
-        status: 'Contactado',
-        date: reservationData.date
-      });
+      await updateProvider(selectedProvider.id, { ...selectedProvider, status: 'Contactado', date: reservationData.date });
     }
     setShowReservationModal(false);
   };
 
-  const handleViewTrackingDetails = (trackingItem) => {
-    setCurrentTrackingItem(trackingItem);
-    setShowTrackingModal(true);
-  };
-
-  return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
+  return (      <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
-          
           <div className="flex space-x-2">
-            <Button onClick={handleOpenAISearch} className="flex items-center">
-              <Sparkles size={16} className="mr-1" /> Búsqueda IA
-            </Button>
-            <Button onClick={handleNewProvider} className="flex items-center">
-              <Plus size={16} className="mr-1" /> Nuevo Proveedor
-            </Button>
+            <Button onClick={()=>setShowWantedModal(true)} className="flex items-center" variant="outline">Configurar servicios</Button>
+            <Button onClick={handleOpenAISearch} className="flex items-center"><Sparkles size={16} className="mr-1" /> Búsqueda IA</Button>
+            <Button onClick={handleNewProvider} className="flex items-center"><Plus size={16} className="mr-1" /> Nuevo Proveedor</Button>
           </div>
         </div>
 
-        {error && (
-          <Card className="mb-6 bg-red-50 border border-red-200">
-            <p className="text-red-700">{error}</p>
-          </Card>
-        )}
+        {error && (<Card className="mb-6 bg-red-50 border border-red-200"><p className="text-red-700">{error}</p></Card>)}
 
         {loading ? (
-          <Card className="p-8 text-center">
-            <p className="text-gray-500">Cargando proveedores...</p>
-          </Card>
+          <Card className="p-8 text-center"><p className="text-gray-500">Cargando proveedores...</p></Card>
         ) : (
           <div className="grid grid-cols-1 gap-6">
+            {/* Placeholders de servicios faltantes */}
+            {missingServices.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {missingServices.map((s) => (
+                  <Card key={s.id || s.name} className="opacity-60 border-dashed">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold">{s.name || s.id}</h3>
+                      <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">Pendiente</span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">Aún no hay proveedor confirmado para este servicio.</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => { setServiceFilter(s.name || s.id); setShowAISearchModal(true); }}>Buscar con IA</Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
             {/* Lista de proveedores con filtros */}
             <ProveedorList
               providers={filteredProviders}
@@ -223,76 +196,45 @@ const Proveedores = () => {
               handleViewDetail={handleViewDetail}
               tab={tab}
               setTab={setTab}
-              highlightGroupId={highlightGroupId}
               selected={selectedProviderIds}
               toggleSelect={toggleSelectProvider}
               toggleFavorite={toggleFavoriteProvider}
             />
-
-            {/* Acciones con proveedores seleccionados */}
-            {selectedProviderIds.length > 0 && (
-              <Card className="bg-blue-50 border border-blue-100">
-                <div className="flex justify-between items-center">
-                  <p className="text-blue-800">
-                    {selectedProviderIds.length} {selectedProviderIds.length === 1 ? 'proveedor seleccionado' : 'proveedores seleccionados'}
-                  </p>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" onClick={clearSelection}>
-                      Deseleccionar todo
-                    </Button>
-                    <Button size="sm" onClick={()=>setShowBulkStatus(true)}>Cambiar estado</Button>
-                    <Button size="sm" variant="outline" onClick={()=>setShowDupModal(true)}>Duplicados</Button>
-                  </div>
-                </div>
-              </Card>
-            )}
           </div>
         )}
 
-        {/* Vista detallada simple (temporal) */}
-        {selectedProvider && (
-          <Card className="p-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold">{selectedProvider.name}</h2>
-              <Button variant="outline" onClick={handleCloseDetail}>Cerrar</Button>
-            </div>
-            <div className="space-y-1 text-sm text-gray-700">
-              {selectedProvider.service && <p><strong>Servicio:</strong> {selectedProvider.service}</p>}
-              {selectedProvider.email && <p><strong>Email:</strong> {selectedProvider.email}</p>}
-              {selectedProvider.phone && <p><strong>Teléfono:</strong> {selectedProvider.phone}</p>}
-              {selectedProvider.snippet && <p className="text-gray-600">{selectedProvider.snippet}</p>}
-            </div>
-          </Card>
-        )}
-
-        {/* Modal para añadir nuevo proveedor */}
+        {/* Modales */}
         {showNewProviderForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <ProveedorForm
-              onSubmit={handleSubmitProvider}
-              onCancel={() => setShowNewProviderForm(false)}
-            />
+            <ProveedorForm onSubmit={handleSubmitProvider} onCancel={() => setShowNewProviderForm(false)} />
           </div>
         )}
 
-        {/* Modal para editar proveedor */}
         {showEditProviderForm && selectedProvider && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <ProveedorForm
-              initialData={selectedProvider}
-              onSubmit={handleSubmitProvider}
-              onCancel={() => setShowEditProviderForm(false)}
-            />
+            <ProveedorForm initialData={selectedProvider} onSubmit={handleSubmitProvider} onCancel={() => setShowEditProviderForm(false)} />
           </div>
         )}
 
-        {/* Modal de búsqueda con IA */}
         <AISearchModal
           isOpen={showAISearchModal}
           onClose={() => setShowAISearchModal(false)}
           onSearch={searchProviders}
           onSelect={handleAISelect}
           isLoading={aiLoading}
+          providers={providers}
+          serviceFilter={serviceFilter}
+          setServiceFilter={setServiceFilter}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+          ratingMin={ratingMin}
+          setRatingMin={setRatingMin}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
 
         {showAIEmailModal && aiSelectedResult && (
@@ -313,7 +255,6 @@ const Proveedores = () => {
               if (!p) continue;
               await updateProvider(pid, { ...p, status: newStatus });
             }
-            // No limpiamos la selección automáticamente
           }}
         />
 
@@ -327,70 +268,22 @@ const Proveedores = () => {
             const others = group.filter(x => x.id !== primary.id);
             const aliases = Array.from(new Set([...(primary.aliases||[]), ...others.map(o=>o.email).filter(Boolean)]));
             await updateProvider(primary.id, { ...primary, aliases });
-            for (const o of others) {
-              await deleteProvider(o.id);
-            }
+            for (const o of others) { await deleteProvider(o.id); }
           }}
         />
 
-        {/* Modal de reserva */}
         {showReservationModal && selectedProvider && (
-          <ReservationModal
-            provider={selectedProvider}
-            onClose={() => setShowReservationModal(false)}
-            onSubmit={handleSubmitReservation}
-          />
+          <ReservationModal provider={selectedProvider} onClose={() => setShowReservationModal(false)} onSubmit={handleSubmitReservation} />
         )}
 
-        {/* Modal de seguimiento */}
-        {showTrackingModal && currentTrackingItem && (
-          <TrackingModal
-            isOpen={showTrackingModal}
-            onClose={() => setShowTrackingModal(false)}
-            trackingItem={currentTrackingItem}
-          />
+        {showTrackingModal && (
+          <TrackingModal isOpen={showTrackingModal} onClose={() => setShowTrackingModal(false)} trackingItem={null} />
         )}
 
-        {/* Proveedores seleccionados */}
-        {selectedProviderIds.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold mb-4">Proveedores seleccionados</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {selectedProviderIds.map(pid => {
-                const provider = providers.find(p => p.id === pid);
-                if(!provider) return null;
-                // inyectar nombre de grupo si está en grupos
-                let groupName = provider.groupName;
-                if (!groupName && Array.isArray(groups)) {
-                  for (const g of groups) {
-                    if (Array.isArray(g.memberIds) && g.memberIds.includes(pid)) {
-                      groupName = g.name || '';
-                      break;
-                    }
-                  }
-                }
-                return (
-                  <ProveedorCard
-                    key={pid}
-                    provider={{ ...provider, groupName }}
-                    isSelected={true}
-                    onToggleSelect={() => toggleSelectProvider(pid)}
-                    onViewDetail={() => handleViewDetail(provider)}
-                    onToggleFavorite={toggleFavoriteProvider}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-    </MainLayout>
-  );
+        <WantedServicesModal open={showWantedModal} onClose={()=>setShowWantedModal(false)} value={wantedServices} onSave={saveWanted} />
+      </div>);
 };
 
 export default Proveedores;
-
-
-
 
 

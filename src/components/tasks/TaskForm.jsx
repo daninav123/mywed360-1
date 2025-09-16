@@ -99,7 +99,8 @@ const TaskForm = ({
           {editingId && (
             <button 
               type="button"
-              onClick={handleDeleteTask} 
+              onMouseDown={(e)=>e.stopPropagation()}
+              onClick={(e)=>{ e.stopPropagation(); handleDeleteTask(); }} 
               className="px-4 py-2 rounded bg-red-600 text-white mr-auto"
             >
               Eliminar

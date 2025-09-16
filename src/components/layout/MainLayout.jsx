@@ -17,9 +17,12 @@ const MainLayout = ({ children }) => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  const hideTopNav = location.pathname.startsWith('/proveedores');
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Cabecera */}
+      {/* Cabecera (oculta en página de Proveedores) */}
+      {!hideTopNav && (
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -236,6 +239,7 @@ const MainLayout = ({ children }) => {
           </div>
         )}
       </header>
+      )}
       
       {/* Contenido principal */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
