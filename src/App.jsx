@@ -65,6 +65,7 @@ import SupplierPortal from './pages/SupplierPortal';
 import './i18n';
 import DiagnosticPanel from './components/DiagnosticPanel';
 import './utils/consoleCommands';
+import { UserPreferencesProvider } from './contexts/UserContext';
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -159,6 +160,7 @@ function App() {
                 <Route path="disenos" element={<DisenosLayout />}>
                   <Route index element={<Navigate to="invitaciones" replace />} />
                   <Route path="invitaciones" element={<DisenosInvitaciones />} />
+                  <Route path="invitacion-vector" element={<DisenosInvitaciones />} />
                   <Route path="logo" element={<DisenosLogo />} />
                   <Route path="menu" element={<MenuDiseno />} />
                   <Route path="seating-plan" element={<SeatingPlanPost />} />
@@ -183,7 +185,7 @@ function App() {
                 <Route path="email/inbox" element={<UnifiedEmail />} />
                 <Route path="email/compose" element={<ComposeEmail />} />
                 <Route path="email/compose/:action/:id" element={<ComposeEmail />} />
-                <Route path="email/stats" element={<EmailStatistics />} />
+                <Route path="email/stats" element={<UserPreferencesProvider><EmailStatistics /></UserPreferencesProvider>} />
                 <Route path="email/setup" element={<EmailSetup />} />
                 <Route path="email/test" element={<MailgunTester />} />
 

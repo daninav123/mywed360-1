@@ -5,6 +5,7 @@ import PageWrapper from '../../components/PageWrapper';
 import { Button } from '../../components/ui';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 import { post as apiPost } from '../../services/apiClient';
+import * as Playback from '../../services/PlaybackService';
 import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 
 const TABS = [
@@ -54,27 +55,37 @@ const MomentosEspeciales = () => {
       }
     } catch {}
   }, []);
+  // Cleanup al desmontar
+  useEffect(() => {
+    return () => { try { Playback.stop(); } catch {} };
+  }, []);
   const [playingId, setPlayingId] = useState(null);
-  const [audioObj, setAudioObj] = useState(null);
 
-  const stopAudio = () => {
-    try { audioObj?.pause(); } catch {}
-    setPlayingId(null);
-    setAudioObj(null);
+  // Guardar preferencias músicales en localStorage
+  const saveProfilePrefs = () => {
+    try {
+      localStorage.setItem('lovenda_music_prefs', JSON.stringify(profilePrefs));
+      if (Array.isArray(profilePrefs.languages) && profilePrefs.languages.length) {
+        setAiLanguage(profilePrefs.languages[0]);
+      }
+    } catch {}
   };
 
-  const togglePreview = (item) => {
-    if (!item?.previewUrl) return;
-    if (playingId === item.id && audioObj) {
-      stopAudio();
+  const stopAudio = async () => {
+    await Playback.stop();
+    setPlayingId(null);
+  };
+
+  const togglePreview = async (item) => {
+    if (!item) return;
+    if (playingId === item.id) {
+      await Playback.pause();
+      setPlayingId(null);
       return;
     }
-    try { audioObj?.pause(); } catch {}
-    const a = new Audio(item.previewUrl);
-    a.play().catch(() => {});
-    a.onended = () => stopAudio();
-    setAudioObj(a);
-    setPlayingId(item.id);
+    await Playback.stop();
+    const ok = await Playback.playTrack(item);
+    setPlayingId(ok ? item.id : null);
   };
 
   // BÃºsqueda por nombre (iTunes)
@@ -189,6 +200,81 @@ const MomentosEspeciales = () => {
   return (
     <PageWrapper title="Momentos Especiales">
       <div className="space-y-6">
+        {/* Preferencias músicales (movidas desde Perfil) */}
+        <Card className="space-y-4 p-5">
+          <h3 className="text-md font-medium flex items-center gap-2"><Music size={16} /> Preferencias músicales</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <div className="text-sm font-medium mb-1">Idiomas</div>
+              <div className="flex flex-wrap gap-2">
+                {['es','en','it','fr','pt'].map(lang => (
+                  <label key={lang} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.languages.includes(lang)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      checked={profilePrefs.languages.includes(lang)}
+                      onChange={(e)=>{
+                        setProfilePrefs(prev => {
+                          const set = new Set(prev.languages);
+                          e.target.checked ? set.add(lang) : set.delete(lang);
+                          return { ...prev, languages: Array.from(set) };
+                        });
+                      }}
+                    />
+                    {lang.toUpperCase()}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm font-medium mb-1">Generos</div>
+              <div className="flex flex-wrap gap-2">
+                {['pop','rock','jazz','latino','cl\\u00E1sica','indie','r&b','electr\\u00F3nica'].map(genre => (
+                  <label key={genre} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.genres.includes(genre)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      checked={profilePrefs.genres.includes(genre)}
+                      onChange={(e)=>{
+                        setProfilePrefs(prev => {
+                          const set = new Set(prev.genres);
+                          e.target.checked ? set.add(genre) : set.delete(genre);
+                          return { ...prev, genres: Array.from(set) };
+                        });
+                      }}
+                    />
+                    {genre}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm font-medium mb-1">Decadas</div>
+              <div className="flex flex-wrap gap-2">
+                {['70s','80s','90s','2000s','2010s','actual'].map(dec => (
+                  <label key={dec} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.decades.includes(dec)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                    <input
+                      type="checkbox"
+                      className="hidden"
+                      checked={profilePrefs.decades.includes(dec)}
+                      onChange={(e)=>{
+                        setProfilePrefs(prev => {
+                          const set = new Set(prev.decades);
+                          e.target.checked ? set.add(dec) : set.delete(dec);
+                          return { ...prev, decades: Array.from(set) };
+                        });
+                      }}
+                    />
+                    {dec}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="text-right"><Button onClick={saveProfilePrefs}>Guardar preferencias</Button></div>
+        </Card>
         <p className="text-gray-600">Planifica cada instante clave con la mÃºsica y el momento adecuados.</p>
 
         {/* Tabs */}
@@ -336,15 +422,13 @@ const MomentosEspeciales = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {s.previewUrl && (
-                            <button
-                              title={playingId === s.id ? 'Pausar' : 'Reproducir preview'}
-                              onClick={() => togglePreview(s)}
-                              className="text-gray-500 hover:text-purple-600 p-1"
-                            >
-                              {playingId === s.id ? <Pause size={16} /> : <Play size={16} />}
-                            </button>
-                          )}
+                          <button
+                            title={playingId === s.id ? 'Pausar' : 'Reproducir'}
+                            onClick={() => togglePreview(s)}
+                            className="text-gray-500 hover:text-purple-600 p-1"
+                          >
+                            {playingId === s.id ? <Pause size={16} /> : <Play size={16} />}
+                          </button>
                           <Button
                             className="text-xs py-1 px-2"
                             onClick={() => {
@@ -411,15 +495,13 @@ const MomentosEspeciales = () => {
                         </div>
                       </div>
 
-                      {song.previewUrl && (
-                        <button
-                          title={playingId === song.id ? 'Pausar' : 'Reproducir preview'}
-                          onClick={() => togglePreview(song)}
-                          className="text-gray-500 hover:text-blue-600 p-1"
-                        >
-                          {playingId === song.id ? <Pause size={16} /> : <Play size={16} />}
-                        </button>
-                      )}
+                      <button
+                        title={playingId === song.id ? 'Pausar' : 'Reproducir'}
+                        onClick={() => togglePreview(song)}
+                        className="text-gray-500 hover:text-blue-600 p-1"
+                      >
+                        {playingId === song.id ? <Pause size={16} /> : <Play size={16} />}
+                      </button>
 
                       <button
                         className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
@@ -550,3 +632,4 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
+

@@ -18,3 +18,8 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+/* Evitar solapes: ocultar etiquetas fuera de la barra (solo mostrar texto dentro) */
+._3KcaM {
+  display: none !important;
+}

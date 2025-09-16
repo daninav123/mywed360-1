@@ -13,10 +13,12 @@ import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import { Button } from '../components/ui';
 import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
+import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
 import GroupManager from '../components/guests/GroupManager';
 import { post as apiPost } from '../services/apiClient';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 
 /**
  * Página de gestión de invitados completamente refactorizada
@@ -39,6 +41,7 @@ function Invitados() {
   const [showRsvpModal, setShowRsvpModal] = useState(false);
   const [showWhatsModal, setShowWhatsModal] = useState(false);
   const [showWhatsBatch, setShowWhatsBatch] = useState(false);
+  const [showSaveTheDate, setShowSaveTheDate] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [showGroupManager, setShowGroupManager] = useState(false);
@@ -47,6 +50,7 @@ function Invitados() {
   const { t } = useTranslations();
   const { currentUser } = useAuth();
   const { weddings, activeWedding } = useWedding();
+  const { info: activeWeddingInfo } = useActiveWeddingInfo();
     
   // Datos provenientes de Firebase mediante hooks
   const {
@@ -73,6 +77,44 @@ function Invitados() {
     updateFilters,
     utils
   } = useGuests();
+
+  // Mensaje por defecto para SAVE THE DATE
+  const saveTheDateDefault = React.useMemo(() => {
+    try {
+      // Prioriza weddingInfo del doc principal
+      const wi = activeWeddingInfo?.weddingInfo || {};
+      const wList = (weddings || []).find(x => x.id === activeWedding) || {};
+
+      // Nombres pareja
+      let p1 = '', p2 = '';
+      const coupleRaw = wi.coupleName || wList.coupleName || wList.name || wi.brideAndGroom || wList.brideAndGroom || wi.nombrePareja || '';
+      if (coupleRaw) {
+        const parts = String(coupleRaw).trim().split(/\s*&\s*|\s+y\s+/i);
+        p1 = (parts[0] || '').trim();
+        p2 = (parts[1] || '').trim();
+      } else if (wi.bride || wi.groom || wList.bride || wList.groom) {
+        p1 = String(wi.bride || wList.bride || '').trim();
+        p2 = String(wi.groom || wList.groom || '').trim();
+      }
+      if (!p1 && !p2) { p1 = 'pareja1'; p2 = 'pareja2'; }
+
+      // Fecha de la boda
+      const dateRaw = wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
+      let fechaFmt = '';
+      if (dateRaw) {
+        try {
+          const d = typeof dateRaw === 'string' ? new Date(dateRaw) : (dateRaw?.seconds ? new Date(dateRaw.seconds * 1000) : new Date(dateRaw));
+          fechaFmt = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+        } catch { fechaFmt = String(dateRaw); }
+      } else {
+        fechaFmt = 'la fecha de la boda';
+      }
+
+      return `Hola somos ${p1}${p2 ? ' y ' + p2 : ''}, tenemos un noticion super importante que compartir contigo! NOS CASAMOS!! Reservate el ${fechaFmt} porque queremos contar contigo!`;
+    } catch {
+      return 'Hola! Tenemos un noticion super importante que compartir contigo! NOS CASAMOS!! Reservate la fecha porque queremos contar contigo!';
+    }
+  }, [weddings, activeWedding, activeWeddingInfo]);
 
   // Opciones únicas de grupo (group o companionGroupId)
   const groupOptions = React.useMemo(() => {
@@ -201,6 +243,8 @@ function Invitados() {
   // Abrir modal de envío masivo WhatsApp
   const openWhatsBatch = () => setShowWhatsBatch(true);
   const closeWhatsBatch = () => setShowWhatsBatch(false);
+  const openSaveTheDate = () => setShowSaveTheDate(true);
+  const closeSaveTheDate = () => setShowSaveTheDate(false);
 
   // Selección múltiple
   const handleToggleSelect = (id, checked) => {
@@ -555,6 +599,7 @@ function Invitados() {
           onAddGuest={handleAddGuest}
           onBulkInvite={bulkInviteWhatsAppApi}
           onOpenRsvpSummary={handleOpenRsvpSummary}
+          onOpenSaveTheDate={openSaveTheDate}
           guestCount={guests?.length || 0}
           isLoading={isLoading}
           selectedCount={selectedIds.length}
@@ -741,6 +786,16 @@ function Invitados() {
           onBatchCreated={(res)=>{
             alert(`Lote creado con ${res.items?.length || 0} mensajes`);
           }}
+        />
+
+        {/* Modal SAVE THE DATE */}
+        <SaveTheDateModal
+          open={showSaveTheDate}
+          onClose={closeSaveTheDate}
+          guests={guests || []}
+          weddingId={activeWedding}
+          defaultMessage={saveTheDateDefault}
+          selectedDefaultIds={selectedIds}
         />
 
         {/* Modal WhatsApp con dos pestañas (móvil personal / API) */}

@@ -109,6 +109,10 @@ export const useFirestoreCollection = (collectionName, fallback = []) => {
   const updateItem = useCallback(async (id, changes) => {
     if (auth.currentUser?.uid) {
       await updateItemFS(collectionName, id, changes);
+      // Optimistic local update to reflect immediately
+      const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
+      setData(next);
+      lsSet(collectionName, next);
     } else {
       const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
       setData(next);
@@ -119,6 +123,10 @@ export const useFirestoreCollection = (collectionName, fallback = []) => {
   const deleteItem = useCallback(async (id) => {
     if (auth.currentUser?.uid) {
       await deleteItemFS(collectionName, id);
+      // Optimistic local removal
+      const next = data.filter((d) => d.id !== id);
+      setData(next);
+      lsSet(collectionName, next);
     } else {
       const next = data.filter((d) => d.id !== id);
       setData(next);

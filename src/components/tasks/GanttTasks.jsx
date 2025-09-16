@@ -8,11 +8,25 @@ export const GanttChart = ({
   onTaskClick,
   viewMode = ViewMode.Month, 
   listCellWidth = 0,
-  columnWidth = 65 
+  columnWidth = 65,
+  rowHeight = 44,
+  ganttHeight,
 }) => {
   // Tooltip simple que muestra solo el nombre del proceso
   const NameOnlyTooltip = ({ task }) => (
-    <div style={{ background: 'white', border: '1px solid #ddd', borderRadius: 6, padding: 8, boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}>
+    <div
+      style={{
+        background: 'white',
+        border: '1px solid #ddd',
+        borderRadius: 6,
+        padding: 8,
+        boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+        maxWidth: 320,
+        whiteSpace: 'normal',
+        wordBreak: 'break-word',
+        lineHeight: 1.25,
+      }}
+    >
       <div style={{ fontWeight: 600 }}>{task.name}</div>
     </div>
   );
@@ -56,6 +70,8 @@ export const GanttChart = ({
       listCellWidth={listCellWidth}
       columnWidth={columnWidth}
       locale="es"
+      rowHeight={rowHeight}
+      ganttHeight={typeof ganttHeight === 'number' ? ganttHeight : undefined}
       fontSize="12px"
       TooltipContent={NameOnlyTooltip}
       barFill={60}

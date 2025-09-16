@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { categories } from './CalendarComponents';
 
 // Componente para el formulario de tareas
@@ -11,9 +12,9 @@ const TaskForm = ({
   closeModal,
   setFormData 
 }) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" onClick={closeModal}>
-      <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4 shadow-lg" onClick={e => e.stopPropagation()}>
+  const modal = (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[9999]" onClick={closeModal}>
+      <div className="bg-white rounded-lg w-full max-w-md p-6 space-y-4 shadow-lg relative z-[10000]" onClick={e => e.stopPropagation()}>
         <h3 className="text-xl font-semibold">{editingId ? 'Editar tarea' : 'Crear nueva tarea'}</h3>
         <div className="space-y-3">
           <input 
@@ -97,6 +98,7 @@ const TaskForm = ({
         <div className="flex justify-end space-x-2">
           {editingId && (
             <button 
+              type="button"
               onClick={handleDeleteTask} 
               className="px-4 py-2 rounded bg-red-600 text-white mr-auto"
             >
@@ -119,6 +121,12 @@ const TaskForm = ({
       </div>
     </div>
   );
+
+  // Renderizar en portal para evitar problemas de stacking/overflow
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(modal, document.body);
+  }
+  return modal;
 };
 
 export default TaskForm;

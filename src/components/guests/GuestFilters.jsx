@@ -24,6 +24,7 @@ const GuestFilters = React.memo(({
   onAddGuest,
   onBulkInvite,
   onOpenRsvpSummary,
+  onOpenSaveTheDate,
   guestCount = 0,
   isLoading = false,
   // selección múltiple
@@ -182,6 +183,15 @@ const GuestFilters = React.memo(({
 
         <Button
           variant="outline"
+          onClick={() => onOpenSaveTheDate?.()}
+          disabled={isLoading || guestCount === 0}
+          title="Enviar SAVE THE DATE por WhatsApp"
+        >
+          Enviar SAVE THE DATE
+        </Button>
+
+        <Button
+          variant="outline"
           onClick={handleOpenRsvp}
           disabled={isLoading}
         >
@@ -233,7 +243,7 @@ const GuestFilters = React.memo(({
             </Button>
           )}
 
-          <Button
+          <Button className="hidden"
             variant="outline"
             onClick={() => onOpenGroupManager?.()}
             disabled={isLoading}

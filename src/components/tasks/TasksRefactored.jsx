@@ -108,6 +108,8 @@ export default function Tasks() {
   const [columnWidthState] = useState(65);
   // Ocultar completamente la lista izquierda del Gantt
   const listCellWidth = 0;
+  // Altura de fila del Gantt
+  const rowHeight = 44;
 
   // Manejar eventos de calendario externos
   useEffect(() => {
@@ -477,15 +479,29 @@ export default function Tasks() {
   };
 
   // Eliminar una tarea
-  const handleDeleteTask = () => {
-    if (confirm('¿Estás seguro de querer eliminar esta tarea?')) {
-      // Buscar en ambas colecciones - con verificación de tipo
-      if (tasksState.some(t => t.id === editingId)) {
-        deleteTaskFS(editingId);
-      } else {
-        deleteMeetingFS(editingId);
+  const handleDeleteTask = async () => {
+    try {
+      if (!editingId) return;
+      if (!(typeof window !== 'undefined' ? window.confirm('¿Estás seguro de querer eliminar esta tarea?') : true)) return;
+      const existsInTasks = Array.isArray(tasksState) && tasksState.some(t => t?.id === editingId);
+      const existsInMeetings = Array.isArray(meetingsState) && meetingsState.some(m => m?.id === editingId);
+
+      if (existsInTasks) {
+        await deleteTaskFS(editingId);
       }
+      if (existsInMeetings) {
+        await deleteMeetingFS(editingId);
+      }
+      // Si no podemos determinar, probar ambas (por compatibilidad)
+      if (!existsInTasks && !existsInMeetings) {
+        try { await deleteTaskFS(editingId); } catch (_) {}
+        try { await deleteMeetingFS(editingId); } catch (_) {}
+      }
+
       closeModal();
+    } catch (error) {
+      console.error('Error eliminando tarea/proceso:', error);
+      alert('No se pudo eliminar. Revisa tu conexión o permisos.');
     }
   };
 
@@ -673,15 +689,17 @@ export default function Tasks() {
       </div>
       
       {/* Componente para el diagrama Gantt */}
-      <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg relative z-[60]">
+      <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
-        <div className="h-96 overflow-x-auto overflow-y-hidden mb-4 border border-gray-100 rounded-lg min-w-[600px]">
+        <div className="overflow-x-auto mb-4 border border-gray-100 rounded-lg min-w-[600px]">
           {safeGanttTasks && safeGanttTasks.length > 0 ? (
             <GanttChart 
               tasks={safeGanttTasks} 
               viewMode={ViewMode.Month}
               listCellWidth={listCellWidth}
               columnWidth={columnWidthState}
+              rowHeight={rowHeight}
+              ganttHeight={safeGanttTasks.length * rowHeight}
               onTaskClick={(task) => {
                 // Abrir modal de edición para tareas de largo plazo
                 setEditingId(task.id);

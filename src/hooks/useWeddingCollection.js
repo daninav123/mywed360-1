@@ -280,6 +280,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     if (weddingId) {
       try {
         await updateDoc(doc(db, 'weddings', weddingId, ...subName.split('/'), id), changes);
+        // Optimistic local update
+        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
+        setData(next);
+        lsSet(weddingId, subName, next);
         return;
       } catch (err) {
         console.warn('updateItem Firestore failed, usando localStorage:', err);
@@ -295,6 +299,10 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     if (weddingId) {
       try {
         await deleteDoc(doc(db, 'weddings', weddingId, ...subName.split('/'), id));
+        // Optimistic local removal
+        const next = data.filter((d) => d.id !== id);
+        setData(next);
+        lsSet(weddingId, subName, next);
         return;
       } catch (err) {
         console.warn('deleteItem Firestore failed, usando localStorage:', err);

@@ -173,7 +173,7 @@ function renderHtmlFromPayload(payload) {
 </html>`);
 }
 
-export async function getHtmlForWeddingIdOrSlug(idOrSlug) {
+async function getHtmlForWeddingIdOrSlug(idOrSlug) {
   const found = await getWeddingByIdOrSlug(idOrSlug);
   if (!found) return null;
   try {
@@ -314,4 +314,3 @@ router.post('/:weddingId/publish', async (req, res) => {
 
 export default router;
 export { buildPublicPayload, getHtmlForWeddingIdOrSlug };
-

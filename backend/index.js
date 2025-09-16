@@ -73,6 +73,7 @@ import paymentsWebhookRouter from './routes/payments-webhook.js';
 import healthRouter from './routes/health.js';
 import calendarFeedRouter from './routes/calendar-feed.js';
 import spotifyRouter from './routes/spotify.js';
+import playbackRouter from './routes/playback.js';
 
 
 // Load environment variables (root .env)
@@ -289,6 +290,7 @@ app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
+app.use('/api/playback', playbackRouter);
 
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);

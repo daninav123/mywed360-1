@@ -15,10 +15,11 @@ import { db, firebaseReady } from '../firebaseConfig';
  *  - templates: Array<{ name, description, prompt }>
  *  - onImageGenerated: (image) => void
  */
-const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerated = () => {} }) => {
+const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerated = () => {}, defaultPrompt = '', autoGenerate = false }) => {
   const navigate = useNavigate();
   const { activeWedding } = useWedding();
   const [prompt, setPrompt] = useState('');
+  const autoGenOnce = React.useRef(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,19 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  // Aplicar prompt por defecto si llega desde fuera
+  useEffect(() => {
+    if (defaultPrompt && !prompt) setPrompt(defaultPrompt);
+  }, [defaultPrompt]);
+
+  // Auto-generar una vez si se solicita y hay prompt listo
+  useEffect(() => {
+    if (autoGenerate && !autoGenOnce.current && prompt && !loading) {
+      autoGenOnce.current = true;
+      generateImage();
+    }
+  }, [autoGenerate, prompt, loading]);
 
   const handleSelectTemplate = (template) => {
     setSelectedTemplate(template);

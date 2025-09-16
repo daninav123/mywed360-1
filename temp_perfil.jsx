@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { useWedding } from '../context/WeddingContext';
 import useRoles from '../hooks/useRoles';
-import { Users, X } from 'lucide-react';
+import { Users, X, Music } from 'lucide-react';
 import { loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { auth, db } from '../firebaseConfig';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -268,5 +268,6 @@ function Perfil() {
 }
 
 export default Perfil;
+
 
 
