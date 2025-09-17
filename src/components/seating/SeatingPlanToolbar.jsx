@@ -37,6 +37,7 @@ const SeatingPlanToolbar = ({
   onExportPDF,
   onExportPNG,
   onExportCSV,
+  onExportPlaceCards,
   onOpenCeremonyConfig,
   onOpenBanquetConfig,
   onOpenSpaceConfig,
@@ -54,6 +55,7 @@ const SeatingPlanToolbar = ({
   onToggleSnap,
   gridStep = 20,
   onExportSVG,
+  onExportPoster,
   showSeatNumbers = false,
   onToggleSeatNumbers,
   onRotateLeft,
@@ -64,6 +66,11 @@ const SeatingPlanToolbar = ({
   onToggleValidations,
   globalMaxSeats = 0,
   onOpenCapacity,
+  // Snapshots
+  snapshots = [],
+  onSaveSnapshot,
+  onLoadSnapshot,
+  onDeleteSnapshot,
   className = ""
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -74,9 +81,10 @@ const SeatingPlanToolbar = ({
   };
   const exportRef = useRef(null);
   const alignRef = useRef(null);
+  const snapsRef = useRef(null);
   const { t } = useTranslations();
   const [showTablesLocal, setShowTablesLocal] = useState(showTables);
-
+  
   // Cierre por click-away
   useEffect(() => {
     const onClickAway = (e) => {
@@ -85,6 +93,9 @@ const SeatingPlanToolbar = ({
       }
       if (alignRef.current && !alignRef.current.contains(e.target)) {
         setShowAlignMenu(false);
+      }
+      if (snapsRef.current && !snapsRef.current.contains(e.target)) {
+        setShowSnaps(false);
       }
     };
     document.addEventListener('mousedown', onClickAway);
@@ -118,6 +129,7 @@ const SeatingPlanToolbar = ({
         return <CloudOff className="h-4 w-4 text-gray-400" />;
     }
   };
+  const [showSnaps, setShowSnaps] = useState(false);
 
   const getSyncText = () => {
     switch (syncStatus?.status) {
@@ -387,6 +399,22 @@ const SeatingPlanToolbar = ({
               >
                 SVG
               </button>
+              {tab === 'banquet' && (
+                <button type="button" data-testid="export-poster"
+                  onClick={() => { onExportPoster?.(); setShowExportMenu(false); }}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                >
+                  Póster A2
+                </button>
+              )}
+              {tab === 'banquet' && (
+                <button type="button" data-testid="export-placecards"
+                  onClick={() => { onExportPlaceCards?.(); setShowExportMenu(false); }}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
+                >
+                  Tarjetas
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -406,9 +434,47 @@ const SeatingPlanToolbar = ({
           <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }} />
         </div>
       )}
+
+      {/* Snapshots menu */}
+      <div className="px-3 pb-3">
+        <div ref={snapsRef} className="relative inline-block">
+          <button
+            type="button"
+            onClick={() => setShowSnaps(s => !s)}
+            className="px-2 py-1 text-sm rounded border hover:bg-gray-50"
+            title="Snapshots"
+          >
+            Snapshots
+          </button>
+          {showSnaps && (
+            <div className="absolute z-10 mt-1 bg-white border rounded shadow w-56">
+              <div className="px-3 py-2 border-b text-sm font-medium">Gestionar Snapshots</div>
+              <button className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm" onClick={() => {
+                const name = window.prompt('Nombre del snapshot:');
+                if (!name) return;
+                onSaveSnapshot?.(name);
+                setShowSnaps(false);
+              }}>Guardar actual…</button>
+              <div className="max-h-48 overflow-auto">
+                {(snapshots||[]).length === 0 ? (
+                  <div className="px-3 py-2 text-xs text-gray-500">Sin snapshots</div>
+                ) : (
+                  snapshots.map(n => (
+                    <div key={n} className="flex items-center justify-between px-3 py-1 text-sm hover:bg-gray-50">
+                      <button className="text-blue-600 hover:underline" onClick={() => { onLoadSnapshot?.(n); setShowSnaps(false); }}>Cargar: {n}</button>
+                      <button className="text-red-600 hover:underline" onClick={() => onDeleteSnapshot?.(n)}>Borrar</button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
 export default React.memo(SeatingPlanToolbar);
+
 

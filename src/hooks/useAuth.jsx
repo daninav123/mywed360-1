@@ -196,9 +196,10 @@ export const AuthProvider = ({ children }) => {
         return mockToken;
       }
 
-      // Para usuarios reales de Firebase
-      if (currentUser.getIdToken) {
-        const token = await currentUser.getIdToken(forceRefresh);
+      // Para usuarios reales: usar el usuario real de Firebase Auth
+      const fbUser = auth?.currentUser;
+      if (fbUser?.getIdToken) {
+        const token = await fbUser.getIdToken(forceRefresh);
         console.log(' Token Firebase obtenido');
         return token;
       }

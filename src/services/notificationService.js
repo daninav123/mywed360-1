@@ -51,11 +51,20 @@ export async function getNotifications() {
     const headers = await authHeader();
     const res = await apiGet('/api/notifications', { headers });
     if (!res.ok) throw new Error('Error fetching notifications');
-    return res.json();
+    const arr = await res.json();
+    const notifications = (Array.isArray(arr) ? arr : []).map(n => ({
+      ...n,
+      timestamp: n.date || n.createdAt || n.time || new Date().toISOString(),
+    }));
+    const unreadCount = notifications.filter(n => !n.read).length;
+    return { notifications, unreadCount };
   } catch (error) {
-    console.error('Error getting notifications:', error);
-    // Modo fallback: devolver notificaciones de localStorage
-    return loadLocalNotifications();
+    // Silenciar 401/primer arranque sin token; devolver vacío/local
+    try {
+      const local = loadLocalNotifications();
+      const unreadCount = local.filter(n => !n.read).length;
+      return { notifications: local, unreadCount };
+    } catch { return { notifications: [], unreadCount: 0 }; }
   }
 }
 
@@ -120,6 +129,24 @@ export async function deleteNotification(id) {
     // Modo fallback: eliminar de localStorage
     return deleteLocalNotification(id);
   }
+}
+
+// Alias por compatibilidad
+export const markAsRead = markNotificationRead;
+
+// ---- Email actions ----
+export async function acceptMeeting({ weddingId, mailId, title, when }) {
+  const headers = await authHeader({ 'Content-Type': 'application/json' });
+  const res = await apiPost('/api/email-actions/accept-meeting', { weddingId, mailId, title, when }, { headers });
+  if (!res.ok) throw new Error('acceptMeeting failed');
+  return res.json();
+}
+
+export async function acceptBudget({ weddingId, budgetId, emailId }) {
+  const headers = await authHeader({ 'Content-Type': 'application/json' });
+  const res = await apiPost('/api/email-actions/accept-budget', { weddingId, budgetId, emailId }, { headers });
+  if (!res.ok) throw new Error('acceptBudget failed');
+  return res.json();
 }
 
 // =============== PROVIDER TRACKING NOTIFICATIONS ===============
@@ -239,10 +266,10 @@ export function generateTrackingNotifications(trackingRecords, providers) {
  * @param {string} notification.type - Tipo de notificación (success, error, info, warning)
  * @param {number} notification.duration - Duración en ms (opcional, por defecto 3000ms)
  */
-export function showNotification({ title, message, type = 'info', duration = 3000 }) {
+export function showNotification({ title, message, type = 'info', duration = 3000, actions = [] }) {
   // Crear evento personalizado para el sistema de notificaciones
   const event = new CustomEvent('lovenda-toast', { 
-    detail: { title, message, type, duration }
+    detail: { title, message, type, duration, actions }
   });
   
   // Disparar evento para que lo capture el componente de notificaciones
@@ -250,6 +277,22 @@ export function showNotification({ title, message, type = 'info', duration = 300
   
   // También registrar en consola para desarrollo
   console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+}
+
+// Marcar todas como leídas (best-effort)
+export async function markAllAsRead() {
+  try {
+    const { notifications } = await getNotifications();
+    const ids = (Array.isArray(notifications) ? notifications : [])
+      .filter(n => !n.read && n.id)
+      .map(n => n.id);
+    for (const id of ids) {
+      try { await markNotificationRead(id); } catch {}
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**

@@ -1,17 +1,41 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
 
 // Componente para el diagrama Gantt
-export const GanttChart = ({ 
-  tasks = [], 
+export const GanttChart = ({
+  tasks = [],
   onTaskClick,
-  viewMode = ViewMode.Month, 
+  viewMode = ViewMode.Month,
   listCellWidth = 0,
   columnWidth = 65,
   rowHeight = 44,
   ganttHeight,
+  preStepsCount = 0,
+  viewDate,
+  markerDate, // fecha para marcar con una ldnea roja (p.ej., boda)
+  gridStartDate,
 }) => {
+  // ErrorBoundary local para evitar que la página caiga si la librería falla
+  class LocalErrorBoundary extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+    static getDerivedStateFromError() { return { hasError: true }; }
+    componentDidCatch(err) { console.error('[GanttChart] Error atrapado:', err); }
+    render() {
+      if (this.state.hasError) {
+        return (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            No se pudo renderizar el diagrama Gantt (datos inválidos)
+          </div>
+        );
+      }
+      return this.props.children;
+    }
+  }
+
   // Tooltip simple que muestra solo el nombre del proceso
   const NameOnlyTooltip = ({ task }) => (
     <div
@@ -30,26 +54,54 @@ export const GanttChart = ({
       <div style={{ fontWeight: 600 }}>{task.name}</div>
     </div>
   );
-  // Garantizar que las tareas estén bien formadas y sin valores vacíos
+
   // Normalizar fechas y filtrar tareas inválidas
   const normalizeDate = (d) => {
     if (!d) return null;
-    if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
-    const parsed = new Date(d);
-    return isNaN(parsed.getTime()) ? null : parsed;
+    try {
+      if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+      if (typeof d?.toDate === 'function') {
+        const conv = d.toDate();
+        return isNaN(conv.getTime()) ? null : conv;
+      }
+      if (typeof d === 'number') {
+        const num = new Date(d);
+        return isNaN(num.getTime()) ? null : num;
+      }
+      const parsed = new Date(d);
+      return isNaN(parsed.getTime()) ? null : parsed;
+    } catch (_) {
+      return null;
+    }
   };
 
-  const cleanTasks = Array.isArray(tasks)
+  let cleanTasks = Array.isArray(tasks)
     ? tasks
-        .map(t => {
+        .map((t) => {
           if (!t) return null;
-          const start = normalizeDate(t.start);
-          const end = normalizeDate(t.end);
+          // Aceptar campos legacy como startDate/endDate/date/when
+          const startRaw = t.start ?? t.startDate ?? t.date ?? t.when;
+          const endRaw = t.end ?? t.endDate ?? t.until ?? t.finish ?? t.to;
+          const start = normalizeDate(startRaw);
+          const end = normalizeDate(endRaw);
           if (!start || !end) return null;
+          if (end.getTime() < start.getTime()) return null;
           return { ...t, start, end };
         })
-        .filter(Boolean)
+        .filter(
+          (t) =>
+            !!t &&
+            t.start instanceof Date &&
+            t.end instanceof Date &&
+            !isNaN(t.start.getTime()) &&
+            !isNaN(t.end.getTime())
+        )
     : [];
+
+  // Orden estable por fecha de inicio
+  if (Array.isArray(cleanTasks)) {
+    cleanTasks = cleanTasks.sort((a, b) => a.start.getTime() - b.start.getTime());
+  }
 
   if (cleanTasks.length === 0) {
     // Evitar renderizar el componente de la librería con datos vacíos o corruptos
@@ -63,27 +115,195 @@ export const GanttChart = ({
   const handleClick = (task) => {
     if (typeof onTaskClick === 'function') onTaskClick(task);
   };
+
+  const wrapperRef = useRef(null);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [contentOffsetX, setContentOffsetX] = useState(0);
+  const scrollerRef = useRef(null);
+  const movingGroupRef = useRef(null);
+
+  useEffect(() => {
+    const root = wrapperRef.current;
+    if (!root) return;
+    // Buscar el contenedor scrollable interno del Gantt
+    let scroller = null;
+    const all = root.querySelectorAll('*');
+    for (const el of all) {
+      try {
+        const style = window.getComputedStyle(el);
+        const hasOverflowX = /(auto|scroll)/.test(style.overflowX || '');
+        if (hasOverflowX && el.scrollWidth > el.clientWidth + 2) {
+          scroller = el; break;
+        }
+      } catch {}
+    }
+    if (!scroller) return;
+    scrollerRef.current = scroller;
+    const onScroll = () => setScrollLeft(scroller.scrollLeft || 0);
+    onScroll();
+    scroller.addEventListener('scroll', onScroll);
+    return () => scroller.removeEventListener('scroll', onScroll);
+  }, [viewMode, columnWidth, cleanTasks.length]);
+
+  // Capturar scroll de cualquier descendiente (por si cambia el nodo scrollable)
+  useEffect(() => {
+    const root = wrapperRef.current;
+    if (!root) return;
+    const onScrollCapture = (e) => {
+      const el = e.target;
+      if (el && typeof el.scrollLeft === 'number' && el.scrollWidth > el.clientWidth + 1) {
+        setScrollLeft(el.scrollLeft || 0);
+      }
+    };
+    root.addEventListener('scroll', onScrollCapture, true);
+    return () => root.removeEventListener('scroll', onScrollCapture, true);
+  }, [viewMode, columnWidth]);
+
+  // Detectar translateX aplicado al contenido del Gantt (cuando el control de scroll es custom)
+  useEffect(() => {
+    const root = wrapperRef.current;
+    if (!root) return;
+
+    const findMovingGroup = () => {
+      const svgs = root.querySelectorAll('svg g');
+      let best = null;
+      for (const g of svgs) {
+        const tr = g.getAttribute && g.getAttribute('transform');
+        if (tr && /translate\(/.test(tr)) {
+          best = g; break;
+        }
+      }
+      return best;
+    };
+
+    const parseTX = (tr) => {
+      try {
+        const m = tr.match(/translate\(([-0-9\.]+)[ ,]/);
+        return m ? parseFloat(m[1]) : 0;
+      } catch { return 0; }
+    };
+
+    const g = findMovingGroup();
+    if (!g) return;
+    movingGroupRef.current = g;
+    // Inicial
+    const tr0 = g.getAttribute('transform') || '';
+    setContentOffsetX(-parseTX(tr0));
+
+    const obs = new MutationObserver((records) => {
+      for (const r of records) {
+        if (r.type === 'attributes' && r.attributeName === 'transform') {
+          const tr = g.getAttribute('transform') || '';
+          setContentOffsetX(-parseTX(tr));
+        }
+      }
+    });
+    obs.observe(g, { attributes: true, attributeFilter: ['transform'] });
+    return () => obs.disconnect();
+  }, [viewMode, columnWidth, cleanTasks.length]);
+
+  // Animación: seguimiento continuo de scroll/transform por si no disparan eventos
+  useEffect(() => {
+    let rafId = null;
+    const tick = () => {
+      try {
+        const s = scrollerRef.current;
+        if (s) {
+          const sl = s.scrollLeft || 0;
+          if (sl !== scrollLeft) setScrollLeft(sl);
+        }
+        const g = movingGroupRef.current;
+        if (g) {
+          const tr = g.getAttribute('transform') || '';
+          const m = tr.match(/translate\(([-0-9\.]+)[ ,]/);
+          const tx = m ? -parseFloat(m[1]) : 0;
+          if (tx !== contentOffsetX) setContentOffsetX(tx);
+        }
+      } catch {}
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => { if (rafId) cancelAnimationFrame(rafId); };
+  }, [scrollLeft, contentOffsetX]);
+
+  // Calcular offset horizontal en px para el marcador (modo Month fiable)
+  let markerLeftPx = null;
+  try {
+    const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
+    if (markerOk) {
+      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
+        ? gridStartDate
+        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      if (base) {
+        if (viewMode === ViewMode.Month) {
+          // En Month, columnWidth representa el ancho por MES en gantt-task-react
+          const colW = Math.max(8, Number(columnWidth) || 65);
+          const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
+          const monthsDiff = (markerDate.getFullYear() - gridStart.getFullYear()) * 12 + (markerDate.getMonth() - gridStart.getMonth());
+          const daysInMonth = new Date(markerDate.getFullYear(), markerDate.getMonth() + 1, 0).getDate();
+          const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
+          const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
+          markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
+        }
+      }
+    }
+  } catch {}
+
   return (
-    <Gantt
-      tasks={cleanTasks}
-      viewMode={viewMode}
-      listCellWidth={listCellWidth}
-      columnWidth={columnWidth}
-      locale="es"
-      rowHeight={rowHeight}
-      ganttHeight={typeof ganttHeight === 'number' ? ganttHeight : undefined}
-      fontSize="12px"
-      TooltipContent={NameOnlyTooltip}
-      barFill={60}
-      barCornerRadius={4}
-      barProgressColor="#4f46e5"
-      barProgressSelectedColor="#4338ca"
-      barBackgroundColor="#a5b4fc"
-      barBackgroundSelectedColor="#818cf8"
-      todayColor="rgba(252,165,165,0.2)"
-      onClick={handleClick}
-      onSelect={(task)=>handleClick(task)}
-      onDoubleClick={(task)=>handleClick(task)}
-    />
+    <LocalErrorBoundary>
+      <div ref={wrapperRef} style={{ position: 'relative', overflow: 'hidden' }}>
+        <Gantt
+          tasks={cleanTasks}
+          viewMode={viewMode}
+          preStepsCount={preStepsCount}
+          listCellWidth={listCellWidth}
+          columnWidth={columnWidth}
+          locale="es"
+          rowHeight={rowHeight}
+          ganttHeight={typeof ganttHeight === 'number' ? ganttHeight : undefined}
+          fontSize="12px"
+          TooltipContent={NameOnlyTooltip}
+          barFill={60}
+          barCornerRadius={4}
+          barProgressColor="#4f46e5"
+          barProgressSelectedColor="#4338ca"
+          barBackgroundColor="#a5b4fc"
+          barBackgroundSelectedColor="#818cf8"
+          todayColor="rgba(252,165,165,0.2)"
+          viewDate={viewDate}
+          onClick={handleClick}
+          onSelect={(task) => handleClick(task)}
+          onDoubleClick={(task) => handleClick(task)}
+        />
+        {typeof markerLeftPx === 'number' && markerLeftPx >= 0 && (
+          <div
+            title="Día de la boda"
+            style={{ position: 'absolute', top: 0, left: markerLeftPx - (scrollLeft || 0) - (contentOffsetX || 0), height: '100%', pointerEvents: 'none', zIndex: 1000 }}
+          >
+            {/* Poste vertical */}
+            <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
+            {/* Bandera tipo F1 (chequered) */}
+            <svg
+              width="18"
+              height="14"
+              viewBox="0 0 18 14"
+              style={{ position: 'absolute', top: 6, left: 2, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' }}
+              aria-hidden="true"
+              focusable="false"
+            >
+              {/* paño blanco */}
+              <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="#ffffff" opacity="0.95" />
+              {/* cuadros negros */}
+              <rect x="4" y="2" width="3" height="3" fill="#111" />
+              <rect x="10" y="2" width="3" height="3" fill="#111" />
+              <rect x="7" y="5" width="3" height="3" fill="#111" />
+              <rect x="13" y="5" width="3" height="3" fill="#111" />
+              {/* borde rojo fino para armonizar con el poste */}
+              <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
+            </svg>
+          </div>
+        )}
+      </div>
+    </LocalErrorBoundary>
   );
 };

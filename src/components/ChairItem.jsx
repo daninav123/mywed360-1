@@ -1,4 +1,6 @@
 import React from 'react';
+import { useDrop } from 'react-dnd';
+import { ItemTypes } from './GuestItem';
 
 /**
  * ChairItem
@@ -9,7 +11,7 @@ import React from 'react';
  * - offset: desplazamiento global {x,y}
  * - onToggleEnabled(id): callback al hacer click para (des)habilitar la silla
  */
-function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, onToggleEnabled }) {
+function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, onToggleEnabled, onAssignGuest }) {
   const size = 14; // tamaño base en px
   const s = size * scale;
   const { x, y, enabled, id, guestName } = seat;
@@ -40,12 +42,26 @@ function ChairItem({ seat, scale = 1, offset = { x: 0, y: 0 }, onToggleEnabled }
     return guestName.trim().split(/\s+/).map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
   })();
 
+  // Soporte drop de invitado sobre silla (Ceremonia)
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: ItemTypes.GUEST,
+    canDrop: () => seat?.enabled !== false,
+    drop: (item) => {
+      if (item?.id && typeof onAssignGuest === 'function') {
+        onAssignGuest(seat?.id, item.id);
+      }
+    },
+    collect: (monitor) => ({ isOver: monitor.isOver() })
+  }), [seat?.id, seat?.enabled, onAssignGuest]);
+
   return (
     <div
+      ref={drop}
       style={style}
       title={guestName || `Silla ${id}`}
       onClick={() => onToggleEnabled && onToggleEnabled(id)}
       aria-label={guestName || `Silla ${id}`}
+      className={isOver ? 'ring-2 ring-green-400' : ''}
     >
       {label}
     </div>

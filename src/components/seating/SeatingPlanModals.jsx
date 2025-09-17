@@ -576,7 +576,7 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     return arr;
   };
 
-  const templates = [
+  let templates = [
     {
       id: 'suggested',
       name: 'Sugerido por datos',
@@ -616,12 +616,155 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       banquetTables: buildImperial(),
     },
     {
+      id: 'double-ring',
+      name: 'Doble anillo',
+      description: 'Dos anillos concentricos de mesas',
+      banquetTables: buildDoubleRing(),
+    },
+    {
+      id: 'perimeter',
+      name: 'Perimetro con pista central',
+      description: 'Mesas en perimetro y pista central libre',
+      banquetTables: buildPerimeter(),
+    },
+    {
       id: 'fill-space',
       name: 'Relleno según espacio',
       description: `Cuadrícula adaptada a ${hallW/100|0}×${hallH/100|0} m`,
       banquetTables: buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape),
     },
   ];
+
+  if (tableCount > 0) {
+    // Reordenar mesas existentes en cuadrícula
+    templates.push({
+      id: 'grid-existing',
+      name: 'Reordenar en cuadrícula (existentes)',
+      description: `Coloca tus ${tableCount} mesas actuales en cuadrícula`,
+      banquetTables: (() => {
+        const arr = [];
+        const cols = Math.max(1, Math.ceil(Math.sqrt(tableCount)));
+        const rows = Math.max(1, Math.ceil(tableCount / cols));
+        const cellW = Math.max(180, Math.floor(hallW / (cols + 1)));
+        const cellH = Math.max(180, Math.floor(hallH / (rows + 1)));
+        const startX = bbox ? bbox.minX : 0;
+        const startY = bbox ? bbox.minY : 0;
+        let i = 0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (i >= tables.length) break;
+            const t = tables[i++];
+            const cx = startX + (c + 1) * cellW;
+            const cy = startY + (r + 1) * cellH;
+            arr.push({ id: t.id, name: t.name, x: cx, y: cy, shape: t.shape || 'rectangle', seats: parseInt(t.seats, 10) || avgSeats });
+          }
+        }
+        return arr;
+      })(),
+    });
+
+    // Reordenar mesas existentes en anillo
+    templates.push({
+      id: 'ring-existing',
+      name: 'Reordenar en anillo (existentes)',
+      description: `Distribuye ${tableCount} mesas actuales en un círculo`,
+      banquetTables: (() => {
+        const arr = [];
+        const centerX = centroid.x, centerY = centroid.y;
+        const radius = Math.min(hallW, hallH) * 0.35;
+        for (let i = 0; i < tables.length; i++) {
+          const t = tables[i];
+          const ang = (2 * Math.PI * i) / tables.length;
+          const cx = centerX + radius * Math.cos(ang);
+          const cy = centerY + radius * Math.sin(ang);
+          arr.push({ id: t.id, name: t.name, x: cx, y: cy, shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+        }
+        return arr;
+      })(),
+    });
+
+    // Reordenar mesas existentes en 2–3 filas
+    templates.push({
+      id: 'rows-existing',
+      name: 'Reordenar en filas (existentes)',
+      description: `Coloca ${tableCount} mesas actuales en 2–3 filas equilibradas`,
+      banquetTables: (() => {
+        const arr = [];
+        const rows = tableCount <= 8 ? 2 : 3;
+        const perRow = Math.ceil(tableCount / rows);
+        const gapX = Math.min(220, Math.max(aisle + 40, Math.floor(hallW / (perRow + 1))));
+        const rowYs = rows === 2
+          ? [ (bbox ? bbox.minY : 0) + hallH * 0.4, (bbox ? bbox.minY : 0) + hallH * 0.7 ]
+          : [ (bbox ? bbox.minY : 0) + hallH * 0.35, (bbox ? bbox.minY : 0) + hallH * 0.55, (bbox ? bbox.minY : 0) + hallH * 0.75 ];
+        let i = 0;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < perRow && i < tables.length; c++) {
+            const t = tables[i++];
+            const x = (bbox ? bbox.minX : 0) + (c + 1) * gapX;
+            const y = rowYs[r];
+            arr.push({ id: t.id, name: t.name, x, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats });
+          }
+        }
+        return arr;
+      })(),
+    });
+
+    // Reordenar mesas existentes en doble anillo
+    templates.push({
+      id: 'double-ring-existing',
+      name: 'Doble anillo (existentes)',
+      description: `Distribuye ${tableCount} mesas actuales en dos anillos`,
+      banquetTables: (() => {
+        const arr = [];
+        const cx = centroid.x, cy = centroid.y;
+        const rInner = Math.min(hallW, hallH) * 0.24;
+        const rOuter = Math.min(hallW, hallH) * 0.42;
+        const inner = Math.max(3, Math.floor(tables.length / 2));
+        const outer = Math.max(3, tables.length - inner);
+        let i = 0;
+        // inner ring
+        for (let k = 0; k < inner && i < tables.length; k++) {
+          const t = tables[i++];
+          const ang = (2 * Math.PI * k) / inner;
+          arr.push({ id: t.id, name: t.name, x: cx + rInner * Math.cos(ang), y: cy + rInner * Math.sin(ang), shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+        }
+        // outer ring
+        for (let k = 0; k < outer && i < tables.length; k++) {
+          const t = tables[i++];
+          const ang = (2 * Math.PI * k) / outer;
+          arr.push({ id: t.id, name: t.name, x: cx + rOuter * Math.cos(ang), y: cy + rOuter * Math.sin(ang), shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+        }
+        return arr;
+      })(),
+    });
+
+    // Reordenar mesas existentes en perímetro con pista central
+    templates.push({
+      id: 'perimeter-existing',
+      name: 'Perímetro (existentes)',
+      description: `Mesas actuales alrededor del perímetro y pista central`,
+      banquetTables: (() => {
+        const arr = [];
+        const margin = Math.max(120, aisle + 60);
+        const minX = (bbox ? bbox.minX : 0) + margin;
+        const minY = (bbox ? bbox.minY : 0) + margin;
+        const maxX = (bbox ? bbox.maxX : hallW) - margin;
+        const maxY = (bbox ? bbox.maxY : hallH) - margin;
+        const perim = 2 * ((maxX - minX) + (maxY - minY));
+        const gap = Math.max(180, Math.floor(perim / Math.max(1, tables.length)));
+        let i = 0;
+        // top edge
+        for (let x = minX; x <= maxX && i < tables.length; x += gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x, y: minY, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        // right edge
+        for (let y = minY; y <= maxY && i < tables.length; y += gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x: maxX, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        // bottom edge
+        for (let x = maxX; x >= minX && i < tables.length; x -= gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x, y: maxY, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        // left edge
+        for (let y = maxY; y >= minY && i < tables.length; y -= gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x: minX, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        return arr;
+      })(),
+    });
+  }
 
   return (
     <div className="space-y-4">

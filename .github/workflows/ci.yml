@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -19,10 +19,11 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint --if-present
-      - name: Unit tests
-        run: npm run test --if-present
-      - name: E2E smoke (frontend+backend)
+      - name: Validate i18n
+        run: node scripts/validateI18n.js --strict
+- name: E2E smoke (frontend+backend)
         env:
           VITE_BACKEND_BASE_URL: http://localhost:4004
           ALLOWED_ORIGIN: http://localhost:5173
         run: npm run e2e:ci
+

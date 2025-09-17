@@ -21,16 +21,17 @@ router.get('/', async (_req, res) => {
 // POST /api/notifications { type, message }
 router.post('/', async (req, res) => {
   try {
-    const { type = 'info', message } = req.body;
+    const { type = 'info', message, payload = {}, date: dateFromClient, read = false } = req.body || {};
     if (!message) return res.status(400).json({ error: 'message is required' });
-    const date = new Date().toISOString();
+    const date = dateFromClient || new Date().toISOString();
     const docRef = await db.collection('notifications').add({
       type,
       message,
       date,
-      read: false,
+      read: Boolean(read),
+      payload,
     });
-    const notif = { id: docRef.id, type, message, date, read: false };
+    const notif = { id: docRef.id, type, message, date, read: Boolean(read), payload };
     // TODO: broadcast via WebSocket/SSE later
     res.status(201).json(notif);
   } catch (err) {

@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useRef } from 'react';
+import React, { forwardRef, memo, useRef, useMemo } from 'react';
 
 
 
@@ -25,6 +25,7 @@ import ChairItem from '../../components/ChairItem';
     moveTable,
     onAssignGuest,
     onAssignGuestSeat,
+    onAssignCeremonySeat,
     onToggleEnabled,
     setConfigTable,
     online,
@@ -45,10 +46,68 @@ import ChairItem from '../../components/ChairItem';
     background = null,
     validationsEnabled = true,
     globalMaxSeats = 0,
+    suggestions = null,
   },
   _forwardedRef,
 ) {
   const containerRef = useRef(null);
+  // Helpers locales de validación
+  const getTableBox = (table) => {
+    if (!table) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+    if (table.shape === 'circle') {
+      const r = (table.diameter || 60) / 2;
+      return { minX: (table.x || 0) - r, minY: (table.y || 0) - r, maxX: (table.x || 0) + r, maxY: (table.y || 0) + r };
+    }
+    const hw = (table.width || 80) / 2;
+    const hh = (table.height || table.length || 60) / 2;
+    return { minX: (table.x || 0) - hw, minY: (table.y || 0) - hh, maxX: (table.x || 0) + hw, maxY: (table.y || 0) + hh };
+  };
+  const expandBox = (box, m) => ({ minX: box.minX - m, minY: box.minY - m, maxX: box.maxX + m, maxY: box.maxY + m });
+  const rectsOverlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+  const boundaryPoly = useMemo(() => {
+    try {
+      const b = (areas || []).find(a => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3);
+      return b ? b.points : null;
+    } catch (_) { return null; }
+  }, [areas]);
+  const obstaclesRects = useMemo(() => {
+    try {
+      const rects = [];
+      (areas || []).forEach((a) => {
+        const type = Array.isArray(a) ? undefined : a?.type;
+        if (!(type === 'obstacle' || type === 'door')) return;
+        const pts = Array.isArray(a?.points) ? a.points : [];
+        if (!pts.length) return;
+        const xs = pts.map(p => p.x);
+        const ys = pts.map(p => p.y);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        rects.push({ minX, minY, maxX, maxY });
+      });
+      return rects;
+    } catch (_) { return []; }
+  }, [areas]);
+  const pointInPoly = (px, py, pts) => {
+    if (!Array.isArray(pts) || pts.length < 3) return true;
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const xi = pts[i].x, yi = pts[i].y;
+      const xj = pts[j].x, yj = pts[j].y;
+      const intersect = ((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / ((yj - yi) || 1e-9) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+  const boxInsidePoly = (box, pts) => {
+    if (!Array.isArray(pts) || pts.length < 3) return true;
+    const corners = [
+      { x: box.minX, y: box.minY },
+      { x: box.minX, y: box.maxY },
+      { x: box.maxX, y: box.minY },
+      { x: box.maxX, y: box.maxY },
+    ];
+    return corners.every(c => pointInPoly(c.x, c.y, pts));
+  };
   // Mapear drawMode externo a valores aceptados por FreeDrawCanvas
   const internalDrawMode =
     drawMode === 'boundary' ? 'boundary'  // Usar el nuevo modo boundary
@@ -122,31 +181,41 @@ import ChairItem from '../../components/ChairItem';
 
 {/* Sillas (solo ceremonia) */}
         {tab==='ceremony' && seats.map((seat, idx) => (
-          <ChairItem key={`${seat.id}-${idx}`} seat={seat} scale={scale} offset={offset} onToggleEnabled={onToggleSeat} />
+          <ChairItem key={`${seat.id}-${idx}`} seat={seat} scale={scale} offset={offset}
+            onToggleEnabled={onToggleSeat}
+            onAssignGuest={(seatId, guestId) => onAssignCeremonySeat ? onAssignCeremonySeat(seatId, guestId) : undefined}
+          />
         ))}
 
         {/* Mesas (solo banquete) */}
-        {tab==='banquet' && tables.map((t, idx) => (
-          // Validaciones básicas: proximidad y obstáculos
-          // Se calculan más abajo y se pasan como props
-          <TableItem
-            key={`${t.id}-${idx}`}
-            table={t}
-            scale={scale}
-            offset={offset}
-            containerRef={containerRef}
-            onMove={moveTable}
-            onAssignGuest={onAssignGuest}
-            onAssignGuestSeat={(tableId, seatIndex, guestId) => onAssignGuestSeat ? onAssignGuestSeat(tableId, seatIndex, guestId) : (onAssignGuest && onAssignGuest(tableId, guestId))}
-            onToggleEnabled={onToggleEnabled}
-            onOpenConfig={setConfigTable}
-            onSelect={onSelectTable}
-            guests={guests}
-            canMove={canMoveTables}
-            selected={(selectedTable && selectedTable.id === t.id) || (selectedIds && selectedIds.some(id => String(id) === String(t.id)))}
-            showNumbers={showSeatNumbers}
-            danger={!validationsEnabled ? false : (() => {
-              try {
+        {tab==='banquet' && tables.map((t, idx) => {
+          // Validaciones adicionales si están habilitadas
+          let danger = false;
+          let dangerReason = '';
+          if (validationsEnabled) {
+            try {
+              const aisle = typeof hallSize?.aisleMin === 'number' ? hallSize.aisleMin : 80;
+              const selfBox = getTableBox(t);
+              const padded = expandBox(selfBox, aisle/2);
+
+              // 1) Fuera de perímetro (si existe)
+              if (boundaryPoly && !boxInsidePoly(selfBox, boundaryPoly)) {
+                danger = true; dangerReason = 'Fuera del perímetro';
+              }
+              // 2) Colisión con obstáculo/puerta
+              if (!danger && obstaclesRects.some(o => rectsOverlap(padded, o))) {
+                danger = true; dangerReason = 'Colisión con obstáculo';
+              }
+              // 3) Demasiado cerca de otra mesa (pasillo mínimo)
+              if (!danger) {
+                const others = tables.filter(x => String(x?.id) !== String(t?.id));
+                const otherExpanded = others.map(getTableBox).map(b => expandBox(b, aisle/2));
+                if (otherExpanded.some(o => rectsOverlap(padded, o))) {
+                  danger = true; dangerReason = 'Distancia insuficiente entre mesas';
+                }
+              }
+              // 4) Overbooking de capacidad
+              if (!danger) {
                 const countFromGuests = (guests||[]).reduce((sum,g)=>{
                   const matches = (()=>{
                     if (g.tableId !== undefined && g.tableId !== null) return String(g.tableId)===String(t.id);
@@ -157,13 +226,46 @@ import ChairItem from '../../components/ChairItem';
                   const comp = parseInt(g.companion,10)||0; return sum+1+comp;
                 },0);
                 const cap = (parseInt(t.seats,10) || globalMaxSeats || 0);
-                return cap>0 && countFromGuests>cap;
-              } catch(_) { return false; }
-            })()}
-            dangerReason={!validationsEnabled ? '' : 'Overbooking'}
-            globalMaxSeats={globalMaxSeats}
-          />
-        ))}
+                if (cap>0 && countFromGuests>cap) { danger = true; dangerReason = 'Overbooking'; }
+              }
+            } catch(_) { /* ignore */ }
+          }
+
+          // Highlight suggestions
+          let highlightScore = 0;
+          try {
+            if (suggestions && typeof suggestions === 'object' && !Array.isArray(suggestions)) {
+              const key = String(t.id);
+              if (key in suggestions) highlightScore = suggestions[key] || 0;
+            } else if (Array.isArray(suggestions)) {
+              const found = suggestions.find(s => String(s.tableId) === String(t.id));
+              if (found) highlightScore = found.score || 0;
+            }
+          } catch(_) {}
+          return (
+            <TableItem
+              key={`${t.id}-${idx}`}
+              table={t}
+              scale={scale}
+              offset={offset}
+              containerRef={containerRef}
+              onMove={moveTable}
+              onAssignGuest={onAssignGuest}
+              onAssignGuestSeat={(tableId, seatIndex, guestId) => onAssignGuestSeat ? onAssignGuestSeat(tableId, seatIndex, guestId) : (onAssignGuest && onAssignGuest(tableId, guestId))}
+              onToggleEnabled={onToggleEnabled}
+              onOpenConfig={setConfigTable}
+              onSelect={onSelectTable}
+              guests={guests}
+              canMove={canMoveTables}
+              selected={(selectedTable && selectedTable.id === t.id) || (selectedIds && selectedIds.some(id => String(id) === String(t.id)))}
+              showNumbers={showSeatNumbers}
+              danger={danger}
+              dangerReason={dangerReason}
+              globalMaxSeats={globalMaxSeats}
+              highlightScore={highlightScore}
+            />
+          );
+        })}
 
         {/* Guías inteligentes (líneas) */}
         {tab==='banquet' && selectedTable && (() => {

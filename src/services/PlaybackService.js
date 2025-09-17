@@ -6,8 +6,10 @@
 
 import { post as apiPost } from './apiClient';
 
+// Feature flag: enable remote playback endpoints only if explicitly set
+const REMOTE_ENABLED = (import.meta?.env?.VITE_REMOTE_PLAYBACK === 'true');
 // Force remote-only playback (no HTML5 fallback)
-const ALWAYS_REMOTE = true;
+const ALWAYS_REMOTE = false;
 
 let html5Audio = null;
 let currentId = null;
@@ -23,30 +25,32 @@ export function getCurrentId() {
 }
 
 export async function stop(idOverride = null) {
-  try {
-    await apiPost('/api/playback/stop', {}, { auth: true });
-  } catch {}
+  if (REMOTE_ENABLED) {
+    try { await apiPost('/api/playback/stop', {}, { auth: true }); } catch {}
+  }
   stopHtml5();
   currentId = idOverride === null ? null : idOverride;
 }
 
 export async function pause() {
-  try {
-    await apiPost('/api/playback/pause', {}, { auth: true });
-  } catch {}
+  if (REMOTE_ENABLED) {
+    try { await apiPost('/api/playback/pause', {}, { auth: true }); } catch {}
+  }
   try { html5Audio?.pause(); } catch {}
 }
 
 export async function playTrack(track) {
   const { id, title, artist, previewUrl } = track || {};
   // Always try backend first
-  try {
-    const res = await apiPost('/api/playback/play', { title, artist, previewUrl }, { auth: true });
-    if (res?.ok) {
-      currentId = id || `${title || ''}-${artist || ''}` || 'unknown';
-      return true;
-    }
-  } catch {}
+  if (REMOTE_ENABLED) {
+    try {
+      const res = await apiPost('/api/playback/play', { title, artist, previewUrl }, { auth: true });
+      if (res?.ok) {
+        currentId = id || `${title || ''}-${artist || ''}` || 'unknown';
+        return true;
+      }
+    } catch {}
+  }
 
   if (ALWAYS_REMOTE) {
     return false;

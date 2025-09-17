@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './useAuth';
-import * as EmailService from '../services/EmailService';
+import EmailService from '../services/emailService';
 import { addTagToEmail } from '../services/tagService';
 import { createTrackingRecord } from '../services/EmailTrackingService';
 
@@ -56,7 +56,8 @@ export const useProviderEmail = () => {
       
       // Crear registro de seguimiento para este email
       if (emailData && emailData.id) {
-        const trackingRecord = await createTrackingRecord(emailData, provider);
+        // Pasar id + asunto/cuerpo para tracking
+        const trackingRecord = await createTrackingRecord({ id: emailData.id, subject, body }, provider);
         // Etiquetar también el correo como "Proveedor" en el sistema de tags
         try {
           const uid = (user && user.uid) || (profile && profile.uid) || 'local';

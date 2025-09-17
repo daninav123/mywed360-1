@@ -302,6 +302,132 @@
     "addFav": "Ajouter aux favoris",
     "removeFav": "Retirer des favoris"
   },
+  "finance": {
+    "tabs": {
+      "overview": "Aperçu",
+      "transactions": "Transactions",
+      "budget": "Budget",
+      "contributions": "Contributions",
+      "analytics": "Analytique"
+    },
+    "connectBank": {
+      "title": "Connectez votre banque pour importer des mouvements",
+      "desc": "Accélérez l’enregistrement des dépenses et revenus en reliant votre compte bancaire.",
+      "button": "Connecter la banque"
+    },
+    "alerts": {
+      "budget": "Alertes de budget"
+    }
+    ,
+    "overview": {
+      "title": "Gestion financière",
+      "subtitle": "Contrôle complet du budget et des dépenses de votre mariage",
+      "lastSync": "Dernière synchronisation",
+      "synced": "Synchronisé",
+      "offline": "Hors ligne",
+      "totalBudget": "Budget total",
+      "totalSpent": "Total dépensé",
+      "ofBudget": "du budget",
+      "currentBalance": "Solde actuel",
+      "expectedIncome": "Revenu attendu",
+      "used": "utilisé",
+      "categoryStatus": "État du budget par catégories",
+      "progress": "Progression",
+      "exceededNote": "(Budget dépassé !)"
+    },
+    "form": {
+      "type": "Type de transaction",
+      "concept": "Concept",
+      "conceptPlaceholder": "ex: Paiement traiteur, Cadeau de mariage...",
+      "amount": "Montant (€)",
+      "amountLabel": "Montant :",
+      "date": "Date",
+      "category": "Catégorie",
+      "selectCategory": "Sélectionnez une catégorie",
+      "description": "Description supplémentaire",
+      "descriptionPlaceholder": "Détails supplémentaires sur la transaction...",
+      "transaction": "Transaction",
+      "errors": {
+        "conceptRequired": "Le concept est obligatoire",
+        "amountPositive": "Le montant doit être un nombre positif",
+        "dateRequired": "La date est obligatoire",
+        "categoryRequired": "La catégorie est obligatoire"
+      }
+    },
+    "contributions": {
+      "title": "Configuration des contributions",
+      "subtitle": "Configurez les contributions et estimez les revenus attendus",
+      "updateGuests": "Mettre à jour les invités",
+      "initial": {"title": "Contributions initiales", "personA": "Personne A (€)", "personB": "Personne B (€)", "total": "Total initial :"},
+      "monthly": {"title": "Contributions mensuelles", "personA": "Personne A (€/mois)", "personB": "Personne B (€/mois)", "total": "Total mensuel :"},
+      "extras": {"title": "Contributions supplémentaires", "totalLabel": "Total extras (famille, autres revenus) (€)", "help": "Inclure les cadeaux de la famille, contributions des parents, etc."},
+      "gifts": {"title": "Estimation des cadeaux", "giftPerGuest": "Cadeau estimé par invité (€)", "guestCount": "Nombre d'invités", "loadHint": "Cliquez sur l'icône pour charger automatiquement depuis votre liste d'invités", "total": "Total estimé des cadeaux :"},
+      "unsaved": "Vous avez des modifications non enregistrées",
+      "saveChanges": "Enregistrer les modifications",
+      "summary": {"title": "Résumé des revenus attendus", "subtitle": "Projection totale basée sur vos paramètres", "initial": "Contributions initiales", "monthly": "Contributions mensuelles", "extras": "Contributions supplémentaires", "gifts": "Cadeaux estimés", "total": "Total attendu"},
+      "tips": {"title": "Conseils financiers", "emergencyTitle": "Fonds d'urgence :", "emergencyText": "Envisagez de réserver 10-15% du budget total pour les imprévus.", "giftsTitle": "Cadeaux conservateurs :", "giftsText": "Il vaut mieux sous-estimer les cadeaux de mariage que les surestimer.", "reviewTitle": "Suivi régulier :", "reviewText": "Examinez et mettez à jour ces projections mensuellement.", "balanceTitle": "Contributions équilibrées :", "balanceText": "Maintenez un équilibre juste entre les contributions des deux personnes."}
+    },
+    "charts": {
+      "title": "Analyse financière",
+      "subtitle": "Visualisations et tendances de vos finances de mariage",
+      "totalTransactions": "Total des transactions",
+      "activeCategories": "Catégories actives",
+      "budgetEfficiency": "Efficacité du budget",
+      "projectedBalance": "Solde projeté",
+      "budgetVsSpentByCategory": "Budget vs Dépenses par catégorie",
+      "budgeted": "Budgété",
+      "spent": "Dépensé",
+      "expenseDistributionByCategory": "Répartition des dépenses par catégorie",
+      "monthlyTrend": "Tendance mensuelle des revenus et dépenses",
+      "income": "Revenus",
+      "expenses": "Dépenses",
+      "balance": "Solde",
+      "budgetProgressByCategory": "Progrès du budget par catégorie",
+      "used": "Utilisé",
+      "excess": "Excès",
+      "insights": "Informations financières",
+      "highestExpense": "Plus grande dépense",
+      "mostEfficient": "Le plus efficace",
+      "noData": "Données insuffisantes",
+      "currentTrend": "Tendance actuelle",
+      "trend": {"positive": "Positive", "negative": "Négative"},
+      "balanceLabel": "Solde :"
+    },
+    "bank": {
+      "title": "Lier un compte bancaire",
+      "country": "Pays",
+      "countries": {"es": "Espagne", "fr": "France", "de": "Allemagne", "it": "Italie", "pt": "Portugal"},
+      "bankLabel": "Banque",
+      "selectBank": "Sélectionnez une banque",
+      "selectBankPlaceholder": "Sélectionnez une banque…",
+      "loadBanks": "Charger les banques",
+      "connect": "Connecter",
+      "errorLoad": "Impossible de charger les banques. L'intégration Nordigen peut ne pas être activée ou /api/bank non déployé.",
+      "errorStart": "Impossible de démarrer le lien",
+      "noRequisition": "Aucune réquisition démarrée",
+      "errorCheck": "Impossible de vérifier l'état",
+      "selectWedding": "Sélectionnez un mariage actif",
+      "linked": "Compte lié",
+      "errorSave": "Impossible d'enregistrer le compte",
+      "requirements": {"title": "Exigences backend :", "env": "Définir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY et NORDIGEN_BASE_URL", "route": "Backend avec la route /api/bank déployée"},
+      "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances → Transactions → \"Importer Banque\".",
+      "requisition": "Réquisition :",
+      "checkStatus": "Vérifier l'état",
+      "availableAccounts": "Comptes disponibles",
+      "useThis": "Utiliser ce compte"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Catégorie",
+        "type": "Type",
+        "amount": "Montant",
+        "actions": "Actions"
+      }
+    }
+  },
   "compose": {
     "toField": "Champ destinataire",
     "subjectField": "Champ objet",
@@ -312,6 +438,78 @@
   "rsvp": {
     "section": "RSVP",
     "simulate": "Simuler des rappels",
-    "send": "Envoyer des rappels"
+    "send": "Envoyer des rappels",
+    "overview": {
+      "title": "Gestion financière",
+      "subtitle": "Contrôle complet du budget et des dépenses de votre mariage",
+      "lastSync": "Dernière synchronisation",
+      "synced": "Synchronisé",
+      "offline": "Hors ligne",
+      "totalBudget": "Budget total",
+      "totalSpent": "Total dépensé",
+      "ofBudget": "du budget",
+      "currentBalance": "Solde actuel",
+      "expectedIncome": "Revenu attendu",
+      "used": "utilisé",
+      "categoryStatus": "État du budget par catégories",
+      "progress": "Progression"
+    },
+    "budget": {
+      "title": "Gestion du budget",
+      "subtitle": "Organisez et contrôlez le budget par catégories",
+      "newCategory": "Nouvelle catégorie",
+      "totalBudget": "Budget total",
+      "budgeted": "Budgété",
+      "spent": "Dépensé",
+      "remaining": "Restant",
+      "categoriesTitle": "Catégories de budget",
+      "empty": "Aucune catégorie de budget",
+      "createFirst": "Créer la première catégorie",
+      "exceeded": "Dépassé",
+      "progress": "Progression",
+      "muteAlerts": "Masquer les alertes",
+      "thresholds": {
+        "title": "Seuils d'alerte (globaux)",
+        "warn": "Avertissement (à risque) %",
+        "danger": "Critique (excès) %"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "connectBank": "Connecter la banque (Nordigen)",
+      "importCSV": "Importer CSV",
+      "exportCSV": "Exporter CSV",
+      "new": "Nouvelle transaction",
+      "searchPlaceholder": "Rechercher par concept...",
+      "allTypes": "Tous les types",
+      "incomes": "Revenus",
+      "expenses": "Dépenses",
+      "allCategories": "Toutes les catégories",
+      "allDays": "Tous les jours",
+      "last30": "30 derniers jours",
+      "last90": "90 derniers jours",
+      "onlyUncategorized": "Seulement sans catégorie",
+      "clear": "Effacer",
+      "empty": "Aucune transaction à afficher",
+      "createFirst": "Créer la première transaction",
+      "noConcept": "Sans concept",
+      "noCategory": "Sans catégorie",
+      "income": "Revenu",
+      "expense": "Dépense",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Catégorie",
+        "type": "Type",
+        "amount": "Montant",
+        "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (plus récents d'abord)",
+        "dateAsc": "Date (plus anciens d'abord)",
+        "amountDesc": "Montant (plus élevé d'abord)",
+        "amountAsc": "Montant (plus bas d'abord)"
+      }
+    }
   }
 }

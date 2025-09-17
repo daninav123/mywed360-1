@@ -7,6 +7,8 @@ import DefaultAvatar from './DefaultAvatar';
 import GlobalSearch from './GlobalSearch';
 import { prefetchModule } from '../utils/prefetch';
 import DarkModeToggle from './DarkModeToggle';
+import NotificationCenter from './NotificationCenter';
+import NotificationWatcher from './notifications/NotificationWatcher';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import { useOnboarding } from '../hooks/useOnboarding';
 import RoleBadge from './RoleBadge';
@@ -72,6 +74,9 @@ export default function MainLayout() {
   return (
       <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
         <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
+          {/* Centro de notificaciones y watcher */}
+          <NotificationWatcher intervalMs={20000} />
+          <NotificationCenter />
           {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge /> }
           <div className="hidden md:block">
             <GlobalSearch />

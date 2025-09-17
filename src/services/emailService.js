@@ -78,7 +78,7 @@ export async function getMails(folder = 'inbox') {
     const user = resolveCurrentEmail();
     const qs = new URLSearchParams();
     if (folder) qs.set('folder', folder);
-    if (user) qs.set('user', user);
+    if (user) qs.set('user', (user||'').toLowerCase());
     const url = `${BASE}/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
     const res = await fetch(url, { headers: await buildAuthHeaders() });
     if (!res.ok) throw new Error(`getMails ${res.status}`);

@@ -33,6 +33,14 @@ export default function useFinance() {
     categories: [],
   });
 
+  // Ajustes de finanzas (umbrales de alertas, etc.)
+  const [settings, setSettings] = useState({
+    alertThresholds: { warn: 75, danger: 90 },
+  });
+
+  // Indica si hay cuenta bancaria vinculada
+  const [hasBankAccount, setHasBankAccount] = useState(false);
+
   // Transacciones usando Firestore (subcolección weddings/{id}/transactions)
   const {
     data: transactions,
@@ -111,6 +119,7 @@ export default function useFinance() {
         spent,
         remaining: category.amount - spent,
         percentage: category.amount > 0 ? (spent / category.amount) * 100 : 0,
+        muted: Boolean(category.muted),
       };
     });
   }, [budget.categories, transactions]);
@@ -187,8 +196,20 @@ export default function useFinance() {
               ? b.categories.map((c) => ({
                   name: String(c.name || ''),
                   amount: Number(c.amount) || 0,
+                  muted: Boolean(c.muted || false),
                 }))
               : [],
+          });
+        }
+        // Cargar ajustes (umbrales de alerta)
+        if (data.settings && typeof data.settings === 'object') {
+          const s = data.settings || {};
+          const at = s.alertThresholds || {};
+          setSettings({
+            alertThresholds: {
+              warn: Number(at.warn) || 75,
+              danger: Number(at.danger) || 90,
+            },
           });
         }
         if (data.contributions && typeof data.contributions === 'object') {
@@ -272,6 +293,24 @@ export default function useFinance() {
       return { success: true };
     },
     [budget.categories, persistFinanceDoc]
+  );
+
+  // Actualizar ajustes de presupuesto (umbrales de alerta)
+  const updateBudgetSettings = useCallback(
+    (updates) => {
+      const next = {
+        ...settings,
+        ...updates,
+        alertThresholds: {
+          ...settings.alertThresholds,
+          ...(updates && updates.alertThresholds ? updates.alertThresholds : {}),
+        },
+      };
+      setSettings(next);
+      persistFinanceDoc({ settings: next });
+      return { success: true };
+    },
+    [settings, persistFinanceDoc]
   );
 
   // Gestión de transacciones
@@ -369,6 +408,21 @@ export default function useFinance() {
     [createTransaction, activeWedding]
   );
 
+  // Suscribirse a cuentas bancarias vinculadas (para CTA conectar banco)
+  useEffect(() => {
+    if (!activeWedding) return;
+    const ref = doc(db, 'weddings', activeWedding, 'finance', 'accounts');
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
+        const acc = snap.exists() ? (snap.data() || {}) : {};
+        setHasBankAccount(Boolean(acc.primaryAccountId));
+      },
+      () => setHasBankAccount(false)
+    );
+    return () => unsub();
+  }, [activeWedding]);
+
   return {
     // Estados
     syncStatus,
@@ -381,6 +435,7 @@ export default function useFinance() {
     // Cálculos
     stats,
     budgetUsage,
+    settings,
     monthlyContrib,
     expectedIncome,
     emergencyAmount,
@@ -393,6 +448,7 @@ export default function useFinance() {
     updateBudgetCategory,
     removeBudgetCategory,
     updateTotalBudget,
+    updateBudgetSettings,
     createTransaction,
     updateTransaction,
     deleteTransaction,
@@ -400,5 +456,6 @@ export default function useFinance() {
 
     // Utilidades
     clearError: () => setError(null),
+    hasBankAccount,
   };
 }

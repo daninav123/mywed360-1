@@ -73,7 +73,7 @@ const AdminLayout = ({ children }) => {
         <div className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b`}>
           <Link to="/admin" className="flex items-center">
             <img 
-              src="/logo.png" 
+              src="/icon-192.png" 
               alt="Lovenda" 
               className="h-10 w-10"
             />

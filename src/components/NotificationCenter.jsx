@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell, X, Mail, Calendar, User, Trash, Check, AlertTriangle, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui';
-import * as NotificationService from '../services/NotificationService';
+import * as NotificationService from '../services/notificationService';
 
 /**
  * Centro de notificaciones unificado para toda la aplicación
@@ -88,6 +88,7 @@ const NotificationCenter = () => {
       <div class="flex-grow">
         <h3 class="font-medium text-gray-900">${title}</h3>
         <p class="text-sm text-gray-600">${message}</p>
+        <div class="mt-2 flex gap-2" data-toast-actions></div>
       </div>
       <button class="ml-4 text-gray-400 hover:text-gray-600">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -98,6 +99,34 @@ const NotificationCenter = () => {
     `;
     
     // Añadir al DOM
+        // Renderizar acciones si existen
+    try {
+      if (Array.isArray(actions) && actions.length) {
+        const container = toastElement.querySelector("[data-toast-actions]");
+        actions.forEach((act) => {
+          const b = document.createElement('button');
+          b.className = 'text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700';
+          b.textContent = act.label || 'Aceptar';
+          b.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            try {
+              const kind = act.kind; const p = act.payload || {};
+              if (kind === 'acceptMeeting') {
+                await NotificationService.acceptMeeting({ weddingId: p.weddingId, mailId: p.mailId, title: p.title, when: p.when });
+                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+              } else if (kind === 'acceptBudget') {
+                await NotificationService.acceptBudget({ weddingId: p.weddingId, budgetId: p.budgetId, emailId: p.emailId });
+                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+              } else if (kind === 'markRead') {
+                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+              }
+              removeToast(toastElement);
+            } catch (err) { console.error('toast action failed', err); }
+          });
+          container && container.appendChild(b);
+        });
+      }
+    } catch {}
     document.body.appendChild(toastElement);
     
     // Animación de entrada
@@ -374,6 +403,52 @@ const NotificationCenter = () => {
                           minute: '2-digit'
                         })}
                       </p>
+                      {/* Acciones para notificaciones inteligentes */}
+                      {notification?.payload?.kind === 'meeting_suggested' && (
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const p = notification.payload;
+                                await NotificationService.acceptMeeting({
+                                  weddingId: p.weddingId,
+                                  mailId: p.mailId,
+                                  title: p.meeting?.title,
+                                  when: p.meeting?.when,
+                                });
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
+                              } catch (err) { console.error('accept meeting failed', err); }
+                            }}
+                          >Aceptar</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
+                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
+                          >Rechazar</button>
+                        </div>
+                      )}
+                      {notification?.payload?.kind === 'budget_suggested' && (
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const p = notification.payload;
+                                await NotificationService.acceptBudget({ weddingId: p.weddingId, budgetId: p.budgetId, emailId: p.mailId });
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
+                              } catch (err) { console.error('accept budget failed', err); }
+                            }}
+                          >Aceptar</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
+                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
+                          >Rechazar</button>
+                        </div>
+                      )}
                     </div>
                     
                     <button
@@ -408,3 +483,7 @@ const NotificationCenter = () => {
 };
 
 export default NotificationCenter;
+
+
+
+

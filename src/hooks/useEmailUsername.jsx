@@ -88,13 +88,13 @@ const useEmailUsername = () => {
         username: normalizedUsername,
         userId: currentUser.uid,
         createdAt: new Date(),
-        email: `${normalizedUsername}@mywed360`
+        email: `${normalizedUsername}@mywed360.com`
       });
       
       // Actualizar el perfil del usuario con su correo myWed360
       await setDoc(doc(firestore, 'users', currentUser.uid), {
         emailUsername: normalizedUsername,
-        myWed360Email: `${normalizedUsername}@mywed360`
+        myWed360Email: `${normalizedUsername}@mywed360.com`
       }, { merge: true });
       
       return true;

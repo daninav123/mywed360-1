@@ -17,6 +17,7 @@ const SeatingPlanCanvas = ({
   onTableDimensionChange,
   onAssignGuest,
   onAssignGuestSeat,
+  onAssignCeremonySeat,
   onToggleEnabled,
   onAddArea,
   onAddTable,
@@ -35,6 +36,7 @@ const SeatingPlanCanvas = ({
   showSeatNumbers = false,
   background = null,
   globalMaxSeats = 0,
+  focusTableId = null,
 }) => {
   // DnDProvider se gestiona en el componente padre (SeatingPlanRefactored)
 
@@ -259,6 +261,32 @@ const SeatingPlanCanvas = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Enfocar una mesa concreta (centrar en pantalla)
+  useEffect(() => {
+    if (!focusTableId) return;
+    try {
+      const t = (tables || []).find(x => String(x?.id) === String(focusTableId));
+      if (!t || !canvasRef?.current) return;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const viewW = rect.width || 800;
+      const viewH = rect.height || 600;
+      const target = { x: (viewW/2) - scale * (t.x || 0), y: (viewH/2) - scale * (t.y || 0) };
+      const start = { x: offset.x, y: offset.y };
+      const duration = 300; // ms
+      const t0 = performance.now();
+      const ease = (p) => (p<0.5 ? 2*p*p : 1 - Math.pow(-2*p+2,2)/2);
+      let raf;
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / duration);
+        const e = ease(p);
+        setOffset({ x: start.x + (target.x - start.x) * e, y: start.y + (target.y - start.y) * e });
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+      return () => raf && cancelAnimationFrame(raf);
+    } catch (_) {}
+  }, [focusTableId]);
+
   // Atajos de teclado para zoom: Ctrl/Cmd + '+', '-', '0'
   useEffect(() => {
     const onKey = (e) => {
@@ -304,6 +332,7 @@ const SeatingPlanCanvas = ({
           onSelectTable={onSelectTable}
           onAssignGuest={onAssignGuest}
           onAssignGuestSeat={onAssignGuestSeat}
+          onAssignCeremonySeat={onAssignCeremonySeat}
           onToggleEnabled={onToggleEnabled}
           addArea={onAddArea}
           onAddTable={onAddTable}

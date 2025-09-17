@@ -1,7 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import ReactDOM from 'react-dom/client';
 // Asegurar inicialización de i18n antes de cualquier uso de useTranslation
 import './i18n';
+import './sentry';
 import App from './App';
 import ErrorBoundary from './components/debug/ErrorBoundary';
 import './debug/setupDebug';
@@ -9,6 +10,7 @@ import './debug/setupDebug';
 import './utils/consoleCommands';
 import './index.css';
 import './pwa/registerServiceWorker';
+import './pwa/setupPwaToasts';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,3 +19,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </ErrorBoundary>
   </React.StrictMode>
 );
+
+

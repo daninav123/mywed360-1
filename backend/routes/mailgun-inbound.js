@@ -2,41 +2,51 @@ import express from 'express';
 import crypto from 'crypto';
 import { db } from '../db.js'; // Firestore
 import { analyzeEmail } from '../services/emailAnalysis.js';
-import { saveSupplierBudget } from '../services/budgetService.js';
 
 const router = express.Router();
 
-/**
- * Comprueba la firma que Mailgun envía en cada webhook.
- * Docs: https://documentation.mailgun.com/en/latest/user_manual.html#webhooks
- */
+// Comprueba la firma que Mailgun envía en cada webhook.
+// Docs: https://documentation.mailgun.com/en/latest/user_manual.html#webhooks
 function verifyMailgunSignature(timestamp, token, signature, apiKey) {
-  // Según Mailgun, se concatena timestamp + token y se aplica HMAC-SHA256 con la API-Key
-  const encodedToken = crypto
-    .createHmac('sha256', apiKey)
-    .update(timestamp + token)
-    .digest('hex');
-  return encodedToken === signature;
+  try {
+    const encodedToken = crypto
+      .createHmac('sha256', apiKey)
+      .update(timestamp + token)
+      .digest('hex');
+    return crypto.timingSafeEqual(Buffer.from(encodedToken), Buffer.from(String(signature)));
+  } catch {
+    return false;
+  }
+}
+
+function verifyWithAnyKey({ timestamp, token, signature }) {
+  const candidates = [
+    process.env.MAILGUN_SIGNING_KEY,
+    process.env.MAILGUN_WEBHOOK_SIGNING_KEY,
+    process.env.MAILGUN_API_KEY,
+    process.env.VITE_MAILGUN_API_KEY,
+  ].filter(Boolean);
+  for (const key of candidates) {
+    if (verifyMailgunSignature(timestamp, token, signature, key)) return true;
+  }
+  return false;
 }
 
 router.post('/', (req, res) => {
-  const apiKey = process.env.MAILGUN_SIGNING_KEY 
-    || process.env.MAILGUN_WEBHOOK_SIGNING_KEY 
-    || process.env.MAILGUN_API_KEY 
-    || process.env.VITE_MAILGUN_API_KEY;
+  const anyKey = process.env.MAILGUN_SIGNING_KEY || process.env.MAILGUN_WEBHOOK_SIGNING_KEY || process.env.MAILGUN_API_KEY || process.env.VITE_MAILGUN_API_KEY;
 
   // Extraer datos de cabecera common para la firma
-  const { timestamp, token, signature } = req.body;
+  const { timestamp, token, signature } = req.body || {};
 
-  if (apiKey) {
-    // Verificar firma solo si tenemos la clave privada configurada
-    if (!verifyMailgunSignature(timestamp, token, signature, apiKey)) {
+  if (anyKey) {
+    const ok = verifyWithAnyKey({ timestamp, token, signature });
+    if (!ok) {
       console.warn('Webhook Mailgun firma no válida');
       return res.status(403).json({ success: false, message: 'Invalid signature' });
     }
   } else {
     // Entorno local / CI sin clave: continuar pero advertir
-    console.warn('⚠️  MAILGUN_API_KEY no definido; se omite verificación de firma (solo dev)');
+    console.warn('MAILGUN_SIGNING_KEY no definido; se omite verificación de firma (solo dev)');
   }
 
   // Extraer campos principales del mensaje
@@ -47,22 +57,21 @@ router.post('/', (req, res) => {
     'body-plain': bodyPlain,
     'stripped-text': strippedText,
     'stripped-html': strippedHtml,
-  } = req.body;
+  } = req.body || {};
 
   // Persistir el correo en Firestore
   const bodyContent = bodyPlain || strippedText || strippedHtml || '';
   const date = new Date().toISOString();
 
-  /*
-    Mailgun puede enviar varios destinatarios separados por comas. Procesamos cada uno
-    individualmente para que cada usuario reciba su propio registro en la carpeta inbox.
-  */
-  const recipients = recipient ? recipient.split(/,\s*/).map(r => r.trim()) : [];
+  // Mailgun puede enviar varios destinatarios separados por comas.
+  const recipients = recipient ? recipient.split(/,\s*/).map(r => r.trim()).filter(Boolean) : [];
 
-  const savePromises = recipients.map(async (rcpt) => {
+  const savePromises = recipients.map(async (rcptRaw) => {
+    const rcpt = String(rcptRaw || '').trim().toLowerCase();
+    const senderNorm = String(sender || '').trim().toLowerCase();
     try {
       const mailRef = await db.collection('mails').add({
-        from: sender,
+        from: senderNorm,
         to: rcpt,
         subject,
         body: bodyContent,
@@ -72,19 +81,20 @@ router.post('/', (req, res) => {
         via: 'mailgun'
       });
 
-      // Ensure the global mail doc contains its ID for cross-collection syncing
+      // Guardar ID también en el documento
       try {
         await db.collection('mails').doc(mailRef.id).update({ id: mailRef.id });
       } catch (e) {
         // best-effort only
       }
 
-      // Also store a copy under the owning user's subcollection if we can resolve by email
+      // Guardar copia bajo subcolección del usuario si podemos resolverlo por email
       try {
-        const userSnap = await db.collection('users')
-          .where('myWed360Email', '==', rcpt)
-          .limit(1)
-          .get();
+        let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+        if (userSnap.empty) {
+          const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
+          userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+        }
         if (!userSnap.empty) {
           const uid = userSnap.docs[0].id;
           await db.collection('users')
@@ -93,7 +103,7 @@ router.post('/', (req, res) => {
             .doc(mailRef.id)
             .set({
               id: mailRef.id,
-              from: sender,
+              from: senderNorm,
               to: rcpt,
               subject,
               body: bodyContent,
@@ -107,55 +117,70 @@ router.post('/', (req, res) => {
         console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
       }
 
-      // Análisis IA automático
+      // Análisis IA automático -> guardar insights y generar notificaciones
       try {
-        const insights = await analyzeEmail({ subject, body: bodyContent });
+        const insights = await analyzeEmail({ subject, body: bodyContent, attachments: (req.body?.attachments || []) });
         await db.collection('emailInsights').doc(mailRef.id).set({
           ...insights,
           mailId: mailRef.id,
           createdAt: date,
         });
 
-        // Si la IA detecta presupuestos, guardarlos
-        if (insights?.budgets?.length) {
-          const weddingId = rcpt.split('@')[0] || 'unknown';
-          // Intentar deducir supplierId por email remitente
-          let supplierIdGuess = null;
+        const weddingId = (rcpt || '').split('@')[0] || null;
+
+        // Notificaciones por reuniones detectadas (aceptación desde UI)
+        if (weddingId) {
           try {
-            const supSnap = await db
-              .collection('weddings')
-              .doc(weddingId)
-              .collection('suppliers')
-              .where('email', '==', sender)
-              .limit(1)
-              .get();
-            if (!supSnap.empty) supplierIdGuess = supSnap.docs[0].id;
-          } catch {}
-          for (const b of insights.budgets) {
-            try {
-              await saveSupplierBudget({
-                weddingId,
-                supplierId: b.client || supplierIdGuess || 'unknown',
-                description: subject,
-                amount: b.amount,
-                currency: b.currency || 'EUR',
-                status: 'pending',
-                emailId: mailRef.id,
+            const { createNotification } = await import('../services/notificationService.js');
+            const meetings = Array.isArray(insights?.meetings) ? insights.meetings : [];
+            for (const m of meetings) {
+              const when = m?.start || m?.date || m?.when;
+              if (!when) continue;
+              const title = m?.title || subject || 'Reunión';
+              await createNotification({
+                type: 'event',
+                message: `Se detectó una reunión: ${title}`,
+                payload: {
+                  kind: 'meeting_suggested',
+                  mailId: mailRef.id,
+                  weddingId,
+                  meeting: { title, when }
+                }
               });
-            } catch (saveErr) {
-              console.error('❌ Error guardando presupuesto IA:', saveErr);
             }
-          }
+          } catch (e) { console.warn('notification failed', e?.message || e); }
+        }
+
+        // Notificaciones por presupuestos detectados (aceptación desde UI)
+        if (weddingId) {
+          try {
+            const { createNotification } = await import('../services/notificationService.js');
+            const budgets = Array.isArray(insights?.budgets) ? insights.budgets : [];
+            for (const b of budgets) {
+              await createNotification({
+                type: 'event',
+                message: `Presupuesto detectado: ${subject || b?.description || 'Presupuesto'}`,
+                payload: {
+                  kind: 'budget_suggested',
+                  mailId: mailRef.id,
+                  weddingId,
+                  supplierId: null,
+                  budgetId: null,
+                  budget: { description: subject || b?.description || 'Presupuesto', amount: b?.amount, currency: b?.currency || 'EUR' }
+                }
+              });
+            }
+          } catch (e) { console.warn('notification failed', e?.message || e); }
         }
       } catch (aiErr) {
-        console.error('⚠️  Error analizando correo:', aiErr);
+        console.error('Error analizando correo:', aiErr);
       }
     } catch (err) {
-      console.error('❌ Error guardando correo entrante en Firestore:', err);
+      console.error('Error guardando correo entrante en Firestore:', err);
     }
   });
 
-  console.log('📧 Email recibido de Mailgun:', {
+  console.log('Email recibido de Mailgun:', {
     recipients,
     sender,
     subject,
@@ -164,7 +189,7 @@ router.post('/', (req, res) => {
 
   // Esperar a que todas las escrituras terminen pero sin bloquear la respuesta si tardan
   Promise.allSettled(savePromises).then(() => {
-    console.log('✅ Correo entrante guardado en Firestore');
+    console.log('Correo entrante guardado en Firestore');
   });
 
   // Mailgun requiere respuesta 200 OK
@@ -172,3 +197,4 @@ router.post('/', (req, res) => {
 });
 
 export default router;
+

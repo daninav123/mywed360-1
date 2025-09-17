@@ -48,20 +48,42 @@ export const EMAIL_TAGS = {
 
 // Cargar registros de seguimiento
 export function loadTrackingRecords() {
-  return loadData(TRACKING_STORAGE_KEY, { defaultValue: [] });
+  try {
+    const data = loadData(TRACKING_STORAGE_KEY, { defaultValue: [] });
+    // Si loadData es asíncrono (Promise), usar localStorage como lectura síncrona
+    if (data && typeof data.then === 'function') {
+      try {
+        const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
+        const parsed = JSON.parse(raw || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return Array.isArray(data) ? data : [];
+  } catch {
+    try {
+      const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
+      const parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+  }
 }
 
 // Guardar registros de seguimiento
 export function saveTrackingRecords(records) {
-  saveData(TRACKING_STORAGE_KEY, records);
+  try { localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(Array.isArray(records) ? records : [])); } catch {}
+  // Persistencia en segundo plano (no bloquear UI)
+  try { void saveData(TRACKING_STORAGE_KEY, records, { showNotification: false }); } catch {}
 }
 
 // Crear un nuevo registro de seguimiento para un correo a un proveedor
 export function createTrackingRecord(email, provider, options = {}) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   
   // Verificar si ya existe un registro para este proveedor
-  const existingRecord = trackingRecords.find(record => 
+  const existingRecord = list.find(record => 
     record.providerEmail === provider.email
   );
   
@@ -85,7 +107,7 @@ export function createTrackingRecord(email, provider, options = {}) {
     };
     
     // Actualizar el registro en la lista
-    const updatedRecords = trackingRecords.map(record => 
+    const updatedRecords = list.map(record => 
       record.id === existingRecord.id ? updatedRecord : record
     );
     
@@ -139,7 +161,7 @@ export function createTrackingRecord(email, provider, options = {}) {
     }
     
     // Añadir el nuevo registro
-    const updatedRecords = [...trackingRecords, newRecord];
+    const updatedRecords = [...list, newRecord];
     saveTrackingRecords(updatedRecords);
     return newRecord;
   }
@@ -148,6 +170,7 @@ export function createTrackingRecord(email, provider, options = {}) {
 // Actualizar un registro de seguimiento cuando se recibe una respuesta
 export function updateTrackingWithResponse(email) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   
   // Buscar el registro que corresponde al remitente de este correo
   const recordIndex = trackingRecords.findIndex(record => 
@@ -185,8 +208,9 @@ export function updateTrackingWithResponse(email) {
 // Actualizar estado de un registro de seguimiento
 export function updateTrackingStatus(recordId, status, notes = null, dueDate = undefined) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   
-  const updatedRecords = trackingRecords.map(record => {
+  const updatedRecords = list.map(record => {
     if (record.id === recordId) {
       return {
         ...record,
@@ -204,6 +228,7 @@ export function updateTrackingStatus(recordId, status, notes = null, dueDate = u
 // Obtener registros que necesitan seguimiento (sin respuesta después de N días)
 export function getTrackingNeedingFollowup(days = 3) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   const now = new Date();
   const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   
@@ -216,8 +241,9 @@ export function getTrackingNeedingFollowup(days = 3) {
 // Añadir o eliminar etiquetas de un registro
 export function updateTrackingTags(recordId, tags) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   
-  const updatedRecords = trackingRecords.map(record => {
+  const updatedRecords = list.map(record => {
     if (record.id === recordId) {
       return {
         ...record,
@@ -233,6 +259,7 @@ export function updateTrackingTags(recordId, tags) {
 // Eliminar un registro de seguimiento
 export function deleteTrackingRecord(recordId) {
   const trackingRecords = loadTrackingRecords();
+  const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   const updatedRecords = trackingRecords.filter(record => record.id !== recordId);
   saveTrackingRecords(updatedRecords);
 }
@@ -264,3 +291,4 @@ export function tagProviderEmail_old(emailId, providerId) {
     return false;
   }
 }
+

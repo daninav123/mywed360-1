@@ -55,14 +55,21 @@ const router = express.Router();
 // GET /api/mail?folder=inbox|sent
 router.get('/', requireMailAccess, async (req, res) => {
   try {
-    const { folder = 'inbox', user } = req.query;
+    const { folder = 'inbox' } = req.query;
+    const userRaw = req.query.user;
+    const user = userRaw ? String(userRaw).trim() : undefined;
+    const userNorm = user ? user.toLowerCase() : undefined;
 
     // Si se especifica usuario, intentar leer primero desde la subcoleccion del usuario
-    if (user) {
+    if (userNorm) {
       try {
         let uid = null;
-        // Intentar resolver por myWed360Email y, si no, por email normal
-        const byAlias = await db.collection('users').where('myWed360Email', '==', user).limit(1).get();
+        // Intentar resolver por myWed360Email (normal y legacy sin .com) y, si no, por email normal
+        let byAlias = await db.collection('users').where('myWed360Email', '==', user).limit(1).get();
+        if (byAlias.empty && userNorm) {
+          const legacy = userNorm.replace(/@mywed360\.com$/i, '@mywed360');
+          byAlias = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+        }
         if (!byAlias.empty) {
           uid = byAlias.docs[0].id;
         } else {
@@ -90,12 +97,12 @@ router.get('/', requireMailAccess, async (req, res) => {
     let query = db.collection('mails').where('folder', '==', folder);
 
     // Si se especifica usuario, filtrar por destinatario o remitente segÃºn la carpeta
-    if (user) {
+    if (userNorm) {
       if (folder === 'sent') {
-        query = query.where('from', '==', user);
+        query = query.where('from', '==', userNorm);
       } else {
         // Para inbox y otras carpetas, filtrar por destinatario
-        query = query.where('to', '==', user);
+        query = query.where('to', '==', userNorm);
       }
     }
 
@@ -120,6 +127,22 @@ router.get('/', requireMailAccess, async (req, res) => {
       } else {
         throw fireErr;
       }
+    }
+
+    // Fallback extra: si se pidiÃ³ user pero no hay datos, intentar carga limitada por carpeta y filtrar en servidor (normalizando)
+    if (userNorm && (!Array.isArray(data) || data.length === 0)) {
+      try {
+        const snap2 = await db.collection('mails').where('folder', '==', folder).limit(300).get();
+        const arr = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+        const filtered = arr.filter(m => {
+          const to = String(m.to || '').toLowerCase();
+          const from = String(m.from || '').toLowerCase();
+          return folder === 'sent' ? (from === userNorm) : (to === userNorm);
+        }).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
+        if (filtered.length) {
+          return res.json(filtered);
+        }
+      } catch (e) {}
     }
 
     res.json(data);
@@ -769,7 +792,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
     const data = doc.data();
     await docRef.update({ read: false });
 
-    // Propagar cambio a subcolección del usuario propietario (inbox -> to, sent -> from)
+    // Propagar cambio a subcolecciï¿½n del usuario propietario (inbox -> to, sent -> from)
     try {
       const targetEmail = (data.folder === 'sent') ? data.from : data.to;
       if (targetEmail) {
@@ -786,7 +809,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn('No se pudo propagar unread a subcolección de usuario:', e?.message || e);
+      console.warn('No se pudo propagar unread a subcolecciï¿½n de usuario:', e?.message || e);
     }
 
     res.json({ id, ...data, read: false });
@@ -796,7 +819,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
   }
 });
 
-// Compatibilidad: también aceptar POST para marcar como no leído
+// Compatibilidad: tambiï¿½n aceptar POST para marcar como no leï¿½do
 router.post('/:id/unread', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
@@ -806,7 +829,7 @@ router.post('/:id/unread', requireMailAccess, async (req, res) => {
     const data = doc.data();
     await docRef.update({ read: false });
 
-    // Propagar a subcolección
+    // Propagar a subcolecciï¿½n
     try {
       const targetEmail = (data.folder === 'sent') ? data.from : data.to;
       if (targetEmail) {
@@ -823,7 +846,7 @@ router.post('/:id/unread', requireMailAccess, async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn('No se pudo propagar unread (POST) a subcolección de usuario:', e?.message || e);
+      console.warn('No se pudo propagar unread (POST) a subcolecciï¿½n de usuario:', e?.message || e);
     }
 
     res.json({ id, ...data, read: false });

@@ -7,6 +7,7 @@ import Card from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
 import { useProveedores } from '../hooks/useProveedores';
+import contractTemplates from '../data/templates/contractTemplates';
 
 export default function Contratos() {
   const { currentUser } = useAuth();
@@ -21,7 +22,7 @@ export default function Contratos() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [toast, setToast] = useState(null);
-  const initialContract = { provider: '', type: '', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
+  const initialContract = { provider: '', type: 'Generico', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
   const [newContract, setNewContract] = useState(initialContract);
   const [editContract, setEditContract] = useState(initialContract);
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -29,8 +30,56 @@ export default function Contratos() {
   // Generación de contratos genéricos
   const [showGenericModal, setShowGenericModal] = useState(false);
   const [selectedProvidersForGen, setSelectedProvidersForGen] = useState([]);
-  const [genericForm, setGenericForm] = useState({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente' });
+  const [genericForm, setGenericForm] = useState({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente', templateId: 'contrato_generico_servicios' });
+  const [attachBaseDoc, setAttachBaseDoc] = useState(true);
   const { providers = [], loading: providersLoading } = useProveedores();
+  const [variableValues, setVariableValues] = useState({ clienteNombre: '', cliente: '' });
+  const [previewContent, setPreviewContent] = useState('');
+
+  const getTemplateById = (id) => contractTemplates.find(t => t.id === id) || contractTemplates[0];
+  const extractVariables = (body='') => {
+    const reg = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
+    const set = new Set();
+    let m;
+    while ((m = reg.exec(body)) !== null) set.add(m[1]);
+    return Array.from(set);
+  };
+  const applyTemplate = (body='', replacements={}) => {
+    let out = body;
+    Object.entries(replacements).forEach(([k, v]) => {
+      const re = new RegExp(`\\{\\{\\s*${k}\\s*\\}}`, 'g');
+      out = out.replace(re, String(v ?? ''));
+    });
+    return out.replace(/\{\{\s*[a-zA-Z0-9_]+\s*\}\}/g, '');
+  };
+
+  // Inicializar variables al abrir modal
+  React.useEffect(() => {
+    if (!showGenericModal) return;
+    setVariableValues((prev) => ({
+      ...prev,
+      clienteNombre: currentUser?.displayName || prev.clienteNombre || 'Cliente',
+      cliente: currentUser?.displayName || prev.cliente || 'Cliente',
+    }));
+  }, [showGenericModal, currentUser]);
+
+  // Actualizar vista previa
+  React.useEffect(() => {
+    if (!showGenericModal) return;
+    const tpl = getTemplateById(genericForm.templateId);
+    const firstSelected = providers.find(p => p.id === selectedProvidersForGen[0]);
+    const providerName = firstSelected?.name || 'Proveedor';
+    const service = genericForm.type || firstSelected?.service || 'Servicio';
+    const replacements = {
+      providerName,
+      service,
+      signedDate: genericForm.signedDate || '',
+      serviceDate: genericForm.serviceDate || '',
+      ...variableValues,
+    };
+    setPreviewContent(applyTemplate(tpl?.body || '', replacements));
+  }, [showGenericModal, genericForm, variableValues, selectedProvidersForGen, providers]);
+
 
   const handleAddContract = async e => {
     e.preventDefault();
@@ -97,6 +146,35 @@ export default function Contratos() {
       }
       for (let i = 0; i < picked.length; i++) {
         const p = picked[i];
+        let docUrl = '#';
+        if (attachBaseDoc && genericForm.templateId) {
+          try {
+            const tpl = contractTemplates.find(t => t.id === genericForm.templateId);
+            if (tpl) {
+              const clientName = currentUser?.displayName || 'Cliente';
+              const replacements = {
+                providerName: p?.name || 'Proveedor',
+                service: p?.service || genericForm.type || 'Servicio',
+                signedDate: genericForm.signedDate || '',
+                serviceDate: genericForm.serviceDate || '',
+                clienteNombre: clientName,
+                cliente: clientName,
+              };
+              let content = tpl.body;
+              Object.entries(replacements).forEach(([key, val]) => {
+                const re = new RegExp(`\\{{${key}\\}}`, 'g');
+                content = content.replace(re, String(val || ''));
+              });
+              const fnameSafe = (p?.name || 'Proveedor').replace(/[^a-zA-Z0-9-_ ]/g, '_');
+              const fileName = `Contrato_${fnameSafe}_${Date.now()}.${tpl.ext || 'txt'}`;
+              const file = new File([content], fileName, { type: tpl.mime || 'text/plain' });
+              const uploaded = await uploadFiles([file], uid, 'contracts');
+              if (uploaded && uploaded[0]?.url) docUrl = uploaded[0].url;
+            }
+          } catch (eUp) {
+            console.warn('No se pudo adjuntar documento base', eUp);
+          }
+        }
         const contractObj = {
           id: `ct${Date.now()}_${i}`,
           provider: p?.name || 'Proveedor',
@@ -104,14 +182,15 @@ export default function Contratos() {
           signedDate: genericForm.signedDate || '',
           serviceDate: genericForm.serviceDate || '',
           status: genericForm.status || 'Vigente',
-          docUrl: '#',
+          docUrl,
         };
         // eslint-disable-next-line no-await-in-loop
         await addContract(contractObj);
       }
       setShowGenericModal(false);
       setSelectedProvidersForGen([]);
-      setGenericForm({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente' });
+      setGenericForm({ type: 'Genérico', signedDate: '', serviceDate: '', status: 'Vigente', templateId: 'contrato_generico_servicios' });
+      setAttachBaseDoc(true);
       setToast({ message: 'Contratos generados', type: 'success' });
     } catch (err) {
       console.error('Error generando contratos genéricos', err);
@@ -142,6 +221,10 @@ export default function Contratos() {
     </>
   );
 
+  // Variables de plantilla actuales para render
+  const __tpl = getTemplateById(genericForm.templateId);
+  const __vars = extractVariables(__tpl?.body || '');
+  const __customVars = __vars.filter(v => !['providerName','service','signedDate','serviceDate'].includes(v));
   return (
     <PageWrapper title="Contratos" actions={actionButtons}>
       <Card className="p-6 space-y-6">
@@ -364,6 +447,18 @@ export default function Contratos() {
                   />
                 </div>
                 <div>
+                  <label className="block mb-1 text-sm font-medium">Plantilla legal</label>
+                  <select
+                    value={genericForm.templateId}
+                    onChange={e => setGenericForm({ ...genericForm, templateId: e.target.value })}
+                    className="w-full border rounded px-2 py-1"
+                  >
+                    {contractTemplates.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
                   <label className="block mb-1 text-sm font-medium">Estado</label>
                   <select
                     value={genericForm.status}
@@ -393,6 +488,42 @@ export default function Contratos() {
                     className="w-full border rounded px-2 py-1"
                   />
                 </div>
+              </div>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" checked={attachBaseDoc} onChange={e => setAttachBaseDoc(e.target.checked)} />
+                Adjuntar documento base de la plantilla
+              </label>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Variables de plantilla</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {__customVars.length ? (
+                    __customVars.map((k) => (
+                      <div key={k}>
+                        <label className="block mb-1 text-xs text-gray-600">{k}</label>
+                        <input
+                          type="text"
+                          value={variableValues[k] || ''}
+                          onChange={e => setVariableValues({ ...variableValues, [k]: e.target.value })}
+                          className="w-full border rounded px-2 py-1"
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-gray-500">No hay variables adicionales en la plantilla.</div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-sm font-medium">Previsualización</label>
+                  <button
+                    type="button"
+                    className="text-xs px-2 py-1 border rounded"
+                    onClick={() => { try { navigator.clipboard?.writeText(previewContent); setToast({ message: 'Copiado', type: 'success' }); } catch(_){} }}
+                  >Copiar</button>
+                </div>
+                <div className="border rounded p-2 bg-gray-50 whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto">{previewContent || '...'}</div>
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium">Selecciona proveedores</label>
@@ -472,5 +603,10 @@ function ContractItem({ contract, isSelected, onToggle }) {
     </div>
   );
 }
+
+
+
+
+
 
 

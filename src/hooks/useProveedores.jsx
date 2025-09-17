@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { db } from '../firebaseConfig';
 import { 
   collection, 
@@ -15,6 +15,7 @@ import {
 } from 'firebase/firestore';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
+import { loadData, saveData } from '../services/SyncService';
 
 /**
  * @typedef {Object} Provider
@@ -82,10 +83,11 @@ export const useProveedores = () => {
   const [dateTo, setDateTo] = useState('');
     // Filtro de rating mínimo (0 = cualquiera)
     const [ratingMin, setRatingMin] = useState(0);
-  const [tab, setTab] = useState('all'); // 'all', 'reserved', 'favorite'
+  const [tab, setTab] = useState('contratados'); // 'contratados', 'buscados', 'favoritos'
   
   const { user } = useAuth();
   const { activeWedding } = useWedding();
+  const persistTimer = useRef(null);
 
   const getCollectionPath = useCallback(() => {
     if (activeWedding) return `weddings/${activeWedding}/suppliers`;
@@ -174,12 +176,16 @@ export const useProveedores = () => {
     }
     
     // Filtrar por pestaña
-    if (tab === 'reserved') {
-      filtered = filtered.filter(p => Array.isArray(p.reservations) && p.reservations.length);
+    if (tab === 'contratados') {
+      filtered = filtered.filter(p => ['Confirmado','Seleccionado'].includes(p.status));
     }
-    if (tab === 'favorite') {
+    if (tab === 'buscados') {
+      filtered = filtered.filter(p => ['Pendiente','Contactado'].includes(p.status));
+    }
+    if (tab === 'favoritos') {
       filtered = filtered.filter(p => p.favorite);
     }
+
     
     setFilteredProviders(filtered);
   }, [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]);
@@ -194,7 +200,7 @@ export const useProveedores = () => {
     setDateFrom('');
     setDateTo('');
     setRatingMin(0);
-    setTab('all');
+    setTab('contratados');
   }, []);
   
   /**
@@ -256,7 +262,15 @@ export const useProveedores = () => {
       };
       
       await updateDoc(providerRef, providerWithTimestamp);
-      
+
+      // Actualizar estado local para reflejar cambios inmediatamente
+      setProviders(prev => {
+        const updated = prev.map(p => (p.id === providerId ? { ...p, ...providerData, id: providerId, date: providerData.date ? providerData.date : (p.date || '') } : p));
+        try { applyFilters(updated); } catch {}
+        return updated;
+      });
+      setSelectedProvider(prev => (prev && prev.id === providerId ? { ...prev, ...providerData, id: providerId } : prev));
+
       setError(null);
     } catch (err) {
       console.error('Error al actualizar proveedor:', err);
@@ -366,11 +380,49 @@ export const useProveedores = () => {
       loadProviders();
     }
   }, [user, loadProviders]);
+
+  // Hidratar filtros guardados por boda
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await loadData('supplierFilters', {
+          docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
+          fallbackToLocal: true,
+        });
+        if (!cancelled && data && typeof data === 'object') {
+          if (typeof data.searchTerm === 'string') setSearchTerm(data.searchTerm);
+          if (typeof data.serviceFilter === 'string') setServiceFilter(data.serviceFilter);
+          if (typeof data.statusFilter === 'string') setStatusFilter(data.statusFilter);
+          if (typeof data.dateFrom === 'string') setDateFrom(data.dateFrom);
+          if (typeof data.dateTo === 'string') setDateTo(data.dateTo);
+          if (typeof data.ratingMin === 'number') setRatingMin(data.ratingMin);
+          if (typeof data.tab === 'string') setTab(data.tab);
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [activeWedding]);
   
   // Aplicar filtros cuando cambien
   useEffect(() => {
     applyFilters();
   }, [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, applyFilters]);
+
+  // Persistir filtros (debounce) por boda
+  useEffect(() => {
+    if (persistTimer.current) {
+      clearTimeout(persistTimer.current);
+    }
+    persistTimer.current = setTimeout(() => {
+      const payload = { searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab };
+      saveData('supplierFilters', payload, {
+        docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
+        showNotification: false,
+      }).catch(() => {});
+    }, 300);
+    return () => { if (persistTimer.current) clearTimeout(persistTimer.current); };
+  }, [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, activeWedding]);
   
   return {
     // Estado
@@ -412,3 +464,9 @@ export const useProveedores = () => {
 };
 
 export default useProveedores;
+
+
+
+
+
+

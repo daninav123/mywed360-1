@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useId } from 'react';
 
 // Contexto para compartir el valor actual de la pestaña
 const TabsContext = createContext({ value: '', setValue: () => {} });
@@ -35,7 +35,7 @@ export function Tabs({
 
 /** Lista de pestañas (encabezados) */
 export function TabsList({ children, className = '' }) {
-  return <div className={className}>{children}</div>;
+  return <div role="tablist" className={className}>{children}</div>;
 }
 
 /**
@@ -45,9 +45,15 @@ export function TabsList({ children, className = '' }) {
 export function TabsTrigger({ value, children, className = '' }) {
   const { value: current, setValue } = useContext(TabsContext);
   const isActive = current === value;
+  const tabId = `tab-${value}`;
+  const panelId = `panel-${value}`;
   return (
     <button
+      id={tabId}
       type="button"
+      role="tab"
+      aria-selected={isActive}
+      aria-controls={panelId}
       className={`${className} ${isActive ? 'font-bold border-b-2 border-blue-500' : 'text-gray-600'}`}
       onClick={() => setValue(value)}
     >
@@ -63,5 +69,11 @@ export function TabsTrigger({ value, children, className = '' }) {
 export function TabsContent({ value, children, className = '' }) {
   const { value: current } = useContext(TabsContext);
   if (current !== value) return null;
-  return <div className={className}>{children}</div>;
+  const tabId = `tab-${value}`;
+  const panelId = `panel-${value}`;
+  return (
+    <div id={panelId} role="tabpanel" aria-labelledby={tabId} className={className}>
+      {children}
+    </div>
+  );
 }

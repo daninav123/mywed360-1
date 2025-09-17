@@ -4,21 +4,22 @@ import FinanceOverview from '../components/finance/FinanceOverview';
 import TransactionManager from '../components/finance/TransactionManager';
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
-import FinanceCharts from '../components/finance/FinanceCharts';
+// Lazy load analytics charts to reduce initial bundle
+const FinanceCharts = React.lazy(() => import('../components/finance/FinanceCharts'));
 import useFinance from '../hooks/useFinance';
 import useTranslations from '../hooks/useTranslations';
 
 /**
- * PÃ¡gina de Gestion financiera completamente refactorizada
+ * Página de Gestion financiera completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (571 lÃ­neas â†’ 180 lÃ­neas)
+ * - Eliminada complejidad anterior (571 líneas â†’ 180 líneas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useFinance para lÃ³gica centralizada
- * - MemoizaciÃ³n y optimizaciÃ³n de re-renders
- * - IntegraciÃ³n con sistema i18n
- * - UX mejorada con tabs y navegaciÃ³n clara
+ * - Hook personalizado useFinance para lógica centralizada
+ * - Memoización y optimización de re-renders
+ * - Integración con sistema i18n
+ * - UX mejorada con tabs y navegación clara
  */
 function Finance() {
   const { t } = useTranslations();
@@ -33,9 +34,11 @@ function Finance() {
     budget,
     transactions,
     
-    // CÃ¡lculos
+    // Cálculos
     stats,
     budgetUsage,
+    settings,
+    hasBankAccount,
     
     // Acciones
     updateContributions,
@@ -44,6 +47,7 @@ function Finance() {
     updateBudgetCategory,
     removeBudgetCategory,
     updateTotalBudget,
+    updateBudgetSettings,
     createTransaction,
     updateTransaction,
     deleteTransaction,
@@ -54,22 +58,22 @@ function Finance() {
   // Estado para tabs activo
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Detectar URL hash para abrir modal especÃ­fico
+  // Detectar URL hash para abrir modal específico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager manejarÃ¡ la apertura del modal
+      // El TransactionManager manejará la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar nÃºmero de invitados al montar el componente
+  // Cargar número de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores despuÃ©s de 5 segundos
+  // Limpiar errores después de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -77,7 +81,7 @@ function Finance() {
     }
   }, [error, clearError]);
 
-  // Manejar actualizaciÃ³n de presupuesto total
+  // Manejar actualización de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -89,7 +93,7 @@ function Finance() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Mostrar errores si existen */}
         {error && (
-          <div className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
+          <div className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30" aria-live="polite">
             <div className="flex">
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
@@ -103,14 +107,14 @@ function Finance() {
           </div>
         )}
 
-        {/* NavegaciÃ³n por tabs */}
+        {/* Navegación por tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Resumen</TabsTrigger>
-            <TabsTrigger value="transactions">Transacciones</TabsTrigger>
-            <TabsTrigger value="budget">Presupuesto</TabsTrigger>
-            <TabsTrigger value="contributions">Aportaciones</TabsTrigger>
-            <TabsTrigger value="analytics">Analisis</TabsTrigger>
+            <TabsTrigger value="overview">{t('finance.tabs.overview', { defaultValue: 'Resumen' })}</TabsTrigger>
+            <TabsTrigger value="transactions">{t('finance.tabs.transactions', { defaultValue: 'Transacciones' })}</TabsTrigger>
+            <TabsTrigger value="budget">{t('finance.tabs.budget', { defaultValue: 'Presupuesto' })}</TabsTrigger>
+            <TabsTrigger value="contributions">{t('finance.tabs.contributions', { defaultValue: 'Aportaciones' })}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'Análisis' })}</TabsTrigger>
           </TabsList>
 
           {/* Tab: Resumen general */}
@@ -119,11 +123,23 @@ function Finance() {
               stats={stats}
               syncStatus={syncStatus}
               budgetUsage={budgetUsage}
+              thresholds={settings?.alertThresholds}
             />
           </TabsContent>
 
           {/* Tab: Gestion de transacciones */}
           <TabsContent value="transactions" className="space-y-6">
+            {!hasBankAccount && (
+              <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="font-medium text-[var(--color-primary)]">{t('finance.connectBank.title', { defaultValue: 'Conecta tu banco para importar movimientos' })}</p>
+                    <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.connectBank.desc', { defaultValue: 'Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.' })}</p>
+                  </div>
+                  <a href="/finance/bank-connect" className="inline-flex items-center px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-110">{t('finance.connectBank.button', { defaultValue: 'Conectar banco' })}</a>
+                </div>
+              </div>
+            )}
             <TransactionManager
               transactions={transactions}
               onCreateTransaction={createTransaction}
@@ -143,10 +159,12 @@ function Finance() {
               onAddCategory={addBudgetCategory}
               onUpdateCategory={updateBudgetCategory}
               onRemoveCategory={removeBudgetCategory}
+              alertThresholds={settings?.alertThresholds}
+              onUpdateSettings={(s) => updateBudgetSettings({ alertThresholds: s })}
             />
           </TabsContent>
 
-          {/* Tab: ConfiguraciÃ³n de aportaciones */}
+          {/* Tab: Configuración de aportaciones */}
           <TabsContent value="contributions" className="space-y-6">
             <ContributionSettings
               contributions={contributions}
@@ -156,13 +174,15 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Analisis y grÃ¡ficos */}
+          {/* Tab: Analisis y gráficos */}
           <TabsContent value="analytics" className="space-y-6">
-            <FinanceCharts
-              transactions={transactions}
-              budgetUsage={budgetUsage}
-              stats={stats}
-            />
+            <React.Suspense fallback={<div className="p-4">Cargando análisis…</div>}>
+              <FinanceCharts
+                transactions={transactions}
+                budgetUsage={budgetUsage}
+                stats={stats}
+              />
+            </React.Suspense>
           </TabsContent>
         </Tabs>
       </div>

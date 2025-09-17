@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Button } from '../ui';
 import { formatCurrency } from '../../utils/formatUtils';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Formulario para crear/editar transacciones
  * Incluye validación y categorías predefinidas
  */
 export default function TransactionForm({ transaction, onSave, onCancel, isLoading }) {
+  const { t } = useTranslations();
+
   const [formData, setFormData] = useState({
     concept: '',
     amount: '',
@@ -18,7 +21,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   const [errors, setErrors] = useState({});
 
-  // Categorías predefinidas
+  // Categorías predefinidas (valores internos no traducidos para coherencia)
   const categories = {
     expense: [
       'Catering',
@@ -61,19 +64,19 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     const newErrors = {};
 
     if (!formData.concept.trim()) {
-      newErrors.concept = 'El concepto es obligatorio';
+      newErrors.concept = t('finance.form.errors.conceptRequired', { defaultValue: 'El concepto es obligatorio' });
     }
 
     if (!formData.amount || isNaN(formData.amount) || Number(formData.amount) <= 0) {
-      newErrors.amount = 'El monto debe ser un número positivo';
+      newErrors.amount = t('finance.form.errors.amountPositive', { defaultValue: 'El monto debe ser un número positivo' });
     }
 
     if (!formData.date) {
-      newErrors.date = 'La fecha es obligatoria';
+      newErrors.date = t('finance.form.errors.dateRequired', { defaultValue: 'La fecha es obligatoria' });
     }
 
     if (!formData.category) {
-      newErrors.category = 'La categoría es obligatoria';
+      newErrors.category = t('finance.form.errors.categoryRequired', { defaultValue: 'La categoría es obligatoria' });
     }
 
     setErrors(newErrors);
@@ -114,7 +117,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Tipo de transacción */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Tipo de transacción
+          {t('finance.form.type', { defaultValue: 'Tipo de transacción' })}
         </label>
         <div className="flex space-x-4">
           <label className="flex items-center">
@@ -125,7 +128,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               onChange={(e) => handleChange('type', e.target.value)}
               className="mr-2"
             />
-            <span className="text-sm text-gray-700">Gasto</span>
+            <span className="text-sm text-gray-700">{t('finance.transactions.expense', { defaultValue: 'Gasto' })}</span>
           </label>
           <label className="flex items-center">
             <input
@@ -135,7 +138,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               onChange={(e) => handleChange('type', e.target.value)}
               className="mr-2"
             />
-            <span className="text-sm text-gray-700">Ingreso</span>
+            <span className="text-sm text-gray-700">{t('finance.transactions.income', { defaultValue: 'Ingreso' })}</span>
           </label>
         </div>
       </div>
@@ -143,13 +146,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Concepto */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Concepto *
+          {t('finance.form.concept', { defaultValue: 'Concepto' })} *
         </label>
         <input
           type="text"
           value={formData.concept}
           onChange={(e) => handleChange('concept', e.target.value)}
-          placeholder="Ej: Pago de catering, Regalo de boda..."
+          placeholder={t('finance.form.conceptPlaceholder', { defaultValue: 'Ej: Pago de catering, Regalo de boda...' })}
           className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             errors.concept ? 'border-red-500' : 'border-gray-300'
           }`}
@@ -162,7 +165,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Monto */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Monto (€) *
+          {t('finance.form.amount', { defaultValue: 'Monto (€)' })} *
         </label>
         <input
           type="number"
@@ -180,7 +183,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
         {formData.amount && !isNaN(formData.amount) && (
           <p className="mt-1 text-sm text-gray-500">
-            Monto: {formatCurrency(Number(formData.amount))}
+            {t('finance.form.amountLabel', { defaultValue: 'Monto:' })} {formatCurrency(Number(formData.amount))}
           </p>
         )}
       </div>
@@ -188,7 +191,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Fecha */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Fecha *
+          {t('finance.form.date', { defaultValue: 'Fecha' })} *
         </label>
         <input
           type="date"
@@ -206,7 +209,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Categoría */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Categoría *
+          {t('finance.form.category', { defaultValue: 'Categoría' })} *
         </label>
         <select
           value={formData.category}
@@ -215,7 +218,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             errors.category ? 'border-red-500' : 'border-gray-300'
           }`}
         >
-          <option value="">Selecciona una categoría</option>
+          <option value="">{t('finance.form.selectCategory', { defaultValue: 'Selecciona una categoría' })}</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
               {category}
@@ -230,12 +233,12 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Descripción adicional (opcional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Descripción adicional
+          {t('finance.form.description', { defaultValue: 'Descripción adicional' })}
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
-          placeholder="Detalles adicionales sobre la transacción..."
+          placeholder={t('finance.form.descriptionPlaceholder', { defaultValue: 'Detalles adicionales sobre la transacción...' })}
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
@@ -249,13 +252,13 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           onClick={onCancel}
           disabled={isLoading}
         >
-          Cancelar
+          {t('app.cancel', { defaultValue: 'Cancelar' })}
         </Button>
         <Button
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? 'Guardando...' : (transaction ? 'Actualizar' : 'Crear')} Transacción
+          {isLoading ? t('app.saving', { defaultValue: 'Guardando...' }) : (transaction ? t('app.update', { defaultValue: 'Actualizar' }) : t('app.create', { defaultValue: 'Crear' }))} {t('finance.form.transaction', { defaultValue: 'Transacción' })}
         </Button>
       </div>
     </form>

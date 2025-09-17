@@ -28,12 +28,30 @@ const SeatingPlanSidebar = ({
   onAutoAssign,
   deleteTable,
   duplicateTable,
+  toggleTableLocked,
+  // Conflicts & guided assignment
+  conflicts = [],
+  onFixTable,
+  onFocusTable,
+  onSelectTable,
+  guidedGuestId,
+  onGuideGuest,
+  suggestForGuest,
+  scoringWeights,
+  onUpdateScoringWeights,
   globalMaxSeats = 0,
   className = ""
 }) => {
   const { t } = useTranslations();
   const [guestSearch, setGuestSearch] = useState('');
+  const [guestSide, setGuestSide] = useState(''); // '', 'novia', 'novio'
+  const [guestIsChild, setGuestIsChild] = useState(''); // '', 'si', 'no'
+  const [guestAllergen, setGuestAllergen] = useState('');
+  const [guestGroup, setGuestGroup] = useState('');
   const [showAvailableGuests, setShowAvailableGuests] = useState(false);
+  const [showConflicts, setShowConflicts] = useState(false);
+  const [showGuided, setShowGuided] = useState(false);
+  const [conflictFilters, setConflictFilters] = useState({ perimeter: true, obstacle: true, spacing: true, overbooking: true });
   
   // Herramientas de dibujo específicas para banquete
   const drawingTools = [
@@ -49,9 +67,26 @@ const SeatingPlanSidebar = ({
   // Filtrar invitados disponibles (sin asignar a mesa) con saneo defensivo
   const availableGuests = guests.filter((guest) => {
     const noTable = !guest?.table && !guest?.tableId;
+    if (!noTable) return false;
     const name = typeof guest?.name === 'string' ? guest.name : '';
     const term = typeof guestSearch === 'string' ? guestSearch.toLowerCase() : '';
-    return noTable && name.toLowerCase().includes(term);
+    if (term && !name.toLowerCase().includes(term)) return false;
+    // side filter
+    if (guestSide && String(guest?.side || '').toLowerCase() !== guestSide) return false;
+    // child filter
+    if (guestIsChild === 'si' && !guest?.isChild) return false;
+    if (guestIsChild === 'no' && guest?.isChild) return false;
+    // allergen contains
+    if (guestAllergen) {
+      const all = String(guest?.allergens || guest?.alergenos || '').toLowerCase();
+      if (!all.includes(guestAllergen.toLowerCase())) return false;
+    }
+    // group contains (generic)
+    if (guestGroup) {
+      const g1 = String(guest?.group || guest?.groupName || guest?.companionGroupId || '').toLowerCase();
+      if (!g1.includes(guestGroup.toLowerCase())) return false;
+    }
+    return true;
   });
 
   const pendingCount = availableGuests.length;
@@ -59,6 +94,13 @@ const SeatingPlanSidebar = ({
   const assignedGuests = guests.filter(guest => 
     guest.tableId === selectedTable?.id
   );
+
+  const guidedSuggestions = (() => {
+    try {
+      if (!guidedGuestId || typeof suggestForGuest !== 'function') return [];
+      return (suggestForGuest(guidedGuestId) || []).slice(0, 5);
+    } catch (_) { return []; }
+  })();
 
   return (
     <div className={`bg-white border rounded-lg overflow-hidden ${className}`}>
@@ -140,6 +182,24 @@ const SeatingPlanSidebar = ({
                   className="w-full pl-7 pr-3 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+
+              {/* Filtros avanzados */}
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <select value={guestSide} onChange={(e)=>setGuestSide(e.target.value)} className="px-2 py-1 border rounded text-xs">
+                  <option value="">Lado (todos)</option>
+                  <option value="novia">Novia</option>
+                  <option value="novio">Novio</option>
+                </select>
+                <select value={guestIsChild} onChange={(e)=>setGuestIsChild(e.target.value)} className="px-2 py-1 border rounded text-xs">
+                  <option value="">Niños (todos)</option>
+                  <option value="si">Niños</option>
+                  <option value="no">Adultos</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <input value={guestAllergen} onChange={(e)=>setGuestAllergen(e.target.value)} placeholder="Alergias..." className="px-2 py-1 border rounded text-xs" />
+                <input value={guestGroup} onChange={(e)=>setGuestGroup(e.target.value)} placeholder="Grupo..." className="px-2 py-1 border rounded text-xs" />
+              </div>
               
               {/* Lista de invitados disponibles (drag source + click-assign) */}
               <div className="max-h-32 overflow-y-auto space-y-1">
@@ -158,6 +218,111 @@ const SeatingPlanSidebar = ({
                 )}
               </div>
             </>
+          )}
+        </div>
+      )}
+
+      {/* Conflictos */}
+      {tab === 'banquet' && (
+        <div className="px-4 py-3 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-gray-900">Conflictos</h4>
+            <button onClick={()=>setShowConflicts(!showConflicts)} className="text-sm text-blue-600 hover:underline">{showConflicts ? 'Ocultar' : 'Ver'}</button>
+          </div>
+          {showConflicts && (
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {/* Resumen y filtros */}
+              <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+                {/* Resumen por tipo */}
+                {(() => {
+                  const counts = (conflicts||[]).reduce((m,c)=>{ m[c.type]=(m[c.type]||0)+1; return m; },{});
+                  const badge = (label, k, color) => (
+                    <span key={`b-${k}`} className={`px-2 py-0.5 rounded-full text-white`} style={{ background: color }} title={`${counts[k]||0} ${label}`}>
+                      {label}: {counts[k]||0}
+                    </span>
+                  );
+                  return (
+                    <>
+                      {badge('Perímetro','perimeter','#ef4444')}
+                      {badge('Obstáculos','obstacle','#dc2626')}
+                      {badge('Pasillos','spacing','#f59e0b')}
+                      {badge('Overbooking','overbooking','#f97316')}
+                    </>
+                  );
+                })()}
+                <span className="mx-2 opacity-40">|</span>
+                {['perimeter','obstacle','spacing','overbooking'].map(k => (
+                  <label key={k} className="inline-flex items-center gap-1">
+                    <input type="checkbox" checked={!!conflictFilters[k]} onChange={(e)=> setConflictFilters(prev => ({ ...prev, [k]: e.target.checked }))} />
+                    <span className="capitalize">{k}</span>
+                  </label>
+                ))}
+                <button className="ml-auto text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:true, obstacle:true, spacing:true, overbooking:true })}>Todos</button>
+                <button className="text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:false, obstacle:false, spacing:false, overbooking:false })}>Ninguno</button>
+              </div>
+              {(conflicts||[]).filter(c => conflictFilters[c.type]).length === 0 ? (
+                <div className="text-xs text-gray-500">Sin conflictos</div>
+              ) : (
+                conflicts.filter(c => conflictFilters[c.type]).slice(0, 50).map((c, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-xs bg-red-50 border border-red-200 rounded px-2 py-1">
+                    <button className="text-left flex-1 hover:underline" title="Centrar en el plano" onClick={()=>{ onFocusTable?.(c.tableId); onSelectTable?.(c.tableId, false); }}>
+                      <span className="font-semibold">Mesa {c.tableId}:</span> {c.message}
+                    </button>
+                    <button className="text-red-600 hover:underline" onClick={()=>onFixTable?.(c.tableId)}>Arreglar</button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Asignación guiada */}
+      {tab === 'banquet' && (
+        <div className="px-4 py-3 border-b">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-gray-900">Asignación guiada</h4>
+            <button onClick={()=>setShowGuided(!showGuided)} className="text-sm text-blue-600 hover:underline">{showGuided ? 'Ocultar' : 'Ver'}</button>
+          </div>
+          {showGuided && (
+            <div className="space-y-2">
+              <select value={guidedGuestId||''} onChange={(e)=> onGuideGuest?.(e.target.value || null)} className="w-full px-2 py-1 border rounded text-sm">
+                <option value="">Selecciona invitado…</option>
+                {availableGuests.map(g => (<option key={g.id} value={g.id}>{g.name}</option>))}
+              </select>
+              {guidedGuestId && (
+                <div className="space-y-1">
+                  {guidedSuggestions.length === 0 ? (
+                    <div className="text-xs text-gray-500">Sin sugerencias</div>
+                  ) : (
+                    guidedSuggestions.map(s => (
+                      <div key={s.tableId} className="flex items-center justify-between text-xs bg-blue-50 border border-blue-200 rounded px-2 py-1">
+                        <div>Mesa {s.tableId} · Score {s.score}</div>
+                        <button className="text-blue-600 hover:underline" onClick={()=>onAssignGuest?.(s.tableId, guidedGuestId)}>Asignar</button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+              {/* Pesos del scoring */}
+              <div className="mt-2 p-2 bg-gray-50 rounded border">
+                <div className="text-xs font-medium mb-2">Pesos</div>
+                {[
+                  { key:'fit', label:'Encaje', min:0, max:100, step:5 },
+                  { key:'side', label:'Lado', min:0, max:20, step:1 },
+                  { key:'wants', label:'Juntos', min:0, max:30, step:1 },
+                  { key:'avoid', label:'Evitar', min:-50, max:0, step:1 },
+                ].map(cfg => (
+                  <div key={cfg.key} className="mb-2">
+                    <div className="flex justify-between"><span className="text-xs">{cfg.label}</span><span className="text-[11px] font-semibold">{scoringWeights?.[cfg.key]}</span></div>
+                    <input type="range" min={cfg.min} max={cfg.max} step={cfg.step}
+                      value={scoringWeights?.[cfg.key] ?? 0}
+                      onChange={(e)=> onUpdateScoringWeights?.({ [cfg.key]: parseInt(e.target.value,10) })}
+                      className="w-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -318,7 +483,7 @@ const SeatingPlanSidebar = ({
                 </button>
               )}
 
-              {/* Acciones de mesa: duplicar / eliminar */}
+              {/* Acciones de mesa: duplicar / eliminar / bloquear */}
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   onClick={() => duplicateTable?.(selectedTable.id)}
@@ -333,6 +498,13 @@ const SeatingPlanSidebar = ({
                   title={t('seating.sidebar.deleteTable')}
                 >
                   <Trash2 className="h-4 w-4" /> {t('common.delete')}
+                </button>
+                <button
+                  onClick={() => toggleTableLocked?.(selectedTable.id)}
+                  className="col-span-2 px-3 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
+                  title={selectedTable?.locked ? 'Desbloquear mesa' : 'Bloquear mesa'}
+                >
+                  {selectedTable?.locked ? 'Desbloquear mesa' : 'Bloquear mesa'}
                 </button>
               </div>
             </div>

@@ -25,14 +25,14 @@ async function ensureOpenAI() {
  * @param {string} params.body - Cuerpo (texto plano preferido)
  * @returns {Promise<Object>} JSON con tasks, meetings, budgets, contracts...
  */
-export async function analyzeEmail({ subject = '', body = '' }) {
+export async function analyzeEmail({ subject = '', body = '', attachments = [] }) {
   await ensureOpenAI();
   if (!openai) {
     logger.warn('OPENAI_API_KEY no definido; análisis omitido');
     return { tasks: [], meetings: [], budgets: [], contracts: [] };
   }
 
-  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}\n---\nExtrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
+  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}${Array.isArray(attachments) && attachments.length ? "\nAdjuntos (" + attachments.length + "):\n" + attachments.map((a, i) => "- " + (a.filename || a.name || ("adjunto" + (i+1))) + " (" + (a.type || a.contentType || "desconocido") + ")").join("\\n") : ""}\n---\nSi los adjuntos incluyen presupuestos o convocatorias, tenlos en cuenta. Extrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
 
   const functions = [
     {
@@ -72,7 +72,10 @@ export async function analyzeEmail({ subject = '', body = '' }) {
               properties: {
                 client: { type: 'string' },
                 amount: { type: 'number' },
-                currency: { type: 'string', default: 'EUR' }
+                currency: { type: 'string', default: 'EUR' },
+                status: { type: 'string', enum: ['pending','accepted','rejected'], description: 'Estado detectado del presupuesto' },
+                supplierId: { type: 'string', description: 'Opcional, si se deduce un ID conocido' },
+                description: { type: 'string', description: 'Resumen del presupuesto (p.ej., asunto)' }
               },
               required: ['client','amount']
             }
@@ -121,3 +124,4 @@ export async function analyzeEmail({ subject = '', body = '' }) {
     return { error: true, message: err.message };
   }
 }
+

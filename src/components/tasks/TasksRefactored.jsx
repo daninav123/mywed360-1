@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ViewMode } from 'gantt-task-react';
-import { serverTimestamp, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { serverTimestamp, doc, deleteDoc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { db as clientDb, auth as clientAuth } from '../../firebaseConfig';
 import { db } from '../../firebaseConfig';
 import { subscribeSyncState, getSyncState, loadData } from '../../services/SyncService';
@@ -20,16 +20,35 @@ import { awardPoints } from '../../services/GamificationService';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
 import { useWedding } from '../../context/WeddingContext';
 
-// Función helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÃ³n helper para cargar datos de Firestore de forma segura con fallbacks
 const loadFirestoreData = async (path) => {
   try {
     let data = null;
     // Soportar rutas conocidas con docPath para obtener campos correctos
     if (path.endsWith('/weddingInfo')) {
-      // Intentamos cargar el campo 'weddingInfo' desde el documento de la boda
-      data = await loadData('weddingInfo', { docPath: path });
-      if (!data || typeof data !== 'object') {
-        // Fallback: cargar perfil completo y extraer weddingInfo
+      // Primero: leer weddingInfo como CAMPO del documento de la boda (weddings/{id})
+      try {
+        const parentPath = path.replace(/\/weddingInfo$/,'');
+        const segments = parentPath.split('/').filter(Boolean);
+        if (segments.length >= 2) {
+          const ref = doc(db, ...segments);
+          const { getDoc } = await import('firebase/firestore');
+          const snap = await getDoc(ref);
+          const d = snap.exists() ? (snap.data()?.weddingInfo || {}) : {};
+          if (d && Object.keys(d).length > 0) data = d;
+        }
+      } catch {}
+
+      // Segundo: compatibilidad con docPath directo (por si existiera como subdocumento)
+      if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+        try {
+          const direct = await loadData('weddingInfo', { docPath: path });
+          if (direct && typeof direct === 'object') data = direct;
+        } catch {}
+      }
+
+      // Tercero: fallback al perfil de usuario guardado
+      if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
         const profile = await loadData('lovendaProfile', { collection: 'userProfiles' });
         data = (profile && profile.weddingInfo) ? profile.weddingInfo : (profile || {});
       }
@@ -37,7 +56,7 @@ const loadFirestoreData = async (path) => {
       // Documento que guarda tareas completadas como mapa
       data = await loadData('tasksCompleted', { docPath: path });
     } else {
-      // Fallback genérico: usar la clave tal cual (localStorage / users/{uid})
+      // Fallback genÃ©rico: usar la clave tal cual (localStorage / users/{uid})
       data = await loadData(path);
     }
     return data || {};
@@ -49,7 +68,7 @@ const loadFirestoreData = async (path) => {
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - Inicialización segura con manejo de errores
+  // Estados - InicializaciÃ³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -102,16 +121,146 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronización:', error);
+      console.error('Error al obtener estado de sincronizaciÃ³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
   
-  const [columnWidthState] = useState(65);
+  const [columnWidthState, setColumnWidthState] = useState(65);
+  const [ganttPreSteps, setGanttPreSteps] = useState(0);
+  const [ganttViewDate, setGanttViewDate] = useState(null);
+  const [ganttViewMode, setGanttViewMode] = useState(ViewMode.Month);
+  // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
+  const [projectStart, setProjectStart] = useState(null);
+  const [projectEnd, setProjectEnd] = useState(null);
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin)
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        // Inicio: fecha de registro del usuario
+        let reg = null;
+        try {
+          const meta = clientAuth?.currentUser?.metadata;
+          if (meta?.creationTime) {
+            const d = new Date(meta.creationTime);
+            if (!isNaN(d.getTime())) reg = d;
+          }
+        } catch {}
+        if (!reg) {
+          try {
+            const savedProfile = localStorage.getItem('lovenda_user_profile');
+            if (savedProfile) {
+              const p = JSON.parse(savedProfile);
+              if (p?.createdAt) {
+                const d = new Date(p.createdAt);
+                if (!isNaN(d.getTime())) reg = d;
+              }
+            }
+          } catch {}
+        }
+        if (!reg) reg = new Date();
+
+        // Fin: fecha de la boda
+        let wedding = null;
+        try {
+          if (activeWedding) {
+            const info = await loadFirestoreData(`weddings/${activeWedding}/weddingInfo`);
+            const raw = info?.weddingDate || info?.date;
+            if (raw) {
+              const d = new Date(raw);
+              if (!isNaN(d.getTime())) wedding = d;
+            }
+          }
+        } catch {}
+
+        // Fallback fin: usar el mayor end de tasks/meetings o +6 meses
+        if (!wedding) {
+          const ends = [];
+          try {
+            if (Array.isArray(tasksState)) {
+              tasksState.forEach(t => {
+                const d = t?.end ? new Date(t.end?.toDate?.() || t.end) : null;
+                if (d && !isNaN(d.getTime())) ends.push(d);
+              });
+            }
+            if (Array.isArray(meetingsState)) {
+              meetingsState.forEach(m => {
+                const d = m?.end ? new Date(m.end?.toDate?.() || m.end) : null;
+                if (d && !isNaN(d.getTime())) ends.push(d);
+              });
+            }
+          } catch {}
+          if (ends.length) {
+            wedding = new Date(Math.max(...ends.map(d => d.getTime())));
+          } else {
+            const plus6 = new Date(reg.getTime());
+            plus6.setMonth(plus6.getMonth() + 6);
+            wedding = plus6;
+          }
+        }
+
+        // Asegurar orden
+        if (wedding.getTime() <= reg.getTime()) {
+          const nextDay = new Date(reg.getTime() + 24 * 60 * 60 * 1000);
+          wedding = nextDay;
+        }
+
+        if (isMounted) {
+          setProjectStart(reg);
+          setProjectEnd(wedding);
+        }
+      } catch {}
+    })();
+    return () => { isMounted = false; };
+  }, [activeWedding, clientAuth?.currentUser, tasksState, meetingsState]);
+
+  // Crear/actualizar automaticamente la cita del dia de la boda en el calendario (solo meetings)
+  useEffect(() => {
+    if (!activeWedding) return;
+    if (!projectEnd) return; // necesitamos fecha de boda
+    const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    try {
+      const weddingDate = new Date(projectEnd);
+      if (isNaN(weddingDate.getTime())) return;
+
+      const already = Array.isArray(meetingsState) && meetingsState.some(m => {
+        try {
+          const ms = m?.start ? (typeof m.start.toDate === 'function' ? m.start.toDate() : new Date(m.start)) : null;
+          return m?.autoKey === 'wedding-day' || m?.id === 'wedding-day' || ((m?.title && /boda/i.test(String(m.title))) && ms && sameDay(ms, weddingDate));
+        } catch { return false; }
+      });
+      if (already) return;
+
+      const start = new Date(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate(), 10, 0, 0);
+      const end = new Date(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate(), 23, 59, 0);
+      const payload = {
+        id: 'wedding-day',
+        title: 'Dia de la boda',
+        desc: 'Evento principal',
+        start,
+        end,
+        allDay: true,
+        category: 'OTROS',
+        autoKey: 'wedding-day',
+        createdAt: serverTimestamp()
+      };
+      if (clientDb) {
+        const ref = doc(clientDb, 'weddings', activeWedding, 'meetings', 'wedding-day');
+        setDoc(ref, payload, { merge: true }).catch(() => {});
+      } else {
+        addMeetingFS(payload).catch(() => {});
+      }
+    } catch (e) {
+      console.warn('No se pudo crear el evento automatico del dia de la boda:', e?.message || e);
+    }
+  }, [activeWedding, projectEnd, meetingsState]);
   // Ocultar completamente la lista izquierda del Gantt
   const listCellWidth = 0;
   // Altura de fila del Gantt
   const rowHeight = 44;
+  // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
+  const ganttContainerRef = useRef(null);
 
   // Manejar eventos de calendario externos
   useEffect(() => {
@@ -125,20 +274,22 @@ export default function Tasks() {
     return () => window.removeEventListener('lovenda-tasks', handler);
   }, [meetingsState]);
 
-  // Función para añadir una reunión
+  // FunciÃ³n para aÃ±adir una reuniÃ³n
   const addMeeting = useCallback(async (meeting) => {
     await addMeetingFS({
       ...meeting,
-      title: meeting.title || 'Nueva reunión',
+      title: meeting.title || 'Nueva reuniÃ³n',
       start: new Date(meeting.start),
       end: new Date(meeting.end)
     });
   }, [addMeetingFS]);
 
-  // Generación automática de timeline si está vacío
+  // GeneraciÃ³n automÃ¡tica de timeline si estÃ¡ vacÃ­o
   useEffect(() => {
+    // Desactivado: solo se desea el hito automÃ¡tico de la fecha de la boda en el Gantt
+    return;
     if (!activeWedding) return;
-    // Evitar regenerar si ya se generó para esta boda
+    // Evitar regenerar si ya se generÃ³ para esta boda
     const flagKey = `lovenda_timeline_generated_${activeWedding}`;
     if (localStorage.getItem(flagKey) === 'true') return;
 
@@ -154,19 +305,19 @@ export default function Tasks() {
 
         const addMonths = (d, delta) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + delta); return x; };
 
-        // Definición mínima de tareas base (M1)
+        // DefiniciÃ³n mÃ­nima de tareas base (M1)
         const plan = [
-          { monthsBefore: 12, title: 'Reservar lugar de celebración', category: 'LUGAR' },
-          { monthsBefore: 9,  title: 'Contratar fotógrafo', category: 'FOTOGRAFO' },
+          { monthsBefore: 12, title: 'Reservar lugar de celebraciÃ³n', category: 'LUGAR' },
+          { monthsBefore: 9,  title: 'Contratar fotÃ³grafo', category: 'FOTOGRAFO' },
           { monthsBefore: 9,  title: 'Contratar catering', category: 'COMIDA' },
           { monthsBefore: 6,  title: 'Enviar Save the Date', category: 'INVITADOS' },
           { monthsBefore: 6,  title: 'Vestuario: iniciar pruebas', category: 'VESTUARIO' },
           { monthsBefore: 3,  title: 'Enviar invitaciones', category: 'PAPELERIA' },
           { monthsBefore: 1,  title: 'Confirmar asistentes y mesas', category: 'INVITADOS' },
-          { monthsBefore: 1,  title: 'Prueba de menú con catering', category: 'COMIDA' },
+          { monthsBefore: 1,  title: 'Prueba de menÃº con catering', category: 'COMIDA' },
         ];
 
-        // Evitar duplicados por título si el usuario ya añadió algo manualmente
+        // Evitar duplicados por tÃ­tulo si el usuario ya aÃ±adiÃ³ algo manualmente
         const existingTitles = new Set([
           ...(Array.isArray(tasksState) ? tasksState.map(t => (t?.title || t?.name || '').toLowerCase()) : []),
           ...(Array.isArray(meetingsState) ? meetingsState.map(m => (m?.title || '').toLowerCase()) : []),
@@ -178,13 +329,13 @@ export default function Tasks() {
           const title = item.title;
           if (existingTitles.has(title.toLowerCase())) continue;
           // Para simplicidad: crear como tarea Gantt (largo plazo) o evento puntual
-          // Heurística: hitos clave como eventos, resto como tareas largas de ~15 días
+          // HeurÃ­stica: hitos clave como eventos, resto como tareas largas de ~15 dÃ­as
           const milestoneTitles = ['Enviar Save the Date', 'Enviar invitaciones', 'Confirmar asistentes y mesas'];
           if (milestoneTitles.includes(title)) {
             // Evento puntual (calendario)
             await addMeetingFS({ title, start, end, category: item.category });
           } else {
-            // Tarea de largo plazo (Gantt) de 15 días
+            // Tarea de largo plazo (Gantt) de 15 dÃ­as
             const endTask = new Date(start.getTime() + 15 * 24 * 60 * 60 * 1000);
             await addTaskFS({
               id: `auto-${item.monthsBefore}-${Date.now()}`,
@@ -203,20 +354,20 @@ export default function Tasks() {
         }
 
         localStorage.setItem(flagKey, 'true');
-        // Otorgar puntos de gamificación por crear timeline automáticamente (no intrusivo)
+        // Otorgar puntos de gamificaciÃ³n por crear timeline automÃ¡ticamente (no intrusivo)
         try {
           await awardPoints(activeWedding, 'create_timeline', { source: 'auto' });
         } catch (e) {
           // best-effort; no bloquear si falla
-          console.warn('Gamification awardPoints falló:', e?.message || e);
+          console.warn('Gamification awardPoints fallÃ³:', e?.message || e);
         }
       } catch (err) {
-        console.warn('No se pudo generar timeline automático:', err?.message);
+        console.warn('No se pudo generar timeline automÃ¡tico:', err?.message);
       }
     })();
   }, [activeWedding, tasksState, meetingsState, addMeetingFS, addTaskFS]);
 
-  // Estado para tareas completadas (inicial vacío, se cargará asíncronamente)
+  // Estado para tareas completadas (inicial vacÃ­o, se cargarÃ¡ asÃ­ncronamente)
   const [completed, setCompleted] = useState({});
 
   // Cargar tareas completadas de Firestore/Storage sin bloquear render
@@ -237,12 +388,12 @@ export default function Tasks() {
     return () => { isMounted = false; };
   }, [activeWedding]);
 
-  // Suscribirse al estado de sincronización
+  // Suscribirse al estado de sincronizaciÃ³n
   useEffect(() => {
     return subscribeSyncState(setSyncStatus);
   }, []);
 
-  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacíos al inicio)
+  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃ­os al inicio)
   useEffect(() => {
     if (dataLoadedRef.current) {
       // No es necesario guardar cambios ya que se utiliza Firestore
@@ -261,7 +412,7 @@ export default function Tasks() {
     }
   }, [completed, activeWedding]);
 
-  // Sugerencia automática de categoría
+  // Sugerencia automÃ¡tica de categorÃ­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (texto.includes('lugar') || texto.includes('venue') || texto.includes('salon') || texto.includes('espacio')) {
@@ -274,7 +425,7 @@ export default function Tasks() {
       return 'DECORACION';
     } else if (texto.includes('invitacion') || texto.includes('papel') || texto.includes('tarjeta')) {
       return 'PAPELERIA';
-    } else if (texto.includes('música') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
+    } else if (texto.includes('mÃºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
       return 'MUSICA';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
@@ -293,7 +444,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categoría si se cambia el título y la categoría es OTROS
+      // 1. Sugerir categorÃ­a si se cambia el tÃ­tulo y la categorÃ­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -306,7 +457,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo día por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃ­a por defecto
         }
       }
 
@@ -340,7 +491,7 @@ export default function Tasks() {
     resetForm();
   };
   
-  // Asignación automática de categoría con IA
+  // AsignaciÃ³n automÃ¡tica de categorÃ­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -350,23 +501,23 @@ export default function Tasks() {
       
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salón', 'jardín', 'terraza'],
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃ³n', 'jardÃ­n', 'terraza'],
         INVITADOS: ['guests', 'invitados', 'personas', 'asistentes', 'confirmaciones', 'lista', 'rsvp'],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: ['decoración', 'flores', 'arreglos', 'centros de mesa', 'iluminación', 'ambientación'],
-        PAPELERIA: ['invitaciones', 'papelería', 'save the date', 'tarjetas', 'programa', 'seating plan'],
-        MUSICA: ['música', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografía', 'video', 'recuerdos', 'álbum', 'sesión'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquería'],
+        DECORACION: ['decoraciÃ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃ³n', 'ambientaciÃ³n'],
+        PAPELERIA: ['invitaciones', 'papelerÃ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
+        MUSICA: ['mÃºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotografÃ­a', 'video', 'recuerdos', 'Ã¡lbum', 'sesiÃ³n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃ­a'],
       };
       
-      // Contar coincidencias por categoría
+      // Contar coincidencias por categorÃ­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter(palabra => texto.includes(palabra)).length;
       });
       
-      // Encontrar la categoría con mayor puntuación
+      // Encontrar la categorÃ­a con mayor puntuaciÃ³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -378,17 +529,17 @@ export default function Tasks() {
       
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categoría:', error);
+      console.error('Error al asignar categorÃ­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolección de la boda
+  // Guardar una tarea en la subcolecciÃ³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario básico
+      // Validar formulario bÃ¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un título');
+        alert('Por favor ingresa un tÃ­tulo');
         return;
       }
       
@@ -413,7 +564,7 @@ export default function Tasks() {
       
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no válidas');
+        alert('Fechas no vÃ¡lidas');
         return;
       }
       
@@ -422,7 +573,7 @@ export default function Tasks() {
         return;
       }
       
-      // Asignar categoría con IA si no se especificó
+      // Asignar categorÃ­a con IA si no se especificÃ³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -439,7 +590,7 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
       
-      // Añadir/actualizar según sea una tarea de largo plazo o una reunión
+      // AÃ±adir/actualizar segÃºn sea una tarea de largo plazo o una reuniÃ³n
       if (formData.long) {
         // Para el diagrama Gantt
         const ganttTask = {
@@ -456,8 +607,17 @@ export default function Tasks() {
         if (editingId) {
           await updateTaskFS(editingId, ganttTask);
         } else {
+          // Intentar con hook
           const saved = await addTaskFS(ganttTask);
-          savedId = saved?.id || taskData.id;
+          savedId = saved?.id || null;
+          // Fallback directo a Firestore si no obtuvimos id
+          if (!savedId && clientDb && activeWedding) {
+            const colRef = collection(clientDb, 'weddings', activeWedding, 'tasks');
+            const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
+            savedId = docRef.id;
+          }
+          // Ãšltimo recurso: generar id local si todo falla
+          if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
         try {
@@ -478,7 +638,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reunión (evento puntual del calendario)
+          // Nueva reuniÃ³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -531,7 +691,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] Eliminación completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃ³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -549,7 +709,7 @@ export default function Tasks() {
     ...(Array.isArray(meetingsState) ? meetingsState : [])
   ];
 
-  // Función auxiliar para validar y normalizar fechas
+  // FunciÃ³n auxiliar para validar y normalizar fechas
   const validateAndNormalizeDate = (date) => {
     if (!date) return null;
     
@@ -577,11 +737,11 @@ export default function Tasks() {
         return null;
       }
       
-      // Asegurar que start y end sean objetos Date válidos
+      // Asegurar que start y end sean objetos Date vÃ¡lidos
       const start = validateAndNormalizeDate(event.start);
       const end = validateAndNormalizeDate(event.end);
       
-      // Si alguna fecha no es válida, descartar evento
+      // Si alguna fecha no es vÃ¡lida, descartar evento
       if (!start || !end) {
         return null;
       }
@@ -591,7 +751,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || "Sin título"
+        title: event.title || event.name || "Sin tÃ­tulo"
       };
     })
     .filter(Boolean); // Eliminar eventos nulos
@@ -611,7 +771,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || 'Sin título',
+        title: event.title || event.name || 'Sin tÃ­tulo',
       };
     })
     .filter(Boolean);
@@ -628,7 +788,12 @@ export default function Tasks() {
     return unique;
   })();
 
-  // Filtro específico para tareas del componente Gantt
+  // Ocultar el hito automatico de la boda en la lista, pero mantenerlo en el sistema
+  const safeMeetingsFiltered = Array.isArray(safeMeetings)
+    ? safeMeetings.filter(ev => ev.id !== 'wedding-day' && ev.autoKey !== 'wedding-day')
+    : [];
+
+  // Filtro especÃ­fico para tareas del componente Gantt
   const taskIdSet = new Set(Array.isArray(tasksState) ? tasksState.filter(Boolean).map(t => t?.id).filter(Boolean) : []);
 
   const safeGanttTasks = Array.isArray(tasksState) 
@@ -644,7 +809,7 @@ export default function Tasks() {
           const start = validateAndNormalizeDate(task.start);
           const end = validateAndNormalizeDate(task.end);
           
-          // Si alguna fecha no es válida, descartar tarea
+          // Si alguna fecha no es vÃ¡lida, descartar tarea
           if (!start || !end) {
             return null;
           }
@@ -659,7 +824,7 @@ export default function Tasks() {
             ...task,
             start,
             end,
-            name: task.name || task.title || "Sin título",
+            name: task.name || task.title || "Sin tÃ­tulo",
             type: task.type || "task",
             id: task.id,
             progress: task.progress || 0,
@@ -670,25 +835,251 @@ export default function Tasks() {
         .filter(Boolean) // Eliminar tareas nulas
     : [];
 
-  // Cálculo de progreso - asegurando que los estados sean arrays
-  const allTaskIds = [
-    ...(Array.isArray(tasksState) ? tasksState.map(t => t.id) : []),
-    ...(Array.isArray(meetingsState) ? meetingsState.map(m => m.id) : [])
-  ];
-  const totalTasks = allTaskIds.length;
-  const completedCount = allTaskIds.filter(id => completed[id]).length;
-  const percent = totalTasks === 0 ? 0 : Math.round((completedCount / totalTasks) * 100);
-  let barColor = 'bg-red-500';
-  if (percent >= 80) barColor = 'bg-green-500';
-  else if (percent >= 40) barColor = 'bg-blue-500';
+  // Capa extra de seguridad: descartar cualquier tarea con fechas no vÃ¡lidas antes de pintar
+  const ganttTasksStrict = Array.isArray(safeGanttTasks)
+    ? safeGanttTasks.filter(t => t && t.start instanceof Date && t.end instanceof Date && !isNaN(t.start.getTime()) && !isNaN(t.end.getTime()))
+    : [];
+
+  // Capa ultra-defensiva: aceptar campos legacy y descartar cualquier resto invÃ¡lido
+  const __normalizeDate = (d) => {
+    try {
+      if (!d) return null;
+      if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+      if (typeof d?.toDate === 'function') { const x = d.toDate(); return isNaN(x.getTime()) ? null : x; }
+      if (typeof d === 'number') { const n = new Date(d); return isNaN(n.getTime()) ? null : n; }
+      const parsed = new Date(d); return isNaN(parsed.getTime()) ? null : parsed;
+    } catch { return null; }
+  };
+  const finalGanttTasks = Array.isArray(ganttTasksStrict)
+    ? ganttTasksStrict
+        .map(t => {
+          if (!t) return null;
+          const startRaw = t.start ?? t.startDate ?? t.date ?? t.when;
+          const endRaw = t.end ?? t.endDate ?? t.until ?? t.finish ?? t.to;
+          const start = __normalizeDate(startRaw);
+          const end = __normalizeDate(endRaw);
+          if (!start || !end || end < start) return null;
+          return { ...t, start, end };
+        })
+        .filter(Boolean)
+    : [];
+
+  // De-duplicar por id para evitar claves repetidas en gantt-task-react (Row/RowLine)
+  const uniqueGanttTasks = (() => {
+    const seen = new Set();
+    const out = [];
+    for (const t of finalGanttTasks) {
+      // Si falta id, generamos uno estable a partir de nombre+fechas
+      const stableId = t.id || `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
+      if (seen.has(stableId)) continue;
+      seen.add(stableId);
+      // Forzar que el id usado por la librerÃ­a sea el estable
+      out.push({ ...t, id: stableId });
+    }
+    return out;
+  })();
+
+  const uniqueGanttTasksMemo = useMemo(() => {
+    const seen = new Set();
+    const out = [];
+    for (const t of finalGanttTasks) {
+      const stableId = t.id || `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
+      if (seen.has(stableId)) continue;
+      seen.add(stableId);
+      out.push({ ...t, id: stableId });
+    }
+    return out;
+  }, [finalGanttTasks]);
+
+  // Extender el rango visual del Gantt para cubrir registro -> boda (con fallbacks)
+  const ganttTasksBounded = useMemo(() => {
+    const base = Array.isArray(uniqueGanttTasksMemo) ? uniqueGanttTasksMemo : [];
+    const out = [...base];
+    const addMonths = (d, m) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + m); return x; };
+    let startBound = (projectStart instanceof Date && !isNaN(projectStart.getTime())) ? projectStart : null;
+    let endBound = (projectEnd instanceof Date && !isNaN(projectEnd.getTime())) ? projectEnd : null;
+
+    // Fallback: usar meeting 'wedding-day' como fin si falta
+    if (!endBound) {
+      try {
+        const m = (Array.isArray(meetingsState) ? meetingsState : []).find(ev => ev?.id === 'wedding-day' || ev?.autoKey === 'wedding-day');
+        if (m?.start) {
+          const d = typeof m.start.toDate === 'function' ? m.start.toDate() : new Date(m.start);
+          if (!isNaN(d.getTime())) endBound = d;
+        }
+      } catch {}
+    }
+
+    if (!startBound && endBound) startBound = addMonths(endBound, -6);
+    if (startBound && !endBound) endBound = addMonths(startBound, 6);
+
+    if (startBound && endBound) {
+      out.push({
+        id: '__gantt_bounds',
+        name: '',
+        start: new Date(startBound),
+        end: new Date(endBound),
+        type: 'project',
+        progress: 0,
+        isDisabled: true,
+        styles: {
+          backgroundColor: 'transparent',
+          backgroundSelectedColor: 'transparent',
+          progressColor: 'transparent',
+          progressSelectedColor: 'transparent',
+        },
+      });
+      // No añadimos milestones visibles para evitar rombos en el grid; la marca se dibuja como bandera superpuesta.
+    }
+
+    // Si por cualquier motivo sigue vacío, crear un rango mínimo alrededor de hoy
+    if (out.length === 0) {
+      const today = new Date();
+      const start = addMonths(today, -1);
+      const end = addMonths(today, 1);
+      out.push({ id: '__gantt_bounds_fallback', name: '', start, end, type: 'project', progress: 0, isDisabled: true, styles: { backgroundColor: 'transparent', backgroundSelectedColor: 'transparent', progressColor: 'transparent', progressSelectedColor: 'transparent' } });
+    }
+    // milestone visual desactivado (se usa bandera superpuesta en Gantt)
+    return out;
+  }, [uniqueGanttTasksMemo, projectStart, projectEnd, meetingsState]);
+
+  // Fecha de marcador (boda) para el Gantt: priorizar projectEnd, si no, derivar del meeting 'wedding-day'
+  const weddingMarkerDate = useMemo(() => {
+    if (projectEnd && projectEnd instanceof Date && !isNaN(projectEnd.getTime())) return projectEnd;
+    try {
+      const m = (Array.isArray(meetingsState) ? meetingsState : []).find(ev => ev?.id === 'wedding-day' || ev?.autoKey === 'wedding-day' || /boda/i.test(String(ev?.title || '')));
+      if (!m) return null;
+      const any = m.start || m.date || m.when || m.end;
+      if (!any) return null;
+      const d = typeof any?.toDate === 'function' ? any.toDate() : new Date(any);
+      return isNaN(d.getTime()) ? null : d;
+    } catch { return null; }
+  }, [projectEnd, meetingsState]);
+  
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista
+  useEffect(() => {
+    if (!Array.isArray(uniqueGanttTasksMemo) || uniqueGanttTasksMemo.length === 0) return;
+    // Si ya tenemos rango de proyecto, dejamos que el ResizeObserver gestione el ancho
+    if (projectStart && projectEnd) return;
+    // Medir ancho disponible
+    const container = ganttContainerRef.current;
+    const containerWidth = container && container.clientWidth ? container.clientWidth : 800;
+
+    // Rango temporal (modo mes) usando las tareas actuales
+    const starts = uniqueGanttTasksMemo
+      .map(t => (t?.start instanceof Date ? t.start : (t?.start ? new Date(t.start) : null)))
+      .filter(d => d && !isNaN(d));
+    const ends = uniqueGanttTasksMemo
+      .map(t => (t?.end instanceof Date ? t.end : (t?.end ? new Date(t.end) : null)))
+      .filter(d => d && !isNaN(d));
+    if (starts.length === 0 || ends.length === 0) return;
+    const minStart = new Date(Math.min(...starts.map(d => d.getTime())));
+    const maxEnd = new Date(Math.max(...ends.map(d => d.getTime())));
+
+    // Elegir viewMode segÃºn duraciÃ³n total
+    const msSpan = Math.max(1, maxEnd.getTime() - minStart.getTime());
+    const daysSpan = Math.max(1, Math.ceil(msSpan / (1000 * 60 * 60 * 24)));
+    let targetMode = ViewMode.Month;
+    if (daysSpan > 730) targetMode = ViewMode.Year; // >2 aÃ±os
+    else if (daysSpan > 120) targetMode = ViewMode.Month; // >4 meses
+    else if (daysSpan > 21) targetMode = ViewMode.Week; // >3 semanas
+    else targetMode = ViewMode.Day; // <=3 semanas
+
+    // Calcular unidades visibles segÃºn el modo elegido
+    let units = 1;
+    if (targetMode === ViewMode.Year) {
+      const startYear = minStart.getFullYear();
+      const endYear = maxEnd.getFullYear();
+      units = (endYear - startYear) + 1;
+    } else if (targetMode === ViewMode.Month) {
+      const startMonth = new Date(minStart.getFullYear(), minStart.getMonth(), 1);
+      const endMonth = new Date(maxEnd.getFullYear(), maxEnd.getMonth(), 1);
+      units = (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1;
+    } else if (targetMode === ViewMode.Week) {
+      const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+      units = Math.max(1, Math.ceil((maxEnd - minStart) / msPerWeek) + 1);
+    } else if (targetMode === ViewMode.Day) {
+      units = daysSpan; // inclusivo
+    }
+
+    // Forzar vista mensual para mostrar meses y encajar todo el proyecto
+    const startMonth = new Date(minStart.getFullYear(), minStart.getMonth(), 1);
+    const endMonth = new Date(maxEnd.getFullYear(), maxEnd.getMonth(), 1);
+    units = (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1;
+    targetMode = ViewMode.Month;
+
+    // Sin pasos previos para no aÃ±adir espacio vacÃ­o
+    const pre = 0;
+    const totalUnits = units + pre;
+
+    // Calcular ancho de columna para encajar sin scroll horizontal (lÃ­mites por modo)
+    // Column width calculado para encajar sin scroll
+    const MIN_COL = 72; // meses largos (Septiembre) sin solaparse
+    const MAX_COL = 160; // px mÃ¡ximo
+    const computedCol = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(containerWidth / totalUnits)));
+
+    if (columnWidthState !== computedCol) setColumnWidthState(computedCol);
+    if (ganttPreSteps !== pre) setGanttPreSteps(pre);
+    if (!ganttViewDate || (ganttViewDate instanceof Date ? ganttViewDate.getTime() : Number(ganttViewDate)) !== minStart.getTime()) setGanttViewDate(minStart);
+    if (ganttViewMode !== targetMode) setGanttViewMode(targetMode);
+
+    // Recalcular en resize
+    const onResize = () => {
+      const w = ganttContainerRef.current?.clientWidth || 800;
+      const col = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(w / totalUnits)));
+      if (columnWidthState !== col) setColumnWidthState(col);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [tasksState, meetingsState, uniqueGanttTasksMemo, columnWidthState, ganttPreSteps, ganttViewDate, ganttViewMode, projectStart, projectEnd]);
+
+  // Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃ³n
+  useEffect(() => {
+    if (!projectStart || !projectEnd) return;
+    if (!ganttContainerRef.current) return;
+
+    const MIN_COL = 72; // meses largos (Septiembre) sin solaparse
+    const MAX_COL = 160;
+
+    const computeForWidth = (width) => {
+      const startMonth = new Date(projectStart.getFullYear(), projectStart.getMonth(), 1);
+      const endMonth = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), 1);
+      const units = Math.max(1, (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1);
+      const col = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(width / units)));
+      if (columnWidthState !== col) setColumnWidthState(col);
+      if (!ganttViewDate || (ganttViewDate instanceof Date ? ganttViewDate.getTime() : Number(ganttViewDate)) !== startMonth.getTime()) setGanttViewDate(startMonth);
+      if (ganttViewMode !== ViewMode.Month) setGanttViewMode(ViewMode.Month);
+    };
+
+    const el = ganttContainerRef.current;
+    computeForWidth(el.clientWidth || 800);
+
+    let ro;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(entries => {
+        const w = entries?.[0]?.contentRect?.width || el.clientWidth || 800;
+        computeForWidth(w);
+      });
+      ro.observe(el);
+    } else {
+      const onResize = () => computeForWidth(ganttContainerRef.current?.clientWidth || 800);
+      window.addEventListener('resize', onResize);
+      return () => window.removeEventListener('resize', onResize);
+    }
+
+    return () => { if (ro) ro.disconnect(); };
+  }, [projectStart, projectEnd, columnWidthState, ganttViewDate, ganttViewMode]);
+
+  // CÃ¡lculo de progreso - asegurando que los estados sean arrays
+  // Indicador de progreso eliminado
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       
       <div className="flex items-center justify-between">
-        <h1 className="page-title">Gestión de Tareas</h1>
+        <h1 className="page-title">GestiÃ³n de Tareas</h1>
         <div className="flex items-center space-x-4">
-          {/* Indicador de sincronización */}
+          {/* Indicador de sincronizaciÃ³n */}
           <div className="flex items-center">
             {syncStatus.isSyncing ? (
               <RefreshCw className="w-4 h-4 animate-spin text-yellow-500 mr-2" />
@@ -708,10 +1099,10 @@ export default function Tasks() {
                   : syncStatus.pendingChanges
                   ? "Cambios pendientes"
                   : "Sincronizado"
-                : "Sin conexión"}
+                : "Sin conexiÃ³n"}
             </div>
           </div>
-          {/* Botones de acción */}
+          {/* Botones de acciÃ³n */}
           <div className="flex space-x-2">
             <button
               onClick={() => {
@@ -729,17 +1120,24 @@ export default function Tasks() {
       {/* Componente para el diagrama Gantt */}
       <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
-        <div className="overflow-x-auto mb-4 border border-gray-100 rounded-lg min-w-[600px]" style={{ minHeight: (Array.isArray(safeGanttTasks) ? safeGanttTasks.length : 0) * rowHeight + 60 }}>
-          {safeGanttTasks && safeGanttTasks.length > 0 ? (
+        <div ref={ganttContainerRef} className="w-full overflow-hidden mb-4 border border-gray-100 rounded-lg" style={{ minHeight: (Array.isArray(ganttTasksBounded) ? ganttTasksBounded.length : 0) * rowHeight + 60 }}>
+          {ganttTasksBounded && ganttTasksBounded.length > 0 ? (
             <GanttChart 
-              tasks={safeGanttTasks} 
+              tasks={ganttTasksBounded} 
               viewMode={ViewMode.Month}
               listCellWidth={listCellWidth}
               columnWidth={columnWidthState}
               rowHeight={rowHeight}
-              ganttHeight={safeGanttTasks.length * rowHeight}
+              ganttHeight={ganttTasksBounded.length * rowHeight}
+              preStepsCount={ganttPreSteps}
+              viewDate={ganttViewDate}
+              markerDate={weddingMarkerDate}
+              gridStartDate={(() => {
+                const s = (projectStart instanceof Date && !isNaN(projectStart.getTime())) ? projectStart : (weddingMarkerDate || null);
+                return s ? new Date(s.getFullYear(), s.getMonth(), 1) : undefined;
+              })()}
               onTaskClick={(task) => {
-                // Abrir modal de edición para tareas de largo plazo
+                // Abrir modal de ediciÃ³n para tareas de largo plazo
                 setEditingId(task.id);
                 setFormData({
                   title: task.title,
@@ -760,18 +1158,7 @@ export default function Tasks() {
             </div>
           )}
         </div>
-        <div className="mb-4">
-          <div className="flex justify-between mb-1 text-sm">
-            <span>Progreso general:</span>
-            <span className="font-medium">{percent.toFixed(1)}%</span>
-          </div>
-          <div className="w-full bg-[color:var(--color-surface)]/50 rounded-full h-2.5">
-            <div 
-              className={`h-2.5 rounded-full ${barColor}`} 
-              style={{ width: `${percent}%` }}
-            ></div>
-          </div>
-        </div>
+        {/* Indicador de progreso general eliminado por solicitud */}
       </div>
       
       {/* Contenedor responsivo para Calendario y Lista */}
@@ -780,7 +1167,7 @@ export default function Tasks() {
       <div className="flex-1 bg-[var(--color-surface)] rounded-xl shadow-md p-6 mt-4 overflow-x-auto">
         <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
         
-        {/* Controles de navegación del calendario */}
+        {/* Controles de navegaciÃ³n del calendario */}
         <div className="flex justify-between items-center mb-4">
           <div className="space-x-2">
             <button 
@@ -799,7 +1186,7 @@ export default function Tasks() {
               className={`px-3 py-1 rounded ${currentView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
               onClick={() => setCurrentView('day')}
             >
-              Día
+              DÃ­a
             </button>
           </div>
           <div className="flex items-center space-x-2">
@@ -846,20 +1233,20 @@ export default function Tasks() {
         
         
         <div className="rbc-calendar-container">
-          {/* Componente Calendar con protección de errores */}
+          {/* Componente Calendar con protecciÃ³n de errores */}
           <ErrorBoundary
             fallback={(
               <div>
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-medium text-gray-800 mb-2">Error al cargar el calendario</h3>
-                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de la lista inferior.</p>
+                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a travÃ©s de la lista inferior.</p>
                 </div>
                 <div className="space-y-4 max-h-[300px] overflow-y-auto p-2">
                   {safeEvents && safeEvents.length > 0 ? (
                     sortedTasks
                       .map(event => {
                         const eventId = event.id || '';
-                        const eventTitle = event.title || event.name || "Evento sin título";
+                        const eventTitle = event.title || event.name || "Evento sin tÃ­tulo";
                         const eventStart = event.start instanceof Date ? event.start : new Date();
                         const formattedDate = eventStart.toLocaleDateString('es-ES', {
                           weekday: 'short',
@@ -963,7 +1350,7 @@ export default function Tasks() {
                   min-height: 0;
                 }
                 
-                /* Celdas de días */
+                /* Celdas de dÃ­as */
                 .calendar-container .rbc-day-bg {
                   flex: 1 0;
                   border-bottom: 1px solid #eee;
@@ -1048,7 +1435,7 @@ export default function Tasks() {
                   today: "Hoy",
                   month: "Mes",
                   week: "Semana",
-                  day: "Día"
+                  day: "DÃ­a"
                 }}
               />
             </div>
@@ -1109,7 +1496,7 @@ export default function Tasks() {
                 min-height: 0;
               }
               
-              /* Celdas de días */
+              /* Celdas de dÃ­as */
               .calendar-container .rbc-day-bg {
                 flex: 1 0;
                 border-bottom: 1px solid #eee;
@@ -1194,7 +1581,7 @@ export default function Tasks() {
                 today: "Hoy",
                 month: "Mes",
                 week: "Semana",
-                day: "Día"
+                day: "DÃ­a"
               }}
             />
           </div>
@@ -1204,7 +1591,7 @@ export default function Tasks() {
         <h2 className="text-xl font-semibold mb-4">Listado de Tareas</h2>
         <div className="w-full">
           <TaskList 
-            tasks={safeMeetings} 
+            tasks={safeMeetingsFiltered} 
             onTaskClick={(event) => {
               setEditingId(event.id);
               setFormData({
@@ -1240,3 +1627,8 @@ export default function Tasks() {
      </div>
    );
 }
+
+
+
+
+

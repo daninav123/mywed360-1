@@ -8,7 +8,7 @@ const firstName = (str='?') => {
   const first = String(str).trim().split(/\s+/)[0] || '?';
   return first.length>8? first.slice(0,8)+'…' : first;
 };
-function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, onAssignGuestSeat, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false, showNumbers = false, danger = false, dangerReason = '', globalMaxSeats = 0 }) {
+function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, onAssignGuestSeat, onToggleEnabled, onOpenConfig, onSelect, guests = [], canMove = true, selected = false, showNumbers = false, danger = false, dangerReason = '', globalMaxSeats = 0, highlightScore = 0 }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
   const getLabel = useCallback((name='?') => {
     if (scale >= 1.5) {
@@ -199,14 +199,14 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
     width: sizeX * scale,
     height: sizeY * scale,
     backgroundColor: disabled ? '#e5e7eb' : '#fef3c7',
-    border: selected ? '3px solid #2563eb' : (danger ? '2px solid #ef4444' : '2px solid #f59e0b'),
+    border: selected ? '3px solid #2563eb' : (danger ? '2px solid #ef4444' : (highlightScore>0 ? '2px solid #10b981' : '2px solid #f59e0b')),
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: disabled ? 'not-allowed' : 'grab',
     userSelect: 'none',
-    boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.25)' : 'none',
+    boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.25)' : (highlightScore>0 ? '0 0 0 3px rgba(16,185,129,0.25)' : 'none'),
     transform: `rotate(${table.angle || 0}deg)`,
     transformOrigin: 'center center'
   };
@@ -215,15 +215,23 @@ function TableItem({ table, scale, offset, containerRef, onMove, onAssignGuest, 
     <div ref={node => {ref.current=node; drop(node);}} 
       data-testid={`table-item-${table.id}`}
       style={{...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor}} 
-      onPointerDown={disabled || !canMove ? undefined : handlePointerDown}
+      onPointerDown={disabled || !canMove || table.locked ? undefined : handlePointerDown}
       onContextMenu={e=>{e.preventDefault(); onToggleEnabled(table.id);}}
       onClick={(e)=>{e.stopPropagation(); onSelect && onSelect(table.id, !!e.shiftKey);}}
-      onDoubleClick={()=>onOpenConfig(table)}> 
+      onDoubleClick={()=>onOpenConfig(table)} title={danger ? (dangerReason || 'Problema de validación') : undefined}> 
       <button 
         onClick={(e)=>{e.stopPropagation(); onAssignGuest(table.id, null);}}
         className="absolute top-0 right-0 text-xs px-1 text-red-600">✖</button>
       {/* Contenido central opcional: solo mostramos el número de mesa pequeño */}
       <span style={{fontSize:14, fontWeight:'bold', pointerEvents:'none', color:'#374151'}}>{table.id}</span>
+      {danger && (
+        <div
+          className="absolute top-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-600 text-white"
+          title={dangerReason || 'Problema de validación'}
+        >
+          !
+        </div>
+      )}
       {/* Badge de ocupación: invitados contabilizados / capacidad (seats) */}
       {table.seats != null && (
         <div

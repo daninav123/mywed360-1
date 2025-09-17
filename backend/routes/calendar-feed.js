@@ -195,7 +195,7 @@ router.get('/feed/:token', async (req, res) => {
     const uid = decoded.uid;
     const weddingId = decoded.weddingId || req.query.wid || null;
 
-    // Cargar eventos de la boda (reuniones + tareas)
+    // Cargar eventos de la boda (solo reuniones/"tareas" de la lista, excluye procesos del Gantt)
     const events = [];
     try {
       if (weddingId) {
@@ -207,17 +207,6 @@ router.get('/feed/:token', async (req, res) => {
           const end = fromFSDate(ev.end);
           if (start && end && !isNaN(start) && !isNaN(end)) {
             events.push({ id: d.id, ...ev, start, end });
-          }
-        });
-        // Tareas (Gantt) como eventos de día completo
-        const tasksCol = db().collection('weddings').doc(weddingId).collection('tasks');
-        const taskSnap = await tasksCol.get();
-        taskSnap.forEach((d) => {
-          const ev = d.data() || {};
-          const start = fromFSDate(ev.start);
-          const end = fromFSDate(ev.end);
-          if (start && end && !isNaN(start) && !isNaN(end)) {
-            events.push({ id: d.id, type: 'task', ...ev, start, end });
           }
         });
       } else {
@@ -232,25 +221,26 @@ router.get('/feed/:token', async (req, res) => {
             events.push({ id: d.id, ...ev, start, end });
           }
         });
-        const taskCol = db().collection('users').doc(uid).collection('tasks');
-        const taskSnap = await taskCol.get();
-        taskSnap.forEach((d) => {
-          const ev = d.data() || {};
-          const start = fromFSDate(ev.start);
-          const end = fromFSDate(ev.end);
-          if (start && end && !isNaN(start) && !isNaN(end)) {
-            events.push({ id: d.id, type: 'task', ...ev, start, end });
-          }
-        });
       }
     } catch (e) {
       console.warn('[calendar] error loading events:', e);
       // degradar a feed vacío si hay error para no romper suscripción
     }
 
+    // Ya únicamente llevamos reuniones (lista). Los procesos (Gantt) no se incluyen.
     const ics = buildICS({ events });
+    const etag = crypto.createHash('sha1').update(ics).digest('hex');
+    const inm = req.headers['if-none-match'];
+    if (inm && inm === etag) {
+      res.status(304).end();
+      return;
+    }
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Last-Modified', new Date().toUTCString());
+    res.setHeader('ETag', etag);
     res.status(200).send(ics);
   } catch (e) {
     console.error('[calendar] feed error', e);

@@ -56,7 +56,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-            <img src="/logo.png" alt="Lovenda" className="w-20 h-20" />
+            <img src="/icon-192.png" alt="Lovenda" className="w-20 h-20" />
           </div>
           <h2 className="text-2xl font-bold mb-4">¡Comienza a planificar tu boda!</h2>
           <p className="mb-6 text-gray-600">

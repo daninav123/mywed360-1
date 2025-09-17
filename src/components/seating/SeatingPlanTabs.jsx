@@ -11,6 +11,9 @@ const SeatingPlanTabs = ({
   onTabChange,
   ceremonyCount = 0,
   banquetCount = 0,
+  // New: completion percentage for each tab (0-100)
+  ceremonyProgress = 0,
+  banquetProgress = 0,
   className = ""
 }) => {
   const tabs = [
@@ -65,6 +68,13 @@ const SeatingPlanTabs = ({
                   {tab.count}
                 </span>
               )}
+              {/* Progreso por pestaña (badge pequeño) */}
+              <span
+                className={`px-1.5 py-0.5 text-[10px] rounded border ${isActive ? 'border-blue-200 text-blue-700' : 'border-gray-200 text-gray-500'}`}
+                title={tab.id === 'ceremony' ? `Sillas preparadas: ${Math.round(ceremonyProgress)}%` : `Invitados asignados: ${Math.round(banquetProgress)}%`}
+              >
+                {tab.id === 'ceremony' ? `${Math.round(ceremonyProgress)}%` : `${Math.round(banquetProgress)}%`}
+              </span>
             </button>
           );
         })}
@@ -72,11 +82,10 @@ const SeatingPlanTabs = ({
       
       {/* Indicador de progreso */}
       <div className="h-1 bg-gray-100">
-        <div 
+        <div
           className="h-full bg-blue-500 transition-all duration-300"
-          style={{ 
-            width: activeTab === 'ceremony' ? '50%' : '100%',
-            marginLeft: activeTab === 'ceremony' ? '0%' : '0%'
+          style={{
+            width: `${Math.max(0, Math.min(100, activeTab === 'ceremony' ? ceremonyProgress : banquetProgress))}%`
           }}
         />
       </div>

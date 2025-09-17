@@ -38,6 +38,7 @@
         "e2e:seating": "start-server-and-test dev http://localhost:5173 cypress:run:seating",
         "ensure:finance": "node scripts/ensureFinanceAll.js",
         "validate:schemas": "node scripts/validateSchemas.js",
+        "validate:i18n": "node scripts/validateI18n.js",
         "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",
         "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000",
         "fix:mails:from": "node backend/scripts/fixMailFrom.js",

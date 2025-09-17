@@ -1,5 +1,5 @@
-/**
- * SeatingPlan refactorizado – Componente principal
+﻿/**
+ * SeatingPlan refactorizado â€“ Componente principal
  */
 import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -29,6 +29,7 @@ const SeatingPlanRefactored = () => {
     undo, redo, canUndo, canRedo,
     generateSeatGrid, generateBanquetLayout,
     exportPDF, exportPNG, exportCSV, exportSVG,
+    exportPlaceCardsPDF,
     saveHallDimensions,
     drawMode, setDrawMode,
     moveTable,
@@ -36,18 +37,26 @@ const SeatingPlanRefactored = () => {
     toggleSeatEnabled,
     moveGuest,
     moveGuestToSeat,
+    assignGuestToCeremonySeat,
     deleteArea,
     updateArea,
     deleteTable,
     duplicateTable,
+    toggleTableLocked,
     applyBanquetTables,
     clearBanquetLayout,
     autoAssignGuests,
+    autoAssignGuestsRules,
+    conflicts,
+    fixTablePosition,
+    suggestTablesForGuest,
     // preferencias de lienzo
     snapToGrid, setSnapToGrid, gridStep,
     validationsEnabled, setValidationsEnabled,
     globalMaxSeats, saveGlobalMaxGuests,
-    background, setBackground, saveBackground
+    background, setBackground, saveBackground,
+    // snapshots
+    listSnapshots, saveSnapshot, loadSnapshot, deleteSnapshot
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
@@ -59,9 +68,10 @@ const SeatingPlanRefactored = () => {
   const [backgroundOpen, setBackgroundOpen] = React.useState(false);
   // Modal de capacidad global
   const [capacityOpen, setCapacityOpen] = React.useState(false);
-  // Mostrar numeración de asientos
+  // Mostrar numeraciÃ³n de asientos
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
-  // handler para fondo rápido (prompt)
+  const [guidedGuestId, setGuidedGuestId] = React.useState(null);
+  // handler para fondo rÃ¡pido (prompt)
   const handleOpenBackgroundQuick = () => {
     try {
       const url = window.prompt('URL de imagen (o data URL):');
@@ -123,7 +133,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [setDrawMode]);
 
-  // Backspace: eliminar mesa seleccionada (con confirmación)
+  // Backspace: eliminar mesa seleccionada (con confirmaciÃ³n)
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -131,7 +141,7 @@ const SeatingPlanRefactored = () => {
         if (['input','textarea','select'].includes(tag) || e?.isComposing) return;
         if (e?.key === 'Backspace' && selectedTable) {
           e.preventDefault();
-          if (window.confirm('¿Eliminar la mesa seleccionada?')) {
+          if (window.confirm('Â¿Eliminar la mesa seleccionada?')) {
             deleteTable(selectedTable.id);
           }
         }
@@ -141,7 +151,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedTable, deleteTable]);
 
-  // Atajos de rotación: Q/E para -5°/+5°
+  // Atajos de rotaciÃ³n: Q/E para -5Â°/+5Â°
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -174,7 +184,7 @@ const SeatingPlanRefactored = () => {
   // Asignar invitado a mesa (drag & drop / sidebar)
   const handleAssignGuest = (tableId, guestId) => {
     if (guestId) {
-      // Capacidad: contar asientos ocupados (invitado + acompañantes)
+      // Capacidad: contar asientos ocupados (invitado + acompaÃ±antes)
       try {
         const table = safeTables.find(t => String(t.id) === String(tableId));
         const seatsCap = parseInt(table?.seats, 10) || 0;
@@ -192,7 +202,7 @@ const SeatingPlanRefactored = () => {
             const msg = remaining === 0
               ? 'Capacidad completa: no hay asientos disponibles en esta mesa'
               : `Capacidad insuficiente: necesitas ${needed} asiento(s) y quedan ${remaining}`;
-            // Métrica: asignación bloqueada por capacidad (best-effort, no bloqueante)
+            // MÃ©trica: asignaciÃ³n bloqueada por capacidad (best-effort, no bloqueante)
             try {
               apiPost('/api/metrics/seating', {
                 body: JSON.stringify({ event: 'assign', result: 'blocked', tab }),
@@ -203,7 +213,7 @@ const SeatingPlanRefactored = () => {
           }
         }
         moveGuest(guestId, tableId);
-        // Métrica: asignación exitosa (best-effort, no bloqueante)
+        // MÃ©trica: asignaciÃ³n exitosa (best-effort, no bloqueante)
         try {
           apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
         } catch {}
@@ -251,7 +261,7 @@ const SeatingPlanRefactored = () => {
     }
   };
 
-  // Aplicación de plantillas (evita fallo si se usa el modal de plantillas)
+  // AplicaciÃ³n de plantillas (evita fallo si se usa el modal de plantillas)
   const handleApplyTemplate = (template) => {
     if (template?.ceremony) {
       generateSeatGrid(
@@ -277,7 +287,7 @@ const SeatingPlanRefactored = () => {
       });
     }
 
-    // Asignación automática no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
+    // AsignaciÃ³n automÃ¡tica no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
     setTimeout(async () => {
       try {
         const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
@@ -285,11 +295,11 @@ const SeatingPlanRefactored = () => {
         const res = await autoAssignGuests();
         if (res?.ok) {
           const msg = res.method === 'backend'
-            ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-            : `Asignación automática: ${res.assigned} invitado(s)`;
+            ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
+            : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
           toast.info(msg);
         } else if (res?.error) {
-          toast.warn(`Autoasignación: ${res.error}`);
+          toast.warn(`AutoasignaciÃ³n: ${res.error}`);
         }
       } catch (e) {
         // Silencioso para no molestar al usuario; solo log
@@ -300,21 +310,21 @@ const SeatingPlanRefactored = () => {
 
   const handleAutoAssignClick = async () => {
     try {
-      const res = await autoAssignGuests();
+      const res = await (typeof autoAssignGuestsRules === 'function' ? autoAssignGuestsRules() : autoAssignGuests());
       if (res?.ok) {
         const msg = res.method === 'backend'
-          ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-          : `Asignación automática: ${res.assigned} invitado(s)`;
+          ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
+          : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
         toast.info(msg);
       } else if (res?.error) {
-        toast.warn(`Auto-asignación: ${res.error}`);
+        toast.warn(`Auto-asignaciÃ³n: ${res.error}`);
       }
     } catch (e) {
-      toast.error('Error en auto-asignación');
+      toast.error('Error en auto-asignaciÃ³n');
     }
   };
 
-  // Generación desde modal de banquete seguida de autoasignación (silencioso a nivel de UI)
+  // GeneraciÃ³n desde modal de banquete seguida de autoasignaciÃ³n (silencioso a nivel de UI)
   const handleGenerateBanquetLayoutWithAssign = (config) => {
     try {
       generateBanquetLayout(config);
@@ -323,14 +333,14 @@ const SeatingPlanRefactored = () => {
         try {
           const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
           if (!enableAutoAssign) return;
-          const res = await autoAssignGuests();
+          const res = await (typeof autoAssignGuestsRules === 'function' ? autoAssignGuestsRules() : autoAssignGuests());
           if (res?.ok) {
             const msg = res.method === 'backend'
-              ? `Asignación automática (IA): ${res.assigned} invitado(s)`
-              : `Asignación automática: ${res.assigned} invitado(s)`;
+              ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
+              : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
             toast.info(msg);
           } else if (res?.error) {
-            toast.warn(`Autoasignación: ${res.error}`);
+            toast.warn(`AutoasignaciÃ³n: ${res.error}`);
           }
         } catch (e) {
           console.warn('Auto-assign error', e);
@@ -353,34 +363,65 @@ const SeatingPlanRefactored = () => {
     <div className="h-full flex flex-col bg-gray-50">
       {/* Tabs */}
       <div className="flex-shrink-0 p-4 pb-0">
-        <SeatingPlanTabs
-          activeTab={tab}
-          onTabChange={setTab}
-          ceremonyCount={ceremonyCount}
-          banquetCount={banquetCount}
-        />
+        {(() => {
+          // Progreso por pestaÃ±a
+          const totalGuests = safeGuests.reduce((acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0), 0);
+          const enabledSeats = safeSeats.filter(s => s?.enabled !== false).length;
+          const ceremonyProgress = totalGuests > 0 ? Math.min(100, Math.round((enabledSeats / totalGuests) * 100)) : 0;
+
+          // Invitados asignados a alguna mesa (contando companions)
+          const tableIdSet = new Set(safeTables.map(t => String(t?.id)).filter(Boolean));
+          const tableNameSet = new Set(safeTables.map(t => String(t?.name)).filter(s => s && s.trim() !== ''));
+          const assignedPersons = safeGuests.reduce((sum, g) => {
+            const tid = g?.tableId != null ? String(g.tableId) : null;
+            const tname = g?.table != null ? String(g.table).trim() : '';
+            const isAssigned = (tid && tableIdSet.has(tid)) || (tname && (tableIdSet.has(tname) || tableNameSet.has(tname)));
+            if (!isAssigned) return sum;
+            return sum + 1 + (parseInt(g?.companion, 10) || 0);
+          }, 0);
+          const banquetProgress = totalGuests > 0 ? Math.min(100, Math.round((assignedPersons / totalGuests) * 100)) : 0;
+
+          return (
+            <SeatingPlanTabs
+              activeTab={tab}
+              onTabChange={setTab}
+              ceremonyCount={ceremonyCount}
+              banquetCount={banquetCount}
+              ceremonyProgress={ceremonyProgress}
+              banquetProgress={banquetProgress}
+            />
+          );
+        })()}
       </div>
 
       {/* Toolbar */}
       <div className="flex-shrink-0 p-4 pb-2">
-        <SeatingPlanToolbar
-          tab={tab}
-          onUndo={undo} onRedo={redo}
-          canUndo={canUndo} canRedo={canRedo}
-          onExportPDF={exportPDF}
-          onExportPNG={exportPNG}
-          onExportCSV={exportCSV}
-          onExportSVG={exportSVG}
-          onOpenCeremonyConfig={handleOpenCeremonyConfig}
-          onOpenBanquetConfig={handleOpenBanquetConfig}
+          <SeatingPlanToolbar
+            tab={tab}
+            onUndo={undo} onRedo={redo}
+            canUndo={canUndo} canRedo={canRedo}
+            onExportPDF={exportPDF}
+            onExportPNG={exportPNG}
+            onExportCSV={exportCSV}
+            onExportSVG={exportSVG}
+            onExportPlaceCards={() => exportPlaceCardsPDF?.()}
+            onExportPoster={() => exportPosterA2?.()}
+            onOpenCeremonyConfig={handleOpenCeremonyConfig}
+            onOpenBanquetConfig={handleOpenBanquetConfig}
           onOpenSpaceConfig={handleOpenSpaceConfig}
           onOpenBackground={() => setBackgroundOpen(true)}
           onAutoAssign={handleAutoAssignClick}
           onClearBanquet={clearBanquetLayout}
           onOpenTemplates={handleOpenTemplates}
           syncStatus={syncStatus}
-          showTables={showTables}
-          onToggleShowTables={toggleShowTables}
+          snapshots={typeof listSnapshots === 'function' ? listSnapshots() : []}
+          onSaveSnapshot={(name) => { try { saveSnapshot?.(name); } catch(_){} }}
+          onLoadSnapshot={(name) => { try { loadSnapshot?.(name); } catch(_){} }}
+          onDeleteSnapshot={(name) => { try { deleteSnapshot?.(name); } catch(_){} }}
+          scoringWeights={scoringWeights}
+          onUpdateScoringWeights={(p)=> setScoringWeights?.(p)}
+            showTables={showTables}
+            onToggleShowTables={toggleShowTables}
           showRulers={showRulers}
           onToggleRulers={() => setShowRulers(v => !v)}
           snapEnabled={!!snapToGrid}
@@ -416,6 +457,21 @@ const SeatingPlanRefactored = () => {
             onUnassignGuest={handleUnassignGuest}
             deleteTable={deleteTable}
             duplicateTable={duplicateTable}
+            toggleTableLocked={toggleTableLocked}
+            conflicts={Array.isArray(conflicts)?conflicts:[]}
+            onFixTable={(id)=>{ try { fixTablePosition?.(id); toast.info('Mesa ajustada'); } catch(_){} }}
+            onFocusTable={(id)=>{
+              try {
+                handleSelectTable(id, false);
+                setFocusTableId(id);
+              } catch(_) {}
+            }}
+            onSelectTable={(id, add)=> handleSelectTable(id, add)}
+            guidedGuestId={guidedGuestId}
+            onGuideGuest={(id)=> setGuidedGuestId(id || null)}
+            suggestForGuest={(gid)=>{ try { return suggestTablesForGuest?.(gid) || []; } catch(_) { return []; } }}
+            scoringWeights={scoringWeights}
+            onUpdateScoringWeights={(p)=> setScoringWeights?.(p)}
             globalMaxSeats={globalMaxSeats}
             className="h-full"
           />
@@ -445,6 +501,9 @@ const SeatingPlanRefactored = () => {
             onAssignGuestSeat={(tableId, seatIdx, guestId) => {
               try { moveGuestToSeat(guestId, tableId, seatIdx); toast.success(`Invitado a asiento ${seatIdx+1}`); } catch(_) { handleAssignGuest(tableId, guestId); }
             }}
+            onAssignCeremonySeat={async (seatId, guestId) => {
+              try { await assignGuestToCeremonySeat(seatId, guestId); toast.success('Invitado asignado a silla'); } catch(_) {}
+            }}
           guests={safeGuests}
           onDeleteArea={deleteArea}
           onUpdateArea={updateArea}
@@ -454,7 +513,9 @@ const SeatingPlanRefactored = () => {
           showSeatNumbers={showSeatNumbers}
           background={background}
           globalMaxSeats={globalMaxSeats}
-          validationsEnabled={validationsEnabled}
+            validationsEnabled={validationsEnabled}
+            suggestions={guidedGuestId ? (suggestTablesForGuest?.(guidedGuestId) || null) : null}
+            focusTableId={focusTableId}
         />
         </div>
       </div>
@@ -492,6 +553,10 @@ const SeatingPlanRefactored = () => {
 };
 
 export default SeatingPlanRefactored;
+
+
+
+
 
 
 
