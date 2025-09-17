@@ -505,10 +505,14 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     return arr;
   };
 
+  // Parámetros dependientes del perímetro
+  const [ringParams, setRingParams] = React.useState({ innerPct: 24, outerPct: 42 });
+  const [perimParams, setPerimParams] = React.useState({ marginPct: 8 });
+
   const buildCircularRing = () => {
     const need = guestCount ? Math.ceil(guestCount / avgSeats) : Math.max(tableCount || 6, 6);
     const centerX = centroid.x, centerY = centroid.y;
-    const radius = Math.min(hallW, hallH) * 0.35;
+    const radius = Math.min(hallW, hallH) * (ringParams.outerPct/100);
     const arr = [];
     for (let i = 0; i < need; i++) {
       const ang = (2 * Math.PI * i) / need;
@@ -634,6 +638,18 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       banquetTables: buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape),
     },
   ];
+
+  // Añadir plantillas guardadas por el usuario
+  try {
+    const raw = localStorage.getItem('seatingPlan:local:userTemplates') || localStorage.getItem('userTemplates');
+    const arr = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(arr) && arr.length) {
+      templates = [
+        ...templates,
+        ...arr.map((t) => ({ id: t.id || `user-${t.name}-${Date.now()}`, name: t.name || 'Mi plantilla', description: 'Plantilla guardada por el usuario', banquetTables: Array.isArray(t.banquetTables) ? t.banquetTables : [] }))
+      ];
+    }
+  } catch(_) {}
 
   if (tableCount > 0) {
     // Reordenar mesas existentes en cuadrícula
@@ -895,9 +911,4 @@ const CapacityForm = ({ onSave, onClose, initialMax = 8 }) => {
         <input type="number" min="1" max="100" value={max} onChange={(e)=> setMax(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
       <div className="flex gap-2 pt-2">
-        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
-        <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
-      </div>
-    </form>
-  );
-};
+        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 

@@ -275,10 +275,10 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {typeof markerLeftPx === 'number' && markerLeftPx >= 0 && (
+        {scrollerRef.current && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
           <div
             title="Día de la boda"
-            style={{ position: 'absolute', top: 0, left: markerLeftPx - (scrollLeft || 0) - (contentOffsetX || 0), height: '100%', pointerEvents: 'none', zIndex: 1000 }}
+            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx - ((scrollerRef.current && scrollerRef.current.scrollLeft) || 0) - (contentOffsetX || 0)), height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), pointerEvents: 'none', zIndex: 1000 }}
           >
             {/* Poste vertical */}
             <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
@@ -301,8 +301,8 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>
-        )}
+          </div>, scrollerRef.current)
+        }
       </div>
     </LocalErrorBoundary>
   );

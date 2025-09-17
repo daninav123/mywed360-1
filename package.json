@@ -107,7 +107,8 @@
         "rss-parser": "^3.13.0",
         "sharp": "^0.34.3",
         "svg-to-pdfkit": "^0.1.8",
-        "twilio": "^4.22.0"
+        "twilio": "^4.22.0",
+        "zod": "^3.23.8"
     },
     "overrides": {
         "esbuild": "0.18.20",

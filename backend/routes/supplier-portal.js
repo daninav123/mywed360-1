@@ -1,4 +1,5 @@
 import express from 'express';
+import { z } from 'zod';
 import { db } from '../db.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import crypto from 'crypto';
@@ -84,7 +85,25 @@ router.get('/:token', async (req, res) => {
 // Public: submit availability/message and optional budget
 router.post('/:token/submit', express.json({ limit: '1mb' }), async (req, res) => {
   const { token } = req.params;
-  const { availability, message, budget } = req.body || {};
+  const bodySchema = z.object({
+    availability: z.string().max(50).optional(),
+    message: z.string().max(5000).optional(),
+    budget: z
+      .object({
+        description: z.string().max(2000).optional(),
+        amount: z.coerce.number().nonnegative().optional(),
+        currency: z.string().max(10).optional(),
+        links: z.array(z.string().url()).max(5).optional(),
+      })
+      .optional(),
+  });
+  let availability, message, budget;
+  try {
+    ({ availability, message, budget } = bodySchema.parse(req.body || {}));
+  } catch (e) {
+    const msg = e?.issues ? e.issues.map(i => i.message).join(', ') : 'invalid body';
+    return res.status(400).json({ error: msg });
+  }
   try {
     const t = await resolveToken(token);
     if (!t) return res.status(404).json({ error: 'invalid_token' });
@@ -92,16 +111,16 @@ router.post('/:token/submit', express.json({ limit: '1mb' }), async (req, res) =
     const sRef = db.collection('weddings').doc(weddingId).collection('suppliers').doc(supplierId);
     const updates = { portalLastSubmitAt: FieldValue.serverTimestamp() };
     if (availability) updates.portalAvailability = availability;
-    if (message && typeof message === 'string') updates.portalLastMessage = message.slice(0, 5000);
+    if (message && typeof message === 'string') updates.portalLastMessage = message;
     await sRef.set(updates, { merge: true });
     let budgetId = null;
     if (budget && (budget.amount || budget.description)) {
       const bRef = sRef.collection('budgets').doc();
       await bRef.set({
-        description: String(budget.description || '').slice(0, 2000),
+        description: String(budget.description || ''),
         amount: Number(budget.amount || 0),
-        currency: String(budget.currency || 'EUR').toUpperCase(),
-        links: Array.isArray(budget.links) ? budget.links.slice(0, 5) : [],
+        currency: String((budget.currency || 'EUR')).toUpperCase(),
+        links: Array.isArray(budget.links) ? budget.links : [],
         source: 'portal',
         status: 'submitted',
         createdAt: FieldValue.serverTimestamp(),
@@ -117,4 +136,3 @@ router.post('/:token/submit', express.json({ limit: '1mb' }), async (req, res) =
 });
 
 export default router;
-

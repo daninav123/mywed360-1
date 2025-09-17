@@ -30,6 +30,7 @@ const SeatingPlanRefactored = () => {
     generateSeatGrid, generateBanquetLayout,
     exportPDF, exportPNG, exportCSV, exportSVG,
     exportPlaceCardsPDF,
+    exportPosterA2,
     saveHallDimensions,
     drawMode, setDrawMode,
     moveTable,
@@ -56,7 +57,8 @@ const SeatingPlanRefactored = () => {
     globalMaxSeats, saveGlobalMaxGuests,
     background, setBackground, saveBackground,
     // snapshots
-    listSnapshots, saveSnapshot, loadSnapshot, deleteSnapshot
+    listSnapshots, saveSnapshot, loadSnapshot, deleteSnapshot,
+    scoringWeights, setScoringWeights
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas

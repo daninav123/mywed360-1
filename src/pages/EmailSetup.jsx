@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import EmailSetupForm from '../components/email/EmailSetupForm';
 import useEmailUsername from '../hooks/useEmailUsername';
-import { auth } from '../lib/firebase';
+import { auth } from '../firebaseConfig';
 import { Mail, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import Button from '../components/ui/Button';
 

@@ -11,6 +11,7 @@ import './utils/consoleCommands';
 import './index.css';
 import './pwa/registerServiceWorker';
 import './pwa/setupPwaToasts';
+import './utils/webVitals';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -19,5 +20,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </ErrorBoundary>
   </React.StrictMode>
 );
+
 
 

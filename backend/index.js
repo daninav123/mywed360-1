@@ -292,8 +292,7 @@ app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
-app.use('/api/playback', playbackRouter);
-app.use('/api/bank', requireAuth, bankRouter);\napp.use('/api/email-actions', requireAuth, emailActionsRouter);
+.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);\napp.use('/api/bank', requireAuth, bankRouter);\napp.use('/api/email-actions', requireAuth, emailActionsRouter);
 
 // Rutas de diagnÃƒÂ³stico y test (pÃƒÂºblicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
@@ -435,6 +434,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
+
 
 
 
