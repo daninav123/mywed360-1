@@ -3,7 +3,7 @@
  * Maneja la información de mesas seleccionadas, herramientas de dibujo e invitados
  */
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useTranslations from '../../hooks/useTranslations';
 import TableEditor from './TableEditor';
 import GuestItem from '../GuestItem';
@@ -65,35 +65,33 @@ const SeatingPlanSidebar = ({
   ];
 
   // Filtrar invitados disponibles (sin asignar a mesa) con saneo defensivo
-  const availableGuests = guests.filter((guest) => {
-    const noTable = !guest?.table && !guest?.tableId;
-    if (!noTable) return false;
-    const name = typeof guest?.name === 'string' ? guest.name : '';
-    const term = typeof guestSearch === 'string' ? guestSearch.toLowerCase() : '';
-    if (term && !name.toLowerCase().includes(term)) return false;
-    // side filter
-    if (guestSide && String(guest?.side || '').toLowerCase() !== guestSide) return false;
-    // child filter
-    if (guestIsChild === 'si' && !guest?.isChild) return false;
-    if (guestIsChild === 'no' && guest?.isChild) return false;
-    // allergen contains
-    if (guestAllergen) {
-      const all = String(guest?.allergens || guest?.alergenos || '').toLowerCase();
-      if (!all.includes(guestAllergen.toLowerCase())) return false;
-    }
-    // group contains (generic)
-    if (guestGroup) {
-      const g1 = String(guest?.group || guest?.groupName || guest?.companionGroupId || '').toLowerCase();
-      if (!g1.includes(guestGroup.toLowerCase())) return false;
-    }
-    return true;
-  });
+  const availableGuests = useMemo(() => {
+    return guests.filter((guest) => {
+      const noTable = !guest?.table && !guest?.tableId;
+      if (!noTable) return false;
+      const name = typeof guest?.name === 'string' ? guest.name : '';
+      const term = typeof guestSearch === 'string' ? guestSearch.toLowerCase() : '';
+      if (term && !name.toLowerCase().includes(term)) return false;
+      if (guestSide && String(guest?.side || '').toLowerCase() !== guestSide) return false;
+      if (guestIsChild === 'si' && !guest?.isChild) return false;
+      if (guestIsChild === 'no' && guest?.isChild) return false;
+      if (guestAllergen) {
+        const all = String(guest?.allergens || guest?.alergenos || '').toLowerCase();
+        if (!all.includes(guestAllergen.toLowerCase())) return false;
+      }
+      if (guestGroup) {
+        const g1 = String(guest?.group || guest?.groupName || guest?.companionGroupId || '').toLowerCase();
+        if (!g1.includes(guestGroup.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [guests, guestSearch, guestSide, guestIsChild, guestAllergen, guestGroup]);
 
   const pendingCount = availableGuests.length;
 
-  const assignedGuests = guests.filter(guest => 
-    guest.tableId === selectedTable?.id
-  );
+  const assignedGuests = useMemo(() => {
+    return guests.filter((guest) => guest.tableId === selectedTable?.id);
+  }, [guests, selectedTable?.id]);
 
   const guidedSuggestions = (() => {
     try {
@@ -165,7 +163,7 @@ const SeatingPlanSidebar = ({
               className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
             >
               <UserPlus className="h-4 w-4" />
-              {showAvailableGuests ? 'Ocultar Invitados' : 'Mostrar Invitados'}
+              {showAvailableGuests ? t('seating.sidebar.hideGuests', { defaultValue: 'Ocultar invitados' }) : t('seating.sidebar.showGuests', { defaultValue: 'Mostrar invitados' })}
             </button>
           </div>
           
@@ -204,7 +202,7 @@ const SeatingPlanSidebar = ({
               {/* Lista de invitados disponibles (drag source + click-assign) */}
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {availableGuests.length > 0 ? (
-                  availableGuests.slice(0, 12).map((guest) => (
+                  availableGuests.map((guest) => (
                     <GuestItem
                       key={guest.id}
                       guest={guest}
@@ -226,8 +224,8 @@ const SeatingPlanSidebar = ({
       {tab === 'banquet' && (
         <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium text-gray-900">Conflictos</h4>
-            <button onClick={()=>setShowConflicts(!showConflicts)} className="text-sm text-blue-600 hover:underline">{showConflicts ? 'Ocultar' : 'Ver'}</button>
+            <h4 className="font-medium text-gray-900">{t('seating.sidebar.conflictsTitle', { defaultValue: 'Conflictos' })}</h4>
+            <button onClick={()=>setShowConflicts(!showConflicts)} className="text-sm text-blue-600 hover:underline">{showConflicts ? t('common.hide', { defaultValue: 'Ocultar' }) : t('common.view', { defaultValue: 'Ver' })}</button>
           </div>
           {showConflicts && (
             <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -243,10 +241,10 @@ const SeatingPlanSidebar = ({
                   );
                   return (
                     <>
-                      {badge('Perímetro','perimeter','#ef4444')}
-                      {badge('Obstáculos','obstacle','#dc2626')}
-                      {badge('Pasillos','spacing','#f59e0b')}
-                      {badge('Overbooking','overbooking','#f97316')}
+                      {badge(t('seating.sidebar.conflictPerimeter', { defaultValue: 'Perímetro' }),'perimeter','#ef4444')}
+                      {badge(t('seating.sidebar.conflictObstacle', { defaultValue: 'Obstáculos' }),'obstacle','#dc2626')}
+                      {badge(t('seating.sidebar.conflictAisles', { defaultValue: 'Pasillos' }),'spacing','#f59e0b')}
+                      {badge(t('seating.sidebar.conflictOverbooking', { defaultValue: 'Overbooking' }),'overbooking','#f97316')}
                     </>
                   );
                 })()}
@@ -257,18 +255,18 @@ const SeatingPlanSidebar = ({
                     <span className="capitalize">{k}</span>
                   </label>
                 ))}
-                <button className="ml-auto text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:true, obstacle:true, spacing:true, overbooking:true })}>Todos</button>
-                <button className="text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:false, obstacle:false, spacing:false, overbooking:false })}>Ninguno</button>
+                <button className="ml-auto text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:true, obstacle:true, spacing:true, overbooking:true })}>{t('common.all', { defaultValue: 'Todos' })}</button>
+                <button className="text-blue-600 hover:underline" onClick={()=> setConflictFilters({ perimeter:false, obstacle:false, spacing:false, overbooking:false })}>{t('common.none', { defaultValue: 'Ninguno' })}</button>
               </div>
               {(conflicts||[]).filter(c => conflictFilters[c.type]).length === 0 ? (
-                <div className="text-xs text-gray-500">Sin conflictos</div>
+                <div className="text-xs text-gray-500">{t('seating.sidebar.noConflicts', { defaultValue: 'Sin conflictos' })}</div>
               ) : (
                 conflicts.filter(c => conflictFilters[c.type]).slice(0, 50).map((c, idx) => (
                   <div key={idx} className="flex items-center justify-between text-xs bg-red-50 border border-red-200 rounded px-2 py-1">
-                    <button className="text-left flex-1 hover:underline" title="Centrar en el plano" onClick={()=>{ onFocusTable?.(c.tableId); onSelectTable?.(c.tableId, false); }}>
+                    <button className="text-left flex-1 hover:underline" title={t('seating.sidebar.focusTable', { defaultValue: 'Centrar en el plano' })} onClick={()=>{ onFocusTable?.(c.tableId); onSelectTable?.(c.tableId, false); }}>
                       <span className="font-semibold">Mesa {c.tableId}:</span> {c.message}
                     </button>
-                    <button className="text-red-600 hover:underline" onClick={()=>onFixTable?.(c.tableId)}>Arreglar</button>
+                    <button className="text-red-600 hover:underline" onClick={()=>onFixTable?.(c.tableId)}>{t('seating.sidebar.fix', { defaultValue: 'Arreglar' })}</button>
                   </div>
                 ))
               )}
@@ -282,7 +280,7 @@ const SeatingPlanSidebar = ({
         <div className="px-4 py-3 border-b">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-medium text-gray-900">Asignación guiada</h4>
-            <button onClick={()=>setShowGuided(!showGuided)} className="text-sm text-blue-600 hover:underline">{showGuided ? 'Ocultar' : 'Ver'}</button>
+            <button onClick={()=>setShowGuided(!showGuided)} className="text-sm text-blue-600 hover:underline">{showGuided ? t('common.hide', { defaultValue: 'Ocultar' }) : t('common.view', { defaultValue: 'Ver' })}</button>
           </div>
           {showGuided && (
             <div className="space-y-2">
@@ -293,12 +291,12 @@ const SeatingPlanSidebar = ({
               {guidedGuestId && (
                 <div className="space-y-1">
                   {guidedSuggestions.length === 0 ? (
-                    <div className="text-xs text-gray-500">Sin sugerencias</div>
+                    <div className="text-xs text-gray-500">{t('seating.sidebar.noSuggestions', { defaultValue: 'Sin sugerencias' })}</div>
                   ) : (
                     guidedSuggestions.map(s => (
                       <div key={s.tableId} className="flex items-center justify-between text-xs bg-blue-50 border border-blue-200 rounded px-2 py-1">
-                        <div>Mesa {s.tableId} · Score {s.score}</div>
-                        <button className="text-blue-600 hover:underline" onClick={()=>onAssignGuest?.(s.tableId, guidedGuestId)}>Asignar</button>
+                        <div>Mesa {s.tableId} - Score {s.score}</div>
+                        <button className="text-blue-600 hover:underline" onClick={()=>onAssignGuest?.(s.tableId, guidedGuestId)}>{t('seating.sidebar.assignGuestButton', { defaultValue: 'Asignar' })}</button>
                       </div>
                     ))
                   )}
@@ -306,12 +304,12 @@ const SeatingPlanSidebar = ({
               )}
               {/* Pesos del scoring */}
               <div className="mt-2 p-2 bg-gray-50 rounded border">
-                <div className="text-xs font-medium mb-2">Pesos</div>
+                <div className="text-xs font-medium mb-2">{t('seating.sidebar.weightsTitle', { defaultValue: 'Pesos' })}</div>
                 {[
-                  { key:'fit', label:'Encaje', min:0, max:100, step:5 },
-                  { key:'side', label:'Lado', min:0, max:20, step:1 },
-                  { key:'wants', label:'Juntos', min:0, max:30, step:1 },
-                  { key:'avoid', label:'Evitar', min:-50, max:0, step:1 },
+                  { key:'fit', label: t('seating.sidebar.weightFit', { defaultValue: 'Encaje' }), min:0, max:100, step:5 },
+                  { key:'side', label: t('seating.sidebar.weightSide', { defaultValue: 'Lado' }), min:0, max:20, step:1 },
+                  { key:'wants', label: t('seating.sidebar.weightTogether', { defaultValue: 'Juntos' }), min:0, max:30, step:1 },
+                  { key:'avoid', label: t('seating.sidebar.weightAvoid', { defaultValue: 'Evitar' }), min:-50, max:0, step:1 },
                 ].map(cfg => (
                   <div key={cfg.key} className="mb-2">
                     <div className="flex justify-between"><span className="text-xs">{cfg.label}</span><span className="text-[11px] font-semibold">{scoringWeights?.[cfg.key]}</span></div>
@@ -516,3 +514,7 @@ const SeatingPlanSidebar = ({
 };
 
 export default React.memo(SeatingPlanSidebar);
+
+
+
+

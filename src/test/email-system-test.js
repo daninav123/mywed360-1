@@ -27,6 +27,7 @@ const EmailService = {
     console.log(`A: ${to}`);
     console.log(`Asunto: ${subject}`);
     console.log('Contenido: [Contenido HTML omitido]');
+    if (body) console.log(`Vista previa: ${String(body).slice(0, 120)}...`);
     
     // Simular respuesta exitosa
     return {
@@ -113,7 +114,7 @@ async function runEmailTest() {
       
       // 3. Crear registro de seguimiento
       console.log('\n>> Creando registro de seguimiento...');
-      const trackingResult = await createTrackingRecord(emailResult, testProvider);
+      const trackingResult = await EmailTrackingService.createTrackingRecord(emailResult, testProvider);
       
       if (trackingResult && trackingResult.id) {
         console.log(`✅ Registro de seguimiento creado con ID: ${trackingResult.id}`);

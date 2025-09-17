@@ -114,64 +114,62 @@ const SmartEmailComposer = ({
     
     // Aplicar la recomendación según su tipo
     switch (type) {
-      case 'subject':
-        // Aplicar el patrón de asunto recomendado
+      case 'subject': {
         const newSubject = data
           .replace('[Servicio]', provider?.service || 'servicio')
           .replace('[Fecha]', 'próximamente')
           .replace('[Evento]', 'evento');
-        
+
         setSubject(newSubject);
         setFeedback({
           type: 'success',
           message: 'Línea de asunto actualizada con la recomendación'
         });
         break;
-        
-      case 'template':
-        // Buscar la plantilla recomendada
-        const template = templates.find(t => t.category === data || t.id === data);
+      }
+
+      case 'template': {
+        const template = templates.find((t) => t.category === data || t.id === data);
         if (template) {
           setSelectedTemplate(template.id);
-          
-          // Actualizar el mensaje con la plantilla
+
           const templateMessage = template.messageTemplate
             .replace('[Proveedor]', provider?.name || 'proveedor')
             .replace('[Servicio]', provider?.service || 'servicio');
-          
+
           setMessage(templateMessage);
           setFeedback({
             type: 'success',
-            message: `Plantilla "${template.name}" aplicada`
+            message: `Plantilla &quot;${template.name}&quot; aplicada`,
           });
         }
         break;
-        
-      case 'time':
-        // Programar el envío para la franja horaria recomendada
+      }
+
+      case 'time': {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        let hour = 10; // Por defecto a media mañana
-        
-        // Ajustar hora según la franja recomendada
+
+        let hour = 10;
         if (data.bestTimeSlot === 'morning') hour = 10;
         else if (data.bestTimeSlot === 'afternoon') hour = 14;
         else if (data.bestTimeSlot === 'evening') hour = 18;
         else if (data.bestTimeSlot === 'night') hour = 21;
-        
-        // Formatear fecha para input datetime-local
+
         const scheduledDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}T${String(hour).padStart(2, '0')}:00`;
-        
+
         setScheduledTime(scheduledDate);
         setFeedback({
           type: 'success',
-          message: `Correo programado para mañana a las ${hour}:00h (${data.bestTimeSlotName})`
+          message: `Correo programado para mañana a las ${hour}:00h (${data.bestTimeSlotName})`,
         });
         break;
-        
-      default:
+      }
+
+      default: {
         console.log('Tipo de recomendación no implementado:', type, data);
+        break;
+      }
     }
   };
   

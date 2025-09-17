@@ -1,10 +1,12 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { Plus, Sparkles } from "lucide-react";
 
 // Componentes
 import ProveedorList from "../components/proveedores/ProveedorList";
+import CompareSelectedModal from "../components/proveedores/CompareSelectedModal";
+import SupplierOnboardingModal from "../components/proveedores/SupplierOnboardingModal";
 import ProveedorCard from "../components/proveedores/ProveedorCard";
 import ProveedorForm from "../components/proveedores/ProveedorForm";
 import ReservationModal from "../components/proveedores/ReservationModal";
@@ -20,7 +22,9 @@ import useProveedores from "../hooks/useProveedores";
 import useAISearch from "../hooks/useAISearch";
 import { useAuth } from "../hooks/useAuth";
 import useSupplierGroups from "../hooks/useSupplierGroups";
+import useActiveWeddingInfo from "../hooks/useActiveWeddingInfo";
 import { loadData, saveData } from "../services/SyncService";
+import { toast } from "react-toastify";
 import { useWedding } from "../context/WeddingContext";
 
 const Proveedores = () => {
@@ -65,6 +69,7 @@ const Proveedores = () => {
   } = useAISearch();
   const { user } = useAuth();
   const { groups } = useSupplierGroups();
+  const { info: weddingInfo, loading: loadingWeddingInfo } = useActiveWeddingInfo();
   const { activeWedding } = useWedding();
 
   // Estado UI
@@ -78,6 +83,8 @@ const Proveedores = () => {
   const [activeTab, setActiveTab] = useState("info");
   const [showBulkStatus, setShowBulkStatus] = useState(false);
   const [showDupModal, setShowDupModal] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
 
   // Servicios deseados
   const [wantedServices, setWantedServices] = useState([]);
@@ -88,6 +95,59 @@ const Proveedores = () => {
       .map((s) => (typeof s === "string" ? { id: s, name: s } : s))
       .filter((s) => s && (s.name || s.id));
   }, [wantedServices]);
+
+  const selectedProviders = useMemo(() => {
+    const set = new Set(selectedProviderIds || []);
+    return (providers || []).filter((p) => set.has(p.id));
+  }, [providers, selectedProviderIds]);
+
+  const onboardingKey = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    if (activeWedding) return `supplier_onboarding_done_${activeWedding}`;
+    if (user?.uid) return `supplier_onboarding_done_user_${user.uid}`;
+    return null;
+  }, [activeWedding, user?.uid]);
+
+  useEffect(() => {
+    if (!onboardingKey) return;
+    if (typeof window === "undefined") return;
+    if (showOnboardingModal) return;
+    if (localStorage.getItem(onboardingKey) === '1') return;
+    const hasWanted = normalizedWanted.length > 0;
+    const hasProviders = (providers || []).length > 0;
+    if (!loading && !hasWanted && !hasProviders) {
+      setShowOnboardingModal(true);
+    }
+  }, [onboardingKey, showOnboardingModal, normalizedWanted, providers, loading]);
+
+  const markOnboardingDone = useCallback(() => {
+    if (typeof window !== 'undefined' && onboardingKey) {
+      localStorage.setItem(onboardingKey, '1');
+    }
+    setShowOnboardingModal(false);
+  }, [onboardingKey]);
+
+  const handleOnboardingComplete = useCallback(
+    async (services) => {
+      if (Array.isArray(services) && services.length) {
+        await saveWanted(services);
+        if (typeof window !== 'undefined') {
+          toast.success('Servicios iniciales configurados');
+        }
+      } else if (typeof window !== 'undefined') {
+        toast.info('No se guardaron servicios.');
+      }
+      markOnboardingDone();
+    },
+    [markOnboardingDone, saveWanted]
+  );
+
+  const handleOnboardingSkip = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      toast.info('Puedes configurar los servicios cuando quieras.');
+    }
+    markOnboardingDone();
+  }, [markOnboardingDone]);
 
   // Cargar proveedores
   useEffect(() => {
@@ -146,21 +206,79 @@ const Proveedores = () => {
   const handleCloseDetail = () => setSelectedProvider(null);
   const handleOpenAISearch = () => setShowAISearchModal(true);
 
-  const handleAISelect = (provider, action) => {
-    if (action === "view") {
-      setSelectedProvider(provider);
-      setShowAISearchModal(false);
-    } else if (action === "add") {
-      addProvider(provider);
-      setShowAISearchModal(false);
-    } else if (action === "select") {
-      addProvider({ ...provider, status: "Seleccionado" });
-      setShowAISearchModal(false);
-    } else if (action === "email") {
-      setAiSelectedResult(provider);
-      setShowAIEmailModal(true);
-    }
+  const openCompareModal = () => {
+    if (!selectedProviderIds.length) return;
+    setShowCompareModal(true);
   };
+
+  const openBulkStatusModal = () => {
+    if (!selectedProviderIds.length) return;
+    setShowBulkStatus(true);
+  };
+
+  const openDuplicatesModal = () => {
+    setShowDupModal(true);
+  };
+
+  const mapAIResultToProvider = useCallback((result, overrides = {}) => {
+    if (!result) return null;
+    const baseName = (result.name || result.title || 'Proveedor sugerido').trim();
+    const serviceName = (result.service || serviceFilter || 'Servicio para bodas').trim();
+    const sanitize = (value) =>
+      value.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^[.]+|[.]+$/g, '');
+    const fallbackEmail = result.email || (baseName ? `${sanitize(baseName)}@contacto.pro` : '');
+    const normalized = {
+      name: baseName,
+      service: serviceName,
+      contact: result.contact || '',
+      email: fallbackEmail,
+      phone: result.phone || '',
+      status: 'Pendiente',
+      snippet: result.snippet || result.aiSummary || '',
+      link: result.link || '',
+      image: result.image || '',
+      priceRange: result.priceRange || result.price || '',
+      location: result.location || '',
+      rating: result.rating || 0,
+      ratingCount: result.ratingCount || 0,
+      aiMatch: result.match || 0,
+      aiSummary: result.aiSummary || '',
+      tags: Array.isArray(result.tags) ? result.tags : [],
+      source: 'ai-search',
+      createdFromAI: true,
+    };
+    return { ...normalized, ...overrides };
+  }, [serviceFilter]);
+
+  const handleAISelect = useCallback(
+    async (result, action) => {
+      if (!result) return;
+      if (action === "view") {
+        const normalized = mapAIResultToProvider(result);
+        if (normalized) {
+          setSelectedProvider(normalized);
+          setActiveTab("info");
+        }
+        setShowAISearchModal(false);
+      } else if (action === "add") {
+        const normalized = mapAIResultToProvider(result);
+        if (normalized) {
+          await addProvider(normalized);
+        }
+        setShowAISearchModal(false);
+      } else if (action === "select") {
+        const normalized = mapAIResultToProvider(result, { status: "Seleccionado" });
+        if (normalized) {
+          await addProvider(normalized);
+        }
+        setShowAISearchModal(false);
+      } else if (action === "email") {
+        setAiSelectedResult(result);
+        setShowAIEmailModal(true);
+      }
+    },
+    [mapAIResultToProvider, addProvider, setActiveTab, setSelectedProvider, setShowAISearchModal, setAiSelectedResult, setShowAIEmailModal]
+  );
 
   const handleSubmitProvider = async (providerData) => {
     if (showEditProviderForm && selectedProvider) {
@@ -273,6 +391,10 @@ const Proveedores = () => {
             selected={selectedProviderIds}
             toggleSelect={toggleSelectProvider}
             toggleFavorite={toggleFavoriteProvider}
+            onOpenCompare={openCompareModal}
+            onOpenBulkStatus={openBulkStatusModal}
+            onOpenDuplicates={openDuplicatesModal}
+            onClearSelection={clearSelection}
           />
         </div>
       )}
@@ -330,6 +452,22 @@ const Proveedores = () => {
         />
       )}
 
+      <SupplierOnboardingModal
+        open={showOnboardingModal}
+        onClose={handleOnboardingSkip}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingSkip}
+        initialServices={normalizedWanted.map((item) => item.name || item.id)}
+        weddingInfo={weddingInfo}
+        loadingWedding={loadingWeddingInfo}
+      />
+
+      <CompareSelectedModal
+        open={showCompareModal}
+        onClose={() => setShowCompareModal(false)}
+        providers={selectedProviders}
+      />
+
       <BulkStatusModal
         open={showBulkStatus}
         onClose={() => setShowBulkStatus(false)}
@@ -339,6 +477,8 @@ const Proveedores = () => {
             if (!p) continue;
             await updateProvider(pid, { ...p, status: newStatus });
           }
+          clearSelection();
+          setShowBulkStatus(false);
         }}
       />
 
@@ -360,6 +500,8 @@ const Proveedores = () => {
           for (const o of others) {
             await deleteProvider(o.id);
           }
+          clearSelection();
+          setShowDupModal(false);
         }}
       />
 
@@ -390,3 +532,7 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
+
+
+

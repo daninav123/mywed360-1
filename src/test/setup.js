@@ -39,7 +39,7 @@ afterEach(() => {
 vi.mock('react-beautiful-dnd', () => {
   const Noop = ({ children }) => (children);
   // Draggable y Droppable renderizan children()
-  const Draggable = ({ children, ...rest }) => {
+  const Draggable = ({ children }) => {
     const provided = {
       draggableProps: { style: {} },
       dragHandleProps: {},
@@ -47,7 +47,7 @@ vi.mock('react-beautiful-dnd', () => {
     };
     return children(provided, {});
   };
-  const Droppable = ({ children, ...rest }) => {
+  const Droppable = ({ children }) => {
     const provided = {
       droppableProps: {},
       innerRef: () => {}

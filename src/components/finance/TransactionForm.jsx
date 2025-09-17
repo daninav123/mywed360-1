@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '../ui';
 import { formatCurrency } from '../../utils/formatUtils';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Formulario para crear/editar transacciones
- * Incluye validación y categorías predefinidas
+ * Incluye validacion y categorias predefinidas
  */
 export default function TransactionForm({ transaction, onSave, onCancel, isLoading }) {
   const { t } = useTranslations();
@@ -24,16 +24,20 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
   });
 
   const [errors, setErrors] = useState({});
+  const [existingAttachments, setExistingAttachments] = useState([]);
+  const [newAttachments, setNewAttachments] = useState([]);
+  const fileInputRef = useRef(null);
 
-  // Categorías predefinidas (valores internos no traducidos para coherencia)
+
+  // Categorias predefinidas (valores internos no traducidos para coherencia)
   const categories = {
     expense: [
       'Catering',
-      'Música',
+      'Musica',
       'Flores',
-      'Fotografía',
+      'Fotografia',
       'Vestimenta',
-      'Decoración',
+      'Decoracion',
       'Transporte',
       'Alojamiento',
       'Invitaciones',
@@ -41,10 +45,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       'Otros'
     ],
     income: [
-      'Aportación inicial',
-      'Aportación mensual',
+      'Aportacion inicial',
+      'Aportacion mensual',
       'Regalo de boda',
-      'Aportación familiar',
+      'Aportacion familiar',
       'Otros ingresos'
     ]
   };
@@ -65,6 +69,11 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         status: transaction.status || defaultStatus,
         paidAmount: transaction.paidAmount != null ? String(transaction.paidAmount) : '',
       });
+      setExistingAttachments(Array.isArray(transaction.attachments) ? transaction.attachments : []);
+      setNewAttachments([]);
+    } else {
+      setExistingAttachments([]);
+      setNewAttachments([]);
     }
   }, [transaction]);
 
@@ -87,7 +96,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     }
 
     if (!formData.category) {
-      newErrors.category = t('finance.form.errors.categoryRequired', { defaultValue: 'La categor?a es obligatoria' });
+      newErrors.category = t('finance.form.errors.categoryRequired', { defaultValue: 'La categoria es obligatoria' });
     }
 
     if (formData.paidAmount !== '' && (Number.isNaN(paidValue) || paidValue < 0)) {
@@ -133,7 +142,29 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       transactionData.paidAmount = amountValue;
     }
 
-    await onSave(transactionData);
+    const attachmentsPayload = {
+      keep: existingAttachments,
+      newFiles: newAttachments,
+    };
+
+    await onSave({ ...transactionData, attachments: attachmentsPayload });
+  };
+
+  const handleAttachmentFiles = (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    setNewAttachments((prev) => [...prev, ...files]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveExistingAttachment = (index) => {
+    setExistingAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveNewAttachment = (index) => {
+    setNewAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Manejar cambios en los campos
@@ -180,7 +211,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     }
   };
 
-  // Obtener categorías según el tipo
+  // Obtener categorias según el tipo
   const availableCategories = categories[formData.type] || [];
   const statusOptions = formData.type === "income"
     ? [
@@ -312,10 +343,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
       </div>
 
-      {/* Categoría */}
+      {/* Categoria */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('finance.form.category', { defaultValue: 'Categoría' })} *
+          {t('finance.form.category', { defaultValue: 'Categoria' })} *
         </label>
         <select
           value={formData.category}
@@ -324,7 +355,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             errors.category ? 'border-red-500' : 'border-gray-300'
           }`}
         >
-          <option value="">{t('finance.form.selectCategory', { defaultValue: 'Selecciona una categoría' })}</option>
+          <option value="">{t('finance.form.selectCategory', { defaultValue: 'Selecciona una categoria' })}</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
               {category}
@@ -341,7 +372,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         <h3 className="text-sm font-medium text-gray-700 mb-2">{t('finance.form.paymentTracking', { defaultValue: 'Seguimiento de pago' })}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.form.dueDate', { defaultValue: 'Fecha límite' })}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.form.dueDate', { defaultValue: 'Fecha limite' })}</label>
             <input
               type="date"
               value={formData.dueDate}
@@ -349,7 +380,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
               className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
             />
             {isOverdue && (
-              <p className="mt-1 text-sm text-red-600">{t('finance.form.dueDateOverdue', { defaultValue: 'Atención: este pago está vencido.' })}</p>
+              <p className="mt-1 text-sm text-red-600">{t('finance.form.dueDateOverdue', { defaultValue: 'Atencion: este pago está vencido.' })}</p>
             )}
           </div>
           <div>
@@ -387,10 +418,85 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         </div>
       </div>
 
-      {/* Descripción adicional (opcional) */}
+      {/* Comprobantes */}
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">{t('finance.form.attachments.title', { defaultValue: 'Comprobantes' })}</h3>
+        <p className="text-xs text-gray-500 mb-3">{t('finance.form.attachments.help', { defaultValue: 'Adjunta facturas, contratos o recibos para tenerlos a mano.' })}</p>
+        <div className="space-y-2">
+          {existingAttachments.length > 0 && existingAttachments.map((attachment, index) => (
+            <div key={attachment.url || attachment.filename || index} className="flex items-center justify-between rounded border border-gray-200 px-3 py-2">
+              <div className="flex flex-col">
+                {attachment.url ? (
+                  <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="text-sm text-[color:var(--color-primary)] hover:underline">
+                    {attachment.filename || `${t('finance.transactions.attachment', { defaultValue: 'Adjunto' })} ${index + 1}`}
+                  </a>
+                ) : (
+                  <span className="text-sm text-[color:var(--color-text)]">
+                    {attachment.filename || `${t('finance.transactions.attachment', { defaultValue: 'Adjunto' })} ${index + 1}`}
+                  </span>
+                )}
+                {typeof attachment.size === 'number' && attachment.size > 0 && (
+                  <span className="text-xs text-gray-500">{(attachment.size / 1024).toFixed(1)} KB</span>
+                )}
+              </div>
+              <button
+                type="button"
+                className="text-sm text-[color:var(--color-danger)] hover:underline"
+                onClick={() => handleRemoveExistingAttachment(index)}
+                disabled={isLoading}
+              >
+                {t('finance.form.attachments.remove', { defaultValue: 'Quitar' })}
+              </button>
+            </div>
+          ))}
+          {newAttachments.length > 0 && newAttachments.map((file, index) => (
+            <div key={`${file.name}-${index}`} className="flex items-center justify-between rounded border border-dashed border-gray-200 px-3 py-2 bg-gray-50">
+              <div className="flex flex-col text-sm text-gray-700">
+                <span>{file.name}</span>
+                <span className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</span>
+              </div>
+              <button
+                type="button"
+                className="text-sm text-[color:var(--color-danger)] hover:underline"
+                onClick={() => handleRemoveNewAttachment(index)}
+                disabled={isLoading}
+              >
+                {t('finance.form.attachments.remove', { defaultValue: 'Quitar' })}
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+            onChange={handleAttachmentFiles}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+          >
+            {t('finance.form.attachments.add', { defaultValue: 'Adjuntar comprobante' })}
+          </Button>
+          {(existingAttachments.length + newAttachments.length) > 0 && (
+            <span className="text-xs text-gray-500 self-center">
+              {t('finance.form.attachments.count', { defaultValue: 'Total adjuntos:' })} {existingAttachments.length + newAttachments.length}
+            </span>
+          )}
+        </div>
+      </div>
+
+
+
+      {/* Descripcion adicional (opcional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('finance.form.description', { defaultValue: 'Descripción adicional' })}
+          {t('finance.form.description', { defaultValue: 'Descripcion adicional' })}
         </label>
         <textarea
           value={formData.description}

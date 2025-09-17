@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SeatingPlan refactorizado â€“ Componente principal
  */
 import React, { useEffect } from 'react';
@@ -63,6 +63,7 @@ const SeatingPlanRefactored = () => {
 
   // Mostrar/ocultar mesas
   const [showTables, setShowTables] = React.useState(true);
+  const [focusTableId, setFocusTableId] = React.useState(null);
   const toggleShowTables = () => setShowTables(s => !s);
   // Mostrar/ocultar reglas
   const [showRulers, setShowRulers] = React.useState(true);
@@ -74,19 +75,6 @@ const SeatingPlanRefactored = () => {
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
   // handler para fondo rÃ¡pido (prompt)
-  const handleOpenBackgroundQuick = () => {
-    try {
-      const url = window.prompt('URL de imagen (o data URL):');
-      if (!url) return;
-      const widthStr = window.prompt('Ancho real en metros:', '18');
-      const widthM = Math.max(1, parseFloat(widthStr || '18'));
-      const opacityStr = window.prompt('Opacidad (0-1):', '0.5');
-      const opacity = Math.max(0, Math.min(1, parseFloat(opacityStr || '0.5')));
-      setBackground({ dataUrl: url, widthCm: Math.round(widthM * 100), opacity });
-      toast.success('Fondo actualizado');
-    } catch (_) {}
-  };
-
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
   const safeTables = Array.isArray(tables) ? tables : [];
@@ -555,6 +543,10 @@ const SeatingPlanRefactored = () => {
 };
 
 export default SeatingPlanRefactored;
+
+
+
+
 
 
 

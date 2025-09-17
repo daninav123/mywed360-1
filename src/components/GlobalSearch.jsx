@@ -48,27 +48,30 @@ const GlobalSearch = () => {
       if (!isOpen) return;
       
       switch (e.key) {
-        case 'ArrowDown':
+        case 'ArrowDown': {
           e.preventDefault();
           setActiveIndex(prev => {
             const flatResults = getFlatResults();
             return Math.min(prev + 1, flatResults.length - 1);
           });
           break;
-          
-        case 'ArrowUp':
+        }
+
+        case 'ArrowUp': {
           e.preventDefault();
           setActiveIndex(prev => Math.max(prev - 1, -1));
           break;
-          
-        case 'Enter':
+        }
+
+        case 'Enter': {
           e.preventDefault();
           const flatResults = getFlatResults();
           if (activeIndex >= 0 && activeIndex < flatResults.length) {
             handleSelectResult(flatResults[activeIndex]);
           }
           break;
-          
+        }
+
         case 'Escape':
           e.preventDefault();
           setIsOpen(false);
@@ -316,7 +319,7 @@ const GlobalSearch = () => {
                 </div>
               ) : totalResults === 0 ? (
                 <div className="text-center p-8 text-gray-500">
-                  No se encontraron resultados para "{searchTerm}"
+                  No se encontraron resultados para &quot;{searchTerm}&quot;
                 </div>
               ) : (
                 <>

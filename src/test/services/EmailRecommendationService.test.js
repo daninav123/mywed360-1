@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import EmailRecommendationService from '../../services/EmailRecommendationService';
-import AIEmailTrackingService from '../../services/AIEmailTrackingService';
-
 // Mock del servicio de tracking
 vi.mock('../../services/AIEmailTrackingService', () => {
   return {

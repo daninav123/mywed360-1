@@ -1,9 +1,9 @@
+import { useState } from 'react';
+
 /**
  * Utilidades para renderizado seguro de Promesas en React JSX
  * Previene el error "Objects are not valid as a React child (found: [object Promise])"
  */
-
-import { useState, useEffect, useMemo, useCallback } from 'react';
 
 /**
  * Asegura que un valor no sea una Promesa antes de renderizarlo en JSX

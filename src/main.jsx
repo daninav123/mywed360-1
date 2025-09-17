@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 // Asegurar inicialización de i18n antes de cualquier uso de useTranslation
 import './i18n';

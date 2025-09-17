@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useWedding } from '../context/WeddingContext';
 import { Card, Button } from '../components/ui';
 import { getInstitutions, createRequisition, getRequisition } from '../services/bankConnectService';

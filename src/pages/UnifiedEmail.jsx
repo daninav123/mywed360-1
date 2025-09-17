@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import UsernameWizard from "../components/UsernameWizard";
 import useEmailUsername from "../hooks/useEmailUsername";
 import Button from "../components/ui/Button";

@@ -196,7 +196,9 @@ const SessionManager = ({ children }) => {
     isLoading 
   } = useAuth();
   
-  const { error, clearError, getErrorMessage } = useAuthError();
+  const error = null;
+  const clearError = useCallback(() => {}, []);
+  const getErrorMessage = useCallback((code) => code || 'Error de autenticación', []);
   
   // Estados locales
   const [showReauthModal, setShowReauthModal] = useState(false);

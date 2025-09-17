@@ -571,6 +571,39 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     return arr;
   };
 
+  const buildDoubleRing = () => {
+    const inner = buildCircularRing();
+    const outer = buildCircularRing();
+    return [
+      ...inner.map((table, index) => ({
+        ...table,
+        id: `${table.id || 'inner'}-${index}`,
+        radius: table.radius ? table.radius * 0.85 : table.radius,
+      })),
+      ...outer.map((table, index) => ({
+        ...table,
+        id: `${table.id || 'outer'}-${index}`,
+        radius: table.radius ? table.radius * 1.15 : table.radius,
+      })),
+    ];
+  };
+
+  const buildPerimeter = () => {
+    if (!hallW || !hallH) return buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape);
+    const tables = [];
+    const spacing = 200;
+    const seatsPerTable = Math.max(6, avgSeats);
+    for (let x = spacing; x < hallW - spacing; x += spacing) {
+      tables.push({ id: `top-${x}`, shape: defaultShape, seats: seatsPerTable, x, y: spacing });
+      tables.push({ id: `bottom-${x}`, shape: defaultShape, seats: seatsPerTable, x, y: hallH - spacing });
+    }
+    for (let y = spacing * 1.5; y < hallH - spacing * 1.5; y += spacing) {
+      tables.push({ id: `left-${y}`, shape: defaultShape, seats: seatsPerTable, x: spacing, y });
+      tables.push({ id: `right-${y}`, shape: defaultShape, seats: seatsPerTable, x: hallW - spacing, y });
+    }
+    return tables;
+  };
+
   const buildImperial = () => {
     const arr = [];
     const width = Math.min(hallW * 0.85, Math.max(baseWidth * 2, 800));

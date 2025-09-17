@@ -144,28 +144,180 @@
     "hairdresser": "Coiffeur"
   },
   "finance": {
-    "finance": "Finances",
-    "budget": "Budget",
-    "expenses": "Dépenses",
-    "income": "Revenus",
-    "balance": "Solde",
-    "totalBudget": "Budget total",
-    "spentAmount": "Montant dépensé",
-    "remainingBudget": "Budget restant",
-    "addExpense": "Ajouter une dépense",
-    "editExpense": "Modifier la dépense",
-    "deleteExpense": "Supprimer la dépense",
-    "expenseCategory": "Catégorie de dépense",
-    "expenseAmount": "Montant",
-    "expenseDate": "Date de la dépense",
-    "expenseDescription": "Description",
-    "paymentMethod": "Méthode de paiement",
-    "cash": "Espèces",
-    "card": "Carte",
-    "transfer": "Virement",
-    "budgetOverview": "Aperçu du budget",
-    "monthlyExpenses": "Dépenses mensuelles",
-    "categoryBreakdown": "Répartition par catégorie"
+    "tabs": {
+      "overview": "Aperçu",
+      "transactions": "Transactions",
+      "budget": "Budget",
+      "contributions": "Contributions",
+      "analytics": "Analytique"
+    },
+    "connectBank": {
+      "title": "Connectez votre banque pour importer des mouvements",
+      "desc": "Accélérez l’enregistrement des dépenses et revenus en reliant votre compte bancaire.",
+      "button": "Connecter la banque"
+    },
+    "alerts": {
+      "budget": "Alertes de budget"
+    },
+    "overview": {
+      "title": "Gestion financière",
+      "subtitle": "Contrôle complet du budget et des dépenses de votre mariage",
+      "lastSync": "Dernière synchronisation",
+      "synced": "Synchronisé",
+      "offline": "Hors ligne",
+      "totalBudget": "Budget total",
+      "totalSpent": "Total dépensé",
+      "ofBudget": "du budget",
+      "currentBalance": "Solde actuel",
+      "expectedIncome": "Revenu attendu",
+      "used": "utilisé",
+      "categoryStatus": "État du budget par catégories",
+      "progress": "Progression",
+      "exceededNote": "(Budget dépassé !)"
+    },
+    "form": {
+      "type": "Type de transaction",
+      "concept": "Concept",
+      "conceptPlaceholder": "ex: Paiement traiteur, Cadeau de mariage...",
+      "amount": "Montant (€)",
+      "amountLabel": "Montant :",
+      "date": "Date",
+      "category": "Catégorie",
+      "selectCategory": "Sélectionnez une catégorie",
+      "description": "Description supplémentaire",
+      "descriptionPlaceholder": "Détails supplémentaires sur la transaction...",
+      "transaction": "Transaction",
+      "errors": {
+        "conceptRequired": "Le concept est obligatoire",
+        "amountPositive": "Le montant doit être un nombre positif",
+        "dateRequired": "La date est obligatoire",
+        "categoryRequired": "La catégorie est obligatoire"
+      }
+    },
+    "contributions": {
+      "title": "Configuration des contributions",
+      "subtitle": "Configurez les contributions et estimez les revenus attendus",
+      "updateGuests": "Mettre à jour les invités",
+      "initial": {
+        "title": "Contributions initiales",
+        "personA": "Personne A (€)",
+        "personB": "Personne B (€)",
+        "total": "Total initial :"
+      },
+      "monthly": {
+        "title": "Contributions mensuelles",
+        "personA": "Personne A (€/mois)",
+        "personB": "Personne B (€/mois)",
+        "total": "Total mensuel :"
+      },
+      "extras": {
+        "title": "Contributions supplémentaires",
+        "totalLabel": "Total extras (famille, autres revenus) (€)",
+        "help": "Inclure les cadeaux de la famille, contributions des parents, etc."
+      },
+      "gifts": {
+        "title": "Estimation des cadeaux",
+        "giftPerGuest": "Cadeau estimé par invité (€)",
+        "guestCount": "Nombre d'invités",
+        "loadHint": "Cliquez sur l'icône pour charger automatiquement depuis votre liste d'invités",
+        "total": "Total estimé des cadeaux :"
+      },
+      "unsaved": "Vous avez des modifications non enregistrées",
+      "saveChanges": "Enregistrer les modifications",
+      "summary": {
+        "title": "Résumé des revenus attendus",
+        "subtitle": "Projection totale basée sur vos paramètres",
+        "initial": "Contributions initiales",
+        "monthly": "Contributions mensuelles",
+        "extras": "Contributions supplémentaires",
+        "gifts": "Cadeaux estimés",
+        "total": "Total attendu"
+      },
+      "tips": {
+        "title": "Conseils financiers",
+        "emergencyTitle": "Fonds d'urgence :",
+        "emergencyText": "Envisagez de réserver 10-15% du budget total pour les imprévus.",
+        "giftsTitle": "Cadeaux conservateurs :",
+        "giftsText": "Il vaut mieux sous-estimer les cadeaux de mariage que les surestimer.",
+        "reviewTitle": "Suivi régulier :",
+        "reviewText": "Examinez et mettez à jour ces projections mensuellement.",
+        "balanceTitle": "Contributions équilibrées :",
+        "balanceText": "Maintenez un équilibre juste entre les contributions des deux personnes."
+      }
+    },
+    "charts": {
+      "title": "Analyse financière",
+      "subtitle": "Visualisations et tendances de vos finances de mariage",
+      "totalTransactions": "Total des transactions",
+      "activeCategories": "Catégories actives",
+      "budgetEfficiency": "Efficacité du budget",
+      "projectedBalance": "Solde projeté",
+      "budgetVsSpentByCategory": "Budget vs Dépenses par catégorie",
+      "budgeted": "Budgété",
+      "spent": "Dépensé",
+      "expenseDistributionByCategory": "Répartition des dépenses par catégorie",
+      "monthlyTrend": "Tendance mensuelle des revenus et dépenses",
+      "income": "Revenus",
+      "expenses": "Dépenses",
+      "balance": "Solde",
+      "budgetProgressByCategory": "Progrès du budget par catégorie",
+      "used": "Utilisé",
+      "excess": "Excès",
+      "insights": "Informations financières",
+      "highestExpense": "Plus grande dépense",
+      "mostEfficient": "Le plus efficace",
+      "noData": "Données insuffisantes",
+      "currentTrend": "Tendance actuelle",
+      "trend": {
+        "positive": "Positive",
+        "negative": "Négative"
+      },
+      "balanceLabel": "Solde :"
+    },
+    "bank": {
+      "title": "Lier un compte bancaire",
+      "country": "Pays",
+      "countries": {
+        "es": "Espagne",
+        "fr": "France",
+        "de": "Allemagne",
+        "it": "Italie",
+        "pt": "Portugal"
+      },
+      "bankLabel": "Banque",
+      "selectBank": "Sélectionnez une banque",
+      "selectBankPlaceholder": "Sélectionnez une banque…",
+      "loadBanks": "Charger les banques",
+      "connect": "Connecter",
+      "errorLoad": "Impossible de charger les banques. L'intégration Nordigen peut ne pas être activée ou /api/bank non déployé.",
+      "errorStart": "Impossible de démarrer le lien",
+      "noRequisition": "Aucune réquisition démarrée",
+      "errorCheck": "Impossible de vérifier l'état",
+      "selectWedding": "Sélectionnez un mariage actif",
+      "linked": "Compte lié",
+      "errorSave": "Impossible d'enregistrer le compte",
+      "requirements": {
+        "title": "Exigences backend :",
+        "env": "Définir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY et NORDIGEN_BASE_URL",
+        "route": "Backend avec la route /api/bank déployée"
+      },
+      "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances → Transactions → \"Importer Banque\".",
+      "requisition": "Réquisition :",
+      "checkStatus": "Vérifier l'état",
+      "availableAccounts": "Comptes disponibles",
+      "useThis": "Utiliser ce compte"
+    },
+    "transactions": {
+      "title": "Transactions",
+      "headers": {
+        "date": "Date",
+        "concept": "Concept",
+        "category": "Catégorie",
+        "type": "Type",
+        "amount": "Montant",
+        "actions": "Actions"
+      }
+    }
   },
   "seating": {
     "seatingPlan": "Plan de table",
@@ -186,7 +338,130 @@
     "viewLayout": "Voir la disposition",
     "editLayout": "Modifier la disposition",
     "saveLayout": "Enregistrer la disposition",
-    "resetLayout": "Réinitialiser la disposition"
+    "resetLayout": "Réinitialiser la disposition",
+    "toolbar": {
+      "syncing": "Synchronisation...",
+      "synced": "Synchronisé",
+      "syncError": "Erreur de synchronisation",
+      "offline": "Hors ligne",
+      "undo": "Annuler",
+      "undoTooltip": "Annuler (Ctrl+Z)",
+      "redo": "Rétablir",
+      "redoTooltip": "Rétablir (Ctrl+Y)",
+      "hideTables": "Masquer les tables",
+      "showTables": "Afficher les tables",
+      "hideRulers": "Masquer les règles",
+      "showRulers": "Afficher les règles",
+      "rulers": "Règles",
+      "snapEnabled": "Accrochage actif",
+      "enableSnap": "Activer l'accrochage à la grille",
+      "disableSnap": "Désactiver l'accrochage",
+      "snap": "Snap",
+      "hideSeatNumbers": "Masquer les numéros",
+      "showSeatNumbers": "Afficher les numéros",
+      "seatNumbers": "Numéros",
+      "disableValidations": "Désactiver les validations",
+      "enableValidations": "Activer les validations",
+      "validations": "Contrôles",
+      "spaceConfig": "Configurer l'espace",
+      "space": "Espace",
+      "ceremonyConfig": "Configurer la cérémonie",
+      "ceremony": "Cérémonie",
+      "banquetConfig": "Configurer le banquet",
+      "banquet": "Banquet",
+      "clearBanquet": "Vider le plan",
+      "clear": "Vider",
+      "templates": "Modèles",
+      "export": "Exporter",
+      "capacityTooltip": "Capacité globale",
+      "capacityShort": "Cap",
+      "autoAssign": "Assigner automatiquement les invités",
+      "autoAssignShort": "Assignation auto",
+      "backgroundConfig": "Configurer le fond",
+      "background": "Fond",
+      "alignMenu": "Aligner/Répartir",
+      "align": "Aligner",
+      "alignLeft": "Gauche",
+      "alignCenterX": "Centre X",
+      "alignRight": "Droite",
+      "alignTop": "Haut",
+      "alignCenterY": "Centre Y",
+      "alignBottom": "Bas",
+      "distribute": "Répartir",
+      "distributeHorizontal": "Horizontal",
+      "distributeVertical": "Vertical"
+    },
+    "snapshots": {
+      "title": "Instantanés",
+      "button": "Instantanés",
+      "manage": "Gérer les instantanés",
+      "nameLabel": "Nom",
+      "namePlaceholder": "ex. Plan de base",
+      "saveCurrent": "Enregistrer l'actuel",
+      "empty": "Aucun instantané",
+      "load": "Charger",
+      "delete": "Supprimer",
+      "nameRequired": "Saisissez un nom"
+    },
+    "sidebar": {
+      "tools": "Outils",
+      "pending": "En attente ({{count}})",
+      "hideGuests": "Masquer les invités",
+      "showGuests": "Afficher les invités",
+      "searchGuests": "Rechercher des invités...",
+      "noResults": "Aucune correspondance",
+      "allAssigned": "Tous les invités sont assignés",
+      "conflictsTitle": "Conflits",
+      "conflictPerimeter": "Périmètre",
+      "conflictObstacle": "Obstacles",
+      "conflictAisles": "Allées",
+      "conflictOverbooking": "Suroccupation",
+      "noConflicts": "Aucun conflit",
+      "focusTable": "Centrer sur le plan",
+      "fix": "Corriger",
+      "noSuggestions": "Aucune suggestion",
+      "assignGuestButton": "Assigner",
+      "weightsTitle": "Pondérations",
+      "weightFit": "Adéquation",
+      "weightSide": "Côté",
+      "weightTogether": "Asseoir ensemble",
+      "weightAvoid": "Éviter",
+      "tableDefault": "Table {{id}}",
+      "configureTable": "Configurer la table",
+      "type": "Type",
+      "seats": "Places",
+      "shape": "Forme",
+      "dimensions": "Dimensions",
+      "widthCm": "Largeur (cm)",
+      "lengthCm": "Longueur (cm)",
+      "assignedGuests": "Invités assignés ({{count}})",
+      "removeGuest": "Retirer l'invité",
+      "noAssigned": "Aucun invité assigné",
+      "usePanelToAssign": "Utilisez ce panneau pour assigner des invités.",
+      "guests": "Invités",
+      "duplicateTable": "Dupliquer la table",
+      "deleteTable": "Supprimer la table"
+    },
+    "tools": {
+      "pan": "Déplacer",
+      "moveTables": "Déplacer les tables",
+      "boundary": "Périmètre",
+      "doors": "Portes",
+      "obstacles": "Obstacles",
+      "aisles": "Allées",
+      "erase": "Effacer"
+    },
+    "hints": {
+      "boundary": "Cliquez et faites glisser pour délimiter la salle.",
+      "obstacle": "Cliquez pour placer des obstacles et faites-les glisser pour les ajuster.",
+      "door": "Cliquez pour ajouter des portes ou des accès.",
+      "aisle": "Faites glisser pour tracer les allées entre les tables."
+    },
+    "export": {
+      "pdf": "PDF",
+      "png": "PNG",
+      "csv": "CSV"
+    }
   },
   "email": {
     "email": "Email",
@@ -292,8 +567,7 @@
     "cancelled": "Annulé",
     "draft": "Brouillon",
     "published": "Publié"
-  }
-  ,
+  },
   "inspiration": {
     "alt": "inspiration",
     "altWithTags": "inspiration : {{tags}}",
@@ -301,132 +575,6 @@
     "ariaWithTags": "Image d'inspiration : {{tags}}",
     "addFav": "Ajouter aux favoris",
     "removeFav": "Retirer des favoris"
-  },
-  "finance": {
-    "tabs": {
-      "overview": "Aperçu",
-      "transactions": "Transactions",
-      "budget": "Budget",
-      "contributions": "Contributions",
-      "analytics": "Analytique"
-    },
-    "connectBank": {
-      "title": "Connectez votre banque pour importer des mouvements",
-      "desc": "Accélérez l’enregistrement des dépenses et revenus en reliant votre compte bancaire.",
-      "button": "Connecter la banque"
-    },
-    "alerts": {
-      "budget": "Alertes de budget"
-    }
-    ,
-    "overview": {
-      "title": "Gestion financière",
-      "subtitle": "Contrôle complet du budget et des dépenses de votre mariage",
-      "lastSync": "Dernière synchronisation",
-      "synced": "Synchronisé",
-      "offline": "Hors ligne",
-      "totalBudget": "Budget total",
-      "totalSpent": "Total dépensé",
-      "ofBudget": "du budget",
-      "currentBalance": "Solde actuel",
-      "expectedIncome": "Revenu attendu",
-      "used": "utilisé",
-      "categoryStatus": "État du budget par catégories",
-      "progress": "Progression",
-      "exceededNote": "(Budget dépassé !)"
-    },
-    "form": {
-      "type": "Type de transaction",
-      "concept": "Concept",
-      "conceptPlaceholder": "ex: Paiement traiteur, Cadeau de mariage...",
-      "amount": "Montant (€)",
-      "amountLabel": "Montant :",
-      "date": "Date",
-      "category": "Catégorie",
-      "selectCategory": "Sélectionnez une catégorie",
-      "description": "Description supplémentaire",
-      "descriptionPlaceholder": "Détails supplémentaires sur la transaction...",
-      "transaction": "Transaction",
-      "errors": {
-        "conceptRequired": "Le concept est obligatoire",
-        "amountPositive": "Le montant doit être un nombre positif",
-        "dateRequired": "La date est obligatoire",
-        "categoryRequired": "La catégorie est obligatoire"
-      }
-    },
-    "contributions": {
-      "title": "Configuration des contributions",
-      "subtitle": "Configurez les contributions et estimez les revenus attendus",
-      "updateGuests": "Mettre à jour les invités",
-      "initial": {"title": "Contributions initiales", "personA": "Personne A (€)", "personB": "Personne B (€)", "total": "Total initial :"},
-      "monthly": {"title": "Contributions mensuelles", "personA": "Personne A (€/mois)", "personB": "Personne B (€/mois)", "total": "Total mensuel :"},
-      "extras": {"title": "Contributions supplémentaires", "totalLabel": "Total extras (famille, autres revenus) (€)", "help": "Inclure les cadeaux de la famille, contributions des parents, etc."},
-      "gifts": {"title": "Estimation des cadeaux", "giftPerGuest": "Cadeau estimé par invité (€)", "guestCount": "Nombre d'invités", "loadHint": "Cliquez sur l'icône pour charger automatiquement depuis votre liste d'invités", "total": "Total estimé des cadeaux :"},
-      "unsaved": "Vous avez des modifications non enregistrées",
-      "saveChanges": "Enregistrer les modifications",
-      "summary": {"title": "Résumé des revenus attendus", "subtitle": "Projection totale basée sur vos paramètres", "initial": "Contributions initiales", "monthly": "Contributions mensuelles", "extras": "Contributions supplémentaires", "gifts": "Cadeaux estimés", "total": "Total attendu"},
-      "tips": {"title": "Conseils financiers", "emergencyTitle": "Fonds d'urgence :", "emergencyText": "Envisagez de réserver 10-15% du budget total pour les imprévus.", "giftsTitle": "Cadeaux conservateurs :", "giftsText": "Il vaut mieux sous-estimer les cadeaux de mariage que les surestimer.", "reviewTitle": "Suivi régulier :", "reviewText": "Examinez et mettez à jour ces projections mensuellement.", "balanceTitle": "Contributions équilibrées :", "balanceText": "Maintenez un équilibre juste entre les contributions des deux personnes."}
-    },
-    "charts": {
-      "title": "Analyse financière",
-      "subtitle": "Visualisations et tendances de vos finances de mariage",
-      "totalTransactions": "Total des transactions",
-      "activeCategories": "Catégories actives",
-      "budgetEfficiency": "Efficacité du budget",
-      "projectedBalance": "Solde projeté",
-      "budgetVsSpentByCategory": "Budget vs Dépenses par catégorie",
-      "budgeted": "Budgété",
-      "spent": "Dépensé",
-      "expenseDistributionByCategory": "Répartition des dépenses par catégorie",
-      "monthlyTrend": "Tendance mensuelle des revenus et dépenses",
-      "income": "Revenus",
-      "expenses": "Dépenses",
-      "balance": "Solde",
-      "budgetProgressByCategory": "Progrès du budget par catégorie",
-      "used": "Utilisé",
-      "excess": "Excès",
-      "insights": "Informations financières",
-      "highestExpense": "Plus grande dépense",
-      "mostEfficient": "Le plus efficace",
-      "noData": "Données insuffisantes",
-      "currentTrend": "Tendance actuelle",
-      "trend": {"positive": "Positive", "negative": "Négative"},
-      "balanceLabel": "Solde :"
-    },
-    "bank": {
-      "title": "Lier un compte bancaire",
-      "country": "Pays",
-      "countries": {"es": "Espagne", "fr": "France", "de": "Allemagne", "it": "Italie", "pt": "Portugal"},
-      "bankLabel": "Banque",
-      "selectBank": "Sélectionnez une banque",
-      "selectBankPlaceholder": "Sélectionnez une banque…",
-      "loadBanks": "Charger les banques",
-      "connect": "Connecter",
-      "errorLoad": "Impossible de charger les banques. L'intégration Nordigen peut ne pas être activée ou /api/bank non déployé.",
-      "errorStart": "Impossible de démarrer le lien",
-      "noRequisition": "Aucune réquisition démarrée",
-      "errorCheck": "Impossible de vérifier l'état",
-      "selectWedding": "Sélectionnez un mariage actif",
-      "linked": "Compte lié",
-      "errorSave": "Impossible d'enregistrer le compte",
-      "requirements": {"title": "Exigences backend :", "env": "Définir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY et NORDIGEN_BASE_URL", "route": "Backend avec la route /api/bank déployée"},
-      "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances → Transactions → \"Importer Banque\".",
-      "requisition": "Réquisition :",
-      "checkStatus": "Vérifier l'état",
-      "availableAccounts": "Comptes disponibles",
-      "useThis": "Utiliser ce compte"
-    },
-    "transactions": {
-      "title": "Transactions",
-      "headers": {
-        "date": "Date",
-        "concept": "Concept",
-        "category": "Catégorie",
-        "type": "Type",
-        "amount": "Montant",
-        "actions": "Actions"
-      }
-    }
   },
   "compose": {
     "toField": "Champ destinataire",
@@ -511,5 +659,15 @@
         "amountAsc": "Montant (plus bas d'abord)"
       }
     }
+  },
+  "common": {
+    "all": "Tous",
+    "none": "Aucun",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "view": "Voir",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer"
   }
 }

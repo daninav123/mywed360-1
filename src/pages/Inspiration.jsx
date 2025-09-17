@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { trackInteraction } from '../services/inspirationService';
 import { fetchWall } from '../services/wallService';
 import { saveData, loadData } from '../services/SyncService';

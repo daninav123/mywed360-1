@@ -97,7 +97,6 @@ describe('AIEmailTrackingService', () => {
   
   it('debe actualizar una actividad cuando se recibe respuesta', () => {
     // Preparar datos de prueba
-    const aiResult = { id: 123, name: 'Proveedor Test' };
     localStorage.getItem.mockReturnValueOnce(JSON.stringify([
       { id: 'ai_123', aiResultId: 123, timestamp: new Date().toISOString() }
     ]));

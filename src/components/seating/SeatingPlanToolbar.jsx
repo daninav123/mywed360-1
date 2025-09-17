@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Componente Toolbar modernizado para el plan de asientos
  * Interfaz mejorada con iconos claros y mejor UX
  */
@@ -238,27 +238,28 @@ const SeatingPlanToolbar = ({
             <span className="hidden sm:inline">{t('seating.toolbar.rulers', { defaultValue: 'Reglas' })}</span>
           </button>
 
-          {/* Snap a cuadrícula */}
+          {/* Snap a cuadricula */}
           <button type="button"
             onClick={onToggleSnap}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${snapEnabled ? 'text-blue-700' : ''}`}
-            title={snapEnabled ? `${t('seating.toolbar.snapEnabled', { defaultValue: 'Snap activado' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadrícula' })}
+            title={snapEnabled ? `${t('seating.toolbar.snapEnabled', { defaultValue: 'Snap activado' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadricula' })}
             aria-pressed={snapEnabled}
-            aria-label={snapEnabled ? `${t('seating.toolbar.disableSnap', { defaultValue: 'Desactivar snap' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadrícula' })}
+            aria-label={snapEnabled ? `${t('seating.toolbar.disableSnap', { defaultValue: 'Desactivar snap' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadricula' })}
           >
             <Magnet className="h-4 w-4"/>
             <span className="hidden sm:inline">{t('seating.toolbar.snap', { defaultValue: 'Snap' })}</span>
           </button>
 
-          {/* Numeración */}
+          {/* Numeracion */}
           <button type="button"
             onClick={onToggleSeatNumbers}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${showSeatNumbers ? 'text-blue-700' : ''}`}
-            title={showSeatNumbers ? t('seating.toolbar.hideSeatNumbers', { defaultValue: 'Ocultar numeración' }) : t('seating.toolbar.showSeatNumbers', { defaultValue: 'Mostrar numeración' })}
+            title={showSeatNumbers ? t('seating.toolbar.hideSeatNumbers', { defaultValue: 'Ocultar numeracion' }) : t('seating.toolbar.showSeatNumbers', { defaultValue: 'Mostrar numeracion' })}
             aria-pressed={showSeatNumbers}
+            aria-label={showSeatNumbers ? t('seating.toolbar.hideSeatNumbers', { defaultValue: 'Ocultar numeracion' }) : t('seating.toolbar.showSeatNumbers', { defaultValue: 'Mostrar numeracion' })}
           >
             <Rows className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('seating.toolbar.seatNumbers', { defaultValue: 'Números' })}</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.seatNumbers', { defaultValue: 'Numeros' })}</span>
           </button>
 
           {/* Validaciones en vivo */}
@@ -313,11 +314,11 @@ const SeatingPlanToolbar = ({
             <button type="button"
               onClick={onOpenCapacity}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-               title={`${t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}: ${globalMaxSeats || '--'}`}
-               aria-label={t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}
+              title={`${t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}: ${globalMaxSeats || '--'}`}
+              aria-label={t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}
             >
               <Users className="h-4 w-4" />
-               <span className="hidden sm:inline">{t('seating.toolbar.capacityShort', { defaultValue: 'Cap' })}: {globalMaxSeats || '--'}</span>
+              <span className="hidden sm:inline">{t('seating.toolbar.capacityShort', { defaultValue: 'Cap' })}: {globalMaxSeats || '--'}</span>
             </button>
           )}
 
@@ -468,7 +469,7 @@ const SeatingPlanToolbar = ({
         </div>
       </div>
 
-      {/* Barra de progreso de Sincronización */}
+      {/* Barra de progreso de Sincronizacion */}
       {syncStatus?.status === 'syncing' && (
         <div className="h-1 bg-gray-200">
           <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }} />

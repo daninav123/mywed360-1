@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProveedorCard from "./ProveedorCard";
 import { FixedSizeList as List } from "react-window";
@@ -8,8 +8,8 @@ import { FixedSizeList as List } from "react-window";
  */
 
 /**
- * Lista de proveedores con pestañas (Contratados, Buscados, Favoritos).
- * Activa virtualización cuando la lista es muy grande para mejorar rendimiento.
+ * Lista de proveedores con pestanas (Contratados, Buscados, Favoritos).
+ * Activa virtualizacion cuando la lista es muy grande para mejorar rendimiento.
  */
 const ProveedorList = ({
   providers,
@@ -23,6 +23,7 @@ const ProveedorList = ({
   onOpenCompare,
   onOpenBulkStatus,
   onOpenDuplicates,
+  onClearSelection,
 }) => {
   const navigate = useNavigate();
 
@@ -126,6 +127,15 @@ const ProveedorList = ({
             Revisar duplicados
           </button>
         )}
+        {typeof onClearSelection === "function" && (
+          <button
+            type="button"
+            onClick={onClearSelection}
+            className="px-3 py-1 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
+          >
+            Limpiar
+          </button>
+        )}
       </div>
     );
   };
@@ -150,7 +160,7 @@ const ProveedorList = ({
               ))
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
-                No hay proveedores en esta pestaña.
+                No hay proveedores en esta pestana.
               </div>
             )}
           </div>

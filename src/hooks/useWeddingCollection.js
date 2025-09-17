@@ -7,8 +7,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
-  query,
   serverTimestamp,
 } from 'firebase/firestore';
 
@@ -44,7 +42,6 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
 
   useEffect(() => {
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
-    let isMounted = true;
     const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS !== 'false';
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
@@ -66,7 +63,6 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
           collection: col,
           writeBatch,
           doc: fDoc,
-          getDoc,
         } = await import('firebase/firestore');
 
         const destCol = col(db, 'weddings', weddingId, 'guests');

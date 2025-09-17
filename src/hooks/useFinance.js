@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
-import { useFirestoreCollection } from './useFirestoreCollection';
+import { uploadEmailAttachments } from '../services/storageUploadService';
 import { useWedding } from '../context/WeddingContext';
+import { useFirestoreCollection } from './useFirestoreCollection';
 import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { getTransactions } from '../services/bankService';
 
-// Hook centralizado para gestión de finanzas
-// Maneja transacciones, presupuestos, aportaciones y sincronización
+// Hook centralizado para gestiÃ³n de finanzas
+// Maneja transacciones, presupuestos, aportaciones y sincronizaciÃ³n
 export default function useFinance() {
   const { activeWedding } = useWedding();
 
@@ -16,7 +17,7 @@ export default function useFinance() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Configuración de aportaciones y regalos
+  // ConfiguraciÃ³n de aportaciones y regalos
   const [contributions, setContributions] = useState({
     initA: 0,
     initB: 0,
@@ -27,7 +28,7 @@ export default function useFinance() {
     guestCount: 0,
   });
 
-  // Presupuesto y categorías (persistido en Firestore)
+  // Presupuesto y categorÃ­as (persistido en Firestore)
   const [budget, setBudget] = useState({
     total: 0,
     categories: [],
@@ -41,7 +42,7 @@ export default function useFinance() {
   // Indica si hay cuenta bancaria vinculada
   const [hasBankAccount, setHasBankAccount] = useState(false);
 
-  // Transacciones usando Firestore (subcolección weddings/{id}/transactions)
+  // Transacciones usando Firestore (subcolecciÃ³n weddings/{id}/transactions)
   const {
     data: transactions,
     addItem: _addTransaction,
@@ -63,7 +64,24 @@ export default function useFinance() {
     [activeWedding]
   );
 
-  // Cálculos memoizados
+  // CÃ¡lculos memoizados
+  const normalizePaidAmount = useCallback((transaction) => {
+    if (!transaction) return 0;
+    const type = transaction.type || 'expense';
+    const status = transaction.status || (type === 'income' ? 'expected' : 'pending');
+    const amount = Number(transaction.amount) || 0;
+    const rawPaid = Number(transaction.paidAmount);
+    let paid = Number.isFinite(rawPaid) ? rawPaid : 0;
+    if (amount > 0) {
+      paid = Math.min(Math.max(paid, 0), amount);
+    } else {
+      paid = Math.max(paid, 0);
+    }
+    if (type === 'expense' && status === 'paid' && paid === 0) return amount;
+    if (type === 'income' && status === 'received' && paid === 0) return amount;
+    return paid;
+  }, []);
+
   const monthlyContrib = useMemo(
     () => contributions.monthlyA + contributions.monthlyB,
     [contributions.monthlyA, contributions.monthlyB]
@@ -88,15 +106,15 @@ export default function useFinance() {
     if (!Array.isArray(transactions)) return 0;
     return transactions
       .filter((t) => t.type === 'expense')
-      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-  }, [transactions]);
+      .reduce((sum, t) => sum + normalizePaidAmount(t), 0);
+  }, [transactions, normalizePaidAmount]);
 
   const totalIncome = useMemo(() => {
     if (!Array.isArray(transactions)) return 0;
     return transactions
       .filter((t) => t.type === 'income')
-      .reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-  }, [transactions]);
+      .reduce((sum, t) => sum + normalizePaidAmount(t), 0);
+  }, [transactions, normalizePaidAmount]);
 
   const currentBalance = useMemo(
     () => totalIncome - totalSpent + expectedIncome,
@@ -108,10 +126,8 @@ export default function useFinance() {
     return budget.categories.map((category) => {
       const spent = Array.isArray(transactions)
         ? transactions
-            .filter(
-              (t) => t.type === 'expense' && t.category === category.name
-            )
-            .reduce((sum, t) => sum + (Number(t.amount) || 0), 0)
+            .filter((t) => t.type === 'expense' && t.category === category.name)
+            .reduce((sum, t) => sum + normalizePaidAmount(t), 0)
         : 0;
 
       return {
@@ -124,7 +140,30 @@ export default function useFinance() {
     });
   }, [budget.categories, transactions]);
 
-  // Estadísticas generales
+  // EstadÃ­sticas generales
+  const paymentHealth = useMemo(() => {
+    if (!Array.isArray(transactions)) {
+      return { pendingExpenses: 0, overdueExpenses: 0 };
+    }
+    const now = new Date();
+    return transactions.reduce((acc, tx) => {
+      if (tx.type !== 'expense') return acc;
+      const amount = Number(tx.amount) || 0;
+      const paid = normalizePaidAmount(tx);
+      const outstanding = Math.max(0, amount - paid);
+      if (outstanding > 0) {
+        acc.pendingExpenses += outstanding;
+        if (tx.dueDate) {
+          const due = new Date(tx.dueDate);
+          if (!Number.isNaN(due.getTime()) && due < now && (tx.status || '') !== 'paid') {
+            acc.overdueExpenses += outstanding;
+          }
+        }
+      }
+      return acc;
+    }, { pendingExpenses: 0, overdueExpenses: 0 });
+  }, [transactions, normalizePaidAmount]);
+
   const stats = useMemo(
     () => ({
       totalBudget: budget.total,
@@ -136,6 +175,8 @@ export default function useFinance() {
       budgetRemaining: budget.total - totalSpent,
       budgetUsagePercentage:
         budget.total > 0 ? (totalSpent / budget.total) * 100 : 0,
+      pendingExpenses: paymentHealth.pendingExpenses,
+      overdueExpenses: paymentHealth.overdueExpenses,
     }),
     [
       budget.total,
@@ -144,16 +185,18 @@ export default function useFinance() {
       currentBalance,
       expectedIncome,
       emergencyAmount,
+      paymentHealth.pendingExpenses,
+      paymentHealth.overdueExpenses,
     ]
   );
 
-  // Suscribirse a cambios en el estado de sincronización
+  // Suscribirse a cambios en el estado de sincronizaciÃ³n
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
     return () => unsubscribe();
   }, []);
 
-  // Cargar número de invitados desde el perfil de la boda
+  // Cargar nÃºmero de invitados desde el perfil de la boda
   const loadGuestCount = useCallback(async () => {
     if (!activeWedding) return;
 
@@ -172,7 +215,7 @@ export default function useFinance() {
         }
       }
     } catch (err) {
-      console.error('Error cargando número de invitados:', err);
+      console.error('Error cargando nÃºmero de invitados:', err);
       setError('Error cargando datos del perfil');
     } finally {
       setIsLoading(false);
@@ -232,7 +275,7 @@ export default function useFinance() {
     return () => unsub();
   }, [activeWedding]);
 
-  // Actualizar configuración de aportaciones y persistir
+  // Actualizar configuraciÃ³n de aportaciones y persistir
   const updateContributions = useCallback(
     (updates) => {
       setContributions((prev) => {
@@ -244,11 +287,11 @@ export default function useFinance() {
     [persistFinanceDoc]
   );
 
-  // Gestión de categorías de presupuesto
+  // GestiÃ³n de categorÃ­as de presupuesto
   const addBudgetCategory = useCallback(
     (name, amount = 0) => {
       if (!name || budget.categories.find((c) => c.name === name)) {
-        return { success: false, error: 'Categoría ya existe o nombre inválido' };
+        return { success: false, error: 'CategorÃ­a ya existe o nombre invÃ¡lido' };
       }
       const nextCategories = [...budget.categories, { name, amount }];
       setBudget((prev) => ({ ...prev, categories: nextCategories }));
@@ -313,19 +356,78 @@ export default function useFinance() {
     [settings, persistFinanceDoc]
   );
 
-  // Gestión de transacciones
+  // GestiÃ³n de transacciones
   const createTransaction = useCallback(
     async (transactionData) => {
       try {
         setIsLoading(true);
-        const saved = await _addTransaction({
-          ...transactionData,
-          date:
-            transactionData.date || new Date().toISOString().split('T')[0],
-          createdAt: new Date().toISOString(),
-        });
+        const type = transactionData.type || 'expense';
+        const amount = Number(transactionData.amount) || 0;
+        const status = transactionData.status || (type === 'income' ? 'expected' : 'pending');
 
-        // Sincronizar con localStorage para compatibilidad legacy (movements)
+        let paidAmount = transactionData.paidAmount;
+        if (paidAmount === '' || paidAmount === undefined) {
+          paidAmount = null;
+        } else if (paidAmount !== null) {
+          const numericPaid = Number(paidAmount);
+          paidAmount = Number.isFinite(numericPaid) ? numericPaid : null;
+        }
+
+        if (paidAmount !== null) {
+          if (amount > 0) {
+            paidAmount = Math.min(Math.max(paidAmount, 0), amount);
+          } else {
+            paidAmount = Math.max(paidAmount, 0);
+          }
+        }
+
+        if (type === 'expense' && status === 'paid' && (paidAmount === null || paidAmount === 0)) {
+          paidAmount = amount;
+        }
+
+        if (type === 'income' && status === 'received' && (paidAmount === null || paidAmount === 0)) {
+          paidAmount = amount;
+        }
+
+        const attachmentsSpec = transactionData.attachments || {};
+        const keepAttachments = Array.isArray(attachmentsSpec.keep) ? attachmentsSpec.keep : [];
+        const filesToUpload = Array.isArray(attachmentsSpec.newFiles) ? attachmentsSpec.newFiles : [];
+
+        const payload = {
+          ...transactionData,
+          type,
+          status,
+          amount,
+          provider: (transactionData.provider || '').trim(),
+          dueDate: transactionData.dueDate || null,
+          paidAmount,
+          date: transactionData.date || new Date().toISOString().split('T')[0],
+          createdAt: new Date().toISOString(),
+        };
+
+        delete payload.attachments;
+
+        if (!payload.provider) delete payload.provider;
+        if (!payload.dueDate) payload.dueDate = null;
+        if (payload.paidAmount === null) delete payload.paidAmount;
+        if (payload.category) payload.category = String(payload.category).trim();
+
+        let uploadedAttachments = [];
+        if (filesToUpload.length > 0) {
+          uploadedAttachments = await uploadEmailAttachments(filesToUpload, activeWedding || 'anonymous', 'finance');
+        }
+
+        if (keepAttachments.length > 0 || uploadedAttachments.length > 0) {
+          const nowIso = new Date().toISOString();
+          const attachments = [
+            ...keepAttachments,
+            ...uploadedAttachments.map((file) => ({ ...file, uploadedAt: nowIso })),
+          ];
+          payload.attachments = attachments;
+        }
+
+        const saved = await _addTransaction(payload);
+
         const updatedTransactions = [...transactions, saved];
         saveData('movements', updatedTransactions, {
           docPath: activeWedding
@@ -349,17 +451,110 @@ export default function useFinance() {
   const updateTransaction = useCallback(
     async (id, changes) => {
       try {
-        await _updateTransaction(id, changes);
+        const existing = Array.isArray(transactions)
+          ? transactions.find((tx) => tx.id === id)
+          : null;
+
+        const type = changes?.type || existing?.type || 'expense';
+        const baseAmount = changes?.amount !== undefined ? Number(changes.amount) || 0 : Number(existing?.amount) || 0;
+        const resolvedStatus = changes?.status || existing?.status || (type === 'income' ? 'expected' : 'pending');
+
+        const payload = { ...changes };
+
+        let keepAttachments = [];
+        let filesToUpload = [];
+        const hasAttachmentsSpec = Object.prototype.hasOwnProperty.call(changes || {}, 'attachments');
+        if (hasAttachmentsSpec) {
+          const attachmentSpec = changes.attachments || {};
+          keepAttachments = Array.isArray(attachmentSpec.keep) ? attachmentSpec.keep : [];
+          filesToUpload = Array.isArray(attachmentSpec.newFiles) ? attachmentSpec.newFiles : [];
+        }
+
+        if (Object.prototype.hasOwnProperty.call(payload, 'attachments')) {
+          delete payload.attachments;
+        }
+
+        if (changes?.amount !== undefined) {
+          payload.amount = baseAmount;
+        }
+
+        if (changes?.status !== undefined) {
+          payload.status = resolvedStatus;
+        }
+
+        if (changes?.provider !== undefined) {
+          const provider = (changes.provider || '').trim();
+          payload.provider = provider || null;
+        }
+
+        if (changes?.dueDate !== undefined) {
+          payload.dueDate = changes.dueDate || null;
+        }
+
+        const shouldAdjustPaid =
+          Object.prototype.hasOwnProperty.call(changes || {}, 'paidAmount') ||
+          Object.prototype.hasOwnProperty.call(changes || {}, 'status');
+
+        if (shouldAdjustPaid) {
+          let paidAmount = changes?.paidAmount;
+          if (paidAmount === '' || paidAmount === undefined) {
+            paidAmount = null;
+          } else if (paidAmount !== null) {
+            const numericPaid = Number(paidAmount);
+            paidAmount = Number.isFinite(numericPaid) ? numericPaid : null;
+          } else if (existing && existing.paidAmount != null && changes?.paidAmount === null) {
+            paidAmount = null;
+          }
+
+          if (paidAmount !== null) {
+            if (baseAmount > 0) {
+              paidAmount = Math.min(Math.max(paidAmount, 0), baseAmount);
+            } else {
+              paidAmount = Math.max(paidAmount, 0);
+            }
+          }
+
+          if (type === 'expense' && resolvedStatus === 'paid' && (paidAmount === null || paidAmount === 0)) {
+            paidAmount = baseAmount;
+          }
+          if (type === 'income' && resolvedStatus === 'received' && (paidAmount === null || paidAmount === 0)) {
+            paidAmount = baseAmount;
+          }
+
+          if (paidAmount === null) {
+            if (Object.prototype.hasOwnProperty.call(payload, 'paidAmount')) {
+              delete payload.paidAmount;
+            }
+          } else {
+            payload.paidAmount = paidAmount;
+          }
+        }
+
+        let uploadedAttachments = [];
+        if (filesToUpload.length > 0) {
+          uploadedAttachments = await uploadEmailAttachments(filesToUpload, activeWedding || 'anonymous', 'finance');
+        }
+
+        if (hasAttachmentsSpec) {
+          const nowIso = new Date().toISOString();
+          const attachments = [
+            ...keepAttachments,
+            ...uploadedAttachments.map((file) => ({ ...file, uploadedAt: nowIso })),
+          ];
+          payload.attachments = attachments;
+        }
+
+        await _updateTransaction(id, payload);
         return { success: true };
       } catch (err) {
         console.error('Error actualizando transacción:', err);
         return { success: false, error: err.message };
       }
     },
-    [_updateTransaction]
+    [_updateTransaction, transactions, activeWedding]
   );
 
-  const deleteTransaction = useCallback(
+    const deleteTransaction = useCallback(
     async (id) => {
       try {
         await _deleteTransaction(id);
@@ -388,11 +583,17 @@ export default function useFinance() {
         const bankTransactions = await getTransactions(options);
 
         for (const transaction of bankTransactions) {
+          const amount = Math.abs(transaction.amount);
+          const type = transaction.amount < 0 ? 'expense' : 'income';
           await createTransaction({
             concept: transaction.description,
-            amount: Math.abs(transaction.amount),
-            type: transaction.amount < 0 ? 'expense' : 'income',
+            amount,
+            type,
             category: transaction.category || 'OTROS',
+            provider: transaction.provider || transaction.counterparty || '',
+            dueDate: transaction.dueDate || transaction.bookingDate || null,
+            status: type === 'expense' ? 'paid' : 'received',
+            paidAmount: amount,
             source: 'bank',
           });
         }
@@ -432,7 +633,7 @@ export default function useFinance() {
     budget,
     transactions,
 
-    // Cálculos
+    // CÃ¡lculos
     stats,
     budgetUsage,
     settings,
@@ -459,3 +660,14 @@ export default function useFinance() {
     hasBankAccount,
   };
 }
+
+
+
+
+
+
+
+
+
+
+

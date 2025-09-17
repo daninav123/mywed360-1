@@ -8,18 +8,17 @@ import { toBlob } from 'html-to-image';
 
 // Importamos nuestros componentes de iconos personalizados
 import {
-  IconArrowLeft,
-  IconReply,
-  IconTrash,
-  IconDownload,
-  IconStar,
-  IconMoreHorizontal as IconMore,
-  IconExternalLink as IconExternal,
-  IconPrinter,
-  IconFlag,
-  IconArrowLeftRight,
-  IconFolderMove
-} from '../../ui/IconComponents';
+  ArrowLeft,
+  Reply,
+  Trash,
+  Download,
+  Star,
+  MoreHorizontal,
+  ExternalLink,
+  Printer,
+  Flag,
+  ArrowLeftRight
+} from 'lucide-react';
 import Button from '../../Button';
 import EmailCategoryLabel from './EmailCategoryLabel';
 

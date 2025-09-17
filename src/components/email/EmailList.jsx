@@ -186,6 +186,25 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
         >
           {truncate(stripHtml(email.body), 120)}
         </p>
+        {email.aiClassification?.tags?.length ? (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {email.aiClassification.tags.slice(0, 3).map((tag) => (
+              <span
+                key={`${email.id}-tag-${tag}`}
+                className="inline-flex items-center rounded-full bg-blue-50 px-2 py-px text-[10px] font-medium text-blue-700"
+              >
+                {tag}
+              </span>
+            ))}
+            {email.aiClassification.folder && (
+              <span
+                className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600"
+              >
+                Carpeta sugerida: {email.aiClassification.folder}
+              </span>
+            )}
+          </div>
+        ) : null}
       </div>
     );
   };

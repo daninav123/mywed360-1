@@ -1,8 +1,8 @@
-# Lovenda Email – Frontend
+# Lovenda Email - Frontend
 
 Aplicación SPA para gestión integrada de correos electrónicos en Lovenda, construida con **React 18 + Vite + TailwindCSS** y hospedada como PWA (offline-first).
 
-> ⚠️ *Prueba de sincronización GitHub — 2025-08-04*
+> Nota: *Prueba de sincronización GitHub - 2025-08-04*
 
 Estructura básica para iniciar la aplicación frontend con React, Vite y Tailwind CSS.
 
@@ -34,11 +34,11 @@ npm install
 
 ## Scripts de desarrollo
 
-- `npm run dev` — servidor de desarrollo con recarga en caliente.
-- `npm run build` — genera la build de producción en `dist/`.
-- `npm run preview` — sirve la build para pruebas locales.
-- `npm test` — ejecuta suite de tests unitarios/integración (Vitest).
-- `npm run test:e2e` — lanza tests End-to-End con Cypress.
-- `npm run test:coverage` — genera reporte de cobertura.
+- `npm run dev` - servidor de desarrollo con recarga en caliente.
+- `npm run build` - genera la build de producción en `dist/`.
+- `npm run preview` - sirve la build para pruebas locales.
+- `npm test` - ejecuta suite de tests unitarios/integración (Vitest).
+- `npm run test:e2e` - lanza tests End-to-End con Cypress.
+- `npm run test:coverage` - genera reporte de cobertura.
 - `npm run build`: genera la versión de producción.
 - `npm run preview`: previsualiza la build de producción.

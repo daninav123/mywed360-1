@@ -105,7 +105,7 @@ export default function EmailNotification() {
       />
       
       {/* Estilos para la animación de rebote */}
-      <style jsx="true">{`
+      <style>{`
         @keyframes bounce-once {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-10px); }

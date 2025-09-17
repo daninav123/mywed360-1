@@ -151,7 +151,7 @@ async function runPerformanceTests(emailSizes) {
     }
     
     // Simular procesamiento paralelo
-    await Promise.all(chunks.map(async (chunk) => {
+    await Promise.all(chunks.map(async (_chunk) => {
       // Simular tiempo de procesamiento por chunk
       await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 50));
       return [];

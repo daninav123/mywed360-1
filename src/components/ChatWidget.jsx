@@ -484,12 +484,11 @@ const sendMessage = async () => {
       }
       let text;
       // Manejar respuesta del backend (exitosa o con error)
-      if (data.reply) {
-        text = data.reply;
-      } else if (data.error && data.reply) {
-        // Backend devolvió error pero con mensaje de respuesta
+      if (data.error && data.reply) {
         text = data.reply;
         console.warn('Backend AI error:', data.error, data.details);
+      } else if (data.reply) {
+        text = data.reply;
       } else if (data.extracted && Object.keys(data.extracted).length) {
         text = 'Datos extraídos:\n' + JSON.stringify(data.extracted, null, 2);
       } else if (data.error) {

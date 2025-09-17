@@ -1,4 +1,4 @@
-﻿// Express backend for Lovenda
+// Express backend for Lovenda
 
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
@@ -12,7 +12,7 @@ import path from 'path';
 const secretEnvPath = '/etc/secrets/app.env';
 if (fs.existsSync(secretEnvPath)) {
   dotenv.config({ path: secretEnvPath });
-  console.log('Ã¯Â¿Â½S& Variables de entorno cargadas desde secret file', secretEnvPath);
+  console.log('[env] Variables de entorno cargadas desde secret file', secretEnvPath);
 } else {
   dotenv.config(); // fallback a .env local
 }
@@ -22,7 +22,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
-// Importar middleware de autenticaciÃƒÂ³n (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
+// Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
 import {
   requireAuth,
   requireMailAccess,
@@ -88,21 +88,21 @@ if (result.error) {
   result = dotenv.config({ path: parentEnvPath });
 }
 if (result.error) {
-  console.warn('Ã¯Â¿Â½aÃ¯Â¿Â½Ã¯Â¸Â  .env file not found at', envPath);
+  console.warn('[env] .env file not found at', envPath);
 } else {
-  console.log('Ã¯Â¿Â½S& .env loaded from', envPath);
+  console.log('[env] .env loaded from', envPath);
 }
 if (!process.env.OPENAI_API_KEY) {
-  console.warn('Ã¯Â¿Â½aÃ¯Â¿Â½Ã¯Â¸Â  OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
+  console.warn('[env] OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
 }
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4004; // Render inyecta PORT, 4004 por defecto para desarrollo local
 
 const app = express();
-// DetrÃƒÂ¡s de proxy (Render) para que express-rate-limit use IP correcta
+// Detrás de proxy (Render) para que express-rate-limit use la IP correcta
 app.set('trust proxy', 1);
 
-// Seguridad bÃƒÂ¡sica
+// Seguridad básica
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -121,7 +121,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Rate limiting: por defecto 120/min en producciÃƒÂ³n, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
+// Rate limiting: por defecto 120/min en producción, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
 const AI_RATE_LIMIT_MAX = process.env.RATE_LIMIT_AI_MAX
   ? Number(process.env.RATE_LIMIT_AI_MAX)
   : (process.env.NODE_ENV === 'production' ? 60 : 0);
@@ -147,7 +147,7 @@ if (AI_RATE_LIMIT_MAX > 0) {
   app.use('/api/ai-suppliers', aiLimiter);
 }
 
-// Middleware de correlaciÃƒÂ³n: X-Request-ID en cada peticiÃƒÂ³n
+// Middleware de correlación: X-Request-ID en cada petición
 app.use((req, res, next) => {
   try {
     const incoming = req.headers['x-request-id'];
@@ -160,7 +160,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Prometheus metrics (lazy load si estÃƒÂ¡ disponible)
+// Prometheus metrics (lazy load si está disponible)
 let metrics = {
   loaded: false,
   prom: null,
@@ -184,19 +184,19 @@ async function ensureMetrics() {
     });
     const httpRequestDuration = new prom.Histogram({
       name: 'http_request_duration_seconds',
-      help: 'DuraciÃƒÂ³n de peticiones HTTP en segundos',
+      help: 'Duración de peticiones HTTP en segundos',
       labelNames: ['method', 'route', 'status'],
       buckets: [0.05, 0.1, 0.2, 0.5, 1, 2, 5],
       registers: [registry],
     });
     metrics = { loaded: true, prom, registry, httpRequestsTotal, httpRequestDuration };
   } catch (e) {
-    // prom-client no estÃƒÂ¡ instalado; se omite sin romper
+    // prom-client no está instalado; se omite sin romper
     metrics.loaded = false;
   }
 }
 
-// Middleware de mÃƒÂ©tricas por peticiÃƒÂ³n (no-op si prom-client no estÃƒÂ¡)
+// Middleware de métricas por petición (no-op si prom-client no está)
 app.use((req, res, next) => {
   const start = process.hrtime.bigint();
   res.on('finish', () => {
@@ -215,7 +215,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware para registrar cada peticiÃƒÂ³n entrante
+// Middleware para registrar cada petición entrante
 app.use((req, _res, next) => {
   logger.info(`[${req.id || 'n/a'}] ${req.method} ${req.originalUrl}`);
   next();
@@ -225,7 +225,7 @@ app.use((req, _res, next) => {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Endpoint de mÃƒÂ©tricas (activa prom-client si estÃƒÂ¡ disponible)
+// Endpoint de métricas (activa prom-client si está disponible)
 app.get('/metrics', async (_req, res) => {
   try {
     await ensureMetrics();
@@ -238,25 +238,25 @@ app.get('/metrics', async (_req, res) => {
   }
 });
 
-// Rutas pÃƒÂºblicas (sin autenticaciÃƒÂ³n)
-app.use('/api/mailgun/webhook', mailgunWebhookRouter); // Webhooks de Mailgun (verificaciÃƒÂ³n interna)
+// Rutas públicas (sin autenticación)
+app.use('/api/mailgun/webhook', mailgunWebhookRouter); // Webhooks de Mailgun (verificación interna)
 app.use('/api/inbound/mailgun', mailgunInboundRouter); // Correos entrantes
-app.use('/api/rsvp', rsvpRouter); // Endpoints pÃƒÂºblicos por token para RSVP
+app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
 
-// Rutas que requieren autenticaciÃƒÂ³n especÃƒÂ­fica para correo
+// Rutas que requieren autenticación específica para correo
 app.use('/api/mail', requireMailAccess, mailRouter);
 app.use('/api/mail', mailOpsRouter);
 app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
 
-// IMPORTANTE: Las rutas mÃƒÂ¡s especÃƒÂ­ficas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
+// IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
 app.use('/api/mailgun/events', requireMailAccess, mailgunEventsRouter); // Eventos de Mailgun
 app.use('/api/mailgun', optionalAuth, mailgunTestRouter); // Rutas generales de Mailgun (incluye /test)
 app.use('/api/mailgun-debug', requireMailAccess, mailgunDebugRoutes);
 app.use('/api/email-insights', requireMailAccess, emailInsightsRouter);
 
-// Rutas que requieren autenticaciÃƒÂ³n general
+// Rutas que requieren autenticación general
 app.use('/api/notifications', requireAuth, notificationsRouter);
 app.use('/api/guests', requireAuth, guestsRouter);
 app.use('/api/events', requireAuth, eventsRouter);
@@ -266,19 +266,19 @@ app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
 app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
-app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser pÃƒÂºblico
+app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
 // Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
 app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);
-// Proxy de imÃƒÂ¡genes externas (evita hotlink+cors)
+// Proxy de imágenes externas (evita hotlink+cors)
 app.use('/api/image-proxy', imageProxyRouter);
-app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser pÃƒÂºblico
+app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
 // Public wedding site (GET public, POST publish with auth context)
 app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
   app.use('/api/weddings', requireAuth, supplierBudgetRouter);
   // Supplier portal (public entry by token, handled inside router)
   app.use('/api/supplier-portal', supplierPortalRouter);
-// Nuevos mÃƒÂ³dulos transversales
+// Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
 app.use('/api/legal-docs', requireAuth, legalDocsRouter);
 app.use('/api/signature', requireAuth, signatureRouter);
@@ -292,9 +292,10 @@ app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
-.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);\napp.use('/api/bank', requireAuth, bankRouter);\napp.use('/api/email-actions', requireAuth, emailActionsRouter);
-
-// Rutas de diagnÃƒÂ³stico y test (pÃƒÂºblicas para debugging)
+app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
+app.use('/api/bank', requireAuth, bankRouter);
+app.use('/api/email-actions', requireAuth, emailActionsRouter);
+// Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
 app.use('/api/test', simpleTestRouter);
 app.use('/api/metrics', metricsSeatingRouter);
@@ -303,7 +304,7 @@ app.get('/', (_req, res) => {
   res.send({ status: 'ok', service: 'lovenda-backend' });
 });
 
-// Health check explÃƒÂ­cito para plataformas de despliegue
+// Health check explícito para plataformas de despliegue
 app.get('/health', async (_req, res) => {
   try {
     let whatsapp = { configured: false, provider: 'unknown' };

@@ -303,10 +303,10 @@ const useGuests = () => {
         if (resp.ok) { const json = await resp.json(); link = json.link; }
       } catch {}
       const message = (customMessage && customMessage.trim())
-      ? customMessage.trim()
-      : (link
-        ? `¡Hola ${g.name or ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-        : `¡Hola ${g.name or ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`);
+        ? customMessage.trim()
+        : (link
+          ? `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
+          : `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`);
       const to = toE164Frontend(g.phone);
       if (to) items.push({ to, message, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
     }

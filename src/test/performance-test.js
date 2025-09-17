@@ -74,7 +74,7 @@ function generateTestData(type, size = 'medium') {
   let result = [];
   
   switch (type) {
-    case 'emails':
+    case 'emails': {
       const count = CONFIG.emailCount[size];
       for (let i = 0; i < count; i++) {
         result.push({
@@ -93,8 +93,9 @@ function generateTestData(type, size = 'medium') {
         });
       }
       break;
+    }
       
-    case 'notifications':
+    case 'notifications': {
       const notifCount = CONFIG.notificationCount[size];
       for (let i = 0; i < notifCount; i++) {
         result.push({
@@ -110,8 +111,9 @@ function generateTestData(type, size = 'medium') {
         });
       }
       break;
+    }
       
-    case 'events':
+    case 'events': {
       const eventCount = CONFIG.eventCount[size];
       for (let i = 0; i < eventCount; i++) {
         result.push({
@@ -126,8 +128,9 @@ function generateTestData(type, size = 'medium') {
         });
       }
       break;
+    }
       
-    case 'providers':
+    case 'providers': {
       const provCount = CONFIG.providerCount[size];
       for (let i = 0; i < provCount; i++) {
         result.push({
@@ -141,8 +144,9 @@ function generateTestData(type, size = 'medium') {
         });
       }
       break;
+    }
       
-    case 'templates':
+    case 'templates': {
       const templateCount = CONFIG.templateCount[size];
       for (let i = 0; i < templateCount; i++) {
         result.push({
@@ -160,6 +164,7 @@ function generateTestData(type, size = 'medium') {
         });
       }
       break;
+    }
   }
   
   const endTime = performance.now();
@@ -341,7 +346,7 @@ async function testEventDetection(params) {
   let processedEmails = 0;
   
   // Expresiones regulares para detectar fechas y horas
-  const dateRegex = /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})|(\d{1,2}) de ([a-zá-úñ]+)( de (\d{4}))?/gi;
+  const dateRegex = /(\d{1,2})[/-](\d{1,2})[/-](\d{4})|(\d{1,2}) de ([a-zá-ú]+)( de (\d{4}))?/gi;
   const timeRegex = /(\d{1,2}):(\d{2})( ?(?:AM|PM|a\.m\.|p\.m\.))?/gi;
   
   for (const email of emails) {
@@ -419,6 +424,7 @@ async function testNotificationRendering(params) {
   }
   
   let totalRenderTime = 0;
+  const rendered = [];
   
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
@@ -436,14 +442,14 @@ async function testNotificationRendering(params) {
         : '';
       
       // Simular creación de elementos DOM
-      const dummy = {
+      rendered.push({
         type: notification.type,
         message: notification.message,
         timestamp: formattedTimestamp,
         priority: isHighPriority ? 'high' : 'normal',
         url: actionUrl,
         read: notification.read
-      };
+      });
     }
     
     const endTime = performance.now();
@@ -460,7 +466,8 @@ async function testNotificationRendering(params) {
       totalNotifications: notifications.length,
       batchSize,
       estimatedDOMElements: notifications.length * 5 // Aproximación de elementos DOM por notificación
-    }
+    },
+    renderedSample: rendered.slice(0, Math.min(5, rendered.length))
   };
 }
 

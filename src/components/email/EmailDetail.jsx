@@ -52,6 +52,11 @@ const EmailDetail = ({ email, onBack, onReply, onDelete, onMoveToFolder, folders
   
   if (!email) return null;
 
+  const classification = email?.aiClassification || null;
+  const suggestedTags = classification?.tags || email?.suggestedTags || [];
+  const suggestedFolder = classification?.folder || email?.suggestedFolder || null;
+
+
   // Formatear fecha completa
   const formatFullDate = (dateStr) => {
     if (!dateStr) return '';
@@ -211,7 +216,48 @@ const EmailDetail = ({ email, onBack, onReply, onDelete, onMoveToFolder, folders
           </div>
         </div>
       </header>
-      
+
+      {(classification || suggestedTags.length || suggestedFolder) ? (
+        <section className="mb-4 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm text-blue-800" role="note">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium">Análisis inteligente</span>
+            {classification?.source && (
+              <span className="inline-flex items-center rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+                {classification.source === 'ai' ? 'IA' : 'Heurística'}
+              </span>
+            )}
+            {suggestedFolder && (
+              <span className="inline-flex items-center rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                Carpeta sugerida: {suggestedFolder}
+              </span>
+            )}
+          </div>
+          {suggestedTags.length ? (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {suggestedTags.slice(0, 6).map((tag) => (
+                <span
+                  key={`ai-tag-${tag}`}
+                  className="inline-flex items-center rounded-full bg-blue-100 px-2 py-px text-[10px] font-medium text-blue-700"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {suggestedFolder && typeof onMoveToFolder === 'function' ? (
+            <div className="mt-3">
+              <Button
+                variant="outline"
+                size="xs"
+                onClick={() => onMoveToFolder(email.id, suggestedFolder)}
+              >
+                Mover a {suggestedFolder}
+              </Button>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       {/* Contenido del email */}
       <main 
         className="flex-grow overflow-auto mb-3 sm:mb-4"

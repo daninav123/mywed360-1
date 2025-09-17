@@ -8,17 +8,17 @@ import Card from '../../../components/ui/Card';
  */
 
 /**
- * Componente que muestra los resultados de búsqueda con IA de proveedores.
- * Presenta una lista de resultados con porcentaje de coincidencia, acciones rápidas
- * y estados de carga. También muestra mensajes de error si los hubiera.
+ * Componente que muestra los resultados de bÃºsqueda con IA de proveedores.
+ * Presenta una lista de resultados con porcentaje de coincidencia, acciones rÃ¡pidas
+ * y estados de carga. TambiÃ©n muestra mensajes de error si los hubiera.
  * 
  * @param {Object} props - Propiedades del componente
- * @param {AISearchResult[]} [props.results=[]] - Resultados de la búsqueda con IA
- * @param {boolean} props.isLoading - Indica si la búsqueda está en progreso
- * @param {Function} props.onSelect - Función para seleccionar un resultado
- * @param {string} props.query - Término de búsqueda original
+ * @param {AISearchResult[]} [props.results=[]] - Resultados de la bÃºsqueda con IA
+ * @param {boolean} props.isLoading - Indica si la bÃºsqueda estÃ¡ en progreso
+ * @param {Function} props.onSelect - FunciÃ³n para seleccionar un resultado
+ * @param {string} props.query - TÃ©rmino de bÃºsqueda original
  * @param {string} [props.error] - Mensaje de error, si existe
- * @returns {React.ReactElement} Componente de lista de resultados de búsqueda con IA
+ * @returns {React.ReactElement} Componente de lista de resultados de bÃºsqueda con IA
  */
 const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
   if (isLoading) {
@@ -29,7 +29,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
         </div>
         <p className="text-lg font-medium text-gray-700">Buscando proveedores...</p>
         <p className="text-sm text-gray-500 mt-2">
-          Analizando tu consulta: "{query}"
+          Analizando tu consulta: &quot;{query}&quot;
         </p>
       </div>
     );
@@ -57,7 +57,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
       <div className="flex flex-col items-center justify-center py-12">
         <p className="text-lg font-medium text-gray-700">No se encontraron resultados</p>
         <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-          Intenta reformular tu búsqueda o utilizar términos más generales
+          Intenta reformular tu bÃºsqueda o utilizar tÃ©rminos mÃ¡s generales
         </p>
       </div>
     );
@@ -71,58 +71,58 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
         </div>
         <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
         <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-          Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más adecuados
+          Describe lo que buscas en lenguaje natural y la IA encontrarÃ¡ los proveedores mÃ¡s adecuados
         </p>
       </div>
     );
   }
 
-  // Ejemplo de datos para mostrar en modo de demostración
+  // Ejemplo de datos para mostrar en modo de demostraciÃ³n
   const demoResults = [
     {
       id: 1,
-      name: 'Fotografía Naturaleza Viva',
-      service: 'Fotografía',
-      snippet: 'Estudio especializado en fotografía de bodas con estilo natural y documental. Captamos los momentos más emotivos y espontáneos de tu boda.',
+      name: 'FotografÃ­a Naturaleza Viva',
+      service: 'FotografÃ­a',
+      snippet: 'Estudio especializado en fotografÃ­a de bodas con estilo natural y documental. Captamos los momentos mÃ¡s emotivos y espontÃ¡neos de tu boda.',
       match: 95,
       image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Madrid',
-      price: '1200€ - 2500€',
-      aiSummary: 'Este fotógrafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imágenes capturen momentos espontáneos con iluminación natural, ideal para lo que buscas.'
+      price: '1200â‚¬ - 2500â‚¬',
+      aiSummary: 'Este fotÃ³grafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imÃ¡genes capturen momentos espontÃ¡neos con iluminaciÃ³n natural, ideal para lo que buscas.'
     },
     {
       id: 2,
-      name: 'Lente Azul Fotografía',
-      service: 'Fotografía',
-      snippet: 'Más de 10 años de experiencia en fotografía de bodas en playa y espacios naturales. Ofrecemos paquetes personalizados para cada pareja.',
+      name: 'Lente Azul FotografÃ­a',
+      service: 'FotografÃ­a',
+      snippet: 'MÃ¡s de 10 aÃ±os de experiencia en fotografÃ­a de bodas en playa y espacios naturales. Ofrecemos paquetes personalizados para cada pareja.',
       match: 87,
       image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8d2VkZGluZyUyMHBob3RvZ3JhcGh5fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Barcelona',
-      price: '1500€ - 3000€',
+      price: '1500â‚¬ - 3000â‚¬',
       aiSummary: 'Especialistas en bodas en la playa con un estilo luminoso y natural. Su portfolio muestra una gran experiencia en entornos costeros y saben aprovechar la luz natural.'
     },
     {
       id: 3,
       name: 'Momentos Eternos',
-      service: 'Fotografía',
-      snippet: 'Fotografía de autor para bodas con estilo único. Combinamos fotografía documental con retratos artísticos para crear un álbum inolvidable.',
+      service: 'FotografÃ­a',
+      snippet: 'FotografÃ­a de autor para bodas con estilo Ãºnico. Combinamos fotografÃ­a documental con retratos artÃ­sticos para crear un Ã¡lbum inolvidable.',
       match: 79,
       image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Valencia',
-      price: '1000€ - 2000€',
-      aiSummary: 'Ofrece un enfoque artístico con elementos documentales. Aunque su estilo es más estilizado que puramente natural, tiene experiencia en bodas al aire libre.'
+      price: '1000â‚¬ - 2000â‚¬',
+      aiSummary: 'Ofrece un enfoque artÃ­stico con elementos documentales. Aunque su estilo es mÃ¡s estilizado que puramente natural, tiene experiencia en bodas al aire libre.'
     }
   ];
 
-  // Usar datos reales si están disponibles, o los datos de demostración
+  // Usar datos reales si estÃ¡n disponibles, o los datos de demostraciÃ³n
   const displayResults = results.length > 0 ? results : demoResults;
 
   return (
     <div className="space-y-6">
-      {/* Resumen de la búsqueda */}
+      {/* Resumen de la bÃºsqueda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">
-          Se encontraron <span className="font-medium">{displayResults.length}</span> proveedores para tu búsqueda:
+          Se encontraron <span className="font-medium">{displayResults.length}</span> proveedores para tu bÃºsqueda:
         </p>
         <p className="text-lg font-medium">"{query}"</p>
       </div>
@@ -163,16 +163,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
 
               {result.location && (
                 <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Ubicación:</span> {result.location}
+                  <span className="font-medium">UbicaciÃ³n:</span> {result.location}
                 </p>
               )}
 
               <p className="text-sm text-gray-700 mb-3">{result.snippet}</p>
 
-              {/* Análisis de IA */}
+              {/* AnÃ¡lisis de IA */}
               {result.aiSummary && (
                 <div className="bg-blue-50 p-3 rounded-md mb-3">
-                  <p className="text-xs font-semibold text-blue-600 mb-1">Análisis de IA</p>
+                  <p className="text-xs font-semibold text-blue-600 mb-1">AnÃ¡lisis de IA</p>
                   <p className="text-sm text-gray-700">{result.aiSummary}</p>
                 </div>
               )}
@@ -190,7 +190,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
                   onClick={() => onSelect(result, 'add')}
                   size="sm"
                 >
-                  <Plus size={16} className="mr-1" /> Añadir
+                  <Plus size={16} className="mr-1" /> AÃ±adir
                 </Button>
                 <Button
                   onClick={() => onSelect(result, 'email')}
@@ -227,3 +227,4 @@ export default React.memo(AIResultList, (prevProps, nextProps) => {
     prevProps.onSelect === nextProps.onSelect
   );
 });
+

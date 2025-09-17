@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useCallback, useDeferredValue } from 'react';
 import { Card, Button } from '../ui';
-import { Plus, Edit3, Trash2, Download, Upload, Search } from 'lucide-react';
+import { Plus, Edit3, Trash2, Download, Upload, Search, AlertTriangle, Paperclip } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatUtils';
 import Modal from '../Modal';
 import TransactionForm from './TransactionForm';
@@ -19,6 +19,7 @@ export default function TransactionManager({
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [providerFilter, setProviderFilter] = useState('');
   const [dateRange, setDateRange] = useState(''); // '', '30', '90'
   const [onlyUncategorized, setOnlyUncategorized] = useState(false);
   const [sortBy, setSortBy] = useState('date_desc'); // 'date_desc','date_asc','amount_desc','amount_asc'
@@ -44,14 +45,16 @@ export default function TransactionManager({
     const msInDay = 24*60*60*1000;
     const minDate = dateRange ? new Date(now.getTime() - Number(dateRange) * msInDay) : null;
     let list = transactions.filter(t => {
-      const text = (t.concept || t.description || '').toLowerCase();
-      const matchesSearch = text.includes((deferredSearchTerm || '').toLowerCase());
+      const haystack = [t.concept, t.description, t.provider].filter(Boolean).join(' ').toLowerCase();
+      const matchesSearch = haystack.includes((deferredSearchTerm || '').toLowerCase());
       const matchesType = !typeFilter || t.type === typeFilter;
       const cat = t.category || '';
       const matchesCategory = !categoryFilter || cat === categoryFilter;
+      const provider = t.provider || '';
+      const matchesProvider = !providerFilter || provider === providerFilter;
       const matchesUncat = !onlyUncategorized || !cat;
       const matchesDate = !minDate || (t.date && new Date(t.date) >= minDate);
-      return matchesSearch && matchesType && matchesCategory && matchesUncat && matchesDate;
+      return matchesSearch && matchesType && matchesCategory && matchesProvider && matchesUncat && matchesDate;
     });
     // Sort
     list.sort((a,b) => {
@@ -66,17 +69,104 @@ export default function TransactionManager({
       return 0;
     });
     return list;
-  }, [transactions, deferredSearchTerm, typeFilter, categoryFilter, dateRange, onlyUncategorized, sortBy]);
+  }, [transactions, deferredSearchTerm, typeFilter, categoryFilter, providerFilter, dateRange, onlyUncategorized, sortBy]);
 
   const categories = useMemo(() => {
     return [...new Set(transactions.map(t => t.category).filter(Boolean))].sort();
   }, [transactions]);
 
+  const providers = useMemo(() => {
+    return [...new Set(transactions.map(t => (t.provider || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+  }, [transactions]);
+
+  const getPaidValue = useCallback((transaction) => {
+    if (!transaction) return 0;
+    const type = transaction.type || 'expense';
+    const status = transaction.status || (type === 'income' ? 'expected' : 'pending');
+    const amount = Number(transaction.amount) || 0;
+    const rawPaid = Number(transaction.paidAmount);
+    let paid = Number.isFinite(rawPaid) ? rawPaid : 0;
+    if (amount > 0) {
+      paid = Math.min(Math.max(paid, 0), amount);
+    } else {
+      paid = Math.max(paid, 0);
+    }
+    if (type === 'expense' && status === 'paid' && paid === 0) return amount;
+    if (type === 'income' && status === 'received' && paid === 0) return amount;
+    return paid;
+  }, []);
+
   const stats = useMemo(() => {
-    const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((s,t)=>s+(Number(t.amount)||0),0);
-    const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((s,t)=>s+(Number(t.amount)||0),0);
-    return { totalIncome, totalExpenses, balance: totalIncome - totalExpenses, count: filteredTransactions.length };
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    let pendingExpenses = 0;
+    let overdueExpenses = 0;
+    const now = new Date();
+
+    filteredTransactions.forEach((transaction) => {
+      const amount = Number(transaction.amount) || 0;
+      const paid = getPaidValue(transaction);
+
+      if (transaction.type === 'income') {
+        totalIncome += paid;
+      } else {
+        totalExpenses += paid;
+        const outstanding = Math.max(0, amount - paid);
+        if (outstanding > 0) {
+          pendingExpenses += outstanding;
+          if (transaction.dueDate) {
+            const due = new Date(transaction.dueDate);
+            if (!Number.isNaN(due.getTime()) && due < now && (transaction.status || '') !== 'paid') {
+              overdueExpenses += outstanding;
+            }
+          }
+        }
+      }
+    });
+
+    return {
+      totalIncome,
+      totalExpenses,
+      balance: totalIncome - totalExpenses,
+      count: filteredTransactions.length,
+      pendingExpenses,
+      overdueExpenses,
+    };
+  }, [filteredTransactions, getPaidValue]);
+
+  const paymentAlerts = useMemo(() => {
+    const now = new Date();
+    const soonLimit = new Date();
+    soonLimit.setDate(now.getDate() + 7);
+    const overdue = [];
+    const upcoming = [];
+
+    filteredTransactions.forEach((tx) => {
+      if (tx.type !== 'expense') return;
+      if (!tx.dueDate || (tx.status && tx.status === 'paid')) return;
+      const due = new Date(tx.dueDate);
+      if (Number.isNaN(due.getTime())) return;
+      if (due < now) overdue.push(tx);
+      else if (due <= soonLimit) upcoming.push(tx);
+    });
+
+    return { overdue, upcoming };
   }, [filteredTransactions]);
+
+  const statusLabels = {
+    pending: t('finance.transactions.status.pending', { defaultValue: 'Pendiente' }),
+    partial: t('finance.transactions.status.partial', { defaultValue: 'Pago parcial' }),
+    paid: t('finance.transactions.status.paid', { defaultValue: 'Pagado' }),
+    expected: t('finance.transactions.status.expected', { defaultValue: 'Esperado' }),
+    received: t('finance.transactions.status.received', { defaultValue: 'Recibido' }),
+  };
+  const statusStyles = {
+    pending: 'bg-amber-100 text-amber-800',
+    partial: 'bg-blue-100 text-blue-700',
+    paid: 'bg-green-100 text-green-700',
+    expected: 'bg-gray-100 text-gray-600',
+    received: 'bg-green-100 text-green-700',
+  };
 
   // Simple virtualization calculations
   // no virtualization constants required
@@ -99,8 +189,28 @@ export default function TransactionManager({
   };
 
   const handleExportCSV = () => {
-    const headers = ['Fecha', 'Concepto', 'Tipo', 'Categoria', 'Monto'];
-    const csv = [headers.join(','), ...filteredTransactions.map(t => [t.date, `"${t.concept || t.description || ''}"`, t.type === 'income' ? 'Ingreso':'Gasto', t.category || '', t.amount || 0].join(','))].join('\n');
+    const escapeCsv = (value = '') => `"${String(value).replace(/"/g, '""')}"`;
+    const headers = ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Categoria', 'Estado', 'Fecha limite', 'Monto', 'Pagado', 'Pendiente'];
+    const rows = filteredTransactions.map((t) => {
+      const amount = Number(t.amount) || 0;
+      const paid = getPaidValue(t);
+      const outstanding = Math.max(0, amount - paid);
+      const status = t.status || (t.type === 'income' ? 'expected' : 'pending');
+
+      return [
+        t.date || '',
+        escapeCsv(t.concept || t.description || ''),
+        escapeCsv(t.provider || ''),
+        t.type === 'income' ? 'Ingreso' : 'Gasto',
+        escapeCsv(t.category || ''),
+        status,
+        t.dueDate || '',
+        amount.toFixed(2),
+        paid.toFixed(2),
+        outstanding.toFixed(2),
+      ].join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -164,7 +274,15 @@ export default function TransactionManager({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-xl font-semibold text-[color:var(--color-text)]">{t('finance.transactions.title', { defaultValue: 'Transacciones' })}</h2>
-          <p className="text-sm text-[color:var(--color-text)]/70">{stats.count} transacciones - Balance: {formatCurrency(stats.balance)}</p>
+          <p className="text-sm text-[color:var(--color-text)]/70">
+            {stats.count} transacciones - {t('finance.transactions.balanceLabel', { defaultValue: 'Balance:' })} {formatCurrency(stats.balance)}
+            {stats.pendingExpenses > 0 && (
+              <span>{' - '}{t('finance.transactions.pendingAmount', { defaultValue: 'Pendiente:' })} {formatCurrency(stats.pendingExpenses)}</span>
+            )}
+            {stats.overdueExpenses > 0 && (
+              <span className="text-[color:var(--color-danger)]">{' - '}{t('finance.transactions.overdueAmount', { defaultValue: 'Vencido:' })} {formatCurrency(stats.overdueExpenses)}</span>
+            )}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" leftIcon={<Upload size={16} />} onClick={()=>setShowBankModal(true)} disabled={isLoading}>{t('finance.transactions.connectBank', { defaultValue: 'Conectar Banco (Nordigen)' })}</Button>
@@ -175,7 +293,7 @@ export default function TransactionManager({
       </div>
 
       <Card className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--color-text)]/40" />
             <input type="text" placeholder={t('finance.transactions.searchPlaceholder', { defaultValue: 'Buscar por concepto...' })} value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20" />
@@ -189,6 +307,10 @@ export default function TransactionManager({
             <option value="">{t('finance.transactions.allCategories', { defaultValue: 'Todas las categorías' })}</option>
             {categories.map(c => (<option key={c} value={c}>{c}</option>))}
           </select>
+          <select value={providerFilter} onChange={(e)=>setProviderFilter(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20">
+            <option value="">{t('finance.transactions.allProviders', { defaultValue: 'Todos los proveedores' })}</option>
+            {providers.map(provider => (<option key={provider} value={provider}>{provider}</option>))}
+          </select>
           <select value={dateRange} onChange={(e)=>setDateRange(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20">
             <option value="">{t('finance.transactions.allDays', { defaultValue: 'Todos los días' })}</option>
             <option value="30">{t('finance.transactions.last30', { defaultValue: 'Últimos 30 días' })}</option>
@@ -201,9 +323,32 @@ export default function TransactionManager({
             <option value="amount_asc">{t('finance.transactions.sort.amountAsc', { defaultValue: 'Importe (menor primero)' })}</option>
           </select>
           <label className="inline-flex items-center gap-2 text-sm text-[color:var(--color-text)]/70"><input type="checkbox" checked={onlyUncategorized} onChange={(e)=>setOnlyUncategorized(e.target.checked)} /> {t('finance.transactions.onlyUncategorized', { defaultValue: 'Solo sin categoría' })}</label>
-          <Button variant="outline" onClick={()=>{ setSearchTerm(''); setTypeFilter(''); setCategoryFilter(''); setDateRange(''); setOnlyUncategorized(false); setSortBy('date_desc'); }} className="w-full">{t('finance.transactions.clear', { defaultValue: 'Limpiar' })}</Button>
+          <Button variant="outline" onClick={()=>{ setSearchTerm(''); setTypeFilter(''); setCategoryFilter(''); setProviderFilter(''); setDateRange(''); setOnlyUncategorized(false); setSortBy('date_desc'); }} className="w-full">{t('finance.transactions.clear', { defaultValue: 'Limpiar' })}</Button>
         </div>
       </Card>
+
+      {(paymentAlerts.overdue.length > 0 || paymentAlerts.upcoming.length > 0) && (
+        <Card className="p-4 border border-[color:var(--color-warning)]/40 bg-[color:var(--color-warning)]/10">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-[color:var(--color-warning)] mt-0.5" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-[color:var(--color-text)]">
+                {t('finance.transactions.alerts.title', { defaultValue: 'Pagos importantes' })}
+              </p>
+              {paymentAlerts.overdue.length > 0 && (
+                <p className="text-sm text-[color:var(--color-danger)]">
+                  {t('finance.transactions.alerts.overdue', { defaultValue: 'Pagos vencidos:' })} {paymentAlerts.overdue.length}
+                </p>
+              )}
+              {paymentAlerts.upcoming.length > 0 && (
+                <p className="text-sm text-[color:var(--color-warning)]">
+              {t('finance.transactions.alerts.upcoming', { defaultValue: 'Pagos proximos (7 dias):' })} {paymentAlerts.upcoming.length}
+                </p>
+              )}
+            </div>
+          </div>
+        </Card>
+      )}
 
       <Card className="overflow-hidden">
         {filteredTransactions.length === 0 ? (
@@ -220,18 +365,79 @@ export default function TransactionManager({
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.category', { defaultValue: 'Categoría' })}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.type', { defaultValue: 'Tipo' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.status', { defaultValue: 'Estado' })}</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.amount', { defaultValue: 'Monto' })}</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.actions', { defaultValue: 'Acciones' })}</th>
                 </tr>
               </thead>
               <tbody className="bg-[var(--color-surface)] divide-y divide-[color:var(--color-text)]/10">
-                {filteredTransactions.map((t) => (
-                  <tr key={t.id} className="hover:bg-[var(--color-accent)]/10">
+                {filteredTransactions.map((t) => {
+                  const amount = Number(t.amount) || 0;
+                  const paid = getPaidValue(t);
+                  const status = t.status || (t.type === 'income' ? 'expected' : 'pending');
+                  const displayAmount = paid > 0 ? paid : amount;
+                  const outstanding = Math.max(0, amount - paid);
+                  const isExpense = t.type === 'expense';
+                  const dueDate = t.dueDate ? new Date(t.dueDate) : null;
+                  const isOverdue = Boolean(isExpense && dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < new Date() && status !== 'paid');
+
+                  return (
+                    <tr key={t.id} className="hover:bg-[var(--color-accent)]/10">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]">{formatDate(t.date)}</td>
-                    <td className="px-6 py-4 text-sm text-[color:var(--color-text)]"><div className="max-w-xs truncate">{t.concept || t.description || t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}</div></td>
+                    <td className="px-6 py-4 text-sm text-[color:var(--color-text)]">
+                      <div className="max-w-xs font-medium text-[color:var(--color-text)] truncate">
+                        {t.concept || t.description || t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}
+                      </div>
+                      {(t.provider || t.dueDate) && (
+                        <div className="mt-1 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
+                          {t.provider && <div>{t.provider}</div>}
+                          {t.dueDate && (
+                            <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
+                              {t('finance.transactions.dueOn', { defaultValue: 'Vence:' })} {formatDate(t.dueDate)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {Array.isArray(t.attachments) && t.attachments.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text)]/70">
+                          {t.attachments.map((att, index) => {
+                            const label = att?.filename || `${t('finance.transactions.attachment', { defaultValue: 'Adjunto' })} ${index + 1}`;
+                            return att?.url ? (
+                              <a
+                                key={att.url || index}
+                                href={att.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[color:var(--color-primary)] hover:underline"
+                              >
+                                <Paperclip size={12} />
+                                {label}
+                              </a>
+                            ) : (
+                              <span key={index} className="inline-flex items-center gap-1">
+                                <Paperclip size={12} />
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{t.category || t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' })}</span></td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm"><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${t.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}>{t.type === 'income' ? t('finance.transactions.income', { defaultValue: 'Ingreso' }) : t('finance.transactions.expense', { defaultValue: 'Gasto' })}</span></td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${t.type === 'income' ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>{t.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(t.amount || 0))}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-gray-100 text-gray-600'}`}>
+                        {statusLabels[status] || status}
+                      </span>
+                    </td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${t.type === 'income' ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
+                      {t.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(displayAmount))}
+                      {outstanding > 0 && (
+                        <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                          {t(t.type === 'expense' ? 'finance.transactions.outstandingExpense' : 'finance.transactions.outstandingIncome', { defaultValue: t.type === 'expense' ? 'Pendiente:' : 'Por recibir:' })} {formatCurrency(outstanding)}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         <button aria-label="Editar transacción" onClick={() => handleEditTransaction(t)} className="text-[var(--color-primary)] hover:brightness-110"><Edit3 size={16} /></button>
@@ -239,7 +445,8 @@ export default function TransactionManager({
                       </div>
                     </td>
                   </tr>
-                ))}
+                );
+                })}
               </tbody>
             </table>
           </div>
@@ -296,3 +503,12 @@ export default function TransactionManager({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+

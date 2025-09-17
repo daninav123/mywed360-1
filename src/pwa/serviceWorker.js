@@ -39,20 +39,12 @@ const CACHEABLE_API_ROUTES = [
   '/api/proveedores'
 ];
 
-// Estrategias de caché
-const CACHE_STRATEGIES = {
-  CACHE_FIRST: 'cache-first',
-  NETWORK_FIRST: 'network-first',
-  STALE_WHILE_REVALIDATE: 'stale-while-revalidate',
-  NETWORK_ONLY: 'network-only',
-  CACHE_ONLY: 'cache-only'
-};
-
 /**
  * Instalar Service Worker y cachear recursos estáticos
  */
 self.addEventListener('install', (event) => {
   console.log('[SW] Instalando Service Worker...');
+  console.log(`[SW] Cache base version ${CACHE_NAME}`);
   
   event.waitUntil(
     caches.open(STATIC_CACHE)
@@ -484,7 +476,7 @@ self.addEventListener('notificationclick', (event) => {
   const urlToOpen = event.notification.data.url || '/';
   
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((clientList) => {
+    self.clients.matchAll({ type: 'window' }).then((clientList) => {
       // Si ya hay una ventana abierta, enfocarla
       for (const client of clientList) {
         if (client.url === urlToOpen && 'focus' in client) {
@@ -493,8 +485,8 @@ self.addEventListener('notificationclick', (event) => {
       }
       
       // Si no, abrir nueva ventana
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen);
       }
     })
   );

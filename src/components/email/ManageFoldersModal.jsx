@@ -75,7 +75,7 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
         {/* Confirmación de eliminación */}
         {folderPendingDelete && (
           <div className="border-t p-4 flex flex-col space-y-3">
-            <p>¿Seguro que deseas eliminar "{folderPendingDelete.name}"?</p>
+            <p>¿Seguro que deseas eliminar &quot;{folderPendingDelete.name}&quot;?</p>
             <div className="flex justify-end space-x-2">
               <Button
                 variant="ghost"

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Button } from '../ui';
 import { Users, RefreshCw, Calculator } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatUtils';

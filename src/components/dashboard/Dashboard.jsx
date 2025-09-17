@@ -171,7 +171,7 @@ export function Dashboard() {
             />
           </svg>
           <h3 className="mt-2 text-lg font-medium text-gray-700">No hay widgets en tu panel</h3>
-          <p className="mt-1">Haz clic en "Personalizar" para agregar widgets a tu panel de control.</p>
+          <p className="mt-1">Haz clic en &quot;Personalizar&quot; para agregar widgets a tu panel de control.</p>
           <button
             onClick={startEditing}
             className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

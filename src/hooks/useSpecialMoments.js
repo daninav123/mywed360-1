@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /*
   Hook: useSpecialMoments
@@ -96,7 +96,7 @@ export default function useSpecialMoments() {
       if (!snap.exists()) return;
       const data = snap.data() || {};
       // El documento guarda el objeto directamente con claves de bloques
-      const { updatedAt, ...payload } = data;
+      const { updatedAt: _updatedAt, ...payload } = data;
       try {
         const json = JSON.stringify(payload);
         lastRemoteRef.current = json;

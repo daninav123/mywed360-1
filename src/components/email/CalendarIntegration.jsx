@@ -53,7 +53,7 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
       const possibleTitle = email.subject ? email.subject.replace(/^Re: |^Fwd: /gi, '') : '';
       
       // Extraer posibles fechas (formato DD/MM/YYYY o similar)
-      const dateRegex = /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})|(\d{1,2}) de ([a-zá-úñ]+)( de (\d{4}))?/gi;
+      const dateRegex = /(\d{1,2})[/-](\d{1,2})[/-](\d{4})|(\d{1,2}) de ([a-záéíóúñ]+)( de (\d{4}))?/gi;
       const dates = [];
       let dateMatch;
       const bodyText = email.body || '';

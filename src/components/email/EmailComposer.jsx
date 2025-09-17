@@ -3,17 +3,18 @@ import { X, Paperclip, AlertCircle, CheckCircle, ChevronDown } from 'lucide-reac
 import Button from '../Button';
 import Card from '../Card';
 import * as EmailService from '../../services/EmailService';
+import { scheduleEmailSend } from '../../services/emailAutomationService';
 import { safeRender } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
 
 /**
- * Componente para redactar y enviar nuevos emails desde la dirección personalizada del usuario
+ * Componente para redactar y enviar nuevos emails desde la direcciÃ³n personalizada del usuario
  * 
  * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isOpen - Controla si el compositor está abierto
- * @param {Function} props.onClose - Función para cerrar el compositor
- * @param {Object} props.initialValues - Valores iniciales (para respuestas o reenvíos)
- * @param {Function} props.onSend - Callback ejecutado después de enviar el email
+ * @param {boolean} props.isOpen - Controla si el compositor estÃ¡ abierto
+ * @param {Function} props.onClose - FunciÃ³n para cerrar el compositor
+ * @param {Object} props.initialValues - Valores iniciales (para respuestas o reenvÃ­os)
+ * @param {Function} props.onSend - Callback ejecutado despuÃ©s de enviar el email
  * @returns {React.ReactElement} Componente para redactar emails
  */
 const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
@@ -26,7 +27,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const authContext = useAuth();
   const { userProfile } = authContext;
   
-  // Establecer el contexto de autenticación en EmailService (si está disponible en el mock)
+  // Establecer el contexto de autenticaciÃ³n en EmailService (si estÃ¡ disponible en el mock)
   useEffect(() => {
     try {
       EmailService?.setAuthContext?.(authContext);
@@ -40,6 +41,8 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const [subject, setSubject] = useState(initialValues.subject || '');
   const [body, setBody] = useState(initialValues.body || '');
   const [attachments, setAttachments] = useState([]);
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState('');
   const [showCc, setShowCc] = useState(!!initialValues.cc);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
@@ -71,6 +74,21 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     
     loadTemplates();
   }, [userProfile]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setScheduleEnabled(false);
+      setScheduledAt('');
+      return;
+    }
+    if (initialValues && initialValues.scheduledAt) {
+      setScheduleEnabled(true);
+      setScheduledAt(initialValues.scheduledAt);
+    } else {
+      setScheduleEnabled(false);
+      setScheduledAt('');
+    }
+  }, [isOpen, initialValues]);
   
   // Aplicar plantilla seleccionada
   const applyTemplate = (template) => {
@@ -85,14 +103,14 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     
-    // Validar tamaño (máximo 10MB por archivo)
+    // Validar tamaÃ±o (mÃ¡ximo 10MB por archivo)
     const invalidFiles = files.filter(file => file.size > 10 * 1024 * 1024);
     if (invalidFiles.length > 0) {
-      setError(`Algunos archivos exceden el tamaño máximo de 10MB: ${invalidFiles.map(f => f.name).join(', ')}`);
+      setError(`Algunos archivos exceden el tamaÃ±o mÃ¡ximo de 10MB: ${invalidFiles.map(f => f.name).join(', ')}`);
       return;
     }
     
-    // Añadir archivos a la lista de adjuntos
+    // AÃ±adir archivos a la lista de adjuntos
     setAttachments(prev => [...prev, ...files.map(file => ({
       file,
       name: file.name,
@@ -120,22 +138,22 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     }
     
     if (!subject) {
-      setError('Por favor, añade un asunto al email');
+      setError('Por favor, aÃ±ade un asunto al email');
       return false;
     }
     
     if (!body || body.trim().length === 0) {
-      setError('El mensaje no puede estar vacío');
+      setError('El mensaje no puede estar vacÃ­o');
       return false;
     }
     
-    // Validar formato de email (expresión regular básica)
+    // Validar formato de email (expresiÃ³n regular bÃ¡sica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const toEmails = to.split(',').map(email => email.trim());
     const invalidEmails = toEmails.filter(email => !emailRegex.test(email));
     
     if (invalidEmails.length > 0) {
-      setError(`Algunas direcciones de email no son válidas: ${invalidEmails.join(', ')}`);
+      setError(`Algunas direcciones de email no son vÃ¡lidas: ${invalidEmails.join(', ')}`);
       return false;
     }
     
@@ -144,7 +162,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       const invalidCcEmails = ccEmails.filter(email => !emailRegex.test(email));
       
       if (invalidCcEmails.length > 0) {
-        setError(`Algunas direcciones CC no son válidas: ${invalidCcEmails.join(', ')}`);
+        setError(`Algunas direcciones CC no son vÃ¡lidas: ${invalidCcEmails.join(', ')}`);
         return false;
       }
     }
@@ -154,9 +172,9 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   
   // Enviar el email
   const handleSend = async () => {
-    // Prevenir envío duplicado
+    // Prevenir envÃ­o duplicado
     if (sending) {
-      console.log('Envío ya en progreso, ignorando...');
+      console.log('EnvÃ­o ya en progreso, ignorando...');
       return;
     }
     
@@ -167,16 +185,51 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       return;
     }
     
-    // Verificar si el usuario tiene configurada dirección personalizada
+    // Verificar si el usuario tiene configurada direcciÃ³n personalizada
     if (!isTestEnv && userProfile && !userProfile.emailUsername && !userProfile.myWed360Email && !userProfile.emailAlias) {
       if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-        if (window.confirm('No tienes configurada una dirección de correo personalizada. ¿Deseas configurarla ahora?')) {
+        if (window.confirm('No tienes configurada una direcciÃ³n de correo personalizada. Â¿Deseas configurarla ahora?')) {
           window.location.href = '/email/setup';
           return;
         }
       }
     }
     
+    if (scheduleEnabled) {
+      if (!scheduledAt) {
+        setError('Selecciona una fecha y hora para programar el envío');
+        return;
+      }
+      if (attachments.length > 0) {
+        setError('Actualmente no es posible programar correos con adjuntos.');
+        return;
+      }
+      setSending(true);
+      try {
+        const scheduleDate = new Date(scheduledAt);
+        if (Number.isNaN(scheduleDate.getTime())) {
+          throw new Error('Fecha y hora no válidas');
+        }
+        scheduleEmailSend({ to, cc, subject, body }, scheduleDate.toISOString());
+        setSuccess('Correo programado correctamente');
+        if (onSend) {
+          onSend({ scheduled: true, scheduledAt: scheduleDate.toISOString() });
+        }
+        setScheduleEnabled(false);
+        setScheduledAt('');
+        setTimeout(() => {
+          if (typeof onClose === 'function') {
+            onClose();
+          }
+        }, 600);
+      } catch (scheduleError) {
+        setError(scheduleError?.message || 'No se pudo programar el correo.');
+      } finally {
+        setSending(false);
+      }
+      return;
+    }
+
     setSending(true);
     
     try {
@@ -195,7 +248,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           onSend(result);
         }
         
-        // Esperar un momento para mostrar el mensaje de éxito antes de cerrar
+        // Esperar un momento para mostrar el mensaje de Ã©xito antes de cerrar
         setTimeout(() => {
           if (typeof onClose === 'function') {
             onClose();
@@ -231,6 +284,8 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       onClose();
     }
     resetForm();
+    setScheduleEnabled(false);
+    setScheduledAt('');
   };
   
   // Si isOpen no se pasa, asumimos que debe mostrarse
@@ -345,7 +400,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
               onClick={() => setShowCc(true)}
               className="text-sm text-blue-600 hover:text-blue-800"
             >
-              Añadir CC
+              AÃ±adir CC
             </button>
           )}
         </div>
@@ -374,13 +429,13 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
             onChange={(e) => setBody(e.target.value)}
             className="w-full border border-gray-300 rounded-md p-2"
             rows="12"
-            placeholder="Escribe tu mensaje aquí..."
+            placeholder="Escribe tu mensaje aquÃ­..."
             disabled={sending}
             data-testid="body-editor"
           />
         </div>
 
-        {/* Sección de adjuntos */}
+        {/* SecciÃ³n de adjuntos */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Adjuntos:</label>
 
@@ -397,7 +452,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                 disabled={sending}
               />
             </label>
-            <span className="ml-2 text-xs text-gray-500">Máximo 10MB por archivo</span>
+            <span className="ml-2 text-xs text-gray-500">MÃ¡ximo 10MB por archivo</span>
           </div>
           
           {attachments.length > 0 && (
@@ -432,6 +487,36 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           </div>
         </div>
         
+
+        <div className="mt-4 rounded-md border border-dashed border-blue-200 bg-blue-50/60 p-3">
+          <label className="flex items-center space-x-2 text-sm font-medium text-blue-800">
+            <input
+              type="checkbox"
+              className="h-4 w-4 text-blue-600 border-blue-300 rounded"
+              checked={scheduleEnabled}
+              onChange={(e) => {
+                setScheduleEnabled(e.target.checked);
+                if (!e.target.checked) {
+                  setScheduledAt('');
+                }
+              }}
+            />
+            <span>Programar el envío</span>
+          </label>
+          {scheduleEnabled && (
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                min={new Date().toISOString().slice(0, 16)}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                className="w-full sm:w-auto border border-blue-200 rounded-md px-3 py-2 text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-200"
+              />
+              <p className="text-xs text-blue-700 sm:ml-3">Selecciona día y hora para enviar automáticamente.</p>
+            </div>
+          )}
+        </div>
+
         <div className="border-t border-gray-200 p-4 flex justify-end">
           <div className="flex space-x-3">
             <Button
@@ -446,7 +531,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
               disabled={sending}
               data-testid="send-button"
             >
-              {sending ? 'Enviando...' : 'Enviar'}
+              {sending ? (scheduleEnabled ? 'Programando...' : 'Enviando...') : (scheduleEnabled ? 'Programar' : 'Enviar')}
             </Button>
           </div>
         </div>
@@ -456,3 +541,4 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
 };
 
 export default EmailComposer;
+

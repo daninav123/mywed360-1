@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Card } from '../ui';
 import { Cloud, CloudOff, AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatUtils';

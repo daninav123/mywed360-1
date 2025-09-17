@@ -42,7 +42,7 @@ export const diagnosticarFirestore = async () => {
     // 3. Intentar leer un documento público
     try {
       const docRef = doc(db, 'system_status', 'online_check');
-      const docSnap = await getDoc(docRef);
+      await getDoc(docRef);
       resultado.permisoLectura = true;
       resultado.estadoConexion = 'online';
     } catch (error) {

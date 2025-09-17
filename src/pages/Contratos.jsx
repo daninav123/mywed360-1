@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
 import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import Toast from '../components/Toast';

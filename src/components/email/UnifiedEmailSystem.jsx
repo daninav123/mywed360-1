@@ -5,6 +5,7 @@ import EmailViewer from './EmailViewer';
 import EmailComposer from './EmailComposer';
 import * as EmailService from '../../services/EmailService';
 import * as NotificationService from '../../services/NotificationService';
+import { processScheduledEmails } from '../../services/emailAutomationService';
 
 /**
  * Componente principal que integra todos los elementos del sistema de emails personalizado de Lovenda
@@ -54,6 +55,21 @@ const UnifiedEmailSystem = () => {
     
     return () => clearInterval(intervalId);
   }, []);
+  useEffect(() => {
+    const sendFn = typeof EmailService.sendMail === 'function' ? EmailService.sendMail : null;
+    if (!sendFn) return undefined;
+    const tick = () => {
+      try {
+        processScheduledEmails(sendFn);
+      } catch (err) {
+        console.warn('[UnifiedEmailSystem] scheduled processing failed', err);
+      }
+    };
+    tick();
+    const intervalId = setInterval(tick, 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   
   // Manejar selección de un email para visualización
   const handleSelectEmail = async (emailId) => {

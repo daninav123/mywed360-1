@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getMails, deleteMail, initEmailService } from '../../services/EmailService';
+import { getMails, deleteMail, initEmailService, sendMail as sendMailService } from '../../services/EmailService';
 import EmailDetail from './EmailDetail';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
+import { processIncomingEmails } from '../../services/emailAutomationService';
 
 // En entorno de pruebas, algunos tests referencian un mock global `EmailService` en `globalThis`.
 // Para alinearnos con esos tests, si existe ese objeto global, usamos sus métodos; en caso contrario
@@ -93,6 +94,19 @@ export default function EmailInbox() {
         effective = defaultMailsTest;
       }
       setEmails(effective);
+
+      try {
+        const processFn = processIncomingEmails;
+        if (typeof processFn === 'function') {
+          const sendFn = (typeof sendMailService === 'function') ? sendMailService : (EmailServiceShim?.sendMail);
+          const processed = await processFn(effective, { sendMail: sendFn });
+          if (Array.isArray(processed)) {
+            setEmails(processed);
+          }
+        }
+      } catch (automationError) {
+        console.warn('[EmailInbox] automation processing failed', automationError);
+      }
     } catch (e) {
       console.error(e);
       setError('No se pudieron cargar los emails');

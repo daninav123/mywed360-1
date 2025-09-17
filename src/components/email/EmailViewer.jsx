@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import sanitizeHtml from '../../utils/sanitizeHtml';
 import { safeExecute } from '../../utils/promiseSafeRenderer';
-import { ArrowLeft, Trash, Star, StarOff, Reply, Forward, Paperclip, Calendar, Download } from 'lucide-react';
+import { ArrowLeft, Reply, Forward, Trash, Star, StarOff, Paperclip, Calendar, Download } from 'lucide-react';
 import Button from '../Button';
 import Card from '../Card';
 import * as emailService from '../../services/emailService';
@@ -25,9 +25,9 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
   const isImportant = email?.folder === 'important';
 
   // Marcar como leído al visualizar
-  React.useEffect(() => {
+  useEffect(() => {
     if (email && !email.read) {
-      EmailService.markAsRead(email.id);
+      emailService.markAsRead(email.id);
     }
   }, [email]);
 
