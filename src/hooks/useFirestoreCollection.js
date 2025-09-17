@@ -13,7 +13,6 @@ import {
   addItem as addItemFS,
   updateItem as updateItemFS,
   deleteItem as deleteItemFS,
-  getAll as getAllFS,
 } from '../utils/firestoreCollection';
 
 // Fallback helpers using localStorage when the user is not authenticated

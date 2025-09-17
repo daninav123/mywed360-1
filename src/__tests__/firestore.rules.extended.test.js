@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // @vitest-environment node
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';

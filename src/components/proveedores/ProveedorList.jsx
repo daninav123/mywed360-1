@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProveedorCard from "./ProveedorCard";
 import { FixedSizeList as List } from "react-window";
@@ -20,6 +20,9 @@ const ProveedorList = ({
   toggleFavorite,
   toggleSelect,
   onEdit,
+  onOpenCompare,
+  onOpenBulkStatus,
+  onOpenDuplicates,
 }) => {
   const navigate = useNavigate();
 
@@ -40,16 +43,13 @@ const ProveedorList = ({
     });
   };
 
-  // La lista ya viene filtrada según la pestaña desde el hook
   const items = providers || [];
-
-  // Virtualización: activar cuando haya muchos elementos
   const shouldVirtualize = items.length > 120;
   const containerRef = useRef(null);
   const [dims, setDims] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (!shouldVirtualize) return; // solo medir si se usa virtualización
+    if (!shouldVirtualize) return;
     const el = containerRef.current;
     if (!el) return;
     const ro = new ResizeObserver(() => {
@@ -57,80 +57,155 @@ const ProveedorList = ({
       setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     });
     ro.observe(el);
-    // init
     const rect = el.getBoundingClientRect();
     setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     return () => ro.disconnect();
   }, [shouldVirtualize]);
 
-  if (!shouldVirtualize) {
+  const selectedCount = Array.isArray(selected) ? selected.length : 0;
+  const tabOptions = [
+    { id: "contratados", label: "Contratados" },
+    { id: "buscados", label: "Buscados" },
+    { id: "favoritos", label: "Favoritos" },
+  ];
+
+  const renderTabs = () => {
+    if (typeof setTab !== "function") return null;
+    const activeTab = tab || "contratados";
     return (
-      <div className="w-full">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.length > 0 ? (
-            items.map((provider) => (
-              <ProveedorCard
-                key={provider.id}
-                provider={provider}
-                isSelected={selected?.includes?.(provider.id)}
-                onToggleSelect={() => toggleSelect(provider.id)}
-                onViewDetail={() => handleViewDetail(provider)}
-                onToggleFavorite={toggleFavorite}
-                onCreateContract={handleCreateContract}
-                onEdit={onEdit ? () => onEdit(provider) : undefined}
-              />
-            ))
-          ) : (
-            <div className="col-span-full text-center py-8 text-gray-500">
-              No hay proveedores en esta pestaña.
-            </div>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
+          {tabOptions.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              onClick={() => setTab(opt.id)}
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${
+                activeTab === opt.id
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </nav>
       </div>
     );
-  }
+  };
 
-  // Virtualized single-column list (mejora de rendimiento en listas largas)
-  const ITEM_SIZE = 260; // altura aproximada de cada tarjeta
-
-  const Row = ({ index, style }) => {
-    const provider = items[index];
-    if (!provider) return null;
+  const renderSelectionBar = () => {
+    if (!selectedCount) return null;
     return (
-      <div style={style} className="px-1 md:px-2">
-        <ProveedorCard
-          key={provider.id}
-          provider={provider}
-          isSelected={selected?.includes?.(provider.id)}
-          onToggleSelect={() => toggleSelect(provider.id)}
-          onViewDetail={() => handleViewDetail(provider)}
-          onToggleFavorite={toggleFavorite}
-          onCreateContract={handleCreateContract}
-          onEdit={onEdit ? () => onEdit(provider) : undefined}
-        />
+      <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+        <span>{selectedCount} seleccionados</span>
+        {typeof onOpenCompare === "function" && (
+          <button
+            type="button"
+            onClick={onOpenCompare}
+            className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+          >
+            Comparar
+          </button>
+        )}
+        {typeof onOpenBulkStatus === "function" && (
+          <button
+            type="button"
+            onClick={onOpenBulkStatus}
+            className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+          >
+            Cambiar estado
+          </button>
+        )}
+        {typeof onOpenDuplicates === "function" && (
+          <button
+            type="button"
+            onClick={onOpenDuplicates}
+            className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+          >
+            Revisar duplicados
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const renderList = () => {
+    if (!shouldVirtualize) {
+      return (
+        <div className="w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.length > 0 ? (
+              items.map((provider) => (
+                <ProveedorCard
+                  key={provider.id}
+                  provider={provider}
+                  isSelected={selected?.includes?.(provider.id)}
+                  onToggleSelect={() => toggleSelect(provider.id)}
+                  onViewDetail={() => handleViewDetail(provider)}
+                  onToggleFavorite={toggleFavorite}
+                  onCreateContract={handleCreateContract}
+                  onEdit={onEdit ? () => onEdit(provider) : undefined}
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-gray-500">
+                No hay proveedores en esta pestaña.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const ITEM_SIZE = 260;
+
+    const Row = ({ index, style }) => {
+      const provider = items[index];
+      if (!provider) return null;
+      return (
+        <div style={style} className="px-1 md:px-2">
+          <ProveedorCard
+            key={provider.id}
+            provider={provider}
+            isSelected={selected?.includes?.(provider.id)}
+            onToggleSelect={() => toggleSelect(provider.id)}
+            onViewDetail={() => handleViewDetail(provider)}
+            onToggleFavorite={toggleFavorite}
+            onCreateContract={handleCreateContract}
+            onEdit={onEdit ? () => onEdit(provider) : undefined}
+          />
+        </div>
+      );
+    };
+
+    return (
+      <div className="w-full">
+        <div ref={containerRef} style={{ height: '70vh' }} className="border border-gray-200 rounded-md">
+          {dims.height > 0 ? (
+            <List
+              height={dims.height}
+              width={dims.width}
+              itemCount={items.length}
+              itemSize={ITEM_SIZE}
+            >
+              {Row}
+            </List>
+          ) : (
+            <div className="p-4 text-sm text-gray-500">Preparando lista...</div>
+          )}
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="w-full">
-      <div ref={containerRef} style={{ height: '70vh' }} className="border border-gray-200 rounded-md">
-        {dims.height > 0 ? (
-          <List
-            height={dims.height}
-            width={dims.width}
-            itemCount={items.length}
-            itemSize={ITEM_SIZE}
-          >
-            {Row}
-          </List>
-        ) : (
-          <div className="p-4 text-sm text-gray-500">Preparando lista…</div>
-        )}
-      </div>
+    <div className="w-full space-y-4">
+      {renderTabs()}
+      {renderSelectionBar()}
+      {renderList()}
     </div>
   );
 };
 
 export default ProveedorList;
-

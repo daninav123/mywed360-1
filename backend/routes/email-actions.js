@@ -103,4 +103,44 @@ router.post('/accept-budget', async (req, res) => {
   }
 });
 
+// POST /api/email-actions/accept-task
+// Body: { weddingId, mailId, title, due?, priority? }
+router.post('/accept-task', async (req, res) => {
+  try {
+    const { weddingId, mailId, title = 'Tarea', due, priority = 'media' } = req.body || {};
+    if (!weddingId || !title) return res.status(400).json({ error: 'weddingId and title required' });
+    const start = due ? new Date(due) : new Date();
+    const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const taskRef = db
+      .collection('weddings').doc(weddingId)
+      .collection('tasks').doc();
+    const payload = {
+      title,
+      name: title,
+      desc: 'Generada desde email',
+      start,
+      end,
+      long: true,
+      category: 'EMAIL',
+      priority,
+      source: { type: 'email', mailId },
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+    if (due) {
+      try {
+        payload.due = new Date(due);
+      } catch {}
+    }
+    await taskRef.set(payload, { merge: true });
+
+    return res.json({ ok: true, id: taskRef.id });
+  } catch (e) {
+    console.error('accept-task failed', e);
+    return res.status(500).json({ error: 'internal' });
+  }
+});
+
+
 export default router;

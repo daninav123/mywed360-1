@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { assertFails, assertSucceeds, initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
 import { getFirestore, doc, setDoc, getDoc, collection } from 'firebase/firestore';

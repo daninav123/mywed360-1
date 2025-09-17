@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
 
@@ -120,11 +121,15 @@ export const GanttChart = ({
   const [scrollLeft, setScrollLeft] = useState(0);
   const [contentOffsetX, setContentOffsetX] = useState(0);
   const scrollerRef = useRef(null);
+  const [scrollerNode, setScrollerNode] = useState(null);
   const movingGroupRef = useRef(null);
 
   useEffect(() => {
     const root = wrapperRef.current;
-    if (!root) return;
+    if (!root) {
+      setScrollerNode(null);
+      return;
+    }
     // Buscar el contenedor scrollable interno del Gantt
     let scroller = null;
     const all = root.querySelectorAll('*');
@@ -137,12 +142,20 @@ export const GanttChart = ({
         }
       } catch {}
     }
-    if (!scroller) return;
+    if (!scroller) {
+      setScrollerNode(null);
+      return;
+    }
     scrollerRef.current = scroller;
+    setScrollerNode(scroller);
     const onScroll = () => setScrollLeft(scroller.scrollLeft || 0);
     onScroll();
     scroller.addEventListener('scroll', onScroll);
-    return () => scroller.removeEventListener('scroll', onScroll);
+    return () => {
+      scroller.removeEventListener('scroll', onScroll);
+      if (scrollerRef.current === scroller) scrollerRef.current = null;
+      setScrollerNode(prev => (prev === scroller ? null : prev));
+    };
   }, [viewMode, columnWidth, cleanTasks.length]);
 
   // Capturar scroll de cualquier descendiente (por si cambia el nodo scrollable)
@@ -275,10 +288,10 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {scrollerRef.current && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
+        {scrollerNode && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
           <div
             title="Día de la boda"
-            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx - ((scrollerRef.current && scrollerRef.current.scrollLeft) || 0) - (contentOffsetX || 0)), height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), pointerEvents: 'none', zIndex: 1000 }}
+            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx - scrollLeft - (contentOffsetX || 0)), height: scrollerNode ? (scrollerNode.scrollHeight || '100%') : '100%', pointerEvents: 'none', zIndex: 1000 }}
           >
             {/* Poste vertical */}
             <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
@@ -301,7 +314,7 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>, scrollerRef.current)
+          </div>, scrollerNode)
         }
       </div>
     </LocalErrorBoundary>

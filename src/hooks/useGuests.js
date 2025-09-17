@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { post as apiPost } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
 import useWeddingCollection from './useWeddingCollection';
-import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { subscribeSyncState, getSyncState } from '../services/SyncService';
 import { sendText as sendWhatsAppText, toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
 import { renderInviteMessage } from '../services/MessageTemplateService';
 import wh from '../utils/whDebug';
@@ -132,18 +132,6 @@ const useGuests = () => {
 
   // EstadÃ­sticas memoizadas
   const stats = useMemo(() => {
-    const confirmed = guests.filter(g => 
-      g.status === 'confirmed' || g.response === 'SÃ­'
-    ).length;
-    
-    const pending = guests.filter(g => 
-      g.status === 'pending' || g.response === 'Pendiente'
-    ).length;
-    
-    const declined = guests.filter(g => 
-      g.status === 'declined' || g.response === 'No'
-    ).length;
-    
     const totalCompanions = guests.reduce((sum, g) => 
       sum + (parseInt(g.companion, 10) || 0), 0
     );
@@ -314,9 +302,13 @@ const useGuests = () => {
         const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {});
         if (resp.ok) { const json = await resp.json(); link = json.link; }
       } catch {}
-      const msg = `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Para confirmar, responde "SÃ­" o "No" a este mensaje. DespuÃ©s te preguntaremos acompaÃ±antes y alergias.`;
+      const message = (customMessage && customMessage.trim())
+      ? customMessage.trim()
+      : (link
+        ? `¡Hola ${g.name or ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
+        : `¡Hola ${g.name or ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`);
       const to = toE164Frontend(g.phone);
-      if (to) items.push({ to, message: msg, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
+      if (to) items.push({ to, message, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
     }
     if (!items.length) {
       alert('Los seleccionados no tienen telÃ©fonos vÃ¡lidos');

@@ -3,8 +3,9 @@ import { Card, Button } from '../ui';
 import { Plus, Edit3, Trash2, AlertTriangle, Target } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatUtils';
 import Modal from '../Modal';
+import useTranslations from '../../hooks/useTranslations';
 
-export default function BudgetManager({ 
+export default function BudgetManager({
   budget, 
   budgetUsage, 
   onUpdateBudget, 
@@ -14,6 +15,7 @@ export default function BudgetManager({
   alertThresholds = { warn: 75, danger: 90 },
   onUpdateSettings,
 }) {
+  const { t } = useTranslations();
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(-1);
@@ -186,3 +188,5 @@ export default function BudgetManager({
     </div>
   );
 }
+
+

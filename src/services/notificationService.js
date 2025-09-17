@@ -2,7 +2,7 @@
 // Notification: { id, type, message, date, read, providerId?, trackingId?, dueDate?, action? }
 
 import { auth } from '../firebaseConfig';
-import { get as apiGet, post as apiPost, del as apiDel, post } from './apiClient';
+import { get as apiGet, post as apiPost, del as apiDel } from './apiClient';
 
 // Sistema de autenticación unificado (inyectado desde useAuth)
 let authContext = null;
@@ -139,6 +139,15 @@ export async function acceptMeeting({ weddingId, mailId, title, when }) {
   const headers = await authHeader({ 'Content-Type': 'application/json' });
   const res = await apiPost('/api/email-actions/accept-meeting', { weddingId, mailId, title, when }, { headers });
   if (!res.ok) throw new Error('acceptMeeting failed');
+  return res.json();
+}
+
+export async function acceptTask({ weddingId, mailId, title, due, priority }) {
+  const headers = await authHeader({ 'Content-Type': 'application/json' });
+  const body = { weddingId, mailId, title, priority };
+  if (due) body.due = due;
+  const res = await apiPost('/api/email-actions/accept-task', body, { headers });
+  if (!res.ok) throw new Error('acceptTask failed');
   return res.json();
 }
 

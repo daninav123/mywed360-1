@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // @vitest-environment node
 import { describe, it, beforeAll, afterAll, beforeEach, expect } from 'vitest';
 import { promises as fs } from 'fs';

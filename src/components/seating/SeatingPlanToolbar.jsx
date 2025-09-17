@@ -3,7 +3,7 @@
  * Interfaz mejorada con iconos claros y mejor UX
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useTranslations from '../../hooks/useTranslations';
 import { 
   Undo2, 
@@ -75,16 +75,58 @@ const SeatingPlanToolbar = ({
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showAlignMenu, setShowAlignMenu] = useState(false);
-  const handleToggleTables = () => {
-    if (onToggleShowTables) onToggleShowTables();
-    setShowTablesLocal(s => !s);
-  };
+  const [showSnaps, setShowSnaps] = useState(false);
+  const [snapshotName, setSnapshotName] = useState('');
+  const [snapshotError, setSnapshotError] = useState('');
   const exportRef = useRef(null);
   const alignRef = useRef(null);
   const snapsRef = useRef(null);
   const { t } = useTranslations();
   const [showTablesLocal, setShowTablesLocal] = useState(showTables);
-  
+
+  const handleToggleTables = () => {
+    if (onToggleShowTables) onToggleShowTables();
+    setShowTablesLocal((s) => !s);
+  };
+
+  const handleCloseSnaps = useCallback(() => {
+    setShowSnaps(false);
+    setSnapshotName('');
+    setSnapshotError('');
+  }, []);
+
+  const handleToggleSnapshots = useCallback(() => {
+    if (showSnaps) {
+      handleCloseSnaps();
+    } else {
+      setShowSnaps(true);
+      setSnapshotName('');
+      setSnapshotError('');
+    }
+  }, [showSnaps, handleCloseSnaps]);
+
+  const handleSnapshotNameChange = useCallback((event) => {
+    setSnapshotName(event.target.value);
+    if (snapshotError) {
+      setSnapshotError('');
+    }
+  }, [snapshotError]);
+
+  const handleSnapshotSubmit = useCallback((event) => {
+    event.preventDefault();
+    const trimmed = snapshotName.trim();
+    if (!trimmed) {
+      setSnapshotError(t('seating.snapshots.nameRequired', { defaultValue: 'Ingresa un nombre' }));
+      return;
+    }
+    onSaveSnapshot?.(trimmed);
+    handleCloseSnaps();
+  }, [snapshotName, onSaveSnapshot, handleCloseSnaps, t]);
+
+  useEffect(() => {
+    setShowTablesLocal(showTables);
+  }, [showTables]);
+
   // Cierre por click-away
   useEffect(() => {
     const onClickAway = (e) => {
@@ -95,12 +137,12 @@ const SeatingPlanToolbar = ({
         setShowAlignMenu(false);
       }
       if (snapsRef.current && !snapsRef.current.contains(e.target)) {
-        setShowSnaps(false);
+        handleCloseSnaps();
       }
     };
     document.addEventListener('mousedown', onClickAway);
     return () => document.removeEventListener('mousedown', onClickAway);
-  }, []);
+  }, [handleCloseSnaps]);
 
   // Atajos de teclado: E (toggle), Escape (cerrar)
   useEffect(() => {
@@ -129,18 +171,16 @@ const SeatingPlanToolbar = ({
         return <CloudOff className="h-4 w-4 text-gray-400" />;
     }
   };
-  const [showSnaps, setShowSnaps] = useState(false);
-
   const getSyncText = () => {
     switch (syncStatus?.status) {
       case 'syncing':
-        return 'Sincronizando...';
+        return t('seating.toolbar.syncing', { defaultValue: 'Sincronizando...' });
       case 'synced':
-        return 'Sincronizado';
+        return t('seating.toolbar.synced', { defaultValue: 'Sincronizado' });
       case 'error':
-        return 'Error de Sincronización';
+        return t('seating.toolbar.syncError', { defaultValue: 'Error de sincronización' });
       default:
-        return 'Sin conexión';
+        return t('seating.toolbar.offline', { defaultValue: 'Sin conexión' });
     }
   };
 
@@ -190,46 +230,46 @@ const SeatingPlanToolbar = ({
           <button type="button"
             onClick={onToggleRulers}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${showRulers ? 'text-blue-700' : ''}`}
-            title={showRulers ? 'Ocultar reglas' : 'Mostrar reglas'}
+            title={showRulers ? t('seating.toolbar.hideRulers', { defaultValue: 'Ocultar reglas' }) : t('seating.toolbar.showRulers', { defaultValue: 'Mostrar reglas' })}
             aria-pressed={showRulers}
-            aria-label={showRulers ? 'Ocultar reglas' : 'Mostrar reglas'}
+            aria-label={showRulers ? t('seating.toolbar.hideRulers', { defaultValue: 'Ocultar reglas' }) : t('seating.toolbar.showRulers', { defaultValue: 'Mostrar reglas' })}
           >
             <Ruler className="h-4 w-4"/>
-            <span className="hidden sm:inline">Reglas</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.rulers', { defaultValue: 'Reglas' })}</span>
           </button>
 
           {/* Snap a cuadrícula */}
           <button type="button"
             onClick={onToggleSnap}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${snapEnabled ? 'text-blue-700' : ''}`}
-            title={snapEnabled ? `Snap: ${gridStep} cm` : 'Activar snap a cuadrícula'}
+            title={snapEnabled ? `${t('seating.toolbar.snapEnabled', { defaultValue: 'Snap activado' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadrícula' })}
             aria-pressed={snapEnabled}
-            aria-label={snapEnabled ? `Desactivar snap (${gridStep} cm)` : 'Activar snap a cuadrícula'}
+            aria-label={snapEnabled ? `${t('seating.toolbar.disableSnap', { defaultValue: 'Desactivar snap' })} (${gridStep} cm)` : t('seating.toolbar.enableSnap', { defaultValue: 'Activar snap a cuadrícula' })}
           >
             <Magnet className="h-4 w-4"/>
-            <span className="hidden sm:inline">Snap</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.snap', { defaultValue: 'Snap' })}</span>
           </button>
 
           {/* Numeración */}
           <button type="button"
             onClick={onToggleSeatNumbers}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${showSeatNumbers ? 'text-blue-700' : ''}`}
-            title={showSeatNumbers ? 'Ocultar numeración' : 'Mostrar numeración'}
+            title={showSeatNumbers ? t('seating.toolbar.hideSeatNumbers', { defaultValue: 'Ocultar numeración' }) : t('seating.toolbar.showSeatNumbers', { defaultValue: 'Mostrar numeración' })}
             aria-pressed={showSeatNumbers}
           >
             <Rows className="h-4 w-4" />
-            <span className="hidden sm:inline">Números</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.seatNumbers', { defaultValue: 'Números' })}</span>
           </button>
 
           {/* Validaciones en vivo */}
           <button type="button"
             onClick={onToggleValidations}
             className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${validationsEnabled ? 'text-blue-700' : ''}`}
-            title={validationsEnabled ? 'Desactivar validaciones' : 'Activar validaciones'}
+            title={validationsEnabled ? t('seating.toolbar.disableValidations', { defaultValue: 'Desactivar validaciones' }) : t('seating.toolbar.enableValidations', { defaultValue: 'Activar validaciones' })}
             aria-pressed={validationsEnabled}
           >
             <AlertTriangle className="h-4 w-4" />
-            <span className="hidden sm:inline">Check</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.validations', { defaultValue: 'Checks' })}</span>
           </button>
         </div>
 
@@ -273,11 +313,11 @@ const SeatingPlanToolbar = ({
             <button type="button"
               onClick={onOpenCapacity}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title={`Capacidad global: ${globalMaxSeats || '—'}`}
-              aria-label="Definir capacidad global"
+               title={`${t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}: ${globalMaxSeats || '--'}`}
+               aria-label={t('seating.toolbar.capacityTooltip', { defaultValue: 'Capacidad global' })}
             >
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Cap: {globalMaxSeats || '—'}</span>
+               <span className="hidden sm:inline">{t('seating.toolbar.capacityShort', { defaultValue: 'Cap' })}: {globalMaxSeats || '--'}</span>
             </button>
           )}
 
@@ -297,11 +337,11 @@ const SeatingPlanToolbar = ({
             <button type="button" data-testid="auto-assign-btn"
               onClick={onAutoAssign}
               className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-              title="Auto-asignar invitados"
-              aria-label="Auto-asignar invitados"
+              title={t('seating.toolbar.autoAssign', { defaultValue: 'Auto-asignar invitados' })}
+              aria-label={t('seating.toolbar.autoAssign', { defaultValue: 'Auto-asignar invitados' })}
             >
               <Palette className="h-4 w-4" />
-              <span className="hidden sm:inline">Auto-asignar</span>
+              <span className="hidden sm:inline">{t('seating.toolbar.autoAssignShort', { defaultValue: 'Auto-asignar' })}</span>
             </button>
           )}
 
@@ -320,11 +360,11 @@ const SeatingPlanToolbar = ({
           <button type="button"
             onClick={onOpenBackground}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title="Configurar fondo"
-            aria-label="Configurar fondo"
+            title={t('seating.toolbar.backgroundConfig', { defaultValue: 'Configurar fondo' })}
+            aria-label={t('seating.toolbar.backgroundConfig', { defaultValue: 'Configurar fondo' })}
           >
             <ImageIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Fondo</span>
+            <span className="hidden sm:inline">{t('seating.toolbar.background', { defaultValue: 'Fondo' })}</span>
           </button>
 
           {/* Rotación rápida */}
@@ -338,22 +378,22 @@ const SeatingPlanToolbar = ({
           {/* Alinear / Distribuir */}
           {tab === 'banquet' && (
             <div ref={alignRef} className="relative">
-              <button type="button" onClick={()=>setShowAlignMenu(s=>!s)} className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100" title="Alinear/Distribuir">
+              <button type="button" onClick={()=>setShowAlignMenu(s=>!s)} className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100" title={t('seating.toolbar.alignMenu', { defaultValue: 'Alinear/Distribuir' })}>
                 <Columns className="h-4 w-4" />
-                <span className="hidden sm:inline">Alinear</span>
+                <span className="hidden sm:inline">{t('seating.toolbar.align', { defaultValue: 'Alinear' })}</span>
               </button>
               {showAlignMenu && (
                 <div className="absolute top-full left-0 mt-1 bg-white border rounded shadow z-10 text-sm">
-                  <div className="px-3 py-1 font-medium text-gray-600">Alinear</div>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','start'); setShowAlignMenu(false);}}>Izquierda</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','center'); setShowAlignMenu(false);}}>Centro X</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','end'); setShowAlignMenu(false);}}>Derecha</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','start'); setShowAlignMenu(false);}}>Arriba</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','center'); setShowAlignMenu(false);}}>Centro Y</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','end'); setShowAlignMenu(false);}}>Abajo</button>
-                  <div className="px-3 py-1 font-medium text-gray-600 border-t">Distribuir</div>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('x'); setShowAlignMenu(false);}}>Horizontal</button>
-                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('y'); setShowAlignMenu(false);}}>Vertical</button>
+                  <div className="px-3 py-1 font-medium text-gray-600">{t('seating.toolbar.align', { defaultValue: 'Alinear' })}</div>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','start'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignLeft', { defaultValue: 'Izquierda' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','center'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignCenterX', { defaultValue: 'Centro X' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('x','end'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignRight', { defaultValue: 'Derecha' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','start'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignTop', { defaultValue: 'Arriba' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','center'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignCenterY', { defaultValue: 'Centro Y' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onAlign?.('y','end'); setShowAlignMenu(false);}}>{t('seating.toolbar.alignBottom', { defaultValue: 'Abajo' })}</button>
+                  <div className="px-3 py-1 font-medium text-gray-600 border-t">{t('seating.toolbar.distribute', { defaultValue: 'Distribuir' })}</div>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('x'); setShowAlignMenu(false);}}>{t('seating.toolbar.distributeHorizontal', { defaultValue: 'Horizontal' })}</button>
+                  <button className="block w-full text-left px-3 py-1 hover:bg-gray-50" onClick={()=>{onDistribute?.('y'); setShowAlignMenu(false);}}>{t('seating.toolbar.distributeVertical', { defaultValue: 'Vertical' })}</button>
                 </div>
               )}
             </div>
@@ -440,29 +480,67 @@ const SeatingPlanToolbar = ({
         <div ref={snapsRef} className="relative inline-block">
           <button
             type="button"
-            onClick={() => setShowSnaps(s => !s)}
+            onClick={handleToggleSnapshots}
             className="px-2 py-1 text-sm rounded border hover:bg-gray-50"
-            title="Snapshots"
+            title={t('seating.snapshots.title', { defaultValue: 'Snapshots' })}
+            aria-expanded={showSnaps}
+            aria-controls="seating-snapshots-menu"
           >
-            Snapshots
+            {t('seating.snapshots.button', { defaultValue: 'Snapshots' })}
           </button>
           {showSnaps && (
-            <div className="absolute z-10 mt-1 bg-white border rounded shadow w-56">
-              <div className="px-3 py-2 border-b text-sm font-medium">Gestionar Snapshots</div>
-              <button className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm" onClick={() => {
-                const name = window.prompt('Nombre del snapshot:');
-                if (!name) return;
-                onSaveSnapshot?.(name);
-                setShowSnaps(false);
-              }}>Guardar actual…</button>
+            <div id="seating-snapshots-menu" className="absolute z-10 mt-1 bg-white border rounded shadow w-64">
+              <div className="px-3 py-2 border-b text-sm font-medium">
+                {t('seating.snapshots.manage', { defaultValue: 'Gestionar snapshots' })}
+              </div>
+              <form onSubmit={handleSnapshotSubmit} className="px-3 py-2 space-y-2">
+                <div>
+                  <label htmlFor="snapshot-name" className="block text-xs font-medium text-gray-600">
+                    {t('seating.snapshots.nameLabel', { defaultValue: 'Nombre' })}
+                  </label>
+                  <input
+                    id="snapshot-name"
+                    type="text"
+                    value={snapshotName}
+                    onChange={handleSnapshotNameChange}
+                    className="w-full px-2 py-1 border rounded text-sm"
+                    placeholder={t('seating.snapshots.namePlaceholder', { defaultValue: 'Ej: Plano base' })}
+                  />
+                </div>
+                {snapshotError && (
+                  <p className="text-xs text-red-600">{snapshotError}</p>
+                )}
+                <div className="flex items-center gap-2">
+                  <button type="submit" className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                    {t('seating.snapshots.saveCurrent', { defaultValue: 'Guardar actual' })}
+                  </button>
+                  <button type="button" onClick={handleCloseSnaps} className="px-2 py-1 text-sm rounded border hover:bg-gray-50">
+                    {t('common.cancel', { defaultValue: 'Cancelar' })}
+                  </button>
+                </div>
+              </form>
               <div className="max-h-48 overflow-auto">
-                {(snapshots||[]).length === 0 ? (
-                  <div className="px-3 py-2 text-xs text-gray-500">Sin snapshots</div>
+                {(snapshots || []).length === 0 ? (
+                  <div className="px-3 py-2 text-xs text-gray-500">
+                    {t('seating.snapshots.empty', { defaultValue: 'Sin snapshots' })}
+                  </div>
                 ) : (
-                  snapshots.map(n => (
-                    <div key={n} className="flex items-center justify-between px-3 py-1 text-sm hover:bg-gray-50">
-                      <button className="text-blue-600 hover:underline" onClick={() => { onLoadSnapshot?.(n); setShowSnaps(false); }}>Cargar: {n}</button>
-                      <button className="text-red-600 hover:underline" onClick={() => onDeleteSnapshot?.(n)}>Borrar</button>
+                  snapshots.map((name) => (
+                    <div key={name} className="flex items-center justify-between px-3 py-1 text-sm hover:bg-gray-50">
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:underline"
+                        onClick={() => { onLoadSnapshot?.(name); handleCloseSnaps(); }}
+                      >
+                        {t('seating.snapshots.load', { defaultValue: 'Cargar' })}: {name}
+                      </button>
+                      <button
+                        type="button"
+                        className="text-red-600 hover:underline"
+                        onClick={() => onDeleteSnapshot?.(name)}
+                      >
+                        {t('seating.snapshots.delete', { defaultValue: 'Borrar' })}
+                      </button>
                     </div>
                   ))
                 )}

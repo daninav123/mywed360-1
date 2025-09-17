@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, X, Mail, Calendar, User, Trash, Check, AlertTriangle, Info } from 'lucide-react';
+import { Bell, Mail, Calendar, User, Trash, Check, AlertTriangle, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './ui';
 import * as NotificationService from '../services/notificationService';
@@ -75,7 +75,7 @@ const NotificationCenter = () => {
   };
   
   // Mostrar toast de notificación
-  const showToast = ({ title, message, type = 'info', duration = 3000 }) => {
+  const showToast = ({ title, message, type = 'info', duration = 3000, actions = [] }) => {
     // Crear elemento toast
     const toastElement = document.createElement('div');
     toastElement.className = `fixed bottom-4 right-4 bg-white rounded-md shadow-lg p-4 flex items-start max-w-sm transform transition-all duration-300 z-50 border-l-4 ${getToastBorderColor(type)}`;
@@ -116,6 +116,9 @@ const NotificationCenter = () => {
                 if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
               } else if (kind === 'acceptBudget') {
                 await NotificationService.acceptBudget({ weddingId: p.weddingId, budgetId: p.budgetId, emailId: p.emailId });
+                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+              } else if (kind === 'acceptTask') {
+                await NotificationService.acceptTask({ weddingId: p.weddingId, mailId: p.mailId, title: p.title, due: p.due, priority: p.priority });
                 if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
               } else if (kind === 'markRead') {
                 if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
@@ -423,6 +426,32 @@ const NotificationCenter = () => {
                               } catch (err) { console.error('accept meeting failed', err); }
                             }}
                           >Aceptar</button>
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
+                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
+                          >Rechazar</button>
+                        </div>
+                      )}
+                      {notification?.payload?.kind === 'task_suggested' && (
+                        <div className="mt-2 flex gap-2">
+                          <button
+                            className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const p = notification.payload;
+                                await NotificationService.acceptTask({
+                                  weddingId: p.weddingId,
+                                  mailId: p.mailId,
+                                  title: p.task?.title,
+                                  due: p.task?.due,
+                                  priority: p.task?.priority,
+                                });
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
+                              } catch (err) { console.error('accept task failed', err); }
+                            }}
+                          >Agregar</button>
                           <button
                             className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
                             onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}

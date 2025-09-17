@@ -1,11 +1,11 @@
-ï»¿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui';
 import { formatCurrency } from '../../utils/formatUtils';
 import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Formulario para crear/editar transacciones
- * Incluye validaciÃ³n y categorÃ­as predefinidas
+ * Incluye validación y categorías predefinidas
  */
 export default function TransactionForm({ transaction, onSave, onCancel, isLoading }) {
   const { t } = useTranslations();
@@ -16,20 +16,24 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     date: new Date().toISOString().split('T')[0],
     type: 'expense',
     category: '',
-    description: ''
+    description: '',
+    provider: '',
+    dueDate: '',
+    status: 'pending',
+    paidAmount: ''
   });
 
   const [errors, setErrors] = useState({});
 
-  // CategorÃ­as predefinidas (valores internos no traducidos para coherencia)
+  // Categorías predefinidas (valores internos no traducidos para coherencia)
   const categories = {
     expense: [
       'Catering',
-      'MÃºsica',
+      'Música',
       'Flores',
-      'FotografÃ­a',
+      'Fotografía',
       'Vestimenta',
-      'DecoraciÃ³n',
+      'Decoración',
       'Transporte',
       'Alojamiento',
       'Invitaciones',
@@ -37,24 +41,29 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       'Otros'
     ],
     income: [
-      'AportaciÃ³n inicial',
-      'AportaciÃ³n mensual',
+      'Aportación inicial',
+      'Aportación mensual',
       'Regalo de boda',
-      'AportaciÃ³n familiar',
+      'Aportación familiar',
       'Otros ingresos'
     ]
   };
 
-  // Inicializar formulario con datos de transacciÃ³n existente
+  // Inicializar formulario con datos de transacción existente
   useEffect(() => {
     if (transaction) {
+      const defaultStatus = transaction.type === 'income' ? 'expected' : 'pending';
       setFormData({
         concept: transaction.concept || transaction.description || '',
         amount: transaction.amount?.toString() || '',
         date: transaction.date || new Date().toISOString().split('T')[0],
         type: transaction.type || 'expense',
         category: transaction.category || '',
-        description: transaction.description || ''
+        description: transaction.description || '',
+        provider: transaction.provider || '',
+        dueDate: transaction.dueDate ? transaction.dueDate.slice(0, 10) : '',
+        status: transaction.status || defaultStatus,
+        paidAmount: transaction.paidAmount != null ? String(transaction.paidAmount) : '',
       });
     }
   }, [transaction]);
@@ -62,13 +71,15 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
   // Validar formulario
   const validateForm = () => {
     const newErrors = {};
+    const amountValue = Number(formData.amount);
+    const paidValue = formData.paidAmount === '' ? 0 : Number(formData.paidAmount);
 
     if (!formData.concept.trim()) {
       newErrors.concept = t('finance.form.errors.conceptRequired', { defaultValue: 'El concepto es obligatorio' });
     }
 
-    if (!formData.amount || isNaN(formData.amount) || Number(formData.amount) <= 0) {
-      newErrors.amount = t('finance.form.errors.amountPositive', { defaultValue: 'El monto debe ser un nÃºmero positivo' });
+    if (!formData.amount || Number.isNaN(amountValue) || amountValue <= 0) {
+      newErrors.amount = t('finance.form.errors.amountPositive', { defaultValue: 'El monto debe ser un n?mero positivo' });
     }
 
     if (!formData.date) {
@@ -76,48 +87,126 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     }
 
     if (!formData.category) {
-      newErrors.category = t('finance.form.errors.categoryRequired', { defaultValue: 'La categorÃ­a es obligatoria' });
+      newErrors.category = t('finance.form.errors.categoryRequired', { defaultValue: 'La categor?a es obligatoria' });
+    }
+
+    if (formData.paidAmount !== '' && (Number.isNaN(paidValue) || paidValue < 0)) {
+      newErrors.paidAmount = t('finance.form.errors.paidAmountPositive', { defaultValue: 'El monto pagado debe ser un n?mero positivo' });
+    } else if (!Number.isNaN(amountValue) && paidValue > amountValue) {
+      newErrors.paidAmount = t('finance.form.errors.paidAmountExceeds', { defaultValue: 'El monto pagado no puede superar el total' });
+    } else if (formData.type === 'expense' && formData.status === 'partial' && paidValue <= 0) {
+      newErrors.paidAmount = t('finance.form.errors.paidAmountRequired', { defaultValue: 'Registra cu?nto has pagado para marcar el estado como parcial' });
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejar envÃ­o del formulario
+  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
+    const amountValue = Number(formData.amount);
+    const rawPaidValue = formData.paidAmount === '' ? null : Number(formData.paidAmount);
+    const sanitizedPaidValue = rawPaidValue == null || Number.isNaN(rawPaidValue) ? null : Math.max(0, rawPaidValue);
+
     const transactionData = {
       ...formData,
-      amount: Number(formData.amount)
+      concept: formData.concept.trim(),
+      provider: formData.provider.trim(),
+      amount: amountValue,
+      paidAmount: sanitizedPaidValue,
+      dueDate: formData.dueDate || null,
     };
+
+    if (transactionData.type === 'expense') {
+      if (transactionData.status === 'paid') {
+        transactionData.paidAmount = Number.isNaN(amountValue) ? null : amountValue;
+      } else if (transactionData.paidAmount != null && !Number.isNaN(amountValue) && amountValue > 0) {
+        transactionData.paidAmount = Math.min(transactionData.paidAmount, amountValue);
+      }
+    } else if (transactionData.type === 'income' && transactionData.status === 'received' && transactionData.paidAmount == null && !Number.isNaN(amountValue)) {
+      transactionData.paidAmount = amountValue;
+    }
 
     await onSave(transactionData);
   };
 
   // Manejar cambios en los campos
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Limpiar error del campo cuando el usuario empiece a escribir
+    setFormData(prev => {
+      let next = { ...prev, [field]: value };
+
+      if (field === 'type') {
+        const defaultStatus = value === 'income' ? 'expected' : 'pending';
+        const allowedCategories = categories[value] || [];
+        next = {
+          ...next,
+          status: defaultStatus,
+          category: allowedCategories.includes(prev.category) ? prev.category : '',
+        };
+        if (defaultStatus === 'expected' && !prev.paidAmount) {
+          next.paidAmount = '';
+        }
+      }
+
+      if (field === 'status' && value === 'paid') {
+        const amountValue = Number(next.amount);
+        if (!Number.isNaN(amountValue) && amountValue > 0) {
+          next.paidAmount = String(amountValue);
+        }
+      }
+
+      if (field === 'amount' && next.status === 'paid') {
+        const amountValue = Number(value);
+        if (!Number.isNaN(amountValue) && amountValue > 0) {
+          next.paidAmount = String(amountValue);
+        }
+      }
+
+      return next;
+    });
+
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+
+    if ((field === 'amount' || field === 'paidAmount' || field === 'status') && errors.paidAmount) {
+      setErrors(prev => ({ ...prev, paidAmount: '' }));
+    }
   };
 
-  // Obtener categorÃ­as segÃºn el tipo
+  // Obtener categorías según el tipo
   const availableCategories = categories[formData.type] || [];
+  const statusOptions = formData.type === "income"
+    ? [
+        { value: 'expected', label: t('finance.form.status.expected', { defaultValue: 'Esperado' }) },
+        { value: 'received', label: t('finance.form.status.received', { defaultValue: 'Recibido' }) },
+      ]
+    : [
+        { value: 'pending', label: t('finance.form.status.pending', { defaultValue: 'Pendiente' }) },
+        { value: 'partial', label: t('finance.form.status.partial', { defaultValue: 'Pago parcial' }) },
+        { value: 'paid', label: t('finance.form.status.paid', { defaultValue: 'Pagado' }) },
+      ];
+
+  const numericAmount = Number(formData.amount) || 0;
+  const numericPaid = formData.paidAmount === '' ? 0 : Math.max(0, Number(formData.paidAmount) || 0);
+  const effectivePaid = numericAmount > 0 ? Math.min(numericPaid, numericAmount) : numericPaid;
+  const remainingAmount = Math.max(0, numericAmount - effectivePaid);
+  const dueDateObject = formData.dueDate ? new Date(formData.dueDate) : null;
+  const isOverdue = Boolean(dueDateObject && dueDateObject < new Date() && formData.status !== 'paid');
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Tipo de transacciÃ³n */}
+      {/* Tipo de transacción */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('finance.form.type', { defaultValue: 'Tipo de transacciÃ³n' })}
+          {t('finance.form.type', { defaultValue: 'Tipo de transacción' })}
         </label>
         <div className="flex space-x-4">
           <label className="flex items-center">
@@ -162,10 +251,27 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
       </div>
 
+      {/* Proveedor / Fuente */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {t('finance.form.provider', { defaultValue: 'Proveedor / Fuente' })}
+        </label>
+        <input
+          type="text"
+          value={formData.provider}
+          onChange={(e) => handleChange('provider', e.target.value)}
+          placeholder={t('finance.form.providerPlaceholder', { defaultValue: 'Ej: Catering Gourmet, Banco BBVA...' })}
+          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
+        />
+        <p className="mt-1 text-sm text-gray-500">
+          {t('finance.form.providerHint', { defaultValue: 'Identifica con quién se contrata o de dónde proviene el dinero.' })}
+        </p>
+      </div>
+
       {/* Monto */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('finance.form.amount', { defaultValue: 'Monto (â‚¬)' })} *
+          {t('finance.form.amount', { defaultValue: 'Monto (€)' })} *
         </label>
         <input
           type="number"
@@ -206,10 +312,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
       </div>
 
-      {/* CategorÃ­a */}
+      {/* Categoría */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('finance.form.category', { defaultValue: 'CategorÃ­a' })} *
+          {t('finance.form.category', { defaultValue: 'Categoría' })} *
         </label>
         <select
           value={formData.category}
@@ -218,7 +324,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             errors.category ? 'border-red-500' : 'border-gray-300'
           }`}
         >
-          <option value="">{t('finance.form.selectCategory', { defaultValue: 'Selecciona una categorÃ­a' })}</option>
+          <option value="">{t('finance.form.selectCategory', { defaultValue: 'Selecciona una categoría' })}</option>
           {availableCategories.map(category => (
             <option key={category} value={category}>
               {category}
@@ -230,21 +336,72 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         )}
       </div>
 
-      {/* DescripciÃ³n adicional (opcional) */}
+      {/* Seguimiento de pago */}
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">{t('finance.form.paymentTracking', { defaultValue: 'Seguimiento de pago' })}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.form.dueDate', { defaultValue: 'Fecha límite' })}</label>
+            <input
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => handleChange('dueDate', e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
+            />
+            {isOverdue && (
+              <p className="mt-1 text-sm text-red-600">{t('finance.form.dueDateOverdue', { defaultValue: 'Atención: este pago está vencido.' })}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.form.status', { defaultValue: 'Estado' })}</label>
+            <select
+              value={formData.status}
+              onChange={(e) => handleChange('status', e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
+            >
+              {statusOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.form.paidAmount', { defaultValue: 'Monto abonado' })}</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.paidAmount}
+              onChange={(e) => handleChange('paidAmount', e.target.value)}
+              placeholder="0.00"
+              className={`w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.paidAmount ? 'border-red-500' : 'border-gray-300'}`}
+            />
+            {errors.paidAmount && (
+              <p className="mt-1 text-sm text-red-600">{errors.paidAmount}</p>
+            )}
+            {numericAmount > 0 && (
+              <p className="mt-1 text-sm text-gray-500">
+                {t(formData.type === 'expense' ? 'finance.form.remainingToPay' : 'finance.form.remainingToReceive', { defaultValue: formData.type === 'expense' ? 'Pendiente por pagar:' : 'Pendiente por recibir:' })} {formatCurrency(remainingAmount)}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Descripción adicional (opcional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('finance.form.description', { defaultValue: 'DescripciÃ³n adicional' })}
+          {t('finance.form.description', { defaultValue: 'Descripción adicional' })}
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
-          placeholder={t('finance.form.descriptionPlaceholder', { defaultValue: 'Detalles adicionales sobre la transacciÃ³n...' })}
+          placeholder={t('finance.form.descriptionPlaceholder', { defaultValue: 'Detalles adicionales sobre la transacción...' })}
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
-      {/* Botones de acciÃ³n */}
+      {/* Botones de acción */}
       <div className="flex justify-end space-x-3 pt-4">
         <Button
           type="button"
@@ -258,7 +415,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
           type="submit"
           disabled={isLoading}
         >
-          {isLoading ? t('app.saving', { defaultValue: 'Guardando...' }) : (transaction ? t('app.update', { defaultValue: 'Actualizar' }) : t('app.create', { defaultValue: 'Crear' }))} {t('finance.form.transaction', { defaultValue: 'TransacciÃ³n' })}
+          {isLoading ? t('app.saving', { defaultValue: 'Guardando...' }) : (transaction ? t('app.update', { defaultValue: 'Actualizar' }) : t('app.create', { defaultValue: 'Crear' }))} {t('finance.form.transaction', { defaultValue: 'Transacción' })}
         </Button>
       </div>
     </form>

@@ -12,7 +12,7 @@ import EmailTemplateService from '../services/EmailTemplateService';
 export const useAIProviderEmail = () => {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
-  const { userEmail, sendEmailToProvider, generateDefaultSubject, generateDefaultEmailBody } = useProviderEmail();
+  const { userEmail, sendEmailToProvider } = useProviderEmail();
   
   /**
    * Genera un asunto personalizado basado en el resultado de la búsqueda AI

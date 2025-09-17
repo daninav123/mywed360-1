@@ -172,6 +172,31 @@ router.post('/', (req, res) => {
             }
           } catch (e) { console.warn('notification failed', e?.message || e); }
         }
+
+        // Notificaciones por tareas detectadas
+        if (weddingId) {
+          try {
+            const { createNotification } = await import('../services/notificationService.js');
+            const tasks = Array.isArray(insights?.tasks) ? insights.tasks : [];
+            for (const t of tasks) {
+              const title = t?.title || subject || 'Tarea';
+              await createNotification({
+                type: 'event',
+                message: `Tarea detectada: ${title}`,
+                payload: {
+                  kind: 'task_suggested',
+                  mailId: mailRef.id,
+                  weddingId,
+                  task: {
+                    title,
+                    due: t?.due || null,
+                    priority: t?.priority || 'media'
+                  }
+                }
+              });
+            }
+          } catch (e) { console.warn('notification failed', e?.message || e); }
+        }
       } catch (aiErr) {
         console.error('Error analizando correo:', aiErr);
       }

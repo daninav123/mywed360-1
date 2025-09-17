@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { showNotification } from '../../services/notificationService';
@@ -60,6 +60,20 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
               duration: 9000,
               actions: [
                 { label: 'Aceptar', kind: 'acceptBudget', payload: { weddingId: n?.payload?.weddingId, budgetId: n?.payload?.budgetId, emailId: n?.payload?.mailId, notificationId: n.id } },
+                { label: 'Rechazar', kind: 'markRead', payload: { notificationId: n.id } },
+              ],
+            });
+          } else if (kind === 'task_suggested') {
+            const title = n?.payload?.task?.title || 'Tarea detectada';
+            const due = n?.payload?.task?.due;
+            const priority = n?.payload?.task?.priority || 'media';
+            showNotification({
+              title: 'Tarea sugerida',
+              message: `${title}${due ? ' - ' + due : ''}`,
+              type: 'info',
+              duration: 9000,
+              actions: [
+                { label: 'Agregar', kind: 'acceptTask', payload: { weddingId: n?.payload?.weddingId, mailId: n?.payload?.mailId, title, due, priority, notificationId: n.id } },
                 { label: 'Rechazar', kind: 'markRead', payload: { notificationId: n.id } },
               ],
             });
