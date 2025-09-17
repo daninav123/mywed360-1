@@ -150,7 +150,10 @@ export async function markAsUnread(id) {
   return true;
 }
 
-export async function createEmailAlias(alias) {
+export async function createEmailAlias(arg1, arg2) {
+  // Soportar firmas: (alias) o (profile, alias)
+  const alias = (typeof arg1 === 'string') ? arg1 : arg2;
+  if (!alias) throw new Error('alias required');
   if (USE_BACKEND) {
     const res = await fetch(`${BASE}/api/mail/alias`, { method: 'POST', headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ alias }) });
     if (!res.ok) throw new Error(`createEmailAlias ${res.status}`);

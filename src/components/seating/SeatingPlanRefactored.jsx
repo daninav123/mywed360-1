@@ -84,6 +84,9 @@ const SeatingPlanRefactored = () => {
     ? hallSize
     : { width: 1800, height: 1200 };
 
+  const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
+
+
   /* ---- atajos Ctrl/Cmd + Z / Y ---- */
   useEffect(() => {
     const h = (e) => {
@@ -97,7 +100,7 @@ const SeatingPlanRefactored = () => {
       } catch (_) {}
     };
     window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
+  return () => window.removeEventListener('keydown', h);
   }, [undo, redo]);
 
   // Atajos de teclado para herramientas: 1=pan,2=move,3=boundary,4=door,5=obstacle,6=aisle
@@ -157,22 +160,22 @@ const SeatingPlanRefactored = () => {
   }, [rotateSelected]);
 
   /* ---- handlers ---- */
-  const handleOpenCeremonyConfig = () => setCeremonyConfigOpen(true);
-  const handleCloseCeremonyConfig = () => setCeremonyConfigOpen(false);
-  const handleOpenBanquetConfig  = () => setBanquetConfigOpen(true);
-  const handleCloseBanquetConfig = () => setBanquetConfigOpen(false);
-  const handleOpenSpaceConfig    = () => setSpaceConfigOpen(true);
-  const handleCloseSpaceConfig   = () => setSpaceConfigOpen(false);
-  const handleOpenTemplates      = () => setTemplateOpen(true);
-  const handleCloseTemplates     = () => setTemplateOpen(false);
+  const handleOpenCeremonyConfig = React.useCallback(() => setCeremonyConfigOpen(true), [setCeremonyConfigOpen]);
+  const handleCloseCeremonyConfig = React.useCallback(() => setCeremonyConfigOpen(false), [setCeremonyConfigOpen]);
+  const handleOpenBanquetConfig  = React.useCallback(() => setBanquetConfigOpen(true), [setBanquetConfigOpen]);
+  const handleCloseBanquetConfig = React.useCallback(() => setBanquetConfigOpen(false), [setBanquetConfigOpen]);
+  const handleOpenSpaceConfig    = React.useCallback(() => setSpaceConfigOpen(true), [setSpaceConfigOpen]);
+  const handleCloseSpaceConfig   = React.useCallback(() => setSpaceConfigOpen(false), [setSpaceConfigOpen]);
+  const handleOpenTemplates      = React.useCallback(() => setTemplateOpen(true), [setTemplateOpen]);
+  const handleCloseTemplates     = React.useCallback(() => setTemplateOpen(false), [setTemplateOpen]);
 
-  const handleConfigureTable = (t) => {
+  const handleConfigureTable = React.useCallback((t) => {
     setConfigTable(t);
     tab === 'ceremony' ? handleOpenCeremonyConfig() : handleOpenBanquetConfig();
-  };
+  }, [setConfigTable, tab, handleOpenCeremonyConfig, handleOpenBanquetConfig]);
 
   // Asignar invitado a mesa (drag & drop / sidebar)
-  const handleAssignGuest = (tableId, guestId) => {
+  const handleAssignGuest = React.useCallback((tableId, guestId) => {
     if (guestId) {
       // Capacidad: contar asientos ocupados (invitado + acompaÃ±antes)
       try {
@@ -237,10 +240,10 @@ const SeatingPlanRefactored = () => {
       console.warn('Unassign error', e);
       toast.error('Error al desasignar invitados');
     }
-  };
+  }, [safeTables, safeGuests, moveGuest, tab]);
 
   // Desasignar un invitado concreto
-  const handleUnassignGuest = (guestId) => {
+  const handleUnassignGuest = React.useCallback((guestId) => {
     try {
       if (!guestId) return;
       moveGuest(guestId, null);
@@ -249,10 +252,10 @@ const SeatingPlanRefactored = () => {
       console.warn('Unassign single guest error', e);
       toast.error('No se pudo desasignar el invitado');
     }
-  };
+  }, [moveGuest]);
 
   // AplicaciÃ³n de plantillas (evita fallo si se usa el modal de plantillas)
-  const handleApplyTemplate = (template) => {
+  const handleApplyTemplate = React.useCallback((template) => {
     if (template?.ceremony) {
       generateSeatGrid(
         template.ceremony.rows,
@@ -296,9 +299,9 @@ const SeatingPlanRefactored = () => {
         console.warn('Auto-assign error', e);
       }
     }, 50);
-  };
+  }, [generateSeatGrid, applyBanquetTables, generateBanquetLayout, autoAssignGuests]);
 
-  const handleAutoAssignClick = async () => {
+  const handleAutoAssignClick = React.useCallback(async () => {
     try {
       const res = await (typeof autoAssignGuestsRules === 'function' ? autoAssignGuestsRules() : autoAssignGuests());
       if (res?.ok) {
@@ -315,7 +318,7 @@ const SeatingPlanRefactored = () => {
   };
 
   // GeneraciÃ³n desde modal de banquete seguida de autoasignaciÃ³n (silencioso a nivel de UI)
-  const handleGenerateBanquetLayoutWithAssign = (config) => {
+  const handleGenerateBanquetLayoutWithAssign = React.useCallback((config) => {
     try {
       generateBanquetLayout(config);
     } finally {
@@ -337,10 +340,10 @@ const SeatingPlanRefactored = () => {
         }
       }, 50);
     }
-  };
+  }, [generateBanquetLayout, autoAssignGuestsRules, autoAssignGuests]);
 
   // No-op defensivo para habilitar/deshabilitar elementos desde el canvas
-  const handleToggleEnabled = () => {};
+  const handleToggleEnabled = React.useCallback(() => {}, []);
 
   // Auto IA eliminado en la toolbar (feature desactivada en UI)
 
@@ -348,7 +351,15 @@ const SeatingPlanRefactored = () => {
   const ceremonyCount = safeSeats.length;
   const banquetCount  = safeTables.length;
 
-  return (
+    if (!isHallReady) {
+    return (
+      <DndProvider backend={HTML5Backend}>
+        <div className="h-full flex items-center justify-center text-gray-600">Cargando plano...</div>
+      </DndProvider>
+    );
+  }
+
+return (
     <DndProvider backend={HTML5Backend}>
     <div className="h-full flex flex-col bg-gray-50">
       {/* Tabs */}

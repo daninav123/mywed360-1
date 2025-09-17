@@ -7,6 +7,29 @@ import { useFirestoreCollection } from './useFirestoreCollection';
 import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
 import { getTransactions } from '../services/bankService';
 
+// Reglas simples de autocategorización por palabras clave/proveedor
+const AUTO_CATEGORY_RULES = [
+  { cat: 'Catering', keywords: ['catering', 'restaurante', 'banquete', 'comida', 'menú'] },
+  { cat: 'Música', keywords: ['dj', 'banda', 'música', 'musica', 'orquesta', 'sonido'] },
+  { cat: 'Flores', keywords: ['flor', 'flores', 'floristería', 'floristeria', 'ramo', 'decor floral'] },
+  { cat: 'Fotografia', keywords: ['foto', 'fotógrafo', 'fotografo', 'fotografía', 'fotografia'] },
+  { cat: 'Vestimenta', keywords: ['vestido', 'traje', 'moda', 'sastre', 'zapatos'] },
+  { cat: 'Decoracion', keywords: ['decoración', 'decoracion', 'iluminación', 'iluminacion', 'alquiler', 'carpa'] },
+  { cat: 'Transporte', keywords: ['taxi', 'uber', 'cabify', 'bus', 'autobús', 'autobus', 'transporte', 'coche'] },
+  { cat: 'Alojamiento', keywords: ['hotel', 'hostal', 'alojamiento'] },
+  { cat: 'Invitaciones', keywords: ['invitación', 'invitacion', 'papelería', 'papeleria', 'impresión', 'impresion', 'save the date'] },
+  { cat: 'Luna de miel', keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'] },
+];
+
+const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type = 'expense') => {
+  const text = `${concept} ${provider}`.toLowerCase();
+  if (type !== 'expense') return '';
+  for (const rule of AUTO_CATEGORY_RULES) {
+    if (rule.keywords.some((k) => text.includes(k))) return rule.cat;
+  }
+  return '';
+};
+
 // Hook centralizado para gestiÃ³n de finanzas
 // Maneja transacciones, presupuestos, aportaciones y sincronizaciÃ³n
 export default function useFinance() {
@@ -412,6 +435,17 @@ export default function useFinance() {
         if (payload.paidAmount === null) delete payload.paidAmount;
         if (payload.category) payload.category = String(payload.category).trim();
 
+        // Autocategorizar si no hay categoría definida o es genérica
+        if (!payload.category || payload.category === 'OTROS' || payload.category === 'Otros') {
+          const inferred = autoCategorizeTransaction(
+            payload.concept || payload.description || '',
+            payload.provider || '',
+            payload.amount,
+            payload.type
+          );
+          if (inferred) payload.category = inferred;
+        }
+
         let uploadedAttachments = [];
         if (filesToUpload.length > 0) {
           uploadedAttachments = await uploadEmailAttachments(filesToUpload, activeWedding || 'anonymous', 'finance');
@@ -585,12 +619,15 @@ export default function useFinance() {
         for (const transaction of bankTransactions) {
           const amount = Math.abs(transaction.amount);
           const type = transaction.amount < 0 ? 'expense' : 'income';
+          const concept = transaction.description;
+          const provider = transaction.provider || transaction.counterparty || '';
+          const inferredCategory = autoCategorizeTransaction(concept, provider, amount, type) || 'OTROS';
           await createTransaction({
-            concept: transaction.description,
+            concept,
             amount,
             type,
-            category: transaction.category || 'OTROS',
-            provider: transaction.provider || transaction.counterparty || '',
+            category: transaction.category || inferredCategory,
+            provider,
             dueDate: transaction.dueDate || transaction.bookingDate || null,
             status: type === 'expense' ? 'paid' : 'received',
             paidAmount: amount,

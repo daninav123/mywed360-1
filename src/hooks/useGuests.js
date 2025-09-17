@@ -3,7 +3,7 @@ import { post as apiPost } from '../services/apiClient';
 import { useWedding } from '../context/WeddingContext';
 import useWeddingCollection from './useWeddingCollection';
 import { subscribeSyncState, getSyncState } from '../services/SyncService';
-import { sendText as sendWhatsAppText, toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
+import { sendText as sendWhatsAppText, toE164 as toE164Frontend, waDeeplink, getProviderStatus } from '../services/whatsappService';
 import { renderInviteMessage } from '../services/MessageTemplateService';
 import wh from '../utils/whDebug';
 
@@ -234,7 +234,7 @@ const useGuests = () => {
 
     let link = '';
     try {
-      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -263,7 +263,7 @@ const useGuests = () => {
       try {
         let link = '';
         try {
-          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
           if (resp.ok) { const json = await resp.json(); link = json.link; }
         } catch {}
         const message = customMessage && customMessage.trim() ? customMessage : (
@@ -299,7 +299,7 @@ const useGuests = () => {
       // Generar enlace RSVP si es posible
       let link = '';
       try {
-        const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {});
+        const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
         if (resp.ok) { const json = await resp.json(); link = json.link; }
       } catch {}
       const message = (customMessage && customMessage.trim())
@@ -344,6 +344,35 @@ const useGuests = () => {
 
   // EnvÃ­o por API (nÃºmero de la app) â€” invitado individual (flujo conversacional RSVP)
   const inviteViaWhatsAppApi = useCallback(async (guest, customMessage) => {
+    // Pre-check provider configuration; fall back to deeplink if not ready
+    try {
+      const status = await getProviderStatus().catch(() => ({ configured: false }));
+      if (!status?.configured) {
+        const doFallback = window.confirm('El proveedor de WhatsApp API no está configurado o puede bloquear el primer contacto. ¿Quieres usar tu WhatsApp para este invitado?');
+        if (doFallback) {
+          try {
+            const phone = utils.phoneClean(guest.phone);
+            if (!phone) return { success: false, error: 'no-phone' };
+            let link = '';
+            try {
+              const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
+              if (resp.ok) { const json = await resp.json(); link = json.link; }
+            } catch {}
+            const messageFallback = (customMessage && customMessage.trim())
+              ? customMessage.trim()
+              : (link
+                ? `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
+                : `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`);
+            const deeplink = waDeeplink(toE164Frontend(phone), messageFallback);
+            window.open(deeplink, '_blank');
+            return { success: true, fallback: 'deeplink' };
+          } catch (e) {
+            return { success: false, error: e?.message || 'deeplink-error' };
+          }
+        }
+        return { success: false, cancelled: true };
+      }
+    } catch {}
     const phone = utils.phoneClean(guest.phone);
     if (!phone) {
       alert('El invitado no tiene nÃºmero de telÃ©fono');
@@ -380,7 +409,7 @@ const useGuests = () => {
 
     let link = '';
     try {
-      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -419,7 +448,7 @@ const useGuests = () => {
         // Generar enlace RSVP si hay API disponible
         let rsvpLink = '';
         try {
-          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
           if (resp.ok) {
             const { link } = await resp.json();
             rsvpLink = link;
@@ -470,6 +499,16 @@ const useGuests = () => {
   // EnvÃ­o por API a una selecciÃ³n de invitados (selectedIds)
   const inviteSelectedWhatsAppApi = useCallback(async (selectedIds = [], customMessage) => {
     try {
+      // Pre-chequeo del proveedor para evitar intentos fallidos en bloque
+      const status = await getProviderStatus().catch(() => ({ configured: false }));
+      if (!status?.configured) {
+        const choice = window.confirm('El WhatsApp API no está configurado o puede bloquear el primer contacto. ¿Quieres usar tu WhatsApp (abre chats) para los seleccionados?');
+        if (choice) {
+          const r = await inviteSelectedWhatsAppDeeplink(selectedIds, customMessage);
+          return { success: true, opened: r?.opened || 0, mode: 'deeplink' };
+        }
+        return { success: false, cancelled: true };
+      }
       wh('Selected API â€“ inicio', { selectedIdsLength: (selectedIds || []).length });
       const setIds = new Set(selectedIds || []);
       const targets = guests.filter(g => setIds.has(g.id) && utils.phoneClean(g.phone));
@@ -508,7 +547,7 @@ const useGuests = () => {
     }
     let link = '';
     try {
-      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {});
+      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
       if (resp.ok) {
         const json = await resp.json();
         link = json.link;
@@ -651,5 +690,6 @@ const useGuests = () => {
 };
 
 export default useGuests;
+
 
 

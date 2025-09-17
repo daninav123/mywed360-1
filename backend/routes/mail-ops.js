@@ -4,13 +4,34 @@ import { requireMailAccess } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+function hasPrivilegedRole(profile) {
+  const role = String((profile && profile.role) || '').toLowerCase();
+  return role === 'admin' || role === 'planner';
+}
+
+function isOwner(profile, mailData) {
+  if (!profile || !mailData) return false;
+  const myAlias = String(profile.myWed360Email || '').toLowerCase();
+  const myLogin = String(profile.email || '').toLowerCase();
+  const target = String(mailData.folder === 'sent' ? (mailData.from || '') : (mailData.to || '')).toLowerCase();
+  return !!target && (target === myAlias || target === myLogin);
+}
+
 // PUT /api/mail/:id/folder  { folder }
 router.put('/:id/folder', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
     const { folder = 'inbox' } = req.body || {};
     if (!id) return res.status(400).json({ error: 'id-required' });
-    await db.collection('mails').doc(id).set({ folder }, { merge: true });
+    const ref = db.collection('mails').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const data = snap.data() || {};
+    const profile = req.userProfile || {};
+    if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
+    await ref.set({ folder }, { merge: true });
     res.json({ ok: true });
   } catch (e) {
     console.error('PUT /api/mail/:id/folder', e);
@@ -28,6 +49,10 @@ router.post('/:id/tags', requireMailAccess, async (req, res) => {
     const snap = await ref.get();
     if (!snap.exists) return res.status(404).json({ error: 'not-found' });
     const data = snap.data() || {};
+    const profile = req.userProfile || {};
+    if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
     let tags = Array.isArray(data.tags) ? data.tags.slice() : [];
     for (const t of add) {
       const name = String(t || '').trim();
@@ -54,7 +79,15 @@ router.delete('/:id', requireMailAccess, async (req, res) => {
     if (!id) return res.status(400).json({ error: 'id-required' });
 
     // Eliminar del buzón global
-    await db.collection('mails').doc(id).delete();
+    const ref = db.collection('mails').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const data = snap.data() || {};
+    const profile = req.userProfile || {};
+    if (!hasPrivilegedRole(profile) && !isOwner(profile, data)) {
+      return res.status(403).json({ error: 'forbidden' });
+    }
+    await ref.delete();
 
     // Eliminar de subcolección del usuario si aplica
     try {

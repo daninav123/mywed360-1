@@ -16,8 +16,9 @@ export const GanttChart = ({
   viewDate,
   markerDate, // fecha para marcar con una ldnea roja (p.ej., boda)
   gridStartDate,
+  gridEndDate,   // tope visual estricto del grid (fin)
 }) => {
-  // ErrorBoundary local para evitar que la página caiga si la librería falla
+  // ErrorBoundary local para evitar que la pÃ¡gina caiga si la librerÃ­a falla
   class LocalErrorBoundary extends React.Component {
     constructor(props) {
       super(props);
@@ -29,7 +30,7 @@ export const GanttChart = ({
       if (this.state.hasError) {
         return (
           <div className="flex items-center justify-center h-full text-gray-500">
-            No se pudo renderizar el diagrama Gantt (datos inválidos)
+            No se pudo renderizar el diagrama Gantt (datos invÃ¡lidos)
           </div>
         );
       }
@@ -56,7 +57,7 @@ export const GanttChart = ({
     </div>
   );
 
-  // Normalizar fechas y filtrar tareas inválidas
+  // Normalizar fechas y filtrar tareas invÃ¡lidas
   const normalizeDate = (d) => {
     if (!d) return null;
     try {
@@ -105,10 +106,10 @@ export const GanttChart = ({
   }
 
   if (cleanTasks.length === 0) {
-    // Evitar renderizar el componente de la librería con datos vacíos o corruptos
+    // Evitar renderizar el componente de la librerÃ­a con datos vacÃ­os o corruptos
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
-        No hay tareas válidas para mostrar
+        No hay tareas vÃ¡lidas para mostrar
       </div>
     );
   }
@@ -215,7 +216,7 @@ export const GanttChart = ({
     return () => obs.disconnect();
   }, [viewMode, columnWidth, cleanTasks.length]);
 
-  // Animación: seguimiento continuo de scroll/transform por si no disparan eventos
+  // AnimaciÃ³n: seguimiento continuo de scroll/transform por si no disparan eventos
   useEffect(() => {
     let rafId = null;
     const tick = () => {
@@ -262,6 +263,26 @@ export const GanttChart = ({
     }
   } catch {}
 
+  // Calcular máscara de recorte a la derecha para no mostrar meses extra (tope visual estricto)
+  let rightMaskLeftPx = null;
+  let rightMaskWidthPx = null;
+  try {
+    const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+    const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
+      ? gridStartDate
+      : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+    if (endOk && base && viewMode === ViewMode.Month && scrollerRef.current) {
+      const colW = Math.max(8, Number(columnWidth) || 65);
+      const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
+      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
+      // Número de meses completos visibles (inclusivo)
+      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
+      rightMaskLeftPx = Math.max(0, monthsInclusive * colW);
+      const fullWidth = scrollerRef.current.scrollWidth || 0;
+      rightMaskWidthPx = Math.max(0, fullWidth - rightMaskLeftPx);
+    }
+  } catch {}
+
   return (
     <LocalErrorBoundary>
       <div ref={wrapperRef} style={{ position: 'relative', overflow: 'hidden' }}>
@@ -288,10 +309,10 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {scrollerNode && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
+        {scrollerRef.current && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
           <div
-            title="Día de la boda"
-            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx - scrollLeft - (contentOffsetX || 0)), height: scrollerNode ? (scrollerNode.scrollHeight || '100%') : '100%', pointerEvents: 'none', zIndex: 1000 }}
+            title="Dia de la boda"
+            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx), height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), pointerEvents: 'none', zIndex: 1000 }}
           >
             {/* Poste vertical */}
             <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
@@ -304,7 +325,7 @@ export const GanttChart = ({
               aria-hidden="true"
               focusable="false"
             >
-              {/* paño blanco */}
+              {/* paÃ±o blanco */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="#ffffff" opacity="0.95" />
               {/* cuadros negros */}
               <rect x="4" y="2" width="3" height="3" fill="#111" />
@@ -314,9 +335,18 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>, scrollerNode)
+          </div>, scrollerRef.current.firstElementChild || scrollerRef.current)
         }
+        {scrollerRef.current && typeof rightMaskLeftPx === 'number' && typeof rightMaskWidthPx === 'number' && rightMaskWidthPx > 0 && createPortal(
+          <div
+            aria-hidden="true"
+            style={{ position: 'absolute', top: 0, left: Math.max(0, rightMaskLeftPx), width: rightMaskWidthPx, height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), background: 'white', pointerEvents: 'none', zIndex: 1001 }}
+          />,
+          scrollerRef.current.firstElementChild || scrollerRef.current
+        )}
       </div>
     </LocalErrorBoundary>
   );
 };
+
+

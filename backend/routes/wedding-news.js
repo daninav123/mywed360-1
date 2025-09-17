@@ -10,8 +10,16 @@ import Parser from 'rss-parser';
 const router = express.Router();
 
 // Cache en memoria: 6 horas
-const cache = new LRU({ max: 1, ttl: 1000 * 60 * 60 * 6 });
-const parser = new Parser();
+// Guardamos listas completas por idioma para poder paginar sin refetch
+const cache = new LRU({ max: 4, ttl: 1000 * 60 * 60 * 6 });
+const parser = new Parser({
+  requestOptions: {
+    headers: {
+      // Algunos hosts bloquean user-agents desconocidos
+      'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app)'
+    },
+  },
+});
 
 // Feeds RSS categorizados por idioma
 const RSS_FEEDS = {
@@ -54,42 +62,53 @@ function mapItems(feed, feedUrl) {
 
 router.get('/', async (req, res) => {
   try {
-    const lang = (req.query.lang || 'es').toLowerCase();
-    const pageSize = parseInt(req.query.pageSize || '10', 10);
+    const lang = String(req.query.lang || 'es').toLowerCase().slice(0, 2);
+    const page = Math.max(parseInt(req.query.page || '1', 10) || 1, 1);
+    const pageSize = Math.min(Math.max(parseInt(req.query.pageSize || '10', 10) || 10, 1), 100);
 
-    // Cache por idioma
-    if (cache.has(`posts_${lang}`)) {
-      return res.json(cache.get(`posts_${lang}`).slice(0, pageSize));
+    // Recuperar o construir el cache por idioma (lista completa limitada)
+    let allPosts = cache.get(`posts_${lang}`);
+    if (!allPosts) {
+      const sources = RSS_FEEDS[lang] || RSS_FEEDS['en'];
+
+      const promises = sources.map(async (url) => {
+        try {
+          const feed = await parser.parseURL(url);
+          return mapItems(feed, url);
+        } catch (err) {
+          console.warn('RSS fetch failed', url, err?.message || err);
+          return [];
+        }
+      });
+
+      const lists = await Promise.all(promises);
+      let results = ([]).concat(...lists);
+      // Eliminar duplicados por id/url
+      const seen = new Set();
+      results = results.filter((p) => {
+        const key = p.id || p.url;
+        if (!key) return false;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      // Ordenar por fecha descendente
+      results.sort((a, b) => new Date(b.published) - new Date(a.published));
+      // Limitar lista completa para cache (evitar memoria excesiva)
+      allPosts = results.slice(0, 200);
+      cache.set(`posts_${lang}`, allPosts);
     }
 
-    const sources = RSS_FEEDS[lang] || RSS_FEEDS['en'];
+    // Paginacion por desplazamiento
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const pageItems = start < allPosts.length ? allPosts.slice(start, end) : [];
 
-    const promises = sources.map(async (url) => {
-      try {
-        const feed = await parser.parseURL(url);
-        return mapItems(feed, url);
-      } catch (err) {
-        console.warn('RSS fetch failed', url, err.message);
-        return [];
-      }
-    });
-
-    let results = (await Promise.all(promises)).flat();
-    // Elimina duplicados por id/url
-    const seen = new Set();
-    results = results.filter((p)=>{
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
-      return true;
-    });
-    // Ordenar por fecha descendente
-    results.sort((a, b) => new Date(b.published) - new Date(a.published));
-    const final = results.slice(0, 50); // Cache hasta 50
-    cache.set(`posts_${lang}`, final);
-    res.json(final.slice(0, pageSize));
+    res.status(200).json(pageItems);
   } catch (err) {
-    console.error('wedding-news error', err);
-    res.status(500).json({ error: 'wedding-news-failed' });
+    console.error('wedding-news error', err?.message || err);
+    // Degradar con 200 y lista vacia para evitar bucles de errores en el frontend
+    res.status(200).json([]);
   }
 });
 

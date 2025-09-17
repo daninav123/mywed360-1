@@ -3,38 +3,68 @@ import { getCurrentLanguage, formatDate, formatCurrency, formatNumber } from '..
 
 /**
  * Hook personalizado para traducciones y formateo localizado
- * Extiende useTranslation con funcionalidades adicionales específicas de MyWed360
+ * Extiende useTranslation con funcionalidades adicionales especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ficas de MyWed360
  * 
- * @returns {Object} Objeto con funciones de traducción y formateo
+ * @returns {Object} Objeto con funciones de traducciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n y formateo
  */
 const useTranslations = () => {
-  const { t, i18n } = useTranslation();
+  const fixMojibake = (s) => {
+  try {
+    if (!s || typeof s !== 'string') return s;
+    const replacements = [
+      ['A�adir','Añadir'],['A��adir','Añadir'],
+      ['S�','Sí'],['S��','Sí'],
+      ['M��s','Más'],['Mǭs','Más'],
+      ['Configuraci��n','Configuración'],
+      ['Dise��os','Diseños'],['Disenos','Diseños'],
+      ['Cerrar Sesi��n','Cerrar Sesión'],['Iniciar Sesi��n','Iniciar Sesión'],
+      ['Contrase��a','Contraseña'],['Confirmar Contrase��a','Confirmar Contraseña'],
+      ['Correo Electr��nico','Correo Electrónico'],
+      ['Tel��fono','Teléfono'],['Direcci��n','Dirección'],
+      ['Ma��ana','Mañana'],['Pr��xima','Próxima'],['Pr��ximo','Próximo'],
+      ['Param��tres','Paramètres'],['D��connexion','Déconnexion'],['T��ches','Tâches'],
+      ['Cr��er','Créer'],['R��initialiser','Réinitialiser'],
+      ['Ã¡','á'],['Ã©','é'],['Ãí','í'],['Ã³','ó'],['Ãº','ú'],['Ãñ','ñ'],['Ã§','ç'],['Ã‰','É']
+    ];
+    let out = s;
+    for (const [bad, good] of replacements) { out = out.split(bad).join(good); }
+    if (out.includes('�')) out = out.replace(/�+/g,'');
+    return out;
+  } catch { return s; }
+};
+  // Prioriza el namespace 'finance' sobre 'common' para evitar textos corruptos en common
+  const { t, i18n } = useTranslation(['common', 'finance']);
   
-  // Función de traducción mejorada con fallback
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de traducciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mejorada con fallback
   const translate = (key, options = {}) => {
-    const translation = t(key, options);
-    
-    // Si la traducción es igual a la clave, significa que no se encontró
-    if (translation === key && process.env.NODE_ENV === 'development') {
-      console.warn(`Traducción faltante para la clave: ${key}`);
+    const opts = { ...options };
+    let lookupKey = key;
+    if (typeof key === "string" && key.startsWith("finance.")) {
+      opts.ns = "finance";
+      lookupKey = key.slice("finance.".length);
+    }
+    const translation = t(lookupKey, opts);
+    // Aviso en desarrollo si falta la clave
+    if (translation === key && process.env.NODE_ENV === "development") {
+      console.warn(`TraducciÃƒÂ³n faltante para la clave: ${key}`);
     }
     
-    return translation;
+    return fixMojibake(translation);
   };
 
-  // Función para traducir con pluralización
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para traducir con pluralizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
   const translatePlural = (key, count, options = {}) => {
     return t(key, { count, ...options });
   };
 
-  // Función para traducir con interpolación de variables
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para traducir con interpolaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de variables
   const translateWithVars = (key, variables = {}) => {
     return t(key, variables);
   };
 
   // Funciones de formateo localizadas
   const formatters = {
-    // Formatear fecha según el idioma actual
+    // Formatear fecha segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn el idioma actual
     date: (date, options = {}) => {
       const defaultOptions = {
         year: 'numeric',
@@ -77,7 +107,7 @@ const useTranslations = () => {
       return formatCurrency(amount, currency);
     },
 
-    // Formatear número
+    // Formatear nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero
     number: (number) => {
       return formatNumber(number);
     },
@@ -93,7 +123,7 @@ const useTranslations = () => {
     }
   };
 
-  // Funciones específicas para MyWed360
+  // Funciones especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ficas para MyWed360
   const wedding = {
     // Formatear estado de invitado
     guestStatus: (status) => {
@@ -136,7 +166,7 @@ const useTranslations = () => {
       return statusMap[status] || status;
     },
 
-    // Formatear método de pago
+    // Formatear mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todo de pago
     paymentMethod: (method) => {
       const methodMap = {
         cash: translate('finance.cash'),
@@ -164,7 +194,7 @@ const useTranslations = () => {
     }
   };
 
-  // Función para obtener traducciones de navegación
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para obtener traducciones de navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
   const getNavigation = () => {
     return {
       home: translate('navigation.home'),
@@ -185,7 +215,7 @@ const useTranslations = () => {
     };
   };
 
-  // Función para obtener mensajes comunes
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para obtener mensajes comunes
   const getMessages = () => {
     return {
       saveSuccess: translate('messages.saveSuccess'),
@@ -201,7 +231,7 @@ const useTranslations = () => {
     };
   };
 
-  // Función para obtener etiquetas de formulario
+  // FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para obtener etiquetas de formulario
   const getFormLabels = () => {
     return {
       required: translate('forms.required'),
@@ -219,7 +249,7 @@ const useTranslations = () => {
   };
 
   return {
-    // Funciones básicas de traducción
+    // Funciones bÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sicas de traducciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
     t: translate,
     tPlural: translatePlural,
     tVars: translateWithVars,
@@ -227,7 +257,7 @@ const useTranslations = () => {
     // Funciones de formateo
     format: formatters,
     
-    // Funciones específicas de MyWed360
+    // Funciones especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ficas de MyWed360
     wedding,
     
     // Funciones de conveniencia
@@ -235,7 +265,7 @@ const useTranslations = () => {
     getMessages,
     getFormLabels,
     
-    // Información del idioma actual
+    // InformaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del idioma actual
     currentLanguage: getCurrentLanguage(),
     isRTL: ['ar', 'he', 'fa'].includes(getCurrentLanguage()),
     

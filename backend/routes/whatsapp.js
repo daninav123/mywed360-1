@@ -272,6 +272,19 @@ router.post('/batch', requireAuth, async (req, res) => {
       } catch { return null; }
     };
 
+    // Helper E.164 robusto (no duplica CC y soporta 00)
+    const cc = (process.env.DEFAULT_COUNTRY_CODE || '+34').replace('+','');
+    const toE164Local = (num = '') => {
+      try {
+        let n = String(num).replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+        if (n.startsWith('00')) n = '+' + n.slice(2);
+        if (n.startsWith('+')) return n;
+        if (cc && n.startsWith(cc)) return '+' + n;
+        if (!cc && n.length === 9) return '+34' + n;
+        return cc ? '+' + cc + n : '+' + n;
+      } catch { return null; }
+    };
+
     // Fetch guests en lote
     const col = admin.firestore().collection('weddings').doc(weddingId).collection('guests');
     const items = [];
@@ -279,7 +292,7 @@ router.post('/batch', requireAuth, async (req, res) => {
       const snap = await col.doc(gid).get();
       if (!snap.exists) continue;
       const g = snap.data() || {};
-      const phone = toE164(g.phone || '');
+      const phone = toE164Local(g.phone || '');
       if (!phone) continue;
       const msg = (messageTemplate || '').replace('{guestName}', g.name || '');
       items.push({ guestId: gid, phone, message: msg });

@@ -1,9 +1,46 @@
 // blogService.js - noticias de bodas
 import axios from 'axios';
 import { translateText } from './translationService.js';
+import { getBackendBase } from '@/utils/backendBase.js';
+
+// Evita spam de peticiones al backend si est cado/no iniciado
+let BACKEND_BACKOFF_UNTIL = 0;
+const backendAvailable = () => Date.now() > BACKEND_BACKOFF_UNTIL;
+const backoffBackend = (ms = 60_000) => { BACKEND_BACKOFF_UNTIL = Date.now() + ms; };
 
 // Usa variable de entorno Vite; si no existe, usa clave proporcionada explicitamente.
 const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || 'f7579ee601634944822b313e268a9357';
+
+function normalizeLang(lang) {
+  if (!lang) return 'es';
+  const s = String(lang).toLowerCase();
+  const m = s.match(/^[a-z]{2}/);
+  return m ? m[0] : 'es';
+}
+
+async function fetchFromBackend({ page, pageSize, language }) {
+  const envBase = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_BASE)) || '';
+  const derivedBase = getBackendBase();
+  const candidates = Array.from(new Set([
+    envBase && envBase.replace(/\/$/, ''),
+    derivedBase && derivedBase.replace(/\/$/, ''),
+    'https://mywed360-backend.onrender.com',
+    '' // como último recurso: proxy de Vite
+  ].filter(Boolean)));
+
+  for (const base of candidates) {
+    try {
+      const url = base ? `${base}/api/wedding-news` : '/api/wedding-news';
+      const resp = await axios.get(url, {
+        params: { page, pageSize, lang: language },
+        timeout: 8000,
+        validateStatus: () => true,
+      });
+      if (Array.isArray(resp.data) && resp.status < 400) return resp.data;
+    } catch {}
+  }
+  return [];
+}
 
 const stripDiacritics = (text = '') =>
   text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -193,18 +230,18 @@ const scoreMatches = (text, patterns) =>
  * @returns {Promise<BlogPost[]>}
  */
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
+  const lang = normalizeLang(language);
   if (!API_KEY) {
     // Fallback RSS proxy (backend) para evitar CORS
-    const { data } = await axios.get('/api/wedding-news', {
-      params: { page, pageSize },
-      timeout: 8000,
-    });
+    if (!backendAvailable()) return [];
+    const rssData = await fetchFromBackend({ page, pageSize, language: lang });
+    if (!Array.isArray(rssData) || !rssData.length) { backoffBackend(); return []; }
 
-    let posts = data;
-    if (language && language !== 'en') {
+    let posts = rssData;
+    if (lang && lang !== 'en') {
       for (const p of posts) {
-        p.title = await translateText(p.title, language, '');
-        p.description = await translateText(p.description, language, '');
+        p.title = await translateText(p.title, lang, '');
+        p.description = await translateText(p.description, lang, '');
       }
     }
     return posts;
@@ -213,16 +250,15 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   // NewsAPI solo permite 100 resultados y rate-limit estricto.
   // Para paginas >1 recurrimos al backend RSS proxy para continuar con variedad.
   if (page > 1) {
-    const { data } = await axios.get('/api/wedding-news', {
-      params: { page, pageSize, lang: language },
-      timeout: 8000,
-    });
-    return data;
+    if (!backendAvailable()) return [];
+    const arr = await fetchFromBackend({ page, pageSize, language: lang });
+    if (!Array.isArray(arr) || !arr.length) { backoffBackend(); return []; }
+    return arr;
   }
   const endpointOpts = {
     params: {
       q: 'wedding OR boda',
-      language,
+      language: lang,
       sortBy: 'publishedAt',
       pageSize,
       page,
@@ -308,10 +344,10 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
       .map(toPost);
   }
 
-  if (language && language !== 'en') {
+  if (lang && lang !== 'en') {
     for (const p of posts) {
-      p.title = await translateText(p.title, language, '');
-      p.description = await translateText(p.description, language, '');
+      p.title = await translateText(p.title, lang, '');
+      p.description = await translateText(p.description, lang, '');
     }
   }
 

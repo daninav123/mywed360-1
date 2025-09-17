@@ -60,6 +60,21 @@ router.get('/', requireMailAccess, async (req, res) => {
     const user = userRaw ? String(userRaw).trim() : undefined;
     const userNorm = user ? user.toLowerCase() : undefined;
 
+    // Seguridad: si se solicita un usuario distinto al propio y no se tiene rol elevado
+    try {
+      const profile = req.userProfile || {};
+      const role = String(profile.role || '').toLowerCase();
+      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myLogin = String(profile.email || '').toLowerCase();
+      const isPrivileged = role === 'admin' || role === 'planner';
+      if (userNorm && !isPrivileged) {
+        const matches = userNorm === myAlias || userNorm === myLogin;
+        if (!matches) {
+          return res.status(403).json({ success: false, error: 'forbidden_user_scope' });
+        }
+      }
+    } catch (_) {}
+
     // Si se especifica usuario, intentar leer primero desde la subcoleccion del usuario
     if (userNorm) {
       try {
@@ -160,7 +175,7 @@ router.get('/', requireMailAccess, async (req, res) => {
 // POST /api/mail  { to, subject, body }
 router.post('/', requireMailAccess, async (req, res) => {
   try {
-    const { to, subject, body, recordOnly, from: fromBody, attachments: rawAttachments } = req.body;
+    const { to, subject, body, recordOnly, from: fromBody, attachments: rawAttachments, cc, bcc, replyTo } = req.body;
     const attachments = Array.isArray(rawAttachments) ? rawAttachments.map(a => ({ filename: a.filename || a.name || null, name: a.name || a.filename || null, size: a.size || 0, url: a.url || null })) : [];
     const date = new Date().toISOString();
     const profile = req.userProfile || {};
@@ -173,8 +188,12 @@ router.post('/', requireMailAccess, async (req, res) => {
       to: to,
       subject: subject,
       text: body,
-      html: `<div style="font-family: Arial, sans-serif; line-height: 1.6;">${body.replace(/\n/g, '<br>')}</div>`
+      html: `<div style=\"font-family: Arial, sans-serif; line-height: 1.6;\">${body.replace(/\\n/g, '<br>')}</div>`
     };
+
+    if (cc) mailData.cc = cc;
+    if (bcc) mailData.bcc = bcc;
+    if (replyTo) mailData['h:Reply-To'] = replyTo;
     
 
     // Preparar adjuntos si hay URLs
@@ -295,6 +314,9 @@ router.post('/', requireMailAccess, async (req, res) => {
       folder: 'sent',
       read: true,
       attachments: attachments,
+      cc: cc || null,
+      bcc: bcc || null,
+      replyTo: replyTo || null,
     });
     try { await db.collection('mails').doc(sentRef.id).update({ id: sentRef.id }); } catch {}
 
@@ -313,6 +335,9 @@ router.post('/', requireMailAccess, async (req, res) => {
           folder: 'sent',
       read: true,
       attachments: attachments,
+          cc: cc || null,
+          bcc: bcc || null,
+          replyTo: replyTo || null,
           via: 'backend'
         });
       }
@@ -332,6 +357,9 @@ router.post('/', requireMailAccess, async (req, res) => {
       folder: 'inbox',
       read: false,
       attachments: attachments,
+      cc: cc || null,
+      bcc: bcc || null,
+      replyTo: replyTo || null,
     });
     try { await db.collection('mails').doc(inboxRef.id).update({ id: inboxRef.id }); } catch {}
 
@@ -356,6 +384,9 @@ router.post('/', requireMailAccess, async (req, res) => {
           folder: 'inbox',
       read: false,
       attachments: attachments,
+          cc: cc || null,
+          bcc: bcc || null,
+          replyTo: replyTo || null,
           via: 'backend'
         });
       }
@@ -776,6 +807,53 @@ router.post('/test-personal-email', requireMailAccess, async (req, res) => {
       message: 'Error al procesar la solicitud',
       error: error.message
     });
+  }
+});
+
+// POST /api/mail/alias  { alias }
+router.post('/alias', requireMailAccess, async (req, res) => {
+  try {
+    const { alias } = req.body || {};
+    const user = req.user || {};
+    const profile = req.userProfile || {};
+    if (!user?.uid) return res.status(401).json({ success: false, error: 'unauthorized' });
+    const raw = String(alias || '').trim().toLowerCase();
+    const usernameRegex = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
+    const RESERVED = new Set(['admin','soporte','noreply','contacto','info','ayuda','sistema','mywed360','staff','test','prueba']);
+    if (!raw || !usernameRegex.test(raw) || RESERVED.has(raw)) {
+      return res.status(400).json({ success: false, error: 'invalid_alias' });
+    }
+    // Comprobar disponibilidad en emailUsernames
+    const existing = await db.collection('emailUsernames').doc(raw).get();
+    if (existing.exists) {
+      // Si existe y pertenece a otro usuario, conflicto
+      const data = existing.data() || {};
+      if (data.userId && data.userId !== user.uid) {
+        return res.status(409).json({ success: false, error: 'alias_taken' });
+      }
+    }
+    const DOMAIN = (process.env.MY_EMAIL_DOMAIN || 'mywed360.com').toLowerCase();
+    const email = `${raw}@${DOMAIN}`;
+
+    // Guardar reserva
+    await db.collection('emailUsernames').doc(raw).set({
+      username: raw,
+      userId: user.uid,
+      email,
+      updatedAt: new Date().toISOString(),
+      createdAt: existing.exists ? (existing.data()?.createdAt || new Date().toISOString()) : new Date().toISOString()
+    }, { merge: true });
+
+    // Actualizar perfil de usuario
+    await db.collection('users').doc(user.uid).set({
+      emailUsername: raw,
+      myWed360Email: email
+    }, { merge: true });
+
+    return res.status(200).json({ success: true, alias: raw, email });
+  } catch (e) {
+    console.error('POST /api/mail/alias failed', e);
+    return res.status(500).json({ success: false, error: 'alias_failed' });
   }
 });
 

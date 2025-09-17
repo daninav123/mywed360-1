@@ -1,0 +1,212 @@
+{
+  "tabs": {
+    "overview": "Resumen",
+    "transactions": "Transacciones",
+    "budget": "Presupuesto",
+    "contributions": "Aportaciones",
+    "analytics": "Análisis"
+  },
+  "connectBank": {
+    "title": "Conecta tu banco para importar movimientos",
+    "desc": "Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.",
+    "button": "Conectar banco"
+  },
+  "alerts": { "budget": "Alertas de Presupuesto" },
+  "overview": {
+    "title": "Gestión Financiera",
+    "subtitle": "Control completo de presupuesto y gastos de tu boda",
+    "lastSync": "Última sincronización",
+    "synced": "Sincronizado",
+    "offline": "Sin conexión",
+    "totalBudget": "Presupuesto Total",
+    "totalSpent": "Total Gastado",
+    "ofBudget": "del presupuesto",
+    "currentBalance": "Balance Actual",
+    "expectedIncome": "Ingresos Esperados",
+    "used": "utilizado",
+    "categoryStatus": "Estado del Presupuesto por Categorías",
+    "progress": "Progreso",
+    "exceededNote": "(¡Presupuesto excedido!)"
+  },
+  "form": {
+    "type": "Tipo de transacción",
+    "concept": "Concepto",
+    "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
+    "amount": "Monto (€)",
+    "amountLabel": "Monto:",
+    "date": "Fecha",
+    "category": "Categoría",
+    "selectCategory": "Selecciona una categoría",
+    "description": "Descripción adicional",
+    "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
+    "transaction": "Transacción",
+    "provider": "Proveedor / Fuente",
+    "attachments": {
+      "title": "Comprobantes",
+      "help": "Adjunta facturas, contratos o recibos para tenerlos a mano.",
+      "add": "Adjuntar comprobante",
+      "remove": "Quitar",
+      "count": "Total adjuntos:",
+      "attachment": "Adjunto"
+    },
+    "status": {
+      "expected": "Esperado",
+      "received": "Recibido",
+      "pending": "Pendiente",
+      "partial": "Pago parcial",
+      "paid": "Pagado"
+    },
+    "errors": {
+      "conceptRequired": "El concepto es obligatorio",
+      "amountPositive": "El monto debe ser un número positivo",
+      "dateRequired": "La fecha es obligatoria",
+      "categoryRequired": "La categoría es obligatoria",
+      "paidAmountPositive": "El monto abonado debe ser un número positivo",
+      "paidAmountExceeds": "El monto abonado no puede superar el total",
+      "paidAmountRequired": "Registra cuánto has pagado para marcar el estado como parcial"
+    }
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "new": "Nueva Transacción",
+    "empty": "No hay transacciones que mostrar",
+    "createFirst": "Crear primera transacción",
+    "searchPlaceholder": "Buscar por concepto...",
+    "allTypes": "Todos los tipos",
+    "incomes": "Ingresos",
+    "expenses": "Gastos",
+    "allCategories": "Todas las categorías",
+    "allProviders": "Todos los proveedores",
+    "allDays": "Todos los días",
+    "last30": "Últimos 30 días",
+    "last90": "Últimos 90 días",
+    "onlyUncategorized": "Solo sin categoría",
+    "clear": "Limpiar",
+    "sort": {
+      "dateDesc": "Fecha (recientes primero)",
+      "dateAsc": "Fecha (antiguos primero)",
+      "amountDesc": "Importe (mayor primero)",
+      "amountAsc": "Importe (menor primero)"
+    },
+    "headers": {
+      "date": "Fecha",
+      "concept": "Concepto",
+      "category": "Categoría",
+      "type": "Tipo",
+      "status": "Estado",
+      "amount": "Monto",
+      "actions": "Acciones"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "partial": "Pago parcial",
+      "paid": "Pagado",
+      "expected": "Esperado",
+      "received": "Recibido"
+    },
+    "saved": "Transacción guardada",
+    "deleted": "Transacción eliminada",
+    "deleteErrorPrefix": "Error eliminando transacción:",
+    "saveUnexpected": "Error inesperado al guardar la transacción",
+    "noConcept": "Sin concepto",
+    "noCategory": "Sin categoría",
+    "dueOn": "Vence:",
+    "attachment": "Adjunto",
+    "balanceLabel": "Balance:",
+    "pendingAmount": "Pendiente:",
+    "overdueAmount": "Vencido:",
+    "outstandingExpense": "Pendiente:",
+    "outstandingIncome": "Por recibir:",
+    "alerts": {
+      "title": "Pagos importantes",
+      "overdue": "Pagos vencidos:",
+      "upcoming": "Pagos próximos (7 días):"
+    },
+    "csv": {
+      "title": "Importar CSV - Mapeo de columnas",
+      "fields": {
+        "date": "Fecha",
+        "description": "Descripción",
+        "amount": "Importe",
+        "type": "Tipo",
+        "category": "Categoría"
+      },
+      "none": "Ninguna",
+      "preview": "Vista previa"
+    }
+  },
+  "charts": {
+    "title": "Análisis Financiero",
+    "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
+    "totalTransactions": "Total Transacciones",
+    "activeCategories": "Categorías Activas",
+    "budgetEfficiency": "Eficiencia Presupuesto",
+    "projectedBalance": "Balance Proyectado",
+    "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
+    "budgeted": "Presupuestado",
+    "spent": "Gastado",
+    "expenseDistributionByCategory": "Distribución de Gastos por Categoría",
+    "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "balance": "Balance",
+    "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
+    "used": "Usado",
+    "excess": "Exceso",
+    "insights": "Insights Financieros",
+    "highestExpense": "Mayor Gasto",
+    "mostEfficient": "Más Eficiente",
+    "noData": "No hay datos suficientes",
+    "currentTrend": "Tendencia Actual",
+    "trend": { "positive": "Positiva", "negative": "Negativa" },
+    "balanceLabel": "Balance:"
+  },
+  "bank": {
+    "title": "Vincular cuenta bancaria",
+    "country": "País",
+    "countries": { "es": "España", "fr": "Francia", "de": "Alemania", "it": "Italia", "pt": "Portugal" },
+    "bankLabel": "Banco",
+    "selectBank": "Selecciona un banco",
+    "selectBankPlaceholder": "Selecciona un banco…",
+    "loadBanks": "Cargar bancos",
+    "connect": "Conectar",
+    "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integración Nordigen o la ruta /api/bank aún no esté desplegada.",
+    "errorStart": "No se pudo iniciar la vinculación",
+    "noRequisition": "No hay requisición iniciada",
+    "errorCheck": "No se pudo consultar el estado",
+    "selectWedding": "Selecciona una boda activa",
+    "linked": "Cuenta vinculada",
+    "errorSave": "No se pudo guardar la cuenta",
+    "requirements": {
+      "title": "Requisitos backend:",
+      "env": "Definir NORDIGEN_SECRET_ID, NORDIGEN_SECRET KEY y NORDIGEN_BASE_URL",
+      "route": "Backend con ruta /api/bank desplegada"
+    },
+    "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas → Transacciones → \"Importar Banco\".",
+    "requisition": "Requisition:",
+    "checkStatus": "Comprobar estado",
+    "availableAccounts": "Cuentas disponibles",
+    "useThis": "Usar esta cuenta"
+  },
+  "budget": {
+    "title": "Gestión de presupuesto",
+    "subtitle": "Organiza y controla el presupuesto por categorías",
+    "newCategory": "Nueva categoría",
+    "totalBudget": "Presupuesto Total",
+    "budgeted": "Presupuestado",
+    "spent": "Gastado",
+    "remaining": "Restante",
+    "progress": "Progreso",
+    "categoriesTitle": "Categorías de presupuesto",
+    "empty": "No hay categorías de presupuesto",
+    "createFirst": "Crear primera categoría",
+    "category": "categoría",
+    "overallProgress": "Progreso del presupuesto",
+    "thresholds": { "warn": "Aviso (en riesgo) %", "danger": "Crítico (exceso) %" },
+    "modal": {
+      "editTitle": "Editar categoría",
+      "newTitle": "Nueva categoría",
+      "name": "Nombre de la categoría"
+    }
+  }
+}

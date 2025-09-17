@@ -66,8 +66,10 @@ export default function Blog() {
         }
         for (const p of batch) {
           if (!p.url) continue;
-          if (!p.image) continue; // exigir imagen
           if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
+          const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
+          if ((domainCounts[dom] || 0) >= 3) continue;
+          domainCounts[dom] = (domainCounts[dom] || 0) + 1;
           newPosts.push(p);
           if (newPosts.length >= targetLength) break;
         }
@@ -104,8 +106,10 @@ export default function Blog() {
           }
           for (const p of batch) {
             if (!p.url) continue;
-            if (!p.image) continue; // exigir imagen
             if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
+            const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
+            if ((domainCounts[dom] || 0) >= 3) continue;
+            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
             newPosts.push(p);
             if (newPosts.length >= targetLength) break;
           }

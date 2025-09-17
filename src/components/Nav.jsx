@@ -8,7 +8,7 @@ import LanguageSelector from './ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 
-// Devuelve los ítems de navegación según rol
+// Devuelve los ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­tems de navegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n segÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºn rol
 function getNavItems(role, t) {
   const roleMap = {
     'pareja': 'owner',
@@ -25,26 +25,26 @@ function getNavItems(role, t) {
         { path: '/home', label: t('navigation.home') },
         { path: '/tasks', label: t('navigation.tasks') },
         { path: '/finance', label: t('navigation.finance') },
-        { path: '/more', label: 'Más' },
+        { path: '/more', label: t('navigation.more') },
       ];
     case 'planner':
       return [
         { path: '/home', label: t('navigation.home') },
         { path: '/tasks', label: t('navigation.tasks') },
-        { path: '/bodas', label: 'Bodas' },
-        { path: '/more', label: 'Más' },
+        { path: '/bodas', label: t('navigation.weddings') },
+        { path: '/more', label: t('navigation.more') },
       ];
     case 'assistant':
       return [
         { path: '/tasks', label: t('navigation.tasks') },
-        { path: '/protocolo', label: 'Protocolo' },
-        { path: '/more', label: 'Más' },
+        { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
       ];
     default:
       return [
         { path: '/home', label: t('navigation.home') },
         { path: '/tasks', label: t('navigation.tasks') },
-        { path: '/more', label: 'Más' },
+        { path: '/more', label: t('navigation.more') },
       ];
   }
 }
@@ -63,7 +63,7 @@ function getNavItems(role, t) {
       { path: '/home', label: 'Inicio' },
       { path: '/tasks', label: 'Tareas' },
       { path: '/finance', label: 'Finanzas' },
-      { path: '/more', label: 'Más' },
+        { path: '/more', label: t('navigation.more') },
     ];
   }
 
@@ -71,16 +71,16 @@ function getNavItems(role, t) {
     return [
       { path: '/home', label: 'Inicio' },
       { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: 'Protocolo' },
-      { path: '/more', label: 'Más' },
+      { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
     ];
   }
 
   if (normalizedRole === 'assistant') {
     return [
       { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: 'Protocolo' },
-      { path: '/more', label: 'Más' },
+      { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
     ];
   }
 
@@ -88,7 +88,7 @@ function getNavItems(role, t) {
   return [
     { path: '/home', label: 'Inicio' },
     { path: '/tasks', label: 'Tareas' },
-    { path: '/more', label: 'Más' },
+        { path: '/more', label: t('navigation.more') },
   ];
   // Normalizar nombres de roles provenientes de Firestore
   const roleMap = {
@@ -101,8 +101,8 @@ function getNavItems(role, t) {
   const common = [
     { path: '/home', label: 'Inicio' },
     { path: '/tasks', label: 'Tareas' },
-    { path: '/protocolo', label: 'Protocolo' },
-    { path: '/more', label: 'Más' },
+    { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
   ];
 
   if (normalizedRole === 'owner') {
@@ -110,24 +110,24 @@ function getNavItems(role, t) {
       { path: '/home', label: 'Inicio' },
       { path: '/tasks', label: 'Tareas' },
       { path: '/finance', label: 'Finanzas' },
-      { path: '/more', label: 'Más' },
+        { path: '/more', label: t('navigation.more') },
     ];
   }
   if (normalizedRole === 'planner') {
-    // Planner no ve finanzas, pero puede tener otras secciones específicas
+    // Planner no ve finanzas, pero puede tener otras secciones especÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ficas
     return [
       { path: '/home', label: 'Inicio' },
       { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: 'Protocolo' },
-      { path: '/more', label: 'Más' },
+      { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
     ];
   }
   if (normalizedRole === 'assistant') {
-    // Asistente: solo tareas y protocolo (más se mantiene)
+    // Asistente: solo tareas y protocolo (mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡s se mantiene)
     return [
       { path: '/tasks', label: 'Tareas' },
-      { path: '/protocolo', label: 'Protocolo' },
-      { path: '/more', label: 'Más' },
+      { path: '/protocolo', label: t('navigation.protocol') },
+        { path: '/more', label: t('navigation.more') },
     ];
 
   }
@@ -143,7 +143,7 @@ function Nav() {
   // Hook de traducciones
   const { t } = useTranslations();
   
-  // Usar el nuevo sistema para el rol, con fallback básico
+  // Usar el nuevo sistema para el rol, con fallback bÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡sico
   const role = userProfile?.role || 'owner';
   const navItems = React.useMemo(() => getNavItems(role, t), [role, t]);
   
@@ -161,7 +161,7 @@ function Nav() {
 
   return (
     <nav className='fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30'>
-      {/* Navegación principal */}
+      {/* NavegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n principal */}
       <div className='flex justify-around flex-1'>
         {navItems.map(({ path, label }, idx) => {
           const isActive = location.pathname.startsWith(path);

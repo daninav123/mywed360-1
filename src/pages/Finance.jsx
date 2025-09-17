@@ -10,16 +10,16 @@ import useFinance from '../hooks/useFinance';
 import useTranslations from '../hooks/useTranslations';
 
 /**
- * Página de Gestion financiera completamente refactorizada
+ * PÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina de Gestion financiera completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (571 líneas â†’ 180 líneas)
+ * - Eliminada complejidad anterior (571 lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ 180 lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useFinance para lógica centralizada
- * - Memoización y optimización de re-renders
- * - Integración con sistema i18n
- * - UX mejorada con tabs y navegación clara
+ * - Hook personalizado useFinance para lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³gica centralizada
+ * - MemoizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n y optimizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de re-renders
+ * - IntegraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n con sistema i18n
+ * - UX mejorada con tabs y navegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n clara
  */
 function Finance() {
   const { t } = useTranslations();
@@ -34,7 +34,7 @@ function Finance() {
     budget,
     transactions,
     
-    // Cálculos
+    // CÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lculos
     stats,
     budgetUsage,
     settings,
@@ -57,23 +57,25 @@ function Finance() {
 
   // Estado para tabs activo
   const [activeTab, setActiveTab] = useState('overview');
+  const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
-  // Detectar URL hash para abrir modal específico
+
+  // Detectar URL hash para abrir modal especÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­fico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager manejará la apertura del modal
+      // El TransactionManager manejarÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar número de invitados al montar el componente
+  // Cargar nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores después de 5 segundos
+  // Limpiar errores despuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©s de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -81,7 +83,12 @@ function Finance() {
     }
   }, [error, clearError]);
 
-  // Manejar actualización de presupuesto total
+  const navigateToTransactions = ({ tab = 'transactions', filters = {} } = {}) => {
+    if (tab) setActiveTab(tab);
+    setTransactionFiltersSignal({ version: Date.now(), filters });
+  }; 
+
+  // Manejar actualizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -107,14 +114,14 @@ function Finance() {
           </div>
         )}
 
-        {/* Navegación por tabs */}
+        {/* NavegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n por tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">{t('finance.tabs.overview', { defaultValue: 'Resumen' })}</TabsTrigger>
             <TabsTrigger value="transactions">{t('finance.tabs.transactions', { defaultValue: 'Transacciones' })}</TabsTrigger>
             <TabsTrigger value="budget">{t('finance.tabs.budget', { defaultValue: 'Presupuesto' })}</TabsTrigger>
             <TabsTrigger value="contributions">{t('finance.tabs.contributions', { defaultValue: 'Aportaciones' })}</TabsTrigger>
-            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'Análisis' })}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'AnÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lisis' })}</TabsTrigger>
           </TabsList>
 
           {/* Tab: Resumen general */}
@@ -164,7 +171,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Configuración de aportaciones */}
+          {/* Tab: ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de aportaciones */}
           <TabsContent value="contributions" className="space-y-6">
             <ContributionSettings
               contributions={contributions}
@@ -174,9 +181,9 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Analisis y gráficos */}
+          {/* Tab: Analisis y grÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ficos */}
           <TabsContent value="analytics" className="space-y-6">
-            <React.Suspense fallback={<div className="p-4">Cargando análisis…</div>}>
+            <React.Suspense fallback={<div className="p-4">Cargando anÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lisisÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦</div>}>
               <FinanceCharts
                 transactions={transactions}
                 budgetUsage={budgetUsage}

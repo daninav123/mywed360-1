@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ViewMode } from 'gantt-task-react';
 import { serverTimestamp, doc, deleteDoc, setDoc, collection, addDoc } from 'firebase/firestore';
 import { db as clientDb, auth as clientAuth } from '../../firebaseConfig';
@@ -20,7 +20,7 @@ import { awardPoints } from '../../services/GamificationService';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
 import { useWedding } from '../../context/WeddingContext';
 
-// FunciÃ³n helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÃƒÆ’Ã‚Â³n helper para cargar datos de Firestore de forma segura con fallbacks
 const loadFirestoreData = async (path) => {
   try {
     let data = null;
@@ -56,7 +56,7 @@ const loadFirestoreData = async (path) => {
       // Documento que guarda tareas completadas como mapa
       data = await loadData('tasksCompleted', { docPath: path });
     } else {
-      // Fallback genÃ©rico: usar la clave tal cual (localStorage / users/{uid})
+      // Fallback genÃƒÆ’Ã‚Â©rico: usar la clave tal cual (localStorage / users/{uid})
       data = await loadData(path);
     }
     return data || {};
@@ -68,7 +68,7 @@ const loadFirestoreData = async (path) => {
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÃ³n segura con manejo de errores
+  // Estados - InicializaciÃƒÆ’Ã‚Â³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -121,7 +121,7 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÃ³n:', error);
+      console.error('Error al obtener estado de sincronizaciÃƒÆ’Ã‚Â³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
@@ -133,7 +133,7 @@ export default function Tasks() {
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin)
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)
   useEffect(() => {
     let isMounted = true;
     (async () => {
@@ -174,6 +174,33 @@ export default function Tasks() {
           }
         } catch {}
 
+        // Fallback intermedio: permitir configurar una fecha por defecto via ENV o localStorage
+        if (!wedding) {
+          try {
+            const parseLooseDate = (val) => {
+              if (!val || typeof val !== 'string') return null;
+              const trimmed = val.trim();
+              // Soportar formato DD/MM/YYYY
+              const m = trimmed.match(/^([0-3]?\d)\/([0-1]?\d)\/(\d{4})$/);
+              if (m) {
+                const dd = parseInt(m[1], 10);
+                const mm = parseInt(m[2], 10) - 1;
+                const yy = parseInt(m[3], 10);
+                const d = new Date(yy, mm, dd);
+                return isNaN(d.getTime()) ? null : d;
+              }
+              // ISO u otros formatos reconocidos por Date
+              const d = new Date(trimmed);
+              return isNaN(d.getTime()) ? null : d;
+            };
+
+            const envDate = (import.meta?.env?.VITE_DEFAULT_WEDDING_DATE) ? String(import.meta.env.VITE_DEFAULT_WEDDING_DATE) : null;
+            const lsDate = localStorage.getItem('lovenda_default_wedding_date') || null;
+            const candidate = parseLooseDate(envDate) || parseLooseDate(lsDate);
+            if (candidate) wedding = candidate;
+          } catch {}
+        }
+
         // Fallback fin: usar el mayor end de tasks/meetings o +6 meses
         if (!wedding) {
           const ends = [];
@@ -206,6 +233,7 @@ export default function Tasks() {
           wedding = nextDay;
         }
 
+        // Guardar fecha de registro y fecha de boda (el rango visible se extiende +1 mes en los límites)
         if (isMounted) {
           setProjectStart(reg);
           setProjectEnd(wedding);
@@ -256,7 +284,7 @@ export default function Tasks() {
     }
   }, [activeWedding, projectEnd, meetingsState]);
   // Ocultar completamente la lista izquierda del Gantt
-  const listCellWidth = 0;
+  const listCellWidth = "";
   // Altura de fila del Gantt
   const rowHeight = 44;
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
@@ -274,22 +302,22 @@ export default function Tasks() {
     return () => window.removeEventListener('lovenda-tasks', handler);
   }, [meetingsState]);
 
-  // FunciÃ³n para aÃ±adir una reuniÃ³n
+  // FunciÃƒÆ’Ã‚Â³n para aÃƒÆ’Ã‚Â±adir una reuniÃƒÆ’Ã‚Â³n
   const addMeeting = useCallback(async (meeting) => {
     await addMeetingFS({
       ...meeting,
-      title: meeting.title || 'Nueva reuniÃ³n',
+      title: meeting.title || 'Nueva reuniÃƒÆ’Ã‚Â³n',
       start: new Date(meeting.start),
       end: new Date(meeting.end)
     });
   }, [addMeetingFS]);
 
-  // GeneraciÃ³n automÃ¡tica de timeline si estÃ¡ vacÃ­o
+  // GeneraciÃƒÆ’Ã‚Â³n automÃƒÆ’Ã‚Â¡tica de timeline si estÃƒÆ’Ã‚Â¡ vacÃƒÆ’Ã‚Â­o
   useEffect(() => {
-    // Desactivado: solo se desea el hito automÃ¡tico de la fecha de la boda en el Gantt
+    // Desactivado: solo se desea el hito automÃƒÆ’Ã‚Â¡tico de la fecha de la boda en el Gantt
     return;
     if (!activeWedding) return;
-    // Evitar regenerar si ya se generÃ³ para esta boda
+    // Evitar regenerar si ya se generÃƒÆ’Ã‚Â³ para esta boda
     const flagKey = `lovenda_timeline_generated_${activeWedding}`;
     if (localStorage.getItem(flagKey) === 'true') return;
 
@@ -305,19 +333,19 @@ export default function Tasks() {
 
         const addMonths = (d, delta) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + delta); return x; };
 
-        // DefiniciÃ³n mÃ­nima de tareas base (M1)
+        // DefiniciÃƒÆ’Ã‚Â³n mÃƒÆ’Ã‚Â­nima de tareas base (M1)
         const plan = [
-          { monthsBefore: 12, title: 'Reservar lugar de celebraciÃ³n', category: 'LUGAR' },
-          { monthsBefore: 9,  title: 'Contratar fotÃ³grafo', category: 'FOTOGRAFO' },
+          { monthsBefore: 12, title: 'Reservar lugar de celebraciÃƒÆ’Ã‚Â³n', category: 'LUGAR' },
+          { monthsBefore: 9,  title: 'Contratar fotÃƒÆ’Ã‚Â³grafo', category: 'FOTOGRAFO' },
           { monthsBefore: 9,  title: 'Contratar catering', category: 'COMIDA' },
           { monthsBefore: 6,  title: 'Enviar Save the Date', category: 'INVITADOS' },
           { monthsBefore: 6,  title: 'Vestuario: iniciar pruebas', category: 'VESTUARIO' },
           { monthsBefore: 3,  title: 'Enviar invitaciones', category: 'PAPELERIA' },
           { monthsBefore: 1,  title: 'Confirmar asistentes y mesas', category: 'INVITADOS' },
-          { monthsBefore: 1,  title: 'Prueba de menÃº con catering', category: 'COMIDA' },
+          { monthsBefore: 1,  title: 'Prueba de menÃƒÆ’Ã‚Âº con catering', category: 'COMIDA' },
         ];
 
-        // Evitar duplicados por tÃ­tulo si el usuario ya aÃ±adiÃ³ algo manualmente
+        // Evitar duplicados por tÃƒÆ’Ã‚Â­tulo si el usuario ya aÃƒÆ’Ã‚Â±adiÃƒÆ’Ã‚Â³ algo manualmente
         const existingTitles = new Set([
           ...(Array.isArray(tasksState) ? tasksState.map(t => (t?.title || t?.name || '').toLowerCase()) : []),
           ...(Array.isArray(meetingsState) ? meetingsState.map(m => (m?.title || '').toLowerCase()) : []),
@@ -329,13 +357,13 @@ export default function Tasks() {
           const title = item.title;
           if (existingTitles.has(title.toLowerCase())) continue;
           // Para simplicidad: crear como tarea Gantt (largo plazo) o evento puntual
-          // HeurÃ­stica: hitos clave como eventos, resto como tareas largas de ~15 dÃ­as
+          // HeurÃƒÆ’Ã‚Â­stica: hitos clave como eventos, resto como tareas largas de ~15 dÃƒÆ’Ã‚Â­as
           const milestoneTitles = ['Enviar Save the Date', 'Enviar invitaciones', 'Confirmar asistentes y mesas'];
           if (milestoneTitles.includes(title)) {
             // Evento puntual (calendario)
             await addMeetingFS({ title, start, end, category: item.category });
           } else {
-            // Tarea de largo plazo (Gantt) de 15 dÃ­as
+            // Tarea de largo plazo (Gantt) de 15 dÃƒÆ’Ã‚Â­as
             const endTask = new Date(start.getTime() + 15 * 24 * 60 * 60 * 1000);
             await addTaskFS({
               id: `auto-${item.monthsBefore}-${Date.now()}`,
@@ -354,20 +382,20 @@ export default function Tasks() {
         }
 
         localStorage.setItem(flagKey, 'true');
-        // Otorgar puntos de gamificaciÃ³n por crear timeline automÃ¡ticamente (no intrusivo)
+        // Otorgar puntos de gamificaciÃƒÆ’Ã‚Â³n por crear timeline automÃƒÆ’Ã‚Â¡ticamente (no intrusivo)
         try {
           await awardPoints(activeWedding, 'create_timeline', { source: 'auto' });
         } catch (e) {
           // best-effort; no bloquear si falla
-          console.warn('Gamification awardPoints fallÃ³:', e?.message || e);
+          console.warn('Gamification awardPoints fallÃƒÆ’Ã‚Â³:', e?.message || e);
         }
       } catch (err) {
-        console.warn('No se pudo generar timeline automÃ¡tico:', err?.message);
+        console.warn('No se pudo generar timeline automÃƒÆ’Ã‚Â¡tico:', err?.message);
       }
     })();
   }, [activeWedding, tasksState, meetingsState, addMeetingFS, addTaskFS]);
 
-  // Estado para tareas completadas (inicial vacÃ­o, se cargarÃ¡ asÃ­ncronamente)
+  // Estado para tareas completadas (inicial vacÃƒÆ’Ã‚Â­o, se cargarÃƒÆ’Ã‚Â¡ asÃƒÆ’Ã‚Â­ncronamente)
   const [completed, setCompleted] = useState({});
 
   // Cargar tareas completadas de Firestore/Storage sin bloquear render
@@ -388,12 +416,12 @@ export default function Tasks() {
     return () => { isMounted = false; };
   }, [activeWedding]);
 
-  // Suscribirse al estado de sincronizaciÃ³n
+  // Suscribirse al estado de sincronizaciÃƒÆ’Ã‚Â³n
   useEffect(() => {
     return subscribeSyncState(setSyncStatus);
   }, []);
 
-  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃ­os al inicio)
+  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÆ’Ã‚Â­os al inicio)
   useEffect(() => {
     if (dataLoadedRef.current) {
       // No es necesario guardar cambios ya que se utiliza Firestore
@@ -412,7 +440,7 @@ export default function Tasks() {
     }
   }, [completed, activeWedding]);
 
-  // Sugerencia automÃ¡tica de categorÃ­a
+  // Sugerencia automÃƒÆ’Ã‚Â¡tica de categorÃƒÆ’Ã‚Â­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (texto.includes('lugar') || texto.includes('venue') || texto.includes('salon') || texto.includes('espacio')) {
@@ -425,7 +453,7 @@ export default function Tasks() {
       return 'DECORACION';
     } else if (texto.includes('invitacion') || texto.includes('papel') || texto.includes('tarjeta')) {
       return 'PAPELERIA';
-    } else if (texto.includes('mÃºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
+    } else if (texto.includes('mÃƒÆ’Ã‚Âºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
       return 'MUSICA';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
@@ -444,7 +472,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃ­a si se cambia el tÃ­tulo y la categorÃ­a es OTROS
+      // 1. Sugerir categorÃƒÆ’Ã‚Â­a si se cambia el tÃƒÆ’Ã‚Â­tulo y la categorÃƒÆ’Ã‚Â­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -457,7 +485,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃ­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÆ’Ã‚Â­a por defecto
         }
       }
 
@@ -491,7 +519,7 @@ export default function Tasks() {
     resetForm();
   };
   
-  // AsignaciÃ³n automÃ¡tica de categorÃ­a con IA
+  // AsignaciÃƒÆ’Ã‚Â³n automÃƒÆ’Ã‚Â¡tica de categorÃƒÆ’Ã‚Â­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -501,23 +529,23 @@ export default function Tasks() {
       
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃ³n', 'jardÃ­n', 'terraza'],
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒÆ’Ã‚Â³n', 'jardÃƒÆ’Ã‚Â­n', 'terraza'],
         INVITADOS: ['guests', 'invitados', 'personas', 'asistentes', 'confirmaciones', 'lista', 'rsvp'],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: ['decoraciÃ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃ³n', 'ambientaciÃ³n'],
-        PAPELERIA: ['invitaciones', 'papelerÃ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
-        MUSICA: ['mÃºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografÃ­a', 'video', 'recuerdos', 'Ã¡lbum', 'sesiÃ³n'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃ­a'],
+        DECORACION: ['decoraciÃƒÆ’Ã‚Â³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃƒÆ’Ã‚Â³n', 'ambientaciÃƒÆ’Ã‚Â³n'],
+        PAPELERIA: ['invitaciones', 'papelerÃƒÆ’Ã‚Â­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
+        MUSICA: ['mÃƒÆ’Ã‚Âºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotografÃƒÆ’Ã‚Â­a', 'video', 'recuerdos', 'ÃƒÆ’Ã‚Â¡lbum', 'sesiÃƒÆ’Ã‚Â³n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒÆ’Ã‚Â­a'],
       };
       
-      // Contar coincidencias por categorÃ­a
+      // Contar coincidencias por categorÃƒÆ’Ã‚Â­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter(palabra => texto.includes(palabra)).length;
       });
       
-      // Encontrar la categorÃ­a con mayor puntuaciÃ³n
+      // Encontrar la categorÃƒÆ’Ã‚Â­a con mayor puntuaciÃƒÆ’Ã‚Â³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -529,17 +557,17 @@ export default function Tasks() {
       
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃ­a:', error);
+      console.error('Error al asignar categorÃƒÆ’Ã‚Â­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃ³n de la boda
+  // Guardar una tarea en la subcolecciÃƒÆ’Ã‚Â³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃ¡sico
+      // Validar formulario bÃƒÆ’Ã‚Â¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃ­tulo');
+        alert('Por favor ingresa un tÃƒÆ’Ã‚Â­tulo');
         return;
       }
       
@@ -564,7 +592,7 @@ export default function Tasks() {
       
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no vÃ¡lidas');
+        alert('Fechas no vÃƒÆ’Ã‚Â¡lidas');
         return;
       }
       
@@ -573,7 +601,7 @@ export default function Tasks() {
         return;
       }
       
-      // Asignar categorÃ­a con IA si no se especificÃ³
+      // Asignar categorÃƒÆ’Ã‚Â­a con IA si no se especificÃƒÆ’Ã‚Â³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -590,7 +618,7 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
       
-      // AÃ±adir/actualizar segÃºn sea una tarea de largo plazo o una reuniÃ³n
+      // AÃƒÆ’Ã‚Â±adir/actualizar segÃƒÆ’Ã‚Âºn sea una tarea de largo plazo o una reuniÃƒÆ’Ã‚Â³n
       if (formData.long) {
         // Para el diagrama Gantt
         const ganttTask = {
@@ -616,7 +644,7 @@ export default function Tasks() {
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // Ãšltimo recurso: generar id local si todo falla
+          // ÃƒÆ’Ã…Â¡ltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
@@ -638,7 +666,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÃ³n (evento puntual del calendario)
+          // Nueva reuniÃƒÆ’Ã‚Â³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -691,7 +719,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃ³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃƒÆ’Ã‚Â³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -709,7 +737,7 @@ export default function Tasks() {
     ...(Array.isArray(meetingsState) ? meetingsState : [])
   ];
 
-  // FunciÃ³n auxiliar para validar y normalizar fechas
+  // FunciÃƒÆ’Ã‚Â³n auxiliar para validar y normalizar fechas
   const validateAndNormalizeDate = (date) => {
     if (!date) return null;
     
@@ -737,11 +765,11 @@ export default function Tasks() {
         return null;
       }
       
-      // Asegurar que start y end sean objetos Date vÃ¡lidos
+      // Asegurar que start y end sean objetos Date vÃƒÆ’Ã‚Â¡lidos
       const start = validateAndNormalizeDate(event.start);
       const end = validateAndNormalizeDate(event.end);
       
-      // Si alguna fecha no es vÃ¡lida, descartar evento
+      // Si alguna fecha no es vÃƒÆ’Ã‚Â¡lida, descartar evento
       if (!start || !end) {
         return null;
       }
@@ -751,7 +779,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || "Sin tÃ­tulo"
+        title: event.title || event.name || "Sin tÃƒÆ’Ã‚Â­tulo"
       };
     })
     .filter(Boolean); // Eliminar eventos nulos
@@ -771,7 +799,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || 'Sin tÃ­tulo',
+        title: event.title || event.name || 'Sin tÃƒÆ’Ã‚Â­tulo',
       };
     })
     .filter(Boolean);
@@ -793,7 +821,7 @@ export default function Tasks() {
     ? safeMeetings.filter(ev => ev.id !== 'wedding-day' && ev.autoKey !== 'wedding-day')
     : [];
 
-  // Filtro especÃ­fico para tareas del componente Gantt
+  // Filtro especÃƒÆ’Ã‚Â­fico para tareas del componente Gantt
   const taskIdSet = new Set(Array.isArray(tasksState) ? tasksState.filter(Boolean).map(t => t?.id).filter(Boolean) : []);
 
   const safeGanttTasks = Array.isArray(tasksState) 
@@ -809,7 +837,7 @@ export default function Tasks() {
           const start = validateAndNormalizeDate(task.start);
           const end = validateAndNormalizeDate(task.end);
           
-          // Si alguna fecha no es vÃ¡lida, descartar tarea
+          // Si alguna fecha no es vÃƒÆ’Ã‚Â¡lida, descartar tarea
           if (!start || !end) {
             return null;
           }
@@ -824,7 +852,7 @@ export default function Tasks() {
             ...task,
             start,
             end,
-            name: task.name || task.title || "Sin tÃ­tulo",
+            name: task.name || task.title || "Sin tÃƒÆ’Ã‚Â­tulo",
             type: task.type || "task",
             id: task.id,
             progress: task.progress || 0,
@@ -835,12 +863,12 @@ export default function Tasks() {
         .filter(Boolean) // Eliminar tareas nulas
     : [];
 
-  // Capa extra de seguridad: descartar cualquier tarea con fechas no vÃ¡lidas antes de pintar
+  // Capa extra de seguridad: descartar cualquier tarea con fechas no vÃƒÆ’Ã‚Â¡lidas antes de pintar
   const ganttTasksStrict = Array.isArray(safeGanttTasks)
     ? safeGanttTasks.filter(t => t && t.start instanceof Date && t.end instanceof Date && !isNaN(t.start.getTime()) && !isNaN(t.end.getTime()))
     : [];
 
-  // Capa ultra-defensiva: aceptar campos legacy y descartar cualquier resto invÃ¡lido
+  // Capa ultra-defensiva: aceptar campos legacy y descartar cualquier resto invÃƒÆ’Ã‚Â¡lido
   const __normalizeDate = (d) => {
     try {
       if (!d) return null;
@@ -873,7 +901,7 @@ export default function Tasks() {
       const stableId = t.id || `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
       if (seen.has(stableId)) continue;
       seen.add(stableId);
-      // Forzar que el id usado por la librerÃ­a sea el estable
+      // Forzar que el id usado por la librerÃƒÆ’Ã‚Â­a sea el estable
       out.push({ ...t, id: stableId });
     }
     return out;
@@ -894,7 +922,7 @@ export default function Tasks() {
   // Extender el rango visual del Gantt para cubrir registro -> boda (con fallbacks)
   const ganttTasksBounded = useMemo(() => {
     const base = Array.isArray(uniqueGanttTasksMemo) ? uniqueGanttTasksMemo : [];
-    const out = [...base];
+    const out = [];
     const addMonths = (d, m) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + m); return x; };
     let startBound = (projectStart instanceof Date && !isNaN(projectStart.getTime())) ? projectStart : null;
     let endBound = (projectEnd instanceof Date && !isNaN(projectEnd.getTime())) ? projectEnd : null;
@@ -914,11 +942,24 @@ export default function Tasks() {
     if (startBound && !endBound) endBound = addMonths(startBound, 6);
 
     if (startBound && endBound) {
+      const endPlusOneMonth = addMonths(endBound, 1);
+      // Limitar las tareas duras al rango visible
+      for (const t of base) {
+        try {
+          const s = t?.start instanceof Date ? t.start : (t?.start ? new Date(t.start) : null);
+          const e = t?.end instanceof Date ? t.end : (t?.end ? new Date(t.end) : null);
+          if (!s || !e) continue;
+          const cs = new Date(Math.max(s.getTime(), startBound.getTime()));
+          const ce = new Date(Math.min(e.getTime(), endPlusOneMonth.getTime()));
+          if (ce.getTime() < cs.getTime()) continue;
+          out.push({ ...t, start: cs, end: ce });
+        } catch {}
+      }
       out.push({
         id: '__gantt_bounds',
         name: '',
         start: new Date(startBound),
-        end: new Date(endBound),
+        end: new Date(endPlusOneMonth),
         type: 'project',
         progress: 0,
         isDisabled: true,
@@ -929,10 +970,10 @@ export default function Tasks() {
           progressSelectedColor: 'transparent',
         },
       });
-      // No añadimos milestones visibles para evitar rombos en el grid; la marca se dibuja como bandera superpuesta.
+      // No aÃƒÂ±adimos milestones visibles para evitar rombos en el grid; la marca se dibuja como bandera superpuesta.
     }
 
-    // Si por cualquier motivo sigue vacío, crear un rango mínimo alrededor de hoy
+    // Si por cualquier motivo sigue vacÃƒÂ­o, crear un rango mÃƒÂ­nimo alrededor de hoy
     if (out.length === 0) {
       const today = new Date();
       const start = addMonths(today, -1);
@@ -943,17 +984,23 @@ export default function Tasks() {
     return out;
   }, [uniqueGanttTasksMemo, projectStart, projectEnd, meetingsState]);
 
-  // Fecha de marcador (boda) para el Gantt: priorizar projectEnd, si no, derivar del meeting 'wedding-day'
+  // Fecha de marcador (boda) para el Gantt: derivar del meeting 'wedding-day' o weddingInfo (no usar projectEnd porque ya es +1 mes)
   const weddingMarkerDate = useMemo(() => {
-    if (projectEnd && projectEnd instanceof Date && !isNaN(projectEnd.getTime())) return projectEnd;
     try {
       const m = (Array.isArray(meetingsState) ? meetingsState : []).find(ev => ev?.id === 'wedding-day' || ev?.autoKey === 'wedding-day' || /boda/i.test(String(ev?.title || '')));
-      if (!m) return null;
-      const any = m.start || m.date || m.when || m.end;
-      if (!any) return null;
-      const d = typeof any?.toDate === 'function' ? any.toDate() : new Date(any);
-      return isNaN(d.getTime()) ? null : d;
-    } catch { return null; }
+      if (m) {
+        const any = m.start || m.date || m.when || m.end;
+        if (any) {
+          const d = typeof any?.toDate === 'function' ? any.toDate() : new Date(any);
+          if (!isNaN(d.getTime())) return d;
+        }
+      }
+    } catch {}
+    // Fallback: si no hay meeting, usar la fecha de proyecto (boda)
+    if (projectEnd && projectEnd instanceof Date && !isNaN(projectEnd.getTime())) {
+      return new Date(projectEnd);
+    }
+    return null;
   }, [projectEnd, meetingsState]);
   
   // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista
@@ -976,16 +1023,16 @@ export default function Tasks() {
     const minStart = new Date(Math.min(...starts.map(d => d.getTime())));
     const maxEnd = new Date(Math.max(...ends.map(d => d.getTime())));
 
-    // Elegir viewMode segÃºn duraciÃ³n total
+    // Elegir viewMode segÃƒÆ’Ã‚Âºn duraciÃƒÆ’Ã‚Â³n total
     const msSpan = Math.max(1, maxEnd.getTime() - minStart.getTime());
     const daysSpan = Math.max(1, Math.ceil(msSpan / (1000 * 60 * 60 * 24)));
     let targetMode = ViewMode.Month;
-    if (daysSpan > 730) targetMode = ViewMode.Year; // >2 aÃ±os
+    if (daysSpan > 730) targetMode = ViewMode.Year; // >2 aÃƒÆ’Ã‚Â±os
     else if (daysSpan > 120) targetMode = ViewMode.Month; // >4 meses
     else if (daysSpan > 21) targetMode = ViewMode.Week; // >3 semanas
     else targetMode = ViewMode.Day; // <=3 semanas
 
-    // Calcular unidades visibles segÃºn el modo elegido
+    // Calcular unidades visibles segÃƒÆ’Ã‚Âºn el modo elegido
     let units = 1;
     if (targetMode === ViewMode.Year) {
       const startYear = minStart.getFullYear();
@@ -1008,14 +1055,14 @@ export default function Tasks() {
     units = (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1;
     targetMode = ViewMode.Month;
 
-    // Sin pasos previos para no aÃ±adir espacio vacÃ­o
+    // Sin pasos previos para no aÃƒÆ’Ã‚Â±adir espacio vacÃƒÆ’Ã‚Â­o
     const pre = 0;
     const totalUnits = units + pre;
 
-    // Calcular ancho de columna para encajar sin scroll horizontal (lÃ­mites por modo)
+    // Calcular ancho de columna para encajar sin scroll horizontal (lÃƒÆ’Ã‚Â­mites por modo)
     // Column width calculado para encajar sin scroll
     const MIN_COL = 72; // meses largos (Septiembre) sin solaparse
-    const MAX_COL = 160; // px mÃ¡ximo
+    const MAX_COL = 160; // px mÃƒÆ’Ã‚Â¡ximo
     const computedCol = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(containerWidth / totalUnits)));
 
     if (columnWidthState !== computedCol) setColumnWidthState(computedCol);
@@ -1033,7 +1080,7 @@ export default function Tasks() {
     return () => window.removeEventListener('resize', onResize);
   }, [tasksState, meetingsState, uniqueGanttTasksMemo, columnWidthState, ganttPreSteps, ganttViewDate, ganttViewMode, projectStart, projectEnd]);
 
-  // Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃ³n
+  // Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÆ’Ã‚Â³n
   useEffect(() => {
     if (!projectStart || !projectEnd) return;
     if (!ganttContainerRef.current) return;
@@ -1043,7 +1090,8 @@ export default function Tasks() {
 
     const computeForWidth = (width) => {
       const startMonth = new Date(projectStart.getFullYear(), projectStart.getMonth(), 1);
-      const endMonth = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), 1);
+      const endMonthBase = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), 1);
+      const endMonth = new Date(endMonthBase.getFullYear(), endMonthBase.getMonth() + 1, 1);
       const units = Math.max(1, (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1);
       const col = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(width / units)));
       if (columnWidthState !== col) setColumnWidthState(col);
@@ -1070,16 +1118,16 @@ export default function Tasks() {
     return () => { if (ro) ro.disconnect(); };
   }, [projectStart, projectEnd, columnWidthState, ganttViewDate, ganttViewMode]);
 
-  // CÃ¡lculo de progreso - asegurando que los estados sean arrays
+  // CÃƒÆ’Ã‚Â¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       
       <div className="flex items-center justify-between">
-        <h1 className="page-title">GestiÃ³n de Tareas</h1>
+        <h1 className="page-title">GestiÃƒÆ’Ã‚Â³n de Tareas</h1>
         <div className="flex items-center space-x-4">
-          {/* Indicador de sincronizaciÃ³n */}
+          {/* Indicador de sincronizaciÃƒÆ’Ã‚Â³n */}
           <div className="flex items-center">
             {syncStatus.isSyncing ? (
               <RefreshCw className="w-4 h-4 animate-spin text-yellow-500 mr-2" />
@@ -1099,10 +1147,10 @@ export default function Tasks() {
                   : syncStatus.pendingChanges
                   ? "Cambios pendientes"
                   : "Sincronizado"
-                : "Sin conexiÃ³n"}
+                : "Sin conexiÃƒÆ’Ã‚Â³n"}
             </div>
           </div>
-          {/* Botones de acciÃ³n */}
+          {/* Botones de acciÃƒÆ’Ã‚Â³n */}
           <div className="flex space-x-2">
             <button
               onClick={() => {
@@ -1136,8 +1184,16 @@ export default function Tasks() {
                 const s = (projectStart instanceof Date && !isNaN(projectStart.getTime())) ? projectStart : (weddingMarkerDate || null);
                 return s ? new Date(s.getFullYear(), s.getMonth(), 1) : undefined;
               })()}
+              gridEndDate={(() => {
+                const e = (projectEnd instanceof Date && !isNaN(projectEnd.getTime())) ? projectEnd : (weddingMarkerDate || null);
+                if (!e) return undefined;
+                // Último día del mes siguiente a la boda
+                const base = new Date(e.getFullYear(), e.getMonth(), 1);
+                const lastDayNextMonth = new Date(base.getFullYear(), base.getMonth() + 2, 0);
+                return lastDayNextMonth;
+              })()}
               onTaskClick={(task) => {
-                // Abrir modal de ediciÃ³n para tareas de largo plazo
+                // Abrir modal de ediciÃƒÆ’Ã‚Â³n para tareas de largo plazo
                 setEditingId(task.id);
                 setFormData({
                   title: task.title,
@@ -1167,7 +1223,7 @@ export default function Tasks() {
       <div className="flex-1 bg-[var(--color-surface)] rounded-xl shadow-md p-6 mt-4 overflow-x-auto">
         <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
         
-        {/* Controles de navegaciÃ³n del calendario */}
+        {/* Controles de navegaciÃƒÆ’Ã‚Â³n del calendario */}
         <div className="flex justify-between items-center mb-4">
           <div className="space-x-2">
             <button 
@@ -1186,7 +1242,7 @@ export default function Tasks() {
               className={`px-3 py-1 rounded ${currentView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
               onClick={() => setCurrentView('day')}
             >
-              DÃ­a
+              DÃƒÆ’Ã‚Â­a
             </button>
           </div>
           <div className="flex items-center space-x-2">
@@ -1233,20 +1289,20 @@ export default function Tasks() {
         
         
         <div className="rbc-calendar-container">
-          {/* Componente Calendar con protecciÃ³n de errores */}
+          {/* Componente Calendar con protecciÃƒÆ’Ã‚Â³n de errores */}
           <ErrorBoundary
             fallback={(
               <div>
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-medium text-gray-800 mb-2">Error al cargar el calendario</h3>
-                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a travÃ©s de la lista inferior.</p>
+                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a travÃƒÆ’Ã‚Â©s de la lista inferior.</p>
                 </div>
                 <div className="space-y-4 max-h-[300px] overflow-y-auto p-2">
                   {safeEvents && safeEvents.length > 0 ? (
                     sortedTasks
                       .map(event => {
                         const eventId = event.id || '';
-                        const eventTitle = event.title || event.name || "Evento sin tÃ­tulo";
+                        const eventTitle = event.title || event.name || "Evento sin tÃƒÆ’Ã‚Â­tulo";
                         const eventStart = event.start instanceof Date ? event.start : new Date();
                         const formattedDate = eventStart.toLocaleDateString('es-ES', {
                           weekday: 'short',
@@ -1350,7 +1406,7 @@ export default function Tasks() {
                   min-height: 0;
                 }
                 
-                /* Celdas de dÃ­as */
+                /* Celdas de dÃƒÆ’Ã‚Â­as */
                 .calendar-container .rbc-day-bg {
                   flex: 1 0;
                   border-bottom: 1px solid #eee;
@@ -1435,7 +1491,7 @@ export default function Tasks() {
                   today: "Hoy",
                   month: "Mes",
                   week: "Semana",
-                  day: "DÃ­a"
+                  day: "DÃƒÆ’Ã‚Â­a"
                 }}
               />
             </div>
@@ -1496,7 +1552,7 @@ export default function Tasks() {
                 min-height: 0;
               }
               
-              /* Celdas de dÃ­as */
+              /* Celdas de dÃƒÆ’Ã‚Â­as */
               .calendar-container .rbc-day-bg {
                 flex: 1 0;
                 border-bottom: 1px solid #eee;
@@ -1581,7 +1637,7 @@ export default function Tasks() {
                 today: "Hoy",
                 month: "Mes",
                 week: "Semana",
-                day: "DÃ­a"
+                day: "DÃƒÆ’Ã‚Â­a"
               }}
             />
           </div>
@@ -1627,6 +1683,10 @@ export default function Tasks() {
      </div>
    );
 }
+
+
+
+
 
 
 

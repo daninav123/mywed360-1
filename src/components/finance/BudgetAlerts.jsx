@@ -3,7 +3,7 @@ import Card from '../Card';
 import { AlertCircle, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
-  // Calcular totales por categoría
+  // Calcular totales por categorÃ­a
   const categoryTotals = React.useMemo(() => {
     return transactions.reduce((acc, curr) => {
       if (!acc[curr.category]) {
@@ -19,7 +19,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
     const result = [];
     const now = new Date();
     
-    // Verificar presupuestos por categoría
+    // Verificar presupuestos por categorÃ­a
     Object.entries(categoryTotals).forEach(([category, { expense }]) => {
       const limit = budgetLimits[category] || 0;
       if (limit > 0) {
@@ -28,7 +28,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
         if (expense > limit) {
           result.push({
             type: 'error',
-            message: `¡Presupuesto excedido en ${category}! (${percentage.toFixed(0)}%)`,
+          message: `Presupuesto excedido en ${category}! (${percentage.toFixed(0)}%)`,
             icon: <AlertCircle className="text-red-500" />
           });
         } else if (percentage >= 90) {
@@ -63,7 +63,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
     if (result.length === 0) {
       result.push({
         type: 'success',
-        message: '¡Todo en orden! No hay alertas importantes.'
+        message: 'Todo en orden! No hay alertas importantes.'
       });
     }
 
@@ -109,3 +109,4 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
     </Card>
   );
 };
+

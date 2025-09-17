@@ -37,16 +37,10 @@ export function toE164(phone, defaultCountryCode = '') {
   if (!phone) return null;
   let p = String(phone).replace(/\s+/g, '').replace(/[^0-9+]/g, '');
   if (p.startsWith('00')) p = '+' + p.slice(2);
-  if (!p.startsWith('+')) {
-    if (defaultCountryCode) {
-      const cc = defaultCountryCode.replace('+', '');
-      p = `+${cc}${p}`;
-    } else {
-      // Asumir que ya viene en nacional, no se puede garantizar E.164 sin CC
-      p = `+${p}`;
-    }
-  }
-  return p;
+  if (p.startsWith('+')) return p;
+  const cc = (defaultCountryCode || '').replace('+', '');
+  if (cc && p.startsWith(cc)) return '+' + p; // evitar duplicar CC
+  return cc ? `+${cc}${p}` : `+${p}`;
 }
 
 function buildStatusCallbackUrl() {

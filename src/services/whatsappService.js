@@ -36,11 +36,16 @@ async function getAuthToken() {
 export function toE164(phone) {
   if (!phone) return null;
   let p = String(phone).replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+  // 00 -> +
   if (p.startsWith('00')) p = '+' + p.slice(2);
-  if (!p.startsWith('+')) {
-    if (DEFAULT_CC) p = `+${DEFAULT_CC}${p}`; else p = `+${p}`;
+  // Si ya viene con +, devolver tal cual
+  if (p.startsWith('+')) return p;
+  // Si empieza con el CC por defecto ya incluido (sin +), no duplicar
+  if (DEFAULT_CC && p.startsWith(String(DEFAULT_CC))) {
+    return '+' + p;
   }
-  return p;
+  // Caso general: anteponer CC por defecto o +
+  return DEFAULT_CC ? `+${DEFAULT_CC}${p}` : `+${p}`;
 }
 
 export function waDeeplink(phoneE164, text) {

@@ -66,7 +66,7 @@ export const VendorPayments = ({ transactions }) => {
                   <span>{formatCurrency(item.realCost)}</span>
                 </div>
                 <div className="text-xs text-gray-500">
-                  {item.item} • {new Date(item.paymentDate).toLocaleDateString()}
+                  {item.item} â€¢ {new Date(item.paymentDate).toLocaleDateString()}
                 </div>
               </div>
             ))}
@@ -92,7 +92,7 @@ export const VendorPayments = ({ transactions }) => {
           color={{ bg: 'bg-red-50', text: 'text-red-700' }}
         />
         <PaymentStatusCard
-          title="Próximos Pagos"
+          title="PrÃ³ximos Pagos"
           items={paymentStatus.upcoming}
           total={totals.upcoming}
           icon={<Clock className="w-4 h-4" />}

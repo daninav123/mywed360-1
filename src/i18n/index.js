@@ -7,8 +7,9 @@ import Backend from 'i18next-http-backend';
 import esTranslations from './locales/es/common.json';
 import enTranslations from './locales/en/common.json';
 import frTranslations from './locales/fr/common.json';
+import esFinance from './locales/es/finance.json';
 
-// Configuración de i18next
+// ConfiguraciÃƒÆ’Ã‚Â³n de i18next
 i18n
   // Detectar idioma del navegador
   .use(LanguageDetector)
@@ -26,7 +27,7 @@ i18n
     // Idiomas soportados
     supportedLngs: ['es', 'en', 'fr'],
     
-    // Configuración de detección de idioma
+    // ConfiguraciÃƒÆ’Ã‚Â³n de detecciÃƒÆ’Ã‚Â³n de idioma
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
@@ -34,15 +35,16 @@ i18n
       checkWhitelist: true
     },
     
-    // Configuración de backend para cargar traducciones
+    // ConfiguraciÃƒÆ’Ã‚Â³n de backend para cargar traducciones
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
     
-    // Recursos de traducción embebidos (fallback)
+    // Recursos de traducciÃƒÆ’Ã‚Â³n embebidos (fallback)
     resources: {
       es: {
-        common: esTranslations
+        common: esTranslations,
+        finance: esFinance,
       },
       en: {
         common: enTranslations
@@ -54,14 +56,16 @@ i18n
     
     // Namespace por defecto
     defaultNS: 'common',
+    ns: ['common', 'finance'],
+    fallbackNS: ['common'],
     
-    // Configuración de interpolación (nuevo formato)
+    // ConfiguraciÃƒÆ’Ã‚Â³n de interpolaciÃƒÆ’Ã‚Â³n (nuevo formato)
     interpolation: {
       escapeValue: false, // React ya escapa por defecto
       formatSeparator: ','
     },
     
-    // Configuración de formateo (nuevo formato)
+    // ConfiguraciÃƒÆ’Ã‚Â³n de formateo (nuevo formato)
     formatting: {
       uppercase: (value) => value.toUpperCase(),
       lowercase: (value) => value.toLowerCase(),
@@ -76,17 +80,17 @@ i18n
       }
     },
     
-    // Configuración de desarrollo
+    // ConfiguraciÃƒÆ’Ã‚Â³n de desarrollo
     debug: process.env.NODE_ENV === 'development',
     
-    // Configuración de carga
-    load: 'languageOnly', // Solo cargar idioma, no región (es en lugar de es-ES)
+    // ConfiguraciÃƒÆ’Ã‚Â³n de carga
+    load: 'languageOnly', // Solo cargar idioma, no regiÃƒÆ’Ã‚Â³n (es en lugar de es-ES)
     
-    // Configuración de pluralización
+    // ConfiguraciÃƒÆ’Ã‚Â³n de pluralizaciÃƒÆ’Ã‚Â³n
     pluralSeparator: '_',
     contextSeparator: '_',
     
-    // Configuración de React
+    // ConfiguraciÃƒÆ’Ã‚Â³n de React
     react: {
       useSuspense: false, // Evitar suspense para mejor UX
       bindI18n: 'languageChanged',
@@ -97,17 +101,17 @@ i18n
     }
   });
 
-// Función para cambiar idioma
+// FunciÃƒÆ’Ã‚Â³n para cambiar idioma
 export const changeLanguage = (lng) => {
   return i18n.changeLanguage(lng);
 };
 
-// Función para obtener idioma actual
+// FunciÃƒÆ’Ã‚Â³n para obtener idioma actual
 export const getCurrentLanguage = () => {
   return i18n.language || 'es';
 };
 
-// Función para obtener idiomas disponibles
+// FunciÃƒÆ’Ã‚Â³n para obtener idiomas disponibles
 export const getAvailableLanguages = () => {
   return [
     { code: 'es', name: 'Español', flag: '🇪🇸' },
@@ -116,13 +120,13 @@ export const getAvailableLanguages = () => {
   ];
 };
 
-// Función para formatear fechas según el idioma
+// FunciÃƒÆ’Ã‚Â³n para formatear fechas segÃƒÆ’Ã‚Âºn el idioma
 export const formatDate = (date, options = {}) => {
   const lng = getCurrentLanguage();
   return new Intl.DateTimeFormat(lng, options).format(new Date(date));
 };
 
-// Función para formatear moneda según el idioma
+// FunciÃƒÆ’Ã‚Â³n para formatear moneda segÃƒÆ’Ã‚Âºn el idioma
 export const formatCurrency = (amount, currency = 'EUR') => {
   const lng = getCurrentLanguage();
   return new Intl.NumberFormat(lng, {
@@ -131,7 +135,7 @@ export const formatCurrency = (amount, currency = 'EUR') => {
   }).format(amount);
 };
 
-// Función para formatear números según el idioma
+// FunciÃƒÆ’Ã‚Â³n para formatear nÃƒÆ’Ã‚Âºmeros segÃƒÆ’Ã‚Âºn el idioma
 export const formatNumber = (number) => {
   const lng = getCurrentLanguage();
   return new Intl.NumberFormat(lng).format(number);
