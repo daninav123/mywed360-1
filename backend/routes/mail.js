@@ -58,20 +58,40 @@ router.get('/', requireMailAccess, async (req, res) => {
   try {
     const { folder = 'inbox' } = req.query;
     const userRaw = req.query.user;
-    const user = userRaw ? String(userRaw).trim() : undefined;
-    const userNorm = user ? user.toLowerCase() : undefined;
+    let user = userRaw ? String(userRaw).trim() : undefined;
+    let userNorm = user ? user.toLowerCase() : undefined;
 
     // Seguridad: si se solicita un usuario distinto al propio y no se tiene rol elevado
     try {
       const profile = req.userProfile || {};
       const role = String(profile.role || '').toLowerCase();
-      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      let myAlias = String(profile.myWed360Email || '').toLowerCase();
       const myLogin = String(profile.email || '').toLowerCase();
       const isPrivileged = role === 'admin' || role === 'planner';
-      if (userNorm && !isPrivileged) {
-        const matches = userNorm === myAlias || userNorm === myLogin;
-        if (!matches) {
-          return res.status(403).json({ success: false, error: 'forbidden_user_scope' });
+      if (!isPrivileged) {
+        // Aceptar variantes de alias legacy (sin .com) y normalizadas
+        const legacyAlias = myAlias.replace(/@mywed360\.com$/i, '@mywed360');
+        // Si no tena alias, derivarlo del login (4 primeras letras)
+        if (!myAlias && myLogin) {
+          try {
+            const prefix = myLogin.split('@')[0].slice(0, 4).toLowerCase();
+            if (prefix) myAlias = `${prefix}@mywed360.com`;
+          } catch {}
+        }
+        const matches = (
+          userNorm === myAlias ||
+          userNorm === myLogin ||
+          userNorm === legacyAlias
+        );
+        // Si el cliente solicita un usuario distinto, forzar el propio en lugar de 403
+        if (userNorm && !matches) {
+          userNorm = myAlias || myLogin || undefined;
+          user = userNorm;
+        }
+        // Si no llega user, por defecto usar el propio para evitar fugas de datos
+        if (!userNorm) {
+          userNorm = myAlias || myLogin || undefined;
+          user = userNorm;
         }
       }
     } catch (_) {}
@@ -1004,8 +1024,8 @@ router.get('/page', requireMailAccess, async (req, res) => {
   try {
     const { folder = 'inbox', limit: rawLimit, cursor: rawCursor } = req.query;
     const userRaw = req.query.user;
-    const user = userRaw ? String(userRaw).trim() : undefined;
-    const userNorm = user ? user.toLowerCase() : undefined;
+    let user = userRaw ? String(userRaw).trim() : undefined;
+    let userNorm = user ? user.toLowerCase() : undefined;
     const lim = Math.max(1, Math.min(parseInt(rawLimit, 10) || 50, 100));
     const after = rawCursor ? new Date(String(rawCursor)) : null;
 
@@ -1013,13 +1033,29 @@ router.get('/page', requireMailAccess, async (req, res) => {
     try {
       const profile = req.userProfile || {};
       const role = String(profile.role || '').toLowerCase();
-      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      let myAlias = String(profile.myWed360Email || '').toLowerCase();
       const myLogin = String(profile.email || '').toLowerCase();
       const isPrivileged = role === 'admin' || role === 'planner';
-      if (userNorm && !isPrivileged) {
-        const matches = userNorm === myAlias || userNorm === myLogin;
-        if (!matches) {
-          return res.status(403).json({ success: false, error: 'forbidden_user_scope' });
+      if (!isPrivileged) {
+        const legacyAlias = myAlias.replace(/@mywed360\.com$/i, '@mywed360');
+        if (!myAlias && myLogin) {
+          try {
+            const prefix = myLogin.split('@')[0].slice(0, 4).toLowerCase();
+            if (prefix) myAlias = `${prefix}@mywed360.com`;
+          } catch {}
+        }
+        const matches = (
+          userNorm === myAlias ||
+          userNorm === myLogin ||
+          userNorm === legacyAlias
+        );
+        if (userNorm && !matches) {
+          userNorm = myAlias || myLogin || undefined;
+          user = userNorm;
+        }
+        if (!userNorm) {
+          userNorm = myAlias || myLogin || undefined;
+          user = userNorm;
         }
       }
     } catch (_) {}

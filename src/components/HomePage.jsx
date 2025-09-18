@@ -291,8 +291,8 @@ export default function HomePage() {
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {[
             { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'Aadir invitado', icon: Users },
-            { key: 'movimiento', label: 'Aadir movimiento', icon: DollarSign },
+            { key: 'invitado', label: 'Añadir invitado', icon: Users },
+            { key: 'movimiento', label: 'Añadir movimiento', icon: DollarSign },
             { key: 'nota', label: 'Nueva nota', icon: Plus },
           ].map((action, idx) => {
             const Icon = action.icon;
@@ -405,7 +405,7 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">Aadir Invitado</h2>
+            <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
             <div className="space-y-4">
               <Input 
                 label="Nombre" 

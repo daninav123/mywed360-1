@@ -8,8 +8,9 @@ let BACKEND_BACKOFF_UNTIL = 0;
 const backendAvailable = () => Date.now() > BACKEND_BACKOFF_UNTIL;
 const backoffBackend = (ms = 60_000) => { BACKEND_BACKOFF_UNTIL = Date.now() + ms; };
 
-// Usa variable de entorno Vite; si no existe, usa clave proporcionada explicitamente.
-const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || 'f7579ee601634944822b313e268a9357';
+// Preferimos el agregador backend (RSS) para variedad y fiabilidad.
+// Si se quiere forzar NewsAPI, definir VITE_NEWSAPI_KEY en build.
+const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || '';
 
 function normalizeLang(lang) {
   if (!lang) return 'es';
@@ -231,24 +232,22 @@ const scoreMatches = (text, patterns) =>
  */
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
   const lang = normalizeLang(language);
-  if (!API_KEY) {
-    // Fallback RSS proxy (backend) para evitar CORS
-    if (!backendAvailable()) return [];
-    const rssData = await fetchFromBackend({ page, pageSize, language: lang });
-    if (!Array.isArray(rssData) || !rssData.length) { backoffBackend(); return []; }
+  // Ruta principal: backend RSS aggregator
+  if (!backendAvailable()) return [];
+  const rssData = await fetchFromBackend({ page, pageSize, language: lang });
+  if (!Array.isArray(rssData) || !rssData.length) { backoffBackend(); return []; }
 
-    let posts = rssData;
-    if (lang && lang !== 'en') {
-      for (const p of posts) {
-        p.title = await translateText(p.title, lang, '');
-        p.description = await translateText(p.description, lang, '');
-      }
+  let posts = rssData;
+  if (lang && lang !== 'en') {
+    for (const p of posts) {
+      p.title = await translateText(p.title, lang, '');
+      p.description = await translateText(p.description, lang, '');
     }
-    return posts;
   }
-
-  // NewsAPI solo permite 100 resultados y rate-limit estricto.
-  // Para paginas >1 recurrimos al backend RSS proxy para continuar con variedad.
+  return posts;
+  // NewsAPI (opcional) — no usado por defecto
+  // Mantener el codigo para compatibilidad si en el futuro se habilita con API key.
+  /*
   if (page > 1) {
     if (!backendAvailable()) return [];
     const arr = await fetchFromBackend({ page, pageSize, language: lang });
@@ -352,5 +351,6 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   }
 
   return posts;
+  */
 }
 // Fin de archivo

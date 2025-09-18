@@ -22,12 +22,12 @@ export const Loader = ({
   };
 
   const colorClasses = {
-    primary: 'border-blue-500',
-    secondary: 'border-gray-300',
-    accent: 'border-pink-500',
-    success: 'border-green-500',
-    warning: 'border-yellow-500',
-    error: 'border-red-500'
+    primary: 'border-[var(--color-primary)]',
+    secondary: 'border-[color:var(--color-text)]/30',
+    accent: 'border-[var(--color-accent)]',
+    success: 'border-[var(--color-success)]',
+    warning: 'border-[var(--color-warning)]',
+    error: 'border-[var(--color-danger)]'
   };
 
   const classes = `

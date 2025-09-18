@@ -65,3 +65,65 @@ Esta guía define convenciones para código, UI y estructura, alineadas con las 
 ## Commits y PR
 - Conventional Commits: `feat:`, `fix:`, `chore:`, `docs:`, `test:`.
 - PR checklist: tests pasan, lint ok, i18n validado, UI accesible.
+
+## Sistema Visual Definitivo (Tokens + Utilidades)
+
+- Tokens CSS (definidos en `src/index.css`):
+  - `--color-bg`, `--color-surface`, `--color-text`
+  - `--color-primary`, `--color-accent`, `--color-success`, `--color-warning`, `--color-danger`, `--color-info`
+  - Derivados: `--color-border`, `--color-muted`, `--radius-md`
+- Modo oscuro controlado por clase (`dark`) con equivalentes de todos los tokens.
+- Utilidades semánticas para migración gradual (definidas en `@layer utilities` en `src/index.css`):
+  - Fondo: `bg-app`, `bg-surface`, `bg-primary`, `bg-accent`, `bg-success`, `bg-warning`, `bg-danger`, `bg-info`
+  - Texto: `text-body`, `text-muted`, `text-primary`, `text-accent`, `text-success`, `text-warning`, `text-danger`, `text-info`
+  - Bordes/Anillos: `border-soft`, `ring-primary`
+- Reglas base (`@layer base`) ya aplican tipografía, enlaces, inputs/select/textarea y foco con `--tw-ring-color: var(--color-primary)`.
+
+## Kit UI (reutilizable)
+
+- `Card` (`src/components/ui/Card.jsx`): contenedor estándar con `bg-[var(--color-surface)]`, borde suave y sombra.
+- `Button` (`src/components/ui/Button.jsx`): variantes `primary|secondary|outline|ghost|destructive|link`, tamaños `xs..xl`.
+- `Input` (`src/components/Input.jsx`): con etiqueta, error, y foco consistente.
+- `Modal` (`src/components/Modal.jsx`) actualizado: tokens, accesible y tamaños `sm|md|lg|xl|full`.
+- `Tabs` (`src/components/ui/Tabs.jsx`) actualizado: indicador inferior con `--color-primary` y texto inactivo atenuado.
+- `Loader` (`src/components/ui/Loader.jsx`) actualizado: colores por tokens.
+- Recomendado añadir (si se necesita en nuevas vistas): `EmptyState`, `Badge`, `Table` estilizados con tokens.
+
+## Estándares de Página
+
+- Envolver vistas con `MainLayout` (ya lo hace `App.jsx`) y usar `PageWrapper` para título/acciones.
+- Usar `Card` para secciones internas; no aplicar `bg-white` directo.
+- Títulos: `h1` con `.page-title` (definido en base) o `text-2xl font-semibold` + color desde tokens.
+- Formularios: `Input`/`Button` y `focus:ring-2` con `ring-primary` para consistencia.
+
+## Migración Gradual (aplicar al resto de páginas)
+
+1) Preferir utilidades semánticas sobre colores crudos:
+   - Reemplazar `bg-white` → `bg-surface`, `text-gray-700` → `text-body` o `text-muted`, `border-gray-200` → `border-soft`.
+   - Reemplazar `text-blue-500|border-blue-500` → `text-primary|border-[var(--color-primary)]`.
+2) Sustituir componentes ad-hoc por el kit UI:
+   - Modales manuales → `Modal`.
+   - Botones manuales → `Button` con `variant` adecuado.
+3) Para nuevas piezas, partir de Home/Tasks como referencia visual: tarjetas translúcidas, uso de `var(--color-*)`, `backdrop-blur-md` cuando aplique.
+4) Accesibilidad: mantener foco visible, `aria-*` en modales y tabs.
+
+Checklist rápida por vista:
+- [ ] Usa tokens (no colores hardcodeados).
+- [ ] Encapsula secciones en `Card`.
+- [ ] Inputs con foco consistente y etiquetas.
+- [ ] Acciones principales a la derecha del título (`PageWrapper`).
+- [ ] Modo oscuro revisado (clase `dark`).
+
+## Títulos de Página
+- Ubicación: siempre en la parte superior izquierda del contenido, fuera de los cards.
+- Tamaño: referencia Tasks → `text-2xl` con `font-semibold` y `mb-6` (ver `h1, .page-title` en `src/index.css`).
+- Contenedor: usar `PageWrapper` que ya renderiza una cabecera estándar (`.page-header`) con acciones a la derecha.
+- Excepción: Home tiene composición propia; no usar `.page-title` ahí si se requiere un estilo especial.
+
+## Pestañas (Tabs) de Página
+- Estilo base inspirado en Proveedores (borde inferior y realce de la activa):
+  - Contenedor: `.tabs-nav`
+  - Botón: `.tab-trigger` y activa `.tab-trigger-active`
+- Componente listo: `src/components/ui/PageTabs.jsx`
+  - Props: `value`, `onChange`, `options: [{ id, label }]`
+  - Usa tokens (`var(--color-primary)`, `border-soft`) para consistencia claro/oscuro.

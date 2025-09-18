@@ -1,6 +1,7 @@
 ﻿﻿﻿import express from 'express';
 import LRU from 'lru-cache';
 import Parser from 'rss-parser';
+import axios from 'axios';
 
 // Ruta que recupera titulares del sector nupcial desde varios feeds RSS.
 // Se usa en el frontend Blog cuando no hay NEWSAPI_KEY.
@@ -29,8 +30,12 @@ const RSS_FEEDS = {
     'https://luciasecasa.com/feed/',
     'https://www.zankyou.es/feed/',
     'https://luciasecasa.com/feed/vestidos-de-novia',
-    'https://www.zankyou.it/feed/',
-    'https://news.google.com/rss/search?q=boda%20OR%20novias%20vestidos&hl=es-ES&gl=ES&ceid=ES:es',
+    // Google News en español con distintas consultas para diversidad de fuentes
+    'https://news.google.com/rss/search?q=boda%20OR%20bodas%20OR%20novias%20vestidos&hl=es-ES&gl=ES&ceid=ES:es',
+    'https://news.google.com/rss/search?q=wedding%20planner%20OR%20organizador%20de%20bodas&hl=es-ES&gl=ES&ceid=ES:es',
+    'https://news.google.com/rss/search?q=decoraci%C3%B3n%20boda%20OR%20banquete%20de%20boda&hl=es-ES&gl=ES&ceid=ES:es',
+    'https://news.google.com/rss/search?q=vestido%20de%20novia%20OR%20peinado%20novia&hl=es-ES&gl=ES&ceid=ES:es',
+    'https://news.google.com/rss/search?q=fotograf%C3%ADa%20de%20boda%20OR%20vide%C3%B3grafo%20boda&hl=es-ES&gl=ES&ceid=ES:es',
   ],
   en: [
     'https://rss.nytimes.com/services/xml/rss/nyt/Weddings.xml',
@@ -38,6 +43,19 @@ const RSS_FEEDS = {
     'https://weddinginspiration.co/feed/',
   ],
 };
+
+// Resolver imagen OG/Twitter si falta en un item
+async function resolveOgImage(pageUrl) {
+  try {
+    const res = await axios.get(pageUrl, { timeout: 5000, responseType: 'text' });
+    const html = String(res.data || '');
+    const og = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i);
+    if (og && og[1]) return og[1];
+    const tw = html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i);
+    if (tw && tw[1]) return tw[1];
+  } catch {}
+  return null;
+}
 
 // Conversión genérica de elementos RSS a esquema del frontend
 function mapItems(feed, feedUrl) {
@@ -169,16 +187,46 @@ router.get('/', async (req, res) => {
     const perSourceLimit = 1;
     const counts = new Map();
     const pageItems = [];
-    for (const p of slice) {
-      const k = p.source || "unknown";
+    const take = (item) => {
+      const k = item.source || "unknown";
       const c = counts.get(k) || 0;
-      if (c >= perSourceLimit) continue;
+      if (c >= perSourceLimit) return false;
       counts.set(k, c + 1);
-      pageItems.push(p);
+      pageItems.push(item);
+      return true;
+    };
+    // Primer pase: dentro del slice
+    for (const p of slice) {
       if (pageItems.length >= pageSize) break;
+      take(p);
+    }
+    // Relleno hacia delante si faltan elementos por ldmites de fuente
+    if (pageItems.length < pageSize && end < allPosts.length) {
+      for (let i = end; i < allPosts.length && pageItems.length < pageSize; i++) {
+        take(allPosts[i]);
+      }
+    }
+    // Relleno hacia atrds como altimo recurso (evitar paginas escuetas)
+    if (pageItems.length < pageSize && start > 0) {
+      for (let i = start - 1; i >= 0 && pageItems.length < pageSize; i--) {
+        take(allPosts[i]);
+      }
     }
 
-    res.status(200).json(pageItems);
+    // Completar imagen de portada cuando falte
+    const withImages = [];
+    for (const item of pageItems) {
+      let img = item.image;
+      if (!(typeof img === 'string' && /^https?:\/\//i.test(img)) && item.url) {
+        try {
+          const found = await resolveOgImage(item.url);
+          if (found && /^https?:\/\//i.test(found)) img = found;
+        } catch {}
+      }
+      withImages.push({ ...item, image: img || item.image || null });
+    }
+
+    res.status(200).json(withImages);
   } catch (err) {
     console.error('wedding-news error', err?.message || err);
     // Degradar con 200 y lista vacia para evitar bucles de errores en el frontend

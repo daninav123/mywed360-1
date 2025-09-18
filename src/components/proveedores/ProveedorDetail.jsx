@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProveedorBudgets from "./ProveedorBudgets.jsx";
 import {
@@ -268,9 +268,7 @@ const ProveedorDetail = ({
                       <Button
                         onClick={async () => {
                           if (removing) return;
-                          const ok = window.confirm(
-                            "Â¿Quitar este proveedor del grupo?",
-                          );
+                          const ok = window.confirm('¿Quitar este proveedor del grupo?');
                           if (!ok) return;
                           try {
                             setRemoving(true);
@@ -646,3 +644,5 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
+
+

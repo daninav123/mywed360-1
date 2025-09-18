@@ -243,7 +243,7 @@ export default function Tasks() {
     return () => { isMounted = false; };
   }, [activeWedding, clientAuth?.currentUser, tasksState, meetingsState]);
 
-  // Crear/actualizar automaticamente la cita del dia de la boda en el calendario (solo meetings)
+  // Crear/actualizar automaticamente la cita del Día de la boda en el calendario (solo meetings)
   useEffect(() => {
     if (!activeWedding) return;
     if (!projectEnd) return; // necesitamos fecha de boda
@@ -264,7 +264,7 @@ export default function Tasks() {
       const end = new Date(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate(), 23, 59, 0);
       const payload = {
         id: 'wedding-day',
-        title: 'Dia de la boda',
+        title: 'Día de la boda',
         desc: 'Evento principal',
         start,
         end,
@@ -280,7 +280,7 @@ export default function Tasks() {
         addMeetingFS(payload).catch(() => {});
       }
     } catch (e) {
-      console.warn('No se pudo crear el evento automatico del dia de la boda:', e?.message || e);
+      console.warn('No se pudo crear el evento automatico del Día de la boda:', e?.message || e);
     }
   }, [activeWedding, projectEnd, meetingsState]);
   // Ocultar completamente la lista izquierda del Gantt
@@ -1242,7 +1242,7 @@ export default function Tasks() {
               className={`px-3 py-1 rounded ${currentView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
               onClick={() => setCurrentView('day')}
             >
-              DÃƒÂ­a
+              Día
             </button>
           </div>
           <div className="flex items-center space-x-2">
@@ -1471,6 +1471,7 @@ export default function Tasks() {
                 popup={true}
                 eventPropGetter={eventStyleGetter}
                 components={{ event: Event }}
+                culture="es"
                 onDoubleClickEvent={(event) => {
                   setEditingId(event.id);
                   setFormData({
@@ -1488,10 +1489,10 @@ export default function Tasks() {
                 messages={{
                   next: "Siguiente",
                   previous: "Anterior",
-                  today: "Hoy",
+                  today: "Día",
                   month: "Mes",
                   week: "Semana",
-                  day: "DÃƒÂ­a"
+                  day: "Día"
                 }}
               />
             </div>
@@ -1617,6 +1618,7 @@ export default function Tasks() {
               popup={true}
               eventPropGetter={eventStyleGetter}
               components={{ event: Event }}
+              culture="es"
               onDoubleClickEvent={(event) => {
                 setEditingId(event.id);
                 setFormData({
@@ -1634,10 +1636,10 @@ export default function Tasks() {
               messages={{
                 next: "Siguiente",
                 previous: "Anterior",
-                today: "Hoy",
+                today: "Día",
                 month: "Mes",
                 week: "Semana",
-                day: "DÃƒÂ­a"
+                day: "Día"
               }}
             />
           </div>
@@ -1683,6 +1685,9 @@ export default function Tasks() {
      </div>
    );
 }
+
+
+
 
 
 

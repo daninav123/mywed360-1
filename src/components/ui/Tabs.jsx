@@ -54,7 +54,11 @@ export function TabsTrigger({ value, children, className = '' }) {
       role="tab"
       aria-selected={isActive}
       aria-controls={panelId}
-      className={`${className} ${isActive ? 'font-bold border-b-2 border-blue-500' : 'text-gray-600'}`}
+      className={`${className} px-3 py-2 transition-colors ${
+        isActive
+          ? 'font-semibold text-[var(--color-primary)] border-b-2 border-[var(--color-primary)]'
+          : 'text-[color:var(--color-text)]/60 hover:text-[color:var(--color-text)]'
+      } focus:outline-none focus:ring-2 ring-primary rounded-t`}
       onClick={() => setValue(value)}
     >
       {children}

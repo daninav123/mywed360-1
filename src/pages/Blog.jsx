@@ -140,8 +140,9 @@ export default function Blog() {
 
 const ArticleCard = React.forwardRef(({ post }, ref) => {
   const base = getBackendBase();
+  const isHttpUrl = typeof post.image === 'string' && /^https?:\/\//i.test(post.image);
   const imgSrc = post.image
-    ? (base ? `${base}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image)
+    ? (base && isHttpUrl ? `${base}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image)
     : null;
   return (
     <div ref={ref} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition">

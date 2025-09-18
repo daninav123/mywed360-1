@@ -137,6 +137,7 @@ export const GanttChart = ({
   const movingGroupRef = useRef(null);
 
   const [verticalNode, setVerticalNode] = useState(null);
+  const autoCenteredRef = useRef(false);
   useEffect(() => {
     const root = wrapperRef.current;
     if (!root) {
@@ -345,6 +346,37 @@ export const GanttChart = ({
     } catch {}
   }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
 
+  // Centrar automáticamente (una sola vez) el hito de la boda para que sea visible al cargar
+  useEffect(() => {
+    try {
+      if (autoCenteredRef?.current) return; // solo la primera vez
+      if (viewMode !== ViewMode.Month) return;
+      const s = scrollerRef.current;
+      const root = wrapperRef.current;
+      if (!s || !root) return;
+      const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
+      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      if (!markerOk || !endOk) return;
+      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
+        ? gridStartDate
+        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      if (!base) return;
+      const colW = Math.max(8, Number(columnWidth) || 65);
+      const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
+      const monthsDiff = (markerDate.getFullYear() - gridStart.getFullYear()) * 12 + (markerDate.getMonth() - gridStart.getMonth());
+      const daysInMonth = new Date(markerDate.getFullYear(), markerDate.getMonth() + 1, 0).getDate();
+      const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
+      const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
+      const markerLeft = Math.max(0, (monthsDiff + frac) * colW);
+      const targetLeft = Math.max(0, markerLeft - (s.clientWidth * 0.35));
+      if (Math.abs((s.scrollLeft || 0) - targetLeft) > 2) {
+        s.scrollTo({ left: targetLeft, behavior: 'auto' });
+        try { if (debugEnabled) dbg('Auto-centering to marker', { targetLeft, markerLeft, clientW: s.clientWidth, scrollW: s.scrollWidth }); } catch {}
+      }
+      if (autoCenteredRef) autoCenteredRef.current = true;
+    } catch {}
+  }, [scrollerNode, markerDate, viewMode, columnWidth, gridStartDate, gridEndDate, cleanTasks.length]);
+
   // Calcular offset horizontal en px para el marcador (modo Month fiable)
   let markerLeftPx = null;
   let markerViewportLeftPx = null; // posiciÃ³n dentro del wrapper (tras restar scroll)
@@ -368,7 +400,8 @@ export const GanttChart = ({
           const s = scrollerRef.current;
           if (wrapperRef.current) {
             const sl = (s?.scrollLeft || containerScrollLeft || 0);
-            markerViewportLeftPx = Math.max(0, markerLeftPx - sl);
+            const tx = contentOffsetX || 0;
+            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx);
             if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
               base,
               gridStart: gridStart.toISOString(),
@@ -380,6 +413,7 @@ export const GanttChart = ({
               frac,
               markerLeftPx,
               scrollLeft: sl,
+              contentTX: tx,
               markerViewportLeftPx,
               wrapperW: wrapperRef.current?.clientWidth,
               scrollerW: s?.clientWidth,
@@ -454,6 +488,7 @@ export const GanttChart = ({
     </LocalErrorBoundary>
   );
 };
+
 
 
 

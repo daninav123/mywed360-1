@@ -193,22 +193,24 @@ const verifyFirebaseToken = async (token) => {
  * @param {string} uid - ID del usuario
  * @returns {Promise<Object>} - Perfil del usuario
  */
-const getUserProfile = async (uid) => {
+const getUserProfile = async (uid, emailHint = '') => {
   try {
     const userDoc = await admin.firestore().collection('users').doc(uid).get();
-    
-    if (!userDoc.exists) {
-      return {
-        uid,
-        role: 'particular',
-        preferences: {}
-      };
+    const baseProfile = userDoc.exists
+      ? { uid, ...userDoc.data() }
+      : { uid, role: 'particular', preferences: {} };
+
+    // Asegurar campos esenciales derivados del token cuando falten en Firestore
+    const email = String(baseProfile.email || emailHint || '').toLowerCase();
+    let myWed360Email = String(baseProfile.myWed360Email || '').toLowerCase();
+    if (!myWed360Email && email) {
+      try {
+        const loginPrefix = email.split('@')[0].slice(0, 4).toLowerCase();
+        if (loginPrefix) myWed360Email = `${loginPrefix}@mywed360.com`;
+      } catch {}
     }
-    
-    return {
-      uid,
-      ...userDoc.data()
-    };
+
+    return { ...baseProfile, email, myWed360Email };
   } catch (error) {
     console.error('[AuthMiddleware] Error obteniendo perfil:', error);
     return {
@@ -267,7 +269,7 @@ const authMiddleware = (options = {}) => {
         }
         
         // Obtener perfil completo del usuario
-        const userProfile = await getUserProfile(tokenResult.user.uid);
+        const userProfile = await getUserProfile(tokenResult.user.uid, tokenResult.user.email || '');
         
         // Añadir información del usuario al request
         req.user = tokenResult.user;
