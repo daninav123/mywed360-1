@@ -12,7 +12,8 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Tasks from './pages/Tasks';
 import Bodas from './pages/Bodas';
-import BodaDetalle from './pages/BodaDetalle';
+// Nota: especificamos la extensión .jsx para asegurar la resolución en entornos Linux/CI
+import BodaDetalle from './pages/BodaDetalle.jsx';
 import Finance from './pages/Finance';
 import BankConnect from './pages/BankConnect.jsx';
 import More from './pages/More';
