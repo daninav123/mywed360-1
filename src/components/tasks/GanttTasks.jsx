@@ -218,8 +218,11 @@ export const GanttChart = ({
       const svgs = root.querySelectorAll('svg g');
       let best = null;
       for (const g of svgs) {
-        const tr = g.getAttribute && g.getAttribute('transform');
-        if (tr && /translate\(/.test(tr)) {
+        const attr = g.getAttribute && g.getAttribute('transform');
+        const css = (typeof window !== 'undefined' && window.getComputedStyle)
+          ? window.getComputedStyle(g).transform
+          : '';
+        if ((attr && /translate|matrix/i.test(attr)) || (css && css !== 'none')) {
           best = g; break;
         }
       }
@@ -228,8 +231,17 @@ export const GanttChart = ({
 
     const parseTX = (tr) => {
       try {
-        const m = tr.match(/translate\(([-0-9\.]+)[ ,]/);
-        return m ? parseFloat(m[1]) : 0;
+        if (!tr) return 0;
+        // translate3d(x, y, z)
+        let m = tr.match(/translate3d\(([-0-9\.]+)[ ,]/i);
+        if (m) return parseFloat(m[1]);
+        // translate(x[, y])
+        m = tr.match(/translate\(([-0-9\.]+)[ ,]/i);
+        if (m) return parseFloat(m[1]);
+        // matrix(a,b,c,d,e,f) => e = translateX
+        m = tr.match(/matrix\(([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+)\)/i);
+        if (m) return parseFloat(m[5]);
+        return 0;
       } catch { return 0; }
     };
 
@@ -237,18 +249,18 @@ export const GanttChart = ({
     if (!g) return;
     movingGroupRef.current = g;
     // Inicial
-    const tr0 = g.getAttribute('transform') || '';
+    const tr0 = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
     setContentOffsetX(-parseTX(tr0));
 
     const obs = new MutationObserver((records) => {
       for (const r of records) {
-        if (r.type === 'attributes' && r.attributeName === 'transform') {
-          const tr = g.getAttribute('transform') || '';
+        if (r.type === 'attributes') {
+          const tr = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
           setContentOffsetX(-parseTX(tr));
         }
       }
     });
-    obs.observe(g, { attributes: true, attributeFilter: ['transform'] });
+    obs.observe(g, { attributes: true });
     return () => obs.disconnect();
   }, [viewMode, columnWidth, cleanTasks.length]);
 
@@ -264,9 +276,8 @@ export const GanttChart = ({
         }
         const g = movingGroupRef.current;
         if (g) {
-          const tr = g.getAttribute('transform') || '';
-          const m = tr.match(/translate\(([-0-9\.]+)[ ,]/);
-          const tx = m ? -parseFloat(m[1]) : 0;
+          const tr = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
+          const tx = -parseTX(tr);
           if (tx !== contentOffsetX) setContentOffsetX(tx);
         }
       } catch {}
@@ -470,17 +481,17 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && createPortal(
+        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && (
           <div
             data-testid="wedding-marker"
             title="Dia de la boda"
             style={{
-              position: 'fixed',
-              top: (wrapperRef.current?.getBoundingClientRect?.().top ?? 0),
-              left: Math.max(0, (wrapperRef.current?.getBoundingClientRect?.().left ?? 0) + markerViewportLeftPx),
+              position: 'absolute',
+              top: 0,
+              left: Math.max(0, markerViewportLeftPx),
               height: (wrapperRef.current ? (wrapperRef.current.clientHeight || '100%') : '100%'),
               pointerEvents: 'none',
-              zIndex: 9999
+              zIndex: 3
             }}
           >
             {/* Poste vertical */}
@@ -504,8 +515,8 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>, (typeof document !== 'undefined' ? document.body : wrapperRef.current))
-        }
+          </div>
+        )}
       </div>
     </LocalErrorBoundary>
   );
