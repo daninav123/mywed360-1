@@ -11,7 +11,9 @@
     "desc": "Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.",
     "button": "Conectar banco"
   },
-  "alerts": { "budget": "Alertas de Presupuesto" },
+  "alerts": {
+    "budget": "Alertas de Presupuesto"
+  },
   "overview": {
     "title": "Gestión Financiera",
     "subtitle": "Control completo de presupuesto y gastos de tu boda",
@@ -158,13 +160,22 @@
     "mostEfficient": "Más Eficiente",
     "noData": "No hay datos suficientes",
     "currentTrend": "Tendencia Actual",
-    "trend": { "positive": "Positiva", "negative": "Negativa" },
+    "trend": {
+      "positive": "Positiva",
+      "negative": "Negativa"
+    },
     "balanceLabel": "Balance:"
   },
   "bank": {
     "title": "Vincular cuenta bancaria",
     "country": "País",
-    "countries": { "es": "España", "fr": "Francia", "de": "Alemania", "it": "Italia", "pt": "Portugal" },
+    "countries": {
+      "es": "España",
+      "fr": "Francia",
+      "de": "Alemania",
+      "it": "Italia",
+      "pt": "Portugal"
+    },
     "bankLabel": "Banco",
     "selectBank": "Selecciona un banco",
     "selectBankPlaceholder": "Selecciona un banco…",
@@ -202,7 +213,10 @@
     "createFirst": "Crear primera categoría",
     "category": "categoría",
     "overallProgress": "Progreso del presupuesto",
-    "thresholds": { "warn": "Aviso (en riesgo) %", "danger": "Crítico (exceso) %" },
+    "thresholds": {
+      "warn": "Aviso (en riesgo) %",
+      "danger": "Crítico (exceso) %"
+    },
     "modal": {
       "editTitle": "Editar categoría",
       "newTitle": "Nueva categoría",

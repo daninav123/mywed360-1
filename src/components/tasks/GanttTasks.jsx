@@ -258,7 +258,7 @@ export const GanttChart = ({
       try {
         const s = scrollerRef.current;
         if (s) {
-          const sl = s.scrollLeft || 0;
+          const sl = (s?.scrollLeft || containerScrollLeft || 0);
           if (sl !== scrollLeft) setScrollLeft(sl);
         }
         const g = movingGroupRef.current;
@@ -366,8 +366,8 @@ export const GanttChart = ({
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
           // Convertir a coordenadas del wrapper restando el scroll actual (con fallback)
           const s = scrollerRef.current;
-          if (s && wrapperRef.current) {
-            const sl = s.scrollLeft || 0;
+          if (wrapperRef.current) {
+            const sl = (s?.scrollLeft || containerScrollLeft || 0);
             markerViewportLeftPx = Math.max(0, markerLeftPx - sl);
             if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
               base,
