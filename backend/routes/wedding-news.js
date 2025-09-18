@@ -49,16 +49,27 @@ async function resolveOgImage(pageUrl) {
   try {
     const res = await axios.get(pageUrl, { timeout: 5000, responseType: 'text' });
     const html = String(res.data || '');
-    const og = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i);
-    if (og && og[1]) return og[1];
-    const tw = html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i);
-    if (tw && tw[1]) return tw[1];
+    const patterns = [
+      /<meta\s+property=["']og:image:secure_url["']\s+content=["']([^"']+)["'][^>]*>/i,
+      /<meta\s+property=["']og:image["']\s+content=["']([^"']+)["'][^>]*>/i,
+      /<meta\s+name=["']twitter:image:src["']\s+content=["']([^"']+)["'][^>]*>/i,
+      /<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["'][^>]*>/i,
+    ];
+    for (const re of patterns) {
+      const m = html.match(re);
+      if (m && m[1]) {
+        try { return new URL(m[1], pageUrl).toString(); } catch {}
+      }
+    }
   } catch {}
   return null;
 }
 
 // Conversión genérica de elementos RSS a esquema del frontend
 function mapItems(feed, feedUrl) {
+  let feedHost = '';
+  try { feedHost = new URL(feedUrl).hostname.replace('www.', ''); } catch {}
+  const fromGoogleNews = /news\.google\.com$/i.test(feedHost);
   return (feed.items || []).map((it) => {
     let link = it.link || '';
     try {
@@ -74,6 +85,20 @@ function mapItems(feed, feedUrl) {
     } catch {
       try { sourceHost = new URL(feedUrl).hostname.replace('www.', ''); } catch { sourceHost = 'unknown'; }
     }
+    // Resolver imagen del item (absoluta si es relativa)
+    let rawImage = (
+      it.enclosure?.url ||
+      it['media:content']?.url ||
+      it['media:thumbnail']?.url ||
+      (it['media:group']?.['media:content']?.url) ||
+      (Array.isArray(it.enclosure) && it.enclosure[0]?.url) ||
+      null
+    );
+    let absImage = null;
+    if (rawImage && typeof rawImage === 'string') {
+      try { absImage = new URL(rawImage, link || feedUrl).toString(); } catch {}
+    }
+
     return {
       id: it.guid || it.id || it.link,
       title: it.title || '',
@@ -83,15 +108,10 @@ function mapItems(feed, feedUrl) {
         it.content ||
         (typeof it.description === 'string' ? it.description.replace(/<[^>]+>/g, '') : ''),
       url: link,
-      image:
-        it.enclosure?.url ||
-        it['media:content']?.url ||
-        it['media:thumbnail']?.url ||
-        (it['media:group']?.['media:content']?.url) ||
-        (Array.isArray(it.enclosure) && it.enclosure[0]?.url) ||
-        null,
+      image: absImage,
       source: sourceHost,
       published: it.isoDate || it.pubDate || new Date().toISOString(),
+      feedSource: fromGoogleNews ? 'google-news' : feedHost || 'feed',
     };
   });
 }
@@ -184,10 +204,16 @@ router.get('/', async (req, res) => {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const slice = start < allPosts.length ? allPosts.slice(start, end) : [];
-    const perSourceLimit = 1;
+    // Permitir maximo 2 items por fuente para mayor densidad inicial
+    const perSourceLimit = 2;
     const counts = new Map();
     const pageItems = [];
     const take = (item) => {
+      // Para ítems que provienen de Google News, no aplicar el límite por fuente
+      if (item && item.feedSource === 'google-news') {
+        pageItems.push(item);
+        return true;
+      }
       const k = item.source || "unknown";
       const c = counts.get(k) || 0;
       if (c >= perSourceLimit) return false;
@@ -223,6 +249,8 @@ router.get('/', async (req, res) => {
           if (found && /^https?:\/\//i.test(found)) img = found;
         } catch {}
       }
+      // Asegurar absoluta si es relativa
+      try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, item.url).toString(); } catch {}
       withImages.push({ ...item, image: img || item.image || null });
     }
 

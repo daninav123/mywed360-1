@@ -7,6 +7,9 @@ import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
 import { useAuth } from '../hooks/useAuth';
 import { useWedding } from '../context/WeddingContext';
+import PageWrapper from '../components/PageWrapper';
+import Button from '../components/ui/Button';
+import PageTabs from '../components/ui/PageTabs';
 
 
 export default function Bodas() {
@@ -111,34 +114,24 @@ export default function Bodas() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Mis Bodas</h1>
-        {userProfile?.role === 'planner' && (
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded shadow"
-          >
-            + Crear nueva boda
-          </button>
-        )}
-      </div>
+    <PageWrapper
+      title="Mis Bodas"
+      actions={userProfile?.role === 'planner' ? (
+        <Button size="sm" onClick={() => setShowCreateModal(true)}>+ Crear nueva boda</Button>
+      ) : null}
+      className="max-w-7xl mx-auto"
+    >
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => setTab('active')}
-          className={`px-4 py-1 rounded font-medium ${tab==='active' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Bodas activas
-        </button>
-        <button
-          onClick={() => setTab('past')}
-          className={`px-4 py-1 rounded font-medium ${tab==='past' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Bodas pasadas
-        </button>
-      </div>
+      <PageTabs
+        value={tab}
+        onChange={setTab}
+        options={[
+          { id: 'active', label: 'Bodas activas' },
+          { id: 'past', label: 'Bodas pasadas' },
+        ]}
+        className="mb-4"
+      />
 
       {weddingsToShow.length === 0 ? (
         <p>No tienes bodas asignadas todavía.</p>
@@ -154,8 +147,8 @@ export default function Bodas() {
               }}
             >
               <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-gray-800">{wed.name}</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="text-lg font-semibold text-[color:var(--color-text)]">{wed.name}</h2>
+                <p className="text-sm text-muted">
                   {wed.date} · {wed.location}
                 </p>
               </div>
@@ -171,11 +164,11 @@ export default function Bodas() {
           ))}
         </div>
       )}
-          <WeddingFormModal
+      <WeddingFormModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSave={crearBoda}
       />
-    </div>
+    </PageWrapper>
   );
 }

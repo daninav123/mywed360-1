@@ -259,7 +259,7 @@ export const GanttChart = ({
       try {
         const s = scrollerRef.current;
         if (s) {
-          const sl = (s?.scrollLeft || containerScrollLeft || 0);
+          const sl = (s?.scrollLeft ?? containerScrollLeft ?? 0);
           if (sl !== scrollLeft) setScrollLeft(sl);
         }
         const g = movingGroupRef.current;
@@ -346,7 +346,7 @@ export const GanttChart = ({
     } catch {}
   }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
 
-  // Centrar automáticamente (una sola vez) el hito de la boda para que sea visible al cargar
+  // Desplazar (una vez) al mes actual para que sea visible al cargar
   useEffect(() => {
     try {
       if (autoCenteredRef?.current) return; // solo la primera vez
@@ -354,28 +354,28 @@ export const GanttChart = ({
       const s = scrollerRef.current;
       const root = wrapperRef.current;
       if (!s || !root) return;
-      const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
       const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
-      if (!markerOk || !endOk) return;
+      if (!endOk) return;
       const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
         ? gridStartDate
         : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
       if (!base) return;
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
-      const monthsDiff = (markerDate.getFullYear() - gridStart.getFullYear()) * 12 + (markerDate.getMonth() - gridStart.getMonth());
-      const daysInMonth = new Date(markerDate.getFullYear(), markerDate.getMonth() + 1, 0).getDate();
-      const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
+      const today = new Date();
+      const monthsDiff = (today.getFullYear() - gridStart.getFullYear()) * 12 + (today.getMonth() - gridStart.getMonth());
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      const dayIndex = Math.max(0, Math.min(daysInMonth, today.getDate())) - 1;
       const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
-      const markerLeft = Math.max(0, (monthsDiff + frac) * colW);
-      const targetLeft = Math.max(0, markerLeft - (s.clientWidth * 0.35));
+      const todayLeft = Math.max(0, (monthsDiff + frac) * colW);
+      const targetLeft = Math.max(0, Math.min(todayLeft - (s.clientWidth * 0.35), Math.max(0, s.scrollWidth - s.clientWidth)));
       if (Math.abs((s.scrollLeft || 0) - targetLeft) > 2) {
         s.scrollTo({ left: targetLeft, behavior: 'auto' });
-        try { if (debugEnabled) dbg('Auto-centering to marker', { targetLeft, markerLeft, clientW: s.clientWidth, scrollW: s.scrollWidth }); } catch {}
+        try { if (debugEnabled) dbg('Auto-centering to current month', { targetLeft, todayLeft, clientW: s.clientWidth, scrollW: s.scrollWidth }); } catch {}
       }
       if (autoCenteredRef) autoCenteredRef.current = true;
     } catch {}
-  }, [scrollerNode, markerDate, viewMode, columnWidth, gridStartDate, gridEndDate, cleanTasks.length]);
+  }, [scrollerNode, viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
 
   // Calcular offset horizontal en px para el marcador (modo Month fiable)
   let markerLeftPx = null;
@@ -399,9 +399,22 @@ export const GanttChart = ({
           // Convertir a coordenadas del wrapper restando el scroll actual (con fallback)
           const s = scrollerRef.current;
           if (wrapperRef.current) {
-            const sl = (s?.scrollLeft || containerScrollLeft || 0);
+            // Usar el scroll horizontal detectado en cualquier descendiente si existe
+            // Preferimos el estado `scrollLeft` (capturado en bubbling/capture) y evitamos
+            // tratar 0 como falsy usando nullish coalescing para no perder el valor 0.
+            const sl = (scrollLeft ?? s?.scrollLeft ?? containerScrollLeft ?? 0);
             const tx = contentOffsetX || 0;
-            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx);
+            // Offset del grid respecto al wrapper (para contemplar panel de lista si existe)
+            let gridOffset = 0;
+            try {
+              const inner = s.querySelector('svg');
+              if (inner && wrapperRef.current?.getBoundingClientRect) {
+                const r = inner.getBoundingClientRect();
+                const wr = wrapperRef.current.getBoundingClientRect();
+                gridOffset = Math.max(0, Math.round(r.left - wr.left));
+              }
+            } catch {}
+            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx + gridOffset);
             if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
               base,
               gridStart: gridStart.toISOString(),
@@ -414,6 +427,7 @@ export const GanttChart = ({
               markerLeftPx,
               scrollLeft: sl,
               contentTX: tx,
+              gridOffset,
               markerViewportLeftPx,
               wrapperW: wrapperRef.current?.clientWidth,
               scrollerW: s?.clientWidth,
@@ -458,8 +472,16 @@ export const GanttChart = ({
         />
         {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && createPortal(
           <div
+            data-testid="wedding-marker"
             title="Dia de la boda"
-            style={{ position: 'absolute', top: 0, left: Math.max(0, markerViewportLeftPx), height: (wrapperRef.current ? ((wrapperRef.current.scrollHeight || wrapperRef.current.clientHeight) || '100%') : '100%'), pointerEvents: 'none', zIndex: 5000 }}
+            style={{
+              position: 'fixed',
+              top: (wrapperRef.current?.getBoundingClientRect?.().top ?? 0),
+              left: Math.max(0, (wrapperRef.current?.getBoundingClientRect?.().left ?? 0) + markerViewportLeftPx),
+              height: (wrapperRef.current ? (wrapperRef.current.clientHeight || '100%') : '100%'),
+              pointerEvents: 'none',
+              zIndex: 9999
+            }}
           >
             {/* Poste vertical */}
             <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
@@ -482,7 +504,7 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>, wrapperRef.current)
+          </div>, (typeof document !== 'undefined' ? document.body : wrapperRef.current))
         }
       </div>
     </LocalErrorBoundary>

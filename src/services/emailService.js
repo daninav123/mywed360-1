@@ -63,6 +63,21 @@ function resolveCurrentEmail() {
   }
 }
 
+// Direcciones propias normalizadas (alias @mywed360 y login real)
+function resolveMyAddresses() {
+  try {
+    const alias = (resolveCurrentEmail() || '').toLowerCase();
+    const login = (auth && auth.currentUser && auth.currentUser.email)
+      ? String(auth.currentUser.email).toLowerCase()
+      : '';
+    const set = new Set([alias, login].filter(Boolean));
+    if (alias.endsWith('@mywed360.com')) set.add(alias.replace(/@mywed360\.com$/i, '@mywed360'));
+    return Array.from(set);
+  } catch {
+    return [];
+  }
+}
+
 async function buildAuthHeaders(base = {}) {
   try {
     const user = auth && auth.currentUser;
@@ -81,7 +96,24 @@ export async function getMails(folder = 'inbox') {
     if (folder) qs.set('folder', folder);
     if (user) qs.set('user', (user||'').toLowerCase());
     const url = `${BASE}/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
-    const res = await fetch(url, { headers: await buildAuthHeaders() });
+    let res = await fetch(url, { headers: await buildAuthHeaders() });
+    // Fallback por 403: reintentar sin user y filtrar en cliente
+    if (res.status === 403) {
+      const qs2 = new URLSearchParams();
+      if (folder) qs2.set('folder', folder);
+      const url2 = `${BASE}/api/mail${qs2.toString() ? `?${qs2.toString()}` : ''}`;
+      res = await fetch(url2, { headers: await buildAuthHeaders() });
+      if (res.ok) {
+        const all = await res.json();
+        const myAddrs = resolveMyAddresses();
+        const filtered = (Array.isArray(all) ? all : []).filter(m => {
+          const to = String(m.to||'').toLowerCase();
+          const from = String(m.from||'').toLowerCase();
+          return folder === 'sent' ? myAddrs.includes(from) : myAddrs.includes(to);
+        });
+        try { return filtered.map(classifyMailClientSide); } catch { return filtered; }
+      }
+    }
     if (!res.ok) throw new Error(`getMails ${res.status}`);
     const list = await res.json();
     try {
@@ -108,12 +140,33 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
   if (cursor) qs.set('cursor', String(cursor));
   const url = `${BASE}/api/mail/page${qs.toString() ? `?${qs.toString()}` : ''}`;
   try {
-    const res = await fetch(url, { headers: await buildAuthHeaders() });
+    let res = await fetch(url, { headers: await buildAuthHeaders() });
     if (res.ok) {
       const json = await res.json();
       const items = Array.isArray(json?.items) ? json.items : [];
       const nextCursor = json?.nextCursor || null;
       try { return { items: items.map(classifyMailClientSide), nextCursor }; } catch { return { items, nextCursor }; }
+    }
+    // Fallback por 403: reintentar sin user y filtrar en cliente
+    if (res.status === 403) {
+      const qs2 = new URLSearchParams();
+      if (folder) qs2.set('folder', folder);
+      if (limit) qs2.set('limit', String(limit));
+      if (cursor) qs2.set('cursor', String(cursor));
+      const url2 = `${BASE}/api/mail/page${qs2.toString() ? `?${qs2.toString()}` : ''}`;
+      res = await fetch(url2, { headers: await buildAuthHeaders() });
+      if (res.ok) {
+        const json = await res.json();
+        const baseItems = Array.isArray(json?.items) ? json.items : [];
+        const myAddrs = resolveMyAddresses();
+        const filtered = baseItems.filter(m => {
+          const to = String(m.to||'').toLowerCase();
+          const from = String(m.from||'').toLowerCase();
+          return folder === 'sent' ? myAddrs.includes(from) : myAddrs.includes(to);
+        });
+        const nextCursor = json?.nextCursor || null;
+        try { return { items: filtered.map(classifyMailClientSide), nextCursor }; } catch { return { items: filtered, nextCursor }; }
+      }
     }
     // Fallback si el backend aún no expone /page (404/501)
     if (res.status === 404 || res.status === 501) {

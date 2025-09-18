@@ -29,7 +29,13 @@
     "pdfkit": "^0.17.1",
     "svg-to-pdfkit": "^0.1.8",
     "twilio": "^4.22.0",
-    "@myno_21/pinterest-scraper": "^1.0.4"
+    "@myno_21/pinterest-scraper": "^1.0.4",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.6.0",
+    "xlsx": "^0.18.5"
+  },
+  "optionalDependencies": {
+    "tesseract.js": "^5.0.5"
   },
   "devDependencies": {
     "concurrently": "^8.0.1",

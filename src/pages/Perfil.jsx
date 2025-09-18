@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import LanguageSelector from '../components/ui/LanguageSelector';
 import { Card, Button, Input } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
@@ -44,7 +44,7 @@ function Perfil() {
   const weddingId = activeWedding || userProfile?.weddingId || '';
   const { roles: collaborators, loading: rolesLoading, assignRole, removeRole } = useRoles(weddingId);
 
-  // Actualiza número de invitados (con muestra local si no hay datos)
+  // Actualiza nÃºmero de invitados (con muestra local si no hay datos)
   useEffect(() => {
     function updateGuestCount() {
       let guests = [];
@@ -104,10 +104,10 @@ function Perfil() {
   const saveProfile = async () => {
     const uid = fallbackUid;
     if (!uid) { toast.error('No se pudo determinar tu usuario'); return; }
-    // Validaciones rápidas
+    // Validaciones rÃ¡pidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrónico inválido');
+        toast.error('Correo electrÃ³nico invÃ¡lido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -116,7 +116,7 @@ function Perfil() {
       }
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
-        if (isNaN(d.getTime())) { toast.error('Fecha de boda inválida'); return; }
+        if (isNaN(d.getTime())) { toast.error('Fecha de boda invÃ¡lida'); return; }
       }
     } catch {}
     try {
@@ -176,15 +176,15 @@ function Perfil() {
   }, [weddingId]);
 
   return (
-    <div className="space-y-6 p-4 max-w-3xl mx-auto">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Perfil</h1>
+    <div className="p-4 max-w-3xl mx-auto space-y-6">
+      <div className="page-header">
+        <h1 className="page-title">Perfil</h1>
         <div className="mt-2"><LanguageSelector /></div>
         <div className="flex items-center text-sm gap-3">
-          <div className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-red-500' : syncStatus.isSyncing ? 'bg-yellow-500' : syncStatus.pendingChanges ? 'bg-orange-500' : 'bg-green-500'}`}></div>
+          <div className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-[var(--color-danger)]' : (syncStatus.isSyncing || syncStatus.pendingChanges) ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}></div>
           <span>{!syncStatus.isOnline ? 'Sin conexi\u00F3n (modo offline)' : syncStatus.isSyncing ? 'Sincronizando...' : syncStatus.pendingChanges ? 'Cambios pendientes' : 'Sincronizado'}</span>
           {lastSavedAt && (
-            <span className="text-gray-500">{'Último guardado: '} {new Date(lastSavedAt).toLocaleString()}</span>
+            <span className="text-muted">{'Ãšltimo guardado: '} {new Date(lastSavedAt).toLocaleString()}</span>
           )}
         </div>
       </div>
@@ -203,7 +203,7 @@ function Perfil() {
         <div className="p-2">
           <p className="text-sm text-gray-600">
             Las preferencias musicales ahora se configuran desde
-            <a className="ml-1 text-blue-600 hover:underline" href="/protocolo/momentos-especiales">Protocolo → Momentos Especiales</a>.
+            <a className="ml-1 text-blue-600 hover:underline" href="/protocolo/momentos-especiales">Protocolo â†’ Momentos Especiales</a>.
           </p>
         </div>
       </Card>
@@ -301,5 +301,6 @@ function Perfil() {
 }
 
 export default Perfil;
+
 
 

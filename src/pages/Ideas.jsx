@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { saveData, loadData } from '../services/SyncService';
 import SyncIndicator from '../components/SyncIndicator';
+import PageWrapper from '../components/PageWrapper';
+import PageTabs from '../components/ui/PageTabs';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
 
@@ -58,14 +60,9 @@ export default function Ideas() {
   }, []);
 
   return (
-    <div className="p-4 md:p-6 space-y-8">
+    <PageWrapper title="Ideas" className="max-w-5xl mx-auto">
       <SyncIndicator />
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Ideas</h1>
-      <div className="flex space-x-4 mb-4">
-        <button onClick={() => setView('notes')} className={`px-4 py-2 rounded ${view==='notes'?'bg-blue-600 text-white':''}`}>Notas</button>
-        
-        <button onClick={() => setView('photos')} className={`px-4 py-2 rounded ${view==='photos'?'bg-blue-600 text-white':''}`}>Fotos</button>
-      </div>
+      <PageTabs value={view} onChange={setView} options={[{ id: 'notes', label: 'Notas' }, { id: 'photos', label: 'Fotos' }]} className="mb-4" />
       {view==='notes' && (
         <div>
           {/* Selector de carpetas */}
@@ -74,7 +71,7 @@ export default function Ideas() {
               <button
                 key={folder}
                 onClick={() => setCurrentFolder(folder)}
-                className={`px-2 py-1 rounded-full text-sm ${currentFolder===folder ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                className={`px-2 py-1 rounded-full text-sm ${currentFolder===folder ? 'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 {folder}
               </button>
@@ -87,7 +84,7 @@ export default function Ideas() {
                   setCurrentFolder(name);
                 }
               }}
-              className="px-2 py-1 rounded-full text-sm bg-green-500 text-white"
+              className="px-2 py-1 rounded-full text-sm bg-[var(--color-success)] text-white"
             >
               + Nueva carpeta
             </button>
@@ -106,7 +103,7 @@ export default function Ideas() {
                 setNoteText('');
               }
             }}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-[var(--color-primary)] text-white px-4 py-2 rounded"
           >
             Añadir Nota
           </button>
@@ -144,6 +141,6 @@ export default function Ideas() {
           </div>
         </div>
       )}
-    </div>
+    </PageWrapper>
   );
 }

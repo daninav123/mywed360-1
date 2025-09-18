@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
+import React, { useState, useEffect } from 'react';
+import PageWrapper from '../components/PageWrapper';
+import PageTabs from '../components/ui/PageTabs';
 import FinanceOverview from '../components/finance/FinanceOverview';
 
 import TransactionManager from '../components/finance/TransactionManager';
@@ -10,22 +11,10 @@ const FinanceCharts = React.lazy(() => import('../components/finance/FinanceChar
 import useFinance from '../hooks/useFinance';
 import useTranslations from '../hooks/useTranslations';
 
-/**
- * PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina de Gestion financiera completamente refactorizada
- * Arquitectura modular, optimizada y mantenible
- * 
- * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (571 lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­neas ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ 180 lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­neas)
- * - Arquitectura modular con componentes especializados
- * - Hook personalizado useFinance para lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gica centralizada
- * - MemoizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n y optimizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de re-renders
- * - IntegraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n con sistema i18n
- * - UX mejorada con tabs y navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n clara
- */
 function Finance() {
   const { t } = useTranslations();
-  
-  // Hook personalizado para Gestion financiera
+
+  // Hook personalizado para Gestión financiera
   const {
     // Estados
     syncStatus,
@@ -34,13 +23,13 @@ function Finance() {
     contributions,
     budget,
     transactions,
-    
-    // CÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lculos
+
+    // Cálculos
     stats,
     budgetUsage,
     settings,
     hasBankAccount,
-    
+
     // Acciones
     updateContributions,
     loadGuestCount,
@@ -53,30 +42,29 @@ function Finance() {
     updateTransaction,
     deleteTransaction,
     importBankTransactions,
-    clearError
+    clearError,
   } = useFinance();
 
   // Estado para tabs activo
   const [activeTab, setActiveTab] = useState('overview');
   const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
-
-  // Detectar URL hash para abrir modal especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico
+  // Detectar URL hash para abrir modal específico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager manejarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ la apertura del modal
+      // El TransactionManager gestionará la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de invitados al montar el componente
+  // Cargar número de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de 5 segundos
+  // Limpiar errores después de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -87,9 +75,9 @@ function Finance() {
   const navigateToTransactions = ({ tab = 'transactions', filters = {} } = {}) => {
     if (tab) setActiveTab(tab);
     setTransactionFiltersSignal({ version: Date.now(), filters });
-  }; 
+  };
 
-  // Manejar actualizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de presupuesto total
+  // Manejar actualización de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -97,16 +85,14 @@ function Finance() {
   };
 
   return (
-    <div className="bg-[var(--color-bg)] p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <PageWrapper title={t('navigation.finance', { defaultValue: 'Finanzas' })} className="max-w-7xl mx-auto">
+      <div className="space-y-6">
         {/* Mostrar errores si existen */}
         {error && (
           <div className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30" aria-live="polite">
             <div className="flex">
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
-                  Error en Gestion financiera
-                </h3>
+                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">Error en Gestión financiera</h3>
                 <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
                 </div>
@@ -115,19 +101,23 @@ function Finance() {
           </div>
         )}
 
-        {/* Navegación por tabs */}
-        {/* Cabecera de página */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">{t('finance.tabs.overview', { defaultValue: 'Resumen' })}</TabsTrigger>
-            <TabsTrigger value="transactions">{t('finance.tabs.transactions', { defaultValue: 'Transacciones' })}</TabsTrigger>
-            <TabsTrigger value="budget">{t('finance.tabs.budget', { defaultValue: 'Presupuesto' })}</TabsTrigger>
-            <TabsTrigger value="contributions">{t('finance.tabs.contributions', { defaultValue: 'Aportaciones' })}</TabsTrigger>
-            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'AnÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lisis' })}</TabsTrigger>
-          </TabsList>
+        {/* Tabs de página (estilo Proveedores) */}
+        <PageTabs
+          value={activeTab}
+          onChange={setActiveTab}
+          options={[
+            { id: 'overview', label: t('finance.tabs.overview', { defaultValue: 'Resumen' }) },
+            { id: 'transactions', label: t('finance.tabs.transactions', { defaultValue: 'Transacciones' }) },
+            { id: 'budget', label: t('finance.tabs.budget', { defaultValue: 'Presupuesto' }) },
+            { id: 'contributions', label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }) },
+            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'Análisis' }) },
+          ]}
+          className="w-full"
+        />
 
-          {/* Tab: Resumen general */}
-          <TabsContent value="overview" className="space-y-6">
+        {/* Contenido: Resumen */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
             <FinanceOverview
               stats={stats}
               syncStatus={syncStatus}
@@ -136,10 +126,12 @@ function Finance() {
               isLoading={isLoading}
               transactions={transactions}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab: Gestion de transacciones */}
-          <TabsContent value="transactions" className="space-y-6">
+        {/* Contenido: Transacciones */}
+        {activeTab === 'transactions' && (
+          <div className="space-y-6">
             {!hasBankAccount && (
               <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -159,10 +151,12 @@ function Finance() {
               onImportBank={importBankTransactions}
               isLoading={isLoading}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab: Gestion de presupuesto */}
-          <TabsContent value="budget" className="space-y-6">
+        {/* Contenido: Presupuesto */}
+        {activeTab === 'budget' && (
+          <div className="space-y-6">
             <BudgetManager
               budget={budget}
               budgetUsage={budgetUsage}
@@ -173,38 +167,33 @@ function Finance() {
               alertThresholds={settings?.alertThresholds}
               onUpdateSettings={(s) => updateBudgetSettings({ alertThresholds: s })}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab: ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de aportaciones */}
-          <TabsContent value="contributions" className="space-y-6">
+        {/* Contenido: Aportaciones */}
+        {activeTab === 'contributions' && (
+          <div className="space-y-6">
             <ContributionSettings
               contributions={contributions}
               onUpdateContributions={updateContributions}
               onLoadGuestCount={loadGuestCount}
               isLoading={isLoading}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          {/* Tab: Analisis y grÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ficos */}
-          <TabsContent value="analytics" className="space-y-6">
-            <React.Suspense fallback={<div className="p-4">Cargando anÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lisisÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦</div>}>
-              <FinanceCharts
-                transactions={transactions}
-                budgetUsage={budgetUsage}
-                stats={stats}
-              />
+        {/* Contenido: Análisis */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <React.Suspense fallback={<div className="p-4">Cargando análisis…</div>}>
+              <FinanceCharts transactions={transactions} budgetUsage={budgetUsage} stats={stats} />
             </React.Suspense>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 
 export default Finance;
-
-
-
-
-
 

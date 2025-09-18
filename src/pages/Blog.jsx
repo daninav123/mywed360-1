@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchWeddingNews } from '../services/blogService';
 import Spinner from '../components/Spinner';
 import { getBackendBase } from '@/utils/backendBase.js';
+import PageWrapper from '../components/PageWrapper';
 
 export default function Blog() {
   const { i18n } = useTranslation();
@@ -12,9 +13,9 @@ export default function Blog() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const observer = useRef();
-  // Límites para evitar bucles de llamadas cuando el backend devuelve []
+  // LÃ­mites para evitar bucles de llamadas cuando el backend devuelve []
   const MAX_LOOKAHEAD = 10; // antes 60
-  const MAX_EMPTY_BATCHES = 2; // corta pronto si no hay más datos
+  const MAX_EMPTY_BATCHES = 2; // corta pronto si no hay mÃ¡s datos
   const MAX_FETCHES_PER_LOAD = 12;
 
   const lastRef = useCallback((node) => {
@@ -30,13 +31,16 @@ export default function Blog() {
     async function load() {
       setLoading(true);
       let newPosts = [...posts];
-      const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente múltiplo de 10
+      const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente mÃºltiplo de 10
       const domainCounts = {};
       const windowStart = Math.floor(newPosts.length / 10) * 10;
       for (let i = windowStart; i < newPosts.length; i++) {
         const d = (()=>{try{return (new URL(newPosts[i].url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
         domainCounts[d] = (domainCounts[d] || 0) + 1;
       }
+
+      // Acumular candidatos para un relleno posterior si faltan dominios Ãºnicos
+      const candidates = [];
 
       let fetchPage = page;
       let consecutiveErrors = 0;
@@ -68,18 +72,23 @@ export default function Blog() {
         for (const p of batch) {
           if (!p?.url) continue;
           const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
-          if ((domainCounts[dom] || 0) >= 1) continue; // 1 por dominio por bloque
-          if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
-          domainCounts[dom] = (domainCounts[dom] || 0) + 1;
           const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
           const withImage = p.image ? p : { ...p, image: placeholder };
+          // Guardar como candidato global para posibles rellenos
+          if (!candidates.some(x => x.url === withImage.url || x.id === withImage.id)) {
+            candidates.push(withImage);
+          }
+          // Estricto: 1 por dominio por bloque
+          if ((domainCounts[dom] || 0) >= 1) continue;
+          if (newPosts.some(x => x.url === withImage.url || x.id === withImage.id)) continue;
+          domainCounts[dom] = (domainCounts[dom] || 0) + 1;
           newPosts.push(withImage);
           if (newPosts.length >= targetLength) break;
         }
       }
 
-      // Fallback: si tras buscar no llenamos el bloque, relajamos dominio y buscamos en inglés
-      if (newPosts.length < targetLength && (lang === 'en' || import.meta?.env?.VITE_TRANSLATE_KEY)) {
+      // Fallback: si tras buscar no llenamos el bloque, relajamos dominio y buscamos en inglÃ©s
+      if (newPosts.length < targetLength) {
         fetchPage = 1;
         consecutiveErrors = 0;
         let emptyBatchesEn = 0;
@@ -110,13 +119,40 @@ export default function Blog() {
           for (const p of batch) {
             if (!p?.url) continue;
             const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
-            if ((domainCounts[dom] || 0) >= 1) continue;
-            if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
-            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
             const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
             const withImage = p.image ? p : { ...p, image: placeholder };
+            if (!candidates.some(x => x.url === withImage.url || x.id === withImage.id)) {
+              candidates.push(withImage);
+            }
+            if ((domainCounts[dom] || 0) >= 1) continue;
+            if (newPosts.some(x => x.url === withImage.url || x.id === withImage.id)) continue;
+            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
             newPosts.push(withImage);
             if (newPosts.length >= targetLength) break;
+          }
+        }
+      }
+
+      // Relleno final: si no hay suficientes dominios Ãºnicos, permitir hasta 2 por dominio
+      if (newPosts.length < targetLength && candidates.length) {
+        const exists = (p) => newPosts.some(x => x.url === p.url || x.id === p.id);
+        const notUsed = candidates.filter((c) => !exists(c));
+        if (notUsed.length) {
+          const dom2 = { ...domainCounts };
+          for (const p of notUsed) {
+            if (newPosts.length >= targetLength) break;
+            const d = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
+            if ((dom2[d] || 0) >= 2) continue;
+            dom2[d] = (dom2[d] || 0) + 1;
+            newPosts.push(p);
+          }
+        }
+        // Si aun as no se llena, ignorar limite por dominio
+        if (newPosts.length < targetLength) {
+          for (const p of candidates) {
+            if (newPosts.length >= targetLength) break;
+            if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
+            newPosts.push(p);
           }
         }
       }
@@ -128,35 +164,54 @@ export default function Blog() {
   }, [page]);
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Blog</h1>
+    <PageWrapper title="Blog" className="max-w-5xl mx-auto">
       {posts.map((p, idx) => (
         <ArticleCard key={p.url || p.id || idx} post={p} ref={idx === posts.length - 1 ? lastRef : null} />
       ))}
       {loading && <div className="flex justify-center my-6"><Spinner /></div>}
-    </div>
+    </PageWrapper>
   );
 }
 
 const ArticleCard = React.forwardRef(({ post }, ref) => {
   const base = getBackendBase();
-  const isHttpUrl = typeof post.image === 'string' && /^https?:\/\//i.test(post.image);
-  const imgSrc = post.image
-    ? (base && isHttpUrl ? `${base}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image)
+  // Resolver URL de imagen relativa respecto al enlace de la noticia
+  let resolvedImage = post.image || null;
+  try {
+    if (post.image && post.url) {
+      resolvedImage = new URL(post.image, post.url).toString();
+    }
+  } catch {}
+  const isHttpUrl = typeof resolvedImage === 'string' && /^https?:\/\//i.test(resolvedImage);
+  const [useProxy, setUseProxy] = React.useState(false);
+  const imgSrc = resolvedImage
+    ? (useProxy && base && isHttpUrl ? `${base}/api/image-proxy?u=${encodeURIComponent(resolvedImage)}` : resolvedImage)
     : null;
   return (
-    <div ref={ref} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition">
-      {imgSrc && <img src={imgSrc} alt={post.title} className="w-full h-48 object-cover" />}
+    <div ref={ref} className="border border-soft bg-[var(--color-surface)] rounded-lg overflow-hidden shadow hover:shadow-md transition">
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt={post.title}
+          className="w-full h-48 object-cover"
+          loading="lazy"
+          onError={() => { if (!useProxy && base && isHttpUrl) setUseProxy(true); }}
+        />
+      )}
       <div className="p-4 space-y-2">
         <h2 className="text-lg font-semibold">{post.title}</h2>
-        <p className="text-sm text-gray-700 line-clamp-3">{post.description}</p>
-        <div className="text-xs text-gray-500 flex justify-between">
+        <p className="text-sm text-body line-clamp-3">{post.description}</p>
+        <div className="text-xs text-muted flex justify-between">
           <span>{post.source}</span>
           <span>{new Date(post.published).toLocaleDateString()}</span>
         </div>
-        <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm">Leer más</a>
+        <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-primary text-sm">Leer mas</a>
       </div>
     </div>
   );
 });
+
+
+
+
 

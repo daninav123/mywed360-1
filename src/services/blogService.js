@@ -37,7 +37,11 @@ async function fetchFromBackend({ page, pageSize, language }) {
         timeout: 8000,
         validateStatus: () => true,
       });
-      if (Array.isArray(resp.data) && resp.status < 400) return resp.data;
+      if (resp.status < 400 && Array.isArray(resp.data)) {
+        if (resp.data.length > 0) return resp.data;
+        // Si el backend de este candidato devuelve array vacío, probar el siguiente candidato
+        continue;
+      }
     } catch {}
   }
   return [];

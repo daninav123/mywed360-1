@@ -4,6 +4,8 @@ import multer from 'multer';
 import { db } from '../db.js'; // Firestore
 import admin from 'firebase-admin';
 import { analyzeEmail } from '../services/emailAnalysis.js';
+import { applyEmailInsightsToSystem } from '../services/emailActionRouter.js';
+import { extractTextFromAttachment } from '../services/attachmentText.js';
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
@@ -175,16 +177,50 @@ router.post('/', upload.any(), async (req, res) => {
         console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
       }
 
-      // Análisis IA automático -> guardar insights y generar notificaciones
+      // Análisis IA automático -> extraer texto de adjuntos, guardar insights y generar notificaciones
       try {
-        const insights = await analyzeEmail({ subject, body: bodyContent, attachments: (req.body?.attachments || []) });
+        let attachmentsText = [];
+        try {
+          const maxBytes = parseInt(process.env.EMAIL_ANALYSIS_MAX_ATTACHMENT_BYTES || String(5 * 1024 * 1024), 10);
+          for (const d of attachmentDocs) {
+            if (!d || !d.buffer) continue;
+            const tooBig = typeof d.size === 'number' && d.size > maxBytes;
+            if (tooBig) continue;
+            const text = await extractTextFromAttachment({ buffer: d.buffer, contentType: d.contentType || '', filename: d.filename || '' });
+            if (text && text.trim()) attachmentsText.push({ filename: d.filename || '', mime: d.contentType || '', text });
+          }
+        } catch {}
+        const insights = await analyzeEmail({ subject, body: bodyContent, attachments: (req.body?.attachments || []), attachmentsText });
         await db.collection('emailInsights').doc(mailRef.id).set({
           ...insights,
           mailId: mailRef.id,
           createdAt: date,
         });
 
-        const weddingId = (rcpt || '').split('@')[0] || null;
+        let weddingId = (rcpt || '').split('@')[0] || null;
+        if (!weddingId || weddingId.length < 8) {
+          try {
+            // Intentar resolver weddingId desde el propietario del correo
+            let uid = null;
+            let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+            if (userSnap.empty) {
+              const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
+              userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+            }
+            if (!userSnap.empty) {
+              uid = userSnap.docs[0].id;
+            } else {
+              const byLogin = await db.collection('users').where('email', '==', rcpt).limit(1).get();
+              if (!byLogin.empty) uid = byLogin.docs[0].id;
+            }
+            if (uid) {
+              const ws = await db.collection('users').doc(uid).collection('weddings').limit(1).get();
+              if (!ws.empty) {
+                weddingId = ws.docs[0].id;
+              }
+            }
+          } catch {}
+        }
 
         // Notificaciones por reuniones detectadas (aceptación desde UI)
         if (weddingId) {
@@ -254,6 +290,14 @@ router.post('/', upload.any(), async (req, res) => {
               });
             }
           } catch (e) { console.warn('notification failed', e?.message || e); }
+        }
+        // Aplicación automática opcional de insights al sistema
+        try {
+          if (process.env.EMAIL_INSIGHTS_AUTO_APPLY === 'true' && weddingId) {
+            await applyEmailInsightsToSystem({ weddingId, sender: senderNorm, mailId: mailRef.id, insights, subject });
+          }
+        } catch (autoErr) {
+          console.warn('auto-apply insights failed', autoErr?.message || autoErr);
         }
       } catch (aiErr) {
         console.error('Error analizando correo:', aiErr);

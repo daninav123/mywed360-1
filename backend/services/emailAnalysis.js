@@ -25,14 +25,43 @@ async function ensureOpenAI() {
  * @param {string} params.body - Cuerpo (texto plano preferido)
  * @returns {Promise<Object>} JSON con tasks, meetings, budgets, contracts...
  */
-export async function analyzeEmail({ subject = '', body = '', attachments = [] }) {
+export async function analyzeEmail({ subject = '', body = '', attachments = [], attachmentsText = [] }) {
   await ensureOpenAI();
   if (!openai) {
     logger.warn('OPENAI_API_KEY no definido; análisis omitido');
     return { tasks: [], meetings: [], budgets: [], contracts: [] };
   }
 
-  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}${Array.isArray(attachments) && attachments.length ? "\nAdjuntos (" + attachments.length + "):\n" + attachments.map((a, i) => "- " + (a.filename || a.name || ("adjunto" + (i+1))) + " (" + (a.type || a.contentType || "desconocido") + ")").join("\\n") : ""}\n---\nSi los adjuntos incluyen presupuestos o convocatorias, tenlos en cuenta. Extrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
+  const INCLUDE_ATTACHMENTS = (process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS ? process.env.EMAIL_ANALYSIS_INCLUDE_ATTACHMENTS !== 'false' : true);
+  const PER_FILE_LIMIT = parseInt(process.env.EMAIL_ANALYSIS_MAX_ATTACHMENT_CHARS || '5000', 10);
+  const TOTAL_LIMIT = parseInt(process.env.EMAIL_ANALYSIS_TOTAL_CHARS || '20000', 10);
+
+  function truncate(s, n) {
+    const str = String(s || '');
+    return str.length > n ? (str.slice(0, n) + '\n[...truncated...]') : str;
+  }
+
+  let attachmentsBlock = '';
+  try {
+    if (INCLUDE_ATTACHMENTS && Array.isArray(attachmentsText) && attachmentsText.length) {
+      const blocks = [];
+      let used = 0;
+      for (const a of attachmentsText) {
+        const piece = truncate(a.text || '', Math.min(PER_FILE_LIMIT, Math.max(1000, PER_FILE_LIMIT)));
+        if (!piece) continue;
+        const header = `\n\n[ADJUNTO] ${a.filename || 'archivo'} (${a.mime || 'desconocido'})\n`;
+        const chunk = header + piece + '\n';
+        if (used + chunk.length > TOTAL_LIMIT) break;
+        blocks.push(chunk);
+        used += chunk.length;
+      }
+      if (blocks.length) {
+        attachmentsBlock = `\nAdjuntos extraídos (texto):${blocks.join('')}`;
+      }
+    }
+  } catch {}
+
+  const promptUser = `Email recibido:\nAsunto: ${subject}\nCuerpo:\n${body}${Array.isArray(attachments) && attachments.length ? "\nAdjuntos (" + attachments.length + "):\n" + attachments.map((a, i) => "- " + (a.filename || a.name || ("adjunto" + (i+1))) + " (" + (a.type || a.contentType || "desconocido") + ")").join("\\n") : ""}${attachmentsBlock}\n---\nSi los adjuntos incluyen presupuestos, convocatorias o contratos, tenlos en cuenta. Extrae acciones relevantes (tareas, reuniones, presupuestos, contratos). Devuelve JSON tal como se indica en la función.`;
 
   const functions = [
     {

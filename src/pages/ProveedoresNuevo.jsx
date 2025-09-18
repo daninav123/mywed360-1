@@ -2,6 +2,7 @@
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { Plus, Sparkles } from "lucide-react";
+import PageTabs from "../components/ui/PageTabs";
 
 // Componentes
 import ProveedorList from "../components/proveedores/ProveedorList";
@@ -359,8 +360,8 @@ const markOnboardingDone = useCallback(() => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
+      <div className="page-header">
+        <h1 className="page-title">Gestión de Proveedores</h1>
         <div className="flex space-x-2">
           <Button
             onClick={() => setShowWantedModal(true)}
@@ -380,72 +381,61 @@ const markOnboardingDone = useCallback(() => {
 
       {/* Tabs de proveedores */}
       <div className="mb-4">
-        <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
-          {([
+        <PageTabs
+          value={tab}
+          onChange={setTab}
+          options={[
             { id: "contratados", label: "Contratados" },
             { id: "buscados", label: "Buscados" },
             { id: "favoritos", label: "Favoritos" },
-          ]).map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => setTab(opt.id)}
-              className={`px-3 py-2 text-sm font-medium border-b-2 ${
-                tab === opt.id
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </nav>
+          ]}
+        />
         {tab === 'buscados' && (
           <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">Origen:</span>
+              <span className="text-muted">Origen:</span>
               <button
                 type="button"
                 onClick={() => setOriginFilter('all')}
-                className={`px-2 py-1 rounded border text-xs ${originFilter === 'all' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${originFilter === 'all' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 Todos
               </button>
               <button
                 type="button"
                 onClick={() => setOriginFilter('ai')}
-                className={`px-2 py-1 rounded border text-xs ${originFilter === 'ai' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${originFilter === 'ai' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 IA
               </button>
               <button
                 type="button"
                 onClick={() => setOriginFilter('manual')}
-                className={`px-2 py-1 rounded border text-xs ${originFilter === 'manual' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${originFilter === 'manual' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 Manual
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-gray-500">Estado:</span>
+              <span className="text-muted">Estado:</span>
               <button
                 type="button"
                 onClick={() => setStatusView('all')}
-                className={`px-2 py-1 rounded border text-xs ${statusView === 'all' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${statusView === 'all' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 Todos
               </button>
               <button
                 type="button"
                 onClick={() => setStatusView('pending')}
-                className={`px-2 py-1 rounded border text-xs ${statusView === 'pending' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${statusView === 'pending' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 Pendiente
               </button>
               <button
                 type="button"
                 onClick={() => setStatusView('contacted')}
-                className={`px-2 py-1 rounded border text-xs ${statusView === 'contacted' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'}`}
+                className={`px-2 py-1 rounded border text-xs ${statusView === 'contacted' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 Contactado
               </button>
@@ -460,7 +450,7 @@ const markOnboardingDone = useCallback(() => {
                   });
                   setExpandedGroups(all);
                 }}
-                className="px-2 py-1 rounded border text-xs border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                className="px-2 py-1 rounded border text-xs border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"
               >
                 Expandir todo
               </button>
@@ -473,7 +463,7 @@ const markOnboardingDone = useCallback(() => {
                   });
                   setExpandedGroups(all);
                 }}
-                className="px-2 py-1 rounded border text-xs border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                className="px-2 py-1 rounded border text-xs border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"
               >
                 Contraer todo
               </button>
@@ -481,18 +471,18 @@ const markOnboardingDone = useCallback(() => {
           </div>
         )}
         <div className="mt-2 flex items-center gap-2 text-sm">
-          <span className="text-gray-500">Ordenar por:</span>
+          <span className="text-muted">Ordenar por:</span>
           <button
             type="button"
             onClick={() => setSortMode("match")}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === "match" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"}`}
+            className={`px-2 py-1 rounded border text-xs ${sortMode === "match" ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]" : "border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"}`}
           >
             Puntuacion IA
           </button>
           <button
             type="button"
             onClick={() => setSortMode("name")}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === "name" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"}`}
+            className={`px-2 py-1 rounded border text-xs ${sortMode === "name" ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]" : "border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"}`}
           >
             Nombre
           </button>
@@ -507,7 +497,7 @@ const markOnboardingDone = useCallback(() => {
 
       {loading ? (
         <Card className="p-8 text-center">
-          <p className="text-gray-500">Cargando proveedores...</p>
+          <p className="text-muted">Cargando proveedores...</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-6">
@@ -555,7 +545,7 @@ const markOnboardingDone = useCallback(() => {
                     className="flex items-center gap-2 mb-2"
                   >
                     <span className="text-lg font-semibold">{svc}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted">
                       {expandedGroups?.[svc] === false ? "(mostrar)" : "(ocultar)"}
                     </span>
                   </button>
@@ -739,6 +729,7 @@ const markOnboardingDone = useCallback(() => {
 };
 
 export default Proveedores;
+
 
 
 

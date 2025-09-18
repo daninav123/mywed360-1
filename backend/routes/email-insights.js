@@ -2,6 +2,7 @@ import express from 'express';
 import { db } from '../db.js';
 import OpenAI from 'openai';
 import logger from '../logger.js';
+import { extractTextForMail } from '../services/attachmentText.js';
 
 const router = express.Router();
 
@@ -149,6 +150,12 @@ router.post('/analyze', async (req, res) => {
 
     const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
     let insights = null;
+    let attachmentsText = [];
+
+    // Intentar extraer texto de adjuntos desde Storage
+    try {
+      attachmentsText = await extractTextForMail(mailId);
+    } catch {}
 
     if (apiKey) {
       try {
@@ -161,7 +168,7 @@ router.post('/analyze', async (req, res) => {
   "contracts": [{"party": string, "type": string, "action": string}]
 }
 Responde SOLO el JSON. Email:
-Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}`;
+Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
 
         const completion = await openai.chat.completions.create({
           model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
@@ -194,5 +201,58 @@ Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}`;
   } catch (err) {
     console.error('Error analyzing email:', err);
     res.status(500).json({ error: 'internal', details: err.message });
+  }
+});
+
+// POST /api/email-insights/reanalyze/:mailId
+// Reconstruye subject/body y adjuntos desde BD/Storage y vuelve a analizar
+router.post('/reanalyze/:mailId', async (req, res) => {
+  try {
+    const { mailId } = req.params;
+    if (!mailId) return res.status(400).json({ error: 'mailId required' });
+    let subject = '', body = '';
+    try {
+      const snap = await db.collection('mails').doc(mailId).get();
+      if (snap.exists) {
+        const d = snap.data() || {};
+        subject = d.subject || '';
+        body = d.body || '';
+      }
+    } catch {}
+    if (!subject && !body) return res.status(404).json({ error: 'mail not found' });
+
+    const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
+    let insights = null;
+    let attachmentsText = [];
+    try { attachmentsText = await extractTextForMail(mailId); } catch {}
+
+    if (apiKey) {
+      try {
+        const openai = new OpenAI({ apiKey, project: process.env.OPENAI_PROJECT_ID });
+        const prompt = `Eres un asistente de boda. A partir del siguiente email, extrae acciones estructuradas en JSON con este esquema exacto:\n{\n  "tasks": [{"title": string, "due": string|null}],\n  "meetings": [{"title": string, "date": string|null, "when": string|null}],\n  "budgets": [{"client": string, "amount": string, "currency": string|null}],\n  "contracts": [{"party": string, "type": string, "action": string}]\n}\nResponde SOLO el JSON. Email:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
+        const completion = await openai.chat.completions.create({
+          model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+          temperature: 0,
+          messages: [
+            { role: 'system', content: 'Devuelve solo JSON válido según el esquema indicado.' },
+            { role: 'user', content: prompt },
+          ],
+        });
+        const content = completion.choices?.[0]?.message?.content || '';
+        try { insights = JSON.parse(content); } catch {
+          const match = content.match(/\{[\s\S]*\}$/);
+          if (match) insights = JSON.parse(match[0]);
+        }
+      } catch (e) {
+        logger.warn('[email-insights] reanalyze OpenAI falló, usando heurística:', e?.message || e);
+      }
+    }
+
+    if (!insights) insights = heuristicAnalyze({ subject, body });
+    try { await db.collection('emailInsights').doc(mailId).set(insights, { merge: true }); } catch {}
+    return res.json(insights);
+  } catch (err) {
+    console.error('reanalyze failed', err);
+    return res.status(500).json({ error: 'internal' });
   }
 });

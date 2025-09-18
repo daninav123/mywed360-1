@@ -556,15 +556,15 @@ function Invitados() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <div className="min-h-screen bg-app p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header con indicador de sincronización */}
-        <div className="flex items-center justify-between">
+        <div className="page-header">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="page-title">
               {t('guests.guestList')}
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-muted mt-1">
               Gestiona tu lista de invitados de forma eficiente
             </p>
           </div>
@@ -572,12 +572,12 @@ function Invitados() {
           {/* Indicador de sincronización */}
           <div className="flex items-center space-x-2">
             {syncStatus?.isOnline ? (
-              <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full">
+              <div className="flex items-center text-[var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
                 <Cloud size={16} className="mr-2" />
                 <span className="text-sm font-medium">Sincronizado</span>
               </div>
             ) : (
-              <div className="flex items-center text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+              <div className="flex items-center text-[var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
                 <CloudOff size={16} className="mr-2" />
                 <span className="text-sm font-medium">Sin conexión</span>
               </div>
@@ -611,7 +611,7 @@ function Invitados() {
 
         {/* Debug info para verificar estado */}
         {import.meta.env.DEV && (
-          <div className="bg-blue-50 p-4 rounded-lg text-sm">
+          <div className="p-4 rounded-lg text-sm bg-[var(--color-primary)]/10">
             <strong>Debug Info:</strong><br/>
             - activeWedding: {activeWedding || 'null'}<br/>
             - weddings count: {weddings?.length || 0}<br/>

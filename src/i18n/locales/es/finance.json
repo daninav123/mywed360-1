@@ -4,7 +4,7 @@
     "transactions": "Transacciones",
     "budget": "Presupuesto",
     "contributions": "Aportaciones",
-    "analytics": "Análisis"
+    "analytics": "Anǭlisis"
   },
   "connectBank": {
     "title": "Conecta tu banco para importar movimientos",
@@ -15,33 +15,31 @@
     "budget": "Alertas de Presupuesto"
   },
   "overview": {
-    "title": "Gestión Financiera",
-    "subtitle": "Control completo de presupuesto y gastos de tu boda",
-    "lastSync": "Última sincronización",
+    "lastSync": "�sltima sincronizaci��n",
     "synced": "Sincronizado",
-    "offline": "Sin conexión",
+    "offline": "Sin conexi��n",
     "totalBudget": "Presupuesto Total",
     "totalSpent": "Total Gastado",
     "ofBudget": "del presupuesto",
     "currentBalance": "Balance Actual",
     "expectedIncome": "Ingresos Esperados",
     "used": "utilizado",
-    "categoryStatus": "Estado del Presupuesto por Categorías",
+    "categoryStatus": "Estado del Presupuesto por Categor��as",
     "progress": "Progreso",
-    "exceededNote": "(¡Presupuesto excedido!)"
+    "exceededNote": "(��Presupuesto excedido!)"
   },
   "form": {
-    "type": "Tipo de transacción",
+    "type": "Tipo de transacci��n",
     "concept": "Concepto",
     "conceptPlaceholder": "Ej: Pago de catering, Regalo de boda...",
-    "amount": "Monto (€)",
+    "amount": "Monto (�'�)",
     "amountLabel": "Monto:",
     "date": "Fecha",
-    "category": "Categoría",
-    "selectCategory": "Selecciona una categoría",
-    "description": "Descripción adicional",
-    "descriptionPlaceholder": "Detalles adicionales sobre la transacción...",
-    "transaction": "Transacción",
+    "category": "Categor��a",
+    "selectCategory": "Selecciona una categor��a",
+    "description": "Descripci��n adicional",
+    "descriptionPlaceholder": "Detalles adicionales sobre la transacci��n...",
+    "transaction": "Transacci��n",
     "provider": "Proveedor / Fuente",
     "attachments": {
       "title": "Comprobantes",
@@ -60,29 +58,29 @@
     },
     "errors": {
       "conceptRequired": "El concepto es obligatorio",
-      "amountPositive": "El monto debe ser un número positivo",
+      "amountPositive": "El monto debe ser un nǧmero positivo",
       "dateRequired": "La fecha es obligatoria",
-      "categoryRequired": "La categoría es obligatoria",
-      "paidAmountPositive": "El monto abonado debe ser un número positivo",
+      "categoryRequired": "La categor��a es obligatoria",
+      "paidAmountPositive": "El monto abonado debe ser un nǧmero positivo",
       "paidAmountExceeds": "El monto abonado no puede superar el total",
-      "paidAmountRequired": "Registra cuánto has pagado para marcar el estado como parcial"
+      "paidAmountRequired": "Registra cuǭnto has pagado para marcar el estado como parcial"
     }
   },
   "transactions": {
     "title": "Transacciones",
-    "new": "Nueva Transacción",
+    "new": "Nueva Transacci��n",
     "empty": "No hay transacciones que mostrar",
-    "createFirst": "Crear primera transacción",
+    "createFirst": "Crear primera transacci��n",
     "searchPlaceholder": "Buscar por concepto...",
     "allTypes": "Todos los tipos",
     "incomes": "Ingresos",
     "expenses": "Gastos",
-    "allCategories": "Todas las categorías",
+    "allCategories": "Todas las categor��as",
     "allProviders": "Todos los proveedores",
-    "allDays": "Todos los días",
-    "last30": "Últimos 30 días",
-    "last90": "Últimos 90 días",
-    "onlyUncategorized": "Solo sin categoría",
+    "allDays": "Todos los d��as",
+    "last30": "�sltimos 30 d��as",
+    "last90": "�sltimos 90 d��as",
+    "onlyUncategorized": "Solo sin categor��a",
     "clear": "Limpiar",
     "sort": {
       "dateDesc": "Fecha (recientes primero)",
@@ -93,7 +91,7 @@
     "headers": {
       "date": "Fecha",
       "concept": "Concepto",
-      "category": "Categoría",
+      "category": "Categor��a",
       "type": "Tipo",
       "status": "Estado",
       "amount": "Monto",
@@ -106,12 +104,12 @@
       "expected": "Esperado",
       "received": "Recibido"
     },
-    "saved": "Transacción guardada",
-    "deleted": "Transacción eliminada",
-    "deleteErrorPrefix": "Error eliminando transacción:",
-    "saveUnexpected": "Error inesperado al guardar la transacción",
+    "saved": "Transacci��n guardada",
+    "deleted": "Transacci��n eliminada",
+    "deleteErrorPrefix": "Error eliminando transacci��n:",
+    "saveUnexpected": "Error inesperado al guardar la transacci��n",
     "noConcept": "Sin concepto",
-    "noCategory": "Sin categoría",
+    "noCategory": "Sin categor��a",
     "dueOn": "Vence:",
     "attachment": "Adjunto",
     "balanceLabel": "Balance:",
@@ -122,42 +120,42 @@
     "alerts": {
       "title": "Pagos importantes",
       "overdue": "Pagos vencidos:",
-      "upcoming": "Pagos próximos (7 días):"
+      "upcoming": "Pagos pr��ximos (7 d��as):"
     },
     "csv": {
       "title": "Importar CSV - Mapeo de columnas",
       "fields": {
         "date": "Fecha",
-        "description": "Descripción",
+        "description": "Descripci��n",
         "amount": "Importe",
         "type": "Tipo",
-        "category": "Categoría"
+        "category": "Categor��a"
       },
       "none": "Ninguna",
       "preview": "Vista previa"
     }
   },
   "charts": {
-    "title": "Análisis Financiero",
+    "title": "Anǭlisis Financiero",
     "subtitle": "Visualizaciones y tendencias de tus finanzas de boda",
     "totalTransactions": "Total Transacciones",
-    "activeCategories": "Categorías Activas",
+    "activeCategories": "Categor��as Activas",
     "budgetEfficiency": "Eficiencia Presupuesto",
     "projectedBalance": "Balance Proyectado",
-    "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categoría",
+    "budgetVsSpentByCategory": "Presupuesto vs Gastado por Categor��a",
     "budgeted": "Presupuestado",
     "spent": "Gastado",
-    "expenseDistributionByCategory": "Distribución de Gastos por Categoría",
+    "expenseDistributionByCategory": "Distribuci��n de Gastos por Categor��a",
     "monthlyTrend": "Tendencia Mensual de Ingresos y Gastos",
     "income": "Ingresos",
     "expenses": "Gastos",
     "balance": "Balance",
-    "budgetProgressByCategory": "Progreso del Presupuesto por Categoría",
+    "budgetProgressByCategory": "Progreso del Presupuesto por Categor��a",
     "used": "Usado",
     "excess": "Exceso",
     "insights": "Insights Financieros",
     "highestExpense": "Mayor Gasto",
-    "mostEfficient": "Más Eficiente",
+    "mostEfficient": "Mǭs Eficiente",
     "noData": "No hay datos suficientes",
     "currentTrend": "Tendencia Actual",
     "trend": {
@@ -168,9 +166,9 @@
   },
   "bank": {
     "title": "Vincular cuenta bancaria",
-    "country": "País",
+    "country": "Pa��s",
     "countries": {
-      "es": "España",
+      "es": "Espa��a",
       "fr": "Francia",
       "de": "Alemania",
       "it": "Italia",
@@ -178,12 +176,12 @@
     },
     "bankLabel": "Banco",
     "selectBank": "Selecciona un banco",
-    "selectBankPlaceholder": "Selecciona un banco…",
+    "selectBankPlaceholder": "Selecciona un banco�?�",
     "loadBanks": "Cargar bancos",
     "connect": "Conectar",
-    "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integración Nordigen o la ruta /api/bank aún no esté desplegada.",
-    "errorStart": "No se pudo iniciar la vinculación",
-    "noRequisition": "No hay requisición iniciada",
+    "errorLoad": "No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integraci��n Nordigen o la ruta /api/bank aǧn no estǸ desplegada.",
+    "errorStart": "No se pudo iniciar la vinculaci��n",
+    "noRequisition": "No hay requisici��n iniciada",
     "errorCheck": "No se pudo consultar el estado",
     "selectWedding": "Selecciona una boda activa",
     "linked": "Cuenta vinculada",
@@ -193,34 +191,34 @@
       "env": "Definir NORDIGEN_SECRET_ID, NORDIGEN_SECRET KEY y NORDIGEN_BASE_URL",
       "route": "Backend con ruta /api/bank desplegada"
     },
-    "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas → Transacciones → \"Importar Banco\".",
+    "alternative": "Alternativa temporal: importa movimientos manualmente desde Finanzas ��' Transacciones ��' \"Importar Banco\".",
     "requisition": "Requisition:",
     "checkStatus": "Comprobar estado",
     "availableAccounts": "Cuentas disponibles",
     "useThis": "Usar esta cuenta"
   },
   "budget": {
-    "title": "Gestión de presupuesto",
-    "subtitle": "Organiza y controla el presupuesto por categorías",
-    "newCategory": "Nueva categoría",
+    "title": "Gesti��n de presupuesto",
+    "subtitle": "Organiza y controla el presupuesto por categor��as",
+    "newCategory": "Nueva categor��a",
     "totalBudget": "Presupuesto Total",
     "budgeted": "Presupuestado",
     "spent": "Gastado",
     "remaining": "Restante",
     "progress": "Progreso",
-    "categoriesTitle": "Categorías de presupuesto",
-    "empty": "No hay categorías de presupuesto",
-    "createFirst": "Crear primera categoría",
-    "category": "categoría",
+    "categoriesTitle": "Categor��as de presupuesto",
+    "empty": "No hay categor��as de presupuesto",
+    "createFirst": "Crear primera categor��a",
+    "category": "categor��a",
     "overallProgress": "Progreso del presupuesto",
     "thresholds": {
       "warn": "Aviso (en riesgo) %",
-      "danger": "Crítico (exceso) %"
+      "danger": "Cr��tico (exceso) %"
     },
     "modal": {
-      "editTitle": "Editar categoría",
-      "newTitle": "Nueva categoría",
-      "name": "Nombre de la categoría"
+      "editTitle": "Editar categor��a",
+      "newTitle": "Nueva categor��a",
+      "name": "Nombre de la categor��a"
     }
   }
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/ui/Button';
+import PageWrapper from '../components/PageWrapper';
 import NotificationSettings from '../components/settings/NotificationSettings';
 import { getNotifications, markNotificationRead, deleteNotification } from '../services/notificationService';
 import { isSupported as pushSupported, subscribe as pushSubscribe, unsubscribe as pushUnsubscribe, sendTest as pushTest } from '../services/PushService';
@@ -37,8 +38,7 @@ export default function Notificaciones() {
   const filtered = items.filter((n) => (filter === 'unread' ? !n.read : true));
 
   return (
-    <div className="p-4 space-y-4 text-[color:var(--color-text)]">
-      <h1 className="text-2xl font-semibold">Notificaciones</h1>
+    <PageWrapper title="Notificaciones" className="max-w-4xl mx-auto">
 
       {/* Ajustes de notificaciones */}
       <NotificationSettings />
@@ -78,7 +78,7 @@ export default function Notificaciones() {
 
       {/* Preferencias granulares antiguas eliminadas a favor del nuevo panel */}
 
-      <div className="bg-[var(--color-surface)] border border-[color:var(--color-text)]/10 rounded divide-y divide-[color:var(--color-text)]/10">
+      <div className="bg-[var(--color-surface)] border border-soft rounded divide-y divide-[color:var(--color-text)]/10">
         {filtered.length === 0 && <p className="p-4 text-[color:var(--color-text)]/60">No hay notificaciones.</p>}
         {filtered.map((n) => (
           <div
@@ -104,7 +104,7 @@ export default function Notificaciones() {
           </div>
         ))}
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 
