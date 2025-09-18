@@ -136,7 +136,6 @@ export const GanttChart = ({
   const [scrollerNode, setScrollerNode] = useState(null);
   const overlayRef = useRef(null);
   const movingGroupRef = useRef(null);
-  const baseOffsetRef = useRef(0);
 
   const [verticalNode, setVerticalNode] = useState(null);
   const autoCenteredRef = useRef(false);
@@ -387,13 +386,6 @@ export const GanttChart = ({
 
       if (horizontal) {
         horizontal.style.width = `${wantedWidth}px`;
-        // Calcular offset base del grid respecto al wrapper (independiente del scroll)
-        try {
-          const wr = wrapperRef.current.getBoundingClientRect();
-          const hr = horizontal.getBoundingClientRect();
-          baseOffsetRef.current = Math.max(0, Math.round(hr.left - wr.left));
-          if (debugEnabled) dbg('BaseOffset recalculado', { baseOffset: baseOffsetRef.current });
-        } catch {}
       }
       svgs.forEach(svg => {
         try { svg.setAttribute('width', String(wantedWidth)); } catch {}
@@ -451,25 +443,25 @@ export const GanttChart = ({
           const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
-          // Posición dentro del wrapper: baseOffset - scrollLeft - translateX + markerLeft
+          // Posición dentro del wrapper usando delta geométrico (contenido vs viewport)
           const s = scrollerRef.current;
           if (wrapperRef.current) {
-            const sl = (scrollLeft ?? s?.scrollLeft ?? containerScrollLeft ?? 0);
-            const tx = contentOffsetX || 0;
-            let baseOffset = baseOffsetRef.current || 0;
-            if (!baseOffset) {
-              try {
-                const root = wrapperRef.current;
-                const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
-                const horizontal = vertical?.querySelector('div[class*="horizontalContainer"], .horizontalContainer');
-                if (horizontal && root?.getBoundingClientRect) {
-                  const wr = root.getBoundingClientRect();
-                  const hr = horizontal.getBoundingClientRect();
-                  baseOffset = Math.max(0, Math.round(hr.left - wr.left));
-                }
-              } catch {}
-            }
-            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx + baseOffset);
+            let baseOffset = 0;
+            let delta = 0;
+            try {
+              const wr = wrapperRef.current.getBoundingClientRect();
+              const viewportRect = s?.getBoundingClientRect ? s.getBoundingClientRect() : null;
+              baseOffset = viewportRect ? Math.max(0, Math.round(viewportRect.left - wr.left)) : 0;
+
+              const inner = (s || wrapperRef.current)?.querySelector?.('div[class*="horizontalContainer"], .horizontalContainer')
+                || (s || wrapperRef.current)?.querySelector?.('svg');
+              const contentRect = inner?.getBoundingClientRect ? inner.getBoundingClientRect() : null;
+              delta = (contentRect && viewportRect)
+                ? Math.round(contentRect.left - viewportRect.left)
+                : 0;
+            } catch {}
+
+            markerViewportLeftPx = Math.max(0, baseOffset + markerLeftPx + delta);
             if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
               base,
               gridStart: gridStart.toISOString(),
@@ -480,9 +472,8 @@ export const GanttChart = ({
               dayIndex,
               frac,
               markerLeftPx,
-              scrollLeft: sl,
-              contentTX: tx,
               baseOffset,
+              delta,
               markerViewportLeftPx,
               wrapperW: wrapperRef.current?.clientWidth,
               scrollerW: s?.clientWidth,

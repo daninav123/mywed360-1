@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Cell
 } from 'recharts';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
+import { get as apiGet } from '../../services/apiClient';
 
 /**
  * Dashboard para visualizar métricas de rendimiento del sistema
@@ -71,15 +72,21 @@ function MetricsDashboard() {
           timestamp: Date.now(),
         });
       } catch (err) {
+        try {
+          const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT;
+          if (metricsEndpoint) {
+            const resp = await apiGet(${metricsEndpoint}/dashboard?timeframe=, { auth: true });
+            if (resp?.ok) {
+              const remoteMetrics = await resp.json();
+              setMetrics(remoteMetrics || { timeSeriesData: [], performanceData: {}, errorData: [], usageData: [], timestamp: Date.now() });
+              setIsLoading(false);
+              return;
+            }
+          }
+        } catch {}
         console.error('Error al cargar métricas:', err);
         setError('No se pudieron cargar las métricas.');
-        setMetrics({
-          timeSeriesData: [],
-          performanceData: {},
-          errorData: [],
-          usageData: [],
-          timestamp: Date.now(),
-        });
+        setMetrics({ timeSeriesData: [], performanceData: {}, errorData: [], usageData: [], timestamp: Date.now() });
       } finally {
         setIsLoading(false);
       }
