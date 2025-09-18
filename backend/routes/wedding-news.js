@@ -125,7 +125,9 @@ router.get('/', async (req, res) => {
           let extra = ([]).concat(...extraLists);
           const seen2 = new Set(results.map(r => r.id || r.url));
           extra = extra.filter(p => { const k = p.id || p.url; if (!k || seen2.has(k)) return false; seen2.add(k); return true; });
-          extra = extra.filter(p => typeof p.image === 'string' && /^https?:\\/\\//i.test(p.image));
+          // Asegurar que la imagen es una URL http(s) válida.
+          // En un literal regex, solo se necesita escapar cada '/': \/\/
+          extra = extra.filter(p => typeof p.image === 'string' && /^https?:\/\//i.test(p.image));
           results = results.concat(extra);
         } catch {}
       }
