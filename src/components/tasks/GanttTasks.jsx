@@ -134,7 +134,9 @@ export const GanttChart = ({
   const [containerScrollLeft, setContainerScrollLeft] = useState(0); // scroll del contenedor vertical (header+grid)
   const scrollerRef = useRef(null);
   const [scrollerNode, setScrollerNode] = useState(null);
+  const overlayRef = useRef(null);
   const movingGroupRef = useRef(null);
+  const baseOffsetRef = useRef(0);
 
   const [verticalNode, setVerticalNode] = useState(null);
   const autoCenteredRef = useRef(false);
@@ -181,6 +183,41 @@ export const GanttChart = ({
       setVerticalNode(null);
     };
   }, [viewMode, columnWidth, cleanTasks.length]);
+
+  // Crear/actualizar overlay dentro del contenedor scrolleable para dibujar el marcador
+  useEffect(() => {
+    try {
+      const s = scrollerRef.current;
+      if (!s) return;
+      if (!overlayRef.current || overlayRef.current.parentNode !== s) {
+        // Aseguramos stacking y tamaño
+        if (!s.style.position) s.style.position = 'relative';
+        const host = document.createElement('div');
+        host.setAttribute('data-gantt-marker-host', '');
+        host.style.position = 'absolute';
+        host.style.top = '0';
+        host.style.left = '0';
+        host.style.height = '100%';
+        host.style.pointerEvents = 'none';
+        host.style.zIndex = '3';
+        host.style.width = `${Math.max(s.scrollWidth, s.clientWidth)}px`;
+        s.appendChild(host);
+        overlayRef.current = host;
+        try { if (debugEnabled) dbg('Overlay host ready', { clientW: s.clientWidth, scrollW: s.scrollWidth }); } catch {}
+      } else {
+        overlayRef.current.style.width = `${Math.max(s.scrollWidth, s.clientWidth)}px`;
+      }
+    } catch {}
+    return () => {
+      try {
+        const s = scrollerRef.current;
+        if (overlayRef.current && s && overlayRef.current.parentNode === s) {
+          s.removeChild(overlayRef.current);
+        }
+      } catch {}
+      overlayRef.current = null;
+    };
+  }, [scrollerNode, viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
 
   // Capturar scroll horizontal del contenedor que envuelve cabecera y grid (afecta a ambos)
   useEffect(() => {
@@ -350,6 +387,13 @@ export const GanttChart = ({
 
       if (horizontal) {
         horizontal.style.width = `${wantedWidth}px`;
+        // Calcular offset base del grid respecto al wrapper (independiente del scroll)
+        try {
+          const wr = wrapperRef.current.getBoundingClientRect();
+          const hr = horizontal.getBoundingClientRect();
+          baseOffsetRef.current = Math.max(0, Math.round(hr.left - wr.left));
+          if (debugEnabled) dbg('BaseOffset recalculado', { baseOffset: baseOffsetRef.current });
+        } catch {}
       }
       svgs.forEach(svg => {
         try { svg.setAttribute('width', String(wantedWidth)); } catch {}
@@ -407,25 +451,25 @@ export const GanttChart = ({
           const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
-          // Convertir a coordenadas del wrapper restando el scroll actual (con fallback)
+          // Posición dentro del wrapper: baseOffset - scrollLeft - translateX + markerLeft
           const s = scrollerRef.current;
           if (wrapperRef.current) {
-            // Usar el scroll horizontal detectado en cualquier descendiente si existe
-            // Preferimos el estado `scrollLeft` (capturado en bubbling/capture) y evitamos
-            // tratar 0 como falsy usando nullish coalescing para no perder el valor 0.
             const sl = (scrollLeft ?? s?.scrollLeft ?? containerScrollLeft ?? 0);
             const tx = contentOffsetX || 0;
-            // Offset del grid respecto al wrapper (para contemplar panel de lista si existe)
-            let gridOffset = 0;
-            try {
-              const inner = s.querySelector('svg');
-              if (inner && wrapperRef.current?.getBoundingClientRect) {
-                const r = inner.getBoundingClientRect();
-                const wr = wrapperRef.current.getBoundingClientRect();
-                gridOffset = Math.max(0, Math.round(r.left - wr.left));
-              }
-            } catch {}
-            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx + gridOffset);
+            let baseOffset = baseOffsetRef.current || 0;
+            if (!baseOffset) {
+              try {
+                const root = wrapperRef.current;
+                const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+                const horizontal = vertical?.querySelector('div[class*="horizontalContainer"], .horizontalContainer');
+                if (horizontal && root?.getBoundingClientRect) {
+                  const wr = root.getBoundingClientRect();
+                  const hr = horizontal.getBoundingClientRect();
+                  baseOffset = Math.max(0, Math.round(hr.left - wr.left));
+                }
+              } catch {}
+            }
+            markerViewportLeftPx = Math.max(0, markerLeftPx - sl - tx + baseOffset);
             if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
               base,
               gridStart: gridStart.toISOString(),
@@ -438,7 +482,7 @@ export const GanttChart = ({
               markerLeftPx,
               scrollLeft: sl,
               contentTX: tx,
-              gridOffset,
+              baseOffset,
               markerViewportLeftPx,
               wrapperW: wrapperRef.current?.clientWidth,
               scrollerW: s?.clientWidth,
@@ -481,17 +525,17 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && (
+        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && createPortal(
           <div
             data-testid="wedding-marker"
             title="Dia de la boda"
             style={{
-              position: 'absolute',
-              top: 0,
-              left: Math.max(0, markerViewportLeftPx),
+              position: 'fixed',
+              top: (wrapperRef.current?.getBoundingClientRect?.().top ?? 0),
+              left: Math.max(0, (wrapperRef.current?.getBoundingClientRect?.().left ?? 0) + markerViewportLeftPx),
               height: (wrapperRef.current ? (wrapperRef.current.clientHeight || '100%') : '100%'),
               pointerEvents: 'none',
-              zIndex: 3
+              zIndex: 9999
             }}
           >
             {/* Poste vertical */}
@@ -515,12 +559,15 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>
-        )}
+          </div>, (typeof document !== 'undefined' ? document.body : wrapperRef.current))
+        }
       </div>
     </LocalErrorBoundary>
   );
 };
+
+
+
 
 
 

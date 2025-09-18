@@ -31,10 +31,9 @@ export default defineConfig({
       ['backend/**', 'node'],
     ],
 
-    // Reporters: consola + JUnit
+    // Reporters
     reporters: [
       'default',
-      ['junit', { outputFile: 'junit.xml', suiteName: 'vitest', useShortPaths: true }],
     ],
 
     // Setups para front (src) y mocks globales controlados

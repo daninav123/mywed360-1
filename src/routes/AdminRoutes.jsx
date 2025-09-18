@@ -2,12 +2,14 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Loader from "../components/ui/Loader";
 import AdminLayout from '../layouts/AdminLayout';
+import { useAuth } from '../hooks/useAuth';
 
 // Carga perezosa (lazy loading) de componentes para mejor rendimiento
 const AdminDashboard = lazy(() => import('../components/admin/AdminDashboard'));
 const UserManagement = lazy(() => import('../components/admin/UserManagement'));
 const SystemSettings = lazy(() => import('../components/admin/SystemSettings'));
 const CachePerformancePanel = lazy(() => import('../components/admin/CachePerformancePanel'));
+const MetricsDashboard = lazy(() => import('../components/admin/MetricsDashboard'));
 
 // Componente para mostrar durante la carga
 const LoadingFallback = () => (
@@ -22,6 +24,9 @@ const LoadingFallback = () => (
  * Requiere autenticación y rol de administrador
  */
 const AdminRoutes = () => {
+  const { hasRole, isLoading } = useAuth();
+  if (isLoading) return <LoadingFallback />;
+  if (!hasRole('admin')) return <Navigate to="/home" replace />;
   return (
     <AdminLayout>
       <Suspense fallback={<LoadingFallback />}>
@@ -31,6 +36,7 @@ const AdminRoutes = () => {
           <Route path="/users" element={<UserManagement />} />
           <Route path="/settings" element={<SystemSettings />} />
           <Route path="/cache" element={<CachePerformancePanel />} />
+          <Route path="/metrics" element={<MetricsDashboard />} />
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </Suspense>

@@ -61,28 +61,6 @@ async function resolveOgImage(pageUrl) {
         try { return new URL(m[1], pageUrl).toString(); } catch {}
       }
     }
-    // Intento extra: si es Google News, seguir canonical/og:url al origen y volver a buscar imagen
-    try {
-      const host = new URL(pageUrl).hostname;
-      if (/news\.google\.com$/i.test(host)) {
-        const canRe = /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i;
-        const ogUrlRe = /<meta\s+property=["']og:url["']\s+content=["']([^"']+)["'][^>]*>/i;
-        const m2 = html.match(canRe) || html.match(ogUrlRe);
-        if (m2 && m2[1]) {
-          const canonical = new URL(m2[1], pageUrl).toString();
-          try {
-            const res2 = await axios.get(canonical, { timeout: 5000, responseType: 'text' });
-            const html2 = String(res2.data || '');
-            for (const re of patterns) {
-              const m3 = html2.match(re);
-              if (m3 && m3[1]) {
-                try { return new URL(m3[1], canonical).toString(); } catch {}
-              }
-            }
-          } catch {}
-        }
-      }
-    } catch {}
   } catch {}
   return null;
 }
@@ -285,3 +263,5 @@ router.get('/', async (req, res) => {
 });
 
 export default router;
+
+

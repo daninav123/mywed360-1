@@ -35,6 +35,7 @@ vi.mock('../middleware/authMiddleware.js', () => ({
   requireAuth: () => (req, _res, next) => { req.user = { uid: 't' }; next(); },
   requireMailAccess: () => (req, _res, next) => { req.user = { uid: 't' }; next(); },
   requirePlanner: () => (req, _res, next) => { req.user = { uid: 't' }; req.userProfile = { role: 'planner' }; next(); },
+  requireAdmin: () => (req, _res, next) => { req.user = { uid: 'admin' }; req.userProfile = { role: 'admin' }; next(); },
   optionalAuth: () => (_req, _res, next) => next(),
 }));
 

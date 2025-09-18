@@ -165,15 +165,24 @@ router.get('/', requireMailAccess, async (req, res) => {
       }
     }
 
-    // Fallback extra: si se pidió user pero no hay datos, intentar carga limitada por carpeta y filtrar en servidor (normalizando)
+    // Fallback extra: si se pidió user pero no hay datos, intentar carga limitada por carpeta y
+    // filtrar por CUALQUIERA de las direcciones del usuario (alias/login/legacy)
     if (userNorm && (!Array.isArray(data) || data.length === 0)) {
       try {
         const snap2 = await db.collection('mails').where('folder', '==', folder).limit(300).get();
         const arr = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+        let addresses = new Set([userNorm]);
+        try {
+          const profile = req.userProfile || {};
+          let myAlias = String(profile.myWed360Email || '').toLowerCase();
+          const myLogin = String(profile.email || '').toLowerCase();
+          const legacy = myAlias ? myAlias.replace(/@mywed360\.com$/i, '@mywed360') : '';
+          [myAlias, myLogin, legacy].filter(Boolean).forEach(a=>addresses.add(a));
+        } catch {}
         const filtered = arr.filter(m => {
           const to = String(m.to || '').toLowerCase();
           const from = String(m.from || '').toLowerCase();
-          return folder === 'sent' ? (from === userNorm) : (to === userNorm);
+          return folder === 'sent' ? (addresses.has(from)) : (addresses.has(to));
         }).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
         if (filtered.length) {
           return res.json(filtered);
@@ -1104,6 +1113,27 @@ router.get('/page', requireMailAccess, async (req, res) => {
     } catch (fireErr) {
       const snap = await query.limit(lim).get();
       items = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
+    }
+    // Fallback extra: si se pidió user pero no hay items, intentar filtrar por conjunto de direcciones (alias/login/legacy)
+    if (userNorm && (!Array.isArray(items) || items.length === 0)) {
+      try {
+        const snap2 = await db.collection('mails').where('folder', '==', folder).limit(lim * 4).get();
+        const arr = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+        let addresses = new Set([userNorm]);
+        try {
+          const profile = req.userProfile || {};
+          let myAlias = String(profile.myWed360Email || '').toLowerCase();
+          const myLogin = String(profile.email || '').toLowerCase();
+          const legacy = myAlias ? myAlias.replace(/@mywed360\.com$/i, '@mywed360') : '';
+          [myAlias, myLogin, legacy].filter(Boolean).forEach(a=>addresses.add(a));
+        } catch {}
+        const filtered = arr.filter(m => {
+          const to = String(m.to || '').toLowerCase();
+          const from = String(m.from || '').toLowerCase();
+          return folder === 'sent' ? (addresses.has(from)) : (addresses.has(to));
+        }).sort((a,b) => new Date(b.date||0) - new Date(a.date||0));
+        items = filtered.slice(0, lim);
+      } catch {}
     }
     const nextCursor = items.length === lim ? items[items.length - 1].date : null;
     return res.json({ items, nextCursor });

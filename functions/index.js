@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const cors = require('cors')({ origin: true });
-const fetch = require('node-fetch');
+// Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
+const fetch = globalThis.fetch;
 let FormDataLib = null;
 try { FormDataLib = require('form-data'); } catch (_) { FormDataLib = null; }
 const admin = require('firebase-admin');

@@ -64,6 +64,7 @@ export default function useFinance() {
 
   // Indica si hay cuenta bancaria vinculada
   const [hasBankAccount, setHasBankAccount] = useState(false);
+  const [weddingTimeline, setWeddingTimeline] = useState({ invitesSentDate: null, weddingDate: null });
 
   // Transacciones usando Firestore (subcolección weddings/{id}/transactions)
   const {
@@ -213,6 +214,118 @@ export default function useFinance() {
     ]
   );
 
+  // Proyección completa (ingresos y gastos futuros)
+  const projection = useMemo(() => {
+    try {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weddingDate = weddingTimeline.weddingDate instanceof Date && !Number.isNaN(weddingTimeline.weddingDate?.getTime())
+        ? new Date(weddingTimeline.weddingDate.getFullYear(), weddingTimeline.weddingDate.getMonth(), weddingTimeline.weddingDate.getDate())
+        : null;
+      const invitesDateRaw = weddingTimeline.invitesSentDate instanceof Date && !Number.isNaN(weddingTimeline.invitesSentDate?.getTime())
+        ? new Date(weddingTimeline.invitesSentDate.getFullYear(), weddingTimeline.invitesSentDate.getMonth(), weddingTimeline.invitesSentDate.getDate())
+        : null;
+      const invitesDate = invitesDateRaw || new Date(start.getFullYear(), start.getMonth(), start.getDate() - 60);
+      const tailDays = 30;
+      const end = weddingDate
+        ? new Date(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate() + tailDays)
+        : new Date(start.getFullYear(), start.getMonth(), start.getDate() + 90);
+
+      const daysBetween = (d1, d2) => Math.max(0, Math.ceil((d2 - d1) / (24 * 60 * 60 * 1000)));
+      const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+      const toISO = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
+
+      const incomesByDay = new Map();
+      const expensesByDay = new Map();
+      const bump = (map, date, amount) => {
+        if (!amount || !Number.isFinite(amount)) return;
+        const key = toISO(date);
+        map.set(key, (map.get(key) || 0) + amount);
+      };
+
+      // Invitados: curva Beta-like entre invitaciones y boda, con cola post-boda
+      const totalGifts = Math.max(0, (contributions.giftPerGuest || 0) * (contributions.guestCount || 0));
+      const preDays = weddingDate ? Math.max(1, daysBetween(invitesDate, weddingDate)) : 60;
+      const a = 2.5, b = 2.0; // forma asimétrica
+      let preWeights = [];
+      let preSum = 0;
+      for (let i = 0; i < preDays; i++) {
+        const x = (i + 1) / preDays;
+        const w = Math.pow(x, a - 1) * Math.pow(1 - x, b - 1);
+        preWeights.push(w);
+        preSum += w;
+      }
+      preWeights = preSum > 0 ? preWeights.map((w) => w / preSum) : Array(preDays).fill(0);
+      const tailMass = 0.3;
+      const preMass = 1 - tailMass;
+      for (let i = 0; i < preDays; i++) {
+        const d = addDays(invitesDate, i);
+        if (d >= start && d <= end) bump(incomesByDay, d, totalGifts * preMass * preWeights[i]);
+      }
+      const r = 0.9;
+      let geoSum = 0; for (let i = 1; i <= tailDays; i++) geoSum += Math.pow(r, i);
+      for (let i = 1; i <= tailDays; i++) {
+        const d = weddingDate ? addDays(weddingDate, i) : addDays(start, i);
+        if (d >= start && d <= end) bump(incomesByDay, d, totalGifts * tailMass * (Math.pow(r, i) / geoSum));
+      }
+
+      // Contribuciones de novios
+      const initialContrib = Math.max(0, (contributions.initA || 0) + (contributions.initB || 0));
+      const monthly = Math.max(0, (contributions.monthlyA || 0) + (contributions.monthlyB || 0));
+      const extras = Math.max(0, contributions.extras || 0);
+      const contribStart = invitesDate > start ? invitesDate : start;
+      if (initialContrib > 0) bump(incomesByDay, contribStart, initialContrib);
+      if (monthly > 0) { let d = new Date(start); while (d <= end && (!weddingDate || d <= weddingDate)) { bump(incomesByDay, d, monthly); d = addDays(d, 30); } }
+      if (extras > 0) bump(incomesByDay, weddingDate || end, extras);
+
+      // Gastos: pagos pendientes con dueDate
+      for (const tx of Array.isArray(transactions) ? transactions : []) {
+        if (!tx || tx.type !== 'expense') continue;
+        const due = tx.dueDate ? new Date(tx.dueDate) : null;
+        if (!due || Number.isNaN(due.getTime())) continue;
+        const amount = Number(tx.amount) || 0;
+        const paid = normalizePaidAmount(tx);
+        const outstanding = Math.max(0, amount - paid);
+        if (outstanding <= 0) continue;
+        const dd = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+        if (dd >= start && dd <= end) bump(expensesByDay, dd, outstanding);
+      }
+
+      // Serie
+      const series = [];
+      const daysTotal = daysBetween(start, end);
+      let balance = (totalIncome - totalSpent);
+      let minBalance = balance;
+      let minDate = toISO(start);
+      let riskDays = 0;
+      for (let i = 0; i <= daysTotal; i++) {
+        const d = addDays(start, i);
+        const key = toISO(d);
+        const inc = incomesByDay.get(key) || 0;
+        const exp = expensesByDay.get(key) || 0;
+        balance = balance + inc - exp;
+        if (balance < minBalance) { minBalance = balance; minDate = key; }
+        if (balance < 0) riskDays += 1;
+        series.push({ date: key, income: inc, expense: exp, balance });
+      }
+
+      const toISODate = (d) => (d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10) : null);
+      const projectedAtWedding = weddingDate ? series.find((p) => p.date === toISODate(weddingDate))?.balance ?? balance : balance;
+      return {
+        startDate: toISO(start),
+        endDate: toISO(end),
+        weddingDate: toISODate(weddingDate),
+        invitesSentDate: toISODate(invitesDate),
+        params: { gifts: { a, b, tailMass, r }, monthlyStepDays: 30, tailDays },
+        series,
+        summary: { projectedAtWedding, minProjectedBalance: minBalance, minProjectedBalanceDate: minDate, riskDays, totalProjectedGifts: totalGifts },
+      };
+    } catch (e) {
+      console.warn('[useFinance] projection computation error:', e);
+      return null;
+    }
+  }, [transactions, contributions, totalIncome, totalSpent, weddingTimeline]);
+
   // Suscribirse a cambios en el estado de sincronización
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
@@ -236,6 +349,14 @@ export default function useFinance() {
             guestCount: Number(info.numGuests),
           }));
         }
+        // Fechas clave: invitaciones y boda
+        try {
+          const rawWeddingDate = info?.weddingDate || info?.date || null;
+          const rawInvitesDate = info?.invitesSentDate || info?.invitationsSentDate || info?.invitesSentAt || info?.invitationsSentAt || null;
+          const parsedWedding = rawWeddingDate ? new Date(rawWeddingDate) : null;
+          const parsedInvites = rawInvitesDate ? new Date(rawInvitesDate) : null;
+          setWeddingTimeline({ invitesSentDate: parsedInvites, weddingDate: parsedWedding });
+        } catch (_) {}
       }
     } catch (err) {
       console.error('Error cargando número de invitados:', err);
@@ -678,6 +799,7 @@ export default function useFinance() {
     expectedIncome,
     emergencyAmount,
     currentBalance,
+    projection,
 
     // Acciones
     updateContributions,

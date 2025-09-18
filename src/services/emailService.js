@@ -90,6 +90,25 @@ async function buildAuthHeaders(base = {}) {
 }
 
 export async function getMails(folder = 'inbox') {
+  // Carpeta virtual: combinar inbox+sent
+  if (folder === 'all') {
+    try {
+      const [inbox, sent] = await Promise.all([
+        getMails('inbox').catch(() => []),
+        getMails('sent').catch(() => []),
+      ]);
+      const combined = [
+        ...(Array.isArray(inbox) ? inbox : []),
+        ...(Array.isArray(sent) ? sent : []),
+      ];
+      // Ordenar por fecha desc y deduplicar por id
+      const byId = new Map();
+      for (const m of combined) { if (m && m.id) byId.set(m.id, m); }
+      return Array.from(byId.values()).sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+    } catch {
+      // fall through to backend path
+    }
+  }
   if (USE_BACKEND) {
     const user = resolveCurrentEmail();
     const qs = new URLSearchParams();

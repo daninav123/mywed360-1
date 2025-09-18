@@ -7,6 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
 import { post as apiPost } from '../../services/apiClient';
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
+import { useWedding } from '../../context/WeddingContext';
 import SeatingPlanTabs    from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
 import SeatingPlanCanvas  from './SeatingPlanCanvas';
@@ -14,6 +15,7 @@ import SeatingPlanSidebar from './SeatingPlanSidebar';
 import SeatingPlanModals  from './SeatingPlanModals';
 
 const SeatingPlanRefactored = () => {
+  const { activeWedding } = useWedding();
   /* ---- estado / funciones principales ---- */
   const {
     tab, setTab, syncStatus, hallSize, areas, tables, seats,
@@ -197,9 +199,7 @@ const SeatingPlanRefactored = () => {
               : `Capacidad insuficiente: necesitas ${needed} asiento(s) y quedan ${remaining}`;
             // Métrica: asignación bloqueada por capacidad (best-effort, no bloqueante)
             try {
-              apiPost('/api/metrics/seating', {
-                body: JSON.stringify({ event: 'assign', result: 'blocked', tab }),
-              }).catch(() => {});
+              apiPost('/api/metrics/seating', { event: 'assign', result: 'blocked', tab, weddingId: activeWedding }, { auth: true }).catch(() => {});
             } catch {}
             toast.error(msg);
             return;
@@ -208,7 +208,7 @@ const SeatingPlanRefactored = () => {
         moveGuest(guestId, tableId);
         // Métrica: asignación exitosa (best-effort, no bloqueante)
         try {
-          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
+          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab, weddingId: activeWedding }, { auth: true }).catch(() => {});
         } catch {}
         toast.success('Invitado asignado a la mesa');
         return;
@@ -217,7 +217,7 @@ const SeatingPlanRefactored = () => {
         // fallback: intentar asignar igualmente
         moveGuest(guestId, tableId);
         try {
-          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
+          apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab, weddingId: activeWedding }, { auth: true }).catch(() => {});
         } catch {}
         toast.success('Invitado asignado a la mesa');
         return;

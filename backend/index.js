@@ -26,7 +26,8 @@ import { randomUUID } from 'crypto';
 import {
   requireAuth,
   requireMailAccess,
-  optionalAuth
+  optionalAuth,
+  requireAdmin,
 } from './middleware/authMiddleware.js';
 
 import mailRouter from './routes/mail.js';
@@ -240,7 +241,7 @@ app.use(express.urlencoded({ extended: true, limit: process.env.BODY_URLENCODED_
 app.use(express.json({ limit: process.env.BODY_JSON_LIMIT || '1mb' }));
 
 // Endpoint de métricas (activa prom-client si está disponible)
-app.get('/metrics', async (_req, res) => {
+app.get('/metrics', requireAdmin, async (req, res) => {
   try {
     await ensureMetrics();
     if (!metrics.loaded) return res.status(503).send('metrics unavailable');
@@ -307,6 +308,13 @@ app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
 app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
+app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
+// Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
+try {
+  const { requireAdmin } = await import('./middleware/authMiddleware.js');
+  const metricsAdminRouter = (await import('./routes/metrics-admin.js')).default;
+  app.use('/api/admin/metrics', requireAdmin, metricsAdminRouter);
+} catch {}
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);
 // Rutas de diagnóstico y test (públicas para debugging)
