@@ -316,10 +316,10 @@ function mapTagToCategory(tags = [], folder = null) {
 
   if (has('contrato', 'legal')) return 'Contratos';
   if (has('factura', 'invoice', 'recibo')) return 'Facturas';
-  if (has('reuniÃ¡Â³n', 'reunion', 'meeting', 'cita', 'llamada')) return 'Reuniones';
-  if (has('rsvp', 'invitaciÃ¡Â³n', 'invitacion', 'confirmaciÃ¡Â³n', 'confirmacion')) return 'RSVP';
+  if (has('reuniáÂ³n', 'reunion', 'meeting', 'cita', 'llamada')) return 'Reuniones';
+  if (has('rsvp', 'invitaciáÂ³n', 'invitacion', 'confirmaciáÂ³n', 'confirmacion')) return 'RSVP';
   if (has('guest', 'invitado')) return 'Invitado';
-  if (has('proveedor', 'catering', 'fotÃ¡Â³grafo', 'fotografo', 'dj', 'mÃ¡Âºsica', 'musica', 'flor', 'banquete', 'venue')) return 'Proveedor';
+  if (has('proveedor', 'catering', 'fotáÂ³grafo', 'fotografo', 'dj', 'máÂºsica', 'musica', 'flor', 'banquete', 'venue')) return 'Proveedor';
   if (has('finanzas', 'presupuesto', 'pago', 'importe', 'transferencia', 'budget')) return 'Finanzas';
   if (has('urgente', 'emergencia', 'asap')) return 'Urgente';
 
@@ -448,10 +448,10 @@ export function scheduleEmailSend(payload, scheduledAt) {
   if (!scheduledAt) throw new Error("scheduledAt requerido");
   const date = new Date(scheduledAt);
   if (Number.isNaN(date.getTime())) {
-    throw new Error("Fecha programada no vÃ¡Æ’Ã†â€™Ã¡â€ Ã¢â‚¬â„¢Ã¡Æ’Ã¢â‚¬Å¡Ã¡â€šÃ‚Â¡lida");
+    throw new Error("Fecha programada no váÆ’Ã†â€™áâ€ Ã¢â‚¬â„¢áÆ’Ã¢â‚¬Å¡áâ€šÃ‚Â¡lida");
   }
   if (payload?.attachments && payload.attachments.length) {
-    throw new Error("La programaciÃ¡Æ’Ã†â€™Ã¡â€ Ã¢â‚¬â„¢Ã¡Æ’Ã¢â‚¬Å¡Ã¡â€šÃ‚Â³n con adjuntos no estÃ¡Æ’Ã†â€™Ã¡â€ Ã¢â‚¬â„¢Ã¡Æ’Ã¢â‚¬Å¡Ã¡â€šÃ‚Â¡ soportada todavÃ¡Æ’Ã†â€™Ã¡â€ Ã¢â‚¬â„¢Ã¡Æ’Ã¢â‚¬Å¡Ã¡â€šÃ‚Â­a");
+    throw new Error("La programaciáÆ’Ã†â€™áâ€ Ã¢â‚¬â„¢áÆ’Ã¢â‚¬Å¡áâ€šÃ‚Â³n con adjuntos no estáÆ’Ã†â€™áâ€ Ã¢â‚¬â„¢áÆ’Ã¢â‚¬Å¡áâ€šÃ‚Â¡ soportada todaváÆ’Ã†â€™áâ€ Ã¢â‚¬â„¢áÆ’Ã¢â‚¬Å¡áâ€šÃ‚Â­a");
   }
   const now = Date.now();
   if (date.getTime() < now + 60 * 1000) {

@@ -5,9 +5,9 @@ import { MessageSquare, Smartphone, Send, Settings } from 'lucide-react';
 import { getProviderStatus, getHealth, getMetrics, toE164, waDeeplink } from '../../services/whatsappService';
 
 /**
- * Modal de EnvÃ­o por WhatsApp
- * - PestaÃ±a 1: MÃ³vil personal (deeplink)
- * - PestaÃ±a 2: NÃºmero de la app (API WhatsApp Business)
+ * Modal de Envío por WhatsApp
+ * - Pestaña 1: Móvil personal (deeplink)
+ * - Pestaña 2: Número de la app (API WhatsApp Business)
  */
 export default function WhatsAppModal({
   open,
@@ -47,7 +47,7 @@ export default function WhatsAppModal({
 
   function buildDefaultMessage(g) {
     if (!g) return 'Â¡Hola! Queremos invitarte a nuestra boda. Â¿Puedes confirmar tu asistencia?';
-    return `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
+    return `Â¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
   }
 
   const deeplinkHref = useMemo(() => {
@@ -82,7 +82,7 @@ export default function WhatsAppModal({
   const handleSendApi = useCallback(async () => {
     if (!canSend) return;
     if (!provider.configured) {
-      alert('El proveedor de WhatsApp API aÃºn no estÃ¡ configurado.');
+      alert('El proveedor de WhatsApp API aún no está configurado.');
       return;
     }
     await onSendApi?.(guest, message);
@@ -105,16 +105,16 @@ export default function WhatsAppModal({
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="flex space-x-6 border-b mb-4">
               <TabsTrigger value="personal" className="pb-2 flex items-center gap-2">
-                <Smartphone size={16} /> MÃ³vil personal
+                <Smartphone size={16} /> Móvil personal
               </TabsTrigger>
               <TabsTrigger value="api" className="pb-2 flex items-center gap-2">
-                <Send size={16} /> NÃºmero de la app
+                <Send size={16} /> Número de la app
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4">
               <p className="text-sm text-gray-600">
-                Se abrirÃ¡ WhatsApp en tu dispositivo con el mensaje preparado. PodrÃ¡s confirmar el envÃ­o manualmente.
+                Se abrirá WhatsApp en tu dispositivo con el mensaje preparado. Podrás confirmar el envío manualmente.
               </p>
 
               <div>
@@ -162,12 +162,12 @@ export default function WhatsAppModal({
                         }
                       }}
                     >
-                      Ver mÃ©tricas
+                      Ver métricas
                     </button>
                     {showMetrics && (
                       <div className="mt-2 border rounded p-2 bg-gray-50">
                         {loadingMetrics ? (
-                          <div>Cargando mÃ©tricasâ€¦</div>
+                          <div>Cargando métricasâ€¦</div>
                         ) : metrics ? (
                           <div className="text-[11px] text-gray-700">
                             <div>Total: {metrics.total || 0}</div>
@@ -192,11 +192,11 @@ export default function WhatsAppModal({
               <div className="flex flex-wrap justify-end gap-3">
                 <Button variant="outline" onClick={onClose}>Cerrar</Button>
                 <Button onClick={handleSendApi} disabled={!canSend || !provider.configured}>Enviar a este invitado</Button>
-                <Button variant="outline" onClick={onSendApiBulk} title="Enviar a invitados pendientes (API)">Masivo: pendientes</Button>
+                <Button variant="outline" onClick={onSendApiBulk} title="Enviar a invitados pendientes (API)">Másivo: pendientes</Button>
               </div>
               {!provider.configured && (
                 <div className="mt-2 text-xs text-gray-500">
-                  Nota: El proveedor API no estÃ¡ listo. Puedes usar la pestaña &quot;Móvil personal&quot; (deeplink) como alternativa.
+                  Nota: El proveedor API no está listo. Puedes usar la pestaña &quot;Móvil personal&quot; (deeplink) como alternativa.
                 </div>
               )}
             </TabsContent>

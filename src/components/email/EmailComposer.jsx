@@ -8,13 +8,13 @@ import { safeRender } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
 
 /**
- * Componente para redactar y enviar nuevos emails desde la direcciÃ³n personalizada del usuario
+ * Componente para redactar y enviar nuevos emails desde la dirección personalizada del usuario
  * 
  * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isOpen - Controla si el compositor estÃ¡ abierto
- * @param {Function} props.onClose - FunciÃ³n para cerrar el compositor
- * @param {Object} props.initialValues - Valores iniciales (para respuestas o reenvÃ­os)
- * @param {Function} props.onSend - Callback ejecutado despuÃ©s de enviar el email
+ * @param {boolean} props.isOpen - Controla si el compositor está abierto
+ * @param {Function} props.onClose - Función para cerrar el compositor
+ * @param {Object} props.initialValues - Valores iniciales (para respuestas o reenvíos)
+ * @param {Function} props.onSend - Callback ejecutado después de enviar el email
  * @returns {React.ReactElement} Componente para redactar emails
  */
 const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
@@ -27,7 +27,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const authContext = useAuth();
   const { userProfile } = authContext;
   
-  // Establecer el contexto de autenticaciÃ³n en EmailService (si estÃ¡ disponible en el mock)
+  // Establecer el contexto de autenticación en EmailService (si está disponible en el mock)
   useEffect(() => {
     try {
       EmailService?.setAuthContext?.(authContext);
@@ -103,14 +103,14 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
     
-    // Validar tamaÃ±o (mÃ¡ximo 10MB por archivo)
+    // Validar tamaño (máximo 10MB por archivo)
     const invalidFiles = files.filter(file => file.size > 10 * 1024 * 1024);
     if (invalidFiles.length > 0) {
-      setError(`Algunos archivos exceden el tamaÃ±o mÃ¡ximo de 10MB: ${invalidFiles.map(f => f.name).join(', ')}`);
+      setError(`Algunos archivos exceden el tamaño máximo de 10MB: ${invalidFiles.map(f => f.name).join(', ')}`);
       return;
     }
     
-    // AÃ±adir archivos a la lista de adjuntos
+    // Añadir archivos a la lista de adjuntos
     setAttachments(prev => [...prev, ...files.map(file => ({
       file,
       name: file.name,
@@ -138,22 +138,22 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     }
     
     if (!subject) {
-      setError('Por favor, aÃ±ade un asunto al email');
+      setError('Por favor, añade un asunto al email');
       return false;
     }
     
     if (!body || body.trim().length === 0) {
-      setError('El mensaje no puede estar vacÃ­o');
+      setError('El mensaje no puede estar vacío');
       return false;
     }
     
-    // Validar formato de email (expresiÃ³n regular bÃ¡sica)
+    // Validar formato de email (expresión regular básica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const toEmails = to.split(',').map(email => email.trim());
     const invalidEmails = toEmails.filter(email => !emailRegex.test(email));
     
     if (invalidEmails.length > 0) {
-      setError(`Algunas direcciones de email no son vÃ¡lidas: ${invalidEmails.join(', ')}`);
+      setError(`Algunas direcciones de email no son válidas: ${invalidEmails.join(', ')}`);
       return false;
     }
     
@@ -162,7 +162,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       const invalidCcEmails = ccEmails.filter(email => !emailRegex.test(email));
       
       if (invalidCcEmails.length > 0) {
-        setError(`Algunas direcciones CC no son vÃ¡lidas: ${invalidCcEmails.join(', ')}`);
+        setError(`Algunas direcciones CC no son válidas: ${invalidCcEmails.join(', ')}`);
         return false;
       }
     }
@@ -172,9 +172,9 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
   
   // Enviar el email
   const handleSend = async () => {
-    // Prevenir envÃ­o duplicado
+    // Prevenir envío duplicado
     if (sending) {
-      console.log('EnvÃ­o ya en progreso, ignorando...');
+      console.log('Envío ya en progreso, ignorando...');
       return;
     }
     
@@ -185,10 +185,10 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       return;
     }
     
-    // Verificar si el usuario tiene configurada direcciÃ³n personalizada
+    // Verificar si el usuario tiene configurada dirección personalizada
     if (!isTestEnv && userProfile && !userProfile.emailUsername && !userProfile.myWed360Email && !userProfile.emailAlias) {
       if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-        if (window.confirm('No tienes configurada una direcciÃ³n de correo personalizada. Â¿Deseas configurarla ahora?')) {
+        if (window.confirm('No tienes configurada una dirección de correo personalizada. Â¿Deseas configurarla ahora?')) {
           window.location.href = '/email/setup';
           return;
         }
@@ -248,7 +248,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
           onSend(result);
         }
         
-        // Esperar un momento para mostrar el mensaje de Ã©xito antes de cerrar
+        // Esperar un momento para mostrar el mensaje de éxito antes de cerrar
         setTimeout(() => {
           if (typeof onClose === 'function') {
             onClose();
@@ -400,7 +400,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
               onClick={() => setShowCc(true)}
               className="text-sm text-blue-600 hover:text-blue-800"
             >
-              AÃ±adir CC
+              Añadir CC
             </button>
           )}
         </div>
@@ -429,13 +429,13 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
             onChange={(e) => setBody(e.target.value)}
             className="w-full border border-gray-300 rounded-md p-2"
             rows="12"
-            placeholder="Escribe tu mensaje aquÃ­..."
+            placeholder="Escribe tu mensaje aquí..."
             disabled={sending}
             data-testid="body-editor"
           />
         </div>
 
-        {/* SecciÃ³n de adjuntos */}
+        {/* Sección de adjuntos */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Adjuntos:</label>
 
@@ -452,7 +452,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
                 disabled={sending}
               />
             </label>
-            <span className="ml-2 text-xs text-gray-500">MÃ¡ximo 10MB por archivo</span>
+            <span className="ml-2 text-xs text-gray-500">Máximo 10MB por archivo</span>
           </div>
           
           {attachments.length > 0 && (

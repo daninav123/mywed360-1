@@ -71,10 +71,10 @@ const SeatingPlanRefactored = () => {
   const [backgroundOpen, setBackgroundOpen] = React.useState(false);
   // Modal de capacidad global
   const [capacityOpen, setCapacityOpen] = React.useState(false);
-  // Mostrar numeraciÃ³n de asientos
+  // Mostrar numeración de asientos
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
-  // handler para fondo rÃ¡pido (prompt)
+  // handler para fondo rápido (prompt)
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
   const safeTables = Array.isArray(tables) ? tables : [];
@@ -126,7 +126,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [setDrawMode]);
 
-  // Backspace: eliminar mesa seleccionada (con confirmaciÃ³n)
+  // Backspace: eliminar mesa seleccionada (con confirmación)
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -144,7 +144,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedTable, deleteTable]);
 
-  // Atajos de rotaciÃ³n: Q/E para -5Â°/+5Â°
+  // Atajos de rotación: Q/E para -5Â°/+5Â°
   useEffect(() => {
     const onKey = (e) => {
       try {
@@ -177,7 +177,7 @@ const SeatingPlanRefactored = () => {
   // Asignar invitado a mesa (drag & drop / sidebar)
   const handleAssignGuest = React.useCallback((tableId, guestId) => {
     if (guestId) {
-      // Capacidad: contar asientos ocupados (invitado + acompaÃ±antes)
+      // Capacidad: contar asientos ocupados (invitado + acompañantes)
       try {
         const table = safeTables.find(t => String(t.id) === String(tableId));
         const seatsCap = parseInt(table?.seats, 10) || 0;
@@ -195,7 +195,7 @@ const SeatingPlanRefactored = () => {
             const msg = remaining === 0
               ? 'Capacidad completa: no hay asientos disponibles en esta mesa'
               : `Capacidad insuficiente: necesitas ${needed} asiento(s) y quedan ${remaining}`;
-            // MÃ©trica: asignaciÃ³n bloqueada por capacidad (best-effort, no bloqueante)
+            // Métrica: asignación bloqueada por capacidad (best-effort, no bloqueante)
             try {
               apiPost('/api/metrics/seating', {
                 body: JSON.stringify({ event: 'assign', result: 'blocked', tab }),
@@ -206,7 +206,7 @@ const SeatingPlanRefactored = () => {
           }
         }
         moveGuest(guestId, tableId);
-        // MÃ©trica: asignaciÃ³n exitosa (best-effort, no bloqueante)
+        // Métrica: asignación exitosa (best-effort, no bloqueante)
         try {
           apiPost('/api/metrics/seating', { event: 'assign', result: 'success', tab }).catch(() => {});
         } catch {}
@@ -254,7 +254,7 @@ const SeatingPlanRefactored = () => {
     }
   }, [moveGuest]);
 
-  // AplicaciÃ³n de plantillas (evita fallo si se usa el modal de plantillas)
+  // Aplicación de plantillas (evita fallo si se usa el modal de plantillas)
   const handleApplyTemplate = React.useCallback((template) => {
     if (template?.ceremony) {
       generateSeatGrid(
@@ -280,7 +280,7 @@ const SeatingPlanRefactored = () => {
       });
     }
 
-    // AsignaciÃ³n automÃ¡tica no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
+    // Asignación automática no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
     setTimeout(async () => {
       try {
         const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
@@ -288,11 +288,11 @@ const SeatingPlanRefactored = () => {
         const res = await autoAssignGuests();
         if (res?.ok) {
           const msg = res.method === 'backend'
-            ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
-            : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
+            ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+            : `Asignación automática: ${res.assigned} invitado(s)`;
           toast.info(msg);
         } else if (res?.error) {
-          toast.warn(`AutoasignaciÃ³n: ${res.error}`);
+          toast.warn(`Autoasignación: ${res.error}`);
         }
       } catch (e) {
         // Silencioso para no molestar al usuario; solo log
@@ -306,18 +306,18 @@ const SeatingPlanRefactored = () => {
       const res = await (typeof autoAssignGuestsRules === 'function' ? autoAssignGuestsRules() : autoAssignGuests());
       if (res?.ok) {
         const msg = res.method === 'backend'
-          ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
-          : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
+          ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+          : `Asignación automática: ${res.assigned} invitado(s)`;
         toast.info(msg);
       } else if (res?.error) {
-        toast.warn(`Auto-asignaciÃ³n: ${res.error}`);
+        toast.warn(`Auto-asignación: ${res.error}`);
       }
     } catch (e) {
-      toast.error('Error en auto-asignaciÃ³n');
+      toast.error('Error en auto-asignación');
     }
-  };
+  }, [autoAssignGuestsRules, autoAssignGuests]);
 
-  // GeneraciÃ³n desde modal de banquete seguida de autoasignaciÃ³n (silencioso a nivel de UI)
+  // Generación desde modal de banquete seguida de autoasignación (silencioso a nivel de UI)
   const handleGenerateBanquetLayoutWithAssign = React.useCallback((config) => {
     try {
       generateBanquetLayout(config);
@@ -329,11 +329,11 @@ const SeatingPlanRefactored = () => {
           const res = await (typeof autoAssignGuestsRules === 'function' ? autoAssignGuestsRules() : autoAssignGuests());
           if (res?.ok) {
             const msg = res.method === 'backend'
-              ? `AsignaciÃ³n automÃ¡tica (IA): ${res.assigned} invitado(s)`
-              : `AsignaciÃ³n automÃ¡tica: ${res.assigned} invitado(s)`;
+              ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+              : `Asignación automática: ${res.assigned} invitado(s)`;
             toast.info(msg);
           } else if (res?.error) {
-            toast.warn(`AutoasignaciÃ³n: ${res.error}`);
+            toast.warn(`Autoasignación: ${res.error}`);
           }
         } catch (e) {
           console.warn('Auto-assign error', e);
@@ -365,7 +365,7 @@ return (
       {/* Tabs */}
       <div className="flex-shrink-0 p-4 pb-0">
         {(() => {
-          // Progreso por pestaÃ±a
+          // Progreso por pestaña
           const totalGuests = safeGuests.reduce((acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0), 0);
           const enabledSeats = safeSeats.filter(s => s?.enabled !== false).length;
           const ceremonyProgress = totalGuests > 0 ? Math.min(100, Math.round((enabledSeats / totalGuests) * 100)) : 0;

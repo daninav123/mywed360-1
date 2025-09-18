@@ -118,7 +118,21 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204
+}));
+
+// Responder preflight explícitamente y cachear durante 10 minutos
+app.options('*', cors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204,
+  maxAge: 600
 }));
 
 // Rate limiting: por defecto 120/min en producción, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
@@ -222,8 +236,8 @@ app.use((req, _res, next) => {
 });
 
 // Para que Mailgun (form-urlencoded) sea aceptado
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: process.env.BODY_URLENCODED_LIMIT || '2mb' }));
+app.use(express.json({ limit: process.env.BODY_JSON_LIMIT || '1mb' }));
 
 // Endpoint de métricas (activa prom-client si está disponible)
 app.get('/metrics', async (_req, res) => {

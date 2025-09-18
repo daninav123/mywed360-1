@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
-import { showNotification } from '../../services/notificationService';
+import { showNotification, shouldNotify } from '../../services/notificationService';
 
 const BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_BACKEND_BASE_URL) || '';
 
@@ -39,7 +39,8 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
           if (kind === 'meeting_suggested') {
             const title = n?.payload?.meeting?.title || 'Reunión detectada';
             const when = n?.payload?.meeting?.when || '';
-            showNotification({
+            if (shouldNotify({ type: 'ai', subtype: 'meeting_suggested', priority: 'high', channel: 'toast' })) {
+              showNotification({
               title: 'Reunión sugerida',
               message: `${title}${when ? ' · ' + when : ''}`,
               type: 'info',
@@ -48,12 +49,14 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
                 { label: 'Aceptar', kind: 'acceptMeeting', payload: { weddingId: n?.payload?.weddingId, mailId: n?.payload?.mailId, title, when, notificationId: n.id } },
                 { label: 'Rechazar', kind: 'markRead', payload: { notificationId: n.id } },
               ],
-            });
+              });
+            }
           } else if (kind === 'budget_suggested') {
             const amount = n?.payload?.budget?.amount;
             const currency = n?.payload?.budget?.currency || 'EUR';
             const desc = n?.payload?.budget?.description || 'Presupuesto';
-            showNotification({
+            if (shouldNotify({ type: 'ai', subtype: 'budget_suggested', priority: 'high', channel: 'toast' })) {
+              showNotification({
               title: 'Presupuesto detectado',
               message: `${desc}${amount ? ' · ' + amount + ' ' + currency : ''}`,
               type: 'info',
@@ -62,12 +65,14 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
                 { label: 'Aceptar', kind: 'acceptBudget', payload: { weddingId: n?.payload?.weddingId, budgetId: n?.payload?.budgetId, emailId: n?.payload?.mailId, notificationId: n.id } },
                 { label: 'Rechazar', kind: 'markRead', payload: { notificationId: n.id } },
               ],
-            });
+              });
+            }
           } else if (kind === 'task_suggested') {
             const title = n?.payload?.task?.title || 'Tarea detectada';
             const due = n?.payload?.task?.due;
             const priority = n?.payload?.task?.priority || 'media';
-            showNotification({
+            if (shouldNotify({ type: 'ai', subtype: 'task_suggested', priority: 'high', channel: 'toast' })) {
+              showNotification({
               title: 'Tarea sugerida',
               message: `${title}${due ? ' - ' + due : ''}`,
               type: 'info',
@@ -76,7 +81,8 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
                 { label: 'Agregar', kind: 'acceptTask', payload: { weddingId: n?.payload?.weddingId, mailId: n?.payload?.mailId, title, due, priority, notificationId: n.id } },
                 { label: 'Rechazar', kind: 'markRead', payload: { notificationId: n.id } },
               ],
-            });
+              });
+            }
           }
         }
         try { localStorage.setItem('lovenda_notif_seen', JSON.stringify(Array.from(seenRef.current))); } catch {}

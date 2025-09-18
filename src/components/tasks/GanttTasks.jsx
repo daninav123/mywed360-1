@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
@@ -18,7 +18,17 @@ export const GanttChart = ({
   gridStartDate,
   gridEndDate,   // tope visual estricto del grid (fin)
 }) => {
-  // ErrorBoundary local para evitar que la pÃ¡gina caiga si la librerÃ­a falla
+  // Debug opt-in: activa con localStorage.setItem('lovenda_gantt_debug','1') o window.__GANTT_DEBUG__=true
+  const debugEnabled = (() => {
+    try {
+      if (typeof window !== 'undefined' && window.__GANTT_DEBUG__) return true;
+      const v = (typeof localStorage !== 'undefined') ? localStorage.getItem('lovenda_gantt_debug') : null;
+      return v === '1' || /^true$/i.test(String(v || ''));
+    } catch { return false; }
+  })();
+  const dbg = (...args) => { if (debugEnabled) console.log('[GanttDebug]', ...args); };
+  try { dbg('GanttDebug init', { debugEnabled, viewMode, columnWidth, markerDate }); } catch {}
+  // ErrorBoundary local para evitar que la pÃƒÆ’Ã‚Â¡gina caiga si la librerÃƒÆ’Ã‚Â­a falla
   class LocalErrorBoundary extends React.Component {
     constructor(props) {
       super(props);
@@ -30,7 +40,7 @@ export const GanttChart = ({
       if (this.state.hasError) {
         return (
           <div className="flex items-center justify-center h-full text-gray-500">
-            No se pudo renderizar el diagrama Gantt (datos invÃ¡lidos)
+            No se pudo renderizar el diagrama Gantt (datos invÃƒÆ’Ã‚Â¡lidos)
           </div>
         );
       }
@@ -57,7 +67,7 @@ export const GanttChart = ({
     </div>
   );
 
-  // Normalizar fechas y filtrar tareas invÃ¡lidas
+  // Normalizar fechas y filtrar tareas invÃƒÆ’Ã‚Â¡lidas
   const normalizeDate = (d) => {
     if (!d) return null;
     try {
@@ -106,10 +116,10 @@ export const GanttChart = ({
   }
 
   if (cleanTasks.length === 0) {
-    // Evitar renderizar el componente de la librerÃ­a con datos vacÃ­os o corruptos
+    // Evitar renderizar el componente de la librerÃƒÆ’Ã‚Â­a con datos vacÃƒÆ’Ã‚Â­os o corruptos
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
-        No hay tareas vÃ¡lidas para mostrar
+        No hay tareas vÃƒÆ’Ã‚Â¡lidas para mostrar
       </div>
     );
   }
@@ -121,29 +131,37 @@ export const GanttChart = ({
   const wrapperRef = useRef(null);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [contentOffsetX, setContentOffsetX] = useState(0);
+  const [containerScrollLeft, setContainerScrollLeft] = useState(0); // scroll del contenedor vertical (header+grid)
   const scrollerRef = useRef(null);
   const [scrollerNode, setScrollerNode] = useState(null);
   const movingGroupRef = useRef(null);
 
+  const [verticalNode, setVerticalNode] = useState(null);
   useEffect(() => {
     const root = wrapperRef.current;
     if (!root) {
       setScrollerNode(null);
+      setVerticalNode(null);
       return;
     }
-    // Buscar el contenedor scrollable interno del Gantt
+    // Buscar el contenedor scrollable interno del Gantt (preferir verticalContainer de la librerÃ­a)
     let scroller = null;
-    const all = root.querySelectorAll('*');
-    for (const el of all) {
-      try {
-        const style = window.getComputedStyle(el);
-        const hasOverflowX = /(auto|scroll)/.test(style.overflowX || '');
-        if (hasOverflowX && el.scrollWidth > el.clientWidth + 2) {
-          scroller = el; break;
-        }
-      } catch {}
+    try {
+      const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+      if (vertical && vertical.scrollWidth > vertical.clientWidth) scroller = vertical;
+    } catch {}
+    if (!scroller) {
+      const all = root.querySelectorAll('*');
+      for (const el of all) {
+        try {
+          const style = window.getComputedStyle(el);
+          const hasOverflowX = /(auto|scroll)/.test(style.overflowX || '');
+          if (hasOverflowX && el.scrollWidth > el.clientWidth + 2) { scroller = el; break; }
+        } catch {}
+      }
     }
     if (!scroller) {
+      dbg('No se encontrÃ³ scroller interno');
       setScrollerNode(null);
       return;
     }
@@ -152,11 +170,28 @@ export const GanttChart = ({
     const onScroll = () => setScrollLeft(scroller.scrollLeft || 0);
     onScroll();
     scroller.addEventListener('scroll', onScroll);
+    // guardar referencia del contenedor principal de scroll
+    setVerticalNode(scroller);
+
     return () => {
       scroller.removeEventListener('scroll', onScroll);
       if (scrollerRef.current === scroller) scrollerRef.current = null;
       setScrollerNode(prev => (prev === scroller ? null : prev));
+      setVerticalNode(null);
     };
+  }, [viewMode, columnWidth, cleanTasks.length]);
+
+  // Capturar scroll horizontal del contenedor que envuelve cabecera y grid (afecta a ambos)
+  useEffect(() => {
+    const root = wrapperRef.current;
+    if (!root) return;
+    // El contenedor suele llevar una clase ofuscada que contiene 'ganttVerticalContainer'
+    const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+    if (!vertical) return;
+    const onScroll = () => setContainerScrollLeft(vertical.scrollLeft || 0);
+    onScroll();
+    vertical.addEventListener('scroll', onScroll);
+    return () => vertical.removeEventListener('scroll', onScroll);
   }, [viewMode, columnWidth, cleanTasks.length]);
 
   // Capturar scroll de cualquier descendiente (por si cambia el nodo scrollable)
@@ -216,7 +251,7 @@ export const GanttChart = ({
     return () => obs.disconnect();
   }, [viewMode, columnWidth, cleanTasks.length]);
 
-  // AnimaciÃ³n: seguimiento continuo de scroll/transform por si no disparan eventos
+  // AnimaciÃƒÆ’Ã‚Â³n: seguimiento continuo de scroll/transform por si no disparan eventos
   useEffect(() => {
     let rafId = null;
     const tick = () => {
@@ -240,8 +275,79 @@ export const GanttChart = ({
     return () => { if (rafId) cancelAnimationFrame(rafId); };
   }, [scrollLeft, contentOffsetX]);
 
+  // Forzar el ancho scrollable (fin del scroll) exactamente hasta gridEndDate (modo Mes)
+  useEffect(() => {
+    try {
+      if (viewMode !== ViewMode.Month) return;
+      const scroller = scrollerRef.current;
+      if (!scroller) return;
+      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
+        ? gridStartDate
+        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      if (!endOk || !base) return;
+
+      const colW = Math.max(8, Number(columnWidth) || 65);
+      const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
+      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
+      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
+      const wantedWidth = Math.max(1, monthsInclusive * colW);
+
+      // 1) Contenedor scrolleable (div) que determina el fin del scroll
+      scroller.style.width = `${wantedWidth}px`;
+
+      // 2) SVG del grid (contenido)
+      const innerSvg = scroller.querySelector('svg');
+      if (innerSvg) innerSvg.setAttribute('width', String(wantedWidth));
+
+      // 3) SVG de cabecera (hermano anterior en el contenedor vertical)
+      const vertical = scroller.parentElement; // div.ganttVerticalContainer
+      if (vertical) {
+        const headerSvg = vertical.querySelector('svg');
+        if (headerSvg) headerSvg.setAttribute('width', String(wantedWidth));
+      }
+      try {
+        const s = scrollerRef.current;
+        if (debugEnabled && s) dbg('ScrollWidth forzado', { wantedWidth, clientWidth: s.clientWidth, scrollWidth: s.scrollWidth });
+      } catch {}
+    } catch {}
+  }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
+
+  // Ajuste duro del ancho interno: forzar que el SVG y el contenedor horizontal no excedan el mes lÃƒÂ­mite
+  useEffect(() => {
+    try {
+      if (viewMode !== ViewMode.Month) return;
+      if (!wrapperRef.current) return;
+      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
+        ? gridStartDate
+        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      if (!endOk || !base) return;
+
+      const colW = Math.max(8, Number(columnWidth) || 65);
+      const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
+      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
+      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
+      const wantedWidth = Math.max(1, monthsInclusive * colW);
+
+      const root = wrapperRef.current;
+      const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+      if (!vertical) return;
+      const horizontal = vertical.querySelector('div[class*="horizontalContainer"], .horizontalContainer');
+      const svgs = vertical.querySelectorAll('svg');
+
+      if (horizontal) {
+        horizontal.style.width = `${wantedWidth}px`;
+      }
+      svgs.forEach(svg => {
+        try { svg.setAttribute('width', String(wantedWidth)); } catch {}
+      });
+    } catch {}
+  }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
+
   // Calcular offset horizontal en px para el marcador (modo Month fiable)
   let markerLeftPx = null;
+  let markerViewportLeftPx = null; // posiciÃ³n dentro del wrapper (tras restar scroll)
   try {
     const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
     if (markerOk) {
@@ -258,31 +364,38 @@ export const GanttChart = ({
           const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
+          // Convertir a coordenadas del wrapper restando el scroll actual (con fallback)
+          const s = scrollerRef.current;
+          if (s && wrapperRef.current) {
+            const sl = s.scrollLeft || 0;
+            markerViewportLeftPx = Math.max(0, markerLeftPx - sl);
+            if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
+              base,
+              gridStart: gridStart.toISOString(),
+              markerDate: markerDate?.toISOString?.() || markerDate,
+              colW,
+              monthsDiff,
+              daysInMonth,
+              dayIndex,
+              frac,
+              markerLeftPx,
+              scrollLeft: sl,
+              markerViewportLeftPx,
+              wrapperW: wrapperRef.current?.clientWidth,
+              scrollerW: s?.clientWidth,
+              scrollerSW: s?.scrollWidth
+            });
+          }
         }
       }
+    } else {
+      if (debugEnabled) console.warn('[GanttDebug] markerDate invÃ¡lido o no definido', { markerDate });
     }
-  } catch {}
+  } catch (e) {
+    console.warn('[GanttDebug] Error calculando marker', e);
+  }
 
-  // Calcular máscara de recorte a la derecha para no mostrar meses extra (tope visual estricto)
-  let rightMaskLeftPx = null;
-  let rightMaskWidthPx = null;
-  try {
-    const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
-    const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
-      ? gridStartDate
-      : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
-    if (endOk && base && viewMode === ViewMode.Month && scrollerRef.current) {
-      const colW = Math.max(8, Number(columnWidth) || 65);
-      const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
-      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
-      // Número de meses completos visibles (inclusivo)
-      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
-      rightMaskLeftPx = Math.max(0, monthsInclusive * colW);
-      const fullWidth = scrollerRef.current.scrollWidth || 0;
-      rightMaskWidthPx = Math.max(0, fullWidth - rightMaskLeftPx);
-    }
-  } catch {}
-
+  // Right mask placeholder\n
   return (
     <LocalErrorBoundary>
       <div ref={wrapperRef} style={{ position: 'relative', overflow: 'hidden' }}>
@@ -309,10 +422,10 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {scrollerRef.current && typeof markerLeftPx === 'number' && markerLeftPx >= 0 && createPortal(
+        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && createPortal(
           <div
             title="Dia de la boda"
-            style={{ position: 'absolute', top: 0, left: Math.max(0, markerLeftPx), height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), pointerEvents: 'none', zIndex: 1000 }}
+            style={{ position: 'absolute', top: 0, left: Math.max(0, markerViewportLeftPx), height: (wrapperRef.current ? ((wrapperRef.current.scrollHeight || wrapperRef.current.clientHeight) || '100%') : '100%'), pointerEvents: 'none', zIndex: 5000 }}
           >
             {/* Poste vertical */}
             <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
@@ -325,7 +438,7 @@ export const GanttChart = ({
               aria-hidden="true"
               focusable="false"
             >
-              {/* paÃ±o blanco */}
+              {/* paÃƒÆ’Ã‚Â±o blanco */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="#ffffff" opacity="0.95" />
               {/* cuadros negros */}
               <rect x="4" y="2" width="3" height="3" fill="#111" />
@@ -335,18 +448,12 @@ export const GanttChart = ({
               {/* borde rojo fino para armonizar con el poste */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
             </svg>
-          </div>, scrollerRef.current.firstElementChild || scrollerRef.current)
+          </div>, wrapperRef.current)
         }
-        {scrollerRef.current && typeof rightMaskLeftPx === 'number' && typeof rightMaskWidthPx === 'number' && rightMaskWidthPx > 0 && createPortal(
-          <div
-            aria-hidden="true"
-            style={{ position: 'absolute', top: 0, left: Math.max(0, rightMaskLeftPx), width: rightMaskWidthPx, height: (scrollerRef.current ? (scrollerRef.current.scrollHeight || '100%') : '100%'), background: 'white', pointerEvents: 'none', zIndex: 1001 }}
-          />,
-          scrollerRef.current.firstElementChild || scrollerRef.current
-        )}
       </div>
     </LocalErrorBoundary>
   );
 };
+
 
 

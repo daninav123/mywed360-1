@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+  const normalizeLang = (l) => (String(l || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es');
 import { toast } from 'react-toastify';
 // import anterior eliminado: useUserContext
 import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
@@ -18,13 +19,14 @@ import { useTranslation } from 'react-i18next';
 import PlannerDashboard from './PlannerDashboard';
 import useFinance from '../hooks/useFinance';
 
+import { getBackendBase } from '@/utils/backendBase.js';
 export default function HomePage() {
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
   const [guest, setGuest] = useState({name: '', side: 'novia', contact: ''});
   const [newMovement, setNewMovement] = useState({concept: '', amount: 0, date: '', type: 'expense'});
   const [activeModal, setActiveModal] = useState(null);
-  // Hook de autenticación unificado
+  // Hook de autenticacin unificado
   const { hasRole, userProfile, currentUser } = useAuth();
   
   // Derivados equivalentes al antiguo UserContext
@@ -34,10 +36,10 @@ export default function HomePage() {
   const progress = Number(localStorage.getItem('lovenda_progress') || 0);
   const logoUrl = userProfile?.logoUrl || '';
   
-  // Datos derivados ya calculados más arriba
+  // Datos derivados ya calculados ms arriba
   const email = currentUser?.email || '';
 
-  // Si el usuario es Wedding Planner mostramos dashboard específico
+  // Si el usuario es Wedding Planner mostramos dashboard especfico
   if (role === 'planner') {
     return <PlannerDashboard />;
   }
@@ -45,12 +47,12 @@ export default function HomePage() {
   const [newsPosts, setNewsPosts] = useState([]);
   const [categoryImages, setCategoryImages] = useState([]);
   const { i18n } = useTranslation();
-  const normalizeLang = (l) => (String(l || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es');
   const lang = normalizeLang(i18n.language);
+  const backendBase = getBackendBase();
 
-  // Cargar primera imagen de cada categoría
+  // Cargar primera imagen de cada categora
   useEffect(() => {
-    const categories = ['decoración','cóctel','banquete','ceremonia'];
+    const categories = ['decoracin','cctel','banquete','ceremonia'];
     Promise.all(categories.map(cat=>fetchWall(1, cat))).then(results=>{
       const imgs = results.map((arr,i)=>{
         const first = arr[0];
@@ -61,12 +63,14 @@ export default function HomePage() {
     }).catch(console.error);
   }, []);
 
-  // Cargar últimas noticias (máx 3 por dominio y 4 con imagen)
+  // Cargar ltimas noticias (mx 3 por dominio y 4 con imagen)
   useEffect(() => {
     const loadNews = async () => {
       const desired = 4;
       let page = 1;
       const results = [];
+      const domainCounts = {};
+      const PER_DOMAIN_LIMIT = 1;
       let consecutiveErrors = 0;
 
       while (results.length < desired && page <= 20) {
@@ -75,7 +79,10 @@ export default function HomePage() {
           consecutiveErrors = 0;
           for (const post of batch) {
             if (!post?.url || !post.image) continue;
+            const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
+            if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
             if (results.some(x => x.url === post.url)) continue;
+            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
             results.push(post);
             if (results.length >= desired) break;
           }
@@ -98,9 +105,12 @@ export default function HomePage() {
             const batch = await fetchWeddingNews(page, 50, lang === 'en' ? 'en' : 'en');
             consecutiveErrors = 0;
             for (const post of batch) {
-              if (!post?.url || !post.image) continue;
-              if (results.some(x => x.url === post.url)) continue;
-              results.push(post);
+            if (!post?.url || !post.image) continue;
+            const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
+            if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
+            if (results.some(x => x.url === post.url)) continue;
+            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
+            results.push(post);
               if (results.length >= desired) break;
             }
           } catch (err) {
@@ -123,7 +133,10 @@ export default function HomePage() {
             consecutiveErrors = 0;
             for (const post of batch) {
               if (!post?.url) continue;
+              const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
+              if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
               if (results.some(x => x.url === post.url)) continue;
+              domainCounts[dom] = (domainCounts[dom] || 0) + 1;
               results.push(post.image ? post : { ...post, image: placeholder });
               if (results.length >= desired) break;
             }
@@ -142,7 +155,7 @@ export default function HomePage() {
   }, [lang]);
 
   const handleRedoTutorial = useCallback(async () => {
-    if (!confirm('Esto eliminará datos locales y creará una nueva boda de prueba. ¿Continuar?')) return;
+    if (!confirm('Esto eliminar datos locales y crear una nueva boda de prueba. Continuar?')) return;
     try {
       // 1. Limpiar almacenamiento y marcar flag para mostrar tutorial
       localStorage.clear();
@@ -165,7 +178,7 @@ export default function HomePage() {
     galleryRef.current?.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   }, []);
 
-  // --- Métricas dinámicas (memoizadas para performance) ---
+  // --- Mtricas dinmicas (memoizadas para performance) ---
   const guestsMetrics = useMemo(() => {
     try {
       const guestsArr = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
@@ -207,7 +220,7 @@ export default function HomePage() {
 
   const statsNovios = useMemo(() => [
     { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `€${financeSpent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
+    { label: 'Presupuesto gastado', value: `${financeSpent.toLocaleString()}` + (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
     { label: 'Proveedores contratados', value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`, icon: User },
     { label: 'Tareas completadas', value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`, icon: Calendar },
   ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
@@ -216,7 +229,7 @@ export default function HomePage() {
     { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
     { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
     { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `€${financeSpent.toLocaleString()}` + (budgetTotal ? ` / €${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
+    { label: 'Presupuesto gastado', value: `${financeSpent.toLocaleString()}` + (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
   ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
 
   const statsCommon = useMemo(() => 
@@ -226,7 +239,7 @@ export default function HomePage() {
 
   return (
     <React.Fragment>
-      {/* Botón solo visible en desarrollo */}
+      {/* Botn solo visible en desarrollo */}
       {true && (
         <button
           onClick={handleRedoTutorial}
@@ -278,8 +291,8 @@ export default function HomePage() {
         <section className="z-10 p-6 grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
           {[
             { key: 'proveedor', label: 'Buscar proveedor', icon: User },
-            { key: 'invitado', label: 'Añadir invitado', icon: Users },
-            { key: 'movimiento', label: 'Añadir movimiento', icon: DollarSign },
+            { key: 'invitado', label: 'Aadir invitado', icon: Users },
+            { key: 'movimiento', label: 'Aadir movimiento', icon: DollarSign },
             { key: 'nota', label: 'Nueva nota', icon: Plus },
           ].map((action, idx) => {
             const Icon = action.icon;
@@ -323,7 +336,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                Inspiración para tu boda
+                Inspiracin para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -368,12 +381,15 @@ export default function HomePage() {
               {newsPosts.map((post) => (
                 <Card key={post.id} onClick={() => window.open(post.url, '_blank')} className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition">
                   {post.image && (
-                    <img src={post.image} alt={post.title} className="w-full h-40 object-cover" />
+                    <img src={backendBase ? `${backendBase}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image} alt={post.title} className="w-full h-40 object-cover" />
                   )}
-                  <div className="p-4 space-y-1">
-                    <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">{post.title}</h3>
-                    <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">{post.description}</p>
-                  </div>
+              <div className="p-4 space-y-1">
+                <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">{post.title}</h3>
+                <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">{post.description}</p>
+                <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
+                  Fuente: {post.source || ((post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0])}
+                </div>
+              </div>
                 </Card>
               ))}
             </div>
@@ -389,7 +405,7 @@ export default function HomePage() {
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
-            <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
+            <h2 className="text-xl font-bold mb-4">Aadir Invitado</h2>
             <div className="space-y-4">
               <Input 
                 label="Nombre" 
@@ -451,7 +467,7 @@ export default function HomePage() {
                 onChange={e => setNewMovement({...newMovement, concept: e.target.value})} 
               />
               <Input 
-                label="Cantidad (€)" 
+                label="Cantidad ()" 
                 type="number"
                 value={newMovement.amount} 
                 onChange={e => setNewMovement({...newMovement, amount: parseFloat(e.target.value) || 0})} 
@@ -505,7 +521,7 @@ export default function HomePage() {
             <div className="space-y-4">
               <textarea
                 className="w-full p-3 border border-gray-300 rounded h-32"
-                placeholder="Escribe tu nota aquí..."
+                placeholder="Escribe tu nota aqu..."
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
               ></textarea>

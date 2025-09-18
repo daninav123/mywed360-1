@@ -3,14 +3,18 @@ import { X, AlertCircle } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
+import { useAuth } from '../../hooks/useAuth';
 import * as EmailService from '../../services/EmailService';
+import DOMPurify from 'dompurify';
 
 const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
   const { userEmail, loading, error, sendEmailToProvider, generateDefaultSubject, generateDefaultEmailBody } = useProviderEmail();
+  const { profile } = useAuth();
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState('');
+  const [showPreview, setShowPreview] = useState(true);
   const validEmail = useMemo(() => /.+@.+\..+/.test(provider?.email || ''), [provider]);
 
   useEffect(() => {
@@ -36,8 +40,41 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
     setSelectedTemplateIndex(idx);
     const t = templates[Number(idx)];
     if (!t) return;
-    setSubject(t.subject || subject);
-    setBody(t.body || body);
+
+    const fmtDate = (d) => {
+      try {
+        if (!d) return '';
+        const dt = new Date(d);
+        if (Number.isNaN(dt.getTime())) return '';
+        return dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch { return ''; }
+    };
+
+    const coupleFromProfile = () => {
+      const couple = [profile?.brideFirstName, profile?.brideLastName].filter(Boolean).join(' ').trim();
+      return couple || profile?.name || '';
+    };
+
+    const data = {
+      providerName: provider?.name || '',
+      weddingDate: fmtDate(profile?.weddingDate),
+      weddingPlace: profile?.weddingPlace || profile?.weddingLocation || '',
+      coupleName: profile?.coupleName || coupleFromProfile(),
+      userName: profile?.name || coupleFromProfile(),
+      userPhone: profile?.phone || profile?.contactPhone || '',
+      userEmail: userEmail || profile?.email || '',
+    };
+
+    const replaceVars = (text, map) => {
+      try {
+        return String(text || '').replace(/\{\{(\w+)\}\}/g, (m, key) => (map[key] !== undefined ? String(map[key]) : m));
+      } catch { return text || ''; }
+    };
+
+    const newSubject = replaceVars(t.subject || subject, data);
+    const newBody = replaceVars(t.body || body, data);
+    setSubject(newSubject);
+    setBody(newBody);
   };
 
   const handleSend = async () => {
@@ -47,6 +84,15 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
       if (typeof onSent === 'function') onSent(res);
       if (typeof onClose === 'function') onClose();
     }
+  };
+
+  const resetDefaults = () => {
+    if (!provider) return;
+    try {
+      setSelectedTemplateIndex('');
+      setSubject(generateDefaultSubject(provider));
+      setBody(generateDefaultEmailBody(provider));
+    } catch {}
   };
 
   if (!open) return null;
@@ -89,8 +135,23 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Mensaje</label>
             <textarea value={body} onChange={(e) => setBody(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md min-h-[180px]" placeholder="Escribe tu mensaje..." />
           </div>
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-gray-700">Vista previa</h3>
+              <label className="text-xs text-gray-600 flex items-center gap-2">
+                <input type="checkbox" checked={showPreview} onChange={(e)=>setShowPreview(e.target.checked)} /> Mostrar
+              </label>
+            </div>
+            {showPreview && (
+              <Card className="p-3 border border-gray-200 bg-white">
+                <div className="text-sm text-gray-800 mb-2"><span className="font-semibold">Asunto:</span> {subject || '(Sin asunto)'}</div>
+                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body || '', { USE_PROFILES: { html: true } }) }} />
+              </Card>
+            )}
+          </div>
         </div>
         <div className="border-t p-4 flex justify-end gap-2 bg-gray-50">
+          <Button variant="outline" onClick={resetDefaults} disabled={loading || !provider}>Restaurar</Button>
           <Button variant="outline" onClick={onClose} disabled={loading}>Cancelar</Button>
           <Button onClick={handleSend} disabled={loading || !validEmail}>{loading ? 'Enviando...' : 'Enviar'}</Button>
         </div>
@@ -100,4 +161,3 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 };
 
 export default ProviderEmailModal;
-

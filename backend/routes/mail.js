@@ -6,6 +6,7 @@ import mailgunJs from 'mailgun-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { requireMailAccess } from '../middleware/authMiddleware.js';
+import admin from 'firebase-admin';
 
 // Obtener el directorio actual
 const __filename = fileURLToPath(import.meta.url);
@@ -279,6 +280,10 @@ router.post('/', requireMailAccess, async (req, res) => {
           // Primero intentar con el dominio principal
           result = await mailgun.messages().send(mailData);
           console.log('Correo enviado exitosamente con dominio principal:', result);
+          try {
+            const rawId = (result && (result.id || result.messageId)) || null;
+            if (rawId) messageId = String(rawId).trim().toLowerCase().replace(/^<|>$/g, '');
+          } catch {}
         } catch (primaryError) {
           console.error('Error al enviar con dominio principal:', primaryError?.message || primaryError);
 
@@ -287,6 +292,10 @@ router.post('/', requireMailAccess, async (req, res) => {
             try {
               result = await mailgunAlt.messages().send(mailData);
               console.log('Correo enviado exitosamente con dominio alternativo:', result);
+              try {
+                const rawId = (result && (result.id || result.messageId)) || null;
+                if (rawId) messageId = String(rawId).trim().toLowerCase().replace(/^<|>$/g, '');
+              } catch {}
             } catch (altError) {
               console.error('Error al enviar con dominio alternativo:', altError?.message || altError);
               throw new Error('No se pudo enviar el correo con ninguna configuración de Mailgun');
@@ -317,6 +326,7 @@ router.post('/', requireMailAccess, async (req, res) => {
       cc: cc || null,
       bcc: bcc || null,
       replyTo: replyTo || null,
+      messageId: messageId || null,
     });
     try { await db.collection('mails').doc(sentRef.id).update({ id: sentRef.id }); } catch {}
 
@@ -338,6 +348,7 @@ router.post('/', requireMailAccess, async (req, res) => {
           cc: cc || null,
           bcc: bcc || null,
           replyTo: replyTo || null,
+          messageId: messageId || null,
           via: 'backend'
         });
       }
@@ -850,7 +861,34 @@ router.post('/alias', requireMailAccess, async (req, res) => {
       myWed360Email: email
     }, { merge: true });
 
-    return res.status(200).json({ success: true, alias: raw, email });
+    // Crear ruta Mailgun (opcional) para el alias
+    let routeResult = null;
+    try {
+      const ENABLE_ROUTES = (process.env.MAILGUN_CREATE_ROUTES || '').toString().toLowerCase() === 'true';
+      const API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
+      const EU = (process.env.VITE_MAILGUN_EU_REGION || process.env.MAILGUN_EU_REGION || '').toString() === 'true';
+      const BASE = process.env.BACKEND_PUBLIC_BASE_URL || process.env.VITE_BACKEND_BASE_URL || '';
+      const inboundUrl = BASE ? `${BASE.replace(/\/$/,'')}/api/inbound/mailgun` : null;
+      if (ENABLE_ROUTES && API_KEY && inboundUrl) {
+        const cfg = { apiKey: API_KEY, ...(EU ? { host: 'api.eu.mailgun.net' } : {}) };
+        const mg = mailgunJs(cfg);
+        const expression = `match_recipient('${email}')`;
+        // store() permite ver el mensaje en Mailgun; forward() envía a nuestro webhook; stop() evita otras rutas
+        const action = [
+          `forward('${inboundUrl}')`,
+          'stop()'
+        ];
+        try {
+          routeResult = await mg.routes().create({ priority: 0, description: `Alias ${email}`, expression, action });
+        } catch (routeErr) {
+          console.warn('No se pudo crear ruta Mailgun para alias', email, routeErr?.message || routeErr);
+        }
+      }
+    } catch (routeWrapErr) {
+      console.warn('Alias route creation wrapper failed', routeWrapErr?.message || routeWrapErr);
+    }
+
+    return res.status(200).json({ success: true, alias: raw, email, route: routeResult || null });
   } catch (e) {
     console.error('POST /api/mail/alias failed', e);
     return res.status(500).json({ success: false, error: 'alias_failed' });
@@ -859,6 +897,228 @@ router.post('/alias', requireMailAccess, async (req, res) => {
 
 export default router;
 
+
+// GET /api/mail/:id/attachments/:attId  -> Descarga de adjunto inbound pequeño (inline)
+router.get('/:id/attachments/:attId', requireMailAccess, async (req, res) => {
+  try {
+    const { id, attId } = req.params;
+    if (!id || !attId) return res.status(400).json({ error: 'id-required' });
+
+    const ref = db.collection('mails').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const data = snap.data() || {};
+
+    // Ownership check (similar a otras rutas)
+    try {
+      const profile = req.userProfile || {};
+      const role = String(profile.role || '').toLowerCase();
+      const isPrivileged = role === 'admin' || role === 'planner';
+      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myLogin = String(profile.email || '').toLowerCase();
+      const ownerTarget = String(data.folder === 'sent' ? (data.from || '') : (data.to || '')).toLowerCase();
+      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+        return res.status(403).json({ error: 'forbidden' });
+      }
+    } catch {}
+
+    const attRef = ref.collection('attachments').doc(attId);
+    const attSnap = await attRef.get();
+    if (!attSnap.exists) return res.status(404).json({ error: 'attachment-not-found' });
+    const att = attSnap.data() || {};
+    if (att.dataBase64) {
+      const buf = Buffer.from(att.dataBase64, 'base64');
+      res.setHeader('Content-Type', att.contentType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${att.filename || 'attachment'}"`);
+      return res.status(200).send(buf);
+    }
+    // Intentar desde Cloud Storage si hay ruta
+    const storagePath = att.storagePath || att.gcsPath || null;
+    const bucketName = process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || null;
+    if (storagePath && bucketName) {
+      try {
+        res.setHeader('Content-Type', att.contentType || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${att.filename || 'attachment'}"`);
+        const stream = admin.storage().bucket(bucketName).file(storagePath).createReadStream();
+        stream.on('error', (err) => {
+          console.error('Attachment stream error', err);
+          if (!res.headersSent) res.status(500).json({ error: 'attachment-stream-error' });
+        });
+        return stream.pipe(res);
+      } catch (e) {
+        console.error('Attachment download from storage failed', e);
+      }
+    }
+    return res.status(410).json({ error: 'attachment-too-large-or-missing' });
+  } catch (e) {
+    console.error('GET /api/mail/:id/attachments/:attId', e);
+    return res.status(500).json({ error: 'attachment-download-failed' });
+  }
+});
+
+// GET /api/mail/:id/attachments/:attId/url -> Signed URL para descarga directa desde Storage
+router.get('/:id/attachments/:attId/url', requireMailAccess, async (req, res) => {
+  try {
+    const { id, attId } = req.params;
+    if (!id || !attId) return res.status(400).json({ error: 'id-required' });
+
+    const ref = db.collection('mails').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const data = snap.data() || {};
+
+    // Ownership check similar al de descarga binaria
+    try {
+      const profile = req.userProfile || {};
+      const role = String(profile.role || '').toLowerCase();
+      const isPrivileged = role === 'admin' || role === 'planner';
+      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myLogin = String(profile.email || '').toLowerCase();
+      const ownerTarget = String(data.folder === 'sent' ? (data.from || '') : (data.to || '')).toLowerCase();
+      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+        return res.status(403).json({ error: 'forbidden' });
+      }
+    } catch {}
+
+    const attSnap = await ref.collection('attachments').doc(attId).get();
+    if (!attSnap.exists) return res.status(404).json({ error: 'attachment-not-found' });
+    const att = attSnap.data() || {};
+    const bucketName = process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || null;
+    if (!bucketName) return res.status(503).json({ error: 'storage-not-configured' });
+    const storagePath = att.storagePath || att.gcsPath || null;
+    if (!storagePath) return res.status(410).json({ error: 'no-storage-path' });
+
+    const file = admin.storage().bucket(bucketName).file(storagePath);
+    const ttlSec = Math.max(60, parseInt(process.env.ATTACHMENT_SIGNED_URL_TTL_SECONDS || '3600', 10));
+    const expires = Date.now() + ttlSec * 1000;
+    const [url] = await file.getSignedUrl({ action: 'read', expires });
+    return res.status(200).json({ url, expiresAt: new Date(expires).toISOString() });
+  } catch (e) {
+    console.error('GET /api/mail/:id/attachments/:attId/url', e);
+    return res.status(500).json({ error: 'signed-url-failed' });
+  }
+});
+
+// GET /api/mail/page?folder=inbox|sent&user=...&limit=50&cursor=ISODate
+router.get('/page', requireMailAccess, async (req, res) => {
+  try {
+    const { folder = 'inbox', limit: rawLimit, cursor: rawCursor } = req.query;
+    const userRaw = req.query.user;
+    const user = userRaw ? String(userRaw).trim() : undefined;
+    const userNorm = user ? user.toLowerCase() : undefined;
+    const lim = Math.max(1, Math.min(parseInt(rawLimit, 10) || 50, 100));
+    const after = rawCursor ? new Date(String(rawCursor)) : null;
+
+    // Seguridad similar a GET /api/mail
+    try {
+      const profile = req.userProfile || {};
+      const role = String(profile.role || '').toLowerCase();
+      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myLogin = String(profile.email || '').toLowerCase();
+      const isPrivileged = role === 'admin' || role === 'planner';
+      if (userNorm && !isPrivileged) {
+        const matches = userNorm === myAlias || userNorm === myLogin;
+        if (!matches) {
+          return res.status(403).json({ success: false, error: 'forbidden_user_scope' });
+        }
+      }
+    } catch (_) {}
+
+    // Intentar subcolección del usuario si se resolvió uid
+    if (userNorm) {
+      try {
+        let uid = null;
+        let byAlias = await db.collection('users').where('myWed360Email', '==', user).limit(1).get();
+        if (byAlias.empty && userNorm) {
+          const legacy = userNorm.replace(/@mywed360\.com$/i, '@mywed360');
+          byAlias = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+        }
+        if (!byAlias.empty) {
+          uid = byAlias.docs[0].id;
+        } else {
+          const byLogin = await db.collection('users').where('email', '==', user).limit(1).get();
+          if (!byLogin.empty) uid = byLogin.docs[0].id;
+        }
+        if (uid) {
+          let uq = db.collection('users').doc(uid).collection('mails').where('folder', '==', folder);
+          let q = uq.orderBy('date', 'desc');
+          if (after && !Number.isNaN(after.getTime())) {
+            q = q.startAfter(after.toISOString());
+          }
+          const usnap = await q.limit(lim).get();
+          const items = usnap.docs.map(d => ({ id: d.id, ...d.data() }));
+          const nextCursor = items.length === lim ? items[items.length - 1].date : null;
+          return res.json({ items, nextCursor });
+        }
+      } catch (_) {}
+    }
+
+    // Colección global
+    let query = db.collection('mails').where('folder', '==', folder);
+    if (userNorm) {
+      if (folder === 'sent') query = query.where('from', '==', userNorm);
+      else query = query.where('to', '==', userNorm);
+    }
+    let items = [];
+    try {
+      let q = query.orderBy('date', 'desc');
+      if (after && !Number.isNaN(after.getTime())) q = q.startAfter(after.toISOString());
+      const snap = await q.limit(lim).get();
+      items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (fireErr) {
+      const snap = await query.limit(lim).get();
+      items = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
+    }
+    const nextCursor = items.length === lim ? items[items.length - 1].date : null;
+    return res.json({ items, nextCursor });
+  } catch (err) {
+    console.error('Error en GET /api/mail/page:', err);
+    res.status(503).json({ success: false, message: 'Fallo obteniendo correos', error: err?.message || String(err) });
+  }
+});
+
+// GET /api/mail/:id  -> Detalle de correo + adjuntos
+router.get('/:id', requireMailAccess, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'id-required' });
+    const ref = db.collection('mails').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'not-found' });
+    const data = snap.data() || {};
+    // Ownership check
+    try {
+      const profile = req.userProfile || {};
+      const role = String(profile.role || '').toLowerCase();
+      const isPrivileged = role === 'admin' || role === 'planner';
+      const myAlias = String(profile.myWed360Email || '').toLowerCase();
+      const myLogin = String(profile.email || '').toLowerCase();
+      const ownerTarget = String(data.folder === 'sent' ? (data.from || '') : (data.to || '')).toLowerCase();
+      if (!isPrivileged && ownerTarget && !(ownerTarget === myAlias || ownerTarget === myLogin)) {
+        return res.status(403).json({ error: 'forbidden' });
+      }
+    } catch {}
+    // Adjuntos desde subcolección
+    let attachments = Array.isArray(data.attachments) ? data.attachments : [];
+    try {
+      const attSnap = await ref.collection('attachments').get();
+      const list = attSnap.docs.map(d => ({ id: d.id, ...(d.data()||{}) }));
+      // generar endpoints de descarga
+      attachments = list.map(a => ({
+        id: a.id,
+        filename: a.filename || a.name || 'attachment',
+        contentType: a.contentType || 'application/octet-stream',
+        size: a.size || 0,
+        url: `/api/mail/${encodeURIComponent(id)}/attachments/${encodeURIComponent(a.id)}`,
+        signedUrl: `/api/mail/${encodeURIComponent(id)}/attachments/${encodeURIComponent(a.id)}/url`,
+      }));
+    } catch {}
+    return res.json({ id: snap.id, ...data, attachments });
+  } catch (e) {
+    console.error('GET /api/mail/:id failed', e);
+    return res.status(500).json({ error: 'mail-detail-failed' });
+  }
+});
 
 // PATCH /api/mail/:id/unread
 router.patch('/:id/unread', requireMailAccess, async (req, res) => {
@@ -870,7 +1130,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
     const data = doc.data();
     await docRef.update({ read: false });
 
-    // Propagar cambio a subcolecci�n del usuario propietario (inbox -> to, sent -> from)
+    // Propagar cambio a subcoleccin del usuario propietario (inbox -> to, sent -> from)
     try {
       const targetEmail = (data.folder === 'sent') ? data.from : data.to;
       if (targetEmail) {
@@ -887,7 +1147,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn('No se pudo propagar unread a subcolecci�n de usuario:', e?.message || e);
+      console.warn('No se pudo propagar unread a subcoleccin de usuario:', e?.message || e);
     }
 
     res.json({ id, ...data, read: false });
@@ -897,7 +1157,7 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
   }
 });
 
-// Compatibilidad: tambi�n aceptar POST para marcar como no le�do
+// Compatibilidad: tambin aceptar POST para marcar como no ledo
 router.post('/:id/unread', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
@@ -907,7 +1167,7 @@ router.post('/:id/unread', requireMailAccess, async (req, res) => {
     const data = doc.data();
     await docRef.update({ read: false });
 
-    // Propagar a subcolecci�n
+    // Propagar a subcoleccin
     try {
       const targetEmail = (data.folder === 'sent') ? data.from : data.to;
       if (targetEmail) {
@@ -924,7 +1184,7 @@ router.post('/:id/unread', requireMailAccess, async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn('No se pudo propagar unread (POST) a subcolecci�n de usuario:', e?.message || e);
+      console.warn('No se pudo propagar unread (POST) a subcoleccin de usuario:', e?.message || e);
     }
 
     res.json({ id, ...data, read: false });

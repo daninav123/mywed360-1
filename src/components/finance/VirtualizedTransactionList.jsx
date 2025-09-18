@@ -14,15 +14,15 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
     received: t('finance.transactions.status.received', { defaultValue: 'Recibido' }),
   };
   const statusStyles = {
-    pending: 'bg-amber-100 text-amber-800',
-    partial: 'bg-blue-100 text-blue-700',
-    paid: 'bg-green-100 text-green-700',
-    expected: 'bg-gray-100 text-gray-600',
-    received: 'bg-green-100 text-green-700',
+    pending: 'bg-[var(--color-warning)]/15 text-[color:var(--color-warning)]',
+    partial: 'bg-[var(--color-primary)]/15 text-[color:var(--color-primary)]',
+    paid: 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]',
+    expected: 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70',
+    received: 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]',
   };
   return (
     <div className="w-full">
-      <div className="grid grid-cols-7 gap-2 px-6 py-3 bg-gray-50 text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+      <div className="grid grid-cols-7 gap-2 px-6 py-3 bg-[var(--color-surface)] text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
         <div>{t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}</div>
         <div className="col-span-2">{t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}</div>
         <div>{t('finance.transactions.headers.category', { defaultValue: 'Categoría' })}</div>
@@ -47,7 +47,7 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
               <div className="col-span-2 text-sm text-[color:var(--color-text)]">
                 <div className="font-medium truncate">{tx.concept || tx.description || t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}</div>
                 {(tx.provider || tx.dueDate) && (
-                  <div className="mt-0.5 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
+              <div className="mt-0.5 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
                     {tx.provider && <div>{tx.provider}</div>}
                     {tx.dueDate && (
                       <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
@@ -57,12 +57,12 @@ export default function VirtualizedTransactionList({ items, getPaidValue, onEdit
                   </div>
                 )}
               </div>
-              <div className="text-xs text-[color:var(--color-text)]/60"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{tx.category || t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' })}</span></div>
+              <div className="text-xs text-[color:var(--color-text)]/60"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">{tx.category || t('finance.transactions.noCategory', { defaultValue: 'Sin categoría' })}</span></div>
               <div>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tx.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}>{tx.type === 'income' ? t('finance.transactions.income', { defaultValue: 'Ingreso' }) : t('finance.transactions.expense', { defaultValue: 'Gasto' })}</span>
               </div>
               <div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-gray-100 text-gray-600'}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'}`}>
                   {statusLabels[status] || status}
                 </span>
               </div>

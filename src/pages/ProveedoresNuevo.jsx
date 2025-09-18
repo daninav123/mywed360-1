@@ -168,8 +168,8 @@ const Proveedores = () => {
 
   const onboardingKey = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    if (activeWedding) return supplier_onboarding_done_;
-    if (user?.uid) return supplier_onboarding_done_user_;
+    if (activeWedding) return 'supplier_onboarding_done_' + activeWedding;
+    if (user?.uid) return 'supplier_onboarding_done_user_' + (user?.uid);
     return null;
   }, [activeWedding, user?.uid]);
 const markOnboardingDone = useCallback(() => {
@@ -360,7 +360,7 @@ const markOnboardingDone = useCallback(() => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">GestiÃ³n de Proveedores</h1>
+        <h1 className="text-2xl font-bold">Gestión de Proveedores</h1>
         <div className="flex space-x-2">
           <Button
             onClick={() => setShowWantedModal(true)}
@@ -370,7 +370,7 @@ const markOnboardingDone = useCallback(() => {
             Configurar servicios
           </Button>
           <Button onClick={handleOpenAISearch} className="flex items-center">
-            <Sparkles size={16} className="mr-1" /> BÃºsqueda IA
+            <Sparkles size={16} className="mr-1" /> Búsqueda IA
           </Button>
           <Button onClick={handleNewProvider} className="flex items-center">
             <Plus size={16} className="mr-1" /> Nuevo Proveedor
@@ -512,7 +512,7 @@ const markOnboardingDone = useCallback(() => {
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {/* Placeholders de servicios faltantes */}
-          {missingServices.length > 0 && (
+          {tab === "contratados" && missingServices.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {missingServices.map((s) => (
                 <Card key={s.id || s.name} className="opacity-60 border-dashed">
@@ -523,7 +523,7 @@ const markOnboardingDone = useCallback(() => {
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-3">
-                    AÃºn no hay proveedor confirmado para este servicio.
+                    Aún no hay proveedor confirmado para este servicio.
                   </p>
                   <div className="flex gap-2">
                     <Button

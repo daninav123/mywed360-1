@@ -19,12 +19,12 @@ import { loadTrackingRecords } from "../../services/EmailTrackingService";
  */
 
 /**
- * Componente que muestra la informaciÃ³n de un proveedor en formato de tarjeta.
+ * Componente que muestra la información de un proveedor en formato de tarjeta.
  * Incluye opciones para ver detalles, editar, eliminar y agendar una cita.
  *
  * @param {Object} props - Propiedades del componente
  * @param {Provider} props.provider - Datos del proveedor a mostrar
- * @param {boolean} props.isSelected - Indica si el proveedor estÃ¡ selecciónado
+ * @param {boolean} props.isSelected - Indica si el proveedor está selecciónado
  * @param {Function} props.onToggleSelect - Función para alternar la selección del proveedor
  * @param {Function} props.onViewDetail - Función para ver detalles del proveedor
  * @param {Function} props.onEdit - Función para editar el proveedor
@@ -84,7 +84,7 @@ const ProveedorCard = ({
       return null;
     }
   }, [tracking?.lastEmailDate]);
-  // Función para mostrar estrellas de calificaciÃ³n
+  // Función para mostrar estrellas de calificación
   const renderRating = (rating, count) => {
     const stars = [];
     const actualRating = count > 0 ? rating / count : 0;
@@ -135,7 +135,7 @@ const ProveedorCard = ({
         className={`relative transition-all ${isSelected ? "ring-2 ring-blue-500" : ""}`}
         onClick={() => setShowDetail(true)}
       >
-        {/* BotÃ³n favorito */}
+        {/* Botón favorito */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -258,12 +258,12 @@ const ProveedorCard = ({
             </div>
           )}
 
-          {/* CalificaciÃ³n */}
+          {/* Calificación */}
           <div className="mt-2">
             {renderRating(provider.rating, provider.ratingCount)}
           </div>
 
-          {/* Extracto o descripciÃ³n corta */}
+          {/* Extracto o descripción corta */}
           {provider.snippet && (
             <p className="mt-2 text-sm text-gray-600 line-clamp-2">
               {provider.snippet}
@@ -384,7 +384,7 @@ const ProveedorCard = ({
 
 // Utilizar React.memo para evitar renderizados innecesarios cuando las props no cambian
 export default React.memo(ProveedorCard, (prevProps, nextProps) => {
-  // ComparaciÃ³n personalizada para determinar si las props han cambiado
+  // Comparación personalizada para determinar si las props han cambiado
   // Solo re-renderiza si alguna de estas propiedades ha cambiado
   return (
     prevProps.provider.id === nextProps.provider.id &&

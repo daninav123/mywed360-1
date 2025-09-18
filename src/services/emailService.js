@@ -3,6 +3,7 @@
 // and a minimal in-memory fallback otherwise to keep the UI functional.
 
 import { auth } from '../firebaseConfig';
+import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 
 const BASE = (typeof import.meta !== 'undefined' && import.meta && import.meta.env && import.meta.env.VITE_BACKEND_BASE_URL) || '';
 export const USE_BACKEND = !!BASE;
@@ -91,6 +92,80 @@ export async function getMails(folder = 'inbox') {
     }
   }
   return memoryStore.mails.filter(m => (folder === 'all' ? true : (m.folder || 'inbox') === folder));
+}
+
+// Paginado del buzón desde backend
+export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null } = {}) {
+  if (!USE_BACKEND) {
+    const items = await getMails(folder);
+    return { items, nextCursor: null };
+  }
+  const user = resolveCurrentEmail();
+  const qs = new URLSearchParams();
+  if (folder) qs.set('folder', folder);
+  if (user) qs.set('user', (user || '').toLowerCase());
+  if (limit) qs.set('limit', String(limit));
+  if (cursor) qs.set('cursor', String(cursor));
+  const url = `${BASE}/api/mail/page${qs.toString() ? `?${qs.toString()}` : ''}`;
+  try {
+    const res = await fetch(url, { headers: await buildAuthHeaders() });
+    if (res.ok) {
+      const json = await res.json();
+      const items = Array.isArray(json?.items) ? json.items : [];
+      const nextCursor = json?.nextCursor || null;
+      try { return { items: items.map(classifyMailClientSide), nextCursor }; } catch { return { items, nextCursor }; }
+    }
+    // Fallback si el backend aún no expone /page (404/501)
+    if (res.status === 404 || res.status === 501) {
+      const all = await getMails(folder);
+      // Ordenar por fecha desc
+      const sorted = (Array.isArray(all) ? all : []).slice().sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      const cur = cursor ? new Date(String(cursor)) : null;
+      const pageItems = sorted.filter(m => (cur ? (new Date(m.date||0) < cur) : true)).slice(0, limit);
+      const next = pageItems.length === limit ? pageItems[pageItems.length-1].date : null;
+      return { items: pageItems, nextCursor: next };
+    }
+    throw new Error(`getMailsPage ${res.status}`);
+  } catch (e) {
+    // Fallback general ante errores de red
+    try {
+      const all = await getMails(folder);
+      const sorted = (Array.isArray(all) ? all : []).slice().sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      const cur = cursor ? new Date(String(cursor)) : null;
+      const pageItems = sorted.filter(m => (cur ? (new Date(m.date||0) < cur) : true)).slice(0, limit);
+      const next = pageItems.length === limit ? pageItems[pageItems.length-1].date : null;
+      return { items: pageItems, nextCursor: next };
+    } catch {
+      throw e;
+    }
+  }
+}
+
+/**
+ * Obtener plantillas de correo para usar en selectores/edición.
+ * Intenta backend si existe; si no, usa las plantillas locales.
+ * Devuelve una lista de objetos { name, subject, body }.
+ */
+export async function getEmailTemplates() {
+  // Intento backend (tolerante a fallos / endpoint opcional)
+  if (USE_BACKEND) {
+    try {
+      const res = await fetch(`${BASE}/api/email/templates`, { headers: await buildAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data?.items)) return data.items;
+      }
+    } catch {
+      // fallback a locales
+    }
+  }
+  try {
+    const all = getAllEmailTemplates();
+    return Object.values(all).map((t) => ({ name: t.name, subject: t.subject, body: t.body }));
+  } catch {
+    return [];
+  }
 }
 
 export async function sendMail({ to, cc, bcc, subject, body, attachments } = {}) {
@@ -284,6 +359,8 @@ const api = {
   updateMailTags,
   USE_BACKEND,
   USE_MAILGUN,
+  getMailsPage,
+  getEmailTemplates,
 };
 
 // Registro simple de actividad de emails AI (best-effort local)

@@ -4,14 +4,14 @@ import Button from '../ui/Button';
 
 const STOPWORDS = new Set([
   'y','de','la','el','los','las','para','con','sin','del','al','un','una','unos','unas','por','en',
-  'incluye','incluyen','pack','paquete','oferta','promocion','promociÃ³n','servicio','servicios','precio','precios',
+  'incluye','incluyen','pack','paquete','oferta','promocion','promoción','servicio','servicios','precio','precios',
   'equipo','equipos','material','materiales','evento','eventos','boda','bodas'
 ]);
 
 function tokenize(text = '') {
   return (text || '')
     .toLowerCase()
-    .replace(/[^a-zÃ¡Ã©Ã­Ã³ÃºÃ±0-9+\s]/gi, ' ')
+    .replace(/[^a-záéíóúñ0-9+\s]/gi, ' ')
     .split(/\s+|,|\+|\by\b|\/|&/i)
     .map((t) => t.trim())
     .filter((t) => t.length > 2 && !STOPWORDS.has(t));
@@ -83,7 +83,7 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         <div>
           <h4 className="font-semibold mb-2">Posibles unificaciones por solapamiento</h4>
           {overlaps.length === 0 ? (
-            <p className="text-sm text-gray-600">No se detectan tÃ©rminos comunes entre presupuestos.</p>
+            <p className="text-sm text-gray-600">No se detectan términos comunes entre presupuestos.</p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {overlaps.slice(0, 8).map(([word, occ]) => {
@@ -99,7 +99,7 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Posibles separaciones por partidas mÃºltiples</h4>
+          <h4 className="font-semibold mb-2">Posibles separaciones por partidas múltiples</h4>
           {splits.length === 0 ? (
             <p className="text-sm text-gray-600">No se detectan presupuestos con varias subpartidas claras.</p>
           ) : (
@@ -114,9 +114,9 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Presupuestos atÃ­picos por importe</h4>
+          <h4 className="font-semibold mb-2">Presupuestos atípicos por importe</h4>
           {outliers.length === 0 ? (
-            <p className="text-sm text-gray-600">Sin atÃ­picos; importes dentro de la media del grupo.</p>
+            <p className="text-sm text-gray-600">Sin atípicos; importes dentro de la media del grupo.</p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {outliers.slice(0, 8).map((o, idx) => (

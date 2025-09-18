@@ -28,9 +28,9 @@ export default defineConfig({
     // Proxy para API backend
     proxy: {
       '/api': {
-        target: 'http://localhost:4004',
+        target: process.env.VITE_BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         // Conserva el path original (/api/…)
         rewrite: (path) => path
       }
@@ -41,9 +41,9 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:4004',
+        target: process.env.VITE_BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         rewrite: (path) => path
       }
     }
@@ -65,10 +65,10 @@ export default defineConfig({
         '**/*.spec.{js,jsx}'
       ],
       all: true,
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
+      branches: 72,
+      functions: 72,
+      lines: 72,
+      statements: 72
     }
   },
   build: {
@@ -87,3 +87,4 @@ export default defineConfig({
     }
   }
 });
+

@@ -2,6 +2,8 @@ import express from 'express';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import logger from '../logger.js';
+import { db } from '../db.js';
+import admin from 'firebase-admin';
 
 // Asegura que variables estén disponibles
 dotenv.config();
@@ -68,6 +70,88 @@ router.post('/', async (req, res) => {
       messageId: event?.message?.headers?.['message-id'] || event?.MessageId,
     });
 
+    // Persistencia de evento (auditoría)
+    try {
+      await db.collection('mailgunEvents').add({
+        receivedAt: new Date().toISOString(),
+        verified: Boolean(isVerified || !signingKey),
+        event: event?.event || event?.eventName || 'unknown',
+        recipient: event?.recipient || null,
+        messageId: event?.message?.headers?.['message-id'] || event?.MessageId || null,
+        raw: event || {},
+      });
+    } catch (e) { logger.warn('No se pudo persistir mailgunEvents', e?.message || e); }
+
+    // Actualizar mails por Message-Id si aplica
+    try {
+      const hdrMid = (event?.message && (event.message['message-id'] || (event.message.headers && event.message.headers['message-id']))) || event?.MessageId || null;
+      const normalize = (s) => String(s || '').trim().toLowerCase().replace(/^<|>$/g, '');
+      const mid = normalize(hdrMid);
+      if (mid) {
+        const snap = await db.collection('mails').where('messageId', '==', mid).limit(5).get();
+        const kind = String(event?.event || event?.eventName || '').toLowerCase();
+        const ts = Number(event?.timestamp || Math.floor(Date.now()/1000));
+        const dateIso = new Date(ts * 1000).toISOString();
+        const updates = { lastEvent: kind, lastEventAt: dateIso };
+        if (kind === 'delivered') updates.deliveredAt = dateIso;
+        if (kind === 'opened' || kind === 'open') updates.openedAt = dateIso, updates.openCount = admin.firestore.FieldValue.increment(1);
+        if (kind === 'clicked' || kind === 'click') updates.clickCount = admin.firestore.FieldValue.increment(1);
+        if (kind === 'failed') {
+          updates.failedAt = dateIso;
+          updates.failedReason = (event['delivery-status'] && (event['delivery-status'].message || event['delivery-status'].description)) || event.reason || null;
+        }
+        for (const doc of snap.docs) {
+          await db.collection('mails').doc(doc.id).set(updates, { merge: true });
+          try {
+            const ev = { at: dateIso, kind };
+            await db.collection('mails').doc(doc.id).collection('events').add(ev);
+          } catch {}
+        }
+      }
+    } catch (linkErr) {
+      logger.warn('No se pudo vincular evento a mail por Message-Id', linkErr?.message || linkErr);
+    }
+
+    // Agregación básica a emailMetrics
+    try {
+      const recipient = String(event?.recipient || '').toLowerCase();
+      if (recipient) {
+        let userSnap = await db.collection('users').where('myWed360Email', '==', recipient).limit(1).get();
+        if (userSnap.empty) {
+          const legacy = recipient.replace(/@mywed360\.com$/i, '@mywed360');
+          userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+        }
+        if (!userSnap.empty) {
+          const uid = userSnap.docs[0].id;
+          const ts = Number(event?.timestamp || Math.floor(Date.now()/1000));
+          const date = new Date(ts * 1000);
+          const dayKey = date.toISOString().slice(0,10);
+          const kind = String(event?.event || event?.eventName || '').toLowerCase();
+          const inc = admin.firestore.FieldValue.increment(1);
+          const zero = admin.firestore.FieldValue.increment(0);
+          const totals = {};
+          if (kind === 'delivered') totals.totalDelivered = inc;
+          else if (kind === 'opened' || kind === 'open') totals.totalOpened = inc;
+          else if (kind === 'failed') totals.totalFailed = inc;
+          else if (kind === 'accepted') totals.totalAccepted = inc;
+          else if (kind === 'clicked' || kind === 'click') totals.totalClicked = inc;
+          if (Object.keys(totals).length) {
+            await db.collection('emailMetrics').doc(uid).set({ updatedAt: new Date().toISOString(), ...totals }, { merge: true });
+            await db.collection('emailMetrics').doc(uid).collection('daily').doc(dayKey).set({
+              date: dayKey,
+              delivered: totals.totalDelivered || zero,
+              opened: totals.totalOpened || zero,
+              failed: totals.totalFailed || zero,
+              accepted: totals.totalAccepted || zero,
+              clicked: totals.totalClicked || zero,
+            }, { merge: true });
+          }
+        }
+      }
+    } catch (e) {
+      logger.warn('Aggregación Mailgun falló', e?.message || e);
+    }
+
     // Aquí podrías persistir en BD si se requiere
     // await db.collection('mailgun_events').insertOne({ receivedAt: new Date(), verified: isVerified, event });
 
@@ -79,3 +163,4 @@ router.post('/', async (req, res) => {
 });
 
 export default router;
+

@@ -20,7 +20,7 @@ import { awardPoints } from '../../services/GamificationService';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
 import { useWedding } from '../../context/WeddingContext';
 
-// FunciÃƒÆ’Ã‚Â³n helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÃƒÂ³n helper para cargar datos de Firestore de forma segura con fallbacks
 const loadFirestoreData = async (path) => {
   try {
     let data = null;
@@ -56,7 +56,7 @@ const loadFirestoreData = async (path) => {
       // Documento que guarda tareas completadas como mapa
       data = await loadData('tasksCompleted', { docPath: path });
     } else {
-      // Fallback genÃƒÆ’Ã‚Â©rico: usar la clave tal cual (localStorage / users/{uid})
+      // Fallback genÃƒÂ©rico: usar la clave tal cual (localStorage / users/{uid})
       data = await loadData(path);
     }
     return data || {};
@@ -68,7 +68,7 @@ const loadFirestoreData = async (path) => {
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÃƒÆ’Ã‚Â³n segura con manejo de errores
+  // Estados - InicializaciÃƒÂ³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -121,7 +121,7 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÃƒÆ’Ã‚Â³n:', error);
+      console.error('Error al obtener estado de sincronizaciÃƒÂ³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
@@ -302,22 +302,22 @@ export default function Tasks() {
     return () => window.removeEventListener('lovenda-tasks', handler);
   }, [meetingsState]);
 
-  // FunciÃƒÆ’Ã‚Â³n para aÃƒÆ’Ã‚Â±adir una reuniÃƒÆ’Ã‚Â³n
+  // FunciÃƒÂ³n para aÃƒÂ±adir una reuniÃƒÂ³n
   const addMeeting = useCallback(async (meeting) => {
     await addMeetingFS({
       ...meeting,
-      title: meeting.title || 'Nueva reuniÃƒÆ’Ã‚Â³n',
+      title: meeting.title || 'Nueva reuniÃƒÂ³n',
       start: new Date(meeting.start),
       end: new Date(meeting.end)
     });
   }, [addMeetingFS]);
 
-  // GeneraciÃƒÆ’Ã‚Â³n automÃƒÆ’Ã‚Â¡tica de timeline si estÃƒÆ’Ã‚Â¡ vacÃƒÆ’Ã‚Â­o
+  // GeneraciÃƒÂ³n automÃƒÂ¡tica de timeline si estÃƒÂ¡ vacÃƒÂ­o
   useEffect(() => {
-    // Desactivado: solo se desea el hito automÃƒÆ’Ã‚Â¡tico de la fecha de la boda en el Gantt
+    // Desactivado: solo se desea el hito automÃƒÂ¡tico de la fecha de la boda en el Gantt
     return;
     if (!activeWedding) return;
-    // Evitar regenerar si ya se generÃƒÆ’Ã‚Â³ para esta boda
+    // Evitar regenerar si ya se generÃƒÂ³ para esta boda
     const flagKey = `lovenda_timeline_generated_${activeWedding}`;
     if (localStorage.getItem(flagKey) === 'true') return;
 
@@ -333,19 +333,19 @@ export default function Tasks() {
 
         const addMonths = (d, delta) => { const x = new Date(d.getTime()); x.setMonth(x.getMonth() + delta); return x; };
 
-        // DefiniciÃƒÆ’Ã‚Â³n mÃƒÆ’Ã‚Â­nima de tareas base (M1)
+        // DefiniciÃƒÂ³n mÃƒÂ­nima de tareas base (M1)
         const plan = [
-          { monthsBefore: 12, title: 'Reservar lugar de celebraciÃƒÆ’Ã‚Â³n', category: 'LUGAR' },
-          { monthsBefore: 9,  title: 'Contratar fotÃƒÆ’Ã‚Â³grafo', category: 'FOTOGRAFO' },
+          { monthsBefore: 12, title: 'Reservar lugar de celebraciÃƒÂ³n', category: 'LUGAR' },
+          { monthsBefore: 9,  title: 'Contratar fotÃƒÂ³grafo', category: 'FOTOGRAFO' },
           { monthsBefore: 9,  title: 'Contratar catering', category: 'COMIDA' },
           { monthsBefore: 6,  title: 'Enviar Save the Date', category: 'INVITADOS' },
           { monthsBefore: 6,  title: 'Vestuario: iniciar pruebas', category: 'VESTUARIO' },
           { monthsBefore: 3,  title: 'Enviar invitaciones', category: 'PAPELERIA' },
           { monthsBefore: 1,  title: 'Confirmar asistentes y mesas', category: 'INVITADOS' },
-          { monthsBefore: 1,  title: 'Prueba de menÃƒÆ’Ã‚Âº con catering', category: 'COMIDA' },
+          { monthsBefore: 1,  title: 'Prueba de menÃƒÂº con catering', category: 'COMIDA' },
         ];
 
-        // Evitar duplicados por tÃƒÆ’Ã‚Â­tulo si el usuario ya aÃƒÆ’Ã‚Â±adiÃƒÆ’Ã‚Â³ algo manualmente
+        // Evitar duplicados por tÃƒÂ­tulo si el usuario ya aÃƒÂ±adiÃƒÂ³ algo manualmente
         const existingTitles = new Set([
           ...(Array.isArray(tasksState) ? tasksState.map(t => (t?.title || t?.name || '').toLowerCase()) : []),
           ...(Array.isArray(meetingsState) ? meetingsState.map(m => (m?.title || '').toLowerCase()) : []),
@@ -357,13 +357,13 @@ export default function Tasks() {
           const title = item.title;
           if (existingTitles.has(title.toLowerCase())) continue;
           // Para simplicidad: crear como tarea Gantt (largo plazo) o evento puntual
-          // HeurÃƒÆ’Ã‚Â­stica: hitos clave como eventos, resto como tareas largas de ~15 dÃƒÆ’Ã‚Â­as
+          // HeurÃƒÂ­stica: hitos clave como eventos, resto como tareas largas de ~15 dÃƒÂ­as
           const milestoneTitles = ['Enviar Save the Date', 'Enviar invitaciones', 'Confirmar asistentes y mesas'];
           if (milestoneTitles.includes(title)) {
             // Evento puntual (calendario)
             await addMeetingFS({ title, start, end, category: item.category });
           } else {
-            // Tarea de largo plazo (Gantt) de 15 dÃƒÆ’Ã‚Â­as
+            // Tarea de largo plazo (Gantt) de 15 dÃƒÂ­as
             const endTask = new Date(start.getTime() + 15 * 24 * 60 * 60 * 1000);
             await addTaskFS({
               id: `auto-${item.monthsBefore}-${Date.now()}`,
@@ -382,20 +382,20 @@ export default function Tasks() {
         }
 
         localStorage.setItem(flagKey, 'true');
-        // Otorgar puntos de gamificaciÃƒÆ’Ã‚Â³n por crear timeline automÃƒÆ’Ã‚Â¡ticamente (no intrusivo)
+        // Otorgar puntos de gamificaciÃƒÂ³n por crear timeline automÃƒÂ¡ticamente (no intrusivo)
         try {
           await awardPoints(activeWedding, 'create_timeline', { source: 'auto' });
         } catch (e) {
           // best-effort; no bloquear si falla
-          console.warn('Gamification awardPoints fallÃƒÆ’Ã‚Â³:', e?.message || e);
+          console.warn('Gamification awardPoints fallÃƒÂ³:', e?.message || e);
         }
       } catch (err) {
-        console.warn('No se pudo generar timeline automÃƒÆ’Ã‚Â¡tico:', err?.message);
+        console.warn('No se pudo generar timeline automÃƒÂ¡tico:', err?.message);
       }
     })();
   }, [activeWedding, tasksState, meetingsState, addMeetingFS, addTaskFS]);
 
-  // Estado para tareas completadas (inicial vacÃƒÆ’Ã‚Â­o, se cargarÃƒÆ’Ã‚Â¡ asÃƒÆ’Ã‚Â­ncronamente)
+  // Estado para tareas completadas (inicial vacÃƒÂ­o, se cargarÃƒÂ¡ asÃƒÂ­ncronamente)
   const [completed, setCompleted] = useState({});
 
   // Cargar tareas completadas de Firestore/Storage sin bloquear render
@@ -416,12 +416,12 @@ export default function Tasks() {
     return () => { isMounted = false; };
   }, [activeWedding]);
 
-  // Suscribirse al estado de sincronizaciÃƒÆ’Ã‚Â³n
+  // Suscribirse al estado de sincronizaciÃƒÂ³n
   useEffect(() => {
     return subscribeSyncState(setSyncStatus);
   }, []);
 
-  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÆ’Ã‚Â­os al inicio)
+  // Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÂ­os al inicio)
   useEffect(() => {
     if (dataLoadedRef.current) {
       // No es necesario guardar cambios ya que se utiliza Firestore
@@ -440,7 +440,7 @@ export default function Tasks() {
     }
   }, [completed, activeWedding]);
 
-  // Sugerencia automÃƒÆ’Ã‚Â¡tica de categorÃƒÆ’Ã‚Â­a
+  // Sugerencia automÃƒÂ¡tica de categorÃƒÂ­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (texto.includes('lugar') || texto.includes('venue') || texto.includes('salon') || texto.includes('espacio')) {
@@ -453,7 +453,7 @@ export default function Tasks() {
       return 'DECORACION';
     } else if (texto.includes('invitacion') || texto.includes('papel') || texto.includes('tarjeta')) {
       return 'PAPELERIA';
-    } else if (texto.includes('mÃƒÆ’Ã‚Âºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
+    } else if (texto.includes('mÃƒÂºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
       return 'MUSICA';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
@@ -472,7 +472,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃƒÆ’Ã‚Â­a si se cambia el tÃƒÆ’Ã‚Â­tulo y la categorÃƒÆ’Ã‚Â­a es OTROS
+      // 1. Sugerir categorÃƒÂ­a si se cambia el tÃƒÂ­tulo y la categorÃƒÂ­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -485,7 +485,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÆ’Ã‚Â­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÂ­a por defecto
         }
       }
 
@@ -519,7 +519,7 @@ export default function Tasks() {
     resetForm();
   };
   
-  // AsignaciÃƒÆ’Ã‚Â³n automÃƒÆ’Ã‚Â¡tica de categorÃƒÆ’Ã‚Â­a con IA
+  // AsignaciÃƒÂ³n automÃƒÂ¡tica de categorÃƒÂ­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -529,23 +529,23 @@ export default function Tasks() {
       
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒÆ’Ã‚Â³n', 'jardÃƒÆ’Ã‚Â­n', 'terraza'],
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒÂ³n', 'jardÃƒÂ­n', 'terraza'],
         INVITADOS: ['guests', 'invitados', 'personas', 'asistentes', 'confirmaciones', 'lista', 'rsvp'],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: ['decoraciÃƒÆ’Ã‚Â³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃƒÆ’Ã‚Â³n', 'ambientaciÃƒÆ’Ã‚Â³n'],
-        PAPELERIA: ['invitaciones', 'papelerÃƒÆ’Ã‚Â­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
-        MUSICA: ['mÃƒÆ’Ã‚Âºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografÃƒÆ’Ã‚Â­a', 'video', 'recuerdos', 'ÃƒÆ’Ã‚Â¡lbum', 'sesiÃƒÆ’Ã‚Â³n'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒÆ’Ã‚Â­a'],
+        DECORACION: ['decoraciÃƒÂ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃƒÂ³n', 'ambientaciÃƒÂ³n'],
+        PAPELERIA: ['invitaciones', 'papelerÃƒÂ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
+        MUSICA: ['mÃƒÂºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotografÃƒÂ­a', 'video', 'recuerdos', 'ÃƒÂ¡lbum', 'sesiÃƒÂ³n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒÂ­a'],
       };
       
-      // Contar coincidencias por categorÃƒÆ’Ã‚Â­a
+      // Contar coincidencias por categorÃƒÂ­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter(palabra => texto.includes(palabra)).length;
       });
       
-      // Encontrar la categorÃƒÆ’Ã‚Â­a con mayor puntuaciÃƒÆ’Ã‚Â³n
+      // Encontrar la categorÃƒÂ­a con mayor puntuaciÃƒÂ³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -557,17 +557,17 @@ export default function Tasks() {
       
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃƒÆ’Ã‚Â­a:', error);
+      console.error('Error al asignar categorÃƒÂ­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃƒÆ’Ã‚Â³n de la boda
+  // Guardar una tarea en la subcolecciÃƒÂ³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃƒÆ’Ã‚Â¡sico
+      // Validar formulario bÃƒÂ¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃƒÆ’Ã‚Â­tulo');
+        alert('Por favor ingresa un tÃƒÂ­tulo');
         return;
       }
       
@@ -592,7 +592,7 @@ export default function Tasks() {
       
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no vÃƒÆ’Ã‚Â¡lidas');
+        alert('Fechas no vÃƒÂ¡lidas');
         return;
       }
       
@@ -601,7 +601,7 @@ export default function Tasks() {
         return;
       }
       
-      // Asignar categorÃƒÆ’Ã‚Â­a con IA si no se especificÃƒÆ’Ã‚Â³
+      // Asignar categorÃƒÂ­a con IA si no se especificÃƒÂ³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -618,7 +618,7 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
       
-      // AÃƒÆ’Ã‚Â±adir/actualizar segÃƒÆ’Ã‚Âºn sea una tarea de largo plazo o una reuniÃƒÆ’Ã‚Â³n
+      // AÃƒÂ±adir/actualizar segÃƒÂºn sea una tarea de largo plazo o una reuniÃƒÂ³n
       if (formData.long) {
         // Para el diagrama Gantt
         const ganttTask = {
@@ -666,7 +666,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÃƒÆ’Ã‚Â³n (evento puntual del calendario)
+          // Nueva reuniÃƒÂ³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -719,7 +719,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃƒÆ’Ã‚Â³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃƒÂ³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -737,7 +737,7 @@ export default function Tasks() {
     ...(Array.isArray(meetingsState) ? meetingsState : [])
   ];
 
-  // FunciÃƒÆ’Ã‚Â³n auxiliar para validar y normalizar fechas
+  // FunciÃƒÂ³n auxiliar para validar y normalizar fechas
   const validateAndNormalizeDate = (date) => {
     if (!date) return null;
     
@@ -765,11 +765,11 @@ export default function Tasks() {
         return null;
       }
       
-      // Asegurar que start y end sean objetos Date vÃƒÆ’Ã‚Â¡lidos
+      // Asegurar que start y end sean objetos Date vÃƒÂ¡lidos
       const start = validateAndNormalizeDate(event.start);
       const end = validateAndNormalizeDate(event.end);
       
-      // Si alguna fecha no es vÃƒÆ’Ã‚Â¡lida, descartar evento
+      // Si alguna fecha no es vÃƒÂ¡lida, descartar evento
       if (!start || !end) {
         return null;
       }
@@ -779,7 +779,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || "Sin tÃƒÆ’Ã‚Â­tulo"
+        title: event.title || event.name || "Sin tÃƒÂ­tulo"
       };
     })
     .filter(Boolean); // Eliminar eventos nulos
@@ -799,7 +799,7 @@ export default function Tasks() {
         ...event,
         start,
         end,
-        title: event.title || event.name || 'Sin tÃƒÆ’Ã‚Â­tulo',
+        title: event.title || event.name || 'Sin tÃƒÂ­tulo',
       };
     })
     .filter(Boolean);
@@ -821,7 +821,7 @@ export default function Tasks() {
     ? safeMeetings.filter(ev => ev.id !== 'wedding-day' && ev.autoKey !== 'wedding-day')
     : [];
 
-  // Filtro especÃƒÆ’Ã‚Â­fico para tareas del componente Gantt
+  // Filtro especÃƒÂ­fico para tareas del componente Gantt
   const taskIdSet = new Set(Array.isArray(tasksState) ? tasksState.filter(Boolean).map(t => t?.id).filter(Boolean) : []);
 
   const safeGanttTasks = Array.isArray(tasksState) 
@@ -837,7 +837,7 @@ export default function Tasks() {
           const start = validateAndNormalizeDate(task.start);
           const end = validateAndNormalizeDate(task.end);
           
-          // Si alguna fecha no es vÃƒÆ’Ã‚Â¡lida, descartar tarea
+          // Si alguna fecha no es vÃƒÂ¡lida, descartar tarea
           if (!start || !end) {
             return null;
           }
@@ -852,7 +852,7 @@ export default function Tasks() {
             ...task,
             start,
             end,
-            name: task.name || task.title || "Sin tÃƒÆ’Ã‚Â­tulo",
+            name: task.name || task.title || "Sin tÃƒÂ­tulo",
             type: task.type || "task",
             id: task.id,
             progress: task.progress || 0,
@@ -863,12 +863,12 @@ export default function Tasks() {
         .filter(Boolean) // Eliminar tareas nulas
     : [];
 
-  // Capa extra de seguridad: descartar cualquier tarea con fechas no vÃƒÆ’Ã‚Â¡lidas antes de pintar
+  // Capa extra de seguridad: descartar cualquier tarea con fechas no vÃƒÂ¡lidas antes de pintar
   const ganttTasksStrict = Array.isArray(safeGanttTasks)
     ? safeGanttTasks.filter(t => t && t.start instanceof Date && t.end instanceof Date && !isNaN(t.start.getTime()) && !isNaN(t.end.getTime()))
     : [];
 
-  // Capa ultra-defensiva: aceptar campos legacy y descartar cualquier resto invÃƒÆ’Ã‚Â¡lido
+  // Capa ultra-defensiva: aceptar campos legacy y descartar cualquier resto invÃƒÂ¡lido
   const __normalizeDate = (d) => {
     try {
       if (!d) return null;
@@ -901,7 +901,7 @@ export default function Tasks() {
       const stableId = t.id || `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
       if (seen.has(stableId)) continue;
       seen.add(stableId);
-      // Forzar que el id usado por la librerÃƒÆ’Ã‚Â­a sea el estable
+      // Forzar que el id usado por la librerÃƒÂ­a sea el estable
       out.push({ ...t, id: stableId });
     }
     return out;
@@ -970,10 +970,10 @@ export default function Tasks() {
           progressSelectedColor: 'transparent',
         },
       });
-      // No aÃƒÂ±adimos milestones visibles para evitar rombos en el grid; la marca se dibuja como bandera superpuesta.
+      // No aÃ±adimos milestones visibles para evitar rombos en el grid; la marca se dibuja como bandera superpuesta.
     }
 
-    // Si por cualquier motivo sigue vacÃƒÂ­o, crear un rango mÃƒÂ­nimo alrededor de hoy
+    // Si por cualquier motivo sigue vacÃ­o, crear un rango mÃ­nimo alrededor de hoy
     if (out.length === 0) {
       const today = new Date();
       const start = addMonths(today, -1);
@@ -1023,16 +1023,16 @@ export default function Tasks() {
     const minStart = new Date(Math.min(...starts.map(d => d.getTime())));
     const maxEnd = new Date(Math.max(...ends.map(d => d.getTime())));
 
-    // Elegir viewMode segÃƒÆ’Ã‚Âºn duraciÃƒÆ’Ã‚Â³n total
+    // Elegir viewMode segÃƒÂºn duraciÃƒÂ³n total
     const msSpan = Math.max(1, maxEnd.getTime() - minStart.getTime());
     const daysSpan = Math.max(1, Math.ceil(msSpan / (1000 * 60 * 60 * 24)));
     let targetMode = ViewMode.Month;
-    if (daysSpan > 730) targetMode = ViewMode.Year; // >2 aÃƒÆ’Ã‚Â±os
+    if (daysSpan > 730) targetMode = ViewMode.Year; // >2 aÃƒÂ±os
     else if (daysSpan > 120) targetMode = ViewMode.Month; // >4 meses
     else if (daysSpan > 21) targetMode = ViewMode.Week; // >3 semanas
     else targetMode = ViewMode.Day; // <=3 semanas
 
-    // Calcular unidades visibles segÃƒÆ’Ã‚Âºn el modo elegido
+    // Calcular unidades visibles segÃƒÂºn el modo elegido
     let units = 1;
     if (targetMode === ViewMode.Year) {
       const startYear = minStart.getFullYear();
@@ -1055,14 +1055,14 @@ export default function Tasks() {
     units = (endMonth.getFullYear() - startMonth.getFullYear()) * 12 + (endMonth.getMonth() - startMonth.getMonth()) + 1;
     targetMode = ViewMode.Month;
 
-    // Sin pasos previos para no aÃƒÆ’Ã‚Â±adir espacio vacÃƒÆ’Ã‚Â­o
+    // Sin pasos previos para no aÃƒÂ±adir espacio vacÃƒÂ­o
     const pre = 0;
     const totalUnits = units + pre;
 
-    // Calcular ancho de columna para encajar sin scroll horizontal (lÃƒÆ’Ã‚Â­mites por modo)
+    // Calcular ancho de columna para encajar sin scroll horizontal (lÃƒÂ­mites por modo)
     // Column width calculado para encajar sin scroll
     const MIN_COL = 72; // meses largos (Septiembre) sin solaparse
-    const MAX_COL = 160; // px mÃƒÆ’Ã‚Â¡ximo
+    const MAX_COL = 160; // px mÃƒÂ¡ximo
     const computedCol = Math.max(MIN_COL, Math.min(MAX_COL, Math.floor(containerWidth / totalUnits)));
 
     if (columnWidthState !== computedCol) setColumnWidthState(computedCol);
@@ -1080,7 +1080,7 @@ export default function Tasks() {
     return () => window.removeEventListener('resize', onResize);
   }, [tasksState, meetingsState, uniqueGanttTasksMemo, columnWidthState, ganttPreSteps, ganttViewDate, ganttViewMode, projectStart, projectEnd]);
 
-  // Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÆ’Ã‚Â³n
+  // Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÂ³n
   useEffect(() => {
     if (!projectStart || !projectEnd) return;
     if (!ganttContainerRef.current) return;
@@ -1118,16 +1118,16 @@ export default function Tasks() {
     return () => { if (ro) ro.disconnect(); };
   }, [projectStart, projectEnd, columnWidthState, ganttViewDate, ganttViewMode]);
 
-  // CÃƒÆ’Ã‚Â¡lculo de progreso - asegurando que los estados sean arrays
+  // CÃƒÂ¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       
       <div className="flex items-center justify-between">
-        <h1 className="page-title">GestiÃƒÆ’Ã‚Â³n de Tareas</h1>
+        <h1 className="page-title">Gestión de Tareas</h1>
         <div className="flex items-center space-x-4">
-          {/* Indicador de sincronizaciÃƒÆ’Ã‚Â³n */}
+          {/* Indicador de sincronizaciÃƒÂ³n */}
           <div className="flex items-center">
             {syncStatus.isSyncing ? (
               <RefreshCw className="w-4 h-4 animate-spin text-yellow-500 mr-2" />
@@ -1147,10 +1147,10 @@ export default function Tasks() {
                   : syncStatus.pendingChanges
                   ? "Cambios pendientes"
                   : "Sincronizado"
-                : "Sin conexiÃƒÆ’Ã‚Â³n"}
+                : "Sin conexiÃƒÂ³n"}
             </div>
           </div>
-          {/* Botones de acciÃƒÆ’Ã‚Â³n */}
+          {/* Botones de acciÃƒÂ³n */}
           <div className="flex space-x-2">
             <button
               onClick={() => {
@@ -1193,7 +1193,7 @@ export default function Tasks() {
                 return lastDayNextMonth;
               })()}
               onTaskClick={(task) => {
-                // Abrir modal de ediciÃƒÆ’Ã‚Â³n para tareas de largo plazo
+                // Abrir modal de ediciÃƒÂ³n para tareas de largo plazo
                 setEditingId(task.id);
                 setFormData({
                   title: task.title,
@@ -1223,7 +1223,7 @@ export default function Tasks() {
       <div className="flex-1 bg-[var(--color-surface)] rounded-xl shadow-md p-6 mt-4 overflow-x-auto">
         <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
         
-        {/* Controles de navegaciÃƒÆ’Ã‚Â³n del calendario */}
+        {/* Controles de navegaciÃƒÂ³n del calendario */}
         <div className="flex justify-between items-center mb-4">
           <div className="space-x-2">
             <button 
@@ -1242,7 +1242,7 @@ export default function Tasks() {
               className={`px-3 py-1 rounded ${currentView === 'day' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
               onClick={() => setCurrentView('day')}
             >
-              DÃƒÆ’Ã‚Â­a
+              DÃƒÂ­a
             </button>
           </div>
           <div className="flex items-center space-x-2">
@@ -1289,20 +1289,20 @@ export default function Tasks() {
         
         
         <div className="rbc-calendar-container">
-          {/* Componente Calendar con protecciÃƒÆ’Ã‚Â³n de errores */}
+          {/* Componente Calendar con protecciÃƒÂ³n de errores */}
           <ErrorBoundary
             fallback={(
               <div>
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-medium text-gray-800 mb-2">Error al cargar el calendario</h3>
-                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a travÃƒÆ’Ã‚Â©s de la lista inferior.</p>
+                  <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a travÃƒÂ©s de la lista inferior.</p>
                 </div>
                 <div className="space-y-4 max-h-[300px] overflow-y-auto p-2">
                   {safeEvents && safeEvents.length > 0 ? (
                     sortedTasks
                       .map(event => {
                         const eventId = event.id || '';
-                        const eventTitle = event.title || event.name || "Evento sin tÃƒÆ’Ã‚Â­tulo";
+                        const eventTitle = event.title || event.name || "Evento sin tÃƒÂ­tulo";
                         const eventStart = event.start instanceof Date ? event.start : new Date();
                         const formattedDate = eventStart.toLocaleDateString('es-ES', {
                           weekday: 'short',
@@ -1406,7 +1406,7 @@ export default function Tasks() {
                   min-height: 0;
                 }
                 
-                /* Celdas de dÃƒÆ’Ã‚Â­as */
+                /* Celdas de dÃƒÂ­as */
                 .calendar-container .rbc-day-bg {
                   flex: 1 0;
                   border-bottom: 1px solid #eee;
@@ -1491,7 +1491,7 @@ export default function Tasks() {
                   today: "Hoy",
                   month: "Mes",
                   week: "Semana",
-                  day: "DÃƒÆ’Ã‚Â­a"
+                  day: "DÃƒÂ­a"
                 }}
               />
             </div>
@@ -1552,7 +1552,7 @@ export default function Tasks() {
                 min-height: 0;
               }
               
-              /* Celdas de dÃƒÆ’Ã‚Â­as */
+              /* Celdas de dÃƒÂ­as */
               .calendar-container .rbc-day-bg {
                 flex: 1 0;
                 border-bottom: 1px solid #eee;
@@ -1637,7 +1637,7 @@ export default function Tasks() {
                 today: "Hoy",
                 month: "Mes",
                 week: "Semana",
-                day: "DÃƒÆ’Ã‚Â­a"
+                day: "DÃƒÂ­a"
               }}
             />
           </div>

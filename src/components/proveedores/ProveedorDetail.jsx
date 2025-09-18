@@ -28,8 +28,8 @@ import useSupplierRFQHistory from "../../hooks/useSupplierRFQHistory";
 
 /**
  * Componente que muestra los detalles completos de un proveedor seleccionado.
- * Incluye informaciÃ³n de contacto, calificaciones, notas y opciones para editar.
- * También permite aÃ±adir valoraciones y mostrar el historial de interacciones.
+ * Incluye información de contacto, calificaciones, notas y opciones para editar.
+ * También permite añadir valoraciones y mostrar el historial de interacciones.
  *
  * @param {Object} props - Propiedades del componente
  * @param {Provider} props.provider - Proveedor a mostrar en detalle
@@ -126,7 +126,7 @@ const ProveedorDetail = ({
     });
   };
 
-  // Renderizar estrellas para calificaciÃ³n
+  // Renderizar estrellas para calificación
   const renderRatingStars = (currentRating, interactive = false) => {
     return (
       <div className="flex">
@@ -174,7 +174,7 @@ const ProveedorDetail = ({
     }
   };
 
-  // Color segÃºn estado del proveedor
+  // Color según estado del proveedor
   const getStatusColor = (status) => {
     switch (status) {
       case "Confirmado":
@@ -194,7 +194,7 @@ const ProveedorDetail = ({
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          {/* Header con tÃ­tulo y botÃ³n de cierre */}
+          {/* Header con título y botón de cierre */}
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-xl font-semibold">{provider.name}</h2>
             <button
@@ -206,7 +206,7 @@ const ProveedorDetail = ({
             </button>
           </div>
 
-          {/* pestañas de navegaciÃ³n */}
+          {/* pestañas de navegación */}
           <div className="flex border-b">
             <button
               className={`py-2 px-4 ${activeTab === "info" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
@@ -305,7 +305,7 @@ const ProveedorDetail = ({
                     </div>
                   )}
 
-                  {/* DescripciÃ³n o snippet */}
+                  {/* Descripción o snippet */}
                   {provider.snippet && (
                     <p className="text-gray-700 mb-4">{provider.snippet}</p>
                   )}
@@ -398,7 +398,7 @@ const ProveedorDetail = ({
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
-                          <p className="font-medium">UbicaciÃ³n</p>
+                          <p className="font-medium">Ubicación</p>
                           <p className="text-sm text-gray-600">
                             {provider.location || provider.address}
                           </p>
@@ -416,9 +416,9 @@ const ProveedorDetail = ({
                     )}
                   </div>
 
-                  {/* CalificaciÃ³n */}
+                  {/* Calificación */}
                   <div className="mt-6">
-                    <p className="font-medium mb-1">CalificaciÃ³n</p>
+                    <p className="font-medium mb-1">Calificación</p>
                     <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
@@ -556,7 +556,7 @@ const ProveedorDetail = ({
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Comunicaciones</h3>
-                  {/* AquÃ­ se renderizarÃ­an las comunicaciones */}
+                  {/* Aquí se renderizarían las comunicaciones */}
                   <p className="text-gray-500">
                     Historial de comunicaciones con este proveedor.
                   </p>
@@ -568,7 +568,7 @@ const ProveedorDetail = ({
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Seguimiento</h3>
-                  {/* AquÃ­ se renderizarÃ­a el seguimiento */}
+                  {/* Aquí se renderizaría el seguimiento */}
                   <p className="text-gray-500">
                     Historial de seguimiento de comunicaciones con este
                     proveedor.
@@ -578,7 +578,7 @@ const ProveedorDetail = ({
             )}
           </div>
 
-          {/* Footer con botones de acciÃ³n */}
+          {/* Footer con botones de acción */}
           <div className="border-t p-4 bg-gray-50 flex justify-end space-x-3">
             <Button variant="outline" onClick={onClose}>
               Cerrar

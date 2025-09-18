@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import LanguageSelector from '../components/ui/LanguageSelector';
 import { Card, Button, Input } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
@@ -178,6 +179,7 @@ function Perfil() {
     <div className="space-y-6 p-4 max-w-3xl mx-auto">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Perfil</h1>
+        <div className="mt-2"><LanguageSelector /></div>
         <div className="flex items-center text-sm gap-3">
           <div className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-red-500' : syncStatus.isSyncing ? 'bg-yellow-500' : syncStatus.pendingChanges ? 'bg-orange-500' : 'bg-green-500'}`}></div>
           <span>{!syncStatus.isOnline ? 'Sin conexi\u00F3n (modo offline)' : syncStatus.isSyncing ? 'Sincronizando...' : syncStatus.pendingChanges ? 'Cambios pendientes' : 'Sincronizado'}</span>
@@ -299,6 +301,5 @@ function Perfil() {
 }
 
 export default Perfil;
-
 
 

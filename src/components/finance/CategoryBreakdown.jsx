@@ -2,7 +2,13 @@ import React, { useRef, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import Card from '../Card';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+const COLORS = [
+  'var(--color-primary)',
+  'var(--color-success)',
+  'var(--color-warning)',
+  'var(--color-danger)',
+  'var(--color-accent)'
+];
 
 export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
   const chartRef = useRef(null);
@@ -45,7 +51,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
         <h3 className="text-lg font-semibold mb-4">
           {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
         </h3>
-        <p className="text-gray-500 text-center my-8">No hay datos disponibles</p>
+        <p className="text-[color:var(--color-text)]/70 text-center my-8">No hay datos disponibles</p>
       </Card>
     );
   }
@@ -66,7 +72,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
               cy="50%"
               labelLine={false}
               outerRadius={outerR}
-              fill="#8884d8"
+              fill="var(--color-primary)"
               dataKey="value"
               label={({ name, percent }) => percent * 100 > 5 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
             >

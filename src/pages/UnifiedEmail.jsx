@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import UsernameWizard from "../components/UsernameWizard";
 import useEmailUsername from "../hooks/useEmailUsername";
 import Button from "../components/ui/Button";
@@ -7,7 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Spinner from "../components/ui/Spinner";
 import Alert from "../components/ui/Alert";
 import { uploadEmailAttachments } from "../services/storageUploadService";
-import { getMails, initEmailService, markAsRead, markAsUnread, deleteMail, sendMail, setFolder } from "../services/emailService";
+import { getMails, getMailsPage, initEmailService, markAsRead, markAsUnread, deleteMail, sendMail, setFolder } from "../services/emailService";
 import EmailRecommendationService from "../services/EmailRecommendationService";
 import { detectProviderResponse } from "../services/EmailTrackingService";
 import { useWedding } from "../context/WeddingContext";
@@ -37,6 +37,9 @@ const UnifiedEmail = () => {
   const [onlyUnread, setOnlyUnread] = useState(false);
   const [onlyWithAttachments, setOnlyWithAttachments] = useState(false);
   const [composeInitial, setComposeInitial] = useState(null);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const [userId, setUserId] = useState(null);
   const [customFolders, setCustomFolders] = useState([]);
@@ -60,12 +63,16 @@ const UnifiedEmail = () => {
     setError(null);
     try {
       const fetchFolder = activeCustomFolder || activeTagId ? "all" : (folder === "sent" ? "sent" : "inbox");
-      const mails = await getMails(fetchFolder);
-      if (Array.isArray(mails)) {
-        setEmails(mails);
+      if (fetchFolder === 'all') {
+        const mails = await getMails(fetchFolder);
+        setEmails(Array.isArray(mails) ? mails : []);
+        setNextCursor(null);
+        setHasMore(false);
       } else {
-        console.warn("Respuesta inesperada de getMails", mails);
-        setEmails([]);
+        const page = await getMailsPage(fetchFolder, { limit: 50, cursor: null });
+        setEmails(Array.isArray(page.items) ? page.items : []);
+        setNextCursor(page.nextCursor || null);
+        setHasMore(Boolean(page.nextCursor));
       }
     } catch (err) {
       console.error("Error cargando correos:", err);
@@ -74,6 +81,27 @@ const UnifiedEmail = () => {
       setLoading(false);
     }
   }, [myEmail, folder, activeCustomFolder, activeTagId]);
+
+  const loadMore = useCallback(async () => {
+    try {
+      if (loadingMore || !hasMore) return;
+      setLoadingMore(true);
+      const fetchFolder = (folder === "sent" ? "sent" : "inbox");
+      const page = await getMailsPage(fetchFolder, { limit: 50, cursor: nextCursor });
+      const newItems = Array.isArray(page.items) ? page.items : [];
+      setEmails(prev => {
+        const byId = new Map(prev.map(m => [m.id, m]));
+        for (const m of newItems) { if (!byId.has(m.id)) byId.set(m.id, m); }
+        return Array.from(byId.values()).sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      });
+      setNextCursor(page.nextCursor || null);
+      setHasMore(Boolean(page.nextCursor));
+    } catch (e) {
+      console.warn('loadMore failed', e);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, nextCursor, folder]);
 
   // Detectar respuestas de proveedores
   useEffect(() => {
@@ -338,7 +366,7 @@ const UnifiedEmail = () => {
                     </button>
                     <div className="ml-2 flex items-center gap-1 text-xs text-gray-500">
                       <button title="Renombrar" onClick={() => { try { const nn = prompt('Nuevo nombre', f.name); if (!nn) return; renameFolder(userId||'', f.id, nn); setCustomFolders(getUserFolders(userId||'')); } catch(_){} }}>??</button>
-                      <button title="Eliminar" onClick={() => { try { if (!confirm('¿Eliminar carpeta?')) return; deleteFolder(userId||'', f.id); setCustomFolders(getUserFolders(userId||'')); if (activeCustomFolder===f.id) setActiveCustomFolder(null); } catch(_){} }}>???</button>
+                      <button title="Eliminar" onClick={() => { try { if (!confirm('Â¿Eliminar carpeta?')) return; deleteFolder(userId||'', f.id); setCustomFolders(getUserFolders(userId||'')); if (activeCustomFolder===f.id) setActiveCustomFolder(null); } catch(_){} }}>???</button>
                     </div>
                   </div>
                 ))}
@@ -388,6 +416,9 @@ const UnifiedEmail = () => {
             onMoveToFolder={handleMoveToFolder}
             selectedIds={selectedIds}
             onToggleSelect={(id) => setSelectedIds(prev => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; })}
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            onLoadMore={loadMore}
           />
           {loading && (
             <div className="flex items-center justify-center p-4">
@@ -431,15 +462,32 @@ const UnifiedEmail = () => {
 /**
  * Lista lateral de correos sencillos.
  */
-const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 'No hay correos', onToggleRead = () => {}, onDelete = () => {}, folders = [], onMoveToFolder = () => {}, userId = null, selectedIds = new Set(), onToggleSelect = () => {} }) => {
+const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 'No hay correos', onToggleRead = () => {}, onDelete = () => {}, folders = [], onMoveToFolder = () => {}, userId = null, selectedIds = new Set(), onToggleSelect = () => {}, hasMore = false, loadingMore = false, onLoadMore = null }) => {
   const [visible, setVisible] = useState(30);
   const [menuOpenId, setMenuOpenId] = useState(null);
   const [tick, setTick] = useState(0);
+  const bottomRef = useRef(null);
   useEffect(() => {
     const h = () => setTick((t) => t + 1);
     window.addEventListener('lovenda-email-tags', h);
     return () => window.removeEventListener('lovenda-email-tags', h);
   }, []);
+
+  useEffect(() => {
+    if (!hasMore || typeof onLoadMore !== 'function') return;
+    const el = bottomRef.current;
+    if (!el) return;
+    let pending = false;
+    const io = new IntersectionObserver((entries) => {
+      const e = entries && entries[0];
+      if (e && e.isIntersecting && !pending) {
+        pending = true;
+        Promise.resolve(onLoadMore()).finally(() => { pending = false; });
+      }
+    }, { root: null, rootMargin: '200px', threshold: 0 });
+    io.observe(el);
+    return () => { try { io.disconnect(); } catch {} };
+  }, [hasMore, onLoadMore]);
 
   const dateGroupLabel = (d) => {
     if (!d) return 'Sin fecha';
@@ -469,7 +517,7 @@ const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 
 
   const items = loading && emails.length === 0
     ? Array.from({ length: 8 }).map((_, i) => renderSkeleton(i))
-    : emails.slice(0, visible).map((mail, idx) => (
+    : emails.map((mail, idx) => (
         <div key={`wrap-${mail.id}`}>
           {(idx === 0 || dateGroupLabel(emails[idx-1].date) !== dateGroupLabel(mail.date)) && (
             <div key={`hdr-${dateGroupLabel(mail.date)}-${idx}`} className="bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-600">
@@ -492,6 +540,23 @@ const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 
                 <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
                   <span className="truncate">{mail.sender || mail.from}</span>
                   {Array.isArray(mail.attachments) && mail.attachments.length > 0 && <span title="Adjuntos">??</span>}
+                </div>
+                {/* Estado de entrega/lectura */}
+                <div className="mt-0.5 flex flex-wrap items-center gap-1 text-[11px]">
+                  {(() => {
+                    try {
+                      const failed = Boolean(mail.failedAt || (mail.lastEvent && String(mail.lastEvent).toLowerCase()==='failed'));
+                      const delivered = Boolean(mail.deliveredAt || (mail.lastEvent && String(mail.lastEvent).toLowerCase()==='delivered'));
+                      const openCount = Number(mail.openCount || 0);
+                      const clickCount = Number(mail.clickCount || 0);
+                      const badges = [];
+                      if (failed) badges.push(<span key="b-f" className="rounded bg-red-50 px-1.5 py-0.5 text-red-600 border border-red-200">Fallo</span>);
+                      if (delivered && !failed) badges.push(<span key="b-d" className="rounded bg-green-50 px-1.5 py-0.5 text-green-700 border border-green-200">Entregado</span>);
+                      if (openCount>0) badges.push(<span key="b-o" className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 border border-blue-200">Abierto {openCount}</span>);
+                      if (clickCount>0) badges.push(<span key="b-c" className="rounded bg-purple-50 px-1.5 py-0.5 text-purple-700 border border-purple-200">Clicks {clickCount}</span>);
+                      return badges.length ? badges : null;
+                    } catch { return null; }
+                  })()}
                 </div>
                 {(() => {
                   const tds = userId ? getEmailTagsDetails(userId, mail.id) : [];
@@ -533,11 +598,7 @@ const MailList = ({ emails, onSelect, selected, loading = false, emptyMessage = 
       {items.length > 0 ? items : (
         <div className="p-4 text-sm text-gray-500">{emptyMessage}</div>
       )}
-      {emails.length > visible && (
-        <div className="p-3">
-          <Button variant="ghost" onClick={() => setVisible(v => v + 30)}>Cargar más</Button>
-        </div>
-      )}
+      <div ref={bottomRef} className="h-1" />
     </div>
   );
 };
@@ -555,12 +616,65 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
     subject: mail.subject ? `Fwd: ${mail.subject}` : 'Fwd: (Sin asunto)',
     body: `\n\n----- Mensaje reenviado -----\n${(mail.body || '').toString()}`,
   });
-  const downloadAttachment = (att, i = 0) => {
+  const downloadAttachment = async (att, i = 0) => {
     try {
       let url = att && (att.url || att.link);
       const name = (att && (att.filename || att.name)) || `adjunto-${i+1}`;
       if (!url && att && att.file) url = URL.createObjectURL(att.file);
       if (!url) return;
+
+      // Si es un endpoint del backend, intentar URL firmada desde Storage primero
+      const isApi = typeof url === 'string' && (url.startsWith('/api/') || url.includes('/api/mail/'));
+      if (isApi) {
+        try {
+          const base = (import.meta && import.meta.env && import.meta.env.VITE_BACKEND_BASE_URL) || '';
+          const toFull = (path) => (path.startsWith('http') ? path : (base ? `${base}${path.startsWith('/') ? '' : '/'}${path}` : path));
+          // Derivar endpoint /url
+          let urlInfo = url;
+          // si coincide /api/mail/{id}/attachments/{attId}
+          const m = url.match(/^(.*\/api\/mail\/[^/]+\/attachments\/[^/]+)(?:\/?|$)/);
+          if (m) {
+            const signedEndpoint = `${m[1]}/url`;
+            const token = auth && auth.currentUser && auth.currentUser.getIdToken ? await auth.currentUser.getIdToken() : null;
+            const resSigned = await fetch(toFull(signedEndpoint), { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+            if (resSigned.ok) {
+              const json = await resSigned.json();
+              if (json && json.url) {
+                const a = document.createElement('a');
+                a.href = json.url;
+                a.download = name;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { try { a.remove(); } catch {} }, 0);
+                return;
+              }
+            }
+          }
+          // Fallback: descarga autenticada vía proxy binario
+          {
+            const full = toFull(urlInfo);
+            const token = auth && auth.currentUser && auth.currentUser.getIdToken ? await auth.currentUser.getIdToken() : null;
+            const res = await fetch(full, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              try { a.remove(); } catch {}
+              try { URL.revokeObjectURL(blobUrl); } catch {}
+            }, 0);
+            return;
+          }
+        } catch (fetchErr) {
+          console.error('Descarga autenticada falló', fetchErr);
+        }
+      }
+
+      // Fallback: abrir URL directa
       const a = document.createElement('a');
       a.href = url;
       a.download = name;
@@ -578,7 +692,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
   };
   const handleMark = () => { onMarkRead(mail); };
   const handleDelete = () => {
-    if (onDelete && window.confirm("¿Borrar este correo?")) {
+    if (onDelete && window.confirm("Â¿Borrar este correo?")) {
       onDelete(mail);
     }
   };
@@ -592,7 +706,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
           {folders && folders.length > 0 && (
             <div className="flex items-center gap-2">
               <select className="border rounded px-2 py-1 text-xs" onChange={(e)=>{ const fid=e.target.value; if(fid) onMoveToFolder(mail, fid); }} defaultValue="">
-                <option value="">Mover a carpeta…</option>
+                <option value="">Mover a carpetaâ€¦</option>
                 {folders.map(f => (
                   <option key={f.id} value={f.id}>{f.name}</option>
                 ))}
@@ -602,7 +716,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
           {/* Gestión de etiquetas */}
           <div className="flex items-center gap-1">
             <select className="border rounded px-2 py-1 text-xs" defaultValue="" onChange={async (e)=>{ const tid=e.target.value; if(!tid) return; try { addTagToEmail(userId||'', mail.id, tid); try { await updateMailTags(mail.id, { add: [tid] }); } catch {} window.dispatchEvent(new Event('lovenda-email-tags')); } catch(_){} e.target.value=''; }}>
-              <option value="">Añadir etiqueta…</option>
+              <option value="">Añadir etiquetaâ€¦</option>
               {getUserTags(userId||'').map(t => (<option key={t.id} value={t.id}>{t.name}</option>))}
             </select>
           </div>
@@ -624,7 +738,7 @@ const MailViewer = ({ mail, onMarkRead, onDelete, onCompose, folders = [], onMov
           {tds.map(t => (
             <span key={t.id} className="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-700">
               #{t.name}
-              <button title="Quitar" onClick={() => { try { removeTagFromEmail(userId||'', mail.id, t.id); window.dispatchEvent(new Event('lovenda-email-tags')); } catch(_){} }}>×</button>
+              <button title="Quitar" onClick={() => { try { removeTagFromEmail(userId||'', mail.id, t.id); window.dispatchEvent(new Event('lovenda-email-tags')); } catch(_){} }}>Ã—</button>
             </span>
           ))}
         </div>
@@ -738,7 +852,7 @@ const ComposeModal = ({ onClose, from, initial = {}, userId = null }) => {
           )}
           <textarea
             rows="8"
-            placeholder="Escribe tu mensaje…"
+            placeholder="Escribe tu mensajeâ€¦"
             className="w-full rounded border px-3 py-2 text-sm"
             value={body}
             onChange={(e) => setBody(e.target.value)}

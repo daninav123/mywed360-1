@@ -11,6 +11,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Detect changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'src/**'
+              - 'public/**'
+              - 'vite.config.*'
+            backend:
+              - 'backend/**'
+              - 'firebase.json'
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -21,7 +33,14 @@ jobs:
         run: npm run lint --if-present
       - name: Validate i18n
         run: node scripts/validateI18n.js --strict
-- name: E2E smoke (frontend+backend)
+      - name: Run unit tests
+        run: npm test --if-present
+      - name: Build frontend
+        run: npm run build
+      - name: Bundle budget
+        run: npm run check:bundle
+      - name: E2E smoke (frontend+backend)
+        if: ${{ steps.changes.outputs.frontend == 'true' || steps.changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'e2e')) }}
         env:
           VITE_BACKEND_BASE_URL: http://localhost:4004
           ALLOWED_ORIGIN: http://localhost:5173

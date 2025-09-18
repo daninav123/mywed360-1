@@ -77,5 +77,26 @@ router.get('/', async (_req, res) => {
   });
 });
 
-export default router;
+// Señales estándar para probes
+router.get('/livez', (_req, res) => {
+  // Liveness: si el proceso responde, está vivo
+  res.status(200).send('ok');
+});
 
+router.get('/readyz', async (_req, res) => {
+  // Readiness: prueba superficial de dependencias principales
+  try {
+    let firestoreOk = false;
+    try {
+      const db = admin.firestore();
+      await db.collection('health').limit(1).get();
+      firestoreOk = true;
+    } catch {}
+    const ok = firestoreOk; // ampliar con más verificaciones si hace falta
+    return res.status(ok ? 200 : 503).json({ ok, firestore: firestoreOk });
+  } catch {
+    return res.status(503).json({ ok: false });
+  }
+});
+
+export default router;

@@ -46,6 +46,120 @@ async function authHeader(base = {}) {
   return token ? { ...base, 'Authorization': `Bearer ${token}` } : base;
 }
 
+// ==================== PREFERENCIAS DE NOTIFICACIONES ====================
+
+export const DEFAULT_NOTIFICATION_PREFS = {
+  channels: {
+    inApp: true,
+    push: true,
+    emailDigest: { daily: true, weekly: false }
+  },
+  quietHours: { enabled: false, start: '22:00', end: '08:00', allowCritical: true },
+  categories: {
+    email: { new: true, important: true },
+    tasks: { assigned: true, reminder24h: true, overdue: true },
+    meetings: { suggested: true, reminder1h: true },
+    providers: { trackingUrgent: true, budgetReceived: true, contractSigned: true },
+    finance: { invoiceDue: true, paymentReceived: true, overbudget: true },
+    rsvp: { new: true, changed: true },
+    documents: { signatureRequested: true, signatureSigned: true },
+    system: { exportReady: true, maintenance: true },
+    ai: { suggestedTask: true, suggestedMeeting: true, suggestedBudget: true }
+  }
+};
+
+const PREFS_KEY = 'lovenda_notification_prefs_v1';
+
+export function getNotificationPrefs() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return DEFAULT_NOTIFICATION_PREFS;
+    const parsed = JSON.parse(raw);
+    // merge con defaults para compatibilidad
+    return deepMerge(DEFAULT_NOTIFICATION_PREFS, parsed);
+  } catch {
+    return DEFAULT_NOTIFICATION_PREFS;
+  }
+}
+
+export function saveNotificationPrefs(prefs) {
+  try {
+    const merged = deepMerge(DEFAULT_NOTIFICATION_PREFS, prefs || {});
+    localStorage.setItem(PREFS_KEY, JSON.stringify(merged));
+    return merged;
+  } catch {
+    return prefs;
+  }
+}
+
+function deepMerge(base, ext) {
+  if (Array.isArray(base) || Array.isArray(ext)) return ext ?? base;
+  if (typeof base !== 'object' || typeof ext !== 'object' || !base || !ext) return ext ?? base;
+  const out = { ...base };
+  for (const k of Object.keys(ext)) {
+    out[k] = deepMerge(base[k], ext[k]);
+  }
+  return out;
+}
+
+export function isQuietHoursActive(date = new Date(), quiet = getNotificationPrefs().quietHours) {
+  try {
+    if (!quiet?.enabled) return false;
+    const [sh, sm] = (quiet.start || '22:00').split(':').map(n => parseInt(n || '0', 10));
+    const [eh, em] = (quiet.end || '08:00').split(':').map(n => parseInt(n || '0', 10));
+    const startM = sh * 60 + (sm || 0);
+    const endM = eh * 60 + (em || 0);
+    const m = date.getHours() * 60 + date.getMinutes();
+    if (startM <= endM) {
+      return m >= startM && m < endM;
+    } else {
+      // rango que cruza medianoche
+      return m >= startM || m < endM;
+    }
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Determina si se debe notificar según preferencias y prioridad
+ * @param {Object} evt { type, subtype, priority='normal', channel='toast', when=Date }
+ * @param {Object} prefs preferencias opcionales (si no, se cargan)
+ */
+export function shouldNotify(evt, prefs = null) {
+  const { type, subtype, priority = 'normal', channel = 'toast', when = new Date() } = evt || {};
+  const p = prefs || getNotificationPrefs();
+  if (!p?.channels?.inApp && channel === 'toast') return false;
+  if (!p?.channels?.push && channel === 'push') return false;
+
+  // quiet hours
+  if (isQuietHoursActive(new Date(when), p.quietHours)) {
+    if (!(priority === 'critical' && p.quietHours?.allowCritical)) return false;
+  }
+
+  // categorías
+  const cat = (p.categories && p.categories[type]) || null;
+  if (!cat) return true; // si no existe categoría, permitir
+  if (subtype && Object.prototype.hasOwnProperty.call(cat, mapSubtypeKey(type, subtype))) {
+    return !!cat[mapSubtypeKey(type, subtype)];
+  }
+  return true;
+}
+
+function mapSubtypeKey(type, subtype) {
+  // Mapear subtipos conocidos a claves de prefs
+  const map = {
+    ai: {
+      meeting_suggested: 'suggestedMeeting',
+      budget_suggested: 'suggestedBudget',
+      task_suggested: 'suggestedTask'
+    },
+    tasks: { reminder24h: 'reminder24h', overdue: 'overdue', assigned: 'assigned' },
+    email: { new: 'new', important: 'important' }
+  };
+  return (map[type] && map[type][subtype]) ? map[type][subtype] : (subtype || '');
+}
+
 export async function getNotifications() {
   try {
     const headers = await authHeader();
@@ -336,14 +450,16 @@ export function generateEmailNotifications(emails) {
   // Filtrar emails no leídos
   const unreadEmails = emails.filter(email => !email.read);
   
-  // Notificar sobre emails no leídos
-  if (unreadEmails.length > 0) {
-    showNotification({
-      title: 'Emails sin leer',
-      message: `Tienes ${unreadEmails.length} ${unreadEmails.length === 1 ? 'email sin leer' : 'emails sin leer'}`,
-      type: 'info'
-    });
-  }
+  // Notificar sobre emails no leídos (respetar preferencias)
+  try {
+    if (unreadEmails.length > 0 && shouldNotify({ type: 'email', subtype: 'new', priority: 'normal', channel: 'toast' })) {
+      showNotification({
+        title: 'Emails sin leer',
+        message: `Tienes ${unreadEmails.length} ${unreadEmails.length === 1 ? 'email sin leer' : 'emails sin leer'}`,
+        type: 'info'
+      });
+    }
+  } catch {}
   
   // Filtrar emails importantes y no leídos para notificaciones persistentes
   const importantUnread = unreadEmails.filter(email => 

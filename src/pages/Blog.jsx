@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchWeddingNews } from '../services/blogService';
 import Spinner from '../components/Spinner';
+import { getBackendBase } from '@/utils/backendBase.js';
 
 export default function Blog() {
   const { i18n } = useTranslation();
@@ -65,10 +66,14 @@ export default function Blog() {
           emptyBatches = 0;
         }
         for (const p of batch) {
-          if (!p.url) continue;
-          if (!p.image) continue; // exigir imagen
+          if (!p?.url) continue;
+          const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
+          if ((domainCounts[dom] || 0) >= 1) continue; // 1 por dominio por bloque
           if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
-          newPosts.push(p);
+          domainCounts[dom] = (domainCounts[dom] || 0) + 1;
+          const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
+          const withImage = p.image ? p : { ...p, image: placeholder };
+          newPosts.push(withImage);
           if (newPosts.length >= targetLength) break;
         }
       }
@@ -103,10 +108,14 @@ export default function Blog() {
             emptyBatchesEn = 0;
           }
           for (const p of batch) {
-            if (!p.url) continue;
-            if (!p.image) continue; // exigir imagen
+            if (!p?.url) continue;
+            const dom = (()=>{try{return (new URL(p.url)).hostname.replace(/^www\./,'');}catch{return 'unk';}})();
+            if ((domainCounts[dom] || 0) >= 1) continue;
             if (newPosts.some(x => x.url === p.url || x.id === p.id)) continue;
-            newPosts.push(p);
+            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
+            const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
+            const withImage = p.image ? p : { ...p, image: placeholder };
+            newPosts.push(withImage);
             if (newPosts.length >= targetLength) break;
           }
         }
@@ -129,18 +138,24 @@ export default function Blog() {
   );
 }
 
-const ArticleCard = React.forwardRef(({ post }, ref) => (
-  <div ref={ref} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition">
-    {post.image && <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />}
-    <div className="p-4 space-y-2">
-      <h2 className="text-lg font-semibold">{post.title}</h2>
-      <p className="text-sm text-gray-700 line-clamp-3">{post.description}</p>
-      <div className="text-xs text-gray-500 flex justify-between">
-        <span>{post.source}</span>
-        <span>{new Date(post.published).toLocaleDateString()}</span>
+const ArticleCard = React.forwardRef(({ post }, ref) => {
+  const base = getBackendBase();
+  const imgSrc = post.image
+    ? (base ? `${base}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image)
+    : null;
+  return (
+    <div ref={ref} className="border rounded-lg overflow-hidden shadow hover:shadow-md transition">
+      {imgSrc && <img src={imgSrc} alt={post.title} className="w-full h-48 object-cover" />}
+      <div className="p-4 space-y-2">
+        <h2 className="text-lg font-semibold">{post.title}</h2>
+        <p className="text-sm text-gray-700 line-clamp-3">{post.description}</p>
+        <div className="text-xs text-gray-500 flex justify-between">
+          <span>{post.source}</span>
+          <span>{new Date(post.published).toLocaleDateString()}</span>
+        </div>
+        <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm">Leer más</a>
       </div>
-      <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm">Leer más</a>
     </div>
-  </div>
-));
+  );
+});
 

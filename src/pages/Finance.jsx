@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import FinanceOverview from '../components/finance/FinanceOverview';
+
 import TransactionManager from '../components/finance/TransactionManager';
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
@@ -10,16 +11,16 @@ import useFinance from '../hooks/useFinance';
 import useTranslations from '../hooks/useTranslations';
 
 /**
- * PÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina de Gestion financiera completamente refactorizada
+ * PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina de Gestion financiera completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  * 
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (571 lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ 180 lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas)
+ * - Eliminada complejidad anterior (571 lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­neas ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢ 180 lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­neas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useFinance para lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³gica centralizada
- * - MemoizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n y optimizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de re-renders
- * - IntegraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n con sistema i18n
- * - UX mejorada con tabs y navegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n clara
+ * - Hook personalizado useFinance para lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gica centralizada
+ * - MemoizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n y optimizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de re-renders
+ * - IntegraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n con sistema i18n
+ * - UX mejorada con tabs y navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n clara
  */
 function Finance() {
   const { t } = useTranslations();
@@ -34,7 +35,7 @@ function Finance() {
     budget,
     transactions,
     
-    // CÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lculos
+    // CÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lculos
     stats,
     budgetUsage,
     settings,
@@ -60,22 +61,22 @@ function Finance() {
   const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
 
-  // Detectar URL hash para abrir modal especÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­fico
+  // Detectar URL hash para abrir modal especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager manejarÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ la apertura del modal
+      // El TransactionManager manejarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºmero de invitados al montar el componente
+  // Cargar nÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores despuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©s de 5 segundos
+  // Limpiar errores despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -88,7 +89,7 @@ function Finance() {
     setTransactionFiltersSignal({ version: Date.now(), filters });
   }; 
 
-  // Manejar actualizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de presupuesto total
+  // Manejar actualizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -114,14 +115,15 @@ function Finance() {
           </div>
         )}
 
-        {/* NavegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n por tabs */}
+        {/* Navegación por tabs */}
+        {/* Cabecera de página */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">{t('finance.tabs.overview', { defaultValue: 'Resumen' })}</TabsTrigger>
             <TabsTrigger value="transactions">{t('finance.tabs.transactions', { defaultValue: 'Transacciones' })}</TabsTrigger>
             <TabsTrigger value="budget">{t('finance.tabs.budget', { defaultValue: 'Presupuesto' })}</TabsTrigger>
             <TabsTrigger value="contributions">{t('finance.tabs.contributions', { defaultValue: 'Aportaciones' })}</TabsTrigger>
-            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'AnÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lisis' })}</TabsTrigger>
+            <TabsTrigger value="analytics">{t('finance.tabs.analytics', { defaultValue: 'AnÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lisis' })}</TabsTrigger>
           </TabsList>
 
           {/* Tab: Resumen general */}
@@ -131,6 +133,8 @@ function Finance() {
               syncStatus={syncStatus}
               budgetUsage={budgetUsage}
               thresholds={settings?.alertThresholds}
+              isLoading={isLoading}
+              transactions={transactions}
             />
           </TabsContent>
 
@@ -171,7 +175,7 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de aportaciones */}
+          {/* Tab: ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de aportaciones */}
           <TabsContent value="contributions" className="space-y-6">
             <ContributionSettings
               contributions={contributions}
@@ -181,9 +185,9 @@ function Finance() {
             />
           </TabsContent>
 
-          {/* Tab: Analisis y grÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ficos */}
+          {/* Tab: Analisis y grÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ficos */}
           <TabsContent value="analytics" className="space-y-6">
-            <React.Suspense fallback={<div className="p-4">Cargando anÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lisisÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦</div>}>
+            <React.Suspense fallback={<div className="p-4">Cargando anÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lisisÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦</div>}>
               <FinanceCharts
                 transactions={transactions}
                 budgetUsage={budgetUsage}
@@ -198,3 +202,9 @@ function Finance() {
 }
 
 export default Finance;
+
+
+
+
+
+

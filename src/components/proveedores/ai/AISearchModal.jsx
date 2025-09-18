@@ -4,7 +4,7 @@ import Button from '../../../components/ui/Button';
 import AIResultList from './AIResultList';
 
 /**
- * Modal de bÃºsqueda inteligente con filtros integrados
+ * Modal de búsqueda inteligente con filtros integrados
  */
 export default function AISearchModal({
   isOpen,
@@ -41,10 +41,10 @@ export default function AISearchModal({
       try { setSearchHistory(JSON.parse(saved)); } catch {}
     }
     setSuggestions([
-      'FotÃ³grafo estilo documental',
+      'Fotógrafo estilo documental',
       'Catering para 120 invitados',
       'DJ disponible en agosto',
-      'FloristerÃ­a vintage en Madrid',
+      'Floristería vintage en Madrid',
       'Lugar al aire libre cerca de Barcelona'
     ]);
     return () => { if (searchTimeout) clearTimeout(searchTimeout); };
@@ -82,7 +82,7 @@ export default function AISearchModal({
       <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col" onClick={(e)=>e.stopPropagation()}>
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-semibold flex items-center"><Sparkles size={20} className="mr-2 text-blue-500"/>BÃºsqueda inteligente</h2>
+          <h2 className="text-xl font-semibold flex items-center"><Sparkles size={20} className="mr-2 text-blue-500"/>Búsqueda inteligente</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar"><X size={24}/></button>
         </div>
 
@@ -94,7 +94,7 @@ export default function AISearchModal({
               <Search className="absolute left-3 top-3 text-gray-400" size={20}/>
               <Button type="submit" className="absolute right-2 top-1.5" size="sm" disabled={isLoading || !query.trim()}>{isLoading ? 'Buscando...' : 'Buscar'}</Button>
             </div>
-            <p className="mt-2 text-sm text-gray-500">Ejemplo: &quot;FotÃ³grafo estilo natural en Sevilla"</p>
+            <p className="mt-2 text-sm text-gray-500">Ejemplo: &quot;Fotógrafo estilo natural en Sevilla"</p>
           </form>
 
           {/* Filtros trasladados */}
@@ -114,7 +114,7 @@ export default function AISearchModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Rating mÃ­nimo</label>
+              <label className="block text-xs text-gray-500 mb-1">Rating mínimo</label>
               <select className="w-full p-2 border rounded" value={ratingMin} onChange={(e)=>setRatingMin?.(Number(e.target.value))}>
                 <option value={0}>Cualquiera</option>
                 {[1,2,3,4,5].map(r=> <option key={r} value={r}>{r}+</option>)}
@@ -129,7 +129,7 @@ export default function AISearchModal({
               <input type="date" className="w-full p-2 border rounded" value={dateTo} onChange={(e)=>setDateTo?.(e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">BÃºsqueda por texto</label>
+              <label className="block text-xs text-gray-500 mb-1">Búsqueda por texto</label>
               <input type="text" className="w-full p-2 border rounded" value={searchTerm} onChange={(e)=>setSearchTerm?.(e.target.value)} placeholder="Nombre, contacto, estado..." />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function AISearchModal({
           <div className="w-64 p-4 border-r overflow-y-auto">
             {searchHistory.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">BÃºsquedas recientes</h3>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Búsquedas recientes</h3>
                 <ul className="space-y-1">
                   {searchHistory.map((item, i) => (
                     <li key={i}><button onClick={()=>selectQuery(item)} className="text-sm text-left w-full p-1.5 hover:bg-gray-100 rounded-md truncate">{item}</button></li>

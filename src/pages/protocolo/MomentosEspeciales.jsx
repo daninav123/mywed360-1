@@ -10,7 +10,7 @@ import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 
 const TABS = [
   { key: 'ceremonia', label: 'Ceremonia' },
-  { key: 'coctail', label: 'CÃ³ctel' },
+  { key: 'coctail', label: 'Cóctel' },
   { key: 'banquete', label: 'Banquete' },
   { key: 'disco', label: 'Disco' },
 ];
@@ -18,14 +18,14 @@ const TABS = [
 const MomentosEspeciales = () => {
   const { moments, addMoment, updateMoment, removeMoment, reorderMoment, duplicateMoment } = useSpecialMoments();
 
-  // Estado bÃ¡sico
+  // Estado básico
   const [activeTab, setActiveTab] = useState('ceremonia');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [errorSearch, setErrorSearch] = useState(null);
 
-  // IA e inspiraciÃ³n
+  // IA e inspiración
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -48,7 +48,7 @@ const MomentosEspeciales = () => {
           genres: Array.isArray(parsed?.genres) ? parsed.genres : [],
           decades: Array.isArray(parsed?.decades) ? parsed.decades : [],
         });
-        // Prefijar idioma si viene vacÃ­o
+        // Prefijar idioma si viene vacío
         if (!aiLanguage && parsed?.languages?.length) {
           setAiLanguage(parsed.languages[0]);
         }
@@ -134,7 +134,7 @@ const MomentosEspeciales = () => {
     setPlayingId(ok ? item.id : null);
   };
 
-  // BÃºsqueda por nombre (iTunes)
+  // Búsqueda por nombre (iTunes)
   const handleSearch = async () => {
     const term = search.trim();
     if (!term) { setResults([]); return; }
@@ -166,13 +166,13 @@ const MomentosEspeciales = () => {
     }
   };
 
-  // AÃ±adir momento
+  // Añadir momento
   const handleAddMoment = () => {
     const nextOrder = (moments[activeTab]?.length || 0) + 1;
     addMoment(activeTab, { order: nextOrder, title: `Nuevo momento ${nextOrder}`, song: '', time: '' });
   };
 
-  // BÃºsqueda con IA via backend
+  // Búsqueda con IA via backend
   const handleAISearch = async () => {
     const prompt = aiPrompt.trim();
     if (!prompt) { setAiSongs([]); return; }
@@ -180,18 +180,18 @@ const MomentosEspeciales = () => {
     setAiError(null);
     try {
       const prefs = [];
-      // Idioma explÃ­cito del selector
-      if (aiLanguage === 'es') prefs.push('idioma espaÃ±ol');
-      else if (aiLanguage === 'en') prefs.push('idioma inglÃ©s');
-      // Si no hay gÃ©nero/decada en UI, usa preferencias del perfil
+      // Idioma explícito del selector
+      if (aiLanguage === 'es') prefs.push('idioma español');
+      else if (aiLanguage === 'en') prefs.push('idioma inglés');
+      // Si no hay género/decada en UI, usa preferencias del perfil
       if (aiTempo) prefs.push(`tempo ${aiTempo}`);
-      if (aiEra) prefs.push(`dÃ©cada ${aiEra}`);
-      if (aiGenre) prefs.push(`gÃ©nero ${aiGenre}`);
-      if (!aiGenre && profilePrefs.genres?.length) prefs.push(`gÃ©neros: ${profilePrefs.genres.join(', ')}`);
-      if (!aiEra && profilePrefs.decades?.length) prefs.push(`dÃ©cadas: ${profilePrefs.decades.join(', ')}`);
+      if (aiEra) prefs.push(`década ${aiEra}`);
+      if (aiGenre) prefs.push(`género ${aiGenre}`);
+      if (!aiGenre && profilePrefs.genres?.length) prefs.push(`géneros: ${profilePrefs.genres.join(', ')}`);
+      if (!aiEra && profilePrefs.decades?.length) prefs.push(`décadas: ${profilePrefs.decades.join(', ')}`);
       // Idiomas adicionales como pista
       const extraLangs = (profilePrefs.languages || []).filter(l => l !== aiLanguage);
-      if (extraLangs.length) prefs.push(`tambiÃ©n considerar idiomas: ${extraLangs.join(', ')}`);
+      if (extraLangs.length) prefs.push(`también considerar idiomas: ${extraLangs.join(', ')}`);
       const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
       const res = await apiPost('/api/ai-songs/recommend', { prompt: fullPrompt, context: activeTab }, { auth: true });
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -228,8 +228,8 @@ const MomentosEspeciales = () => {
       };
       const enriched = [];
       for (let i = 0; i < mapped.length; i++) {
-        // Secuencial para evitar rÃ¡fagas innecesarias
-        // Se puede mejorar con lÃ­mite de concurrencia si hiciera falta
+        // Secuencial para evitar ráfagas innecesarias
+        // Se puede mejorar con límite de concurrencia si hiciera falta
         // eslint-disable-next-line no-await-in-loop
         enriched.push(await enrich(mapped[i]));
       }
@@ -339,7 +339,7 @@ const MomentosEspeciales = () => {
           </div>
           <div className="text-right"><Button onClick={saveProfilePrefs}>Guardar preferencias</Button></div>
         </Card>
-        <p className="text-gray-600">Planifica cada instante clave con la mÃºsica y el momento adecuados.</p>
+        <p className="text-gray-600">Planifica cada instante clave con la música y el momento adecuados.</p>
 
         {/* Tabs */}
         <div className="border-b flex gap-4">
@@ -356,11 +356,11 @@ const MomentosEspeciales = () => {
 
         {/* Content */}
         <Card className="space-y-5 p-5">
-          {/* InspiraciÃ³n */}
+          {/* Inspiración */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles size={16} className="text-yellow-600" />
-              <h3 className="font-medium">InspiraciÃ³n</h3>
+              <h3 className="font-medium">Inspiración</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(MUSIC_INSPIRATION[activeTab] || {}).map(([cat, songs]) => (
@@ -406,22 +406,22 @@ const MomentosEspeciales = () => {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles size={16} className="text-purple-600" />
-              <h3 className="font-medium">Encuentra la canciÃ³n perfecta (IA)</h3>
+              <h3 className="font-medium">Encuentra la canción perfecta (IA)</h3>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <label className="text-gray-600">Idioma</label>
               <select className="border rounded px-2 py-1" value={aiLanguage} onChange={e => setAiLanguage(e.target.value)}>
-                <option value="es">EspaÃ±ol</option>
-                <option value="en">InglÃ©s</option>
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
               </select>
               <label className="text-gray-600">Tempo</label>
               <select className="border rounded px-2 py-1" value={aiTempo} onChange={e => setAiTempo(e.target.value)}>
                 <option value="">Cualquiera</option>
                 <option value="lento">Lento</option>
                 <option value="medio">Medio</option>
-                <option value="rÃ¡pido">RÃ¡pido</option>
+                <option value="rápido">Rápido</option>
               </select>
-              <label className="text-gray-600">DÃ©cada</label>
+              <label className="text-gray-600">Década</label>
               <select className="border rounded px-2 py-1" value={aiEra} onChange={e => setAiEra(e.target.value)}>
                 <option value="">Cualquiera</option>
                 <option value="80s">80s</option>
@@ -430,14 +430,14 @@ const MomentosEspeciales = () => {
                 <option value="2010s">2010s</option>
                 <option value="actual">Actual</option>
               </select>
-              <label className="text-gray-600">GÃ©nero</label>
+              <label className="text-gray-600">Género</label>
               <select className="border rounded px-2 py-1" value={aiGenre} onChange={e => setAiGenre(e.target.value)}>
                 <option value="">Cualquiera</option>
                 <option value="pop">Pop</option>
                 <option value="rock">Rock</option>
                 <option value="jazz">Jazz</option>
                 <option value="latino">Latino</option>
-                <option value="clÃ¡sica">ClÃ¡sica</option>
+                <option value="clásica">Clásica</option>
                 <option value="indie">Indie</option>
                 <option value="r&b">R&B</option>
               </select>
@@ -447,7 +447,7 @@ const MomentosEspeciales = () => {
                 rows={2}
                 value={aiPrompt}
                 onChange={e => setAiPrompt(e.target.value)}
-                placeholder="Describe el momento: 'primer baile, balada en espaÃ±ol'"
+                placeholder="Describe el momento: 'primer baile, balada en español'"
                 className="flex-1 border rounded px-3 py-2"
               />
               <button onClick={handleAISearch} className="bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
@@ -519,7 +519,7 @@ const MomentosEspeciales = () => {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar canciÃ³n por nombre..."
+              placeholder="Buscar canción por nombre..."
               className="flex-1 border rounded px-3 py-2"
               onKeyPress={e => e.key === 'Enter' && handleSearch()}
             />
@@ -528,11 +528,11 @@ const MomentosEspeciales = () => {
             </button>
           </div>
 
-          {/* Estado bÃºsqueda */}
+          {/* Estado búsqueda */}
           {loadingSearch && <p className="text-sm text-gray-500">Buscando...</p>}
           {errorSearch && <p className="text-sm text-red-600">{errorSearch}</p>}
 
-          {/* Resultados bÃºsqueda */}
+          {/* Resultados búsqueda */}
           {results.length > 0 && (
             <div className="border rounded-md overflow-hidden">
               <div className="bg-gray-50 p-2 border-b text-sm font-medium">
@@ -594,7 +594,7 @@ const MomentosEspeciales = () => {
             <div className="flex justify-between items-center">
               <h3 className="font-medium">{TABS.find(t => t.key === activeTab)?.label || 'Momentos'}</h3>
               <Button onClick={handleAddMoment} className="py-1 px-3 text-sm flex items-center gap-1">
-                <Plus size={14} /> AÃ±adir momento
+                <Plus size={14} /> Añadir momento
               </Button>
             </div>
 
@@ -611,20 +611,20 @@ const MomentosEspeciales = () => {
                             className="w-full font-medium border-0 border-b border-transparent focus:border-blue-300 focus:ring-0 p-0 pb-1"
                             value={moment.title || ''}
                             onChange={e => updateMoment(activeTab, moment.id, { ...moment, title: e.target.value })}
-                            placeholder="TÃ­tulo del momento"
+                            placeholder="Título del momento"
                           />
 
                           <div className="mt-2 flex flex-wrap gap-2">
                             <div className="flex-1 min-w-[200px]">
                               <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                                <Music size={12} /> CanciÃ³n
+                                <Music size={12} /> Canción
                               </div>
                               <input
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
                                 value={moment.song || ''}
                                 onChange={e => updateMoment(activeTab, moment.id, { ...moment, song: e.target.value })}
-                                placeholder="Nombre de la canciÃ³n"
+                                placeholder="Nombre de la canción"
                               />
                               {/* Si pega un enlace de Spotify válido, mostramos el reproductor embebido */}
                               {(() => {
@@ -650,7 +650,7 @@ const MomentosEspeciales = () => {
                             </div>
 
                             <div className="w-24">
-                              <div className="text-xs text-gray-500 mb-1">DuraciÃ³n</div>
+                              <div className="text-xs text-gray-500 mb-1">Duración</div>
                               <input
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
@@ -704,8 +704,8 @@ const MomentosEspeciales = () => {
                   ))
               ) : (
                 <div className="text-center py-6 text-gray-500">
-                  <p>No hay momentos en esta secciÃ³n.</p>
-                  <p className="text-sm mt-1">Haz clic en "AÃ±adir momento" para crear uno nuevo.</p>
+                  <p>No hay momentos en esta sección.</p>
+                  <p className="text-sm mt-1">Haz clic en "Añadir momento" para crear uno nuevo.</p>
                 </div>
               )}
             </div>

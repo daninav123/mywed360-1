@@ -6,7 +6,7 @@ import { db, firebaseReady } from '../../firebaseConfig';
 const fsImport = () => import('firebase/firestore');
 const stImport = () => import('firebase/storage');
 
-export default function MisDisenos() {
+export default function MisDiseños() {
   const { activeWedding } = useWedding();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);

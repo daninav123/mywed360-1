@@ -494,16 +494,28 @@ const NotificationCenter = () => {
           
           {/* Pie del panel */}
           <div className="p-3 border-t border-gray-200 bg-gray-50 text-center">
-            <Button 
-              variant="link" 
-              size="sm"
-              onClick={() => {
-                navigate('/notificaciones');
-                setIsOpen(false);
-              }}
-            >
-              Ver todas las notificaciones
-            </Button>
+            <div className="flex items-center justify-center gap-3">
+              <Button 
+                variant="link" 
+                size="sm"
+                onClick={() => {
+                  navigate('/notificaciones');
+                  setIsOpen(false);
+                }}
+              >
+                Ver todas
+              </Button>
+              <Button 
+                variant="link" 
+                size="sm"
+                onClick={() => {
+                  navigate('/notificaciones#ajustes');
+                  setIsOpen(false);
+                }}
+              >
+                Ajustes
+              </Button>
+            </div>
           </div>
         </div>
       )}

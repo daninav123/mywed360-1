@@ -1,9 +1,12 @@
 import express from 'express';
 import crypto from 'crypto';
+import multer from 'multer';
 import { db } from '../db.js'; // Firestore
+import admin from 'firebase-admin';
 import { analyzeEmail } from '../services/emailAnalysis.js';
 
 const router = express.Router();
+const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
 
 // Comprueba la firma que Mailgun envía en cada webhook.
 // Docs: https://documentation.mailgun.com/en/latest/user_manual.html#webhooks
@@ -32,7 +35,7 @@ function verifyWithAnyKey({ timestamp, token, signature }) {
   return false;
 }
 
-router.post('/', (req, res) => {
+router.post('/', upload.any(), async (req, res) => {
   const anyKey = process.env.MAILGUN_SIGNING_KEY || process.env.MAILGUN_WEBHOOK_SIGNING_KEY || process.env.MAILGUN_API_KEY || process.env.VITE_MAILGUN_API_KEY;
 
   // Extraer datos de cabecera common para la firma
@@ -70,6 +73,21 @@ router.post('/', (req, res) => {
     const rcpt = String(rcptRaw || '').trim().toLowerCase();
     const senderNorm = String(sender || '').trim().toLowerCase();
     try {
+      // Adjuntos (multipart)
+      const files = Array.isArray(req.files) ? req.files : [];
+      const attachmentsTmp = [];
+      const attachmentDocs = [];
+      for (let i = 0; i < files.length; i += 1) {
+        const f = files[i];
+        if (!f) continue;
+        const attId = (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}_${i}`;
+        const contentType = f.mimetype || f.type || 'application/octet-stream';
+        const size = typeof f.size === 'number' ? f.size : (f.buffer ? f.buffer.length : 0);
+        const filename = f.originalname || f.filename || `attachment_${i+1}`;
+        attachmentsTmp.push({ id: attId, filename, size, contentType, url: `/api/mail/PENDING/attachments/${attId}` });
+        attachmentDocs.push({ id: attId, filename, size, contentType, buffer: f.buffer || null });
+      }
+
       const mailRef = await db.collection('mails').add({
         from: senderNorm,
         to: rcpt,
@@ -78,14 +96,54 @@ router.post('/', (req, res) => {
         date,
         folder: 'inbox',
         read: false,
-        via: 'mailgun'
+        via: 'mailgun',
+        attachments: attachmentsTmp
       });
 
       // Guardar ID también en el documento
       try {
-        await db.collection('mails').doc(mailRef.id).update({ id: mailRef.id });
+        const fixed = (attachmentsTmp || []).map(a => ({ ...a, url: `/api/mail/${mailRef.id}/attachments/${a.id}` }));
+        await db.collection('mails').doc(mailRef.id).update({ id: mailRef.id, attachments: fixed });
       } catch (e) {
         // best-effort only
+      }
+
+      // Guardar adjuntos exclusivamente en Storage (si está configurado), evitando inline
+      try {
+        const bucketName = process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || null;
+        if (bucketName) {
+          for (const d of attachmentDocs) {
+            if (d && d.buffer) {
+              const safeName = String(d.filename || 'attachment').replace(/[^a-zA-Z0-9_\.\-]/g, '_');
+              const objectPath = `email_attachments/${mailRef.id}/${d.id}/${safeName}`;
+              await admin.storage().bucket(bucketName).file(objectPath).save(d.buffer, { contentType: d.contentType || 'application/octet-stream', resumable: false, public: false, metadata: { contentType: d.contentType || 'application/octet-stream' } });
+              await db.collection('mails').doc(mailRef.id).collection('attachments').doc(d.id).set({
+                id: d.id,
+                filename: d.filename,
+                contentType: d.contentType,
+                size: d.size,
+                storagePath: objectPath,
+                createdAt: date,
+              }, { merge: true });
+            }
+          }
+        } else {
+          // Fallback: si no hay bucket, guardar inline solo si es pequeño
+          for (const d of attachmentDocs) {
+            let dataBase64 = null;
+            try { if (d.buffer && d.buffer.length <= 250 * 1024) dataBase64 = d.buffer.toString('base64'); } catch {}
+            await db.collection('mails').doc(mailRef.id).collection('attachments').doc(d.id).set({
+              id: d.id,
+              filename: d.filename,
+              contentType: d.contentType,
+              size: d.size,
+              dataBase64,
+              createdAt: date,
+            }, { merge: true });
+          }
+        }
+      } catch (attErr) {
+        console.warn('Could not persist inbound attachments:', attErr?.message || attErr);
       }
 
       // Guardar copia bajo subcolección del usuario si podemos resolverlo por email

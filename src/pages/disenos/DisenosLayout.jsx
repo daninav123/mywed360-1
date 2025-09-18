@@ -13,7 +13,7 @@ const tabs = [
   { path: 'mis-disenos', label: 'Mis diseños' },
 ];
 
-const DisenosLayout = React.memo(() => {
+const DiseñosLayout = React.memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -63,5 +63,5 @@ const DisenosLayout = React.memo(() => {
   );
 });
 
-export default DisenosLayout;
+export default DiseñosLayout;
 

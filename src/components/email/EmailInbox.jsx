@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { getMails, deleteMail, initEmailService, sendMail as sendMailService } from '../../services/EmailService';
+import React, { useEffect, useState, useRef } from 'react';
+import { getMails, getMailsPage, deleteMail, initEmailService, sendMail as sendMailService } from '../../services/EmailService';
 import EmailDetail from './EmailDetail';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
@@ -65,6 +65,10 @@ export default function EmailInbox() {
   const [sortState, setSortState] = useState('none'); // none | alpha | date
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [detailEmail, setDetailEmail] = useState(null);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const bottomRef = useRef(null);
 
   // Inicializar servicio de email cuando tengamos perfil de usuario y recargar correos
   useEffect(() => {
@@ -84,6 +88,34 @@ export default function EmailInbox() {
     try {
       setLoading(true);
       setError(null);
+      // Paginación real para inbox/sent (mejora)
+      if (targetFolder === 'inbox' || targetFolder === 'sent') {
+        try {
+          const page = (typeof getMailsPage === 'function') ? await getMailsPage(targetFolder, { limit: 50, cursor: null }) : { items: [], nextCursor: null };
+          let effective = Array.isArray(page.items) ? page.items : [];
+          if ((isTestEnv || EmailServiceShim) && effective.length === 0) {
+            effective = defaultMailsTest;
+          }
+          setEmails(effective);
+          setNextCursor(page.nextCursor || null);
+          setHasMore(Boolean(page.nextCursor));
+          try {
+            const processFn = processIncomingEmails;
+            if (typeof processFn === 'function') {
+              const sendFn = (typeof sendMailService === 'function') ? sendMailService : (EmailServiceShim?.sendMail);
+              const processed = await processFn(effective, { sendMail: sendFn });
+              if (Array.isArray(processed)) {
+                setEmails(processed);
+              }
+            }
+          } catch (automationError) {
+            console.warn('[EmailInbox] automation processing failed', automationError);
+          }
+          return; // evitar fallback legacy si la página funcionó
+        } catch (pageErr) {
+          // Fallback debajo
+        }
+      }
       // Preferir el módulo importado (los tests lo mockean); fallback al stub global si fuera necesario
       const getFn = (typeof getMails === 'function') ? getMails : (EmailServiceShim?.getMails);
       const data = await getFn(targetFolder);
@@ -137,6 +169,39 @@ export default function EmailInbox() {
     const id = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(id);
   }, [loading]);
+
+  // Infinite scroll con IntersectionObserver
+  useEffect(() => {
+    if (!hasMore) return;
+    const el = bottomRef.current;
+    if (!el) return;
+    let pending = false;
+    const io = new IntersectionObserver(async (entries) => {
+      const e = entries && entries[0];
+      if (e && e.isIntersecting && !pending) {
+        pending = true;
+        try {
+          setLoadingMore(true);
+          const page = (typeof getMailsPage === 'function') ? await getMailsPage(folder, { limit: 50, cursor: nextCursor }) : { items: [], nextCursor: null };
+          const newItems = Array.isArray(page.items) ? page.items : [];
+          setEmails((prev) => {
+            const map = new Map(prev.map(m => [m.id, m]));
+            for (const m of newItems) if (!map.has(m.id)) map.set(m.id, m);
+            return Array.from(map.values()).sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+          });
+          setNextCursor(page.nextCursor || null);
+          setHasMore(Boolean(page.nextCursor));
+        } catch (err) {
+          console.warn('[EmailInbox] auto loadMore failed', err);
+        } finally {
+          setLoadingMore(false);
+          pending = false;
+        }
+      }
+    }, { root: null, rootMargin: '200px', threshold: 0 });
+    io.observe(el);
+    return () => { try { io.disconnect(); } catch {} };
+  }, [hasMore, nextCursor, folder]);
 
   // Utilidades
   const toggleSelect = (id) => {
@@ -346,16 +411,33 @@ export default function EmailInbox() {
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">
-                      {safeRender(email.subject, '(Sin asunto)')}
+                <td className="px-4 py-3">
+                  <div className="font-medium text-gray-900">
+                    {safeRender(email.subject, '(Sin asunto)')}
+                  </div>
+                  {email.body && (
+                    <div className="text-sm text-gray-500 truncate max-w-xs">
+                      {safeRender(email.body.substring(0, 100), '')}...
                     </div>
-                    {email.body && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
-                        {safeRender(email.body.substring(0, 100), '')}...
-                      </div>
-                    )}
-                  </td>
+                  )}
+                  {/* Estado de entrega/lectura */}
+                  <div className="mt-1 flex flex-wrap items-center gap-1 text-[11px]">
+                    {(() => {
+                      try {
+                        const failed = Boolean(email.failedAt || (email.lastEvent && String(email.lastEvent).toLowerCase()==='failed'));
+                        const delivered = Boolean(email.deliveredAt || (email.lastEvent && String(email.lastEvent).toLowerCase()==='delivered'));
+                        const openCount = Number(email.openCount || 0);
+                        const clickCount = Number(email.clickCount || 0);
+                        const chips = [];
+                        if (failed) chips.push(<span key={`f-${email.id}`} className="rounded bg-red-50 px-1.5 py-0.5 text-red-600 border border-red-200">Fallo</span>);
+                        if (delivered && !failed) chips.push(<span key={`d-${email.id}`} className="rounded bg-green-50 px-1.5 py-0.5 text-green-700 border border-green-200">Entregado</span>);
+                        if (openCount>0) chips.push(<span key={`o-${email.id}`} className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 border border-blue-200">Abierto {openCount}</span>);
+                        if (clickCount>0) chips.push(<span key={`c-${email.id}`} className="rounded bg-purple-50 px-1.5 py-0.5 text-purple-700 border border-purple-200">Clicks {clickCount}</span>);
+                        return chips.length ? chips : null;
+                      } catch (e) { return null; }
+                    })()}
+                  </div>
+                </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {safeRender(email.from, 'Desconocido')}
                   </td>
@@ -366,6 +448,9 @@ export default function EmailInbox() {
               ))}
             </tbody>
           </table>
+          {/* Sentinel para auto-carga */}
+          <div ref={bottomRef} className="h-1" />
+          {/* Scroll infinito: botón manual retirado */}
         </div>
       )}
     </div>

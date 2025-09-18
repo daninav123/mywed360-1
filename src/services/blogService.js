@@ -1,4 +1,4 @@
-// blogService.js - noticias de bodas
+﻿// blogService.js - noticias de bodas
 import axios from 'axios';
 import { translateText } from './translationService.js';
 import { getBackendBase } from '@/utils/backendBase.js';

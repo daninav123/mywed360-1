@@ -18,7 +18,8 @@
                       },
     "plugins":  [
                     "react",
-                    "react-hooks"
+                    "react-hooks",
+                    "import"
                 ],
     "rules":  {
                   "no-unused-vars":  [
@@ -35,7 +36,23 @@
                                    {
                                        "allowEmptyCatch":  true
                                    }
-                               ]
+                               ],
+                  "import/order": [
+                    "warn",
+                    {
+                      "groups": [
+                        ["builtin", "external"],
+                        ["internal"],
+                        ["parent", "sibling", "index"],
+                        ["type"]
+                      ],
+                      "pathGroups": [
+                        { "pattern": "@/**", "group": "internal", "position": "before" }
+                      ],
+                      "alphabetize": { "order": "asc", "caseInsensitive": true },
+                      "newlines-between": "always"
+                    }
+                  ]
               },
     "settings":  {
                      "react":  {

@@ -110,7 +110,7 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
       }
       
       // Construir formData para Mailgun
-            // Crear autenticación Basic para Mailgun
+            // Crear autenticacin Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
 
       // Si hay adjuntos, usar multipart/form-data con descarga de URLs

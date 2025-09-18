@@ -124,18 +124,18 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
       out = out.replace(/Â/g, '');
       const patterns = [
         [/MÃ’Âºsica/gi, 'Música'],
-        [/MÃºsica/gi, 'Música'],
+        [/Música/gi, 'Música'],
         [/Musica/gi, 'Música'],
         [/VÃ’Â­deo/gi, 'Vídeo'],
-        [/VÃ­deo/gi, 'Vídeo'],
+        [/Vídeo/gi, 'Vídeo'],
         [/Video/gi, 'Vídeo'],
         [/FotografÃ’Â­a/gi, 'Fotografía'],
-        [/FotografÃ­a/gi, 'Fotografía'],
+        [/Fotografía/gi, 'Fotografía'],
         [/Fotografia/gi, 'Fotografía'],
-        [/DecoraciÃ³n/gi, 'Decoración'],
-        [/IluminaciÃ³n/gi, 'Iluminación'],
-        [/PeluquerÃ­a/gi, 'Peluquería'],
-        [/JoyerÃ­a/gi, 'Joyería']
+        [/Decoración/gi, 'Decoración'],
+        [/Iluminación/gi, 'Iluminación'],
+        [/Peluquería/gi, 'Peluquería'],
+        [/Joyería/gi, 'Joyería']
       ];
       for (const [re, rep] of patterns) out = out.replace(re, rep);
       return out;

@@ -294,8 +294,8 @@ export default function ContributionSettings({
                 <span className="text-sm text-[color:var(--color-text)]/70">{t('finance.contributions.summary.gifts', { defaultValue: 'Regalos estimados' })}</span>
                 <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(expectedGifts)}</span>
               </div>
-              <div className="flex justify-between items-center py-3 bg-green-50 px-4 rounded-lg">
-                <span className="font-medium text-green-800">{t('finance.contributions.summary.total', { defaultValue: 'Total Esperado' })}</span>
+              <div className="flex justify-between items-center py-3 bg-[var(--color-success)]/10 px-4 rounded-lg">
+                <span className="font-medium text-[color:var(--color-success)]">{t('finance.contributions.summary.total', { defaultValue: 'Total Esperado' })}</span>
                 <span className="text-xl font-bold text-[color:var(--color-success)]">{formatCurrency(totalExpectedIncome)}</span>
               </div>
             </div>

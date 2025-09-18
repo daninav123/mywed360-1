@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { Users, Briefcase, Clock, User, Layers } from 'lucide-react';
+import { Users, Briefcase, Clock, Layers } from 'lucide-react';
 import { prefetchModule } from '../utils/prefetch';
-import * as Push from '../services/PushService';
+// PushService import removed; push controls moved out to Notification Center
 
 export default function More() {
   const [openMenu, setOpenMenu] = useState(null);
-  const [pushSupported, setPushSupported] = useState(false);
-  const [pushEnabled, setPushEnabled] = useState(false);
-  const [pushBusy, setPushBusy] = useState(false);
+  // Push controls removed from this page to avoid duplication
+
+  // Prefetch helpers
   const pfInvitados = () => prefetchModule('Invitados', () => import('./Invitados'));
   const pfSeating = () => prefetchModule('SeatingPlanRefactored', () => import('../components/seating/SeatingPlanRefactored.jsx'));
   const pfProveedores = () => prefetchModule('Proveedores', () => import('./Proveedores'));
@@ -20,7 +20,7 @@ export default function More() {
   const pfInspiration = () => prefetchModule('Inspiration', () => import('./Inspiration'));
   const pfBlog = () => prefetchModule('Blog', () => import('./Blog'));
 
-  // --- Prefetch grouped menus (evita error de función no definida) ---
+  // Grouped prefetch on hover/focus/touch
   const pfInvitadosMenu = () => {
     pfInvitados();
     pfSeating();
@@ -39,42 +39,8 @@ export default function More() {
     pfInspiration();
     pfBlog();
   };
-  // --- Push notifications setup ---
-  useEffect(() => {
-    try {
-      const sup = Push.isSupported();
-      setPushSupported(sup);
-      if (sup) {
-        Push.getSubscription()
-          .then((sub) => setPushEnabled(!!sub))
-          .catch(() => {});
-      }
-    } catch {}
-  }, []);
 
-  const handleTogglePush = async () => {
-    if (!pushSupported) return;
-    setPushBusy(true);
-    try {
-      if (pushEnabled) {
-        await Push.unsubscribe();
-        setPushEnabled(false);
-      } else {
-        await Push.subscribe();
-        setPushEnabled(true);
-      }
-    } catch (e) {
-      console.warn('Push toggle error', e);
-    } finally {
-      setPushBusy(false);
-    }
-  };
-
-  const handleTestPush = async () => {
-    try {
-      await Push.sendTest();
-    } catch {}
-  };
+  // Push handlers removed
 
   return (
     <div className="p-4 md:p-6 space-y-8">
@@ -86,37 +52,37 @@ export default function More() {
       {/* Tiles */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="relative">
-        <button onClick={() => setOpenMenu(openMenu==='invitados'?null:'invitados')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
-          <Users size={32} className="text-blue-600 mb-2" />
-          <h2 className="font-semibold mb-1">Invitados</h2>
-          <p className="text-sm text-gray-600">Gestiona invitados y seating plan.</p>
-        </button>
-        {openMenu==='invitados' && (
-          <div className="absolute bg-white border border-gray-200 rounded shadow mt-2 w-full z-10" onMouseEnter={pfInvitadosMenu} onFocus={pfInvitadosMenu} onTouchStart={pfInvitadosMenu}>
-            <Link to="/invitados" className="block px-4 py-2 hover:bg-gray-100">Gestión de invitados</Link>
-            <Link to="/invitados/seating" className="block px-4 py-2 hover:bg-gray-100">Seating plan</Link>
+          <button onClick={() => setOpenMenu(openMenu==='invitados'?null:'invitados')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
+            <Users size={32} className="text-blue-600 mb-2" />
+            <h2 className="font-semibold mb-1">Invitados</h2>
+            <p className="text-sm text-gray-600">Gestiona invitados y seating plan.</p>
+          </button>
+          {openMenu==='invitados' && (
+            <div className="absolute bg-white border border-gray-200 rounded shadow mt-2 w-full z-10" onMouseEnter={pfInvitadosMenu} onFocus={pfInvitadosMenu} onTouchStart={pfInvitadosMenu}>
+              <Link to="/invitados" className="block px-4 py-2 hover:bg-gray-100">Gestión de invitados</Link>
+              <Link to="/invitados/seating" className="block px-4 py-2 hover:bg-gray-100">Seating plan</Link>
+            </div>
+          )}
+        </div>
 
-          </div>
-        )}
-      </div>
         <div className="relative">
-        <button onClick={() => setOpenMenu(openMenu==='proveedores'?null:'proveedores')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
-          <Briefcase size={32} className="text-blue-600 mb-2" />
-          <h2 className="font-semibold mb-1">Proveedores</h2>
-          <p className="text-sm text-gray-600">Gestiona proveedores y contratos.</p>
-        </button>
-        {openMenu==='proveedores' && (
-          <div className="absolute bg-white border border-gray-200 rounded shadow mt-2 w-full z-10" onMouseEnter={pfProveedoresMenu} onFocus={pfProveedoresMenu} onTouchStart={pfProveedoresMenu}>
-            <Link to="/proveedores" className="block px-4 py-2 hover:bg-gray-100">Gestión de proveedores</Link>
+          <button onClick={() => setOpenMenu(openMenu==='proveedores'?null:'proveedores')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
+            <Briefcase size={32} className="text-blue-600 mb-2" />
+            <h2 className="font-semibold mb-1">Proveedores</h2>
+            <p className="text-sm text-gray-600">Gestiona proveedores y contratos.</p>
+          </button>
+          {openMenu==='proveedores' && (
+            <div className="absolute bg-white border border-gray-200 rounded shadow mt-2 w-full z-10" onMouseEnter={pfProveedoresMenu} onFocus={pfProveedoresMenu} onTouchStart={pfProveedoresMenu}>
+              <Link to="/proveedores" className="block px-4 py-2 hover:bg-gray-100">Gestión de proveedores</Link>
               <Link to="/proveedores/contratos" className="block px-4 py-2 hover:bg-gray-100">Contratos</Link>
-            
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+
         <div className="relative">
           <button onClick={() => setOpenMenu(openMenu==='protocolo'?null:'protocolo')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
             <Clock size={32} className="text-blue-600 mb-2" />
-          <h2 className="font-semibold mb-1">Protocolo</h2>
+            <h2 className="font-semibold mb-1">Protocolo</h2>
             <p className="text-sm text-gray-600">Momentos especiales, Timing, Checklist y Documentos legales</p>
           </button>
           {openMenu==='protocolo' && (
@@ -129,6 +95,7 @@ export default function More() {
             </div>
           )}
         </div>
+
         <div className="relative">
           <button onClick={() => setOpenMenu(openMenu==='extras'?null:'extras')} className="bg-white p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full">
             <Layers size={32} className="text-blue-600 mb-2" />
@@ -147,31 +114,7 @@ export default function More() {
         </div>
       </div>
 
-      {/* Notificaciones Push */}
-      <div className="bg-white rounded shadow p-4 mt-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-semibold mb-1">Notificaciones Push</h2>
-            <p className="text-sm text-gray-600">
-              {pushSupported ? 'Recibe avisos de nuevos correos y eventos.' : 'Este navegador no soporta notificaciones push.'}
-            </p>
-          </div>
-          {pushSupported && (
-            <div className="flex gap-2">
-              <button
-                className={`px-3 py-1 rounded ${pushEnabled ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'} ${pushBusy ? 'opacity-60' : ''}`}
-                onClick={handleTogglePush}
-                disabled={pushBusy}
-              >
-                {pushEnabled ? 'Desactivar' : 'Activar'}
-              </button>
-              <button className="px-3 py-1 rounded border" onClick={handleTestPush} disabled={!pushEnabled || pushBusy}>
-                Probar
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Notificaciones Push removidas para evitar duplicidad con el centro de notificaciones */}
 
       {/* Content */}
       <div className="mt-6">

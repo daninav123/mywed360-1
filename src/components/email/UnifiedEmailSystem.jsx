@@ -5,6 +5,7 @@ import EmailViewer from './EmailViewer';
 import EmailComposer from './EmailComposer';
 import * as EmailService from '../../services/EmailService';
 import * as NotificationService from '../../services/NotificationService';
+import { shouldNotify } from '../../services/notificationService';
 import { processScheduledEmails } from '../../services/emailAutomationService';
 
 /**
@@ -34,13 +35,15 @@ const UnifiedEmailSystem = () => {
         if (result && result.hasNew) {
           setHasNewEmails(true);
           
-          // Mostrar notificación
-          NotificationService.showNotification({
-            title: 'Nuevos emails',
-            message: `Tienes ${result.count} ${result.count === 1 ? 'nuevo email' : 'nuevos emails'}`,
-            type: 'info',
-            duration: 5000
-          });
+          // Mostrar notificación (respetando preferencias)
+          if (shouldNotify({ type: 'email', subtype: 'new', priority: 'normal', channel: 'toast' })) {
+            NotificationService.showNotification({
+              title: 'Nuevos emails',
+              message: `Tienes ${result.count} ${result.count === 1 ? 'nuevo email' : 'nuevos emails'}`,
+              type: 'info',
+              duration: 5000
+            });
+          }
         }
       } catch (err) {
         console.error('Error al verificar nuevos emails:', err);

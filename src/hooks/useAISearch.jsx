@@ -108,7 +108,7 @@ const generateDemoResults = (query) => {
       name: 'Lente Azul Fotografia',
       service: 'Fotografia',
       snippet:
-        'Mas de 10 anos de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.',
+        'Más de 10 anos de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.',
       image:
         'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60',
       location: 'Barcelona',

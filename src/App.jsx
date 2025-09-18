@@ -18,7 +18,7 @@ import BankConnect from './pages/BankConnect.jsx';
 import More from './pages/More';
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 import Proveedores from './pages/ProveedoresNuevo';
-// Lazy load de páginas pesadas para reducir bundle inicial
+// Lazy load de pÃ¡ginas pesadas para reducir bundle inicial
 const UnifiedEmail = React.lazy(() => import('./pages/UnifiedEmail'));
 const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
 const ComposeEmail = React.lazy(() => import('./components/email/ComposeEmail'));
@@ -119,14 +119,14 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Rutas públicas */}
+            {/* Rutas pÃºblicas */}
             <Route path="w/:uid" element={<WeddingSite />} />
             <Route path="p/:slug" element={<PublicWedding />} />
             <Route path="supplier/:token" element={<SupplierPortal />} />
             <Route path="invitation/:code" element={<AcceptInvitation />} />
             <Route path="rsvp/:token" element={<RSVPConfirm />} />
 
-            {/* Dev tools públicas */}
+            {/* Dev tools pÃºblicas */}
             <Route path="dev/seed-guests" element={<DevSeedGuests />} />
             <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />
 
@@ -158,7 +158,7 @@ function App() {
                   <Route path="documentos-legales" element={<Navigate to="documentos" replace />} />
                 </Route>
 
-                {/* Diseños */}
+                {/* Dise�os */}
                 <Route path="disenos" element={<DisenosLayout />}>
                   <Route index element={<Navigate to="invitaciones" replace />} />
                   <Route path="invitaciones" element={<DisenosInvitaciones />} />
@@ -199,7 +199,7 @@ function App() {
               </Route>
             </Route>
           </Routes>
-          {/* Sistema de diagnóstico global */}
+          {/* Sistema de diagnÃ³stico global */}
           </React.Suspense>
           <DiagnosticPanel />
         </BrowserRouter>

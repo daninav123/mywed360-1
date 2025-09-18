@@ -30,8 +30,8 @@ const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type
   return '';
 };
 
-// Hook centralizado para gestiÃ³n de finanzas
-// Maneja transacciones, presupuestos, aportaciones y sincronizaciÃ³n
+// Hook centralizado para gestión de finanzas
+// Maneja transacciones, presupuestos, aportaciones y sincronización
 export default function useFinance() {
   const { activeWedding } = useWedding();
 
@@ -40,7 +40,7 @@ export default function useFinance() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ConfiguraciÃ³n de aportaciones y regalos
+  // Configuración de aportaciones y regalos
   const [contributions, setContributions] = useState({
     initA: 0,
     initB: 0,
@@ -51,7 +51,7 @@ export default function useFinance() {
     guestCount: 0,
   });
 
-  // Presupuesto y categorÃ­as (persistido en Firestore)
+  // Presupuesto y categorías (persistido en Firestore)
   const [budget, setBudget] = useState({
     total: 0,
     categories: [],
@@ -65,7 +65,7 @@ export default function useFinance() {
   // Indica si hay cuenta bancaria vinculada
   const [hasBankAccount, setHasBankAccount] = useState(false);
 
-  // Transacciones usando Firestore (subcolecciÃ³n weddings/{id}/transactions)
+  // Transacciones usando Firestore (subcolección weddings/{id}/transactions)
   const {
     data: transactions,
     addItem: _addTransaction,
@@ -87,7 +87,7 @@ export default function useFinance() {
     [activeWedding]
   );
 
-  // CÃ¡lculos memoizados
+  // Cálculos memoizados
   const normalizePaidAmount = useCallback((transaction) => {
     if (!transaction) return 0;
     const type = transaction.type || 'expense';
@@ -163,7 +163,7 @@ export default function useFinance() {
     });
   }, [budget.categories, transactions]);
 
-  // EstadÃ­sticas generales
+  // Estadísticas generales
   const paymentHealth = useMemo(() => {
     if (!Array.isArray(transactions)) {
       return { pendingExpenses: 0, overdueExpenses: 0 };
@@ -213,13 +213,13 @@ export default function useFinance() {
     ]
   );
 
-  // Suscribirse a cambios en el estado de sincronizaciÃ³n
+  // Suscribirse a cambios en el estado de sincronización
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
     return () => unsubscribe();
   }, []);
 
-  // Cargar nÃºmero de invitados desde el perfil de la boda
+  // Cargar número de invitados desde el perfil de la boda
   const loadGuestCount = useCallback(async () => {
     if (!activeWedding) return;
 
@@ -238,7 +238,7 @@ export default function useFinance() {
         }
       }
     } catch (err) {
-      console.error('Error cargando nÃºmero de invitados:', err);
+      console.error('Error cargando número de invitados:', err);
       setError('Error cargando datos del perfil');
     } finally {
       setIsLoading(false);
@@ -298,7 +298,7 @@ export default function useFinance() {
     return () => unsub();
   }, [activeWedding]);
 
-  // Actualizar configuraciÃ³n de aportaciones y persistir
+  // Actualizar configuración de aportaciones y persistir
   const updateContributions = useCallback(
     (updates) => {
       setContributions((prev) => {
@@ -310,11 +310,11 @@ export default function useFinance() {
     [persistFinanceDoc]
   );
 
-  // GestiÃ³n de categorÃ­as de presupuesto
+  // Gestión de categorías de presupuesto
   const addBudgetCategory = useCallback(
     (name, amount = 0) => {
       if (!name || budget.categories.find((c) => c.name === name)) {
-        return { success: false, error: 'CategorÃ­a ya existe o nombre invÃ¡lido' };
+        return { success: false, error: 'Categoría ya existe o nombre inválido' };
       }
       const nextCategories = [...budget.categories, { name, amount }];
       setBudget((prev) => ({ ...prev, categories: nextCategories }));
@@ -379,7 +379,7 @@ export default function useFinance() {
     [settings, persistFinanceDoc]
   );
 
-  // GestiÃ³n de transacciones
+  // Gestión de transacciones
   const createTransaction = useCallback(
     async (transactionData) => {
       try {
@@ -670,7 +670,7 @@ export default function useFinance() {
     budget,
     transactions,
 
-    // CÃ¡lculos
+    // Cálculos
     stats,
     budgetUsage,
     settings,

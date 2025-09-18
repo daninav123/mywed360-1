@@ -120,7 +120,7 @@ export default function BudgetManager({
         <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10"><h3 className="text-lg font-medium text-[color:var(--color-text)]">{t('finance.budget.categoriesTitle', { defaultValue: 'Categorías de presupuesto' })}</h3></div>
         {budgetUsage.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500 mb-4">{t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}</p>
+            <p className="text-[color:var(--color-text)]/70 mb-4">{t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}</p>
             <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>{t('finance.budget.createFirst', { defaultValue: 'Crear primera categoría' })}</Button>
           </div>
         ) : (
@@ -172,12 +172,12 @@ export default function BudgetManager({
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('finance.budget.modal.name', { defaultValue: 'Nombre de la categoría' })}</label>
-            <input type="text" value={newCategory.name} onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} placeholder="Ej: Catering, Musica, Flores..." className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">{t('finance.budget.modal.name', { defaultValue: 'Nombre de la categoría' })}</label>
+            <input type="text" value={newCategory.name} onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })} placeholder="Ej: Catering, Musica, Flores..." className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Presupuesto asignado (€)</label>
-            <input type="number" step="0.01" min="0" value={newCategory.amount} onChange={(e) => setNewCategory({ ...newCategory, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">Presupuesto asignado (€)</label>
+            <input type="number" step="0.01" min="0" value={newCategory.amount} onChange={(e) => setNewCategory({ ...newCategory, amount: e.target.value })} placeholder="0.00" className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]" />
           </div>
           <div className="flex justify-end space-x-3 pt-4">
             <Button variant="outline" onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setEditingCategoryIndex(-1); setNewCategory({ name: '', amount: '' }); }}>{t('app.cancel', { defaultValue: 'Cancelar' })}</Button>
