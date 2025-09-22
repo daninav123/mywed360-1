@@ -76,7 +76,7 @@ export default function ContributionSettings({
         {/* Formulario de configuración */}
         <div className="space-y-6">
           {/* Aportaciones iniciales */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.initial.title', { defaultValue: 'Aportaciones Iniciales' })}
             </h3>
@@ -118,7 +118,7 @@ export default function ContributionSettings({
           </Card>
 
           {/* Aportaciones mensuales */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.monthly.title', { defaultValue: 'Aportaciones Mensuales' })}
             </h3>
@@ -160,7 +160,7 @@ export default function ContributionSettings({
           </Card>
 
           {/* Aportaciones extras */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.extras.title', { defaultValue: 'Aportaciones Extras' })}
             </h3>
@@ -186,7 +186,7 @@ export default function ContributionSettings({
           </Card>
 
           {/* Estimación de regalos */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.gifts.title', { defaultValue: 'Estimación de Regalos' })}
             </h3>
@@ -241,7 +241,7 @@ export default function ContributionSettings({
 
           {/* Botones de acción */}
           {hasChanges && (
-            <Card className="p-4 bg-[var(--color-primary)]/10 border-blue-200">
+          <Card className="p-4 bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-[var(--color-primary)]">
                   {t('finance.contributions.unsaved', { defaultValue: 'Tienes cambios sin guardar' })}
@@ -262,7 +262,7 @@ export default function ContributionSettings({
         {/* Resumen y proyecciones */}
         <div className="space-y-6">
           {/* Resumen de ingresos esperados */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <div className="flex items-center space-x-3 mb-4">
               <div className="flex items-center justify-center w-10 h-10 bg-[var(--color-success)]/15 rounded-full">
                 <Calculator className="w-5 h-5 text-[color:var(--color-success)]" />
@@ -302,7 +302,7 @@ export default function ContributionSettings({
           </Card>
 
           {/* Consejos y recomendaciones */}
-          <Card className="p-6">
+          <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
             <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">
               {t('finance.contributions.tips.title', { defaultValue: 'Consejos Financieros' })}
             </h3>

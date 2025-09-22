@@ -136,26 +136,26 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4 text-center">
+        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.charts.totalTransactions', { defaultValue: 'Total Transacciones' })}</p>
           <p className="text-2xl font-bold text-[color:var(--color-text)]">{totalTransactions}</p>
         </Card>
-        <Card className="p-4 text-center">
+        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.charts.activeCategories', { defaultValue: 'Categorías Activas' })}</p>
           <p className="text-2xl font-bold text-[color:var(--color-primary)]">{activeCategories}</p>
         </Card>
-        <Card className="p-4 text-center">
+        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.charts.budgetEfficiency', { defaultValue: 'Eficiencia Presupuesto' })}</p>
           <p className="text-2xl font-bold text-[color:var(--color-success)]">{efficiency}%</p>
         </Card>
-        <Card className="p-4 text-center">
+        <Card className="p-4 text-center bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.charts.projectedBalance', { defaultValue: 'Balance Proyectado' })}</p>
           <p className={`text-2xl font-bold ${safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>{formatCurrency(safeStats.currentBalance)}</p>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">{t('finance.charts.budgetVsSpentByCategory', { defaultValue: 'Presupuesto vs Gastado por Categoría' })}</h3>
           <div className="h-80">
             {hasFiniteForKeys(categoryData, ['presupuestado', 'gastado']) ? (
@@ -178,7 +178,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">{t('finance.charts.expenseDistributionByCategory', { defaultValue: 'Distribución de Gastos por Categoría' })}</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -203,7 +203,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">{t('finance.charts.monthlyTrend', { defaultValue: 'Tendencia Mensual de Ingresos y Gastos' })}</h3>
           <div className="h-80">
             {hasFiniteForKeys(monthlyTrend, ['ingresos', 'gastos', 'balance']) ? (
@@ -227,7 +227,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
           <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">{t('finance.charts.budgetProgressByCategory', { defaultValue: 'Progreso del Presupuesto por Categoría' })}</h3>
           <div className="h-80">
             {hasFiniteForKeys(budgetProgress, ['porcentaje', 'exceso']) ? (
@@ -256,7 +256,7 @@ export default function FinanceCharts({ transactions = [], budgetUsage = [], sta
         </Card>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-medium text-[color:var(--color-text)] mb-4">{t('finance.charts.insights', { defaultValue: 'Insights Financieros' })}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {expenseDistribution.length > 0 && (

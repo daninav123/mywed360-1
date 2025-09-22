@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -8,8 +8,8 @@ import { performanceMonitor } from '../../services/PerformanceMonitor';
 import { get as apiGet } from '../../services/apiClient';
 
 /**
- * Dashboard para visualizar métricas de rendimiento del sistema
- * Especialmente enfocado en el sistema de correo electrónico personalizado
+ * Dashboard para visualizar mÃ©tricas de rendimiento del sistema
+ * Especialmente enfocado en el sistema de correo electrÃ³nico personalizado
  * 
  * @component
  * @example
@@ -23,7 +23,7 @@ function MetricsDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Colores para gráficos
+  // Colores para grÃ¡ficos
   const colors = {
     email: '#8884d8',
     search: '#82ca9d',
@@ -32,14 +32,14 @@ function MetricsDashboard() {
     error: '#ff0000'
   };
 
-  // Cargar datos de métricas al montar el componente
+  // Cargar datos de mÃ©tricas al montar el componente
   useEffect(() => {
     const fetchMetrics = async () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        // Intentar obtener métricas de localStorage (modo desarrollo)
+        // Intentar obtener mÃ©tricas de localStorage (modo desarrollo)
         let localMetrics = null;
         try {
           const storedMetrics = localStorage.getItem('lovenda_last_metrics');
@@ -47,10 +47,10 @@ function MetricsDashboard() {
             localMetrics = JSON.parse(storedMetrics);
           }
         } catch (e) {
-          console.log('No se encontraron métricas locales');
+          console.log('No se encontraron mÃ©tricas locales');
         }
         
-        // Si hay un endpoint de métricas configurado, obtener de allí
+        // Si hay un endpoint de mÃ©tricas configurado, obtener de allÃ­
         let remoteMetrics = null;
         const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT;
         
@@ -59,11 +59,11 @@ function MetricsDashboard() {
           if (response.ok) {
             remoteMetrics = await response.json();
           } else {
-            throw new Error(`Error al obtener métricas: ${response.statusText}`);
+            throw new Error(`Error al obtener mÃ©tricas: ${response.statusText}`);
           }
         }
         
-        // Usar métricas remotas si están disponibles, sino las locales (sin mocks)
+        // Usar mÃ©tricas remotas si estÃ¡n disponibles, sino las locales (sin mocks)
         setMetrics(remoteMetrics || localMetrics || {
           timeSeriesData: [],
           performanceData: {},
@@ -75,7 +75,7 @@ function MetricsDashboard() {
         try {
           const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT;
           if (metricsEndpoint) {
-            const resp = await apiGet(${metricsEndpoint}/dashboard?timeframe=, { auth: true });
+            const resp = await apiGet(`${metricsEndpoint}/dashboard?timeframe=${selectedTimeframe}`, { auth: true });
             if (resp?.ok) {
               const remoteMetrics = await resp.json();
               setMetrics(remoteMetrics || { timeSeriesData: [], performanceData: {}, errorData: [], usageData: [], timestamp: Date.now() });
@@ -84,8 +84,8 @@ function MetricsDashboard() {
             }
           }
         } catch {}
-        console.error('Error al cargar métricas:', err);
-        setError('No se pudieron cargar las métricas.');
+        console.error('Error al cargar mÃ©tricas:', err);
+        setError('No se pudieron cargar las mÃ©tricas.');
         setMetrics({ timeSeriesData: [], performanceData: {}, errorData: [], usageData: [], timestamp: Date.now() });
       } finally {
         setIsLoading(false);
@@ -94,14 +94,14 @@ function MetricsDashboard() {
     
     fetchMetrics();
     
-    // Programar actualización de métricas cada minuto
+    // Programar actualizaciÃ³n de mÃ©tricas cada minuto
     const intervalId = setInterval(fetchMetrics, 60000);
     return () => clearInterval(intervalId);
   }, [selectedTimeframe]);
   
-  // Eliminado: generación de datos mock
+  // Eliminado: generaciÃ³n de datos mock
   
-  // Procesar los datos de rendimiento para el gráfico de barras
+  // Procesar los datos de rendimiento para el grÃ¡fico de barras
   const processedPerformanceData = useMemo(() => {
     if (!metrics || !metrics.performanceData) return [];
     
@@ -110,8 +110,18 @@ function MetricsDashboard() {
       value: value,
     }));
   }, [metrics]);
+
+  // Punto más reciente de la serie temporal (seguro)
+  const lastPoint = useMemo(() => {
+    try {
+      const ts = metrics?.timeSeriesData;
+      if (Array.isArray(ts) && ts.length > 0) return ts[ts.length - 1];
+    } catch {}
+    return null;
+  }, [metrics]);
+
   
-  // Si está cargando, mostrar indicador
+  // Si estÃ¡ cargando, mostrar indicador
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -123,7 +133,7 @@ function MetricsDashboard() {
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Panel de Métricas</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Panel de MÃ©tricas</h2>
         
         <div className="flex space-x-2">
           <button
@@ -134,7 +144,7 @@ function MetricsDashboard() {
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            Día
+            DÃ­a
           </button>
           <button
             onClick={() => setSelectedTimeframe('week')}
@@ -166,7 +176,7 @@ function MetricsDashboard() {
       )}
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico de actividad de email */}
+        {/* GrÃ¡fico de actividad de email */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Actividad de Email</h3>
           <div className="h-80">
@@ -187,7 +197,7 @@ function MetricsDashboard() {
           </div>
         </div>
         
-        {/* Gráfico de rendimiento */}
+        {/* GrÃ¡fico de rendimiento */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Tiempo de Respuesta (ms)</h3>
           <div className="h-80">
@@ -235,7 +245,7 @@ function MetricsDashboard() {
                   nameKey="name"
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 >
-                  {metrics?.errorData.map((entry, index) => (
+                  {(metrics?.errorData || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors.error} opacity={(index + 5) / 10} />
                   ))}
                 </Pie>
@@ -260,13 +270,13 @@ function MetricsDashboard() {
                 <YAxis dataKey="name" type="category" width={100} />
                 <Tooltip />
                 <Bar dataKey="value" name="Cantidad">
-                  {metrics?.usageData.map((entry, index) => (
+                  {(metrics?.usageData || []).map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
                       fill={
                         entry.name.includes('Email enviados') ? colors.email :
                         entry.name.includes('Email recibidos') ? colors.notification :
-                        entry.name.includes('Búsquedas') ? colors.search :
+                        entry.name.includes('BÃºsquedas') ? colors.search :
                         colors.eventDetection
                       } 
                     />
@@ -279,46 +289,46 @@ function MetricsDashboard() {
       </div>
       
       <div className="mt-6">
-        <h3 className="text-lg font-medium text-gray-700 mb-3">Estadísticas de Uso del Sistema de Emails</h3>
+        <h3 className="text-lg font-medium text-gray-700 mb-3">EstadÃ­sticas de Uso del Sistema de Emails</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Tarjetas de estadísticas */}
+          {/* Tarjetas de estadÃ­sticas */}
           <StatCard 
             title="Emails enviados hoy" 
-            value={metrics?.timeSeriesData?.[metrics.timeSeriesData.length-1]?.emailSent || 0} 
+            value={lastPoint?.emailSent || 0} 
             trend={10} 
-            icon="📤" 
+            icon="ðŸ“¤" 
           />
           <StatCard 
             title="Emails recibidos hoy" 
-            value={metrics?.timeSeriesData?.[metrics.timeSeriesData.length-1]?.emailReceived || 0} 
+            value={lastPoint?.emailReceived || 0} 
             trend={15} 
-            icon="📥" 
+            icon="ðŸ“¥" 
           />
           <StatCard 
-            title="Búsquedas realizadas" 
-            value={metrics?.timeSeriesData?.[metrics.timeSeriesData.length-1]?.searchCount || 0} 
+            title="BÃºsquedas realizadas" 
+            value={lastPoint?.searchCount || 0} 
             trend={-5} 
-            icon="🔍" 
+            icon="ðŸ”" 
           />
           <StatCard 
             title="Eventos detectados" 
-            value={metrics?.timeSeriesData?.[metrics.timeSeriesData.length-1]?.eventsDetected || 0} 
+            value={lastPoint?.eventsDetected || 0} 
             trend={20} 
-            icon="📅" 
+            icon="ðŸ“…" 
           />
         </div>
       </div>
       
-      {/* Última actualización */}
+      {/* Ãšltima actualizaciÃ³n */}
       <div className="mt-6 text-right text-sm text-gray-500">
-        Última actualización: {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleString() : 'N/A'}
+        Ãšltima actualizaciÃ³n: {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleString() : 'N/A'}
       </div>
     </div>
   );
 }
 
 /**
- * Tarjeta para mostrar estadísticas individuales
+ * Tarjeta para mostrar estadÃ­sticas individuales
  */
 function StatCard({ title, value, trend, icon }) {
   return (
@@ -326,7 +336,7 @@ function StatCard({ title, value, trend, icon }) {
       <div className="flex justify-between items-start">
         <span className="text-2xl">{icon}</span>
         <span className={`text-sm font-medium ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-          {trend >= 0 ? '↑' : '↓'} {Math.abs(trend)}%
+          {trend >= 0 ? 'â†‘' : 'â†“'} {Math.abs(trend)}%
         </span>
       </div>
       <h4 className="mt-2 text-gray-500 text-sm">{title}</h4>

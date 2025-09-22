@@ -159,7 +159,7 @@ function App() {
                   <Route path="documentos-legales" element={<Navigate to="documentos" replace />} />
                 </Route>
 
-                {/* Dise�os */}
+                {/* Diseños */}
                 <Route path="disenos" element={<DisenosLayout />}>
                   <Route index element={<Navigate to="invitaciones" replace />} />
                   <Route path="invitaciones" element={<DisenosInvitaciones />} />

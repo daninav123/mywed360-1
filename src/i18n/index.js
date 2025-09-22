@@ -1,18 +1,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
 
-// Local resources
+// Local resources embebidos
 import esTranslations from './locales/es/common.json';
 import enTranslations from './locales/en/common.json';
 import frTranslations from './locales/fr/common.json';
 import esFinance from './locales/es/finance.json';
 
-// Repair UTF-8 mojibake (e.g., BuzÃ³n -> Buzón, ðŸ‘¤ -> 👤)
+// Reparación ligera de mojibake en tiempo de lectura
 function fixMojibake(s) {
   if (typeof s !== 'string' || !s) return s;
-  if (!(/[ÃÂð]/.test(s))) return s; // quick heuristic
+  if (!(/[ÃÂ�ǟ]/.test(s))) return s; // heurística rápida
   try {
     const rec = decodeURIComponent(escape(s));
     return rec && rec !== s ? rec : s;
@@ -23,7 +22,6 @@ function fixMojibake(s) {
 
 i18n
   .use(LanguageDetector)
-  .use(Backend)
   .use(initReactI18next)
   .init({
     fallbackLng: 'es',
@@ -33,13 +31,14 @@ i18n
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
-      checkWhitelist: true
+      checkWhitelist: true,
     },
-    backend: { loadPath: '/locales/{{lng}}/{{ns}}.json' },
+    // Cargamos recursos embebidos; evitamos peticiones a /locales
     resources: {
       es: { common: esTranslations, finance: esFinance },
-      en: { common: enTranslations },
-      fr: { common: frTranslations }
+      // Para en/fr, exponemos el subárbol "finance" dentro de common como namespace independiente
+      en: { common: enTranslations, finance: enTranslations.finance || {} },
+      fr: { common: frTranslations, finance: frTranslations.finance || {} },
     },
     defaultNS: 'common',
     ns: ['common', 'finance'],
@@ -49,10 +48,10 @@ i18n
     load: 'languageOnly',
     pluralSeparator: '_',
     contextSeparator: '_',
-    react: { useSuspense: false, bindI18n: 'languageChanged', bindI18nStore: 'added removed' }
+    react: { useSuspense: false, bindI18n: 'languageChanged', bindI18nStore: 'added removed' },
   });
 
-// Wrap i18n.t to repair mojibake on read
+// Wrap i18n.t to reparar mojibake en lectura
 const _origT = i18n.t.bind(i18n);
 i18n.t = (key, opts) => fixMojibake(_origT(key, opts));
 
@@ -61,7 +60,7 @@ export const getCurrentLanguage = () => i18n.language || 'es';
 export const getAvailableLanguages = () => ([
   { code: 'es', name: 'Español', flag: '🇪🇸' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷' }
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
 ]);
 
 export const formatDate = (date, options = {}) => new Intl.DateTimeFormat(getCurrentLanguage(), options).format(new Date(date));

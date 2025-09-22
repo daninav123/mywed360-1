@@ -22,19 +22,36 @@ function normalizeLang(lang) {
 async function fetchFromBackend({ page, pageSize, language }) {
   const envBase = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_BASE)) || '';
   const derivedBase = getBackendBase();
-  const candidates = Array.from(new Set([
-    envBase && envBase.replace(/\/$/, ''),
-    derivedBase && derivedBase.replace(/\/$/, ''),
+  // Importante: no usar filter(Boolean) porque elimina '' y perdemos el fallback
+  // a la ruta relativa '/api/wedding-news' gestionada por el proxy de Vite.
+  const rawCandidates = [
+    envBase ? envBase.replace(/\/$/, '') : undefined,
+    derivedBase ? derivedBase.replace(/\/$/, '') : undefined,
     'https://mywed360-backend.onrender.com',
-    '' // como último recurso: proxy de Vite
-  ].filter(Boolean)));
+    '' // como último recurso: proxy de Vite o mismo origen
+  ];
+  let candidates = Array.from(new Set(rawCandidates.filter(v => v !== undefined && v !== null)));
+  // Prioritize Render backend to avoid slow/failing local attempts first
+  try {
+    const RENDER_BASE = 'https://mywed360-backend.onrender.com';
+    if (candidates.includes(RENDER_BASE)) {
+      candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
+    }
+  } catch {}
 
+  let sawError = false;
   for (const base of candidates) {
     try {
       const url = base ? `${base}/api/wedding-news` : '/api/wedding-news';
+      // Adaptive timeout: short for local/same-origin, longer for Render aggregator
+      const isProbablyLocal = (b) => {
+        const s = String(b || '');
+        return s === '' || /localhost|127\.0\.0\.1|:4004/.test(s);
+      };
+      const timeoutMs = isProbablyLocal(base) ? 5000 : 35000;
       const resp = await axios.get(url, {
         params: { page, pageSize, lang: language },
-        timeout: 8000,
+        timeout: timeoutMs,
         validateStatus: () => true,
       });
       if (resp.status < 400 && Array.isArray(resp.data)) {
@@ -42,9 +59,14 @@ async function fetchFromBackend({ page, pageSize, language }) {
         // Si el backend de este candidato devuelve array vacío, probar el siguiente candidato
         continue;
       }
-    } catch {}
+      // Estado no exitoso: marcar como error para posible backoff
+      sawError = true;
+    } catch {
+      sawError = true;
+    }
   }
-  return [];
+  // Si hubo errores en candidatos, devolver null para diferenciar de "vacío"
+  return sawError ? null : [];
 }
 
 const stripDiacritics = (text = '') =>
@@ -237,9 +259,11 @@ const scoreMatches = (text, patterns) =>
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
   const lang = normalizeLang(language);
   // Ruta principal: backend RSS aggregator
-  if (!backendAvailable()) return [];
   const rssData = await fetchFromBackend({ page, pageSize, language: lang });
-  if (!Array.isArray(rssData) || !rssData.length) { backoffBackend(); return []; }
+  // Si hubo errores de red/servidor, aplicar backoff breve
+  if (rssData === null) { return []; }
+  // Si el backend respondió OK pero sin datos, no aplicar backoff
+  if (!Array.isArray(rssData) || !rssData.length) { return []; }
 
   let posts = rssData;
   if (lang && lang !== 'en') {

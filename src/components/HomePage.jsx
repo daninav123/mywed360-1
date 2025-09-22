@@ -75,7 +75,7 @@ export default function HomePage() {
 
       while (results.length < desired && page <= 20) {
         try {
-          const batch = await fetchWeddingNews(page, 50, lang);
+          const batch = await fetchWeddingNews(page, 10, lang);
           consecutiveErrors = 0;
           for (const post of batch) {
             if (!post?.url || !post.image) continue;
@@ -102,7 +102,7 @@ export default function HomePage() {
         consecutiveErrors = 0;
         while (results.length < desired && page <= 20) {
           try {
-            const batch = await fetchWeddingNews(page, 50, lang === 'en' ? 'en' : 'en');
+            const batch = await fetchWeddingNews(page, 10, lang === 'en' ? 'en' : 'en');
             consecutiveErrors = 0;
             for (const post of batch) {
             if (!post?.url || !post.image) continue;
@@ -129,7 +129,7 @@ export default function HomePage() {
         const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
         while (results.length < desired && page <= 20) {
           try {
-            const batch = await fetchWeddingNews(page, 50, lang);
+            const batch = await fetchWeddingNews(page, 10, lang);
             consecutiveErrors = 0;
             for (const post of batch) {
               if (!post?.url) continue;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Tabs, Tab, Button, Box, Typography, Menu, MenuItem, Paper, Badge, Divider } from '@mui/material';
 // Eliminando importación problemática de @mui/icons-material
 // Vamos a usar alternativas simples de texto para los íconos
@@ -369,3 +369,4 @@ function EmailAdminDashboard() {
 }
 
 export default EmailAdminDashboard;
+

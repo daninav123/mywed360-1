@@ -72,6 +72,9 @@ const TaskList = ({
                   {event.desc && (
                     <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">{event.desc}</div>
                   )}
+                  {event.assignee && (
+                    <div className="text-xs text-[color:var(--color-text)]/60 mt-1">Asignado a: {event.assignee}</div>
+                  )}
                 </div>
               </div>
             </div>

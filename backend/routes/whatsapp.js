@@ -43,10 +43,16 @@ router.get('/health', (req, res) => {
 // POST /api/whatsapp/test/session  { phone, weddingId, guestId }
 router.post('/test/session', requireAuth, async (req, res) => {
   try {
-    const { phone, weddingId, guestId } = req.body || {};
-    if (!phone || !weddingId || !guestId) {
-      return res.status(400).json({ success: false, error: 'phone, weddingId y guestId son requeridos' });
+    const { z } = await import('zod');
+    const parsed = z.object({
+      phone: z.string().min(5),
+      weddingId: z.string().min(1),
+      guestId: z.string().min(1),
+    }).safeParse(req.body || {});
+    if (!parsed.success) {
+      return res.status(400).json({ success: false, error: parsed.error.issues });
     }
+    const { phone, weddingId, guestId } = parsed.data;
     const e164 = toE164(phone, process.env.DEFAULT_COUNTRY_CODE || '');
     if (!e164) return res.status(400).json({ success: false, error: 'phone inválido' });
     const ok = await ensureTestSession({ phoneE164: e164, weddingId, guestId, rsvpFlow: true });
@@ -62,8 +68,10 @@ router.post('/test/session', requireAuth, async (req, res) => {
 // POST /api/whatsapp/test/inbound  { phone, body }
 router.post('/test/inbound', requireAuth, async (req, res) => {
   try {
-    const { phone, body } = req.body || {};
-    if (!phone || !body) return res.status(400).json({ success: false, error: 'phone y body requeridos' });
+    const { z } = await import('zod');
+    const parsed = z.object({ phone: z.string().min(5), body: z.string().min(1) }).safeParse(req.body || {});
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    const { phone, body } = parsed.data;
     const e164 = toE164(phone, process.env.DEFAULT_COUNTRY_CODE || '');
     if (!e164) return res.status(400).json({ success: false, error: 'phone inválido' });
 
@@ -237,10 +245,18 @@ router.post('/cron-run', async (req, res) => {
 // Envío de mensaje WhatsApp via API (número de la app)
 router.post('/send', requireAuth, async (req, res) => {
   try {
-    const { to, message, weddingId, guestId, templateId, scheduleAt, metadata } = req.body || {};
-    if (!to || !message) {
-      return res.status(400).json({ success: false, error: 'Parámetros requeridos: to, message' });
-    }
+    const { z } = await import('zod');
+    const parsed = z.object({
+      to: z.string().min(5),
+      message: z.string().min(1),
+      weddingId: z.string().optional(),
+      guestId: z.string().optional(),
+      templateId: z.string().optional(),
+      scheduleAt: z.string().optional(),
+      metadata: z.record(z.any()).optional(),
+    }).safeParse(req.body || {});
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    const { to, message, weddingId, guestId, templateId, scheduleAt, metadata } = parsed.data;
 
     const result = await sendWhatsAppText({ to, message, weddingId, guestId, templateId, scheduleAt, metadata });
     if (!result.success) {
@@ -257,10 +273,14 @@ router.post('/send', requireAuth, async (req, res) => {
 // POST /api/whatsapp/batch  { weddingId, guestIds:[], messageTemplate }
 router.post('/batch', requireAuth, async (req, res) => {
   try {
-    const { weddingId, guestIds = [], messageTemplate = '' } = req.body || {};
-    if (!weddingId || !Array.isArray(guestIds) || guestIds.length === 0) {
-      return res.status(400).json({ success: false, error: 'weddingId y guestIds requeridos' });
-    }
+    const { z } = await import('zod');
+    const parsed = z.object({
+      weddingId: z.string().min(1),
+      guestIds: z.array(z.string().min(1)).min(1),
+      messageTemplate: z.string().optional(),
+    }).safeParse(req.body || {});
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    const { weddingId, guestIds, messageTemplate = '' } = parsed.data;
 
     // Helper simple → E.164 (solo España por demo)
     const toE164 = (num = '') => {
@@ -319,13 +339,20 @@ router.post('/batch', requireAuth, async (req, res) => {
 // Programación de envíos (en cola) — no envía inmediatamente
 router.post('/schedule', requireAuth, async (req, res) => {
   try {
-    const { items = [], scheduledAt } = req.body || {};
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ success: false, error: 'items requerido (array)' });
-    }
-    if (!scheduledAt) {
-      return res.status(400).json({ success: false, error: 'scheduledAt requerido' });
-    }
+    const { z } = await import('zod');
+    const parsed = z.object({
+      items: z.array(z.object({
+        to: z.string().min(5).optional(),
+        message: z.string().min(1),
+        weddingId: z.string().optional(),
+        guestId: z.string().optional(),
+        templateId: z.string().optional(),
+        metadata: z.record(z.any()).optional(),
+      })).min(1),
+      scheduledAt: z.union([z.string(), z.date()]),
+    }).safeParse(req.body || {});
+    if (!parsed.success) return res.status(400).json({ success: false, error: parsed.error.issues });
+    const { items = [], scheduledAt } = parsed.data;
 
     const batch = admin.firestore().batch();
     const scheduledTs = new Date(scheduledAt);
@@ -361,6 +388,26 @@ router.post('/schedule', requireAuth, async (req, res) => {
 // Twilio envía application/x-www-form-urlencoded por defecto; index.js ya tiene express.urlencoded
 router.post('/webhook/twilio', async (req, res) => {
   try {
+    // Verificación de firma Twilio (si está configurado TWILIO_AUTH_TOKEN)
+    try {
+      const authToken = process.env.TWILIO_AUTH_TOKEN || '';
+      if (authToken) {
+        const signature = req.get('X-Twilio-Signature') || req.get('x-twilio-signature') || '';
+        const absUrl = process.env.WHATSAPP_STATUS_CALLBACK_URL || `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+        const twModule = await import('twilio');
+        const tw = twModule.default || twModule;
+        const ok = tw.validateRequest(authToken, signature, absUrl, req.body || {});
+        if (!ok) {
+          logger.warn('[whatsapp] webhook/twilio: firma inválida', { absUrl });
+          return res.status(403).send('Invalid signature');
+        }
+      } else {
+        logger.warn('[whatsapp] TWILIO_AUTH_TOKEN no configurado; se omite verificación de firma');
+      }
+    } catch (sigErr) {
+      logger.warn('[whatsapp] Error verificando firma Twilio:', sigErr?.message || sigErr);
+    }
+
     const payload = req.body || {};
     logger.info(`[whatsapp] webhook/twilio: ${JSON.stringify(payload)}`);
     // Procesar en paralelo sin bloquear la respuesta a Twilio

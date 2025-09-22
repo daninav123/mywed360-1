@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import errorLogger from '../utils/errorLogger';
 import { useAuth } from '../hooks/useAuth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -57,6 +57,19 @@ export default function WeddingProvider({ children }) {
     }
   }, [weddings, activeWedding, currentUser]);
 
+  // Sincronizar activeWedding entre pestañas (localStorage)
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key !== 'lovenda_active_wedding') return;
+      try {
+        const id = localStorage.getItem('lovenda_active_wedding') || '';
+        setActiveWeddingState(id);
+      } catch {}
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
   // Cargar lista de bodas del planner desde Firestore (omitido en Cypress con mock)
   useEffect(() => {
     async function listenWeddings() {
@@ -109,7 +122,7 @@ export default function WeddingProvider({ children }) {
         }
 
         // Fallback adicional controlado por flag: buscar en colección principal por roles (legacy)
-        const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS !== 'false';
+        const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS === 'true';
         if (list.length === 0 && ENABLE_LEGACY_FALLBACKS) {
           // Intento adicional: si tenemos activeWedding en localStorage, recuperar manualmente ese doc
           if (activeWedding) {
@@ -174,13 +187,15 @@ export default function WeddingProvider({ children }) {
     listenWeddings();
   }, [currentUser]);
 
-  const setActiveWedding = (id) => {
+  const setActiveWedding = useCallback((id) => {
     setActiveWeddingState(id);
-    localStorage.setItem('lovenda_active_wedding', id);
-  };
+    try { localStorage.setItem('lovenda_active_wedding', id); } catch {}
+  }, []);
+
+  const value = useMemo(() => ({ weddings, activeWedding, setActiveWedding }), [weddings, activeWedding, setActiveWedding]);
 
   return (
-    <WeddingContext.Provider value={{ weddings, activeWedding, setActiveWedding }}>
+    <WeddingContext.Provider value={value}>
       {children}
     </WeddingContext.Provider>
   );

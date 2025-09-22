@@ -265,26 +265,40 @@ export const GanttChart = ({
 
   // AnimaciÃƒÆ’Ã‚Â³n: seguimiento continuo de scroll/transform por si no disparan eventos
   useEffect(() => {
+    // Seguimiento suave con rAF sin re-crear el efecto en cada actualización
     let rafId = null;
+    const parseTX = (tr) => {
+      try {
+        if (!tr) return 0;
+        let m = tr.match(/translate3d\(([-0-9\.]+)[ ,]/i);
+        if (m) return parseFloat(m[1]);
+        m = tr.match(/translate\(([-0-9\.]+)[ ,]/i);
+        if (m) return parseFloat(m[1]);
+        m = tr.match(/matrix\(([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+)\)/i);
+        if (m) return parseFloat(m[5]);
+        return 0;
+      } catch { return 0; }
+    };
     const tick = () => {
       try {
         const s = scrollerRef.current;
         if (s) {
           const sl = (s?.scrollLeft ?? containerScrollLeft ?? 0);
-          if (sl !== scrollLeft) setScrollLeft(sl);
+          // Evitar sets redundantes para no encadenar renders
+          setScrollLeft((prev) => (prev !== sl ? sl : prev));
         }
         const g = movingGroupRef.current;
         if (g) {
           const tr = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
           const tx = -parseTX(tr);
-          if (tx !== contentOffsetX) setContentOffsetX(tx);
+          setContentOffsetX((prev) => (prev !== tx ? tx : prev));
         }
       } catch {}
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => { if (rafId) cancelAnimationFrame(rafId); };
-  }, [scrollLeft, contentOffsetX]);
+  }, []);
 
   // Forzar el ancho scrollable (fin del scroll) exactamente hasta gridEndDate (modo Mes)
   useEffect(() => {
@@ -446,7 +460,7 @@ export const GanttChart = ({
         }
       }
     } else {
-      if (debugEnabled) console.warn('[GanttDebug] markerDate invÃ¡lido o no definido', { markerDate });
+      if (debugEnabled) dbg('markerDate no definido (esperando datos)', { markerDate });
     }
   } catch (e) {
     console.warn('[GanttDebug] Error calculando marker', e);
@@ -454,8 +468,15 @@ export const GanttChart = ({
 
   // Right mask placeholder\n
   return (
-    <LocalErrorBoundary>
-      <div ref={wrapperRef} style={{ position: 'relative', overflow: 'hidden' }}>
+        <LocalErrorBoundary>
+      <div
+        ref={wrapperRef}
+        style={{ position: 'relative', overflow: 'hidden' }}
+        onWheelCapture={(e) => {
+          // Evita que el handler interno de la librería encadene actualizaciones excesivas
+          try { e.stopPropagation(); } catch {}
+        }}
+      >
         <Gantt
           tasks={cleanTasks}
           viewMode={viewMode}
@@ -519,6 +540,7 @@ export const GanttChart = ({
     </LocalErrorBoundary>
   );
 };
+
 
 
 

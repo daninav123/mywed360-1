@@ -71,7 +71,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
   }, [categoryTotals, transactions, budgetLimits]);
 
   return (
-    <Card className="p-4 h-full">
+    <Card className="p-4 h-full bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Alertas de Presupuesto

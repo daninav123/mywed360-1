@@ -2,7 +2,6 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Loader from "../components/ui/Loader";
 import AdminLayout from '../layouts/AdminLayout';
-import { useAuth } from '../hooks/useAuth';
 
 // Carga perezosa (lazy loading) de componentes para mejor rendimiento
 const AdminDashboard = lazy(() => import('../components/admin/AdminDashboard'));
@@ -24,9 +23,6 @@ const LoadingFallback = () => (
  * Requiere autenticación y rol de administrador
  */
 const AdminRoutes = () => {
-  const { hasRole, isLoading } = useAuth();
-  if (isLoading) return <LoadingFallback />;
-  if (!hasRole('admin')) return <Navigate to="/home" replace />;
   return (
     <AdminLayout>
       <Suspense fallback={<LoadingFallback />}>

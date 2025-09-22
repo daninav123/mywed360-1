@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Cloud, CloudOff } from 'lucide-react';
 import useTranslations from '../../hooks/useTranslations';
 
@@ -36,4 +36,7 @@ export default function FinanceHeader({ syncStatus }) {
     </div>
   );
 }
+
+
+
 

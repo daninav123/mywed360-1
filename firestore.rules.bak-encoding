@@ -1,0 +1,211 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Colección de bodas
+    match /weddings/{weddingId} {
+      // Lectura: propietarios, planners y asistentes
+      allow read: if request.auth != null && (
+        (resource.data.ownerIds != null && request.auth.uid in resource.data.ownerIds) ||
+        (resource.data.plannerIds != null && request.auth.uid in resource.data.plannerIds) ||
+        (resource.data.assistantIds != null && request.auth.uid in resource.data.assistantIds)
+      );
+      // Escritura: propietarios y planners. Además permitimos que el invitado se añada a sí mismo como planner una única vez.
+      allow update: if isOwnerOrPlanner(weddingId) || isAddingSelfAsPlanner();
+      // Permitir crear una boda si el usuario autenticado se incluye en ownerIds o plannerIds del nuevo documento
+      allow create: if request.auth != null && (
+        (request.resource.data.ownerIds != null && request.auth.uid in request.resource.data.ownerIds) ||
+        (request.resource.data.plannerIds != null && request.auth.uid in request.resource.data.plannerIds)
+      );
+      allow delete: if isOwnerOrPlanner(weddingId);
+
+            function isAddingSelfAsPlanner() {
+        return request.auth != null &&
+          // Permitimos si la operación SOLO modifica plannerIds (ideal para FieldValue.arrayUnion)
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['plannerIds']) && (request.resource.data.plannerIds is list) && request.auth.uid in request.resource.data.plannerIds && (!(resource.data.plannerIds is list) || !(request.auth.uid in resource.data.plannerIds));
+      }
+    }
+
+    // Subcolecciones dentro de una boda (invitados, tareas, proveedores, etc.)
+    match /weddings/{weddingId}/{document=**} {
+      allow read: if request.auth != null && (
+        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
+        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds) ||
+        (get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.assistantIds)
+      );
+      // Para escrituras en general exigimos owner/planner. Adicionalmente,
+      // si el path objetivo es seatingPlan/banquet o seatingPlan/ceremony,
+      // validamos la estructura y el rango de config.aisleMin.
+      allow write: if request.auth != null && (
+        (
+          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.ownerIds) ||
+          (get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(weddingId)).data.plannerIds)
+        ) && (
+          // document es el sufijo capturado por {document=**}, p.ej. "seatingPlan/banquet"
+          !(document.matches('^seatingPlan/(banquet|ceremony)$')) || isValidSeatingPlanDoc(document, request.resource.data)
+        )
+      );
+    }
+    // Invitaciones ahora se almacenan como subcolección:
+    // weddings/{weddingId}/weddingInvitations/{code}
+    // -> Se aplican las mismas reglas que otras subcolecciones mediante el bloque
+    //    match /weddings/{weddingId}/{document=**} más arriba.
+
+    // Colección de usuarios - permitir lectura/escritura de su propio documento
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Subcolección de bodas del usuario
+      match /weddings/{weddingId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Colección de onboarding - permitir lectura/escritura de su propio documento
+    match /onboarding/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Colección de configuración - permitir lectura a usuarios autenticados
+    match /config/{document=**} {
+      allow read: if request.auth != null;
+    }
+
+    // Colección diagnosis para test de conexión
+    match /diagnosis/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Colección _conexion_prueba para ping healthcheck
+    match /_conexion_prueba/{docId} {\n      // Lectura p�blica para healthcheck; escritura solo autenticados\n      allow read: if true;\n      allow write: if request.auth != null;\n    }
+
+    // Colección _test_connection para prueba de escritura
+    match /_test_connection/{docId} {\n      // Lectura p�blica; escritura solo autenticados\n      allow read: if true;\n      allow write: if request.auth != null;\n    }
+
+    // Colección _test para diagnósticos sin autenticación
+    match /_test/{docId} {\n      // Lectura p�blica; escritura solo autenticados\n      allow read: if true;\n      allow write: if request.auth != null;\n    }
+
+    // Perfil de usuario
+    match /users/{uid} {
+      // Cualquier usuario autenticado puede leer datos de perfil básicos
+      allow read: if request.auth != null;
+      // Solo el propietario puede crear o actualizar su perfil
+      allow update, create: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Subcolecciones dentro de un perfil de usuario (p.ej. tasks, mails, etc.)
+    match /users/{uid}/{subCollection=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+
+    // Colección de invitados por usuario (almacenamiento híbrido)
+    match /userGuests/{uid} {
+      // Cada usuario puede leer y escribir su propio documento de invitados
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Colecciones de datos privados por usuario (sincronización local)
+    match /userData/{uid} {
+      // Cada usuario sólo puede leer/escribir su propio documento
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /userSuppliers/{uid} {
+      // Cada usuario sólo puede leer/escribir sus proveedores temporales
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /userTasksCompleted/{uid} {
+      // Cada usuario sólo puede leer/escribir su propio documento
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Colección de transacciones por usuario
+    match /transactions/{uid} {
+      // Cada usuario puede leer/escribir sus propias transacciones
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Subcolecciones de transacciones
+    match /transactions/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Colección de finanzas por usuario
+    match /finance/{uid} {
+      // Cada usuario puede leer/escribir sus propias finanzas
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Subcolecciones de finanzas
+    match /finance/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    function isOwner(wid) {
+      return request.auth != null &&
+        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds;
+    }
+
+    function isPlanner(wid) {
+      return request.auth != null &&
+        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds;
+    }
+
+    function isAssistant(wid) {
+      return request.auth != null &&
+        request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds;
+    }
+
+    function isOwnerOrPlanner(wid) {
+      return isOwner(wid) || isPlanner(wid);
+    }
+
+    function isCollaborator(wid) {
+      return isOwner(wid) || isPlanner(wid) || isAssistant(wid);
+    }
+
+    // ---------------- SeatingPlan validations ----------------
+    function isValidConfig(cfg) {
+      return cfg.width is number && cfg.height is number &&
+             cfg.width > 0 && cfg.height > 0 &&
+             cfg.aisleMin is number && cfg.aisleMin >= 40 && cfg.aisleMin <= 300;
+    }
+
+    function listFieldValid(data, field) {
+      return !(data.keys().hasAny([field])) || (data[field] is list);
+    }
+
+    function isValidBanquetData(data) {
+      // Aceptar config anidado o plano para compatibilidad
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             (
+               (data.keys().hasAny(['config']) && isValidConfig(data.config)) ||
+               (
+                 // fallback compat: width/height/aisleMin en raíz
+                 (data.keys().hasAny(['width']) || data.keys().hasAny(['height']) || data.keys().hasAny(['aisleMin']))
+                 ? isValidConfig(data)
+                 : true
+               )
+             );
+    }
+
+    function isValidCeremonyData(data) {
+      return listFieldValid(data, 'tables') &&
+             listFieldValid(data, 'areas') &&
+             listFieldValid(data, 'seats');
+    }
+
+    function isValidSeatingPlanDoc(path, data) {
+      // path esperado: "seatingPlan/banquet" o "seatingPlan/ceremony"
+      return (path.matches('^seatingPlan/banquet$') && isValidBanquetData(data)) ||
+             (path.matches('^seatingPlan/ceremony$') && isValidCeremonyData(data));
+    }
+  }
+}
+
+
+
+

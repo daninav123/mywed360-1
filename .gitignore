@@ -40,6 +40,10 @@ modal_test_output.txt
 new_debug.txt
 temp_*.js
 temp_*.jsx
+tmp_*.js
+tmp_*.jsx
+tmp_*.txt
+tmp_*
 
 # Cypress artifacts
 cypress/screenshots/

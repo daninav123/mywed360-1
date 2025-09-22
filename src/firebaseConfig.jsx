@@ -4,16 +4,25 @@ import { initializeFirestore, getFirestore, connectFirestoreEmulator, doc, setDo
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getDatabase, ref, onValue } from 'firebase/database';
 
-// Configuración de Firebase
+// Configuración de Firebase desde variables de entorno (sin secretos hard-coded)
 const firebaseConfig = {
-  apiKey: "AIzaSyArwjJewGV5j_vzWjqOsQPoJMSFtaCkSZE",
-  authDomain: "lovenda-98c77.firebaseapp.com",
-  projectId: "lovenda-98c77",
-  storageBucket: "lovenda-98c77.appspot.com",
-  messagingSenderId: "844882125080",
-  appId: "1:844882125080:web:4015c2e2e6eedf009f7e6d",
-  measurementId: "G-4QMWEHYPG8"
+  apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || '',
+  authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || '',
+  projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || '',
+  storageBucket: import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: import.meta?.env?.VITE_FIREBASE_APP_ID || '',
+  measurementId: import.meta?.env?.VITE_FIREBASE_MEASUREMENT_ID || undefined,
 };
+
+if (typeof window !== 'undefined') {
+  const missing = Object.entries(firebaseConfig).filter(([_, v]) => !v).map(([k]) => k);
+  if (missing.length) {
+    // Aviso en consola para facilitar configuración local
+    // No expone valores; solo lista claves faltantes
+    console.warn('[firebaseConfig] Variables VITE_* faltantes:', missing.join(', '));
+  }
+}
 
 // Variables globales de Firebase
 let app = getApps().length ? getApp() : initializeApp(firebaseConfig);

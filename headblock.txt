@@ -1,0 +1,13 @@
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.category', { defaultValue: 'Categoría' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.type', { defaultValue: 'Tipo' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.status', { defaultValue: 'Estado' })}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.amount', { defaultValue: 'Monto' })}</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.actions', { defaultValue: 'Acciones' })}</th>
+                </tr>
+              </thead>
+              {/* redundant thead removed
+                <tr>

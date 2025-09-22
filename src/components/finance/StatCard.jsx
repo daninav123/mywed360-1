@@ -79,7 +79,7 @@ export default function StatCard({
 
   return (
     <Card
-      className={`${padding} relative overflow-hidden ${clickable ? 'cursor-pointer transition hover:shadow-lg hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/40' : ''} ${className}`}
+      className={`${padding} relative overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft ${clickable ? 'cursor-pointer transition hover:shadow-lg hover:-translate-y-0.5 focus-within:ring-2 focus-within:ring-[color:var(--color-primary)]/40' : 'transition'} ${className}`}
       onClick={onClick}
       role={role}
       tabIndex={tabIndex}

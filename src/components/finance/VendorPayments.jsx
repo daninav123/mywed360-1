@@ -77,7 +77,7 @@ export const VendorPayments = ({ transactions }) => {
   );
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-4 space-y-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
       <h3 className="text-lg font-semibold flex items-center gap-2">
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Seguimiento de Pagos a Proveedores

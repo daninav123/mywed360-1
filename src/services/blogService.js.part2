@@ -1,0 +1,21 @@
+    posts = pickPosts((entry) => entry.passesMinimal, (entry) => entry.designHits + entry.planningHits);
+  }
+
+  if (!posts.length) {
+    posts = entries
+      .filter((entry) => entry.hasWeddingContext && !entry.isHardNegative && !entry.isGossip)
+      .slice(0, pageSize)
+      .map(toPost);
+  }
+
+  if (lang && lang !== 'en') {
+    for (const p of posts) {
+      p.title = await translateText(p.title, lang, '');
+      p.description = await translateText(p.description, lang, '');
+    }
+  }
+
+  return posts;
+  */
+}
+// Fin de archivo

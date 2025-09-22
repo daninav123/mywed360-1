@@ -9,7 +9,9 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+const WEBHOOK_MAX_BYTES = Number(process.env.WEBHOOK_MAX_BYTES || 262144);
+
+router.post('/webhook', express.raw({ type: 'application/json', limit: WEBHOOK_MAX_BYTES }), async (req, res) => {
   try {
     const STRIPE_KEY = process.env.STRIPE_SECRET_KEY;
     const STRIPE_WH_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
@@ -25,6 +27,12 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       return res.status(503).send('stripe-not-installed');
     }
     const sig = req.headers['stripe-signature'];
+    if (!sig) {
+      return res.status(400).send('missing-signature');
+    }
+    if (Buffer.isBuffer(req.body) && req.body.length > WEBHOOK_MAX_BYTES) {
+      return res.status(413).send('payload-too-large');
+    }
     let event;
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, STRIPE_WH_SECRET);

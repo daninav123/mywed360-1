@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { auth, db, firebaseReady } from '../firebaseConfig';
 import {
   collection,
@@ -9,6 +9,7 @@ import {
   onSnapshot,
   serverTimestamp,
 } from 'firebase/firestore';
+import { post as apiPost } from '../services/apiClient';
 
 // Helpers para localStorage (caché offline por boda)
 const localKey = (wid, name) => `lovenda_${wid}_${name}`;
@@ -29,7 +30,16 @@ const lsSet = (wid, name, data) => {
  * weddings/{weddingId}/{subName}
  * Soporta modo offline usando localStorage.
  */
-export const useWeddingCollection = (subName, weddingId, fallback = []) => {
+// options: { orderBy?: { field: string, direction?: 'asc'|'desc' }, limit?: number }
+/**
+ * Suscribe y gestiona una subcolección de una boda: weddings/{weddingId}/{subName}
+ * options: {
+ *  orderBy?: { field: string, direction?: 'asc'|'desc' },
+ *  limit?: number,
+ *  where?: Array<{ field: string, op: any, value: any }>
+ * }
+ */
+export const useWeddingCollection = (subName, weddingId, fallback = [], options = {}) => {
   const [data, setData] = useState(() => {
     try {
       return lsGet(weddingId, subName, fallback);
@@ -39,10 +49,15 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     }
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [reloadTick, setReloadTick] = useState(0);
+  const lastLocalWriteRef = useRef(0);
+
+  const reload = useCallback(() => setReloadTick((t) => t + 1), []);
 
   useEffect(() => {
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
-    const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS !== 'false';
+    const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS === 'true';
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
       if (!ENABLE_LEGACY_FALLBACKS) return; // desactivado por flag
@@ -162,43 +177,84 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
     setData([]);
 
     let unsub = null;
-    const listen = () => {
+    const listen = async () => {
       // Intentamos ordenar por createdAt; si el campo no existe en algún documento, Firestore
       // igualmente los devuelve, pero algunos proyectos tienen reglas que lo impiden. Para
       // máxima compatibilidad hacemos la consulta base sin orderBy y ordenamos luego en cliente.
       const colRef = collection(db, 'weddings', weddingId, ...subName.split('/'));
-      const q = colRef;
-      console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
+      let q = colRef;
+      try {
+        const { query: fQuery, orderBy: fOrderBy, limit: fLimit, where: fWhere } = await import('firebase/firestore');
+        const constraints = [];
+        const ob = options?.orderBy;
+        if (ob && ob.field && typeof fOrderBy === 'function') {
+          constraints.push(fOrderBy(ob.field, ob.direction === 'desc' ? 'desc' : 'asc'));
+        }
+        const lim = options?.limit;
+        if (Number.isFinite(lim) && lim > 0 && typeof fLimit === 'function') {
+          constraints.push(fLimit(lim));
+        }
+        const wh = Array.isArray(options?.where) ? options.where : [];
+        if (wh.length && typeof fWhere === 'function') {
+          for (const w of wh) {
+            if (w && w.field && w.op !== undefined) constraints.push(fWhere(w.field, w.op, w.value));
+          }
+        }
+        if (constraints.length && typeof fQuery === 'function') {
+          q = fQuery(colRef, ...constraints);
+        }
+      } catch {}
+      if (import.meta.env.DEV) console.log(`[useWeddingCollection] Iniciando listener para weddings/${weddingId}/${subName}`);
       unsub = onSnapshot(q, (snap) => {
         // Asegurar que el id del documento prevalezca sobre cualquier campo id dentro de los datos
-        const arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
-        console.log(`[useWeddingCollection] Datos recibidos:`, { sub: subName, wedding: weddingId, size: arr.length, data: arr });
+        let arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
+        // Ordenar en cliente si se solicitó y no se aplicó en servidor
+        const ob2 = options?.orderBy;
+        if (ob2 && ob2.field) {
+          const dirMul = (ob2.direction === 'desc') ? -1 : 1;
+          const f = ob2.field;
+          try {
+            arr = arr.slice().sort((a, b) => {
+              const av = a?.[f];
+              const bv = b?.[f];
+              if (av == null && bv == null) return 0;
+              if (av == null) return -1 * dirMul;
+              if (bv == null) return 1 * dirMul;
+              if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dirMul;
+              const as = String(av);
+              const bs = String(bv);
+              return as.localeCompare(bs) * dirMul;
+            });
+          } catch {}
+        }
+        if (import.meta.env.DEV) console.log(`[useWeddingCollection] Datos recibidos:`, { sub: subName, wedding: weddingId, size: arr.length });
         setData(arr);
         lsSet(weddingId, subName, arr);
         setLoading(false);
       }, async (err) => {
         console.error(`Snapshot error ${subName}:`, err);
-        // Intento automático: si es permiso denegado, añadirse como planner y reintentar
+        // Intento automático: si es permiso denegado, solicitar autofix seguro al backend y reintentar
         if (err?.code === 'permission-denied' && auth.currentUser?.uid) {
           try {
-            console.warn(`[auto-fix] Intentando añadirme como planner en ${weddingId}… (uid: ${auth.currentUser.uid})`);
-            const { doc: fDoc, updateDoc, arrayUnion } = await import('firebase/firestore');
-            const wedRef = fDoc(db, 'weddings', weddingId);
-            await updateDoc(wedRef, { plannerIds: arrayUnion(auth.currentUser.uid) });
-            console.log(`[auto-fix] Añadido ${auth.currentUser.uid} a plannerIds en ${weddingId}`);
-            // Cerrar listener anterior si existe
-            if (typeof unsub === 'function') try { unsub(); } catch(_) {}
-            // Dar más tiempo al backend para propagar reglas y reintentar
-            if (import.meta.env.DEV) console.debug('[useWeddingCollection] reintento de listener tras auto-fix en 3000ms', { sub: subName, wedding: weddingId });
-            setTimeout(() => listen(), 3000);
-            return;
+            console.warn(`[auto-fix] Solicitando autofix backend para ${weddingId}… (uid: ${auth.currentUser.uid})`);
+            const resp = await apiPost(`/api/weddings/${weddingId}/permissions/autofix`, {}, { auth: true });
+            if (resp?.ok) {
+              try { if (typeof unsub === 'function') unsub(); } catch {}
+              if (import.meta.env.DEV) console.debug('[useWeddingCollection] reintento de listener tras autofix en 3000ms', { sub: subName, wedding: weddingId });
+              setTimeout(() => listen(), 3000);
+              return;
+            } else {
+              const text = await resp.text().catch(() => '');
+              console.warn('[auto-fix] Backend rechazó autofix', resp?.status, text);
+            }
           } catch (permErr) {
-            console.warn('[auto-fix] Error añadiendo plannerIds:', permErr);
+            console.warn('[auto-fix] Error llamando autofix backend:', permErr);
           }
         }
         if (import.meta.env.DEV) console.debug('[useWeddingCollection] usando caché local por error en snapshot', { sub: subName, wedding: weddingId, code: err?.code });
         setData(lsGet(weddingId, subName, fallback));
         setLoading(false);
+        try { setError(err); } catch {}
       });
     };
 
@@ -230,9 +286,38 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
         console.error('[useWeddingCollection] Error en firebaseReady:', err);
         setData(lsGet(weddingId, subName, fallback));
         setLoading(false);
+        setError(err);
       });
     return () => unsub && unsub();
-  }, [subName, weddingId]);
+  }, [subName, weddingId, reloadTick]);
+
+  // Sincronización intra‑pestaña (evento custom) y entre pestañas (evento storage)
+  useEffect(() => {
+    if (!weddingId) return;
+    const evtName = `lovenda-${weddingId}-${subName}`;
+    const onLocal = () => {
+      try {
+        // Evitar eco inmediato de nuestra propia escritura
+        const now = Date.now();
+        if (now - lastLocalWriteRef.current < 100) return;
+        const next = lsGet(weddingId, subName, data);
+        setData(Array.isArray(next) ? next : data);
+      } catch {}
+    };
+    const onStorage = (e) => {
+      try {
+        if (e.key !== localKey(weddingId, subName)) return;
+        const next = lsGet(weddingId, subName, data);
+        setData(Array.isArray(next) ? next : data);
+      } catch {}
+    };
+    window.addEventListener(evtName, onLocal);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(evtName, onLocal);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [weddingId, subName, data]);
 
   const addItem = useCallback(
     async (item) => {
@@ -249,8 +334,12 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
 
           const saved = { ...item, id: docRef.id };
           // Actualizamos estado local inmediatamente para feedback optimista
-          setData(prev => [...prev, saved]);
-          lsSet(weddingId, subName, [...data, saved]);
+          setData(prev => {
+            const next = [...prev, saved];
+            lastLocalWriteRef.current = Date.now();
+            lsSet(weddingId, subName, next);
+            return next;
+          });
 
           return saved;
         } catch (err) {
@@ -265,12 +354,15 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
       }
 
       const offlineItem = { ...item, id: item.id || Date.now() };
-      const next = [...data, offlineItem];
-      setData(next);
-      lsSet(weddingId, subName, next);
+      setData((prev) => {
+        const next = [...prev, offlineItem];
+        lastLocalWriteRef.current = Date.now();
+        lsSet(weddingId, subName, next);
+        return next;
+      });
       return offlineItem;
     },
-    [subName, weddingId, data]
+    [subName, weddingId]
   );
 
   const updateItem = useCallback(async (id, changes) => {
@@ -278,40 +370,52 @@ export const useWeddingCollection = (subName, weddingId, fallback = []) => {
       try {
         await updateDoc(doc(db, 'weddings', weddingId, ...subName.split('/'), id), changes);
         // Optimistic local update
-        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-        setData(next);
-        lsSet(weddingId, subName, next);
+        setData((prev) => {
+          const next = prev.map((d) => (d.id === id ? { ...d, ...changes } : d));
+          lastLocalWriteRef.current = Date.now();
+          lsSet(weddingId, subName, next);
+          return next;
+        });
         return;
       } catch (err) {
         console.warn('updateItem Firestore failed, usando localStorage:', err);
       }
     }
     if (!weddingId) console.warn('updateItem: sin weddingId activo; se guarda solo en localStorage');
-    const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-    setData(next);
-    lsSet(weddingId, subName, next);
-  }, [subName, weddingId, data]);
+    setData((prev) => {
+      const next = prev.map((d) => (d.id === id ? { ...d, ...changes } : d));
+      lastLocalWriteRef.current = Date.now();
+      lsSet(weddingId, subName, next);
+      return next;
+    });
+  }, [subName, weddingId]);
 
   const deleteItem = useCallback(async (id) => {
     if (weddingId) {
       try {
         await deleteDoc(doc(db, 'weddings', weddingId, ...subName.split('/'), id));
         // Optimistic local removal
-        const next = data.filter((d) => d.id !== id);
-        setData(next);
-        lsSet(weddingId, subName, next);
+        setData((prev) => {
+          const next = prev.filter((d) => d.id !== id);
+          lastLocalWriteRef.current = Date.now();
+          lsSet(weddingId, subName, next);
+          return next;
+        });
         return;
       } catch (err) {
         console.warn('deleteItem Firestore failed, usando localStorage:', err);
       }
     }
     if (!weddingId) console.warn('deleteItem: sin weddingId activo; se guarda solo en localStorage');
-    const next = data.filter((d) => d.id !== id);
-    setData(next);
-    lsSet(weddingId, subName, next);
-  }, [subName, weddingId, data]);
+    setData((prev) => {
+      const next = prev.filter((d) => d.id !== id);
+      lastLocalWriteRef.current = Date.now();
+      lsSet(weddingId, subName, next);
+      return next;
+    });
+  }, [subName, weddingId]);
 
-  return { data, loading, addItem, updateItem, deleteItem };
+  return { data, loading, error, reload, addItem, updateItem, deleteItem };
 };
 
 export default useWeddingCollection;

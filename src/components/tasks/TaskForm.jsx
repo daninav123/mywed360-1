@@ -31,6 +31,13 @@ const TaskForm = ({
             placeholder="Descripción" 
             className="w-full border rounded px-3 py-1" 
           />
+          <input 
+            name="assignee" 
+            onChange={handleChange} 
+            value={formData.assignee || ""} 
+            placeholder="Responsable (nombre o ID)" 
+            className="w-full border rounded px-3 py-1" 
+          />
           <select 
             name="category" 
             onChange={handleChange} 

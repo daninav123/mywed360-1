@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, ChevronDown, Check } from 'lucide-react';
-import { changeLanguage, getCurrentLanguage } from '../../i18n';
+import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
 
 // Selector de idioma con dropdown
 const LanguageSelector = ({
@@ -15,11 +15,7 @@ const LanguageSelector = ({
   const [isChanging, setIsChanging] = useState(false);
 
   const currentLanguage = getCurrentLanguage();
-  const availableLanguages = [
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' }
-  ];
+  const availableLanguages = getAvailableLanguages();
   const currentLang = availableLanguages.find((lang) => lang.code === currentLanguage) || availableLanguages[0];
 
   const handleLanguageChange = async (languageCode) => {

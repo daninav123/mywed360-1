@@ -10,8 +10,8 @@ import wh from '../utils/whDebug';
 import { ensureExtensionAvailable, sendBatchMessages, sendBroadcastMessages } from '../services/whatsappBridge';
 
 /**
- * Hook personalizado para gestión optimizada de invitados
- * Centraliza toda la lógica de invitados con performance mejorada
+ * Hook personalizado para gesti�n optimizada de invitados
+ * Centraliza toda la l�gica de invitados con performance mejorada
  */
 const useGuests = () => {
   // Manejo seguro del contexto de bodas
@@ -32,13 +32,13 @@ const useGuests = () => {
     return [
     { 
       id: 1, 
-      name: 'Ana García', 
+      name: 'Ana Garc�a', 
       email: 'ana@example.com',
       phone: '123456789', 
       address: 'Calle Sol 1', 
       companion: 1, 
       table: '5', 
-      response: 'Sí',
+      response: 'S�',
       status: 'confirmed',
       dietaryRestrictions: '',
       notes: '',
@@ -47,7 +47,7 @@ const useGuests = () => {
     },
     { 
       id: 2, 
-      name: 'Luis Martínez', 
+      name: 'Luis Mart�nez', 
       email: 'luis@example.com',
       phone: '987654321', 
       address: 'Av. Luna 3', 
@@ -56,14 +56,14 @@ const useGuests = () => {
       response: 'Pendiente',
       status: 'pending',
       dietaryRestrictions: 'Vegetariano',
-      notes: 'Llegará tarde a la ceremonia',
+      notes: 'Llegar� tarde a la ceremonia',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
   ];
   }, [allowSamples]);
 
-  // Usar datos de ejemplo solo si no hay boda activa y está habilitado allowSamples
+  // Usar datos de ejemplo solo si no hay boda activa y est� habilitado allowSamples
   const fallbackGuests = activeWedding ? [] : sampleGuests;
   
   // Debug: log para verificar activeWedding
@@ -72,20 +72,22 @@ const useGuests = () => {
     console.log('[useGuests] fallbackGuests length:', fallbackGuests.length);
   }, [activeWedding, fallbackGuests]);
   
-  // Hook de colección con datos optimizados
-  // Obtenemos loading de la colección y lo exponemos como isLoading
+  // Hook de colecci�n con datos optimizados
+  // Obtenemos loading de la colecci�n y lo exponemos como isLoading
   const {
     data: guests,
     addItem,
     updateItem,
     deleteItem,
     loading: collectionLoading,
-  } = useWeddingCollection('guests', activeWedding, fallbackGuests);
+    error: collectionError,
+    reload,
+  } = useWeddingCollection('guests', activeWedding, fallbackGuests, { orderBy: { field: 'createdAt', direction: 'desc' } });
 
   // Alias legible para el resto del hook/componentes
   const isLoading = collectionLoading;
 
-  // Estado de sincronización
+  // Estado de sincronizaci�n
   const [syncStatus, setSyncStatus] = useState(getSyncState());
   
   // Estado para filtros
@@ -96,13 +98,50 @@ const useGuests = () => {
     group: ''
   });
 
-  // Suscribirse a cambios en el estado de sincronización
+  // Lista filtrada memoizada seg�n filtros actuales
+  const filteredGuests = useMemo(() => {
+    try {
+      const term = (filters.search || '').trim().toLowerCase();
+      const status = String(filters.status || '').toLowerCase();
+      const table = String(filters.table || '').trim();
+      const group = String(filters.group || '').trim();
+      return guests.filter((g) => {
+        if (term) {
+          const haystack = [g.name, g.email, g.phone, g.address, g.notes]
+            .map((v) => (v ? String(v).toLowerCase() : ''))
+            .join(' ');
+          if (!haystack.includes(term)) return false;
+        }
+        if (status) {
+          const s = String(g.status || '').toLowerCase();
+          const r = String(g.response || '').toLowerCase();
+          if (status === 'confirmed' && !(s === 'confirmed' || s === 'accepted' || r === 's' || r === 's�' || r === 'si')) return false;
+          if (status === 'declined' && !(s === 'declined' || s === 'rejected' || r === 'no')) return false;
+          if (status === 'pending') {
+            const isPending = !(s === 'confirmed' || s === 'accepted' || s === 'declined' || s === 'rejected') && r !== 's' && r !== 's�' && r !== 'si' && r !== 'no';
+            if (!isPending) return false;
+          }
+        }
+        if (table) {
+          if (String(g.table || '').trim() !== table) return false;
+        }
+        if (group) {
+          if (String(g.group || g.companionGroupId || '').trim() !== group) return false;
+        }
+        return true;
+      });
+    } catch {
+      return guests;
+    }
+  }, [guests, filters]);
+
+  // Suscribirse a cambios en el estado de sincronizaci�n
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
     return () => unsubscribe();
   }, []);
 
-  // Sincronización con localStorage para compatibilidad
+  // Sincronizaci�n con localStorage para compatibilidad
   useEffect(() => {
     try {
       localStorage.setItem('lovendaGuests', JSON.stringify(guests));
@@ -122,7 +161,7 @@ const useGuests = () => {
     phoneClean: (str = '') => str.replace(/\s+/g, '').replace(/[^0-9+]/g, ''),
     getStatusLabel: (guest) => {
       if (guest.status) {
-        if (guest.status === 'confirmed') return 'Sí';
+        if (guest.status === 'confirmed') return 'S�';
         if (guest.status === 'declined') return 'No';
         return 'Pendiente';
       }
@@ -130,7 +169,7 @@ const useGuests = () => {
     }
   }), []);
 
-  // Estadísticas memoizadas
+  // Estad�sticas memoizadas
   const stats = useMemo(() => {
     const totalCompanions = guests.reduce((sum, g) => 
       sum + (parseInt(g.companion, 10) || 0), 0
@@ -140,10 +179,10 @@ const useGuests = () => {
       g.dietaryRestrictions && g.dietaryRestrictions.trim()
     ).length;
 
-    // Normalización de estados (UI/Backend)
+    // Normalizaci�n de estados (UI/Backend)
     const c2 = guests.filter(g => {
       const s = String(g.status || '').toLowerCase();
-      return s === 'confirmed' || s === 'accepted' || g.response === 'Sí' || g.response === 'S';
+      return s === 'confirmed' || s === 'accepted' || g.response === 'S�' || g.response === 'S';
     }).length;
     const d2 = guests.filter(g => {
       const s = String(g.status || '').toLowerCase();
@@ -166,7 +205,7 @@ const useGuests = () => {
     };
   }, [guests]);
 
-  // Funciones de gestión de invitados
+  // Funciones de gesti�n de invitados
   const addGuest = useCallback(async (guestData) => {
     try {
       const newGuest = {
@@ -180,7 +219,7 @@ const useGuests = () => {
       await addItem(newGuest);
       return { success: true, guest: newGuest };
     } catch (error) {
-      console.error('Error añadiendo invitado:', error);
+      console.error('Error a�adiendo invitado:', error);
       return { success: false, error: error.message };
     }
   }, [addItem]);
@@ -198,7 +237,7 @@ const useGuests = () => {
       
       await updateItem(guestId, updatedGuest);
 
-      // Si cambió la mesa y pertenece a un grupo, actualizar acompañantes
+      // Si cambi� la mesa y pertenece a un grupo, actualizar acompa�antes
       if (updatedGuest.table !== originalTable && updatedGuest.companionGroupId) {
         const companions = guests.filter(g => g.companionGroupId === updatedGuest.companionGroupId && g.id !== guestId);
         if (companions.length) {
@@ -224,11 +263,11 @@ const useGuests = () => {
     }
   }, [deleteItem]);
 
-  // Funciones de invitación
+  // Funciones de invitaci�n
   const inviteViaWhatsApp = useCallback(async (guest) => {
     const phone = utils.phoneClean(guest.phone);
     if (!phone) {
-      alert('El invitado no tiene número de teléfono');
+      alert('El invitado no tiene n�mero de tel�fono');
       return;
     }
 
@@ -244,22 +283,17 @@ const useGuests = () => {
     }
 
     const text = link
-      ? `Â¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-      : `Â¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
+      ? `�Hola ${guest.name}! Nos encantar�a contar contigo en nuestra boda. Confirma tu asistencia aqu�: ${link}`
+      : `�Hola ${guest.name}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`;
     const deeplink = waDeeplink(toE164Frontend(phone), text);
     window.open(deeplink, '_blank');
   }, [utils, activeWedding]);
 
-  // Envío por deeplink (móvil personal) a una selección
+  // Env�o por deeplink (m�vil personal) a una selecci�n
   const inviteSelectedWhatsAppDeeplink = useCallback(async (selectedIds = [], customMessage) => {
     const setIds = new Set(selectedIds || []);
     const targets = guests.filter(g => setIds.has(g.id) && utils.phoneClean(g.phone));
-    if (targets.length === 0) {
-      alert('No hay invitados seleccionados con teléfono válido');
-      return { success: true, opened: 0 };
-    }
-    let opened = 0;
-    for (const guest of targets) {
+    let opened = 0; for (const guest of targets) {
       try {
         let link = '';
         try {
@@ -268,20 +302,21 @@ const useGuests = () => {
         } catch {}
         const message = customMessage && customMessage.trim() ? customMessage : (
           link
-            ? `Â¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-            : `Â¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`
+            ? `�Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. Confirma tu asistencia aqu�: ${link}`
+            : `�Hola ${guest.name || ''}! Nos encantar�a contar contigo en nuestra boda. �Puedes confirmar tu asistencia?`
         );
         const phone = toE164Frontend(utils.phoneClean(guest.phone));
         const url = waDeeplink(phone, message);
         window.open(url, '_blank');
         opened++;
+
         await new Promise(r => setTimeout(r, 200));
       } catch {}
     }
     return { success: true, opened };
   }, [guests, utils, activeWedding]);
 
-  // Envío en una sola acción usando extensión (WhatsApp Web automation)
+  // Env�o a seleccionados usando la extensi�n (abre WhatsApp Web con mensajes preparados)
   const inviteSelectedWhatsAppViaExtension = useCallback(async (selectedIds = [], customMessage) => {
     const available = await ensureExtensionAvailable(1500);
     if (!available) {
@@ -290,36 +325,40 @@ const useGuests = () => {
     const idSet = new Set(selectedIds || []);
     const targets = guests.filter(g => idSet.has(g.id) && utils.phoneClean(g.phone));
     if (targets.length === 0) {
-      alert('No hay invitados seleccionados con teléfono válido');
       return { success: false, error: 'no-targets' };
     }
-    // Construir items con RSVP link cuando sea posible
+
     const items = [];
-    for (const g of targets) {
-      // Generar enlace RSVP si es posible
-      let link = '';
+    for (const guest of targets) {
       try {
-        const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
-        if (resp.ok) { const json = await resp.json(); link = json.link; }
+        // Intentar generar enlace RSVP del backend (opcional)
+        let link = '';
+        try {
+          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
+          if (resp.ok) {
+            const json = await resp.json();
+            link = json.link || '';
+          }
+        } catch {}
+
+        const msg = (customMessage && customMessage.trim())
+          ? customMessage
+          : (link
+            ? `Hola ${guest.name || ''}! Nos encantaria contar contigo en nuestra boda. Confirma tu asistencia aqui: ${link}`
+            : `Hola ${guest.name || ''}! Nos encantaria contar contigo en nuestra boda. Puedes confirmar tu asistencia?`);
+
+        const phone = toE164Frontend(utils.phoneClean(guest.phone));
+        if (!phone) continue;
+        items.push({ to: phone, message: msg });
       } catch {}
-      const message = (customMessage && customMessage.trim())
-        ? customMessage.trim()
-        : (link
-          ? `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-          : `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.`);
-      const to = toE164Frontend(g.phone);
-      if (to) items.push({ to, message, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
     }
-    if (!items.length) {
-      alert('Los seleccionados no tienen teléfonos válidos');
-      return { success: false, error: 'no-valid-phones' };
-    }
-    // Enviar lote a la extensión (rate limit suave en la extensión)
+
+    // Enviar lote a la extensi�n (rate limit suave en la extensi�n)
     const result = await sendBatchMessages(items, { rateLimitMs: 400 });
     return { success: true, ...result, count: items.length };
   }, [guests, utils, activeWedding]);
 
-  // Difusión (lista de difusión) â€” un solo mensaje para todos los seleccionados usando la extensión
+  // Difusi�n (lista de difusi�n) � un solo mensaje para todos los seleccionados usando la extensi�n
   const inviteSelectedWhatsAppBroadcastViaExtension = useCallback(async (selectedIds = [], customMessage) => {
     const available = await ensureExtensionAvailable(1500);
     if (!available) {
@@ -328,280 +367,72 @@ const useGuests = () => {
     const idSet = new Set(selectedIds || []);
     const targets = guests.filter(g => idSet.has(g.id) && utils.phoneClean(g.phone));
     if (targets.length === 0) {
-      alert('No hay invitados seleccionados con teléfono válido');
+      alert('No hay invitados seleccionados con telefono valido');
+      return { success: false, error: 'no-targets' };
+    }
+    const msg = (customMessage && customMessage.trim()) ? customMessage : 'Nos encantaria contar contigo en nuestra boda! Por favor, confirma tu asistencia.';
+    const numbers = targets.map(g => toE164Frontend(utils.phoneClean(g.phone))).filter(Boolean);
+    if (!numbers.length) return { success: false, error: 'no-valid-phones' };
+    const result = await sendBroadcastMessages(numbers, msg, { cleanup: true, rateLimitMs: 400 });
+    return { success: true, ...result, count: numbers.length };
+  }, [guests, utils, activeWedding]);
+
+    const available = await ensureExtensionAvailable(1500);
+    if (!available) {
+      return { success: false, notAvailable: true };
+    }
+    const idSet = new Set(selectedIds || []);
+    const targets = guests.filter(g => idSet.has(g.id) && utils.phoneClean(g.phone));
+    if (targets.length === 0) {
+      alert('No hay invitados seleccionados con tel�fono v�lido');
       return { success: false, error: 'no-targets' };
     }
     const msg = (customMessage && customMessage.trim())
       ? customMessage
-      : 'Â¡Nos encantaría contar contigo en nuestra boda! Por favor, confirma tu asistencia.';
-    const numbers = targets
-      .map(g => toE164Frontend(utils.phoneClean(g.phone)))
-      .filter(Boolean);
-    if (!numbers.length) return { success: false, error: 'no-valid-phones' };
-    const result = await sendBroadcastMessages(numbers, msg, { cleanup: true, rateLimitMs: 400 });
-    return { success: true, ...result, count: numbers.length };
-  }, [guests, utils]);
-
-  // Envío por API (número de la app) â€” invitado individual (flujo conversacional RSVP)
-  const inviteViaWhatsAppApi = useCallback(async (guest, customMessage) => {
-    // Pre-check provider configuration; fall back to deeplink if not ready
-    try {
-      const status = await getProviderStatus().catch(() => ({ configured: false }));
-      if (!status?.configured) {
-        const doFallback = window.confirm('El proveedor de WhatsApp API no está configurado o puede bloquear el primer contacto. ¿Quieres usar tu WhatsApp para este invitado?');
-        if (doFallback) {
-          try {
-            const phone = utils.phoneClean(guest.phone);
-            if (!phone) return { success: false, error: 'no-phone' };
-            let link = '';
-            try {
-              const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
-              if (resp.ok) { const json = await resp.json(); link = json.link; }
-            } catch {}
-            const messageFallback = (customMessage && customMessage.trim())
-              ? customMessage.trim()
-              : (link
-                ? `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-                : `¡Hola ${guest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`);
-            const deeplink = waDeeplink(toE164Frontend(phone), messageFallback);
-            window.open(deeplink, '_blank');
-            return { success: true, fallback: 'deeplink' };
-          } catch (e) {
-            return { success: false, error: e?.message || 'deeplink-error' };
-          }
-        }
-        return { success: false, cancelled: true };
-      }
-    } catch {}
-    const phone = utils.phoneClean(guest.phone);
-    if (!phone) {
-      alert('El invitado no tiene número de teléfono');
-      return { success: false, error: 'No phone' };
-    }
-
-    // Mensaje diseñado para flujo conversacional sin enlaces
-    const message = (customMessage && customMessage.trim())
-      ? customMessage.trim()
-      : renderInviteMessage(guest.name || '');
-
-    const to = toE164Frontend(phone);
-    const result = await sendWhatsAppText({
-      to,
-      message,
-      weddingId: activeWedding,
-      guestId: guest.id,
-      metadata: { guestName: guest.name || '', rsvpFlow: true },
-    });
-    if (!result.success) {
-      alert('Error enviando WhatsApp: ' + (result.error || 'desconocido'));
-    } else {
-      // Registrar fecha de último envío
-      try { await updateItem(guest.id, { lastWhatsAppSentAt: new Date().toISOString() }); } catch {}
-    }
-    return result;
-  }, [utils, activeWedding, updateItem]);
-
-  const inviteViaEmail = useCallback(async (guest) => {
-    if (!guest.email) {
-      alert('El invitado no tiene email');
-      return;
-    }
-
-    let link = '';
-    try {
-      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
-      if (resp.ok) {
-        const json = await resp.json();
-        link = json.link;
-      }
-    } catch (err) {
-      console.warn('No se pudo obtener enlace RSVP', err);
-    }
-
-    const subject = encodeURIComponent('Invitación a nuestra boda');
-    const bodyLines = [
-      `Hola ${guest.name},`,
-      '',
-      'Nos complace invitarte a nuestra boda y sería un honor contar con tu presencia.',
-      link ? `Confirma tu asistencia haciendo clic aquí: ${link}` : 'Por favor confirma tu asistencia respondiendo a este mensaje.',
-      '',
-      'Â¡Gracias!'
-    ];
-    const body = encodeURIComponent(bodyLines.join('\n'));
-
-    window.open(`mailto:${guest.email}?subject=${subject}&body=${body}`, '_blank');
-  }, []);
-
-  const bulkInviteWhatsApp = useCallback(async () => {
-    // Recordatorios solo a pendientes
-    const guestsWithPhone = guests.filter(g =>
-      (g.status === 'pending' || g.response === 'Pendiente') && utils.phoneClean(g.phone));
-    
-    if (guestsWithPhone.length === 0) {
-      alert('No hay invitados con número de teléfono');
-      return;
-    }
-    
-    // Eliminamos confirm para evitar cancelaciones inesperadas
-    for (const guest of guestsWithPhone) {
-      try {
-        // Generar enlace RSVP si hay API disponible
-        let rsvpLink = '';
-        try {
-          const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
-          if (resp.ok) {
-            const { link } = await resp.json();
-            rsvpLink = link;
-          }
-        } catch (err) {
-          console.warn('No se pudo generar enlace RSVP:', err);
-        }
-        
-        const message = rsvpLink 
-          ? `Â¡Hola ${guest.name}! Estamos encantados de invitarte a nuestra boda. Por favor confirma tu asistencia aquí: ${rsvpLink}`
-          : `Â¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
-        
-        const deeplink = waDeeplink(toE164Frontend(utils.phoneClean(guest.phone)), message);
-        window.open(deeplink, '_blank');
-        
-        // Registrar fecha de recordatorio
-        await updateItem(guest.id, { lastReminderAt: new Date().toISOString() });
-        // Pequeña pausa entre invitaciones
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error(`Error invitando a ${guest.name}:`, error);
-      }
-    }
-  }, [guests, utils]);
-
-  // Envío por API (número de la app) â€” masivo a pendientes
-  const bulkInviteWhatsAppApi = useCallback(async () => {
-    wh('Bulk API â€“ inicio');
-    const targets = guests.filter(g => (g.status === 'pending' || g.response === 'Pendiente') && utils.phoneClean(g.phone));
-    if (targets.length === 0) {
-      alert('No hay invitados pendientes con número de teléfono');
-      wh('Bulk API â€“ sin targets');
-      return;
-    }
-    // Eliminamos confirm para evitar cancelaciones inesperadas
-    let ok = 0, fail = 0;
-    for (const g of targets) {
-      try {
-        const r = await inviteViaWhatsAppApi(g);
-        if (r?.success) ok++; else fail++;
-        await new Promise(r => setTimeout(r, 400));
-      } catch { fail++; }
-    }
-    wh('Bulk API â€“ fin', { ok, fail, total: targets.length });
-    alert(`WhatsApp API â€“ Envíos completados. Éxitos: ${ok}, Fallos: ${fail}`);
-  }, [guests, utils, inviteViaWhatsAppApi]);
-
-  // Envío por API a una selección de invitados (selectedIds)
-  const inviteSelectedWhatsAppApi = useCallback(async (selectedIds = [], customMessage) => {
-    try {
-      // Pre-chequeo del proveedor para evitar intentos fallidos en bloque
-      const status = await getProviderStatus().catch(() => ({ configured: false }));
-      if (!status?.configured) {
-        const choice = window.confirm('El WhatsApp API no está configurado o puede bloquear el primer contacto. ¿Quieres usar tu WhatsApp (abre chats) para los seleccionados?');
-        if (choice) {
-          const r = await inviteSelectedWhatsAppDeeplink(selectedIds, customMessage);
-          return { success: true, opened: r?.opened || 0, mode: 'deeplink' };
-        }
-        return { success: false, cancelled: true };
-      }
-      wh('Selected API â€“ inicio', { selectedIdsLength: (selectedIds || []).length });
-      const setIds = new Set(selectedIds || []);
-      const targets = guests.filter(g => setIds.has(g.id) && utils.phoneClean(g.phone));
-      wh('Selected API â€“ targets', { count: targets.length });
-      if (targets.length === 0) {
-        alert('No hay invitados seleccionados con número de teléfono');
-        wh('Selected API â€“ sin targets');
-        return { success: true, ok: 0, fail: 0 };
-      }
-      // Eliminamos confirm para evitar cancelaciones inesperadas
-      let ok = 0, fail = 0;
-      for (const g of targets) {
-        try {
-          const r = await inviteViaWhatsAppApi(g, customMessage);
-          if (r?.success) ok++; else fail++;
-          await new Promise(r => setTimeout(r, 300));
-        } catch (err) {
-          wh('Selected API â€“ error invitado', { guestId: g?.id, error: String(err?.message || err) });
-          fail++;
-        }
-      }
-      wh('Selected API â€“ fin', { ok, fail });
-      return { success: true, ok, fail };
-    } catch (e) {
-      wh('Selected API â€“ exception', { error: String(e?.message || e) });
-      return { success: false, error: e?.message || 'error' };
-    }
-  }, [guests, utils, inviteViaWhatsAppApi]);
-
-  // Deeplink personalizado con mensaje proporcionado (para modal)
-  const inviteViaWhatsAppDeeplinkCustom = useCallback(async (guest, customMessage) => {
-    const phone = utils.phoneClean(guest.phone);
-    if (!phone) {
-      alert('El invitado no tiene número de teléfono');
-      return;
-    }
-    let link = '';
-    try {
-      const resp = await apiPost(`/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`, {}, { auth: true });
-      if (resp.ok) {
-        const json = await resp.json();
-        link = json.link;
-      }
-    } catch {}
-    const message = customMessage && customMessage.trim() ? customMessage : (
-      link
-        ? `Â¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-        : `Â¡Hola ${guest.name}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`
-    );
-    const deeplink = waDeeplink(toE164Frontend(phone), message);
-    window.open(deeplink, '_blank');
-  }, [utils, activeWedding]);
-
-  // Funciones de importación/exportación
-  const importFromContacts = useCallback(async () => {
-    if (!navigator.contacts || !navigator.contacts.select) {
-      alert('La API de contactos no está disponible en este navegador');
-      return;
-    }
-    
-    try {
-      const contacts = await navigator.contacts.select(
-        ['name', 'tel', 'email'], 
-        { multiple: true }
-      );
-      
-      const importedGuests = contacts.map(contact => ({
-        id: `imported-${Date.now()}-${Math.random()}`,
-        name: contact.name?.[0] || 'Sin nombre',
-        email: contact.email?.[0] || '',
-        phone: contact.tel?.[0] || '',
-        address: '',
-        companion: 0,
-        table: '',
-        response: 'Pendiente',
-        status: 'pending',
-        dietaryRestrictions: '',
-        notes: 'Importado desde contactos',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }));
-      
-      // Añadir todos los invitados importados
-      for (const guest of importedGuests) {
-        await addGuest(guest);
-      }
-      
-      alert(`Se importaron ${importedGuests.length} contactos exitosamente`);
-    } catch (error) {
-      console.error('Error importando contactos:', error);
-      alert('Error al importar contactos');
-    }
-  }, [addGuest]);
+      : '�Nos encantar�a contar contigo en nuestra boda! Por favor, confirma tu asistencia.';
+//
+//    const numbers = targets
+//      .map(g => toE164Frontend(utils.phoneClean(g.phone)))
+//      .filter(Boolean);
+//    if (!numbers.length) return { success: false, error: 'no-valid-phones' };
+//    const result = await sendBroadcastMessages(numbers, msg, { cleanup: true, rateLimitMs: 400 });
+//    return { success: true, ...result, count: numbers.length };
+//  }, [guests, utils, activeWedding]);
+//    }
+//    
+//    try {
+//      const contacts = await navigator.contacts.select(
+//        ['name', 'tel', 'email'], 
+//        { multiple: true }
+//      );
+//      
+//      const importedGuests = contacts.map(contact => ({
+//        id: `imported-${Date.now()}-${Math.random()}`,
+//        name: contact.name?.[0] || 'Sin nombre',
+//        email: contact.email?.[0] || '',
+//        phone: contact.tel?.[0] || '',
+//        address: '',
+//        companion: 0,
+//        table: '',
+//        response: 'Pendiente',
+//        status: 'pending',
+//        dietaryRestrictions: '',
+//        notes: 'Importado desde contactos',
+//        createdAt: new Date().toISOString(),
+//        updatedAt: new Date().toISOString()
+//      }));
+//      
+      // A�adir todos los invitados importados
+//      for (const guest of importedGuests) {
+//        await addGuest(guest);
+//      }
+//      
+//      alert(`Se importaron ${importedGuests.length} contactos exitosamente`);
+//    } catch (error) {
+//      console.error('Error importando contactos:', error);
+//      alert('Error al importar contactos');
+//    }
+//  }, [addGuest]);
 
   const exportToCSV = useCallback(() => {
     if (guests.length === 0) {
@@ -610,8 +441,8 @@ const useGuests = () => {
     }
     
     const headers = [
-      'Nombre', 'Email', 'Teléfono', 'Dirección', 'Estado', 
-      'Mesa', 'Acompañantes', 'Restricciones Dietéticas', 'Notas'
+      'Nombre', 'Email', 'Tel�fono', 'Direcci�n', 'Estado', 
+      'Mesa', 'Acompa�antes', 'Restricciones Diet�ticas', 'Notas'
     ];
     
     const csvContent = [
@@ -648,36 +479,35 @@ const useGuests = () => {
   }, []);
 
   const clearFilters = useCallback(() => {
-    setFilters({ search: '', status: '', table: '' });
+    setFilters({ search: '', status: '', table: '', group: '' });
   }, []);
 
   return {
     // Datos
     guests,
+    filteredGuests,
     stats,
     filters,
     syncStatus,
     isLoading,
+    error: collectionError,
+    reload,
     
-    // Funciones de gestión
+    // Funciones de gesti�n
     addGuest,
     updateGuest,
     removeGuest,
     
-    // Funciones de invitación
+    // Funciones de invitaci�n
     inviteViaWhatsApp,
     inviteViaWhatsAppApi,
-    inviteViaWhatsAppDeeplinkCustom,
-    inviteViaEmail,
-    bulkInviteWhatsApp,
     bulkInviteWhatsAppApi,
     inviteSelectedWhatsAppDeeplink,
     inviteSelectedWhatsAppViaExtension,
     inviteSelectedWhatsAppBroadcastViaExtension,
     inviteSelectedWhatsAppApi,
     
-    // Funciones de importación/exportación
-    importFromContacts,
+    // Funciones de importaci�n/exportaci�n
     exportToCSV,
     
     // Funciones de filtrado
@@ -690,6 +520,3 @@ const useGuests = () => {
 };
 
 export default useGuests;
-
-
-

@@ -306,7 +306,7 @@
         "env": "Define NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY and NORDIGEN_BASE_URL",
         "route": "Backend with /api/bank route deployed"
       },
-      "alternative": "Temporary alternative: import transactions manually from Finance Ã¢â€ â€™ Transactions Ã¢â€ â€™ \"Import Bank\".",
+      "alternative": "Temporary alternative: import transactions manually from Finance › Transactions › \"Import Bank\".",
       "requisition": "Requisition:",
       "checkStatus": "Check status",
       "availableAccounts": "Available accounts",

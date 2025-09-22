@@ -97,7 +97,12 @@ export const AuthProvider = ({ children }) => {
     if (loading) return;
     if (!userProfile) return;
     const { remindersEnabled = true, reminderDays = 3 } = userProfile.preferences || {};
-    if (remindersEnabled) {
+    // En desarrollo, desactivar recordatorios salvo que se fuerce por env
+    const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+    const isDev = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() !== 'production';
+    const enableFlag = /^true$/i.test(String(env?.VITE_ENABLE_REMINDERS || ''));
+    const shouldEnable = remindersEnabled && (enableFlag || !isDev);
+    if (shouldEnable) {
       initReminderService({ days: reminderDays, enabled: true });
     } else {
       stopReminderService();

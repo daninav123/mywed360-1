@@ -12,6 +12,7 @@ export default function Blog() {
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
   const observer = useRef();
   // LÃ­mites para evitar bucles de llamadas cuando el backend devuelve []
   const MAX_LOOKAHEAD = 10; // antes 60
@@ -30,6 +31,7 @@ export default function Blog() {
   useEffect(() => {
     async function load() {
       setLoading(true);
+      if (import.meta?.env?.DEV) console.info('[Blog] load start', { page, lang, existing: posts.length });
       let newPosts = [...posts];
       const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente mÃºltiplo de 10
       const domainCounts = {};
@@ -54,7 +56,7 @@ export default function Blog() {
       ) {
         let batch = [];
         try {
-          batch = await fetchWeddingNews(fetchPage, 50, lang);
+          batch = await fetchWeddingNews(fetchPage, 10, lang);
           consecutiveErrors = 0;
         } catch (err) {
           console.error(err);
@@ -101,7 +103,7 @@ export default function Blog() {
         ) {
           let batch = [];
           try {
-            batch = await fetchWeddingNews(fetchPage, 50, 'en');
+            batch = await fetchWeddingNews(fetchPage, 10, 'en');
             consecutiveErrors = 0;
           } catch (err) {
             console.error(err);
@@ -159,12 +161,26 @@ export default function Blog() {
 
       setPosts(newPosts);
       setLoading(false);
+      setAttempts((a) => a + 1);
+      if (import.meta?.env?.DEV) console.info('[Blog] load end', { added: newPosts.length - posts.length, total: newPosts.length });
     }
     load();
   }, [page]);
 
   return (
     <PageWrapper title="Blog" className="max-w-5xl mx-auto">
+      {!loading && attempts > 0 && posts.length === 0 && (
+        <div className="py-20 text-center text-muted">
+          <p className="mb-4">No hay noticias disponibles ahora mismo.</p>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => { setPage((p) => p + 1); }}
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
       {posts.map((p, idx) => (
         <ArticleCard key={p.url || p.id || idx} post={p} ref={idx === posts.length - 1 ? lastRef : null} />
       ))}

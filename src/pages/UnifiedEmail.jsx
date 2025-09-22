@@ -14,6 +14,11 @@ import { useWedding } from "../context/WeddingContext";
 import useWeddingCollection from "../hooks/useWeddingCollection";
 import EmailInsights from "../components/EmailInsights";
 import sanitizeHtml from "../utils/sanitizeHtml";
+import EmailComposeModal from "../components/email/ComposeModal";
+import Avatar from "../components/email/Avatar";
+import ChipToggle from "../components/email/ChipToggle";
+import MailListComponent from "../components/email/MailList";
+import MailViewerComponent from "../components/email/MailViewer";
 import { getUserFolders, assignEmailToFolder, createFolder, renameFolder, deleteFolder, getEmailsInFolder } from "../services/folderService";
 import { getEmailTagsDetails, getUserTags, createTag, addTagToEmail, getEmailsByTag, removeTagFromEmail } from "../services/tagService";
 
@@ -403,7 +408,7 @@ const UnifiedEmail = () => {
               }}>Borrar</Button>
             </div>
           </div>
-          <MailList
+          <MailListComponent
             emails={filteredEmails}
             onSelect={setSelected}
             selected={selected}
@@ -435,7 +440,7 @@ const UnifiedEmail = () => {
         {/* Visor del correo */}
         <main className="flex-1 p-6">
           {selected ? (
-            <MailViewer
+            <MailViewerComponent
               mail={selected}
               onMarkRead={handleMarkRead}
               onDelete={handleDelete}
@@ -454,7 +459,7 @@ const UnifiedEmail = () => {
 
       {/* Modal de redactar */}
       {showCompose && (
-        <ComposeModal onClose={() => setShowCompose(false)} from={myEmail} userId={userId} initial={composeInitial || {}} />
+        <EmailComposeModal onClose={() => setShowCompose(false)} from={myEmail} userId={userId} initial={composeInitial || {}} />
       )}
     </div>
   );
@@ -904,24 +909,7 @@ const formatDateShort = (d) => {
   return dt.toLocaleDateString();
 };
 
-const Avatar = ({ email, unread }) => {
-  const ch = (email || '?').trim()[0]?.toUpperCase() || '?';
-  return (
-    <div className={`flex h-8 w-8 items-center justify-center rounded-full ${unread ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>
-      <span className="text-xs font-semibold">{ch}</span>
-    </div>
-  );
-};
-
-const ChipToggle = ({ active, onClick, label }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`rounded-full border px-2.5 py-1 text-xs ${active ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
-  >
-    {label}
-  </button>
-);
+// Avatar y ChipToggle se han extraído a componentes reutilizables
 
 
 

@@ -11,6 +11,31 @@ if (!fs.existsSync(logsDir)) {
 // Configuración de Winston para mostrar los logs en consola y guardarlos en archivo
 const { combine, timestamp, colorize, printf, errors, json } = winston.format;
 
+const redactEnabled = String(process.env.LOG_REDACT || '').toLowerCase() === 'true' || process.env.LOG_REDACT === '1';
+
+function redactText(s) {
+  try {
+    let t = String(s || '');
+    // Emails
+    t = t.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[REDACTED_EMAIL]');
+    // Phone-like sequences
+    t = t.replace(/\+?\d[\d\s\-().]{6,}\d/g, '[REDACTED_PHONE]');
+    // Bearer/API tokens
+    t = t.replace(/Bearer\s+[A-Za-z0-9\-._~+/]+=*/g, 'Bearer [REDACTED_TOKEN]');
+    return t;
+  } catch {
+    return s;
+  }
+}
+
+const redactFormat = winston.format((info) => {
+  if (!redactEnabled) return info;
+  const out = { ...info };
+  if (typeof out.message === 'string') out.message = redactText(out.message);
+  if (typeof out.stack === 'string') out.stack = redactText(out.stack);
+  return out;
+});
+
 const humanFormat = printf(({ level, message, timestamp, stack }) => {
   return `${timestamp} ${level}: ${stack || message}`;
 });
@@ -19,7 +44,8 @@ const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: combine(
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    errors({ stack: true }) // Incluye stack trace en errores
+    errors({ stack: true }), // Incluye stack trace en errores
+    redactFormat()
   ),
   transports: [
     // Consola con colores, para ver en tiempo real en CMD/PowerShell

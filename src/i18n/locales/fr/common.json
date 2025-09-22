@@ -306,7 +306,7 @@
         "env": "DÒ©finir NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY et NORDIGEN_BASE_URL",
         "route": "Backend avec la route /api/bank dÒ©ployÒ©e"
       },
-      "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances Ã¢â€ â€™ Transactions Ã¢â€ â€™ \"Importer Banque\".",
+      "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances › Transactions › \"Importer Banque\".",
       "requisition": "RÒ©quisition :",
       "checkStatus": "VÒ©rifier l'Ò©tat",
       "availableAccounts": "Comptes disponibles",
@@ -484,7 +484,7 @@
     "markAsUnread": "Marquer comme non lu",
     "subject": "Objet",
     "from": "De",
-    "to": "Ãƒâ‚¬",
+    "to": "À",
     "cc": "CC",
     "bcc": "CCI",
     "attachments": "PiÒ¨ces jointes",

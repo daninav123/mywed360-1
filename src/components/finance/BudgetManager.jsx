@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, Button } from '../ui';
 import { Plus, Edit3, Trash2, AlertTriangle, Target } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -70,7 +70,7 @@ export default function BudgetManager({
         <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>{t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}</Button>
       </div>
 
-      <Card className="p-6">
+      <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-primary)]/15 rounded-full mx-auto mb-3"><Target className="w-6 h-6 text-[var(--color-primary)]" /></div>
@@ -116,7 +116,7 @@ export default function BudgetManager({
         </div>
       </Card>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10"><h3 className="text-lg font-medium text-[color:var(--color-text)]">{t('finance.budget.categoriesTitle', { defaultValue: 'Categorías de presupuesto' })}</h3></div>
         {budgetUsage.length === 0 ? (
           <div className="p-8 text-center">
@@ -139,7 +139,7 @@ export default function BudgetManager({
                       <input type="checkbox" checked={Boolean(category.muted)} onChange={(e)=> onUpdateCategory(index, { muted: e.target.checked })} />
                       Silenciar alertas
                     </label>
-                    <button aria-label="Editar categoria" onClick={() => handleEditCategory(category, index)} className="text-[var(--color-primary)] hover:brightness-110 p-1"><Edit3 size={16} /></button>
+                    <button aria-label="Editar categoría" onClick={() => handleEditCategory(category, index)} className="text-[var(--color-primary)] hover:brightness-110 p-1"><Edit3 size={16} /></button>
                     <button aria-label="Eliminar categoria" onClick={() => handleDeleteCategory(index, category.name)} className="text-[color:var(--color-danger)] hover:brightness-110 p-1"><Trash2 size={16} /></button>
                   </div>
                 </div>
@@ -188,5 +188,6 @@ export default function BudgetManager({
     </div>
   );
 }
+
 
 

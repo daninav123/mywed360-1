@@ -4,6 +4,8 @@ import { Plus, Download, Eye, ChevronDown, ChevronUp, FileText } from 'lucide-re
 import Toast from '../components/Toast';
 import PageWrapper from '../components/PageWrapper';
 import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import BaseModal from '../components/ui/BaseModal';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFiles } from '../services/storageUploadService';
 import { useProveedores } from '../hooks/useProveedores';
@@ -22,7 +24,7 @@ export default function Contratos() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [toast, setToast] = useState(null);
-  const initialContract = { provider: '', type: 'Generico', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
+  const initialContract = { provider: '', type: 'Genérico', signedDate: '', serviceDate: '', status: '', docUrl: '', docFile: null };
   const [newContract, setNewContract] = useState(initialContract);
   const [editContract, setEditContract] = useState(initialContract);
   const [showPdfModal, setShowPdfModal] = useState(false);
@@ -202,19 +204,19 @@ export default function Contratos() {
     <>
       <button
         onClick={() => setShowAddModal(true)}
-        className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+        className="flex items-center"
       >
         <Plus size={16} className="mr-2" /> Añadir Contrato
       </button>
       <button
         onClick={() => setShowGenericModal(true)}
-        className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
+        className="flex items-center"
       >
         <FileText size={16} className="mr-2" /> Generar contratos
       </button>
       <button
         onClick={exportSelected}
-        className="bg-gray-200 px-4 py-2 rounded flex items-center"
+        className="flex items-center"
       >
         <Download size={16} className="mr-2" /> Exportar Seleccionados
       </button>
@@ -233,7 +235,7 @@ export default function Contratos() {
         )}
         
           
-          <div className="flex gap-2">
+          <div className="hidden">
             <button
               onClick={() => setShowAddModal(true)}
               className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
@@ -256,8 +258,8 @@ export default function Contratos() {
         {/* Escritorio */}
         <div className="hidden md:block overflow-auto">
           <table className="w-full table-auto">
-            <thead>
-              <tr className="bg-gray-50">
+            <thead className="bg-[color:var(--color-text)]/5">
+              <tr>
                 <th className="p-2">
                   <input
                     type="checkbox"
@@ -271,7 +273,7 @@ export default function Contratos() {
                 <th className="p-2">Fecha de firma</th>
                 <th className="p-2">Fecha de servicio</th>
                 <th className="p-2">Estado</th>
-                <th className="p-2">documento</th>
+                <th className="p-2">Documento</th>
                 <th className="p-2">Acciones</th>
               </tr>
             </thead>
@@ -279,7 +281,7 @@ export default function Contratos() {
               {contracts.map(c => (
                 <tr
                   key={c.id}
-                  className={`${isNearExpiry(c.serviceDate) ? 'bg-yellow-100' : ''} border-b`}
+                  className={`${isNearExpiry(c.serviceDate) ? 'bg-[var(--color-warning)]/20' : ''} border-b border-[color:var(--color-text)]/10`}
                 >
                   <td className="p-2">
                     <input
@@ -290,8 +292,8 @@ export default function Contratos() {
                   </td>
                   <td className="p-2">
                     <div className="flex gap-2">
-                      <button className="px-2 py-1 border rounded" onClick={() => { setEditContract(c); setShowEditModal(true); }}>Editar</button>
-                      <button className="px-2 py-1 border rounded" onClick={async () => {
+                      <button className="px-2 py-1 border rounded bg-transparent" onClick={() => { setEditContract(c); setShowEditModal(true); }}>Editar</button>
+                      <button className="px-2 py-1 border rounded bg-transparent" onClick={async () => {
                         const clone = { ...c, id: `ct${Date.now()}` };
                         await addContract(clone);
                         setToast({ message: 'Contrato duplicado', type: 'success' });
@@ -309,13 +311,13 @@ export default function Contratos() {
                         href={c.docUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center text-blue-600"
+                        className="flex items-center text-[var(--color-primary)]"
                       >
                         <Eye size={16} className="mr-1" /> Ver
                       </a>
                       {c.docUrl && c.docUrl.toLowerCase().includes('.pdf') && (
                         <button
-                          className="px-2 py-1 border rounded text-xs"
+                          className="px-2 py-1 border rounded text-xs bg-transparent"
                           onClick={()=>{ setPdfUrl(c.docUrl); setShowPdfModal(true); }}
                         >Abrir</button>
                       )}
@@ -341,7 +343,7 @@ export default function Contratos() {
       </Card>
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="hidden">
           <div className="bg-white p-6 rounded shadow w-96">
             <h2 className="text-xl font-semibold mb-4">Añadir Contrato</h2>
             <form onSubmit={handleAddContract} className="space-y-3">
@@ -406,7 +408,7 @@ export default function Contratos() {
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="hidden">
           <div className="bg-white p-6 rounded shadow w-96">
             <h2 className="text-xl font-semibold mb-4">Editar Contrato</h2>
             <form onSubmit={async (e)=>{ e.preventDefault(); await updateContract(editContract.id, editContract); setShowEditModal(false); setToast({ message: 'Contrato actualizado', type: 'success' }); }} className="space-y-3">
@@ -429,7 +431,7 @@ export default function Contratos() {
       )}
 
       {showGenericModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="hidden">
           <div className="bg-white p-6 rounded shadow w-[90vw] max-w-3xl">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <FileText size={18} className="mr-2" /> Generar contratos genéricos
@@ -559,7 +561,7 @@ export default function Contratos() {
       )}
 
       {showPdfModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div className="hidden">
           <div className="bg-white rounded shadow-lg w-[90vw] max-w-3xl h-[85vh] relative">
             <div className="flex items-center justify-between p-3 border-b">
               <div className="font-semibold">Documento</div>
@@ -578,13 +580,13 @@ export default function Contratos() {
 function ContractItem({ contract, isSelected, onToggle }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border rounded p-4">
+    <div className="border border-[color:var(--color-text)]/15 rounded p-4 bg-[var(--color-surface)]">
       <div className="flex justify-between items-center">
         <div>
           <p className="font-semibold">{contract.provider}</p>
-          <p className="text-sm text-gray-600">{contract.type} - {contract.status}</p>
+          <p className="text-sm text-[color:var(--color-text)]/60">{contract.type} - {contract.status}</p>
         </div>
-        <button onClick={() => setOpen(v => !v)}>
+        <button className="px-2 py-1 rounded bg-transparent" onClick={() => setOpen(v => !v)}>
           {open ? <ChevronUp /> : <ChevronDown />}
         </button>
       </div>
@@ -592,7 +594,7 @@ function ContractItem({ contract, isSelected, onToggle }) {
         <div className="mt-2 space-y-2">
           <p>Fecha de firma: {contract.signedDate}</p>
           <p>Fecha de servicio: {contract.serviceDate}</p>
-          <a href={contract.docUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600">
+          <a href={contract.docUrl} target="_blank" rel="noopener noreferrer" className="flex items-center text-[var(--color-primary)]">
             <Eye size={16} className="mr-1" /> Ver documento
           </a>
           <div>
@@ -600,6 +602,168 @@ function ContractItem({ contract, isSelected, onToggle }) {
           </div>
         </div>
       )}
+
+      {/* Modales con estilo unificado */}
+      <BaseModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Añadir Contrato"
+        size="md"
+        footer={(
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowAddModal(false)}>Cancelar</Button>
+            <Button form="add-contract-form" type="submit">Guardar</Button>
+          </div>
+        )}
+      >
+        <form id="add-contract-form" onSubmit={handleAddContract} className="space-y-3">
+          <input type="text" placeholder="Proveedor" value={newContract.provider} onChange={e => setNewContract({ ...newContract, provider: e.target.value })} className="w-full" required />
+          <input type="text" placeholder="Tipo de contrato" value={newContract.type} onChange={e => setNewContract({ ...newContract, type: e.target.value })} className="w-full" required />
+          <input type="date" value={newContract.signedDate} onChange={e => setNewContract({ ...newContract, signedDate: e.target.value })} className="w-full" required />
+          <input type="date" value={newContract.serviceDate} onChange={e => setNewContract({ ...newContract, serviceDate: e.target.value })} className="w-full" required />
+          <select value={newContract.status} onChange={e => setNewContract({ ...newContract, status: e.target.value })} className="w-full">
+            <option value="">Seleccionar estado</option>
+            <option value="Vigente">Vigente</option>
+            <option value="Expirado">Expirado</option>
+          </select>
+          <div>
+            <label className="block mb-1">Documento</label>
+            <input type="file" accept=".pdf,.doc,.docx" onChange={e => { const file = e.target.files[0]; setNewContract({ ...newContract, docFile: file, docUrl: file ? URL.createObjectURL(file) : '' }); }} className="w-full" />
+          </div>
+        </form>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Editar Contrato"
+        size="md"
+        footer={(
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancelar</Button>
+            <Button form="edit-contract-form" type="submit">Guardar cambios</Button>
+          </div>
+        )}
+      >
+        <form id="edit-contract-form" onSubmit={async (e)=>{ e.preventDefault(); await updateContract(editContract.id, editContract); setShowEditModal(false); setToast({ message: 'Contrato actualizado', type: 'success' }); }} className="space-y-3">
+          <input type="text" placeholder="Proveedor" value={editContract.provider} onChange={e=>setEditContract({ ...editContract, provider: e.target.value })} className="w-full" required />
+          <input type="text" placeholder="Tipo de contrato" value={editContract.type} onChange={e=>setEditContract({ ...editContract, type: e.target.value })} className="w-full" required />
+          <input type="date" value={editContract.signedDate} onChange={e=>setEditContract({ ...editContract, signedDate: e.target.value })} className="w-full" required />
+          <input type="date" value={editContract.serviceDate} onChange={e=>setEditContract({ ...editContract, serviceDate: e.target.value })} className="w-full" required />
+          <select value={editContract.status} onChange={e=>setEditContract({ ...editContract, status: e.target.value })} className="w-full">
+            <option value="Vigente">Vigente</option>
+            <option value="Expirado">Expirado</option>
+            <option value="Señal pagada">Señal pagada</option>
+          </select>
+        </form>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={showGenericModal}
+        onClose={() => setShowGenericModal(false)}
+        title={(<span className="flex items-center"><FileText size={18} className="mr-2" /> Generar contratos genéricos</span>)}
+        size="xl"
+        footer={(
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setShowGenericModal(false)}>Cancelar</Button>
+            <Button form="generate-contracts-form" type="submit">Generar</Button>
+          </div>
+        )}
+      >
+        <form id="generate-contracts-form" onSubmit={handleGenerateGenericContracts} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block mb-1 text-sm font-medium">Tipo de contrato</label>
+              <input type="text" value={genericForm.type} onChange={e => setGenericForm({ ...genericForm, type: e.target.value })} className="w-full" placeholder="Genérico / Catering / Foto..." />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium">Plantilla legal</label>
+              <select value={genericForm.templateId} onChange={e => setGenericForm({ ...genericForm, templateId: e.target.value })} className="w-full">
+                {contractTemplates.map(t => (<option key={t.id} value={t.id}>{t.name}</option>))}
+              </select>
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium">Estado</label>
+              <select value={genericForm.status} onChange={e => setGenericForm({ ...genericForm, status: e.target.value })} className="w-full">
+                <option value="Vigente">Vigente</option>
+                <option value="Expirado">Expirado</option>
+                <option value="Señal pagada">Señal pagada</option>
+              </select>
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium">Fecha de firma</label>
+              <input type="date" value={genericForm.signedDate} onChange={e => setGenericForm({ ...genericForm, signedDate: e.target.value })} className="w-full" />
+            </div>
+            <div>
+              <label className="block mb-1 text-sm font-medium">Fecha de servicio</label>
+              <input type="date" value={genericForm.serviceDate} onChange={e => setGenericForm({ ...genericForm, serviceDate: e.target.value })} className="w-full" />
+            </div>
+          </div>
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={attachBaseDoc} onChange={e => setAttachBaseDoc(e.target.checked)} />
+            Adjuntar documento base de la plantilla
+          </label>
+          <div>
+            <h3 className="text-sm font-medium mb-2">Variables de plantilla</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {__customVars.length ? (
+                __customVars.map((k) => (
+                  <div key={k}>
+                    <label className="block mb-1 text-xs text-[color:var(--color-text)]/60">{k}</label>
+                    <input type="text" value={variableValues[k] || ''} onChange={e => setVariableValues({ ...variableValues, [k]: e.target.value })} className="w-full" />
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-[color:var(--color-text)]/60">No hay variables adicionales en la plantilla.</div>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-sm font-medium">Previsualización</label>
+              <button type="button" className="text-xs px-2 py-1 border rounded bg-transparent" onClick={() => { try { navigator.clipboard?.writeText(previewContent); setToast({ message: 'Copiado', type: 'success' }); } catch(_){} }}>Copiar</button>
+            </div>
+            <div className="border border-[color:var(--color-text)]/15 rounded p-2 bg-[var(--color-surface)] whitespace-pre-wrap text-sm font-mono max-h-56 overflow-auto">{previewContent || '...'}</div>
+          </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium">Selecciona proveedores</label>
+            <div className="border border-[color:var(--color-text)]/15 rounded max-h-64 overflow-auto divide-y divide-[color:var(--color-text)]/10">
+              {providersLoading ? (
+                <div className="p-3 text-sm text-[color:var(--color-text)]/60">Cargando proveedores...</div>
+              ) : providers.length ? (
+                providers.map(p => (
+                  <label key={p.id} className="flex items-center gap-3 p-2">
+                    <input type="checkbox" checked={selectedProvidersForGen.includes(p.id)} onChange={() => toggleProviderForGen(p.id)} />
+                    <div>
+                      <div className="font-medium">{p.name || 'Proveedor'}</div>
+                      <div className="text-xs text-[color:var(--color-text)]/60">{p.service || 'Servicio'}</div>
+                    </div>
+                  </label>
+                ))
+              ) : (
+                <div className="p-3 text-sm text-[color:var(--color-text)]/60">No hay proveedores disponibles.</div>
+              )}
+            </div>
+          </div>
+        </form>
+      </BaseModal>
+
+      <BaseModal
+        isOpen={showPdfModal}
+        onClose={()=> setShowPdfModal(false)}
+        title="Documento"
+        size="xl"
+        scrollable={false}
+        footer={(
+          <div className="flex justify-end">
+            <Button variant="secondary" onClick={()=> setShowPdfModal(false)}>Cerrar</Button>
+          </div>
+        )}
+      >
+        <div className="w-full" style={{ height: '70vh' }}>
+          <iframe title="PDF" src={pdfUrl} className="w-full h-full" />
+        </div>
+      </BaseModal>
     </div>
   );
 }

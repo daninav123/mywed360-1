@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import logger from '../logger.js';
 import { db } from '../db.js';
 import admin from 'firebase-admin';
+import { Buffer } from 'buffer';
 
 // Asegura que variables estén disponibles
 dotenv.config();
@@ -17,17 +18,21 @@ function verifyMailgunSignature(signingKey, timestamp, token, signature) {
     // Protección contra replay (15 minutos)
     const now = Math.floor(Date.now() / 1000);
     const ts = parseInt(timestamp, 10);
-    if (Number.isFinite(ts) && Math.abs(now - ts) > 15 * 60) {
-      logger.warn('Webhook Mailgun: timestamp fuera de ventana (posible replay)');
-      // no rechazamos por sólo timestamp, pero lo marcamos
-    }
+    if (!Number.isFinite(ts)) return false;
+    const tooOld = Math.abs(now - ts) > 15 * 60;
 
     const hmac = crypto
       .createHmac('sha256', signingKey)
       .update(timestamp + token)
       .digest('hex');
 
-    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signature));
+    const sigValid = crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signature));
+    if (!sigValid) return false;
+    if (tooOld) {
+      logger.warn('Webhook Mailgun: firma válida pero fuera de ventana (replay)');
+      return false;
+    }
+    return true;
   } catch (e) {
     logger.error('Error verificando firma de Mailgun:', e);
     return false;
@@ -38,6 +43,26 @@ function verifyMailgunSignature(signingKey, timestamp, token, signature) {
 // También podría enviar form-urlencoded en algunos casos. Ya tenemos urlencoded/json habilitados en index.js
 router.post('/', async (req, res) => {
   try {
+    // Validar tipo de contenido permitido
+    const ct = String(req.headers['content-type'] || '').toLowerCase();
+    if (ct && !(ct.includes('application/json') || ct.includes('application/x-www-form-urlencoded'))) {
+      return res.status(415).json({ success: false, message: 'Unsupported content type' });
+    }
+
+    // Límite de tamaño específico de webhook (aproximado sobre body ya parseado)
+    const maxBytes = Number(process.env.WEBHOOK_MAX_BYTES || 262144); // 256KB por defecto
+    let approxSize = 0;
+    try {
+      if (req.body) {
+        approxSize = Buffer.byteLength(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+      } else {
+        approxSize = Number(req.headers['content-length'] || 0);
+      }
+    } catch {}
+    if (Number.isFinite(maxBytes) && approxSize > maxBytes) {
+      return res.status(413).json({ success: false, message: 'Payload too large' });
+    }
+
     const signingKey = process.env.MAILGUN_SIGNING_KEY;
 
     // Intentar extraer firma de body JSON (event-data)

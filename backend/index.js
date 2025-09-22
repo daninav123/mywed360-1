@@ -20,7 +20,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import compression from 'compression';
 import axios from 'axios';
+import { http, requestWithRetry } from './utils/http.js';
 import { randomUUID } from 'crypto';
 // Importar middleware de autenticación (ESM) - debe cargarse antes que las rutas para inicializar Firebase Admin correctamente
 import {
@@ -77,6 +79,9 @@ import spotifyRouter from './routes/spotify.js';
 import playbackRouter from './routes/playback.js';
 import bankRouter from './routes/bank.js';
 import emailActionsRouter from './routes/email-actions.js';
+import weddingsRouter from './routes/weddings.js';
+import { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } from './config.js';
+import ipAllowlist from './middleware/ipAllowlist.js';
 
 
 // Load environment variables (root .env)
@@ -97,29 +102,38 @@ if (!process.env.OPENAI_API_KEY) {
   console.warn('[env] OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
 }
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 4004; // Render inyecta PORT, 4004 por defecto para desarrollo local
+// Puerto desde config centralizada (Render inyecta PORT)
+// const PORT = process.env.PORT ? Number(process.env.PORT) : 4004;
 
 const app = express();
 // Detrás de proxy (Render) para que express-rate-limit use la IP correcta
 app.set('trust proxy', 1);
 
+// Timeout de red por defecto (evita cuelgues con integraciones externas)
+try { axios.defaults.timeout = Number(process.env.AXIOS_TIMEOUT_MS || 10000); } catch {}
+
+// Compresión HTTP (gzip/br) para respuestas
+app.use(compression());
+
 // Seguridad básica
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
+  referrerPolicy: { policy: 'no-referrer' },
 }));
 
 // Configurar CORS por allowlist (coma-separado)
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'http://localhost:5173';
-const ALLOWED_ORIGINS = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    // log denegación sin detalles sensibles
+    try { logger.warn(`[CORS] Origin no permitido: ${origin || 'n/a'}`); } catch {}
     return cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: CORS_EXPOSE_HEADERS,
   optionsSuccessStatus: 204
 }));
 
@@ -137,13 +151,10 @@ app.options('*', cors({
 }));
 
 // Rate limiting: por defecto 120/min en producción, 0 en otros entornos (puede sobreescribirse con RATE_LIMIT_AI_MAX)
-const AI_RATE_LIMIT_MAX = process.env.RATE_LIMIT_AI_MAX
-  ? Number(process.env.RATE_LIMIT_AI_MAX)
-  : (process.env.NODE_ENV === 'production' ? 60 : 0);
-if (AI_RATE_LIMIT_MAX > 0) {
+if (RATE_LIMIT_AI_MAX > 0) {
   const aiLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: AI_RATE_LIMIT_MAX,
+    max: RATE_LIMIT_AI_MAX,
     standardHeaders: true,
     legacyHeaders: false,
     // Limitar por usuario autenticado (uid); fallback a IP
@@ -160,6 +171,27 @@ if (AI_RATE_LIMIT_MAX > 0) {
   app.use('/api/ai', aiLimiter);
   app.use('/api/ai-image', aiLimiter);
   app.use('/api/ai-suppliers', aiLimiter);
+}
+
+// Rate limit global opcional (excluye health/metrics/vitals)
+if (RATE_LIMIT_GLOBAL_MAX > 0) {
+  const globalLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: RATE_LIMIT_GLOBAL_MAX,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req) => {
+      const p = req.path || '';
+      return p.startsWith('/api/health') || p.startsWith('/api/web-vitals') || p.startsWith('/metrics');
+    },
+    keyGenerator: (req, _res) => {
+      try { if (req?.user?.uid) return `uid:${req.user.uid}`; } catch {}
+      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      return `ip:${ip}`;
+    },
+    message: { success: false, error: { code: 'rate_limit', message: 'Too many requests' } },
+  });
+  app.use('/api', globalLimiter);
 }
 
 // Middleware de correlación: X-Request-ID en cada petición
@@ -182,6 +214,8 @@ let metrics = {
   registry: null,
   httpRequestsTotal: null,
   httpRequestDuration: null,
+  httpErrorsTotal: null,
+  httpResponseSize: null,
 };
 
 async function ensureMetrics() {
@@ -204,7 +238,21 @@ async function ensureMetrics() {
       buckets: [0.05, 0.1, 0.2, 0.5, 1, 2, 5],
       registers: [registry],
     });
-    metrics = { loaded: true, prom, registry, httpRequestsTotal, httpRequestDuration };
+    const httpErrorsTotal = new prom.Counter({
+      name: 'http_errors_total',
+      help: 'Total de respuestas de error (>=400)',
+      labelNames: ['method', 'route', 'status_class'],
+      registers: [registry],
+    });
+    const httpResponseSize = new prom.Histogram({
+      name: 'http_response_size_bytes',
+      help: 'Tamaño de respuesta en bytes',
+      labelNames: ['method', 'route', 'status'],
+      buckets: [512, 1024, 4096, 16384, 65536, 262144, 1048576, 4194304],
+      registers: [registry],
+    });
+
+    metrics = { loaded: true, prom, registry, httpRequestsTotal, httpRequestDuration, httpErrorsTotal, httpResponseSize };
   } catch (e) {
     // prom-client no está instalado; se omite sin romper
     metrics.loaded = false;
@@ -225,6 +273,20 @@ app.use((req, res, next) => {
       const status = String(res.statusCode || 0);
       metrics.httpRequestsTotal.labels(method, route, status).inc(1);
       metrics.httpRequestDuration.labels(method, route, status).observe(durationSec);
+      // errores por clase
+      const sc = Number(res.statusCode || 0);
+      if (sc >= 400) {
+        const cls = sc >= 500 ? '5xx' : '4xx';
+        metrics.httpErrorsTotal.labels(method, route, cls).inc(1);
+      }
+      // tamaño de respuesta
+      try {
+        const lenHeader = res.getHeader('Content-Length');
+        const bytes = typeof lenHeader === 'string' ? parseInt(lenHeader, 10) : (typeof lenHeader === 'number' ? lenHeader : 0);
+        if (Number.isFinite(bytes) && bytes >= 0) {
+          metrics.httpResponseSize.labels(method, route, status).observe(bytes);
+        }
+      } catch {}
     } catch {}
   });
   next();
@@ -237,7 +299,7 @@ app.use((req, _res, next) => {
 });
 
 // Para que Mailgun (form-urlencoded) sea aceptado
-app.use(express.urlencoded({ extended: true, limit: process.env.BODY_URLENCODED_LIMIT || '2mb' }));
+app.use(express.urlencoded({ extended: true, parameterLimit: Number(process.env.BODY_PARAMETER_LIMIT || '1000'), limit: process.env.BODY_URLENCODED_LIMIT || '2mb' }));
 app.use(express.json({ limit: process.env.BODY_JSON_LIMIT || '1mb' }));
 
 // Endpoint de métricas (activa prom-client si está disponible)
@@ -254,6 +316,24 @@ app.get('/metrics', requireAdmin, async (req, res) => {
 });
 
 // Rutas públicas (sin autenticación)
+// Allowlist y rate limit específico para webhooks
+if (MAILGUN_WEBHOOK_IP_ALLOWLIST.length) {
+  app.use('/api/mailgun/webhook', ipAllowlist(MAILGUN_WEBHOOK_IP_ALLOWLIST));
+}
+if (Number(MAILGUN_WEBHOOK_RATE_LIMIT_MAX) > 0) {
+  const mailgunLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: Number(MAILGUN_WEBHOOK_RATE_LIMIT_MAX),
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      return `ip:${ip}`;
+    },
+    message: 'Too many webhook requests',
+  });
+  app.use('/api/mailgun/webhook', mailgunLimiter);
+}
 app.use('/api/mailgun/webhook', mailgunWebhookRouter); // Webhooks de Mailgun (verificación interna)
 app.use('/api/inbound/mailgun', mailgunInboundRouter); // Correos entrantes
 app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
@@ -285,20 +365,52 @@ app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser 
 // Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
 app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);
 // Proxy de imágenes externas (evita hotlink+cors)
-app.use('/api/image-proxy', imageProxyRouter);
-app.use('/api/wedding-news', optionalAuth, weddingNewsRouter); // Puede ser público
+// CORS liberal para contenido público (lectura desde apps externas)
+const publicCors = cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: CORS_EXPOSE_HEADERS,
+  optionsSuccessStatus: 204,
+  maxAge: 600,
+});
+app.options('/api/image-proxy', publicCors);
+app.use('/api/image-proxy', publicCors, imageProxyRouter);
+app.options('/api/wedding-news', publicCors);
+app.use('/api/wedding-news', publicCors, optionalAuth, weddingNewsRouter); // Puede ser público
 // Public wedding site (GET public, POST publish with auth context)
 app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
-  app.use('/api/weddings', requireAuth, supplierBudgetRouter);
-  // Supplier portal (public entry by token, handled inside router)
-  app.use('/api/supplier-portal', supplierPortalRouter);
+app.use('/api/weddings', requireAuth, supplierBudgetRouter);
+// Weddings general (autofix permisos, etc.)
+app.use('/api/weddings', requireAuth, weddingsRouter);
+// Supplier portal (public entry by token, handled inside router)
+app.use('/api/supplier-portal', supplierPortalRouter);
+
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
 app.use('/api/legal-docs', requireAuth, legalDocsRouter);
 app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
+if (WHATSAPP_WEBHOOK_IP_ALLOWLIST.length) {
+  app.use('/api/whatsapp/webhook/twilio', ipAllowlist(WHATSAPP_WEBHOOK_IP_ALLOWLIST));
+}
+if (Number(WHATSAPP_WEBHOOK_RATE_LIMIT_MAX) > 0) {
+  const waLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: Number(WHATSAPP_WEBHOOK_RATE_LIMIT_MAX),
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+      const ip = req.ip || (Array.isArray(req.ips) && req.ips[0]) || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+      return `ip:${ip}`;
+    },
+    message: 'Too many webhook requests',
+  });
+  app.use('/api/whatsapp/webhook/twilio', waLimiter);
+}
 app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/gdpr', gdprRouter);
 app.use('/api/push', pushRouter);
@@ -313,7 +425,7 @@ app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
 try {
   const { requireAdmin } = await import('./middleware/authMiddleware.js');
   const metricsAdminRouter = (await import('./routes/metrics-admin.js')).default;
-  app.use('/api/admin/metrics', requireAdmin, metricsAdminRouter);
+  app.use('/api/admin/metrics', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, metricsAdminRouter);
 } catch {}
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);
@@ -362,13 +474,13 @@ app.get('/api/transactions', async (req, res) => {
     }
 
     // 1. Get access token from Nordigen
-    const tokenResp = await axios.post(
+    const tokenResp = await requestWithRetry(() => http.post(
       `${NORDIGEN_BASE_URL}/token/new/`,
       {
         secret_id: NORDIGEN_SECRET_ID,
         secret_key: NORDIGEN_SECRET_KEY,
       }
-    );
+    ));
 
     const access = tokenResp.data.access;
 
@@ -379,14 +491,14 @@ app.get('/api/transactions', async (req, res) => {
     if (to) params.append('to', to);
 
     // 3. Fetch transactions from your own aggregator endpoint or Nordigen endpoint directly
-    const txnResp = await axios.get(
+    const txnResp = await requestWithRetry(() => http.get(
       `${NORDIGEN_BASE_URL}/accounts/${bankId}/transactions/?${params}`,
       {
         headers: {
           Authorization: `Bearer ${access}`,
         },
       }
-    );
+    ));
 
     res.json(txnResp.data.transactions.booked);
   } catch (err) {
@@ -457,7 +569,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
-
 
 
 

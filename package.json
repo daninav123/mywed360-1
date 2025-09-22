@@ -14,7 +14,7 @@
                     "frontend:ci":  "vite --host --port 5173 --strictPort",
                     "start:ci":  "concurrently -k -n backend,frontend -c blue,magenta \"npm:backend:ci\" \"npm:frontend:ci\"",
                     "dev":  "vite --host --port 5173 --strictPort",
-                    "build":  "vite build && node scripts/patch-csp.js",
+                    "build":  "node scripts/check-prod-safety.js \u0026\u0026 vite build \u0026\u0026 node scripts/patch-csp.js \u0026\u0026 node scripts/prune-public-test-files.js",
                     "preview":  "vite preview --host --port 5173 --strictPort",
                     "monitor":  "powershell -ExecutionPolicy Bypass -File ./scripts/monitor-5173.ps1 -AutoFix",
                     "lint":  "eslint \"src/**/*.{js,jsx,ts,tsx}\" --max-warnings 0",
@@ -45,9 +45,10 @@
                     "check:bundle":  "node scripts/bundleBudget.js --maxBytes=2000000",
                     "format":  "prettier --write .",
                     "prepare":  "husky install",
-    "i18n:fix": "node scripts/fixLocalesMojibake.js && node scripts/validateI18n.js",
-    "i18n:update": "node scripts/update_i18n_full.js && node scripts/fixLocalesMojibake.js && node scripts/validateI18n.js",
-    "i18n:sync": "node scripts/syncLocales.js es fr"
+                    "i18n:fix":  "node scripts/fixLocalesMojibake.js \u0026\u0026 node scripts/validateI18n.js",
+                    "i18n:update":  "node scripts/update_i18n_full.js \u0026\u0026 node scripts/fixLocalesMojibake.js \u0026\u0026 node scripts/validateI18n.js",
+                    "i18n:sync":  "node scripts/syncLocales.js es fr",
+                    "fix:mojibake":  "node scripts/fixSpanishMojibake.js"
                 },
     "dependencies":  {
                          "@emotion/react":  "^11.14.0",
@@ -69,7 +70,6 @@
                          "file-saver":  "^2.0.5",
                          "firebase":  "^10.6.0",
                          "firebase-admin":  "^13.4.0",
-                         
                          "form-data":  "^4.0.4",
                          "framer-motion":  "^10.12.16",
                          "gantt-task-react":  "^0.3.9",
@@ -129,7 +129,7 @@
                             "cypress":  "^13.17.0",
                             "cypress-file-upload":  "^5.0.8",
                             "eslint":  "^8.57.1",
-                            "eslint-plugin-import": "^2.29.1",
+                            "eslint-plugin-import":  "^2.29.1",
                             "eslint-plugin-react":  "^7.37.5",
                             "eslint-plugin-react-hooks":  "^4.6.2",
                             "eslint-plugin-vitest":  "^0.5.4",
