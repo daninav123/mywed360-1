@@ -525,7 +525,7 @@ const ProveedorDetail = ({
                               {r.subject || "Sin asunto"}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {r.email || provider?.email} Â·{" "}
+                              {r.email || provider?.email} ·{" "}
                               {formatDateTime(r.sentAt)}
                             </p>
                           </div>

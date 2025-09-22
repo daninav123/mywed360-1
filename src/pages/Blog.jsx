@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
+�import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchWeddingNews } from '../services/blogService';
 import Spinner from '../components/Spinner';
@@ -14,9 +14,9 @@ export default function Blog() {
   const [loading, setLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const observer = useRef();
-  // LÃ­mites para evitar bucles de llamadas cuando el backend devuelve []
+  // Límites para evitar bucles de llamadas cuando el backend devuelve []
   const MAX_LOOKAHEAD = 10; // antes 60
-  const MAX_EMPTY_BATCHES = 2; // corta pronto si no hay mÃ¡s datos
+  const MAX_EMPTY_BATCHES = 2; // corta pronto si no hay más datos
   const MAX_FETCHES_PER_LOAD = 12;
 
   const lastRef = useCallback((node) => {
@@ -33,7 +33,7 @@ export default function Blog() {
       setLoading(true);
       if (import.meta?.env?.DEV) console.info('[Blog] load start', { page, lang, existing: posts.length });
       let newPosts = [...posts];
-      const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente mÃºltiplo de 10
+      const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente múltiplo de 10
       const domainCounts = {};
       const windowStart = Math.floor(newPosts.length / 10) * 10;
       for (let i = windowStart; i < newPosts.length; i++) {
@@ -41,7 +41,7 @@ export default function Blog() {
         domainCounts[d] = (domainCounts[d] || 0) + 1;
       }
 
-      // Acumular candidatos para un relleno posterior si faltan dominios Ãºnicos
+      // Acumular candidatos para un relleno posterior si faltan dominios únicos
       const candidates = [];
 
       let fetchPage = page;
@@ -89,7 +89,7 @@ export default function Blog() {
         }
       }
 
-      // Fallback: si tras buscar no llenamos el bloque, relajamos dominio y buscamos en inglÃ©s
+      // Fallback: si tras buscar no llenamos el bloque, relajamos dominio y buscamos en inglés
       if (newPosts.length < targetLength) {
         fetchPage = 1;
         consecutiveErrors = 0;
@@ -135,7 +135,7 @@ export default function Blog() {
         }
       }
 
-      // Relleno final: si no hay suficientes dominios Ãºnicos, permitir hasta 2 por dominio
+      // Relleno final: si no hay suficientes dominios únicos, permitir hasta 2 por dominio
       if (newPosts.length < targetLength && candidates.length) {
         const exists = (p) => newPosts.some(x => x.url === p.url || x.id === p.id);
         const notUsed = candidates.filter((c) => !exists(c));

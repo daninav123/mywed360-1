@@ -46,8 +46,8 @@ export default function WhatsAppModal({
   const canSend = !!guest && !!guest.phone;
 
   function buildDefaultMessage(g) {
-    if (!g) return 'Â¡Hola! Queremos invitarte a nuestra boda. Â¿Puedes confirmar tu asistencia?';
-    return `Â¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
+    if (!g) return '¡Hola! Queremos invitarte a nuestra boda. ¿Puedes confirmar tu asistencia?';
+    return `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
   }
 
   const deeplinkHref = useMemo(() => {
@@ -139,7 +139,7 @@ export default function WhatsAppModal({
             <TabsContent value="api" className="space-y-4">
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  Estado del proveedor: {loadingProvider ? 'Comprobandoâ€¦' : (provider.configured ? 'Configurado' : 'No configurado')}
+                  Estado del proveedor: {loadingProvider ? 'Comprobando…' : (provider.configured ? 'Configurado' : 'No configurado')}
                 </div>
                 <Settings size={14} /> {provider.provider?.toUpperCase?.() || 'TWILIO'}
               </div>
@@ -167,7 +167,7 @@ export default function WhatsAppModal({
                     {showMetrics && (
                       <div className="mt-2 border rounded p-2 bg-gray-50">
                         {loadingMetrics ? (
-                          <div>Cargando métricasâ€¦</div>
+                          <div>Cargando métricas…</div>
                         ) : metrics ? (
                           <div className="text-[11px] text-gray-700">
                             <div>Total: {metrics.total || 0}</div>

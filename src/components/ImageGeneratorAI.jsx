@@ -9,7 +9,7 @@ import { useWedding } from '../context/WeddingContext';
 import { db, firebaseReady } from '../firebaseConfig';
 
 /**
- * Componente para generar imÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡genes con IA (DALLÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â·E/Proxy)
+ * Componente para generar imÒ�� �"Ò�a�¡genes con IA (DALLÒ�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�·E/Proxy)
  * Props:
  *  - category: string (invitaciones, logo, etc.)
  *  - templates: Array<{ name, description, prompt }>
@@ -26,12 +26,12 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
-  // Opciones de exportaciÃƒÂ³n (PDF imprenta)
+  // Opciones de exportaciÒ³n (PDF imprenta)
   const [paperPreset, setPaperPreset] = useState('5x7in'); // '5x7in' | 'A5' | 'A6' | 'DL' | 'SQ140'
   const [orientation, setOrientation] = useState('portrait'); // 'portrait' | 'landscape'
   const [bleed, setBleed] = useState(true); // sangrado 3mm
 
-  // Cargar imÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡genes guardadas al iniciar
+  // Cargar imÒ�� �"Ò�a�¡genes guardadas al iniciar
   useEffect(() => {
     (async () => {
       try {
@@ -72,7 +72,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
     setPrompt(template.prompt);
   };
 
-  // Calcular dimensiones en mm segÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºn preset/orientaciÃƒÂ³n/sangrado
+  // Calcular dimensiones en mm segÒ�� �"Ò�a�ºn preset/orientaciÒ³n/sangrado
   const getSizeMm = () => {
     let w = 0, h = 0;
     if (paperPreset === '5x7in') { w = 127; h = 178; }
@@ -94,7 +94,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
     setLoading(true);
     setError(null);
     try {
-      // 1) Proxy backend si estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ disponible
+      // 1) Proxy backend si estÒ�� �"Ò�a�¡ disponible
       try {
         const res = await apiPost('/api/ai-image', { prompt }, { auth: true });
         if (res.ok) {
@@ -108,9 +108,9 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         console.warn('Proxy AI-image no disponible, usando OpenAI directo:', err);
       }
 
-      // 2) Fallback directo a OpenAI (si estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ habilitado)
+      // 2) Fallback directo a OpenAI (si estÒ�� �"Ò�a�¡ habilitado)
       const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n');
+      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÒ�� �"Ò�a�³n');
 
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
@@ -126,7 +126,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       }
       const data = await response.json();
       const url = data?.data?.[0]?.url;
-      if (!url) throw new Error('No se recibiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³ URL de imagen');
+      if (!url) throw new Error('No se recibiÒ�� �"Ò�a�³ URL de imagen');
       handleImageGenerated(url);
     } catch (err) {
       console.error('Error al generar imagen:', err);
@@ -150,17 +150,17 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
     // persistir
     saveData(`lovenda_ai_images_${category}`, updatedImages, { collection: 'userDesigns', showNotification: false });
     onImageGenerated(newImage);
-    setToast({ type: 'success', message: 'ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡Ãƒâ€šÃ‚Â¡Ã‚Â¡Imagen generada con ÃƒÂ©xito! con ÃƒÂ©xito!ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©xito!' });
+    setToast({ type: 'success', message: 'Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�a�¡�¡Imagen generada con Ò©xito! con Ò©xito!Ò�� �"Ò�a�©xito!' });
   };
 
   // Guardar imagen en la boda (Storage + Firestore)
   const saveImageToWedding = async (imageUrl) => {
     if (!activeWedding) {
-      setToast({ type: 'error', message: 'Selecciona una boda para guardar el diseÃƒÂ±o' });
+      setToast({ type: 'error', message: 'Selecciona una boda para guardar el diseÒ±o' });
       return;
     }
     try {
-      // Descargar a travÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©s del proxy para evitar CORS
+      // Descargar a travÒ�� �"Ò�a�©s del proxy para evitar CORS
       const resp = await fetch(`/api/image-proxy?u=${encodeURIComponent(imageUrl)}`);
       if (!resp.ok) throw new Error('No se pudo descargar la imagen');
       const blob = await resp.blob();
@@ -184,10 +184,10 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         prompt,
         createdAt: serverTimestamp()
       });
-      setToast({ type: 'success', message: 'diseÃƒÂ±o guardado en la boda' });
+      setToast({ type: 'success', message: 'diseÒ±o guardado en la boda' });
     } catch (e) {
-      console.error('Guardar diseÃƒÂ±o error', e);
-      setToast({ type: 'error', message: 'No se pudo guardar el diseÃƒÂ±o' });
+      console.error('Guardar diseÒ±o error', e);
+      setToast({ type: 'error', message: 'No se pudo guardar el diseÒ±o' });
     }
   };
 
@@ -231,14 +231,14 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
     }
   };
 
-  // PDF vectorial (backend vectoriza y compone al TamaÃƒÂ±o elegido)
+  // PDF vectorial (backend vectoriza y compone al TamaÒ±o elegido)
   const downloadVectorPdf = async (imageUrl, fileName) => {
     try {
       const dims = getSizeMm();
       const res = await apiPost('/api/ai-image/vector-pdf', { url: imageUrl, ...dims }, { auth: true });
       if (!res.ok) throw new Error('Error generando PDF');
       const blob = await res.blob();
-      if (!blob || blob.size === 0) throw new Error('PDF vacÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­o');
+      if (!blob || blob.size === 0) throw new Error('PDF vacÒ�� �"Ò�a�­o');
       saveAs(blob, fileName || `lovenda-${category}-${Date.now()}.pdf`);
     } catch (err) {
       console.error('Error al descargar PDF:', err);
@@ -274,9 +274,9 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         </div>
       )}
 
-      {/* Editor de prompt + ajustes de exportaciÃƒÂ³n */}
+      {/* Editor de prompt + ajustes de exportaciÒ³n */}
       <div className="bg-white p-4 border rounded-lg">
-        <label htmlFor="prompt" className="block font-medium mb-2">Prompt para la generaciÃƒÂ³n</label>
+        <label htmlFor="prompt" className="block font-medium mb-2">Prompt para la generaciÒ³n</label>
         <div className="flex space-x-2">
           <textarea
             id="prompt"
@@ -288,17 +288,17 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         </div>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="block text-sm font-medium mb-1">TamaÃƒÂ±o</label>
+            <label className="block text-sm font-medium mb-1">TamaÒ±o</label>
             <select value={paperPreset} onChange={(e)=>setPaperPreset(e.target.value)} className="w-full border rounded p-2 text-sm">
-              <option value="5x7in">5x7&quot; (127Ãƒâ€”178 mm)</option>
-              <option value="A5">A5 (148Ãƒâ€”210 mm)</option>
-              <option value="A6">A6 (105Ãƒâ€”148 mm)</option>
-              <option value="DL">DL (99Ãƒâ€”210 mm)</option>
-              <option value="SQ140">Cuadrado (140Ãƒâ€”140 mm)</option>
+              <option value="5x7in">5x7&quot; (127Ò�178 mm)</option>
+              <option value="A5">A5 (148Ò�210 mm)</option>
+              <option value="A6">A6 (105Ò�148 mm)</option>
+              <option value="DL">DL (99Ò�210 mm)</option>
+              <option value="SQ140">Cuadrado (140Ò�140 mm)</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">orientaciÃƒÂ³n</label>
+            <label className="block text-sm font-medium mb-1">orientaciÒ³n</label>
             <select value={orientation} onChange={(e)=>setOrientation(e.target.value)} className="w-full border rounded p-2 text-sm">
               <option value="portrait">Vertical</option>
               <option value="landscape">Horizontal</option>
@@ -306,7 +306,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
           </div>
           <label className="inline-flex items-center gap-2 mt-6">
             <input type="checkbox" checked={bleed} onChange={(e)=>setBleed(e.target.checked)} />
-            <span className="text-sm">AÃƒÂ±adir sangrado 3mm</span>
+            <span className="text-sm">AÒ±adir sangrado 3mm</span>
           </label>
         </div>
         <div className="mt-4 flex justify-end">
@@ -326,10 +326,10 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         </div>
       </div>
 
-      {/* GalerÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a de imÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡genes generadas */}
+      {/* GalerÒ�� �"Ò�a�­a de imÒ�� �"Ò�a�¡genes generadas */}
       {generatedImages.length > 0 && (
         <div className="mt-8">
-          <h3 className="font-semibold mb-4">ImÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡genes generadas</h3>
+          <h3 className="font-semibold mb-4">ImÒ�� �"Ò�a�¡genes generadas</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {generatedImages.map((image) => (
               <div key={image.id} className="border rounded-lg overflow-hidden">

@@ -188,7 +188,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
     // Verificar si el usuario tiene configurada dirección personalizada
     if (!isTestEnv && userProfile && !userProfile.emailUsername && !userProfile.myWed360Email && !userProfile.emailAlias) {
       if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-        if (window.confirm('No tienes configurada una dirección de correo personalizada. Â¿Deseas configurarla ahora?')) {
+        if (window.confirm('No tienes configurada una dirección de correo personalizada. ¿Deseas configurarla ahora?')) {
           window.location.href = '/email/setup';
           return;
         }

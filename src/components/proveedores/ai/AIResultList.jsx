@@ -87,7 +87,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
       match: 95,
       image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Madrid',
-      price: '1200â‚¬ - 2500â‚¬',
+      price: '1200€ - 2500€',
       aiSummary: 'Este fotógrafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imágenes capturen momentos espontáneos con iluminación natural, ideal para lo que buscas.'
     },
     {
@@ -98,7 +98,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
       match: 87,
       image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8d2VkZGluZyUyMHBob3RvZ3JhcGh5fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Barcelona',
-      price: '1500â‚¬ - 3000â‚¬',
+      price: '1500€ - 3000€',
       aiSummary: 'Especialistas en bodas en la playa con un estilo luminoso y natural. Su portfolio muestra una gran experiencia en entornos costeros y saben aprovechar la luz natural.'
     },
     {
@@ -109,7 +109,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
       match: 79,
       image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
       location: 'Valencia',
-      price: '1000â‚¬ - 2000â‚¬',
+      price: '1000€ - 2000€',
       aiSummary: 'Ofrece un enfoque artístico con elementos documentales. Aunque su estilo es más estilizado que puramente natural, tiene experiencia en bodas al aire libre.'
     }
   ];

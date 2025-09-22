@@ -200,7 +200,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
             {success && (
               <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md flex items-start">
                 <Check size={16} className="mr-2 mt-0.5" />
-                <p className="text-sm">Â¡Tu dirección de correo ha sido actualizada con éxito!</p>
+                <p className="text-sm">¡Tu dirección de correo ha sido actualizada con éxito!</p>
               </div>
             )}
             

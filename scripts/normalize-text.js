@@ -4,49 +4,11 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 
 function countSuspects(str) {
-  // Common mojibake markers from UTF-8 mis-decoding
-  const re = /(Ã.|Â.|â.|�|��|ǟ|ǭ|Ǹ)/g;
+  // Common mojibake markers from UTF-8 mis-decoding (widened)
+  const re = /(Ã|Â|â|�|ǟ)/g;
   const m = str.match(re);
   return m ? m.length : 0;
 }
-
-const targetedPairs = [
-  ['Comprobando�?�', 'Comprobando…'],
-  ['Informaci��n', 'Información'],
-  ['conexi��n', 'conexión'],
-  ['Sincronizaci��n', 'Sincronización'],
-  ['suscripci��n', 'suscripción'],
-  ['Suscripci��n', 'Suscripción'],
-  ['Mǧsica', 'Música'],
-  ['GǸneros', 'Géneros'],
-  ['clǭsica', 'clásica'],
-  ['electr��nica', 'electrónica'],
-  ['DǸcadas', 'Décadas'],
-  ['Correo electr��nico', 'Correo electrónico'],
-  ['Nǧmero', 'Número'],
-  ['contrase��a', 'contraseña'],
-  ['celebraci��n', 'celebración'],
-  ['cr��ticos', 'críticos'],
-  ['Invitaci��n', 'Invitación'],
-  ['invitaci��n', 'invitación'],
-  ['facturaci��n', 'facturación'],
-  ['Direcci��n', 'Dirección'],
-  ['Pa��s', 'País'],
-  ['No se encontr��', 'No se encontró'],
-  ['estǭ', 'está'],
-  ['intǸntalo', 'inténtalo'],
-];
-
-const genericPairs = [
-  // Spanish letters
-  ['Ã¡', 'á'], ['Ã©', 'é'], ['Ã­', 'í'], ['Ã³', 'ó'], ['Ãº', 'ú'],
-  ['Ã±', 'ñ'], ['Ã‘', 'Ñ'], ['Ã¼', 'ü'], ['Ãœ', 'Ü'],
-  // Punctuation and symbols
-  ['Â¿', '¿'], ['Â¡', '¡'], ['Âº', 'º'], ['Âª', 'ª'], ['Â·', '·'],
-  ['Â', ''], // stray ghost char
-  ['â€“', '–'], ['â€”', '—'], ['â€˜', '‘'], ['â€™', '’'],
-  ['â€œ', '“'], ['â€�', '”'], ['â€¢', '•'], ['â€¦', '…'], ['â‚¬', '€']
-];
 
 function fixContent(original) {
   let s = original;
@@ -54,11 +16,9 @@ function fixContent(original) {
   if (before > 0) {
     try {
       const restored = Buffer.from(s, 'latin1').toString('utf8');
-      if (countSuspects(restored) < before) s = restored;
+      if (countSuspects(restored) <= before) s = restored;
     } catch {}
   }
-  for (const [from, to] of genericPairs) if (s.includes(from)) s = s.split(from).join(to);
-  for (const [from, to] of targetedPairs) if (s.includes(from)) s = s.split(from).join(to);
   return s;
 }
 

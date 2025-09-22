@@ -121,7 +121,7 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
             <ul className="list-disc ml-5 space-y-1">
               {outliers.slice(0, 8).map((o, idx) => (
                 <li key={idx} className="text-sm">
-                  {providerById[o.supplierId]?.name || o.supplierId}: {o.amount} â‚¬ (media â‰ˆ {Math.round(o.mean)} â‚¬)
+                  {providerById[o.supplierId]?.name || o.supplierId}: {o.amount} € (media â‰ˆ {Math.round(o.mean)} €)
                 </li>
               ))}
             </ul>

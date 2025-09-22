@@ -12,6 +12,8 @@ export default function EventsCalendar({
   sortedEvents,
   categories,
   onEventEdit,
+  completedSet,
+  onToggleComplete,
   ErrorBoundaryComponent,
   localizer,
   eventStyleGetter,
@@ -106,7 +108,14 @@ export default function EventsCalendar({
                         <div className="mr-3">
                           <input
                             type="checkbox"
-                            disabled
+                            checked={completedSet ? completedSet.has(String(eventId)) : false}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              if (typeof onToggleComplete === 'function') {
+                                onToggleComplete(String(eventId), e.target.checked);
+                              }
+                            }}
                           />
                         </div>
                         <div className="flex-1">
@@ -168,4 +177,3 @@ export default function EventsCalendar({
     </div>
   );
 }
-

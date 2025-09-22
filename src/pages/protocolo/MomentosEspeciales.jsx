@@ -379,7 +379,7 @@ const MomentosEspeciales = () => {
                           <div className="min-w-0">
                             <div className="truncate text-sm font-medium">{s.title} <span className="text-gray-500">- {s.artist}</span></div>
                             {s.tags?.length ? (
-                              <div className="text-xs text-gray-500 truncate">{s.tags.join(' Â· ')}</div>
+                              <div className="text-xs text-gray-500 truncate">{s.tags.join(' · ')}</div>
                             ) : null}
                           </div>
                           <Button
@@ -472,16 +472,16 @@ const MomentosEspeciales = () => {
                           <div className="truncate text-sm font-medium">{s.title} {s.artist ? <span className="text-gray-500">- {s.artist}</span> : null}</div>
                           {(s.mood || s.tempo || s.era || (s.tags?.length)) && (
                             <div className="text-xs text-gray-500 truncate">
-                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' Â· ')}{s.tags?.length ? ` Â· ${s.tags.join(' Â· ')}` : ''}
+                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' · ')}{s.tags?.length ? ` · ${s.tags.join(' · ')}` : ''}
                             </div>
                           )}
                           {s.reason && <div className="text-xs text-gray-600 line-clamp-2">{s.reason}</div>}
                           <div className="text-xs text-gray-500 truncate mt-1">
                             Ver en: 
                             <a className="ml-1 hover:underline" href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">YouTube</a>
-                            <span> Â· </span>
+                            <span> · </span>
                             <a className="hover:underline" href={`https://open.spotify.com/search/${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">Spotify</a>
-                            <span> Â· </span>
+                            <span> · </span>
                             <a className="hover:underline" href={`https://music.apple.com/search?term=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">Apple</a>
                           </div>
                         </div>
@@ -552,9 +552,9 @@ const MomentosEspeciales = () => {
                         <div className="truncate text-sm font-medium">{song.title} <span className="text-gray-500">- {song.artist}</span></div>
                         <div className="text-xs text-gray-500 truncate">
                           <a className="hover:underline" href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">YouTube</a>
-                          <span> Â· </span>
+                          <span> · </span>
                           <a className="hover:underline" href={`https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">Spotify</a>
-                          <span> Â· </span>
+                          <span> · </span>
                           <a className="hover:underline" href={song.trackUrl || `https://music.apple.com/search?term=${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">Apple</a>
                         </div>
                       </div>

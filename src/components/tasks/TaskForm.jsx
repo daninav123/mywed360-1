@@ -101,6 +101,15 @@ const TaskForm = ({
             /> 
             <span>Proceso (Gantt)</span>
           </label>
+          <label className="flex items-center space-x-2 text-sm">
+            <input
+              type="checkbox"
+              name="completed"
+              checked={!!formData.completed}
+              onChange={e => setFormData({ ...formData, completed: e.target.checked })}
+            />
+            <span>Completada</span>
+          </label>
         </div>
         <div className="flex justify-end space-x-2">
           {editingId && (

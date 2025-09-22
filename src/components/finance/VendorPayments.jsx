@@ -66,7 +66,7 @@ export const VendorPayments = ({ transactions }) => {
                   <span>{formatCurrency(item.realCost)}</span>
                 </div>
                 <div className="text-xs text-[color:var(--color-text)]/60">
-                  {item.item} â€¢ {new Date(item.paymentDate).toLocaleDateString()}
+                  {item.item} • {new Date(item.paymentDate).toLocaleDateString()}
                 </div>
               </div>
             ))}

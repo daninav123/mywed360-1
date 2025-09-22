@@ -1,10 +1,10 @@
-﻿import React, { useEffect, useMemo } from 'react';
+�import React, { useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import PageTabs from '../../components/ui/PageTabs';
 
-// DefiniciÃ³n estÃ¡tica de las pestaÃ±as para evitar recreaciones
-// Nota: 'Documentos Legales' se muestra como pÃ¡gina independiente en el submenÃº,
-// por eso NO aparece como pestaÃ±a aquÃ­.
+// Definición estática de las pestañas para evitar recreaciones
+// Nota: 'Documentos Legales' se muestra como página independiente en el submenú,
+// por eso NO aparece como pestaña aquí.
 const tabs = [
   { path: 'momentos-especiales', label: 'Momentos Especiales' },
 ];
@@ -14,14 +14,14 @@ const ProtocoloLayout = React.memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  /* Redirigir a la primera pestaÃ±a si estamos en la raÃ­z de protocolo */
+  /* Redirigir a la primera pestaña si estamos en la raíz de protocolo */
   useEffect(() => {
     if (location.pathname === '/protocolo' || location.pathname === '/protocolo/') {
       navigate('/protocolo/momentos-especiales', { replace: true });
     }
   }, [location.pathname, navigate]);
 
-  // Memoizamos la lista de pestaÃ±as con sus rutas completas
+  // Memoizamos la lista de pestañas con sus rutas completas
   const navTabs = useMemo(() => tabs.map(t => ({ ...t, href: `/protocolo/${t.path}` })), []);
   const activeId = useMemo(() => {
     const m = navTabs.find(t => location.pathname.startsWith(t.href));
@@ -39,7 +39,7 @@ const ProtocoloLayout = React.memo(() => {
 
   return (
     <section className="p-4 md:p-6 flex flex-col gap-8" aria-labelledby="protocolo-heading">
-      {/* TÃ­tulo y navegaciÃ³n solo si hay mÃ¡s de una secciÃ³n */}
+      {/* Título y navegación solo si hay más de una sección */}
       {navTabs.length > 1 && (
         <>
           <h1 id="protocolo-heading" className="page-title">

@@ -5,7 +5,9 @@ import { categories } from './CalendarComponents';
 const TaskList = ({ 
   tasks, 
   onTaskClick,
-  maxItems = 8
+  maxItems = 8,
+  completedSet,
+  onToggleComplete,
 }) => {
   const sortedTasks = Array.isArray(tasks) ? (() => {
     const todayStart = new Date();
@@ -44,6 +46,7 @@ const TaskList = ({
       <div className="p-4 space-y-4 flex-1 overflow-y-auto">
         {sortedTasks.map(event => {
           const cat = categories[event.category] || categories.OTROS;
+          const isCompleted = completedSet ? completedSet.has(String(event.id)) : false;
           return (
             <div 
               key={event.id} 
@@ -55,10 +58,19 @@ const TaskList = ({
               }}
             >
               <div className="flex items-start">
-                <div 
-                  className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
-                  style={{ backgroundColor: cat.color, marginTop: '5px' }} 
-                />
+                <div className="mr-2 flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isCompleted}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      if (typeof onToggleComplete === 'function') {
+                        onToggleComplete(String(event.id), e.target.checked);
+                      }
+                    }}
+                  />
+                </div>
                 <div className="flex-1">
                   <div className="font-medium mb-1">{event.title}</div>
                   <div className="text-xs text-[color:var(--color-text)]/60">

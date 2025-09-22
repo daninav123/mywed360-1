@@ -17,9 +17,9 @@ describe('i18n locales are free of mojibake', () => {
 
   const badFragments = [
     'Ã', // common UTF-8 double-decoding marker
-    'Â',
+    '',
     'â€', // quotes/ellipsis broken
-    'â‚¬', // euro broken
+    '€', // euro broken
     '??', // placeholder pairs
   ];
 

@@ -1,5 +1,5 @@
 /**
- * SeatingPlan refactorizado â€“ Componente principal
+ * SeatingPlan refactorizado – Componente principal
  */
 import React, { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -136,7 +136,7 @@ const SeatingPlanRefactored = () => {
         if (['input','textarea','select'].includes(tag) || e?.isComposing) return;
         if (e?.key === 'Backspace' && selectedTable) {
           e.preventDefault();
-          if (window.confirm('Â¿Eliminar la mesa seleccionada?')) {
+          if (window.confirm('¿Eliminar la mesa seleccionada?')) {
             deleteTable(selectedTable.id);
           }
         }
@@ -146,7 +146,7 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedTable, deleteTable]);
 
-  // Atajos de rotación: Q/E para -5Â°/+5Â°
+  // Atajos de rotación: Q/E para -5°/+5°
   useEffect(() => {
     const onKey = (e) => {
       try {

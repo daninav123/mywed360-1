@@ -11,7 +11,7 @@ import esFinance from './locales/es/finance.json';
 // Reparación ligera de mojibake en tiempo de lectura
 function fixMojibake(s) {
   if (typeof s !== 'string' || !s) return s;
-  if (!(/[ÃÂ�ǟ]/.test(s))) return s; // heurística rápida
+  if (!(/[Ã�ǟ]/.test(s))) return s; // heurística rápida
   try {
     const rec = decodeURIComponent(escape(s));
     return rec && rec !== s ? rec : s;

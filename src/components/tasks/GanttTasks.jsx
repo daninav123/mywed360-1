@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+�import React, { useEffect, useRef, useState } from 'react';
 import { Gantt, ViewMode } from 'gantt-task-react';
 import 'gantt-task-react/dist/index.css';
 
@@ -27,7 +27,7 @@ export const GanttChart = ({
   })();
   const dbg = (...args) => { if (debugEnabled) console.log('[GanttDebug]', ...args); };
   try { dbg('GanttDebug init', { debugEnabled, viewMode, columnWidth, markerDate }); } catch {}
-  // ErrorBoundary local para evitar que la pÃƒÆ’Ã‚Â¡gina caiga si la librerÃƒÆ’Ã‚Â­a falla
+  // ErrorBoundary local para evitar que la pÒ��¡gina caiga si la librerÒ��­a falla
   class LocalErrorBoundary extends React.Component {
     constructor(props) {
       super(props);
@@ -39,7 +39,7 @@ export const GanttChart = ({
       if (this.state.hasError) {
         return (
           <div className="flex items-center justify-center h-full text-gray-500">
-            No se pudo renderizar el diagrama Gantt (datos invÃƒÆ’Ã‚Â¡lidos)
+            No se pudo renderizar el diagrama Gantt (datos invÒ��¡lidos)
           </div>
         );
       }
@@ -66,7 +66,7 @@ export const GanttChart = ({
     </div>
   );
 
-  // Normalizar fechas y filtrar tareas invÃƒÆ’Ã‚Â¡lidas
+  // Normalizar fechas y filtrar tareas invÒ��¡lidas
   const normalizeDate = (d) => {
     if (!d) return null;
     try {
@@ -115,10 +115,10 @@ export const GanttChart = ({
   }
 
   if (cleanTasks.length === 0) {
-    // Evitar renderizar el componente de la librerÃƒÆ’Ã‚Â­a con datos vacÃƒÆ’Ã‚Â­os o corruptos
+    // Evitar renderizar el componente de la librerÒ��­a con datos vacÒ��­os o corruptos
     return (
       <div className="flex items-center justify-center h-full text-gray-500">
-        No hay tareas vÃƒÆ’Ã‚Â¡lidas para mostrar
+        No hay tareas vÒ��¡lidas para mostrar
       </div>
     );
   }
@@ -144,7 +144,7 @@ export const GanttChart = ({
       setVerticalNode(null);
       return;
     }
-    // Buscar el contenedor scrollable interno del Gantt (preferir verticalContainer de la librerÃ­a)
+    // Buscar el contenedor scrollable interno del Gantt (preferir verticalContainer de la librería)
     let scroller = null;
     try {
       const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
@@ -161,7 +161,7 @@ export const GanttChart = ({
       }
     }
     if (!scroller) {
-      dbg('No se encontrÃ³ scroller interno');
+      dbg('No se encontró scroller interno');
       setScrollerNode(null);
       return;
     }
@@ -263,9 +263,9 @@ export const GanttChart = ({
     return () => obs.disconnect();
   }, [viewMode, columnWidth, cleanTasks.length]);
 
-  // AnimaciÃƒÆ’Ã‚Â³n: seguimiento continuo de scroll/transform por si no disparan eventos
+  // AnimaciÒ��³n: seguimiento continuo de scroll/transform por si no disparan eventos
   useEffect(() => {
-    // Seguimiento suave con rAF sin re-crear el efecto en cada actualización
+    // Seguimiento suave con rAF sin re-crear el efecto en cada actualizaci�n
     let rafId = null;
     const parseTX = (tr) => {
       try {
@@ -338,7 +338,7 @@ export const GanttChart = ({
     } catch {}
   }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
 
-  // Ajuste duro del ancho interno: forzar que el SVG y el contenedor horizontal no excedan el mes lÃƒÂ­mite
+  // Ajuste duro del ancho interno: forzar que el SVG y el contenedor horizontal no excedan el mes lÒ­mite
   useEffect(() => {
     try {
       if (viewMode !== ViewMode.Month) return;
@@ -403,7 +403,7 @@ export const GanttChart = ({
 
   // Calcular offset horizontal en px para el marcador (modo Month fiable)
   let markerLeftPx = null;
-  let markerViewportLeftPx = null; // posiciÃ³n dentro del wrapper (tras restar scroll)
+  let markerViewportLeftPx = null; // posición dentro del wrapper (tras restar scroll)
   try {
     const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
     if (markerOk) {
@@ -420,7 +420,7 @@ export const GanttChart = ({
           const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
-          // Posición dentro del wrapper usando delta geométrico (contenido vs viewport)
+          // Posici�n dentro del wrapper usando delta geom�trico (contenido vs viewport)
           const s = scrollerRef.current;
           if (wrapperRef.current) {
             let baseOffset = 0;
@@ -473,7 +473,7 @@ export const GanttChart = ({
         ref={wrapperRef}
         style={{ position: 'relative', overflow: 'hidden' }}
         onWheelCapture={(e) => {
-          // Evita que el handler interno de la librería encadene actualizaciones excesivas
+          // Evita que el handler interno de la librer�a encadene actualizaciones excesivas
           try { e.stopPropagation(); } catch {}
         }}
       >
@@ -524,7 +524,7 @@ export const GanttChart = ({
               aria-hidden="true"
               focusable="false"
             >
-              {/* paÃƒÆ’Ã‚Â±o blanco */}
+              {/* paÒ��±o blanco */}
               <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="#ffffff" opacity="0.95" />
               {/* cuadros negros */}
               <rect x="4" y="2" width="3" height="3" fill="#111" />

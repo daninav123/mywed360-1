@@ -1,20 +1,17 @@
-﻿import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+�import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { ViewMode } from 'gantt-task-react';
-import { serverTimestamp, doc, deleteDoc, setDoc, collection, addDoc } from 'firebase/firestore';
-import { db as clientDb, auth as clientAuth } from '../../firebaseConfig';
-import { db } from '../../firebaseConfig';
-import { subscribeSyncState, getSyncState, loadData } from '../../services/SyncService';
-import { Cloud, CloudOff, RefreshCw, Download } from 'lucide-react';
+import { serverTimestamp, doc, deleteDoc, setDoc, collection, addDoc, onSnapshot, getDoc } from 'firebase/firestore';
+import { db, auth } from '../../firebaseConfig';
+import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Importar componentes separados
 import ErrorBoundary from './ErrorBoundary';
-import { downloadAllICS } from './CalendarUtils';
 import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents';
 import EventsCalendar from './EventsCalendar';
 import TaskList from './TaskList';
 import TasksHeader from './TasksHeader';
 import TaskForm from './TaskForm';
-import { awardPoints } from '../../services/GamificationService';
+//
 
 // Importar hooks de Firestore
 import { useWedding } from '../../context/WeddingContext';
@@ -27,14 +24,14 @@ import LongTermTasksGantt from './LongTermTasksGantt';
 
 import { useSafeEvents } from './hooks/useSafeEvents';
 
-// FunciÃƒÂ³n helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
-import { validateAndNormalizeDate, normalizeAnyDate, addMonths } from './utils/dateUtils';
+import { addMonths } from './utils/dateUtils';
 import { useGanttSizing } from './hooks/useGanttSizing';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÃƒÂ³n segura con manejo de errores
+  // Estados - InicializaciÒ³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -64,8 +61,7 @@ export default function Tasks() {
     loading: completedLoading,
   } = useFirestoreCollection('tasksCompleted', []);
 
-  // --- Ya no se requiere estado local ni carga inicial mediante loadData; los hooks de Firestore se encargan ---
-  const dataLoadedRef = useRef(false);
+  // --- Los hooks de Firestore gestionan la carga reactiva ---
 
   const [showNewTask, setShowNewTask] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -79,6 +75,7 @@ export default function Tasks() {
     endTime: '11:00',
     long: false,
     assignee: '',
+    completed: false,
   });
   
   const [currentView, setCurrentView] = useState('month');
@@ -93,7 +90,7 @@ export default function Tasks() {
     }
   }, [calendarDate]);
 
-  // Altura del contenedor del calendario (reactiva al tamaño de ventana)
+  // Altura del contenedor del calendario (reactiva al tama�o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
   useEffect(() => {
     const compute = () => {
@@ -111,11 +108,16 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÃƒÂ³n:', error);
+      console.error('Error al obtener estado de sincronizaciÒ³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
   
+  // Suscripción a cambios del estado de sincronización (online/syncing/pending)
+  useEffect(() => {
+    const unsub = subscribeSyncState(setSyncStatus);
+    return () => { try { unsub && unsub(); } catch (_) {} };
+  }, []);
   const [columnWidthState, setColumnWidthState] = useState(65);
   const [ganttPreSteps, setGanttPreSteps] = useState(0);
   const [ganttViewDate, setGanttViewDate] = useState(null);
@@ -123,7 +125,7 @@ export default function Tasks() {
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del Día de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del D�a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
   const listCellWidth = "";
   // Altura de fila del Gantt
   const rowHeight = 44;
@@ -131,20 +133,22 @@ export default function Tasks() {
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
 
-  // Manejar eventos de calendario externos// FunciÃƒÂ³n para aÃƒÂ±adir una reuniÃƒÂ³n
+  // Manejar eventos de calendario externos// FunciÒ³n para aÒ±adir una reuniÒ³n
   const addMeeting = useCallback(async (meeting) => {
     await addMeetingFS({
       ...meeting,
-      title: meeting.title || 'Nueva reuniÃƒÂ³n',
+      title: meeting.title || 'Nueva reuniÒ³n',
       start: new Date(meeting.start),
       end: new Date(meeting.end)
     });
   }, [addMeetingFS]);
+  // keep for future use (avoid unused-var warnings)
+  // eslint-disable-next-line no-unused-expressions
+  addMeeting && null;
 
-  // GeneraciÃƒÂ³n automÃƒÂ¡tica de timeline si estÃƒÂ¡ vacÃƒÂ­o// Estado para tareas completadas (inicial vacÃƒÂ­o, se cargarÃƒÂ¡ asÃƒÂ­ncronamente)
-  const [completed, setCompleted] = useState({});
+  // GeneraciÒ³n automÒ¡tica de timeline si estÒ¡ vacÒ­o// Estado para tareas completadas (inicial vacÒ­o, se cargarÒ¡ asÒ­ncronamente)
 
-  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÃƒÂ³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÂ­os al inicio)// Sugerencia automÃƒÂ¡tica de categorÃƒÂ­a
+  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÒ³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÒ­os al inicio)// Sugerencia automÒ¡tica de categorÒ­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (texto.includes('lugar') || texto.includes('venue') || texto.includes('salon') || texto.includes('espacio')) {
@@ -157,7 +161,7 @@ export default function Tasks() {
       return 'DECORACION';
     } else if (texto.includes('invitacion') || texto.includes('papel') || texto.includes('tarjeta')) {
       return 'PAPELERIA';
-    } else if (texto.includes('mÃƒÂºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
+    } else if (texto.includes('mÒºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
       return 'MUSICA';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
@@ -176,7 +180,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃƒÂ­a si se cambia el tÃƒÂ­tulo y la categorÃƒÂ­a es OTROS
+      // 1. Sugerir categorÒ­a si se cambia el tÒ­tulo y la categorÒ­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -189,7 +193,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÂ­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÒ­a por defecto
         }
       }
 
@@ -223,7 +227,7 @@ export default function Tasks() {
     resetForm();
   };
   
-  // AsignaciÃƒÂ³n automÃƒÂ¡tica de categorÃƒÂ­a con IA
+  // AsignaciÒ³n automÒ¡tica de categorÒ­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -233,23 +237,23 @@ export default function Tasks() {
       
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒÂ³n', 'jardÃƒÂ­n', 'terraza'],
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÒ³n', 'jardÒ­n', 'terraza'],
         INVITADOS: ['guests', 'invitados', 'personas', 'asistentes', 'confirmaciones', 'lista', 'rsvp'],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: ['decoraciÃƒÂ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÃƒÂ³n', 'ambientaciÃƒÂ³n'],
-        PAPELERIA: ['invitaciones', 'papelerÃƒÂ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
-        MUSICA: ['mÃƒÂºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografÃƒÂ­a', 'video', 'recuerdos', 'ÃƒÂ¡lbum', 'sesiÃƒÂ³n'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒÂ­a'],
+        DECORACION: ['decoraciÒ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÒ³n', 'ambientaciÒ³n'],
+        PAPELERIA: ['invitaciones', 'papelerÒ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
+        MUSICA: ['mÒºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotografÒ­a', 'video', 'recuerdos', 'Ò¡lbum', 'sesiÒ³n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÒ­a'],
       };
       
-      // Contar coincidencias por categorÃƒÂ­a
+      // Contar coincidencias por categorÒ­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter(palabra => texto.includes(palabra)).length;
       });
       
-      // Encontrar la categorÃƒÂ­a con mayor puntuaciÃƒÂ³n
+      // Encontrar la categorÒ­a con mayor puntuaciÒ³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -261,17 +265,17 @@ export default function Tasks() {
       
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃƒÂ­a:', error);
+      console.error('Error al asignar categorÒ­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃƒÂ³n de la boda
+  // Guardar una tarea en la subcolecciÒ³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃƒÂ¡sico
+      // Validar formulario bÒ¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃƒÂ­tulo');
+        alert('Por favor ingresa un tÒ­tulo');
         return;
       }
       
@@ -296,7 +300,7 @@ export default function Tasks() {
       
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no vÃƒÂ¡lidas');
+        alert('Fechas no vÒ¡lidas');
         return;
       }
       
@@ -305,7 +309,7 @@ export default function Tasks() {
         return;
       }
       
-      // Asignar categorÃƒÂ­a con IA si no se especificÃƒÂ³
+      // Asignar categorÒ­a con IA si no se especificÒ³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -322,7 +326,7 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() })
       };
       
-      // AÃƒÂ±adir/actualizar segÃƒÂºn sea una tarea de largo plazo o una reuniÃƒÂ³n
+      // AÒ±adir/actualizar segÒºn sea una tarea de largo plazo o una reuniÒ³n
       if (formData.long) {
         // Para el diagrama Gantt
         const ganttTask = {
@@ -343,20 +347,20 @@ export default function Tasks() {
           const saved = await addTaskFS(ganttTask);
           savedId = saved?.id || null;
           // Fallback directo a Firestore si no obtuvimos id
-          if (!savedId && clientDb && activeWedding) {
-            const colRef = collection(clientDb, 'weddings', activeWedding, 'tasks');
+          if (!savedId && db && activeWedding) {
+            const colRef = collection(db, 'weddings', activeWedding, 'tasks');
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // ÃƒÆ’Ã…Â¡ltimo recurso: generar id local si todo falla
+          // Ò��&¡ltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
         try {
-          const uid = clientAuth?.currentUser?.uid;
-          if (uid && clientDb && (savedId || editingId)) {
+          const uid = auth?.currentUser?.uid;
+          if (uid && db && (savedId || editingId)) {
             const mirrorId = savedId || editingId;
-            await setDoc(doc(clientDb, 'users', uid, 'tasks', mirrorId), { ...ganttTask, id: mirrorId }, { merge: true });
+            await setDoc(doc(db, 'users', uid, 'tasks', mirrorId), { ...ganttTask, id: mirrorId }, { merge: true });
           }
         } catch (_) {}
       } else {
@@ -370,21 +374,34 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÃƒÂ³n (evento puntual del calendario)
+          // Nueva reuniÒ³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/meetings
         try {
-          const uid = clientAuth?.currentUser?.uid;
-          if (uid && clientDb) {
+          const uid = auth?.currentUser?.uid;
+          if (uid && db) {
             const mirrorId = savedId || editingId || taskData.id;
             if (mirrorId) {
-              await setDoc(doc(clientDb, 'users', uid, 'meetings', mirrorId), { ...taskData, id: mirrorId }, { merge: true });
+              await setDoc(doc(db, 'users', uid, 'meetings', mirrorId), { ...taskData, id: mirrorId }, { merge: true });
             }
           }
         } catch (_) {}
       }
+
+      // Persistir estado de completado en weddings/{id}/tasksCompleted/{taskId}
+      try {
+        const finalId = editingId || taskData.id;
+        if (activeWedding && finalId) {
+          const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', finalId);
+          if (formData.completed) {
+            await setDoc(compRef, { id: finalId, taskId: finalId, completedAt: serverTimestamp() }, { merge: true });
+          } else {
+            await deleteDoc(compRef).catch(() => {});
+          }
+        }
+      } catch (_) {}
       
       // Cerrar modal y limpiar
       closeModal();
@@ -411,19 +428,20 @@ export default function Tasks() {
       if (activeWedding && db) {
         ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
         ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'meetings', editingId)));
+        ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasksCompleted', editingId)).catch(() => {}));
       }
       // Borrado espejo en users/{uid}/...
       try {
-        const uid = clientAuth?.currentUser?.uid;
-        if (uid && clientDb) {
-          ops.push(deleteDoc(doc(clientDb, 'users', uid, 'tasks', editingId)));
-          ops.push(deleteDoc(doc(clientDb, 'users', uid, 'meetings', editingId)));
+        const uid = auth?.currentUser?.uid;
+        if (uid && db) {
+          ops.push(deleteDoc(doc(db, 'users', uid, 'tasks', editingId)));
+          ops.push(deleteDoc(doc(db, 'users', uid, 'meetings', editingId)));
         }
       } catch (_) {}
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃƒÂ³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÒ³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -431,23 +449,44 @@ export default function Tasks() {
     }
   };
 
-  // Marcar tarea como completada
-  const toggleCompleted = id => {
-    setCompleted(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  //
 
   // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
-  const allEvents = [
-    ...(Array.isArray(meetingsState) ? meetingsState : [])
-  ];
 
-  // FunciÃƒÂ³n auxiliar para validar y normalizar fechas
+  // FunciÒ³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
   const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } = useSafeEvents(meetingsState);
 
   // Tareas Gantt normalizadas y acotadas
   const { uniqueGanttTasks } = useGanttNormalizedTasks(tasksState);
   const ganttTasksBounded = useGanttBoundedTasks(uniqueGanttTasks, projectStart, projectEnd, meetingsState);
+
+  // Conjunto de tareas completadas (por id o por taskId)
+  const completedIdSet = useMemo(() => {
+    const s = new Set();
+    try {
+      const arr = Array.isArray(completedDocs) ? completedDocs : [];
+      for (const d of arr) {
+        if (!d) continue;
+        if (d.id) s.add(String(d.id));
+        if (d.taskId) s.add(String(d.taskId));
+      }
+    } catch (_) {}
+    return s;
+  }, [completedDocs]);
+
+  // Toggle rápido de completado (lista/fallback)
+  const toggleCompleteById = useCallback(async (id, nextCompleted) => {
+    try {
+      if (!activeWedding || !id) return;
+      const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', String(id));
+      if (nextCompleted) {
+        await setDoc(compRef, { id: String(id), taskId: String(id), completedAt: serverTimestamp() }, { merge: true });
+      } else {
+        await deleteDoc(compRef).catch(() => {});
+      }
+    } catch (_) {}
+  }, [activeWedding]);
   const weddingMarkerDate = useMemo(() => {
     try {
       const m = (Array.isArray(meetingsState) ? meetingsState : []).find(ev => ev?.id === 'wedding-day' || ev?.autoKey === 'wedding-day' || /boda/i.test(String(ev?.title || '')));
@@ -482,8 +521,59 @@ export default function Tasks() {
     setGanttViewMode,
   });
   
-  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÂ³n// CÃƒÂ¡lculo de progreso - asegurando que los estados sean arrays
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÒ³n// CÒ¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
+
+  // 1) Escuchar info de la boda para fijar projectStart/projectEnd
+  useEffect(() => {
+    if (!activeWedding || !db) return;
+    try {
+      const ref = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
+      const unsub = onSnapshot(ref, (snap) => {
+        try {
+          const info = snap.exists() ? (snap.data() || {}) : {};
+          let raw = info?.weddingDate || info?.date || null;
+          let wDate = null;
+          if (raw) {
+            wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+          }
+          if (wDate && !isNaN(wDate.getTime())) {
+            setProjectEnd(wDate);
+            setProjectStart(addMonths(wDate, -6));
+          }
+        } catch (_) {}
+      }, () => {});
+      return () => { try { unsub && unsub(); } catch (_) {} };
+    } catch (_) {}
+  }, [activeWedding]);
+
+  // 2) Crear/actualizar automáticamente el evento 'wedding-day' si hay fecha
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!activeWedding || !db) return;
+        if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
+        const start = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), projectEnd.getDate(), 12, 0, 0, 0);
+        const end = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), projectEnd.getDate(), 14, 0, 0, 0);
+        const ref = doc(db, 'weddings', activeWedding, 'meetings', 'wedding-day');
+        const snap = await getDoc(ref).catch(() => null);
+        const prev = snap && snap.exists() ? snap.data() : null;
+        const next = {
+          id: 'wedding-day',
+          autoKey: 'wedding-day',
+          title: prev?.title || 'Día de la boda',
+          category: prev?.category || 'OTROS',
+          start,
+          end,
+          createdAt: prev?.createdAt || serverTimestamp(),
+        };
+        const same = prev && prev.start && prev.end &&
+          (new Date(prev.start).getTime() === start.getTime()) &&
+          (new Date(prev.end).getTime() === end.getTime());
+        if (!same) await setDoc(ref, next, { merge: true });
+      } catch (_) {}
+    })();
+  }, [activeWedding, projectEnd]);
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
@@ -513,6 +603,7 @@ export default function Tasks() {
             endTime: task.end.toTimeString().slice(0, 5),
             long: true,
             assignee: task.assignee || '',
+            completed: completedIdSet.has(String(task.id)),
           });
           setShowNewTask(true);
         }}
@@ -530,6 +621,8 @@ export default function Tasks() {
           safeEvents={safeMeetings}
           sortedEvents={sortedEvents}
           categories={categories}
+          completedSet={completedIdSet}
+          onToggleComplete={(id, val) => toggleCompleteById(id, val)}
           ErrorBoundaryComponent={ErrorBoundary}
           localizer={localizer}
           eventStyleGetter={eventStyleGetter}
@@ -548,6 +641,7 @@ export default function Tasks() {
               endTime: eventEnd.toTimeString().slice(0, 5),
               long: false,
               assignee: event.assignee || '',
+              completed: completedIdSet.has(String(event.id)),
             });
             setShowNewTask(true);
           }}
@@ -555,6 +649,8 @@ export default function Tasks() {
         <div className="w-full lg:w-1/3">
           <TaskList
             tasks={safeMeetingsFiltered}
+            completedSet={completedIdSet}
+            onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             onTaskClick={(event) => {
               const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
               const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
@@ -569,6 +665,7 @@ export default function Tasks() {
                 endTime: eventEnd.toTimeString().slice(0, 5),
                 long: false,
                 assignee: event.assignee || '',
+                completed: completedIdSet.has(String(event.id)),
               });
               setShowNewTask(true);
             }}

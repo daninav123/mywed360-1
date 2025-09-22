@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+�import React, { useEffect, useState } from 'react';
 import LanguageSelector from '../components/ui/LanguageSelector';
 import { Card, Button, Input } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
@@ -44,7 +44,7 @@ function Perfil() {
   const weddingId = activeWedding || userProfile?.weddingId || '';
   const { roles: collaborators, loading: rolesLoading, assignRole, removeRole } = useRoles(weddingId);
 
-  // Actualiza nÃºmero de invitados (con muestra local si no hay datos)
+  // Actualiza número de invitados (con muestra local si no hay datos)
   useEffect(() => {
     function updateGuestCount() {
       let guests = [];
@@ -104,10 +104,10 @@ function Perfil() {
   const saveProfile = async () => {
     const uid = fallbackUid;
     if (!uid) { toast.error('No se pudo determinar tu usuario'); return; }
-    // Validaciones rÃ¡pidas
+    // Validaciones rápidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrÃ³nico invÃ¡lido');
+        toast.error('Correo electrónico inválido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -116,7 +116,7 @@ function Perfil() {
       }
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
-        if (isNaN(d.getTime())) { toast.error('Fecha de boda invÃ¡lida'); return; }
+        if (isNaN(d.getTime())) { toast.error('Fecha de boda inválida'); return; }
       }
     } catch {}
     try {
@@ -184,7 +184,7 @@ function Perfil() {
           <div className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-[var(--color-danger)]' : (syncStatus.isSyncing || syncStatus.pendingChanges) ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}></div>
           <span>{!syncStatus.isOnline ? 'Sin conexi\u00F3n (modo offline)' : syncStatus.isSyncing ? 'Sincronizando...' : syncStatus.pendingChanges ? 'Cambios pendientes' : 'Sincronizado'}</span>
           {lastSavedAt && (
-            <span className="text-muted">{'Ãšltimo guardado: '} {new Date(lastSavedAt).toLocaleString()}</span>
+            <span className="text-muted">{'�altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}</span>
           )}
         </div>
       </div>
@@ -203,7 +203,7 @@ function Perfil() {
         <div className="p-2">
           <p className="text-sm text-gray-600">
             Las preferencias musicales ahora se configuran desde
-            <a className="ml-1 text-blue-600 hover:underline" href="/protocolo/momentos-especiales">Protocolo â†’ Momentos Especiales</a>.
+            <a className="ml-1 text-blue-600 hover:underline" href="/protocolo/momentos-especiales">Protocolo �  Momentos Especiales</a>.
           </p>
         </div>
       </Card>

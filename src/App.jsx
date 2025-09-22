@@ -12,14 +12,14 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Tasks from './pages/Tasks';
 import Bodas from './pages/Bodas';
-// Nota: especificamos la extensión .jsx para asegurar la resolución en entornos Linux/CI
+// Nota: especificamos la extensi�n .jsx para asegurar la resoluci�n en entornos Linux/CI
 import BodaDetalle from './pages/BodaDetalle.jsx';
 import Finance from './pages/Finance';
 import BankConnect from './pages/BankConnect.jsx';
 import More from './pages/More';
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 import Proveedores from './pages/ProveedoresNuevo';
-// Lazy load de pÃ¡ginas pesadas para reducir bundle inicial
+// Lazy load de páginas pesadas para reducir bundle inicial
 const UnifiedEmail = React.lazy(() => import('./pages/UnifiedEmail'));
 const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
 const ComposeEmail = React.lazy(() => import('./components/email/ComposeEmail'));
@@ -120,14 +120,14 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
-            {/* Rutas pÃºblicas */}
+            {/* Rutas públicas */}
             <Route path="w/:uid" element={<WeddingSite />} />
             <Route path="p/:slug" element={<PublicWedding />} />
             <Route path="supplier/:token" element={<SupplierPortal />} />
             <Route path="invitation/:code" element={<AcceptInvitation />} />
             <Route path="rsvp/:token" element={<RSVPConfirm />} />
 
-            {/* Dev tools pÃºblicas */}
+            {/* Dev tools públicas */}
             <Route path="dev/seed-guests" element={<DevSeedGuests />} />
             <Route path="dev/ensure-finance" element={<DevEnsureFinance />} />
 
@@ -159,7 +159,7 @@ function App() {
                   <Route path="documentos-legales" element={<Navigate to="documentos" replace />} />
                 </Route>
 
-                {/* Diseños */}
+                {/* Dise�os */}
                 <Route path="disenos" element={<DisenosLayout />}>
                   <Route index element={<Navigate to="invitaciones" replace />} />
                   <Route path="invitaciones" element={<DisenosInvitaciones />} />
@@ -200,7 +200,7 @@ function App() {
               </Route>
             </Route>
           </Routes>
-          {/* Sistema de diagnÃ³stico global */}
+          {/* Sistema de diagnóstico global */}
           </React.Suspense>
           <DiagnosticPanel />
         </BrowserRouter>

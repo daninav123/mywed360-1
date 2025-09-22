@@ -121,15 +121,15 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
         if (cp > 0xFFFF) i++;
       }
       let out = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
-      out = out.replace(/Â/g, '');
+      out = out.replace(//g, '');
       const patterns = [
-        [/MÃ’Âºsica/gi, 'Música'],
+        [/MÃ’ºsica/gi, 'Música'],
         [/Música/gi, 'Música'],
         [/Musica/gi, 'Música'],
-        [/VÃ’Â­deo/gi, 'Vídeo'],
+        [/VÃ’­deo/gi, 'Vídeo'],
         [/Vídeo/gi, 'Vídeo'],
         [/Video/gi, 'Vídeo'],
-        [/FotografÃ’Â­a/gi, 'Fotografía'],
+        [/FotografÃ’­a/gi, 'Fotografía'],
         [/Fotografía/gi, 'Fotografía'],
         [/Fotografia/gi, 'Fotografía'],
         [/Decoración/gi, 'Decoración'],
