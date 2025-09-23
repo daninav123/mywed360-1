@@ -1,8 +1,8 @@
 import { UploadCloud, Check, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
-import useTranslations from '../../hooks/useTranslations';
 
+import useTranslations from '../../hooks/useTranslations';
 import { Button, Input } from '../ui';
 
 /**

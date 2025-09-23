@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
 import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { useEffect } from 'react';
+
 import { useWedding } from '../../context/WeddingContext';
+import { db } from '../../firebaseConfig';
 import { addNotification, showNotification, shouldNotify } from '../../services/notificationService';
 
 // Observa tareas de la boda activa (consulta puntual + polling simple) y emite notificaciones

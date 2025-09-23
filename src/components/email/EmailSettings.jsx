@@ -1,6 +1,7 @@
 import { Check, AlertTriangle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
+import TagsManager from './TagsManager';
 import { useAuth } from '../../context/AuthContext';
 import {
   getAutomationConfig,
@@ -10,9 +11,8 @@ import {
 } from '../../services/emailAutomationService';
 import { createEmailAlias, initEmailService } from '../../services/emailService';
 import Button from '../Button';
-import Card from '../ui/Card';
-import TagsManager from './TagsManager';
 import WeddingAccountLink from '../settings/WeddingAccountLink';
+import Card from '../ui/Card';
 
 /**
  * Componente para gestionar la configuración de correo electrónico del usuario

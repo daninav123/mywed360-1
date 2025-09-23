@@ -1,11 +1,11 @@
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
-import { useAuth } from '../../hooks/useAuth';
 import { auth, db } from '../../firebaseConfig';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '../../hooks/useAuth';
+import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
 
 // Selector de idioma con dropdown
 const LanguageSelector = ({

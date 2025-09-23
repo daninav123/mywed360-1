@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
 import { collectionGroup, onSnapshot } from 'firebase/firestore';
 // Construimos la query con where/orderBy de forma segura (fallback sin order)
 import { query as fQuery, where as fWhere, orderBy as fOrderBy } from 'firebase/firestore';
+import { useEffect, useMemo, useState } from 'react';
+
 import { db } from '../firebaseConfig';
 
 // Escucha una collectionGroup y filtra por weddingId.

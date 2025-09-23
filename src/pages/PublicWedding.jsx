@@ -1,6 +1,7 @@
 import React from 'react';
-import ExternalImage from '@/components/ExternalImage';
 import { useParams } from 'react-router-dom';
+
+import ExternalImage from '@/components/ExternalImage';
 
 export default function PublicWedding() {
   const { slug } = useParams();

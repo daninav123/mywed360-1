@@ -1,5 +1,5 @@
-import { useWedding } from '../context/WeddingContext';
 import { useWeddingCollection } from './useWeddingCollection';
+import { useWedding } from '../context/WeddingContext';
 
 /**
  * Simplificado: este hook siempre trabaja contra weddings/{weddingId}/{collectionName}.

@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { get as apiGet } from '../../services/apiClient';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+
+import { get as apiGet } from '../../services/apiClient';
 
 function UsersWithErrorsTable({ timeframe = 'day' }) {
   const [items, setItems] = useState([]);

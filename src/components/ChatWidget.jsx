@@ -5,9 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 import Spinner from './Spinner';
-import { performanceMonitor } from '../services/PerformanceMonitor';
 import { useAuth } from '../hooks/useAuth';
 import { post as apiPost } from '../services/apiClient';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 import { getBackendBase } from '../utils/backendBase';
 
 // --- Modo debug opcional ---

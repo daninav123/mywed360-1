@@ -1,4 +1,4 @@
-{
+﻿{
     "$schema":  "https://json.schemastore.org/package.json",
     "name":  "mywed360",
     "version":  "0.1.0",
@@ -49,7 +49,7 @@
                     "i18n:update":  "node scripts/update_i18n_full.js \u0026\u0026 node scripts/fixLocalesMojibake.js \u0026\u0026 node scripts/validateI18n.js",
                     "i18n:sync":  "node scripts/syncLocales.js es fr",
                     "fix:mojibake":  "node scripts/fixSpanishMojibake.js",
-                    "ci:check": "npm run lint && npm run test:unit && npm run validate:i18n && npm run check:bundle"
+                    "ci:check":  "npm run lint \u0026\u0026 npm run test:unit \u0026\u0026 npm run validate:i18n \u0026\u0026 npm run check:bundle"
                 },
     "dependencies":  {
                          "@emotion/react":  "^11.14.0",
@@ -113,7 +113,7 @@
                       "react":  "18.2.0",
                       "react-dom":  "18.2.0"
                   },
-    "devDependencies":  {
+  "devDependencies":  {
                             "@babel/core":  "7.24.7",
                             "@firebase/rules-unit-testing":  "^3.0.0",
                             "@testing-library/jest-dom":  "^6.8.0",
@@ -148,18 +148,19 @@
                             "husky":  "^9.1.6",
                             "lint-staged":  "^15.2.10",
                             "prettier":  "^3.3.3",
-                            "sharp":  "^0.34.3"
+                            "sharp":  "^0.34.3",
+                            "firebase-functions-test": "^3.0.0"
                         },
     "optionalDependencies":  {
                                  "@rollup/rollup-linux-x64-gnu":  "^4.46.4"
                              },
-    "lint-staged": {
-      "*.{js,jsx,ts,tsx}": [
-        "eslint --fix",
-        "prettier --write"
-      ],
-      "*.{json,css,md}": [
-        "prettier --write"
-      ]
-    }
+    "lint-staged":  {
+                        "*.{js,jsx,ts,tsx}":  [
+                                                  "eslint --fix",
+                                                  "prettier --write"
+                                              ],
+                        "*.{json,css,md}":  [
+                                                "prettier --write"
+                                            ]
+                    }
 }

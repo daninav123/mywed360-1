@@ -12,9 +12,7 @@ import {
 import { Sparkles, Plus, Settings } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { post as apiPost } from '../services/apiClient';
-import { useWedding } from '../context/WeddingContext';
-import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+
 
 // Firebase
 
@@ -25,8 +23,11 @@ import ProveedorCardNuevo from '../components/proveedores/ProveedorCardNuevo';
 import ProveedorDetalle from '../components/proveedores/ProveedorDetalle';
 import ProveedorFiltro from '../components/proveedores/ProveedorFiltro';
 import ProveedorFormModal from '../components/proveedores/ProveedorFormModal';
+import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../lib/firebase';
+import { post as apiPost } from '../services/apiClient';
 
 /**
  * Página de gestión de proveedores

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   collection,
   addDoc,
@@ -11,8 +10,10 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { db, auth } from '../../firebaseConfig';
+import { useEffect } from 'react';
+
 import { useWedding } from '../../context/WeddingContext';
+import { db, auth } from '../../firebaseConfig';
 
 // Listens to window 'lovenda-tasks' events and persists tasks/meetings in Firestore
 // Supports actions: add (default), update, delete, complete (only for tasks)

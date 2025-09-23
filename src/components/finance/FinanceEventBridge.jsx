@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { useEffect } from 'react';
+
 import { useWedding } from '../../context/WeddingContext';
+import { db } from '../../firebaseConfig';
 
 // Listens to 'lovenda-finance' custom events and creates transactions in Firestore
 export default function FinanceEventBridge() {

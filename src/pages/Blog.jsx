@@ -1,11 +1,11 @@
 ﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import ExternalImage from '@/components/ExternalImage';
 import { getBackendBase } from '@/utils/backendBase.js';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
-import ExternalImage from '@/components/ExternalImage';
 import { fetchWeddingNews } from '../services/blogService';
 
 export default function Blog() {

@@ -4,8 +4,8 @@ import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
-import EmailService, { setAuthContext } from '../../../services/emailService';
 import { post as apiPost } from '../../../services/apiClient';
+import EmailService, { setAuthContext } from '../../../services/emailService';
 import EmailComposer from '../EmailComposer';
 // (duplicated import removed)
 

@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 // import anterior eliminado: useUserContext
 import { getBackendBase } from '@/utils/backendBase.js';
 
+import ExternalImage from './ExternalImage';
 import Input from './Input';
 import Nav from './Nav';
 import PlannerDashboard from './PlannerDashboard';
@@ -31,7 +32,6 @@ import {
 
 import useFinance from '../hooks/useFinance';
 import { fetchWeddingNews } from '../services/blogService';
-import ExternalImage from './ExternalImage';
 import { fetchWall } from '../services/wallService';
 
 export default function HomePage() {

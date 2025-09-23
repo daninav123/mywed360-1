@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { db } from '../../firebaseConfig';
 import { useWedding } from '../../context/WeddingContext';
+import { db } from '../../firebaseConfig';
 import { useAuth } from '../../hooks/useAuth';
 import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
 

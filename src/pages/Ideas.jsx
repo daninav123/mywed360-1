@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+
 import ExternalImage from '@/components/ExternalImage';
 
 import PageWrapper from '../components/PageWrapper';

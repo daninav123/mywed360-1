@@ -17,6 +17,7 @@ export default defineConfig({
     include: [
       'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
       'backend/**/*.{test,spec}.{js,ts}',
+      'functions/**/*.{test,spec}.{js,ts}',
     ],
     exclude: ['**/node_modules/**', '**/dist/**'],
     passWithNoTests: false,
@@ -29,6 +30,7 @@ export default defineConfig({
     environmentMatchGlobs: [
       ['src/**', 'jsdom'],
       ['backend/**', 'node'],
+      ['functions/**', 'node'],
     ],
 
     // Reporters

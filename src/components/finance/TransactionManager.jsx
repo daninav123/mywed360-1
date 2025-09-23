@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
+import React, { useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
-import { Card, Button } from '../ui';
 import Modal from '../Modal';
-import TransactionForm from './TransactionForm';
+import { Card, Button } from '../ui';
 import FinanceStatsHeader from './FinanceStatsHeader';
+import TransactionForm from './TransactionForm';
 
 // ImplementaciÃ³n mÃ­nima pero funcional para gestionar la primera creaciÃ³n
 export default function TransactionManager({
@@ -28,7 +28,7 @@ export default function TransactionManager({
         {t('finance.transactions.empty', { defaultValue: 'No hay transacciones que mostrar' })}
       </p>
       <Button className="mt-4" onClick={openCreate} leftIcon={<Plus size={16} />}>
-        {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacción' })}
+        {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacciï¿½n' })}
       </Button>
     </div>
   );
@@ -72,7 +72,7 @@ export default function TransactionManager({
       <Modal
         open={showTransactionModal}
         onClose={closeModal}
-        title={t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}
+        title={t('finance.transactions.new', { defaultValue: 'Nueva transacciï¿½n' })}
       >
         <TransactionForm
           isLoading={isLoading}

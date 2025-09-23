@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
-const cors = require('cors')({ origin: true });
+const createCors = require('cors');
+const crypto = require('crypto');
 // Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
 const fetch = globalThis.fetch;
 let FormDataLib = null;
@@ -11,17 +12,76 @@ if (!admin.apps?.length) {
 }
 const db = admin.firestore();
 
+// ----- CORS estricto para Functions -----
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://mywed360.netlify.app',
+];
+const ALLOWED_ORIGINS = String(
+  process.env.FUNCTIONS_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || DEFAULT_ALLOWED_ORIGINS.join(',')
+)
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const corsHandler = createCors({
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+});
+
+// ----- Helpers de autenticación (Firebase ID token) -----
+const allowMockTokens = (() => {
+  const v = process.env.ALLOW_MOCK_TOKENS;
+  return v ? v !== 'false' : (process.env.NODE_ENV !== 'production');
+})();
+
+function getBearerToken(req) {
+  try {
+    const h = req.headers['authorization'] || req.headers['Authorization'];
+    if (!h) return null;
+    const p = String(h).split(' ');
+    if (p.length !== 2 || p[0] !== 'Bearer') return null;
+    return p[1];
+  } catch { return null; }
+}
+
+async function verifyIdTokenOrMock(req) {
+  const token = getBearerToken(req);
+  if (!token) return null;
+  if (allowMockTokens && token.startsWith('mock-')) {
+    // mock-<uid>-<email>
+    const parts = token.split('-');
+    if (parts.length >= 3) {
+      return { uid: parts[1], email: parts.slice(2).join('-'), email_verified: true };
+    }
+  }
+  try {
+    return await admin.auth().verifyIdToken(token);
+  } catch {
+    return null;
+  }
+}
 // Configuración para Mailgun
 // Usar variable de entorno primero; si no existe, intentar leer de funciones config y evitar TypeError
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || functions.config().mailgun?.key || '';
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'mywed360.com';
 // Permitir sobreescribir la URL base (soporta US y EU)
 const MAILGUN_BASE_URL = process.env.MAILGUN_BASE_URL || functions.config().mailgun?.base_url || 'https://api.mailgun.net/v3';
+const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY || functions.config().mailgun?.signing_key || '';
 
 // Función para obtener eventos de Mailgun
 exports.getMailgunEvents = functions.https.onRequest((request, response) => {
-  cors(request, response, async () => {
+  corsHandler(request, response, async () => {
     try {
+      const user = await verifyIdTokenOrMock(request);
+      if (!user) {
+        return response.status(401).json({ error: 'Unauthorized' });
+      }
       // Verificar que el usuario está autenticado (recomendado usar Firebase Auth)
       // const authHeader = request.headers.authorization;
       // if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -40,7 +100,7 @@ exports.getMailgunEvents = functions.https.onRequest((request, response) => {
       // Construir URL para Mailgun
       const params = new URLSearchParams({
         event,
-        limit
+        limit: String(Math.min(300, Math.max(1, Number(limit) || 50)))
       });
       if (recipient) params.append('recipient', recipient);
       if (from) params.append('from', from);
@@ -88,10 +148,8 @@ exports.getMailgunEvents = functions.https.onRequest((request, response) => {
 
 // Función para enviar correos a través de Mailgun
 exports.sendEmail = functions.https.onRequest((request, response) => {
-  cors(request, response, async () => {
+  corsHandler(request, response, async () => {
     // Configurar CORS de forma explícita
-    response.set('Access-Control-Allow-Origin', '*');
-    response.set('Access-Control-Allow-Headers', 'Content-Type');
     response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
     // Preflight
@@ -103,6 +161,11 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
     }
     
     try {
+      // Requiere autenticación Firebase
+      const user = await verifyIdTokenOrMock(request);
+      if (!user) {
+        return response.status(401).json({ error: 'Unauthorized' });
+      }
       // Extraer datos del cuerpo
       const { from, to, subject, body, html, attachments } = request.body;
       
@@ -111,13 +174,38 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
       }
       
       // Construir formData para Mailgun
-            // Crear autenticacin Basic para Mailgun
+            // Crear autenticación Basic para Mailgun
       const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
 
       // Si hay adjuntos, usar multipart/form-data con descarga de URLs
       const hasAttachments = Array.isArray(attachments) && attachments.length > 0;
       let mailgunResponse;
       if (hasAttachments && FormDataLib) {
+        const ATTACHMENT_MAX_BYTES = Number(process.env.EMAIL_ATTACHMENT_MAX_BYTES || 5 * 1024 * 1024);
+        const ATTACHMENT_TIMEOUT_MS = Number(process.env.EMAIL_ATTACHMENT_TIMEOUT_MS || 10000);
+        const DEFAULT_ALLOWED_MIME = [
+          'application/pdf',
+          'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+          'text/plain',
+        ];
+        const ALLOWED_MIME = String(process.env.EMAIL_ATTACHMENT_ALLOWED_MIME || DEFAULT_ALLOWED_MIME.join(','))
+          .split(',')
+          .map((s) => s.trim().toLowerCase())
+          .filter(Boolean);
+
+        const inferMimeFromName = (name) => {
+          try {
+            const n = String(name || '').toLowerCase();
+            if (n.endsWith('.pdf')) return 'application/pdf';
+            if (n.endsWith('.jpg') || n.endsWith('.jpeg')) return 'image/jpeg';
+            if (n.endsWith('.png')) return 'image/png';
+            if (n.endsWith('.gif')) return 'image/gif';
+            if (n.endsWith('.webp')) return 'image/webp';
+            if (n.endsWith('.svg')) return 'image/svg+xml';
+            if (n.endsWith('.txt')) return 'text/plain';
+          } catch {}
+          return '';
+        };
         const form = new FormDataLib();
         form.append('from', from);
         form.append('to', to);
@@ -130,9 +218,28 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
           const filename = att.filename || att.name || 'attachment';
           if (att.url) {
             try {
-              const resp = await fetch(att.url);
+              const controller = new AbortController();
+              const t = setTimeout(() => controller.abort(), ATTACHMENT_TIMEOUT_MS);
+              const resp = await fetch(att.url, { signal: controller.signal });
+              clearTimeout(t);
               if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              // Validar tipo MIME permitido
+              let ctype = '';
+              try { ctype = (resp.headers && (resp.headers.get ? resp.headers.get('content-type') : resp.headers['content-type'])) || ''; } catch {}
+              const baseType = String(ctype || '').split(';')[0].trim().toLowerCase();
+              const inferred = baseType || inferMimeFromName(filename || att.url || '');
+              if (ALLOWED_MIME.length && inferred && !ALLOWED_MIME.includes(inferred)) {
+                throw new Error(`Attachment content-type not allowed: ${inferred}`);
+              }
+              const lenHeader = resp.headers?.get ? resp.headers.get('content-length') : (resp.headers && resp.headers['content-length']);
+              const contentLength = Number(lenHeader || 0);
+              if (contentLength && contentLength > ATTACHMENT_MAX_BYTES) {
+                throw new Error(`Attachment too large (${contentLength} > ${ATTACHMENT_MAX_BYTES})`);
+              }
               const buf = Buffer.from(await resp.arrayBuffer());
+              if (buf.length > ATTACHMENT_MAX_BYTES) {
+                throw new Error(`Attachment too large after download (${buf.length} > ${ATTACHMENT_MAX_BYTES})`);
+              }
               form.append('attachment', buf, { filename });
             } catch (e) {
               console.warn('No se pudo adjuntar archivo desde URL:', filename, e?.message || e);
@@ -188,14 +295,45 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
 // Webhook: recepción de eventos de Mailgun
 // ------------------------------
 exports.mailgunWebhook = functions.https.onRequest((request, response) => {
-  cors(request, response, async () => {
+  corsHandler(request, response, async () => {
+    if (request.method === 'OPTIONS') {
+      return response.status(204).send('');
+    }
     if (request.method !== 'POST') {
       return response.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
+      const isProd = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+      if (!MAILGUN_SIGNING_KEY && isProd) {
+        console.error('MAILGUN_SIGNING_KEY no configurada');
+        return response.status(500).json({ error: 'Signing key not configured' });
+      }
       // Mailgun puede enviar un único evento o un array bajo "signature"+"event-data"
       const events = Array.isArray(request.body) ? request.body : [request.body];
+
+      // Verificación de firma (primer evento) para asegurar origen Mailgun
+      if (MAILGUN_SIGNING_KEY) {
+        for (const evt of events) {
+          const sig = evt?.signature;
+        if (!sig) {
+          console.warn('Webhook Mailgun sin firma');
+          return response.status(401).json({ error: 'Missing signature' });
+        }
+        const signed = String(sig.signature || '');
+        const token = String(sig.token || '');
+        const timestamp = String(sig.timestamp || '');
+        const hmac = crypto
+          .createHmac('sha256', MAILGUN_SIGNING_KEY)
+          .update(timestamp + token)
+          .digest('hex');
+        const ok = signed && hmac && signed.length === hmac.length && crypto.timingSafeEqual(Buffer.from(signed), Buffer.from(hmac));
+        if (!ok) {
+          console.warn('Webhook Mailgun firma inválida');
+          return response.status(401).json({ error: 'Invalid signature' });
+        }
+        }
+      }
 
       const batch = db.batch();
 

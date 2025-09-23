@@ -189,9 +189,9 @@ export default function Tasks() {
       window.mywed = window.mywed || {};
       window.mywed.fixParentBlockDates = async () => {
         if (!activeWedding) return { ok: false };
-        const startForBlocks = projectEnd instanceof Date && !isNaN(projectEnd)
-          ? addMonths(projectEnd, -12)
-          : projectStart;
+        const startForBlocks = (projectStart instanceof Date && !isNaN(projectStart))
+          ? projectStart
+          : (projectEnd instanceof Date && !isNaN(projectEnd) ? addMonths(projectEnd, -12) : null);
         const res = await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
         console.log('[Debug] fixParentBlockDates', res);
         return res;
@@ -1323,7 +1323,7 @@ export default function Tasks() {
       try {
         if (!activeWedding) return;
         if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
-        const startForBlocks = addMonths(projectEnd, -12);
+        const startForBlocks = (projectStart instanceof Date && !isNaN(projectStart)) ? projectStart : addMonths(projectEnd, -12);
         await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
       } catch (_) {}
     })();
@@ -1462,4 +1462,7 @@ export default function Tasks() {
     </div>
   );
 }
+
+
+
 

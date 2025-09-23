@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 
-import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { useAuth } from '../hooks/useAuth';
+import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
 

@@ -7,7 +7,8 @@ function getNordigenEnv() {
   const {
     NORDIGEN_SECRET_ID,
     NORDIGEN_SECRET_KEY,
-    NORDIGEN_BASE_URL = 'https://ob.nordigen.com/api/v2',
+    // Nordigen was acquired by GoCardless; default to GoCardless domain
+    NORDIGEN_BASE_URL = 'https://ob.gocardless.com/api/v2',
     BANK_REDIRECT_URL,
     VITE_BACKEND_BASE_URL,
     PUBLIC_URL,

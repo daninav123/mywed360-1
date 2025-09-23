@@ -566,9 +566,9 @@ app.get('/api/transactions', async (req, res) => {
   try {
     const { bankId, from, to } = req.query;
 
-    // If Nordigen credentials missing, return mock data
-    const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY, NORDIGEN_BASE_URL } =
-      process.env;
+    // If Nordigen/GoCardless credentials missing, return mock data
+    const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY } = process.env;
+    const NORDIGEN_BASE_URL = process.env.NORDIGEN_BASE_URL || 'https://ob.gocardless.com/api/v2';
     if (!NORDIGEN_SECRET_ID || !NORDIGEN_SECRET_KEY) {
       return res.json([
         {

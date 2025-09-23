@@ -629,7 +629,7 @@
     },
     "transactions": {
       "title": "Transactions",
-      "connectBank": "Connecter la banque (Nordigen)",
+      "connectBank": "Connecter la banque (Open Banking)",
       "importCSV": "Importer CSV",
       "exportCSV": "Exporter CSV",
       "new": "Nouvelle transaction",

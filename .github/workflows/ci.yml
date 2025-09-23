@@ -1,49 +1,88 @@
-name: CI
+﻿name: CI
 
 on:
   push:
-    branches: [ main, master, windows ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, master, windows ]
+    branches: [ main, master ]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  build-and-unit:
+    name: Lint, Unit Tests, Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Detect changes
-        id: changes
-        uses: dorny/paths-filter@v3
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          filters: |
-            frontend:
-              - 'src/**'
-              - 'public/**'
-              - 'vite.config.*'
-            backend:
-              - 'backend/**'
-              - 'firebase.json'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+          node-version: 20
           cache: 'npm'
-      - name: Install deps
-        run: npm ci
+
+      - name: Install root deps (no postinstall)
+        run: npm ci --ignore-scripts
+
+      - name: Install backend deps (no postinstall)
+        run: |
+          cd backend
+          npm ci --ignore-scripts
+
       - name: Lint
-        run: npm run lint --if-present || true
-      - name: Validate i18n (non-strict)
-        run: node scripts/validateI18n.js || true
-      - name: Run unit tests (disabled)
-        if: ${{ false }}
-        run: npm test --if-present
-      - name: Build frontend
-        run: npm run build
-      - name: Bundle budget
-        run: npm run check:bundle
-      - name: E2E smoke (temporarily disabled)
-        if: ${{ false }}
+        run: npm run lint
+
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
+
+      - name: Validate i18n
+        run: npm run validate:i18n
+
+      - name: Build (Vite)
         env:
-          VITE_BACKEND_BASE_URL: http://localhost:4004
-          ALLOWED_ORIGIN: http://localhost:5173
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Bundle budget check
+        run: npm run check:bundle -- --maxBytes=2000000
+
+  e2e:
+    name: E2E (Cypress)
+    if: ${{ vars.CI_E2E == 'true' }}
+    needs: build-and-unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install deps (enable scripts for Cypress)
+        run: |
+          npm ci
+          cd backend && npm ci
+
+      - name: Run E2E
+        env:
+          # Provide these via repo/environment secrets if needed
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         run: npm run e2e:ci
 
+      - name: Upload Cypress videos (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: cypress/videos

@@ -14,10 +14,10 @@ import { useState, useEffect, createContext, useContext, useCallback } from 'rea
 import { auth } from '../firebaseConfig';
 import { setAuthContext as registerEmailAuthContext } from '../services/emailService';
 import { setAuthContext as registerNotificationAuthContext } from '../services/notificationService';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 import { initReminderService, stopReminderService } from '../services/reminderService';
 import { setAuthContext as registerWhatsappAuthContext } from '../services/whatsappService';
 import errorLogger from '../utils/errorLogger';
-import { performanceMonitor } from '../services/PerformanceMonitor';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);

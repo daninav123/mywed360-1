@@ -3,6 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 
+import ConfigEventBridge from '@/components/config/ConfigEventBridge.jsx';
+import FinanceEventBridge from '@/components/finance/FinanceEventBridge.jsx';
+import GuestEventBridge from '@/components/guests/GuestEventBridge.jsx';
+import SupplierEventBridge from '@/components/proveedores/SupplierEventBridge.jsx';
+import TaskEventBridge from '@/components/tasks/TaskEventBridge.jsx';
+import TaskNotificationWatcher from '@/components/tasks/TaskNotificationWatcher.jsx';
+
 import ChatWidget from './ChatWidget';
 import DarkModeToggle from './DarkModeToggle';
 import DefaultAvatar from './DefaultAvatar';
@@ -16,12 +23,6 @@ import NotificationWatcher from './notifications/NotificationWatcher';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
 import { useOnboarding } from '../hooks/useOnboarding';
-import TaskEventBridge from '@/components/tasks/TaskEventBridge.jsx';
-import FinanceEventBridge from '@/components/finance/FinanceEventBridge.jsx';
-import SupplierEventBridge from '@/components/proveedores/SupplierEventBridge.jsx';
-import ConfigEventBridge from '@/components/config/ConfigEventBridge.jsx';
-import GuestEventBridge from '@/components/guests/GuestEventBridge.jsx';
-import TaskNotificationWatcher from '@/components/tasks/TaskNotificationWatcher.jsx';
 
 export default function MainLayout() {
   const { t } = useTranslation();

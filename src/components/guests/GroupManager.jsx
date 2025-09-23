@@ -1,6 +1,6 @@
 ﻿import React, { useMemo, useState } from 'react';
-import useTranslations from '../../hooks/useTranslations';
 
+import useTranslations from '../../hooks/useTranslations';
 import Modal from '../Modal';
 import { Button, Input } from '../ui';
 

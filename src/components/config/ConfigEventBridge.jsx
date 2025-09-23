@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
-import { db, auth } from '../../firebaseConfig';
+import { useEffect } from 'react';
+
 import { useWedding } from '../../context/WeddingContext';
+import { db, auth } from '../../firebaseConfig';
 
 // Listens to 'lovenda-profile' changes and persists wedding/user config to Firestore
 export default function ConfigEventBridge() {

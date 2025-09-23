@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
-import { useAuth } from '../../hooks/useAuth';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
+import { useAuth } from '../../hooks/useAuth';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 import * as EmailService from '../../services/EmailService';
 

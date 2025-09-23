@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import { useAuth } from './useAuth';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
+import { useAuth } from './useAuth';
 import EmailService from '../services/emailService';
 import { createTrackingRecord } from '../services/EmailTrackingService';
 import { addTagToEmail } from '../services/tagService';

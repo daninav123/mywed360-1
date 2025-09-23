@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import useWeddingCollection from './useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
+import { guestSchema, guestUpdateSchema } from '../schemas/guest';
 import { post as apiPost } from '../services/apiClient';
 import { subscribeSyncState, getSyncState } from '../services/SyncService';
 import { ensureExtensionAvailable, sendBatchMessages } from '../services/whatsappBridge';
 import { toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
-import { guestSchema, guestUpdateSchema } from '../schemas/guest';
 
 // Hook personalizado para gestión optimizada de invitados
 const useGuests = () => {

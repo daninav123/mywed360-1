@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
-import { useProviderEmail } from './useProviderEmail';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
+import { useProviderEmail } from './useProviderEmail';
 import * as EmailService from '../services/emailService';
 import EmailTemplateService from '../services/EmailTemplateService';
 

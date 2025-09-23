@@ -19,7 +19,7 @@ export default function BankImportModal({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <p className="text-sm text-[color:var(--color-text)]/70">
-              Conecta tu cuenta bancaria usando Nordigen y luego importa por fecha.
+              Conecta tu cuenta bancaria usando GoCardless (ex Nordigen) y luego importa por fecha.
             </p>
           </div>
           <div>
@@ -50,7 +50,7 @@ export default function BankImportModal({
           </Button>
         </div>
         <p className="text-xs text-[color:var(--color-text)]/60">
-          Requiere backend con Nordigen configurado.
+          Requiere backend con GoCardless (ex Nordigen) configurado.
         </p>
       </div>
     </Modal>

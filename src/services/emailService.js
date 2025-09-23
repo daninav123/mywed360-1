@@ -3,8 +3,8 @@
 // and a minimal in-memory fallback otherwise to keep the UI functional.
 
 import { auth } from '../firebaseConfig';
-import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 import { get as apiGet, post as apiPost, put as apiPut, del as apiDel } from './apiClient';
+import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 
 const BASE =
   (typeof import.meta !== 'undefined' &&
