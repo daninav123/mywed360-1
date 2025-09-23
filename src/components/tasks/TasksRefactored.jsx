@@ -1340,35 +1340,9 @@ export default function Tasks() {
       />
 
       {/* Componente para el diagrama Gantt */}
-      <LongTermTasksGantt
-        containerRef={ganttContainerRef}
-        tasks={ganttDisplayTasks}
-        columnWidth={columnWidthState}
-        rowHeight={rowHeight}
-        preSteps={ganttPreSteps}
-        viewDate={ganttViewDate}
-        markerDate={weddingMarkerDate}
-        projectStart={projectStart}
-        projectEnd={projectEnd}
-        extendMonthsAfterEnd={1}
-        onTaskClick={(task) => {
-          setEditingId(task.id);
-          setFormData({
-            title: task.title,
-            desc: task.desc || '',
-            category: task.category || 'OTROS',
-            startDate: task.start.toISOString().slice(0, 10),
-            startTime: task.start.toTimeString().slice(0, 5),
-            endDate: task.end.toISOString().slice(0, 10),
-            endTime: task.end.toTimeString().slice(0, 5),
-            long: true,
-            parentTaskId: task.parentId || '',
-            assignee: task.assignee || '',
-            completed: completedIdSet.has(String(task.id)),
-          });
-          setShowNewTask(true);
-        }}
-      />
+       param($m) $block=$m.Groups[1].Value; if ($block -notmatch 'subtasks=') { $block += "
+        subtasks={subtaskEvents}
+      " }; return "<LongTermTasksGantt$block/>" 
 
       {/* Contenedor responsivo para Calendario y Lista */}
       <div className="flex flex-col lg:flex-row gap-6">
@@ -1462,6 +1436,7 @@ export default function Tasks() {
     </div>
   );
 }
+
 
 
 
