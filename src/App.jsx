@@ -1,34 +1,40 @@
 import React from 'react';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
+import './i18n';
+import DiagnosticPanel from './components/DiagnosticPanel';
 import EmailNotification from './components/EmailNotification';
 import MainLayout from './components/MainLayout';
 import Loader from './components/ui/Loader';
 import { WeddingProvider } from './context/WeddingContext';
 import { UserPreferencesProvider } from './contexts/UserContext';
 import { useAuth, AuthProvider } from './hooks/useAuth';
+import AcceptInvitation from './pages/AcceptInvitation';
 import BankConnect from './pages/BankConnect.jsx';
 import BodaDetalle from './pages/BodaDetalle.jsx';
 import Bodas from './pages/Bodas';
+import DevEnsureFinance from './pages/DevEnsureFinance';
+import DevSeedGuests from './pages/DevSeedGuests';
 import Finance from './pages/Finance';
 import Home from './pages/Home';
+import Invitaciones from './pages/Invitaciones';
 import Login from './pages/Login';
 import More from './pages/More';
+import Perfil from './pages/Perfil';
+import Proveedores from './pages/ProveedoresNuevo';
+import PublicWedding from './pages/PublicWedding';
+import RSVPConfirm from './pages/RSVPConfirm';
+import RSVPDashboard from './pages/RSVPDashboard';
 import Signup from './pages/Signup';
+import SupplierPortal from './pages/SupplierPortal';
 import Tasks from './pages/Tasks';
+import WebEditor from './pages/WebEditor';
+import WeddingSite from './pages/WeddingSite';
+import AdminRoutes from './routes/AdminRoutes';
 // Nota: especificamos la extensi�n .jsx para asegurar la resoluci�n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
-import Proveedores from './pages/ProveedoresNuevo';
 // Lazy load de páginas pesadas para reducir bundle inicial
 // Nueva bandeja de entrada (UI definitiva)
 const UnifiedInbox = React.lazy(() => import('./components/email/UnifiedInbox/InboxContainer.jsx'));
@@ -37,12 +43,11 @@ const ComposeEmail = React.lazy(() => import('./components/email/ComposeEmail'))
 const EmailStatistics = React.lazy(() => import('./pages/user/EmailStatistics'));
 const MailgunTester = React.lazy(() => import('./components/email/MailgunTester'));
 const EmailSetup = React.lazy(() => import('./pages/EmailSetup'));
-import AdminRoutes from './routes/AdminRoutes';
-import Perfil from './pages/Perfil';
+//
 const SeatingPlanRefactored = React.lazy(
   () => import('./components/seating/SeatingPlanRefactored.jsx')
 );
-import Invitaciones from './pages/Invitaciones';
+// (dedupe) Invitaciones ya importado arriba
 const Contratos = React.lazy(() => import('./pages/Contratos'));
 const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
 // Protocolo
@@ -52,7 +57,7 @@ const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
 const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
 const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
 const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
-import WebEditor from './pages/WebEditor';
+// (dedupe) WebEditor ya importado arriba
 const DisenosLayout = React.lazy(() => import('./pages/disenos/DisenosLayout'));
 const DisenosInvitaciones = React.lazy(() => import('./pages/disenos/Invitaciones'));
 const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo'));
@@ -65,19 +70,10 @@ const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
 const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
-import DevSeedGuests from './pages/DevSeedGuests';
-import DevEnsureFinance from './pages/DevEnsureFinance';
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
-import WeddingSite from './pages/WeddingSite';
-import RSVPConfirm from './pages/RSVPConfirm';
-import AcceptInvitation from './pages/AcceptInvitation';
-import RSVPDashboard from './pages/RSVPDashboard';
-import PublicWedding from './pages/PublicWedding';
-import SupplierPortal from './pages/SupplierPortal';
+// (dedupe) rutas públicas ya importadas arriba
 
-import './i18n';
-import DiagnosticPanel from './components/DiagnosticPanel';
 import './utils/consoleCommands';
 
 function ProtectedRoute() {
