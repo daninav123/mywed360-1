@@ -4,13 +4,31 @@ import { requireMailAccess } from '../../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-async function setReadFlag(id, flag) {
+async function setReadFlag(id, flag, req) {
+  // Intentar primero en la colección global
   const docRef = db.collection('mails').doc(id);
   const doc = await docRef.get();
-  if (!doc.exists) return { notFound: true };
-  const data = doc.data();
-  await docRef.update({ read: flag });
-  return { data };
+  if (doc.exists) {
+    const data = doc.data();
+    await docRef.update({ read: flag });
+    return { data, scope: 'global' };
+  }
+
+  // Fallback: algunos mensajes existen sólo en la subcolección del usuario
+  try {
+    const uid = req?.user?.uid || null;
+    if (uid) {
+      const userDocRef = db.collection('users').doc(uid).collection('mails').doc(id);
+      const userDoc = await userDocRef.get();
+      if (userDoc.exists) {
+        await userDocRef.set({ read: flag }, { merge: true });
+        const data = userDoc.data() || {};
+        return { data, scope: 'user', uid };
+      }
+    }
+  } catch (_) {}
+
+  return { notFound: true };
 }
 
 async function propagateToUserSubcollection(data, id, flag) {
@@ -38,9 +56,9 @@ async function propagateToUserSubcollection(data, id, flag) {
 router.patch('/:id/read', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const r = await setReadFlag(id, true);
+    const r = await setReadFlag(id, true, req);
     if (r.notFound) return res.status(404).json({ error: 'Not found' });
-    await propagateToUserSubcollection(r.data, id, true);
+    if (r.scope === 'global') await propagateToUserSubcollection(r.data, id, true);
     res.json({ id, ...r.data, read: true });
   } catch (err) {
     console.error('Error en PATCH /api/mail/:id/read:', err);
@@ -52,9 +70,9 @@ router.patch('/:id/read', requireMailAccess, async (req, res) => {
 router.post('/:id/read', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const r = await setReadFlag(id, true);
+    const r = await setReadFlag(id, true, req);
     if (r.notFound) return res.status(404).json({ error: 'Not found' });
-    await propagateToUserSubcollection(r.data, id, true);
+    if (r.scope === 'global') await propagateToUserSubcollection(r.data, id, true);
     res.json({ id, ...r.data, read: true });
   } catch (err) {
     console.error('Error en POST /api/mail/:id/read:', err);
@@ -66,9 +84,9 @@ router.post('/:id/read', requireMailAccess, async (req, res) => {
 router.patch('/:id/unread', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const r = await setReadFlag(id, false);
+    const r = await setReadFlag(id, false, req);
     if (r.notFound) return res.status(404).json({ error: 'Not found' });
-    await propagateToUserSubcollection(r.data, id, false);
+    if (r.scope === 'global') await propagateToUserSubcollection(r.data, id, false);
     res.json({ id, ...r.data, read: false });
   } catch (err) {
     console.error('Error en PATCH /api/mail/:id/unread:', err);
@@ -80,9 +98,9 @@ router.patch('/:id/unread', requireMailAccess, async (req, res) => {
 router.post('/:id/unread', requireMailAccess, async (req, res) => {
   try {
     const { id } = req.params;
-    const r = await setReadFlag(id, false);
+    const r = await setReadFlag(id, false, req);
     if (r.notFound) return res.status(404).json({ error: 'Not found' });
-    await propagateToUserSubcollection(r.data, id, false);
+    if (r.scope === 'global') await propagateToUserSubcollection(r.data, id, false);
     res.json({ id, ...r.data, read: false });
   } catch (err) {
     console.error('Error en POST /api/mail/:id/unread:', err);

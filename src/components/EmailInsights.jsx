@@ -51,7 +51,7 @@ export default function EmailInsights({ mailId, userId, email }) {
     if (!mailId || analyzing) return;
     setAnalyzing(true);
     try {
-      await apiPost('/api/email-insights/analyze', { mailId }, { auth: true });
+      await apiPost('/api/email-insights/analyze', { mailId }, { auth: true, silent: true });
       // Refrescar insights tras analizar
       const res = await apiGet(`/api/email-insights/${mailId}`, { auth: true });
       const json = await res.json();

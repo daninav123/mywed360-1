@@ -70,6 +70,16 @@ export const GanttChart = ({
         const num = new Date(d);
         return isNaN(num.getTime()) ? null : num;
       }
+      if (typeof d === 'string') {
+        const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (m) {
+          const y = parseInt(m[1], 10);
+          const mo = parseInt(m[2], 10) - 1;
+          const da = parseInt(m[3], 10);
+          const local = new Date(y, mo, da, 0, 0, 0, 0);
+          return isNaN(local.getTime()) ? null : local;
+        }
+      }
       const parsed = new Date(d);
       return isNaN(parsed.getTime()) ? null : parsed;
     } catch (_) {
@@ -113,6 +123,12 @@ export const GanttChart = ({
       </div>
     );
   }
+
+  // Normalizar props de fechas externas para evitar depender de instanceof Date
+  const normViewDate = normalizeDate(viewDate);
+  const normMarkerDate = normalizeDate(markerDate);
+  const normGridStartDate = normalizeDate(gridStartDate);
+  const normGridEndDate = normalizeDate(gridEndDate);
 
   const handleClick = (task) => {
     if (typeof onTaskClick === 'function') onTaskClick(task);
@@ -325,18 +341,18 @@ export const GanttChart = ({
       if (viewMode !== ViewMode.Month) return;
       const scroller = scrollerRef.current;
       if (!scroller) return;
-      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      const endOk = normGridEndDate instanceof Date && !isNaN(normGridEndDate.getTime());
       const base =
-        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
-          ? gridStartDate
-          : viewDate instanceof Date && !isNaN(viewDate.getTime())
-            ? viewDate
+        normGridStartDate instanceof Date && !isNaN(normGridStartDate.getTime())
+          ? normGridStartDate
+          : normViewDate instanceof Date && !isNaN(normViewDate.getTime())
+            ? normViewDate
             : cleanTasks[0]?.start || null;
       if (!endOk || !base) return;
 
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
-      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
+      const gridEnd = new Date(normGridEndDate.getFullYear(), normGridEndDate.getMonth(), 1);
       const monthsInclusive =
         (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 +
         (gridEnd.getMonth() - gridStart.getMonth()) +
@@ -366,25 +382,32 @@ export const GanttChart = ({
           });
       } catch {}
     } catch {}
-  }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
+  }, [
+    viewMode,
+    columnWidth,
+    normGridStartDate ? normGridStartDate.getTime() : null,
+    normGridEndDate ? normGridEndDate.getTime() : null,
+    normViewDate ? normViewDate.getTime() : null,
+    cleanTasks.length,
+  ]);
 
   // Ajuste duro del ancho interno: forzar que el SVG y el contenedor horizontal no excedan el mes lÒ­mite
   useEffect(() => {
     try {
       if (viewMode !== ViewMode.Month) return;
       if (!wrapperRef.current) return;
-      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      const endOk = normGridEndDate instanceof Date && !isNaN(normGridEndDate.getTime());
       const base =
-        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
-          ? gridStartDate
-          : viewDate instanceof Date && !isNaN(viewDate.getTime())
-            ? viewDate
+        normGridStartDate instanceof Date && !isNaN(normGridStartDate.getTime())
+          ? normGridStartDate
+          : normViewDate instanceof Date && !isNaN(normViewDate.getTime())
+            ? normViewDate
             : cleanTasks[0]?.start || null;
       if (!endOk || !base) return;
 
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
-      const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
+      const gridEnd = new Date(normGridEndDate.getFullYear(), normGridEndDate.getMonth(), 1);
       const monthsInclusive =
         (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 +
         (gridEnd.getMonth() - gridStart.getMonth()) +
@@ -410,7 +433,14 @@ export const GanttChart = ({
         } catch {}
       });
     } catch {}
-  }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
+  }, [
+    viewMode,
+    columnWidth,
+    normGridStartDate ? normGridStartDate.getTime() : null,
+    normGridEndDate ? normGridEndDate.getTime() : null,
+    normViewDate ? normViewDate.getTime() : null,
+    cleanTasks.length,
+  ]);
 
   // Desplazar (una vez) al mes actual para que sea visible al cargar
   useEffect(() => {
@@ -420,13 +450,13 @@ export const GanttChart = ({
       const s = scrollerRef.current;
       const root = wrapperRef.current;
       if (!s || !root) return;
-      const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
+      const endOk = normGridEndDate instanceof Date && !isNaN(normGridEndDate.getTime());
       if (!endOk) return;
       const base =
-        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
-          ? gridStartDate
-          : viewDate instanceof Date && !isNaN(viewDate.getTime())
-            ? viewDate
+        normGridStartDate instanceof Date && !isNaN(normGridStartDate.getTime())
+          ? normGridStartDate
+          : normViewDate instanceof Date && !isNaN(normViewDate.getTime())
+            ? normViewDate
             : cleanTasks[0]?.start || null;
       if (!base) return;
       const colW = Math.max(8, Number(columnWidth) || 65);
@@ -461,9 +491,9 @@ export const GanttChart = ({
     scrollerNode,
     viewMode,
     columnWidth,
-    gridStartDate,
-    gridEndDate,
-    viewDate,
+    normGridStartDate ? normGridStartDate.getTime() : null,
+    normGridEndDate ? normGridEndDate.getTime() : null,
+    normViewDate ? normViewDate.getTime() : null,
     cleanTasks.length,
   ]);
 
@@ -471,13 +501,13 @@ export const GanttChart = ({
   let markerLeftPx = null;
   let markerViewportLeftPx = null; // posición dentro del wrapper (tras restar scroll)
   try {
-    const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
+    const markerOk = normMarkerDate instanceof Date && !isNaN(normMarkerDate.getTime());
     if (markerOk) {
       const base =
-        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
-          ? gridStartDate
-          : viewDate instanceof Date && !isNaN(viewDate.getTime())
-            ? viewDate
+        normGridStartDate instanceof Date && !isNaN(normGridStartDate.getTime())
+          ? normGridStartDate
+          : normViewDate instanceof Date && !isNaN(normViewDate.getTime())
+            ? normViewDate
             : cleanTasks[0]?.start || null;
       if (base) {
         if (viewMode === ViewMode.Month) {
@@ -485,14 +515,14 @@ export const GanttChart = ({
           const colW = Math.max(8, Number(columnWidth) || 65);
           const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
           const monthsDiff =
-            (markerDate.getFullYear() - gridStart.getFullYear()) * 12 +
-            (markerDate.getMonth() - gridStart.getMonth());
+            (normMarkerDate.getFullYear() - gridStart.getFullYear()) * 12 +
+            (normMarkerDate.getMonth() - gridStart.getMonth());
           const daysInMonth = new Date(
-            markerDate.getFullYear(),
-            markerDate.getMonth() + 1,
+            normMarkerDate.getFullYear(),
+            normMarkerDate.getMonth() + 1,
             0
           ).getDate();
-          const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
+          const dayIndex = Math.max(0, Math.min(daysInMonth, normMarkerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
           // Posici�n dentro del wrapper usando delta geom�trico (contenido vs viewport)
@@ -521,7 +551,7 @@ export const GanttChart = ({
               console.log('[GanttDebug] Marker calculado', {
                 base,
                 gridStart: gridStart.toISOString(),
-                markerDate: markerDate?.toISOString?.() || markerDate,
+                markerDate: normMarkerDate?.toISOString?.() || normMarkerDate,
                 colW,
                 monthsDiff,
                 daysInMonth,
@@ -576,7 +606,7 @@ export const GanttChart = ({
           barBackgroundColor="#a5b4fc"
           barBackgroundSelectedColor="#818cf8"
           todayColor="rgba(252,165,165,0.2)"
-          viewDate={viewDate}
+          viewDate={normViewDate}
           onClick={handleClick}
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}

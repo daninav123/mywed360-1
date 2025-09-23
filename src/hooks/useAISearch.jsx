@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 import { useAuth } from './useAuth';
+import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { post as apiPost } from '../services/apiClient';
 
 /**
@@ -218,6 +219,7 @@ export const useAISearch = () => {
   const [error, setError] = useState(null);
   const [lastQuery, setLastQuery] = useState('');
   const { user } = useAuth();
+  const { info: weddingDoc } = useActiveWeddingInfo();
 
   const searchProviders = useCallback(
     async (query) => {
@@ -231,7 +233,30 @@ export const useAISearch = () => {
 
       try {
         try {
-          const res = await apiPost('/api/ai-suppliers', { query }, { auth: true });
+          // Derivar servicio desde la consulta si no hay filtro explícito
+          const inferredService = guessServiceFromQuery(query);
+
+          // Extraer datos de la boda (perfil) desde Firestore
+          const profile = (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
+          const location =
+            profile.celebrationPlace ||
+            profile.location ||
+            profile.city ||
+            profile.ceremonyLocation ||
+            profile.receptionVenue ||
+            '';
+          const budget =
+            profile.budget ||
+            profile.estimatedBudget ||
+            profile.totalBudget ||
+            profile.presupuesto ||
+            '';
+
+          const res = await apiPost(
+            '/api/ai-suppliers',
+            { query, service: inferredService, budget, profile, location },
+            { auth: true }
+          );
           if (res && res.ok) {
             const data = await res.json();
             if (Array.isArray(data) && data.length) {
@@ -242,7 +267,7 @@ export const useAISearch = () => {
                     {
                       ...item,
                       name: item.name || item.title,
-                      service: item.service || guessServiceFromQuery(query),
+                      service: item.service || inferredService,
                       priceRange: item.priceRange,
                       snippet: item.snippet,
                     },
@@ -274,7 +299,7 @@ export const useAISearch = () => {
         return [];
       }
     },
-    [user]
+    [user, weddingDoc]
   );
 
   const clearResults = useCallback(() => {

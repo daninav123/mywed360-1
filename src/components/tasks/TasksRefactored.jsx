@@ -29,6 +29,7 @@ import { addMonths } from './utils/dateUtils';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
+import { useUserCollection } from '../../hooks/useUserCollection';
 
 // FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
@@ -56,7 +57,7 @@ export default function Tasks() {
     updateItem: updateMeetingFS,
     deleteItem: deleteMeetingFS,
     loading: meetingsLoading,
-  } = useFirestoreCollection('meetings', []);
+  } = useUserCollection('meetings', []);
 
   const {
     data: completedDocs,
@@ -576,27 +577,8 @@ export default function Tasks() {
     [activeWedding]
   );
   const weddingMarkerDate = useMemo(() => {
-    try {
-      const m = (Array.isArray(meetingsState) ? meetingsState : []).find(
-        (ev) =>
-          ev?.id === 'wedding-day' ||
-          ev?.autoKey === 'wedding-day' ||
-          /boda/i.test(String(ev?.title || ''))
-      );
-      if (m) {
-        const any = m.start || m.date || m.when || m.end;
-        if (any) {
-          const d = typeof any?.toDate === 'function' ? any.toDate() : new Date(any);
-          if (!isNaN(d.getTime())) return d;
-        }
-      }
-    } catch {}
-    // Fallback: si no hay meeting, usar la fecha de proyecto (boda)
-    if (projectEnd && projectEnd instanceof Date && !isNaN(projectEnd.getTime())) {
-      return new Date(projectEnd);
-    }
-    return null;
-  }, [projectEnd, meetingsState]);
+    return projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? new Date(projectEnd) : null;
+  }, [projectEnd]);
 
   // Ajuste de Gantt (hooks deben estar a nivel superior del componente)
   useGanttSizing({
@@ -619,6 +601,8 @@ export default function Tasks() {
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
   useEffect(() => {
+    // Deshabilitado: sólo usar weddings/{id}.weddingDate como fuente
+    return;
     if (!activeWedding || !db) return;
     try {
       const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
@@ -651,6 +635,58 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
+  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta común)
+  useEffect(() => {
+    if (!activeWedding || !db) return;
+    try {
+      const ref = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
+      const unsub = onSnapshot(
+        ref,
+        (snap) => {
+          try {
+            if (!snap || !snap.exists()) return;
+            const info = snap.data() || {};
+            const raw =
+              (info?.weddingInfo && (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
+              info?.weddingDate ||
+              info?.weddingdate ||
+              info?.date ||
+              null;
+            let d = null;
+            if (raw && typeof raw?.toDate === 'function') d = raw.toDate();
+            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') d = new Date(raw.seconds * 1000);
+            else if (typeof raw === 'number') d = new Date(raw < 1e12 ? raw * 1000 : raw);
+            else if (typeof raw === 'string') {
+              const ymd = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+              if (ymd) {
+                const y = parseInt(ymd[1], 10);
+                const mo = parseInt(ymd[2], 10) - 1;
+                const da = parseInt(ymd[3], 10);
+                const local = new Date(y, mo, da, 0, 0, 0, 0);
+                if (!isNaN(local.getTime())) d = local;
+                else {
+                  const iso = new Date(raw);
+                  if (!isNaN(iso.getTime())) d = iso;
+                }
+              } else {
+                const iso = new Date(raw);
+                if (!isNaN(iso.getTime())) d = iso;
+              }
+            }
+            if (d && !isNaN(d.getTime())) {
+              try { console.log('[Tasks] projectEnd from root', d); } catch(_){}
+              setProjectEnd(d);
+            }
+          } catch (_) {}
+        },
+        () => {}
+      );
+      return () => {
+        try { unsub && unsub(); } catch (_) {}
+      };
+    } catch (_) {}
+  }, [activeWedding, db]);
+
   // 1a) Fallback adicional: leer weddingDate del documento raíz weddings/{id}
   useEffect(() => {
     if (!activeWedding || !db) return;
@@ -662,12 +698,25 @@ export default function Tasks() {
           try {
             if (!snap || !snap.exists()) return;
             const info = snap.data() || {};
-            const raw = info?.weddingDate || info?.weddingdate || info?.date || null;
+            const raw =
+              (info?.weddingInfo && (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
+              info?.weddingDate ||
+              info?.weddingdate ||
+              info?.date ||
+              null;
             let d = null;
             if (raw && typeof raw?.toDate === 'function') d = raw.toDate();
             else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') d = new Date(raw.seconds * 1000);
             else if (typeof raw === 'number') d = new Date(raw < 1e12 ? raw * 1000 : raw);
             else if (typeof raw === 'string') {
+              const ymd0 = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+              if (ymd0) {
+                const y = parseInt(ymd0[1], 10);
+                const mo = parseInt(ymd0[2], 10) - 1;
+                const da = parseInt(ymd0[3], 10);
+                const local = new Date(y, mo, da, 0, 0, 0, 0);
+                if (!isNaN(local.getTime())) d = local;
+              }
               const iso = new Date(raw);
               if (!isNaN(iso.getTime())) d = iso;
               else {
@@ -682,7 +731,10 @@ export default function Tasks() {
                 }
               }
             }
-            if (d && !isNaN(d.getTime())) setProjectEnd(d);
+            if (d && !isNaN(d.getTime())) {
+              try { console.log('[Tasks] projectEnd from subdoc info/weddingInfo', d); } catch(_){}
+              setProjectEnd(d);
+            }
           } catch (_) {}
         },
         () => {}
@@ -814,6 +866,7 @@ export default function Tasks() {
         markerDate={weddingMarkerDate}
         projectStart={projectStart}
         projectEnd={projectEnd}
+        extendMonthsAfterEnd={1}
         onTaskClick={(task) => {
           setEditingId(task.id);
           setFormData({

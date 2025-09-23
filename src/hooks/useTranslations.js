@@ -6,43 +6,27 @@ import { getCurrentLanguage, formatDate, formatCurrency, formatNumber } from '..
 const useTranslations = () => {
   const { t, i18n } = useTranslation(['common', 'finance']);
 
-  const fixMojibake = (s) => {
-    try {
-      if (!s || typeof s !== 'string') return s;
-      // Eliminar caracteres de reemplazo
-      let out = s.replace(/\uFFFD+/g, '');
-      // Normalizaciones mínimas comunes
-      const pairs = [
-        ['á', 'á'],
-        ['é', 'é'],
-        ['í', 'í'],
-        ['ó', 'ó'],
-        ['ú', 'ú'],
-        ['ñ', 'ñ'],
-        ['Ã‰', 'É'],
-        ['€', '€'],
-        ['…', '…'],
-        ['–', '–'],
-        ['—', '—'],
-        ['“', '“'],
-        ['â€\u009D', '”'],
-        ['’', '’'],
-      ];
-      for (const [bad, good] of pairs) out = out.split(bad).join(good);
-      return out;
-    } catch {
-      return s;
+  // Normalize key/namespace: if key starts with "finance." use finance ns and drop prefix
+  const normalizeNs = (key, opts = {}) => {
+    if (typeof key === 'string' && key.startsWith('finance.')) {
+      return { key: key.slice('finance.'.length), opts: { ...opts, ns: 'finance' } };
     }
+    return { key, opts };
   };
 
   const translate = (key, options = {}) => {
-    const opts = { ...options };
-    if (typeof key === 'string' && key.startsWith('finance.')) opts.ns = 'finance';
-    return fixMojibake(t(key, opts));
+    const { key: k, opts } = normalizeNs(key, options);
+    return t(k, opts);
   };
 
-  const translatePlural = (key, count, options = {}) => t(key, { count, ...options });
-  const translateWithVars = (key, variables = {}) => t(key, variables);
+  const translatePlural = (key, count, options = {}) => {
+    const { key: k, opts } = normalizeNs(key, options);
+    return t(k, { count, ...opts });
+  };
+  const translateWithVars = (key, variables = {}) => {
+    const { key: k, opts } = normalizeNs(key, variables);
+    return t(k, opts);
+  };
 
   const formatters = {
     date: (date, options = {}) =>
@@ -148,3 +132,4 @@ const useTranslations = () => {
 };
 
 export default useTranslations;
+

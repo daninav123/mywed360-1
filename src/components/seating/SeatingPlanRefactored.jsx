@@ -461,6 +461,35 @@ const SeatingPlanRefactored = () => {
     [generateBanquetLayout, autoAssignGuestsRules, autoAssignGuests]
   );
 
+  // Generación desde modal de ceremonia seguida de autoasignación forzada
+  const handleGenerateCeremonyWithAssign = React.useCallback(
+    (rows, cols, gap, startX, startY, aisleAfter) => {
+      try {
+        generateSeatGrid(rows, cols, gap, startX, startY, aisleAfter);
+      } finally {
+        setTimeout(async () => {
+          try {
+            const res = await (typeof autoAssignGuestsRules === 'function'
+              ? autoAssignGuestsRules()
+              : autoAssignGuests());
+            if (res?.ok) {
+              const msg =
+                res.method === 'backend'
+                  ? `Asignación automática (IA): ${res.assigned} invitado(s)`
+                  : `Asignación automática: ${res.assigned} invitado(s)`;
+              toast.info(msg);
+            } else if (res?.error) {
+              toast.warn(`Autoasignación: ${res.error}`);
+            }
+          } catch (e) {
+            console.warn('Auto-assign error', e);
+          }
+        }, 50);
+      }
+    },
+    [generateSeatGrid, autoAssignGuestsRules, autoAssignGuests]
+  );
+
   // No-op defensivo para habilitar/deshabilitar elementos desde el canvas
   const handleToggleEnabled = React.useCallback(() => {}, []);
 
@@ -700,7 +729,7 @@ const SeatingPlanRefactored = () => {
           onCloseBackground={() => setBackgroundOpen(false)}
           onCloseCapacity={() => setCapacityOpen(false)}
           onCloseTemplate={handleCloseTemplates}
-          onGenerateSeatGrid={generateSeatGrid}
+          onGenerateSeatGrid={handleGenerateCeremonyWithAssign}
           onGenerateBanquetLayout={handleGenerateBanquetLayoutWithAssign}
           onSaveHallDimensions={async (w, h, aisle) => {
             try {

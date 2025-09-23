@@ -7,7 +7,19 @@ export function validateAndNormalizeDate(date) {
     validDate = date.toDate();
   } else if (!(date instanceof Date)) {
     try {
-      validDate = new Date(date);
+      if (typeof date === 'string') {
+        const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (m) {
+          const y = parseInt(m[1], 10);
+          const mo = parseInt(m[2], 10) - 1;
+          const da = parseInt(m[3], 10);
+          validDate = new Date(y, mo, da, 0, 0, 0, 0);
+        } else {
+          validDate = new Date(date);
+        }
+      } else {
+        validDate = new Date(date);
+      }
     } catch {
       return null;
     }
@@ -26,6 +38,16 @@ export function normalizeAnyDate(d) {
     if (typeof d === 'number') {
       const n = new Date(d);
       return isNaN(n.getTime()) ? null : n;
+    }
+    if (typeof d === 'string') {
+      const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) {
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const da = parseInt(m[3], 10);
+        const local = new Date(y, mo, da, 0, 0, 0, 0);
+        return isNaN(local.getTime()) ? null : local;
+      }
     }
     const parsed = new Date(d);
     return isNaN(parsed.getTime()) ? null : parsed;

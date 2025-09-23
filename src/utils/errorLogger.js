@@ -51,24 +51,40 @@ class ErrorLogger {
       this.originalConsoleError.apply(console, args);
     };
 
-    // Interceptar fetch para capturar errores de red
+        // Interceptar fetch para capturar errores de red
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
+      let suppressLogging = false;
       try {
+        // Detectar bandera para silenciar logging desde los callers (cabeceras o query param)
+        try {
+          const init = (args && typeof args[1] === 'object') ? args[1] : null;
+          const headers = init?.headers;
+          if (headers) {
+            if (headers.get && typeof headers.get === 'function') {
+              const v = headers.get('X-Suppress-Error-Logging') || headers.get('x-suppress-error-logging');
+              if (String(v || '').trim() === '1') suppressLogging = true;
+            } else if (typeof headers === 'object') {
+              const k = Object.keys(headers).find((h) => h.toLowerCase() === 'x-suppress-error-logging');
+              if (k && String(headers[k] || '').trim() === '1') suppressLogging = true;
+            }
+          }
+        } catch {}
+        try {
+          const reqUrlStr = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+          const u = new URL(reqUrlStr, window.location.origin);
+          if (u.searchParams.get('x-suppress-error-logging') === '1') suppressLogging = true;
+        } catch {}
+
         const response = await originalFetch(...args);
         if (!response.ok) {
           try {
             const reqUrl = typeof args[0] === 'string' ? args[0] : args[0]?.url || '';
             const method = args[1]?.method || 'GET';
-            const isPublicWeddingCheck =
-              method === 'GET' && reqUrl.includes('/api/public/weddings/');
-            const isBenignAsset404 =
-              response.status === 404 && /\/logo\.png(\?|$)/.test(reqUrl || '');
-            // Silenciar 404/403 esperados por comprobación de slug público y assets benignos
-            if (isPublicWeddingCheck && (response.status === 404 || response.status === 403)) {
-              return response;
-            }
-            if (isBenignAsset404) {
+            const isPublicWeddingCheck = method === 'GET' && reqUrl.includes('/api/public/weddings/');
+            const isBenignAsset404 = response.status === 404 && /\/logo\.png(\?|$)/.test(reqUrl || '');
+            const isMailRead404 = /\/api\/mail\/[^/]+\/(read|unread)$/i.test(reqUrl || '') && response.status === 404;
+            if (suppressLogging || isPublicWeddingCheck || isBenignAsset404 || isMailRead404) {
               return response;
             }
           } catch {}
@@ -81,11 +97,13 @@ class ErrorLogger {
         }
         return response;
       } catch (error) {
-        this.logError('Network Error', {
-          url: args[0],
-          error: error.message,
-          stack: error.stack,
-        });
+        if (!suppressLogging) {
+          this.logError('Network Error', {
+            url: args[0],
+            error: error.message,
+            stack: error.stack,
+          });
+        }
         throw error;
       }
     };
@@ -563,3 +581,9 @@ const errorLogger = new ErrorLogger();
 window.errorLogger = errorLogger;
 
 export default errorLogger;
+
+
+
+
+
+

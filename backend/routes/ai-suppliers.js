@@ -16,9 +16,9 @@ let openai = null;
 const projectId = process.env.OPENAI_PROJECT_ID;
 if (apiKey) {
   openai = new OpenAI({ apiKey, project: projectId });
-  logger.info('✅ Cliente OpenAI inicializado para /api/ai-suppliers');
+  logger.info('[ai-suppliers] Cliente OpenAI inicializado');
 } else {
-  logger.warn('⚠️  OPENAI_API_KEY no definido. /api/ai-suppliers devolverá 500');
+  logger.warn('[ai-suppliers] OPENAI_API_KEY no definido. /api/ai-suppliers devolverá 500');
 }
 
 router.post('/', async (req, res) => {
@@ -29,28 +29,38 @@ router.post('/', async (req, res) => {
   }
 
   const servicioSeleccionado = service;
-  const formattedLocation = location || profile?.celebrationPlace || 'España';
+  // Derivar ubicación desde distintos posibles campos del perfil
+  const formattedLocation =
+    location ||
+    (profile && (profile.celebrationPlace || profile.location || profile.city || profile.ceremonyLocation || profile.receptionVenue)) ||
+    (profile && profile.weddingInfo && (profile.weddingInfo.celebrationPlace || profile.weddingInfo.location || profile.weddingInfo.city)) ||
+    'Espana';
 
   const locationPrompt = formattedLocation
     ? `La boda es en ${formattedLocation}.`
-    : 'La ubicación de la boda no está especificada.';
-  const budgetPrompt = budget ? `El presupuesto es ${budget}.` : 'No hay un presupuesto especificado.';
+    : 'La ubicacion de la boda no esta especificada.';
+  const inferredBudget =
+    budget ||
+    (profile && (profile.budget || profile.estimatedBudget || profile.totalBudget)) ||
+    (profile && profile.weddingInfo && (profile.weddingInfo.budget || profile.weddingInfo.estimatedBudget || profile.weddingInfo.totalBudget)) ||
+    '';
+  const budgetPrompt = inferredBudget ? `El presupuesto es ${inferredBudget}.` : 'No hay un presupuesto especificado.';
 
-  const prompt = `Actúa como un asistente de planificación de bodas que busca proveedores reales. 
+  const prompt = `Actua como un asistente de planificacion de bodas que busca proveedores reales.
 Necesito encontrar proveedores de "${servicioSeleccionado || 'servicios para bodas'}" que ofrezcan: "${query}".
 ${locationPrompt}
 ${budgetPrompt}
-Devuelve ÚNICAMENTE un array JSON con 5 opciones de proveedores reales, con el formato exacto por cada proveedor: \n{
-  \"title\": \"Nombre del proveedor\",\n  \"link\": \"URL de su web oficial o perfil en plataforma de bodas\",\n  \"snippet\": \"Breve descripción del servicio que ofrecen\",\n  \"service\": \"${servicioSeleccionado || 'Servicios para bodas'}\",\n  \"location\": \"Ubicación del proveedor (ciudad o provincia)\",\n  \"priceRange\": \"Rango de precios aproximado\"\n}\nAsegúrate de: 1) incluir enlaces reales y operativos, preferiblemente web oficial o bodas.net; 2) priorizar proveedores en ${formattedLocation}; 3) que sean relevantes para "${query}"; 4) devolver SOLO el array JSON, sin texto adicional.`;
+Devuelve UNICAMENTE un array JSON con 5 opciones de proveedores reales, con el formato exacto por cada proveedor: \n{
+  \"title\": \"Nombre del proveedor\",\n  \"link\": \"URL de su web oficial o perfil en plataforma de bodas\",\n  \"snippet\": \"Breve descripcion del servicio que ofrecen\",\n  \"service\": \"${servicioSeleccionado || 'Servicios para bodas'}\",\n  \"location\": \"Ubicacion del proveedor (ciudad o provincia)\",\n  \"priceRange\": \"Rango de precios aproximado\"\n}\nAsegurate de: 1) incluir enlaces reales y operativos, preferiblemente web oficial o bodas.net; 2) priorizar proveedores en ${formattedLocation}; 3) que sean relevantes para "${query}"; 4) devolver SOLO el array JSON, sin texto adicional.`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
       temperature: 0,
       messages: [
-        { role: 'system', content: 'Eres un asistente experto en planificación de bodas.' },
-        { role: 'user', content: prompt }
-      ]
+        { role: 'system', content: 'Eres un asistente experto en planificacion de bodas.' },
+        { role: 'user', content: prompt },
+      ],
     });
 
     const content = completion.choices?.[0]?.message?.content || '';
@@ -63,7 +73,9 @@ Devuelve ÚNICAMENTE un array JSON con 5 opciones de proveedores reales, con el 
       if (match) {
         try {
           results = JSON.parse(match[0]);
-        } catch { /* deja results vacío */ }
+        } catch {
+          /* deja results vacio */
+        }
       }
     }
 
@@ -73,9 +85,10 @@ Devuelve ÚNICAMENTE un array JSON con 5 opciones de proveedores reales, con el 
 
     res.json(results);
   } catch (err) {
-    logger.error('❌ Error en /api/ai-suppliers', err);
+    logger.error('[ai-suppliers] Error', err);
     res.status(500).json({ error: 'openai_failed', details: err?.message || 'unknown' });
   }
 });
 
 export default router;
+

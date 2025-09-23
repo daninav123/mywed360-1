@@ -12,6 +12,9 @@ import {
 import { Sparkles, Plus, Settings } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { post as apiPost } from '../services/apiClient';
+import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 
 // Firebase
 
@@ -33,6 +36,8 @@ const GestionProveedores = () => {
   // Contextos
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const { activeWedding } = useWedding();
+  const { info: weddingDoc } = useActiveWeddingInfo();
 
   // Estados para proveedores
   const [proveedores, setProveedores] = useState([]);
@@ -324,6 +329,69 @@ const GestionProveedores = () => {
     }
   };
 
+  // Nueva implementación real de búsqueda IA usando backend y perfil de boda
+  const buscarConIAReal = async (consulta) => {
+    if (!consulta) return;
+
+    setCargandoBusquedaIA(true);
+    setResultadoBusquedaIA(null);
+
+    try {
+      const profile = (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
+      const location =
+        profile.celebrationPlace ||
+        profile.location ||
+        profile.city ||
+        profile.ceremonyLocation ||
+        profile.receptionVenue ||
+        '';
+      const budget =
+        profile.budget ||
+        profile.estimatedBudget ||
+        profile.totalBudget ||
+        '';
+      const guessService = (q) => {
+        const t = String(q || '').toLowerCase();
+        if (t.includes('foto')) return 'Fotografia';
+        if (t.includes('video')) return 'Video';
+        if (t.includes('catering')) return 'Catering';
+        if (t.includes('dj') || t.includes('musica')) return 'Musica';
+        if (t.includes('flor')) return 'Flores';
+        return '';
+      };
+
+      const res = await apiPost(
+        '/api/ai-suppliers',
+        { query: consulta, service: guessService(consulta), budget, profile, location, weddingId: activeWedding || '' },
+        { auth: true }
+      );
+
+      if (!res.ok) throw new Error('ai-suppliers failed');
+      const list = await res.json();
+      if (Array.isArray(list) && list.length) {
+        const item = list[0];
+        const mapped = {
+          nombre: item.title || item.name || 'Proveedor sugerido',
+          servicio: item.service || guessService(consulta) || 'Servicio para bodas',
+          descripcion: item.snippet || '',
+          web: item.link || '',
+          ubicacion: item.location || location || '',
+          contacto: item.contact || '',
+          email: item.email || '',
+          telefono: item.phone || '',
+        };
+        setResultadoBusquedaIA(mapped);
+      } else {
+        setResultadoBusquedaIA(null);
+      }
+    } catch (error) {
+      console.error('Error en busqueda IA:', error);
+      setResultadoBusquedaIA(null);
+    } finally {
+      setCargandoBusquedaIA(false);
+    }
+  };
+
   // Guardar proveedor de IA
   const guardarProveedorIA = (resultado) => {
     if (!resultado) return;
@@ -498,7 +566,7 @@ const GestionProveedores = () => {
           setModalAIVisible(false);
           setResultadoBusquedaIA(null);
         }}
-        onBuscar={buscarConIA}
+        onBuscar={buscarConIAReal}
         onGuardar={guardarProveedorIA}
         resultado={resultadoBusquedaIA}
         cargando={cargandoBusquedaIA}

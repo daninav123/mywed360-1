@@ -14,6 +14,7 @@ export default function LongTermTasksGantt({
   projectStart,
   projectEnd,
   onTaskClick,
+  extendMonthsAfterEnd = 0,
 }) {
   const colW = Math.max(60, Number(columnWidth) || 90);
 
@@ -86,7 +87,8 @@ export default function LongTermTasksGantt({
   // 3) Rango del timeline
   const registrationDate = useMemo(() => {
     // Prioridad absoluta: projectStart proveniente de Firestore (users/{uid}.createdAt)
-    if (projectStart instanceof Date && !isNaN(projectStart.getTime())) return projectStart;
+    const ps = toDateSafe(projectStart);
+    if (ps) return ps;
     // Fallback: metadata de Auth
     try {
       const cs = auth?.currentUser?.metadata?.creationTime || null;
@@ -102,15 +104,15 @@ export default function LongTermTasksGantt({
     // Prioridad: projectEnd (weddingDate de Firestore). Fallback: markerDate
     const raw = projectEnd || markerDate || null;
     if (!raw) return null;
-    const d = raw instanceof Date ? raw : new Date(raw);
-    return isNaN(d.getTime()) ? null : d;
+    const d = toDateSafe(raw);
+    return d;
   }, [projectEnd, markerDate]);
 
   const timelineStart = registrationDate;
   const timelineEnd = useMemo(() => {
-    if (weddingBaseDate) return addMonths(weddingBaseDate, 1);
+    if (weddingBaseDate) return addMonths(weddingBaseDate, extendMonthsAfterEnd);
     return addMonths(registrationDate, 24);
-  }, [weddingBaseDate, registrationDate]);
+  }, [weddingBaseDate, registrationDate, extendMonthsAfterEnd]);
 
   // 4) Escala mensual
   const monthStart = new Date(timelineStart.getFullYear(), timelineStart.getMonth(), 1);
@@ -137,7 +139,10 @@ export default function LongTermTasksGantt({
   // 6) Barras (excluye hitos)
   const bars = useMemo(() => {
     return normalizedTasks
-      .filter((t) => String(t.type || 'task') !== 'milestone')
+      .filter((t) => {
+        const ty = String(t.type || 'task');
+        return ty !== 'milestone' && ty !== 'project';
+      })
       .map((t, idx) => {
         const cs = new Date(Math.max(t.start.getTime(), timelineStart.getTime()));
         const ce = new Date(Math.min(t.end.getTime(), timelineEnd.getTime()));
@@ -351,18 +356,38 @@ export default function LongTermTasksGantt({
           ))}
 
           {milestones.map((m, i) => (
-            <div
-              key={`milestone-${i}`}
-              style={{
-                position: 'absolute',
-                left: m.left,
-                top: 0,
-                bottom: 0,
-                width: 2,
-                background: '#f59e0b',
-                opacity: 0.9,
-              }}
-            />
+            <React.Fragment key={`milestone-${i}`}>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: m.left,
+                  top: 0,
+                  bottom: 0,
+                  width: 2,
+                  background: '#ef4444',
+                  opacity: 0.95,
+                  pointerEvents: 'none',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: m.left + 4,
+                  top: 6,
+                  background: '#fee2e2',
+                  color: '#991b1b',
+                  border: '1px solid #fecaca',
+                  borderRadius: 4,
+                  padding: '2px 6px',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  pointerEvents: 'none',
+                }}
+              >
+                {m?.task?.name || 'Boda'}
+              </div>
+            </React.Fragment>
           ))}
 
           {bars.map((bar, i) => (
@@ -427,6 +452,16 @@ function toDateSafe(d) {
     if (typeof d === 'number') {
       const n = new Date(d);
       return isNaN(n.getTime()) ? null : n;
+    }
+    if (typeof d === 'string') {
+      const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) {
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10) - 1;
+        const da = parseInt(m[3], 10);
+        const local = new Date(y, mo, da, 0, 0, 0, 0);
+        return isNaN(local.getTime()) ? null : local;
+      }
     }
     const parsed = new Date(d);
     return isNaN(parsed.getTime()) ? null : parsed;

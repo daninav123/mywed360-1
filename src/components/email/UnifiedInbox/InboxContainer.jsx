@@ -5,7 +5,9 @@ import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import EmailService, { setAuthContext } from '../../../services/emailService';
+import { post as apiPost } from '../../../services/apiClient';
 import EmailComposer from '../EmailComposer';
+// (duplicated import removed)
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
@@ -28,6 +30,7 @@ const InboxContainer = () => {
   const [folder, setFolder] = useState('inbox'); // 'inbox' | 'sent'
   const [inboxCounts, setInboxCounts] = useState({ total: 0, unread: 0 });
   const [sentCounts, setSentCounts] = useState({ total: 0, unread: 0 });
+  const [analyzing, setAnalyzing] = useState(false);
 
   // Cargar emails al montar el componente
   const refreshEmails = useCallback(async (targetFolder = folder) => {
@@ -99,7 +102,15 @@ const InboxContainer = () => {
       setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
       try { await refreshCounts(); } catch {}
     } catch (err) {
-      console.error('Error marcando como le��do:', err);
+      // En algunos entornos el backend puede devolver 404 si el mail solo
+      // existe en la subcolección del usuario. Marcamos localmente y no
+      // llenamos la consola de errores para este caso.
+      const msg = String(err?.message || '');
+      if (/404/.test(msg)) {
+        setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
+      } else {
+        console.error('Error marcando como leído:', err);
+      }
     }
   }, [refreshCounts]);
 
@@ -286,6 +297,69 @@ const InboxContainer = () => {
               Usuario: {user.email} | {filteredEmails.length} emails
             </p>
           )}
+
+          {/* Herramientas de desarrollo */}
+          {!import.meta.env.PROD && (
+            <div className="mt-3">
+              <button
+                onClick={async () => {
+                  if (analyzing) return;
+                  try {
+                    setAnalyzing(true);
+                    const list = Array.isArray(filteredEmails) ? filteredEmails : [];
+                    const ids = selectedEmailId
+                      ? [selectedEmailId]
+                      : list.map((e) => e && e.id).filter(Boolean);
+
+                    const tryAnalyze = async (mailId, emailObj) => {
+                      const candidates = Array.from(
+                        new Set([
+                          mailId,
+                          emailObj?.apiId,
+                          emailObj?.messageId,
+                          emailObj?._id,
+                        ].filter(Boolean))
+                      );
+                      let ok = false;
+                      for (const cand of candidates) {
+                        try {
+                          const res = await apiPost(
+                            '/api/email-insights/analyze',
+                            { mailId: cand },
+                            { auth: true, silent: true }
+                          );
+                          if (res && res.ok) { ok = true; break; }
+                        } catch (err) {
+                          // continue to next candidate
+                        }
+                      }
+                      if (!ok) {
+                        console.warn('analyze failed for', mailId, 'candidates:', candidates);
+                      }
+                      return ok;
+                    };
+
+                    let success = 0;
+                    for (const id of ids) {
+                      const emailObj = list.find((e) => e?.id === id || e?.apiId === id) || null;
+                      const ok = await tryAnalyze(id, emailObj);
+                      if (ok) success++;
+                    }
+                    console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
+                  } catch (e) {
+                    console.error('Error analizando correos', e);
+                  } finally {
+                    setAnalyzing(false);
+                  }
+                }}
+                className={`mt-2 px-3 py-2 text-xs border rounded ${analyzing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-gray-50'}`}
+                title="Analizar correos (IA) - sólo en desarrollo"
+                disabled={analyzing}
+              >
+                {analyzing ? 'Analizando…' : 'Analizar IA (carpeta actual)'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -324,16 +398,18 @@ const InboxContainer = () => {
           <div className="border-r overflow-hidden">
             <EmailList
               emails={filteredEmails}
-              onEmailSelect={handleEmailSelect}
-              onEmailDelete={handleEmailDelete}
+              onSelectEmail={handleEmailSelect}
+              onDeleteEmail={handleEmailDelete}
               selectedEmailId={selectedEmailId}
               loading={loading}
+              currentFolder={folder}
             />
           </div>
           <div className="overflow-auto">
             {selectedEmail ? (
               <EmailDetail
                 email={selectedEmail}
+                userId={user?.uid}
                 onBack={handleBackToList}
                 onDelete={() => handleEmailDelete(selectedEmail.id)}
                 onReply={() => {

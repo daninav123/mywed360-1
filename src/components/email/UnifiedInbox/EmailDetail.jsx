@@ -22,6 +22,7 @@ import {
 } from '../../../utils/promiseSafeRenderer';
 import sanitizeHtml from '../../../utils/sanitizeHtml';
 import Button from '../../Button';
+import EmailInsights from '../../EmailInsights';
 import EmailComments from '../EmailComments';
 // Importación problemática eliminada temporalmente
 // import { Viewer } from 'react-tiff';
@@ -53,7 +54,7 @@ const IMAGE_TYPES = {
   bmp: 'image/bmp',
   ico: 'image/x-icon',
 };
-const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll }) => {
+const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll, userId }) => {
   // Si email es null o undefined, mostrar un mensaje
   if (!email) {
     return (
@@ -488,6 +489,9 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, 
           </div>
         </div>
       )}
+
+      {/* Acciones sugeridas por IA */}
+      <EmailInsights mailId={email.id} userId={userId} email={email} />
 
       {/* Panel de comentarios internos */}
       <EmailComments emailId={email.id} />

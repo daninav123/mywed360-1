@@ -33,12 +33,18 @@ function url(path) {
 }
 
 export async function get(path, opts = {}) {
-  const res = await fetch(url(path), { method: 'GET', headers: await buildHeaders(opts) });
+  const silent = !!opts.silent;
+  const u = url(path);
+  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const res = await fetch(u2, { method: 'GET', headers: await buildHeaders(opts) });
   return res;
 }
 
 export async function post(path, body, opts = {}) {
-  const res = await fetch(url(path), {
+  const silent = !!opts.silent;
+  const u = url(path);
+  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const res = await fetch(u2, {
     method: 'POST',
     headers: await buildHeaders(opts),
     body: body ? JSON.stringify(body) : undefined,
@@ -47,7 +53,10 @@ export async function post(path, body, opts = {}) {
 }
 
 export async function put(path, body, opts = {}) {
-  const res = await fetch(url(path), {
+  const silent = !!opts.silent;
+  const u = url(path);
+  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const res = await fetch(u2, {
     method: 'PUT',
     headers: await buildHeaders(opts),
     body: body ? JSON.stringify(body) : undefined,
@@ -56,6 +65,9 @@ export async function put(path, body, opts = {}) {
 }
 
 export async function del(path, opts = {}) {
-  const res = await fetch(url(path), { method: 'DELETE', headers: await buildHeaders(opts) });
+  const silent = !!opts.silent;
+  const u = url(path);
+  const u2 = silent ? (u + (u.includes('?') ? '&' : '?') + 'x-suppress-error-logging=1') : u;
+  const res = await fetch(u2, { method: 'DELETE', headers: await buildHeaders(opts) });
   return res;
 }

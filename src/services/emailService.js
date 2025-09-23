@@ -27,6 +27,41 @@ let memoryStore = {
   mails: [],
 };
 
+// Normalize mail objects to ensure a stable id for API operations
+function chooseMailId(m) {
+  try {
+    const candidates = [
+      m?.id,
+      m?._id,
+      m?.messageId,
+      m?.messageID,
+      m?.mailId,
+      m?.mailID,
+      m?.uid,
+      m?.uuid,
+    ];
+    for (const v of candidates) {
+      if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    for (const v of candidates) {
+      if (v != null) return String(v);
+    }
+  } catch {}
+  return null;
+}
+
+function normalizeMail(m) {
+  try {
+    const idRaw = chooseMailId(m);
+    const id = String(idRaw || m?.date || Date.now());
+    const apiId = String(idRaw || id);
+    return { ...m, id, apiId };
+  } catch {
+    const id = String(Date.now());
+    return { ...(m || {}), id, apiId: id };
+  }
+}
+
 // Heurísticas básicas de clasificación en cliente (sin IA externa)
 function classifyMailClientSide(m) {
   try {
@@ -148,9 +183,9 @@ export async function getMails(folder = 'inbox') {
           return folder === 'sent' ? myAddrs.includes(from) : myAddrs.includes(to);
         });
         try {
-          return filtered.map(classifyMailClientSide);
+          return filtered.map((m) => normalizeMail(classifyMailClientSide(m)));
         } catch {
-          return filtered;
+          return filtered.map(normalizeMail);
         }
       }
     }
@@ -158,9 +193,9 @@ export async function getMails(folder = 'inbox') {
     const list = await res.json();
     try {
       // Clasificación ligera en cliente (tags sugeridos y carpeta probable)
-      return (Array.isArray(list) ? list : []).map(classifyMailClientSide);
+      return (Array.isArray(list) ? list : []).map((m) => normalizeMail(classifyMailClientSide(m)));
     } catch {
-      return list;
+      return (Array.isArray(list) ? list : []).map(normalizeMail);
     }
   }
   return memoryStore.mails.filter((m) =>
@@ -188,9 +223,9 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
       const items = Array.isArray(json?.items) ? json.items : [];
       const nextCursor = json?.nextCursor || null;
       try {
-        return { items: items.map(classifyMailClientSide), nextCursor };
+        return { items: items.map((m) => normalizeMail(classifyMailClientSide(m))), nextCursor };
       } catch {
-        return { items, nextCursor };
+        return { items: items.map(normalizeMail), nextCursor };
       }
     }
     // Fallback por 403: reintentar sin user y filtrar en cliente
@@ -212,9 +247,9 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
         });
         const nextCursor = json?.nextCursor || null;
         try {
-          return { items: filtered.map(classifyMailClientSide), nextCursor };
+          return { items: filtered.map((m) => normalizeMail(classifyMailClientSide(m))), nextCursor };
         } catch {
-          return { items: filtered, nextCursor };
+          return { items: filtered.map(normalizeMail), nextCursor };
         }
       }
     }
@@ -328,8 +363,16 @@ export async function deleteMail(id) {
 
 export async function markAsRead(id) {
   if (USE_BACKEND) {
-    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/read`, {}, { auth: true });
-    if (!res.ok) throw new Error(`markAsRead ${res.status}`);
+    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/read`, {}, { auth: true, silent: true });
+    if (!res.ok) {
+      // Tolerar 404 cuando el mensaje solo existe en la subcolección de usuario
+      if (res.status !== 404) throw new Error(`markAsRead ${res.status}`);
+      // Best-effort: marcar localmente y no romper la UI
+      try {
+        memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: true } : m));
+      } catch {}
+      return true;
+    }
     return true;
   }
   memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: true } : m));
@@ -338,8 +381,14 @@ export async function markAsRead(id) {
 
 export async function markAsUnread(id) {
   if (USE_BACKEND) {
-    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/unread`, {}, { auth: true });
-    if (!res.ok) throw new Error(`markAsUnread ${res.status}`);
+    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/unread`, {}, { auth: true, silent: true });
+    if (!res.ok) {
+      if (res.status !== 404) throw new Error(`markAsUnread ${res.status}`);
+      try {
+        memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: false } : m));
+      } catch {}
+      return true;
+    }
     return true;
   }
   memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: false } : m));

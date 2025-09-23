@@ -156,6 +156,19 @@ const useGuests = () => {
         }
         return guest.response || 'Pendiente';
       },
+      normalizeStatus: (statusRaw = '', responseRaw = '') => {
+        try {
+          const strip = (x = '') =>
+            x && x.normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x;
+          const s = String(statusRaw || '').toLowerCase();
+          const r = strip(String(responseRaw || '').toLowerCase().trim());
+          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) return 'confirmed';
+          if (s === 'declined' || s === 'rejected' || r === 'no') return 'declined';
+          return 'pending';
+        } catch {
+          return 'pending';
+        }
+      },
     }),
     []
   );
@@ -205,6 +218,16 @@ const useGuests = () => {
           updatedAt: new Date().toISOString(),
         };
         if (base.phone) base.phone = utils.phoneClean(base.phone);
+        // Normalizar estado coherente basado en status/response
+        try {
+          const sd = (s = '') =>
+            s && s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s;
+          const s = String(base.status || '').toLowerCase();
+          const r = sd(String(base.response || '').toLowerCase().trim());
+          if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) base.status = 'confirmed';
+          else if (s === 'declined' || s === 'rejected' || r === 'no') base.status = 'declined';
+          else base.status = 'pending';
+        } catch {}
         const parsed = guestSchema.safeParse(base);
         if (!parsed.success) {
           return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };
@@ -227,6 +250,17 @@ const useGuests = () => {
       try {
         const patch = { ...updates, id: guestId, updatedAt: new Date().toISOString() };
         if (patch.phone) patch.phone = utils.phoneClean(patch.phone);
+        // Normalizar estado coherente si se cambia status/response
+        try {
+          if (Object.prototype.hasOwnProperty.call(patch, 'status') || Object.prototype.hasOwnProperty.call(patch, 'response')) {
+            const sd = (s = '') => (s && s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s);
+            const s = String((patch.status ?? original?.status) || '').toLowerCase();
+            const r = sd(String((patch.response ?? original?.response) || '').toLowerCase().trim());
+            if (s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r)) patch.status = 'confirmed';
+            else if (s === 'declined' || s === 'rejected' || r === 'no') patch.status = 'declined';
+            else patch.status = 'pending';
+          }
+        } catch {}
         const parsed = guestUpdateSchema.safeParse(patch);
         if (!parsed.success) {
           return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };

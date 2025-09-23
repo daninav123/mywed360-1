@@ -3,7 +3,6 @@ import {
   ArrowUp,
   ArrowDown,
   Trash,
-  Star,
   AlertCircle,
   Loader,
   Star as StarIcon,
