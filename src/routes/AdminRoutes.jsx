@@ -5,12 +5,12 @@ import Loader from '../components/ui/Loader';
 import AdminLayout from '../layouts/AdminLayout';
 
 // Carga perezosa (lazy loading) de componentes para mejor rendimiento
-const AdminDashboard = lazy(() => import('../components/admin/AdminDashboard'));
-const UserManagement = lazy(() => import('../components/admin/UserManagement'));
-const SystemSettings = lazy(() => import('../components/admin/SystemSettings'));
-const CachePerformancePanel = lazy(() => import('../components/admin/CachePerformancePanel'));
-const MetricsDashboard = lazy(() => import('../components/admin/MetricsDashboard'));
-const AdminHealth = lazy(() => import('../components/admin/AdminHealth'));
+const AdminDashboard = lazy(() => import('@/components/admin/AdminDashboard.jsx'));
+const UserManagement = lazy(() => import('@/components/admin/UserManagement.jsx'));
+const SystemSettings = lazy(() => import('@/components/admin/SystemSettings.jsx'));
+const CachePerformancePanel = lazy(() => import('@/components/admin/CachePerformancePanel.jsx'));
+const MetricsDashboard = lazy(() => import('@/components/admin/MetricsDashboard.jsx'));
+const AdminHealth = lazy(() => import('@/components/admin/AdminHealth.jsx'));
 
 // Componente para mostrar durante la carga
 const LoadingFallback = () => (

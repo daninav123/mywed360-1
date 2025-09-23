@@ -96,7 +96,7 @@ export function useGanttBoundedTasks(uniqueGanttTasks, projectStart, projectEnd,
       } catch {}
     }
 
-    if (!startBound && endBound) startBound = addMonths(endBound, -6);
+    if (!startBound && endBound) startBound = addMonths(endBound, -12);
     if (startBound && !endBound) endBound = addMonths(startBound, 6);
 
     if (startBound && endBound) {

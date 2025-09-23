@@ -121,15 +121,30 @@ function toDateSafe(raw) {
   }
 }
 
+function addMonths(base, delta) {
+  try {
+    const d = base instanceof Date ? new Date(base.getTime()) : new Date(base);
+    if (isNaN(d)) return new Date();
+    const targetMonthIndex = d.getMonth() + delta;
+    const targetYear = d.getFullYear() + Math.floor(targetMonthIndex / 12);
+    const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
+    const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
+    const day = Math.min(d.getDate(), lastDay);
+    return new Date(targetYear, targetMonth, day, d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds());
+  } catch {
+    return base;
+  }
+}
+
 async function seedDefaultTasksForWedding(weddingId, weddingData) {
   if (!weddingId) return;
   // Evitar doble seed
   const seedRef = doc(db, 'weddings', weddingId, 'tasks', '_seed_meta');
   const seedSnap = await getDoc(seedRef).catch(() => null);
   if (seedSnap && seedSnap.exists()) return;
-
-  const startBase = toDateSafe(weddingData?.createdAt) || new Date();
-  const endBase = toDateSafe(weddingData?.weddingDate) || new Date(startBase.getFullYear(), startBase.getMonth() + 12, startBase.getDate());
+  const wDate = toDateSafe(weddingData?.weddingDate);
+  const endBase = wDate || new Date();
+  const startBase = wDate ? addMonths(endBase, -12) : new Date(endBase.getFullYear(), endBase.getMonth() - 12, endBase.getDate());
   const span = Math.max(1, endBase.getTime() - startBase.getTime());
   const at = (p) => new Date(startBase.getTime() + span * p);
 
@@ -393,4 +408,72 @@ export async function addPlannerToWedding(weddingId, plannerUid) {
   // Opcional: guardar referencia de bodas que gestiona el planner
   await updateDoc(doc(db, 'users', plannerUid), { plannerWeddingIds: arrayUnion(weddingId) });
   return true;
+}
+
+/**
+ * Ajusta las fechas de las tareas padre (bloques) según porcentajes fijos
+ * en el intervalo [weddingDate - 12 meses, weddingDate].
+ * No crea ni elimina tareas; solo actualiza start/end si existen.
+ */
+export async function fixParentBlockDates(weddingId) {
+  if (!weddingId) return { updated: 0 };
+  // Obtener weddingDate desde root o subdoc info/weddingInfo
+  let wDate = null;
+  try {
+    const snap = await getDoc(doc(db, 'weddings', weddingId));
+    if (snap.exists()) {
+      const data = snap.data() || {};
+      const raw = data?.weddingDate || data?.weddingdate || data?.date || null;
+      if (raw) wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+    }
+  } catch (_) {}
+  if (!wDate) {
+    try {
+      const info = await getDoc(doc(db, 'weddings', weddingId, 'info', 'weddingInfo'));
+      if (info.exists()) {
+        const data = info.data() || {};
+        const raw = data?.weddingDate || data?.weddingdate || null;
+        if (raw) wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+      }
+    } catch (_) {}
+  }
+  if (!wDate || isNaN(wDate)) throw new Error('weddingDate no disponible para ' + weddingId);
+
+  const startBase = addMonths(wDate, -12);
+  const span = Math.max(1, wDate.getTime() - startBase.getTime());
+  const at = (p) => new Date(startBase.getTime() + span * p);
+
+  const blocks = [
+    { name: 'Fundamentos', p0: 0.0, p1: 0.2 },
+    { name: 'Proveedores Clave', p0: 0.1, p1: 0.8 },
+    { name: 'Vestuario y Moda', p0: 0.15, p1: 0.9 },
+    { name: 'Estilo y Detalles', p0: 0.2, p1: 0.95 },
+    { name: 'Organización y Logística', p0: 0.3, p1: 1.0 },
+    { name: 'Celebraciones y Emociones', p0: 0.4, p1: 0.95 },
+    { name: 'Belleza y Cuidado', p0: 0.6, p1: 0.95 },
+    { name: 'Anillos y Luna de Miel', p0: 0.7, p1: 1.0 },
+    { name: 'Después de la Boda', p0: 1.0, p1: 1.05 },
+  ];
+
+  const byName = new Map(blocks.map((b) => [b.name.toLowerCase(), b]));
+  const colRef = collection(db, 'weddings', weddingId, 'tasks');
+  let updated = 0;
+  try {
+    const all = await getDocs(colRef);
+    for (const d of all.docs) {
+      const t = d.data() || {};
+      if (String(t?.type || 'task') !== 'task') continue;
+      const nm = String(t?.name || t?.title || '').trim().toLowerCase();
+      const def = byName.get(nm);
+      if (!def) continue;
+      const s = at(def.p0);
+      const eTent = at(def.p1);
+      const e = eTent.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : eTent;
+      await updateDoc(d.ref, { start: s, end: e });
+      updated++;
+    }
+  } catch (e) {
+    console.warn('fixParentBlockDates error:', e);
+  }
+  return { updated };
 }

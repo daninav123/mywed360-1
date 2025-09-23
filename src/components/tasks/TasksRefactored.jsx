@@ -22,6 +22,7 @@ import LongTermTasksGantt from './LongTermTasksGantt';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TasksHeader from './TasksHeader';
+import DebugTasksPanel from './DebugTasksPanel';
 //
 
 // Importar hooks de Firestore
@@ -32,7 +33,7 @@ import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
 import { useWeddingCollection } from '../../hooks/useWeddingCollection';
 import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup';
 import { useUserCollection } from '../../hooks/useUserCollection';
-import { migrateFlatSubtasksToNested } from '../../services/WeddingService';
+import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 
 // FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
@@ -89,6 +90,20 @@ export default function Tasks() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
+  // Exponer helpers en modo debug para corrección in-situ
+  useEffect(() => {
+    if (!debugEnabled) return;
+    try {
+      window.mywed = window.mywed || {};
+      window.mywed.fixParentBlockDates = async () => {
+        if (!activeWedding) return { ok: false };
+        const res = await fixParentBlockDates(activeWedding);
+        console.log('[Debug] fixParentBlockDates', res);
+        return res;
+      };
+    } catch (_) {}
+  }, [debugEnabled, activeWedding]);
+
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
   const [showNewTask, setShowNewTask] = useState(false);
@@ -110,6 +125,20 @@ export default function Tasks() {
   const [currentView, setCurrentView] = useState('month');
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [seedingDefaults, setSeedingDefaults] = useState(false);
+
+  // Debug flag (localStorage, query param, or global)
+  const debugEnabled = useMemo(() => {
+    try {
+      if (typeof window !== 'undefined' && window.__GANTT_DEBUG__) return true;
+      const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const q = qs ? (qs.get('debug') || qs.get('ganttDebug') || qs.get('debugGantt')) : '';
+      const ls1 = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
+      const ls2 = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_debug') : null;
+      return [q, ls1, ls2].some((v) => v && (/^1|true$/i.test(String(v))));
+    } catch {
+      return false;
+    }
+  }, []);
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
@@ -765,16 +794,16 @@ export default function Tasks() {
         setSeedingDefaults(false);
         return;
       }
-      const startBase =
-        projectStart instanceof Date && !isNaN(projectStart.getTime())
-          ? projectStart
-          : new Date();
-      const endBase =
-        projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-          ? projectEnd
-          : addMonths(startBase, 12);
-      const span = Math.max(1, endBase.getTime() - startBase.getTime());
-      const at = (p) => new Date(startBase.getTime() + span * p);
+        const endBase =
+          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+            ? projectEnd
+            : new Date();
+        const startBase =
+          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+            ? addMonths(projectEnd, -12)
+            : addMonths(endBase, -12);
+        const span = Math.max(1, endBase.getTime() - startBase.getTime());
+        const at = (p) => new Date(startBase.getTime() + span * p);
 
       const blocks = [
         { key: 'A', name: 'Bloque A - Fundamentos', p0: 0.0, p1: 0.2, items: [
@@ -886,14 +915,15 @@ export default function Tasks() {
         if (seedSnap && seedSnap.exists()) return;
 
         // Permitir seed aunque aún no haya weddingDate: usar fallbacks razonables
-        const startBase =
-          projectStart instanceof Date && !isNaN(projectStart.getTime())
-            ? projectStart
-            : new Date();
+        // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
         const endBase =
           projectEnd instanceof Date && !isNaN(projectEnd.getTime())
             ? projectEnd
-            : addMonths(startBase, 12);
+            : new Date();
+        const startBase =
+          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+            ? addMonths(projectEnd, -12)
+            : addMonths(endBase, -12);
         const span = Math.max(1, endBase.getTime() - startBase.getTime());
         const at = (p) => new Date(startBase.getTime() + span * p);
 
@@ -1385,6 +1415,18 @@ export default function Tasks() {
           />
         </div>
       </div>
+
+      {debugEnabled && (
+        <DebugTasksPanel
+          projectStart={projectStart}
+          projectEnd={projectEnd}
+          parentsRaw={(Array.isArray(tasksState) ? tasksState : []).filter((t)=>String(t?.type||'task')==='task')}
+          uniqueGanttTasks={uniqueGanttTasks}
+          ganttTasksBounded={ganttTasksBounded}
+          ganttDisplayTasks={ganttDisplayTasks}
+          nestedSubtasks={nestedSubtasks}
+        />
+      )}
       {/* Modal para nueva tarea */}
       {showNewTask && (
         <TaskForm
