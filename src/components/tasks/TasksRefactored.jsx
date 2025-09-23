@@ -90,19 +90,7 @@ export default function Tasks() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
-  // Exponer helpers en modo debug para corrección in-situ
-  useEffect(() => {
-    if (!debugEnabled) return;
-    try {
-      window.mywed = window.mywed || {};
-      window.mywed.fixParentBlockDates = async () => {
-        if (!activeWedding) return { ok: false };
-        const res = await fixParentBlockDates(activeWedding);
-        console.log('[Debug] fixParentBlockDates', res);
-        return res;
-      };
-    } catch (_) {}
-  }, [debugEnabled, activeWedding]);
+  // (movido más abajo tras declarar debugEnabled)
 
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
@@ -139,6 +127,20 @@ export default function Tasks() {
       return false;
     }
   }, []);
+
+  // Exponer helpers en modo debug para corrección in-situ
+  useEffect(() => {
+    if (!debugEnabled) return;
+    try {
+      window.mywed = window.mywed || {};
+      window.mywed.fixParentBlockDates = async () => {
+        if (!activeWedding) return { ok: false };
+        const res = await fixParentBlockDates(activeWedding);
+        console.log('[Debug] fixParentBlockDates', res);
+        return res;
+      };
+    } catch (_) {}
+  }, [debugEnabled, activeWedding]);
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
