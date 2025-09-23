@@ -6,6 +6,7 @@ import { post as apiPost } from '../services/apiClient';
 import { subscribeSyncState, getSyncState } from '../services/SyncService';
 import { ensureExtensionAvailable, sendBatchMessages } from '../services/whatsappBridge';
 import { toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
+import { guestSchema, guestUpdateSchema } from '../schemas/guest';
 
 // Hook personalizado para gestión optimizada de invitados
 const useGuests = () => {
@@ -196,13 +197,19 @@ const useGuests = () => {
   const addGuest = useCallback(
     async (guestData) => {
       try {
-        const newGuest = {
+        const base = {
           companionGroupId: guestData.companionGroupId || '',
           ...guestData,
           id: guestData.id || `guest-${Date.now()}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
+        if (base.phone) base.phone = utils.phoneClean(base.phone);
+        const parsed = guestSchema.safeParse(base);
+        if (!parsed.success) {
+          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };
+        }
+        const newGuest = parsed.data;
         await addItem(newGuest);
         return { success: true, guest: newGuest };
       } catch (error) {
@@ -218,7 +225,13 @@ const useGuests = () => {
       const original = guests.find((g) => g.id === guestId);
       const originalTable = original?.table || '';
       try {
-        const updatedGuest = { ...updates, id: guestId, updatedAt: new Date().toISOString() };
+        const patch = { ...updates, id: guestId, updatedAt: new Date().toISOString() };
+        if (patch.phone) patch.phone = utils.phoneClean(patch.phone);
+        const parsed = guestUpdateSchema.safeParse(patch);
+        if (!parsed.success) {
+          return { success: false, error: parsed.error?.errors?.[0]?.message || 'Datos inválidos' };
+        }
+        const updatedGuest = parsed.data;
         await updateItem(guestId, updatedGuest);
         if (updatedGuest.table !== originalTable && updatedGuest.companionGroupId) {
           const companions = guests.filter(

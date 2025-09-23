@@ -23,10 +23,18 @@ export default function Login() {
 
   // Redirige automáticamente cuando ya estás autenticado
   useEffect(() => {
-    if (!authLoading && authStatus) {
+    if (authLoading) return;
+    if (!authStatus) return;
+    try {
+      // Respeta la ruta de retorno si existe, evitando bucles a /login
+      const fromPath =
+        (location?.state && location.state.from && location.state.from.pathname) || '/home';
+      const safePath = fromPath === '/login' || fromPath === '/' ? '/home' : fromPath;
+      navigate(safePath, { replace: true });
+    } catch (_) {
       navigate('/home', { replace: true });
     }
-  }, [authLoading, authStatus, navigate]);
+  }, [authLoading, authStatus, navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

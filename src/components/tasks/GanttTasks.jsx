@@ -1,5 +1,6 @@
 import { Gantt, ViewMode } from 'gantt-task-react';
 import React, { useEffect, useRef, useState } from 'react';
+import ErrorBoundary from '../debug/ErrorBoundary.jsx';
 import 'gantt-task-react/dist/index.css';
 
 // Componente para el diagrama Gantt
@@ -35,28 +36,7 @@ export const GanttChart = ({
     dbg('GanttDebug init', { debugEnabled, viewMode, columnWidth, markerDate });
   } catch {}
   // ErrorBoundary local para evitar que la pÒ��¡gina caiga si la librerÒ��­a falla
-  class LocalErrorBoundary extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = { hasError: false };
-    }
-    static getDerivedStateFromError() {
-      return { hasError: true };
-    }
-    componentDidCatch(err) {
-      console.error('[GanttChart] Error atrapado:', err);
-    }
-    render() {
-      if (this.state.hasError) {
-        return (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            No se pudo renderizar el diagrama Gantt (datos invÒ��¡lidos)
-          </div>
-        );
-      }
-      return this.props.children;
-    }
-  }
+  // ErrorBoundary local eliminado
 
   // Tooltip simple que muestra solo el nombre del proceso
   const NameOnlyTooltip = ({ task }) => (
@@ -567,7 +547,7 @@ export const GanttChart = ({
 
   // Right mask placeholder\n
   return (
-    <LocalErrorBoundary>
+    <ErrorBoundary>
       <div
         ref={wrapperRef}
         style={{ position: 'relative', overflow: 'hidden' }}
@@ -675,6 +655,8 @@ export const GanttChart = ({
             </div>
           )}
       </div>
-    </LocalErrorBoundary>
+    </ErrorBoundary>
   );
 };
+
+

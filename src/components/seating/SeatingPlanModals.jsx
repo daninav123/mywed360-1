@@ -430,9 +430,20 @@ const TemplateSelector = ({
   areas = [],
 }) => {
   // Calcular necesidades a partir de datos reales
-  const guestCount = Array.isArray(guests)
-    ? guests.reduce((acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0), 0)
-    : 0;
+  const countAttendees = (gs) => {
+    try {
+      if (!Array.isArray(gs)) return 0;
+      return gs.reduce((acc, g) => {
+        const c = parseInt(g?.companion, 10) || 0;
+        const s = String(g?.status || '').toLowerCase();
+        const r = String(g?.response || '').toLowerCase();
+        const isConfirmed = s === 'confirmed' || s === 'accepted' || ['s', 'si', 'sí'].includes(r);
+        const isPending = s === 'pending' || (!s && !r);
+        return acc + (isConfirmed || isPending ? 1 + c : 0);
+      }, 0);
+    } catch (_) { return 0; }
+  };
+  const guestCount = countAttendees(guests);
   const tableCount = Array.isArray(tables) ? tables.length : 0;
 
   // Boundary y dimensiones efectivas
@@ -514,16 +525,38 @@ const TemplateSelector = ({
         (tables.map((t) => t?.height || t?.length).filter(Boolean).length || 1) || 60
     )
   );
-  const avgSeats = (() => {
-    if (!tableCount) return 8;
-    const seats = tables.map((t) => parseInt(t?.seats, 10) || 0).filter((n) => n > 0);
-    if (!seats.length) return 8;
-    const avg = Math.round(seats.reduce((a, b) => a + b, 0) / seats.length);
-    return Math.min(12, Math.max(6, avg));
+  const seatPref = (() => {
+    try {
+      const valid = (tables || [])
+        .map((t) => parseInt(t?.seats, 10) || 0)
+        .filter((n) => n > 0);
+      if (valid.length) {
+        const freq = new Map();
+        for (const n of valid) freq.set(n, (freq.get(n) || 0) + 1);
+        let best = null,
+          bestC = -1;
+        for (const [n, c] of freq.entries()) {
+          if (c > bestC) {
+            best = n;
+            bestC = c;
+          }
+        }
+        const avg = Math.round(valid.reduce((a, b) => a + b, 0) / valid.length);
+        const prefer = best || avg;
+        return Math.min(12, Math.max(6, prefer));
+      }
+      if (guestCount <= 60) return 8;
+      if (guestCount <= 120) return 10;
+      return 12;
+    } catch (_) {
+      return 8;
+    }
   })();
+  // Asiento promedio por mesa (alias para compatibilidad con código legado)
+  const avgSeats = seatPref;
 
   const suggestedBanquet = (() => {
-    const seatsPerTable = avgSeats || 8;
+    const seatsPerTable = seatPref || 8;
     const neededTables =
       guestCount > 0 ? Math.ceil(guestCount / seatsPerTable) : Math.max(1, tableCount || 6);
     const rows = Math.max(1, Math.floor(Math.sqrt(neededTables)));
@@ -541,7 +574,7 @@ const TemplateSelector = ({
   // Helpers para construir arreglos de mesas
   const buildGridTables = (rows, cols, shape = defaultShape) => {
     const count = rows * cols;
-    const need = Math.max(count, guestCount ? Math.ceil(guestCount / avgSeats) : count);
+    const need = Math.max(count, guestCount ? Math.ceil(guestCount / seatPref) : count);
     const useCols = cols;
     const useRows = Math.ceil(need / useCols);
     const cellW = hallW / (useCols + 1);
@@ -555,7 +588,7 @@ const TemplateSelector = ({
         const cy = (r + 1) * cellH;
         arr.push(
           shape === 'circle'
-            ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats }
+            ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: seatPref }
             : {
                 id: id++,
                 x: cx,
@@ -563,7 +596,7 @@ const TemplateSelector = ({
                 shape: 'rectangle',
                 width: baseWidth,
                 height: baseHeight,
-                seats: avgSeats,
+                seats: seatPref,
               }
         );
       }
@@ -576,7 +609,7 @@ const TemplateSelector = ({
   const [perimParams, setPerimParams] = React.useState({ marginPct: 8 });
 
   const buildCircularRing = () => {
-    const need = guestCount ? Math.ceil(guestCount / avgSeats) : Math.max(tableCount || 6, 6);
+    const need = guestCount ? Math.ceil(guestCount / seatPref) : Math.max(tableCount || 6, 6);
     const centerX = centroid.x,
       centerY = centroid.y;
     const radius = Math.min(hallW, hallH) * (ringParams.outerPct / 100);
@@ -591,7 +624,7 @@ const TemplateSelector = ({
         y: cy,
         shape: 'circle',
         diameter: baseDiameter,
-        seats: avgSeats,
+        seats: seatPref,
       });
     }
     return arr;
@@ -601,7 +634,7 @@ const TemplateSelector = ({
     const segments = 3; // izquierda, abajo, derecha
     const perSeg = Math.max(
       2,
-      Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 10) / segments)
+      Math.ceil((guestCount ? Math.ceil(guestCount / seatPref) : 10) / segments)
     );
     const gap = Math.min(200, Math.max(aisle + 40, Math.floor(hallW / (perSeg + 1))));
     const arr = [];
@@ -652,7 +685,7 @@ const TemplateSelector = ({
   };
 
   const buildLShape = () => {
-    const perSeg = Math.max(3, Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 8) / 2));
+    const perSeg = Math.max(3, Math.ceil((guestCount ? Math.ceil(guestCount / seatPref) : 8) / 2));
     const gapX = Math.min(220, Math.max(aisle + 40, Math.floor(hallW / (perSeg + 1))));
     const gapY = Math.min(220, Math.max(aisle + 40, Math.floor(hallH / (perSeg + 1))));
     const arr = [];
@@ -710,7 +743,7 @@ const TemplateSelector = ({
       return buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape);
     const tables = [];
     const spacing = 200;
-    const seatsPerTable = Math.max(6, avgSeats);
+    const seatsPerTable = Math.max(6, seatPref);
     for (let x = spacing; x < hallW - spacing; x += spacing) {
       tables.push({ id: `top-${x}`, shape: defaultShape, seats: seatsPerTable, x, y: spacing });
       tables.push({
@@ -747,9 +780,67 @@ const TemplateSelector = ({
       shape: 'rectangle',
       width,
       height,
-      seats: Math.max(guestCount, avgSeats),
+      seats: Math.max(guestCount, seatPref),
     });
     return arr;
+  };
+
+  // Ocupación inferida por mesa a partir de invitados asignados (id o nombre)
+  const occMapReal = (() => {
+    try {
+      const idSet = new Set((tables || []).map((t) => String(t?.id)));
+      const nameSet = new Set((tables || []).map((t) => String(t?.name || '').trim()).filter(Boolean));
+      const map = new Map();
+      (guests || []).forEach((g) => {
+        const tid = g?.tableId != null ? String(g.tableId) : null;
+        const tname = g?.table != null ? String(g.table).trim() : '';
+        let key = null;
+        if (tid && idSet.has(tid)) key = tid;
+        else if (tname && (idSet.has(tname) || nameSet.has(tname))) key = tname;
+        if (!key) return;
+        const count = 1 + (parseInt(g?.companion, 10) || 0);
+        map.set(key, (map.get(key) || 0) + count);
+      });
+      return map;
+    } catch (_) {
+      return new Map();
+    }
+  })();
+
+  // Cuadrícula a partir de conteos por mesa
+  const gridFromCountsReal = (counts = [], shape = defaultShape) => {
+    const n = counts.length;
+    if (n <= 0) return [];
+    const cols = Math.max(1, Math.ceil(Math.sqrt(n)));
+    const rows = Math.max(1, Math.ceil(n / cols));
+    const cellW = hallW / (cols + 1);
+    const cellH = hallH / (rows + 1);
+    const arr = [];
+    let id = 1;
+    let i = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols && i < n; c++) {
+        const cx = (c + 1) * cellW;
+        const cy = (r + 1) * cellH;
+        const seats = Math.max(6, Math.min(16, counts[i]));
+        arr.push(
+          shape === 'circle'
+            ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats }
+            : { id: id++, x: cx, y: cy, shape: 'rectangle', width: baseWidth, height: baseHeight, seats }
+        );
+        i++;
+      }
+    }
+    return arr;
+  };
+
+  // Fallbacks para datos de ocupación si no están disponibles en el contexto
+  const occupancyByTable = new Map();
+  const buildGridFromCounts = (counts = [], shape = defaultShape) => {
+    const n = Math.max(1, counts.length || 1);
+    const rows = Math.max(1, Math.floor(Math.sqrt(n)));
+    const cols = Math.max(1, Math.ceil(n / rows));
+    return buildGridTables(rows, cols, shape);
   };
 
   let templates = [
@@ -758,6 +849,30 @@ const TemplateSelector = ({
       name: 'Sugerido por datos',
       description: `${guestCount || 0} invitados • ${tableCount || 0} mesas • Banquete ~${suggestedBanquet.rows}×${suggestedBanquet.cols} de ${suggestedBanquet.seats}`,
       banquet: suggestedBanquet,
+      ceremony: suggestedCeremony,
+    },
+    {
+      id: 'smart-adapted',
+      name: 'Adaptado a tu boda',
+      description: (() => {
+        const distinctAssigned = occMapReal.size;
+        if (distinctAssigned > 0) {
+          const totalAssigned = Array.from(occMapReal.values()).reduce((a, b) => a + b, 0);
+          return `Distribuye ${distinctAssigned} mesas según asignaciones (${totalAssigned} asignados)`;
+        }
+        const needed = guestCount > 0 ? Math.ceil(guestCount / seatPref) : Math.max(tableCount || 6, 6);
+        return `Estima ${needed} mesas de ${seatPref} plazas para ${guestCount} invitados`;
+      })(),
+      banquetTables: (() => {
+        const distinctAssigned = occMapReal.size;
+        if (distinctAssigned > 0) {
+          const counts = Array.from(occMapReal.values());
+          return gridFromCountsReal(counts, defaultShape);
+        }
+        const needed = guestCount > 0 ? Math.ceil(guestCount / seatPref) : Math.max(tableCount || 6, 6);
+        const cols = Math.max(1, Math.ceil(needed / Math.max(1, Math.floor(Math.sqrt(needed)))));
+        return buildGridTables(Math.max(1, Math.floor(Math.sqrt(needed))), cols, defaultShape);
+      })(),
       ceremony: suggestedCeremony,
     },
     {
@@ -770,7 +885,7 @@ const TemplateSelector = ({
     {
       id: 'circle',
       name: 'Distribución circular',
-      description: `Anillo central con ${avgSeats} asientos por mesa (forma redonda)`,
+      description: `Anillo central con ${seatPref} asientos por mesa (forma redonda)`,
       banquetTables: buildCircularRing(),
     },
     {
@@ -788,7 +903,7 @@ const TemplateSelector = ({
     {
       id: 'imperial',
       name: 'Mesa Imperial única',
-      description: `Una mesa central para ~${guestCount || avgSeats} comensales`,
+      description: `Una mesa central para ~${guestCount || seatPref} comensales`,
       banquetTables: buildImperial(),
     },
     {
@@ -857,7 +972,7 @@ const TemplateSelector = ({
               x: cx,
               y: cy,
               shape: t.shape || 'rectangle',
-              seats: parseInt(t.seats, 10) || avgSeats,
+              seats: parseInt(t.seats, 10) || seatPref,
             });
           }
         }
@@ -886,7 +1001,7 @@ const TemplateSelector = ({
             x: cx,
             y: cy,
             shape: t.shape || 'circle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         return arr;
@@ -923,7 +1038,7 @@ const TemplateSelector = ({
               x,
               y,
               shape: t.shape || 'rectangle',
-              seats: parseInt(t.seats, 10) || avgSeats,
+              seats: parseInt(t.seats, 10) || seatPref,
             });
           }
         }
@@ -955,7 +1070,7 @@ const TemplateSelector = ({
             x: cx + rInner * Math.cos(ang),
             y: cy + rInner * Math.sin(ang),
             shape: t.shape || 'circle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         // outer ring
@@ -968,7 +1083,7 @@ const TemplateSelector = ({
             x: cx + rOuter * Math.cos(ang),
             y: cy + rOuter * Math.sin(ang),
             shape: t.shape || 'circle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         return arr;
@@ -999,7 +1114,7 @@ const TemplateSelector = ({
             x,
             y: minY,
             shape: t.shape || 'rectangle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         // right edge
@@ -1011,7 +1126,7 @@ const TemplateSelector = ({
             x: maxX,
             y,
             shape: t.shape || 'rectangle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         // bottom edge
@@ -1023,7 +1138,7 @@ const TemplateSelector = ({
             x,
             y: maxY,
             shape: t.shape || 'rectangle',
-            seats: parseInt(t.seats, 10) || avgSeats,
+            seats: parseInt(t.seats, 10) || seatPref,
           });
         }
         // left edge

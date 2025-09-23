@@ -48,7 +48,8 @@
                     "i18n:fix":  "node scripts/fixLocalesMojibake.js \u0026\u0026 node scripts/validateI18n.js",
                     "i18n:update":  "node scripts/update_i18n_full.js \u0026\u0026 node scripts/fixLocalesMojibake.js \u0026\u0026 node scripts/validateI18n.js",
                     "i18n:sync":  "node scripts/syncLocales.js es fr",
-                    "fix:mojibake":  "node scripts/fixSpanishMojibake.js"
+                    "fix:mojibake":  "node scripts/fixSpanishMojibake.js",
+                    "ci:check": "npm run lint && npm run test:unit && npm run validate:i18n && npm run check:bundle"
                 },
     "dependencies":  {
                          "@emotion/react":  "^11.14.0",

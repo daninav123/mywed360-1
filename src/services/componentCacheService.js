@@ -3,7 +3,7 @@
  * Optimiza el rendimiento cachéando resultados de componentes pesados
  */
 
-import { useMemo, useCallback, useRef, useEffect } from 'react';
+import { useMemo, useCallback, useRef, useEffect, useState } from 'react';
 
 // Caché global en memoria
 const globalCache = new Map();

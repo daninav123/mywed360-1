@@ -1,9 +1,11 @@
 import { differenceInSeconds } from 'date-fns';
 import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import ExternalImage from '@/components/ExternalImage';
 import { useParams } from 'react-router-dom';
 
 import { db } from '../lib/firebase';
+import sanitizeHtml from '../utils/sanitizeHtml';
 
 /*
   Página pública one-page con la información de la boda.
@@ -71,7 +73,7 @@ export default function WeddingSite() {
     }
   };
 
-  if (customHtml) return <div dangerouslySetInnerHTML={{ __html: customHtml }} />;
+  if (customHtml) return <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(customHtml) }} />;
 
   if (!profile) return <p style={{ textAlign: 'center', marginTop: 40 }}>Cargando…</p>;
 
@@ -125,7 +127,12 @@ export default function WeddingSite() {
           <h2 className="text-3xl font-semibold text-center mb-6">Galería</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {gallery.map((g, i) => (
-              <img key={i} src={g.url} alt="Foto" className="object-cover w-full h-40 rounded" />
+              <ExternalImage
+                key={i}
+                src={g.url}
+                alt="Foto"
+                className="object-cover w-full h-40 rounded"
+              />
             ))}
           </div>
         </section>

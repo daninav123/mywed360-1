@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 
 import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
@@ -9,14 +9,14 @@ import EmailComposer from '../EmailComposer';
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
- * Versión completa con todas las correcciones aplicadas para evitar errores de Promise
+ * VersiÃ³n completa con todas las correcciones aplicadas para evitar errores de Promise
  */
 const InboxContainer = () => {
   const authContext = useAuth();
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
 
-  // Establecer el contexto de autenticación en EmailService
+  // Establecer el contexto de autenticaciÃ³n en EmailService
   useEffect(() => {
     setAuthContext(authContext);
   }, [authContext]);
@@ -39,14 +39,14 @@ const InboxContainer = () => {
         setEmails(res);
         setError(null);
       } else if (res && typeof res === 'object') {
-        // El servicio devolvió un objeto con error o estructura inesperada
-        console.warn('EmailService devolvió estructura no esperada:', res);
+        // El servicio devolviÃ³ un objeto con error o estructura inesperada
+        console.warn('EmailService devolviÃ³ estructura no esperada:', res);
         setEmails([]);
         setError(res.error || 'No se pudieron cargar los emails');
       } else {
         // Valor totalmente inesperado
         setEmails([]);
-        setError('Respuesta de EmailService no válida');
+        setError('Respuesta de EmailService no vÃ¡lida');
       }
     } catch (err) {
       console.error('Error cargando emails:', err);
@@ -92,30 +92,33 @@ const InboxContainer = () => {
     };
   }, [user, folder, refreshEmails, refreshCounts]);
 
-  // Marcar email como leído
+  // Marcar email como leÃ­do
   const markAsRead = useCallback(async (emailId) => {
     try {
       await EmailService.markAsRead(emailId);
       setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
+      try { await refreshCounts(); } catch {}
     } catch (err) {
-      console.error('Error marcando como leído:', err);
+      console.error('Error marcando como le��do:', err);
     }
-  }, []);
+  }, [refreshCounts]);
 
   // Eliminar email
   const deleteEmail = useCallback(async (emailId) => {
     try {
       await EmailService.deleteMail(emailId);
       setEmails((prev) => prev.filter((e) => e.id !== emailId));
+      try { await refreshCounts(); } catch {}
     } catch (err) {
       console.error('Error eliminando email:', err);
       throw err;
     }
-  }, []);
+  }, [refreshCounts]);
 
   // Estados locales
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showComposer, setShowComposer] = useState(false);
+  const [composerInitial, setComposerInitial] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
   const [viewMode, setViewMode] = useState('list'); // list, detail
@@ -128,7 +131,7 @@ const InboxContainer = () => {
     ? safeEmails.find((email) => email.id === selectedEmailId)
     : null;
 
-  // Filtrar emails según búsqueda y estado
+  // Filtrar emails segÃºn bÃºsqueda y estado
   const filteredEmails = safeEmails.filter((email) => {
     const matchesSearch =
       !searchTerm ||
@@ -150,7 +153,7 @@ const InboxContainer = () => {
       setSelectedEmailId(emailId);
       setViewMode('detail');
 
-      // Marcar como leído si no lo está
+      // Marcar como leÃ­do si no lo estÃ¡
       const email = emails.find((e) => e.id === emailId);
       if (email && !email.read) {
         markAsRead(emailId);
@@ -182,14 +185,14 @@ const InboxContainer = () => {
   const handleSendEmail = useCallback(
     async (emailData) => {
       try {
-        // ✅ Usar EmailService directamente sin safeRender para evitar Promise rendering
+        // âœ… Usar EmailService directamente sin safeRender para evitar Promise rendering
         const result = await EmailService.sendEmail(emailData);
 
         if (result && result.success) {
           setShowComposer(false);
-          await refreshEmails(); // Refrescar lista tras envío
+          await refreshEmails(); // Refrescar lista tras envío\n          try { await refreshCounts(); } catch {}
 
-          // Track operation si está disponible
+          // Track operation si estÃ¡ disponible
           if (trackOperation) {
             trackOperation('email_sent', { success: true });
           }
@@ -201,7 +204,7 @@ const InboxContainer = () => {
         }
       }
     },
-    [refreshEmails, trackOperation]
+    [refreshEmails, refreshCounts, trackOperation]
   );
 
   // Estados de carga y error
@@ -244,19 +247,19 @@ const InboxContainer = () => {
                 onClick={() => setShowComposer(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                ✉️ Nuevo Email
+                âœ‰ï¸ Nuevo Email
               </button>
               <button
                 onClick={refreshEmails}
                 className="px-3 py-2 text-gray-600 hover:text-gray-800 transition-colors"
                 title="Actualizar"
               >
-                🔄
+                ðŸ”„
               </button>
             </div>
           </div>
 
-          {/* Barra de búsqueda y filtros */}
+          {/* Barra de bÃºsqueda y filtros */}
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <input
@@ -273,8 +276,8 @@ const InboxContainer = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Todos</option>
-              <option value="unread">No leídos</option>
-              <option value="read">Leídos</option>
+              <option value="unread">No leÃ­dos</option>
+              <option value="read">LeÃ­dos</option>
             </select>
           </div>
 
@@ -316,9 +319,9 @@ const InboxContainer = () => {
           </nav>
         </aside>
 
-        {/* Lista/Detalle */}
-        {viewMode === 'list' || !selectedEmail ? (
-          <div className="flex-1">
+        {/* Lista y detalle lado a lado */}
+        <div className="flex-1 grid grid-cols-2 gap-0">
+          <div className="border-r overflow-hidden">
             <EmailList
               emails={filteredEmails}
               onEmailSelect={handleEmailSelect}
@@ -327,18 +330,33 @@ const InboxContainer = () => {
               loading={loading}
             />
           </div>
-        ) : (
-          <div className="flex-1">
-            <EmailDetail
-              email={selectedEmail}
-              onBack={handleBackToList}
-              onDelete={() => handleEmailDelete(selectedEmail.id)}
-              onReply={() => {
-                setShowComposer(true);
-              }}
-            />
+          <div className="overflow-auto">
+            {selectedEmail ? (
+              <EmailDetail
+                email={selectedEmail}
+                onBack={handleBackToList}
+                onDelete={() => handleEmailDelete(selectedEmail.id)}
+                onReply={() => {
+                  const subj = selectedEmail?.subject ? `Re: ${selectedEmail.subject}` : 'Re:';
+                  const to = selectedEmail?.from || '';
+                  const quoted = `\n\n---- Mensaje original ----\nDe: ${selectedEmail?.from || ''}\nFecha: ${selectedEmail?.date || ''}\nAsunto: ${selectedEmail?.subject || ''}\n\n${selectedEmail?.body || ''}`;
+                  setComposerInitial({ to, subject: subj, body: quoted });
+                  setShowComposer(true);
+                }}
+                onForward={() => {
+                  const subj = selectedEmail?.subject ? `Fwd: ${selectedEmail.subject}` : 'Fwd:';
+                  const quoted = `\n\n---- Mensaje reenviado ----\nDe: ${selectedEmail?.from || ''}\nFecha: ${selectedEmail?.date || ''}\nAsunto: ${selectedEmail?.subject || ''}\n\n${selectedEmail?.body || ''}`;
+                  setComposerInitial({ to: '', subject: subj, body: quoted });
+                  setShowComposer(true);
+                }}
+              />
+            ) : (
+              <div className="h-full flex items-center justify-center text-gray-500">
+                Selecciona un correo para verlo
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Composer modal */}
@@ -346,7 +364,7 @@ const InboxContainer = () => {
         <EmailComposer
           onSend={handleSendEmail}
           onClose={() => setShowComposer(false)}
-          replyTo={selectedEmail}
+          initialValues={composerInitial}
         />
       )}
     </div>
@@ -354,3 +372,6 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
+
+
+

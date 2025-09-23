@@ -42,7 +42,8 @@ const AyudaCeremonia = () => {
   const [readingPreview, setReadingPreview] = useState('');
 
   // Verificar si el usuario tiene permisos
-  const canEdit = user?.role === 'wedding-planner' || user?.role === 'ayudante';
+  const canEdit =
+    currentUser?.role === 'wedding-planner' || currentUser?.role === 'ayudante';
 
   const handleReadingSave = (e) => {
     e.preventDefault();

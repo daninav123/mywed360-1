@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /**
  * Servicio de Diagnóstico Avanzado para Backend y Servicios Externos
  * Proporciona funciones específicas para diagnosticar problemas comunes

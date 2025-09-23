@@ -389,12 +389,12 @@ const SeatingPlanRefactored = () => {
         });
       }
 
-      // Asignación automática no intrusiva (sin cambiar UI): intentar asignar tras aplicar plantilla
+      // Asignación automática forzada tras aplicar plantilla
       setTimeout(async () => {
         try {
-          const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
-          if (!enableAutoAssign) return;
-          const res = await autoAssignGuests();
+          const res = await (typeof autoAssignGuestsRules === 'function'
+            ? autoAssignGuestsRules()
+            : autoAssignGuests());
           if (res?.ok) {
             const msg =
               res.method === 'backend'
@@ -432,7 +432,7 @@ const SeatingPlanRefactored = () => {
     }
   }, [autoAssignGuestsRules, autoAssignGuests]);
 
-  // Generación desde modal de banquete seguida de autoasignación (silencioso a nivel de UI)
+  // Generación desde modal de banquete seguida de autoasignación forzada (silencioso a nivel de UI)
   const handleGenerateBanquetLayoutWithAssign = React.useCallback(
     (config) => {
       try {
@@ -440,8 +440,6 @@ const SeatingPlanRefactored = () => {
       } finally {
         setTimeout(async () => {
           try {
-            const enableAutoAssign = import.meta.env.VITE_ENABLE_AUTO_ASSIGN === 'true';
-            if (!enableAutoAssign) return;
             const res = await (typeof autoAssignGuestsRules === 'function'
               ? autoAssignGuestsRules()
               : autoAssignGuests());

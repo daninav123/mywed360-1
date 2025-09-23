@@ -21,7 +21,7 @@ import {
   collection,
   Timestamp,
 } from 'firebase/firestore';
-import { collectionGroup } from 'firebase/firestore';
+import { collectionGroup, documentId } from 'firebase/firestore';
 import { query, where, getDocs, limit } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -99,7 +99,10 @@ async function createInvitation(weddingId, email, role) {
 export async function acceptInvitation(code, uid) {
   if (!code || !uid) throw new Error('parámetros requeridos');
   // Buscar código en cualquier boda usando collectionGroup
-  const q = query(collectionGroup(db, 'weddingInvitations'), where('__name__', '==', code));
+  const q = query(
+    collectionGroup(db, 'weddingInvitations'),
+    where(documentId(), '==', code)
+  );
   const res = await getDocs(q);
   if (res.empty) throw new Error('Invitación no encontrada');
   const snap = res.docs[0];

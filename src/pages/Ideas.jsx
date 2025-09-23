@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ExternalImage from '@/components/ExternalImage';
 
 import PageWrapper from '../components/PageWrapper';
 import SyncIndicator from '../components/SyncIndicator';
@@ -172,10 +173,11 @@ export default function Ideas() {
           <div className="mt-4 grid grid-cols-3 gap-2">
             {photos.map((p, i) => (
               <div key={i} className="relative">
-                <img
+                <ExternalImage
                   src={p.url}
                   alt={p.name || `Foto ${i}`}
                   className="w-full h-32 object-cover rounded"
+                  requireHttp={false}
                 />
                 <div className="absolute bottom-1 left-1 right-1 text-[10px] bg-black/40 text-white px-1 py-0.5 rounded truncate">
                   {p.name || `Foto ${i + 1}`}

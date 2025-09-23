@@ -1,5 +1,4 @@
 ﻿// blogService.js - noticias de bodas
-import axios from 'axios';
 
 import { getBackendBase } from '@/utils/backendBase.js';
 
@@ -48,6 +47,8 @@ async function fetchFromBackend({ page, pageSize, language }) {
   } catch {}
 
   let sawError = false;
+  // Carga perezosa de axios para reducir bundle inicial
+  const axios = (await import('axios')).default;
   for (const base of candidates) {
     try {
       const url = base ? `${base}/api/wedding-news` : '/api/wedding-news';
@@ -79,6 +80,8 @@ async function fetchFromBackend({ page, pageSize, language }) {
 
 // Fallback: NewsAPI.org cuando hay API_KEY y el agregador devuelve vacD
 async function fetchFromNewsApi(page, pageSize, lang) {
+  // Carga perezosa de axios para reducir bundle inicial
+  const axios = (await import('axios')).default;
   const endpointOpts = {
     params: {
       q: 'wedding OR boda',

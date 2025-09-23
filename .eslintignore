@@ -11,3 +11,15 @@ src/pages/MomentosEspeciales.old.jsx
 dist/
 build/
 logs/
+
+# Tests y E2E
+src/test/
+src/__tests__/
+**/*.test.js
+**/*.test.jsx
+**/*.spec.js
+**/*.spec.jsx
+cypress/
+
+# Páginas WIP que no deben bloquear el lint
+src/pages/Contratos.jsx

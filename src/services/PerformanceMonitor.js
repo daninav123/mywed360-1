@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 /**
  * Servicio de monitoreo de rendimiento para la aplicación Lovenda
  *

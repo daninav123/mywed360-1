@@ -4,6 +4,7 @@
 
 import { auth } from '../firebaseConfig';
 import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
+import { get as apiGet, post as apiPost, put as apiPut, del as apiDel } from './apiClient';
 
 const BASE =
   (typeof import.meta !== 'undefined' &&
@@ -99,16 +100,7 @@ function resolveMyAddresses() {
   }
 }
 
-async function buildAuthHeaders(base = {}) {
-  try {
-    const user = auth && auth.currentUser;
-    if (user && typeof user.getIdToken === 'function') {
-      const token = await user.getIdToken();
-      return { ...base, Authorization: `Bearer ${token}` };
-    }
-  } catch {}
-  return base;
-}
+// Autenticación se maneja vía apiClient (opción { auth: true })
 
 export async function getMails(folder = 'inbox') {
   // Carpeta virtual: combinar inbox+sent
@@ -139,14 +131,14 @@ export async function getMails(folder = 'inbox') {
     const qs = new URLSearchParams();
     if (folder) qs.set('folder', folder);
     if (user) qs.set('user', (user || '').toLowerCase());
-    const url = `${BASE}/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
-    let res = await fetch(url, { headers: await buildAuthHeaders() });
+    const path = `/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
+    let res = await apiGet(path, { auth: true });
     // Fallback por 403: reintentar sin user y filtrar en cliente
     if (res.status === 403) {
       const qs2 = new URLSearchParams();
       if (folder) qs2.set('folder', folder);
-      const url2 = `${BASE}/api/mail${qs2.toString() ? `?${qs2.toString()}` : ''}`;
-      res = await fetch(url2, { headers: await buildAuthHeaders() });
+      const path2 = `/api/mail${qs2.toString() ? `?${qs2.toString()}` : ''}`;
+      res = await apiGet(path2, { auth: true });
       if (res.ok) {
         const all = await res.json();
         const myAddrs = resolveMyAddresses();
@@ -188,9 +180,9 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
   if (user) qs.set('user', (user || '').toLowerCase());
   if (limit) qs.set('limit', String(limit));
   if (cursor) qs.set('cursor', String(cursor));
-  const url = `${BASE}/api/mail/page${qs.toString() ? `?${qs.toString()}` : ''}`;
+  const path = `/api/mail/page${qs.toString() ? `?${qs.toString()}` : ''}`;
   try {
-    let res = await fetch(url, { headers: await buildAuthHeaders() });
+    let res = await apiGet(path, { auth: true });
     if (res.ok) {
       const json = await res.json();
       const items = Array.isArray(json?.items) ? json.items : [];
@@ -207,8 +199,8 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
       if (folder) qs2.set('folder', folder);
       if (limit) qs2.set('limit', String(limit));
       if (cursor) qs2.set('cursor', String(cursor));
-      const url2 = `${BASE}/api/mail/page${qs2.toString() ? `?${qs2.toString()}` : ''}`;
-      res = await fetch(url2, { headers: await buildAuthHeaders() });
+      const path2 = `/api/mail/page${qs2.toString() ? `?${qs2.toString()}` : ''}`;
+      res = await apiGet(path2, { auth: true });
       if (res.ok) {
         const json = await res.json();
         const baseItems = Array.isArray(json?.items) ? json.items : [];
@@ -306,11 +298,7 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
           }))
         : [],
     };
-    const res = await fetch(`${BASE}/api/mail`, {
-      method: 'POST',
-      headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(payload),
-    });
+    const res = await apiPost(`/api/mail`, payload, { auth: true });
     if (!res.ok) throw new Error(`sendMail ${res.status}`);
     return res.json();
   }
@@ -330,10 +318,7 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
 
 export async function deleteMail(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: await buildAuthHeaders(),
-    });
+    const res = await apiDel(`/api/mail/${encodeURIComponent(id)}`, { auth: true });
     if (!res.ok) throw new Error(`deleteMail ${res.status}`);
     return true;
   }
@@ -343,10 +328,7 @@ export async function deleteMail(id) {
 
 export async function markAsRead(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/read`, {
-      method: 'POST',
-      headers: await buildAuthHeaders(),
-    });
+    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/read`, {}, { auth: true });
     if (!res.ok) throw new Error(`markAsRead ${res.status}`);
     return true;
   }
@@ -356,10 +338,7 @@ export async function markAsRead(id) {
 
 export async function markAsUnread(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/unread`, {
-      method: 'POST',
-      headers: await buildAuthHeaders(),
-    });
+    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/unread`, {}, { auth: true });
     if (!res.ok) throw new Error(`markAsUnread ${res.status}`);
     return true;
   }
@@ -372,11 +351,7 @@ export async function createEmailAlias(arg1, arg2) {
   const alias = typeof arg1 === 'string' ? arg1 : arg2;
   if (!alias) throw new Error('alias required');
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/alias`, {
-      method: 'POST',
-      headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify({ alias }),
-    });
+    const res = await apiPost(`/api/mail/alias`, { alias }, { auth: true });
     if (!res.ok) throw new Error(`createEmailAlias ${res.status}`);
     return res.json();
   }
@@ -385,7 +360,7 @@ export async function createEmailAlias(arg1, arg2) {
 
 export async function getEmailStatistics() {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/stats`, { headers: await buildAuthHeaders() });
+    const res = await apiGet(`/api/mail/stats`, { auth: true });
     if (!res.ok) throw new Error(`getEmailStatistics ${res.status}`);
     return res.json();
   }
@@ -398,9 +373,7 @@ export async function searchEmails(term = '') {
   if (!q) return [];
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/mail/search?q=${encodeURIComponent(q)}`, {
-        headers: await buildAuthHeaders(),
-      });
+      const res = await apiGet(`/api/mail/search?q=${encodeURIComponent(q)}`, { auth: true });
       if (res.ok) {
         const items = await res.json();
         return (Array.isArray(items) ? items : []).map((m) => ({
@@ -450,9 +423,7 @@ export async function searchEvents(term = '') {
   if (!q) return [];
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/events/search?q=${encodeURIComponent(q)}`, {
-        headers: await buildAuthHeaders(),
-      });
+      const res = await apiGet(`/api/events/search?q=${encodeURIComponent(q)}`, { auth: true });
       if (!res.ok) throw new Error(`searchEvents ${res.status}`);
       const items = await res.json();
       return (Array.isArray(items) ? items : []).map((e) => ({
@@ -471,22 +442,14 @@ export async function searchEvents(term = '') {
 // Mail operations
 export async function setFolder(id, folder) {
   if (!USE_BACKEND) return true;
-  const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/folder`, {
-    method: 'PUT',
-    headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ folder }),
-  });
+  const res = await apiPut(`/api/mail/${encodeURIComponent(id)}/folder`, { folder }, { auth: true });
   if (!res.ok) throw new Error(`setFolder ${res.status}`);
   return true;
 }
 
 export async function updateMailTags(id, { add = [], remove = [] } = {}) {
   if (!USE_BACKEND) return true;
-  const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/tags`, {
-    method: 'POST',
-    headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ add, remove }),
-  });
+  const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/tags`, { add, remove }, { auth: true });
   if (!res.ok) throw new Error(`updateTags ${res.status}`);
   return (await res.json()).tags || true;
 }

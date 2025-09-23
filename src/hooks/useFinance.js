@@ -7,6 +7,7 @@ import { useWedding } from '../context/WeddingContext';
 import { getTransactions } from '../services/bankService';
 import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { transactionSchema, transactionUpdateSchema } from '../schemas/transaction';
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
@@ -614,7 +615,7 @@ export default function useFinance() {
           ? attachmentsSpec.newFiles
           : [];
 
-        const payload = {
+        let payload = {
           ...transactionData,
           type,
           status,
@@ -662,6 +663,13 @@ export default function useFinance() {
           payload.attachments = attachments;
         }
 
+        // Validar y normalizar con Zod
+        const parsed = transactionSchema.safeParse(payload);
+        if (!parsed.success) {
+          throw new Error(parsed.error?.errors?.[0]?.message || 'Datos de transacción inválidos');
+        }
+        payload = parsed.data;
+
         const saved = await _addTransaction(payload);
 
         const updatedTransactions = [...transactions, saved];
@@ -697,7 +705,7 @@ export default function useFinance() {
         const resolvedStatus =
           changes?.status || existing?.status || (type === 'income' ? 'expected' : 'pending');
 
-        const payload = { ...changes };
+        let payload = { ...changes };
 
         let keepAttachments = [];
         let filesToUpload = [];
@@ -796,6 +804,13 @@ export default function useFinance() {
           ];
           payload.attachments = attachments;
         }
+
+        // Validar update parcial
+        const parsed = transactionUpdateSchema.safeParse(payload);
+        if (!parsed.success) {
+          throw new Error(parsed.error?.errors?.[0]?.message || 'Cambios de transacción inválidos');
+        }
+        payload = parsed.data;
 
         await _updateTransaction(id, payload);
         return { success: true };

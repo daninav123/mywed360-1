@@ -83,22 +83,8 @@ import './utils/consoleCommands';
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const hasRedirected = React.useRef(false);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined' && window.Cypress) return;
-    if (hasRedirected.current) return;
-
-    if (!isLoading && !isAuthenticated) {
-      if (location.pathname !== '/login' && location.pathname !== '/') {
-        hasRedirected.current = true;
-        navigate('/login', { replace: true, state: { from: location } });
-      }
-    }
-  }, [isAuthenticated, isLoading, location, navigate]);
-
+  // Bypass in Cypress tests
   if (typeof window !== 'undefined' && window.Cypress) {
     return (
       <>
@@ -109,7 +95,9 @@ function ProtectedRoute() {
   }
 
   if (isLoading) return null;
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
 
   return (
     <>

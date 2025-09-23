@@ -381,11 +381,13 @@ const ArticleCard = React.forwardRef(({ post }, ref) => {
   } catch {}
   const isHttpUrl = typeof resolvedImage === 'string' && /^https?:\/\//i.test(resolvedImage);
   const [useProxy, setUseProxy] = React.useState(false);
+  const [imgFailed, setImgFailed] = React.useState(false);
   const imgSrc = resolvedImage
     ? useProxy && base && isHttpUrl
       ? `${base}/api/image-proxy?u=${encodeURIComponent(resolvedImage)}`
       : resolvedImage
     : null;
+  if (imgFailed) return null;
   return (
     <div
       ref={ref}
@@ -398,7 +400,11 @@ const ArticleCard = React.forwardRef(({ post }, ref) => {
           className="w-full h-48 object-cover"
           loading="lazy"
           onError={() => {
-            if (!useProxy && base && isHttpUrl) setUseProxy(true);
+            if (!useProxy && base && isHttpUrl) {
+              setUseProxy(true);
+            } else {
+              setImgFailed(true);
+            }
           }}
         />
       )}

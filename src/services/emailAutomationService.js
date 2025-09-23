@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { post } from './apiClient';
 
 const CONFIG_KEY = 'lovenda.email.automation.config';

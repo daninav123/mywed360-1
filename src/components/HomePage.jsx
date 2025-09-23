@@ -31,6 +31,7 @@ import {
 
 import useFinance from '../hooks/useFinance';
 import { fetchWeddingNews } from '../services/blogService';
+import ExternalImage from './ExternalImage';
 import { fetchWall } from '../services/wallService';
 
 export default function HomePage() {
@@ -410,7 +411,7 @@ export default function HomePage() {
                 key={idx}
                 className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden"
               >
-                <img
+                <ExternalImage
                   src={img.src}
                   alt={img.alt}
                   className="w-full h-full object-cover transition transform hover:scale-110"
@@ -441,12 +442,8 @@ export default function HomePage() {
                   className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition"
                 >
                   {post.image && (
-                    <img
-                      src={
-                        backendBase
-                          ? `${backendBase}/api/image-proxy?u=${encodeURIComponent(post.image)}`
-                          : post.image
-                      }
+                    <ExternalImage
+                      src={post.image}
                       alt={post.title}
                       className="w-full h-40 object-cover"
                     />

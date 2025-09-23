@@ -1,4 +1,5 @@
 import React from 'react';
+import ExternalImage from '@/components/ExternalImage';
 import { useParams } from 'react-router-dom';
 
 export default function PublicWedding() {
@@ -94,7 +95,7 @@ export default function PublicWedding() {
           <h2 className="text-2xl font-semibold mb-4">Galería</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {gallery.map((g) => (
-              <img
+              <ExternalImage
                 key={g.id}
                 src={g.url || g.src}
                 alt="Foto"

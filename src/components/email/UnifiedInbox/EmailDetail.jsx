@@ -53,7 +53,7 @@ const IMAGE_TYPES = {
   bmp: 'image/bmp',
   ico: 'image/x-icon',
 };
-const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
+const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll }) => {
   // Si email es null o undefined, mostrar un mensaje
   if (!email) {
     return (
@@ -280,7 +280,13 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
                   <ExternalLink size={16} className="mr-2" />
                   Abrir en nueva ventana
                 </button>
-                <button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <button
+                  className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    if (onForward) onForward(email);
+                  }}
+                >
                   <ArrowLeftRight size={16} className="mr-2" />
                   Reenviar
                 </button>

@@ -629,7 +629,13 @@ export default function Tasks() {
         try {
           if (!snap || !snap.exists()) return;
           const info = snap.data() || {};
-          const raw = info?.weddingDate || info?.date || info?.eventDate || null;
+          const raw =
+            info?.weddingDate ||
+            info?.weddingdate ||
+            info?.date ||
+            info?.eventDate ||
+            info?.eventdate ||
+            null;
           const d = raw && typeof raw?.toDate === 'function' ? raw.toDate() : raw ? new Date(raw) : null;
           if (d && !isNaN(d.getTime())) setProjectEnd(d);
         } catch (_) {}
@@ -645,6 +651,48 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
+  // 1a) Fallback adicional: leer weddingDate del documento raíz weddings/{id}
+  useEffect(() => {
+    if (!activeWedding || !db) return;
+    try {
+      const ref = doc(db, 'weddings', activeWedding);
+      const unsub = onSnapshot(
+        ref,
+        (snap) => {
+          try {
+            if (!snap || !snap.exists()) return;
+            const info = snap.data() || {};
+            const raw = info?.weddingDate || info?.weddingdate || info?.date || null;
+            let d = null;
+            if (raw && typeof raw?.toDate === 'function') d = raw.toDate();
+            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') d = new Date(raw.seconds * 1000);
+            else if (typeof raw === 'number') d = new Date(raw < 1e12 ? raw * 1000 : raw);
+            else if (typeof raw === 'string') {
+              const iso = new Date(raw);
+              if (!isNaN(iso.getTime())) d = iso;
+              else {
+                const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]+)\s+de\s+(\d{4})/);
+                if (m) {
+                  const day = parseInt(m[1], 10);
+                  const name = m[2].toLowerCase();
+                  const year = parseInt(m[3], 10);
+                  const map = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11 };
+                  const mon = map[name];
+                  if (mon !== undefined) d = new Date(year, mon, day);
+                }
+              }
+            }
+            if (d && !isNaN(d.getTime())) setProjectEnd(d);
+          } catch (_) {}
+        },
+        () => {}
+      );
+      return () => {
+        try { unsub && unsub(); } catch (_) {}
+      };
+    } catch (_) {}
+  }, [activeWedding, db]);
+
   // 1b) Fijar projectStart desde users/{uid}.createdAt (fallback: auth.metadata.creationTime)
   useEffect(() => {
     (async () => {
@@ -656,8 +704,28 @@ export default function Tasks() {
         let d = null;
         if (snap && snap.exists()) {
           const data = snap.data() || {};
-          const raw = data?.createdAt || data?.created_at || data?.created || null;
-          if (raw) d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+          const raw = data?.createdAt || data?.created_at || data?.created || data?.createdat || null;
+          if (raw && typeof raw?.toDate === 'function') {
+            d = raw.toDate();
+          } else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') {
+            d = new Date(raw.seconds * 1000);
+          } else if (typeof raw === 'number') {
+            d = new Date(raw < 1e12 ? raw * 1000 : raw);
+          } else if (typeof raw === 'string') {
+            const iso = new Date(raw);
+            if (!isNaN(iso.getTime())) d = iso;
+            else {
+              const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]+)\s+de\s+(\d{4})/);
+              if (m) {
+                const day = parseInt(m[1], 10);
+                const name = m[2].toLowerCase();
+                const year = parseInt(m[3], 10);
+                const map = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11 };
+                const mon = map[name];
+                if (mon !== undefined) d = new Date(year, mon, day);
+              }
+            }
+          }
         }
         // Fallback adicional: colección de perfiles si existiese
         if (!d) {

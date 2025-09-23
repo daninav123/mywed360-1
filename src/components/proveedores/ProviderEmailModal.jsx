@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import { X, AlertCircle } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -205,9 +204,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
                 </div>
                 <div
                   className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(body || '', { USE_PROFILES: { html: true } }),
-                  }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(body || '') }}
                 />
               </Card>
             )}
@@ -230,3 +227,4 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
 };
 
 export default ProviderEmailModal;
+import sanitizeHtml from '../../utils/sanitizeHtml';

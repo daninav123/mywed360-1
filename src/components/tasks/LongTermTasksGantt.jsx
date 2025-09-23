@@ -85,22 +85,26 @@ export default function LongTermTasksGantt({
 
   // 3) Rango del timeline
   const registrationDate = useMemo(() => {
+    // Prioridad absoluta: projectStart proveniente de Firestore (users/{uid}.createdAt)
+    if (projectStart instanceof Date && !isNaN(projectStart.getTime())) return projectStart;
+    // Fallback: metadata de Auth
     try {
       const cs = auth?.currentUser?.metadata?.creationTime || null;
       const d = cs ? new Date(cs) : null;
       if (d && !isNaN(d.getTime())) return d;
     } catch {}
-    if (projectStart instanceof Date && !isNaN(projectStart.getTime())) return projectStart;
+    // Últimos recursos
     if (normalizedTasks.length > 0) return new Date(normalizedTasks[0].start);
     return new Date();
-  }, [normalizedTasks, projectStart]);
+  }, [projectStart, normalizedTasks]);
 
   const weddingBaseDate = useMemo(() => {
-    const raw = markerDate || projectEnd || null;
+    // Prioridad: projectEnd (weddingDate de Firestore). Fallback: markerDate
+    const raw = projectEnd || markerDate || null;
     if (!raw) return null;
     const d = raw instanceof Date ? raw : new Date(raw);
     return isNaN(d.getTime()) ? null : d;
-  }, [markerDate, projectEnd]);
+  }, [projectEnd, markerDate]);
 
   const timelineStart = registrationDate;
   const timelineEnd = useMemo(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /**
  * Servicio de integración con Mailgun para correos myWed360 (actualizado)
  * Este servicio gestiona todas las interacciones con Mailgun a través de

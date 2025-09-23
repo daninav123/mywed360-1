@@ -7,6 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import * as EmailService from '../../services/emailService';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import sanitizeHtml from '../../utils/sanitizeHtml';
 import Button from '../Button';
 import Card from '../ui/Card';
 
@@ -246,7 +247,7 @@ const ComposeEmail = () => {
               className="w-full min-h-[120px] border border-gray-300 rounded-md p-2 focus:outline-none"
               onInput={(e) => setBody(e.currentTarget.innerHTML)}
               suppressContentEditableWarning
-              dangerouslySetInnerHTML={body ? { __html: body } : undefined}
+              dangerouslySetInnerHTML={body ? { __html: sanitizeHtml(body) } : undefined}
             />
             {/* Respuestas sugeridas */}
             <div className="mt-2 flex flex-wrap gap-2">
