@@ -16,12 +16,12 @@ import NotificationWatcher from './notifications/NotificationWatcher';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
 import { useOnboarding } from '../hooks/useOnboarding';
-import TaskEventBridge from './tasks/TaskEventBridge';
-import FinanceEventBridge from './finance/FinanceEventBridge';
-import SupplierEventBridge from './proveedores/SupplierEventBridge';
-import ConfigEventBridge from './config/ConfigEventBridge';
-import GuestEventBridge from './guests/GuestEventBridge';
-import TaskNotificationWatcher from './tasks/TaskNotificationWatcher';
+import TaskEventBridge from './tasks/TaskEventBridge.js';
+import FinanceEventBridge from './finance/FinanceEventBridge.js';
+import SupplierEventBridge from './proveedores/SupplierEventBridge.js';
+import ConfigEventBridge from './config/ConfigEventBridge.js';
+import GuestEventBridge from './guests/GuestEventBridge.js';
+import TaskNotificationWatcher from './tasks/TaskNotificationWatcher.js';
 
 export default function MainLayout() {
   const { t } = useTranslation();
