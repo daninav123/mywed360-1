@@ -17,10 +17,13 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
         });
         return (
           Array.from(byId.values())
-            .filter((e) => e && e.start instanceof Date) // Verificar que sean tareas válidas
+            .filter((e) => e && e.start instanceof Date)
             .sort((a, b) => a.start - b.start)
-            // Mostrar tareas desde hoy (inclusivo), aunque la hora ya haya pasado
-            .filter((e) => e.start >= todayStart)
+            // Mostrar tareas con fin en futuro o inicio desde hoy
+            .filter((e) => {
+              const end = e.end instanceof Date ? e.end : e.start;
+              return (end >= todayStart) || (e.start >= todayStart);
+            })
             .slice(0, maxItems)
         );
       })()
