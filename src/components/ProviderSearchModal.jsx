@@ -191,6 +191,23 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           console.error('Error en solicitud API:', err);
         }
 
+        // Intentar motor web como fallback
+        try {
+          const q = [aiQuery, serviceFilter, formattedLocation].filter(Boolean).join(' ');
+          const res2 = await fetch(${import.meta.env.VITE_BACKEND_BASE_URL || ''}/api/ai/search-suppliers?q=);
+          if (res2.ok) {
+            const js = await res2.json();
+            if (Array.isArray(js?.results) && js.results.length) {
+              const verifiedResults = await verifyProviderLinks(js.results);
+              setAiResults(verifiedResults);
+              setShowResults(true);
+              saveData('lovendaSuppliers', verifiedResults, { firestore: false, showNotification: false });
+              window.dispatchEvent(new Event('lovenda-suppliers'));
+              return;
+            }
+          }
+        } catch (_) {}
+
         // Si la solicitud API falló o no devolvió resultados, usar OpenAI directamente (si está habilitado)
         await fetchOpenAi();
       } catch (err) {
@@ -579,3 +596,4 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     </div>
   );
 }
+

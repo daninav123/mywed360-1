@@ -413,6 +413,41 @@ export default function Tasks() {
 
       // AÒ±adir/actualizar segÒºn sea una tarea de largo plazo o una reuniÒ³n
       if (formData.long) {
+        // Si no se eligió tarea padre, asignar por defecto a "OTROS"
+        try {
+          if (!formData.parentTaskId) {
+            const arr = Array.isArray(tasksState) ? tasksState : [];
+            let others = arr.find(
+              (t) =>
+                String(t?.type || 'task') === 'task' &&
+                ((String(t?.name || '').trim().toUpperCase() === 'OTROS') ||
+                  (String(t?.title || '').trim().toUpperCase() === 'OTROS'))
+            );
+            if (!others && activeWedding && db) {
+              const pStart = (projectStart instanceof Date && !isNaN(projectStart)) ? projectStart : startDate;
+              const pEndBase = (projectEnd instanceof Date && !isNaN(projectEnd)) ? projectEnd : endDate;
+              const pEnd = pEndBase && pEndBase > pStart ? pEndBase : new Date(pStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+              const colRef = collection(db, 'weddings', activeWedding, 'tasks');
+              const docRef = await addDoc(colRef, {
+                title: 'OTROS',
+                name: 'OTROS',
+                type: 'task',
+                start: pStart,
+                end: pEnd,
+                progress: 0,
+                isDisabled: false,
+                createdAt: serverTimestamp(),
+                category: 'OTROS',
+              });
+              await setDoc(docRef, { id: docRef.id }, { merge: true });
+              others = { id: docRef.id };
+            }
+            if (others?.id) {
+              // Forzar que se guarde como SUBTAREA asignada a OTROS
+              formData.parentTaskId = String(others.id);
+            }
+          }
+        } catch (_) {}
         // Para el diagrama Gantt
         const ganttTask = {
           ...taskData,

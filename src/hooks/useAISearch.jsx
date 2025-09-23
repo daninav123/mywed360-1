@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 
 import { useAuth } from './useAuth';
 import useActiveWeddingInfo from './useActiveWeddingInfo';
-import { post as apiPost } from '../services/apiClient';
+import { post as apiPost, get as apiGet } from '../services/apiClient';
 
 // Utils
 const slugify = (value) =>
@@ -123,6 +123,30 @@ export const useAISearch = () => {
             }
           }
         }
+        // Intentar motor de búsqueda real del backend si está configurado (SerpAPI)
+        try {
+          const q = [query, inferredService, location].filter(Boolean).join(' ');
+          const res2 = await apiGet(`/api/ai/search-suppliers?q=${encodeURIComponent(q)}`, { silent: true });
+          if (res2 && res2.ok) {
+            const json = await res2.json();
+            const arr = Array.isArray(json?.results) ? json.results : [];
+            if (arr.length) {
+              const normalized = arr.map((item, index) => normalizeResult({
+                name: item.title,
+                title: item.title,
+                link: item.link,
+                snippet: item.snippet,
+                service: inferredService,
+                location,
+              }, index, query, 'web-search'));
+              const refined = refineResults(normalized, { service: inferredService, location });
+              setResults(refined);
+              setUsedFallback(false);
+              setLoading(false);
+              return refined;
+            }
+          }
+        } catch {}
       } catch (backendError) {
         console.warn('Fallo consultando ai-suppliers', backendError);
       }
