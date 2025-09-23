@@ -1,5 +1,4 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
 
 # Do not block commits on warnings or local lint issues.
 # i18n validation may warn; allow commit regardless.
@@ -7,3 +6,4 @@ npm run validate:i18n || true
 
 # Run lint-staged for auto-fixes, but never fail the commit.
 npx lint-staged || true
+
