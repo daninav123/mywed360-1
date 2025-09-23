@@ -222,7 +222,7 @@ const InboxContainer = () => {
       <div className="bg-white p-4 border-b shadow-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-800">Bandeja unificada</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">{folder === 'inbox' ? 'Recibidos' : 'Enviados'}</h1>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowComposer(true)}
@@ -267,6 +267,26 @@ const InboxContainer = () => {
               Usuario: {user.email} | {filteredEmails.length} emails
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Tabs carpeta */}
+      <div className="bg-white px-4 pb-2 border-b">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center space-x-3">
+            <button
+              className={`px-3 py-1 rounded-full text-sm border ${folder === 'inbox' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+              onClick={() => { setSelectedEmailId(null); setFolder('inbox'); }}
+            >
+              Recibidos
+            </button>
+            <button
+              className={`px-3 py-1 rounded-full text-sm border ${folder === 'sent' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
+              onClick={() => { setSelectedEmailId(null); setFolder('sent'); }}
+            >
+              Enviados
+            </button>
+          </div>
         </div>
       </div>
 

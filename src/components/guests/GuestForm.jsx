@@ -255,6 +255,85 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
           placeholder="Dirección completa (opcional)"
           disabled={isLoading}
         />
+        <div className="mt-2">
+          <button
+            type="button"
+            className="text-xs text-blue-600 hover:underline"
+            onClick={() => setShowAddressDetails((v) => !v)}
+            disabled={isLoading}
+          >
+            {showAddressDetails ? 'Ocultar dirección completa' : 'Añadir dirección completa'}
+          </button>
+          {showAddressDetails && (
+            <div className="mt-3 p-3 border rounded-md bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Calle y número</label>
+                  <Input
+                    type="text"
+                    value={formData.addressStreet}
+                    onChange={(e) => handleChange('addressStreet', e.target.value)}
+                    placeholder="Ej. Calle Luna 23"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Piso, puerta, etc.</label>
+                  <Input
+                    type="text"
+                    value={formData.addressStreet2}
+                    onChange={(e) => handleChange('addressStreet2', e.target.value)}
+                    placeholder="Ej. 3ºB"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Ciudad</label>
+                  <Input
+                    type="text"
+                    value={formData.addressCity}
+                    onChange={(e) => handleChange('addressCity', e.target.value)}
+                    placeholder="Ej. Madrid"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Provincia/Estado</label>
+                  <Input
+                    type="text"
+                    value={formData.addressState}
+                    onChange={(e) => handleChange('addressState', e.target.value)}
+                    placeholder="Ej. Madrid"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Código Postal</label>
+                  <Input
+                    type="text"
+                    value={formData.addressZip}
+                    onChange={(e) => handleChange('addressZip', e.target.value)}
+                    placeholder="Ej. 28001"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">País</label>
+                  <Input
+                    type="text"
+                    value={formData.addressCountry}
+                    onChange={(e) => handleChange('addressCountry', e.target.value)}
+                    placeholder="Ej. España"
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-2">
+                El campo "Dirección" se compone automáticamente a partir de estos datos.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Grupo / Categoría */}
