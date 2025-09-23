@@ -617,36 +617,51 @@ export default function Tasks() {
   // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÒ³n// CÒ¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
-  // 1) Escuchar info de la boda para fijar projectStart/projectEnd
+  // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
-      const ref = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      const unsub = onSnapshot(
-        ref,
-        (snap) => {
-          try {
-            const info = snap.exists() ? snap.data() || {} : {};
-            let raw = info?.weddingDate || info?.date || null;
-            let wDate = null;
-            if (raw) {
-              wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
-            }
-            if (wDate && !isNaN(wDate.getTime())) {
-              setProjectEnd(wDate);
-              setProjectStart(addMonths(wDate, -6));
-            }
-          } catch (_) {}
-        },
-        () => {}
-      );
-      return () => {
+      const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
+      const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
+      const handler = (snap) => {
         try {
-          unsub && unsub();
+          if (!snap || !snap.exists()) return;
+          const info = snap.data() || {};
+          const raw = info?.weddingDate || info?.date || info?.eventDate || null;
+          const d = raw && typeof raw?.toDate === 'function' ? raw.toDate() : raw ? new Date(raw) : null;
+          if (d && !isNaN(d.getTime())) setProjectEnd(d);
         } catch (_) {}
       };
+      const unsub1 = onSnapshot(refPrimary, handler, () => {});
+      const unsub2 = onSnapshot(refLegacy, handler, () => {});
+      return () => {
+        try { unsub1 && unsub1(); } catch (_) {}
+        try { unsub2 && unsub2(); } catch (_) {}
+      };
     } catch (_) {}
-  }, [activeWedding]);
+  }, [activeWedding, db]);
+
+  // 1b) Fijar projectStart desde users/{uid}.createdAt (fallback: auth.metadata.creationTime)
+  useEffect(() => {
+    (async () => {
+      try {
+        const uid = auth?.currentUser?.uid;
+        if (!uid || !db) return;
+        const uref = doc(db, 'users', uid);
+        const snap = await getDoc(uref).catch(() => null);
+        let d = null;
+        if (snap && snap.exists()) {
+          const data = snap.data() || {};
+          const raw = data?.createdAt || data?.created_at || data?.created || null;
+          if (raw) d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+        }
+        if (!d && auth?.currentUser?.metadata?.creationTime) {
+          d = new Date(auth.currentUser.metadata.creationTime);
+        }
+        if (d && !isNaN(d.getTime())) setProjectStart(d);
+      } catch (_) {}
+    })();
+  }, [auth?.currentUser?.uid, db]);
 
   // 2) Crear/actualizar automáticamente el evento 'wedding-day' si hay fecha
   useEffect(() => {

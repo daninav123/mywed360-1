@@ -29,16 +29,21 @@
     "guests": "Invitados",
     "providers": "Proveedores",
     "finance": "Finanzas",
-    "seating": "Plan de Asientos",
+    "seating": "Plan de asientos",
     "email": "Correo electrónico",
     "protocol": "Protocolo",
     "designs": "Diseños",
-    "website": "Web de Boda",
+    "website": "Web de boda",
     "contracts": "Contratos",
     "tasks": "Tareas",
     "profile": "Perfil",
     "settings": "Configuración",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "more": "Más",
+    "weddings": "Bodas",
+    "emailInbox": "Bandeja de entrada",
+    "darkMode": "Modo oscuro",
+    "userMenu": "Menú de usuario"
   },
   "finance": {
     "transactions": {
