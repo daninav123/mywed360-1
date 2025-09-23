@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
 
@@ -19,13 +19,16 @@ function dayFraction(d) {
   }
 }
 
+// Gap de días para agrupar subtareas en segmentos
+const SEGMENT_GAP_DAYS = 10;
+
 export default function LongTermTasksGantt({
   containerRef,
   tasks,
   columnWidth,
   rowHeight = 44,
-  preSteps,
-  viewDate,
+  preSteps, // compat
+  viewDate, // compat
   markerDate,
   projectStart,
   projectEnd,
@@ -47,7 +50,7 @@ export default function LongTermTasksGantt({
     }
   }, []);
 
-  // Inyectar hito "Boda" si no existe
+  // 1) Inyectar hito "Boda" si no existe
   const withWedding = useMemo(() => {
     try {
       const arr = Array.isArray(tasks) ? tasks.slice() : [];
@@ -68,30 +71,58 @@ export default function LongTermTasksGantt({
     }
   }, [tasks, markerDate, projectEnd]);
 
-  // Normalizar tareas válidas
+  // 2) Normalizar tareas
   const normalizedTasks = useMemo(() => {
     const arr = Array.isArray(withWedding) ? withWedding : [];
     return arr
       .map((t) => {
-        if (!t) return null;
         const s = normalizeAnyDate(t?.start ?? t?.startDate ?? t?.date ?? t?.when);
         const e = normalizeAnyDate(t?.end ?? t?.endDate ?? t?.until ?? t?.finish ?? t?.to);
         if (!s || !e || e < s) return null;
         const type = t?.type ? String(t.type) : t?.milestone ? 'milestone' : 'task';
-        return {
-          ...t,
-          id: String(t.id || `${t.title || 't'}-${s.getTime()}-${e.getTime()}`),
-          start: s,
-          end: e,
-          type,
-          name: t.name || t.title || 'Sin titulo',
-        };
+        return { ...t, id: String(t.id || `${t.title || 't'}-${s.getTime()}-${e.getTime()}`), start: s, end: e, type, name: t.name || t.title || 'Sin titulo' };
       })
       .filter(Boolean)
       .sort((a, b) => a.start - b.start);
   }, [withWedding]);
 
-  // Fechas base para el timeline
+  // 3) Subtareas normalizadas por parentId
+  const normalizedSubtasks = useMemo(() => {
+    try {
+      const arr = Array.isArray(subtasks) ? subtasks : [];
+      return arr
+        .map((s) => {
+          const start = normalizeAnyDate(s?.start);
+          const end = normalizeAnyDate(s?.end);
+          const parentId = String(s?.parentId || s?.parentTaskId || s?.parent || '');
+          if (!start || !end || end < start || !parentId) return null;
+          return {
+            id: String(s.id || `${parentId}-${start.getTime()}`),
+            name: s.name || s.title || 'Subtarea',
+            start,
+            end,
+            parentId,
+            type: 'subtask',
+            progress: Number(s.progress) || 0,
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.start - b.start);
+    } catch {
+      return [];
+    }
+  }, [subtasks]);
+
+  const subtasksByParent = useMemo(() => {
+    const map = new Map();
+    for (const st of normalizedSubtasks) {
+      if (!map.has(st.parentId)) map.set(st.parentId, []);
+      map.get(st.parentId).push(st);
+    }
+    return map;
+  }, [normalizedSubtasks]);
+
+  // 4) Fechas base
   const registrationDate = useMemo(() => {
     const ps = normalizeAnyDate(projectStart);
     if (ps) return ps;
@@ -116,7 +147,7 @@ export default function LongTermTasksGantt({
     [weddingBaseDate, registrationDate, extendMonthsAfterEnd]
   );
 
-  // Escala
+  // 5) Escala mensual
   const monthStart = new Date(timelineStart.getFullYear(), timelineStart.getMonth(), 1);
   const endMonthStart = new Date(timelineEnd.getFullYear(), timelineEnd.getMonth(), 1);
   const monthsDiff = diffMonths(monthStart, endMonthStart);
@@ -126,7 +157,7 @@ export default function LongTermTasksGantt({
   const totalMonths = Math.max(1, diffMonths(monthStart, endMonthStart) + 1);
   const contentWidth = Math.max(1, monthsDiff * colW + endFrac * colW);
 
-  // Auto-scroll al mes actual
+  // 6) Auto scroll a mes actual
   const scrollRef = useRef(null);
   useEffect(() => {
     const el = (containerRef && containerRef.current) || (scrollRef && scrollRef.current);
@@ -138,43 +169,106 @@ export default function LongTermTasksGantt({
     el.scrollTo({ left, behavior: 'auto' });
   }, [containerRef, monthStart, timelineEnd, colW]);
 
-  // Barras
+  // 7) Segmentar padres por huecos de subtareas
+  const parentTasks = useMemo(() => normalizedTasks.filter((t) => String(t.type || 'task') === 'task'), [normalizedTasks]);
+
+  const segmentsByParent = useMemo(() => {
+    const out = new Map();
+    const MS = 24 * 60 * 60 * 1000;
+    for (const p of parentTasks) {
+      const kids = (subtasksByParent.get(String(p.id)) || []).slice().sort((a, b) => a.start - b.start);
+      const segs = [];
+      let current = null;
+      for (const st of kids) {
+        if (!current) {
+          current = { id: `${p.id}-seg-0`, parentId: p.id, start: st.start, end: st.end, subtaskIds: [st.id] };
+          segs.push(current);
+        } else {
+          const gapDays = Math.round((st.start.getTime() - current.end.getTime()) / MS);
+          if (gapDays > SEGMENT_GAP_DAYS) {
+            current = { id: `${p.id}-seg-${segs.length}`, parentId: p.id, start: st.start, end: st.end, subtaskIds: [st.id] };
+            segs.push(current);
+          } else {
+            current.end = new Date(Math.max(current.end.getTime(), st.end.getTime()));
+            current.subtaskIds.push(st.id);
+          }
+        }
+      }
+      out.set(String(p.id), segs);
+    }
+    return out;
+  }, [parentTasks, subtasksByParent]);
+
+  // 8) Filas: padre -> segmentos -> (opcional) subtareas
+  const [expandedParents, setExpandedParents] = useState(() => new Set());
+  const [expandedSegments, setExpandedSegments] = useState(() => new Set());
+
+  const toggleParent = (id) => setExpandedParents((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  const toggleSegment = (id) => setExpandedSegments((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+
+  const rows = useMemo(() => {
+    const out = [];
+    for (const p of parentTasks) {
+      const pid = String(p.id);
+      out.push({ kind: 'parent', id: pid, task: p, level: 0 });
+      if (expandedParents.has(pid)) {
+        const segs = segmentsByParent.get(pid) || [];
+        for (const seg of segs) {
+          out.push({ kind: 'segment', id: seg.id, segment: seg, parentId: pid, level: 1 });
+          if (expandedSegments.has(seg.id)) {
+            const kids = (subtasksByParent.get(pid) || []).filter((st) => seg.subtaskIds.includes(st.id));
+            for (const st of kids) out.push({ kind: 'subtask', id: st.id, task: st, parentId: pid, segmentId: seg.id, level: 2 });
+          }
+        }
+      }
+    }
+    return out;
+  }, [parentTasks, expandedParents, expandedSegments, segmentsByParent, subtasksByParent]);
+
+  // 9) Barras por fila (múltiples para padres)
   const bars = useMemo(() => {
-    return normalizedTasks
-      .filter((t) => {
-        const ty = String(t.type || 'task');
-        return ty !== 'milestone' && ty !== 'project' && ty !== 'subtask';
-      })
-      .map((t, idx) => {
-        const cs = new Date(Math.max(t.start.getTime(), timelineStart.getTime()));
-        const ce = new Date(Math.min(t.end.getTime(), timelineEnd.getTime()));
-        if (ce.getTime() < cs.getTime()) return null;
+    const out = [];
+    rows.forEach((row, rowIndex) => {
+      if (row.kind === 'parent') {
+        const segs = segmentsByParent.get(String(row.id)) || [];
+        segs.forEach((seg, j) => {
+          const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
+          const ce = new Date(Math.min(seg.end.getTime(), timelineEnd.getTime()));
+          if (ce.getTime() < cs.getTime()) return;
+          const sM = diffMonths(monthStart, cs);
+          const eM = diffMonths(monthStart, ce);
+          const left = Math.max(0, (sM + dayFraction(cs)) * colW);
+          const right = Math.max(0, (eM + dayFraction(ce)) * colW);
+          const width = Math.max(2, right - left + Math.max(2, Math.floor(colW * 0.1)));
+          out.push({ key: `${row.id}-segbar-${j}`, left, width, rowIndex, type: 'segment-parent', task: row.task });
+        });
+      } else if (row.kind === 'segment') {
+        const seg = row.segment;
+        const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
+        const ce = new Date(Math.min(seg.end.getTime(), timelineEnd.getTime()));
+        if (ce.getTime() < cs.getTime()) return;
         const sM = diffMonths(monthStart, cs);
         const eM = diffMonths(monthStart, ce);
         const left = Math.max(0, (sM + dayFraction(cs)) * colW);
         const right = Math.max(0, (eM + dayFraction(ce)) * colW);
         const width = Math.max(2, right - left + Math.max(2, Math.floor(colW * 0.1)));
-        return { key: String(t.id || idx), left, width, task: t };
-      })
-      .filter(Boolean);
-  }, [normalizedTasks, monthStart, colW, timelineStart, timelineEnd]);
-
-  // Hitos
-  const milestones = useMemo(() => {
-    const out = [];
-    for (const t of normalizedTasks) {
-      if (String(t.type || 'task') !== 'milestone') continue;
-      const d = t.start instanceof Date ? t.start : null;
-      if (!d) continue;
-      if (d < timelineStart || d > timelineEnd) continue;
-      const m = diffMonths(monthStart, d);
-      const left = Math.max(0, (m + dayFraction(d)) * colW);
-      out.push({ left, task: t });
-    }
+        out.push({ key: `${row.id}-bar`, left, width, rowIndex, type: 'segment', task: { name: 'Segmento', progress: 0 } });
+      } else if (row.kind === 'subtask') {
+        const t = row.task;
+        const cs = new Date(Math.max(t.start.getTime(), timelineStart.getTime()));
+        const ce = new Date(Math.min(t.end.getTime(), timelineEnd.getTime()));
+        if (ce.getTime() < cs.getTime()) return;
+        const sM = diffMonths(monthStart, cs);
+        const eM = diffMonths(monthStart, ce);
+        const left = Math.max(0, (sM + dayFraction(cs)) * colW);
+        const right = Math.max(0, (eM + dayFraction(ce)) * colW);
+        const width = Math.max(2, right - left + Math.max(2, Math.floor(colW * 0.1)));
+        out.push({ key: `${row.id}-bar`, left, width, rowIndex, type: 'subtask', task: t });
+      }
+    });
     return out;
-  }, [normalizedTasks, monthStart, colW, timelineStart, timelineEnd]);
+  }, [rows, segmentsByParent, monthStart, colW, timelineStart, timelineEnd]);
 
-  // Etiquetas
   const monthLabels = useMemo(() => {
     const labels = [];
     for (let i = 0; i < totalMonths; i++) {
@@ -195,9 +289,7 @@ export default function LongTermTasksGantt({
       const y = d.getFullYear();
       if (y !== currentYear) {
         labels.push({ year: currentYear, left: startIndex * colW, width: Math.max(colW, span * colW), key: `${currentYear}-${startIndex}` });
-        currentYear = y;
-        span = 1;
-        startIndex = i;
+        currentYear = y; span = 1; startIndex = i;
       } else {
         span += 1;
       }
@@ -206,20 +298,16 @@ export default function LongTermTasksGantt({
     return labels;
   }, [totalMonths, monthStart, colW]);
 
-  const handleClick = (bar) => { if (typeof onTaskClick === 'function') onTaskClick(bar.task); };
-  const contentHeight = (Array.isArray(normalizedTasks) ? normalizedTasks.length : 0) * rowHeight + 60;
+  const handleClick = (bar) => { if (typeof onTaskClick === 'function') onTaskClick(bar.task || bar); };
+  const contentHeight = rows.length * rowHeight + 60;
 
   return (
     <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg" data-testid="longterm-gantt-new">
       <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
       {debugEnabled && (
         <div data-testid="gantt-debug" style={{ marginBottom: 8, fontSize: 12, color: '#4b5563', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <span>
-            Inicio: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineStart); } catch { return timelineStart?.toISOString?.().slice(0, 10) || String(timelineStart); } })()}
-          </span>
-          <span>
-            Fin: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineEnd); } catch { return timelineEnd?.toISOString?.().slice(0, 10) || String(timelineEnd); } })()}
-          </span>
+          <span>Inicio: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineStart); } catch { return timelineStart?.toISOString?.().slice(0, 10) || String(timelineStart); } })()}</span>
+          <span>Fin: {(() => { try { return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineEnd); } catch { return timelineEnd?.toISOString?.().slice(0, 10) || String(timelineEnd); } })()}</span>
         </div>
       )}
 
@@ -228,16 +316,24 @@ export default function LongTermTasksGantt({
         <div className="shrink-0 rounded-lg border border-gray-100 bg-white" style={{ width: leftColumnWidth, minHeight: contentHeight }}>
           <div style={{ height: 56, display: 'flex', alignItems: 'center', padding: '0 10px', borderBottom: '1px solid #eee', fontWeight: 600, color: '#111827' }}>Tarea</div>
           <div style={{ position: 'relative', minHeight: Math.max(0, contentHeight - 56) }}>
-            {rows.map((row, i) => (
-              <div
-                key={`left-${bar.key}`}
-                onClick={() => handleClick(bar)}
-                title={bar?.task?.name || bar?.task?.title || ''}
-                style={{ position: 'absolute', left: 0, right: 0, top: 40 + i * rowHeight, height: rowHeight, display: 'flex', alignItems: 'center', padding: '2px 10px', boxSizing: 'border-box', cursor: 'pointer', color: '#111827', fontSize: 13, borderBottom: '1px dashed #f0f0f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-              >
-                {bar.task?.name || bar.task?.title || 'Tarea'}
-              </div>
-            ))}
+            {rows.map((row, i) => {
+              const isParent = row.kind === 'parent';
+              const isSegment = row.kind === 'segment';
+              const t = row.task || {};
+              const leftPad = isParent ? 0 : isSegment ? 12 : 24;
+              const indicator = isParent ? (expandedParents.has(row.id) ? '▼' : '▶') : isSegment ? (expandedSegments.has(row.id) ? '▾' : '▸') : '•';
+              const onClick = () => {
+                if (isParent) toggleParent(row.id);
+                else if (isSegment) toggleSegment(row.id);
+                else handleClick({ task: t });
+              };
+              return (
+                <div key={`left-${row.kind}-${row.id}-${i}`} onClick={onClick} title={t?.name || t?.title || ''} style={{ position: 'absolute', left: 0, right: 0, top: 40 + i * rowHeight, height: rowHeight, display: 'flex', alignItems: 'center', padding: '2px 10px', boxSizing: 'border-box', cursor: 'pointer', color: '#111827', fontSize: 13, borderBottom: '1px dashed #f0f0f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>{indicator}</span>
+                  <span style={{ marginLeft: leftPad }}>{t?.name || t?.title || (isSegment ? 'Segmento' : 'Tarea')}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -262,21 +358,10 @@ export default function LongTermTasksGantt({
               <div key={`grid-${m.key}`} style={{ position: 'absolute', left: m.left, top: 0, bottom: 0, width: 1, background: '#ececec' }} />
             ))}
 
-            {milestones.map((m, i) => (
-              <React.Fragment key={`milestone-${i}`}>
-                <div style={{ position: 'absolute', left: m.left, top: 0, bottom: 0, width: 2, background: '#ef4444', opacity: 0.95, pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', left: m.left + 4, top: 6, background: '#fee2e2', color: '#991b1b', border: '1px solid #fecaca', borderRadius: 4, padding: '2px 6px', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', pointerEvents: 'none' }}>{m?.task?.name || 'Boda'}</div>
-              </React.Fragment>
-            ))}
-
-            {rows.map((row, i) => (
-              <div
-                key={bar.key}
-                onClick={() => handleClick(bar)}
-                style={{ position: 'absolute', left: bar.left, top: 40 + i * rowHeight, height: (bar.task?.type === 'subtask') ? Math.max(12, rowHeight * 0.35) : Math.max(16, rowHeight * 0.5), width: bar.width, background: (bar.task?.type === 'subtask') ? '#c7d2fe' : '#a5b4fc', borderRadius: 6, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)', overflow: 'hidden', border: (bar.task?.type === 'subtask') ? '1px dashed #818cf8' : 'none' }}
-              >
-                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, Number(bar.task.progress ?? 0)))}%`, background: (bar.task?.type === 'subtask') ? 'linear-gradient(90deg, #93c5fd, #60a5fa)' : 'linear-gradient(90deg, #818cf8, #6366f1)' }} />
-                <div style={{ position: 'absolute', left: 8, top: 2, right: 8, bottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: (bar.task?.type === 'subtask') ? '#1e293b' : '#0f172a', fontSize: 12 }}>{bar.task.name}</div>
+            {bars.map((bar) => (
+              <div key={bar.key} onClick={() => handleClick(bar)} style={{ position: 'absolute', left: bar.left, top: 40 + bar.rowIndex * rowHeight, height: bar.type === 'subtask' ? Math.max(12, rowHeight * 0.35) : bar.type === 'segment' ? Math.max(14, rowHeight * 0.45) : Math.max(16, rowHeight * 0.5), width: bar.width, background: bar.type === 'subtask' ? '#c7d2fe' : bar.type === 'segment' ? '#93c5fd' : '#a5b4fc', borderRadius: 6, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)', overflow: 'hidden', border: bar.type === 'subtask' ? '1px dashed #818cf8' : 'none' }}>
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, Number(bar.task?.progress ?? 0)))}%`, background: bar.type === 'subtask' ? 'linear-gradient(90deg, #93c5fd, #60a5fa)' : 'linear-gradient(90deg, #818cf8, #6366f1)' }} />
+                <div style={{ position: 'absolute', left: 8, top: 2, right: 8, bottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#0f172a', fontSize: 12 }}>{bar.task?.name || ''}</div>
               </div>
             ))}
           </div>
@@ -285,7 +370,4 @@ export default function LongTermTasksGantt({
     </div>
   );
 }
-
-
-
 

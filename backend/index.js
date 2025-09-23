@@ -566,10 +566,11 @@ app.get('/api/transactions', async (req, res) => {
   try {
     const { bankId, from, to } = req.query;
 
-    // If Nordigen/GoCardless credentials missing, return mock data
+    // If no credentials or static token, return mock data
     const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY } = process.env;
+    const STATIC_TOKEN = process.env.NORDIGEN_ACCESS_TOKEN || process.env.GOCARDLESS_ACCESS_TOKEN || process.env.BANK_ACCESS_TOKEN;
     const NORDIGEN_BASE_URL = process.env.NORDIGEN_BASE_URL || 'https://ob.gocardless.com/api/v2';
-    if (!NORDIGEN_SECRET_ID || !NORDIGEN_SECRET_KEY) {
+    if (!NORDIGEN_SECRET_ID && !NORDIGEN_SECRET_KEY && !STATIC_TOKEN) {
       return res.json([
         {
           id: 'txn_demo_1',
@@ -581,16 +582,16 @@ app.get('/api/transactions', async (req, res) => {
       ]);
     }
 
-    // 1. Get access token from Nordigen
-    const tokenResp = await requestWithRetry(() => http.post(
-      `${NORDIGEN_BASE_URL}/token/new/`,
-      {
-        secret_id: NORDIGEN_SECRET_ID,
-        secret_key: NORDIGEN_SECRET_KEY,
-      }
-    ));
-
-    const access = tokenResp.data.access;
+    // 1. Get access token from Nordigen/GoCardless (or use static token if set)
+    const access = STATIC_TOKEN || (
+      await requestWithRetry(() => http.post(
+        `${NORDIGEN_BASE_URL}/token/new/`,
+        {
+          secret_id: NORDIGEN_SECRET_ID,
+          secret_key: NORDIGEN_SECRET_KEY,
+        }
+      ))
+    ).data.access;
 
     // 2. Build query params
     const params = new URLSearchParams();

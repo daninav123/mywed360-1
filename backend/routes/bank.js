@@ -25,6 +25,9 @@ function getNordigenEnv() {
 
 async function getNordigenToken() {
   const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY, NORDIGEN_BASE_URL } = getNordigenEnv();
+  // Allow using a pre-generated access token from console if provided
+  const STATIC_TOKEN = process.env.NORDIGEN_ACCESS_TOKEN || process.env.GOCARDLESS_ACCESS_TOKEN || process.env.BANK_ACCESS_TOKEN;
+  if (STATIC_TOKEN) return STATIC_TOKEN;
   if (!NORDIGEN_SECRET_ID || !NORDIGEN_SECRET_KEY) {
     throw Object.assign(new Error('Nordigen credentials missing'), { status: 400 });
   }

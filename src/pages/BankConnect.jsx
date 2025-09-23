@@ -1,4 +1,4 @@
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
 import { Card, Button } from '../components/ui';
@@ -28,7 +28,7 @@ export default function BankConnect() {
       setError(
         t('finance.bank.errorLoad', {
           defaultValue:
-            'No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integración Nordigen o la ruta /api/bank aún no esté desplegada.',
+            'No se pudieron cargar bancos. Es posible que el backend no tenga habilitada la integracion GoCardless (ex Nordigen) o la ruta /api/bank aun no este desplegada.',
         })
       );
     } finally {
@@ -48,7 +48,7 @@ export default function BankConnect() {
       setRequisition(ref);
       if (ref?.link) window.open(ref.link, '_blank');
     } catch (e) {
-      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculación' }));
+      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculaciÃ³n' }));
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function BankConnect() {
 
   const handleCheck = async () => {
     if (!requisition?.id) {
-      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisición iniciada' }));
+      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisiciÃ³n iniciada' }));
       return;
     }
     try {
@@ -104,7 +104,7 @@ export default function BankConnect() {
         <div className="flex gap-3 items-end">
           <div>
             <label className="block text-sm text-gray-700 mb-1">
-              {t('finance.bank.country', { defaultValue: 'País' })}
+              {t('finance.bank.country', { defaultValue: 'PaÃ­s' })}
             </label>
             <select
               value={country}
@@ -112,7 +112,7 @@ export default function BankConnect() {
               className="border rounded px-2 py-1"
             >
               <option value="ES">
-                {t('finance.bank.countries.es', { defaultValue: 'España' })}
+                {t('finance.bank.countries.es', { defaultValue: 'EspaÃ±a' })}
               </option>
               <option value="FR">
                 {t('finance.bank.countries.fr', { defaultValue: 'Francia' })}
@@ -138,7 +138,7 @@ export default function BankConnect() {
               className="border rounded px-2 py-1 w-full"
             >
               <option value="">
-                {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un banco…' })}
+                {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un bancoâ€¦' })}
               </option>
               {institutions.map((i) => (
                 <option key={i.id} value={i.id}>
@@ -179,7 +179,7 @@ export default function BankConnect() {
               </ul>
               {t('finance.bank.alternative', {
                 defaultValue:
-                  'Alternativa temporal: importa movimientos manualmente desde Finanzas → Transacciones → "Importar Banco".',
+                  'Alternativa temporal: importa movimientos manualmente desde Finanzas â†’ Transacciones â†’ "Importar Banco".',
               })}
             </div>
           </div>
