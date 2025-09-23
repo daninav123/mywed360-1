@@ -99,7 +99,7 @@ export const isValidDate = (date) => {
   if (!date) return false;
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(date)) return false;
-  
+
   const dateObj = new Date(date);
   return dateObj instanceof Date && !isNaN(dateObj);
 };
@@ -135,10 +135,10 @@ export const isValidSpanishPostalCode = (postalCode) => {
  */
 export const isValidSpanishDNI = (dni) => {
   if (!dni) return false;
-  
+
   // Limpiar espacios y convertir a mayúsculas
   const cleanDNI = dni.replace(/\s/g, '').toUpperCase();
-  
+
   // Validar formato DNI (8 dígitos + letra)
   const dniRegex = /^\d{8}[A-Z]$/;
   if (dniRegex.test(cleanDNI)) {
@@ -147,23 +147,23 @@ export const isValidSpanishDNI = (dni) => {
     const letter = cleanDNI.charAt(8);
     return letters.charAt(number % 23) === letter;
   }
-  
+
   // Validar formato NIE (X/Y/Z + 7 dígitos + letra)
   const nieRegex = /^[XYZ]\d{7}[A-Z]$/;
   if (nieRegex.test(cleanDNI)) {
     const letters = 'TRWAGMYFPDXBNJZSQVHLCKE';
     let number = cleanDNI.substr(1, 7);
     const firstChar = cleanDNI.charAt(0);
-    
+
     // Convertir primera letra a número
     if (firstChar === 'X') number = '0' + number;
     else if (firstChar === 'Y') number = '1' + number;
     else if (firstChar === 'Z') number = '2' + number;
-    
+
     const letter = cleanDNI.charAt(8);
     return letters.charAt(parseInt(number, 10) % 23) === letter;
   }
-  
+
   return false;
 };
 
@@ -174,7 +174,7 @@ export const isValidSpanishDNI = (dni) => {
  */
 export const sanitizeString = (input) => {
   if (!input || typeof input !== 'string') return '';
-  
+
   return input
     .replace(/[<>]/g, '') // Eliminar < y >
     .replace(/javascript:/gi, '') // Eliminar javascript:
@@ -189,7 +189,7 @@ export const sanitizeString = (input) => {
  */
 export const normalizeString = (str) => {
   if (!str || typeof str !== 'string') return '';
-  
+
   return str
     .toLowerCase()
     .normalize('NFD')
@@ -204,57 +204,57 @@ export const normalizeString = (str) => {
 export const commonValidationRules = {
   required: {
     required: true,
-    requiredMessage: 'Este campo es obligatorio'
+    requiredMessage: 'Este campo es obligatorio',
   },
-  
+
   email: {
     required: true,
     email: true,
     requiredMessage: 'El email es obligatorio',
-    emailMessage: 'El formato del email no es válido'
+    emailMessage: 'El formato del email no es válido',
   },
-  
+
   phone: {
     custom: (value) => {
       if (!value) return null;
       return isValidPhone(value) ? null : 'El formato del teléfono no es válido';
-    }
+    },
   },
-  
+
   url: {
     custom: (value) => {
       if (!value) return null;
       return isValidUrl(value) ? null : 'La URL debe empezar con http:// o https://';
-    }
+    },
   },
-  
+
   password: {
     required: true,
     minLength: 6,
     requiredMessage: 'La contraseña es obligatoria',
-    minLengthMessage: 'La contraseña debe tener al menos 6 caracteres'
+    minLengthMessage: 'La contraseña debe tener al menos 6 caracteres',
   },
-  
+
   name: {
     required: true,
     minLength: 2,
     maxLength: 50,
     requiredMessage: 'El nombre es obligatorio',
     minLengthMessage: 'El nombre debe tener al menos 2 caracteres',
-    maxLengthMessage: 'El nombre no puede tener más de 50 caracteres'
+    maxLengthMessage: 'El nombre no puede tener más de 50 caracteres',
   },
-  
+
   postalCode: {
     custom: (value) => {
       if (!value) return null;
       return isValidSpanishPostalCode(value) ? null : 'El código postal no es válido';
-    }
+    },
   },
-  
+
   dni: {
     custom: (value) => {
       if (!value) return null;
       return isValidSpanishDNI(value) ? null : 'El DNI/NIE no es válido';
-    }
-  }
+    },
+  },
 };

@@ -3,14 +3,20 @@
  * Este hook proporciona funcionalidades de autenticación y gestión de perfil de usuario
  */
 
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
 import { useState, useEffect, createContext, useContext, useCallback } from 'react';
-import { initReminderService, stopReminderService } from '../services/reminderService';
-import errorLogger from '../utils/errorLogger';
+
+import { auth } from '../firebaseConfig';
 import { setAuthContext as registerEmailAuthContext } from '../services/emailService';
 import { setAuthContext as registerNotificationAuthContext } from '../services/notificationService';
+import { initReminderService, stopReminderService } from '../services/reminderService';
 import { setAuthContext as registerWhatsappAuthContext } from '../services/whatsappService';
-import { auth } from '../firebaseConfig';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import errorLogger from '../utils/errorLogger';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);
@@ -29,21 +35,21 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       console.log('[useAuth] Firebase auth state changed:', firebaseUser?.email || 'No user');
-      
+
       if (firebaseUser) {
         // Usuario autenticado en Firebase
         const user = {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
-          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0]
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
         };
         console.log('[useAuth] Usuario autenticado:', user.uid);
         setCurrentUser(user);
-        
+
         // Crear o cargar perfil
         const savedProfile = localStorage.getItem('lovenda_user_profile');
         let profile;
-        
+
         if (savedProfile) {
           profile = JSON.parse(savedProfile);
         } else {
@@ -56,17 +62,17 @@ export const AuthProvider = ({ children }) => {
               emailSignature: 'Enviado desde MyWed360',
               theme: 'light',
               remindersEnabled: true,
-              reminderDays: 3
-            }
+              reminderDays: 3,
+            },
           };
         }
-        
+
         // Generar myWed360Email si no existe
         if (!profile.myWed360Email && user.email) {
-          const loginPrefix = user.email.split('@')[0].slice(0,4).toLowerCase();
+          const loginPrefix = user.email.split('@')[0].slice(0, 4).toLowerCase();
           profile.myWed360Email = `${loginPrefix}@mywed360.com`;
         }
-        
+
         setUserProfile(profile);
         localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
       } else {
@@ -75,10 +81,10 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(null);
         setUserProfile(null);
       }
-      
+
       setLoading(false);
     });
-    
+
     return () => unsubscribe();
   }, []);
 
@@ -86,7 +92,11 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (loading) return;
     if (currentUser) {
-      errorLogger.setAuthInfo({ uid: currentUser.uid, email: currentUser.email, profile: userProfile });
+      errorLogger.setAuthInfo({
+        uid: currentUser.uid,
+        email: currentUser.email,
+        profile: userProfile,
+      });
     } else {
       errorLogger.setAuthInfo(null);
     }
@@ -98,7 +108,12 @@ export const AuthProvider = ({ children }) => {
     if (!userProfile) return;
     const { remindersEnabled = true, reminderDays = 3 } = userProfile.preferences || {};
     // En desarrollo, desactivar recordatorios salvo que se fuerce por env
-    const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+    const env =
+      typeof import.meta !== 'undefined' && import.meta.env
+        ? import.meta.env
+        : typeof process !== 'undefined'
+          ? process.env
+          : {};
     const isDev = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() !== 'production';
     const enableFlag = /^true$/i.test(String(env?.VITE_ENABLE_REMINDERS || ''));
     const shouldEnable = remindersEnabled && (enableFlag || !isDev);
@@ -109,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     }
     return () => stopReminderService();
   }, [loading, userProfile]);
-  
+
   // -----------------------------
   // REGISTER / SIGNUP
   // -----------------------------
@@ -126,8 +141,8 @@ export const AuthProvider = ({ children }) => {
         role,
         preferences: {
           emailNotifications: true,
-          theme: 'light'
-        }
+          theme: 'light',
+        },
       };
       setUserProfile(profile);
       localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
@@ -137,7 +152,7 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
   }, []);
-  
+
   /**
    * Iniciar sesión con email y contraseña
    * @param {string} email - Email del usuario
@@ -152,12 +167,12 @@ export const AuthProvider = ({ children }) => {
       // Usar Firebase Auth real en lugar de mock
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      
+
       console.log('[useAuth] Login exitoso con Firebase Auth:', user.uid);
-      
+
       // El estado se actualiza automáticamente por onAuthStateChanged
       // No necesitamos setCurrentUser aquí
-      
+
       // Crear perfil por defecto si no existe
       if (!userProfile) {
         const defaultProfile = {
@@ -169,13 +184,13 @@ export const AuthProvider = ({ children }) => {
             emailSignature: 'Enviado desde Lovenda',
             theme: 'light',
             remindersEnabled: true,
-            reminderDays: 3
-          }
+            reminderDays: 3,
+          },
         };
         setUserProfile(defaultProfile);
         localStorage.setItem('lovenda_user_profile', JSON.stringify(defaultProfile));
       }
-      
+
       return { success: true, user };
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
@@ -188,36 +203,39 @@ export const AuthProvider = ({ children }) => {
    * @param {boolean} forceRefresh - Forzar actualización del token
    * @returns {Promise<string>} Token de autenticación
    */
-  const getIdToken = useCallback(async (forceRefresh = false) => {
-    try {
-      if (!currentUser) {
-        throw new Error('No hay usuario autenticado');
-      }
+  const getIdToken = useCallback(
+    async (forceRefresh = false) => {
+      try {
+        if (!currentUser) {
+          throw new Error('No hay usuario autenticado');
+        }
 
-      // Para usuarios mock/test, generar token compatible
-      if (currentUser.uid === 'cypress-test' || currentUser.uid.startsWith('mock-')) {
-        const mockToken = `mock-${currentUser.uid}-${currentUser.email}`;
-        console.log(' Token mock generado para:', currentUser.email);
-        return mockToken;
-      }
+        // Para usuarios mock/test, generar token compatible
+        if (currentUser.uid === 'cypress-test' || currentUser.uid.startsWith('mock-')) {
+          const mockToken = `mock-${currentUser.uid}-${currentUser.email}`;
+          console.log(' Token mock generado para:', currentUser.email);
+          return mockToken;
+        }
 
-      // Para usuarios reales: usar el usuario real de Firebase Auth
-      const fbUser = auth?.currentUser;
-      if (fbUser?.getIdToken) {
-        const token = await fbUser.getIdToken(forceRefresh);
-        console.log(' Token Firebase obtenido');
-        return token;
-      }
+        // Para usuarios reales: usar el usuario real de Firebase Auth
+        const fbUser = auth?.currentUser;
+        if (fbUser?.getIdToken) {
+          const token = await fbUser.getIdToken(forceRefresh);
+          console.log(' Token Firebase obtenido');
+          return token;
+        }
 
-      // Fallback: generar token mock si no hay método getIdToken
-      const fallbackToken = `mock-${currentUser.uid}-${currentUser.email}`;
-      console.log(' Token fallback generado para:', currentUser.email);
-      return fallbackToken;
-    } catch (error) {
-      console.error('Error obteniendo token:', error);
-      throw error;
-    }
-  }, [currentUser]);
+        // Fallback: generar token mock si no hay método getIdToken
+        const fallbackToken = `mock-${currentUser.uid}-${currentUser.email}`;
+        console.log(' Token fallback generado para:', currentUser.email);
+        return fallbackToken;
+      } catch (error) {
+        console.error('Error obteniendo token:', error);
+        throw error;
+      }
+    },
+    [currentUser]
+  );
 
   /**
    * Cerrar sesión
@@ -265,15 +283,15 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     isAuthenticated,
     // Roles básicos desde el perfil (compatibilidad con MainLayout)
-    hasRole: ((...roles) => {
+    hasRole: (...roles) => {
       try {
         const currentRole = userProfile?.role || 'particular';
         if (!roles || roles.length === 0) return !!currentRole;
-        return roles.some(r => r === currentRole);
+        return roles.some((r) => r === currentRole);
       } catch {
         return false;
       }
-    }),
+    },
     login,
     logout,
     register,
@@ -299,11 +317,7 @@ export const AuthProvider = ({ children }) => {
     });
   }, [currentUser, getIdToken]);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
 
 /**
@@ -313,7 +327,26 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === null) {
-    throw new Error('useAuth debe utilizarse dentro de un AuthProvider');
+    try {
+      if (import.meta?.env?.DEV) {
+        console.warn('[useAuth] Llamado fuera de AuthProvider. Usando fallback no-auth.');
+      }
+    } catch {}
+    // Fallback seguro para evitar crasheos en rutas pblicas o durante HMR
+    return {
+      currentUser: null,
+      user: null,
+      userProfile: null,
+      loading: false,
+      isLoading: false,
+      isAuthenticated: false,
+      hasRole: () => false,
+      login: async () => ({ success: false, error: 'auth_unavailable' }),
+      logout: async () => ({ success: true }),
+      register: async () => ({ success: false, error: 'auth_unavailable' }),
+      getIdToken: async () => '',
+      updateUserProfile: async () => ({ success: false, error: 'auth_unavailable' }),
+    };
   }
   return context;
 };

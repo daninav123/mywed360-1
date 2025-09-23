@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
 import { get as apiGet, put as apiPut } from '../services/apiClient';
 
 function RSVPConfirm() {
@@ -34,7 +35,11 @@ function RSVPConfirm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await apiPut(`/api/rsvp/by-token/${token}`, { status, companions: Number(companions), allergens });
+      const res = await apiPut(`/api/rsvp/by-token/${token}`, {
+        status,
+        companions: Number(companions),
+        allergens,
+      });
       if (!res.ok) throw new Error('Error enviando respuesta');
       toast.success('¡Respuesta registrada!');
       setSubmitted(true);
@@ -63,21 +68,49 @@ function RSVPConfirm() {
         <div>
           <label className="font-medium mr-4">¿Asistirás?</label>
           <label className="mr-4">
-            <input type="radio" value="accepted" checked={status==='accepted'} onChange={()=>setStatus('accepted')} /> Sí
+            <input
+              type="radio"
+              value="accepted"
+              checked={status === 'accepted'}
+              onChange={() => setStatus('accepted')}
+            />{' '}
+            Sí
           </label>
           <label>
-            <input type="radio" value="rejected" checked={status==='rejected'} onChange={()=>setStatus('rejected')} /> No
+            <input
+              type="radio"
+              value="rejected"
+              checked={status === 'rejected'}
+              onChange={() => setStatus('rejected')}
+            />{' '}
+            No
           </label>
         </div>
         <div>
           <label className="font-medium block mb-1">Número de acompañantes</label>
-          <input type="number" min="0" value={companions} onChange={e=>setCompanions(e.target.value)} className="border rounded px-2 py-1 w-full" />
+          <input
+            type="number"
+            min="0"
+            value={companions}
+            onChange={(e) => setCompanions(e.target.value)}
+            className="border rounded px-2 py-1 w-full"
+          />
         </div>
         <div>
           <label className="font-medium block mb-1">Alergias o restricciones alimentarias</label>
-          <textarea value={allergens} onChange={e=>setAllergens(e.target.value)} className="border rounded px-2 py-1 w-full" rows={3} />
+          <textarea
+            value={allergens}
+            onChange={(e) => setAllergens(e.target.value)}
+            className="border rounded px-2 py-1 w-full"
+            rows={3}
+          />
         </div>
-        <button type="submit" className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded">Enviar respuesta</button>
+        <button
+          type="submit"
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded"
+        >
+          Enviar respuesta
+        </button>
       </form>
     </div>
   );

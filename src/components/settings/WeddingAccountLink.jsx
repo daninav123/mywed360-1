@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Check, AlertTriangle, Send as SendIcon, Users } from 'lucide-react';
-import Button from '../Button';
+import React, { useState, useEffect } from 'react';
+
 import { useAuth } from '../../hooks/useAuth';
 import {
   createWedding,
@@ -8,6 +8,7 @@ import {
   invitePlanner,
   acceptInvitation,
 } from '../../services/WeddingService';
+import Button from '../Button';
 
 /**
  * Componente para vincular cuentas de boda y gestionar invitaciones.
@@ -93,7 +94,9 @@ const WeddingAccountLink = () => {
 
       {!weddingId ? (
         <div>
-          <p className="text-gray-600 mb-3">Crea tu boda para poder invitar a tu pareja o wedding planner.</p>
+          <p className="text-gray-600 mb-3">
+            Crea tu boda para poder invitar a tu pareja o wedding planner.
+          </p>
           <Button onClick={handleCreateWedding} disabled={loading}>
             {loading ? 'Creando...' : 'Crear mi boda'}
           </Button>
@@ -123,7 +126,8 @@ const WeddingAccountLink = () => {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              className="w-full p-2 border rounded-md">
+              className="w-full p-2 border rounded-md"
+            >
               <option value="partner">Pareja (copropietario)</option>
               <option value="planner">Wedding Planner</option>
             </select>
@@ -142,13 +146,13 @@ const WeddingAccountLink = () => {
             </div>
           )}
 
-          <Button
-            onClick={handleSendInvite}
-            disabled={loading || !emailInvite}
-            variant="default"
-          >
-            {loading ? 'Enviando...' : (
-              <span className="flex items-center"><SendIcon size={16} className="mr-1" /> Enviar invitación</span>
+          <Button onClick={handleSendInvite} disabled={loading || !emailInvite} variant="default">
+            {loading ? (
+              'Enviando...'
+            ) : (
+              <span className="flex items-center">
+                <SendIcon size={16} className="mr-1" /> Enviar invitación
+              </span>
             )}
           </Button>
         </div>
@@ -158,4 +162,3 @@ const WeddingAccountLink = () => {
 };
 
 export default WeddingAccountLink;
-

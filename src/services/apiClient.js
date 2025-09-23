@@ -38,12 +38,20 @@ export async function get(path, opts = {}) {
 }
 
 export async function post(path, body, opts = {}) {
-  const res = await fetch(url(path), { method: 'POST', headers: await buildHeaders(opts), body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(url(path), {
+    method: 'POST',
+    headers: await buildHeaders(opts),
+    body: body ? JSON.stringify(body) : undefined,
+  });
   return res;
 }
 
 export async function put(path, body, opts = {}) {
-  const res = await fetch(url(path), { method: 'PUT', headers: await buildHeaders(opts), body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(url(path), {
+    method: 'PUT',
+    headers: await buildHeaders(opts),
+    body: body ? JSON.stringify(body) : undefined,
+  });
   return res;
 }
 

@@ -53,7 +53,7 @@ export function addComment(userId, emailId, comment) {
   const newComment = {
     id: `c_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     ...comment,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
   };
   mapping[emailId].push(newComment);
   saveAllComments(userId, mapping);
@@ -70,7 +70,7 @@ export function addComment(userId, emailId, comment) {
 export function deleteComment(userId, emailId, commentId) {
   const mapping = loadAllComments(userId);
   if (!mapping[emailId]) return [];
-  mapping[emailId] = mapping[emailId].filter(c => c.id !== commentId);
+  mapping[emailId] = mapping[emailId].filter((c) => c.id !== commentId);
   saveAllComments(userId, mapping);
   return mapping[emailId];
 }

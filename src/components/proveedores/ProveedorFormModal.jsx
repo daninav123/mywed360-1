@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import { X, Calendar } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 /**
  * Modal para añadir o editar proveedores
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.visible - Indica si el modal está visible
  * @param {Function} props.onClose - Función para cerrar el modal
@@ -11,12 +11,7 @@ import { X, Calendar } from 'lucide-react';
  * @param {Object} props.proveedorEditar - Proveedor a editar (null si es nuevo)
  * @returns {React.ReactElement} Modal de formulario de proveedor
  */
-const ProveedorFormModal = ({ 
-  visible, 
-  onClose, 
-  onGuardar,
-  proveedorEditar = null
-}) => {
+const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = null }) => {
   // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
@@ -30,13 +25,13 @@ const ProveedorFormModal = ({
     ubicacion: '',
     notas: '',
     fechaCita: '',
-    imagen: ''
+    imagen: '',
   });
-  
+
   // Estados de la UI
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState({});
-  
+
   // Cargar datos si estamos editando
   useEffect(() => {
     if (proveedorEditar) {
@@ -52,7 +47,7 @@ const ProveedorFormModal = ({
         ubicacion: proveedorEditar.ubicacion || '',
         notas: proveedorEditar.notas || '',
         fechaCita: proveedorEditar.fechaCita || '',
-        imagen: proveedorEditar.imagen || ''
+        imagen: proveedorEditar.imagen || '',
       });
     } else {
       // Resetear si es nuevo
@@ -68,88 +63,88 @@ const ProveedorFormModal = ({
         ubicacion: '',
         notas: '',
         fechaCita: '',
-        imagen: ''
+        imagen: '',
       });
     }
-    
+
     // Limpiar errores
     setErrores({});
   }, [proveedorEditar, visible]);
-  
+
   // Actualizar un campo del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Si es presupuesto, asegurar que sea numérico
     if (name === 'presupuesto') {
       const numericValue = value.replace(/\D/g, '');
       setFormData({ ...formData, [name]: numericValue });
       return;
     }
-    
+
     setFormData({ ...formData, [name]: value });
-    
+
     // Limpiar error de ese campo si existe
     if (errores[name]) {
       setErrores({
         ...errores,
-        [name]: null
+        [name]: null,
       });
     }
   };
-  
+
   // Validar formulario
   const validarFormulario = () => {
     const nuevosErrores = {};
-    
+
     if (!formData.nombre.trim()) {
       nuevosErrores.nombre = 'El nombre es obligatorio';
     }
-    
+
     if (!formData.servicio.trim()) {
       nuevosErrores.servicio = 'El servicio es obligatorio';
     }
-    
+
     // Email válido si se proporciona
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
       nuevosErrores.email = 'El email no tiene formato válido';
     }
-    
+
     // Web con formato válido si se proporciona
     if (formData.web && !formData.web.startsWith('http')) {
       nuevosErrores.web = 'La web debe empezar con http:// o https://';
     }
-    
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
-  
+
   // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form submitted');
-    
+
     // Validar
     if (!validarFormulario()) {
       console.log('Validation failed');
       return;
     }
-    
+
     console.log('Validation passed, sending data', formData);
     setEnviando(true);
-    
+
     try {
       // Convertir presupuesto a número si existe
       const datosFinales = {
         ...formData,
-        presupuesto: formData.presupuesto ? parseInt(formData.presupuesto, 10) : null
+        presupuesto: formData.presupuesto ? parseInt(formData.presupuesto, 10) : null,
       };
-      
+
       // Si estamos editando, incluir el ID
       if (proveedorEditar) {
         datosFinales.id = proveedorEditar.id;
       }
-      
+
       // Guardar
       await onGuardar(datosFinales);
       onClose();
@@ -157,15 +152,15 @@ const ProveedorFormModal = ({
       console.error('Error al guardar proveedor:', error);
       setErrores({
         ...errores,
-        general: 'Error al guardar. Inténtalo de nuevo.'
+        general: 'Error al guardar. Inténtalo de nuevo.',
       });
     } finally {
       setEnviando(false);
     }
   };
-  
+
   if (!visible) return null;
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
@@ -174,28 +169,23 @@ const ProveedorFormModal = ({
           <h3 className="font-semibold text-lg text-gray-800">
             {proveedorEditar ? 'Editar proveedor' : 'Nuevo proveedor'}
           </h3>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
-          >
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
             <X size={20} className="text-gray-500" />
           </button>
         </div>
-        
+
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-5 space-y-4">
             {/* Error general */}
             {errores.general && (
-              <div className="bg-red-50 text-red-700 p-3 rounded-md">
-                {errores.general}
-              </div>
+              <div className="bg-red-50 text-red-700 p-3 rounded-md">{errores.general}</div>
             )}
-            
+
             {/* Datos básicos */}
             <div className="space-y-4">
               <h4 className="font-medium text-gray-700">Información básica</h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nombre */}
                 <div>
@@ -213,14 +203,15 @@ const ProveedorFormModal = ({
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
                     placeholder="Nombre del proveedor"
                   />
-                  {errores.nombre && (
-                    <p className="mt-1 text-sm text-red-600">{errores.nombre}</p>
-                  )}
+                  {errores.nombre && <p className="mt-1 text-sm text-red-600">{errores.nombre}</p>}
                 </div>
-                
+
                 {/* Servicio */}
                 <div>
-                  <label htmlFor="servicio" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="servicio"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Servicio *
                   </label>
                   <input
@@ -239,11 +230,14 @@ const ProveedorFormModal = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Presupuesto */}
                 <div>
-                  <label htmlFor="presupuesto" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="presupuesto"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Presupuesto
                   </label>
                   <div className="relative">
@@ -261,7 +255,7 @@ const ProveedorFormModal = ({
                     />
                   </div>
                 </div>
-                
+
                 {/* Estado */}
                 <div>
                   <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">
@@ -283,15 +277,18 @@ const ProveedorFormModal = ({
                 </div>
               </div>
             </div>
-            
+
             {/* Datos de contacto */}
             <div className="pt-2 space-y-4">
               <h4 className="font-medium text-gray-700">Datos de contacto</h4>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Contacto */}
                 <div>
-                  <label htmlFor="contacto" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="contacto"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Persona de contacto
                   </label>
                   <input
@@ -304,10 +301,13 @@ const ProveedorFormModal = ({
                     placeholder="Nombre de contacto"
                   />
                 </div>
-                
+
                 {/* Teléfono */}
                 <div>
-                  <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="telefono"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Teléfono
                   </label>
                   <input
@@ -321,7 +321,7 @@ const ProveedorFormModal = ({
                   />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Email */}
                 <div>
@@ -339,11 +339,9 @@ const ProveedorFormModal = ({
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
                     placeholder="email@ejemplo.com"
                   />
-                  {errores.email && (
-                    <p className="mt-1 text-sm text-red-600">{errores.email}</p>
-                  )}
+                  {errores.email && <p className="mt-1 text-sm text-red-600">{errores.email}</p>}
                 </div>
-                
+
                 {/* Web */}
                 <div>
                   <label htmlFor="web" className="block text-sm font-medium text-gray-700 mb-1">
@@ -360,12 +358,10 @@ const ProveedorFormModal = ({
                     } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
                     placeholder="https://ejemplo.com"
                   />
-                  {errores.web && (
-                    <p className="mt-1 text-sm text-red-600">{errores.web}</p>
-                  )}
+                  {errores.web && <p className="mt-1 text-sm text-red-600">{errores.web}</p>}
                 </div>
               </div>
-              
+
               {/* Ubicación */}
               <div>
                 <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
@@ -381,7 +377,7 @@ const ProveedorFormModal = ({
                   placeholder="Ciudad, provincia"
                 />
               </div>
-              
+
               {/* Cita */}
               <div>
                 <label htmlFor="fechaCita" className="block text-sm font-medium text-gray-700 mb-1">
@@ -402,11 +398,11 @@ const ProveedorFormModal = ({
                 </div>
               </div>
             </div>
-            
+
             {/* Información adicional */}
             <div className="pt-2 space-y-4">
               <h4 className="font-medium text-gray-700">Información adicional</h4>
-              
+
               {/* Notas */}
               <div>
                 <label htmlFor="notas" className="block text-sm font-medium text-gray-700 mb-1">
@@ -422,7 +418,7 @@ const ProveedorFormModal = ({
                   placeholder="Notas adicionales sobre el proveedor"
                 />
               </div>
-              
+
               {/* URL de imagen */}
               <div>
                 <label htmlFor="imagen" className="block text-sm font-medium text-gray-700 mb-1">
@@ -443,7 +439,7 @@ const ProveedorFormModal = ({
               </div>
             </div>
           </div>
-          
+
           {/* Pie del formulario */}
           <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-2">
             <button

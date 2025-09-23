@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Button from '../Button';
 
 /**
@@ -54,7 +55,7 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
           {folders.map((folder) => (
             <div
               key={folder.id}
-              className="flex items-center justify-between px-4 py-2" 
+              className="flex items-center justify-between px-4 py-2"
               data-testid="folder-row"
               role="listitem"
             >
@@ -77,11 +78,7 @@ const ManageFoldersModal = ({ isOpen, onClose, folders = [], onDeleteFolder }) =
           <div className="border-t p-4 flex flex-col space-y-3">
             <p>¿Seguro que deseas eliminar &quot;{folderPendingDelete.name}&quot;?</p>
             <div className="flex justify-end space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setFolderPendingDelete(null)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setFolderPendingDelete(null)}>
                 Cancelar
               </Button>
               <Button

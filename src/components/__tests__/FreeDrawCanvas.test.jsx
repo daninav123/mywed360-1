@@ -1,7 +1,8 @@
 /* @vitest-environment jsdom */
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
+import React from 'react';
 import { describe, test, expect, vi } from 'vitest';
+
 import FreeDrawCanvas from '../../components/FreeDrawCanvas.jsx';
 
 describe('FreeDrawCanvas', () => {

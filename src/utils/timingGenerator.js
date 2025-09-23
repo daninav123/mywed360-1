@@ -68,7 +68,12 @@ export function generateTimingFromAnswers(answers) {
 
   if (hasCocktail) {
     // Añadir traslado si ceremonia y cóctel están en ubicaciones diferentes
-    if (hasCeremony && differentLocations && Number.isFinite(transferMinutes) && transferMinutes > 0) {
+    if (
+      hasCeremony &&
+      differentLocations &&
+      Number.isFinite(transferMinutes) &&
+      transferMinutes > 0
+    ) {
       currentStart = addMinutes(currentStart, transferMinutes);
     }
     const end = addMinutes(currentStart, Number.isFinite(cocktailDuration) ? cocktailDuration : 90);
@@ -118,7 +123,12 @@ export function generateTimingFromAnswers(answers) {
           ceremonia: [
             { id: Date.now() + 1, order: 1, title: 'Entrada Novio', song: '' },
             { id: Date.now() + 2, order: 2, title: 'Entrada Novia', song: '' },
-            { id: Date.now() + 3, order: 3, title: ceremonyType === 'religiosa' ? 'Lectura' : 'Votos', song: '' },
+            {
+              id: Date.now() + 3,
+              order: 3,
+              title: ceremonyType === 'religiosa' ? 'Lectura' : 'Votos',
+              song: '',
+            },
             { id: Date.now() + 4, order: 4, title: 'Intercambio de Anillos', song: '' },
             { id: Date.now() + 5, order: 5, title: 'Salida', song: '' },
           ],

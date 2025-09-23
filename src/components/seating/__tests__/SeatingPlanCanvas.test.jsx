@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import React, { createRef } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 
 // Mock SeatingCanvas to surface scale/offset for assertions
 vi.mock('../../../features/seating/SeatingCanvas', () => ({
@@ -12,7 +12,7 @@ vi.mock('../../../features/seating/SeatingCanvas', () => ({
       data-offset-x={props.offset?.x}
       data-offset-y={props.offset?.y}
     />
-  )
+  ),
 }));
 
 import SeatingPlanCanvas from '../SeatingPlanCanvas.jsx';
@@ -124,7 +124,9 @@ describe('SeatingPlanCanvas interactions', () => {
     const ref = createRef();
     const props = baseProps();
     // Supply some content to trigger fitToContent effect
-    props.tables = [{ id: 1, x: 200, y: 150, width: 120, height: 80, shape: 'rectangle', seats: 6 }];
+    props.tables = [
+      { id: 1, x: 200, y: 150, width: 120, height: 80, shape: 'rectangle', seats: 6 },
+    ];
     render(<SeatingPlanCanvas {...props} drawMode="pan" canvasRef={ref} />);
 
     const mc = () => screen.getByTestId('mock-seating-canvas');

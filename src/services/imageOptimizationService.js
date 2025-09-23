@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = {
   format: 'webp',
   fallbackFormat: 'jpeg',
   lazyLoadOffset: 100, // píxeles antes de que la imagen entre en viewport
-  placeholderColor: '#f3f4f6'
+  placeholderColor: '#f3f4f6',
 };
 
 /**
@@ -63,16 +63,20 @@ export const compressImage = (file, options = {}) => {
  * @param {string} color - Color de fondo
  * @returns {string} - Data URL del placeholder
  */
-export const generatePlaceholder = (width = 400, height = 300, color = DEFAULT_CONFIG.placeholderColor) => {
+export const generatePlaceholder = (
+  width = 400,
+  height = 300,
+  color = DEFAULT_CONFIG.placeholderColor
+) => {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
+
   canvas.width = width;
   canvas.height = height;
-  
+
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, width, height);
-  
+
   return canvas.toDataURL('image/png');
 };
 
@@ -84,12 +88,12 @@ export const detectImageSupport = () => {
   const canvas = document.createElement('canvas');
   canvas.width = 1;
   canvas.height = 1;
-  
+
   return {
     webp: canvas.toDataURL('image/webp').startsWith('data:image/webp'),
     avif: canvas.toDataURL('image/avif').startsWith('data:image/avif'),
     jpeg: true,
-    png: true
+    png: true,
   };
 };
 
@@ -98,16 +102,16 @@ export const detectImageSupport = () => {
  */
 import React, { useState, useRef, useEffect } from 'react';
 
-export const OptimizedImage = ({ 
-  src, 
-  alt, 
-  width, 
-  height, 
-  className = '', 
+export const OptimizedImage = ({
+  src,
+  alt,
+  width,
+  height,
+  className = '',
   placeholder,
   onLoad,
   onError,
-  ...props 
+  ...props
 }) => {
   const [loaded, setLoaded] = useState(false);
   const [inView, setInView] = useState(false);
@@ -146,11 +150,7 @@ export const OptimizedImage = ({
   const placeholderSrc = placeholder || generatePlaceholder(width, height);
 
   return (
-    <div 
-      ref={imgRef}
-      className={`relative overflow-hidden ${className}`}
-      style={{ width, height }}
-    >
+    <div ref={imgRef} className={`relative overflow-hidden ${className}`} style={{ width, height }}>
       {/* Placeholder */}
       <img
         src={placeholderSrc}
@@ -160,7 +160,7 @@ export const OptimizedImage = ({
         }`}
         aria-hidden="true"
       />
-      
+
       {/* Imagen real */}
       {inView && (
         <img
@@ -174,7 +174,7 @@ export const OptimizedImage = ({
           {...props}
         />
       )}
-      
+
       {/* Error fallback */}
       {error && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500">
@@ -209,14 +209,14 @@ export const useImageOptimization = (files = [], options = {}) => {
         results.push({
           original: files[i],
           optimized,
-          savings: ((files[i].size - optimized.size) / files[i].size * 100).toFixed(1)
+          savings: (((files[i].size - optimized.size) / files[i].size) * 100).toFixed(1),
         });
       } catch (error) {
         console.error(`Error optimizando imagen ${files[i].name}:`, error);
         results.push({
           original: files[i],
           optimized: null,
-          error: error.message
+          error: error.message,
         });
       }
 
@@ -231,7 +231,7 @@ export const useImageOptimization = (files = [], options = {}) => {
     optimizedImages,
     progress,
     isOptimizing,
-    optimizeImages
+    optimizeImages,
   };
 };
 
@@ -240,5 +240,5 @@ export default {
   generatePlaceholder,
   detectImageSupport,
   OptimizedImage,
-  useImageOptimization
+  useImageOptimization,
 };

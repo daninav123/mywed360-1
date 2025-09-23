@@ -14,7 +14,10 @@ export async function sendBatch({ weddingId, guestIds, messageTemplate }) {
       const { auth } = mod;
       const u = auth?.currentUser;
       if (u?.getIdToken) {
-        try { const t = await u.getIdToken(true); if (t) return t; } catch {}
+        try {
+          const t = await u.getIdToken(true);
+          if (t) return t;
+        } catch {}
         return await u.getIdToken();
       }
     } catch {}
@@ -22,7 +25,10 @@ export async function sendBatch({ weddingId, guestIds, messageTemplate }) {
   }
   try {
     const token = await getAuthToken();
-    const headers = { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) };
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/batch` : '/api/whatsapp/batch';
     const res = await fetch(url, {

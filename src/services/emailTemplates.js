@@ -17,8 +17,8 @@
 export const EMAIL_TEMPLATES = {
   // Solicitud de información general
   GENERAL_INFO: {
-    name: "Solicitud de información",
-    subject: "Solicitud de información para boda el {{weddingDate}} en {{weddingPlace}}",
+    name: 'Solicitud de información',
+    subject: 'Solicitud de información para boda el {{weddingDate}} en {{weddingPlace}}',
     body: `Hola {{providerName}},
 
 Soy {{userName}} y estoy organizando mi boda que se celebrará el {{weddingDate}} en {{weddingPlace}}. 
@@ -32,13 +32,13 @@ Un cordial saludo,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Solicitud de presupuesto
   BUDGET_REQUEST: {
-    name: "Solicitud de presupuesto",
-    subject: "Solicitud de presupuesto para boda el {{weddingDate}}",
+    name: 'Solicitud de presupuesto',
+    subject: 'Solicitud de presupuesto para boda el {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Soy {{userName}} y junto con mi pareja estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}}.
@@ -58,13 +58,13 @@ Muchas gracias,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Confirmación de reserva
   BOOKING_CONFIRMATION: {
-    name: "Confirmación de reserva",
-    subject: "Confirmación de reserva para nuestra boda - {{weddingDate}}",
+    name: 'Confirmación de reserva',
+    subject: 'Confirmación de reserva para nuestra boda - {{weddingDate}}',
     body: `Estimado/a {{providerName}},
 
 Por la presente queremos confirmar la reserva de sus servicios para nuestra boda que se celebrará el {{weddingDate}} en {{weddingPlace}}.
@@ -79,13 +79,13 @@ Saludos cordiales,
 {{coupleName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Seguimiento
   FOLLOW_UP: {
-    name: "Seguimiento",
-    subject: "Seguimiento sobre consulta para boda {{weddingDate}}",
+    name: 'Seguimiento',
+    subject: 'Seguimiento sobre consulta para boda {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Hace unos días les envié una consulta sobre sus servicios para nuestra boda del {{weddingDate}} en {{weddingPlace}}.
@@ -99,13 +99,13 @@ Un saludo,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Fotografía
   PHOTOGRAPHY: {
-    name: "Fotógrafo - Consulta",
-    subject: "Consulta sobre servicios de fotografía para boda {{weddingDate}}",
+    name: 'Fotógrafo - Consulta',
+    subject: 'Consulta sobre servicios de fotografía para boda {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Soy {{userName}} y estoy organizando mi boda para el {{weddingDate}} en {{weddingPlace}}.
@@ -125,13 +125,13 @@ Muchas gracias,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Catering
   CATERING: {
-    name: "Catering - Consulta",
-    subject: "Consulta sobre servicios de catering para boda {{weddingDate}}",
+    name: 'Catering - Consulta',
+    subject: 'Consulta sobre servicios de catering para boda {{weddingDate}}',
     body: `Estimado equipo de {{providerName}},
 
 Mi pareja y yo estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}} y estamos interesados en sus servicios de catering.
@@ -150,13 +150,13 @@ Un cordial saludo,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // DJ/Música
   MUSIC: {
-    name: "DJ/Música - Consulta",
-    subject: "Consulta sobre música/DJ para boda {{weddingDate}}",
+    name: 'DJ/Música - Consulta',
+    subject: 'Consulta sobre música/DJ para boda {{weddingDate}}',
     body: `Hola {{providerName}},
 
 Estamos organizando nuestra boda para el {{weddingDate}} en {{weddingPlace}} y estamos buscando servicios de DJ/música para amenizar el evento.
@@ -176,13 +176,13 @@ Saludos cordiales,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Flores
   FLOWERS: {
-    name: "Flores - Consulta",
-    subject: "Consulta sobre decoración floral para boda {{weddingDate}}",
+    name: 'Flores - Consulta',
+    subject: 'Consulta sobre decoración floral para boda {{weddingDate}}',
     body: `Estimado/a {{providerName}},
 
 Estoy organizando mi boda que se celebrará el {{weddingDate}} en {{weddingPlace}} y estoy interesado/a en sus servicios de decoración floral.
@@ -201,13 +201,13 @@ Muchas gracias,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Lugar de celebración
   VENUE: {
-    name: "Lugar de celebración - Consulta",
-    subject: "Consulta sobre disponibilidad para boda {{weddingDate}}",
+    name: 'Lugar de celebración - Consulta',
+    subject: 'Consulta sobre disponibilidad para boda {{weddingDate}}',
     body: `Estimado equipo de {{providerName}},
 
 Mi pareja y yo estamos buscando un lugar para celebrar nuestra boda el {{weddingDate}}.
@@ -228,13 +228,13 @@ Un cordial saludo,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Vestido / Traje
   DRESS_SUIT: {
-    name: "Vestido/Traje - Consulta",
-    subject: "Consulta sobre cita para vestido/traje de boda",
+    name: 'Vestido/Traje - Consulta',
+    subject: 'Consulta sobre cita para vestido/traje de boda',
     body: `Hola {{providerName}},
 
 Estoy organizando mi boda para el {{weddingDate}} y estoy interesado/a en sus servicios para encontrar mi vestido/traje ideal.
@@ -253,13 +253,13 @@ Un saludo,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
+`,
   },
 
   // Invitaciones
   INVITATIONS: {
-    name: "Invitaciones - Consulta",
-    subject: "Consulta sobre diseño de invitaciones para boda",
+    name: 'Invitaciones - Consulta',
+    subject: 'Consulta sobre diseño de invitaciones para boda',
     body: `Hola {{providerName}},
 
 Estamos organizando nuestra boda que tendrá lugar el {{weddingDate}} en {{weddingPlace}} y estamos interesados en sus servicios de diseño e impresión de invitaciones.
@@ -278,8 +278,8 @@ Muchas gracias,
 {{userName}}
 {{userPhone}}
 {{userEmail}}
-`
-  }
+`,
+  },
 };
 
 /**
@@ -322,7 +322,7 @@ export function applyTemplate(templateKey, data) {
   return {
     name: template.name,
     subject: replaceVars(template.subject, data),
-    body: replaceVars(template.body, data)
+    body: replaceVars(template.body, data),
   };
 }
 
@@ -333,6 +333,6 @@ export function applyTemplate(templateKey, data) {
 export function getTemplateOptions() {
   return Object.entries(EMAIL_TEMPLATES).map(([key, template]) => ({
     key,
-    name: template.name
+    name: template.name,
   }));
 }

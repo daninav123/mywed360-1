@@ -2,9 +2,21 @@ import axios from 'axios';
 
 const defaultTimeout = Number(process.env.AXIOS_TIMEOUT_MS || 10000);
 
-const http = axios.create({
-  timeout: defaultTimeout,
-});
+// Tolerar mocks de axios sin create()
+const ax = (axios && typeof axios.create === 'function')
+  ? axios
+  : (axios && axios.default && typeof axios.default.create === 'function')
+    ? axios.default
+    : null;
+
+const http = ax
+  ? ax.create({ timeout: defaultTimeout })
+  : {
+      get: async () => { throw new Error('http.get unavailable (axios mock)'); },
+      post: async () => { throw new Error('http.post unavailable (axios mock)'); },
+      put: async () => { throw new Error('http.put unavailable (axios mock)'); },
+      delete: async () => { throw new Error('http.delete unavailable (axios mock)'); },
+    };
 
 function isRetryable(err) {
   try {

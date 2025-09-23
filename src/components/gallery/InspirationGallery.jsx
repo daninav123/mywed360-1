@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
 import { Star, StarOff, X } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // Tags base; en producción pueden venir de API/CMS
@@ -152,7 +152,9 @@ export default function InspirationGallery({
                 }}
                 alt={
                   img.tags && img.tags.length
-                    ? t('inspiration.altWithTags', 'inspiración: {{tags}}', { tags: img.tags.join(', ') })
+                    ? t('inspiration.altWithTags', 'inspiración: {{tags}}', {
+                        tags: img.tags.join(', '),
+                      })
                     : t('inspiration.alt', 'inspiración')
                 }
                 aria-label={
@@ -212,4 +214,3 @@ export default function InspirationGallery({
     </div>
   );
 }
-

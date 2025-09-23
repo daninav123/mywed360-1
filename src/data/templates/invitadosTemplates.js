@@ -23,7 +23,7 @@ Con cariño,
 {{nombre_novios}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'fecha_boda', 'lugar_boda', 'nombre_novios']
+    variables: ['nombre_invitado', 'fecha_boda', 'lugar_boda', 'nombre_novios'],
   },
   {
     id: 'template_invitados_info_2',
@@ -53,7 +53,20 @@ Con mucho cariño,
 P.D.: Hemos creado un sitio web con toda la información detallada sobre la boda. Puedes visitarlo aquí: {{enlace_web_boda}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'fecha_boda', 'hora_ceremonia', 'lugar_ceremonia', 'lugar_recepcion', 'hora_recepcion', 'codigo_vestimenta', 'fecha_limite_confirmacion', 'informacion_alojamiento', 'informacion_transporte', 'nombre_novios', 'enlace_web_boda']
+    variables: [
+      'nombre_invitado',
+      'fecha_boda',
+      'hora_ceremonia',
+      'lugar_ceremonia',
+      'lugar_recepcion',
+      'hora_recepcion',
+      'codigo_vestimenta',
+      'fecha_limite_confirmacion',
+      'informacion_alojamiento',
+      'informacion_transporte',
+      'nombre_novios',
+      'enlace_web_boda',
+    ],
   },
   {
     id: 'template_invitados_info_3',
@@ -77,7 +90,7 @@ Con cariño,
 {{nombre_novios}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'fecha_boda', 'enlace_lista_bodas', 'nombre_novios']
+    variables: ['nombre_invitado', 'fecha_boda', 'enlace_lista_bodas', 'nombre_novios'],
   },
   {
     id: 'template_invitados_recordatorio_1',
@@ -103,7 +116,13 @@ Con cariño,
 {{nombre_novios}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'fecha_boda', 'fecha_limite_confirmacion', 'enlace_confirmacion', 'nombre_novios']
+    variables: [
+      'nombre_invitado',
+      'fecha_boda',
+      'fecha_limite_confirmacion',
+      'enlace_confirmacion',
+      'nombre_novios',
+    ],
   },
   {
     id: 'template_invitados_recordatorio_2',
@@ -131,7 +150,19 @@ Con mucha ilusión,
 {{nombre_novios}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'dia_semana', 'fecha_boda', 'hora_ceremonia', 'lugar_ceremonia', 'hora_recepcion', 'lugar_recepcion', 'codigo_vestimenta', 'informacion_aparcamiento', 'prevision_tiempo', 'nombre_novios']
+    variables: [
+      'nombre_invitado',
+      'dia_semana',
+      'fecha_boda',
+      'hora_ceremonia',
+      'lugar_ceremonia',
+      'hora_recepcion',
+      'lugar_recepcion',
+      'codigo_vestimenta',
+      'informacion_aparcamiento',
+      'prevision_tiempo',
+      'nombre_novios',
+    ],
   },
   {
     id: 'template_invitados_agradecimiento',
@@ -153,7 +184,7 @@ Con todo nuestro cariño y gratitud,
 {{nombre_novios}}
     `,
     isSystem: true,
-    variables: ['nombre_invitado', 'fecha_boda', 'agradecimiento_regalo', 'nombre_novios']
+    variables: ['nombre_invitado', 'fecha_boda', 'agradecimiento_regalo', 'nombre_novios'],
   },
 ];
 

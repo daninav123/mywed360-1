@@ -1,13 +1,38 @@
 import React, { useMemo } from 'react';
+
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
 function toCSV(rows) {
   const esc = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
-  const headers = ['Nombre','Servicio','Estado','Precio','Rating','Ubicación','Email','Teléfono'];
-  const csv = [headers.join(',')].concat(
-    rows.map(r => [r.name, r.service, r.status, r.priceRange, (r.ratingCount>0? (r.rating/r.ratingCount).toFixed(1):''), r.location||r.address||'', r.email||'', r.phone||''].map(esc).join(','))
-  ).join('\n');
+  const headers = [
+    'Nombre',
+    'Servicio',
+    'Estado',
+    'Precio',
+    'Rating',
+    'Ubicación',
+    'Email',
+    'Teléfono',
+  ];
+  const csv = [headers.join(',')]
+    .concat(
+      rows.map((r) =>
+        [
+          r.name,
+          r.service,
+          r.status,
+          r.priceRange,
+          r.ratingCount > 0 ? (r.rating / r.ratingCount).toFixed(1) : '',
+          r.location || r.address || '',
+          r.email || '',
+          r.phone || '',
+        ]
+          .map(esc)
+          .join(',')
+      )
+    )
+    .join('\n');
   return csv;
 }
 
@@ -47,7 +72,9 @@ export default function CompareSelectedModal({ open, onClose, providers = [] }) 
                   <td className="p-2">{r.service}</td>
                   <td className="p-2">{r.status}</td>
                   <td className="p-2">{r.priceRange || '-'}</td>
-                  <td className="p-2">{r.ratingCount>0 ? (r.rating/r.ratingCount).toFixed(1) : '-'}</td>
+                  <td className="p-2">
+                    {r.ratingCount > 0 ? (r.rating / r.ratingCount).toFixed(1) : '-'}
+                  </td>
                   <td className="p-2">{r.location || r.address || '-'}</td>
                   <td className="p-2">{r.email || '-'}</td>
                   <td className="p-2">{r.phone || '-'}</td>
@@ -57,11 +84,14 @@ export default function CompareSelectedModal({ open, onClose, providers = [] }) 
           </table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cerrar</Button>
-          <Button variant="outline" onClick={exportCSV}>Exportar CSV</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cerrar
+          </Button>
+          <Button variant="outline" onClick={exportCSV}>
+            Exportar CSV
+          </Button>
         </div>
       </div>
     </Modal>
   );
 }
-

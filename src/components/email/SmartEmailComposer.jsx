@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Divider, 
+import AccessTime from '@mui/icons-material/AccessTime';
+import InsertDriveFile from '@mui/icons-material/InsertDriveFile';
+import Lightbulb from '@mui/icons-material/Lightbulb';
+import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
+import Schedule from '@mui/icons-material/Schedule';
+import Send from '@mui/icons-material/Send';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Divider,
   IconButton,
   Tooltip,
   Collapse,
@@ -15,16 +20,12 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from '@mui/material';
-import Send from '@mui/icons-material/Send';
-import Lightbulb from '@mui/icons-material/Lightbulb';
-import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
-import Schedule from '@mui/icons-material/Schedule';
-import AccessTime from '@mui/icons-material/AccessTime';
-import InsertDriveFile from '@mui/icons-material/InsertDriveFile';
-import EmailRecommendationService from '../../services/EmailRecommendationService';
+import React, { useState, useEffect } from 'react';
+
 import EmailRecommendationsPanel from './EmailRecommendationsPanel';
+import EmailRecommendationService from '../../services/EmailRecommendationService';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 
 /**
@@ -36,59 +37,57 @@ import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRe
  * @param {Function} props.onCancel - Función llamada al cancelar
  * @param {Array} props.templates - Lista de plantillas disponibles (opcional)
  */
-const SmartEmailComposer = ({ 
-  provider, 
-  searchQuery, 
-  onSend, 
-  onCancel,
-  templates = []
-}) => {
+const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates = [] }) => {
   // Estado del formulario
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
-  
+
   // Estado de las recomendaciones
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [category, setCategory] = useState(provider?.service || null);
-  
+
   // Para seguimiento de recomendaciones aplicadas
   const [appliedRecommendations, setAppliedRecommendations] = useState([]);
-  
+
   // Servicio de recomendaciones
   const recommendationService = new EmailRecommendationService();
-  
+
   // Cargar plantilla inicial si hay proveedor y categoría
   useEffect(() => {
     if (provider && category && templates.length > 0) {
-      const categoryTemplate = templates.find(t => t.category === category);
+      const categoryTemplate = templates.find((t) => t.category === category);
       if (categoryTemplate) {
         setSelectedTemplate(categoryTemplate.id);
-        
+
         // Pre-rellenar el asunto y mensaje con la plantilla
-        setSubject(categoryTemplate.subjectTemplate
-          .replace('[Proveedor]', provider.name || 'proveedor')
-          .replace('[Servicio]', provider.service || 'servicio'));
-        
-        setMessage(categoryTemplate.messageTemplate
-          .replace('[Proveedor]', provider.name || 'proveedor')
-          .replace('[Servicio]', provider.service || 'servicio'));
+        setSubject(
+          categoryTemplate.subjectTemplate
+            .replace('[Proveedor]', provider.name || 'proveedor')
+            .replace('[Servicio]', provider.service || 'servicio')
+        );
+
+        setMessage(
+          categoryTemplate.messageTemplate
+            .replace('[Proveedor]', provider.name || 'proveedor')
+            .replace('[Servicio]', provider.service || 'servicio')
+        );
       }
     }
   }, [provider, category, templates]);
-  
+
   // Manejar envío del correo
   const handleSend = () => {
     if (!subject || !message) {
       setFeedback({
         type: 'error',
-        message: 'Por favor, completa el asunto y el mensaje antes de enviar.'
+        message: 'Por favor, completa el asunto y el mensaje antes de enviar.',
       });
       return;
     }
-    
+
     // Preparar datos del correo
     const emailData = {
       to: provider?.email || '',
@@ -98,20 +97,23 @@ const SmartEmailComposer = ({
       provider,
       searchQuery,
       wasCustomized: appliedRecommendations.length > 0,
-      appliedRecommendations
+      appliedRecommendations,
     };
-    
+
     // Llamar a la función de envío proporcionada por el padre
     if (onSend) {
       onSend(emailData);
     }
   };
-  
+
   // Manejar aplicación de recomendaciones
   const handleApplyRecommendation = (type, data) => {
     // Registrar la recomendación aplicada
-    setAppliedRecommendations([...appliedRecommendations, { type, timestamp: new Date().toISOString() }]);
-    
+    setAppliedRecommendations([
+      ...appliedRecommendations,
+      { type, timestamp: new Date().toISOString() },
+    ]);
+
     // Aplicar la recomendación según su tipo
     switch (type) {
       case 'subject': {
@@ -123,7 +125,7 @@ const SmartEmailComposer = ({
         setSubject(newSubject);
         setFeedback({
           type: 'success',
-          message: 'Línea de asunto actualizada con la recomendación'
+          message: 'Línea de asunto actualizada con la recomendación',
         });
         break;
       }
@@ -172,30 +174,30 @@ const SmartEmailComposer = ({
       }
     }
   };
-  
+
   // Cambiar plantilla seleccionada
   const handleTemplateChange = (e) => {
     const templateId = e.target.value;
     setSelectedTemplate(templateId);
-    
+
     if (templateId) {
-      const template = templates.find(t => t.id === templateId);
+      const template = templates.find((t) => t.id === templateId);
       if (template) {
         // Actualizar el mensaje con la plantilla
         const templateMessage = template.messageTemplate
           .replace('[Proveedor]', provider?.name || 'proveedor')
           .replace('[Servicio]', provider?.service || 'servicio');
-        
+
         setMessage(templateMessage);
       }
     }
   };
-  
+
   // Cerrar alerta de feedback
   const handleCloseFeedback = () => {
     setFeedback(null);
   };
-  
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h5" gutterBottom>
@@ -206,19 +208,21 @@ const SmartEmailComposer = ({
           </Typography>
         )}
       </Typography>
-      
+
       <Grid container spacing={2}>
         <Grid item xs={12} md={showRecommendations ? 7 : 12}>
           <Paper sx={{ p: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
               <Typography variant="h6">Mensaje</Typography>
-              <Tooltip title={showRecommendations ? "Ocultar recomendaciones" : "Mostrar recomendaciones"}>
+              <Tooltip
+                title={showRecommendations ? 'Ocultar recomendaciones' : 'Mostrar recomendaciones'}
+              >
                 <IconButton onClick={() => setShowRecommendations(!showRecommendations)}>
                   {showRecommendations ? <Lightbulb color="primary" /> : <LightbulbOutlined />}
                 </IconButton>
               </Tooltip>
             </Box>
-            
+
             <Grid container spacing={2}>
               {/* Asunto */}
               <Grid item xs={12}>
@@ -231,7 +235,7 @@ const SmartEmailComposer = ({
                   placeholder="Escribe un asunto efectivo..."
                 />
               </Grid>
-              
+
               {/* Selección de plantilla */}
               {templates.length > 0 && (
                 <Grid item xs={12}>
@@ -246,7 +250,7 @@ const SmartEmailComposer = ({
                       <MenuItem value="">
                         <em>Ninguna</em>
                       </MenuItem>
-                      {templates.map(template => (
+                      {templates.map((template) => (
                         <MenuItem key={template.id} value={template.id}>
                           {template.name}
                         </MenuItem>
@@ -255,7 +259,7 @@ const SmartEmailComposer = ({
                   </FormControl>
                 </Grid>
               )}
-              
+
               {/* Mensaje */}
               <Grid item xs={12}>
                 <TextField
@@ -269,7 +273,7 @@ const SmartEmailComposer = ({
                   placeholder="Escribe tu mensaje aquí..."
                 />
               </Grid>
-              
+
               {/* Programación de envío */}
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -288,28 +292,21 @@ const SmartEmailComposer = ({
                     size="small"
                   />
                   {scheduledTime && (
-                    <Button 
-                      size="small"
-                      onClick={() => setScheduledTime('')}
-                      sx={{ ml: 1 }}
-                    >
+                    <Button size="small" onClick={() => setScheduledTime('')} sx={{ ml: 1 }}>
                       Limpiar
                     </Button>
                   )}
                 </Box>
               </Grid>
-              
+
               {/* Botones de acción */}
               <Grid item xs={12}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-                  <Button 
-                    variant="outlined" 
-                    onClick={onCancel}
-                  >
+                  <Button variant="outlined" onClick={onCancel}>
                     Cancelar
                   </Button>
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
                     startIcon={scheduledTime ? <Schedule /> : <Send />}
                     onClick={handleSend}
                   >
@@ -320,12 +317,12 @@ const SmartEmailComposer = ({
             </Grid>
           </Paper>
         </Grid>
-        
+
         {/* Panel de recomendaciones */}
         {showRecommendations && (
           <Grid item xs={12} md={5}>
             <Paper sx={{ height: '100%', overflow: 'auto' }}>
-              <EmailRecommendationsPanel 
+              <EmailRecommendationsPanel
                 category={category}
                 searchQuery={searchQuery}
                 onApplyRecommendation={handleApplyRecommendation}
@@ -334,17 +331,17 @@ const SmartEmailComposer = ({
           </Grid>
         )}
       </Grid>
-      
+
       {/* Alertas de feedback */}
-      <Snackbar 
-        open={!!feedback} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!feedback}
+        autoHideDuration={6000}
         onClose={handleCloseFeedback}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={handleCloseFeedback} 
-          severity={feedback?.type || 'info'} 
+        <Alert
+          onClose={handleCloseFeedback}
+          severity={feedback?.type || 'info'}
           sx={{ width: '100%' }}
         >
           {feedback?.message}

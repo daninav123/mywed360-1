@@ -1,19 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Tabs, Tab, CircularProgress, Paper, Divider, 
-         Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-         Chip, Card, CardContent, Grid, LinearProgress } from '@mui/material';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, 
-         LinearScale, PointElement, LineElement, BarElement } from 'chart.js';
-import { Pie, Bar } from 'react-chartjs-2';
-import AIEmailTrackingService from '../../services/AIEmailTrackingService';
+import {
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  CircularProgress,
+  Paper,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  Card,
+  CardContent,
+  Grid,
+  LinearProgress,
+} from '@mui/material';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+} from 'chart.js';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import React, { useEffect, useState } from 'react';
+import { Pie, Bar } from 'react-chartjs-2';
+
+import AIEmailTrackingService from '../../services/AIEmailTrackingService';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
-  ArcElement, 
-  Tooltip, 
-  Legend, 
+  ArcElement,
+  Tooltip,
+  Legend,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -30,65 +57,61 @@ const AIEmailHistoryPanel = () => {
   const [activities, setActivities] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [comparisonData, setComparisonData] = useState(null);
-  
+
   const trackingService = new AIEmailTrackingService();
-  
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      
+
       // Cargar actividades
       const activitiesData = trackingService.getActivities();
       setActivities(activitiesData);
-      
+
       // Cargar métricas
       const metricsData = trackingService.getMetrics();
       setMetrics(metricsData);
-      
+
       // Cargar datos de comparación
       const comparisonData = trackingService.getComparisonData();
       setComparisonData(comparisonData);
-      
+
       setLoading(false);
     };
-    
+
     loadData();
   }, []);
-  
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-  
+
   // Datos para el gráfico de tasa de respuesta
   const responseRateChartData = {
     labels: ['Correos AI', 'Correos Tradicionales'],
     datasets: [
       {
         label: 'Tasa de Respuesta (%)',
-        data: comparisonData ? [
-          parseFloat(comparisonData.ai.responseRate),
-          parseFloat(comparisonData.nonAi.responseRate)
-        ] : [0, 0],
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 99, 132, 0.6)',
-        ],
-        borderColor: [
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 99, 132, 1)',
-        ],
+        data: comparisonData
+          ? [
+              parseFloat(comparisonData.ai.responseRate),
+              parseFloat(comparisonData.nonAi.responseRate),
+            ]
+          : [0, 0],
+        backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(255, 99, 132, 0.6)'],
+        borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
         borderWidth: 1,
       },
     ],
   };
-  
+
   // Datos para el gráfico de tasa de respuesta por categoría
   const categoryChartData = {
-    labels: comparisonData?.categoryBreakdown?.map(cat => cat.category) || [],
+    labels: comparisonData?.categoryBreakdown?.map((cat) => cat.category) || [],
     datasets: [
       {
         label: 'Tasa de Respuesta por Categoría (%)',
-        data: comparisonData?.categoryBreakdown?.map(cat => parseFloat(cat.responseRate)) || [],
+        data: comparisonData?.categoryBreakdown?.map((cat) => parseFloat(cat.responseRate)) || [],
         backgroundColor: [
           'rgba(75, 192, 192, 0.6)',
           'rgba(153, 102, 255, 0.6)',
@@ -107,7 +130,7 @@ const AIEmailHistoryPanel = () => {
       },
     ],
   };
-  
+
   // Opciones para los gráficos de barras
   const barOptions = {
     responsive: true,
@@ -130,7 +153,7 @@ const AIEmailHistoryPanel = () => {
       <Typography variant="h4" gutterBottom>
         Historial de Correos desde Búsqueda AI
       </Typography>
-      
+
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
         <Tabs value={activeTab} onChange={handleTabChange}>
           <Tab label="Resumen" />
@@ -138,7 +161,7 @@ const AIEmailHistoryPanel = () => {
           <Tab label="Historial de Actividad" />
         </Tabs>
       </Box>
-      
+
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
           <CircularProgress />
@@ -155,9 +178,7 @@ const AIEmailHistoryPanel = () => {
                       <Typography variant="h6" gutterBottom>
                         Correos Enviados
                       </Typography>
-                      <Typography variant="h4">
-                        {metrics?.totalEmails || 0}
-                      </Typography>
+                      <Typography variant="h4">{metrics?.totalEmails || 0}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -192,23 +213,20 @@ const AIEmailHistoryPanel = () => {
                         Distribución de Respuestas
                       </Typography>
                       <Box height={250}>
-                        <Pie 
+                        <Pie
                           data={{
                             labels: ['Respondidos', 'Sin Respuesta'],
                             datasets: [
                               {
                                 data: [
                                   metrics?.totalResponses || 0,
-                                  (metrics?.totalEmails || 0) - (metrics?.totalResponses || 0)
+                                  (metrics?.totalEmails || 0) - (metrics?.totalResponses || 0),
                                 ],
                                 backgroundColor: [
                                   'rgba(75, 192, 192, 0.6)',
                                   'rgba(255, 99, 132, 0.6)',
                                 ],
-                                borderColor: [
-                                  'rgba(75, 192, 192, 1)',
-                                  'rgba(255, 99, 132, 1)',
-                                ],
+                                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
                                 borderWidth: 1,
                               },
                             ],
@@ -225,10 +243,7 @@ const AIEmailHistoryPanel = () => {
                         Tasas de Respuesta por Categoría
                       </Typography>
                       <Box height={250}>
-                        <Bar 
-                          data={categoryChartData} 
-                          options={barOptions} 
-                        />
+                        <Bar data={categoryChartData} options={barOptions} />
                       </Box>
                     </CardContent>
                   </Card>
@@ -236,7 +251,7 @@ const AIEmailHistoryPanel = () => {
               </Grid>
             </Box>
           )}
-          
+
           {/* Tab 2: Comparativa */}
           {activeTab === 1 && comparisonData && (
             <Box>
@@ -272,30 +287,46 @@ const AIEmailHistoryPanel = () => {
                             </TableRow>
                             <TableRow>
                               <TableCell>Tasa de Respuesta</TableCell>
-                              <TableCell align="center">{comparisonData.ai.responseRate}%</TableCell>
-                              <TableCell align="center">{comparisonData.nonAi.responseRate}%</TableCell>
-                              <TableCell 
+                              <TableCell align="center">
+                                {comparisonData.ai.responseRate}%
+                              </TableCell>
+                              <TableCell align="center">
+                                {comparisonData.nonAi.responseRate}%
+                              </TableCell>
+                              <TableCell
                                 align="center"
                                 sx={{
-                                  color: parseFloat(comparisonData.difference.responseRate) > 0 ? 'success.main' : 'error.main',
-                                  fontWeight: 'bold'
+                                  color:
+                                    parseFloat(comparisonData.difference.responseRate) > 0
+                                      ? 'success.main'
+                                      : 'error.main',
+                                  fontWeight: 'bold',
                                 }}
                               >
-                                {comparisonData.difference.responseRate > 0 ? '+' : ''}{comparisonData.difference.responseRate}%
+                                {comparisonData.difference.responseRate > 0 ? '+' : ''}
+                                {comparisonData.difference.responseRate}%
                               </TableCell>
                             </TableRow>
                             <TableRow>
                               <TableCell>Tiempo Promedio de Respuesta</TableCell>
-                              <TableCell align="center">{comparisonData.ai.avgResponseTime}h</TableCell>
-                              <TableCell align="center">{comparisonData.nonAi.avgResponseTime}h</TableCell>
-                              <TableCell 
+                              <TableCell align="center">
+                                {comparisonData.ai.avgResponseTime}h
+                              </TableCell>
+                              <TableCell align="center">
+                                {comparisonData.nonAi.avgResponseTime}h
+                              </TableCell>
+                              <TableCell
                                 align="center"
                                 sx={{
-                                  color: parseFloat(comparisonData.difference.avgResponseTime) > 0 ? 'success.main' : 'error.main',
-                                  fontWeight: 'bold'
+                                  color:
+                                    parseFloat(comparisonData.difference.avgResponseTime) > 0
+                                      ? 'success.main'
+                                      : 'error.main',
+                                  fontWeight: 'bold',
                                 }}
                               >
-                                {comparisonData.difference.avgResponseTime > 0 ? '+' : ''}{comparisonData.difference.avgResponseTime}h
+                                {comparisonData.difference.avgResponseTime > 0 ? '+' : ''}
+                                {comparisonData.difference.avgResponseTime}h
                               </TableCell>
                             </TableRow>
                           </TableBody>
@@ -311,10 +342,7 @@ const AIEmailHistoryPanel = () => {
                         Comparación de Tasas de Respuesta
                       </Typography>
                       <Box height={250}>
-                        <Bar 
-                          data={responseRateChartData}
-                          options={barOptions}
-                        />
+                        <Bar data={responseRateChartData} options={barOptions} />
                       </Box>
                     </CardContent>
                   </Card>
@@ -353,7 +381,7 @@ const AIEmailHistoryPanel = () => {
               </Grid>
             </Box>
           )}
-          
+
           {/* Tab 3: Historial de Actividad */}
           {activeTab === 2 && (
             <Box>
@@ -374,7 +402,9 @@ const AIEmailHistoryPanel = () => {
                       activities.map((activity) => (
                         <TableRow key={activity.id}>
                           <TableCell>
-                            {format(new Date(activity.timestamp), 'dd MMM yyyy HH:mm', { locale: es })}
+                            {format(new Date(activity.timestamp), 'dd MMM yyyy HH:mm', {
+                              locale: es,
+                            })}
                           </TableCell>
                           <TableCell>{activity.providerName || 'N/A'}</TableCell>
                           <TableCell>{activity.templateCategory || 'general'}</TableCell>
@@ -384,15 +414,15 @@ const AIEmailHistoryPanel = () => {
                               : activity.searchQuery}
                           </TableCell>
                           <TableCell>
-                            <Chip 
-                              label={activity.responseReceived ? 'Respondido' : 'Pendiente'} 
+                            <Chip
+                              label={activity.responseReceived ? 'Respondido' : 'Pendiente'}
                               color={activity.responseReceived ? 'success' : 'default'}
                               size="small"
                             />
                           </TableCell>
                           <TableCell>
-                            {activity.responseTime 
-                              ? `${activity.responseTime.toFixed(1)}h` 
+                            {activity.responseTime
+                              ? `${activity.responseTime.toFixed(1)}h`
                               : 'Pendiente'}
                           </TableCell>
                         </TableRow>
@@ -400,9 +430,7 @@ const AIEmailHistoryPanel = () => {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={6} align="center">
-                          <Typography variant="body1">
-                            No hay actividades registradas
-                          </Typography>
+                          <Typography variant="body1">No hay actividades registradas</Typography>
                         </TableCell>
                       </TableRow>
                     )}

@@ -1,7 +1,6 @@
 // Generic Firestore helpers for collections nested under users/{uid}/{collection}
 // Usage: await addItem('guests', { name: 'Ana' })
 
-import { auth, db } from '../lib/firebase';
 import {
   collection,
   getDocs,
@@ -12,6 +11,8 @@ import {
   setDoc,
   serverTimestamp,
 } from 'firebase/firestore';
+
+import { auth, db } from '../lib/firebase';
 
 const colRef = (name) => {
   const uid = auth.currentUser?.uid;

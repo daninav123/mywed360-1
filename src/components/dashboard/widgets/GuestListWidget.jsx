@@ -1,16 +1,19 @@
 import React, { useMemo } from 'react';
+
 import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
 
 export const GuestListWidget = ({ config }) => {
   const { data: guests = [] } = useFirestoreCollection('guests', []);
   const filteredGuests = useMemo(() => {
-    const base = Array.isArray(guests) ? guests.map(g => ({
-      id: g.id,
-      name: g.name || g.fullName || g.nombre || 'Invitado',
-      email: g.email || g.mail || '',
-      rsvp: g.rsvp || g.attendance || 'pending',
-      group: g.group || g.category || 'General'
-    })) : [];
+    const base = Array.isArray(guests)
+      ? guests.map((g) => ({
+          id: g.id,
+          name: g.name || g.fullName || g.nombre || 'Invitado',
+          email: g.email || g.mail || '',
+          rsvp: g.rsvp || g.attendance || 'pending',
+          group: g.group || g.category || 'General',
+        }))
+      : [];
     const res = [...base];
     if (config?.sortBy === 'name') {
       res.sort((a, b) => a.name.localeCompare(b.name));
@@ -19,7 +22,7 @@ export const GuestListWidget = ({ config }) => {
     }
     return res;
   }, [guests, config?.sortBy]);
-  
+
   if (config.sortBy === 'name') {
     filteredGuests.sort((a, b) => a.name.localeCompare(b.name));
   } else if (config.sortBy === 'group') {
@@ -48,19 +51,20 @@ export const GuestListWidget = ({ config }) => {
         </div>
         <div className="flex space-x-1">
           <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'confirmed').length} Sí
+            {filteredGuests.filter((g) => (g.rsvp || '').toLowerCase() === 'confirmed').length} Sí
           </span>
           <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
-            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'pending').length} Pendiente
+            {filteredGuests.filter((g) => (g.rsvp || '').toLowerCase() === 'pending').length}{' '}
+            Pendiente
           </span>
           <span className="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">
-            {filteredGuests.filter(g => (g.rsvp || '').toLowerCase() === 'declined').length} No
+            {filteredGuests.filter((g) => (g.rsvp || '').toLowerCase() === 'declined').length} No
           </span>
         </div>
       </div>
 
       <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-        {filteredGuests.map(guest => {
+        {filteredGuests.map((guest) => {
           const rsvp = getRsvpStatus(guest.rsvp);
           return (
             <div key={guest.id} className="flex items-center p-2 bg-white rounded-lg border">
@@ -72,9 +76,7 @@ export const GuestListWidget = ({ config }) => {
                 <div className="text-xs text-gray-500 truncate">{guest.email}</div>
               </div>
               <div className="ml-2">
-                <span className={`text-xs px-2 py-1 rounded-full ${rsvp.color}`}>
-                  {rsvp.text}
-                </span>
+                <span className={`text-xs px-2 py-1 rounded-full ${rsvp.color}`}>{rsvp.text}</span>
               </div>
             </div>
           );
@@ -82,9 +84,7 @@ export const GuestListWidget = ({ config }) => {
       </div>
 
       <div className="mt-4 text-right">
-        <button className="text-sm text-blue-600 hover:text-blue-800">
-          Ver lista completa →
-        </button>
+        <button className="text-sm text-blue-600 hover:text-blue-800">Ver lista completa →</button>
       </div>
     </div>
   );

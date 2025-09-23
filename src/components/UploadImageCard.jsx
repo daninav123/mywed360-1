@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import Card from './ui/Card';
 import { Trash2, UploadCloud } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+
+import Card from './ui/Card';
 
 /**
  * Componente reutilizable para subir y previsualizar una imagen.
@@ -35,7 +36,10 @@ export default function UploadImageCard({ title, storageKey }) {
       {imageData ? (
         <>
           <img src={imageData} alt={title} className="max-h-40 object-contain border rounded" />
-          <button onClick={handleRemove} className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded">
+          <button
+            onClick={handleRemove}
+            className="flex items-center gap-1 bg-red-600 text-white px-3 py-1 rounded"
+          >
             <Trash2 size={16} /> Eliminar
           </button>
         </>

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { useEffect, useState } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
 
 export default function useActiveWeddingInfo() {
   const { activeWedding } = useWedding();
@@ -12,7 +13,10 @@ export default function useActiveWeddingInfo() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (!activeWedding) { setInfo(null); return; }
+      if (!activeWedding) {
+        setInfo(null);
+        return;
+      }
       setLoading(true);
       try {
         const ref = doc(db, 'weddings', activeWedding);
@@ -24,9 +28,10 @@ export default function useActiveWeddingInfo() {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeWedding]);
 
   return { info, loading, error };
 }
-

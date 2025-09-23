@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { motion } from 'framer-motion';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
@@ -11,10 +10,10 @@ import { prefetchModule } from '../utils/prefetch';
 // Devuelve los Ò�� �"Ò�a�­tems de navegaciÒ�� �"Ò�a�³n segÒ�� �"Ò�a�ºn rol
 function getNavItems(role, t) {
   const roleMap = {
-    'pareja': 'owner',
+    pareja: 'owner',
     'wedding-planner': 'planner',
-    'planner': 'planner',
-    'ayudante': 'assistant'
+    planner: 'planner',
+    ayudante: 'assistant',
   };
   const rawRole = (role || '').toString().trim().toLowerCase();
   const normalizedRole = roleMap[rawRole] || 'owner';
@@ -139,14 +138,13 @@ function getNavItems(role, t) {
 function Nav() {
   // Nuevo sistema unificado
   const { userProfile, hasRole } = useAuth();
-  
+
   // Hook de traducciones
   const { t } = useTranslations();
-  
+
   // Usar el nuevo sistema para el rol, con fallback bÒ�� �"Ò�a�¡sico
   const role = userProfile?.role || 'owner';
   const navItems = React.useMemo(() => getNavItems(role, t), [role, t]);
-  
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -155,14 +153,15 @@ function Nav() {
   const prefetchForPath = React.useCallback((path) => {
     try {
       // Solo prefetch de rutas lazy para evitar warnings de Vite
-      if (path.startsWith('/protocolo')) prefetchModule('ProtocoloLayout', () => import('../pages/protocolo/ProtocoloLayout'));
+      if (path.startsWith('/protocolo'))
+        prefetchModule('ProtocoloLayout', () => import('../pages/protocolo/ProtocoloLayout'));
     } catch {}
   }, []);
 
   return (
-    <nav className='fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30'>
+    <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30">
       {/* NavegaciÒ�� �"Ò�a�³n principal */}
-      <div className='flex justify-around flex-1'>
+      <div className="flex justify-around flex-1">
         {navItems.map(({ path, label }, idx) => {
           const isActive = location.pathname.startsWith(path);
           return (
@@ -172,32 +171,33 @@ function Nav() {
               onMouseEnter={() => prefetchForPath(path)}
               onFocus={() => prefetchForPath(path)}
               onTouchStart={() => prefetchForPath(path)}
-              className='relative'
+              className="relative"
             >
               <motion.span
                 animate={{ scale: isActive ? 1.1 : 1 }}
                 transition={{ type: 'spring', stiffness: 300 }}
-                className={isActive ? 'text-[var(--color-accent)] font-semibold' : 'text-[color:var(--color-text)]'}
+                className={
+                  isActive
+                    ? 'text-[var(--color-accent)] font-semibold'
+                    : 'text-[color:var(--color-text)]'
+                }
               >
                 {label}
               </motion.span>
               {isActive && (
                 <motion.span
-                  className='absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-[var(--color-accent)] rounded'
-                  layoutId='activeUnderline'
+                  className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-[var(--color-accent)] rounded"
+                  layoutId="activeUnderline"
                 />
               )}
             </button>
           );
         })}
       </div>
-      
+
       {/* Selector de idioma */}
-      <div className='ml-2'>
-        <LanguageSelector 
-          variant="minimal" 
-          className="text-[color:var(--color-text)]" 
-        />
+      <div className="ml-2">
+        <LanguageSelector variant="minimal" className="text-[color:var(--color-text)]" />
       </div>
     </nav>
   );

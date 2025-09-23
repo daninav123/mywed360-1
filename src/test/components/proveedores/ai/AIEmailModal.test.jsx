@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // --- Mocks globales de hooks ---
@@ -30,8 +30,8 @@ vi.mock('../../../../components/Alert', () => ({
   ),
 }));
 
-import { useAIProviderEmail } from '../../../../hooks/useAIProviderEmail';
 import AIEmailModal from '../../../../components/proveedores/ai/AIEmailModal';
+import { useAIProviderEmail } from '../../../../hooks/useAIProviderEmail';
 
 const defaultAIResult = {
   id: 1,
@@ -46,8 +46,7 @@ const baseHookState = {
   isSending: false,
   error: null,
   sendEmailFromAIResult: mockSendEmail,
-  generateAISubject: () =>
-    'Consulta sobre Fotografía para boda - Fotógrafo Prueba',
+  generateAISubject: () => 'Consulta sobre Fotografía para boda - Fotógrafo Prueba',
   generateAIEmailBody: () => 'Cuerpo de email generado por IA',
 };
 
@@ -69,17 +68,12 @@ describe('AIEmailModal', () => {
         searchQuery="fotógrafo estilo moderno para boda"
         onClose={onClose}
         {...props}
-      />,
+      />
     );
 
   it('no renderiza nada cuando isOpen es false', () => {
     const { container } = render(
-      <AIEmailModal
-        isOpen={false}
-        aiResult={defaultAIResult}
-        searchQuery="q"
-        onClose={onClose}
-      />,
+      <AIEmailModal isOpen={false} aiResult={defaultAIResult} searchQuery="q" onClose={onClose} />
     );
     expect(container.firstChild).toBeNull();
   });
@@ -90,7 +84,7 @@ describe('AIEmailModal', () => {
     expect(screen.getByText(/usuario.test@lovenda.com/i)).toBeInTheDocument();
     expect(screen.getByText(/fotografo@prueba.com/i)).toBeInTheDocument();
     expect(screen.getByTestId('email-subject')).toHaveValue(
-      'Consulta sobre Fotografía para boda - Fotógrafo Prueba',
+      'Consulta sobre Fotografía para boda - Fotógrafo Prueba'
     );
     expect(screen.getByTestId('email-body')).toHaveValue('Cuerpo de email generado por IA');
   });

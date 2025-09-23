@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+
 import Modal from './Modal';
 
 /**
  * Modal para crear una nueva boda.
- * @param {{open:boolean,onClose:()=>void,onSave:(values:any)=>void}} props 
+ * @param {{open:boolean,onClose:()=>void,onSave:(values:any)=>void}} props
  */
 export default function WeddingFormModal({ open, onClose, onSave }) {
   const [values, setValues] = useState({

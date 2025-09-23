@@ -42,7 +42,7 @@ export default function TableEditor({ table, onChange, onClose, globalMaxSeats =
           className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
         />
         <p className="mt-1 text-[11px] text-gray-500">
-          Capacidad efectiva: {parseInt(table.seats,10) || globalMaxSeats || '—'}
+          Capacidad efectiva: {parseInt(table.seats, 10) || globalMaxSeats || '—'}
         </p>
       </div>
 

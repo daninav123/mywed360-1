@@ -10,14 +10,14 @@ const globalCache = new Map();
 const cacheStats = {
   hits: 0,
   misses: 0,
-  evictions: 0
+  evictions: 0,
 };
 
 // Configuración por defecto
 const DEFAULT_CONFIG = {
   maxSize: 100, // Máximo número de entradas en caché
   ttl: 5 * 60 * 1000, // 5 minutos en millisegundos
-  enableStats: true
+  enableStats: true,
 };
 
 /**
@@ -39,14 +39,14 @@ const generateCacheKey = (componentName, props = {}, deps = []) => {
 const cleanExpiredEntries = () => {
   const now = Date.now();
   let cleaned = 0;
-  
+
   for (const [key, entry] of globalCache.entries()) {
     if (now > entry.expiresAt) {
       globalCache.delete(key);
       cleaned++;
     }
   }
-  
+
   if (cleaned > 0) {
     cacheStats.evictions += cleaned;
     console.log(`[ComponentCache] Limpiadas ${cleaned} entradas expiradas`);
@@ -58,18 +58,18 @@ const cleanExpiredEntries = () => {
  */
 const evictLRU = () => {
   if (globalCache.size <= DEFAULT_CONFIG.maxSize) return;
-  
+
   // Encontrar la entrada menos recientemente usada
   let oldestKey = null;
   let oldestTime = Infinity;
-  
+
   for (const [key, entry] of globalCache.entries()) {
     if (entry.lastAccessed < oldestTime) {
       oldestTime = entry.lastAccessed;
       oldestKey = key;
     }
   }
-  
+
   if (oldestKey) {
     globalCache.delete(oldestKey);
     cacheStats.evictions++;
@@ -86,11 +86,11 @@ const evictLRU = () => {
 export const useCachedComputation = (computeFn, deps = [], options = {}) => {
   const config = { ...DEFAULT_CONFIG, ...options };
   const componentName = options.name || 'anonymous';
-  
+
   return useMemo(() => {
     const cacheKey = generateCacheKey(componentName, {}, deps);
     const now = Date.now();
-    
+
     // Verificar si existe en caché y no ha expirado
     if (globalCache.has(cacheKey)) {
       const entry = globalCache.get(cacheKey);
@@ -102,23 +102,23 @@ export const useCachedComputation = (computeFn, deps = [], options = {}) => {
         globalCache.delete(cacheKey);
       }
     }
-    
+
     // Computar nuevo valor
     cacheStats.misses++;
     const value = computeFn();
-    
+
     // Limpiar caché si es necesario
     cleanExpiredEntries();
     evictLRU();
-    
+
     // Guardar en caché
     globalCache.set(cacheKey, {
       value,
       createdAt: now,
       lastAccessed: now,
-      expiresAt: now + config.ttl
+      expiresAt: now + config.ttl,
     });
-    
+
     return value;
   }, deps);
 };
@@ -134,11 +134,11 @@ export const useCachedComputation = (computeFn, deps = [], options = {}) => {
 export const useCachedComponent = (renderFn, props = {}, deps = [], options = {}) => {
   const config = { ...DEFAULT_CONFIG, ...options };
   const componentName = options.name || 'CachedComponent';
-  
+
   return useMemo(() => {
     const cacheKey = generateCacheKey(componentName, props, deps);
     const now = Date.now();
-    
+
     // Verificar caché
     if (globalCache.has(cacheKey)) {
       const entry = globalCache.get(cacheKey);
@@ -150,23 +150,23 @@ export const useCachedComponent = (renderFn, props = {}, deps = [], options = {}
         globalCache.delete(cacheKey);
       }
     }
-    
+
     // Renderizar nuevo componente
     cacheStats.misses++;
     const component = renderFn(props);
-    
+
     // Gestión del caché
     cleanExpiredEntries();
     evictLRU();
-    
+
     // Guardar en caché
     globalCache.set(cacheKey, {
       value: component,
       createdAt: now,
       lastAccessed: now,
-      expiresAt: now + config.ttl
+      expiresAt: now + config.ttl,
     });
-    
+
     return component;
   }, [renderFn, JSON.stringify(props), ...deps]);
 };
@@ -177,19 +177,22 @@ export const useCachedComponent = (renderFn, props = {}, deps = [], options = {}
  * @returns {Function} - Función para invalidar caché
  */
 export const useCacheInvalidation = (componentName) => {
-  return useCallback((props = {}, deps = []) => {
-    const pattern = generateCacheKey(componentName, props, deps);
-    let invalidated = 0;
-    
-    for (const key of globalCache.keys()) {
-      if (key.startsWith(`${componentName}:`)) {
-        globalCache.delete(key);
-        invalidated++;
+  return useCallback(
+    (props = {}, deps = []) => {
+      const pattern = generateCacheKey(componentName, props, deps);
+      let invalidated = 0;
+
+      for (const key of globalCache.keys()) {
+        if (key.startsWith(`${componentName}:`)) {
+          globalCache.delete(key);
+          invalidated++;
+        }
       }
-    }
-    
-    console.log(`[ComponentCache] Invalidadas ${invalidated} entradas para ${componentName}`);
-  }, [componentName]);
+
+      console.log(`[ComponentCache] Invalidadas ${invalidated} entradas para ${componentName}`);
+    },
+    [componentName]
+  );
 };
 
 /**
@@ -201,7 +204,7 @@ export const useCacheInvalidation = (componentName) => {
 export const withCache = (WrappedComponent, options = {}) => {
   const CachedComponent = (props) => {
     const componentName = options.name || WrappedComponent.displayName || WrappedComponent.name;
-    
+
     return useCachedComponent(
       (cachedProps) => <WrappedComponent {...cachedProps} />,
       props,
@@ -209,7 +212,7 @@ export const withCache = (WrappedComponent, options = {}) => {
       { ...options, name: componentName }
     );
   };
-  
+
   CachedComponent.displayName = `withCache(${WrappedComponent.displayName || WrappedComponent.name})`;
   return CachedComponent;
 };
@@ -219,15 +222,16 @@ export const withCache = (WrappedComponent, options = {}) => {
  * @returns {Object} - Estadísticas del caché
  */
 export const getCacheStats = () => {
-  const hitRate = cacheStats.hits + cacheStats.misses > 0 
-    ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses) * 100).toFixed(2)
-    : 0;
-    
+  const hitRate =
+    cacheStats.hits + cacheStats.misses > 0
+      ? ((cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100).toFixed(2)
+      : 0;
+
   return {
     ...cacheStats,
     hitRate: `${hitRate}%`,
     cacheSize: globalCache.size,
-    maxSize: DEFAULT_CONFIG.maxSize
+    maxSize: DEFAULT_CONFIG.maxSize,
   };
 };
 
@@ -246,15 +250,15 @@ export const clearCache = () => {
  */
 export const useCacheMonitor = () => {
   const [stats, setStats] = useState(getCacheStats());
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setStats(getCacheStats());
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   return stats;
 };
 
@@ -268,5 +272,5 @@ export default {
   withCache,
   getCacheStats,
   clearCache,
-  useCacheMonitor
+  useCacheMonitor,
 };

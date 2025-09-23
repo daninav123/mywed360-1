@@ -1,16 +1,26 @@
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  getDoc,
+  doc,
+  addDoc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, where, getDoc, doc, addDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
 import { useNavigate } from 'react-router-dom';
-import WeddingFormModal from '../components/WeddingFormModal';
-import { Card } from '../components/ui/Card';
-import { Progress } from '../components/ui/Progress';
-import { useAuth } from '../hooks/useAuth';
-import { useWedding } from '../context/WeddingContext';
+
 import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 import PageTabs from '../components/ui/PageTabs';
-
+import { Progress } from '../components/ui/Progress';
+import WeddingFormModal from '../components/WeddingFormModal';
+import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Bodas() {
   const { currentUser, userProfile } = useAuth();
@@ -52,14 +62,18 @@ export default function Bodas() {
 
   useEffect(() => {
     if (!currentUser?.uid) return;
-    const q = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', currentUser.uid));
+    const q = query(
+      collection(db, 'weddings'),
+      where('plannerIds', 'array-contains', currentUser.uid)
+    );
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
       // Enriquecer con weddingInfo del primer owner si faltan campos
       Promise.all(
         data.map(async (w) => {
-          if ((w.name && w.weddingDate) || !Array.isArray(w.ownerIds) || w.ownerIds.length === 0) return w;
+          if ((w.name && w.weddingDate) || !Array.isArray(w.ownerIds) || w.ownerIds.length === 0)
+            return w;
           try {
             const ownerId = w.ownerIds[0];
             const profileSnap = await getDoc(doc(db, 'users', ownerId));
@@ -91,12 +105,11 @@ export default function Bodas() {
         );
         setLoading(false);
       });
-
     });
     return () => unsub();
   }, [currentUser]);
 
-    const today = new Date();
+  const today = new Date();
   const activeWeddings = weddings.filter((w) => {
     if (!w.date) return true; // sin fecha = activa
     const d = new Date(w.date);
@@ -116,12 +129,15 @@ export default function Bodas() {
   return (
     <PageWrapper
       title="Mis Bodas"
-      actions={userProfile?.role === 'planner' ? (
-        <Button size="sm" onClick={() => setShowCreateModal(true)}>+ Crear nueva boda</Button>
-      ) : null}
+      actions={
+        userProfile?.role === 'planner' ? (
+          <Button size="sm" onClick={() => setShowCreateModal(true)}>
+            + Crear nueva boda
+          </Button>
+        ) : null
+      }
       className="max-w-7xl mx-auto"
     >
-
       {/* Tabs */}
       <PageTabs
         value={tab}

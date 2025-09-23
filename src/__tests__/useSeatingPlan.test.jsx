@@ -3,40 +3,43 @@
  * Valida la funcionalidad del estado centralizado y operaciones
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { useSeatingPlan } from '../hooks/useSeatingPlan';
 
 // Mock de dependencias
 vi.mock('../firebaseConfig', () => ({
-  db: {}
+  db: {},
 }));
 
 vi.mock('../services/SyncService', () => ({
   saveData: vi.fn(),
   loadData: vi.fn(),
   subscribeSyncState: vi.fn(() => () => {}),
-  getSyncState: vi.fn(() => ({ status: 'synced' }))
+  getSyncState: vi.fn(() => ({ status: 'synced' })),
 }));
 
 vi.mock('../context/WeddingContext', () => ({
   useWedding: () => ({
-    activeWedding: 'test-wedding-id'
-  })
+    activeWedding: 'test-wedding-id',
+  }),
 }));
 
 vi.mock('html2canvas', () => ({
-  default: vi.fn(() => Promise.resolve({
-    toDataURL: () => 'data:image/png;base64,test'
-  }))
+  default: vi.fn(() =>
+    Promise.resolve({
+      toDataURL: () => 'data:image/png;base64,test',
+    })
+  ),
 }));
 
 vi.mock('jspdf', () => ({
   default: vi.fn(() => ({
     addImage: vi.fn(),
     addPage: vi.fn(),
-    save: vi.fn()
-  }))
+    save: vi.fn(),
+  })),
 }));
 
 describe('useSeatingPlan Hook', () => {
@@ -67,9 +70,9 @@ describe('useSeatingPlan Hook', () => {
 
   it('should handle table selection', () => {
     const { result } = renderHook(() => useSeatingPlan());
-    
+
     const mockTable = { id: 1, name: 'Mesa 1', x: 100, y: 100 };
-    
+
     // Primero añadir una mesa
     act(() => {
       result.current.setTables([mockTable]);
@@ -85,9 +88,9 @@ describe('useSeatingPlan Hook', () => {
 
   it('should handle table dimension changes', () => {
     const { result } = renderHook(() => useSeatingPlan());
-    
+
     const mockTable = { id: 1, name: 'Mesa 1', x: 100, y: 100, width: 80, height: 60 };
-    
+
     act(() => {
       result.current.setTables([mockTable]);
       result.current.handleSelectTable(1);
@@ -102,9 +105,9 @@ describe('useSeatingPlan Hook', () => {
 
   it('should toggle table shape', () => {
     const { result } = renderHook(() => useSeatingPlan());
-    
+
     const mockTable = { id: 1, name: 'Mesa 1', shape: 'rectangle' };
-    
+
     act(() => {
       result.current.setTables([mockTable]);
       result.current.handleSelectTable(1);
@@ -130,7 +133,7 @@ describe('useSeatingPlan Hook', () => {
       x: 100,
       y: 80,
       enabled: true,
-      guestId: null
+      guestId: null,
     });
   });
 
@@ -146,7 +149,7 @@ describe('useSeatingPlan Hook', () => {
         gapX: 140,
         gapY: 160,
         startX: 120,
-        startY: 160
+        startY: 160,
       });
     });
 
@@ -156,7 +159,7 @@ describe('useSeatingPlan Hook', () => {
       x: 120,
       y: 160,
       seats: 8,
-      enabled: true
+      enabled: true,
     });
   });
 
@@ -173,7 +176,7 @@ describe('useSeatingPlan Hook', () => {
         type: 'ceremony',
         seats: [{ id: 1, x: 100, y: 100 }],
         tables: [],
-        areas: []
+        areas: [],
       });
     });
 

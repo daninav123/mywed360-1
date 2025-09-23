@@ -1,27 +1,23 @@
 /* eslint-disable no-unused-vars */
 // @vitest-environment node
-import { describe, it, beforeAll, afterAll, beforeEach, expect } from 'vitest';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import {
   initializeTestEnvironment,
   assertFails,
   assertSucceeds,
 } from '@firebase/rules-unit-testing';
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-} from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { describe, it, beforeAll, afterAll, beforeEach, expect } from 'vitest';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let testEnv;
 
-const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const RUN_FIRESTORE_RULES =
+  process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
 const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
@@ -56,11 +52,15 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const db = user.firestore();
     const ref = doc(db, 'weddings', 'w1', 'seatingPlan', 'banquet');
     await assertFails(
-      setDoc(ref, {
-        config: { width: 1000, height: 800, aisleMin: 30 },
-        tables: [],
-        areas: [],
-      }, { merge: true })
+      setDoc(
+        ref,
+        {
+          config: { width: 1000, height: 800, aisleMin: 30 },
+          tables: [],
+          areas: [],
+        },
+        { merge: true }
+      )
     );
   });
 
@@ -69,11 +69,15 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const db = user.firestore();
     const ref = doc(db, 'weddings', 'w1', 'seatingPlan', 'banquet');
     await assertSucceeds(
-      setDoc(ref, {
-        config: { width: 1200, height: 800, aisleMin: 80 },
-        tables: [],
-        areas: [],
-      }, { merge: true })
+      setDoc(
+        ref,
+        {
+          config: { width: 1200, height: 800, aisleMin: 80 },
+          tables: [],
+          areas: [],
+        },
+        { merge: true }
+      )
     );
   });
 
@@ -82,13 +86,17 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const db = user.firestore();
     const ref = doc(db, 'weddings', 'w1', 'seatingPlan', 'banquet');
     await assertSucceeds(
-      setDoc(ref, {
-        width: 1600,
-        height: 1000,
-        aisleMin: 100,
-        tables: [],
-        areas: [],
-      }, { merge: true })
+      setDoc(
+        ref,
+        {
+          width: 1600,
+          height: 1000,
+          aisleMin: 100,
+          tables: [],
+          areas: [],
+        },
+        { merge: true }
+      )
     );
   });
 
@@ -97,11 +105,15 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const db = user.firestore();
     const ref = doc(db, 'weddings', 'w1', 'seatingPlan', 'ceremony');
     await assertFails(
-      setDoc(ref, {
-        tables: [],
-        areas: [],
-        seats: { id: 1 },
-      }, { merge: true })
+      setDoc(
+        ref,
+        {
+          tables: [],
+          areas: [],
+          seats: { id: 1 },
+        },
+        { merge: true }
+      )
     );
   });
 
@@ -110,11 +122,15 @@ describeIf('Firestore rules - seatingPlan (banquet/ceremony)', () => {
     const db = user.firestore();
     const ref = doc(db, 'weddings', 'w1', 'seatingPlan', 'ceremony');
     await assertSucceeds(
-      setDoc(ref, {
-        tables: [],
-        areas: [],
-        seats: [ { id: 1, x: 10, y: 10, enabled: true } ],
-      }, { merge: true })
+      setDoc(
+        ref,
+        {
+          tables: [],
+          areas: [],
+          seats: [{ id: 1, x: 10, y: 10, enabled: true }],
+        },
+        { merge: true }
+      )
     );
   });
 });

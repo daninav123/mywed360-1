@@ -11,7 +11,6 @@
 //   createdAt: Timestamp
 // }
 
-import { db } from '../firebaseConfig';
 import {
   doc,
   setDoc,
@@ -20,13 +19,13 @@ import {
   getDoc,
   addDoc,
   collection,
-  Timestamp
+  Timestamp,
 } from 'firebase/firestore';
-
-import { v4 as uuidv4 } from 'uuid';
 import { collectionGroup } from 'firebase/firestore';
 import { query, where, getDocs, limit } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
+import { db } from '../firebaseConfig';
 
 /**
  * Crea una nueva boda y asigna al usuario como propietario principal.
@@ -148,7 +147,7 @@ export async function getWeddingsForPlanner(plannerUid) {
   if (!plannerUid) return [];
   const q = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', plannerUid));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 export async function addPlannerToWedding(weddingId, plannerUid) {

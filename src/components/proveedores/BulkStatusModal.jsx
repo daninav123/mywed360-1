@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
@@ -10,7 +11,7 @@ const STATUSES = [
   'Negociación',
   'Seleccionado',
   'Confirmado',
-  'Rechazado'
+  'Rechazado',
 ];
 
 export default function BulkStatusModal({ open, onClose, onApply }) {
@@ -32,16 +33,27 @@ export default function BulkStatusModal({ open, onClose, onApply }) {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Nuevo estado</label>
-          <select className="border rounded p-2 w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
-            {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          <select
+            className="border rounded p-2 w-full"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={apply} disabled={loading}>{loading ? 'Aplicando…' : 'Aplicar'}</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button onClick={apply} disabled={loading}>
+            {loading ? 'Aplicando…' : 'Aplicar'}
+          </Button>
         </div>
       </div>
     </Modal>
   );
 }
-

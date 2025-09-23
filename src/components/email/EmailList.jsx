@@ -1,12 +1,10 @@
+import { Mail, Paperclip } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import { Mail, Paperclip } from 'lucide-react';
-
-
 
 /**
  * Componente que muestra la lista de correos electrónicos en la bandeja
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Array} props.emails - Lista de emails a mostrar
  * @param {boolean} props.loading - Indica si está cargando los datos
@@ -14,9 +12,17 @@ import { Mail, Paperclip } from 'lucide-react';
  * @param {Function} props.onSelectEmail - Función para seleccionar un email
  * @param {string} props.folder - Carpeta actual (inbox, sent, trash)
  */
-const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, height = 600, itemHeight = 88 }) => {
+const EmailList = ({
+  emails,
+  loading,
+  selectedEmailId,
+  onSelectEmail,
+  folder,
+  height = 600,
+  itemHeight = 88,
+}) => {
   const listRef = useRef();
-  
+
   // Desplazar a la posición del elemento seleccionado en la lista virtual
   useEffect(() => {
     if (!listRef.current) return;
@@ -28,50 +34,52 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
   // Formatear fecha para mostrar en la lista
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
-    
+
     try {
       const date = new Date(dateStr);
       const now = new Date();
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
-      
+
       // Si es hoy, mostrar solo la hora
       if (date.toDateString() === now.toDateString()) {
         return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
       }
-      
+
       // Si es ayer, mostrar "Ayer"
       if (date.toDateString() === yesterday.toDateString()) {
         return 'Ayer';
       }
-      
+
       // Si es este año, mostrar día y mes
       if (date.getFullYear() === now.getFullYear()) {
         return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
       }
-      
+
       // Si es otro año, mostrar día/mes/año
-      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      });
     } catch (e) {
       console.error('Error al formatear fecha:', e);
       return dateStr;
     }
   };
-  
+
   // Truncar texto largo
   const truncate = (text, maxLength = 100) => {
     if (!text) return '';
-    return text.length > maxLength
-      ? text.substring(0, maxLength) + '...'
-      : text;
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
-  
+
   // Eliminar tags HTML para previsualización
   const stripHtml = (html) => {
     if (!html) return '';
     return html.replace(/<[^>]*>/g, '');
   };
-  
+
   // Función para manejar eventos de teclado en la lista
   const handleKeyDown = (event, email, index) => {
     switch (event.key) {
@@ -102,24 +110,24 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
 
   if (loading) {
     return (
-      <div 
+      <div
         className="flex items-center justify-center h-64"
         role="status"
         aria-live="polite"
         aria-busy="true"
       >
-        <div 
-          className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" 
+        <div
+          className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"
           aria-hidden="true"
         ></div>
         <span className="ml-2 text-gray-800">Cargando correos...</span>
       </div>
     );
   }
-  
+
   if (!emails.length) {
     return (
-      <div 
+      <div
         className="flex flex-col items-center justify-center h-64 text-gray-700"
         data-testid="empty-folder-message"
         role="status"
@@ -127,14 +135,16 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
       >
         <Mail size={48} className="mb-2 opacity-20" aria-hidden="true" />
         <p className="text-center">
-          {folder === 'inbox' ? 'No hay correos en tu bandeja de entrada' : 
-           folder === 'sent' ? 'No has enviado ningún correo' : 
-           'No hay correos en esta carpeta'}
+          {folder === 'inbox'
+            ? 'No hay correos en tu bandeja de entrada'
+            : folder === 'sent'
+              ? 'No has enviado ningún correo'
+              : 'No hay correos en esta carpeta'}
         </p>
       </div>
     );
   }
-  
+
   const Row = ({ index, style }) => {
     const email = emails[index];
     return (
@@ -155,7 +165,7 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
         <div className="flex justify-between items-center mb-1">
           <div className="flex items-center">
             {!email.read && (
-              <span 
+              <span
                 className="w-2 h-2 bg-blue-500 rounded-full mr-2"
                 aria-label="No leído"
                 role="status"
@@ -165,10 +175,12 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
               {folder === 'sent' ? `Para: ${email.to}` : `De: ${email.from}`}
             </span>
           </div>
-          <span className="text-xs text-gray-600" aria-label={`Fecha: ${email.date}`}>{formatDate(email.date)}</span>
+          <span className="text-xs text-gray-600" aria-label={`Fecha: ${email.date}`}>
+            {formatDate(email.date)}
+          </span>
         </div>
         <div className="flex justify-between">
-          <h4 
+          <h4
             id={`email-${email.id}-subject`}
             className="text-sm mb-1 flex-grow pr-2 truncate font-medium text-gray-800"
           >
@@ -180,10 +192,7 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
             </span>
           )}
         </div>
-        <p 
-          className="text-xs text-gray-600 line-clamp-1"
-          aria-label="Vista previa del mensaje"
-        >
+        <p className="text-xs text-gray-600 line-clamp-1" aria-label="Vista previa del mensaje">
           {truncate(stripHtml(email.body), 120)}
         </p>
         {email.aiClassification?.tags?.length ? (
@@ -197,9 +206,7 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
               </span>
             ))}
             {email.aiClassification.folder && (
-              <span
-                className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600"
-              >
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-px text-[10px] font-medium text-gray-600">
                 Carpeta sugerida: {email.aiClassification.folder}
               </span>
             )}
@@ -226,7 +233,5 @@ const EmailList = ({ emails, loading, selectedEmailId, onSelectEmail, folder, he
     </List>
   );
 };
-
-
 
 export default EmailList;

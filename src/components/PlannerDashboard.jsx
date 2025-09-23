@@ -1,6 +1,7 @@
+import { Briefcase, AlertCircle, CheckSquare, Building2 } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, AlertCircle, CheckSquare, Building2 } from 'lucide-react';
+
 import { Card } from './ui/Card';
 import { useWedding } from '../context/WeddingContext';
 import { useFirestoreCollection } from '../hooks/useFirestoreCollection';
@@ -18,7 +19,6 @@ const DashCard = ({ to, icon: Icon, title, count }) => (
   </Link>
 );
 
-
 export default function PlannerDashboard() {
   /*
    * Panel para Wedding Planner alineado visualmente con el Dashboard particular.
@@ -29,7 +29,7 @@ export default function PlannerDashboard() {
   const { data: suppliersList = [] } = useFirestoreCollection('suppliers', []);
   const activeWeddings = Array.isArray(weddings) ? weddings.length : 0;
   const alerts = 0; // pendiente de implementar alertas reales
-  const pendingTasks = Array.isArray(meetings) ? meetings.filter(m => !m.completed).length : 0;
+  const pendingTasks = Array.isArray(meetings) ? meetings.filter((m) => !m.completed).length : 0;
   const suppliers = Array.isArray(suppliersList) ? suppliersList.length : 0;
 
   return (
@@ -49,10 +49,7 @@ export default function PlannerDashboard() {
         <h2 className="text-xl font-semibold mb-4">Inspiración reciente</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[1, 2, 3, 4].map((n) => (
-            <div
-              key={n}
-              className="w-full h-32 bg-gray-200 rounded-lg animate-pulse"
-            />
+            <div key={n} className="w-full h-32 bg-gray-200 rounded-lg animate-pulse" />
           ))}
         </div>
       </section>

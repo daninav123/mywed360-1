@@ -9,21 +9,21 @@ function showUpdateToast(updateFn) {
   // Evitar toasts duplicados
   if (refreshToastId) return;
   refreshToastId = toast.info(
-    (
-      <div>
-        Nueva versión disponible
-        <button
-          style={{ marginLeft: 12, padding: '4px 8px', border: '1px solid #2563eb', borderRadius: 6 }}
-          onClick={() => {
-            try { updateFn?.(); } catch {}
-            toast.dismiss(refreshToastId);
-            refreshToastId = null;
-          }}
-        >
-          Actualizar ahora
-        </button>
-      </div>
-    ),
+    <div>
+      Nueva versión disponible
+      <button
+        style={{ marginLeft: 12, padding: '4px 8px', border: '1px solid #2563eb', borderRadius: 6 }}
+        onClick={() => {
+          try {
+            updateFn?.();
+          } catch {}
+          toast.dismiss(refreshToastId);
+          refreshToastId = null;
+        }}
+      >
+        Actualizar ahora
+      </button>
+    </div>,
     { autoClose: false }
   );
 }

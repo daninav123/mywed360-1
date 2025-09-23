@@ -1,5 +1,6 @@
-import { db } from '../firebaseConfig';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+
+import { db } from '../firebaseConfig';
 
 /**
  * Devuelve el usuario cuyo email coincida exactamente (lowercase).
@@ -8,11 +9,7 @@ import { collection, query, where, getDocs, limit } from 'firebase/firestore';
  */
 export async function getUserByEmail(email) {
   if (!email) return null;
-  const q = query(
-    collection(db, 'users'),
-    where('email', '==', email.toLowerCase()),
-    limit(1)
-  );
+  const q = query(collection(db, 'users'), where('email', '==', email.toLowerCase()), limit(1));
   const snap = await getDocs(q);
   if (snap.empty) return null;
   return { id: snap.docs[0].id, ...snap.docs[0].data() };

@@ -1,20 +1,17 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { axe, formatViolations } from '../helpers/axeSetup';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import EmailDetail from '../../components/email/UnifiedInbox/EmailDetail';
+import { axe, formatViolations } from '../helpers/axeSetup';
 
 // Mock mínimo de EmailComments para evitar dependencias externas
 vi.mock('../../components/email/EmailComments', () => ({
-  default: () => <div data-testid="email-comments" />
+  default: () => <div data-testid="email-comments" />,
 }));
 
-const TestWrapper = ({ children }) => (
-  <BrowserRouter>
-    {children}
-  </BrowserRouter>
-);
+const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
 
 const mockEmail = {
   id: 'email123',
@@ -25,7 +22,7 @@ const mockEmail = {
   date: '2025-07-10T15:30:00Z',
   folder: 'inbox',
   read: false,
-  attachments: []
+  attachments: [],
 };
 
 describe('Pruebas de accesibilidad para EmailDetail', () => {
@@ -39,7 +36,8 @@ describe('Pruebas de accesibilidad para EmailDetail', () => {
         onDelete={vi.fn()}
         onBack={vi.fn()}
         onMarkRead={vi.fn()}
-      />, { wrapper: TestWrapper }
+      />,
+      { wrapper: TestWrapper }
     );
     container = rendered.container;
   });
@@ -66,7 +64,7 @@ describe('Pruebas de accesibilidad para EmailDetail', () => {
   it('los botones de acción son accesibles (texto o aria-label)', () => {
     const actionButtons = container.querySelectorAll('button');
     expect(actionButtons.length).toBeGreaterThan(0);
-    actionButtons.forEach(btn => {
+    actionButtons.forEach((btn) => {
       const hasText = (btn.textContent || '').trim().length > 0;
       const hasAria = btn.getAttribute('aria-label');
       expect(hasText || !!hasAria).toBe(true);

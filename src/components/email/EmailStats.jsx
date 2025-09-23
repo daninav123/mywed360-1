@@ -1,8 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Bar, Line, Pie, Doughnut 
-} from 'react-chartjs-2';
-import { 
+import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
@@ -15,10 +11,13 @@ import {
   Legend,
 } from 'chart.js';
 import { RefreshCw, Mail, Clock, User, Tag, Folder, Eye, MousePointerClick } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
+
+import { getDailyStats } from '../../services/emailMetricsService';
+import { generateUserStats, getUserStats } from '../../services/statsService';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { generateUserStats, getUserStats } from '../../services/statsService';
-import { getDailyStats } from '../../services/emailMetricsService';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -35,7 +34,7 @@ ChartJS.register(
 
 /**
  * Componente que muestra estadísticas del correo en un dashboard visual
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {string} props.userId - ID del usuario actual
  */
@@ -56,20 +55,19 @@ const EmailStats = ({ userId }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Intentar primero desde localStorage para rendimiento
       let userStats = getUserStats(userId);
-      
+
       // Si no hay estadísticas guardadas o están desactualizadas, generarlas
       const now = new Date();
       const lastUpdated = userStats.lastUpdated ? new Date(userStats.lastUpdated) : null;
-      const isOutdated = !lastUpdated || 
-        (now - lastUpdated) > (1000 * 60 * 60); // Más de 1 hora
-      
+      const isOutdated = !lastUpdated || now - lastUpdated > 1000 * 60 * 60; // Más de 1 hora
+
       if (!userStats || Object.keys(userStats).length === 0 || isOutdated) {
         userStats = await generateUserStats(userId);
       }
-      
+
       setStats(userStats);
       // Cargar métricas diarias para aperturas / clics
       const daily = await getDailyStats(userId, 30);
@@ -99,11 +97,7 @@ const EmailStats = ({ userId }) => {
     return (
       <div className="p-4 bg-red-50 text-red-700 rounded-md">
         <p>{error || 'No hay estadísticas disponibles'}</p>
-        <Button 
-          variant="outline" 
-          className="mt-2"
-          onClick={loadStats}
-        >
+        <Button variant="outline" className="mt-2" onClick={loadStats}>
           Reintentar
         </Button>
       </div>
@@ -113,10 +107,16 @@ const EmailStats = ({ userId }) => {
   // Garantizar estructuras con valores por defecto para seguridad
   const emailCounts = stats.emailCounts ?? { total: 0, unread: 0 };
   const contactAnalysis = stats.contactAnalysis ?? { totalContacts: 0, topContacts: [] };
-  const responseMetrics = stats.responseMetrics ?? { responseRate: 0, formattedAvgResponseTime: '' };
+  const responseMetrics = stats.responseMetrics ?? {
+    responseRate: 0,
+    formattedAvgResponseTime: '',
+  };
   const activityMetrics = stats.activityMetrics ?? { today: 0, thisWeek: 0, dailyGraph: [] };
   const tagDistribution = stats.tagDistribution ?? [];
-  const folderDistribution = stats.folderDistribution ?? { system: { inbox: 0, sent: 0, trash: 0 }, custom: [] };
+  const folderDistribution = stats.folderDistribution ?? {
+    system: { inbox: 0, sent: 0, trash: 0 },
+    custom: [],
+  };
   const opens = stats.opens;
   const clicks = stats.clicks;
 
@@ -130,32 +130,32 @@ const EmailStats = ({ userId }) => {
   // Datos para gráfico de actividad diaria (con fallback seguro)
   const dailyGraph = activityMetrics.dailyGraph;
   const activityData = {
-    labels: dailyGraph.map(day => formatDate(day.date)),
+    labels: dailyGraph.map((day) => formatDate(day.date)),
     datasets: [
       {
         label: 'Recibidos',
-        data: dailyGraph.map(day => day.received ?? 0),
+        data: dailyGraph.map((day) => day.received ?? 0),
         backgroundColor: 'rgba(54, 162, 235, 0.5)',
         borderColor: 'rgb(54, 162, 235)',
         borderWidth: 1,
       },
       {
         label: 'Enviados',
-        data: dailyGraph.map(day => day.sent ?? 0),
+        data: dailyGraph.map((day) => day.sent ?? 0),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         borderColor: 'rgb(255, 99, 132)',
         borderWidth: 1,
-      }
-    ]
+      },
+    ],
   };
 
-    const safeDaily = Array.isArray(dailyStats) ? dailyStats : [];
-    const openClickData = {
-    labels: safeDaily.map(day => formatDate(day.date)),
+  const safeDaily = Array.isArray(dailyStats) ? dailyStats : [];
+  const openClickData = {
+    labels: safeDaily.map((day) => formatDate(day.date)),
     datasets: [
       {
         label: 'Aperturas',
-        data: safeDaily.map(day => day.opens || 0),
+        data: safeDaily.map((day) => day.opens || 0),
         backgroundColor: 'rgba(75, 192, 192, 0.5)',
         borderColor: 'rgb(75, 192, 192)',
         borderWidth: 1,
@@ -163,32 +163,38 @@ const EmailStats = ({ userId }) => {
       },
       {
         label: 'Clics',
-        data: safeDaily.map(day => day.clicks || 0),
+        data: safeDaily.map((day) => day.clicks || 0),
         backgroundColor: 'rgba(255, 206, 86, 0.5)',
         borderColor: 'rgb(255, 206, 86)',
         borderWidth: 1,
         tension: 0.3,
-      }
-    ]
+      },
+    ],
   };
 
   // Datos para gráfico circular de etiquetas
   // Compatibilidad: si tagDistribution viene como objeto {labels, data}
   const tagDistributionArray = Array.isArray(tagDistribution)
     ? tagDistribution
-    : (tagDistribution.labels && Array.isArray(tagDistribution.labels)
-        ? tagDistribution.labels.map((name, idx) => ({ name, count: tagDistribution.data?.[idx] ?? 0, color: undefined }))
-        : []);
+    : tagDistribution.labels && Array.isArray(tagDistribution.labels)
+      ? tagDistribution.labels.map((name, idx) => ({
+          name,
+          count: tagDistribution.data?.[idx] ?? 0,
+          color: undefined,
+        }))
+      : [];
   const tagSlice = tagDistributionArray.slice(0, 7);
   const tagData = {
-    labels: tagSlice.map(tag => tag.name),
-    datasets: [{
-      label: 'Correos',
-      data: tagSlice.map(tag => tag.count),
-      backgroundColor: tagSlice.map(tag => tag.color ?? '#888888'),
-      borderColor: '#ffffff',
-      borderWidth: 1,
-    }],
+    labels: tagSlice.map((tag) => tag.name),
+    datasets: [
+      {
+        label: 'Correos',
+        data: tagSlice.map((tag) => tag.count),
+        backgroundColor: tagSlice.map((tag) => tag.color ?? '#888888'),
+        borderColor: '#ffffff',
+        borderWidth: 1,
+      },
+    ],
   };
 
   // Datos para gráfico circular de carpetas
@@ -208,33 +214,35 @@ const EmailStats = ({ userId }) => {
   }
   const folderData = {
     labels: [
-      'Bandeja de entrada', 
-      'Enviados', 
-      'Papelera', 
-      ...folderCustom.map(folder => folder.name)
+      'Bandeja de entrada',
+      'Enviados',
+      'Papelera',
+      ...folderCustom.map((folder) => folder.name),
     ],
-    datasets: [{
-      label: 'Correos',
-      data: [
-        folderSystem.inbox,
-        folderSystem.sent,
-        folderSystem.trash,
-        ...folderCustom.map(folder => folder.count)
-      ],
-      backgroundColor: [
-        '#4CAF50', // Verde para inbox
-        '#2196F3', // Azul para enviados
-        '#F44336', // Rojo para papelera
-        // Colores para carpetas personalizadas
-        ...Array(folderCustom.length)
-          .fill()
-          .map((_, i) => `hsl(${(i * 55) % 360}, 70%, 60%)`)
-      ],
-      borderColor: '#ffffff',
-      borderWidth: 1,
-    }],
+    datasets: [
+      {
+        label: 'Correos',
+        data: [
+          folderSystem.inbox,
+          folderSystem.sent,
+          folderSystem.trash,
+          ...folderCustom.map((folder) => folder.count),
+        ],
+        backgroundColor: [
+          '#4CAF50', // Verde para inbox
+          '#2196F3', // Azul para enviados
+          '#F44336', // Rojo para papelera
+          // Colores para carpetas personalizadas
+          ...Array(folderCustom.length)
+            .fill()
+            .map((_, i) => `hsl(${(i * 55) % 360}, 70%, 60%)`),
+        ],
+        borderColor: '#ffffff',
+        borderWidth: 1,
+      },
+    ],
   };
-  
+
   // Opciones para gráficos
   const chartOptions = {
     responsive: true,
@@ -250,11 +258,7 @@ const EmailStats = ({ userId }) => {
     <div className="email-stats">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Estadísticas de correo</h2>
-        <Button 
-          variant="outline" 
-          onClick={loadStats}
-          className="flex items-center"
-        >
+        <Button variant="outline" onClick={loadStats} className="flex items-center">
           <RefreshCw size={16} className="mr-1" />
           Actualizar
         </Button>
@@ -262,34 +266,36 @@ const EmailStats = ({ userId }) => {
 
       {/* Tarjetas de resumen */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-        <StatCard 
-          title="Correos" 
+        <StatCard
+          title="Correos"
           value={emailCounts.total}
           subtitle={`${emailCounts.unread} sin leer`}
           icon={<Mail />}
           color="bg-blue-50 text-blue-600"
         />
-        
-        <StatCard 
-          title="Contactos" 
+
+        <StatCard
+          title="Contactos"
           value={contactAnalysis.totalContacts}
           subtitle="Proveedores únicos"
           icon={<User />}
           color="bg-green-50 text-green-600"
         />
-        
-        <StatCard 
-          title="Tasa de respuesta" 
+
+        <StatCard
+          title="Tasa de respuesta"
           value={`${Math.round(responseMetrics.responseRate * 100)}%`}
-          subtitle={responseMetrics.formattedAvgResponseTime ? 
-            `Tiempo medio de respuesta: ${responseMetrics.formattedAvgResponseTime}` : 
-            'Sin datos de respuesta'}
+          subtitle={
+            responseMetrics.formattedAvgResponseTime
+              ? `Tiempo medio de respuesta: ${responseMetrics.formattedAvgResponseTime}`
+              : 'Sin datos de respuesta'
+          }
           icon={<Clock />}
           color="bg-purple-50 text-purple-600"
         />
-        
-        <StatCard 
-          title="Actividad" 
+
+        <StatCard
+          title="Actividad"
           value={activityMetrics.today}
           subtitle={`${activityMetrics.thisWeek} esta semana`}
           icon={<Mail />}
@@ -321,10 +327,7 @@ const EmailStats = ({ userId }) => {
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-4">Actividad diaria</h3>
           <div className="h-64">
-            <Bar 
-              data={activityData} 
-              options={chartOptions}
-            />
+            <Bar data={activityData} options={chartOptions} />
           </div>
         </Card>
 
@@ -340,9 +343,7 @@ const EmailStats = ({ userId }) => {
                 <div className="flex-grow">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{contact.name}</span>
-                    <span className="text-sm text-gray-500">
-                      {contact.total} correos
-                    </span>
+                    <span className="text-sm text-gray-500">{contact.total} correos</span>
                   </div>
                   <div className="flex items-center text-xs text-gray-500">
                     <span className="mr-2">{contact.received} recibidos</span>
@@ -351,11 +352,9 @@ const EmailStats = ({ userId }) => {
                 </div>
               </div>
             ))}
-            
+
             {contactAnalysis.topContacts.length === 0 && (
-              <p className="text-center text-gray-500">
-                No hay datos de contactos disponibles
-              </p>
+              <p className="text-center text-gray-500">No hay datos de contactos disponibles</p>
             )}
           </div>
         </Card>
@@ -363,32 +362,29 @@ const EmailStats = ({ userId }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Aperturas y clics */}
-      <Card className="p-4 mb-6">
-        <h3 className="text-lg font-medium mb-4">Aperturas y clics</h3>
-        <div className="h-64">
-          {dailyStats.length > 0 ? (
-            <Line data={openClickData} options={chartOptions} />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              No hay datos de aperturas o clics
-            </div>
-          )}
-        </div>
-      </Card>
+        <Card className="p-4 mb-6">
+          <h3 className="text-lg font-medium mb-4">Aperturas y clics</h3>
+          <div className="h-64">
+            {dailyStats.length > 0 ? (
+              <Line data={openClickData} options={chartOptions} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No hay datos de aperturas o clics
+              </div>
+            )}
+          </div>
+        </Card>
 
-      {/* Distribución por etiquetas */}
+        {/* Distribución por etiquetas */}
         <Card className="p-4">
           <div className="flex items-center mb-4">
             <Tag size={18} className="mr-2" />
             <h3 className="text-lg font-medium">Distribución por etiquetas</h3>
           </div>
-          
+
           <div className="h-64">
             {tagDistribution.length > 0 ? (
-              <Doughnut 
-                data={tagData} 
-                options={chartOptions}
-              />
+              <Doughnut data={tagData} options={chartOptions} />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">
                 No hay etiquetas con correos asignados
@@ -403,19 +399,17 @@ const EmailStats = ({ userId }) => {
             <Folder size={18} className="mr-2" />
             <h3 className="text-lg font-medium">Distribución por carpetas</h3>
           </div>
-          
+
           <div className="h-64">
-            <Pie 
-              data={folderData}
-              options={chartOptions}
-            />
+            <Pie data={folderData} options={chartOptions} />
           </div>
         </Card>
       </div>
 
       {/* Fecha de actualización */}
       <div className="text-xs text-gray-500 text-right mt-4">
-        Última actualización: {stats.lastUpdated ? new Date(stats.lastUpdated).toLocaleString() : 'N/D'}
+        Última actualización:{' '}
+        {stats.lastUpdated ? new Date(stats.lastUpdated).toLocaleString() : 'N/D'}
       </div>
     </div>
   );
@@ -425,9 +419,7 @@ const EmailStats = ({ userId }) => {
 const StatCard = ({ title, value, subtitle, icon, color }) => (
   <Card className="p-4">
     <div className="flex items-start">
-      <div className={`p-3 rounded-lg ${color}`}>
-        {icon}
-      </div>
+      <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
       <div className="ml-3">
         <h3 className="text-sm font-medium text-gray-500">{title}</h3>
         <div className="text-2xl font-semibold mt-1">{value}</div>

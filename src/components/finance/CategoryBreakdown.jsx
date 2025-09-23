@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+
 import Card from '../Card';
 
 const COLORS = [
@@ -7,7 +8,7 @@ const COLORS = [
   'var(--color-success)',
   'var(--color-warning)',
   'var(--color-danger)',
-  'var(--color-accent)'
+  'var(--color-accent)',
 ];
 
 export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
@@ -18,7 +19,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
   useEffect(() => {
     const el = chartRef.current;
     if (!el) return;
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         setSize({ width, height });
@@ -30,7 +31,7 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
 
   // Agrupar transacciones por categoría
   const categoryData = React.useMemo(() => {
-    const filtered = transactions.filter(t => t.type === type);
+    const filtered = transactions.filter((t) => t.type === type);
     const grouped = filtered.reduce((acc, curr) => {
       if (!acc[curr.category]) {
         acc[curr.category] = 0;
@@ -39,10 +40,12 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
       return acc;
     }, {});
 
-    return Object.entries(grouped).map(([name, value]) => ({
-      name,
-      value: parseFloat(value.toFixed(2))
-    })).sort((a, b) => b.value - a.value);
+    return Object.entries(grouped)
+      .map(([name, value]) => ({
+        name,
+        value: parseFloat(value.toFixed(2)),
+      }))
+      .sort((a, b) => b.value - a.value);
   }, [transactions, type]);
 
   if (categoryData.length === 0) {
@@ -51,7 +54,9 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
         <h3 className="text-lg font-semibold mb-4">
           {type === 'expense' ? 'Gastos por Categoría' : 'Ingresos por Categoría'}
         </h3>
-        <p className="text-[color:var(--color-text)]/70 text-center my-8">No hay datos disponibles</p>
+        <p className="text-[color:var(--color-text)]/70 text-center my-8">
+          No hay datos disponibles
+        </p>
       </Card>
     );
   }
@@ -74,15 +79,15 @@ export const CategoryBreakdown = ({ transactions, type = 'expense' }) => {
               outerRadius={outerR}
               fill="var(--color-primary)"
               dataKey="value"
-              label={({ name, percent }) => percent * 100 > 5 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
+              label={({ name, percent }) =>
+                percent * 100 > 5 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''
+              }
             >
               {categoryData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip 
-              formatter={(value) => [`€${value.toFixed(2)}`, 'Total']}
-            />
+            <Tooltip formatter={(value) => [`€${value.toFixed(2)}`, 'Total']} />
             <Legend layout="horizontal" verticalAlign="bottom" height={24} />
           </PieChart>
         </ResponsiveContainer>

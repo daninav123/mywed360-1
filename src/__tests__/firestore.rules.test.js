@@ -1,10 +1,17 @@
 /* eslint-disable no-unused-vars */
-import { assertFails, assertSucceeds, initializeTestEnvironment, RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
+  RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import { getFirestore, doc, setDoc, getDoc, collection } from 'firebase/firestore';
+import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test, expect } from 'vitest';
 
-let testEnv; /** @type {RulesTestEnvironment} */
+let testEnv;
+
+/** @type {RulesTestEnvironment} */
 
 const PROJECT_ID = 'mywed360-test';
 
@@ -14,7 +21,7 @@ beforeAll(async () => {
 
   testEnv = await initializeTestEnvironment({
     projectId: PROJECT_ID,
-    firestore: { rules }
+    firestore: { rules },
   });
 
   // Semilla de datos: crear una boda con distintos roles
@@ -26,13 +33,13 @@ beforeAll(async () => {
       ownerIds: ['owner1'],
       plannerIds: ['planner1'],
       assistantIds: ['assistant1'],
-      name: 'Test Wedding'
+      name: 'Test Wedding',
     });
 
     // Subcolección de tareas
     await setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), {
       name: 'Reservar catering',
-      completed: false
+      completed: false,
     });
   });
 });
@@ -54,14 +61,18 @@ describe('Reglas de Firestore - bodas', () => {
     // Read
     await assertSucceeds(getDoc(doc(db, 'weddings', 'w1')));
     // Write (update un campo)
-    await assertSucceeds(setDoc(doc(db, 'weddings', 'w1'), { updatedBy: 'owner1' }, { merge: true }));
+    await assertSucceeds(
+      setDoc(doc(db, 'weddings', 'w1'), { updatedBy: 'owner1' }, { merge: true })
+    );
   });
 
   test('Planner puede leer y escribir su boda', async () => {
     const ctx = getContext('planner1');
     const db = getFirestore(ctx.app);
     await assertSucceeds(getDoc(doc(db, 'weddings', 'w1')));
-    await assertSucceeds(setDoc(doc(db, 'weddings', 'w1'), { title: 'Planner edit' }, { merge: true }));
+    await assertSucceeds(
+      setDoc(doc(db, 'weddings', 'w1'), { title: 'Planner edit' }, { merge: true })
+    );
   });
 
   test('Assistant puede leer pero no escribir', async () => {
@@ -81,14 +92,18 @@ describe('Reglas de Firestore - bodas', () => {
     const ctx = getContext('planner1');
     const db = getFirestore(ctx.app);
     await assertSucceeds(getDoc(doc(db, 'weddings', 'w1', 'tasks', 't1')));
-    await assertSucceeds(setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true }));
+    await assertSucceeds(
+      setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true })
+    );
   });
 
   test('Assistant puede leer pero no escribir subcolección', async () => {
     const ctx = getContext('assistant1');
     const db = getFirestore(ctx.app);
     await assertSucceeds(getDoc(doc(db, 'weddings', 'w1', 'tasks', 't1')));
-    await assertFails(setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true }));
+    await assertFails(
+      setDoc(doc(db, 'weddings', 'w1', 'tasks', 't1'), { completed: true }, { merge: true })
+    );
   });
 });
 

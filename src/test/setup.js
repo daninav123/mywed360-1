@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
-import { beforeAll, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { beforeAll, afterEach, vi } from 'vitest';
 
 // Alias global "jest" apuntando a la API de "vi" para compatibilidad con pruebas que usan Jest
 if (!globalThis.jest) {
@@ -9,7 +9,6 @@ if (!globalThis.jest) {
   globalThis.jest.spyOn = vi.spyOn;
   globalThis.jest.mock = vi.mock;
 }
-
 
 // ---------- Render con proveedores globales ----------
 // Para evitar el error de solo-lectura, mockeamos todo el módulo de
@@ -25,7 +24,7 @@ vi.mock('@testing-library/react', async () => {
   return {
     __esModule: true,
     ...rtl,
-    render: (ui, options = {}) => rtl.render(ui, { wrapper: AllProviders, ...options })
+    render: (ui, options = {}) => rtl.render(ui, { wrapper: AllProviders, ...options }),
   };
 });
 
@@ -37,20 +36,20 @@ afterEach(() => {
 // ---------- Mocks genericos ----------
 // Mock de react-beautiful-dnd para evitar necesidad del DragDropContext real
 vi.mock('react-beautiful-dnd', () => {
-  const Noop = ({ children }) => (children);
+  const Noop = ({ children }) => children;
   // Draggable y Droppable renderizan children()
   const Draggable = ({ children }) => {
     const provided = {
       draggableProps: { style: {} },
       dragHandleProps: {},
-      innerRef: () => {}
+      innerRef: () => {},
     };
     return children(provided, {});
   };
   const Droppable = ({ children }) => {
     const provided = {
       droppableProps: {},
-      innerRef: () => {}
+      innerRef: () => {},
     };
     return children(provided, {});
   };
@@ -58,7 +57,7 @@ vi.mock('react-beautiful-dnd', () => {
     __esModule: true,
     DragDropContext: Noop,
     Draggable,
-    Droppable
+    Droppable,
   };
 });
 // Mock de todos los iconos Lucide: cualquier componente será un div vacío (o svg)
@@ -72,11 +71,10 @@ vi.mock('lucide-react', () => {
       get: (target, prop) => {
         if (prop in target) return target[prop];
         return Stub;
-      }
+      },
     }
   );
 });
-
 
 // Mockear localStorage
 beforeAll(() => {

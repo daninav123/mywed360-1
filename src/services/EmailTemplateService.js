@@ -37,7 +37,7 @@ Busco específicamente: {searchQuery}
 
 Gracias de antemano,
 {userName}
-        `
+        `,
       },
       catering: {
         subject: 'Información sobre servicios de catering para boda - {providerName}',
@@ -58,7 +58,7 @@ Estoy especialmente interesado/a en: {searchQuery}
 
 Muchas gracias,
 {userName}
-        `
+        `,
       },
       florista: {
         subject: 'Consulta sobre decoración floral para boda - {providerName}',
@@ -79,7 +79,7 @@ Mi idea para la decoración floral es: {searchQuery}
 
 Atentamente,
 {userName}
-        `
+        `,
       },
       música: {
         subject: 'Solicitud de información sobre servicios musicales para boda - {providerName}',
@@ -100,7 +100,7 @@ Estamos buscando específicamente: {searchQuery}
 
 Saludos cordiales,
 {userName}
-        `
+        `,
       },
       local: {
         subject: 'Consulta sobre disponibilidad de espacio para boda - {providerName}',
@@ -121,7 +121,7 @@ Estamos buscando un lugar que: {searchQuery}
 
 Gracias de antemano,
 {userName}
-        `
+        `,
       },
       general: {
         subject: 'Consulta sobre servicios para boda - {providerName}',
@@ -142,8 +142,8 @@ Estoy buscando específicamente: {searchQuery}
 
 Muchas gracias,
 {userName}
-        `
-      }
+        `,
+      },
     };
   }
 
@@ -155,41 +155,42 @@ Muchas gracias,
   getTemplateByCategory(category) {
     // Normalizar categoría (minúsculas, sin acentos)
     const normalizedCategory = category
-      ? category.toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
+      ? category
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
       : '';
-    
+
     // Buscar plantilla específica o devolver la general
     if (normalizedCategory.includes('foto') || normalizedCategory.includes('fotogra')) {
       return this.templates.fotografía;
     } else if (
-      normalizedCategory.includes('catering') || 
-      normalizedCategory.includes('comida') || 
+      normalizedCategory.includes('catering') ||
+      normalizedCategory.includes('comida') ||
       normalizedCategory.includes('gastronomia')
     ) {
       return this.templates.catering;
     } else if (
-      normalizedCategory.includes('flor') || 
-      normalizedCategory.includes('florista') || 
+      normalizedCategory.includes('flor') ||
+      normalizedCategory.includes('florista') ||
       normalizedCategory.includes('decoracion floral')
     ) {
       return this.templates.florista;
     } else if (
-      normalizedCategory.includes('music') || 
-      normalizedCategory.includes('dj') || 
+      normalizedCategory.includes('music') ||
+      normalizedCategory.includes('dj') ||
       normalizedCategory.includes('banda')
     ) {
       return this.templates.música;
     } else if (
-      normalizedCategory.includes('local') || 
-      normalizedCategory.includes('finca') || 
+      normalizedCategory.includes('local') ||
+      normalizedCategory.includes('finca') ||
       normalizedCategory.includes('salon') ||
       normalizedCategory.includes('espacio')
     ) {
       return this.templates.local;
-    } 
-    
+    }
+
     // Plantilla genérica por defecto
     return this.templates.general;
   }
@@ -202,7 +203,7 @@ Muchas gracias,
    */
   generateSubjectFromTemplate(category, data) {
     const template = this.getTemplateByCategory(category);
-    
+
     return this.replaceTemplateVariables(template.subject, data);
   }
 
@@ -214,7 +215,7 @@ Muchas gracias,
    */
   generateBodyFromTemplate(category, data) {
     const template = this.getTemplateByCategory(category);
-    
+
     return this.replaceTemplateVariables(template.body, data);
   }
 
@@ -227,13 +228,13 @@ Muchas gracias,
    */
   replaceTemplateVariables(template, data) {
     let result = template;
-    
+
     // Reemplazar todas las variables en la plantilla
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       const regex = new RegExp(`{${key}}`, 'g');
       result = result.replace(regex, data[key] || '');
     });
-    
+
     return result;
   }
 
@@ -249,7 +250,7 @@ Muchas gracias,
     console.log('Template usage logged:', {
       category,
       aiResultId: aiResult?.id,
-      wasCustomized
+      wasCustomized,
     });
   }
 }

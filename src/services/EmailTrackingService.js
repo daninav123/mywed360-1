@@ -7,23 +7,23 @@ const TRACKING_STORAGE_KEY = 'lovenda_email_tracking';
 
 // Estados posibles para seguimiento de correos
 export const TRACKING_STATUS = {
-  WAITING: 'waiting',         // Esperando respuesta
-  RESPONDED: 'responded',     // Proveedor respondió
-  FOLLOWUP: 'followup',       // Requiere seguimiento adicional
-  COMPLETED: 'completed',     // Conversación completada/cerrada
-  URGENT: 'urgent'            // Requiere atención urgente
+  WAITING: 'waiting', // Esperando respuesta
+  RESPONDED: 'responded', // Proveedor respondió
+  FOLLOWUP: 'followup', // Requiere seguimiento adicional
+  COMPLETED: 'completed', // Conversación completada/cerrada
+  URGENT: 'urgent', // Requiere atención urgente
 };
 
 // Etiquetas disponibles para correos
 export const EMAIL_TAGS = {
-  PROVIDER: 'provider',       // Comunicación con proveedor
-  IMPORTANT: 'important',     // Correo importante
-  BUDGET: 'budget',           // Relacionado con presupuesto
-  CONTRACT: 'contract',       // Relacionado con contrato
-  QUESTION: 'question',       // Consulta o pregunta
-  OFFER: 'offer',             // Oferta o promoción
+  PROVIDER: 'provider', // Comunicación con proveedor
+  IMPORTANT: 'important', // Correo importante
+  BUDGET: 'budget', // Relacionado con presupuesto
+  CONTRACT: 'contract', // Relacionado con contrato
+  QUESTION: 'question', // Consulta o pregunta
+  OFFER: 'offer', // Oferta o promoción
   APPOINTMENT: 'appointment', // Cita o reunión
-  AI_GENERATED: 'ai-generado' // Correo generado por AI
+  AI_GENERATED: 'ai-generado', // Correo generado por AI
 };
 
 // Estructura de un registro de seguimiento
@@ -66,27 +66,34 @@ export function loadTrackingRecords() {
       const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
       const parsed = JSON.parse(raw || '[]');
       return Array.isArray(parsed) ? parsed : [];
-    } catch { return []; }
+    } catch {
+      return [];
+    }
   }
 }
 
 // Guardar registros de seguimiento
 export function saveTrackingRecords(records) {
-  try { localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(Array.isArray(records) ? records : [])); } catch {}
+  try {
+    localStorage.setItem(
+      TRACKING_STORAGE_KEY,
+      JSON.stringify(Array.isArray(records) ? records : [])
+    );
+  } catch {}
   // Persistencia en segundo plano (no bloquear UI)
-  try { void saveData(TRACKING_STORAGE_KEY, records, { showNotification: false }); } catch {}
+  try {
+    void saveData(TRACKING_STORAGE_KEY, records, { showNotification: false });
+  } catch {}
 }
 
 // Crear un nuevo registro de seguimiento para un correo a un proveedor
 export function createTrackingRecord(email, provider, options = {}) {
   const trackingRecords = loadTrackingRecords();
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
-  
+
   // Verificar si ya existe un registro para este proveedor
-  const existingRecord = list.find(record => 
-    record.providerEmail === provider.email
-  );
-  
+  const existingRecord = list.find((record) => record.providerEmail === provider.email);
+
   if (existingRecord) {
     // Actualizar el registro existente con el nuevo correo
     const updatedRecord = {
@@ -101,16 +108,16 @@ export function createTrackingRecord(email, provider, options = {}) {
           direction: 'outgoing',
           date: new Date(),
           subject: email.subject,
-          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '')
-        }
-      ]
+          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : ''),
+        },
+      ],
     };
-    
+
     // Actualizar el registro en la lista
-    const updatedRecords = list.map(record => 
+    const updatedRecords = list.map((record) =>
       record.id === existingRecord.id ? updatedRecord : record
     );
-    
+
     saveTrackingRecords(updatedRecords);
     return updatedRecord;
   } else {
@@ -127,39 +134,47 @@ export function createTrackingRecord(email, provider, options = {}) {
       lastEmailDate: new Date(),
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Por defecto, 7 días
       notes: '',
-      thread: [{
-        emailId: email.id,
-        direction: 'outgoing',
-        date: new Date(),
-        subject: email.subject,
-        snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '')
-      }],
+      thread: [
+        {
+          emailId: email.id,
+          direction: 'outgoing',
+          date: new Date(),
+          subject: email.subject,
+          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : ''),
+        },
+      ],
       isAIGenerated: options.isAIGenerated || false,
-      aiTrackingId: options.aiTrackingId || null
+      aiTrackingId: options.aiTrackingId || null,
     };
-    
+
     // Añadir etiquetas adicionales basadas en el asunto y contenido
-    if (email.subject.toLowerCase().includes('presupuesto') || 
-        email.body.toLowerCase().includes('presupuesto')) {
+    if (
+      email.subject.toLowerCase().includes('presupuesto') ||
+      email.body.toLowerCase().includes('presupuesto')
+    ) {
       newRecord.tags.push(EMAIL_TAGS.BUDGET);
     }
-    
-    if (email.subject.toLowerCase().includes('contrato') || 
-        email.body.toLowerCase().includes('contrato')) {
+
+    if (
+      email.subject.toLowerCase().includes('contrato') ||
+      email.body.toLowerCase().includes('contrato')
+    ) {
       newRecord.tags.push(EMAIL_TAGS.CONTRACT);
     }
-    
-    if (email.subject.toLowerCase().includes('cita') || 
-        email.body.toLowerCase().includes('cita') ||
-        email.subject.toLowerCase().includes('reunión') || 
-        email.body.toLowerCase().includes('reunión')) {
+
+    if (
+      email.subject.toLowerCase().includes('cita') ||
+      email.body.toLowerCase().includes('cita') ||
+      email.subject.toLowerCase().includes('reunión') ||
+      email.body.toLowerCase().includes('reunión')
+    ) {
       newRecord.tags.push(EMAIL_TAGS.APPOINTMENT);
     }
-    
+
     if (options.isAIGenerated) {
       newRecord.tags.push(EMAIL_TAGS.AI_GENERATED);
     }
-    
+
     // Añadir el nuevo registro
     const updatedRecords = [...list, newRecord];
     saveTrackingRecords(updatedRecords);
@@ -171,12 +186,10 @@ export function createTrackingRecord(email, provider, options = {}) {
 export function updateTrackingWithResponse(email) {
   const trackingRecords = loadTrackingRecords();
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
-  
+
   // Buscar el registro que corresponde al remitente de este correo
-  const recordIndex = trackingRecords.findIndex(record => 
-    record.providerEmail === email.from
-  );
-  
+  const recordIndex = trackingRecords.findIndex((record) => record.providerEmail === email.from);
+
   if (recordIndex >= 0) {
     // Actualizar el registro con la respuesta
     const record = trackingRecords[recordIndex];
@@ -191,17 +204,17 @@ export function updateTrackingWithResponse(email) {
           direction: 'incoming',
           date: new Date(email.date),
           subject: email.subject,
-          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : '')
-        }
-      ]
+          snippet: email.body.substring(0, 100) + (email.body.length > 100 ? '...' : ''),
+        },
+      ],
     };
-    
+
     // Actualizar la lista de registros
     trackingRecords[recordIndex] = updatedRecord;
     saveTrackingRecords(trackingRecords);
     return updatedRecord;
   }
-  
+
   return null;
 }
 
@@ -209,19 +222,19 @@ export function updateTrackingWithResponse(email) {
 export function updateTrackingStatus(recordId, status, notes = null, dueDate = undefined) {
   const trackingRecords = loadTrackingRecords();
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
-  
-  const updatedRecords = list.map(record => {
+
+  const updatedRecords = list.map((record) => {
     if (record.id === recordId) {
       return {
         ...record,
         status,
         notes: notes !== null ? notes : record.notes,
-        dueDate: typeof dueDate !== 'undefined' ? dueDate : record.dueDate
+        dueDate: typeof dueDate !== 'undefined' ? dueDate : record.dueDate,
       };
     }
     return record;
   });
-  
+
   saveTrackingRecords(updatedRecords);
 }
 
@@ -231,10 +244,10 @@ export function getTrackingNeedingFollowup(days = 3) {
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
   const now = new Date();
   const cutoffDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-  
-  return trackingRecords.filter(record => 
-    record.status === TRACKING_STATUS.WAITING && 
-    new Date(record.lastEmailDate) < cutoffDate
+
+  return trackingRecords.filter(
+    (record) =>
+      record.status === TRACKING_STATUS.WAITING && new Date(record.lastEmailDate) < cutoffDate
   );
 }
 
@@ -242,17 +255,17 @@ export function getTrackingNeedingFollowup(days = 3) {
 export function updateTrackingTags(recordId, tags) {
   const trackingRecords = loadTrackingRecords();
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
-  
-  const updatedRecords = list.map(record => {
+
+  const updatedRecords = list.map((record) => {
     if (record.id === recordId) {
       return {
         ...record,
-        tags
+        tags,
       };
     }
     return record;
   });
-  
+
   saveTrackingRecords(updatedRecords);
 }
 
@@ -260,28 +273,34 @@ export function updateTrackingTags(recordId, tags) {
 export function deleteTrackingRecord(recordId) {
   const trackingRecords = loadTrackingRecords();
   const list = Array.isArray(trackingRecords) ? trackingRecords : [];
-  const updatedRecords = trackingRecords.filter(record => record.id !== recordId);
+  const updatedRecords = trackingRecords.filter((record) => record.id !== recordId);
   saveTrackingRecords(updatedRecords);
 }
 
 // Detectar automáticamente si un correo entrante es de un proveedor conocido
 export function detectProviderResponse(email, providers) {
   // Si el correo entrante es de un dominio conocido de proveedor
-  const providerMatch = providers.find(p => 
-    p.email && email.from.toLowerCase().includes(p.email.toLowerCase())
+  const providerMatch = providers.find(
+    (p) => p.email && email.from.toLowerCase().includes(p.email.toLowerCase())
   );
-  
+
   if (providerMatch) {
     return updateTrackingWithResponse(email);
   }
-  
+
   return null;
 }
 
 // Marcar un correo relacionado con un proveedor
 export function tagProviderEmail_old(emailId, providerId) {
   try {
-    const profile = (() => { try { return JSON.parse(localStorage.getItem('lovenda_user_profile') || '{}'); } catch { return {}; } })();
+    const profile = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('lovenda_user_profile') || '{}');
+      } catch {
+        return {};
+      }
+    })();
     const uid = (auth && auth.currentUser && auth.currentUser.uid) || profile.uid || 'local';
     // Etiqueta del sistema: 'provider'
     addTagToEmail(uid, emailId, 'provider');
@@ -291,4 +310,3 @@ export function tagProviderEmail_old(emailId, providerId) {
     return false;
   }
 }
-

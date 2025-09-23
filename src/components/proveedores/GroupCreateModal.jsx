@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
@@ -34,11 +35,12 @@ export default function GroupCreateModal({ open, onClose, onConfirm, defaultName
           />
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button onClick={handleConfirm}>Crear grupo</Button>
         </div>
       </div>
     </Modal>
   );
 }
-

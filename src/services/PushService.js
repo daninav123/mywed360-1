@@ -36,7 +36,10 @@ export async function subscribe() {
   const key = await getVapidKey();
   if (!key) throw new Error('VAPID key not configured');
   const reg = await navigator.serviceWorker.ready;
-  const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(key) });
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(key),
+  });
   await post('/api/push/subscribe', sub, { auth: true });
   return sub;
 }
@@ -44,14 +47,17 @@ export async function subscribe() {
 export async function unsubscribe() {
   const sub = await getSubscription();
   if (!sub) return false;
-  try { await post('/api/push/unsubscribe', sub, { auth: true }); } catch {}
+  try {
+    await post('/api/push/unsubscribe', sub, { auth: true });
+  } catch {}
   return await sub.unsubscribe();
 }
 
 export async function sendTest() {
   try {
-    const res = await post('/api/push/test', {} , { auth: true });
+    const res = await post('/api/push/test', {}, { auth: true });
     return res.ok;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
-

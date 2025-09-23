@@ -14,7 +14,7 @@ import es from 'date-fns/locale/es';
 
 // Configuración del localizador para el calendario
 const locales = {
-  'es': es
+  es: es,
 };
 
 export const localizer = dateFnsLocalizer({
@@ -49,8 +49,8 @@ export function eventStyleGetter(event) {
       borderRadius: '0',
       padding: '0px 5px',
       fontSize: '14px',
-      opacity: 0.8
-    }
+      opacity: 0.8,
+    },
   };
 }
 
@@ -58,20 +58,22 @@ export function eventStyleGetter(event) {
 export const Event = ({ event }) => {
   return (
     <div className="rbc-event-content">
-      <div style={{
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        color: '#fff',
-        fontSize: '0.85em',
-        fontWeight: '500',
-        padding: '2px 5px',
-        width: '100%',
-        lineHeight: '1.4',
-        letterSpacing: '0.2px',
-        textShadow: '0 1px 1px rgba(0,0,0,0.2)' // Mejora legibilidad del texto blanco
-      }}>
-        {event.title || event.name || "Sin título"}
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          color: '#fff',
+          fontSize: '0.85em',
+          fontWeight: '500',
+          padding: '2px 5px',
+          width: '100%',
+          lineHeight: '1.4',
+          letterSpacing: '0.2px',
+          textShadow: '0 1px 1px rgba(0,0,0,0.2)', // Mejora legibilidad del texto blanco
+        }}
+      >
+        {event.title || event.name || 'Sin título'}
       </div>
     </div>
   );

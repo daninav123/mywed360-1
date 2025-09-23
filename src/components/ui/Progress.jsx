@@ -13,7 +13,9 @@ function Progress({ value, max = 100, variant = 'primary', className = '' }) {
     }
   };
   return (
-    <div className={`group cursor-pointer w-full rounded-full overflow-visible bg-gray-200 ${className}`}>
+    <div
+      className={`group cursor-pointer w-full rounded-full overflow-visible bg-gray-200 ${className}`}
+    >
       <div
         className={`${getBarClass()} transition-transform duration-200 ease-in-out transform origin-bottom group-hover:scale-y-110`}
         style={{ width: `${(value / max) * 100}%`, height: '100%' }}

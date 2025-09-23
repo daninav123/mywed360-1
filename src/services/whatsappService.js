@@ -7,7 +7,7 @@ export const setAuthContext = (context) => {
 };
 
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_URL || '';
-const DEFAULT_CC = (import.meta.env.VITE_DEFAULT_COUNTRY_CODE || '').replace('+','');
+const DEFAULT_CC = (import.meta.env.VITE_DEFAULT_COUNTRY_CODE || '').replace('+', '');
 
 async function getAuthToken() {
   try {
@@ -24,7 +24,10 @@ async function getAuthToken() {
       const { auth } = mod;
       const u = auth?.currentUser;
       if (u?.getIdToken) {
-        try { const t = await u.getIdToken(true); if (t) return t; } catch {}
+        try {
+          const t = await u.getIdToken(true);
+          if (t) return t;
+        } catch {}
         return await u.getIdToken();
       }
       if (u?.uid && u?.email) return `mock-${u.uid}-${u.email}`; // compat con backend en dev
@@ -35,7 +38,9 @@ async function getAuthToken() {
 
 export function toE164(phone) {
   if (!phone) return null;
-  let p = String(phone).replace(/\s+/g, '').replace(/[^0-9+]/g, '');
+  let p = String(phone)
+    .replace(/\s+/g, '')
+    .replace(/[^0-9+]/g, '');
   // 00 -> +
   if (p.startsWith('00')) p = '+' + p.slice(2);
   // Si ya viene con +, devolver tal cual
@@ -54,23 +59,39 @@ export function waDeeplink(phoneE164, text) {
   return `https://wa.me/${ph}?text=${t}`;
 }
 
-export async function sendText({ to, message, weddingId, guestId, templateId = null, scheduleAt = null, metadata = {} }) {
+export async function sendText({
+  to,
+  message,
+  weddingId,
+  guestId,
+  templateId = null,
+  scheduleAt = null,
+  metadata = {},
+}) {
   try {
     const token = await getAuthToken();
     const headers = {
       'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/send` : `/api/whatsapp/send`;
-    if (import.meta.env.DEV) console.log('[whatsappService] sendText →', { url, hasAuth: !!token, to, hasMessage: !!message, base });
+    if (import.meta.env.DEV)
+      console.log('[whatsappService] sendText →', {
+        url,
+        hasAuth: !!token,
+        to,
+        hasMessage: !!message,
+        base,
+      });
     const res = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ to, message, weddingId, guestId, templateId, scheduleAt, metadata })
+      body: JSON.stringify({ to, message, weddingId, guestId, templateId, scheduleAt, metadata }),
     });
     const json = await res.json().catch(() => ({}));
-    if (import.meta.env.DEV) console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
+    if (import.meta.env.DEV)
+      console.log('[whatsappService] sendText ←', { status: res.status, ok: res.ok, body: json });
     if (!res.ok || json.success === false) {
       const msg = json?.error || `HTTP ${res.status}`;
       return { success: false, error: msg };
@@ -86,13 +107,14 @@ export async function getProviderStatus() {
   try {
     const token = await getAuthToken();
     const headers = {
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/provider-status` : `/api/whatsapp/provider-status`;
     const res = await fetch(url, { headers });
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) return { success: false, configured: false, error: json?.error || `HTTP ${res.status}` };
+    if (!res.ok)
+      return { success: false, configured: false, error: json?.error || `HTTP ${res.status}` };
     return json;
   } catch (e) {
     return { success: false, configured: false, error: e.message || 'error' };
@@ -104,14 +126,14 @@ export async function schedule(items = [], scheduledAt) {
     const token = await getAuthToken();
     const headers = {
       'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/schedule` : `/api/whatsapp/schedule`;
     const res = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ items, scheduledAt })
+      body: JSON.stringify({ items, scheduledAt }),
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok || json.success === false) {
@@ -128,8 +150,8 @@ export async function getMetrics({ weddingId, from, to, groupBy = 'day' } = {}) 
   try {
     const token = await getAuthToken();
     const headers = {
-      'Accept': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const params = new URLSearchParams();
@@ -154,7 +176,7 @@ export async function getHealth() {
   try {
     const token = await getAuthToken();
     const headers = {
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
     const base = BASE ? BASE.replace(/\/$/, '') : '';
     const url = base ? `${base}/api/whatsapp/health` : `/api/whatsapp/health`;

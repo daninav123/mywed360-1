@@ -1,10 +1,23 @@
+import {
+  X,
+  ArrowLeft,
+  Calendar,
+  Mail,
+  Phone,
+  Globe,
+  MapPin,
+  Edit,
+  Bookmark,
+  ChevronRight,
+  CheckCheck,
+  MessageSquare,
+} from 'lucide-react';
 import React, { useState } from 'react';
-import { X, ArrowLeft, Calendar, Mail, Phone, Globe, MapPin, Edit, Bookmark, ChevronRight, CheckCheck, MessageSquare } from 'lucide-react';
 
 /**
  * Componente para mostrar el detalle completo de un proveedor con pestañas
  * para información general y seguimiento de comunicaciones.
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.proveedor - Datos del proveedor
  * @param {Array} props.comunicaciones - Lista de comunicaciones con el proveedor
@@ -13,33 +26,33 @@ import { X, ArrowLeft, Calendar, Mail, Phone, Globe, MapPin, Edit, Bookmark, Che
  * @param {Function} props.onNuevaComunicacion - Función para añadir nueva comunicación
  * @returns {React.ReactElement} Vista detalle del proveedor
  */
-const ProveedorDetalle = ({ 
-  proveedor, 
-  comunicaciones = [], 
-  onCerrar, 
+const ProveedorDetalle = ({
+  proveedor,
+  comunicaciones = [],
+  onCerrar,
   onEditar,
-  onNuevaComunicacion
+  onNuevaComunicacion,
 }) => {
   // Estado para la pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState('info');
-  
+
   // Formatear fecha
   const formatearFecha = (fecha) => {
     if (!fecha) return 'Sin fecha';
     return new Date(fecha).toLocaleDateString('es-ES', {
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric'
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
   };
-  
+
   // Formatear precio
   const formatearPrecio = (valor) => {
     if (!valor) return 'No especificado';
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'EUR',
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(valor);
   };
 
@@ -48,23 +61,23 @@ const ProveedorDetalle = ({
       {/* Cabecera con imagen de fondo */}
       <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-500">
         {proveedor.imagen && (
-          <img 
-            src={proveedor.imagen} 
-            alt={proveedor.nombre} 
+          <img
+            src={proveedor.imagen}
+            alt={proveedor.nombre}
             className="w-full h-full object-cover"
           />
         )}
-        
+
         {/* Botones superiores */}
         <div className="absolute top-0 left-0 w-full p-4 flex justify-between">
-          <button 
+          <button
             onClick={onCerrar}
             className="p-2 rounded-full bg-white/80 hover:bg-white text-gray-700"
           >
             <ArrowLeft size={20} />
           </button>
-          
-          <button 
+
+          <button
             onClick={() => onEditar(proveedor)}
             className="p-2 rounded-full bg-white/80 hover:bg-white text-gray-700"
           >
@@ -72,34 +85,37 @@ const ProveedorDetalle = ({
           </button>
         </div>
       </div>
-      
+
       {/* Título y estado */}
       <div className="p-5 border-b border-gray-200">
         <div className="flex justify-between items-start mb-2">
           <h2 className="text-2xl font-bold text-gray-800">
             {proveedor.nombre || 'Proveedor sin nombre'}
           </h2>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-            proveedor.estado === 'Contratado' ? 'bg-green-100 text-green-800' :
-            proveedor.estado === 'Contactado' ? 'bg-blue-100 text-blue-800' :
-            proveedor.estado === 'Descartado' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-medium ${
+              proveedor.estado === 'Contratado'
+                ? 'bg-green-100 text-green-800'
+                : proveedor.estado === 'Contactado'
+                  ? 'bg-blue-100 text-blue-800'
+                  : proveedor.estado === 'Descartado'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+            }`}
+          >
             {proveedor.estado || 'Nuevo'}
           </span>
         </div>
-        <p className="text-gray-600">
-          {proveedor.servicio || 'Sin categoría'}
-        </p>
+        <p className="text-gray-600">{proveedor.servicio || 'Sin categoría'}</p>
       </div>
-      
+
       {/* Navegación pestañas */}
       <div className="flex border-b border-gray-200">
         <button
           onClick={() => setPestanaActiva('info')}
           className={`flex-1 py-3 font-medium text-sm border-b-2 transition-colors ${
-            pestanaActiva === 'info' 
-              ? 'border-blue-500 text-blue-600' 
+            pestanaActiva === 'info'
+              ? 'border-blue-500 text-blue-600'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -108,15 +124,15 @@ const ProveedorDetalle = ({
         <button
           onClick={() => setPestanaActiva('comunicaciones')}
           className={`flex-1 py-3 font-medium text-sm border-b-2 transition-colors ${
-            pestanaActiva === 'comunicaciones' 
-              ? 'border-blue-500 text-blue-600' 
+            pestanaActiva === 'comunicaciones'
+              ? 'border-blue-500 text-blue-600'
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
           Seguimiento
         </button>
       </div>
-      
+
       {/* Contenido de pestañas */}
       <div className="p-5">
         {pestanaActiva === 'info' ? (
@@ -136,35 +152,43 @@ const ProveedorDetalle = ({
                 </div>
               </div>
             </div>
-            
+
             {/* Contacto */}
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium mb-3 text-gray-700">Datos de contacto</h3>
               <div className="space-y-3">
                 {proveedor.contacto && (
                   <div className="flex items-center">
-                    <div className="w-8 text-gray-400"><MessageSquare size={16} /></div>
+                    <div className="w-8 text-gray-400">
+                      <MessageSquare size={16} />
+                    </div>
                     <p>{proveedor.contacto}</p>
                   </div>
                 )}
                 {proveedor.telefono && (
                   <div className="flex items-center">
-                    <div className="w-8 text-gray-400"><Phone size={16} /></div>
+                    <div className="w-8 text-gray-400">
+                      <Phone size={16} />
+                    </div>
                     <p>{proveedor.telefono}</p>
                   </div>
                 )}
                 {proveedor.email && (
                   <div className="flex items-center">
-                    <div className="w-8 text-gray-400"><Mail size={16} /></div>
+                    <div className="w-8 text-gray-400">
+                      <Mail size={16} />
+                    </div>
                     <p>{proveedor.email}</p>
                   </div>
                 )}
                 {proveedor.web && (
                   <div className="flex items-center">
-                    <div className="w-8 text-gray-400"><Globe size={16} /></div>
-                    <a 
-                      href={proveedor.web} 
-                      target="_blank" 
+                    <div className="w-8 text-gray-400">
+                      <Globe size={16} />
+                    </div>
+                    <a
+                      href={proveedor.web}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
@@ -174,13 +198,15 @@ const ProveedorDetalle = ({
                 )}
                 {proveedor.ubicacion && (
                   <div className="flex items-center">
-                    <div className="w-8 text-gray-400"><MapPin size={16} /></div>
+                    <div className="w-8 text-gray-400">
+                      <MapPin size={16} />
+                    </div>
                     <p>{proveedor.ubicacion}</p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             {/* Notas */}
             {proveedor.notas && (
               <div className="bg-amber-50 rounded-lg p-4">
@@ -194,26 +220,21 @@ const ProveedorDetalle = ({
           <div>
             <div className="flex justify-between mb-4">
               <h3 className="text-lg font-medium">Historial de comunicaciones</h3>
-              <button 
+              <button
                 onClick={onNuevaComunicacion}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
               >
                 Nueva entrada
               </button>
             </div>
-            
+
             {comunicaciones && comunicaciones.length > 0 ? (
               <div className="space-y-4">
                 {comunicaciones.map((item, index) => (
-                  <div 
-                    key={index}
-                    className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-400"
-                  >
+                  <div key={index} className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-400">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-medium text-gray-800">{item.tipo || 'Comunicación'}</h4>
-                      <span className="text-xs text-gray-500">
-                        {formatearFecha(item.fecha)}
-                      </span>
+                      <span className="text-xs text-gray-500">{formatearFecha(item.fecha)}</span>
                     </div>
                     <p className="text-gray-700 mb-2">{item.mensaje}</p>
                     {item.adjuntos && item.adjuntos.length > 0 && (

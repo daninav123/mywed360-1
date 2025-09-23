@@ -49,4 +49,3 @@ Firmado por ambas partes en fecha {{signedDate}}.
 ];
 
 export default contractTemplates;
-

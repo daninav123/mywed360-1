@@ -1,6 +1,7 @@
 import React from 'react';
-import { useWedding } from '../context/WeddingContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+import { useWedding } from '../context/WeddingContext';
 
 // Selector de boda activa para planners
 export default function WeddingSelector() {
@@ -12,7 +13,9 @@ export default function WeddingSelector() {
 
   return (
     <div className="mb-4 flex items-center space-x-2">
-      <label className="text-sm font-medium" htmlFor="wedding-select">Boda:</label>
+      <label className="text-sm font-medium" htmlFor="wedding-select">
+        Boda:
+      </label>
       <select
         id="wedding-select"
         value={activeWedding}
@@ -33,7 +36,9 @@ export default function WeddingSelector() {
             </option>
           ))
         ) : (
-          <option value="" disabled>Sin bodas</option>
+          <option value="" disabled>
+            Sin bodas
+          </option>
         )}
       </select>
     </div>

@@ -1,14 +1,10 @@
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { useEffect, useState, useCallback } from 'react';
+
 import useWeddingCollection from './useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 import { auth, db } from '../lib/firebase';
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-} from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
 import {
   addItem as addItemFS,
   updateItem as updateItemFS,
@@ -48,7 +44,8 @@ export const useFirestoreCollection = (collectionName, fallback = []) => {
     // Función para inicializar listener Firestore cuando tengamos UID
     const initFirestoreListener = (uid) => {
       const q = query(collection(db, 'users', uid, collectionName), orderBy('createdAt', 'asc'));
-      unsubFS = onSnapshot(q,
+      unsubFS = onSnapshot(
+        q,
         (snap) => {
           // Asegurar que el id del documento prevalezca sobre cualquier campo id dentro de los datos
           const arr = snap.docs.map((d) => ({ ...d.data(), id: d.id }));
@@ -82,7 +79,7 @@ export const useFirestoreCollection = (collectionName, fallback = []) => {
           initFirestoreListener(user.uid);
           // Sincronizar datos locales pendientes
           if (Array.isArray(data) && data.length) {
-            data.forEach((item) => addItemFS(collectionName, item).catch(()=>{}));
+            data.forEach((item) => addItemFS(collectionName, item).catch(() => {}));
           }
         }
       });
@@ -93,46 +90,54 @@ export const useFirestoreCollection = (collectionName, fallback = []) => {
         if (typeof unsubFS === 'function') unsubFS();
       };
     }
-
   }, [collectionName, fallback]);
 
-  const addItem = useCallback(async (item) => {
-    if (auth.currentUser?.uid) {
-      await addItemFS(collectionName, item);
-    } else {
-      const next = [...data, { ...item, id: Date.now() }];
-      setData(next);
-      lsSet(collectionName, next);
-    }
-  }, [collectionName, data]);
+  const addItem = useCallback(
+    async (item) => {
+      if (auth.currentUser?.uid) {
+        await addItemFS(collectionName, item);
+      } else {
+        const next = [...data, { ...item, id: Date.now() }];
+        setData(next);
+        lsSet(collectionName, next);
+      }
+    },
+    [collectionName, data]
+  );
 
-  const updateItem = useCallback(async (id, changes) => {
-    if (auth.currentUser?.uid) {
-      await updateItemFS(collectionName, id, changes);
-      // Optimistic local update to reflect immediately
-      const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-      setData(next);
-      lsSet(collectionName, next);
-    } else {
-      const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
-      setData(next);
-      lsSet(collectionName, next);
-    }
-  }, [collectionName, data]);
+  const updateItem = useCallback(
+    async (id, changes) => {
+      if (auth.currentUser?.uid) {
+        await updateItemFS(collectionName, id, changes);
+        // Optimistic local update to reflect immediately
+        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
+        setData(next);
+        lsSet(collectionName, next);
+      } else {
+        const next = data.map((d) => (d.id === id ? { ...d, ...changes } : d));
+        setData(next);
+        lsSet(collectionName, next);
+      }
+    },
+    [collectionName, data]
+  );
 
-  const deleteItem = useCallback(async (id) => {
-    if (auth.currentUser?.uid) {
-      await deleteItemFS(collectionName, id);
-      // Optimistic local removal
-      const next = data.filter((d) => d.id !== id);
-      setData(next);
-      lsSet(collectionName, next);
-    } else {
-      const next = data.filter((d) => d.id !== id);
-      setData(next);
-      lsSet(collectionName, next);
-    }
-  }, [collectionName, data]);
+  const deleteItem = useCallback(
+    async (id) => {
+      if (auth.currentUser?.uid) {
+        await deleteItemFS(collectionName, id);
+        // Optimistic local removal
+        const next = data.filter((d) => d.id !== id);
+        setData(next);
+        lsSet(collectionName, next);
+      } else {
+        const next = data.filter((d) => d.id !== id);
+        setData(next);
+        lsSet(collectionName, next);
+      }
+    },
+    [collectionName, data]
+  );
 
   return { data, loading, addItem, updateItem, deleteItem };
 };

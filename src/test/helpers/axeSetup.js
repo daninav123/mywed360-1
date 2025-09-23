@@ -19,7 +19,7 @@ export const axe = configureAxe({
     'aria-roles': { enabled: true },
     'document-title': { enabled: false }, // Desactivado para componentes individuales
     'landmark-one-main': { enabled: false }, // Desactivado para componentes individuales
-    'region': { enabled: false }, // Desactivado para componentes individuales
+    region: { enabled: false }, // Desactivado para componentes individuales
   },
   runOnly: {
     type: 'tag',
@@ -33,13 +33,17 @@ export const axe = configureAxe({
  * @returns {String} - Mensaje de error formateado
  */
 export function formatViolations(violations) {
-  return violations.map(violation => {
-    const nodeMessage = violation.nodes.map(node => {
-      const selector = node.target.join(', ');
-      const helpUrl = violation.helpUrl;
-      return `\n  - ${selector}\n    ${node.html}\n    ${node.failureSummary}\n    Más información: ${helpUrl}`;
-    }).join('\n');
-    
-    return `\n${violation.id}: ${violation.help} (${violation.impact})\n${nodeMessage}`;
-  }).join('\n\n');
+  return violations
+    .map((violation) => {
+      const nodeMessage = violation.nodes
+        .map((node) => {
+          const selector = node.target.join(', ');
+          const helpUrl = violation.helpUrl;
+          return `\n  - ${selector}\n    ${node.html}\n    ${node.failureSummary}\n    Más información: ${helpUrl}`;
+        })
+        .join('\n');
+
+      return `\n${violation.id}: ${violation.help} (${violation.impact})\n${nodeMessage}`;
+    })
+    .join('\n\n');
 }

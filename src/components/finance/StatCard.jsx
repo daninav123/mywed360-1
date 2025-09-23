@@ -1,11 +1,12 @@
 import React from 'react';
+
 import { Card } from '../ui';
 
 const toneToVar = {
   primary: 'var(--color-primary)',
   success: 'var(--color-success)',
   warning: 'var(--color-warning)',
-  danger: 'var(--color-danger)'
+  danger: 'var(--color-danger)',
 };
 
 export default function StatCard({
@@ -51,7 +52,13 @@ export default function StatCard({
       })
       .join(' ');
     return (
-      <svg width={w} height={h} className="absolute right-3 bottom-3 opacity-70" aria-hidden="true" focusable="false">
+      <svg
+        width={w}
+        height={h}
+        className="absolute right-3 bottom-3 opacity-70"
+        aria-hidden="true"
+        focusable="false"
+      >
         <polyline
           points={points}
           fill="none"
@@ -66,10 +73,18 @@ export default function StatCard({
 
   const renderDelta = () => {
     if (typeof deltaValue !== 'number') return null;
-    const trendColor = deltaTrend === 'up' ? 'var(--color-success)' : deltaTrend === 'down' ? 'var(--color-danger)' : 'var(--color-text)';
+    const trendColor =
+      deltaTrend === 'up'
+        ? 'var(--color-success)'
+        : deltaTrend === 'down'
+          ? 'var(--color-danger)'
+          : 'var(--color-text)';
     const arrow = deltaTrend === 'up' ? '▲' : deltaTrend === 'down' ? '▼' : '•';
     return (
-      <div className="mt-2 inline-flex items-center gap-1 text-xs font-medium" style={{ color: trendColor }}>
+      <div
+        className="mt-2 inline-flex items-center gap-1 text-xs font-medium"
+        style={{ color: trendColor }}
+      >
         <span aria-hidden>{arrow}</span>
         <span>{Math.abs(deltaValue).toFixed(1)}%</span>
         {deltaLabel && <span className="text-[color:var(--color-text)]/60">{deltaLabel}</span>}
@@ -88,15 +103,21 @@ export default function StatCard({
       <div className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: color }} />
       <div className="flex items-start justify-between gap-3">
         <div>
-          {title && <p className="text-sm font-medium text-[color:var(--color-text)]/70">{title}</p>}
+          {title && (
+            <p className="text-sm font-medium text-[color:var(--color-text)]/70">{title}</p>
+          )}
           <div className="mt-1">
             {loading ? (
               <div className="h-7 md:h-8 w-28 bg-[color:var(--color-text)]/10 rounded animate-pulse" />
             ) : (
-              <div className="text-2xl md:text-3xl font-bold text-[color:var(--color-text)]">{value}</div>
+              <div className="text-2xl md:text-3xl font-bold text-[color:var(--color-text)]">
+                {value}
+              </div>
             )}
             {subtitle && !loading && (
-              <p className="text-xs md:text-sm text-[color:var(--color-text)]/60 mt-1">{subtitle}</p>
+              <p className="text-xs md:text-sm text-[color:var(--color-text)]/60 mt-1">
+                {subtitle}
+              </p>
             )}
             {!loading && renderDelta()}
           </div>

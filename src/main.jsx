@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 // Asegurar inicialización de i18n antes de cualquier uso de useTranslation
 import './i18n';
 import './sentry';
@@ -16,10 +17,7 @@ import './utils/webVitals';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
-    <App />
-      </ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>
 );
-
-
-

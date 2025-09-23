@@ -1,27 +1,25 @@
-import React, { useState } from 'react';
 import { X, Plus } from 'lucide-react';
+import React, { useState } from 'react';
 
 const ProviderConfigModal = ({ defaultServices, currentServices, onSave, onCancel }) => {
   const [selectedServices, setSelectedServices] = useState(currentServices || []);
   const [customService, setCustomService] = useState('');
 
   const toggleService = (service) => {
-    setSelectedServices(prev => 
-      prev.includes(service) 
-        ? prev.filter(s => s !== service)
-        : [...prev, service]
+    setSelectedServices((prev) =>
+      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
     );
   };
 
   const addCustomService = () => {
     if (customService.trim() && !selectedServices.includes(customService.trim())) {
-      setSelectedServices(prev => [...prev, customService.trim()]);
+      setSelectedServices((prev) => [...prev, customService.trim()]);
       setCustomService('');
     }
   };
 
   const removeService = (service) => {
-    setSelectedServices(prev => prev.filter(s => s !== service));
+    setSelectedServices((prev) => prev.filter((s) => s !== service));
   };
 
   const handleSave = () => {
@@ -34,7 +32,7 @@ const ProviderConfigModal = ({ defaultServices, currentServices, onSave, onCance
       <div>
         <h4 className="font-semibold mb-3">Servicios básicos</h4>
         <div className="grid grid-cols-2 gap-2">
-          {(defaultServices || []).map(service => (
+          {(defaultServices || []).map((service) => (
             <label key={service} className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -74,7 +72,7 @@ const ProviderConfigModal = ({ defaultServices, currentServices, onSave, onCance
         <div>
           <h4 className="font-semibold mb-3">Servicios configurados ({selectedServices.length})</h4>
           <div className="flex flex-wrap gap-2">
-            {selectedServices.map(service => (
+            {selectedServices.map((service) => (
               <span
                 key={service}
                 className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"

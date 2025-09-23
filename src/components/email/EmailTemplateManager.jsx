@@ -1,4 +1,3 @@
-import React, { useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
   Edit,
@@ -8,49 +7,51 @@ import {
   Copy,
   AlertCircle,
   RefreshCw,
-  Search
-} from "lucide-react";
-import Button from "../Button";
-import Card from "../Card";
-import * as EmailService from "../../services/EmailService";
+  Search,
+} from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import * as EmailService from '../../services/EmailService';
+import Button from '../Button';
+import Card from '../ui/Card';
 
 const DEFAULT_CATEGORIES = [
-  "Proveedores - Solicitud de información",
-  "Proveedores - Confirmación",
-  "Proveedores - Cancelación",
-  "Proveedores - Seguimiento",
-  "Invitados - Información",
-  "Invitados - Recordatorio",
-  "Seguimiento",
-  "General"
+  'Proveedores - Solicitud de información',
+  'Proveedores - Confirmación',
+  'Proveedores - Cancelación',
+  'Proveedores - Seguimiento',
+  'Invitados - Información',
+  'Invitados - Recordatorio',
+  'Seguimiento',
+  'General',
 ];
 
 const emptyTemplate = {
   id: null,
-  name: "",
+  name: '',
   category: DEFAULT_CATEGORIES[0],
-  subject: "",
-  body: "",
-  variables: []
+  subject: '',
+  body: '',
+  variables: [],
 };
 
 function sanitizeTemplate(raw = {}) {
   return {
     id: raw.id ?? raw.templateId ?? null,
-    name: raw.name ?? "Plantilla sin nombre",
+    name: raw.name ?? 'Plantilla sin nombre',
     category: raw.category ?? DEFAULT_CATEGORIES[DEFAULT_CATEGORIES.length - 1],
-    subject: raw.subject ?? "",
-    body: raw.body ?? "",
-    variables: Array.isArray(raw.variables) ? raw.variables : []
+    subject: raw.subject ?? '',
+    body: raw.body ?? '',
+    variables: Array.isArray(raw.variables) ? raw.variables : [],
   };
 }
 
 const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(emptyTemplate);
   const [expandedGroups, setExpandedGroups] = useState(() => new Set(DEFAULT_CATEGORIES));
@@ -61,7 +62,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
 
   useEffect(() => {
     if (!success) return;
-    const timer = setTimeout(() => setSuccess(""), 2500);
+    const timer = setTimeout(() => setSuccess(''), 2500);
     return () => clearTimeout(timer);
   }, [success]);
 
@@ -78,10 +79,10 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
   const groupedTemplates = useMemo(() => {
     const groups = new Map();
     DEFAULT_CATEGORIES.forEach((cat) => groups.set(cat, []));
-    groups.set("Otras", []);
+    groups.set('Otras', []);
 
     filteredTemplates.forEach((tpl) => {
-      const category = tpl.category && groups.has(tpl.category) ? tpl.category : "Otras";
+      const category = tpl.category && groups.has(tpl.category) ? tpl.category : 'Otras';
       groups.get(category).push(tpl);
     });
 
@@ -90,14 +91,14 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
 
   async function loadTemplates(forceRefresh = false) {
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const data = await EmailService.getEmailTemplates(forceRefresh);
       const normalized = Array.isArray(data) ? data.map(sanitizeTemplate) : [];
       setTemplates(normalized);
     } catch (err) {
-      console.error("EmailTemplateManager.loadTemplates", err);
-      setError("No se pudieron cargar las plantillas de email");
+      console.error('EmailTemplateManager.loadTemplates', err);
+      setError('No se pudieron cargar las plantillas de email');
     } finally {
       setLoading(false);
     }
@@ -120,28 +121,28 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
 
   async function handleDeleteTemplate(id) {
     if (!id) return;
-    if (!window.confirm("¿Eliminar la plantilla seleccionada?")) return;
+    if (!window.confirm('¿Eliminar la plantilla seleccionada?')) return;
     try {
       await EmailService.deleteEmailTemplate(id);
       setTemplates((prev) => prev.filter((tpl) => tpl.id !== id));
-      setSuccess("Plantilla eliminada");
+      setSuccess('Plantilla eliminada');
     } catch (err) {
-      console.error("EmailTemplateManager.delete", err);
-      setError("No se pudo eliminar la plantilla");
+      console.error('EmailTemplateManager.delete', err);
+      setError('No se pudo eliminar la plantilla');
     }
   }
 
   async function handleResetTemplates() {
-    if (!window.confirm("Esto restablecerá las plantillas predefinidas. ¿Continuar?")) return;
+    if (!window.confirm('Esto restablecerá las plantillas predefinidas. ¿Continuar?')) return;
     setLoading(true);
     try {
       const restored = await EmailService.resetPredefinedTemplates();
       const normalized = Array.isArray(restored) ? restored.map(sanitizeTemplate) : [];
       setTemplates(normalized);
-      setSuccess("Plantillas restablecidas");
+      setSuccess('Plantillas restablecidas');
     } catch (err) {
-      console.error("EmailTemplateManager.reset", err);
-      setError("No se pudieron restablecer las plantillas");
+      console.error('EmailTemplateManager.reset', err);
+      setError('No se pudieron restablecer las plantillas');
     } finally {
       setLoading(false);
     }
@@ -151,7 +152,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
     event?.preventDefault();
     const payload = {
       ...editingTemplate,
-      variables: editingTemplate.variables || []
+      variables: editingTemplate.variables || [],
     };
 
     try {
@@ -163,11 +164,11 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
         return [...others, sanitized].sort((a, b) => a.name.localeCompare(b.name));
       });
 
-      setSuccess("Plantilla guardada correctamente");
+      setSuccess('Plantilla guardada correctamente');
       handleCancelEdit();
     } catch (err) {
-      console.error("EmailTemplateManager.save", err);
-      setError("No se pudo guardar la plantilla");
+      console.error('EmailTemplateManager.save', err);
+      setError('No se pudo guardar la plantilla');
     }
   }
 
@@ -190,7 +191,12 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold">Plantillas de email</h2>
-          <Button size="sm" variant="ghost" onClick={() => loadTemplates(true)} title="Recargar (ignorar caché)">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => loadTemplates(true)}
+            title="Recargar (ignorar caché)"
+          >
             <RefreshCw size={16} />
           </Button>
         </div>
@@ -235,7 +241,9 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
             <input
               className="w-full border rounded-md p-2"
               value={editingTemplate.name}
-              onChange={(event) => setEditingTemplate({ ...editingTemplate, name: event.target.value })}
+              onChange={(event) =>
+                setEditingTemplate({ ...editingTemplate, name: event.target.value })
+              }
               required
             />
           </div>
@@ -244,7 +252,9 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
             <select
               className="w-full border rounded-md p-2"
               value={editingTemplate.category}
-              onChange={(event) => setEditingTemplate({ ...editingTemplate, category: event.target.value })}
+              onChange={(event) =>
+                setEditingTemplate({ ...editingTemplate, category: event.target.value })
+              }
             >
               {DEFAULT_CATEGORIES.map((category) => (
                 <option key={category} value={category}>
@@ -258,7 +268,9 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
             <input
               className="w-full border rounded-md p-2"
               value={editingTemplate.subject}
-              onChange={(event) => setEditingTemplate({ ...editingTemplate, subject: event.target.value })}
+              onChange={(event) =>
+                setEditingTemplate({ ...editingTemplate, subject: event.target.value })
+              }
             />
           </div>
           <div>
@@ -267,10 +279,13 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
               className="w-full border rounded-md p-2"
               rows={10}
               value={editingTemplate.body}
-              onChange={(event) => setEditingTemplate({ ...editingTemplate, body: event.target.value })}
+              onChange={(event) =>
+                setEditingTemplate({ ...editingTemplate, body: event.target.value })
+              }
             />
             <p className="mt-1 text-xs text-gray-500">
-              Usa &#123;&#123;variable&#125;&#125; para campos dinámicos (ej. &#123;&#123;nombre_proveedor&#125;&#125;).
+              Usa &#123;&#123;variable&#125;&#125; para campos dinámicos (ej.
+              &#123;&#123;nombre_proveedor&#125;&#125;).
             </p>
           </div>
           <div className="flex justify-end gap-2">
@@ -283,9 +298,7 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
           </div>
         </form>
       ) : groupedTemplates.length === 0 ? (
-        <div className="py-10 text-center text-sm text-gray-500">
-          No se encontraron plantillas.
-        </div>
+        <div className="py-10 text-center text-sm text-gray-500">No se encontraron plantillas.</div>
       ) : (
         <div className="space-y-3">
           {groupedTemplates.map(([category, items]) => {
@@ -307,20 +320,40 @@ const EmailTemplateManager = ({ onSelectTemplate, onClose }) => {
                 {isExpanded && (
                   <ul className="divide-y">
                     {items.map((template) => (
-                      <li key={template.id} className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                      <li
+                        key={template.id}
+                        className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                      >
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{template.name}</p>
-                          <p className="truncate text-xs text-gray-500">{template.subject || 'Sin asunto'}</p>
+                          <p className="truncate text-xs text-gray-500">
+                            {template.subject || 'Sin asunto'}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button size="sm" variant="ghost" onClick={() => handleSelectTemplate(template)} title="Usar plantilla">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleSelectTemplate(template)}
+                            title="Usar plantilla"
+                          >
                             <Copy size={14} />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleEditTemplate(template)} title="Editar">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEditTemplate(template)}
+                            title="Editar"
+                          >
                             <Edit size={14} />
                           </Button>
                           {!template.isSystem && (
-                            <Button size="sm" variant="ghost" onClick={() => handleDeleteTemplate(template.id)} title="Eliminar">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleDeleteTemplate(template.id)}
+                              title="Eliminar"
+                            >
                               <Trash size={14} />
                             </Button>
                           )}

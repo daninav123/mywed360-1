@@ -1,26 +1,17 @@
-﻿import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import ProveedorBudgets from "./ProveedorBudgets.jsx";
-import {
-  X,
-  Star,
-  Phone,
-  Mail,
-  Globe,
-  Calendar,
-  Edit2,
-  Clock,
-  MapPin,
-} from "lucide-react";
-import Button from "../ui/Button";
-import Card from "../ui/Card";
-import { post as apiPost } from "../../services/apiClient";
-import { useWedding } from "../../context/WeddingContext";
-import useSupplierGroups from "../../hooks/useSupplierGroups";
-import Toast from "../Toast";
-import Modal from "../Modal";
-import RFQModal from "./RFQModal";
-import useSupplierRFQHistory from "../../hooks/useSupplierRFQHistory";
+﻿import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import ProveedorBudgets from './ProveedorBudgets.jsx';
+import RFQModal from './RFQModal';
+import { useWedding } from '../../context/WeddingContext';
+import useSupplierGroups from '../../hooks/useSupplierGroups';
+import useSupplierRFQHistory from '../../hooks/useSupplierRFQHistory';
+import { post as apiPost } from '../../services/apiClient';
+import Modal from '../Modal';
+import Toast from '../Toast';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -39,16 +30,9 @@ import useSupplierRFQHistory from "../../hooks/useSupplierRFQHistory";
  * @param {Function} props.setActiveTab - Función para cambiar la pestaña activa
  * @returns {React.ReactElement} Componente de detalle de proveedor
  */
-const ProveedorDetail = ({
-  provider,
-  onClose,
-  onEdit,
-  activeTab,
-  setActiveTab,
-  onOpenGroups,
-}) => {
+const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
   const [rating, setRating] = useState(
-    provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0,
+    provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0
   );
   const { activeWedding } = useWedding();
   const [generating, setGenerating] = useState(false);
@@ -60,11 +44,9 @@ const ProveedorDetail = ({
   const [toast, setToast] = useState(null);
   const [groupCleared, setGroupCleared] = useState(false);
   const [rfqOpen, setRfqOpen] = useState(false);
-  const [rfqDefaults, setRfqDefaults] = useState({ subject: "", body: "" });
-  const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(
-    provider?.id,
-  );
-  const [preview, setPreview] = useState({ open: false, url: "", type: "" });
+  const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
+  const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
+  const [preview, setPreview] = useState({ open: false, url: '', type: '' });
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -74,9 +56,9 @@ const ProveedorDetail = ({
       const payload = {
         weddingId: activeWedding,
         payload: {
-          type: "provider_contract",
-          subtype: "basic",
-          title: `Contrato Proveedor - ${provider?.name || "Proveedor"}`,
+          type: 'provider_contract',
+          subtype: 'basic',
+          title: `Contrato Proveedor - ${provider?.name || 'Proveedor'}`,
           data: {
             supplierId: provider?.id,
             supplierName: provider?.name,
@@ -88,39 +70,39 @@ const ProveedorDetail = ({
         },
         saveMeta: true,
       };
-      const res = await apiPost("/api/legal-docs/generate", payload, {
+      const res = await apiPost('/api/legal-docs/generate', payload, {
         auth: true,
       });
       const json = await res.json();
-      if (!res.ok || !json?.success) throw new Error(json?.error || "error");
+      if (!res.ok || !json?.success) throw new Error(json?.error || 'error');
       const b64 = json?.document?.pdfBase64;
       if (b64) {
         const win = window.open();
         if (win) {
           win.document.write(
-            `<iframe src="data:application/pdf;base64,${b64}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`,
+            `<iframe src="data:application/pdf;base64,${b64}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`
           );
         }
       }
     } catch (e) {
-      setGenError("No se pudo generar el contrato");
+      setGenError('No se pudo generar el contrato');
     } finally {
       setGenerating(false);
     }
   };
 
   const handleOpenLegalDocs = () => {
-    const title = `Contrato Proveedor - ${provider?.name || "Proveedor"}`;
-    navigate("/protocolo/documentos", {
+    const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
+    navigate('/protocolo/documentos', {
       state: {
         prefill: {
-          type: "provider_contract",
+          type: 'provider_contract',
           title,
-          providerName: provider?.name || "",
-          service: provider?.service || "",
-          eventDate: provider?.date || "",
-          amount: provider?.priceRange || "",
-          region: "ES",
+          providerName: provider?.name || '',
+          service: provider?.service || '',
+          eventDate: provider?.date || '',
+          amount: provider?.priceRange || '',
+          region: 'ES',
         },
       },
     });
@@ -135,10 +117,8 @@ const ProveedorDetail = ({
             key={star}
             size={interactive ? 24 : 20}
             className={`${
-              star <= currentRating
-                ? "text-yellow-500 fill-yellow-500"
-                : "text-gray-300"
-            } ${interactive ? "cursor-pointer" : ""}`}
+              star <= currentRating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
+            } ${interactive ? 'cursor-pointer' : ''}`}
             onClick={() => interactive && setRating(star)}
           />
         ))}
@@ -148,13 +128,13 @@ const ProveedorDetail = ({
 
   // Formatear fecha para mostrar
   const formatDate = (dateStr) => {
-    if (!dateStr) return "";
+    if (!dateStr) return '';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
     } catch (e) {
       return dateStr;
@@ -162,31 +142,31 @@ const ProveedorDetail = ({
   };
 
   const formatDateTime = (ts) => {
-    if (!ts) return "";
+    if (!ts) return '';
     try {
-      const d = typeof ts?.toDate === "function" ? ts.toDate() : new Date(ts);
-      return d.toLocaleString("es-ES", {
-        dateStyle: "medium",
-        timeStyle: "short",
+      const d = typeof ts?.toDate === 'function' ? ts.toDate() : new Date(ts);
+      return d.toLocaleString('es-ES', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
       });
     } catch (_) {
-      return "";
+      return '';
     }
   };
 
   // Color según estado del proveedor
   const getStatusColor = (status) => {
     switch (status) {
-      case "Confirmado":
-        return "bg-green-100 text-green-800";
-      case "Contactado":
-        return "bg-blue-100 text-blue-800";
-      case "Seleccionado":
-        return "bg-purple-100 text-purple-800";
-      case "Rechazado":
-        return "bg-red-100 text-red-800";
+      case 'Confirmado':
+        return 'bg-green-100 text-green-800';
+      case 'Contactado':
+        return 'bg-blue-100 text-blue-800';
+      case 'Seleccionado':
+        return 'bg-purple-100 text-purple-800';
+      case 'Rechazado':
+        return 'bg-red-100 text-red-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -209,20 +189,20 @@ const ProveedorDetail = ({
           {/* pestañas de navegación */}
           <div className="flex border-b">
             <button
-              className={`py-2 px-4 ${activeTab === "info" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("info")}
+              className={`py-2 px-4 ${activeTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('info')}
             >
               Información
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === "communications" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("communications")}
+              className={`py-2 px-4 ${activeTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('communications')}
             >
               Comunicaciones
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === "tracking" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("tracking")}
+              className={`py-2 px-4 ${activeTab === 'tracking' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              onClick={() => setActiveTab('tracking')}
             >
               Seguimiento
             </button>
@@ -230,7 +210,7 @@ const ProveedorDetail = ({
 
           {/* Contenido principal con scroll */}
           <div className="overflow-y-auto p-4 flex-1">
-            {activeTab === "info" && (
+            {activeTab === 'info' && (
               <div className="space-y-6">
                 {/* Información principal */}
                 <Card>
@@ -241,9 +221,7 @@ const ProveedorDetail = ({
                       >
                         {provider.status}
                       </span>
-                      <span className="ml-2 text-gray-500">
-                        {provider.service}
-                      </span>
+                      <span className="ml-2 text-gray-500">{provider.service}</span>
                       {!!provider.groupName && !groupCleared && (
                         <button
                           type="button"
@@ -256,11 +234,7 @@ const ProveedorDetail = ({
                       )}
                     </div>
                     {onEdit && (
-                      <Button
-                        onClick={() => onEdit(provider)}
-                        variant="outline"
-                        size="sm"
-                      >
+                      <Button onClick={() => onEdit(provider)} variant="outline" size="sm">
                         <Edit2 size={16} className="mr-1" /> Editar
                       </Button>
                     )}
@@ -275,8 +249,8 @@ const ProveedorDetail = ({
                             await removeMember(provider.groupId, provider.id);
                             setGroupCleared(true);
                             setToast({
-                              type: "success",
-                              message: "Proveedor quitado del grupo",
+                              type: 'success',
+                              message: 'Proveedor quitado del grupo',
                             });
                           } finally {
                             setRemoving(false);
@@ -287,7 +261,7 @@ const ProveedorDetail = ({
                         className="ml-2 text-red-600 border-red-200 hover:bg-red-50"
                         disabled={removing}
                       >
-                        {removing ? "Quitando..." : "Quitar del grupo"}
+                        {removing ? 'Quitando...' : 'Quitar del grupo'}
                       </Button>
                     )}
                   </div>
@@ -304,9 +278,7 @@ const ProveedorDetail = ({
                   )}
 
                   {/* Descripción o snippet */}
-                  {provider.snippet && (
-                    <p className="text-gray-700 mb-4">{provider.snippet}</p>
-                  )}
+                  {provider.snippet && <p className="text-gray-700 mb-4">{provider.snippet}</p>}
 
                   {/* Detalles de contacto */}
                   <div className="space-y-3 mt-4">
@@ -319,9 +291,7 @@ const ProveedorDetail = ({
                         </div>
                         <div>
                           <p className="font-medium">Contacto</p>
-                          <p className="text-sm text-gray-600">
-                            {provider.contact}
-                          </p>
+                          <p className="text-sm text-gray-600">{provider.contact}</p>
                         </div>
                       </div>
                     )}
@@ -333,9 +303,7 @@ const ProveedorDetail = ({
                         </div>
                         <div>
                           <p className="font-medium">Teléfono</p>
-                          <p className="text-sm text-gray-600">
-                            {provider.phone}
-                          </p>
+                          <p className="text-sm text-gray-600">{provider.phone}</p>
                         </div>
                       </div>
                     )}
@@ -383,9 +351,7 @@ const ProveedorDetail = ({
                         </div>
                         <div>
                           <p className="font-medium">Fecha</p>
-                          <p className="text-sm text-gray-600">
-                            {formatDate(provider.date)}
-                          </p>
+                          <p className="text-sm text-gray-600">{formatDate(provider.date)}</p>
                         </div>
                       </div>
                     )}
@@ -407,9 +373,7 @@ const ProveedorDetail = ({
                     {provider.priceRange && (
                       <div className="mt-3 p-3 bg-gray-50 rounded-md">
                         <p className="font-medium">Rango de precios</p>
-                        <p className="text-lg font-semibold text-gray-800">
-                          {provider.priceRange}
-                        </p>
+                        <p className="text-lg font-semibold text-gray-800">{provider.priceRange}</p>
                       </div>
                     )}
                   </div>
@@ -420,8 +384,7 @@ const ProveedorDetail = ({
                     <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
-                        {rating.toFixed(1)} de 5 ({provider.ratingCount || 0}{" "}
-                        valoraciones)
+                        {rating.toFixed(1)} de 5 ({provider.ratingCount || 0} valoraciones)
                       </span>
                     </div>
                   </div>
@@ -431,9 +394,7 @@ const ProveedorDetail = ({
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-medium">Documentos</h3>
-                      {genError && (
-                        <p className="text-sm text-red-600 mt-1">{genError}</p>
-                      )}
+                      {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={handleOpenLegalDocs} variant="outline">
@@ -443,7 +404,7 @@ const ProveedorDetail = ({
                         onClick={handleGenerateContract}
                         disabled={!activeWedding || generating}
                       >
-                        {generating ? "Generandoâ¬¦" : "Generar ahora"}
+                        {generating ? 'Generandoâ¬¦' : 'Generar ahora'}
                       </Button>
                     </div>
                   </div>
@@ -461,30 +422,27 @@ const ProveedorDetail = ({
                             const res = await apiPost(
                               `/api/supplier-portal/weddings/${activeWedding}/suppliers/${provider.id}/portal-token`,
                               {},
-                              { auth: true },
+                              { auth: true }
                             );
                             const json = await res.json();
                             if (json?.url) {
                               try {
-                                await navigator.clipboard?.writeText?.(
-                                  json.url,
-                                );
+                                await navigator.clipboard?.writeText?.(json.url);
                               } catch {}
                               setToast({
-                                type: "success",
-                                message: "Enlace del portal copiado",
+                                type: 'success',
+                                message: 'Enlace del portal copiado',
                               });
                             } else {
                               setToast({
-                                type: "info",
-                                message: "Token generado",
+                                type: 'info',
+                                message: 'Token generado',
                               });
                             }
                           } catch (e) {
                             setToast({
-                              type: "error",
-                              message:
-                                "No se pudo generar el enlace del portal",
+                              type: 'error',
+                              message: 'No se pudo generar el enlace del portal',
                             });
                           }
                         }}
@@ -495,9 +453,8 @@ const ProveedorDetail = ({
                         variant="outline"
                         onClick={() => {
                           setRfqDefaults({
-                            subject:
-                              `Solicitud de presupuesto - ${provider?.service || ""}`.trim(),
-                            body: "",
+                            subject: `Solicitud de presupuesto - ${provider?.service || ''}`.trim(),
+                            body: '',
                           });
                           setRfqOpen(true);
                         }}
@@ -513,20 +470,13 @@ const ProveedorDetail = ({
                   ) : (
                     <ul className="divide-y">
                       {rfqHistory.map((r) => (
-                        <li
-                          key={r.id}
-                          className="py-2 flex items-center justify-between"
-                        >
+                        <li key={r.id} className="py-2 flex items-center justify-between">
                           <div>
-                            <p
-                              className="font-medium truncate max-w-[28rem]"
-                              title={r.subject}
-                            >
-                              {r.subject || "Sin asunto"}
+                            <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
+                              {r.subject || 'Sin asunto'}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {r.email || provider?.email} ·{" "}
-                              {formatDateTime(r.sentAt)}
+                              {r.email || provider?.email} · {formatDateTime(r.sentAt)}
                             </p>
                           </div>
                           <Button
@@ -534,8 +484,8 @@ const ProveedorDetail = ({
                             variant="outline"
                             onClick={() => {
                               setRfqDefaults({
-                                subject: r.subject || "",
-                                body: r.body || "",
+                                subject: r.subject || '',
+                                body: r.body || '',
                               });
                               setRfqOpen(true);
                             }}
@@ -550,26 +500,23 @@ const ProveedorDetail = ({
               </div>
             )}
 
-            {activeTab === "communications" && (
+            {activeTab === 'communications' && (
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Comunicaciones</h3>
                   {/* Aquí se renderizarían las comunicaciones */}
-                  <p className="text-gray-500">
-                    Historial de comunicaciones con este proveedor.
-                  </p>
+                  <p className="text-gray-500">Historial de comunicaciones con este proveedor.</p>
                 </Card>
               </div>
             )}
 
-            {activeTab === "tracking" && (
+            {activeTab === 'tracking' && (
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Seguimiento</h3>
                   {/* Aquí se renderizaría el seguimiento */}
                   <p className="text-gray-500">
-                    Historial de seguimiento de comunicaciones con este
-                    proveedor.
+                    Historial de seguimiento de comunicaciones con este proveedor.
                   </p>
                 </Card>
               </div>
@@ -595,22 +542,14 @@ const ProveedorDetail = ({
       {preview.open && (
         <Modal
           open={preview.open}
-          onClose={() => setPreview({ open: false, url: "", type: "" })}
+          onClose={() => setPreview({ open: false, url: '', type: '' })}
           title="Vista previa"
         >
           <div className="min-h-[60vh]">
-            {preview.type === "image" ? (
-              <img
-                src={preview.url}
-                alt="preview"
-                className="max-h-[70vh] mx-auto"
-              />
-            ) : preview.type === "pdf" ? (
-              <iframe
-                src={preview.url}
-                className="w-full h-[70vh]"
-                title="PDF"
-              />
+            {preview.type === 'image' ? (
+              <img src={preview.url} alt="preview" className="max-h-[70vh] mx-auto" />
+            ) : preview.type === 'pdf' ? (
+              <iframe src={preview.url} className="w-full h-[70vh]" title="PDF" />
             ) : (
               <a
                 href={preview.url}
@@ -644,5 +583,3 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
-
-

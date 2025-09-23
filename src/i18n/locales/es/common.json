@@ -65,6 +65,44 @@
       "allCategories": "Todas las categorías",
       "searchPlaceholder": "Buscar por concepto..."
     }
+  },
+  "tasks": {
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+    "completed": "Completada",
+    "inProgress": "En progreso",
+    "notStarted": "No iniciada",
+    "overdue": "Atrasada"
+  },
+  "forms": {
+    "required": "Obligatorio",
+    "optional": "Opcional",
+    "pleaseSelect": "Por favor, selecciona",
+    "selectOption": "Selecciona una opción",
+    "enterText": "Introduce texto",
+    "chooseFile": "Seleccionar archivo",
+    "uploadFile": "Subir archivo",
+    "fieldRequired": "Este campo es obligatorio",
+    "invalidEmail": "Email inválido",
+    "invalidPhone": "Teléfono inválido",
+    "invalidUrl": "URL inválida"
+  },
+  "messages": {
+    "saveSuccess": "Guardado correctamente",
+    "saveError": "Error al guardar",
+    "deleteSuccess": "Eliminado correctamente",
+    "deleteError": "Error al eliminar",
+    "updateSuccess": "Actualizado correctamente",
+    "updateError": "Error al actualizar",
+    "loadError": "Error al cargar datos",
+    "networkError": "Error de red",
+    "confirmDelete": "¿Seguro que deseas eliminar?",
+    "unsavedChanges": "Tienes cambios sin guardar"
+  },
+  "rsvp": {
+    "section": "RSVP",
+    "simulate": "Simular recordatorios",
+    "send": "Enviar recordatorios"
   }
 }
-

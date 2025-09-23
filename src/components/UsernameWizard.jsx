@@ -1,27 +1,23 @@
-import { useEffect, useState } from "react";
-import { auth } from "../lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import useEmailUsername from "../hooks/useEmailUsername";
-import Spinner from "./ui/Spinner";
-import Button from "./ui/Button";
-import Alert from "./ui/Alert";
+import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+
+import useEmailUsername from '../hooks/useEmailUsername';
+import { auth } from '../lib/firebase';
+import Alert from './ui/Alert';
+import Button from './ui/Button';
+import Spinner from './ui/Spinner';
 
 /**
  * Muestra un modal la primera vez que el usuario accede para que elija su nombre
  * de correo @mywed360.com. Una vez configurado desaparece para siempre.
  */
 const UsernameWizard = () => {
-  const {
-    checkUsernameAvailability,
-    reserveUsername,
-    getCurrentUsername,
-    loading,
-    error,
-  } = useEmailUsername();
+  const { checkUsernameAvailability, reserveUsername, getCurrentUsername, loading, error } =
+    useEmailUsername();
 
   const [stepLoading, setStepLoading] = useState(true);
   const [showWizard, setShowWizard] = useState(false);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
   const [checking, setChecking] = useState(false);
   const [available, setAvailable] = useState(null); // null sin comprobar, true/false resultado
   const [feedback, setFeedback] = useState(null);
@@ -43,7 +39,6 @@ const UsernameWizard = () => {
       setStepLoading(false);
       // Nos desuscribimos porque solo necesitamos esta comprobación una vez.
       // (La función retornada por useEffect hará el cleanup).
-      
     });
 
     return () => unsubscribe();
@@ -58,9 +53,9 @@ const UsernameWizard = () => {
     const ok = await checkUsernameAvailability(username.trim());
     setAvailable(ok);
     if (ok) {
-      setFeedback("Disponible ✅");
+      setFeedback('Disponible ✅');
     } else {
-      setFeedback("No disponible ❌");
+      setFeedback('No disponible ❌');
     }
     setChecking(false);
   };
@@ -101,9 +96,7 @@ const UsernameWizard = () => {
         </div>
 
         {feedback && (
-          <p
-            className={`mt-2 text-sm ${available ? "text-green-600" : "text-red-600"}`}
-          >
+          <p className={`mt-2 text-sm ${available ? 'text-green-600' : 'text-red-600'}`}>
             {feedback}
           </p>
         )}
@@ -115,14 +108,10 @@ const UsernameWizard = () => {
 
         <div className="mt-6 flex justify-end gap-2">
           <Button onClick={handleCheck} disabled={checking || !username}>
-            {checking ? <Spinner size="sm" /> : "Comprobar"}
+            {checking ? <Spinner size="sm" /> : 'Comprobar'}
           </Button>
-          <Button
-            onClick={handleSave}
-            variant="primary"
-            disabled={checking || !available}
-          >
-            {checking ? <Spinner size="sm" /> : "Guardar"}
+          <Button onClick={handleSave} variant="primary" disabled={checking || !available}>
+            {checking ? <Spinner size="sm" /> : 'Guardar'}
           </Button>
         </div>
       </div>

@@ -19,10 +19,12 @@ export function prefetchModule(key, loader, opts) {
   if (!key || typeof loader !== 'function') return;
   if (prefetched.has(key)) return;
   const run = () => {
-    try { loader().catch(() => {}); } catch {}
+    try {
+      loader().catch(() => {});
+    } catch {}
     prefetched.add(key);
   };
-  const delay = (opts && typeof opts.delay === 'number') ? opts.delay : 0;
+  const delay = opts && typeof opts.delay === 'number' ? opts.delay : 0;
   const schedule = () => {
     try {
       const ric = window.requestIdleCallback;
@@ -31,5 +33,6 @@ export function prefetchModule(key, loader, opts) {
       setTimeout(run, 0);
     }
   };
-  if (delay > 0) setTimeout(schedule, delay); else schedule();
+  if (delay > 0) setTimeout(schedule, delay);
+  else schedule();
 }

@@ -1,12 +1,25 @@
-﻿import React, { useState, useEffect } from 'react';
-import { Music, Edit2, Play, Plus, Trash2, Search as SearchIcon, X, ChevronUp, ChevronDown, Sparkles, Pause } from 'lucide-react';
-import { Card } from '../../components/ui';
+﻿import {
+  Music,
+  Edit2,
+  Play,
+  Plus,
+  Trash2,
+  Search as SearchIcon,
+  X,
+  ChevronUp,
+  ChevronDown,
+  Sparkles,
+  Pause,
+} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import PageWrapper from '../../components/PageWrapper';
+import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
+import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
-import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 
 const TABS = [
   { key: 'ceremonia', label: 'Ceremonia' },
@@ -16,7 +29,8 @@ const TABS = [
 ];
 
 const MomentosEspeciales = () => {
-  const { moments, addMoment, updateMoment, removeMoment, reorderMoment, duplicateMoment } = useSpecialMoments();
+  const { moments, addMoment, updateMoment, removeMoment, reorderMoment, duplicateMoment } =
+    useSpecialMoments();
 
   // Estado básico
   const [activeTab, setActiveTab] = useState('ceremonia');
@@ -57,7 +71,11 @@ const MomentosEspeciales = () => {
   }, []);
   // Cleanup al desmontar
   useEffect(() => {
-    return () => { try { Playback.stop(); } catch {} };
+    return () => {
+      try {
+        Playback.stop();
+      } catch {}
+    };
   }, []);
   const [playingId, setPlayingId] = useState(null);
 
@@ -73,17 +91,23 @@ const MomentosEspeciales = () => {
         const data = await res.json();
         setSpotifyStatus({ connected: !!data.connected, profile: data.profile || null });
       }
-    } catch {}
-    finally { setSpotifyLoading(false); }
+    } catch {
+    } finally {
+      setSpotifyLoading(false);
+    }
   };
 
-  useEffect(() => { checkSpotifyStatus(); }, []);
+  useEffect(() => {
+    checkSpotifyStatus();
+  }, []);
 
   const connectSpotify = () => {
     try {
       const current = typeof window !== 'undefined' ? window.location.href : '';
-      const base = (import.meta?.env?.VITE_BACKEND_BASE_URL || '');
-      const loginUrl = base ? `${base}/api/spotify/login?return=${encodeURIComponent(current)}` : `/api/spotify/login?return=${encodeURIComponent(current)}`;
+      const base = import.meta?.env?.VITE_BACKEND_BASE_URL || '';
+      const loginUrl = base
+        ? `${base}/api/spotify/login?return=${encodeURIComponent(current)}`
+        : `/api/spotify/login?return=${encodeURIComponent(current)}`;
       window.location.assign(loginUrl);
     } catch {}
   };
@@ -104,7 +128,9 @@ const MomentosEspeciales = () => {
         if (uriMatch && uriMatch[1]) id = uriMatch[1];
       }
       return id ? `https://open.spotify.com/embed/track/${id}` : null;
-    } catch { return null; }
+    } catch {
+      return null;
+    }
   };
 
   // Guardar preferencias músicales en localStorage
@@ -137,21 +163,26 @@ const MomentosEspeciales = () => {
   // Búsqueda por nombre (iTunes)
   const handleSearch = async () => {
     const term = search.trim();
-    if (!term) { setResults([]); return; }
+    if (!term) {
+      setResults([]);
+      return;
+    }
     setLoadingSearch(true);
     setErrorSearch(null);
     try {
-      const resp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=15`);
+      const resp = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=15`
+      );
       const data = await resp.json();
       if (Array.isArray(data.results)) {
-        const mapped = data.results.map(r => ({
+        const mapped = data.results.map((r) => ({
           id: String(r.trackId),
           name: `${r.trackName} - ${r.artistName}`,
           title: r.trackName,
           artist: r.artistName,
           previewUrl: r.previewUrl,
           trackUrl: r.trackViewUrl || r.collectionViewUrl,
-          artwork: r.artworkUrl60 || r.artworkUrl100
+          artwork: r.artworkUrl60 || r.artworkUrl100,
         }));
         setResults(mapped);
       } else {
@@ -169,13 +200,21 @@ const MomentosEspeciales = () => {
   // Añadir momento
   const handleAddMoment = () => {
     const nextOrder = (moments[activeTab]?.length || 0) + 1;
-    addMoment(activeTab, { order: nextOrder, title: `Nuevo momento ${nextOrder}`, song: '', time: '' });
+    addMoment(activeTab, {
+      order: nextOrder,
+      title: `Nuevo momento ${nextOrder}`,
+      song: '',
+      time: '',
+    });
   };
 
   // Búsqueda con IA via backend
   const handleAISearch = async () => {
     const prompt = aiPrompt.trim();
-    if (!prompt) { setAiSongs([]); return; }
+    if (!prompt) {
+      setAiSongs([]);
+      return;
+    }
     setAiLoading(true);
     setAiError(null);
     try {
@@ -187,13 +226,19 @@ const MomentosEspeciales = () => {
       if (aiTempo) prefs.push(`tempo ${aiTempo}`);
       if (aiEra) prefs.push(`década ${aiEra}`);
       if (aiGenre) prefs.push(`género ${aiGenre}`);
-      if (!aiGenre && profilePrefs.genres?.length) prefs.push(`géneros: ${profilePrefs.genres.join(', ')}`);
-      if (!aiEra && profilePrefs.decades?.length) prefs.push(`décadas: ${profilePrefs.decades.join(', ')}`);
+      if (!aiGenre && profilePrefs.genres?.length)
+        prefs.push(`géneros: ${profilePrefs.genres.join(', ')}`);
+      if (!aiEra && profilePrefs.decades?.length)
+        prefs.push(`décadas: ${profilePrefs.decades.join(', ')}`);
       // Idiomas adicionales como pista
-      const extraLangs = (profilePrefs.languages || []).filter(l => l !== aiLanguage);
+      const extraLangs = (profilePrefs.languages || []).filter((l) => l !== aiLanguage);
       if (extraLangs.length) prefs.push(`también considerar idiomas: ${extraLangs.join(', ')}`);
       const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
-      const res = await apiPost('/api/ai-songs/recommend', { prompt: fullPrompt, context: activeTab }, { auth: true });
+      const res = await apiPost(
+        '/api/ai-songs/recommend',
+        { prompt: fullPrompt, context: activeTab },
+        { auth: true }
+      );
       if (!res.ok) throw new Error(`API ${res.status}`);
       const data = await res.json();
       const items = Array.isArray(data?.songs) ? data.songs : [];
@@ -212,7 +257,9 @@ const MomentosEspeciales = () => {
         try {
           const q = `${song.title} ${song.artist}`.trim();
           if (!q) return song;
-          const resp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`);
+          const resp = await fetch(
+            `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`
+          );
           const json = await resp.json();
           const hit = Array.isArray(json?.results) && json.results[0] ? json.results[0] : null;
           if (hit?.previewUrl) {
@@ -252,33 +299,36 @@ const MomentosEspeciales = () => {
             <div>
               <div className="font-medium">Spotify</div>
               <div className="text-sm text-gray-600">
-                {spotifyLoading ? 'Comprobando estado...' : (
-                  spotifyStatus.connected
+                {spotifyLoading
+                  ? 'Comprobando estado...'
+                  : spotifyStatus.connected
                     ? `Conectado${spotifyStatus.profile?.display_name ? ` como ${spotifyStatus.profile.display_name}` : ''}`
-                    : 'Conecta tu cuenta para controlar la reproducción en tu dispositivo'
-                )}
+                    : 'Conecta tu cuenta para controlar la reproducción en tu dispositivo'}
               </div>
             </div>
-            {!spotifyStatus.connected && (
-              <Button onClick={connectSpotify}>Conectar Spotify</Button>
-            )}
+            {!spotifyStatus.connected && <Button onClick={connectSpotify}>Conectar Spotify</Button>}
           </div>
         </Card>
         {/* Preferencias músicales (movidas desde Perfil) */}
         <Card className="space-y-4 p-5">
-          <h3 className="text-md font-medium flex items-center gap-2"><Music size={16} /> Preferencias músicales</h3>
+          <h3 className="text-md font-medium flex items-center gap-2">
+            <Music size={16} /> Preferencias músicales
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <div className="text-sm font-medium mb-1">Idiomas</div>
               <div className="flex flex-wrap gap-2">
-                {['es','en','it','fr','pt'].map(lang => (
-                  <label key={lang} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.languages.includes(lang)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                {['es', 'en', 'it', 'fr', 'pt'].map((lang) => (
+                  <label
+                    key={lang}
+                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.languages.includes(lang) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
+                  >
                     <input
                       type="checkbox"
                       className="hidden"
                       checked={profilePrefs.languages.includes(lang)}
-                      onChange={(e)=>{
-                        setProfilePrefs(prev => {
+                      onChange={(e) => {
+                        setProfilePrefs((prev) => {
                           const set = new Set(prev.languages);
                           e.target.checked ? set.add(lang) : set.delete(lang);
                           return { ...prev, languages: Array.from(set) };
@@ -294,14 +344,26 @@ const MomentosEspeciales = () => {
             <div>
               <div className="text-sm font-medium mb-1">Generos</div>
               <div className="flex flex-wrap gap-2">
-                {['pop','rock','jazz','latino','cl\\u00E1sica','indie','r&b','electr\\u00F3nica'].map(genre => (
-                  <label key={genre} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.genres.includes(genre)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                {[
+                  'pop',
+                  'rock',
+                  'jazz',
+                  'latino',
+                  'cl\\u00E1sica',
+                  'indie',
+                  'r&b',
+                  'electr\\u00F3nica',
+                ].map((genre) => (
+                  <label
+                    key={genre}
+                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.genres.includes(genre) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
+                  >
                     <input
                       type="checkbox"
                       className="hidden"
                       checked={profilePrefs.genres.includes(genre)}
-                      onChange={(e)=>{
-                        setProfilePrefs(prev => {
+                      onChange={(e) => {
+                        setProfilePrefs((prev) => {
                           const set = new Set(prev.genres);
                           e.target.checked ? set.add(genre) : set.delete(genre);
                           return { ...prev, genres: Array.from(set) };
@@ -317,14 +379,17 @@ const MomentosEspeciales = () => {
             <div>
               <div className="text-sm font-medium mb-1">Decadas</div>
               <div className="flex flex-wrap gap-2">
-                {['70s','80s','90s','2000s','2010s','actual'].map(dec => (
-                  <label key={dec} className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.decades.includes(dec)?'bg-blue-600 text-white border-blue-600':'bg-white'}`}>
+                {['70s', '80s', '90s', '2000s', '2010s', 'actual'].map((dec) => (
+                  <label
+                    key={dec}
+                    className={`text-xs border rounded px-2 py-1 cursor-pointer ${profilePrefs.decades.includes(dec) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white'}`}
+                  >
                     <input
                       type="checkbox"
                       className="hidden"
                       checked={profilePrefs.decades.includes(dec)}
-                      onChange={(e)=>{
-                        setProfilePrefs(prev => {
+                      onChange={(e) => {
+                        setProfilePrefs((prev) => {
                           const set = new Set(prev.decades);
                           e.target.checked ? set.add(dec) : set.delete(dec);
                           return { ...prev, decades: Array.from(set) };
@@ -337,17 +402,28 @@ const MomentosEspeciales = () => {
               </div>
             </div>
           </div>
-          <div className="text-right"><Button onClick={saveProfilePrefs}>Guardar preferencias</Button></div>
+          <div className="text-right">
+            <Button onClick={saveProfilePrefs}>Guardar preferencias</Button>
+          </div>
         </Card>
-        <p className="text-gray-600">Planifica cada instante clave con la música y el momento adecuados.</p>
+        <p className="text-gray-600">
+          Planifica cada instante clave con la música y el momento adecuados.
+        </p>
 
         {/* Tabs */}
         <div className="border-b flex gap-4">
-          {TABS.map(tab => (
+          {TABS.map((tab) => (
             <button
               key={tab.key}
               className={`pb-2 -mb-px font-medium ${activeTab === tab.key ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}
-              onClick={() => { stopAudio(); setActiveTab(tab.key); setResults([]); setSearch(''); setAiSongs([]); setAiError(null); }}
+              onClick={() => {
+                stopAudio();
+                setActiveTab(tab.key);
+                setResults([]);
+                setSearch('');
+                setAiSongs([]);
+                setAiError(null);
+              }}
             >
               {tab.label}
             </button>
@@ -367,32 +443,52 @@ const MomentosEspeciales = () => {
                 <div key={cat} className="border rounded-md">
                   <button
                     className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 flex items-center justify-between"
-                    onClick={() => setOpenCategory(prev => prev === cat ? null : cat)}
+                    onClick={() => setOpenCategory((prev) => (prev === cat ? null : cat))}
                   >
                     <span className="font-medium text-sm">{cat}</span>
-                    <span className="text-xs text-gray-500">{openCategory === cat ? 'Ocultar' : 'Ver sugerencias'}</span>
+                    <span className="text-xs text-gray-500">
+                      {openCategory === cat ? 'Ocultar' : 'Ver sugerencias'}
+                    </span>
                   </button>
                   {openCategory === cat && (
                     <ul className="divide-y">
                       {songs.map((s, idx) => (
-                        <li key={`${cat}-${idx}`} className="p-2 flex items-center justify-between gap-2">
+                        <li
+                          key={`${cat}-${idx}`}
+                          className="p-2 flex items-center justify-between gap-2"
+                        >
                           <div className="min-w-0">
-                            <div className="truncate text-sm font-medium">{s.title} <span className="text-gray-500">- {s.artist}</span></div>
+                            <div className="truncate text-sm font-medium">
+                              {s.title} <span className="text-gray-500">- {s.artist}</span>
+                            </div>
                             {s.tags?.length ? (
-                              <div className="text-xs text-gray-500 truncate">{s.tags.join(' · ')}</div>
+                              <div className="text-xs text-gray-500 truncate">
+                                {s.tags.join(' · ')}
+                              </div>
                             ) : null}
                           </div>
                           <Button
                             className="text-xs py-1 px-2"
                             onClick={() => {
                               if (!moments[activeTab]?.length) {
-                                addMoment(activeTab, { order: 1, title: cat, song: `${s.title} - ${s.artist}`, time: '' });
+                                addMoment(activeTab, {
+                                  order: 1,
+                                  title: cat,
+                                  song: `${s.title} - ${s.artist}`,
+                                  time: '',
+                                });
                               } else {
                                 const last = [...(moments[activeTab] || [])].pop();
-                                if (last) updateMoment(activeTab, last.id, { ...last, song: `${s.title} - ${s.artist}` });
+                                if (last)
+                                  updateMoment(activeTab, last.id, {
+                                    ...last,
+                                    song: `${s.title} - ${s.artist}`,
+                                  });
                               }
                             }}
-                          >Usar</Button>
+                          >
+                            Usar
+                          </Button>
                         </li>
                       ))}
                     </ul>
@@ -410,19 +506,31 @@ const MomentosEspeciales = () => {
             </div>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <label className="text-gray-600">Idioma</label>
-              <select className="border rounded px-2 py-1" value={aiLanguage} onChange={e => setAiLanguage(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={aiLanguage}
+                onChange={(e) => setAiLanguage(e.target.value)}
+              >
                 <option value="es">Español</option>
                 <option value="en">Inglés</option>
               </select>
               <label className="text-gray-600">Tempo</label>
-              <select className="border rounded px-2 py-1" value={aiTempo} onChange={e => setAiTempo(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={aiTempo}
+                onChange={(e) => setAiTempo(e.target.value)}
+              >
                 <option value="">Cualquiera</option>
                 <option value="lento">Lento</option>
                 <option value="medio">Medio</option>
                 <option value="rápido">Rápido</option>
               </select>
               <label className="text-gray-600">Década</label>
-              <select className="border rounded px-2 py-1" value={aiEra} onChange={e => setAiEra(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={aiEra}
+                onChange={(e) => setAiEra(e.target.value)}
+              >
                 <option value="">Cualquiera</option>
                 <option value="80s">80s</option>
                 <option value="90s">90s</option>
@@ -431,7 +539,11 @@ const MomentosEspeciales = () => {
                 <option value="actual">Actual</option>
               </select>
               <label className="text-gray-600">Género</label>
-              <select className="border rounded px-2 py-1" value={aiGenre} onChange={e => setAiGenre(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={aiGenre}
+                onChange={(e) => setAiGenre(e.target.value)}
+              >
                 <option value="">Cualquiera</option>
                 <option value="pop">Pop</option>
                 <option value="rock">Rock</option>
@@ -446,11 +558,14 @@ const MomentosEspeciales = () => {
               <textarea
                 rows={2}
                 value={aiPrompt}
-                onChange={e => setAiPrompt(e.target.value)}
+                onChange={(e) => setAiPrompt(e.target.value)}
                 placeholder="Describe el momento: 'primer baile, balada en español'"
                 className="flex-1 border rounded px-3 py-2"
               />
-              <button onClick={handleAISearch} className="bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
+              <button
+                onClick={handleAISearch}
+                className="bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1"
+              >
                 <Sparkles size={16} /> Buscar con IA
               </button>
             </div>
@@ -460,7 +575,10 @@ const MomentosEspeciales = () => {
               <div className="border rounded-md overflow-hidden">
                 <div className="bg-gray-50 p-2 border-b text-sm font-medium">
                   Recomendaciones de IA
-                  <button onClick={() => setAiSongs([])} className="float-right text-gray-500 hover:text-gray-700">
+                  <button
+                    onClick={() => setAiSongs([])}
+                    className="float-right text-gray-500 hover:text-gray-700"
+                  >
                     <X size={16} />
                   </button>
                 </div>
@@ -469,20 +587,47 @@ const MomentosEspeciales = () => {
                     <li key={s.id} className="p-2 hover:bg-purple-50">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium">{s.title} {s.artist ? <span className="text-gray-500">- {s.artist}</span> : null}</div>
-                          {(s.mood || s.tempo || s.era || (s.tags?.length)) && (
+                          <div className="truncate text-sm font-medium">
+                            {s.title}{' '}
+                            {s.artist ? <span className="text-gray-500">- {s.artist}</span> : null}
+                          </div>
+                          {(s.mood || s.tempo || s.era || s.tags?.length) && (
                             <div className="text-xs text-gray-500 truncate">
-                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' · ')}{s.tags?.length ? ` · ${s.tags.join(' · ')}` : ''}
+                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' · ')}
+                              {s.tags?.length ? ` · ${s.tags.join(' · ')}` : ''}
                             </div>
                           )}
-                          {s.reason && <div className="text-xs text-gray-600 line-clamp-2">{s.reason}</div>}
+                          {s.reason && (
+                            <div className="text-xs text-gray-600 line-clamp-2">{s.reason}</div>
+                          )}
                           <div className="text-xs text-gray-500 truncate mt-1">
-                            Ver en: 
-                            <a className="ml-1 hover:underline" href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">YouTube</a>
+                            Ver en:
+                            <a
+                              className="ml-1 hover:underline"
+                              href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              YouTube
+                            </a>
                             <span> · </span>
-                            <a className="hover:underline" href={`https://open.spotify.com/search/${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">Spotify</a>
+                            <a
+                              className="hover:underline"
+                              href={`https://open.spotify.com/search/${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Spotify
+                            </a>
                             <span> · </span>
-                            <a className="hover:underline" href={`https://music.apple.com/search?term=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`} target="_blank" rel="noreferrer">Apple</a>
+                            <a
+                              className="hover:underline"
+                              href={`https://music.apple.com/search?term=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Apple
+                            </a>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
@@ -497,13 +642,24 @@ const MomentosEspeciales = () => {
                             className="text-xs py-1 px-2"
                             onClick={() => {
                               if (!moments[activeTab]?.length) {
-                                addMoment(activeTab, { order: 1, title: 'Nuevo momento', song: `${s.title}${s.artist ? ' - ' + s.artist : ''}`, time: '' });
+                                addMoment(activeTab, {
+                                  order: 1,
+                                  title: 'Nuevo momento',
+                                  song: `${s.title}${s.artist ? ' - ' + s.artist : ''}`,
+                                  time: '',
+                                });
                               } else {
                                 const last = [...(moments[activeTab] || [])].pop();
-                                if (last) updateMoment(activeTab, last.id, { ...last, song: `${s.title}${s.artist ? ' - ' + s.artist : ''}` });
+                                if (last)
+                                  updateMoment(activeTab, last.id, {
+                                    ...last,
+                                    song: `${s.title}${s.artist ? ' - ' + s.artist : ''}`,
+                                  });
                               }
                             }}
-                          >Usar</Button>
+                          >
+                            Usar
+                          </Button>
                         </div>
                       </div>
                     </li>
@@ -518,12 +674,15 @@ const MomentosEspeciales = () => {
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar canción por nombre..."
               className="flex-1 border rounded px-3 py-2"
-              onKeyPress={e => e.key === 'Enter' && handleSearch()}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
-            <button onClick={handleSearch} className="bg-blue-600 text-white px-3 py-2 rounded flex items-center gap-1">
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 text-white px-3 py-2 rounded flex items-center gap-1"
+            >
               <SearchIcon size={16} /> Buscar
             </button>
           </div>
@@ -537,25 +696,62 @@ const MomentosEspeciales = () => {
             <div className="border rounded-md overflow-hidden">
               <div className="bg-gray-50 p-2 border-b text-sm font-medium">
                 Resultados
-                <button onClick={() => { setResults([]); stopAudio(); }} className="float-right text-gray-500 hover:text-gray-700">
+                <button
+                  onClick={() => {
+                    setResults([]);
+                    stopAudio();
+                  }}
+                  className="float-right text-gray-500 hover:text-gray-700"
+                >
                   <X size={16} />
                 </button>
               </div>
               <ul className="divide-y">
-                {results.map(song => (
+                {results.map((song) => (
                   <li key={song.id} className="p-2 hover:bg-blue-50">
                     <div className="w-full flex items-center gap-2">
                       {song.artwork && (
-                        <img src={song.artwork} alt="cover" className="w-8 h-8 rounded object-cover" loading="lazy" />
+                        <img
+                          src={song.artwork}
+                          alt="cover"
+                          className="w-8 h-8 rounded object-cover"
+                          loading="lazy"
+                        />
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="truncate text-sm font-medium">{song.title} <span className="text-gray-500">- {song.artist}</span></div>
+                        <div className="truncate text-sm font-medium">
+                          {song.title} <span className="text-gray-500">- {song.artist}</span>
+                        </div>
                         <div className="text-xs text-gray-500 truncate">
-                          <a className="hover:underline" href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">YouTube</a>
+                          <a
+                            className="hover:underline"
+                            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.title} ${song.artist}`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            YouTube
+                          </a>
                           <span> · </span>
-                          <a className="hover:underline" href={`https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">Spotify</a>
+                          <a
+                            className="hover:underline"
+                            href={`https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Spotify
+                          </a>
                           <span> · </span>
-                          <a className="hover:underline" href={song.trackUrl || `https://music.apple.com/search?term=${encodeURIComponent(`${song.title} ${song.artist}`)}`} target="_blank" rel="noreferrer">Apple</a>
+                          <a
+                            className="hover:underline"
+                            href={
+                              song.trackUrl ||
+                              `https://music.apple.com/search?term=${encodeURIComponent(`${song.title} ${song.artist}`)}`
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Apple
+                          </a>
                         </div>
                       </div>
 
@@ -571,17 +767,27 @@ const MomentosEspeciales = () => {
                         className="text-xs bg-blue-600 text-white px-2 py-1 rounded"
                         onClick={() => {
                           if (!moments[activeTab]?.length) {
-                            addMoment(activeTab, { order: 1, title: 'Nuevo momento', song: `${song.title} - ${song.artist}`, time: '' });
+                            addMoment(activeTab, {
+                              order: 1,
+                              title: 'Nuevo momento',
+                              song: `${song.title} - ${song.artist}`,
+                              time: '',
+                            });
                           } else {
                             const lastMoment = [...(moments[activeTab] || [])].pop();
                             if (lastMoment) {
-                              updateMoment(activeTab, lastMoment.id, { ...lastMoment, song: `${song.title} - ${song.artist}` });
+                              updateMoment(activeTab, lastMoment.id, {
+                                ...lastMoment,
+                                song: `${song.title} - ${song.artist}`,
+                              });
                             }
                           }
                           setResults([]);
                           stopAudio();
                         }}
-                      >Usar</button>
+                      >
+                        Usar
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -592,8 +798,13 @@ const MomentosEspeciales = () => {
           {/* Lista de momentos */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <h3 className="font-medium">{TABS.find(t => t.key === activeTab)?.label || 'Momentos'}</h3>
-              <Button onClick={handleAddMoment} className="py-1 px-3 text-sm flex items-center gap-1">
+              <h3 className="font-medium">
+                {TABS.find((t) => t.key === activeTab)?.label || 'Momentos'}
+              </h3>
+              <Button
+                onClick={handleAddMoment}
+                className="py-1 px-3 text-sm flex items-center gap-1"
+              >
                 <Plus size={14} /> Añadir momento
               </Button>
             </div>
@@ -610,7 +821,12 @@ const MomentosEspeciales = () => {
                             type="text"
                             className="w-full font-medium border-0 border-b border-transparent focus:border-blue-300 focus:ring-0 p-0 pb-1"
                             value={moment.title || ''}
-                            onChange={e => updateMoment(activeTab, moment.id, { ...moment, title: e.target.value })}
+                            onChange={(e) =>
+                              updateMoment(activeTab, moment.id, {
+                                ...moment,
+                                title: e.target.value,
+                              })
+                            }
                             placeholder="Título del momento"
                           />
 
@@ -623,7 +839,12 @@ const MomentosEspeciales = () => {
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
                                 value={moment.song || ''}
-                                onChange={e => updateMoment(activeTab, moment.id, { ...moment, song: e.target.value })}
+                                onChange={(e) =>
+                                  updateMoment(activeTab, moment.id, {
+                                    ...moment,
+                                    song: e.target.value,
+                                  })
+                                }
                                 placeholder="Nombre de la canción"
                               />
                               {/* Si pega un enlace de Spotify válido, mostramos el reproductor embebido */}
@@ -642,7 +863,8 @@ const MomentosEspeciales = () => {
                                       loading="lazy"
                                     />
                                     <div className="text-[11px] text-gray-500 mt-1">
-                                      Pegaste un enlace de Spotify. Se muestra un reproductor de vista previa.
+                                      Pegaste un enlace de Spotify. Se muestra un reproductor de
+                                      vista previa.
                                     </div>
                                   </div>
                                 );
@@ -655,7 +877,12 @@ const MomentosEspeciales = () => {
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
                                 value={moment.time || ''}
-                                onChange={e => updateMoment(activeTab, moment.id, { ...moment, time: e.target.value })}
+                                onChange={(e) =>
+                                  updateMoment(activeTab, moment.id, {
+                                    ...moment,
+                                    time: e.target.value,
+                                  })
+                                }
                                 placeholder="00:00"
                               />
                             </div>
@@ -717,5 +944,3 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
-
-

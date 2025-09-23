@@ -1,13 +1,14 @@
+import { AlertCircle, Paperclip } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { AlertCircle, Paperclip } from 'lucide-react';
-import Button from '../Button';
-import Card from '../ui/Card';
+
+import { useAuth } from '../../hooks/useAuth';
 import * as EmailService from '../../services/emailService';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
-import { useAuth } from '../../hooks/useAuth';
 import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
+import Button from '../Button';
+import Card from '../ui/Card';
 
 /**
  * Página de composición de correo electrónico pensada para las rutas
@@ -36,7 +37,7 @@ const ComposeEmail = () => {
   const [quickReplies, setQuickReplies] = useState([
     'Gracias por su respuesta. Quedo atento/a a próximos pasos.',
     '¿Podrían enviarnos un presupuesto detallado, por favor?',
-    'Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias.'
+    'Confirmamos nuestra disponibilidad en la fecha indicada. Muchas gracias.',
   ]);
 
   // Inicializar desde query params (mailto:, atajos, etc.) y cargar borrador si aplica
@@ -88,10 +89,14 @@ const ComposeEmail = () => {
           getReq.onerror = () => reject(getReq.error);
         });
         // limpiar registro tras leer
-        try { store.delete(shareId); } catch {}
+        try {
+          store.delete(shareId);
+        } catch {}
         db.close();
         if (cancelled || !record || !Array.isArray(record.files)) return;
-        const files = record.files.map((f) => new File([f.blob], f.name, { type: f.type, lastModified: f.lastModified }));
+        const files = record.files.map(
+          (f) => new File([f.blob], f.name, { type: f.type, lastModified: f.lastModified })
+        );
         setAttachments((prev) => [...prev, ...files]);
       } catch (e) {
         console.warn('No se pudieron cargar archivos compartidos', e);
@@ -99,7 +104,9 @@ const ComposeEmail = () => {
     };
 
     loadShared();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [searchParams]);
 
   const handleFileUpload = (e) => {
@@ -135,10 +142,18 @@ const ComposeEmail = () => {
 
     setSending(true);
     try {
-      const uploaded = attachments && attachments.length
-        ? await uploadEmailAttachments(attachments, (profile && profile.id) || 'anon')
-        : [];
-      await EmailService.sendMail({ to, cc, bcc, subject, body, attachments: uploaded.length ? uploaded : attachments });
+      const uploaded =
+        attachments && attachments.length
+          ? await uploadEmailAttachments(attachments, (profile && profile.id) || 'anon')
+          : [];
+      await EmailService.sendMail({
+        to,
+        cc,
+        bcc,
+        subject,
+        body,
+        attachments: uploaded.length ? uploaded : attachments,
+      });
       // Mostrar mensaje de éxito
       setSentSuccess(true);
       // Redirigir tras breve demora
@@ -175,7 +190,7 @@ const ComposeEmail = () => {
               className="w-full border border-gray-300 rounded-md p-2"
               disabled={sending}
               data-testid="recipient-input"
-              aria-label={t('compose.toField','Campo destinatario')}
+              aria-label={t('compose.toField', 'Campo destinatario')}
             />
           </div>
 
@@ -189,12 +204,15 @@ const ComposeEmail = () => {
               className="w-full border border-gray-300 rounded-md p-2"
               disabled={sending}
               data-testid="subject-input"
-              aria-label={t('compose.subjectField','Campo asunto')}
+              aria-label={t('compose.subjectField', 'Campo asunto')}
             />
           </div>
 
           {/* CC/BCC toggle */}
-          <div className="text-sm text-blue-600 cursor-pointer select-none" onClick={() => setShowCcBcc((v) => !v)}>
+          <div
+            className="text-sm text-blue-600 cursor-pointer select-none"
+            onClick={() => setShowCcBcc((v) => !v)}
+          >
             {showCcBcc ? 'Ocultar CC/BCC' : 'Añadir CC/BCC'}
           </div>
           {showCcBcc && (
@@ -206,7 +224,7 @@ const ComposeEmail = () => {
                 onChange={(e) => setCc(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
                 disabled={sending}
-                aria-label={t('compose.ccField','Campo con copia')}
+                aria-label={t('compose.ccField', 'Campo con copia')}
               />
               <input
                 type="text"
@@ -215,7 +233,7 @@ const ComposeEmail = () => {
                 onChange={(e) => setBcc(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2"
                 disabled={sending}
-                aria-label={t('compose.bccField','Campo con copia oculta')}
+                aria-label={t('compose.bccField', 'Campo con copia oculta')}
               />
             </div>
           )}
@@ -239,17 +257,22 @@ const ComposeEmail = () => {
                   className="text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-50"
                   onClick={() => {
                     const br = body && body.trim() ? '<br/><br/>' : '';
-                    setBody(prev => (prev || '') + br + qr);
+                    setBody((prev) => (prev || '') + br + qr);
                   }}
-                  aria-label={`Insertar respuesta sugerida ${i+1}`}
-                >{qr}</button>
+                  aria-label={`Insertar respuesta sugerida ${i + 1}`}
+                >
+                  {qr}
+                </button>
               ))}
             </div>
           </div>
 
           {/* Adjuntos */}
           <div>
-            <label className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50" aria-label="Adjuntar archivo">
+            <label
+              className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50"
+              aria-label="Adjuntar archivo"
+            >
               <Paperclip size={16} className="mr-1" /> Adjuntar archivo
               <input type="file" className="hidden" multiple onChange={handleFileUpload} />
             </label>
@@ -267,8 +290,11 @@ const ComposeEmail = () => {
             {sending ? 'Enviando...' : 'Enviar'}
           </Button>
         </div>
-      {sentSuccess && (
-          <div data-testid="success-message" className="text-green-700 bg-green-50 border border-green-200 p-2 rounded-md mt-2">
+        {sentSuccess && (
+          <div
+            data-testid="success-message"
+            className="text-green-700 bg-green-50 border border-green-200 p-2 rounded-md mt-2"
+          >
             Correo enviado correctamente
           </div>
         )}
@@ -278,4 +304,3 @@ const ComposeEmail = () => {
 };
 
 export default ComposeEmail;
-

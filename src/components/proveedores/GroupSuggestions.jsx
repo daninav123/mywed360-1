@@ -1,11 +1,45 @@
 import React, { useMemo } from 'react';
+
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
 const STOPWORDS = new Set([
-  'y','de','la','el','los','las','para','con','sin','del','al','un','una','unos','unas','por','en',
-  'incluye','incluyen','pack','paquete','oferta','promocion','promoción','servicio','servicios','precio','precios',
-  'equipo','equipos','material','materiales','evento','eventos','boda','bodas'
+  'y',
+  'de',
+  'la',
+  'el',
+  'los',
+  'las',
+  'para',
+  'con',
+  'sin',
+  'del',
+  'al',
+  'un',
+  'una',
+  'unos',
+  'unas',
+  'por',
+  'en',
+  'incluye',
+  'incluyen',
+  'pack',
+  'paquete',
+  'oferta',
+  'promocion',
+  'promoción',
+  'servicio',
+  'servicios',
+  'precio',
+  'precios',
+  'equipo',
+  'equipos',
+  'material',
+  'materiales',
+  'evento',
+  'eventos',
+  'boda',
+  'bodas',
 ]);
 
 function tokenize(text = '') {
@@ -43,7 +77,10 @@ function detectSplits(budgetsBySupplier) {
   const suggestions = [];
   for (const [sid, items] of Object.entries(budgetsBySupplier || {})) {
     for (const b of items || []) {
-      const parts = (b.description || '').split(/\+|,|\by\b/gi).map((s) => s.trim()).filter(Boolean);
+      const parts = (b.description || '')
+        .split(/\+|,|\by\b/gi)
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (parts.length >= 2) {
         suggestions.push({ supplierId: sid, budgetId: b.id, parts });
       }
@@ -71,8 +108,17 @@ function detectOutliers(budgetsBySupplier) {
   return out;
 }
 
-export default function GroupSuggestions({ open, onClose, group, providers = [], budgetsBySupplier = {} }) {
-  const providerById = useMemo(() => Object.fromEntries(providers.map((p) => [p.id, p])), [providers]);
+export default function GroupSuggestions({
+  open,
+  onClose,
+  group,
+  providers = [],
+  budgetsBySupplier = {},
+}) {
+  const providerById = useMemo(
+    () => Object.fromEntries(providers.map((p) => [p.id, p])),
+    [providers]
+  );
   const overlaps = useMemo(() => findOverlaps(budgetsBySupplier), [budgetsBySupplier]);
   const splits = useMemo(() => detectSplits(budgetsBySupplier), [budgetsBySupplier]);
   const outliers = useMemo(() => detectOutliers(budgetsBySupplier), [budgetsBySupplier]);
@@ -83,14 +129,19 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         <div>
           <h4 className="font-semibold mb-2">Posibles unificaciones por solapamiento</h4>
           {overlaps.length === 0 ? (
-            <p className="text-sm text-gray-600">No se detectan términos comunes entre presupuestos.</p>
+            <p className="text-sm text-gray-600">
+              No se detectan términos comunes entre presupuestos.
+            </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {overlaps.slice(0, 8).map(([word, occ]) => {
-                const sNames = Array.from(new Set(occ.map((x) => providerById[x.supplierId]?.name).filter(Boolean)));
+                const sNames = Array.from(
+                  new Set(occ.map((x) => providerById[x.supplierId]?.name).filter(Boolean))
+                );
                 return (
                   <li key={word} className="text-sm">
-                    <mark className="px-1 py-0.5 bg-yellow-200 rounded">{word}</mark> aparece en: {sNames.join(', ')}
+                    <mark className="px-1 py-0.5 bg-yellow-200 rounded">{word}</mark> aparece en:{' '}
+                    {sNames.join(', ')}
                   </li>
                 );
               })}
@@ -101,7 +152,9 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         <div>
           <h4 className="font-semibold mb-2">Posibles separaciones por partidas múltiples</h4>
           {splits.length === 0 ? (
-            <p className="text-sm text-gray-600">No se detectan presupuestos con varias subpartidas claras.</p>
+            <p className="text-sm text-gray-600">
+              No se detectan presupuestos con varias subpartidas claras.
+            </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {splits.slice(0, 8).map((sug, idx) => (
@@ -116,12 +169,15 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         <div>
           <h4 className="font-semibold mb-2">Presupuestos atípicos por importe</h4>
           {outliers.length === 0 ? (
-            <p className="text-sm text-gray-600">Sin atípicos; importes dentro de la media del grupo.</p>
+            <p className="text-sm text-gray-600">
+              Sin atípicos; importes dentro de la media del grupo.
+            </p>
           ) : (
             <ul className="list-disc ml-5 space-y-1">
               {outliers.slice(0, 8).map((o, idx) => (
                 <li key={idx} className="text-sm">
-                  {providerById[o.supplierId]?.name || o.supplierId}: {o.amount} € (media â‰ˆ {Math.round(o.mean)} €)
+                  {providerById[o.supplierId]?.name || o.supplierId}: {o.amount} € (media â‰ˆ{' '}
+                  {Math.round(o.mean)} €)
                 </li>
               ))}
             </ul>
@@ -129,10 +185,11 @@ export default function GroupSuggestions({ open, onClose, group, providers = [],
         </div>
 
         <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cerrar
+          </Button>
         </div>
       </div>
     </Modal>
   );
 }
-

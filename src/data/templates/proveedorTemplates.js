@@ -31,7 +31,15 @@ Saludos cordiales,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'servicio', 'fecha_boda', 'lugar_boda', 'nombre_cliente', 'numero_invitados', 'telefono_cliente']
+    variables: [
+      'nombre_proveedor',
+      'servicio',
+      'fecha_boda',
+      'lugar_boda',
+      'nombre_cliente',
+      'numero_invitados',
+      'telefono_cliente',
+    ],
   },
   {
     id: 'template_proveedor_solicitud_info_2',
@@ -61,7 +69,18 @@ Atentamente,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'servicio', 'fecha_boda', 'lugar_boda', 'numero_invitados', 'horario_evento', 'detalles_especificos', 'presupuesto', 'nombre_cliente', 'telefono_cliente']
+    variables: [
+      'nombre_proveedor',
+      'servicio',
+      'fecha_boda',
+      'lugar_boda',
+      'numero_invitados',
+      'horario_evento',
+      'detalles_especificos',
+      'presupuesto',
+      'nombre_cliente',
+      'telefono_cliente',
+    ],
   },
   {
     id: 'template_proveedor_confirmacion_1',
@@ -84,7 +103,14 @@ Un cordial saludo,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'servicio', 'fecha_boda', 'lugar_boda', 'nombre_cliente', 'telefono_cliente']
+    variables: [
+      'nombre_proveedor',
+      'servicio',
+      'fecha_boda',
+      'lugar_boda',
+      'nombre_cliente',
+      'telefono_cliente',
+    ],
   },
   {
     id: 'template_proveedor_confirmacion_2',
@@ -114,7 +140,17 @@ Saludos cordiales,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'servicio', 'fecha_boda', 'hora_inicio', 'hora_fin', 'lugar_boda', 'numero_invitados_final', 'nombre_cliente', 'telefono_cliente']
+    variables: [
+      'nombre_proveedor',
+      'servicio',
+      'fecha_boda',
+      'hora_inicio',
+      'hora_fin',
+      'lugar_boda',
+      'numero_invitados_final',
+      'nombre_cliente',
+      'telefono_cliente',
+    ],
   },
   {
     id: 'template_proveedor_cancelacion_1',
@@ -137,7 +173,14 @@ Atentamente,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'motivo_cancelacion', 'servicio', 'fecha_boda', 'nombre_cliente', 'telefono_cliente']
+    variables: [
+      'nombre_proveedor',
+      'motivo_cancelacion',
+      'servicio',
+      'fecha_boda',
+      'nombre_cliente',
+      'telefono_cliente',
+    ],
   },
   {
     id: 'template_proveedor_seguimiento_1',
@@ -161,7 +204,14 @@ Saludos cordiales,
 {{nombre_cliente}} y {{nombre_pareja}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'servicio', 'fecha_boda', 'comentario_personalizado', 'nombre_cliente', 'nombre_pareja']
+    variables: [
+      'nombre_proveedor',
+      'servicio',
+      'fecha_boda',
+      'comentario_personalizado',
+      'nombre_cliente',
+      'nombre_pareja',
+    ],
   },
 ];
 

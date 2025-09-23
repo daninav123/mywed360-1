@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { createSignatureRequest, listSignatureRequests, getSignatureStatus, updateSignatureStatus } from '../services/SignatureService';
+
+import {
+  createSignatureRequest,
+  listSignatureRequests,
+  getSignatureStatus,
+  updateSignatureStatus,
+} from '../services/SignatureService';
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
 
@@ -26,7 +32,9 @@ describe('SignatureService', () => {
       expect(body.documentMeta?.title).toBe('Contrato');
       return okJson({ success: true, request: { id: 'sig_1', status: 'pending' } });
     });
-    const res = await createSignatureRequest('w1', { id: 'd1', title: 'Contrato' }, [{ email: 'a@b.com', name: 'A' }]);
+    const res = await createSignatureRequest('w1', { id: 'd1', title: 'Contrato' }, [
+      { email: 'a@b.com', name: 'A' },
+    ]);
     expect(res.success).toBe(true);
   });
 

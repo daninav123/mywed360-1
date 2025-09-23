@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { listRules, upsertRule, evaluateTrigger } from '../services/AutomationRulesService';
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
@@ -47,7 +48,10 @@ describe('AutomationRulesService', () => {
       expect(opts?.method).toBe('POST');
       const body = JSON.parse(opts.body);
       expect(body.trigger).toEqual({ type: 'rsvp_deadline', deadline: '2025-10-01' });
-      return okJson({ success: true, actions: [{ type: 'send_notification', template: 'rsvp_reminder' }] });
+      return okJson({
+        success: true,
+        actions: [{ type: 'send_notification', template: 'rsvp_reminder' }],
+      });
     });
     const res = await evaluateTrigger('w3', { type: 'rsvp_deadline', deadline: '2025-10-01' });
     expect(res.actions?.[0]?.type).toBe('send_notification');

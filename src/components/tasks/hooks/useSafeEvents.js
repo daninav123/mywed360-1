@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { validateAndNormalizeDate } from '../utils/dateUtils';
 
 export function useSafeEvents(meetingsState) {
@@ -56,4 +57,3 @@ export function useSafeEvents(meetingsState) {
 
   return { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered };
 }
-

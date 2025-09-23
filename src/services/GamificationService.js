@@ -1,6 +1,6 @@
 // GamificationService.js - cliente frontend para /api/gamification
-import { getBackendBase } from '../utils/backendBase';
 import { auth } from '../firebaseConfig';
+import { getBackendBase } from '../utils/backendBase';
 
 const base = () => `${getBackendBase()}/api/gamification`;
 
@@ -31,7 +31,7 @@ export async function awardPoints(weddingId, eventType, meta = {}, uid) {
     method: 'POST',
     headers: await authHeader({ 'Content-Type': 'application/json' }),
     credentials: 'include',
-    body: JSON.stringify({ weddingId, uid, eventType, meta })
+    body: JSON.stringify({ weddingId, uid, eventType, meta }),
   });
   if (!res.ok) throw new Error('awardPoints failed');
   return res.json();

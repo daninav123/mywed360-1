@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
+
 import { useAuth } from '../hooks/useAuth';
 
 export default function RoleBadge() {
   // Nuevo sistema unificado
   const { hasRole, userProfile } = useAuth();
-  
+
   // Usar el nuevo sistema para verificaciones de rol
   const role = userProfile?.role;
   const [visible, setVisible] = useState(true);

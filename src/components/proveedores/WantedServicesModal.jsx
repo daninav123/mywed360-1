@@ -1,33 +1,34 @@
-import React, { useEffect, useMemo, useState } from "react";
-import Modal from "../Modal";
-import Button from "../ui/Button";
+import React, { useEffect, useMemo, useState } from 'react';
+
+import Modal from '../Modal';
+import Button from '../ui/Button';
 
 export default function WantedServicesModal({ open, onClose, value = [], onSave }) {
   const [services, setServices] = useState([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
 
   const suggested = useMemo(
     () => [
-      "Fotografía",
-      "Vídeo",
-      "Música/DJ",
-      "Catering",
-      "Flores",
-      "Transporte",
-      "Maquillaje",
-      "Peluquería",
-      "Iluminación",
-      "Sonido",
-      "Decoración",
-      "Animación",
-      "Fotomatón",
-      "Oficiante",
-      "Alquiler mobiliario",
-      "Tarta nupcial",
-      "Invitaciones",
-      "Detalles/Regalos",
-      "Seguridad",
-      "Coordinación día B",
+      'Fotografía',
+      'Vídeo',
+      'Música/DJ',
+      'Catering',
+      'Flores',
+      'Transporte',
+      'Maquillaje',
+      'Peluquería',
+      'Iluminación',
+      'Sonido',
+      'Decoración',
+      'Animación',
+      'Fotomatón',
+      'Oficiante',
+      'Alquiler mobiliario',
+      'Tarta nupcial',
+      'Invitaciones',
+      'Detalles/Regalos',
+      'Seguridad',
+      'Coordinación día B',
     ],
     []
   );
@@ -36,7 +37,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
     try {
       const arr = Array.isArray(value) ? value : [];
       const names = arr
-        .map((it) => (typeof it === "string" ? it : (it && (it.name || it.id)) || ""))
+        .map((it) => (typeof it === 'string' ? it : (it && (it.name || it.id)) || ''))
         .filter(Boolean);
       setServices(names);
     } catch {
@@ -48,7 +49,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
     const s = (name || input).trim();
     if (!s) return;
     if (!services.includes(s)) setServices((prev) => [...prev, s]);
-    setInput("");
+    setInput('');
   };
 
   const removeService = (s) => setServices((prev) => prev.filter((x) => x !== s));
@@ -74,8 +75,8 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
                   onClick={() => (active ? removeService(s) : addService(s))}
                   className={`px-3 py-1 rounded-full text-sm border ${
                     active
-                      ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {s}
@@ -92,7 +93,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") addService();
+              if (e.key === 'Enter') addService();
             }}
           />
           <Button onClick={() => addService()}>Añadir</Button>
@@ -103,7 +104,10 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
         ) : (
           <ul className="flex flex-wrap gap-2">
             {services.map((s) => (
-              <li key={s} className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-2">
+              <li
+                key={s}
+                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-2"
+              >
                 {s}
                 <button
                   className="text-gray-500 hover:text-red-600"

@@ -1,26 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { User, Mail, Moon, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 
-import { useAuth } from '../hooks/useAuth';
-import Nav from './Nav';
 import ChatWidget from './ChatWidget';
+import DarkModeToggle from './DarkModeToggle';
 import DefaultAvatar from './DefaultAvatar';
 import GlobalSearch from './GlobalSearch';
-import { prefetchModule } from '../utils/prefetch';
-import DarkModeToggle from './DarkModeToggle';
+import Nav from './Nav';
 import NotificationCenter from './NotificationCenter';
+import WeddingSelector from './WeddingSelector';
+import { useAuth } from '../hooks/useAuth';
+import { prefetchModule } from '../utils/prefetch';
 import NotificationWatcher from './notifications/NotificationWatcher';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
-import { useOnboarding } from '../hooks/useOnboarding';
 import RoleBadge from './RoleBadge';
-import WeddingSelector from './WeddingSelector';
+import { useOnboarding } from '../hooks/useOnboarding';
 
 export default function MainLayout() {
   const { t } = useTranslation();
   const prefetchNotificaciones = React.useCallback(() => {
-    try { import('../pages/Notificaciones'); } catch {}
+    try {
+      import('../pages/Notificaciones');
+    } catch {}
   }, []);
 
   // Autenticación y rol
@@ -30,7 +32,9 @@ export default function MainLayout() {
   const [openMenu, setOpenMenu] = useState(false);
   const location = useLocation();
   const hideSelectorRoutes = ['/home', '/tasks'];
-  const hideSelector = hideSelectorRoutes.some(r => location.pathname.startsWith(r)) || location.pathname === '/bodas';
+  const hideSelector =
+    hideSelectorRoutes.some((r) => location.pathname.startsWith(r)) ||
+    location.pathname === '/bodas';
   const isPlanner = userProfile && hasRole ? hasRole('planner') : false;
   const showWeddingSelector = isPlanner && !hideSelector;
   const { showOnboarding, completeOnboarding } = useOnboarding();
@@ -56,7 +60,9 @@ export default function MainLayout() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg)]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
-          <p className="text-[color:var(--color-text)]/70">{t('app.loading', { defaultValue: 'Cargando...' })}</p>
+          <p className="text-[color:var(--color-text)]/70">
+            {t('app.loading', { defaultValue: 'Cargando...' })}
+          </p>
         </div>
       </div>
     );
@@ -87,7 +93,9 @@ export default function MainLayout() {
           <div
             onClick={() => setOpenMenu(!openMenu)}
             className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
-              openMenu ? 'ring-2 bg-[var(--color-accent)]/20' : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent)]/20'
+              openMenu
+                ? 'ring-2 bg-[var(--color-accent)]/20'
+                : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent)]/20'
             } flex items-center justify-center`}
             title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
             style={{ '--tw-ring-color': 'var(--color-primary)' }}
@@ -101,7 +109,8 @@ export default function MainLayout() {
                 onClick={() => setOpenMenu(false)}
                 className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
               >
-                <User className="w-4 h-4 mr-2" /> {t('navigation.profile', { defaultValue: 'Perfil' })}
+                <User className="w-4 h-4 mr-2" />{' '}
+                {t('navigation.profile', { defaultValue: 'Perfil' })}
               </Link>
 
               {false && (
@@ -125,22 +134,30 @@ export default function MainLayout() {
                 onTouchStart={prefetchEmail}
                 className="flex items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
               >
-                <Mail className="w-4 h-4 mr-2" /> {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
+                <Mail className="w-4 h-4 mr-2" />{' '}
+                {t('navigation.emailInbox', { defaultValue: 'Buzón de Emails' })}
               </Link>
 
               <div className="px-3 py-2 hover:bg-[var(--color-accent)]/20 rounded-md transition-colors">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm flex items-center"><Moon className="w-4 h-4 mr-2" /> {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}</span>
+                  <span className="text-sm flex items-center">
+                    <Moon className="w-4 h-4 mr-2" />{' '}
+                    {t('navigation.darkMode', { defaultValue: 'Modo oscuro' })}
+                  </span>
                   <DarkModeToggle className="ml-2" />
                 </div>
               </div>
 
               <div className="border-t border-[color:var(--color-text)]/15 my-1"></div>
               <button
-                onClick={() => { logoutUnified(); setOpenMenu(false); }}
+                onClick={() => {
+                  logoutUnified();
+                  setOpenMenu(false);
+                }}
                 className="w-full text-left px-3 py-2 text-sm text-[color:var(--color-danger)] hover:bg-[var(--color-danger)]/10 rounded-md transition-colors flex items-center"
               >
-                <LogOut className="w-4 h-4 mr-2" /> {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
+                <LogOut className="w-4 h-4 mr-2" />{' '}
+                {t('navigation.logout', { defaultValue: 'Cerrar sesión' })}
               </button>
             </div>
           )}

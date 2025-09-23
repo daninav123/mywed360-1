@@ -34,4 +34,3 @@ describe('i18n locales are free of mojibake', () => {
     }
   });
 });
-

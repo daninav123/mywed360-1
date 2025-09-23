@@ -23,11 +23,18 @@ export default function PublicWedding() {
       }
     }
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [slug]);
 
   if (state.loading) return <div style={{ padding: 24, textAlign: 'center' }}>Cargando…</div>;
-  if (state.error) return <div style={{ padding: 24, textAlign: 'center', color: '#b91c1c' }}>No disponible ({state.error})</div>;
+  if (state.error)
+    return (
+      <div style={{ padding: 24, textAlign: 'center', color: '#b91c1c' }}>
+        No disponible ({state.error})
+      </div>
+    );
   const { payload } = state;
 
   // If generated HTML is present, render it in an isolated iframe
@@ -87,7 +94,12 @@ export default function PublicWedding() {
           <h2 className="text-2xl font-semibold mb-4">Galería</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {gallery.map((g) => (
-              <img key={g.id} src={g.url || g.src} alt="Foto" className="object-cover w-full h-40 rounded" />
+              <img
+                key={g.id}
+                src={g.url || g.src}
+                alt="Foto"
+                className="object-cover w-full h-40 rounded"
+              />
             ))}
           </div>
         </section>
@@ -99,4 +111,3 @@ export default function PublicWedding() {
     </div>
   );
 }
-

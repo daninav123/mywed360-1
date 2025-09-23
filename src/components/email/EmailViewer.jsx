@@ -1,15 +1,26 @@
+import {
+  ArrowLeft,
+  Reply,
+  Forward,
+  Trash,
+  Star,
+  StarOff,
+  Paperclip,
+  Calendar,
+  Download,
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import sanitizeHtml from '../../utils/sanitizeHtml';
-import { safeExecute } from '../../utils/promiseSafeRenderer';
-import { ArrowLeft, Reply, Forward, Trash, Star, StarOff, Paperclip, Calendar, Download } from 'lucide-react';
-import Button from '../Button';
-import Card from '../Card';
+
 import * as emailService from '../../services/emailService';
+import { safeExecute } from '../../utils/promiseSafeRenderer';
+import sanitizeHtml from '../../utils/sanitizeHtml';
+import Button from '../Button';
+import Card from '../ui/Card';
 
 /**
  * Componente para visualizar el contenido completo de un email
  * con opciones para responder, reenviar, marcar como importante, etc.
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.email - Datos completos del email a visualizar
  * @param {Function} props.onBack - Función para volver a la lista de emails
@@ -41,21 +52,21 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   // Manejar envío de respuesta
   const handleSendReply = async () => {
     if (!replyText.trim()) return;
-    
+
     await onReply({
       to: email.from,
       subject: `Re: ${email.subject}`,
       body: replyText,
-      replyToId: email.id
+      replyToId: email.id,
     });
-    
+
     setShowReplyForm(false);
     setReplyText('');
   };
@@ -74,12 +85,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
       {/* Cabecera */}
       <div className="border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onBack}
-            className="flex items-center"
-          >
+          <Button variant="ghost" size="sm" onClick={onBack} className="flex items-center">
             <ArrowLeft size={18} className="mr-1" />
             Volver
           </Button>
@@ -129,7 +135,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
         </div>
 
         <h1 className="text-xl font-semibold mb-2">{email.subject || '(Sin asunto)'}</h1>
-        
+
         <div className="flex flex-col sm:flex-row justify-between text-sm text-gray-600">
           <div>
             <span className="font-medium">De:</span> {email.from}
@@ -138,11 +144,11 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             <span className="font-medium">Fecha:</span> {formatDate(email.date)}
           </div>
         </div>
-        
+
         <div className="text-sm text-gray-600 mt-1">
           <span className="font-medium">Para:</span> {email.to}
         </div>
-        
+
         {email.cc && (
           <div className="text-sm text-gray-600 mt-1">
             <span className="font-medium">CC:</span> {email.cc}
@@ -153,15 +159,17 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
       {/* Cuerpo del email */}
       <div className="p-4 flex-grow overflow-auto">
         {/* Renderizar el HTML del cuerpo del email */}
-        <div 
+        <div
           className="prose max-w-none"
-          dangerouslySetInnerHTML={{ __html: safeExecute(
-            () => {
-              const result = sanitizeHtml(email.body || '');
-              return typeof result === 'string' ? result : String(result || '');
-            },
-            email.body || '' // fallback si sanitizeHtml retorna una Promesa
-          ) }}
+          dangerouslySetInnerHTML={{
+            __html: safeExecute(
+              () => {
+                const result = sanitizeHtml(email.body || '');
+                return typeof result === 'string' ? result : String(result || '');
+              },
+              email.body || '' // fallback si sanitizeHtml retorna una Promesa
+            ),
+          }}
         />
       </div>
 
@@ -172,13 +180,10 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             <Paperclip size={16} className="mr-1" />
             Adjuntos ({email.attachments.length})
           </h3>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {email.attachments.map((attachment, index) => (
-              <div 
-                key={index}
-                className="border border-gray-200 rounded p-2 flex items-center"
-              >
+              <div key={index} className="border border-gray-200 rounded p-2 flex items-center">
                 <div className="flex-grow truncate">
                   {attachment.name || `Archivo ${index + 1}`}
                   <span className="text-xs text-gray-500 block">
@@ -189,7 +194,9 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
                   variant="ghost"
                   size="sm"
                   className="flex-shrink-0"
-                  onClick={() => {/* Lógica de descarga */}}
+                  onClick={() => {
+                    /* Lógica de descarga */
+                  }}
                 >
                   <Download size={16} />
                 </Button>
@@ -206,7 +213,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             <Reply size={16} className="mr-1" />
             Responder
           </h3>
-          
+
           <textarea
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
@@ -214,20 +221,12 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             rows="4"
             placeholder="Escribe tu respuesta aquí..."
           ></textarea>
-          
+
           <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowReplyForm(false)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowReplyForm(false)}>
               Cancelar
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSendReply}
-              disabled={!replyText.trim()}
-            >
+            <Button size="sm" onClick={handleSendReply} disabled={!replyText.trim()}>
               Enviar respuesta
             </Button>
           </div>
@@ -246,11 +245,7 @@ const EmailViewer = ({ email, onBack, onDelete, onReply, onForward, onToggleImpo
             <Reply size={16} className="mr-1" />
             Respuesta rápida
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center"
-          >
+          <Button variant="outline" size="sm" className="flex items-center">
             <Calendar size={16} className="mr-1" />
             Añadir al calendario
           </Button>

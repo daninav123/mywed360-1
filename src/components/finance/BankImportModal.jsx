@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Modal from '../Modal';
 import { Button } from '../ui';
 
@@ -23,20 +24,35 @@ export default function BankImportModal({
           </div>
           <div>
             <label className="block text-sm text-[color:var(--color-text)]/80 mb-1">Desde</label>
-            <input type="date" value={dateFrom} onChange={(e)=>setDateFrom(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)] focus:ring-[color:var(--color-primary)]" />
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)] focus:ring-[color:var(--color-primary)]"
+            />
           </div>
           <div>
             <label className="block text-sm text-[color:var(--color-text)]/80 mb-1">Hasta</label>
-            <input type="date" value={dateTo} onChange={(e)=>setDateTo(e.target.value)} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)] focus:ring-[color:var(--color-primary)]" />
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:border-transparent border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)] focus:ring-[color:var(--color-primary)]"
+            />
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={onImport} disabled={isLoading}>Importar</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button onClick={onImport} disabled={isLoading}>
+            Importar
+          </Button>
         </div>
-        <p className="text-xs text-[color:var(--color-text)]/60">Requiere backend con Nordigen configurado.</p>
+        <p className="text-xs text-[color:var(--color-text)]/60">
+          Requiere backend con Nordigen configurado.
+        </p>
       </div>
     </Modal>
   );
 }
-

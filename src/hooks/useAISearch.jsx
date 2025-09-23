@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+
 import { useAuth } from './useAuth';
 import { post as apiPost } from '../services/apiClient';
 
@@ -293,4 +294,3 @@ export const useAISearch = () => {
 };
 
 export default useAISearch;
-

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { validateAndNormalizeDate, normalizeAnyDate, addMonths } from './dateUtils';
 
 describe('dateUtils', () => {
@@ -28,4 +29,3 @@ describe('dateUtils', () => {
     expect(moved.getUTCMonth()).toBe(1); // February
   });
 });
-

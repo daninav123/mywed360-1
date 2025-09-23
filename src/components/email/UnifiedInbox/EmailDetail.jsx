@@ -1,12 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
-import sanitizeHtml from '../../../utils/sanitizeHtml';
-import { safeRender, ensureNotPromise, safeExecute, safeDangerouslySetInnerHTML } from '../../../utils/promiseSafeRenderer';
-import EmailComments from '../EmailComments';
-// Importación problemática eliminada temporalmente
-// import { Viewer } from 'react-tiff';
 import { toBlob } from 'html-to-image';
-
-// Importamos nuestros componentes de iconos personalizados
 import {
   ArrowLeft,
   Reply,
@@ -17,14 +9,28 @@ import {
   ExternalLink,
   Printer,
   Flag,
-  ArrowLeftRight
+  ArrowLeftRight,
 } from 'lucide-react';
-import Button from '../../Button';
+import React, { useState, useEffect, useRef, memo } from 'react';
+
 import EmailCategoryLabel from './EmailCategoryLabel';
+import {
+  safeRender,
+  ensureNotPromise,
+  safeExecute,
+  safeDangerouslySetInnerHTML,
+} from '../../../utils/promiseSafeRenderer';
+import sanitizeHtml from '../../../utils/sanitizeHtml';
+import Button from '../../Button';
+import EmailComments from '../EmailComments';
+// Importación problemática eliminada temporalmente
+// import { Viewer } from 'react-tiff';
+
+// Importamos nuestros componentes de iconos personalizados
 
 /**
  * Componente para mostrar el detalle completo de un email
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.email - Email a mostrar
  * @param {Function} props.onReply - Función para responder al email
@@ -36,16 +42,16 @@ import EmailCategoryLabel from './EmailCategoryLabel';
 
 // Constantes para tipos de archivos
 const IMAGE_TYPES = {
-  'jpg': 'image/jpeg',
-  'jpeg': 'image/jpeg',
-  'png': 'image/png',
-  'gif': 'image/gif',
-  'webp': 'image/webp',
-  'svg': 'image/svg+xml',
-  'tiff': 'image/tiff',
-  'tif': 'image/tiff',
-  'bmp': 'image/bmp',
-  'ico': 'image/x-icon'
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+  tiff: 'image/tiff',
+  tif: 'image/tiff',
+  bmp: 'image/bmp',
+  ico: 'image/x-icon',
 };
 const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
   // Si email es null o undefined, mostrar un mensaje
@@ -62,7 +68,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
   const [expandedImage, setExpandedImage] = useState(null);
   const [loadingImages, setLoadingImages] = useState({});
   const prevEmailIdRef = useRef(email?.id);
-  
+
   // Efecto para actualizar el estado visual cuando cambia el email seleccionado
   useEffect(() => {
     if (email?.id !== prevEmailIdRef.current) {
@@ -70,7 +76,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
       prevEmailIdRef.current = email?.id;
     }
   }, [email?.id, email?.read]);
-  
+
   // Efecto para marcar automáticamente como leído cuando se visualiza un email no leído
   useEffect(() => {
     if (email && !isRead) {
@@ -106,7 +112,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -115,46 +121,49 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
     if (!filename) return '';
     return filename.split('.').pop().toLowerCase();
   };
-  
+
   // Verificar si el archivo es una imagen
   const isImageFile = (filename) => {
     const ext = getFileExtension(filename);
     return Object.keys(IMAGE_TYPES).includes(ext);
   };
-  
+
   // Obtener tipo MIME basado en la extensión
   const getMimeType = (filename) => {
     const ext = getFileExtension(filename);
     return IMAGE_TYPES[ext] || 'application/octet-stream';
   };
-  
+
   // Manejar click en una imagen adjunta
   const handleImageClick = (attachment) => {
     setExpandedImage(attachment);
   };
-  
+
   // Cerrar visualizador de imagen
   const handleCloseImageViewer = () => {
     setExpandedImage(null);
   };
-  
+
   // Manejar la descarga de un archivo adjunto
   const handleDownloadAttachment = (attachment) => {
     // Aquí implementaríamos la lógica de descarga
     console.log('Descargando:', attachment.filename);
     // Idealmente, esto conectaría con un endpoint de la API
   };
-  
+
   // Obtener iniciales para el avatar
   const getInitials = (emailAddress) => {
     if (!emailAddress) return '?';
-    
-    const name = emailAddress.split('@')[0].replace(/[^a-zA-Z0-9]/g, ' ').trim();
-    const parts = name.split(' ').filter(part => part.length > 0);
-    
+
+    const name = emailAddress
+      .split('@')[0]
+      .replace(/[^a-zA-Z0-9]/g, ' ')
+      .trim();
+    const parts = name.split(' ').filter((part) => part.length > 0);
+
     if (parts.length === 0) return '?';
     if (parts.length === 1) return parts[0][0].toUpperCase();
-    
+
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
@@ -168,11 +177,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
       htmlContent || '' // fallback si sanitizeHtml retorna una Promesa
     );
   };
-    
-    
 
-    
-  
   // Obtener color para el avatar basado en el remitente
   const getAvatarColor = (email) => {
     const colors = [
@@ -183,16 +188,16 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
       'bg-pink-500',
       'bg-indigo-500',
       'bg-red-500',
-      'bg-teal-500'
+      'bg-teal-500',
     ];
-    
+
     // Usar una función simple de hash para asignar un color consistente
     let hash = 0;
     for (let i = 0; i < email.length; i++) {
-      hash = ((hash << 5) - hash) + email.charCodeAt(i);
+      hash = (hash << 5) - hash + email.charCodeAt(i);
       hash |= 0;
     }
-    
+
     const colorIndex = Math.abs(hash) % colors.length;
     return colors[colorIndex];
   };
@@ -200,20 +205,20 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
   // Detectar las categorías del email
   const detectCategories = (email) => {
     const categories = [];
-    
+
     // Ejemplo de lógica para detectar categorías
     if (email.from.includes('proveedor') || email.subject.toLowerCase().includes('proveedor')) {
       categories.push({ name: 'Proveedor', color: 'bg-blue-500' });
     }
-    
+
     if (email.from.includes('invitado') || email.subject.toLowerCase().includes('invitado')) {
       categories.push({ name: 'Invitado', color: 'bg-green-500' });
     }
-    
+
     if (email.subject.toLowerCase().includes('importante') || email.important) {
       categories.push({ name: 'Importante', color: 'bg-yellow-500' });
     }
-    
+
     return categories;
   };
 
@@ -224,14 +229,11 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
       {/* Barra de herramientas */}
       <div className="p-4 border-b flex items-center justify-between">
         <div className="flex items-center">
-          <button 
-            onClick={onBack}
-            className="mr-4 text-gray-600 hover:text-gray-900 md:hidden"
-          >
+          <button onClick={onBack} className="mr-4 text-gray-600 hover:text-gray-900 md:hidden">
             <ArrowLeft size={20} />
           </button>
-          
-          <Button 
+
+          <Button
             onClick={onReply}
             variant="outline"
             size="sm"
@@ -241,17 +243,12 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
             <Reply size={16} className="mr-1" />
             <span className="hidden sm:inline">Responder</span>
           </Button>
-          
-          <Button
-            onClick={onDelete}
-            variant="outline"
-            size="sm"
-            className="flex items-center mr-2"
-          >
+
+          <Button onClick={onDelete} variant="outline" size="sm" className="flex items-center mr-2">
             <Trash size={16} className="mr-1" />
             <span className="hidden sm:inline">Eliminar</span>
           </Button>
-          
+
           <button
             onClick={handleToggleStar}
             className={`p-1.5 rounded-full hover:bg-gray-100 ${isStarred ? 'text-yellow-500' : 'text-gray-500'}`}
@@ -259,7 +256,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
             <Star size={20} className={isStarred ? 'fill-yellow-500' : ''} />
           </button>
         </div>
-        
+
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
@@ -267,7 +264,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
           >
             <MoreHorizontal size={20} />
           </button>
-          
+
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
               <div className="py-1">
@@ -296,26 +293,28 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
           )}
         </div>
       </div>
-      
+
       {/* Cabecera del email */}
       <div className="p-6 border-b">
         <div className="flex items-start">
-          <div className={`w-10 h-10 rounded-full ${getAvatarColor(email.from)} flex items-center justify-center text-white font-medium mr-4 flex-shrink-0`}>
+          <div
+            className={`w-10 h-10 rounded-full ${getAvatarColor(email.from)} flex items-center justify-center text-white font-medium mr-4 flex-shrink-0`}
+          >
             {getInitials(email.from)}
           </div>
-          
+
           <div className="flex-grow">
             <div className="flex items-start justify-between">
               <h1 className="text-xl font-medium mb-2">
                 {safeRender(email.subject, '(Sin asunto)')}
               </h1>
             </div>
-            
+
             <div className="flex flex-wrap items-center mb-1">
               <span className="font-medium mr-1">{safeRender(email.from, '')}</span>
               <span className="text-gray-500 text-sm mr-1">para</span>
               <span className="mr-2">{safeRender(email.to, '')}</span>
-              
+
               {email.cc && (
                 <>
                   <span className="text-gray-500 text-sm mr-1">cc:</span>
@@ -323,61 +322,55 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
                 </>
               )}
             </div>
-            
+
             <div className="text-gray-500 text-sm mb-2">
               {safeRender(formatFullDate(email.date), '')}
             </div>
-            
+
             {emailCategories.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {emailCategories.map((category, index) => (
-                  <EmailCategoryLabel 
-                    key={index}
-                    name={category.name}
-                    color={category.color}
-                  />
+                  <EmailCategoryLabel key={index} name={category.name} color={category.color} />
                 ))}
               </div>
             )}
           </div>
         </div>
       </div>
-      
+
       {/* Contenido del email */}
       <div className="p-6 overflow-auto flex-grow">
         {safeRender(email.body) ? (
-          <div 
+          <div
             className="prose max-w-none"
-            dangerouslySetInnerHTML={safeDangerouslySetInnerHTML(getSafeHtml(safeRender(email.body, '')))}
+            dangerouslySetInnerHTML={safeDangerouslySetInnerHTML(
+              getSafeHtml(safeRender(email.body, ''))
+            )}
           />
         ) : (
-          <div className="text-gray-500 italic">
-            (Este mensaje no tiene contenido)
-          </div>
+          <div className="text-gray-500 italic">(Este mensaje no tiene contenido)</div>
         )}
       </div>
-      
+
       {/* Adjuntos si existen */}
       {email.attachments && email.attachments.length > 0 && (
         <div className="p-4 border-t">
-          <h3 className="text-sm font-medium mb-2">
-            Adjuntos ({email.attachments.length})
-          </h3>
-          
+          <h3 className="text-sm font-medium mb-2">Adjuntos ({email.attachments.length})</h3>
+
           <div className="flex flex-wrap gap-3">
             {email.attachments.map((attachment, index) => {
               const isImage = isImageFile(attachment.filename);
               const fileExt = getFileExtension(attachment.filename);
               const isTiff = fileExt === 'tiff' || fileExt === 'tif';
               const isWebp = fileExt === 'webp';
-              
+
               return (
-                <div 
+                <div
                   key={index}
                   className={`border rounded p-2 hover:border-blue-400 transition-all ${isImage ? 'cursor-zoom-in' : 'cursor-pointer'}`}
                 >
                   {isImage ? (
-                    <div 
+                    <div
                       className="w-32 h-32 flex items-center justify-center overflow-hidden bg-gray-50 mb-1 relative"
                       onClick={() => handleImageClick(attachment)}
                     >
@@ -391,7 +384,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
                         // Soporte específico para WebP
                         <picture>
                           <source srcSet={attachment.dataUrl} type="image/webp" />
-                          <img 
+                          <img
                             src={attachment.dataUrl || '/placeholder-image.png'}
                             alt={attachment.filename}
                             className="max-h-full max-w-full object-contain"
@@ -403,7 +396,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
                         </picture>
                       ) : (
                         // Otras imágenes con fallback
-                        <img 
+                        <img
                           src={attachment.dataUrl || '/placeholder-image.png'}
                           alt={attachment.filename}
                           className="max-h-full max-w-full object-contain"
@@ -428,11 +421,15 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
                   )}
                   <div className="w-32">
                     <div className="text-sm font-medium truncate" title={attachment.filename}>
-                      {attachment.filename || `adjunto-${index+1}`}
+                      {attachment.filename || `adjunto-${index + 1}`}
                     </div>
                     <div className="text-xs text-gray-500 flex justify-between items-center mt-1">
-                      <span>{attachment.size ? `${Math.round(attachment.size / 1024)} KB` : 'Tamaño desconocido'}</span>
-                      <button 
+                      <span>
+                        {attachment.size
+                          ? `${Math.round(attachment.size / 1024)} KB`
+                          : 'Tamaño desconocido'}
+                      </span>
+                      <button
                         className="text-blue-600 hover:text-blue-800 p-1"
                         onClick={() => handleDownloadAttachment(attachment)}
                         aria-label="Descargar archivo"
@@ -447,56 +444,52 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead }) => {
           </div>
         </div>
       )}
-      
+
       {/* Visualizador de imagen expandida */}
       {expandedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={handleCloseImageViewer}
         >
           <div className="max-w-4xl max-h-screen overflow-auto bg-white rounded-lg p-2">
             <div className="text-right mb-2">
-              <button 
+              <button
                 className="text-gray-700 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100"
                 onClick={handleCloseImageViewer}
               >
                 ✕
               </button>
             </div>
-            {getFileExtension(expandedImage.filename) === 'tiff' || 
-             getFileExtension(expandedImage.filename) === 'tif' ? (
+            {getFileExtension(expandedImage.filename) === 'tiff' ||
+            getFileExtension(expandedImage.filename) === 'tif' ? (
               // Temporalmente deshabilitado el visor TIFF por problemas de compatibilidad
               <div className="p-4 bg-gray-100 rounded text-center">
-                <p className="text-gray-600 mb-2">Vista previa de TIFF temporalmente no disponible</p>
-                <p className="text-sm text-gray-500">El visor de archivos TIFF está siendo actualizado</p>
+                <p className="text-gray-600 mb-2">
+                  Vista previa de TIFF temporalmente no disponible
+                </p>
+                <p className="text-sm text-gray-500">
+                  El visor de archivos TIFF está siendo actualizado
+                </p>
               </div>
             ) : (
-              <img 
-                src={expandedImage.dataUrl} 
+              <img
+                src={expandedImage.dataUrl}
                 alt={expandedImage.filename}
                 className="max-w-full"
               />
             )}
-            <div className="mt-2 text-center text-sm text-gray-600">
-              {expandedImage.filename}
-            </div>
+            <div className="mt-2 text-center text-sm text-gray-600">{expandedImage.filename}</div>
           </div>
         </div>
       )}
 
-      
       {/* Panel de comentarios internos */}
       <EmailComments emailId={email.id} />
 
       {/* Acciones rápidas */}
       <div className="p-4 border-t">
         <div className="flex space-x-2">
-          <Button
-            onClick={onReply}
-            variant="primary"
-            size="sm"
-            className="flex items-center"
-          >
+          <Button onClick={onReply} variant="primary" size="sm" className="flex items-center">
             <Reply size={16} className="mr-1" />
             Responder
           </Button>

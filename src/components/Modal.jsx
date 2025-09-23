@@ -17,7 +17,7 @@ export default function Modal({ open, title, children, onClose, size = 'md', cla
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-2xl',
-    full: 'max-w-[92vw]'
+    full: 'max-w-[92vw]',
   };
 
   return (
@@ -42,11 +42,8 @@ export default function Modal({ open, title, children, onClose, size = 'md', cla
             <span aria-hidden>×</span>
           </button>
         </div>
-        <div className="overflow-y-auto px-4 py-3 flex-1">
-          {children}
-        </div>
+        <div className="overflow-y-auto px-4 py-3 flex-1">{children}</div>
       </div>
     </div>
   );
 }
-

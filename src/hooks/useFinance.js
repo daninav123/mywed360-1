@@ -1,24 +1,48 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+
 import { db } from '../firebaseConfig';
-import { uploadEmailAttachments } from '../services/storageUploadService';
-import { useWedding } from '../context/WeddingContext';
 import { useFirestoreCollection } from './useFirestoreCollection';
-import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { useWedding } from '../context/WeddingContext';
 import { getTransactions } from '../services/bankService';
+import { uploadEmailAttachments } from '../services/storageUploadService';
+import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
   { cat: 'Catering', keywords: ['catering', 'restaurante', 'banquete', 'comida', 'menú'] },
   { cat: 'Música', keywords: ['dj', 'banda', 'música', 'musica', 'orquesta', 'sonido'] },
-  { cat: 'Flores', keywords: ['flor', 'flores', 'floristería', 'floristeria', 'ramo', 'decor floral'] },
+  {
+    cat: 'Flores',
+    keywords: ['flor', 'flores', 'floristería', 'floristeria', 'ramo', 'decor floral'],
+  },
   { cat: 'Fotografia', keywords: ['foto', 'fotógrafo', 'fotografo', 'fotografía', 'fotografia'] },
   { cat: 'Vestimenta', keywords: ['vestido', 'traje', 'moda', 'sastre', 'zapatos'] },
-  { cat: 'Decoracion', keywords: ['decoración', 'decoracion', 'iluminación', 'iluminacion', 'alquiler', 'carpa'] },
-  { cat: 'Transporte', keywords: ['taxi', 'uber', 'cabify', 'bus', 'autobús', 'autobus', 'transporte', 'coche'] },
+  {
+    cat: 'Decoracion',
+    keywords: ['decoración', 'decoracion', 'iluminación', 'iluminacion', 'alquiler', 'carpa'],
+  },
+  {
+    cat: 'Transporte',
+    keywords: ['taxi', 'uber', 'cabify', 'bus', 'autobús', 'autobus', 'transporte', 'coche'],
+  },
   { cat: 'Alojamiento', keywords: ['hotel', 'hostal', 'alojamiento'] },
-  { cat: 'Invitaciones', keywords: ['invitación', 'invitacion', 'papelería', 'papeleria', 'impresión', 'impresion', 'save the date'] },
-  { cat: 'Luna de miel', keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'] },
+  {
+    cat: 'Invitaciones',
+    keywords: [
+      'invitación',
+      'invitacion',
+      'papelería',
+      'papeleria',
+      'impresión',
+      'impresion',
+      'save the date',
+    ],
+  },
+  {
+    cat: 'Luna de miel',
+    keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'],
+  },
 ];
 
 const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type = 'expense') => {
@@ -64,7 +88,10 @@ export default function useFinance() {
 
   // Indica si hay cuenta bancaria vinculada
   const [hasBankAccount, setHasBankAccount] = useState(false);
-  const [weddingTimeline, setWeddingTimeline] = useState({ invitesSentDate: null, weddingDate: null });
+  const [weddingTimeline, setWeddingTimeline] = useState({
+    invitesSentDate: null,
+    weddingDate: null,
+  });
 
   // Transacciones usando Firestore (subcolección weddings/{id}/transactions)
   const {
@@ -121,10 +148,7 @@ export default function useFinance() {
     [contributions, monthlyContrib]
   );
 
-  const emergencyAmount = useMemo(
-    () => Math.round(budget.total * 0.1),
-    [budget.total]
-  );
+  const emergencyAmount = useMemo(() => Math.round(budget.total * 0.1), [budget.total]);
 
   const totalSpent = useMemo(() => {
     if (!Array.isArray(transactions)) return 0;
@@ -170,22 +194,25 @@ export default function useFinance() {
       return { pendingExpenses: 0, overdueExpenses: 0 };
     }
     const now = new Date();
-    return transactions.reduce((acc, tx) => {
-      if (tx.type !== 'expense') return acc;
-      const amount = Number(tx.amount) || 0;
-      const paid = normalizePaidAmount(tx);
-      const outstanding = Math.max(0, amount - paid);
-      if (outstanding > 0) {
-        acc.pendingExpenses += outstanding;
-        if (tx.dueDate) {
-          const due = new Date(tx.dueDate);
-          if (!Number.isNaN(due.getTime()) && due < now && (tx.status || '') !== 'paid') {
-            acc.overdueExpenses += outstanding;
+    return transactions.reduce(
+      (acc, tx) => {
+        if (tx.type !== 'expense') return acc;
+        const amount = Number(tx.amount) || 0;
+        const paid = normalizePaidAmount(tx);
+        const outstanding = Math.max(0, amount - paid);
+        if (outstanding > 0) {
+          acc.pendingExpenses += outstanding;
+          if (tx.dueDate) {
+            const due = new Date(tx.dueDate);
+            if (!Number.isNaN(due.getTime()) && due < now && (tx.status || '') !== 'paid') {
+              acc.overdueExpenses += outstanding;
+            }
           }
         }
-      }
-      return acc;
-    }, { pendingExpenses: 0, overdueExpenses: 0 });
+        return acc;
+      },
+      { pendingExpenses: 0, overdueExpenses: 0 }
+    );
   }, [transactions, normalizePaidAmount]);
 
   const stats = useMemo(
@@ -197,8 +224,7 @@ export default function useFinance() {
       expectedIncome,
       emergencyAmount,
       budgetRemaining: budget.total - totalSpent,
-      budgetUsagePercentage:
-        budget.total > 0 ? (totalSpent / budget.total) * 100 : 0,
+      budgetUsagePercentage: budget.total > 0 ? (totalSpent / budget.total) * 100 : 0,
       pendingExpenses: paymentHealth.pendingExpenses,
       overdueExpenses: paymentHealth.overdueExpenses,
     }),
@@ -219,21 +245,39 @@ export default function useFinance() {
     try {
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const weddingDate = weddingTimeline.weddingDate instanceof Date && !Number.isNaN(weddingTimeline.weddingDate?.getTime())
-        ? new Date(weddingTimeline.weddingDate.getFullYear(), weddingTimeline.weddingDate.getMonth(), weddingTimeline.weddingDate.getDate())
-        : null;
-      const invitesDateRaw = weddingTimeline.invitesSentDate instanceof Date && !Number.isNaN(weddingTimeline.invitesSentDate?.getTime())
-        ? new Date(weddingTimeline.invitesSentDate.getFullYear(), weddingTimeline.invitesSentDate.getMonth(), weddingTimeline.invitesSentDate.getDate())
-        : null;
-      const invitesDate = invitesDateRaw || new Date(start.getFullYear(), start.getMonth(), start.getDate() - 60);
+      const weddingDate =
+        weddingTimeline.weddingDate instanceof Date &&
+        !Number.isNaN(weddingTimeline.weddingDate?.getTime())
+          ? new Date(
+              weddingTimeline.weddingDate.getFullYear(),
+              weddingTimeline.weddingDate.getMonth(),
+              weddingTimeline.weddingDate.getDate()
+            )
+          : null;
+      const invitesDateRaw =
+        weddingTimeline.invitesSentDate instanceof Date &&
+        !Number.isNaN(weddingTimeline.invitesSentDate?.getTime())
+          ? new Date(
+              weddingTimeline.invitesSentDate.getFullYear(),
+              weddingTimeline.invitesSentDate.getMonth(),
+              weddingTimeline.invitesSentDate.getDate()
+            )
+          : null;
+      const invitesDate =
+        invitesDateRaw || new Date(start.getFullYear(), start.getMonth(), start.getDate() - 60);
       const tailDays = 30;
       const end = weddingDate
-        ? new Date(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate() + tailDays)
+        ? new Date(
+            weddingDate.getFullYear(),
+            weddingDate.getMonth(),
+            weddingDate.getDate() + tailDays
+          )
         : new Date(start.getFullYear(), start.getMonth(), start.getDate() + 90);
 
       const daysBetween = (d1, d2) => Math.max(0, Math.ceil((d2 - d1) / (24 * 60 * 60 * 1000)));
       const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
-      const toISO = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
+      const toISO = (d) =>
+        new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
 
       const incomesByDay = new Map();
       const expensesByDay = new Map();
@@ -244,9 +288,13 @@ export default function useFinance() {
       };
 
       // Invitados: curva Beta-like entre invitaciones y boda, con cola post-boda
-      const totalGifts = Math.max(0, (contributions.giftPerGuest || 0) * (contributions.guestCount || 0));
+      const totalGifts = Math.max(
+        0,
+        (contributions.giftPerGuest || 0) * (contributions.guestCount || 0)
+      );
       const preDays = weddingDate ? Math.max(1, daysBetween(invitesDate, weddingDate)) : 60;
-      const a = 2.5, b = 2.0; // forma asimétrica
+      const a = 2.5,
+        b = 2.0; // forma asimétrica
       let preWeights = [];
       let preSum = 0;
       for (let i = 0; i < preDays; i++) {
@@ -263,10 +311,12 @@ export default function useFinance() {
         if (d >= start && d <= end) bump(incomesByDay, d, totalGifts * preMass * preWeights[i]);
       }
       const r = 0.9;
-      let geoSum = 0; for (let i = 1; i <= tailDays; i++) geoSum += Math.pow(r, i);
+      let geoSum = 0;
+      for (let i = 1; i <= tailDays; i++) geoSum += Math.pow(r, i);
       for (let i = 1; i <= tailDays; i++) {
         const d = weddingDate ? addDays(weddingDate, i) : addDays(start, i);
-        if (d >= start && d <= end) bump(incomesByDay, d, totalGifts * tailMass * (Math.pow(r, i) / geoSum));
+        if (d >= start && d <= end)
+          bump(incomesByDay, d, totalGifts * tailMass * (Math.pow(r, i) / geoSum));
       }
 
       // Contribuciones de novios
@@ -275,7 +325,13 @@ export default function useFinance() {
       const extras = Math.max(0, contributions.extras || 0);
       const contribStart = invitesDate > start ? invitesDate : start;
       if (initialContrib > 0) bump(incomesByDay, contribStart, initialContrib);
-      if (monthly > 0) { let d = new Date(start); while (d <= end && (!weddingDate || d <= weddingDate)) { bump(incomesByDay, d, monthly); d = addDays(d, 30); } }
+      if (monthly > 0) {
+        let d = new Date(start);
+        while (d <= end && (!weddingDate || d <= weddingDate)) {
+          bump(incomesByDay, d, monthly);
+          d = addDays(d, 30);
+        }
+      }
       if (extras > 0) bump(incomesByDay, weddingDate || end, extras);
 
       // Gastos: pagos pendientes con dueDate
@@ -294,7 +350,7 @@ export default function useFinance() {
       // Serie
       const series = [];
       const daysTotal = daysBetween(start, end);
-      let balance = (totalIncome - totalSpent);
+      let balance = totalIncome - totalSpent;
       let minBalance = balance;
       let minDate = toISO(start);
       let riskDays = 0;
@@ -304,13 +360,19 @@ export default function useFinance() {
         const inc = incomesByDay.get(key) || 0;
         const exp = expensesByDay.get(key) || 0;
         balance = balance + inc - exp;
-        if (balance < minBalance) { minBalance = balance; minDate = key; }
+        if (balance < minBalance) {
+          minBalance = balance;
+          minDate = key;
+        }
         if (balance < 0) riskDays += 1;
         series.push({ date: key, income: inc, expense: exp, balance });
       }
 
-      const toISODate = (d) => (d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10) : null);
-      const projectedAtWedding = weddingDate ? series.find((p) => p.date === toISODate(weddingDate))?.balance ?? balance : balance;
+      const toISODate = (d) =>
+        d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10) : null;
+      const projectedAtWedding = weddingDate
+        ? (series.find((p) => p.date === toISODate(weddingDate))?.balance ?? balance)
+        : balance;
       return {
         startDate: toISO(start),
         endDate: toISO(end),
@@ -318,7 +380,13 @@ export default function useFinance() {
         invitesSentDate: toISODate(invitesDate),
         params: { gifts: { a, b, tailMass, r }, monthlyStepDays: 30, tailDays },
         series,
-        summary: { projectedAtWedding, minProjectedBalance: minBalance, minProjectedBalanceDate: minDate, riskDays, totalProjectedGifts: totalGifts },
+        summary: {
+          projectedAtWedding,
+          minProjectedBalance: minBalance,
+          minProjectedBalanceDate: minDate,
+          riskDays,
+          totalProjectedGifts: totalGifts,
+        },
       };
     } catch (e) {
       console.warn('[useFinance] projection computation error:', e);
@@ -338,9 +406,7 @@ export default function useFinance() {
 
     try {
       setIsLoading(true);
-      const infoSnap = await getDoc(
-        doc(db, 'weddings', activeWedding, 'info', 'weddingInfo')
-      );
+      const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'info', 'weddingInfo'));
       if (infoSnap.exists()) {
         const info = infoSnap.data();
         if (info?.numGuests) {
@@ -352,7 +418,12 @@ export default function useFinance() {
         // Fechas clave: invitaciones y boda
         try {
           const rawWeddingDate = info?.weddingDate || info?.date || null;
-          const rawInvitesDate = info?.invitesSentDate || info?.invitationsSentDate || info?.invitesSentAt || info?.invitationsSentAt || null;
+          const rawInvitesDate =
+            info?.invitesSentDate ||
+            info?.invitationsSentDate ||
+            info?.invitesSentAt ||
+            info?.invitationsSentAt ||
+            null;
           const parsedWedding = rawWeddingDate ? new Date(rawWeddingDate) : null;
           const parsedInvites = rawInvitesDate ? new Date(rawInvitesDate) : null;
           setWeddingTimeline({ invitesSentDate: parsedInvites, weddingDate: parsedWedding });
@@ -529,13 +600,19 @@ export default function useFinance() {
           paidAmount = amount;
         }
 
-        if (type === 'income' && status === 'received' && (paidAmount === null || paidAmount === 0)) {
+        if (
+          type === 'income' &&
+          status === 'received' &&
+          (paidAmount === null || paidAmount === 0)
+        ) {
           paidAmount = amount;
         }
 
         const attachmentsSpec = transactionData.attachments || {};
         const keepAttachments = Array.isArray(attachmentsSpec.keep) ? attachmentsSpec.keep : [];
-        const filesToUpload = Array.isArray(attachmentsSpec.newFiles) ? attachmentsSpec.newFiles : [];
+        const filesToUpload = Array.isArray(attachmentsSpec.newFiles)
+          ? attachmentsSpec.newFiles
+          : [];
 
         const payload = {
           ...transactionData,
@@ -569,7 +646,11 @@ export default function useFinance() {
 
         let uploadedAttachments = [];
         if (filesToUpload.length > 0) {
-          uploadedAttachments = await uploadEmailAttachments(filesToUpload, activeWedding || 'anonymous', 'finance');
+          uploadedAttachments = await uploadEmailAttachments(
+            filesToUpload,
+            activeWedding || 'anonymous',
+            'finance'
+          );
         }
 
         if (keepAttachments.length > 0 || uploadedAttachments.length > 0) {
@@ -585,9 +666,7 @@ export default function useFinance() {
 
         const updatedTransactions = [...transactions, saved];
         saveData('movements', updatedTransactions, {
-          docPath: activeWedding
-            ? `weddings/${activeWedding}/finance/main`
-            : undefined,
+          docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
           showNotification: false,
         });
         window.dispatchEvent(new Event('lovenda-movements'));
@@ -611,14 +690,21 @@ export default function useFinance() {
           : null;
 
         const type = changes?.type || existing?.type || 'expense';
-        const baseAmount = changes?.amount !== undefined ? Number(changes.amount) || 0 : Number(existing?.amount) || 0;
-        const resolvedStatus = changes?.status || existing?.status || (type === 'income' ? 'expected' : 'pending');
+        const baseAmount =
+          changes?.amount !== undefined
+            ? Number(changes.amount) || 0
+            : Number(existing?.amount) || 0;
+        const resolvedStatus =
+          changes?.status || existing?.status || (type === 'income' ? 'expected' : 'pending');
 
         const payload = { ...changes };
 
         let keepAttachments = [];
         let filesToUpload = [];
-        const hasAttachmentsSpec = Object.prototype.hasOwnProperty.call(changes || {}, 'attachments');
+        const hasAttachmentsSpec = Object.prototype.hasOwnProperty.call(
+          changes || {},
+          'attachments'
+        );
         if (hasAttachmentsSpec) {
           const attachmentSpec = changes.attachments || {};
           keepAttachments = Array.isArray(attachmentSpec.keep) ? attachmentSpec.keep : [];
@@ -669,10 +755,18 @@ export default function useFinance() {
             }
           }
 
-          if (type === 'expense' && resolvedStatus === 'paid' && (paidAmount === null || paidAmount === 0)) {
+          if (
+            type === 'expense' &&
+            resolvedStatus === 'paid' &&
+            (paidAmount === null || paidAmount === 0)
+          ) {
             paidAmount = baseAmount;
           }
-          if (type === 'income' && resolvedStatus === 'received' && (paidAmount === null || paidAmount === 0)) {
+          if (
+            type === 'income' &&
+            resolvedStatus === 'received' &&
+            (paidAmount === null || paidAmount === 0)
+          ) {
             paidAmount = baseAmount;
           }
 
@@ -687,7 +781,11 @@ export default function useFinance() {
 
         let uploadedAttachments = [];
         if (filesToUpload.length > 0) {
-          uploadedAttachments = await uploadEmailAttachments(filesToUpload, activeWedding || 'anonymous', 'finance');
+          uploadedAttachments = await uploadEmailAttachments(
+            filesToUpload,
+            activeWedding || 'anonymous',
+            'finance'
+          );
         }
 
         if (hasAttachmentsSpec) {
@@ -709,7 +807,7 @@ export default function useFinance() {
     [_updateTransaction, transactions, activeWedding]
   );
 
-    const deleteTransaction = useCallback(
+  const deleteTransaction = useCallback(
     async (id) => {
       try {
         await _deleteTransaction(id);
@@ -742,7 +840,8 @@ export default function useFinance() {
           const type = transaction.amount < 0 ? 'expense' : 'income';
           const concept = transaction.description;
           const provider = transaction.provider || transaction.counterparty || '';
-          const inferredCategory = autoCategorizeTransaction(concept, provider, amount, type) || 'OTROS';
+          const inferredCategory =
+            autoCategorizeTransaction(concept, provider, amount, type) || 'OTROS';
           await createTransaction({
             concept,
             amount,
@@ -774,7 +873,7 @@ export default function useFinance() {
     const unsub = onSnapshot(
       ref,
       (snap) => {
-        const acc = snap.exists() ? (snap.data() || {}) : {};
+        const acc = snap.exists() ? snap.data() || {} : {};
         setHasBankAccount(Boolean(acc.primaryAccountId));
       },
       () => setHasBankAccount(false)
@@ -819,14 +918,3 @@ export default function useFinance() {
     hasBankAccount,
   };
 }
-
-
-
-
-
-
-
-
-
-
-

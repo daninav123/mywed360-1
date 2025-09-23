@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import ProveedorCard from "./ProveedorCard";
-import { FixedSizeList as List } from "react-window";
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FixedSizeList as List } from 'react-window';
+
+import ProveedorCard from './ProveedorCard';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -28,17 +29,17 @@ const ProveedorList = ({
   const navigate = useNavigate();
 
   const handleCreateContract = (provider) => {
-    const title = `Contrato Proveedor - ${provider?.name || "Proveedor"}`;
-    navigate("/protocolo/documentos-legales", {
+    const title = `Contrato Proveedor - ${provider?.name || 'Proveedor'}`;
+    navigate('/protocolo/documentos-legales', {
       state: {
         prefill: {
-          type: "provider_contract",
+          type: 'provider_contract',
           title,
-          providerName: provider?.name || "",
-          service: provider?.service || "",
-          eventDate: provider?.date || "",
-          amount: provider?.priceRange || "",
-          region: "ES",
+          providerName: provider?.name || '',
+          service: provider?.service || '',
+          eventDate: provider?.date || '',
+          amount: provider?.priceRange || '',
+          region: 'ES',
         },
       },
     });
@@ -65,14 +66,14 @@ const ProveedorList = ({
 
   const selectedCount = Array.isArray(selected) ? selected.length : 0;
   const tabOptions = [
-    { id: "contratados", label: "Contratados" },
-    { id: "buscados", label: "Buscados" },
-    { id: "favoritos", label: "Favoritos" },
+    { id: 'contratados', label: 'Contratados' },
+    { id: 'buscados', label: 'Buscados' },
+    { id: 'favoritos', label: 'Favoritos' },
   ];
 
   const renderTabs = () => {
-    if (typeof setTab !== "function") return null;
-    const activeTab = tab || "contratados";
+    if (typeof setTab !== 'function') return null;
+    const activeTab = tab || 'contratados';
     return (
       <div className="flex flex-wrap items-center gap-3">
         <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
@@ -83,8 +84,8 @@ const ProveedorList = ({
               onClick={() => setTab(opt.id)}
               className={`px-3 py-2 text-sm font-medium border-b-2 ${
                 activeTab === opt.id
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               {opt.label}
@@ -100,7 +101,7 @@ const ProveedorList = ({
     return (
       <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
         <span>{selectedCount} seleccionados</span>
-        {typeof onOpenCompare === "function" && (
+        {typeof onOpenCompare === 'function' && (
           <button
             type="button"
             onClick={onOpenCompare}
@@ -109,7 +110,7 @@ const ProveedorList = ({
             Comparar
           </button>
         )}
-        {typeof onOpenBulkStatus === "function" && (
+        {typeof onOpenBulkStatus === 'function' && (
           <button
             type="button"
             onClick={onOpenBulkStatus}
@@ -118,7 +119,7 @@ const ProveedorList = ({
             Cambiar estado
           </button>
         )}
-        {typeof onOpenDuplicates === "function" && (
+        {typeof onOpenDuplicates === 'function' && (
           <button
             type="button"
             onClick={onOpenDuplicates}
@@ -127,7 +128,7 @@ const ProveedorList = ({
             Revisar duplicados
           </button>
         )}
-        {typeof onClearSelection === "function" && (
+        {typeof onClearSelection === 'function' && (
           <button
             type="button"
             onClick={onClearSelection}
@@ -191,7 +192,11 @@ const ProveedorList = ({
 
     return (
       <div className="w-full">
-        <div ref={containerRef} style={{ height: '70vh' }} className="border border-gray-200 rounded-md">
+        <div
+          ref={containerRef}
+          style={{ height: '70vh' }}
+          className="border border-gray-200 rounded-md"
+        >
           {dims.height > 0 ? (
             <List
               height={dims.height}

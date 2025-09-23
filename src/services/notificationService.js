@@ -43,7 +43,7 @@ async function getAuthToken() {
 // Devuelve cabeceras con Authorization si hay token
 async function authHeader(base = {}) {
   const token = await getAuthToken();
-  return token ? { ...base, 'Authorization': `Bearer ${token}` } : base;
+  return token ? { ...base, Authorization: `Bearer ${token}` } : base;
 }
 
 // ==================== PREFERENCIAS DE NOTIFICACIONES ====================
@@ -52,7 +52,7 @@ export const DEFAULT_NOTIFICATION_PREFS = {
   channels: {
     inApp: true,
     push: true,
-    emailDigest: { daily: true, weekly: false }
+    emailDigest: { daily: true, weekly: false },
   },
   quietHours: { enabled: false, start: '22:00', end: '08:00', allowCritical: true },
   categories: {
@@ -64,8 +64,8 @@ export const DEFAULT_NOTIFICATION_PREFS = {
     rsvp: { new: true, changed: true },
     documents: { signatureRequested: true, signatureSigned: true },
     system: { exportReady: true, maintenance: true },
-    ai: { suggestedTask: true, suggestedMeeting: true, suggestedBudget: true }
-  }
+    ai: { suggestedTask: true, suggestedMeeting: true, suggestedBudget: true },
+  },
 };
 
 const PREFS_KEY = 'lovenda_notification_prefs_v1';
@@ -105,8 +105,8 @@ function deepMerge(base, ext) {
 export function isQuietHoursActive(date = new Date(), quiet = getNotificationPrefs().quietHours) {
   try {
     if (!quiet?.enabled) return false;
-    const [sh, sm] = (quiet.start || '22:00').split(':').map(n => parseInt(n || '0', 10));
-    const [eh, em] = (quiet.end || '08:00').split(':').map(n => parseInt(n || '0', 10));
+    const [sh, sm] = (quiet.start || '22:00').split(':').map((n) => parseInt(n || '0', 10));
+    const [eh, em] = (quiet.end || '08:00').split(':').map((n) => parseInt(n || '0', 10));
     const startM = sh * 60 + (sm || 0);
     const endM = eh * 60 + (em || 0);
     const m = date.getHours() * 60 + date.getMinutes();
@@ -152,12 +152,12 @@ function mapSubtypeKey(type, subtype) {
     ai: {
       meeting_suggested: 'suggestedMeeting',
       budget_suggested: 'suggestedBudget',
-      task_suggested: 'suggestedTask'
+      task_suggested: 'suggestedTask',
     },
     tasks: { reminder24h: 'reminder24h', overdue: 'overdue', assigned: 'assigned' },
-    email: { new: 'new', important: 'important' }
+    email: { new: 'new', important: 'important' },
   };
-  return (map[type] && map[type][subtype]) ? map[type][subtype] : (subtype || '');
+  return map[type] && map[type][subtype] ? map[type][subtype] : subtype || '';
 }
 
 export async function getNotifications() {
@@ -166,37 +166,43 @@ export async function getNotifications() {
     const res = await apiGet('/api/notifications', { headers });
     if (!res.ok) throw new Error('Error fetching notifications');
     const arr = await res.json();
-    const notifications = (Array.isArray(arr) ? arr : []).map(n => ({
+    const notifications = (Array.isArray(arr) ? arr : []).map((n) => ({
       ...n,
       timestamp: n.date || n.createdAt || n.time || new Date().toISOString(),
     }));
-    const unreadCount = notifications.filter(n => !n.read).length;
+    const unreadCount = notifications.filter((n) => !n.read).length;
     return { notifications, unreadCount };
   } catch (error) {
     // Silenciar 401/primer arranque sin token; devolver vacío/local
     try {
       const local = loadLocalNotifications();
-      const unreadCount = local.filter(n => !n.read).length;
+      const unreadCount = local.filter((n) => !n.read).length;
       return { notifications: local, unreadCount };
-    } catch { return { notifications: [], unreadCount: 0 }; }
+    } catch {
+      return { notifications: [], unreadCount: 0 };
+    }
   }
 }
 
 export async function addNotification(notification) {
   const { type = 'info', message, providerId, trackingId, dueDate, action } = notification;
-  
+
   try {
-    const res = await apiPost('/api/notifications', { 
-        type, 
-        message, 
-        providerId, 
-        trackingId, 
+    const res = await apiPost(
+      '/api/notifications',
+      {
+        type,
+        message,
+        providerId,
+        trackingId,
         dueDate,
         action,
         date: new Date().toISOString(),
-        read: false
-      }, { headers: await authHeader({}) });
-    
+        read: false,
+      },
+      { headers: await authHeader({}) }
+    );
+
     if (!res.ok) throw new Error('Error adding notification');
     const notif = await res.json();
     window.dispatchEvent(new CustomEvent('lovenda-notif', { detail: { id: notif.id } }));
@@ -205,14 +211,14 @@ export async function addNotification(notification) {
     console.error('Error adding notification:', error);
     // Modo fallback: guardar notificación en localStorage
     return addLocalNotification({
-      type, 
-      message, 
-      providerId, 
-      trackingId, 
+      type,
+      message,
+      providerId,
+      trackingId,
       dueDate,
       action,
-      date: new Date().toISOString(), 
-      read: false
+      date: new Date().toISOString(),
+      read: false,
     });
   }
 }
@@ -251,7 +257,11 @@ export const markAsRead = markNotificationRead;
 // ---- Email actions ----
 export async function acceptMeeting({ weddingId, mailId, title, when }) {
   const headers = await authHeader({ 'Content-Type': 'application/json' });
-  const res = await apiPost('/api/email-actions/accept-meeting', { weddingId, mailId, title, when }, { headers });
+  const res = await apiPost(
+    '/api/email-actions/accept-meeting',
+    { weddingId, mailId, title, when },
+    { headers }
+  );
   if (!res.ok) throw new Error('acceptMeeting failed');
   return res.json();
 }
@@ -267,7 +277,11 @@ export async function acceptTask({ weddingId, mailId, title, due, priority }) {
 
 export async function acceptBudget({ weddingId, budgetId, emailId }) {
   const headers = await authHeader({ 'Content-Type': 'application/json' });
-  const res = await apiPost('/api/email-actions/accept-budget', { weddingId, budgetId, emailId }, { headers });
+  const res = await apiPost(
+    '/api/email-actions/accept-budget',
+    { weddingId, budgetId, emailId },
+    { headers }
+  );
   if (!res.ok) throw new Error('acceptBudget failed');
   return res.json();
 }
@@ -286,7 +300,7 @@ export async function createUrgentTrackingAlert(provider, tracking, reason) {
     message: `Seguimiento urgente: ${provider.name} - ${reason}`,
     providerId: provider.id,
     trackingId: tracking.id,
-    action: 'viewTracking'
+    action: 'viewTracking',
   });
 }
 
@@ -302,7 +316,7 @@ export async function createProviderReminder(provider, dueDate, title) {
     message: `Recordatorio: ${title} - ${provider.name}`,
     providerId: provider.id,
     dueDate: dueDate.toISOString(),
-    action: 'viewProvider'
+    action: 'viewProvider',
   });
 }
 
@@ -316,55 +330,48 @@ export function generateTrackingNotifications(trackingRecords, providers) {
   const now = new Date();
   const sevenDaysAgo = new Date(now);
   sevenDaysAgo.setDate(now.getDate() - 7);
-  
+
   // Filtrar seguimientos pendientes sin actualización por más de 7 días
-  const urgentTrackings = trackingRecords.filter(track => {
+  const urgentTrackings = trackingRecords.filter((track) => {
     if (track.status !== 'Pendiente' && track.status !== 'Esperando respuesta') {
       return false;
     }
-    
+
     const lastUpdate = new Date(track.lastUpdate || track.date);
     return lastUpdate < sevenDaysAgo;
   });
-  
+
   // Generar notificaciones para seguimientos urgentes
-  urgentTrackings.forEach(tracking => {
+  urgentTrackings.forEach((tracking) => {
     // Buscar el proveedor correspondiente
-    const provider = providers.find(p => p.id === tracking.providerId);
+    const provider = providers.find((p) => p.id === tracking.providerId);
     if (provider) {
-      createUrgentTrackingAlert(
-        provider, 
-        tracking, 
-        'Sin respuesta por más de 7 días'
-      );
+      createUrgentTrackingAlert(provider, tracking, 'Sin respuesta por más de 7 días');
     }
   });
-  
+
   // Comprobar seguimientos próximos a vencer (recordatorios a 3 días)
   const threeDaysFromNow = new Date(now);
   threeDaysFromNow.setDate(now.getDate() + 3);
-  
+
   // Filtrar seguimientos con fecha límite próxima
-  const upcomingTrackings = trackingRecords.filter(track => {
+  const upcomingTrackings = trackingRecords.filter((track) => {
     if (!track.dueDate) return false;
-    
+
     const dueDate = new Date(track.dueDate);
     const isToday = dueDate.toDateString() === now.toDateString();
-    const isInThreeDays = (
-      dueDate > now && 
-      dueDate <= threeDaysFromNow
-    );
-    
+    const isInThreeDays = dueDate > now && dueDate <= threeDaysFromNow;
+
     return isToday || isInThreeDays;
   });
-  
+
   // Generar recordatorios para seguimientos próximos
-  upcomingTrackings.forEach(tracking => {
-    const provider = providers.find(p => p.id === tracking.providerId);
+  upcomingTrackings.forEach((tracking) => {
+    const provider = providers.find((p) => p.id === tracking.providerId);
     if (provider) {
       const dueDate = new Date(tracking.dueDate);
       const isToday = dueDate.toDateString() === now.toDateString();
-      
+
       createProviderReminder(
         provider,
         dueDate,
@@ -372,10 +379,10 @@ export function generateTrackingNotifications(trackingRecords, providers) {
       );
     }
   });
-  
+
   return {
     urgentCount: urgentTrackings.length,
-    reminderCount: upcomingTrackings.length
+    reminderCount: upcomingTrackings.length,
   };
 }
 
@@ -391,13 +398,13 @@ export function generateTrackingNotifications(trackingRecords, providers) {
  */
 export function showNotification({ title, message, type = 'info', duration = 3000, actions = [] }) {
   // Crear evento personalizado para el sistema de notificaciones
-  const event = new CustomEvent('lovenda-toast', { 
-    detail: { title, message, type, duration, actions }
+  const event = new CustomEvent('lovenda-toast', {
+    detail: { title, message, type, duration, actions },
   });
-  
+
   // Disparar evento para que lo capture el componente de notificaciones
   window.dispatchEvent(event);
-  
+
   // También registrar en consola para desarrollo
   console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
 }
@@ -407,10 +414,12 @@ export async function markAllAsRead() {
   try {
     const { notifications } = await getNotifications();
     const ids = (Array.isArray(notifications) ? notifications : [])
-      .filter(n => !n.read && n.id)
-      .map(n => n.id);
+      .filter((n) => !n.read && n.id)
+      .map((n) => n.id);
     for (const id of ids) {
-      try { await markNotificationRead(id); } catch {}
+      try {
+        await markNotificationRead(id);
+      } catch {}
     }
     return true;
   } catch {
@@ -428,15 +437,15 @@ export async function createNewEmailNotification(email) {
     type: 'info',
     message: `Nuevo email de ${email.from}: ${email.subject || '(Sin asunto)'}`,
     action: 'viewEmail',
-    emailId: email.id
+    emailId: email.id,
   });
-  
+
   // Mostrar toast inmediato
   showNotification({
     title: 'Nuevo email',
     message: `Has recibido un nuevo email de ${email.from}`,
     type: 'info',
-    duration: 5000
+    duration: 5000,
   });
 }
 
@@ -446,40 +455,42 @@ export async function createNewEmailNotification(email) {
  */
 export function generateEmailNotifications(emails) {
   if (!emails || !emails.length) return { count: 0 };
-  
+
   // Filtrar emails no leídos
-  const unreadEmails = emails.filter(email => !email.read);
-  
+  const unreadEmails = emails.filter((email) => !email.read);
+
   // Notificar sobre emails no leídos (respetar preferencias)
   try {
-    if (unreadEmails.length > 0 && shouldNotify({ type: 'email', subtype: 'new', priority: 'normal', channel: 'toast' })) {
+    if (
+      unreadEmails.length > 0 &&
+      shouldNotify({ type: 'email', subtype: 'new', priority: 'normal', channel: 'toast' })
+    ) {
       showNotification({
         title: 'Emails sin leer',
         message: `Tienes ${unreadEmails.length} ${unreadEmails.length === 1 ? 'email sin leer' : 'emails sin leer'}`,
-        type: 'info'
+        type: 'info',
       });
     }
   } catch {}
-  
+
   // Filtrar emails importantes y no leídos para notificaciones persistentes
-  const importantUnread = unreadEmails.filter(email => 
-    email.folder === 'important' || 
-    email.subject?.toLowerCase().includes('urgente')
+  const importantUnread = unreadEmails.filter(
+    (email) => email.folder === 'important' || email.subject?.toLowerCase().includes('urgente')
   );
-  
+
   // Crear notificaciones persistentes para emails importantes
-  importantUnread.forEach(email => {
+  importantUnread.forEach((email) => {
     addNotification({
       type: 'warning',
       message: `Email importante: ${email.subject || '(Sin asunto)'}`,
       action: 'viewEmail',
-      emailId: email.id
+      emailId: email.id,
     });
   });
-  
+
   return {
     count: unreadEmails.length,
-    importantCount: importantUnread.length
+    importantCount: importantUnread.length,
   };
 }
 
@@ -512,31 +523,33 @@ function addLocalNotification(notification) {
     ...notification,
     id: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
   };
-  
+
   notifications.push(newNotification);
   saveLocalNotifications(notifications);
-  
-  window.dispatchEvent(new CustomEvent('lovenda-notif', { 
-    detail: { id: newNotification.id } 
-  }));
-  
+
+  window.dispatchEvent(
+    new CustomEvent('lovenda-notif', {
+      detail: { id: newNotification.id },
+    })
+  );
+
   return newNotification;
 }
 
 function markLocalNotificationRead(id) {
   const notifications = loadLocalNotifications();
-  const updatedNotifications = notifications.map(notif => 
+  const updatedNotifications = notifications.map((notif) =>
     notif.id === id ? { ...notif, read: true } : notif
   );
-  
+
   saveLocalNotifications(updatedNotifications);
-  return updatedNotifications.find(n => n.id === id) || null;
+  return updatedNotifications.find((n) => n.id === id) || null;
 }
 
 function deleteLocalNotification(id) {
   const notifications = loadLocalNotifications();
-  const updatedNotifications = notifications.filter(notif => notif.id !== id);
-  
+  const updatedNotifications = notifications.filter((notif) => notif.id !== id);
+
   saveLocalNotifications(updatedNotifications);
   return true;
 }

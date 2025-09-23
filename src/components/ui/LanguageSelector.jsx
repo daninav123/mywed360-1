@@ -1,6 +1,7 @@
+import { Globe, ChevronDown, Check } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, ChevronDown, Check } from 'lucide-react';
+
 import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
 
 // Selector de idioma con dropdown
@@ -8,7 +9,7 @@ const LanguageSelector = ({
   className = '',
   showFlag = true,
   showText = true,
-  variant = 'button'
+  variant = 'button',
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +17,14 @@ const LanguageSelector = ({
 
   const currentLanguage = getCurrentLanguage();
   const availableLanguages = getAvailableLanguages();
-  const currentLang = availableLanguages.find((lang) => lang.code === currentLanguage) || availableLanguages[0];
+  const currentLang =
+    availableLanguages.find((lang) => lang.code === currentLanguage) || availableLanguages[0];
 
   const handleLanguageChange = async (languageCode) => {
-    if (languageCode === currentLanguage) { setIsOpen(false); return; }
+    if (languageCode === currentLanguage) {
+      setIsOpen(false);
+      return;
+    }
     setIsChanging(true);
     try {
       await changeLanguage(languageCode);
@@ -36,7 +41,9 @@ const LanguageSelector = ({
   // Cerrar al hacer clic fuera
   useEffect(() => {
     if (!isOpen) return;
-    const onDocClick = (e) => { if (!e.target.closest('.language-selector')) setIsOpen(false); };
+    const onDocClick = (e) => {
+      if (!e.target.closest('.language-selector')) setIsOpen(false);
+    };
     document.addEventListener('click', onDocClick);
     return () => document.removeEventListener('click', onDocClick);
   }, [isOpen]);
@@ -80,8 +87,13 @@ const LanguageSelector = ({
         className={`flex items-center gap-2 px-3 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors min-w-[120px] ${isChanging ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
       >
         {showFlag && <span className="text-lg">{currentLang.flag}</span>}
-        {showText && <span className="flex-1 text-left text-sm font-medium">{currentLang.name}</span>}
-        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''} ${isChanging ? 'animate-spin' : ''}`} />
+        {showText && (
+          <span className="flex-1 text-left text-sm font-medium">{currentLang.name}</span>
+        )}
+        <ChevronDown
+          size={16}
+          className={`transition-transform ${isOpen ? 'rotate-180' : ''} ${isChanging ? 'animate-spin' : ''}`}
+        />
       </button>
 
       {isOpen && (
@@ -104,4 +116,3 @@ const LanguageSelector = ({
 };
 
 export default LanguageSelector;
-

@@ -28,7 +28,17 @@ Saludos,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'fecha_boda', 'tarea_1', 'fecha_limite_1', 'tarea_2', 'fecha_limite_2', 'tarea_3', 'fecha_limite_3', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'fecha_boda',
+      'tarea_1',
+      'fecha_limite_1',
+      'tarea_2',
+      'fecha_limite_2',
+      'tarea_3',
+      'fecha_limite_3',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_seguimiento_confirmacion_1',
@@ -54,7 +64,15 @@ Un abrazo,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'numero_pendientes', 'fecha_boda', 'lista_invitados_pendientes', 'invitados_asignados', 'fecha_limite_confirmaciones', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'numero_pendientes',
+      'fecha_boda',
+      'lista_invitados_pendientes',
+      'invitados_asignados',
+      'fecha_limite_confirmaciones',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_seguimiento_pagos_1',
@@ -82,7 +100,25 @@ Un saludo,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'fecha_boda', 'proveedor_1', 'estado_pago_1', 'fecha_pago_1', 'importe_1', 'proveedor_2', 'estado_pago_2', 'fecha_pago_2', 'importe_2', 'proveedor_3', 'estado_pago_3', 'fecha_pago_3', 'importe_3', 'total_pagado', 'total_pendiente', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'fecha_boda',
+      'proveedor_1',
+      'estado_pago_1',
+      'fecha_pago_1',
+      'importe_1',
+      'proveedor_2',
+      'estado_pago_2',
+      'fecha_pago_2',
+      'importe_2',
+      'proveedor_3',
+      'estado_pago_3',
+      'fecha_pago_3',
+      'importe_3',
+      'total_pagado',
+      'total_pendiente',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_seguimiento_despedida_1',
@@ -114,7 +150,20 @@ Un abrazo,
 {{nombre_organizador/a}}
     `,
     isSystem: true,
-    variables: ['tipo_despedida', 'nombre_homenajeado/a', 'fecha_despedida', 'lugar_despedida', 'presupuesto_persona', 'numero_confirmados', 'numero_pendientes', 'actividades_confirmadas', 'pendiente_organizar', 'fecha_limite_pago', 'fecha_limite_confirmacion', 'nombre_organizador/a']
+    variables: [
+      'tipo_despedida',
+      'nombre_homenajeado/a',
+      'fecha_despedida',
+      'lugar_despedida',
+      'presupuesto_persona',
+      'numero_confirmados',
+      'numero_pendientes',
+      'actividades_confirmadas',
+      'pendiente_organizar',
+      'fecha_limite_pago',
+      'fecha_limite_confirmacion',
+      'nombre_organizador/a',
+    ],
   },
   {
     id: 'template_seguimiento_regalos_1',
@@ -145,7 +194,15 @@ Un abrazo,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'fecha_boda', 'lista_regalos_fisicos', 'lista_transferencias', 'lista_pendientes', 'invitados_sin_direccion', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'fecha_boda',
+      'lista_regalos_fisicos',
+      'lista_transferencias',
+      'lista_pendientes',
+      'invitados_sin_direccion',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_seguimiento_timing_1',
@@ -180,8 +237,24 @@ Un cordial saludo,
 {{telefono_cliente}}
     `,
     isSystem: true,
-    variables: ['nombre_proveedor', 'fecha_boda', 'hora_llegada_novios', 'hora_ceremonia', 'hora_coctel', 'hora_banquete', 'hora_baile', 'hora_fin', 'servicio_proveedor', 'hora_montaje', 'hora_inicio_servicio', 'hora_fin_servicio', 'hora_desmontaje', 'nombre_cliente', 'telefono_cliente']
-  }
+    variables: [
+      'nombre_proveedor',
+      'fecha_boda',
+      'hora_llegada_novios',
+      'hora_ceremonia',
+      'hora_coctel',
+      'hora_banquete',
+      'hora_baile',
+      'hora_fin',
+      'servicio_proveedor',
+      'hora_montaje',
+      'hora_inicio_servicio',
+      'hora_fin_servicio',
+      'hora_desmontaje',
+      'nombre_cliente',
+      'telefono_cliente',
+    ],
+  },
 ];
 
 export default seguimientoTemplates;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
 import { WidgetTypes } from '../components/dashboard/widgets/WidgetTypes';
 
 const WIDGETS_STORAGE_KEY = 'lovenda_dashboard_widgets';
@@ -36,7 +37,7 @@ const DEFAULT_WIDGETS = [
 
 export const useWidgets = () => {
   const [widgets, setWidgets] = useState([]);
-  
+
   // Load widgets from localStorage on mount
   useEffect(() => {
     try {
@@ -51,7 +52,7 @@ export const useWidgets = () => {
       setWidgets(DEFAULT_WIDGETS);
     }
   }, []);
-  
+
   // Save widgets to localStorage whenever they change
   useEffect(() => {
     if (widgets.length > 0) {
@@ -62,7 +63,7 @@ export const useWidgets = () => {
       }
     }
   }, [widgets]);
-  
+
   const addWidget = (type) => {
     const newWidget = {
       id: uuidv4(),
@@ -71,11 +72,11 @@ export const useWidgets = () => {
     };
     setWidgets([...widgets, newWidget]);
   };
-  
+
   const removeWidget = (id) => {
-    setWidgets(widgets.filter(widget => widget.id !== id));
+    setWidgets(widgets.filter((widget) => widget.id !== id));
   };
-  
+
   const moveWidget = (dragIndex, hoverIndex) => {
     const dragItem = widgets[dragIndex];
     const newWidgets = [...widgets];
@@ -83,15 +84,15 @@ export const useWidgets = () => {
     newWidgets.splice(hoverIndex, 0, dragItem);
     setWidgets(newWidgets);
   };
-  
+
   const updateWidgetConfig = (id, newConfig) => {
-    setWidgets(widgets.map(widget => 
-      widget.id === id 
-        ? { ...widget, config: { ...widget.config, ...newConfig } }
-        : widget
-    ));
+    setWidgets(
+      widgets.map((widget) =>
+        widget.id === id ? { ...widget, config: { ...widget.config, ...newConfig } } : widget
+      )
+    );
   };
-  
+
   return {
     widgets,
     addWidget,

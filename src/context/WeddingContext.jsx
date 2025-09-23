@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
-import errorLogger from '../utils/errorLogger';
-import { useAuth } from '../hooks/useAuth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+
 import { db, firebaseReady } from '../firebaseConfig';
+import { useAuth } from '../hooks/useAuth';
+import errorLogger from '../utils/errorLogger';
 
 /**
  * Contexto para la boda activa que está gestionando el planner.
@@ -21,23 +22,25 @@ const WeddingContext = createContext({
 
 export const useWedding = () => useContext(WeddingContext);
 
-async function ensureFinance(weddingId){
-  try{
-    const fRef = doc(db,'weddings',weddingId,'finance','main');
+async function ensureFinance(weddingId) {
+  try {
+    const fRef = doc(db, 'weddings', weddingId, 'finance', 'main');
     const fSnap = await getDoc(fRef);
-    if(!fSnap.exists()){
-      await setDoc(fRef,{movements:[],createdAt:serverTimestamp()},{merge:true});
-      console.log('🆕 finance/main creado para',weddingId);
+    if (!fSnap.exists()) {
+      await setDoc(fRef, { movements: [], createdAt: serverTimestamp() }, { merge: true });
+      console.log('🆕 finance/main creado para', weddingId);
     }
-  }catch(e){
-    console.warn('No se pudo asegurar finance para',weddingId,e);
+  } catch (e) {
+    console.warn('No se pudo asegurar finance para', weddingId, e);
   }
 }
 
 export default function WeddingProvider({ children }) {
   const isCypress = typeof window !== 'undefined' && !!window.Cypress;
   const mock = (typeof window !== 'undefined' && window.__MOCK_WEDDING__) || null;
-  const [weddings, setWeddings] = useState(() => (isCypress && Array.isArray(mock?.weddings)) ? mock.weddings : []);
+  const [weddings, setWeddings] = useState(() =>
+    isCypress && Array.isArray(mock?.weddings) ? mock.weddings : []
+  );
   const { currentUser } = useAuth();
   const [activeWedding, setActiveWeddingState] = useState(() => {
     if (isCypress && mock?.activeWedding?.id) return mock.activeWedding.id;
@@ -49,8 +52,8 @@ export default function WeddingProvider({ children }) {
     if (currentUser) {
       errorLogger.setWeddingInfo({
         count: weddings.length,
-        list: weddings.map(w => ({ id: w.id, name: w.name || w.slug || 'Boda' })),
-        activeWedding
+        list: weddings.map((w) => ({ id: w.id, name: w.name || w.slug || 'Boda' })),
+        activeWedding,
       });
     } else {
       errorLogger.setWeddingInfo(null);
@@ -89,20 +92,23 @@ export default function WeddingProvider({ children }) {
         setWeddings([]);
         return;
       }
-      
+
       try {
         // Aseguramos que Firebase esté totalmente inicializado antes de usar Firestore
         await firebaseReady;
         const { collection, getDocs } = await import('firebase/firestore');
-        
+
         // Cargar bodas desde la subcolección del usuario
         const userWeddingsCol = collection(db, 'users', currentUser.uid, 'weddings');
-        
-        console.log('[WeddingContext] Cargando bodas desde users/{uid}/weddings para:', currentUser.uid);
-        
+
+        console.log(
+          '[WeddingContext] Cargando bodas desde users/{uid}/weddings para:',
+          currentUser.uid
+        );
+
         let list = [];
         const snap = await getDocs(userWeddingsCol);
-        list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         console.log('[WeddingContext] getDocs subcolección ->', list.length);
         setWeddings(list);
 
@@ -114,10 +120,15 @@ export default function WeddingProvider({ children }) {
             const wedSnapSub = await subGetDoc(wedRefSub);
             if (wedSnapSub.exists()) {
               list = [{ id: wedSnapSub.id, ...wedSnapSub.data() }];
-              console.log('[WeddingContext] Boda recuperada manualmente desde subcolección por activeWedding');
+              console.log(
+                '[WeddingContext] Boda recuperada manualmente desde subcolección por activeWedding'
+              );
             }
           } catch (err) {
-            console.warn('[WeddingContext] No se pudo recuperar boda por activeWedding en subcolección:', err);
+            console.warn(
+              '[WeddingContext] No se pudo recuperar boda por activeWedding en subcolección:',
+              err
+            );
           }
         }
 
@@ -138,33 +149,43 @@ export default function WeddingProvider({ children }) {
               console.warn('[WeddingContext] No se pudo recuperar boda manualmente:', err);
             }
           }
-          const {
-            where,
-            query: fQuery,
-          } = await import('firebase/firestore');
+          const { where, query: fQuery } = await import('firebase/firestore');
           const globalCol = collection(db, 'weddings');
           const qLegacy = fQuery(globalCol, where('ownerIds', 'array-contains', currentUser.uid));
-          const qLegacy2 = fQuery(globalCol, where('plannerIds', 'array-contains', currentUser.uid));
+          const qLegacy2 = fQuery(
+            globalCol,
+            where('plannerIds', 'array-contains', currentUser.uid)
+          );
           const [snap1, snap2] = await Promise.all([getDocs(qLegacy), getDocs(qLegacy2)]);
-          const legacyList = [...snap1.docs, ...snap2.docs].map(d => ({ id: d.id, ...d.data() }));
+          const legacyList = [...snap1.docs, ...snap2.docs].map((d) => ({ id: d.id, ...d.data() }));
           list = legacyList;
           if (legacyList.length) {
-            console.log('[WeddingContext] Bodas encontradas en colección global (legacy):', legacyList.length);
+            console.log(
+              '[WeddingContext] Bodas encontradas en colección global (legacy):',
+              legacyList.length
+            );
           }
         }
 
         // Ejecutar la carga inicial
-        if (import.meta.env.DEV) console.debug('[WeddingContext] bodas cargadas', list.map(l=>l.id));
+        if (import.meta.env.DEV)
+          console.debug(
+            '[WeddingContext] bodas cargadas',
+            list.map((l) => l.id)
+          );
         setWeddings(list);
-        list.forEach(w => ensureFinance(w.id));
+        list.forEach((w) => ensureFinance(w.id));
 
         // Si la activeWedding no existe o no pertenece al usuario, seleccionamos la primera válida
-        const existsInList = list.some(w => w.id === activeWedding);
+        const existsInList = list.some((w) => w.id === activeWedding);
         console.log('[WeddingContext] activeWedding actual:', activeWedding);
         console.log('[WeddingContext] existsInList:', existsInList);
         console.log('[WeddingContext] list.length:', list.length);
-        console.log('[WeddingContext] list IDs:', list.map(w => w.id));
-        
+        console.log(
+          '[WeddingContext] list IDs:',
+          list.map((w) => w.id)
+        );
+
         if (list.length > 0) {
           if (!activeWedding || !existsInList) {
             console.log('[WeddingContext] Estableciendo nueva activeWedding:', list[0].id);
@@ -177,28 +198,28 @@ export default function WeddingProvider({ children }) {
         } else {
           console.log('[WeddingContext] No hay bodas disponibles');
         }
-        
       } catch (error) {
         console.error('[WeddingContext] Error cargando bodas:', error);
         setWeddings([]);
       }
     }
-    
+
     listenWeddings();
   }, [currentUser]);
 
   const setActiveWedding = useCallback((id) => {
     setActiveWeddingState(id);
-    try { localStorage.setItem('lovenda_active_wedding', id); } catch {}
+    try {
+      localStorage.setItem('lovenda_active_wedding', id);
+    } catch {}
   }, []);
 
-  const value = useMemo(() => ({ weddings, activeWedding, setActiveWedding }), [weddings, activeWedding, setActiveWedding]);
-
-  return (
-    <WeddingContext.Provider value={value}>
-      {children}
-    </WeddingContext.Provider>
+  const value = useMemo(
+    () => ({ weddings, activeWedding, setActiveWedding }),
+    [weddings, activeWedding, setActiveWedding]
   );
+
+  return <WeddingContext.Provider value={value}>{children}</WeddingContext.Provider>;
 }
 
 export { WeddingProvider };

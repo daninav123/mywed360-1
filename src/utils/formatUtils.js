@@ -103,7 +103,8 @@ export const formatEmail = (email, hidePartial = false) => {
   if (!domain) return email;
   let maskedLocal = localPart;
   if (localPart.length > 3) {
-    maskedLocal = localPart.substring(0, 2) + '*'.repeat(localPart.length - 3) + localPart.slice(-1);
+    maskedLocal =
+      localPart.substring(0, 2) + '*'.repeat(localPart.length - 3) + localPart.slice(-1);
   }
   return `${maskedLocal}@${domain}`;
 };
@@ -221,4 +222,3 @@ export const formatStatus = (status) => {
   };
   return statusMap[status] || { label: status, color: 'gray' };
 };
-

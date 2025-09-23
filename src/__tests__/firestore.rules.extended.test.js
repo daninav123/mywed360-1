@@ -1,13 +1,18 @@
 /* eslint-disable no-unused-vars */
 // @vitest-environment node
-import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc, collection } from 'firebase/firestore';
+import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
 let testEnv;
 const PROJECT_ID = 'mywed360-test-extended';
-const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const RUN_FIRESTORE_RULES =
+  process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
 const D = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 beforeAll(async () => {
@@ -22,7 +27,7 @@ beforeAll(async () => {
     // Wedding with single owner only (no plannerIds/assistantIds yet)
     await setDoc(doc(db, 'weddings', 'w2'), {
       ownerIds: ['owner2'],
-      name: 'Wedding 2'
+      name: 'Wedding 2',
     });
 
     // Wedding with all roles
@@ -30,14 +35,14 @@ beforeAll(async () => {
       ownerIds: ['owner3'],
       plannerIds: ['planner3'],
       assistantIds: ['assistant3'],
-      name: 'Wedding 3'
+      name: 'Wedding 3',
     });
 
     // Invitation doc (as subcollection of wedding)
     await setDoc(doc(db, 'weddings', 'w3', 'weddingInvitations', 'inv123'), {
       weddingId: 'w3',
       email: 'planner@example.com',
-      createdBy: 'owner3'
+      createdBy: 'owner3',
     });
   });
 });
@@ -48,7 +53,7 @@ afterAll(async () => {
   }
 });
 
-const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
+const ctx = (uid) => (uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext());
 
 // Helper
 const weddingDoc = (db, id) => doc(db, 'weddings', id);
@@ -68,24 +73,40 @@ D('Wedding document permissions', () => {
 
   test('Owner can ADD planner to plannerIds', async () => {
     const db = getFirestore(ctx('owner2').app);
-    await assertSucceeds(setDoc(weddingDoc(db, 'w2'), { plannerIds: ['planner2'] }, { merge: true }));
+    await assertSucceeds(
+      setDoc(weddingDoc(db, 'w2'), { plannerIds: ['planner2'] }, { merge: true })
+    );
   });
 
   test('Planner can add THEMSELVES to plannerIds (invitation accepted)', async () => {
     const db = getFirestore(ctx('plannerSelf').app);
     // First seed doc without their uid
     await testEnv.withSecurityRulesDisabled(async (admin) => {
-      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAdd'), { ownerIds: ['ownerX'], plannerIds: [] });
+      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAdd'), {
+        ownerIds: ['ownerX'],
+        plannerIds: [],
+      });
     });
-    await assertSucceeds(setDoc(weddingDoc(db, 'selfAdd'), { plannerIds: ['plannerSelf'] }, { merge: true }));
+    await assertSucceeds(
+      setDoc(weddingDoc(db, 'selfAdd'), { plannerIds: ['plannerSelf'] }, { merge: true })
+    );
   });
 
   test('Planner cannot modify other fields while adding themselves', async () => {
     const db = getFirestore(ctx('plannerBad').app);
     await testEnv.withSecurityRulesDisabled(async (admin) => {
-      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAddBad'), { ownerIds: ['ownerY'], plannerIds: [] });
+      await setDoc(weddingDoc(getFirestore(admin.app), 'selfAddBad'), {
+        ownerIds: ['ownerY'],
+        plannerIds: [],
+      });
     });
-    await assertFails(setDoc(weddingDoc(db, 'selfAddBad'), { plannerIds: ['plannerBad'], name: 'Hack' }, { merge: true }));
+    await assertFails(
+      setDoc(
+        weddingDoc(db, 'selfAddBad'),
+        { plannerIds: ['plannerBad'], name: 'Hack' },
+        { merge: true }
+      )
+    );
   });
 
   test('Assistant cannot WRITE wedding doc', async () => {
@@ -131,12 +152,18 @@ D('Wedding subcollection permissions', () => {
 D('weddingInvitations rules (as subcollection)', () => {
   test('Any owner/planner can CREATE invitation under their wedding', async () => {
     const db = getFirestore(ctx('owner2').app);
-    await assertSucceeds(setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invZ'), { weddingId: 'w2', email: 'p@example.com' }));
+    await assertSucceeds(
+      setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invZ'), {
+        weddingId: 'w2',
+        email: 'p@example.com',
+      })
+    );
   });
 
   test('Unauthenticated cannot CREATE invitation', async () => {
     const db = getFirestore(ctx(null).app);
-    await assertFails(setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invNo'), { weddingId: 'w2' }));
+    await assertFails(
+      setDoc(doc(db, 'weddings', 'w2', 'weddingInvitations', 'invNo'), { weddingId: 'w2' })
+    );
   });
 });
-

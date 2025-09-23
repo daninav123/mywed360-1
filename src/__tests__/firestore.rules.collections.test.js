@@ -1,10 +1,15 @@
 // @vitest-environment node
-import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
-const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const RUN_FIRESTORE_RULES =
+  process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
 const describeIf = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 let testEnv;
@@ -23,24 +28,24 @@ beforeAll(async () => {
       ownerIds: ['owner1'],
       plannerIds: ['planner1'],
       assistantIds: ['assistant1'],
-      name: 'Wedding 1'
+      name: 'Wedding 1',
     });
 
     // Seed one guest doc so read tests have data
     await setDoc(doc(db, 'weddings', 'w1', 'guests', 'g1'), {
-      name: 'Guest 1'
+      name: 'Guest 1',
     });
 
     // Seed one table doc in seatingPlan subcollection
     await setDoc(doc(db, 'weddings', 'w1', 'seatingPlan', 'table1'), {
       name: 'Mesa 1',
       x: 100,
-      y: 100
+      y: 100,
     });
 
     // Seed supplier doc
     await setDoc(doc(db, 'weddings', 'w1', 'suppliers', 's1'), {
-      name: 'Floristería Luz'
+      name: 'Floristería Luz',
     });
   });
 });
@@ -51,7 +56,7 @@ afterAll(async () => {
   }
 });
 
-const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
+const ctx = (uid) => (uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext());
 
 // ---------- Guests ----------
 

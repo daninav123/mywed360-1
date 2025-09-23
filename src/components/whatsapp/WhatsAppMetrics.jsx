@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { getMetrics } from '../../services/whatsappService';
 
 export default function WhatsAppMetrics({ weddingId = '', from = '', to = '', groupBy = 'day' }) {
@@ -20,7 +21,9 @@ export default function WhatsAppMetrics({ weddingId = '', from = '', to = '', gr
         if (!ignore) setLoading(false);
       }
     })();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [weddingId, from, to, groupBy]);
 
   if (loading) return <div className="p-4 text-sm text-gray-600">Cargando métricas…</div>;
@@ -32,8 +35,8 @@ export default function WhatsAppMetrics({ weddingId = '', from = '', to = '', gr
       <h3 className="font-semibold mb-2 text-sm">Métricas WhatsApp</h3>
       <div className="text-xs text-gray-700 space-y-1">
         <div>Total: {data.total || 0}</div>
-        <div>Entrega: {Math.round(((data.rates?.deliveryRate) || 0) * 100)}%</div>
-        <div>Lectura: {Math.round(((data.rates?.readRate) || 0) * 100)}%</div>
+        <div>Entrega: {Math.round((data.rates?.deliveryRate || 0) * 100)}%</div>
+        <div>Lectura: {Math.round((data.rates?.readRate || 0) * 100)}%</div>
       </div>
       {Array.isArray(data.series) && data.series.length > 0 && (
         <div className="mt-3 overflow-auto">
@@ -56,7 +59,9 @@ export default function WhatsAppMetrics({ weddingId = '', from = '', to = '', gr
                   <td className="px-2 py-1">{d.sent || 0}</td>
                   <td className="px-2 py-1">{d.delivered || 0}</td>
                   <td className="px-2 py-1">{d.read || 0}</td>
-                  <td className="px-2 py-1">{(d.failed || 0) + (d.error || 0) + (d.undelivered || 0)}</td>
+                  <td className="px-2 py-1">
+                    {(d.failed || 0) + (d.error || 0) + (d.undelivered || 0)}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -66,4 +71,3 @@ export default function WhatsAppMetrics({ weddingId = '', from = '', to = '', gr
     </div>
   );
 }
-

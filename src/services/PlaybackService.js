@@ -7,7 +7,7 @@
 import { post as apiPost } from './apiClient';
 
 // Feature flag: enable remote playback endpoints only if explicitly set
-const REMOTE_ENABLED = (import.meta?.env?.VITE_REMOTE_PLAYBACK === 'true');
+const REMOTE_ENABLED = import.meta?.env?.VITE_REMOTE_PLAYBACK === 'true';
 // Force remote-only playback (no HTML5 fallback)
 const ALWAYS_REMOTE = false;
 
@@ -15,8 +15,12 @@ let html5Audio = null;
 let currentId = null;
 
 function stopHtml5() {
-  try { html5Audio?.pause(); } catch {}
-  try { html5Audio && (html5Audio.currentTime = 0); } catch {}
+  try {
+    html5Audio?.pause();
+  } catch {}
+  try {
+    html5Audio && (html5Audio.currentTime = 0);
+  } catch {}
   html5Audio = null;
 }
 
@@ -26,7 +30,9 @@ export function getCurrentId() {
 
 export async function stop(idOverride = null) {
   if (REMOTE_ENABLED) {
-    try { await apiPost('/api/playback/stop', {}, { auth: true }); } catch {}
+    try {
+      await apiPost('/api/playback/stop', {}, { auth: true });
+    } catch {}
   }
   stopHtml5();
   currentId = idOverride === null ? null : idOverride;
@@ -34,9 +40,13 @@ export async function stop(idOverride = null) {
 
 export async function pause() {
   if (REMOTE_ENABLED) {
-    try { await apiPost('/api/playback/pause', {}, { auth: true }); } catch {}
+    try {
+      await apiPost('/api/playback/pause', {}, { auth: true });
+    } catch {}
   }
-  try { html5Audio?.pause(); } catch {}
+  try {
+    html5Audio?.pause();
+  } catch {}
 }
 
 export async function playTrack(track) {
@@ -44,7 +54,11 @@ export async function playTrack(track) {
   // Always try backend first
   if (REMOTE_ENABLED) {
     try {
-      const res = await apiPost('/api/playback/play', { title, artist, previewUrl }, { auth: true });
+      const res = await apiPost(
+        '/api/playback/play',
+        { title, artist, previewUrl },
+        { auth: true }
+      );
       if (res?.ok) {
         currentId = id || `${title || ''}-${artist || ''}` || 'unknown';
         return true;
@@ -59,11 +73,15 @@ export async function playTrack(track) {
   // Fallback to HTML5 preview (only if allowed)
   const finalUrl = previewUrl || null;
   if (finalUrl) {
-    try { html5Audio?.pause(); } catch {}
+    try {
+      html5Audio?.pause();
+    } catch {}
     try {
       html5Audio = new Audio(finalUrl);
       await html5Audio.play().catch(() => {});
-      html5Audio.onended = () => { currentId = null; };
+      html5Audio.onended = () => {
+        currentId = null;
+      };
       currentId = id || `${title || ''}-${artist || ''}` || 'unknown';
       return true;
     } catch {}
@@ -73,7 +91,7 @@ export async function playTrack(track) {
 
 export async function toggle(track) {
   if (!track) return false;
-  if (currentId && (currentId === track.id)) {
+  if (currentId && currentId === track.id) {
     await pause();
     currentId = null;
     return false;

@@ -1,17 +1,35 @@
+import {
+  Users,
+  Split,
+  Eye,
+  Lightbulb,
+  X,
+  Edit2,
+  Check,
+  XCircle,
+  Scissors,
+  AlertCircle,
+} from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
-import { Users, Split, Eye, Lightbulb, X, Edit2, Check, XCircle, Scissors, AlertCircle } from 'lucide-react';
-import useGroupBudgets from '../../hooks/useGroupBudgets';
-import GroupSuggestions from './GroupSuggestions';
-import useSupplierGroups from '../../hooks/useSupplierGroups';
+
 import GroupAllocationModal from './GroupAllocationModal';
+import GroupSuggestions from './GroupSuggestions';
+import useGroupBudgets from '../../hooks/useGroupBudgets';
+import useSupplierGroups from '../../hooks/useSupplierGroups';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 
 /**
  * Tarjeta que representa un grupo manual de proveedores unificados
  * @param {{ group: { id:string, name:string, memberIds:string[], notes?:string }, providers: any[], onDissolve:Function }} props
  */
-export default function ProveedorGroupCard({ group, providers = [], onDissolve, onViewMember, highlighted = false }) {
+export default function ProveedorGroupCard({
+  group,
+  providers = [],
+  onDissolve,
+  onViewMember,
+  highlighted = false,
+}) {
   const [openSug, setOpenSug] = useState(false);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(group.name || '');
@@ -43,7 +61,7 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
     members.forEach((m) => {
       const res = Array.isArray(m.reservations) ? m.reservations : [];
       res.forEach((r) => {
-        const d = (r?.date || r?.fecha || '').toString().slice(0,10);
+        const d = (r?.date || r?.fecha || '').toString().slice(0, 10);
         if (!d) return;
         const arr = dateMap.get(d) || [];
         arr.push(m.name || m.id);
@@ -51,11 +69,13 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
         if (arr.length > 1) overlap = true;
       });
     });
-    return { overlap, dates: Array.from(dateMap.entries()).filter(([,v]) => v.length>1) };
+    return { overlap, dates: Array.from(dateMap.entries()).filter(([, v]) => v.length > 1) };
   }, [members]);
 
   return (
-    <Card className={`bg-indigo-50 border-indigo-200 ${highlighted ? 'ring-2 ring-indigo-400 shadow-lg' : ''}`}>
+    <Card
+      className={`bg-indigo-50 border-indigo-200 ${highlighted ? 'ring-2 ring-indigo-400 shadow-lg' : ''}`}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Users size={18} className="text-indigo-600" />
@@ -67,7 +87,9 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
               placeholder="Nombre del grupo"
             />
           ) : (
-            <h3 className="text-lg font-semibold text-indigo-900">{group.name || 'Grupo de proveedores'}</h3>
+            <h3 className="text-lg font-semibold text-indigo-900">
+              {group.name || 'Grupo de proveedores'}
+            </h3>
           )}
         </div>
         <div className="flex gap-2">
@@ -91,7 +113,15 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
               >
                 <Check size={16} className="mr-1" /> Guardar
               </Button>
-              <Button size="sm" variant="outline" onClick={() => { setEditing(false); setName(group.name || ''); setNotes(group.notes || ''); }}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setEditing(false);
+                  setName(group.name || '');
+                  setNotes(group.notes || '');
+                }}
+              >
                 <XCircle size={16} className="mr-1" /> Cancelar
               </Button>
             </>
@@ -122,7 +152,7 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
               </div>
               <div className="flex items-center gap-1">
                 <Button size="xs" variant="ghost" onClick={() => onViewMember?.(m)}>
-                  <Eye size={14} className="mr-1"/> Ver
+                  <Eye size={14} className="mr-1" /> Ver
                 </Button>
                 <Button
                   size="xs"
@@ -142,9 +172,16 @@ export default function ProveedorGroupCard({ group, providers = [], onDissolve, 
         ))}
       </div>
       <div className="mt-3 text-sm text-indigo-900">
-        {loading ? 'Leyendo presupuestos…' : totalRange ? `Rango de presupuestos detectado: ${totalRange}` : 'Sin presupuestos detectados aún'}
+        {loading
+          ? 'Leyendo presupuestos…'
+          : totalRange
+            ? `Rango de presupuestos detectado: ${totalRange}`
+            : 'Sin presupuestos detectados aún'}
         {conflicts.overlap && (
-          <div className="mt-2 text-sm text-red-700 flex items-center gap-1"><AlertCircle size={14}/> Posibles solapes en fechas ({conflicts.dates.map(d=>d[0]).join(', ')})</div>
+          <div className="mt-2 text-sm text-red-700 flex items-center gap-1">
+            <AlertCircle size={14} /> Posibles solapes en fechas (
+            {conflicts.dates.map((d) => d[0]).join(', ')})
+          </div>
         )}
       </div>
 

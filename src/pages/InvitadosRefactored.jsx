@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
 import { Cloud, CloudOff } from 'lucide-react';
-import Modal from '../components/Modal';
+import React, { useState } from 'react';
+
+import GuestBulkGrid from '../components/guests/GuestBulkGrid';
+import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
 import GuestList from '../components/guests/GuestList';
-import GuestFilters from '../components/guests/GuestFilters';
-import GuestBulkGrid from '../components/guests/GuestBulkGrid';
+import Modal from '../components/Modal';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
 
@@ -14,7 +15,7 @@ import useTranslations from '../hooks/useTranslations';
  */
 const InvitadosRefactored = () => {
   const { t } = useTranslations();
-  
+
   // Hook personalizado para gestión de invitados
   const {
     guests,
@@ -30,7 +31,7 @@ const InvitadosRefactored = () => {
     bulkInviteWhatsApp,
     importFromContacts,
     exportToCSV,
-    updateFilters
+    updateFilters,
   } = useGuests();
 
   // Estados para modales
@@ -55,7 +56,7 @@ const InvitadosRefactored = () => {
   // Manejar guardado de invitado (nuevo o editado)
   const handleSaveGuest = async (guestData) => {
     setIsSaving(true);
-    
+
     try {
       let result;
       if (editingGuest) {
@@ -63,7 +64,7 @@ const InvitadosRefactored = () => {
       } else {
         result = await addGuest(guestData);
       }
-      
+
       if (result.success) {
         setShowGuestModal(false);
         setEditingGuest(null);
@@ -121,11 +122,9 @@ const InvitadosRefactored = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
               {t('guests.guestList')}
             </h1>
-            <p className="text-gray-600 mt-1">
-              Gestiona tu lista de invitados de forma eficiente
-            </p>
+            <p className="text-gray-600 mt-1">Gestiona tu lista de invitados de forma eficiente</p>
           </div>
-          
+
           {/* Indicador de sincronización */}
           <div className="flex items-center space-x-2">
             {syncStatus.isOnline ? (

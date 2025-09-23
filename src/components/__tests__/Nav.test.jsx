@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
@@ -26,7 +26,7 @@ vi.mock('../../hooks/useAuth', () => ({
 
 import Nav from '../Nav.jsx';
 
-const getLabels = () => screen.getAllByRole('button').map(btn => btn.textContent);
+const getLabels = () => screen.getAllByRole('button').map((btn) => btn.textContent);
 
 describe('Nav – visibilidad según rol', () => {
   afterEach(() => {

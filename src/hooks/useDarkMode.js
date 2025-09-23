@@ -22,7 +22,7 @@ export default function useDarkMode() {
     localStorage.setItem('lovenda-dark', JSON.stringify(enabled));
   }, [enabled]);
 
-  const toggle = () => setEnabled(prev => !prev);
+  const toggle = () => setEnabled((prev) => !prev);
 
   return [enabled, toggle];
 }

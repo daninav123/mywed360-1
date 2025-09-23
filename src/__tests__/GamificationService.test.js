@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { awardPoints, getStats, getAchievements } from '../services/GamificationService';
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });

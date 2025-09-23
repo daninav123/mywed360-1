@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import React, { useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 // Temporary static templates; in real app, fetched from API or context
@@ -97,16 +97,10 @@ function TemplateGallery({ onSelect }) {
           <div className="absolute z-10 bg-white p-2 border rounded shadow">
             <HexColorPicker color={filterColor} onChange={setFilterColor} />
             <div className="flex justify-end mt-2">
-              <button
-                className="text-sm text-blue-600 mr-2"
-                onClick={() => setFilterColor('')}
-              >
+              <button className="text-sm text-blue-600 mr-2" onClick={() => setFilterColor('')}>
                 Limpiar
               </button>
-              <button
-                className="text-sm text-gray-600"
-                onClick={() => setShowColorPicker(false)}
-              >
+              <button className="text-sm text-gray-600" onClick={() => setShowColorPicker(false)}>
                 Cerrar
               </button>
             </div>

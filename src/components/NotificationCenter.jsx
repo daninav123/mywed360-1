@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Mail, Calendar, User, Trash, Check, AlertTriangle, Info } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { Button } from './ui';
 import * as NotificationService from '../services/notificationService';
 
@@ -8,7 +9,7 @@ import * as NotificationService from '../services/notificationService';
  * Centro de notificaciones unificado para toda la aplicación
  * Muestra notificaciones de emails, eventos, proveedores y sistema
  * Permite marcar como leído, eliminar y navegar directamente a la fuente de la notificación
- * 
+ *
  * @returns {React.ReactElement} Componente del centro de notificaciones
  */
 const NotificationCenter = () => {
@@ -17,17 +18,17 @@ const NotificationCenter = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [activeTab, setActiveTab] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const notificationRef = useRef(null);
   const navigate = useNavigate();
-  
+
   // Cargar notificaciones al abrir el centro
   useEffect(() => {
     if (isOpen) {
       loadNotifications();
     }
   }, [isOpen, activeTab]);
-  
+
   // Cerrar al hacer clic fuera del componente
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -35,13 +36,13 @@ const NotificationCenter = () => {
         setIsOpen(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   // Escuchar eventos de notificación toast
   useEffect(() => {
     const handleToastEvent = (event) => {
@@ -49,22 +50,22 @@ const NotificationCenter = () => {
         showToast(event.detail);
       }
     };
-    
+
     window.addEventListener('lovenda-toast', handleToastEvent);
-    
+
     return () => {
       window.removeEventListener('lovenda-toast', handleToastEvent);
     };
   }, []);
-  
+
   // Cargar notificaciones
   const loadNotifications = async () => {
     setIsLoading(true);
-    
+
     try {
       const filter = activeTab !== 'all' ? activeTab : undefined;
       const notificationData = await NotificationService.getNotifications(filter);
-      
+
       setNotifications(notificationData.notifications || []);
       setUnreadCount(notificationData.unreadCount || 0);
     } catch (error) {
@@ -73,13 +74,13 @@ const NotificationCenter = () => {
       setIsLoading(false);
     }
   };
-  
+
   // Mostrar toast de notificación
   const showToast = ({ title, message, type = 'info', duration = 3000, actions = [] }) => {
     // Crear elemento toast
     const toastElement = document.createElement('div');
     toastElement.className = `fixed bottom-4 right-4 bg-white rounded-md shadow-lg p-4 flex items-start max-w-sm transform transition-all duration-300 z-50 border-l-4 ${getToastBorderColor(type)}`;
-    
+
     // Contenido del toast
     toastElement.innerHTML = `
       <div class="flex-shrink-0 mr-3 mt-0.5">
@@ -97,12 +98,12 @@ const NotificationCenter = () => {
         </svg>
       </button>
     `;
-    
+
     // Añadir al DOM
-        // Renderizar acciones si existen
+    // Renderizar acciones si existen
     try {
       if (Array.isArray(actions) && actions.length) {
-        const container = toastElement.querySelector("[data-toast-actions]");
+        const container = toastElement.querySelector('[data-toast-actions]');
         actions.forEach((act) => {
           const b = document.createElement('button');
           b.className = 'text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700';
@@ -110,33 +111,63 @@ const NotificationCenter = () => {
           b.addEventListener('click', async (e) => {
             e.stopPropagation();
             try {
-              const kind = act.kind; const p = act.payload || {};
+              const kind = act.kind;
+              const p = act.payload || {};
               if (kind === 'acceptMeeting') {
-                await NotificationService.acceptMeeting({ weddingId: p.weddingId, mailId: p.mailId, title: p.title, when: p.when });
-                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+                await NotificationService.acceptMeeting({
+                  weddingId: p.weddingId,
+                  mailId: p.mailId,
+                  title: p.title,
+                  when: p.when,
+                });
+                if (p.notificationId)
+                  try {
+                    await NotificationService.markNotificationRead(p.notificationId);
+                  } catch {}
               } else if (kind === 'acceptBudget') {
-                await NotificationService.acceptBudget({ weddingId: p.weddingId, budgetId: p.budgetId, emailId: p.emailId });
-                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+                await NotificationService.acceptBudget({
+                  weddingId: p.weddingId,
+                  budgetId: p.budgetId,
+                  emailId: p.emailId,
+                });
+                if (p.notificationId)
+                  try {
+                    await NotificationService.markNotificationRead(p.notificationId);
+                  } catch {}
               } else if (kind === 'acceptTask') {
-                await NotificationService.acceptTask({ weddingId: p.weddingId, mailId: p.mailId, title: p.title, due: p.due, priority: p.priority });
-                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+                await NotificationService.acceptTask({
+                  weddingId: p.weddingId,
+                  mailId: p.mailId,
+                  title: p.title,
+                  due: p.due,
+                  priority: p.priority,
+                });
+                if (p.notificationId)
+                  try {
+                    await NotificationService.markNotificationRead(p.notificationId);
+                  } catch {}
               } else if (kind === 'markRead') {
-                if (p.notificationId) try { await NotificationService.markNotificationRead(p.notificationId); } catch {}
+                if (p.notificationId)
+                  try {
+                    await NotificationService.markNotificationRead(p.notificationId);
+                  } catch {}
               }
               removeToast(toastElement);
-            } catch (err) { console.error('toast action failed', err); }
+            } catch (err) {
+              console.error('toast action failed', err);
+            }
           });
           container && container.appendChild(b);
         });
       }
     } catch {}
     document.body.appendChild(toastElement);
-    
+
     // Animación de entrada
     setTimeout(() => {
       toastElement.classList.add('translate-y-0', 'opacity-100');
     }, 10);
-    
+
     // Manejar cierre
     const closeButton = toastElement.querySelector('button');
     if (closeButton) {
@@ -144,24 +175,24 @@ const NotificationCenter = () => {
         removeToast(toastElement);
       });
     }
-    
+
     // Auto-cierre después de duration
     setTimeout(() => {
       removeToast(toastElement);
     }, duration);
   };
-  
+
   // Eliminar toast del DOM
   const removeToast = (element) => {
     element.classList.add('opacity-0', '-translate-y-2');
-    
+
     setTimeout(() => {
       if (element.parentNode) {
         element.parentNode.removeChild(element);
       }
     }, 300);
   };
-  
+
   // Obtener color de borde para el toast
   const getToastBorderColor = (type) => {
     switch (type) {
@@ -175,7 +206,7 @@ const NotificationCenter = () => {
         return 'border-blue-500';
     }
   };
-  
+
   // Obtener icono para el toast
   const getToastIcon = (type) => {
     switch (type) {
@@ -204,28 +235,26 @@ const NotificationCenter = () => {
         </svg>`;
     }
   };
-  
+
   // Manejar clic en notificación
   const handleNotificationClick = async (notification) => {
     // Marcar como leída
     if (!notification.read) {
       await NotificationService.markAsRead(notification.id);
-      
+
       // Actualizar estado local
-      setNotifications(prevNotifications => 
-        prevNotifications.map(n => 
-          n.id === notification.id ? { ...n, read: true } : n
-        )
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((n) => (n.id === notification.id ? { ...n, read: true } : n))
       );
-      
+
       // Actualizar contador
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     }
-    
+
     // Navegar según el tipo de acción
     if (notification.action) {
       setIsOpen(false);
-      
+
       switch (notification.action) {
         case 'viewEmail':
           navigate(`/email#${notification.emailId}`);
@@ -242,45 +271,41 @@ const NotificationCenter = () => {
       }
     }
   };
-  
+
   // Eliminar notificación
   const handleDeleteNotification = async (event, notificationId) => {
     event.stopPropagation(); // Evitar que se active el clic en la notificación
-    
+
     try {
       await NotificationService.deleteNotification(notificationId);
-      
+
       // Actualizar estado local
-      const notificationToDelete = notifications.find(n => n.id === notificationId);
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
+      const notificationToDelete = notifications.find((n) => n.id === notificationId);
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+
       // Actualizar contador si era no leída
       if (notificationToDelete && !notificationToDelete.read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
-      
     } catch (error) {
       console.error('Error al eliminar notificación:', error);
     }
   };
-  
+
   // Marcar todas como leídas
   const handleMarkAllAsRead = async () => {
     try {
       await NotificationService.markAllAsRead();
-      
+
       // Actualizar estado local
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, read: true }))
-      );
-      
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+
       setUnreadCount(0);
-      
     } catch (error) {
       console.error('Error al marcar todas como leídas:', error);
     }
   };
-  
+
   // Renderizar icono según el tipo de notificación
   const renderNotificationIcon = (notification) => {
     switch (notification.type) {
@@ -298,15 +323,15 @@ const NotificationCenter = () => {
         return <Info size={18} className="text-gray-500" />;
     }
   };
-  
+
   // Filtrar notificaciones según la pestaña activa
   const filteredNotifications = notifications;
-  
+
   return (
     <div className="relative" ref={notificationRef}>
       {/* Botón de notificaciones */}
       <button
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="relative p-2 rounded-full hover:bg-gray-100 focus:outline-none"
         aria-label="Notificaciones"
       >
@@ -317,7 +342,7 @@ const NotificationCenter = () => {
           </span>
         )}
       </button>
-      
+
       {/* Panel de notificaciones */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-md shadow-lg overflow-hidden z-50">
@@ -335,14 +360,14 @@ const NotificationCenter = () => {
               )}
             </div>
           </div>
-          
+
           {/* Pestañas de filtro */}
           <div className="flex border-b border-gray-200">
             <button
               onClick={() => setActiveTab('all')}
               className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'all' 
-                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                activeTab === 'all'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -351,8 +376,8 @@ const NotificationCenter = () => {
             <button
               onClick={() => setActiveTab('email')}
               className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'email' 
-                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                activeTab === 'email'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -361,15 +386,15 @@ const NotificationCenter = () => {
             <button
               onClick={() => setActiveTab('event')}
               className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'event' 
-                  ? 'text-blue-600 border-b-2 border-blue-600' 
+                activeTab === 'event'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               Eventos
             </button>
           </div>
-          
+
           {/* Lista de notificaciones */}
           <div className="max-h-80 overflow-y-auto">
             {isLoading ? (
@@ -377,13 +402,11 @@ const NotificationCenter = () => {
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
               </div>
             ) : filteredNotifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
-                No hay notificaciones
-              </div>
+              <div className="p-4 text-center text-gray-500">No hay notificaciones</div>
             ) : (
               <ul>
-                {filteredNotifications.map(notification => (
-                  <li 
+                {filteredNotifications.map((notification) => (
+                  <li
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
                     className={`px-4 py-3 border-b border-gray-100 flex items-start hover:bg-gray-50 cursor-pointer transition ${
@@ -393,17 +416,19 @@ const NotificationCenter = () => {
                     <div className="flex-shrink-0 mt-0.5 mr-3">
                       {renderNotificationIcon(notification)}
                     </div>
-                    
+
                     <div className="flex-grow min-w-0">
-                      <p className={`text-sm ${!notification.read ? 'font-medium' : 'text-gray-800'}`}>
+                      <p
+                        className={`text-sm ${!notification.read ? 'font-medium' : 'text-gray-800'}`}
+                      >
                         {notification.message}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {new Date(notification.timestamp).toLocaleDateString('es-ES', { 
+                        {new Date(notification.timestamp).toLocaleDateString('es-ES', {
                           day: '2-digit',
                           month: '2-digit',
                           hour: '2-digit',
-                          minute: '2-digit'
+                          minute: '2-digit',
                         })}
                       </p>
                       {/* Acciones para notificaciones inteligentes */}
@@ -422,14 +447,34 @@ const NotificationCenter = () => {
                                   when: p.meeting?.when,
                                 });
                                 await NotificationService.markNotificationRead(notification.id);
-                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
-                              } catch (err) { console.error('accept meeting failed', err); }
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch (err) {
+                                console.error('accept meeting failed', err);
+                              }
                             }}
-                          >Aceptar</button>
+                          >
+                            Aceptar
+                          </button>
                           <button
                             className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
-                          >Rechazar</button>
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch {}
+                            }}
+                          >
+                            Rechazar
+                          </button>
                         </div>
                       )}
                       {notification?.payload?.kind === 'task_suggested' && (
@@ -448,14 +493,34 @@ const NotificationCenter = () => {
                                   priority: p.task?.priority,
                                 });
                                 await NotificationService.markNotificationRead(notification.id);
-                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
-                              } catch (err) { console.error('accept task failed', err); }
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch (err) {
+                                console.error('accept task failed', err);
+                              }
                             }}
-                          >Agregar</button>
+                          >
+                            Agregar
+                          </button>
                           <button
                             className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
-                          >Rechazar</button>
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch {}
+                            }}
+                          >
+                            Rechazar
+                          </button>
                         </div>
                       )}
                       {notification?.payload?.kind === 'budget_suggested' && (
@@ -466,20 +531,44 @@ const NotificationCenter = () => {
                               e.stopPropagation();
                               try {
                                 const p = notification.payload;
-                                await NotificationService.acceptBudget({ weddingId: p.weddingId, budgetId: p.budgetId, emailId: p.mailId });
+                                await NotificationService.acceptBudget({
+                                  weddingId: p.weddingId,
+                                  budgetId: p.budgetId,
+                                  emailId: p.mailId,
+                                });
                                 await NotificationService.markNotificationRead(notification.id);
-                                setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
-                              } catch (err) { console.error('accept budget failed', err); }
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch (err) {
+                                console.error('accept budget failed', err);
+                              }
                             }}
-                          >Aceptar</button>
+                          >
+                            Aceptar
+                          </button>
                           <button
                             className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                            onClick={async (e) => { e.stopPropagation(); try { await NotificationService.markNotificationRead(notification.id); setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n)); } catch {} }}
-                          >Rechazar</button>
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await NotificationService.markNotificationRead(notification.id);
+                                setNotifications((prev) =>
+                                  prev.map((n) =>
+                                    n.id === notification.id ? { ...n, read: true } : n
+                                  )
+                                );
+                              } catch {}
+                            }}
+                          >
+                            Rechazar
+                          </button>
                         </div>
                       )}
                     </div>
-                    
+
                     <button
                       onClick={(e) => handleDeleteNotification(e, notification.id)}
                       className="ml-2 text-gray-400 hover:text-gray-600"
@@ -491,12 +580,12 @@ const NotificationCenter = () => {
               </ul>
             )}
           </div>
-          
+
           {/* Pie del panel */}
           <div className="p-3 border-t border-gray-200 bg-gray-50 text-center">
             <div className="flex items-center justify-center gap-3">
-              <Button 
-                variant="link" 
+              <Button
+                variant="link"
                 size="sm"
                 onClick={() => {
                   navigate('/notificaciones');
@@ -505,8 +594,8 @@ const NotificationCenter = () => {
               >
                 Ver todas
               </Button>
-              <Button 
-                variant="link" 
+              <Button
+                variant="link"
                 size="sm"
                 onClick={() => {
                   navigate('/notificaciones#ajustes');
@@ -524,7 +613,3 @@ const NotificationCenter = () => {
 };
 
 export default NotificationCenter;
-
-
-
-

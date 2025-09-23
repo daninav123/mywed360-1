@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
+
 import ProveedorBudgets from '../components/proveedores/ProveedorBudgets';
 
 // Mock del hook para controlar datos y acciones

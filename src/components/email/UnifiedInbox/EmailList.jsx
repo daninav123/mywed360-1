@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
-import { 
-  Search, 
-  ArrowUp, 
-  ArrowDown, 
-  Trash, 
-  Star, 
+import {
+  Search,
+  ArrowUp,
+  ArrowDown,
+  Trash,
+  Star,
   AlertCircle,
   Loader,
-  Star as StarIcon
+  Star as StarIcon,
 } from 'lucide-react';
-import Button from '../../Button';
+import React, { useState } from 'react';
+
 import { safeRender, ensureNotPromise, safeMap } from '../../../utils/promiseSafeRenderer';
+import Button from '../../Button';
 
 /**
  * Componente que muestra una lista de emails con opciones de filtrado y ordenación
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Array} props.emails - Lista de emails a mostrar
  * @param {boolean} props.loading - Indicador de carga
@@ -42,18 +43,18 @@ const EmailList = ({
   sortField,
   sortDirection,
   onSortChange,
-  currentFolder
+  currentFolder,
 }) => {
   const [selectedEmailIds, setSelectedEmailIds] = useState([]);
 
   // Manejador para seleccionar varios emails
   const handleToggleSelect = (emailId, event) => {
     event.stopPropagation();
-    
+
     if (selectedEmailIds.includes(emailId)) {
-      setSelectedEmailIds(prev => prev.filter(id => id !== emailId));
+      setSelectedEmailIds((prev) => prev.filter((id) => id !== emailId));
     } else {
-      setSelectedEmailIds(prev => [...prev, emailId]);
+      setSelectedEmailIds((prev) => [...prev, emailId]);
     }
   };
 
@@ -62,13 +63,13 @@ const EmailList = ({
     if (selectedEmailIds.length === emails.length) {
       setSelectedEmailIds([]);
     } else {
-      setSelectedEmailIds(emails.map(email => email.id));
+      setSelectedEmailIds(emails.map((email) => email.id));
     }
   };
 
   // Manejador para eliminar emails seleccionados
   const handleDeleteSelected = () => {
-    selectedEmailIds.forEach(id => onDeleteEmail(id));
+    selectedEmailIds.forEach((id) => onDeleteEmail(id));
     setSelectedEmailIds([]);
   };
 
@@ -83,31 +84,31 @@ const EmailList = ({
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
-    
+
     // Si es de hoy, mostrar solo la hora
     if (date.toDateString() === now.toDateString()) {
-      return date.toLocaleTimeString('es-ES', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
       });
     }
-    
+
     // Si es de este año pero no de hoy, mostrar día y mes
     if (date.getFullYear() === now.getFullYear()) {
       return date.toLocaleDateString('es-ES', {
         day: '2-digit',
-        month: '2-digit'
+        month: '2-digit',
       });
     }
-    
+
     // Si es de otro año, mostrar día/mes/año
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: '2-digit'
+      year: '2-digit',
     });
   };
-  
+
   // Componente para renderizar mensaje de estado
   const StatusMessage = ({ icon, message, className }) => (
     <div className={`flex flex-col items-center justify-center py-16 ${className}`}>
@@ -131,7 +132,7 @@ const EmailList = ({
             />
             <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           </div>
-          
+
           <div className="ml-4 flex space-x-2">
             <Button
               disabled={selectedEmailIds.length === 0}
@@ -162,51 +163,56 @@ const EmailList = ({
           className="col-span-3 sm:col-span-3 flex items-center cursor-pointer"
           onClick={() => onSortChange('from')}
         >
-          {currentFolder === 'sent' ? 'Para' : 'De'} 
-          {sortField === 'from' && (
-            sortDirection === 'asc' 
-              ? <ArrowUp size={14} className="inline ml-1" /> 
-              : <ArrowDown size={14} className="inline ml-1" />
-          )}
+          {currentFolder === 'sent' ? 'Para' : 'De'}
+          {sortField === 'from' &&
+            (sortDirection === 'asc' ? (
+              <ArrowUp size={14} className="inline ml-1" />
+            ) : (
+              <ArrowDown size={14} className="inline ml-1" />
+            ))}
         </div>
         <div
           className="col-span-6 sm:col-span-6 cursor-pointer truncate"
           onClick={() => onSortChange('subject')}
         >
-          Asunto {sortField === 'subject' && (
-            sortDirection === 'asc' 
-              ? <ArrowUp size={14} className="inline ml-1" /> 
-              : <ArrowDown size={14} className="inline ml-1" />
-          )}
+          Asunto{' '}
+          {sortField === 'subject' &&
+            (sortDirection === 'asc' ? (
+              <ArrowUp size={14} className="inline ml-1" />
+            ) : (
+              <ArrowDown size={14} className="inline ml-1" />
+            ))}
         </div>
         <div
           className="col-span-2 sm:col-span-2 text-right cursor-pointer"
           onClick={() => onSortChange('date')}
         >
-          Fecha {sortField === 'date' && (
-            sortDirection === 'asc' 
-              ? <ArrowUp size={14} className="inline ml-1" /> 
-              : <ArrowDown size={14} className="inline ml-1" />
-          )}
+          Fecha{' '}
+          {sortField === 'date' &&
+            (sortDirection === 'asc' ? (
+              <ArrowUp size={14} className="inline ml-1" />
+            ) : (
+              <ArrowDown size={14} className="inline ml-1" />
+            ))}
         </div>
       </div>
 
       {/* Lista de emails */}
       <div className="overflow-auto flex-grow">
         {loading ? (
-          <StatusMessage 
+          <StatusMessage
             icon={<Loader size={32} className="animate-spin text-blue-500" />}
             message="Cargando emails..."
             className="text-gray-500"
           />
         ) : error ? (
-          <StatusMessage 
+          <StatusMessage
             icon={<AlertCircle size={32} className="text-red-500" />}
             message={error}
             className="text-red-500"
           />
         ) : emails.length === 0 ? (
-          <StatusMessage 
+          <StatusMessage
             icon={<AlertCircle size={32} className="text-gray-400" />}
             message="No hay emails en esta carpeta"
             className="text-gray-500"
@@ -221,8 +227,8 @@ const EmailList = ({
                   selectedEmailId === safeRender(email.id, '') ? 'bg-blue-50' : ''
                 } ${!safeRender(email.read, false) ? 'font-medium' : ''}`}
               >
-                <div 
-                  className="col-span-1 flex items-center justify-center" 
+                <div
+                  className="col-span-1 flex items-center justify-center"
                   onClick={(e) => handleToggleSelect(safeRender(email.id, ''), e)}
                 >
                   <input
@@ -236,16 +242,14 @@ const EmailList = ({
                   {currentFolder === 'sent' ? safeRender(email.to, '') : safeRender(email.from, '')}
                 </div>
                 <div className="col-span-6 sm:col-span-6 truncate flex items-center">
-                  <span className="mr-2 truncate">
-                    {safeRender(email.subject, '(Sin asunto)')}
-                  </span>
+                  <span className="mr-2 truncate">{safeRender(email.subject, '(Sin asunto)')}</span>
                   {email.attachments && email.attachments.length > 0 && (
                     <span className="text-gray-500 text-xs">📎</span>
                   )}
                 </div>
                 <div className="col-span-2 sm:col-span-2 text-right text-gray-500 text-sm flex items-center justify-end">
                   <span className="mr-2">{formatDate(email.date)}</span>
-                  <button 
+                  <button
                     onClick={(e) => handleToggleImportant(email.id, e)}
                     className={`focus:outline-none ${email.important ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'}`}
                   >

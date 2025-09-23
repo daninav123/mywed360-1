@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { acceptInvitation } from '../services/WeddingService';
+
 import { useAuth } from '../hooks/useAuth';
+import { acceptInvitation } from '../services/WeddingService';
 
 export default function AcceptInvitation() {
   const { code } = useParams();

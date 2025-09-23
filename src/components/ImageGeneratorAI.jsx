@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { post as apiPost } from '../services/apiClient';
-import { saveData, loadData } from '../services/SyncService';
-import Spinner from './Spinner';
+/* eslint-disable react/no-unescaped-entities */
 import { saveAs } from 'file-saver';
 import { Wand2, RefreshCcw, Download, FileDown, PenTool, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import Spinner from './Spinner';
 import { useWedding } from '../context/WeddingContext';
 import { db, firebaseReady } from '../firebaseConfig';
+import { post as apiPost } from '../services/apiClient';
+import { saveData, loadData } from '../services/SyncService';
 
 /**
  * Componente para generar imÒ�� �"Ò�a�¡genes con IA (DALLÒ�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�·E/Proxy)
@@ -15,7 +17,13 @@ import { db, firebaseReady } from '../firebaseConfig';
  *  - templates: Array<{ name, description, prompt }>
  *  - onImageGenerated: (image) => void
  */
-const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerated = () => {}, defaultPrompt = '', autoGenerate = false }) => {
+const ImageGeneratorAI = ({
+  category = 'general',
+  templates = [],
+  onImageGenerated = () => {},
+  defaultPrompt = '',
+  autoGenerate = false,
+}) => {
   const navigate = useNavigate();
   const { activeWedding } = useWedding();
   const [prompt, setPrompt] = useState('');
@@ -37,7 +45,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       try {
         const savedImages = await loadData(`lovenda_ai_images_${category}`, {
           defaultValue: [],
-          collection: 'userDesigns'
+          collection: 'userDesigns',
         });
         if (Array.isArray(savedImages) && savedImages.length > 0) {
           setGeneratedImages(savedImages);
@@ -74,13 +82,28 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
 
   // Calcular dimensiones en mm segÒ�� �"Ò�a�ºn preset/orientaciÒ³n/sangrado
   const getSizeMm = () => {
-    let w = 0, h = 0;
-    if (paperPreset === '5x7in') { w = 127; h = 178; }
-    else if (paperPreset === 'A5') { w = 148; h = 210; }
-    else if (paperPreset === 'A6') { w = 105; h = 148; }
-    else if (paperPreset === 'DL') { w = 99; h = 210; }
-    else if (paperPreset === 'SQ140') { w = 140; h = 140; }
-    if (bleed) { w += 6; h += 6; }
+    let w = 0,
+      h = 0;
+    if (paperPreset === '5x7in') {
+      w = 127;
+      h = 178;
+    } else if (paperPreset === 'A5') {
+      w = 148;
+      h = 210;
+    } else if (paperPreset === 'A6') {
+      w = 105;
+      h = 148;
+    } else if (paperPreset === 'DL') {
+      w = 99;
+      h = 210;
+    } else if (paperPreset === 'SQ140') {
+      w = 140;
+      h = 140;
+    }
+    if (bleed) {
+      w += 6;
+      h += 6;
+    }
     if (orientation === 'landscape') return { widthMm: h, heightMm: w };
     return { widthMm: w, heightMm: h };
   };
@@ -88,7 +111,10 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
   // Generar imagen (proxy o fallback directo)
   const generateImage = async () => {
     if (!prompt.trim()) {
-      setToast({ type: 'error', message: 'Por favor, escribe un prompt o selecciona una plantilla' });
+      setToast({
+        type: 'error',
+        message: 'Por favor, escribe un prompt o selecciona una plantilla',
+      });
       return;
     }
     setLoading(true);
@@ -109,16 +135,17 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       }
 
       // 2) Fallback directo a OpenAI (si estÒ�� �"Ò�a�¡ habilitado)
-      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      const allowDirect =
+        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
       if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÒ�� �"Ò�a�³n');
 
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
         },
-        body: JSON.stringify({ model: 'dall-e-3', prompt, n: 1, size: '1024x1024', quality: 'hd' })
+        body: JSON.stringify({ model: 'dall-e-3', prompt, n: 1, size: '1024x1024', quality: 'hd' }),
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -143,14 +170,21 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       url: imageUrl,
       prompt,
       timestamp: new Date().toISOString(),
-      category
+      category,
     };
     const updatedImages = [newImage, ...generatedImages];
     setGeneratedImages(updatedImages);
     // persistir
-    saveData(`lovenda_ai_images_${category}`, updatedImages, { collection: 'userDesigns', showNotification: false });
+    saveData(`lovenda_ai_images_${category}`, updatedImages, {
+      collection: 'userDesigns',
+      showNotification: false,
+    });
     onImageGenerated(newImage);
-    setToast({ type: 'success', message: 'Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�a�¡�¡Imagen generada con Ò©xito! con Ò©xito!Ò�� �"Ò�a�©xito!' });
+    setToast({
+      type: 'success',
+      message:
+        'Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�a�¡�¡Imagen generada con Ò©xito! con Ò©xito!Ò�� �"Ò�a�©xito!',
+    });
   };
 
   // Guardar imagen en la boda (Storage + Firestore)
@@ -167,7 +201,12 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
 
       await firebaseReady;
       const { collection, doc, setDoc, serverTimestamp } = await import('firebase/firestore');
-      const { getStorage, ref: sRef, uploadBytes, getDownloadURL } = await import('firebase/storage');
+      const {
+        getStorage,
+        ref: sRef,
+        uploadBytes,
+        getDownloadURL,
+      } = await import('firebase/storage');
       const storage = getStorage();
 
       const designsCol = collection(db, 'weddings', activeWedding, 'designs');
@@ -182,7 +221,7 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         url,
         source: 'ai-image',
         prompt,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
       setToast({ type: 'success', message: 'diseÒ±o guardado en la boda' });
     } catch (e) {
@@ -235,7 +274,11 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
   const downloadVectorPdf = async (imageUrl, fileName) => {
     try {
       const dims = getSizeMm();
-      const res = await apiPost('/api/ai-image/vector-pdf', { url: imageUrl, ...dims }, { auth: true });
+      const res = await apiPost(
+        '/api/ai-image/vector-pdf',
+        { url: imageUrl, ...dims },
+        { auth: true }
+      );
       if (!res.ok) throw new Error('Error generando PDF');
       const blob = await res.blob();
       if (!blob || blob.size === 0) throw new Error('PDF vacÒ�� �"Ò�a�­o');
@@ -257,14 +300,18 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
               <div
                 key={index}
                 className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                  selectedTemplate === template ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                  selectedTemplate === template
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
                 }`}
                 onClick={() => handleSelectTemplate(template)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium">{template.name}</h4>
                   {selectedTemplate === template && (
-                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Seleccionada</span>
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                      Seleccionada
+                    </span>
                   )}
                 </div>
                 <p className="text-xs text-gray-600 line-clamp-2">{template.description}</p>
@@ -276,7 +323,9 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
 
       {/* Editor de prompt + ajustes de exportaciÒ³n */}
       <div className="bg-white p-4 border rounded-lg">
-        <label htmlFor="prompt" className="block font-medium mb-2">Prompt para la generaciÒ³n</label>
+        <label htmlFor="prompt" className="block font-medium mb-2">
+          Prompt para la generaciÒ³n
+        </label>
         <div className="flex space-x-2">
           <textarea
             id="prompt"
@@ -289,7 +338,11 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-sm font-medium mb-1">TamaÒ±o</label>
-            <select value={paperPreset} onChange={(e)=>setPaperPreset(e.target.value)} className="w-full border rounded p-2 text-sm">
+            <select
+              value={paperPreset}
+              onChange={(e) => setPaperPreset(e.target.value)}
+              className="w-full border rounded p-2 text-sm"
+            >
               <option value="5x7in">5x7&quot; (127Ò�178 mm)</option>
               <option value="A5">A5 (148Ò�210 mm)</option>
               <option value="A6">A6 (105Ò�148 mm)</option>
@@ -299,13 +352,17 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">orientaciÒ³n</label>
-            <select value={orientation} onChange={(e)=>setOrientation(e.target.value)} className="w-full border rounded p-2 text-sm">
+            <select
+              value={orientation}
+              onChange={(e) => setOrientation(e.target.value)}
+              className="w-full border rounded p-2 text-sm"
+            >
               <option value="portrait">Vertical</option>
               <option value="landscape">Horizontal</option>
             </select>
           </div>
           <label className="inline-flex items-center gap-2 mt-6">
-            <input type="checkbox" checked={bleed} onChange={(e)=>setBleed(e.target.checked)} />
+            <input type="checkbox" checked={bleed} onChange={(e) => setBleed(e.target.checked)} />
             <span className="text-sm">AÒ±adir sangrado 3mm</span>
           </label>
         </div>
@@ -314,13 +371,21 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
             onClick={generateImage}
             disabled={loading || !prompt.trim()}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
-              loading || !prompt.trim() ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'
+              loading || !prompt.trim()
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {loading ? (
-              <><RefreshCcw className="animate-spin h-4 w-4" /><span>Generando...</span></>
+              <>
+                <RefreshCcw className="animate-spin h-4 w-4" />
+                <span>Generando...</span>
+              </>
             ) : (
-              <><Wand2 className="h-4 w-4" /><span>Generar imagen</span></>
+              <>
+                <Wand2 className="h-4 w-4" />
+                <span>Generar imagen</span>
+              </>
             )}
           </button>
         </div>
@@ -342,7 +407,11 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
                   />
                   <div className="absolute top-2 right-2 flex space-x-2">
                     <button
-                      onClick={() => navigate(`/disenos/vector-editor?image=${encodeURIComponent(image.url)}&category=${encodeURIComponent(category)}`)}
+                      onClick={() =>
+                        navigate(
+                          `/disenos/vector-editor?image=${encodeURIComponent(image.url)}&category=${encodeURIComponent(category)}`
+                        )
+                      }
                       className="bg-white/80 p-2 rounded-full hover:bg-white"
                       title="Editar (vector)"
                     >
@@ -376,7 +445,8 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
                 <div className="p-3">
                   <p className="text-sm text-gray-700 line-clamp-2">{image.prompt}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {new Date(image.timestamp).toLocaleDateString()} {new Date(image.timestamp).toLocaleTimeString()}
+                    {new Date(image.timestamp).toLocaleDateString()}{' '}
+                    {new Date(image.timestamp).toLocaleTimeString()}
                   </p>
                 </div>
               </div>
@@ -389,7 +459,11 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
       {toast && (
         <div
           className={`fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg ${
-            toast.type === 'error' ? 'bg-red-600 text-white' : toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white'
+            toast.type === 'error'
+              ? 'bg-red-600 text-white'
+              : toast.type === 'success'
+                ? 'bg-green-600 text-white'
+                : 'bg-blue-600 text-white'
           }`}
         >
           {toast.message}
@@ -400,5 +474,3 @@ const ImageGeneratorAI = ({ category = 'general', templates = [], onImageGenerat
 };
 
 export default ImageGeneratorAI;
-
-

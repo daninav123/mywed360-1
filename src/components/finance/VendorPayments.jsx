@@ -1,6 +1,7 @@
-import React from 'react';
-import Card from '../Card';
 import { AlertCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import React from 'react';
+
+import Card from '../Card';
 
 export const VendorPayments = ({ transactions }) => {
   const now = new Date();
@@ -9,46 +10,51 @@ export const VendorPayments = ({ transactions }) => {
 
   // Clasificar transacciones
   const paymentStatus = React.useMemo(() => {
-    return transactions.reduce((acc, transaction) => {
-      if (transaction.type !== 'expense') return acc;
-      
-      const paymentDate = new Date(transaction.paymentDate);
-      const isPaid = transaction.status === 'paid';
-      const isOverdue = !isPaid && paymentDate < now;
-      const isUpcoming = !isPaid && paymentDate > now && paymentDate <= oneWeekFromNow;
-      const isFuture = !isPaid && paymentDate > oneWeekFromNow;
+    return transactions.reduce(
+      (acc, transaction) => {
+        if (transaction.type !== 'expense') return acc;
 
-      if (isPaid) acc.paid.push(transaction);
-      else if (isOverdue) acc.overdue.push(transaction);
-      else if (isUpcoming) acc.upcoming.push(transaction);
-      else if (isFuture) acc.future.push(transaction);
+        const paymentDate = new Date(transaction.paymentDate);
+        const isPaid = transaction.status === 'paid';
+        const isOverdue = !isPaid && paymentDate < now;
+        const isUpcoming = !isPaid && paymentDate > now && paymentDate <= oneWeekFromNow;
+        const isFuture = !isPaid && paymentDate > oneWeekFromNow;
 
-      return acc;
-    }, { 
-      paid: [], 
-      overdue: [], 
-      upcoming: [], 
-      future: [] 
-    });
+        if (isPaid) acc.paid.push(transaction);
+        else if (isOverdue) acc.overdue.push(transaction);
+        else if (isUpcoming) acc.upcoming.push(transaction);
+        else if (isFuture) acc.future.push(transaction);
+
+        return acc;
+      },
+      {
+        paid: [],
+        overdue: [],
+        upcoming: [],
+        future: [],
+      }
+    );
   }, [transactions]);
 
   // Calcular totales
-  const calculateTotal = (items) => 
+  const calculateTotal = (items) =>
     items.reduce((sum, item) => sum + parseFloat(item.realCost || 0), 0);
 
   const totals = {
     paid: calculateTotal(paymentStatus.paid),
     overdue: calculateTotal(paymentStatus.overdue),
     upcoming: calculateTotal(paymentStatus.upcoming),
-    future: calculateTotal(paymentStatus.future)
+    future: calculateTotal(paymentStatus.future),
   };
 
-  const formatCurrency = (amount) => 
+  const formatCurrency = (amount) =>
     new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const PaymentStatusCard = ({ title, items, total, icon, color }) => (
     <div className="border rounded-lg overflow-hidden">
-      <div className={`p-3 ${color.bg} ${color.text} font-medium flex justify-between items-center`}>
+      <div
+        className={`p-3 ${color.bg} ${color.text} font-medium flex justify-between items-center`}
+      >
         <div className="flex items-center gap-2">
           {icon}
           <span>{title}</span>
@@ -82,7 +88,7 @@ export const VendorPayments = ({ transactions }) => {
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Seguimiento de Pagos a Proveedores
       </h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <PaymentStatusCard
           title="Pagos Vencidos"

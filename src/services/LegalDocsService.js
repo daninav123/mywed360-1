@@ -15,7 +15,7 @@ export async function generateDocument(weddingId, payload, { saveMeta = true } =
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ weddingId, payload, saveMeta })
+    body: JSON.stringify({ weddingId, payload, saveMeta }),
   });
   if (!res.ok) throw new Error('generate failed');
   const data = await res.json();

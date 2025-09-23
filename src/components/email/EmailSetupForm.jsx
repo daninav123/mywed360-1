@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Check, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import Button from '../ui/Button';
 
 /**
@@ -23,14 +24,16 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
     // Validar formato del nombre de usuario
     const usernameRegex = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
     if (!usernameRegex.test(value)) {
-      setError('El nombre solo puede contener letras, números, puntos, guiones y guiones bajos. Mínimo 3 caracteres.');
+      setError(
+        'El nombre solo puede contener letras, números, puntos, guiones y guiones bajos. Mínimo 3 caracteres.'
+      );
       setAvailabilityStatus('unavailable');
       return;
     }
 
     setAvailabilityStatus('checking');
     setError('');
-    
+
     try {
       // En un entorno real, esto sería una llamada a la API
       // En este ejemplo simulamos la llamada con un timeout
@@ -38,14 +41,14 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
         // Simulamos que algunos nombres están ocupados
         const takenUsernames = ['admin', 'info', 'soporte', 'ayuda', 'contacto'];
         const isAvailable = !takenUsernames.includes(value.toLowerCase());
-        
+
         setAvailabilityStatus(isAvailable ? 'available' : 'unavailable');
         if (!isAvailable) {
           setError(`El nombre "${value}" ya está en uso. Por favor elige otro.`);
         }
       }, 800); // Simular delay de red
     } catch (error) {
-      console.error("Error al comprobar disponibilidad:", error);
+      console.error('Error al comprobar disponibilidad:', error);
       setAvailabilityStatus('unavailable');
       setError('Error al comprobar disponibilidad. Inténtalo de nuevo más tarde.');
     }
@@ -63,18 +66,18 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
   // Función para guardar el nombre de correo
   const handleSave = async () => {
     if (availabilityStatus !== 'available') return;
-    
+
     setIsSaving(true);
     try {
       // En un entorno real, esto sería una llamada a la API para guardar
       // el nombre de correo asociado al usuario
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulación
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulación
+
       if (onSave) {
         onSave(username);
       }
     } catch (error) {
-      console.error("Error al guardar:", error);
+      console.error('Error al guardar:', error);
       setError('Error al guardar. Inténtalo de nuevo más tarde.');
     } finally {
       setIsSaving(false);
@@ -86,17 +89,17 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
         Configura tu correo electrónico myWed360
       </h2>
-      
+
       <p className="text-gray-600 mb-5">
-        Elige un nombre de usuario único para tu correo electrónico myWed360. 
-        Este será tu correo oficial dentro de la plataforma.
+        Elige un nombre de usuario único para tu correo electrónico myWed360. Este será tu correo
+        oficial dentro de la plataforma.
       </p>
-      
+
       <div className="mb-4">
         <label htmlFor="email-username" className="block text-sm font-medium text-gray-700 mb-1">
           Tu dirección de correo:
         </label>
-        
+
         <div className="flex items-center">
           <input
             id="email-username"
@@ -104,8 +107,8 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className={`border px-3 py-2 rounded-l-md flex-1 focus:ring-2 focus:outline-none ${
-              availabilityStatus === 'available' 
-                ? 'border-green-300 focus:border-green-500 focus:ring-green-200' 
+              availabilityStatus === 'available'
+                ? 'border-green-300 focus:border-green-500 focus:ring-green-200'
                 : availabilityStatus === 'unavailable'
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
                   : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200'
@@ -118,7 +121,7 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
             @mywed360
           </div>
         </div>
-        
+
         <div className="mt-2 min-h-[24px]">
           {availabilityStatus === 'checking' && (
             <div className="flex items-center text-gray-500">
@@ -126,14 +129,14 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
               <span className="text-sm">Comprobando disponibilidad...</span>
             </div>
           )}
-          
+
           {availabilityStatus === 'available' && username && (
             <div className="flex items-center text-green-600">
               <Check size={16} className="mr-2" />
               <span className="text-sm">¡Nombre disponible!</span>
             </div>
           )}
-          
+
           {error && (
             <div className="flex items-center text-red-600">
               <AlertCircle size={16} className="mr-2" />
@@ -142,7 +145,7 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
           )}
         </div>
       </div>
-      
+
       <div className="flex justify-end mt-6">
         <Button
           onClick={handleSave}
@@ -159,11 +162,13 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
           )}
         </Button>
       </div>
-      
+
       <div className="mt-4 text-sm text-gray-500">
         <p>Notas:</p>
         <ul className="list-disc pl-5 space-y-1 mt-1">
-          <li>Tu dirección de correo será <strong>{username || 'tunombre'}@mywed360</strong></li>
+          <li>
+            Tu dirección de correo será <strong>{username || 'tunombre'}@mywed360</strong>
+          </li>
           <li>Podrás enviar y recibir correos desde esta dirección</li>
           <li>Este correo se utilizará para todas las comunicaciones con proveedores</li>
         </ul>

@@ -21,9 +21,14 @@ export function sendBroadcastMessages(numbers = [], message = '', options = {}) 
         }
       };
       window.addEventListener('message', onMsg);
-      window.postMessage({ source: 'mywed360', type: 'MYWED360_WHATSAPP_BROADCAST', id, numbers, message, options }, '*');
+      window.postMessage(
+        { source: 'mywed360', type: 'MYWED360_WHATSAPP_BROADCAST', id, numbers, message, options },
+        '*'
+      );
       setTimeout(() => {
-        try { window.removeEventListener('message', onMsg); } catch {}
+        try {
+          window.removeEventListener('message', onMsg);
+        } catch {}
         resolve({ success: true, noAck: true, count: numbers.length });
       }, 12000);
     } catch (e) {
@@ -57,7 +62,9 @@ export function ensureExtensionAvailable(timeoutMs = 1500) {
       window.addEventListener('message', onMsg);
       window.postMessage({ source: 'mywed360', type: EVENTS.PING, id }, '*');
       setTimeout(() => {
-        try { window.removeEventListener('message', onMsg); } catch {}
+        try {
+          window.removeEventListener('message', onMsg);
+        } catch {}
         resolve(false);
       }, timeoutMs);
     } catch (_) {
@@ -88,7 +95,9 @@ export function sendBatchMessages(items = [], options = {}) {
       window.postMessage(payload, '*');
       // Fallback si la extensión no responde a RESULT
       setTimeout(() => {
-        try { window.removeEventListener('message', onMsg); } catch {}
+        try {
+          window.removeEventListener('message', onMsg);
+        } catch {}
         resolve({ success: true, started: items.length, noAck: true });
       }, 8000);
     } catch (e) {

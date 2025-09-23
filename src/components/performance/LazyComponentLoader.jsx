@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+
 import Loader from '../ui/Loader';
 
 // Carga perezosa con fallback y manejo de error simple
@@ -51,16 +52,24 @@ export const LazyGestionProveedores = createLazyComponent(
 export const LazySeatingPlan = createLazyComponent(
   () => import('../../components/seating/SeatingPlanRefactored.jsx')
 );
-export const LazyInvitationDesigner = createLazyComponent(() => import('../../pages/InvitationDesigner'));
+export const LazyInvitationDesigner = createLazyComponent(
+  () => import('../../pages/InvitationDesigner')
+);
 export const LazyChecklist = createLazyComponent(() => import('../../pages/Checklist'));
 
 // Módulos de email
 export const LazyEmailInbox = createLazyComponent(() => import('../../pages/user/EmailInbox'));
-export const LazyEmailStatistics = createLazyComponent(() => import('../../pages/user/EmailStatistics'));
+export const LazyEmailStatistics = createLazyComponent(
+  () => import('../../pages/user/EmailStatistics')
+);
 
 // Administración
-export const LazyAdminDashboard = createLazyComponent(() => import('../../components/admin/AdminDashboard'));
-export const LazyUserManagement = createLazyComponent(() => import('../../components/admin/UserManagement'));
+export const LazyAdminDashboard = createLazyComponent(
+  () => import('../../components/admin/AdminDashboard')
+);
+export const LazyUserManagement = createLazyComponent(
+  () => import('../../components/admin/UserManagement')
+);
 export const LazyMetricsDashboard = createLazyComponent(
   () => import('../../components/admin/MetricsDashboard')
 );

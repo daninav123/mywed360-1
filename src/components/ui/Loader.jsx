@@ -3,22 +3,18 @@ import React from 'react';
 /**
  * Componente de carga animado
  * Muestra un spinner o indicador de carga visual
- * 
+ *
  * @param {object} props - Propiedades del componente
  * @param {string} props.className - Clases CSS adicionales
  * @param {string} props.size - Tamaño del loader (sm, md, lg)
  * @param {string} props.color - Color del loader
  * @returns {JSX.Element} - Componente de carga
  */
-export const Loader = ({ 
-  className = '', 
-  size = 'md', 
-  color = 'primary'
-}) => {
+export const Loader = ({ className = '', size = 'md', color = 'primary' }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+    lg: 'w-12 h-12',
   };
 
   const colorClasses = {
@@ -27,7 +23,7 @@ export const Loader = ({
     accent: 'border-[var(--color-accent)]',
     success: 'border-[var(--color-success)]',
     warning: 'border-[var(--color-warning)]',
-    error: 'border-[var(--color-danger)]'
+    error: 'border-[var(--color-danger)]',
   };
 
   const classes = `
@@ -42,11 +38,7 @@ export const Loader = ({
   `;
 
   return (
-    <div 
-      className={classes.trim().replace(/\s+/g, ' ')}
-      role="status"
-      aria-label="Cargando"
-    >
+    <div className={classes.trim().replace(/\s+/g, ' ')} role="status" aria-label="Cargando">
       <span className="sr-only">Cargando...</span>
     </div>
   );

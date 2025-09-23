@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Download, Filter, CheckCircle, Circle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import PageWrapper from '../components/PageWrapper';
-import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 
 export default function Checklist() {
   const [view, setView] = useState('list');
@@ -29,111 +30,158 @@ export default function Checklist() {
     {
       name: 'Día Previo a la Boda',
       tasks: [
-        { id: 1, title: 'Ensayo general', type: 'ensayo', responsible: 'Equipo', due: '2025-06-17', status: 'Pendiente' }
-      ]
+        {
+          id: 1,
+          title: 'Ensayo general',
+          type: 'ensayo',
+          responsible: 'Equipo',
+          due: '2025-06-17',
+          status: 'Pendiente',
+        },
+      ],
     },
     {
       name: 'Antes de empezar la boda',
       tasks: [
-        { id: 2, title: 'Alinear decoraciones', type: 'montaje', responsible: 'Rollout', due: '2025-06-18', status: 'En progreso' }
-      ]
-    }
+        {
+          id: 2,
+          title: 'Alinear decoraciones',
+          type: 'montaje',
+          responsible: 'Rollout',
+          due: '2025-06-18',
+          status: 'En progreso',
+        },
+      ],
+    },
   ];
 
-  const toggleSelect = id => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const toggleSelect = (id) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
-  const toggleCompleted = id => {
-    setCompleted(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleCompleted = (id) => {
+    setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
     <PageWrapper title="Checklist">
       <div className="space-y-8">
-      
+        {/* Controles */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <input
+            type="text"
+            placeholder="Buscar tarea"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          />
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          >
+            <option value="">Tipo</option>
+            <option value="ensayo">Ensayo</option>
+            <option value="montaje">Montaje</option>
+            <option value="audio/vídeo">Audio/Vídeo</option>
+          </select>
+          <select
+            value={responsibleFilter}
+            onChange={(e) => setResponsibleFilter(e.target.value)}
+            className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          >
+            <option value="">Responsable</option>
+            <option value="Equipo">Equipo</option>
+            <option value="Rollout">Rollout</option>
+          </select>
+          <input
+            type="date"
+            value={dateFilter.from}
+            onChange={(e) => setDateFilter((prev) => ({ ...prev, from: e.target.value }))}
+            className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          />
+          <input
+            type="date"
+            value={dateFilter.to}
+            onChange={(e) => setDateFilter((prev) => ({ ...prev, to: e.target.value }))}
+            className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+          />
 
-      {/* Controles */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <input type="text" placeholder="Buscar tarea" value={search} onChange={e => setSearch(e.target.value)} className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]" />
-        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]">
-          <option value="">Tipo</option>
-          <option value="ensayo">Ensayo</option>
-          <option value="montaje">Montaje</option>
-          <option value="audio/vídeo">Audio/Vídeo</option>
-        </select>
-        <select value={responsibleFilter} onChange={e => setResponsibleFilter(e.target.value)} className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]">
-          <option value="">Responsable</option>
-          <option value="Equipo">Equipo</option>
-          <option value="Rollout">Rollout</option>
-        </select>
-        <input type="date" value={dateFilter.from} onChange={e => setDateFilter(prev => ({...prev, from: e.target.value}))} className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]" />
-        <input type="date" value={dateFilter.to} onChange={e => setDateFilter(prev => ({...prev, to: e.target.value}))} className="border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]" />
-
-        <button onClick={() => setShowNewModal(true)} className="bg-[var(--color-primary)] text-white px-3 py-1 rounded flex items-center">
-          <Plus size={16} className="mr-1" /> Nueva Tarea
-        </button>
-      </div>
-
-      {/* Bulk Actions */}
-      {selected.length > 0 && (
-        <div className="bg-[color:var(--color-text)]/10 p-2 rounded flex gap-2">
-          <button className="bg-[var(--color-success)] text-white px-2 py-1 rounded">Cambiar estado ({selected.length})</button>
-          <button className="bg-[var(--color-primary)] text-white px-2 py-1 rounded flex items-center">
-            <Download size={16} className="mr-1" /> Exportar CSV
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="bg-[var(--color-primary)] text-white px-3 py-1 rounded flex items-center"
+          >
+            <Plus size={16} className="mr-1" /> Nueva Tarea
           </button>
         </div>
-      )}
 
-      {/* Vista Lista */}
-      {view === 'list' && (
-        <table className="w-full table-auto">
-          <thead className="bg-[color:var(--color-text)]/5">
-            <tr>
-              <th></th>
-              <th>Tarea</th>
-              <th>Tipo</th>
-              <th>Responsable</th>
-              <th>Fecha límite</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {blocks.flatMap(block =>
-              block.tasks.map(t => (
-                <tr key={t.id} className={completed[t.id] ? 'opacity-60 line-through' : ''}>
-                  <td>
-                    <button aria-label="Marcar completada" onClick={() => toggleCompleted(t.id)} className="focus:outline-none">
-                      {completed[t.id] ? <CheckCircle className="text-[color:var(--color-success)]" size={20} /> : <Circle className="text-[color:var(--color-text)]/40" size={20} />}
-                    </button>
-                  </td>
-                  <td>{t.title}</td>
-                  <td>{t.type}</td>
-                  <td>{t.responsible}</td>
-                  <td>{t.due}</td>
-                  <td>{completed[t.id] ? 'Completada' : t.status}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+        {/* Bulk Actions */}
+        {selected.length > 0 && (
+          <div className="bg-[color:var(--color-text)]/10 p-2 rounded flex gap-2">
+            <button className="bg-[var(--color-success)] text-white px-2 py-1 rounded">
+              Cambiar estado ({selected.length})
+            </button>
+            <button className="bg-[var(--color-primary)] text-white px-2 py-1 rounded flex items-center">
+              <Download size={16} className="mr-1" /> Exportar CSV
+            </button>
+          </div>
+        )}
 
+        {/* Vista Lista */}
+        {view === 'list' && (
+          <table className="w-full table-auto">
+            <thead className="bg-[color:var(--color-text)]/5">
+              <tr>
+                <th></th>
+                <th>Tarea</th>
+                <th>Tipo</th>
+                <th>Responsable</th>
+                <th>Fecha límite</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {blocks.flatMap((block) =>
+                block.tasks.map((t) => (
+                  <tr key={t.id} className={completed[t.id] ? 'opacity-60 line-through' : ''}>
+                    <td>
+                      <button
+                        aria-label="Marcar completada"
+                        onClick={() => toggleCompleted(t.id)}
+                        className="focus:outline-none"
+                      >
+                        {completed[t.id] ? (
+                          <CheckCircle className="text-[color:var(--color-success)]" size={20} />
+                        ) : (
+                          <Circle className="text-[color:var(--color-text)]/40" size={20} />
+                        )}
+                      </button>
+                    </td>
+                    <td>{t.title}</td>
+                    <td>{t.type}</td>
+                    <td>{t.responsible}</td>
+                    <td>{t.due}</td>
+                    <td>{completed[t.id] ? 'Completada' : t.status}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
 
-
-      {/* Modal Nueva Tarea */}
-      {showNewModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <Card className="p-4 shadow w-80">
-            <h3 className="font-semibold mb-2">Nueva Tarea</h3>
-            {/* TODO: formulario */}
-            <Button variant="danger" onClick={() => setShowNewModal(false)} className="mt-2">Cerrar</Button>
-          </Card>
-        </div>
-      )}
+        {/* Modal Nueva Tarea */}
+        {showNewModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <Card className="p-4 shadow w-80">
+              <h3 className="font-semibold mb-2">Nueva Tarea</h3>
+              {/* TODO: formulario */}
+              <Button variant="danger" onClick={() => setShowNewModal(false)} className="mt-2">
+                Cerrar
+              </Button>
+            </Card>
+          </div>
+        )}
       </div>
     </PageWrapper>
   );
 }
-
-

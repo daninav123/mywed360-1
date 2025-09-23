@@ -5,8 +5,21 @@
 import { auth } from '../firebaseConfig';
 import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 
-const BASE = (typeof import.meta !== 'undefined' && import.meta && import.meta.env && import.meta.env.VITE_BACKEND_BASE_URL) || '';
-export const USE_BACKEND = !!BASE;
+const BASE =
+  (typeof import.meta !== 'undefined' &&
+    import.meta &&
+    import.meta.env &&
+    import.meta.env.VITE_BACKEND_BASE_URL) ||
+  '';
+// En desarrollo usamos proxy /api incluso si BASE está vacío; desactivar sólo en tests
+const IS_TEST =
+  (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.jest)) ||
+  (typeof process !== 'undefined' &&
+    process.env &&
+    (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
+  (typeof import.meta !== 'undefined' &&
+    (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')));
+export const USE_BACKEND = !IS_TEST;
 export const USE_MAILGUN = true;
 
 let memoryStore = {
@@ -19,11 +32,18 @@ function classifyMailClientSide(m) {
     const txt = `${m.subject || ''} ${m.body || ''}`.toLowerCase();
     const tags = new Set(m.tags || []);
     let folder = m.folder || 'inbox';
-    const add = (t) => { if (t) tags.add(t); };
+    const add = (t) => {
+      if (t) tags.add(t);
+    };
 
     if (/\brsvp\b|confirmaci[óo]n|asistencia/.test(txt)) add('RSVP');
-    if (/presupuesto|factura|pago|importe|transferencia|invoice|budget/.test(txt)) { add('Finanzas'); if (folder === 'inbox') folder = 'finance'; }
-    if (/contrato|firma|acuerdo|sign|docu/.test(txt)) { add('Contratos'); }
+    if (/presupuesto|factura|pago|importe|transferencia|invoice|budget/.test(txt)) {
+      add('Finanzas');
+      if (folder === 'inbox') folder = 'finance';
+    }
+    if (/contrato|firma|acuerdo|sign|docu/.test(txt)) {
+      add('Contratos');
+    }
     if (/proveedor|catering|fot[oó]grafo|dj|m[úu]sica|flor|venue/.test(txt)) add('Proveedores');
     if (/invitaci[óo]n|tarjeta|envelope|sobre/.test(txt)) add('Invitaciones');
     if (/urgente|importante|asap|prisa/.test(txt)) add('Prioridad');
@@ -67,9 +87,10 @@ function resolveCurrentEmail() {
 function resolveMyAddresses() {
   try {
     const alias = (resolveCurrentEmail() || '').toLowerCase();
-    const login = (auth && auth.currentUser && auth.currentUser.email)
-      ? String(auth.currentUser.email).toLowerCase()
-      : '';
+    const login =
+      auth && auth.currentUser && auth.currentUser.email
+        ? String(auth.currentUser.email).toLowerCase()
+        : '';
     const set = new Set([alias, login].filter(Boolean));
     if (alias.endsWith('@mywed360.com')) set.add(alias.replace(/@mywed360\.com$/i, '@mywed360'));
     return Array.from(set);
@@ -103,8 +124,12 @@ export async function getMails(folder = 'inbox') {
       ];
       // Ordenar por fecha desc y deduplicar por id
       const byId = new Map();
-      for (const m of combined) { if (m && m.id) byId.set(m.id, m); }
-      return Array.from(byId.values()).sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      for (const m of combined) {
+        if (m && m.id) byId.set(m.id, m);
+      }
+      return Array.from(byId.values()).sort(
+        (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
+      );
     } catch {
       // fall through to backend path
     }
@@ -113,7 +138,7 @@ export async function getMails(folder = 'inbox') {
     const user = resolveCurrentEmail();
     const qs = new URLSearchParams();
     if (folder) qs.set('folder', folder);
-    if (user) qs.set('user', (user||'').toLowerCase());
+    if (user) qs.set('user', (user || '').toLowerCase());
     const url = `${BASE}/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
     let res = await fetch(url, { headers: await buildAuthHeaders() });
     // Fallback por 403: reintentar sin user y filtrar en cliente
@@ -125,12 +150,16 @@ export async function getMails(folder = 'inbox') {
       if (res.ok) {
         const all = await res.json();
         const myAddrs = resolveMyAddresses();
-        const filtered = (Array.isArray(all) ? all : []).filter(m => {
-          const to = String(m.to||'').toLowerCase();
-          const from = String(m.from||'').toLowerCase();
+        const filtered = (Array.isArray(all) ? all : []).filter((m) => {
+          const to = String(m.to || '').toLowerCase();
+          const from = String(m.from || '').toLowerCase();
           return folder === 'sent' ? myAddrs.includes(from) : myAddrs.includes(to);
         });
-        try { return filtered.map(classifyMailClientSide); } catch { return filtered; }
+        try {
+          return filtered.map(classifyMailClientSide);
+        } catch {
+          return filtered;
+        }
       }
     }
     if (!res.ok) throw new Error(`getMails ${res.status}`);
@@ -142,7 +171,9 @@ export async function getMails(folder = 'inbox') {
       return list;
     }
   }
-  return memoryStore.mails.filter(m => (folder === 'all' ? true : (m.folder || 'inbox') === folder));
+  return memoryStore.mails.filter((m) =>
+    folder === 'all' ? true : (m.folder || 'inbox') === folder
+  );
 }
 
 // Paginado del buzón desde backend
@@ -164,7 +195,11 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
       const json = await res.json();
       const items = Array.isArray(json?.items) ? json.items : [];
       const nextCursor = json?.nextCursor || null;
-      try { return { items: items.map(classifyMailClientSide), nextCursor }; } catch { return { items, nextCursor }; }
+      try {
+        return { items: items.map(classifyMailClientSide), nextCursor };
+      } catch {
+        return { items, nextCursor };
+      }
     }
     // Fallback por 403: reintentar sin user y filtrar en cliente
     if (res.status === 403) {
@@ -178,23 +213,31 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
         const json = await res.json();
         const baseItems = Array.isArray(json?.items) ? json.items : [];
         const myAddrs = resolveMyAddresses();
-        const filtered = baseItems.filter(m => {
-          const to = String(m.to||'').toLowerCase();
-          const from = String(m.from||'').toLowerCase();
+        const filtered = baseItems.filter((m) => {
+          const to = String(m.to || '').toLowerCase();
+          const from = String(m.from || '').toLowerCase();
           return folder === 'sent' ? myAddrs.includes(from) : myAddrs.includes(to);
         });
         const nextCursor = json?.nextCursor || null;
-        try { return { items: filtered.map(classifyMailClientSide), nextCursor }; } catch { return { items: filtered, nextCursor }; }
+        try {
+          return { items: filtered.map(classifyMailClientSide), nextCursor };
+        } catch {
+          return { items: filtered, nextCursor };
+        }
       }
     }
     // Fallback si el backend aún no expone /page (404/501)
     if (res.status === 404 || res.status === 501) {
       const all = await getMails(folder);
       // Ordenar por fecha desc
-      const sorted = (Array.isArray(all) ? all : []).slice().sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      const sorted = (Array.isArray(all) ? all : [])
+        .slice()
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
       const cur = cursor ? new Date(String(cursor)) : null;
-      const pageItems = sorted.filter(m => (cur ? (new Date(m.date||0) < cur) : true)).slice(0, limit);
-      const next = pageItems.length === limit ? pageItems[pageItems.length-1].date : null;
+      const pageItems = sorted
+        .filter((m) => (cur ? new Date(m.date || 0) < cur : true))
+        .slice(0, limit);
+      const next = pageItems.length === limit ? pageItems[pageItems.length - 1].date : null;
       return { items: pageItems, nextCursor: next };
     }
     throw new Error(`getMailsPage ${res.status}`);
@@ -202,10 +245,14 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
     // Fallback general ante errores de red
     try {
       const all = await getMails(folder);
-      const sorted = (Array.isArray(all) ? all : []).slice().sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
+      const sorted = (Array.isArray(all) ? all : [])
+        .slice()
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
       const cur = cursor ? new Date(String(cursor)) : null;
-      const pageItems = sorted.filter(m => (cur ? (new Date(m.date||0) < cur) : true)).slice(0, limit);
-      const next = pageItems.length === limit ? pageItems[pageItems.length-1].date : null;
+      const pageItems = sorted
+        .filter((m) => (cur ? new Date(m.date || 0) < cur : true))
+        .slice(0, limit);
+      const next = pageItems.length === limit ? pageItems[pageItems.length - 1].date : null;
       return { items: pageItems, nextCursor: next };
     } catch {
       throw e;
@@ -251,58 +298,85 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
       subject,
       body,
       attachments: Array.isArray(attachments)
-        ? attachments.map(a => ({ name: a.name || a.filename, size: a.size, type: a.type, url: a.url }))
-        : []
+        ? attachments.map((a) => ({
+            name: a.name || a.filename,
+            size: a.size,
+            type: a.type,
+            url: a.url,
+          }))
+        : [],
     };
     const res = await fetch(`${BASE}/api/mail`, {
       method: 'POST',
       headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`sendMail ${res.status}`);
     return res.json();
   }
   const id = String(Date.now());
-  memoryStore.mails.push({ id, to, subject, body, folder: 'sent', date: new Date().toISOString(), read: true, attachments: [] });
+  memoryStore.mails.push({
+    id,
+    to,
+    subject,
+    body,
+    folder: 'sent',
+    date: new Date().toISOString(),
+    read: true,
+    attachments: [],
+  });
   return { success: true, id };
 }
 
 export async function deleteMail(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}`, { method: 'DELETE', headers: await buildAuthHeaders() });
+    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: await buildAuthHeaders(),
+    });
     if (!res.ok) throw new Error(`deleteMail ${res.status}`);
     return true;
   }
-  memoryStore.mails = memoryStore.mails.filter(m => m.id !== id);
+  memoryStore.mails = memoryStore.mails.filter((m) => m.id !== id);
   return true;
 }
 
 export async function markAsRead(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/read`, { method: 'POST', headers: await buildAuthHeaders() });
+    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/read`, {
+      method: 'POST',
+      headers: await buildAuthHeaders(),
+    });
     if (!res.ok) throw new Error(`markAsRead ${res.status}`);
     return true;
   }
-  memoryStore.mails = memoryStore.mails.map(m => (m.id === id ? { ...m, read: true } : m));
+  memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: true } : m));
   return true;
 }
 
 export async function markAsUnread(id) {
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/unread`, { method: 'POST', headers: await buildAuthHeaders() });
+    const res = await fetch(`${BASE}/api/mail/${encodeURIComponent(id)}/unread`, {
+      method: 'POST',
+      headers: await buildAuthHeaders(),
+    });
     if (!res.ok) throw new Error(`markAsUnread ${res.status}`);
     return true;
   }
-  memoryStore.mails = memoryStore.mails.map(m => (m.id === id ? { ...m, read: false } : m));
+  memoryStore.mails = memoryStore.mails.map((m) => (m.id === id ? { ...m, read: false } : m));
   return true;
 }
 
 export async function createEmailAlias(arg1, arg2) {
   // Soportar firmas: (alias) o (profile, alias)
-  const alias = (typeof arg1 === 'string') ? arg1 : arg2;
+  const alias = typeof arg1 === 'string' ? arg1 : arg2;
   if (!alias) throw new Error('alias required');
   if (USE_BACKEND) {
-    const res = await fetch(`${BASE}/api/mail/alias`, { method: 'POST', headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify({ alias }) });
+    const res = await fetch(`${BASE}/api/mail/alias`, {
+      method: 'POST',
+      headers: await buildAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ alias }),
+    });
     if (!res.ok) throw new Error(`createEmailAlias ${res.status}`);
     return res.json();
   }
@@ -324,7 +398,9 @@ export async function searchEmails(term = '') {
   if (!q) return [];
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/mail/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
+      const res = await fetch(`${BASE}/api/mail/search?q=${encodeURIComponent(q)}`, {
+        headers: await buildAuthHeaders(),
+      });
       if (res.ok) {
         const items = await res.json();
         return (Array.isArray(items) ? items : []).map((m) => ({
@@ -341,13 +417,11 @@ export async function searchEmails(term = '') {
           getMails('inbox').catch(() => []),
           getMails('sent').catch(() => []),
         ]);
-        const base = [
-          ...(Array.isArray(inbox) ? inbox : []),
-          ...(Array.isArray(sent) ? sent : []),
-        ];
+        const base = [...(Array.isArray(inbox) ? inbox : []), ...(Array.isArray(sent) ? sent : [])];
         return base
           .filter((m) => {
-            const hay = `${m.subject || ''} ${m.body || ''} ${m.from || ''} ${m.to || ''}`.toLowerCase();
+            const hay =
+              `${m.subject || ''} ${m.body || ''} ${m.from || ''} ${m.to || ''}`.toLowerCase();
             return hay.includes(q);
           })
           .slice(0, 20)
@@ -376,7 +450,9 @@ export async function searchEvents(term = '') {
   if (!q) return [];
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/events/search?q=${encodeURIComponent(q)}`, { headers: await buildAuthHeaders() });
+      const res = await fetch(`${BASE}/api/events/search?q=${encodeURIComponent(q)}`, {
+        headers: await buildAuthHeaders(),
+      });
       if (!res.ok) throw new Error(`searchEvents ${res.status}`);
       const items = await res.json();
       return (Array.isArray(items) ? items : []).map((e) => ({
@@ -442,7 +518,7 @@ export function logAIEmailActivity(aiResultId, searchQuery) {
     const key = 'aiEmailActivities';
     const list = JSON.parse(localStorage.getItem(key) || '[]');
     list.push({
-      id: `ai_${Date.now()}_${Math.random().toString(36).slice(2,10)}`,
+      id: `ai_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
       aiResultId,
       searchQuery,
       timestamp: new Date().toISOString(),

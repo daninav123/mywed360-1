@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState } from 'react';
+
 import Button from '../Button';
 
 /**
@@ -18,7 +19,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
     isUnread: initialFilters.isUnread || false,
     labels: initialFilters.labels || [],
   });
-  
+
   // Etiquetas predefinidas para el filtrado
   const availableLabels = [
     { id: 'important', name: 'Importante', color: 'bg-red-500' },
@@ -27,7 +28,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
     { id: 'invitation', name: 'Invitación', color: 'bg-purple-500' },
     { id: 'provider', name: 'Proveedor', color: 'bg-yellow-500' },
   ];
-  
+
   // Manejar cambios en los filtros
   const handleFilterChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,23 +37,23 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
       [name]: type === 'checkbox' ? checked : value,
     });
   };
-  
+
   // Manejar selección de etiquetas
   const handleLabelToggle = (labelId) => {
-    setFilters(prev => {
+    setFilters((prev) => {
       if (prev.labels.includes(labelId)) {
-        return { ...prev, labels: prev.labels.filter(id => id !== labelId) };
+        return { ...prev, labels: prev.labels.filter((id) => id !== labelId) };
       } else {
         return { ...prev, labels: [...prev.labels, labelId] };
       }
     });
   };
-  
+
   // Aplicar filtros
   const handleApply = () => {
     onApplyFilters(filters);
   };
-  
+
   // Resetear filtros
   const handleReset = () => {
     setFilters({
@@ -67,11 +68,11 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
     });
     onResetFilters();
   };
-  
+
   return (
     <div className="bg-white border rounded-md shadow-sm mb-4">
       {/* Cabecera de filtros */}
-      <div 
+      <div
         className="flex justify-between items-center p-3 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
@@ -87,7 +88,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
           )}
         </div>
       </div>
-      
+
       {/* Panel de filtros expandible */}
       {expanded && (
         <div className="p-4 border-t">
@@ -107,7 +108,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 placeholder="correo@ejemplo.com"
               />
             </div>
-            
+
             {/* Filtro: Para */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-to">
@@ -123,10 +124,13 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 placeholder="correo@ejemplo.com"
               />
             </div>
-            
+
             {/* Filtro: Asunto */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-subject">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="filter-subject"
+              >
                 Asunto contiene
               </label>
               <input
@@ -139,10 +143,13 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 placeholder="Palabras clave en el asunto"
               />
             </div>
-            
+
             {/* Filtro: Rango de fechas */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-date-from">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="filter-date-from"
+              >
                 Desde fecha
               </label>
               <input
@@ -154,9 +161,12 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="filter-date-to">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="filter-date-to"
+              >
                 Hasta fecha
               </label>
               <input
@@ -168,7 +178,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            
+
             {/* Filtros tipo checkbox */}
             <div className="flex items-center">
               <input
@@ -183,7 +193,7 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 Con archivos adjuntos
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 id="filter-unread"
@@ -197,31 +207,33 @@ const EmailFilters = ({ onApplyFilters, onResetFilters, initialFilters = {} }) =
                 Solo no leídos
               </label>
             </div>
-            
+
             {/* Filtro: Etiquetas */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Etiquetas
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Etiquetas</label>
               <div className="flex flex-wrap gap-2">
-                {availableLabels.map(label => (
+                {availableLabels.map((label) => (
                   <button
                     key={label.id}
                     type="button"
                     onClick={() => handleLabelToggle(label.id)}
                     className={`px-2 py-1 rounded-full text-xs flex items-center
-                      ${filters.labels.includes(label.id) 
-                        ? `${label.color} text-white` 
-                        : 'bg-gray-100 text-gray-800'}`}
+                      ${
+                        filters.labels.includes(label.id)
+                          ? `${label.color} text-white`
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
                   >
-                    <span className={`w-2 h-2 rounded-full mr-1 ${filters.labels.includes(label.id) ? 'bg-white' : label.color}`}></span>
+                    <span
+                      className={`w-2 h-2 rounded-full mr-1 ${filters.labels.includes(label.id) ? 'bg-white' : label.color}`}
+                    ></span>
                     {label.name}
                   </button>
                 ))}
               </div>
             </div>
           </div>
-          
+
           {/* Botones de acción */}
           <div className="flex justify-end mt-4 space-x-2">
             <Button

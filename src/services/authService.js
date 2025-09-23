@@ -3,8 +3,8 @@
  * Maneja automáticamente la renovación de tokens y sesiones expiradas
  */
 
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
@@ -19,23 +19,24 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
   getIdToken,
-  getIdTokenResult
+  getIdTokenResult,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+
 import { auth, db } from '../lib/firebase';
 
 // Configuración del servicio
 const AUTH_CONFIG = {
   TOKEN_REFRESH_INTERVAL: 50 * 60 * 1000, // 50 minutos (Firebase tokens duran 1 hora)
-  SESSION_CHECK_INTERVAL: 5 * 60 * 1000,  // 5 minutos
+  SESSION_CHECK_INTERVAL: 5 * 60 * 1000, // 5 minutos
   MAX_RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000, // 1 segundo
   STORAGE_KEYS: {
     USER: 'lovenda_user_session',
     PREFERENCES: 'lovenda_user_preferences',
     LAST_ACTIVITY: 'lovenda_last_activity',
-    LOGIN_EMAIL: 'lovenda_login_email'
-  }
+    LOGIN_EMAIL: 'lovenda_login_email',
+  },
 };
 
 // Estado global del servicio
@@ -84,7 +85,7 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
   try {
     const userRef = doc(db, 'users', user.uid);
     const existingProfile = await getUserProfile(user.uid);
-    
+
     const profileData = {
       uid: user.uid,
       email: user.email,
@@ -93,7 +94,7 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
       emailVerified: user.emailVerified,
       lastLogin: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      ...additionalData
+      ...additionalData,
     };
 
     // Si es un usuario nuevo, añadir datos de creación
@@ -104,7 +105,7 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
         theme: 'light',
         language: 'es',
         emailNotifications: true,
-        pushNotifications: true
+        pushNotifications: true,
       };
     } else {
       // Mantener datos existentes importantes
@@ -117,7 +118,11 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
     return profileData;
   } catch (error) {
     console.error('Error creando/actualizando perfil:', error);
-    throw new AuthError('profile-update-failed', 'Error al actualizar el perfil del usuario', error);
+    throw new AuthError(
+      'profile-update-failed',
+      'Error al actualizar el perfil del usuario',
+      error
+    );
   }
 };
 
@@ -127,13 +132,13 @@ const createOrUpdateUserProfile = async (user, additionalData = {}) => {
 const updateUserActivity = () => {
   const now = Date.now();
   localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LAST_ACTIVITY, now.toString());
-  
+
   // Actualizar en Firestore si hay usuario autenticado
   if (auth.currentUser) {
     const userRef = doc(db, 'users', auth.currentUser.uid);
-    updateDoc(userRef, { 
-      lastActivity: serverTimestamp() 
-    }).catch(error => {
+    updateDoc(userRef, {
+      lastActivity: serverTimestamp(),
+    }).catch((error) => {
       console.warn('Error actualizando actividad:', error);
     });
   }
@@ -146,11 +151,11 @@ const updateUserActivity = () => {
 const isSessionExpired = () => {
   const lastActivity = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.LAST_ACTIVITY);
   if (!lastActivity) return false;
-  
+
   const now = Date.now();
   const timeSinceLastActivity = now - parseInt(lastActivity);
   const maxInactivity = 24 * 60 * 60 * 1000; // 24 horas
-  
+
   return timeSinceLastActivity > maxInactivity;
 };
 
@@ -167,16 +172,16 @@ const refreshAuthToken = async (forceRefresh = false) => {
 
     const token = await getIdToken(auth.currentUser, forceRefresh);
     const tokenResult = await getIdTokenResult(auth.currentUser, forceRefresh);
-    
+
     console.log('[AuthService] Token refrescado correctamente');
-    
+
     // Programar siguiente refresh
     scheduleTokenRefresh();
-    
+
     return {
       token,
       expirationTime: tokenResult.expirationTime,
-      claims: tokenResult.claims
+      claims: tokenResult.claims,
     };
   } catch (error) {
     console.error('[AuthService] Error refrescando token:', error);
@@ -191,9 +196,9 @@ const scheduleTokenRefresh = () => {
   if (tokenRefreshTimer) {
     clearTimeout(tokenRefreshTimer);
   }
-  
+
   tokenRefreshTimer = setTimeout(() => {
-    refreshAuthToken(true).catch(error => {
+    refreshAuthToken(true).catch((error) => {
       console.error('[AuthService] Error en refresh automático:', error);
       // Si falla el refresh, cerrar sesión
       signOut(auth);
@@ -208,8 +213,8 @@ const startSessionMonitoring = () => {
   // Monitorear actividad del usuario
   const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
   const throttledUpdateActivity = throttle(updateUserActivity, 30000); // Máximo cada 30 segundos
-  
-  events.forEach(event => {
+
+  events.forEach((event) => {
     document.addEventListener(event, throttledUpdateActivity, true);
   });
 
@@ -217,7 +222,7 @@ const startSessionMonitoring = () => {
   if (sessionCheckTimer) {
     clearInterval(sessionCheckTimer);
   }
-  
+
   sessionCheckTimer = setInterval(() => {
     if (isSessionExpired()) {
       console.log('[AuthService] Sesión expirada por inactividad');
@@ -234,7 +239,7 @@ const stopSessionMonitoring = () => {
     clearTimeout(tokenRefreshTimer);
     tokenRefreshTimer = null;
   }
-  
+
   if (sessionCheckTimer) {
     clearInterval(sessionCheckTimer);
     sessionCheckTimer = null;
@@ -246,13 +251,13 @@ const stopSessionMonitoring = () => {
  */
 const throttle = (func, limit) => {
   let inThrottle;
-  return function() {
+  return function () {
     const args = arguments;
     const context = this;
     if (!inThrottle) {
       func.apply(context, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 };
@@ -276,7 +281,7 @@ export const login = async (email, password, rememberMe = true) => {
 
     // Obtener/crear perfil completo
     const profile = await createOrUpdateUserProfile(user);
-    
+
     // Guardar email si se solicita recordar
     if (rememberMe) {
       localStorage.setItem(AUTH_CONFIG.STORAGE_KEYS.LOGIN_EMAIL, email);
@@ -296,7 +301,7 @@ export const login = async (email, password, rememberMe = true) => {
     return userData;
   } catch (error) {
     console.error('[AuthService] Error en login:', error);
-    
+
     let errorMessage = 'Error al iniciar sesión';
     switch (error.code) {
       case 'auth/user-not-found':
@@ -315,7 +320,7 @@ export const login = async (email, password, rememberMe = true) => {
         errorMessage = 'Demasiados intentos. Intenta más tarde';
         break;
     }
-    
+
     throw new AuthError(error.code, errorMessage, error);
   }
 };
@@ -347,7 +352,7 @@ export const register = async (email, password, additionalData = {}) => {
     return { ...user, ...profile };
   } catch (error) {
     console.error('[AuthService] Error en registro:', error);
-    
+
     let errorMessage = 'Error al crear la cuenta';
     switch (error.code) {
       case 'auth/email-already-in-use':
@@ -360,7 +365,7 @@ export const register = async (email, password, additionalData = {}) => {
         errorMessage = 'La contraseña es muy débil';
         break;
     }
-    
+
     throw new AuthError(error.code, errorMessage, error);
   }
 };
@@ -372,9 +377,9 @@ export const register = async (email, password, additionalData = {}) => {
 export const logout = async () => {
   try {
     stopSessionMonitoring();
-    
+
     // Limpiar datos locales
-    Object.values(AUTH_CONFIG.STORAGE_KEYS).forEach(key => {
+    Object.values(AUTH_CONFIG.STORAGE_KEYS).forEach((key) => {
       if (key !== AUTH_CONFIG.STORAGE_KEYS.LOGIN_EMAIL) {
         localStorage.removeItem(key);
       }
@@ -382,7 +387,7 @@ export const logout = async () => {
 
     currentUserData = null;
     await signOut(auth);
-    
+
     console.log('[AuthService] Logout exitoso');
   } catch (error) {
     console.error('[AuthService] Error en logout:', error);
@@ -413,7 +418,7 @@ export const isAuthenticated = () => {
  */
 export const onAuthStateChange = (callback) => {
   authStateListeners.push(callback);
-  
+
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
     if (user) {
       try {
@@ -427,13 +432,13 @@ export const onAuthStateChange = (callback) => {
         const profile = await getUserProfile(user.uid);
         const userData = { ...user, ...profile };
         currentUserData = userData;
-        
+
         // Iniciar monitoreo si no está activo
         if (!tokenRefreshTimer) {
           startSessionMonitoring();
           scheduleTokenRefresh();
         }
-        
+
         updateUserActivity();
         callback(userData);
       } catch (error) {
@@ -469,7 +474,7 @@ export const reauthenticate = async (password) => {
 
     const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
     await reauthenticateWithCredential(auth.currentUser, credential);
-    
+
     console.log('[AuthService] Reautenticación exitosa');
   } catch (error) {
     console.error('[AuthService] Error en reautenticación:', error);
@@ -488,7 +493,11 @@ export const sendPasswordReset = async (email) => {
     console.log('[AuthService] Email de restablecimiento enviado');
   } catch (error) {
     console.error('[AuthService] Error enviando email de restablecimiento:', error);
-    throw new AuthError('password-reset-failed', 'Error al enviar email de restablecimiento', error);
+    throw new AuthError(
+      'password-reset-failed',
+      'Error al enviar email de restablecimiento',
+      error
+    );
   }
 };
 
@@ -507,7 +516,7 @@ export const updateUserProfile = async (updates) => {
     if (updates.displayName || updates.photoURL) {
       await updateProfile(auth.currentUser, {
         displayName: updates.displayName,
-        photoURL: updates.photoURL
+        photoURL: updates.photoURL,
       });
     }
 
@@ -515,7 +524,7 @@ export const updateUserProfile = async (updates) => {
     const userRef = doc(db, 'users', auth.currentUser.uid);
     await updateDoc(userRef, {
       ...updates,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     });
 
     // Actualizar datos locales
@@ -553,5 +562,5 @@ export default {
   sendPasswordReset,
   updateUserProfile,
   refreshAuthToken,
-  AuthError
+  AuthError,
 };

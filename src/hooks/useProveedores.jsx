@@ -1,18 +1,19 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { db } from '../firebaseConfig';
-import { 
-  collection, 
-  getDocs, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  getDocs,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
   orderBy,
   Timestamp,
-  serverTimestamp
+  serverTimestamp,
 } from 'firebase/firestore';
+import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { loadData, saveData } from '../services/SyncService';
@@ -38,7 +39,7 @@ import { loadData, saveData } from '../services/SyncService';
  * Hook personalizado para gestionar la lógica de los proveedores.
  * Proporciona funcionalidades para listar, filtrar, añadir, editar y eliminar proveedores,
  * así como para gestionar el estado de selección y filtrado.
- * 
+ *
  * @returns {Object} Objeto con estados y funciones para gestionar proveedores
  * @property {Provider[]} providers - Lista completa de proveedores
  * @property {Provider[]} filteredProviders - Lista de proveedores filtrada según criterios
@@ -74,17 +75,17 @@ export const useProveedores = () => {
   const [error, setError] = useState(null);
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [selectedProviderIds, setSelectedProviderIds] = useState([]);
-  
+
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-    // Filtro de rating mínimo (0 = cualquiera)
-    const [ratingMin, setRatingMin] = useState(0);
+  // Filtro de rating mínimo (0 = cualquiera)
+  const [ratingMin, setRatingMin] = useState(0);
   const [tab, setTab] = useState('contratados'); // 'contratados', 'buscados', 'favoritos'
-  
+
   const { user } = useAuth();
   const { activeWedding } = useWedding();
   const persistTimer = useRef(null);
@@ -94,34 +95,41 @@ export const useProveedores = () => {
     if (user?.uid) return `usuarios/${user.uid}/proveedores`;
     return null;
   }, [activeWedding, user]);
-  
+
   /**
    * Cargar proveedores desde Firestore
    */
   const loadProviders = useCallback(async () => {
     if (!user) return;
-    
+
     setLoading(true);
-    
+
     try {
       const path = getCollectionPath();
-      if (!path) { setLoading(false); return; }
+      if (!path) {
+        setLoading(false);
+        return;
+      }
       const proveedoresRef = collection(db, path);
       const snapshot = await getDocs(proveedoresRef);
       const toIso = (d) => {
         try {
           if (!d) return '';
-          if (typeof d?.toDate === 'function') return new Date(d.toDate()).toISOString().split('T')[0];
+          if (typeof d?.toDate === 'function')
+            return new Date(d.toDate()).toISOString().split('T')[0];
           return new Date(d).toISOString().split('T')[0];
-        } catch { return ''; }
+        } catch {
+          return '';
+        }
       };
-      const loadedProviders = snapshot.docs.map(d => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
-        .sort((a,b) => {
+      const loadedProviders = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
+        .sort((a, b) => {
           const ac = a.created?.seconds || a.createdAt?.seconds || 0;
           const bc = b.created?.seconds || b.createdAt?.seconds || 0;
           return bc - ac;
         });
-      
+
       setProviders(loadedProviders);
       applyFilters(loadedProviders);
       setLoading(false);
@@ -131,65 +139,68 @@ export const useProveedores = () => {
       setLoading(false);
     }
   }, [user, getCollectionPath]);
-  
+
   /**
    * Aplicar filtros a los proveedores
    */
-  const applyFilters = useCallback((providersToFilter = providers) => {
-    let filtered = [...providersToFilter];
-    
-    // Aplicar filtro de búsqueda
-    if (searchTerm) {
-      const searchTermLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(p => 
-        p.name?.toLowerCase().includes(searchTermLower) || 
-        p.service?.toLowerCase().includes(searchTermLower) || 
-        p.contact?.toLowerCase().includes(searchTermLower) ||
-        p.status?.toLowerCase().includes(searchTermLower) ||
-        p.snippet?.toLowerCase().includes(searchTermLower)
-      );
-    }
-    
-    // Aplicar filtro de servicio
-    if (serviceFilter) {
-      filtered = filtered.filter(p => p.service === serviceFilter);
-    }
-    
-    // Aplicar filtro de estado
-    if (statusFilter) {
-      filtered = filtered.filter(p => p.status === statusFilter);
-    }
-    
-    // Aplicar filtro de fecha desde
-    if (dateFrom) {
-      filtered = filtered.filter(p => p.date >= dateFrom);
-    }
-    
-    // Aplicar filtro de fecha hasta
-    if (dateTo) {
-      filtered = filtered.filter(p => p.date <= dateTo);
-    }
-    
-    // Aplicar filtro de rating mínimo
-    if (ratingMin > 0) {
-      filtered = filtered.filter(p => p.rating >= ratingMin);
-    }
-    
-    // Filtrar por pestaña
-    if (tab === 'contratados') {
-      filtered = filtered.filter(p => ['Confirmado','Seleccionado'].includes(p.status));
-    }
-    if (tab === 'buscados') {
-      filtered = filtered.filter(p => ['Pendiente','Contactado'].includes(p.status));
-    }
-    if (tab === 'favoritos') {
-      filtered = filtered.filter(p => p.favorite);
-    }
+  const applyFilters = useCallback(
+    (providersToFilter = providers) => {
+      let filtered = [...providersToFilter];
 
-    
-    setFilteredProviders(filtered);
-  }, [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]);
-  
+      // Aplicar filtro de búsqueda
+      if (searchTerm) {
+        const searchTermLower = searchTerm.toLowerCase();
+        filtered = filtered.filter(
+          (p) =>
+            p.name?.toLowerCase().includes(searchTermLower) ||
+            p.service?.toLowerCase().includes(searchTermLower) ||
+            p.contact?.toLowerCase().includes(searchTermLower) ||
+            p.status?.toLowerCase().includes(searchTermLower) ||
+            p.snippet?.toLowerCase().includes(searchTermLower)
+        );
+      }
+
+      // Aplicar filtro de servicio
+      if (serviceFilter) {
+        filtered = filtered.filter((p) => p.service === serviceFilter);
+      }
+
+      // Aplicar filtro de estado
+      if (statusFilter) {
+        filtered = filtered.filter((p) => p.status === statusFilter);
+      }
+
+      // Aplicar filtro de fecha desde
+      if (dateFrom) {
+        filtered = filtered.filter((p) => p.date >= dateFrom);
+      }
+
+      // Aplicar filtro de fecha hasta
+      if (dateTo) {
+        filtered = filtered.filter((p) => p.date <= dateTo);
+      }
+
+      // Aplicar filtro de rating mínimo
+      if (ratingMin > 0) {
+        filtered = filtered.filter((p) => p.rating >= ratingMin);
+      }
+
+      // Filtrar por pestaña
+      if (tab === 'contratados') {
+        filtered = filtered.filter((p) => ['Confirmado', 'Seleccionado'].includes(p.status));
+      }
+      if (tab === 'buscados') {
+        filtered = filtered.filter((p) => ['Pendiente', 'Contactado'].includes(p.status));
+      }
+      if (tab === 'favoritos') {
+        filtered = filtered.filter((p) => p.favorite);
+      }
+
+      setFilteredProviders(filtered);
+    },
+    [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]
+  );
+
   /**
    * Limpiar todos los filtros
    */
@@ -202,178 +213,219 @@ export const useProveedores = () => {
     setRatingMin(0);
     setTab('contratados');
   }, []);
-  
+
   /**
    * Crear un nuevo proveedor
    */
-  const addProvider = useCallback(async (providerData) => {
-    if (!user) return null;
+  const addProvider = useCallback(
+    async (providerData) => {
+      if (!user) return null;
 
-    try {
-      const path = getCollectionPath();
-      if (!path) return null;
-      const proveedoresRef = collection(db, path);
-      
-      // Añadir campos de timestamp
-      const providerWithTimestamp = {
-        ...providerData,
-        created: serverTimestamp(),
-        createdAt: serverTimestamp(),
-        updated: serverTimestamp(),
-        date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null
-      };
-      
-      const docRef = await addDoc(proveedoresRef, providerWithTimestamp);
-      
-      // Actualizar estado local
-      const newProvider = {
-        id: docRef.id,
-        ...providerData,
-        date: providerData.date || ''
-      };
-      
-      setProviders(prev => [newProvider, ...prev]);
-      applyFilters([newProvider, ...providers]);
-      
-      return newProvider;
-    } catch (err) {
-      console.error('Error al añadir proveedor:', err);
-      setError('No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.');
-      return null;
-    }
-  }, [user, providers, applyFilters, getCollectionPath]);
-  
+      try {
+        const path = getCollectionPath();
+        if (!path) return null;
+        const proveedoresRef = collection(db, path);
+
+        // Añadir campos de timestamp
+        const providerWithTimestamp = {
+          ...providerData,
+          created: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          updated: serverTimestamp(),
+          date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null,
+        };
+
+        const docRef = await addDoc(proveedoresRef, providerWithTimestamp);
+
+        // Actualizar estado local
+        const newProvider = {
+          id: docRef.id,
+          ...providerData,
+          date: providerData.date || '',
+        };
+
+        setProviders((prev) => [newProvider, ...prev]);
+        applyFilters([newProvider, ...providers]);
+
+        return newProvider;
+      } catch (err) {
+        console.error('Error al añadir proveedor:', err);
+        setError('No se pudo añadir el proveedor. Inténtalo de nuevo más tarde.');
+        return null;
+      }
+    },
+    [user, providers, applyFilters, getCollectionPath]
+  );
+
   /**
    * Actualizar un proveedor existente
    */
-  const updateProvider = useCallback(async (providerId, providerData) => {
-    if (!user) return false;
+  const updateProvider = useCallback(
+    async (providerId, providerData) => {
+      if (!user) return false;
 
-    try {
-      const path = getCollectionPath();
-      if (!path) return false;
-      const providerRef = doc(db, path, providerId);
-      
-      // Añadir campo de timestamp de actualización
-      const providerWithTimestamp = {
-        ...providerData,
-        updated: serverTimestamp(),
-        date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null
-      };
-      
-      await updateDoc(providerRef, providerWithTimestamp);
+      try {
+        const path = getCollectionPath();
+        if (!path) return false;
+        const providerRef = doc(db, path, providerId);
 
-      // Actualizar estado local para reflejar cambios inmediatamente
-      setProviders(prev => {
-        const updated = prev.map(p => (p.id === providerId ? { ...p, ...providerData, id: providerId, date: providerData.date ? providerData.date : (p.date || '') } : p));
-        try { applyFilters(updated); } catch {}
-        return updated;
-      });
-      setSelectedProvider(prev => (prev && prev.id === providerId ? { ...prev, ...providerData, id: providerId } : prev));
+        // Añadir campo de timestamp de actualización
+        const providerWithTimestamp = {
+          ...providerData,
+          updated: serverTimestamp(),
+          date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null,
+        };
 
-      setError(null);
-    } catch (err) {
-      console.error('Error al actualizar proveedor:', err);
-      setError('Error al actualizar el proveedor. Inténtalo de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  }, [user, getCollectionPath]);
-  
+        await updateDoc(providerRef, providerWithTimestamp);
+
+        // Actualizar estado local para reflejar cambios inmediatamente
+        setProviders((prev) => {
+          const updated = prev.map((p) =>
+            p.id === providerId
+              ? {
+                  ...p,
+                  ...providerData,
+                  id: providerId,
+                  date: providerData.date ? providerData.date : p.date || '',
+                }
+              : p
+          );
+          try {
+            applyFilters(updated);
+          } catch {}
+          return updated;
+        });
+        setSelectedProvider((prev) =>
+          prev && prev.id === providerId ? { ...prev, ...providerData, id: providerId } : prev
+        );
+
+        setError(null);
+      } catch (err) {
+        console.error('Error al actualizar proveedor:', err);
+        setError('Error al actualizar el proveedor. Inténtalo de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, getCollectionPath]
+  );
+
   /**
    * Eliminar un proveedor
    */
   /**
    * Añadir reserva a proveedor
    */
-  const addReservation = useCallback(async (providerId, reservation) => {
-    const provider = providers.find(p => p.id === providerId);
-    if(!provider) return false;
-    const newReservations = Array.isArray(provider.reservations) ? [...provider.reservations, reservation] : [reservation];
-    // local update
-    const updatedProvider = { ...provider, reservations: newReservations };
-    setProviders(prev => prev.map(p => p.id===providerId ? updatedProvider : p));
-    applyFilters(providers.map(p => p.id===providerId ? updatedProvider : p));
-    // firestore update
-    if(user){
-      try{
+  const addReservation = useCallback(
+    async (providerId, reservation) => {
+      const provider = providers.find((p) => p.id === providerId);
+      if (!provider) return false;
+      const newReservations = Array.isArray(provider.reservations)
+        ? [...provider.reservations, reservation]
+        : [reservation];
+      // local update
+      const updatedProvider = { ...provider, reservations: newReservations };
+      setProviders((prev) => prev.map((p) => (p.id === providerId ? updatedProvider : p)));
+      applyFilters(providers.map((p) => (p.id === providerId ? updatedProvider : p)));
+      // firestore update
+      if (user) {
+        try {
+          const path = getCollectionPath();
+          if (path) {
+            const providerRef = doc(db, path, providerId);
+            await updateDoc(providerRef, {
+              reservations: newReservations,
+              updated: serverTimestamp(),
+            });
+          }
+        } catch (err) {
+          console.error('Error al guardar reserva', err);
+        }
+      }
+      return true;
+    },
+    [providers, user, applyFilters, getCollectionPath]
+  );
+
+  const deleteProvider = useCallback(
+    async (providerId) => {
+      if (!user) return false;
+
+      try {
         const path = getCollectionPath();
         if (path) {
           const providerRef = doc(db, path, providerId);
-          await updateDoc(providerRef, { reservations: newReservations, updated: serverTimestamp() });
+          await deleteDoc(providerRef);
         }
-      }catch(err){ console.error('Error al guardar reserva', err);}  }
-    return true;
-  }, [providers, user, applyFilters, getCollectionPath]);
 
-  const deleteProvider = useCallback(async (providerId) => {
-    if (!user) return false;
+        // Actualizar estado local
+        setProviders((prev) => prev.filter((p) => p.id !== providerId));
+        applyFilters(providers.filter((p) => p.id !== providerId));
 
-    try {
-      const path = getCollectionPath();
-      if (path) {
-        const providerRef = doc(db, path, providerId);
-        await deleteDoc(providerRef);
+        // Si es el proveedor seleccionado, limpiarlo
+        if (selectedProvider && selectedProvider.id === providerId) {
+          setSelectedProvider(null);
+        }
+
+        // Eliminar de la lista de seleccionados si estaba allí
+        setSelectedProviderIds((prev) => prev.filter((id) => id !== providerId));
+
+        return true;
+      } catch (err) {
+        console.error('Error al eliminar proveedor:', err);
+        setError('No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.');
+        return false;
       }
-      
-      // Actualizar estado local
-      setProviders(prev => prev.filter(p => p.id !== providerId));
-      applyFilters(providers.filter(p => p.id !== providerId));
-      
-      // Si es el proveedor seleccionado, limpiarlo
-      if (selectedProvider && selectedProvider.id === providerId) {
-        setSelectedProvider(null);
-      }
-      
-      // Eliminar de la lista de seleccionados si estaba allí
-      setSelectedProviderIds(prev => prev.filter(id => id !== providerId));
-      
-      return true;
-    } catch (err) {
-      console.error('Error al eliminar proveedor:', err);
-      setError('No se pudo eliminar el proveedor. Inténtalo de nuevo más tarde.');
-      return false;
-    }
-  }, [user, providers, selectedProvider, applyFilters, getCollectionPath]);
-  
+    },
+    [user, providers, selectedProvider, applyFilters, getCollectionPath]
+  );
+
   /**
    * Seleccionar/deseleccionar un proveedor de la lista
    */
-  const toggleFavoriteProvider = useCallback(async (providerId) => {
-    const provider = providers.find(p => p.id === providerId);
-    if(!provider) return;
-    const newFav = !provider.favorite;
-    // actualizar local
-    setProviders(prev => prev.map(p => p.id===providerId ? {...p, favorite:newFav}:p));
-    applyFilters(providers.map(p => p.id===providerId ? {...p, favorite:newFav}:p));
-    // actualizar firestore
-    if(user){
-      try{
-        const path = getCollectionPath();
-        if (path) {
-          const providerRef = doc(db, path, providerId);
-          await updateDoc(providerRef, { favorite: newFav, updated: serverTimestamp() });
+  const toggleFavoriteProvider = useCallback(
+    async (providerId) => {
+      const provider = providers.find((p) => p.id === providerId);
+      if (!provider) return;
+      const newFav = !provider.favorite;
+      // actualizar local
+      setProviders((prev) =>
+        prev.map((p) => (p.id === providerId ? { ...p, favorite: newFav } : p))
+      );
+      applyFilters(providers.map((p) => (p.id === providerId ? { ...p, favorite: newFav } : p)));
+      // actualizar firestore
+      if (user) {
+        try {
+          const path = getCollectionPath();
+          if (path) {
+            const providerRef = doc(db, path, providerId);
+            await updateDoc(providerRef, { favorite: newFav, updated: serverTimestamp() });
+          }
+        } catch (err) {
+          console.error('Error al marcar favorito', err);
         }
-      }catch(err){ console.error('Error al marcar favorito', err);}  }
-  }, [providers, user, applyFilters, getCollectionPath]);
+      }
+    },
+    [providers, user, applyFilters, getCollectionPath]
+  );
 
   const toggleSelectProvider = useCallback((providerId) => {
-    setSelectedProviderIds(prev => {
+    setSelectedProviderIds((prev) => {
       if (prev.includes(providerId)) {
-        return prev.filter(id => id !== providerId);
+        return prev.filter((id) => id !== providerId);
       } else {
         return [...prev, providerId];
       }
     });
   }, []);
-  
+
   /**
    * Limpiar todas las selecciones
    */
   const clearSelection = useCallback(() => {
     setSelectedProviderIds([]);
   }, []);
-  
+
   // Cargar proveedores al iniciar
   useEffect(() => {
     if (user) {
@@ -401,9 +453,11 @@ export const useProveedores = () => {
         }
       } catch {}
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeWedding]);
-  
+
   // Aplicar filtros cuando cambien
   useEffect(() => {
     applyFilters();
@@ -421,9 +475,11 @@ export const useProveedores = () => {
         showNotification: false,
       }).catch(() => {});
     }, 300);
-    return () => { if (persistTimer.current) clearTimeout(persistTimer.current); };
+    return () => {
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+    };
   }, [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, activeWedding]);
-  
+
   return {
     // Estado
     providers,
@@ -459,14 +515,8 @@ export const useProveedores = () => {
     toggleSelectProvider,
     toggleFavoriteProvider,
     clearSelection,
-    clearFilters
+    clearFilters,
   };
 };
 
 export default useProveedores;
-
-
-
-
-
-

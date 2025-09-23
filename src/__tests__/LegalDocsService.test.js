@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { listTemplates, generateDocument, listDocuments } from '../services/LegalDocsService';
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
@@ -33,7 +34,10 @@ describe('LegalDocsService', () => {
       const body = JSON.parse(opts.body);
       expect(body.weddingId).toBe('w1');
       expect(body.payload).toEqual({ type: 'provider_contract', title: 'Contrato' });
-      return okJson({ success: true, document: { id: 'd1', pdfBase64: 'PD94bWw', meta: { title: 'Contrato' } } });
+      return okJson({
+        success: true,
+        document: { id: 'd1', pdfBase64: 'PD94bWw', meta: { title: 'Contrato' } },
+      });
     });
     const doc = await generateDocument('w1', { type: 'provider_contract', title: 'Contrato' });
     expect(doc.id).toBe('d1');

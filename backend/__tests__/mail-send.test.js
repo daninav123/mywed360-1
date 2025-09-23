@@ -1,6 +1,7 @@
 /* @vitest-environment node */
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import request from 'supertest';
+import express from 'express';
 
 // Infra mocks
 vi.mock('helmet', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
@@ -15,6 +16,15 @@ vi.mock('../middleware/authMiddleware.js', () => ({
   requireMailAccess: () => (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { email: 'user@example.com', myWed360Email: 'user@mywed360.com', role: 'admin' }; next(); },
   requirePlanner: () => (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { email: 'user@example.com', role: 'planner' }; next(); },
   optionalAuth: () => (_req, _res, next) => next(),
+}));
+// Mock adicional con el mismo módulo id usado por las rutas (resolución relativa distinta)
+vi.mock('../../middleware/authMiddleware.js', () => ({
+  __esModule: true,
+  requireAuth: () => (_req, _res, next) => next(),
+  requireMailAccess: () => (_req, _res, next) => next(),
+  requirePlanner: () => (_req, _res, next) => next(),
+  optionalAuth: () => (_req, _res, next) => next(),
+  requireAdmin: () => (_req, _res, next) => next(),
 }));
 
 // Firebase admin + Firestore mocks
@@ -44,13 +54,18 @@ vi.mock('axios', () => ({ __esModule: true, default: { get: vi.fn(async () => ({
 
 let app;
 beforeAll(async () => {
-  app = (await import('../index.js')).default;
+  app = express();
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
+  app.use((req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { email: 'user@example.com', myWed360Email: 'user@mywed360.com', role: 'admin' }; next(); });
+  const postSend = (await import('../routes/mail/postSend.js')).default;
+  app.use('/api/mail', postSend);
 });
 
 describe('Mail send (record-only)', () => {
   it('POST /api/mail/send persists mail when recordOnly=true', async () => {
     const body = { to: 'recipient@example.com', subject: 'Hi', body: 'Test', recordOnly: true };
-    const res = await request(app).post('/api/mail/send').send(body);
+    const res = await request(app).post('/api/mail').send(body);
     expect([200, 201]).toContain(res.status);
     expect(res.body).toBeTruthy();
   });

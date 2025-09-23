@@ -3,11 +3,12 @@ import { addTagToEmail, SYSTEM_TAGS } from './tagService';
 
 export function tagProviderEmail(emailId, providerId) {
   try {
-    const userRaw = (typeof window !== 'undefined' && window.localStorage)
-      ? window.localStorage.getItem('lovenda_user')
-      : null;
-    const userId = userRaw ? (JSON.parse(userRaw)?.uid || 'local') : 'local';
-    const providerTagId = (SYSTEM_TAGS.find(t => t.id === 'provider') || { id: 'provider' }).id;
+    const userRaw =
+      typeof window !== 'undefined' && window.localStorage
+        ? window.localStorage.getItem('lovenda_user')
+        : null;
+    const userId = userRaw ? JSON.parse(userRaw)?.uid || 'local' : 'local';
+    const providerTagId = (SYSTEM_TAGS.find((t) => t.id === 'provider') || { id: 'provider' }).id;
     addTagToEmail(userId, emailId, providerTagId);
     return true;
   } catch (e) {
@@ -15,4 +16,3 @@ export function tagProviderEmail(emailId, providerId) {
     return false;
   }
 }
-

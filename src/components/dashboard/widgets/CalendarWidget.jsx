@@ -6,36 +6,36 @@ export const CalendarWidget = ({ config }) => {
   const year = today.getFullYear();
   const daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(year, today.getMonth(), 1).getDay();
-  
+
   // Create array of days in month
   const days = [];
   for (let i = 1; i <= daysInMonth; i++) {
     days.push(i);
   }
-  
+
   // Add empty cells for days before the first day of the month
   const emptyCells = [];
   for (let i = 0; i < firstDayOfMonth; i++) {
     emptyCells.push(<div key={`empty-${i}`} className="h-8"></div>);
   }
-  
+
   return (
     <div className="h-full">
       <div className="text-center font-semibold mb-2">
         {month.charAt(0).toUpperCase() + month.slice(1)} {year}
       </div>
       <div className="grid grid-cols-7 gap-1 text-xs text-center">
-        {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(day => (
-          <div key={day} className="font-medium text-gray-500">{day}</div>
+        {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((day) => (
+          <div key={day} className="font-medium text-gray-500">
+            {day}
+          </div>
         ))}
         {emptyCells}
-        {days.map(day => (
-          <div 
-            key={day} 
+        {days.map((day) => (
+          <div
+            key={day}
             className={`h-8 flex items-center justify-center rounded-full ${
-              day === today.getDate() 
-                ? 'bg-blue-500 text-white' 
-                : 'hover:bg-gray-100'
+              day === today.getDate() ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'
             }`}
           >
             {day}

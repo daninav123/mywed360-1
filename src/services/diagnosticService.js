@@ -1,6 +1,3 @@
-
-
-
 /**
  * Servicio de Diagnóstico Avanzado para Backend y Servicios Externos
  * Proporciona funciones específicas para diagnosticar problemas comunes
@@ -20,17 +17,17 @@ class DiagnosticService {
    */
   async diagnoseEmailSystem() {
     console.group('📧 Diagnosticando Sistema de Emails');
-    
+
     const results = {
       mailgunConfig: await this.testMailgunConfig(),
       backendMailRoutes: await this.testBackendMailRoutes(),
       emailDatabase: await this.testEmailDatabase(),
-      webhooks: await this.testWebhooks()
+      webhooks: await this.testWebhooks(),
     };
 
     console.log('Resultados del diagnóstico de emails:', results);
     console.groupEnd();
-    
+
     return results;
   }
 
@@ -39,16 +36,16 @@ class DiagnosticService {
    */
   async diagnoseAIChat() {
     console.group('🤖 Diagnosticando Chat IA');
-    
+
     const results = {
       openaiConfig: await this.testOpenAIConfig(),
       backendAIRoutes: await this.testBackendAIRoutes(),
-      apiQuota: await this.checkAPIQuota()
+      apiQuota: await this.checkAPIQuota(),
     };
 
     console.log('Resultados del diagnóstico de IA:', results);
     console.groupEnd();
-    
+
     return results;
   }
 
@@ -57,17 +54,17 @@ class DiagnosticService {
    */
   async diagnoseFirebase() {
     console.group('🔥 Diagnosticando Firebase');
-    
+
     const results = {
       authentication: await this.testFirebaseAuth(),
       firestore: await this.testFirestoreConnection(),
       storage: await this.testFirebaseStorage(),
-      rules: await this.testFirestoreRules()
+      rules: await this.testFirestoreRules(),
     };
 
     console.log('Resultados del diagnóstico de Firebase:', results);
     console.groupEnd();
-    
+
     return results;
   }
 
@@ -79,12 +76,12 @@ class DiagnosticService {
       const apiKey = import.meta.env.VITE_MAILGUN_API_KEY;
       const domain = import.meta.env.VITE_MAILGUN_DOMAIN;
       const sendingDomain = import.meta.env.VITE_MAILGUN_SENDING_DOMAIN;
-      
+
       if (!apiKey || !domain) {
         return {
           status: 'error',
           message: 'Variables de Mailgun no configuradas',
-          details: { hasApiKey: !!apiKey, hasDomain: !!domain }
+          details: { hasApiKey: !!apiKey, hasDomain: !!domain },
         };
       }
 
@@ -92,13 +89,13 @@ class DiagnosticService {
       if (this.backendUrl) {
         // Intentar primero la ruta principal
         let response = await fetch(`${this.backendUrl}/api/mailgun/test`, {
-          method: 'GET'
+          method: 'GET',
         });
 
         // Si falla, intentar ruta de test simple
         if (!response.ok) {
           response = await fetch(`${this.backendUrl}/api/test/mailgun`, {
-            method: 'GET'
+            method: 'GET',
           });
         }
 
@@ -107,14 +104,14 @@ class DiagnosticService {
           return {
             status: 'success',
             message: 'Mailgun configurado correctamente',
-            details: { domain, sendingDomain, response: data }
+            details: { domain, sendingDomain, response: data },
           };
         } else {
           const error = await response.text();
           return {
             status: 'error',
             message: `Mailgun test falló con status ${response.status}`,
-            details: { error, domain, hasApiKey: !!apiKey, hasDomain: !!domain }
+            details: { error, domain, hasApiKey: !!apiKey, hasDomain: !!domain },
           };
         }
       }
@@ -122,14 +119,13 @@ class DiagnosticService {
       return {
         status: 'warning',
         message: 'Variables configuradas pero backend no disponible',
-        details: { domain, sendingDomain }
+        details: { domain, sendingDomain },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al probar Mailgun',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -141,41 +137,37 @@ class DiagnosticService {
     if (!this.backendUrl) {
       return {
         status: 'error',
-        message: 'URL del backend no configurada'
+        message: 'URL del backend no configurada',
       };
     }
 
-    const routes = [
-      '/api/mail/send',
-      '/api/mail/inbox',
-      '/api/mailgun/webhook'
-    ];
+    const routes = ['/api/mail/send', '/api/mail/inbox', '/api/mailgun/webhook'];
 
     const results = {};
 
     for (const route of routes) {
       try {
         const response = await fetch(`${this.backendUrl}${route}`, {
-          method: 'OPTIONS' // Usar OPTIONS para verificar que la ruta existe
+          method: 'OPTIONS', // Usar OPTIONS para verificar que la ruta existe
         });
-        
+
         results[route] = {
           status: response.status < 500 ? 'success' : 'error',
           statusCode: response.status,
-          headers: Object.fromEntries(response.headers.entries())
+          headers: Object.fromEntries(response.headers.entries()),
         };
       } catch (error) {
         results[route] = {
           status: 'error',
-          error: error.message
+          error: error.message,
         };
       }
     }
 
     return {
-      status: Object.values(results).some(r => r.status === 'error') ? 'warning' : 'success',
+      status: Object.values(results).some((r) => r.status === 'error') ? 'warning' : 'success',
       message: 'Test de rutas de email completado',
-      details: results
+      details: results,
     };
   }
 
@@ -184,7 +176,9 @@ class DiagnosticService {
    */
   async testEmailDatabase() {
     try {
-      const { getFirestore, collection, query, limit, getDocs } = await import('firebase/firestore');
+      const { getFirestore, collection, query, limit, getDocs } = await import(
+        'firebase/firestore'
+      );
       const db = getFirestore();
 
       // Intentar leer algunos emails de prueba
@@ -197,15 +191,14 @@ class DiagnosticService {
         message: 'Conexión con base de datos de emails OK',
         details: {
           documentsFound: snapshot.size,
-          collectionPath: 'emails'
-        }
+          collectionPath: 'emails',
+        },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al acceder a la base de datos de emails',
-        details: { error: error.message, code: error.code }
+        details: { error: error.message, code: error.code },
       };
     }
   }
@@ -217,7 +210,7 @@ class DiagnosticService {
     if (!this.backendUrl) {
       return {
         status: 'error',
-        message: 'Backend no disponible para test de webhooks'
+        message: 'Backend no disponible para test de webhooks',
       };
     }
 
@@ -228,22 +221,21 @@ class DiagnosticService {
         body: JSON.stringify({
           'event-data': {
             event: 'test',
-            message: { headers: { 'message-id': 'test-webhook' } }
-          }
-        })
+            message: { headers: { 'message-id': 'test-webhook' } },
+          },
+        }),
       });
 
       return {
         status: response.status === 200 ? 'success' : 'warning',
         message: `Webhook test: ${response.status}`,
-        details: { statusCode: response.status }
+        details: { statusCode: response.status },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al probar webhook',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -253,25 +245,30 @@ class DiagnosticService {
    */
   async testOpenAIConfig() {
     try {
-      const allowDirect = (import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true') || import.meta.env.DEV;
+      const allowDirect =
+        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
       if (!allowDirect) {
-        return { status: 'warning', message: 'OpenAI directo deshabilitado (usa backend /api/ai)', details: {} };
+        return {
+          status: 'warning',
+          message: 'OpenAI directo deshabilitado (usa backend /api/ai)',
+          details: {},
+        };
       }
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-      
+
       if (!apiKey) {
         return {
           status: 'error',
-          message: 'API Key de OpenAI no configurada'
+          message: 'API Key de OpenAI no configurada',
         };
       }
 
       // Test básico de la API
       const response = await fetch('https://api.openai.com/v1/models', {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -281,23 +278,22 @@ class DiagnosticService {
           message: 'OpenAI API configurada correctamente',
           details: {
             modelsAvailable: data.data?.length || 0,
-            keyPrefix: apiKey.substring(0, 10) + '...'
-          }
+            keyPrefix: apiKey.substring(0, 10) + '...',
+          },
         };
       } else {
         const error = await response.text();
         return {
           status: 'error',
           message: `Error en OpenAI API: ${response.status}`,
-          details: { error, status: response.status }
+          details: { error, status: response.status },
         };
       }
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al probar OpenAI',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -309,7 +305,7 @@ class DiagnosticService {
     if (!this.backendUrl) {
       return {
         status: 'error',
-        message: 'Backend no disponible'
+        message: 'Backend no disponible',
       };
     }
 
@@ -317,20 +313,19 @@ class DiagnosticService {
       const response = await fetch(`${this.backendUrl}/api/ai/test`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: 'test' })
+        body: JSON.stringify({ message: 'test' }),
       });
 
       return {
         status: response.ok ? 'success' : 'error',
         message: `Backend AI routes: ${response.status}`,
-        details: { statusCode: response.status }
+        details: { statusCode: response.status },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al probar rutas de IA',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -345,13 +340,13 @@ class DiagnosticService {
       return {
         status: 'info',
         message: 'Verificación de cuota requiere implementación específica',
-        details: { note: 'Implementar verificación de billing si es necesario' }
+        details: { note: 'Implementar verificación de billing si es necesario' },
       };
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al verificar cuota',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -369,15 +364,14 @@ class DiagnosticService {
         message: 'Firebase Auth inicializado',
         details: {
           currentUser: auth.currentUser?.uid || 'No authenticated user',
-          authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
-        }
+          authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error en Firebase Auth',
-        details: { error: error.message, code: error.code }
+        details: { error: error.message, code: error.code },
       };
     }
   }
@@ -398,15 +392,14 @@ class DiagnosticService {
         status: 'success',
         message: 'Firestore conectado correctamente',
         details: {
-          projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID
-        }
+          projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error de conexión con Firestore',
-        details: { error: error.message, code: error.code }
+        details: { error: error.message, code: error.code },
       };
     }
   }
@@ -418,7 +411,7 @@ class DiagnosticService {
     try {
       const { getStorage, ref } = await import('firebase/storage');
       const storage = getStorage();
-      
+
       // Crear una referencia de prueba
       const testRef = ref(storage, 'test/connection');
 
@@ -426,15 +419,14 @@ class DiagnosticService {
         status: 'success',
         message: 'Firebase Storage disponible',
         details: {
-          bucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET
-        }
+          bucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+        },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error en Firebase Storage',
-        details: { error: error.message, code: error.code }
+        details: { error: error.message, code: error.code },
       };
     }
   }
@@ -464,14 +456,13 @@ class DiagnosticService {
       return {
         status: 'success',
         message: 'Test de reglas completado',
-        details: { collections: results }
+        details: { collections: results },
       };
-
     } catch (error) {
       return {
         status: 'error',
         message: 'Error al probar reglas de Firestore',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -481,19 +472,18 @@ class DiagnosticService {
    */
   async runFullDiagnostic() {
     console.log('🔍 Iniciando diagnóstico completo del sistema...');
-    
+
     const results = {
       timestamp: new Date().toISOString(),
       email: await this.diagnoseEmailSystem(),
       ai: await this.diagnoseAIChat(),
-      firebase: await this.diagnoseFirebase()
+      firebase: await this.diagnoseFirebase(),
     };
 
     console.log('📊 Diagnóstico completo finalizado:', results);
-    
+
     return results;
   }
 }
 
 export default new DiagnosticService();
-

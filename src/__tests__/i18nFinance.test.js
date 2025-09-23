@@ -1,8 +1,9 @@
-import es from '../i18n/locales/es/common.json';
 import en from '../i18n/locales/en/common.json';
+import es from '../i18n/locales/es/common.json';
 import fr from '../i18n/locales/fr/common.json';
 
-const hasPath = (obj, path) => path.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : undefined), obj) !== undefined;
+const hasPath = (obj, path) =>
+  path.split('.').reduce((o, k) => (o && o[k] != null ? o[k] : undefined), obj) !== undefined;
 
 describe('i18n finance keys', () => {
   const requiredPaths = [
@@ -74,4 +75,3 @@ describe('i18n finance keys', () => {
     }
   });
 });
-

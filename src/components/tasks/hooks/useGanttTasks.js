@@ -1,8 +1,18 @@
 import { useMemo } from 'react';
+
 import { validateAndNormalizeDate, normalizeAnyDate, addMonths } from '../utils/dateUtils';
 
 export function useGanttNormalizedTasks(tasksState) {
-  const taskIdSet = useMemo(() => new Set((Array.isArray(tasksState) ? tasksState : []).filter(Boolean).map((t) => t?.id).filter(Boolean)), [tasksState]);
+  const taskIdSet = useMemo(
+    () =>
+      new Set(
+        (Array.isArray(tasksState) ? tasksState : [])
+          .filter(Boolean)
+          .map((t) => t?.id)
+          .filter(Boolean)
+      ),
+    [tasksState]
+  );
 
   const safeGanttTasks = useMemo(() => {
     if (!Array.isArray(tasksState)) return [];
@@ -13,7 +23,9 @@ export function useGanttNormalizedTasks(tasksState) {
         const start = validateAndNormalizeDate(task.start);
         const end = validateAndNormalizeDate(task.end);
         if (!start || !end) return null;
-        const deps = Array.isArray(task.dependencies) ? task.dependencies.filter((dep) => taskIdSet.has(dep)) : [];
+        const deps = Array.isArray(task.dependencies)
+          ? task.dependencies.filter((dep) => taskIdSet.has(dep))
+          : [];
         return {
           ...task,
           start,
@@ -27,7 +39,14 @@ export function useGanttNormalizedTasks(tasksState) {
         };
       })
       .filter(Boolean)
-      .filter((t) => t && t.start instanceof Date && t.end instanceof Date && !isNaN(t.start.getTime()) && !isNaN(t.end.getTime()))
+      .filter(
+        (t) =>
+          t &&
+          t.start instanceof Date &&
+          t.end instanceof Date &&
+          !isNaN(t.start.getTime()) &&
+          !isNaN(t.end.getTime())
+      )
       .map((t) => {
         const startRaw = t.start ?? t.startDate ?? t.date ?? t.when;
         const endRaw = t.end ?? t.endDate ?? t.until ?? t.finish ?? t.to;
@@ -43,7 +62,9 @@ export function useGanttNormalizedTasks(tasksState) {
     const seen = new Set();
     const out = [];
     for (const t of safeGanttTasks) {
-      const stableId = t.id || `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
+      const stableId =
+        t.id ||
+        `${t.name || t.title || 't'}-${t.start?.toISOString?.() ?? ''}-${t.end?.toISOString?.() ?? ''}`;
       if (!seen.has(stableId)) {
         seen.add(stableId);
         out.push({ ...t, id: stableId });
@@ -59,7 +80,8 @@ export function useGanttBoundedTasks(uniqueGanttTasks, projectStart, projectEnd,
   const bounded = useMemo(() => {
     const base = Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
     const out = [];
-    let startBound = projectStart instanceof Date && !isNaN(projectStart.getTime()) ? projectStart : null;
+    let startBound =
+      projectStart instanceof Date && !isNaN(projectStart.getTime()) ? projectStart : null;
     let endBound = projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : null;
 
     if (!endBound) {
@@ -111,11 +133,24 @@ export function useGanttBoundedTasks(uniqueGanttTasks, projectStart, projectEnd,
       const today = new Date();
       const start = addMonths(today, -1);
       const end = addMonths(today, 1);
-      out.push({ id: '__gantt_bounds_fallback', name: '', start, end, type: 'project', progress: 0, isDisabled: true, styles: { backgroundColor: 'transparent', backgroundSelectedColor: 'transparent', progressColor: 'transparent', progressSelectedColor: 'transparent' } });
+      out.push({
+        id: '__gantt_bounds_fallback',
+        name: '',
+        start,
+        end,
+        type: 'project',
+        progress: 0,
+        isDisabled: true,
+        styles: {
+          backgroundColor: 'transparent',
+          backgroundSelectedColor: 'transparent',
+          progressColor: 'transparent',
+          progressSelectedColor: 'transparent',
+        },
+      });
     }
     return out;
   }, [uniqueGanttTasks, projectStart, projectEnd, meetingsState]);
 
   return bounded;
 }
-

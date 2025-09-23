@@ -3,18 +3,18 @@ import React, { useState, useEffect } from 'react';
 /**
  * Wrapper para manejar componentes que pueden retornar Promesas
  * Previene el error "Objects are not valid as a React child (found: [object Promise])"
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Function} props.asyncFunction - Función async que retorna JSX
  * @param {React.ReactElement} props.fallback - Componente a mostrar mientras se resuelve la Promesa
  * @param {React.ReactElement} props.errorFallback - Componente a mostrar en caso de error
  * @returns {React.ReactElement} Componente renderizado correctamente
  */
-const AsyncWrapper = ({ 
-  asyncFunction, 
-  fallback = <div>Cargando...</div>, 
+const AsyncWrapper = ({
+  asyncFunction,
+  fallback = <div>Cargando...</div>,
   errorFallback = <div>Error al cargar contenido</div>,
-  ...props 
+  ...props
 }) => {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ const AsyncWrapper = ({
       try {
         setLoading(true);
         setError(null);
-        
+
         // Si asyncFunction es una función, ejecutarla
         if (typeof asyncFunction === 'function') {
           const result = await asyncFunction(props);

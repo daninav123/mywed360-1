@@ -41,5 +41,13 @@ export function addMonths(base, delta) {
   const targetMonth = ((targetMonthIndex % 12) + 12) % 12;
   const lastDay = new Date(targetYear, targetMonth + 1, 0).getDate();
   const day = Math.min(d.getDate(), lastDay);
-  return new Date(targetYear, targetMonth, day, d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds());
+  return new Date(
+    targetYear,
+    targetMonth,
+    day,
+    d.getHours(),
+    d.getMinutes(),
+    d.getSeconds(),
+    d.getMilliseconds()
+  );
 }

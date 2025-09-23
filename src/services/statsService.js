@@ -1,13 +1,13 @@
 /**
  * Servicio para recolectar y analizar estadísticas de uso del sistema de correo
- * Proporciona métricas sobre actividad de correo, patrones de comunicación, 
+ * Proporciona métricas sobre actividad de correo, patrones de comunicación,
  * distribución por etiquetas y carpetas, etc.
  */
 
+import { getAggregatedStats, getDailyStats } from './emailMetricsService';
 import { getMails } from './emailService';
 import { getUserFolders, getEmailsInFolder } from './folderService';
 import { getUserTags, getEmailsByTag, getEmailTagsDetails } from './tagService';
-import { getAggregatedStats, getDailyStats } from './emailMetricsService';
 
 /**
  * Almacena las estadísticas de correo del usuario en localStorage
@@ -42,7 +42,7 @@ const getUserStats = (userId) => {
  */
 const generateUserStats = async (userId) => {
   if (!userId) return {};
-  
+
   try {
     // Intentar obtener métricas agregadas desde Firestore
     const aggregated = await getAggregatedStats(userId);
@@ -56,10 +56,10 @@ const generateUserStats = async (userId) => {
     const inboxEmails = await getMails('inbox');
     const sentEmails = await getMails('sent');
     const trashEmails = await getMails('trash');
-    
+
     // Combinar todos los correos para análisis
     const allEmails = [...inboxEmails, ...sentEmails, ...trashEmails];
-    
+
     // Estructura para las estadísticas
     const stats = {
       lastUpdated: new Date().toISOString(),
@@ -68,24 +68,24 @@ const generateUserStats = async (userId) => {
         inbox: inboxEmails.length,
         sent: sentEmails.length,
         trash: trashEmails.length,
-        unread: inboxEmails.filter(email => !email.read).length
+        unread: inboxEmails.filter((email) => !email.read).length,
       },
       activityMetrics: calculateActivityMetrics(allEmails),
       folderDistribution: calculateFolderDistribution(userId, allEmails),
       tagDistribution: calculateTagDistribution(userId, allEmails),
       contactAnalysis: analyzeContacts(allEmails),
-      responseMetrics: calculateResponseMetrics(inboxEmails, sentEmails)
+      responseMetrics: calculateResponseMetrics(inboxEmails, sentEmails),
     };
-    
+
     // Guardar estadísticas en localStorage
     saveUserStats(userId, stats);
-    
+
     return stats;
   } catch (error) {
     console.error('Error al generar estadísticas:', error);
     return {
       error: true,
-      message: 'No se pudieron generar las estadísticas'
+      message: 'No se pudieron generar las estadísticas',
     };
   }
 };
@@ -101,22 +101,22 @@ const calculateActivityMetrics = (emails) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  
+
   const oneWeekAgo = new Date(today);
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  
+
   const oneMonthAgo = new Date(today);
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  
+
   // Inicializar contadores
   const metrics = {
     today: 0,
     yesterday: 0,
     thisWeek: 0,
     thisMonth: 0,
-    daily: {} // Para gráfico diario
+    daily: {}, // Para gráfico diario
   };
-  
+
   // Preparar estructura para gráfico diario (últimos 7 días)
   for (let i = 6; i >= 0; i--) {
     const date = new Date(today);
@@ -125,29 +125,29 @@ const calculateActivityMetrics = (emails) => {
     metrics.daily[dateStr] = {
       sent: 0,
       received: 0,
-      date: dateStr
+      date: dateStr,
     };
   }
-  
+
   // Analizar correos
-  emails.forEach(email => {
+  emails.forEach((email) => {
     if (!email.date) return;
-    
+
     const emailDate = new Date(email.date);
-    
+
     // Determinar si es enviado o recibido
     const isSent = email.from && email.from.includes('@lovenda.app');
-    
+
     // Contar por período
     if (emailDate >= today) {
       metrics.today++;
     } else if (emailDate >= yesterday) {
       metrics.yesterday++;
     }
-    
+
     if (emailDate >= oneWeekAgo) {
       metrics.thisWeek++;
-      
+
       // Agregar al gráfico diario
       const dateStr = emailDate.toISOString().split('T')[0];
       if (metrics.daily[dateStr]) {
@@ -158,15 +158,15 @@ const calculateActivityMetrics = (emails) => {
         }
       }
     }
-    
+
     if (emailDate >= oneMonthAgo) {
       metrics.thisMonth++;
     }
   });
-  
+
   // Convertir el objeto daily a un array para facilitar el renderizado
   metrics.dailyGraph = Object.values(metrics.daily);
-  
+
   return metrics;
 };
 
@@ -181,31 +181,31 @@ const calculateFolderDistribution = (userId, emails) => {
     system: {
       inbox: 0,
       sent: 0,
-      trash: 0
+      trash: 0,
     },
-    custom: []
+    custom: [],
   };
-  
+
   // Contar correos por carpeta del sistema
-  emails.forEach(email => {
+  emails.forEach((email) => {
     if (email.folder === 'inbox') folderDistribution.system.inbox++;
     else if (email.folder === 'sent') folderDistribution.system.sent++;
     else if (email.folder === 'trash') folderDistribution.system.trash++;
   });
-  
+
   // Obtener carpetas personalizadas
   const customFolders = getUserFolders(userId);
-  
+
   // Contar correos por carpeta personalizada
-  customFolders.forEach(folder => {
+  customFolders.forEach((folder) => {
     const folderEmails = getEmailsInFolder(userId, folder.id);
     folderDistribution.custom.push({
       id: folder.id,
       name: folder.name,
-      count: folderEmails.length
+      count: folderEmails.length,
     });
   });
-  
+
   return folderDistribution;
 };
 
@@ -218,27 +218,27 @@ const calculateFolderDistribution = (userId, emails) => {
 const calculateTagDistribution = (userId, emails) => {
   // Obtener todas las etiquetas disponibles
   const allTags = getUserTags(userId);
-  
+
   // Inicializar contadores para cada etiqueta
-  const tagStats = allTags.map(tag => ({
+  const tagStats = allTags.map((tag) => ({
     id: tag.id,
     name: tag.name,
     color: tag.color,
-    count: 0
+    count: 0,
   }));
-  
+
   // Contar correos por etiqueta
-  allTags.forEach(tag => {
+  allTags.forEach((tag) => {
     const taggedEmails = getEmailsByTag(userId, tag.id);
-    const tagStat = tagStats.find(ts => ts.id === tag.id);
+    const tagStat = tagStats.find((ts) => ts.id === tag.id);
     if (tagStat) {
       tagStat.count = taggedEmails.length;
     }
   });
-  
+
   // Ordenar por cantidad (mayor a menor)
   tagStats.sort((a, b) => b.count - a.count);
-  
+
   return tagStats;
 };
 
@@ -249,59 +249,65 @@ const calculateTagDistribution = (userId, emails) => {
  */
 const analyzeContacts = (emails) => {
   const contactMap = new Map();
-  
-  emails.forEach(email => {
+
+  emails.forEach((email) => {
     // Procesar remitente
     if (email.from && !email.from.includes('@lovenda.app')) {
       const senderName = extractNameFromEmail(email.from);
-      const senderContact = contactMap.get(senderName) || { 
-        name: senderName, 
-        sent: 0, 
+      const senderContact = contactMap.get(senderName) || {
+        name: senderName,
+        sent: 0,
         received: 0,
-        lastContact: null
+        lastContact: null,
       };
-      
+
       senderContact.received++;
-      
-      if (!senderContact.lastContact || new Date(email.date) > new Date(senderContact.lastContact)) {
+
+      if (
+        !senderContact.lastContact ||
+        new Date(email.date) > new Date(senderContact.lastContact)
+      ) {
         senderContact.lastContact = email.date;
       }
-      
+
       contactMap.set(senderName, senderContact);
     }
-    
+
     // Procesar destinatario
     if (email.to && !email.to.includes('@lovenda.app')) {
       const recipientName = extractNameFromEmail(email.to);
-      const recipientContact = contactMap.get(recipientName) || { 
-        name: recipientName, 
-        sent: 0, 
+      const recipientContact = contactMap.get(recipientName) || {
+        name: recipientName,
+        sent: 0,
         received: 0,
-        lastContact: null 
+        lastContact: null,
       };
-      
+
       recipientContact.sent++;
-      
-      if (!recipientContact.lastContact || new Date(email.date) > new Date(recipientContact.lastContact)) {
+
+      if (
+        !recipientContact.lastContact ||
+        new Date(email.date) > new Date(recipientContact.lastContact)
+      ) {
         recipientContact.lastContact = email.date;
       }
-      
+
       contactMap.set(recipientName, recipientContact);
     }
   });
-  
+
   // Convertir a array y ordenar por número total de interacciones
   const contacts = Array.from(contactMap.values())
-    .map(contact => ({
+    .map((contact) => ({
       ...contact,
-      total: contact.sent + contact.received
+      total: contact.sent + contact.received,
     }))
     .sort((a, b) => b.total - a.total);
-  
+
   return {
     topContacts: contacts.slice(0, 5),
     totalContacts: contacts.length,
-    contacts: contacts
+    contacts: contacts,
   };
 };
 
@@ -312,19 +318,19 @@ const analyzeContacts = (emails) => {
  */
 const extractNameFromEmail = (emailAddress) => {
   if (!emailAddress) return 'Desconocido';
-  
+
   // Si tiene formato "Nombre <email@ejemplo.com>"
   const match = emailAddress.match(/^([^<]+)\s*<([^>]+)>$/);
   if (match) {
     return match[1].trim();
   }
-  
+
   // Si es solo correo, extraer parte local
   const parts = emailAddress.split('@');
   if (parts.length === 2) {
     return parts[0];
   }
-  
+
   return emailAddress;
 };
 
@@ -337,24 +343,24 @@ const extractNameFromEmail = (emailAddress) => {
 const calculateResponseMetrics = (inboxEmails, sentEmails) => {
   // Mapear correos enviados por referencia a correo original (In-Reply-To)
   const repliesMap = new Map();
-  
-  sentEmails.forEach(email => {
+
+  sentEmails.forEach((email) => {
     if (email.inReplyTo) {
       repliesMap.set(email.inReplyTo, email);
     }
   });
-  
+
   // Analizar tiempos de respuesta
   let totalResponseTime = 0;
   let responseCount = 0;
-  
-  inboxEmails.forEach(receivedEmail => {
+
+  inboxEmails.forEach((receivedEmail) => {
     const reply = repliesMap.get(receivedEmail.id);
-    
+
     if (reply) {
       const receivedDate = new Date(receivedEmail.date);
       const replyDate = new Date(reply.date);
-      
+
       if (receivedDate && replyDate) {
         const responseTime = replyDate - receivedDate;
         totalResponseTime += responseTime;
@@ -362,19 +368,19 @@ const calculateResponseMetrics = (inboxEmails, sentEmails) => {
       }
     }
   });
-  
+
   // Calcular métricas
   const metrics = {
-    responseRate: inboxEmails.length > 0 ? (responseCount / inboxEmails.length) : 0,
-    averageResponseTime: responseCount > 0 ? (totalResponseTime / responseCount) : null,
+    responseRate: inboxEmails.length > 0 ? responseCount / inboxEmails.length : 0,
+    averageResponseTime: responseCount > 0 ? totalResponseTime / responseCount : null,
     responseCount: responseCount,
-    formattedAvgResponseTime: null
+    formattedAvgResponseTime: null,
   };
-  
+
   // Formatear tiempo de respuesta promedio en formato amigable
   if (metrics.averageResponseTime !== null) {
     const avgMinutes = Math.floor(metrics.averageResponseTime / (1000 * 60));
-    
+
     if (avgMinutes < 60) {
       metrics.formattedAvgResponseTime = `${avgMinutes} minutos`;
     } else if (avgMinutes < 24 * 60) {
@@ -383,12 +389,8 @@ const calculateResponseMetrics = (inboxEmails, sentEmails) => {
       metrics.formattedAvgResponseTime = `${Math.floor(avgMinutes / (60 * 24))} días`;
     }
   }
-  
+
   return metrics;
 };
 
-export {
-  generateUserStats,
-  getUserStats,
-  saveUserStats
-};
+export { generateUserStats, getUserStats, saveUserStats };

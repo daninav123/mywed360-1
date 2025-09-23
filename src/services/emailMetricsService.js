@@ -4,6 +4,7 @@
 // Si no existe el documento se devolverá null.
 
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+
 import { db } from '../lib/firebase';
 
 /**
@@ -40,7 +41,7 @@ export async function getDailyStats(userId, days = 30) {
     );
     const snap = await getDocs(q);
     const list = [];
-    snap.forEach(docSnap => {
+    snap.forEach((docSnap) => {
       list.push(docSnap.data());
     });
     // Devolver ordenado ascendente por fecha

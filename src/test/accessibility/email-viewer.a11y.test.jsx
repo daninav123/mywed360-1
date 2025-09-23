@@ -3,7 +3,9 @@
 
 // Mock genérico de lucide-react: exporta explícitamente los iconos usados
 vi.mock('lucide-react', () => {
-  const icon = (name) => (props) => <svg aria-hidden="true" data-testid={`${name}-icon`} {...props} />;
+  const icon = (name) => (props) => (
+    <svg aria-hidden="true" data-testid={`${name}-icon`} {...props} />
+  );
   return {
     __esModule: true,
     // EmailViewer / EmailList
@@ -27,13 +29,14 @@ vi.mock('lucide-react', () => {
   };
 });
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { BrowserRouter } from 'react-router-dom';
-import EmailView from '../../components/email/EmailView';
-import EmailList from '../../components/email/EmailList';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 import EmailFolderList from '../../components/email/EmailFolderList';
+import EmailList from '../../components/email/EmailList';
+import EmailView from '../../components/email/EmailView';
 
 // Extender las utilidades de prueba con el matcher de axe
 expect.extend(toHaveNoViolations);
@@ -99,9 +102,7 @@ const mockFolders = [
 ];
 
 // Wrapper para los componentes
-const TestWrapper = ({ children }) => (
-  <BrowserRouter>{children}</BrowserRouter>
-);
+const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
 
 describe('Pruebas de accesibilidad para visualización de correos', () => {
   beforeEach(() => {
@@ -121,7 +122,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onForward={vi.fn()}
           onDelete={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -137,7 +138,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onForward={vi.fn()}
           onDelete={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -161,7 +162,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onForward={vi.fn()}
           onDelete={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -180,7 +181,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onForward={vi.fn()}
           onDelete={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -203,7 +204,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           selectedEmail={null}
           onDeleteEmail={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -219,7 +220,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           selectedEmail={null}
           onDeleteEmail={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -242,7 +243,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           selectedEmail={null}
           onDeleteEmail={vi.fn()}
           onToggleStarred={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -264,7 +265,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onSelectFolder={vi.fn()}
           onCreateFolder={vi.fn()}
           onDeleteFolder={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -280,7 +281,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onSelectFolder={vi.fn()}
           onCreateFolder={vi.fn()}
           onDeleteFolder={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 
@@ -297,7 +298,7 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
           onSelectFolder={vi.fn()}
           onCreateFolder={vi.fn()}
           onDeleteFolder={vi.fn()}
-        />, 
+        />,
         { wrapper: TestWrapper }
       );
 

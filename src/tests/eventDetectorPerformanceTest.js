@@ -1,9 +1,9 @@
 /**
  * Script de prueba de rendimiento para el detector de eventos
- * 
+ *
  * Este script permite medir y comparar el rendimiento del detector de eventos
  * antes y después de las optimizaciones implementadas.
- * 
+ *
  * Ejecutar este script con Node.js para generar informes de rendimiento.
  */
 
@@ -31,39 +31,33 @@ function generateTestEmail(size) {
     '15-08-2025',
     '20 de septiembre de 2025',
     '5 de octubre',
-    '30 de noviembre de 2025'
+    '30 de noviembre de 2025',
   ];
-  
-  const timeTemplates = [
-    '10:30',
-    '15:45',
-    '20:15 PM',
-    '9:00 a.m.',
-    '18:30'
-  ];
-  
+
+  const timeTemplates = ['10:30', '15:45', '20:15 PM', '9:00 a.m.', '18:30'];
+
   const locationTemplates = [
     'en el Hotel Madrid',
     'en la Calle Principal 123',
     'ubicación: Centro de Eventos El Bosque',
     'lugar: Restaurante La Terraza',
-    'en Plaza Mayor'
+    'en Plaza Mayor',
   ];
-  
+
   const paragraphTemplates = [
     `Hola, te escribo para confirmarte nuestra reunión el {date} a las {time} {location}. Espero que puedas asistir.`,
     `Estimado cliente, nos complace invitarle al evento que tendrá lugar el {date} a las {time} {location}. Será una ocasión especial.`,
     `Recordatorio: la cita programada para el {date} a las {time} {location} sigue en pie. Por favor confirma asistencia.`,
     `Te informamos que la reunión del {date} ha sido reprogramada para las {time} {location}. Disculpa las molestias.`,
-    `La ceremonia se llevará a cabo el {date} comenzando puntualmente a las {time} {location}. Se ruega puntualidad.`
+    `La ceremonia se llevará a cabo el {date} comenzando puntualmente a las {time} {location}. Se ruega puntualidad.`,
   ];
-  
+
   const fillerText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. `;
-  
+
   // Generar el contenido del email
   let emailContent = '';
   let eventsCount = 0;
-  
+
   // Insertar eventos cada ~1000 caracteres
   while (emailContent.length < size) {
     // Añadir texto de relleno
@@ -71,40 +65,41 @@ function generateTestEmail(size) {
       Math.floor(Math.random() * 800) + 200,
       size - emailContent.length
     );
-    
+
     let filler = '';
     while (filler.length < fillerLength) {
       filler += fillerText;
     }
     emailContent += filler.substring(0, fillerLength);
-    
+
     // Si aún no hemos alcanzado el tamaño objetivo, insertar un evento
     if (emailContent.length < size) {
       // Seleccionar plantillas aleatorias
-      const paragraphTemplate = paragraphTemplates[Math.floor(Math.random() * paragraphTemplates.length)];
+      const paragraphTemplate =
+        paragraphTemplates[Math.floor(Math.random() * paragraphTemplates.length)];
       const date = dateTemplates[Math.floor(Math.random() * dateTemplates.length)];
       const time = timeTemplates[Math.floor(Math.random() * timeTemplates.length)];
       const location = locationTemplates[Math.floor(Math.random() * locationTemplates.length)];
-      
+
       // Construir párrafo con evento
       const eventParagraph = paragraphTemplate
         .replace('{date}', date)
         .replace('{time}', time)
         .replace('{location}', location);
-      
+
       emailContent += '\n\n' + eventParagraph + '\n\n';
       eventsCount++;
     }
   }
-  
+
   // Truncar al tamaño exacto si es necesario
   if (emailContent.length > size) {
     emailContent = emailContent.substring(0, size);
   }
-  
+
   return {
     content: emailContent,
-    eventsCount
+    eventsCount,
   };
 }
 
@@ -116,67 +111,69 @@ function generateTestEmail(size) {
 async function runPerformanceTests(emailSizes) {
   const results = {
     timestamp: new Date().toISOString(),
-    tests: []
+    tests: [],
   };
-  
+
   console.log('Iniciando pruebas de rendimiento de detección de eventos...');
-  
+
   for (const size of emailSizes) {
     console.log(`\nProbando email de ${size} caracteres...`);
-    
+
     // Generar email de prueba
     const { content, eventsCount } = generateTestEmail(size);
     console.log(`- Email generado con ${eventsCount} eventos potenciales`);
-    
+
     // Simular detección síncrona (método antiguo)
     console.log('- Simulando detección síncrona...');
     const startSync = performance.now();
-    
+
     // Simular procesamiento síncrono (sin chunks)
     // Solo medimos tiempo sin ejecutar realmente la lógica compleja
-    await new Promise(resolve => setTimeout(resolve, size * 0.0012)); // 1.2ms por cada 1000 caracteres
-    
+    await new Promise((resolve) => setTimeout(resolve, size * 0.0012)); // 1.2ms por cada 1000 caracteres
+
     const endSync = performance.now();
     const syncTime = endSync - startSync;
-    
+
     // Simular detección asíncrona con worker (método nuevo)
     console.log('- Simulando detección asíncrona con web worker...');
     const startAsync = performance.now();
-    
+
     // Dividir en chunks de 1000 caracteres
     const chunkSize = 1000;
     const chunks = [];
     for (let i = 0; i < content.length; i += chunkSize) {
       chunks.push(content.substring(i, i + chunkSize));
     }
-    
+
     // Simular procesamiento paralelo
-    await Promise.all(chunks.map(async (_chunk) => {
-      // Simular tiempo de procesamiento por chunk
-      await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 50));
-      return [];
-    }));
-    
+    await Promise.all(
+      chunks.map(async (_chunk) => {
+        // Simular tiempo de procesamiento por chunk
+        await new Promise((resolve) => setTimeout(resolve, 50 + Math.random() * 50));
+        return [];
+      })
+    );
+
     const endAsync = performance.now();
     const asyncTime = endAsync - startAsync;
-    
+
     // Calcular mejora
     const improvement = syncTime / asyncTime;
-    
+
     console.log(`- Tiempo síncrono: ${syncTime.toFixed(2)}ms`);
     console.log(`- Tiempo asíncrono: ${asyncTime.toFixed(2)}ms`);
     console.log(`- Mejora: ${improvement.toFixed(2)}x más rápido`);
-    
+
     // Añadir resultados
     results.tests.push({
       emailSize: size,
       eventsCount,
       syncTime,
       asyncTime,
-      improvement
+      improvement,
     });
   }
-  
+
   return results;
 }
 
@@ -187,7 +184,7 @@ async function runPerformanceTests(emailSizes) {
 function saveResults(results) {
   const filename = `event-detector-performance-${new Date().toISOString().replace(/:/g, '-')}.json`;
   const filepath = path.join(RESULTS_DIR, filename);
-  
+
   fs.writeFileSync(filepath, JSON.stringify(results, null, 2));
   console.log(`\nResultados guardados en ${filepath}`);
 }
@@ -199,13 +196,13 @@ function saveResults(results) {
 function generateReport(results) {
   const reportFilename = `event-detector-performance-report-${new Date().toISOString().replace(/:/g, '-')}.html`;
   const reportFilepath = path.join(RESULTS_DIR, reportFilename);
-  
+
   // Datos para gráficos
-  const sizes = results.tests.map(test => test.emailSize);
-  const syncTimes = results.tests.map(test => test.syncTime);
-  const asyncTimes = results.tests.map(test => test.asyncTime);
-  const improvements = results.tests.map(test => test.improvement);
-  
+  const sizes = results.tests.map((test) => test.emailSize);
+  const syncTimes = results.tests.map((test) => test.syncTime);
+  const asyncTimes = results.tests.map((test) => test.asyncTime);
+  const improvements = results.tests.map((test) => test.improvement);
+
   // Crear HTML
   const html = `<!DOCTYPE html>
 <html lang="es">
@@ -288,7 +285,9 @@ function generateReport(results) {
       </tr>
     </thead>
     <tbody>
-      ${results.tests.map(test => `
+      ${results.tests
+        .map(
+          (test) => `
       <tr>
         <td>${test.emailSize.toLocaleString()} caracteres</td>
         <td>${test.eventsCount}</td>
@@ -296,7 +295,9 @@ function generateReport(results) {
         <td>${test.asyncTime.toFixed(2)} ms</td>
         <td>${test.improvement.toFixed(2)}x</td>
       </tr>
-      `).join('')}
+      `
+        )
+        .join('')}
     </tbody>
   </table>
   
@@ -306,7 +307,7 @@ function generateReport(results) {
     const timeChart = new Chart(timeCtx, {
       type: 'bar',
       data: {
-        labels: ${JSON.stringify(sizes.map(size => `${size.toLocaleString()} caracteres`))},
+        labels: ${JSON.stringify(sizes.map((size) => `${size.toLocaleString()} caracteres`))},
         datasets: [
           {
             label: 'Tiempo Síncrono (ms)',
@@ -350,7 +351,7 @@ function generateReport(results) {
     const improvementChart = new Chart(improvementCtx, {
       type: 'line',
       data: {
-        labels: ${JSON.stringify(sizes.map(size => `${size.toLocaleString()} caracteres`))},
+        labels: ${JSON.stringify(sizes.map((size) => `${size.toLocaleString()} caracteres`))},
         datasets: [{
           label: 'Factor de Mejora',
           data: ${JSON.stringify(improvements)},
@@ -384,10 +385,10 @@ function generateReport(results) {
   </script>
 </body>
 </html>`;
-  
+
   fs.writeFileSync(reportFilepath, html);
   console.log(`Informe HTML generado en ${reportFilepath}`);
-  
+
   return reportFilepath;
 }
 
@@ -397,21 +398,21 @@ function generateReport(results) {
 async function main() {
   // Tamaños de emails a probar (caracteres)
   const emailSizes = [1000, 2500, 5000, 10000, 20000, 50000];
-  
+
   // Ejecutar pruebas
   const results = await runPerformanceTests(emailSizes);
-  
+
   // Guardar resultados
   saveResults(results);
-  
+
   // Generar informe
   const reportPath = generateReport(results);
-  
+
   console.log('\nPrueba de rendimiento completada.');
   console.log(`Para ver el informe, abre el archivo: ${reportPath}`);
 }
 
 // Ejecutar el script
-main().catch(error => {
+main().catch((error) => {
   console.error('Error al ejecutar las pruebas:', error);
 });

@@ -1,8 +1,16 @@
+import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, getFirestore, connectFirestoreEmulator, doc, setDoc, enableIndexedDbPersistence, enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
-import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getDatabase, ref, onValue } from 'firebase/database';
+import {
+  initializeFirestore,
+  getFirestore,
+  connectFirestoreEmulator,
+  doc,
+  setDoc,
+  enableIndexedDbPersistence,
+  enableMultiTabIndexedDbPersistence,
+} from 'firebase/firestore';
 
 // Configuración de Firebase desde variables de entorno (sin secretos hard-coded)
 const firebaseConfig = {
@@ -16,7 +24,9 @@ const firebaseConfig = {
 };
 
 if (typeof window !== 'undefined') {
-  const missing = Object.entries(firebaseConfig).filter(([_, v]) => !v).map(([k]) => k);
+  const missing = Object.entries(firebaseConfig)
+    .filter(([_, v]) => !v)
+    .map(([k]) => k);
   if (missing.length) {
     // Aviso en consola para facilitar configuración local
     // No expone valores; solo lista claves faltantes
@@ -39,11 +49,15 @@ const probarConexionFirestore = async (maxReintentos = 2) => {
   for (let intento = 0; intento <= maxReintentos; intento++) {
     try {
       const docPrueba = doc(db, '_conexion_prueba', 'test');
-      await setDoc(docPrueba, { timestamp: new Date().toISOString(), intento: intento + 1 }, { merge: true });
+      await setDoc(
+        docPrueba,
+        { timestamp: new Date().toISOString(), intento: intento + 1 },
+        { merge: true }
+      );
       return true;
     } catch (error) {
       if (intento === maxReintentos) throw error;
-      await new Promise(resolver => setTimeout(resolver, 1000 * Math.pow(2, intento)));
+      await new Promise((resolver) => setTimeout(resolver, 1000 * Math.pow(2, intento)));
     }
   }
   return false;
@@ -111,14 +125,19 @@ const inicializarFirebase = async () => {
 
     // Persistencia offline
     try {
-            if (typeof enableMultiTabIndexedDbPersistence === 'function') {
+      if (typeof enableMultiTabIndexedDbPersistence === 'function') {
         await enableMultiTabIndexedDbPersistence(db);
       } else {
         await enableIndexedDbPersistence(db);
       }
     } catch (err) {
       if (err.code === 'failed-precondition') {
-        console.warn('No se pudo habilitar multi‑tab (otra pestaña es dueña). Intentando modo single‑tab...'); try { await enableIndexedDbPersistence(db); } catch {}
+        console.warn(
+          'No se pudo habilitar multi‑tab (otra pestaña es dueña). Intentando modo single‑tab...'
+        );
+        try {
+          await enableIndexedDbPersistence(db);
+        } catch {}
       } else if (err.code === 'unimplemented') {
         console.warn('Este navegador no soporta persistencia offline');
       } else {
@@ -155,7 +174,8 @@ const inicializarFirebase = async () => {
         }
       }
     } catch (error) {
-      let errorMsg = 'Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión';
+      let errorMsg =
+        'Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión';
       if (error.code === 'unavailable') {
         errorMsg = 'Firebase no disponible. Verifica tu conexión a internet.';
       } else if (error.message && error.message.includes('network')) {
@@ -183,7 +203,10 @@ const inicializarFirebase = async () => {
   } catch (error) {
     console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
-      window.mostrarErrorUsuario('Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.', 0);
+      window.mostrarErrorUsuario(
+        'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
+        0
+      );
     }
     throw error;
   }
@@ -196,4 +219,3 @@ const firebaseReady = inicializarFirebase().catch((error) => {
 });
 
 export { auth, db, analytics, firebaseReady };
-

@@ -8,7 +8,27 @@ import { cleanup } from '@testing-library/react';
 // Mock de base de datos Firestore para todas las pruebas
 vi.mock('./db.js', () => ({
   __esModule: true,
-  db: { collection: () => ({}) },
+  db: {
+    collection: () => ({
+      add: async (doc) => ({ id: 'test-id', doc }),
+      doc: () => ({ set: async () => {}, update: async () => {} }),
+      where: () => ({
+        limit: () => ({ get: async () => ({ empty: true, docs: [] }) }),
+        get: async () => ({ empty: true, docs: [] }),
+      }),
+      get: async () => ({ empty: true, docs: [] }),
+    }),
+  },
+}));
+
+// Mock del middleware de auth para que index.js y rutas no fallen por requireAdmin
+vi.mock('./middleware/authMiddleware.js', () => ({
+  __esModule: true,
+  requireAuth: () => (_req, _res, next) => next(),
+  requireMailAccess: () => (_req, _res, next) => next(),
+  requirePlanner: () => (_req, _res, next) => next(),
+  optionalAuth: () => (_req, _res, next) => next(),
+  requireAdmin: () => (_req, _res, next) => next(),
 }));
 
 // Mock del SDK cliente de Firestore solo en entorno jsdom (evitar interferir con pruebas de reglas en entorno node)

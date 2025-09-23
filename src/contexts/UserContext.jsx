@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+
 import { useAuth } from '../hooks/useAuth';
 
 // Contexto específico para preferencias de usuario y datos de perfil
@@ -17,7 +18,7 @@ export const UserPreferencesProvider = ({ children }) => {
   const [userPreferences, setUserPreferences] = useState({
     emailNotifications: true,
     theme: 'light',
-    language: 'es'
+    language: 'es',
   });
 
   // Actualizar el usuario cuando cambia la autenticación
@@ -36,9 +37,9 @@ export const UserPreferencesProvider = ({ children }) => {
 
   // Función para actualizar las preferencias del usuario
   const updatePreferences = (newPreferences) => {
-    setUserPreferences(prev => ({
+    setUserPreferences((prev) => ({
       ...prev,
-      ...newPreferences
+      ...newPreferences,
     }));
     // Aquí podríamos guardar las preferencias en algún almacenamiento persistente
   };
@@ -47,13 +48,11 @@ export const UserPreferencesProvider = ({ children }) => {
   const value = {
     currentUser,
     userPreferences,
-    updatePreferences
+    updatePreferences,
   };
 
   return (
-    <UserPreferencesContext.Provider value={value}>
-      {children}
-    </UserPreferencesContext.Provider>
+    <UserPreferencesContext.Provider value={value}>{children}</UserPreferencesContext.Provider>
   );
 };
 

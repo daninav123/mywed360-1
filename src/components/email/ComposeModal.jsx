@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
+
+import EmailRecommendationService from '../../services/EmailRecommendationService';
+import { sendMail } from '../../services/emailService';
+import { uploadEmailAttachments } from '../../services/storageUploadService';
+import Alert from '../ui/Alert';
 import Button from '../ui/Button';
 import Spinner from '../ui/Spinner';
-import Alert from '../ui/Alert';
-import { uploadEmailAttachments } from '../../services/storageUploadService';
-import { sendMail } from '../../services/emailService';
-import EmailRecommendationService from '../../services/EmailRecommendationService';
 
 export default function ComposeModal({ onClose, from, initial = {}, userId = null }) {
   const [to, setTo] = useState(initial.to || '');
@@ -26,21 +27,25 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
 
   const handleFiles = (files) => {
     try {
-      const arr = Array.from(files || []).map(f => ({ file: f, filename: f.name, size: f.size }));
-      setAttachments(prev => [...prev, ...arr]);
+      const arr = Array.from(files || []).map((f) => ({ file: f, filename: f.name, size: f.size }));
+      setAttachments((prev) => [...prev, ...arr]);
     } catch {}
   };
   const removeAttachment = (idx) => {
-    setAttachments(prev => prev.filter((_, i) => i !== idx));
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleSend = async () => {
     setSending(true);
     setError(null);
     try {
-      const uploaded = attachments && attachments.length
-        ? await uploadEmailAttachments(attachments.map(a => a.file).filter(Boolean), userId || 'anon')
-        : [];
+      const uploaded =
+        attachments && attachments.length
+          ? await uploadEmailAttachments(
+              attachments.map((a) => a.file).filter(Boolean),
+              userId || 'anon'
+            )
+          : [];
       await sendMail({ to, subject, body, attachments: uploaded.length ? uploaded : attachments });
       onClose();
     } catch (err) {
@@ -81,7 +86,9 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
                   type="button"
                   className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-2 py-1 rounded"
                   onClick={() => setSubject(sug)}
-                >{sug}</button>
+                >
+                  {sug}
+                </button>
               ))}
             </div>
           )}
@@ -99,13 +106,20 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
           )}
           <div>
             <div className="mb-2 text-sm font-medium text-gray-700">Adjuntos</div>
-            <input type="file" multiple onChange={(e)=> handleFiles(e.target.files)} />
+            <input type="file" multiple onChange={(e) => handleFiles(e.target.files)} />
             {attachments.length > 0 && (
               <div className="mt-2 space-y-1">
                 {attachments.map((a, i) => (
-                  <div key={`${a.filename}-${i}`} className="flex items-center justify-between rounded border px-2 py-1 text-xs">
-                    <span className="truncate">{a.filename} ({Math.round((a.size||0)/1024)} KB)</span>
-                    <button className="text-red-600" onClick={()=> removeAttachment(i)}>Quitar</button>
+                  <div
+                    key={`${a.filename}-${i}`}
+                    className="flex items-center justify-between rounded border px-2 py-1 text-xs"
+                  >
+                    <span className="truncate">
+                      {a.filename} ({Math.round((a.size || 0) / 1024)} KB)
+                    </span>
+                    <button className="text-red-600" onClick={() => removeAttachment(i)}>
+                      Quitar
+                    </button>
                   </div>
                 ))}
               </div>
@@ -124,4 +138,3 @@ export default function ComposeModal({ onClose, from, initial = {}, userId = nul
     </div>
   );
 }
-

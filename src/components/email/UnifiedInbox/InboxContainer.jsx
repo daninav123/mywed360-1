@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
+import EmailDetail from './EmailDetail';
+import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import EmailService, { setAuthContext } from '../../../services/emailService';
-import EmailList from './EmailList';
-import EmailDetail from './EmailDetail';
 import EmailComposer from '../EmailComposer';
 
 /**
@@ -14,23 +15,23 @@ const InboxContainer = () => {
   const authContext = useAuth();
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
-  
+
   // Establecer el contexto de autenticación en EmailService
   useEffect(() => {
     setAuthContext(authContext);
   }, [authContext]);
 
-  
   // Estados para datos de emails
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [folder, setFolder] = useState('inbox'); // 'inbox' | 'sent'
 
   // Cargar emails al montar el componente
-  const refreshEmails = useCallback(async () => {
+  const refreshEmails = useCallback(async (targetFolder = folder) => {
     try {
       setLoading(true);
-      const res = await EmailService.getMails('inbox');
+      const res = await EmailService.getMails(targetFolder);
 
       if (Array.isArray(res)) {
         setEmails(res);
@@ -51,7 +52,7 @@ const InboxContainer = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [folder]);
 
   // Inicializar EmailService al tener usuario y refrescar lista
   useEffect(() => {
@@ -61,7 +62,7 @@ const InboxContainer = () => {
         try {
           await EmailService.initEmailService({ email: user.email, ...user });
           if (!cancelled) {
-            await refreshEmails();
+            await refreshEmails(folder);
           }
         } catch (err) {
           console.error('Error inicializando EmailService:', err);
@@ -70,14 +71,16 @@ const InboxContainer = () => {
       }
     };
     initAndLoad();
-    return () => { cancelled = true; };
-  }, [user, refreshEmails]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, folder, refreshEmails]);
 
   // Marcar email como leído
   const markAsRead = useCallback(async (emailId) => {
     try {
       await EmailService.markAsRead(emailId);
-      setEmails(prev => prev.map(e => e.id === emailId ? { ...e, read: true } : e));
+      setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
     } catch (err) {
       console.error('Error marcando como leído:', err);
     }
@@ -87,13 +90,13 @@ const InboxContainer = () => {
   const deleteEmail = useCallback(async (emailId) => {
     try {
       await EmailService.deleteMail(emailId);
-      setEmails(prev => prev.filter(e => e.id !== emailId));
+      setEmails((prev) => prev.filter((e) => e.id !== emailId));
     } catch (err) {
       console.error('Error eliminando email:', err);
       throw err;
     }
   }, []);
-  
+
   // Estados locales
   const [selectedEmailId, setSelectedEmailId] = useState(null);
   const [showComposer, setShowComposer] = useState(false);
@@ -105,72 +108,85 @@ const InboxContainer = () => {
   const safeEmails = Array.isArray(emails) ? emails : [];
 
   // Email seleccionado
-  const selectedEmail = selectedEmailId ? safeEmails.find(email => email.id === selectedEmailId) : null;
+  const selectedEmail = selectedEmailId
+    ? safeEmails.find((email) => email.id === selectedEmailId)
+    : null;
 
   // Filtrar emails según búsqueda y estado
-  const filteredEmails = safeEmails.filter(email => {
-    const matchesSearch = !searchTerm || 
+  const filteredEmails = safeEmails.filter((email) => {
+    const matchesSearch =
+      !searchTerm ||
       email.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       email.from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       email.body?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterStatus === 'all' || 
+
+    const matchesFilter =
+      filterStatus === 'all' ||
       (filterStatus === 'read' && email.read) ||
       (filterStatus === 'unread' && !email.read);
-    
+
     return matchesSearch && matchesFilter;
   });
 
   // Handlers
-  const handleEmailSelect = useCallback((emailId) => {
-    setSelectedEmailId(emailId);
-    setViewMode('detail');
-    
-    // Marcar como leído si no lo está
-    const email = emails.find(e => e.id === emailId);
-    if (email && !email.read) {
-      markAsRead(emailId);
-    }
-  }, [safeEmails, markAsRead]);
+  const handleEmailSelect = useCallback(
+    (emailId) => {
+      setSelectedEmailId(emailId);
+      setViewMode('detail');
 
-  const handleEmailDelete = useCallback(async (emailId) => {
-    try {
-      await deleteEmail(emailId);
-      if (selectedEmailId === emailId) {
-        setSelectedEmailId(null);
-        setViewMode('list');
+      // Marcar como leído si no lo está
+      const email = emails.find((e) => e.id === emailId);
+      if (email && !email.read) {
+        markAsRead(emailId);
       }
-    } catch (error) {
-      console.error('Error al eliminar email:', error);
-    }
-  }, [deleteEmail, selectedEmailId, safeEmails]);
+    },
+    [safeEmails, markAsRead]
+  );
+
+  const handleEmailDelete = useCallback(
+    async (emailId) => {
+      try {
+        await deleteEmail(emailId);
+        if (selectedEmailId === emailId) {
+          setSelectedEmailId(null);
+          setViewMode('list');
+        }
+      } catch (error) {
+        console.error('Error al eliminar email:', error);
+      }
+    },
+    [deleteEmail, selectedEmailId, safeEmails]
+  );
 
   const handleBackToList = useCallback(() => {
     setSelectedEmailId(null);
     setViewMode('list');
   }, []);
 
-  const handleSendEmail = useCallback(async (emailData) => {
-    try {
-      // ✅ Usar EmailService directamente sin safeRender para evitar Promise rendering
-      const result = await EmailService.sendEmail(emailData);
-      
-      if (result && result.success) {
-        setShowComposer(false);
-        await refreshEmails(); // Refrescar lista tras envío
-        
-        // Track operation si está disponible
+  const handleSendEmail = useCallback(
+    async (emailData) => {
+      try {
+        // ✅ Usar EmailService directamente sin safeRender para evitar Promise rendering
+        const result = await EmailService.sendEmail(emailData);
+
+        if (result && result.success) {
+          setShowComposer(false);
+          await refreshEmails(); // Refrescar lista tras envío
+
+          // Track operation si está disponible
+          if (trackOperation) {
+            trackOperation('email_sent', { success: true });
+          }
+        }
+      } catch (error) {
+        console.error('Error al enviar email:', error);
         if (trackOperation) {
-          trackOperation('email_sent', { success: true });
+          trackOperation('email_sent', { success: false, error: error.message });
         }
       }
-    } catch (error) {
-      console.error('Error al enviar email:', error);
-      if (trackOperation) {
-        trackOperation('email_sent', { success: false, error: error.message });
-      }
-    }
-  }, [refreshEmails, trackOperation]);
+    },
+    [refreshEmails, trackOperation]
+  );
 
   // Estados de carga y error
   if (loading) {
@@ -189,7 +205,7 @@ const InboxContainer = () => {
       <div className="flex items-center justify-center h-full">
         <div className="text-center text-red-600">
           <p>Error: {error}</p>
-          <button 
+          <button
             onClick={refreshEmails}
             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
@@ -206,7 +222,7 @@ const InboxContainer = () => {
       <div className="bg-white p-4 border-b shadow-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-gray-800">Bandeja de entrada</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Bandeja unificada</h1>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowComposer(true)}
@@ -223,7 +239,7 @@ const InboxContainer = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Barra de búsqueda y filtros */}
           <div className="flex items-center space-x-4">
             <div className="flex-1">
@@ -245,7 +261,7 @@ const InboxContainer = () => {
               <option value="read">Leídos</option>
             </select>
           </div>
-          
+
           {user?.email && (
             <p className="text-sm text-gray-600 mt-2">
               Usuario: {user.email} | {filteredEmails.length} emails
@@ -253,7 +269,7 @@ const InboxContainer = () => {
           )}
         </div>
       </div>
-      
+
       {/* Contenido principal */}
       <div className="flex-1 flex overflow-hidden">
         {viewMode === 'list' || !selectedEmail ? (
@@ -280,7 +296,7 @@ const InboxContainer = () => {
           </div>
         )}
       </div>
-      
+
       {/* Composer modal */}
       {showComposer && (
         <EmailComposer

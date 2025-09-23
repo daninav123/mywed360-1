@@ -1,7 +1,8 @@
+import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useState, useEffect, useCallback, useRef } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
-import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 
 /*
   Hook: useSpecialMoments
@@ -21,9 +22,7 @@ const defaultData = {
     { id: 5, order: 5, title: 'Intercambio de Anillos', song: '' },
     { id: 6, order: 6, title: 'Salida', song: '' },
   ],
-  coctail: [
-    { id: 7, order: 1, title: 'Entrada', song: '' },
-  ],
+  coctail: [{ id: 7, order: 1, title: 'Entrada', song: '' }],
   banquete: [
     { id: 8, order: 1, title: 'Entrada Novios', song: '' },
     { id: 9, order: 2, title: 'Corte Pastel', song: '' },
@@ -59,7 +58,13 @@ export default function useSpecialMoments() {
     } catch {}
 
     // Firestore: evitar loops comparando con último snapshot remoto
-    const json = (() => { try { return JSON.stringify(moments); } catch { return null; } })();
+    const json = (() => {
+      try {
+        return JSON.stringify(moments);
+      } catch {
+        return null;
+      }
+    })();
     if (!activeWedding || !json) return;
     if (lastRemoteRef.current === json) return; // Sin cambios efectivos respecto a remoto
 
@@ -85,7 +90,9 @@ export default function useSpecialMoments() {
     if (!activeWedding) {
       // Si no hay boda activa, cancelar cualquier suscripción previa
       if (unsubRef.current) {
-        try { unsubRef.current(); } catch {}
+        try {
+          unsubRef.current();
+        } catch {}
         unsubRef.current = null;
       }
       return;
@@ -108,14 +115,16 @@ export default function useSpecialMoments() {
     unsubRef.current = unsub;
     return () => {
       if (unsubRef.current) {
-        try { unsubRef.current(); } catch {}
+        try {
+          unsubRef.current();
+        } catch {}
         unsubRef.current = null;
       }
     };
   }, [activeWedding]);
 
   const addMoment = useCallback((blockId, moment) => {
-    setMoments(prev => {
+    setMoments((prev) => {
       const next = { ...prev };
       next[blockId] = [...(prev[blockId] || []), { ...moment, id: Date.now() }];
       return next;
@@ -123,26 +132,28 @@ export default function useSpecialMoments() {
   }, []);
 
   const removeMoment = useCallback((blockId, momentId) => {
-    setMoments(prev => {
+    setMoments((prev) => {
       const next = { ...prev };
-      next[blockId] = prev[blockId].filter(m => m.id !== momentId);
+      next[blockId] = prev[blockId].filter((m) => m.id !== momentId);
       return next;
     });
   }, []);
 
   const updateMoment = useCallback((blockId, momentId, changes) => {
-    setMoments(prev => {
+    setMoments((prev) => {
       const next = { ...prev };
-      next[blockId] = (prev[blockId] || []).map(m => m.id === momentId ? { ...m, ...changes } : m);
+      next[blockId] = (prev[blockId] || []).map((m) =>
+        m.id === momentId ? { ...m, ...changes } : m
+      );
       return next;
     });
   }, []);
 
   // Reordenar (arriba/abajo) un momento dentro de su bloque
-  const reorderMoment = useCallback((blockId, momentId, direction='up') => {
-    setMoments(prev => {
+  const reorderMoment = useCallback((blockId, momentId, direction = 'up') => {
+    setMoments((prev) => {
       const current = prev[blockId] || [];
-      const idx = current.findIndex(m => m.id === momentId);
+      const idx = current.findIndex((m) => m.id === momentId);
       if (idx === -1) return prev;
       const newIdx = direction === 'up' ? idx - 1 : idx + 1;
       if (newIdx < 0 || newIdx >= current.length) return prev;
@@ -154,12 +165,11 @@ export default function useSpecialMoments() {
     });
   }, []);
 
-  
   // Mover un momento a una posición concreta dentro de su mismo bloque
   const moveMoment = useCallback((blockId, momentId, toIndex) => {
-    setMoments(prev => {
+    setMoments((prev) => {
       const list = prev[blockId] || [];
-      const idx = list.findIndex(m => m.id === momentId);
+      const idx = list.findIndex((m) => m.id === momentId);
       if (idx === -1 || toIndex < 0 || toIndex >= list.length) return prev;
       const reordered = [...list];
       const [item] = reordered.splice(idx, 1);
@@ -172,9 +182,9 @@ export default function useSpecialMoments() {
 
   const duplicateMoment = useCallback((fromBlock, momentId, toBlock) => {
     if (fromBlock === toBlock) return;
-    setMoments(prev => {
+    setMoments((prev) => {
       const sourceList = prev[fromBlock] || [];
-      const moment = sourceList.find(m => m.id === momentId);
+      const moment = sourceList.find((m) => m.id === momentId);
       if (!moment) return prev;
       const destList = prev[toBlock] || [];
       const copy = { ...moment, id: Date.now(), order: destList.length + 1 };
@@ -182,5 +192,13 @@ export default function useSpecialMoments() {
     });
   }, []);
 
-  return { moments, addMoment, removeMoment, updateMoment, reorderMoment, moveMoment, duplicateMoment };
+  return {
+    moments,
+    addMoment,
+    removeMoment,
+    updateMoment,
+    reorderMoment,
+    moveMoment,
+    duplicateMoment,
+  };
 }

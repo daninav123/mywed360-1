@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../firebaseConfig';
 import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
-import { post as apiPost } from '../services/apiClient';
+import React, { useEffect, useState } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
+import { post as apiPost } from '../services/apiClient';
 import { evaluateTrigger } from '../services/AutomationRulesService';
 import { addNotification } from '../services/notificationService';
 
@@ -27,20 +28,27 @@ export default function RSVPDashboard() {
     if (!activeWedding) return;
     setLoadingPending(true);
     const q = query(collection(db, 'weddings', activeWedding, 'guests'));
-    const unsub = onSnapshot(q, (snap) => {
-      try {
-        const items = [];
-        snap.forEach(d => {
-          const g = d.data() || {};
-          const s = String(g.status || '').toLowerCase();
-          const isPending = (!s || s === 'pending') && !(s === 'confirmed' || s === 'accepted') && !(s === 'declined' || s === 'rejected');
-          if (isPending) items.push({ id: d.id, ...g });
-        });
-        setPendingGuests(items);
-      } finally {
-        setLoadingPending(false);
-      }
-    }, () => setLoadingPending(false));
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        try {
+          const items = [];
+          snap.forEach((d) => {
+            const g = d.data() || {};
+            const s = String(g.status || '').toLowerCase();
+            const isPending =
+              (!s || s === 'pending') &&
+              !(s === 'confirmed' || s === 'accepted') &&
+              !(s === 'declined' || s === 'rejected');
+            if (isPending) items.push({ id: d.id, ...g });
+          });
+          setPendingGuests(items);
+        } finally {
+          setLoadingPending(false);
+        }
+      },
+      () => setLoadingPending(false)
+    );
     return () => unsub();
   }, [activeWedding]);
 
@@ -51,7 +59,10 @@ export default function RSVPDashboard() {
       try {
         if (!activeWedding) return;
         if (!stats || !stats.deadline) return;
-        const resp = await evaluateTrigger(activeWedding, { type: 'rsvp_deadline', deadline: stats.deadline });
+        const resp = await evaluateTrigger(activeWedding, {
+          type: 'rsvp_deadline',
+          deadline: stats.deadline,
+        });
         const actions = Array.isArray(resp?.actions) ? resp.actions : [];
         for (const a of actions) {
           if (cancelled) break;
@@ -60,7 +71,7 @@ export default function RSVPDashboard() {
             await addNotification({
               type: 'info',
               message: 'Recordatorio RSVP: la fecha límite está próxima',
-              action: 'viewRSVP'
+              action: 'viewRSVP',
             });
           }
         }
@@ -68,7 +79,9 @@ export default function RSVPDashboard() {
         // best-effort
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeWedding, stats?.deadline]);
 
   if (!activeWedding) {
@@ -129,14 +142,24 @@ export default function RSVPDashboard() {
                     if (!activeWedding) return;
                     setSending(true);
                     try {
-                      const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: true }, { auth: true });
-                      const json = await res.json().catch(()=>({}));
-                      alert(`Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`);
+                      const res = await apiPost(
+                        '/api/rsvp/reminders',
+                        { weddingId: activeWedding, dryRun: true },
+                        { auth: true }
+                      );
+                      const json = await res.json().catch(() => ({}));
+                      alert(
+                        `Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                      );
                     } catch (e) {
                       alert('Error simulando recordatorios');
-                    } finally { setSending(false); }
+                    } finally {
+                      setSending(false);
+                    }
                   }}
-                >Simular recordatorios</button>
+                >
+                  Simular recordatorios
+                </button>
                 <button
                   className="px-3 py-1 border rounded bg-blue-600 text-white text-sm"
                   disabled={!activeWedding || sending}
@@ -146,14 +169,24 @@ export default function RSVPDashboard() {
                     if (!ok) return;
                     setSending(true);
                     try {
-                      const res = await apiPost('/api/rsvp/reminders', { weddingId: activeWedding, dryRun: false }, { auth: true });
-                      const json = await res.json().catch(()=>({}));
-                      alert(`Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`);
+                      const res = await apiPost(
+                        '/api/rsvp/reminders',
+                        { weddingId: activeWedding, dryRun: false },
+                        { auth: true }
+                      );
+                      const json = await res.json().catch(() => ({}));
+                      alert(
+                        `Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                      );
                     } catch (e) {
                       alert('Error enviando recordatorios');
-                    } finally { setSending(false); }
+                    } finally {
+                      setSending(false);
+                    }
                   }}
-                >Enviar recordatorios</button>
+                >
+                  Enviar recordatorios
+                </button>
               </div>
             </div>
             {loadingPending ? (
@@ -172,7 +205,7 @@ export default function RSVPDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {pendingGuests.map(g => (
+                    {pendingGuests.map((g) => (
                       <tr key={g.id} className="border-t">
                         <td className="px-3 py-2">{g.name || '-'}</td>
                         <td className="px-3 py-2">{g.email || '-'}</td>
@@ -182,9 +215,14 @@ export default function RSVPDashboard() {
                             className="px-2 py-1 border rounded"
                             onClick={async () => {
                               try {
-                                const res = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
-                                const json = await res.json().catch(()=>({}));
-                                const link = json.link || `${window.location.origin}/rsvp/${json.token}`;
+                                const res = await apiPost(
+                                  `/api/guests/${activeWedding}/id/${g.id}/rsvp-link`,
+                                  {},
+                                  { auth: true }
+                                );
+                                const json = await res.json().catch(() => ({}));
+                                const link =
+                                  json.link || `${window.location.origin}/rsvp/${json.token}`;
                                 await navigator.clipboard.writeText(link);
                                 alert('Enlace RSVP copiado');
                               } catch (e) {
@@ -192,7 +230,9 @@ export default function RSVPDashboard() {
                                 alert('No se pudo generar/copiar el enlace');
                               }
                             }}
-                          >Copiar link</button>
+                          >
+                            Copiar link
+                          </button>
                         </td>
                       </tr>
                     ))}

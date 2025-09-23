@@ -17,7 +17,7 @@ export async function upsertRule(weddingId, rule) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ weddingId, rule })
+    body: JSON.stringify({ weddingId, rule }),
   });
   if (!res.ok) throw new Error('upsertRule failed');
   const data = await res.json();
@@ -29,7 +29,7 @@ export async function evaluateTrigger(weddingId, trigger) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ weddingId, trigger })
+    body: JSON.stringify({ weddingId, trigger }),
   });
   if (!res.ok) throw new Error('evaluate failed');
   return res.json();

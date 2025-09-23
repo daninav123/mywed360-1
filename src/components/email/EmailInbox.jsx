@@ -1,21 +1,34 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { getMails, getMailsPage, deleteMail, initEmailService, sendMail as sendMailService } from '../../services/EmailService';
+
 import EmailDetail from './EmailDetail';
-import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 import { useAuth } from '../../hooks/useAuth';
 import { processIncomingEmails } from '../../services/emailAutomationService';
+import {
+  getMails,
+  getMailsPage,
+  deleteMail,
+  initEmailService,
+  sendMail as sendMailService,
+} from '../../services/EmailService';
+import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRenderer';
 
 // En entorno de pruebas, algunos tests referencian un mock global `EmailService` en `globalThis`.
 // Para alinearnos con esos tests, si existe ese objeto global, usamos sus métodos; en caso contrario
 // usamos los imports estáticos normales.
-const EmailServiceShim = (typeof globalThis !== 'undefined' && globalThis.EmailService) ? globalThis.EmailService : null;
+const EmailServiceShim =
+  typeof globalThis !== 'undefined' && globalThis.EmailService ? globalThis.EmailService : null;
 
 // Detectar entorno de test para habilitar fallbacks seguros que no afectan producción
 const isTestEnv = Boolean(
   (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.jest)) ||
-  (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
-  (typeof navigator !== 'undefined' && navigator.userAgent && /jsdom/i.test(navigator.userAgent)) ||
-  (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
+    (typeof process !== 'undefined' &&
+      process.env &&
+      (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
+    (typeof navigator !== 'undefined' &&
+      navigator.userAgent &&
+      /jsdom/i.test(navigator.userAgent)) ||
+    (typeof import.meta !== 'undefined' &&
+      (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
 );
 const defaultMailsTest = [
   {
@@ -26,7 +39,7 @@ const defaultMailsTest = [
     date: '2025-07-10T10:30:00Z',
     read: false,
     folder: 'inbox',
-    attachments: []
+    attachments: [],
   },
   {
     id: 'email-2',
@@ -36,7 +49,7 @@ const defaultMailsTest = [
     date: '2025-07-09T08:15:00Z',
     read: true,
     folder: 'inbox',
-    attachments: [{ filename: 'acta.pdf' }]
+    attachments: [{ filename: 'acta.pdf' }],
   },
   {
     id: 'email-3',
@@ -46,8 +59,8 @@ const defaultMailsTest = [
     date: '2025-07-08T14:45:00Z',
     read: true,
     folder: 'sent',
-    attachments: []
-  }
+    attachments: [],
+  },
 ];
 
 /**
@@ -74,7 +87,10 @@ export default function EmailInbox() {
   useEffect(() => {
     const initAndLoad = async () => {
       // Preferir las funciones importadas (mockeadas en tests), fallback al stub global sólo si es necesario
-      const initFn = (typeof initEmailService === 'function') ? initEmailService : (EmailServiceShim?.initEmailService);
+      const initFn =
+        typeof initEmailService === 'function'
+          ? initEmailService
+          : EmailServiceShim?.initEmailService;
       await initFn(profile);
       await loadEmails(); // Recargar una vez inicializado
     };
@@ -91,7 +107,10 @@ export default function EmailInbox() {
       // Paginación real para inbox/sent (mejora)
       if (targetFolder === 'inbox' || targetFolder === 'sent') {
         try {
-          const page = (typeof getMailsPage === 'function') ? await getMailsPage(targetFolder, { limit: 50, cursor: null }) : { items: [], nextCursor: null };
+          const page =
+            typeof getMailsPage === 'function'
+              ? await getMailsPage(targetFolder, { limit: 50, cursor: null })
+              : { items: [], nextCursor: null };
           let effective = Array.isArray(page.items) ? page.items : [];
           if ((isTestEnv || EmailServiceShim) && effective.length === 0) {
             effective = defaultMailsTest;
@@ -102,7 +121,10 @@ export default function EmailInbox() {
           try {
             const processFn = processIncomingEmails;
             if (typeof processFn === 'function') {
-              const sendFn = (typeof sendMailService === 'function') ? sendMailService : (EmailServiceShim?.sendMail);
+              const sendFn =
+                typeof sendMailService === 'function'
+                  ? sendMailService
+                  : EmailServiceShim?.sendMail;
               const processed = await processFn(effective, { sendMail: sendFn });
               if (Array.isArray(processed)) {
                 setEmails(processed);
@@ -117,7 +139,7 @@ export default function EmailInbox() {
         }
       }
       // Preferir el módulo importado (los tests lo mockean); fallback al stub global si fuera necesario
-      const getFn = (typeof getMails === 'function') ? getMails : (EmailServiceShim?.getMails);
+      const getFn = typeof getMails === 'function' ? getMails : EmailServiceShim?.getMails;
       const data = await getFn(targetFolder);
       let effective = Array.isArray(data) ? data : [];
       // En test, si no hay datos del mock, usar dataset estable por carpeta
@@ -130,7 +152,8 @@ export default function EmailInbox() {
       try {
         const processFn = processIncomingEmails;
         if (typeof processFn === 'function') {
-          const sendFn = (typeof sendMailService === 'function') ? sendMailService : (EmailServiceShim?.sendMail);
+          const sendFn =
+            typeof sendMailService === 'function' ? sendMailService : EmailServiceShim?.sendMail;
           const processed = await processFn(effective, { sendMail: sendFn });
           if (Array.isArray(processed)) {
             setEmails(processed);
@@ -176,31 +199,43 @@ export default function EmailInbox() {
     const el = bottomRef.current;
     if (!el) return;
     let pending = false;
-    const io = new IntersectionObserver(async (entries) => {
-      const e = entries && entries[0];
-      if (e && e.isIntersecting && !pending) {
-        pending = true;
-        try {
-          setLoadingMore(true);
-          const page = (typeof getMailsPage === 'function') ? await getMailsPage(folder, { limit: 50, cursor: nextCursor }) : { items: [], nextCursor: null };
-          const newItems = Array.isArray(page.items) ? page.items : [];
-          setEmails((prev) => {
-            const map = new Map(prev.map(m => [m.id, m]));
-            for (const m of newItems) if (!map.has(m.id)) map.set(m.id, m);
-            return Array.from(map.values()).sort((a,b)=> new Date(b.date||0)-new Date(a.date||0));
-          });
-          setNextCursor(page.nextCursor || null);
-          setHasMore(Boolean(page.nextCursor));
-        } catch (err) {
-          console.warn('[EmailInbox] auto loadMore failed', err);
-        } finally {
-          setLoadingMore(false);
-          pending = false;
+    const io = new IntersectionObserver(
+      async (entries) => {
+        const e = entries && entries[0];
+        if (e && e.isIntersecting && !pending) {
+          pending = true;
+          try {
+            setLoadingMore(true);
+            const page =
+              typeof getMailsPage === 'function'
+                ? await getMailsPage(folder, { limit: 50, cursor: nextCursor })
+                : { items: [], nextCursor: null };
+            const newItems = Array.isArray(page.items) ? page.items : [];
+            setEmails((prev) => {
+              const map = new Map(prev.map((m) => [m.id, m]));
+              for (const m of newItems) if (!map.has(m.id)) map.set(m.id, m);
+              return Array.from(map.values()).sort(
+                (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
+              );
+            });
+            setNextCursor(page.nextCursor || null);
+            setHasMore(Boolean(page.nextCursor));
+          } catch (err) {
+            console.warn('[EmailInbox] auto loadMore failed', err);
+          } finally {
+            setLoadingMore(false);
+            pending = false;
+          }
         }
-      }
-    }, { root: null, rootMargin: '200px', threshold: 0 });
+      },
+      { root: null, rootMargin: '200px', threshold: 0 }
+    );
     io.observe(el);
-    return () => { try { io.disconnect(); } catch {} };
+    return () => {
+      try {
+        io.disconnect();
+      } catch {}
+    };
   }, [hasMore, nextCursor, folder]);
 
   // Utilidades
@@ -215,7 +250,7 @@ export default function EmailInbox() {
 
   const handleDelete = async () => {
     for (const id of selectedIds) {
-      const delFn = (typeof deleteMail === 'function') ? deleteMail : (EmailServiceShim?.deleteMail);
+      const delFn = typeof deleteMail === 'function' ? deleteMail : EmailServiceShim?.deleteMail;
       await delFn(id);
     }
     setSelectedIds(new Set());
@@ -225,10 +260,9 @@ export default function EmailInbox() {
   // Asegurar que emails siempre sea un array antes de procesarlo
   const safeEmails = Array.isArray(emails) ? emails : [];
   // En modo test, si por cualquier motivo no hay datos del mock, usar un dataset estable
-  const baseEmails = ((isTestEnv || EmailServiceShim) && safeEmails.length === 0)
-    ? defaultMailsTest
-    : safeEmails;
-  
+  const baseEmails =
+    (isTestEnv || EmailServiceShim) && safeEmails.length === 0 ? defaultMailsTest : safeEmails;
+
   const displayed = baseEmails
     .filter((e) => e && e.subject && e.subject.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
@@ -244,9 +278,8 @@ export default function EmailInbox() {
     });
 
   // En entorno de pruebas, si todo queda vacío por mocks inconsistentes, usar dataset por defecto
-  const finalDisplayed = ((isTestEnv || EmailServiceShim) && displayed.length === 0)
-    ? defaultMailsTest
-    : displayed;
+  const finalDisplayed =
+    (isTestEnv || EmailServiceShim) && displayed.length === 0 ? defaultMailsTest : displayed;
 
   if (error) {
     return (
@@ -254,7 +287,7 @@ export default function EmailInbox() {
         <div className="text-center">
           <div className="text-red-500 text-xl mb-2">⚠️</div>
           <p className="text-red-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => loadEmails()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
@@ -267,9 +300,9 @@ export default function EmailInbox() {
 
   if (detailEmail) {
     return (
-      <EmailDetail 
-        email={detailEmail} 
-        onBack={() => setDetailEmail(null)} 
+      <EmailDetail
+        email={detailEmail}
+        onBack={() => setDetailEmail(null)}
         onMoveToFolder={() => {}} /* noop para pruebas */
       />
     );
@@ -283,8 +316,8 @@ export default function EmailInbox() {
       {user?.email && (
         <div className="bg-blue-50 p-3 rounded-lg">
           <p className="text-sm text-blue-700">
-            📧 Usuario: <span className="font-medium">{user.email}</span> | 
-            📊 {displayed.length} emails en {folder === 'inbox' ? 'Recibidos' : 'Enviados'}
+            📧 Usuario: <span className="font-medium">{user.email}</span> | 📊 {displayed.length}{' '}
+            emails en {folder === 'inbox' ? 'Recibidos' : 'Enviados'}
           </p>
         </div>
       )}
@@ -293,22 +326,22 @@ export default function EmailInbox() {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Selector de carpeta */}
         <div className="flex bg-gray-100 rounded-lg p-1">
-          <button 
+          <button
             onClick={() => setFolder('inbox')}
             className={`px-4 py-2 rounded-md transition-colors ${
-              folder === 'inbox' 
-                ? 'bg-white text-blue-600 shadow-sm' 
+              folder === 'inbox'
+                ? 'bg-white text-blue-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
             aria-current={folder === 'inbox' ? 'true' : undefined}
           >
             📥 Recibidos
           </button>
-          <button 
+          <button
             onClick={() => setFolder('sent')}
             className={`px-4 py-2 rounded-md transition-colors ${
-              folder === 'sent' 
-                ? 'bg-white text-blue-600 shadow-sm' 
+              folder === 'sent'
+                ? 'bg-white text-blue-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-800'
             }`}
             aria-current={folder === 'sent' ? 'true' : undefined}
@@ -329,7 +362,7 @@ export default function EmailInbox() {
         </div>
 
         {/* Botón eliminar */}
-        <button 
+        <button
           onClick={handleDelete}
           disabled={selectedIds.size === 0}
           className={`px-4 py-2 rounded-lg transition-colors ${
@@ -347,13 +380,17 @@ export default function EmailInbox() {
         <div className="flex items-center justify-center h-32">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            <p className="text-gray-600" aria-live="polite">Cargando...</p>
+            <p className="text-gray-600" aria-live="polite">
+              Cargando...
+            </p>
           </div>
         </div>
       ) : finalDisplayed.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-gray-400 text-4xl mb-4">📭</div>
-          <p className="text-gray-600">No hay emails {search ? 'que coincidan con tu búsqueda' : 'en esta carpeta'}</p>
+          <p className="text-gray-600">
+            No hay emails {search ? 'que coincidan con tu búsqueda' : 'en esta carpeta'}
+          </p>
         </div>
       ) : (
         <div data-testid="email-list" className="bg-white rounded-lg shadow overflow-hidden">
@@ -376,7 +413,7 @@ export default function EmailInbox() {
                   />
                 </th>
                 <th className="px-4 py-3 text-left">
-                  <button 
+                  <button
                     onClick={() => setSortState((prev) => (prev === 'alpha' ? 'date' : 'alpha'))}
                     className="flex items-center space-x-1 text-gray-700 hover:text-gray-900 font-medium"
                   >
@@ -392,9 +429,9 @@ export default function EmailInbox() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {finalDisplayed.map((email) => (
-                <tr 
-                  key={safeRender(email.id, '')} 
-                  role="row" 
+                <tr
+                  key={safeRender(email.id, '')}
+                  role="row"
                   onClick={() => setDetailEmail(email)}
                   className="hover:bg-gray-50 cursor-pointer transition-colors"
                 >
@@ -411,33 +448,75 @@ export default function EmailInbox() {
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </td>
-                <td className="px-4 py-3">
-                  <div className="font-medium text-gray-900">
-                    {safeRender(email.subject, '(Sin asunto)')}
-                  </div>
-                  {email.body && (
-                    <div className="text-sm text-gray-500 truncate max-w-xs">
-                      {safeRender(email.body.substring(0, 100), '')}...
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-gray-900">
+                      {safeRender(email.subject, '(Sin asunto)')}
                     </div>
-                  )}
-                  {/* Estado de entrega/lectura */}
-                  <div className="mt-1 flex flex-wrap items-center gap-1 text-[11px]">
-                    {(() => {
-                      try {
-                        const failed = Boolean(email.failedAt || (email.lastEvent && String(email.lastEvent).toLowerCase()==='failed'));
-                        const delivered = Boolean(email.deliveredAt || (email.lastEvent && String(email.lastEvent).toLowerCase()==='delivered'));
-                        const openCount = Number(email.openCount || 0);
-                        const clickCount = Number(email.clickCount || 0);
-                        const chips = [];
-                        if (failed) chips.push(<span key={`f-${email.id}`} className="rounded bg-red-50 px-1.5 py-0.5 text-red-600 border border-red-200">Fallo</span>);
-                        if (delivered && !failed) chips.push(<span key={`d-${email.id}`} className="rounded bg-green-50 px-1.5 py-0.5 text-green-700 border border-green-200">Entregado</span>);
-                        if (openCount>0) chips.push(<span key={`o-${email.id}`} className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 border border-blue-200">Abierto {openCount}</span>);
-                        if (clickCount>0) chips.push(<span key={`c-${email.id}`} className="rounded bg-purple-50 px-1.5 py-0.5 text-purple-700 border border-purple-200">Clicks {clickCount}</span>);
-                        return chips.length ? chips : null;
-                      } catch (e) { return null; }
-                    })()}
-                  </div>
-                </td>
+                    {email.body && (
+                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                        {safeRender(email.body.substring(0, 100), '')}...
+                      </div>
+                    )}
+                    {/* Estado de entrega/lectura */}
+                    <div className="mt-1 flex flex-wrap items-center gap-1 text-[11px]">
+                      {(() => {
+                        try {
+                          const failed = Boolean(
+                            email.failedAt ||
+                              (email.lastEvent &&
+                                String(email.lastEvent).toLowerCase() === 'failed')
+                          );
+                          const delivered = Boolean(
+                            email.deliveredAt ||
+                              (email.lastEvent &&
+                                String(email.lastEvent).toLowerCase() === 'delivered')
+                          );
+                          const openCount = Number(email.openCount || 0);
+                          const clickCount = Number(email.clickCount || 0);
+                          const chips = [];
+                          if (failed)
+                            chips.push(
+                              <span
+                                key={`f-${email.id}`}
+                                className="rounded bg-red-50 px-1.5 py-0.5 text-red-600 border border-red-200"
+                              >
+                                Fallo
+                              </span>
+                            );
+                          if (delivered && !failed)
+                            chips.push(
+                              <span
+                                key={`d-${email.id}`}
+                                className="rounded bg-green-50 px-1.5 py-0.5 text-green-700 border border-green-200"
+                              >
+                                Entregado
+                              </span>
+                            );
+                          if (openCount > 0)
+                            chips.push(
+                              <span
+                                key={`o-${email.id}`}
+                                className="rounded bg-blue-50 px-1.5 py-0.5 text-blue-700 border border-blue-200"
+                              >
+                                Abierto {openCount}
+                              </span>
+                            );
+                          if (clickCount > 0)
+                            chips.push(
+                              <span
+                                key={`c-${email.id}`}
+                                className="rounded bg-purple-50 px-1.5 py-0.5 text-purple-700 border border-purple-200"
+                              >
+                                Clicks {clickCount}
+                              </span>
+                            );
+                          return chips.length ? chips : null;
+                        } catch (e) {
+                          return null;
+                        }
+                      })()}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {safeRender(email.from, 'Desconocido')}
                   </td>

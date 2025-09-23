@@ -1,14 +1,15 @@
 /**
  * Hook personalizado para monitoreo de operaciones de email y plantillas
- * 
+ *
  * Este hook facilita la integración del monitoreo de rendimiento con los componentes
  * relacionados con emails y plantillas, proporcionando métodos específicos para
  * diferentes operaciones comunes en el sistema de emails.
- * 
+ *
  * @module hooks/useEmailMonitoring
  */
 
 import { useCallback } from 'react';
+
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
 /**
@@ -26,10 +27,10 @@ export function useEmailMonitoring() {
   const measureTemplateRendering = useCallback(async (templateId, templateData, renderFn) => {
     // Calcular tamaño aproximado de los datos de plantilla
     const dataSize = JSON.stringify(templateData).length;
-    
+
     return performanceMonitor.monitorTemplateRendering(templateId, dataSize, renderFn);
   }, []);
-  
+
   /**
    * Registrar uso de una plantilla
    * @param {string} templateId - ID de la plantilla
@@ -39,10 +40,13 @@ export function useEmailMonitoring() {
    * @param {Object} metadata - Metadatos adicionales
    * @returns {Promise<any>} Resultado de la función
    */
-  const trackTemplateUsage = useCallback(async (templateId, category, action, fn, metadata = {}) => {
-    return performanceMonitor.monitorTemplateUsage(templateId, category, action, fn, metadata);
-  }, []);
-  
+  const trackTemplateUsage = useCallback(
+    async (templateId, category, action, fn, metadata = {}) => {
+      return performanceMonitor.monitorTemplateUsage(templateId, category, action, fn, metadata);
+    },
+    []
+  );
+
   /**
    * Monitorear el envío de un email
    * @param {string} emailId - ID del email
@@ -54,10 +58,10 @@ export function useEmailMonitoring() {
   const trackEmailSend = useCallback(async (emailId, recipientType, templateId, sendFn) => {
     return performanceMonitor.monitorEmailDelivery(emailId, recipientType, sendFn, {
       templateId,
-      operation: 'send'
+      operation: 'send',
     });
   }, []);
-  
+
   /**
    * Registrar interacción con un email
    * @param {string} emailId - ID del email
@@ -67,7 +71,7 @@ export function useEmailMonitoring() {
   const trackInteraction = useCallback((emailId, interactionType, metadata = {}) => {
     performanceMonitor.trackEmailInteraction(emailId, interactionType, metadata);
   }, []);
-  
+
   /**
    * Monitorear operación general del sistema de emails
    * @param {string} operation - Nombre de la operación
@@ -78,7 +82,7 @@ export function useEmailMonitoring() {
   const trackEmailOperation = useCallback(async (operation, fn, metadata = {}) => {
     return performanceMonitor.monitorEmailOperation(operation, fn, metadata);
   }, []);
-  
+
   /**
    * Monitorear la búsqueda de plantillas
    * @param {string} query - Consulta de búsqueda
@@ -89,10 +93,10 @@ export function useEmailMonitoring() {
   const trackTemplateSearch = useCallback(async (query, category, searchFn) => {
     return performanceMonitor.monitorSearch(query, searchFn, {
       type: 'template_search',
-      category
+      category,
     });
   }, []);
-  
+
   /**
    * Monitorear el rendimiento de la caché de plantillas
    * @param {string} operation - Operación realizada (get, set, hit, miss)
@@ -105,9 +109,9 @@ export function useEmailMonitoring() {
       category: 'cache',
       action: 'template_cache_' + operation,
       value: durationMs,
-      ...metadata
+      ...metadata,
     });
-    
+
     // Registrar eventos específicos para análisis de patrón de uso
     if (operation === 'hit' || operation === 'miss') {
       performanceMonitor.logEvent('template_cache_access', {
@@ -116,7 +120,7 @@ export function useEmailMonitoring() {
         templateId: metadata.templateId || 'unknown',
         category: metadata.category || 'unknown',
         source: metadata.source || 'memory',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   }, []);
@@ -141,7 +145,7 @@ export function useEmailMonitoring() {
       category: 'general',
       action: operation,
       ...metadata,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
 
@@ -154,7 +158,7 @@ export function useEmailMonitoring() {
     trackTemplateSearch,
     trackOperation, // Añadida función faltante
     measureCachePerformance,
-    logEmailError
+    logEmailError,
   };
 }
 

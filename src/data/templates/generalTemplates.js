@@ -22,7 +22,13 @@ Saludos cordiales,
 {{datos_contacto}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'tema_consulta', 'detalle_consulta', 'nombre_remitente', 'datos_contacto']
+    variables: [
+      'nombre_destinatario',
+      'tema_consulta',
+      'detalle_consulta',
+      'nombre_remitente',
+      'datos_contacto',
+    ],
   },
   {
     id: 'template_general_agradecimiento_1',
@@ -42,7 +48,13 @@ Atentamente,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'motivo_agradecimiento', 'beneficio_obtenido', 'mensaje_personalizado', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'motivo_agradecimiento',
+      'beneficio_obtenido',
+      'mensaje_personalizado',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_general_recordatorio_1',
@@ -65,7 +77,17 @@ Saludos,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'nombre_evento', 'fecha_evento', 'hora_evento', 'lugar_evento', 'detalle_1', 'detalle_2', 'detalle_3', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'nombre_evento',
+      'fecha_evento',
+      'hora_evento',
+      'lugar_evento',
+      'detalle_1',
+      'detalle_2',
+      'detalle_3',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_general_confirmacion_1',
@@ -87,7 +109,14 @@ Saludos cordiales,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'tipo_comunicacion', 'asunto_original', 'estado_solicitud', 'tiempo_respuesta', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'tipo_comunicacion',
+      'asunto_original',
+      'estado_solicitud',
+      'tiempo_respuesta',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_general_reunion_1',
@@ -114,7 +143,19 @@ Saludos,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'tema_reunion', 'opcion_fecha_1', 'opcion_hora_1', 'opcion_fecha_2', 'opcion_hora_2', 'opcion_fecha_3', 'opcion_hora_3', 'duracion_estimada', 'modo_reunion', 'nombre_remitente']
+    variables: [
+      'nombre_destinatario',
+      'tema_reunion',
+      'opcion_fecha_1',
+      'opcion_hora_1',
+      'opcion_fecha_2',
+      'opcion_hora_2',
+      'opcion_fecha_3',
+      'opcion_hora_3',
+      'duracion_estimada',
+      'modo_reunion',
+      'nombre_remitente',
+    ],
   },
   {
     id: 'template_general_disculpa_1',
@@ -136,8 +177,14 @@ Atentamente,
 {{nombre_remitente}}
     `,
     isSystem: true,
-    variables: ['nombre_destinatario', 'motivo_disculpa', 'explicacion_situacion', 'solucion_propuesta', 'nombre_remitente']
-  }
+    variables: [
+      'nombre_destinatario',
+      'motivo_disculpa',
+      'explicacion_situacion',
+      'solucion_propuesta',
+      'nombre_remitente',
+    ],
+  },
 ];
 
 export default generalTemplates;

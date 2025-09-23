@@ -1,12 +1,16 @@
 ﻿// blogService.js - noticias de bodas
 import axios from 'axios';
-import { translateText } from './translationService.js';
+
 import { getBackendBase } from '@/utils/backendBase.js';
 
-// Evita spam de peticiones al backend si est cado/no iniciado
-let BACKEND_BACKOFF_UNTIL = 0;
-const backendAvailable = () => Date.now() > BACKEND_BACKOFF_UNTIL;
-const backoffBackend = (ms = 60_000) => { BACKEND_BACKOFF_UNTIL = Date.now() + ms; };
+import { translateText } from './translationService.js';
+
+// Evita spam de peticiones al backend si estÃ¡ caÃ­do/no iniciado (reservado para uso futuro)
+let _BACKEND_BACKOFF_UNTIL = 0;
+const _backendAvailable = () => Date.now() > _BACKEND_BACKOFF_UNTIL;
+const _backoffBackend = (ms = 60_000) => {
+  _BACKEND_BACKOFF_UNTIL = Date.now() + ms;
+};
 
 // Preferimos el agregador backend (RSS) para variedad y fiabilidad.
 // Si se quiere forzar NewsAPI, definir VITE_NEWSAPI_KEY en build.
@@ -20,7 +24,11 @@ function normalizeLang(lang) {
 }
 
 async function fetchFromBackend({ page, pageSize, language }) {
-  const envBase = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_BASE)) || '';
+  const envBase =
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      (import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_BASE)) ||
+    '';
   const derivedBase = getBackendBase();
   // Importante: no usar filter(Boolean) porque elimina '' y perdemos el fallback
   // a la ruta relativa '/api/wedding-news' gestionada por el proxy de Vite.
@@ -28,9 +36,9 @@ async function fetchFromBackend({ page, pageSize, language }) {
     envBase ? envBase.replace(/\/$/, '') : undefined,
     derivedBase ? derivedBase.replace(/\/$/, '') : undefined,
     'https://mywed360-backend.onrender.com',
-    '' // como último recurso: proxy de Vite o mismo origen
+    '', // como Ãºltimo recurso: proxy de Vite o mismo origen
   ];
-  let candidates = Array.from(new Set(rawCandidates.filter(v => v !== undefined && v !== null)));
+  let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   // Prioritize Render backend to avoid slow/failing local attempts first
   try {
     const RENDER_BASE = 'https://mywed360-backend.onrender.com';
@@ -48,7 +56,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
         const s = String(b || '');
         return s === '' || /localhost|127\.0\.0\.1|:4004/.test(s);
       };
-      const timeoutMs = isProbablyLocal(base) ? 5000 : 35000;
+      const timeoutMs = isProbablyLocal(base) ? 5000 : 10000;
       const resp = await axios.get(url, {
         params: { page, pageSize, lang: language },
         timeout: timeoutMs,
@@ -56,7 +64,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
       });
       if (resp.status < 400 && Array.isArray(resp.data)) {
         if (resp.data.length > 0) return resp.data;
-        // Si el backend de este candidato devuelve array vacío, probar el siguiente candidato
+        // Si el backend de este candidato devuelve array vacÃ­o, probar el siguiente candidato
         continue;
       }
       // Estado no exitoso: marcar como error para posible backoff
@@ -65,12 +73,118 @@ async function fetchFromBackend({ page, pageSize, language }) {
       sawError = true;
     }
   }
-  // Si hubo errores en candidatos, devolver null para diferenciar de "vacío"
+  // Si hubo errores en candidatos, devolver null para diferenciar de "vacÃ­o"
   return sawError ? null : [];
 }
 
-const stripDiacritics = (text = '') =>
-  text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+// Fallback: NewsAPI.org cuando hay API_KEY y el agregador devuelve vacD
+async function fetchFromNewsApi(page, pageSize, lang) {
+  const endpointOpts = {
+    params: {
+      q: 'wedding OR boda',
+      language: lang,
+      sortBy: 'publishedAt',
+      pageSize,
+      page,
+    },
+    headers: { 'X-Api-Key': API_KEY },
+    timeout: 10000,
+    validateStatus: () => true,
+  };
+
+  const resp = await axios.get('https://newsapi.org/v2/everything', endpointOpts);
+  if (resp.status === 426) {
+    console.warn('NewsAPI 426 Upgrade Required -> plan gratuito limitado a primera pagina.');
+    return [];
+  }
+  if (resp.status >= 400) {
+    throw new Error(`NewsAPI error ${resp.status}`);
+  }
+  const data = resp.data || {};
+  const articles = Array.isArray(data.articles) ? data.articles : [];
+
+  const entries = articles.map((article, idx) => {
+    const rawText = [article.title || '', article.description || '', article.content || ''].join(
+      ' '
+    );
+    const normalizedText = normalizeForMatch(rawText);
+    const hasWeddingContext = hasAny(normalizedText, WEDDING_PATTERNS);
+    const designHits = scoreMatches(normalizedText, DESIGN_PATTERNS);
+    const planningHits = scoreMatches(normalizedText, PLANNING_PATTERNS);
+    const valueScore = designHits * 3 + planningHits;
+    const isHardNegative = hasAny(normalizedText, HARD_NEGATIVE_PATTERNS);
+    const isGossip = hasAny(normalizedText, GOSSIP_PATTERNS);
+
+    return {
+      article,
+      idx,
+      designHits,
+      planningHits,
+      valueScore,
+      hasWeddingContext,
+      isHardNegative,
+      isGossip,
+      passesStrict:
+        hasWeddingContext &&
+        (designHits > 0 || planningHits > 0) &&
+        !isHardNegative &&
+        !(isGossip && designHits === 0),
+      passesLoose:
+        hasWeddingContext && !isHardNegative && (!isGossip || designHits > 0 || planningHits > 0),
+      passesMinimal: hasWeddingContext && !isHardNegative && !isGossip,
+    };
+  });
+
+  const toPost = ({ article, idx }) => ({
+    id: [String(page), String(idx), article.url].join('_'),
+    title: article.title,
+    description: article.description,
+    url: article.url,
+    image: article.urlToImage,
+    source: article.source?.name,
+    published: article.publishedAt,
+  });
+
+  const pickPosts = (filterFn, scoreFn) =>
+    entries
+      .filter(filterFn)
+      .sort((a, b) => scoreFn(b) - scoreFn(a) || a.idx - b.idx)
+      .map(toPost);
+
+  let posts = pickPosts(
+    (entry) => entry.passesStrict,
+    (entry) => entry.valueScore
+  );
+  if (!posts.length) {
+    posts = pickPosts(
+      (entry) => entry.passesLoose,
+      (entry) => entry.valueScore || entry.designHits + entry.planningHits
+    );
+  }
+  if (!posts.length) {
+    posts = pickPosts(
+      (entry) => entry.passesMinimal,
+      (entry) => entry.designHits + entry.planningHits
+    );
+  }
+  if (!posts.length) {
+    posts = entries
+      .filter((entry) => entry.hasWeddingContext && !entry.isHardNegative && !entry.isGossip)
+      .slice(0, pageSize)
+      .map(toPost);
+  }
+
+  // Traducir sDlo si se solicita un idioma distinto a inglDs
+  if (lang && lang !== 'en') {
+    for (const p of posts) {
+      p.title = await translateText(p.title, lang, '');
+      p.description = await translateText(p.description, lang, '');
+    }
+  }
+  return posts;
+}
+
+const stripDiacritics = (text = '') => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 const normalizeForMatch = (text = '') => stripDiacritics(text).toLowerCase();
 
@@ -260,10 +374,28 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   const lang = normalizeLang(language);
   // Ruta principal: backend RSS aggregator
   const rssData = await fetchFromBackend({ page, pageSize, language: lang });
-  // Si hubo errores de red/servidor, aplicar backoff breve
-  if (rssData === null) { return []; }
-  // Si el backend respondió OK pero sin datos, no aplicar backoff
-  if (!Array.isArray(rssData) || !rssData.length) { return []; }
+  // Si hubo errores de red/servidor, probar NewsAPI si hay clave
+  if (rssData === null) {
+    if (API_KEY) {
+      try {
+        const posts = await fetchFromNewsApi(page, pageSize, lang);
+        return posts;
+      } catch (e) {
+        console.warn('NewsAPI fallback failed:', e?.message || e);
+      }
+    }
+    return [];
+  }
+  // Si el backend respondiÃ³ OK pero sin datos, intentar NewsAPI si hay clave
+  if (!Array.isArray(rssData) || !rssData.length) {
+    if (API_KEY) {
+      try {
+        const posts = await fetchFromNewsApi(page, pageSize, lang);
+        return posts;
+      } catch {}
+    }
+    return [];
+  }
 
   let posts = rssData;
   if (lang && lang !== 'en') {
@@ -273,7 +405,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     }
   }
   return posts;
-  // NewsAPI (opcional) — no usado por defecto
+  // NewsAPI (opcional) â€” no usado por defecto
   // Mantener el codigo para compatibilidad si en el futuro se habilita con API key.
   /*
   if (page > 1) {

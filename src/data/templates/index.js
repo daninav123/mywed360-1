@@ -3,9 +3,9 @@
  * Este archivo centraliza la exportación de todas las colecciones de plantillas
  */
 
-import proveedorTemplates from './proveedorTemplates';
-import invitadosTemplates from './invitadosTemplates';
 import generalTemplates from './generalTemplates';
+import invitadosTemplates from './invitadosTemplates';
+import proveedorTemplates from './proveedorTemplates';
 import seguimientoTemplates from './seguimientoTemplates';
 
 // Combinar todas las plantillas en una sola colección
@@ -13,7 +13,7 @@ const allTemplates = [
   ...proveedorTemplates,
   ...invitadosTemplates,
   ...generalTemplates,
-  ...seguimientoTemplates
+  ...seguimientoTemplates,
 ];
 
 export {
@@ -21,5 +21,5 @@ export {
   invitadosTemplates,
   generalTemplates,
   seguimientoTemplates,
-  allTemplates
+  allTemplates,
 };

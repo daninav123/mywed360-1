@@ -1,9 +1,10 @@
+import { ArrowLeft } from 'lucide-react';
 import React, { useContext } from 'react';
-import { UserPreferencesContext } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
+
 import EmailStats from '../../components/email/EmailStats';
 import { Button } from '../../components/ui';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { UserPreferencesContext } from '../../contexts/UserContext';
 
 /**
  * Página de estadísticas de correo electrónico
@@ -12,23 +13,19 @@ import { useNavigate } from 'react-router-dom';
 const EmailStatistics = () => {
   const { currentUser } = useContext(UserPreferencesContext);
   const navigate = useNavigate();
-  
+
   // Navegar a la bandeja de entrada
   const goToInbox = () => {
     navigate('/user/email');
   };
-  
+
   return (
     <div className="container mx-auto px-4 py-6">
       {/* Botón para volver */}
-      <Button 
-        variant="ghost" 
-        onClick={goToInbox}
-        className="mb-4"
-      >
+      <Button variant="ghost" onClick={goToInbox} className="mb-4">
         <ArrowLeft size={18} className="mr-2" /> Volver a la bandeja
       </Button>
-      
+
       {/* Contenido principal */}
       <div className="bg-white rounded-lg shadow p-4 md:p-6">
         {currentUser ? (

@@ -1,15 +1,16 @@
 /**
  * Hook personalizado para monitorear métricas de rendimiento de la bandeja unificada
- * 
+ *
  * Proporciona funciones especializadas para registrar y analizar el rendimiento
  * de las operaciones más comunes en la bandeja unificada de emails
- * 
+ *
  * @module hooks/useUnifiedInboxMetrics
  */
 
 import { useCallback } from 'react';
-import { performanceMonitor } from '../services/PerformanceMonitor';
+
 import { useEmailMonitoring } from './useEmailMonitoring';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 /**
  * Hook para monitorear rendimiento y uso de la bandeja unificada
@@ -17,7 +18,7 @@ import { useEmailMonitoring } from './useEmailMonitoring';
  */
 export function useUnifiedInboxMetrics() {
   const { trackOperation } = useEmailMonitoring();
-  
+
   /**
    * Registrar tiempo de carga de la vista principal
    * @param {string} folder - Carpeta que se está cargando
@@ -29,10 +30,10 @@ export function useUnifiedInboxMetrics() {
       folder,
       emailCount,
       loadTimeMs,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
-  
+
   /**
    * Registrar tiempo de búsqueda y filtrado
    * @param {string} query - Consulta de búsqueda
@@ -44,10 +45,10 @@ export function useUnifiedInboxMetrics() {
       queryLength: query.length,
       resultCount,
       searchTimeMs,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
-  
+
   /**
    * Registrar tiempo de renderizado detallado de un email
    * @param {string} emailId - ID del email visualizado
@@ -61,10 +62,10 @@ export function useUnifiedInboxMetrics() {
       hasAttachments,
       contentLength,
       renderTimeMs,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
-  
+
   /**
    * Registrar interacciones del usuario con la bandeja
    * @param {string} actionType - Tipo de acción (click, scroll, filter, etc)
@@ -74,10 +75,10 @@ export function useUnifiedInboxMetrics() {
     performanceMonitor.logEvent('unified_inbox_interaction', {
       actionType,
       ...details,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
-  
+
   /**
    * Registrar métricas de caché de la bandeja
    * @param {string} operation - Operación (hit, miss, set)
@@ -91,16 +92,16 @@ export function useUnifiedInboxMetrics() {
       key,
       sizeBytes,
       durationMs,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }, []);
-  
+
   return {
     logInitialLoad,
     logSearch,
     logEmailRender,
     logUserInteraction,
     logCacheOperation,
-    trackOperation
+    trackOperation,
   };
 }

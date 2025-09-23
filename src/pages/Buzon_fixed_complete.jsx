@@ -5,27 +5,24 @@ import {
   ChevronUpIcon,
   CheckCircleIcon,
   ClockIcon,
-  PlusCircleIcon, 
+  PlusCircleIcon,
   TagIcon,
   BellIcon,
   ExclamationCircleIcon,
   PaperclipIcon,
-  XIcon
+  XIcon,
 } from '../components/ui/icons';
 
-import { 
-  initEmailService, 
-  getMails, 
-  sendMail, 
-  deleteMail, 
+import {
+  initEmailService,
+  getMails,
+  sendMail,
+  deleteMail,
   createEmailAlias,
-  markAsRead
+  markAsRead,
 } from '../services/EmailService';
 
-import { 
-  loadData, 
-  saveData 
-} from '../services/StorageService';
+import { loadData, saveData } from '../services/StorageService';
 
 import {
   createTrackingRecord,
@@ -35,7 +32,7 @@ import {
   updateTrackingTags,
   deleteTrackingRecord,
   TRACKING_STATUS,
-  EMAIL_TAGS
+  EMAIL_TAGS,
 } from '../services/EmailTrackingService';
 
 import { getTemplateOptions, applyTemplate } from '../services/emailTemplates';
@@ -69,7 +66,7 @@ export default function Buzon() {
     status: '',
     dueDate: '',
     notes: '',
-    tags: []
+    tags: [],
   });
 
   const [providers, setProviders] = useState([]);
@@ -79,30 +76,30 @@ export default function Buzon() {
       try {
         const userProfile = await loadData('lovendaProfile', {});
         setProfile(userProfile);
-        
+
         const storedProviders = await loadData('providers', { defaultValue: [] });
         setProviders(storedProviders);
-        
+
         const email = initEmailService(userProfile);
         setUserEmail(email);
         setServiceStatus({ initialized: true, error: null });
-        
+
         if (userProfile.emailAlias) {
           setEmailAlias(userProfile.emailAlias);
         }
-        
+
         const tracking = loadTrackingRecords();
         setTrackingRecords(tracking);
-        
+
         console.log('Servicio de correo inicializado:', email);
       } catch (error) {
         console.error('Error al inicializar el servicio de correo:', error);
         setServiceStatus({ initialized: false, error: error.message });
       }
     }
-    
+
     loadProfile();
-    
+
     // Cargar las plantillas de correo
     const templateOpts = getTemplateOptions();
     setTemplates(templateOpts);
@@ -110,7 +107,7 @@ export default function Buzon() {
 
   useEffect(() => {
     if (!serviceStatus.initialized) return;
-    
+
     const loadEmails = async () => {
       try {
         const emails = await getMails(folder);
@@ -120,13 +117,13 @@ export default function Buzon() {
         console.error('Error al cargar correos:', error);
       }
     };
-    
+
     loadEmails();
   }, [folder, serviceStatus.initialized]);
 
   const refresh = useCallback(async () => {
     if (!serviceStatus.initialized) return;
-    
+
     try {
       const emails = await getMails(folder);
       setMails(emails);
@@ -137,14 +134,14 @@ export default function Buzon() {
 
   const handleCreateAlias = async () => {
     if (!emailAlias) return;
-    
+
     setAliasStatus({ loading: true, error: null, success: false });
-    
+
     try {
       await createEmailAlias(emailAlias);
-      
+
       setAliasStatus({ loading: false, error: null, success: true });
-      
+
       // Actualizar perfil
       if (profile) {
         const updatedProfile = { ...profile, emailAlias };
@@ -161,7 +158,7 @@ export default function Buzon() {
     const files = Array.from(e.target.files);
     setForm({
       ...form,
-      attachments: [...form.attachments, ...files]
+      attachments: [...form.attachments, ...files],
     });
   };
 
@@ -170,7 +167,7 @@ export default function Buzon() {
     newAttachments.splice(index, 1);
     setForm({
       ...form,
-      attachments: newAttachments
+      attachments: newAttachments,
     });
   };
 
@@ -179,19 +176,19 @@ export default function Buzon() {
       alert('Por favor completa los campos requeridos');
       return;
     }
-    
+
     try {
       await sendMail({
         to: form.to,
         subject: form.subject,
         body: form.body,
-        attachments: form.attachments
+        attachments: form.attachments,
       });
-      
+
       alert('Correo enviado exitosamente');
       setComposeOpen(false);
       setForm({ to: '', subject: '', body: '', attachments: [] });
-      
+
       // Actualizar bandeja de enviados
       if (folder === 'sent') {
         refresh();
@@ -208,7 +205,7 @@ export default function Buzon() {
     if (!mail.read) {
       markAsRead(mail.id);
       // Actualizar el estado local
-      setMails(mails.map(m => m.id === mail.id ? {...m, read: true} : m));
+      setMails(mails.map((m) => (m.id === mail.id ? { ...m, read: true } : m)));
     }
   };
 
@@ -221,7 +218,7 @@ export default function Buzon() {
       status: TRACKING_STATUS.NEW,
       providerName: email.from,
       subject: email.subject,
-      initialMessage: email.body
+      initialMessage: email.body,
     });
 
     setTrackingRecords([...trackingRecords, newRecord]);
@@ -231,16 +228,16 @@ export default function Buzon() {
 
   // Actualizar el estado de un seguimiento
   const handleUpdateTrackingStatus = (id, newStatus) => {
-    const updatedRecords = trackingRecords.map(record => 
-      record.id === id ? {...record, status: newStatus} : record
+    const updatedRecords = trackingRecords.map((record) =>
+      record.id === id ? { ...record, status: newStatus } : record
     );
     updateTrackingStatus(id, newStatus);
     setTrackingRecords(updatedRecords);
-    
+
     if (trackingSelected && trackingSelected.id === id) {
       setTrackingSelected({
         ...trackingSelected,
-        status: newStatus
+        status: newStatus,
       });
     }
   };
@@ -248,24 +245,24 @@ export default function Buzon() {
   // Aplicar una plantilla al campo del correo
   const handleApplyTemplate = (templateId) => {
     if (!templateId) return;
-    
+
     const result = applyTemplate(templateId, {
       userName: profile?.name || 'Usuario',
       companyName: 'Lovenda',
-      providerName: form.to.split('@')[0] || 'Proveedor'
+      providerName: form.to.split('@')[0] || 'Proveedor',
     });
-    
+
     setForm({
       ...form,
       subject: result.subject || form.subject,
-      body: result.body || form.body
+      body: result.body || form.body,
     });
-    
+
     setSelectedTemplate('');
   };
 
   // Filtrar correos según la búsqueda
-  const filteredMails = mails.filter(mail => {
+  const filteredMails = mails.filter((mail) => {
     const searchLower = search.toLowerCase();
     return (
       mail.subject.toLowerCase().includes(searchLower) ||
@@ -276,9 +273,10 @@ export default function Buzon() {
 
   // Filtrar y ordenar los registros de seguimiento
   const filteredTrackingRecords = trackingRecords
-    .filter(record => {
-      const searchMatch = record.providerName.toLowerCase().includes(search.toLowerCase()) || 
-                         record.subject.toLowerCase().includes(search.toLowerCase());
+    .filter((record) => {
+      const searchMatch =
+        record.providerName.toLowerCase().includes(search.toLowerCase()) ||
+        record.subject.toLowerCase().includes(search.toLowerCase());
       const statusMatch = statusFilter ? record.status === statusFilter : true;
       return searchMatch && statusMatch;
     })

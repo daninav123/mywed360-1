@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Loader from "../components/ui/Loader";
+
+import Loader from '../components/ui/Loader';
 import AdminLayout from '../layouts/AdminLayout';
 
 // Carga perezosa (lazy loading) de componentes para mejor rendimiento

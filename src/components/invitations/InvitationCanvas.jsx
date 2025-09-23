@@ -1,13 +1,13 @@
+import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
 import Draggable from 'react-draggable';
-import PropTypes from 'prop-types';
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 850; // A5 vertical
 
 const InvitationCanvas = React.forwardRef(function InvitationCanvas(
   { template, elements, setElements, scale, selectedId, onSelect },
-  ref,
+  ref
 ) {
   // Seed demo elements only once
   useEffect(() => {
@@ -20,9 +20,7 @@ const InvitationCanvas = React.forwardRef(function InvitationCanvas(
   }, [elements.length, setElements]);
 
   const handleStop = (e, data, id) => {
-    setElements((prev) =>
-      prev.map((el) => (el.id === id ? { ...el, x: data.x, y: data.y } : el)),
-    );
+    setElements((prev) => prev.map((el) => (el.id === id ? { ...el, x: data.x, y: data.y } : el)));
   };
 
   return (
@@ -30,7 +28,12 @@ const InvitationCanvas = React.forwardRef(function InvitationCanvas(
       <div
         ref={ref}
         className="relative bg-white shadow-md border mx-auto"
-        style={{ width: CANVAS_WIDTH * scale, height: CANVAS_HEIGHT * scale, transformOrigin: 'top left', transform: `scale(${scale})` }}
+        style={{
+          width: CANVAS_WIDTH * scale,
+          height: CANVAS_HEIGHT * scale,
+          transformOrigin: 'top left',
+          transform: `scale(${scale})`,
+        }}
         role="region"
         aria-label="Lienzo de invitación"
       >
@@ -50,7 +53,7 @@ const InvitationCanvas = React.forwardRef(function InvitationCanvas(
           >
             {el.type === 'text' ? (
               <div
-                className={`cursor-move select-none text-gray-800 ${selectedId===el.id ? 'ring-2 ring-blue-500' : ''}`}
+                className={`cursor-move select-none text-gray-800 ${selectedId === el.id ? 'ring-2 ring-blue-500' : ''}`}
                 onMouseDown={() => onSelect(el.id)}
               >
                 {el.content}
@@ -60,7 +63,8 @@ const InvitationCanvas = React.forwardRef(function InvitationCanvas(
         ))}
       </div>
       <p className="text-xs text-gray-500 text-center mt-2">
-        Arrastra los textos para recolocarlos (demo). Próximamente: añadir nuevos elementos y propiedades.
+        Arrastra los textos para recolocarlos (demo). Próximamente: añadir nuevos elementos y
+        propiedades.
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import UnifiedEmail from '../UnifiedEmail';
 
 // Wrapper de compatibilidad para LazyEmailInbox

@@ -1,41 +1,64 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-  const normalizeLang = (l) => (String(l || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es');
+const normalizeLang = (l) =>
+  String(l || 'es')
+    .toLowerCase()
+    .match(/^[a-z]{2}/)?.[0] || 'es';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
 // import anterior eliminado: useUserContext
+import { getBackendBase } from '@/utils/backendBase.js';
+
+import Input from './Input';
+import Nav from './Nav';
+import PlannerDashboard from './PlannerDashboard';
+import ProviderSearchModal from './ProviderSearchModal';
 import { useAuth } from '../hooks/useAuth'; // Nuevo sistema
 import { Card } from './ui/Card';
 import { Progress } from './ui/Progress';
-import Nav from './Nav';
-import { Link } from 'react-router-dom';
 
-import { User, DollarSign, Calendar, Users, ChevronLeft, ChevronRight, Plus, Phone } from 'lucide-react';
-import Input from './Input';
-import ProviderSearchModal from './ProviderSearchModal';
+import {
+  User,
+  DollarSign,
+  Calendar,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Phone,
+} from 'lucide-react';
 
-import { fetchWall } from '../services/wallService';
-import { fetchWeddingNews } from '../services/blogService';
-import { useTranslation } from 'react-i18next';
-
-import PlannerDashboard from './PlannerDashboard';
 import useFinance from '../hooks/useFinance';
+import { fetchWeddingNews } from '../services/blogService';
+import { fetchWall } from '../services/wallService';
 
-import { getBackendBase } from '@/utils/backendBase.js';
 export default function HomePage() {
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
-  const [guest, setGuest] = useState({name: '', side: 'novia', contact: ''});
-  const [newMovement, setNewMovement] = useState({concept: '', amount: 0, date: '', type: 'expense'});
+  const [guest, setGuest] = useState({ name: '', side: 'novia', contact: '' });
+  const [newMovement, setNewMovement] = useState({
+    concept: '',
+    amount: 0,
+    date: '',
+    type: 'expense',
+  });
   const [activeModal, setActiveModal] = useState(null);
   // Hook de autenticacin unificado
   const { hasRole, userProfile, currentUser } = useAuth();
-  
+
   // Derivados equivalentes al antiguo UserContext
   const role = userProfile?.role || 'particular';
-  const displayName = userProfile?.name || userProfile?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
+  const displayName =
+    userProfile?.name ||
+    userProfile?.displayName ||
+    currentUser?.displayName ||
+    currentUser?.email?.split('@')[0] ||
+    '';
   const weddingName = localStorage.getItem('lovenda_active_wedding_name') || '';
   const progress = Number(localStorage.getItem('lovenda_progress') || 0);
   const logoUrl = userProfile?.logoUrl || '';
-  
+
   // Datos derivados ya calculados ms arriba
   const email = currentUser?.email || '';
 
@@ -52,15 +75,19 @@ export default function HomePage() {
 
   // Cargar primera imagen de cada categora
   useEffect(() => {
-    const categories = ['decoracin','cctel','banquete','ceremonia'];
-    Promise.all(categories.map(cat=>fetchWall(1, cat))).then(results=>{
-      const imgs = results.map((arr,i)=>{
-        const first = arr[0];
-        if(first) return { src: first.url, alt: categories[i] };
-        return null;
-      }).filter(Boolean);
-      setCategoryImages(imgs);
-    }).catch(console.error);
+    const categories = ['decoracin', 'cctel', 'banquete', 'ceremonia'];
+    Promise.all(categories.map((cat) => fetchWall(1, cat)))
+      .then((results) => {
+        const imgs = results
+          .map((arr, i) => {
+            const first = arr[0];
+            if (first) return { src: first.url, alt: categories[i] };
+            return null;
+          })
+          .filter(Boolean);
+        setCategoryImages(imgs);
+      })
+      .catch(console.error);
   }, []);
 
   // Cargar ltimas noticias (mx 3 por dominio y 4 con imagen)
@@ -79,9 +106,15 @@ export default function HomePage() {
           consecutiveErrors = 0;
           for (const post of batch) {
             if (!post?.url || !post.image) continue;
-            const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
+            const dom = (() => {
+              try {
+                return new URL(post.url).hostname.replace(/^www\./, '');
+              } catch {
+                return 'unk';
+              }
+            })();
             if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-            if (results.some(x => x.url === post.url)) continue;
+            if (results.some((x) => x.url === post.url)) continue;
             domainCounts[dom] = (domainCounts[dom] || 0) + 1;
             results.push(post);
             if (results.length >= desired) break;
@@ -96,7 +129,7 @@ export default function HomePage() {
       }
 
       // fallback: si a?n faltan, relajamos l?mite
-      const canTranslate = !!(import.meta?.env?.VITE_TRANSLATE_KEY);
+      const canTranslate = !!import.meta?.env?.VITE_TRANSLATE_KEY;
       if (results.length < desired && (lang === 'en' || canTranslate)) {
         page = 1;
         consecutiveErrors = 0;
@@ -105,12 +138,18 @@ export default function HomePage() {
             const batch = await fetchWeddingNews(page, 10, lang === 'en' ? 'en' : 'en');
             consecutiveErrors = 0;
             for (const post of batch) {
-            if (!post?.url || !post.image) continue;
-            const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
-            if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-            if (results.some(x => x.url === post.url)) continue;
-            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-            results.push(post);
+              if (!post?.url || !post.image) continue;
+              const dom = (() => {
+                try {
+                  return new URL(post.url).hostname.replace(/^www\./, '');
+                } catch {
+                  return 'unk';
+                }
+              })();
+              if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
+              if (results.some((x) => x.url === post.url)) continue;
+              domainCounts[dom] = (domainCounts[dom] || 0) + 1;
+              results.push(post);
               if (results.length >= desired) break;
             }
           } catch (err) {
@@ -125,7 +164,8 @@ export default function HomePage() {
 
       // ?ltimo recurso: completar hasta 4 con placeholder si falta imagen
       if (results.length < desired) {
-        page = 1; consecutiveErrors = 0;
+        page = 1;
+        consecutiveErrors = 0;
         const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
         while (results.length < desired && page <= 20) {
           try {
@@ -133,9 +173,15 @@ export default function HomePage() {
             consecutiveErrors = 0;
             for (const post of batch) {
               if (!post?.url) continue;
-              const dom = (()=>{ try { return new URL(post.url).hostname.replace(/^www\./, ""); } catch { return "unk"; } })();
+              const dom = (() => {
+                try {
+                  return new URL(post.url).hostname.replace(/^www\./, '');
+                } catch {
+                  return 'unk';
+                }
+              })();
               if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-              if (results.some(x => x.url === post.url)) continue;
+              if (results.some((x) => x.url === post.url)) continue;
               domainCounts[dom] = (domainCounts[dom] || 0) + 1;
               results.push(post.image ? post : { ...post, image: placeholder });
               if (results.length >= desired) break;
@@ -155,7 +201,8 @@ export default function HomePage() {
   }, [lang]);
 
   const handleRedoTutorial = useCallback(async () => {
-    if (!confirm('Esto eliminar datos locales y crear una nueva boda de prueba. Continuar?')) return;
+    if (!confirm('Esto eliminar datos locales y crear una nueva boda de prueba. Continuar?'))
+      return;
     try {
       // 1. Limpiar almacenamiento y marcar flag para mostrar tutorial
       localStorage.clear();
@@ -182,7 +229,9 @@ export default function HomePage() {
   const guestsMetrics = useMemo(() => {
     try {
       const guestsArr = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
-      const confirmedCount = guestsArr.filter(g => ((g.response || g.status || '').toLowerCase() === 'confirmado')).length;
+      const confirmedCount = guestsArr.filter(
+        (g) => (g.response || g.status || '').toLowerCase() === 'confirmado'
+      ).length;
       return { guestsArr, confirmedCount, totalGuests: guestsArr.length };
     } catch {
       return { guestsArr: [], confirmedCount: 0, totalGuests: 0 };
@@ -196,7 +245,7 @@ export default function HomePage() {
       const longTasksArr = JSON.parse(localStorage.getItem('lovendaLongTasks') || '[]');
       const allTasks = [...meetingsArr, ...longTasksArr];
       const tasksTotal = allTasks.length;
-      const tasksCompleted = allTasks.filter(t => tasksCompletedMap[t.id]).length;
+      const tasksCompleted = allTasks.filter((t) => tasksCompletedMap[t.id]).length;
       return { tasksTotal, tasksCompleted };
     } catch {
       return { tasksTotal: 0, tasksCompleted: 0 };
@@ -218,22 +267,48 @@ export default function HomePage() {
   const financeSpent = Number(financeStats?.totalSpent || 0);
   const budgetTotal = Number(financeStats?.totalBudget || 0);
 
-  const statsNovios = useMemo(() => [
-    { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `${financeSpent.toLocaleString()}` + (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
-    { label: 'Proveedores contratados', value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`, icon: User },
-    { label: 'Tareas completadas', value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`, icon: Calendar },
-  ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
+  const statsNovios = useMemo(
+    () => [
+      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
+      {
+        label: 'Presupuesto gastado',
+        value:
+          `${financeSpent.toLocaleString()}` +
+          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
+        icon: DollarSign,
+      },
+      {
+        label: 'Proveedores contratados',
+        value: `${providersMetrics.providersAssigned} / ${providersMetrics.providersTotalNeeded}`,
+        icon: User,
+      },
+      {
+        label: 'Tareas completadas',
+        value: `${tasksMetrics.tasksCompleted} / ${tasksMetrics.tasksTotal}`,
+        icon: Calendar,
+      },
+    ],
+    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
+  );
 
-  const statsPlanner = useMemo(() => [
-    { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
-    { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
-    { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
-    { label: 'Presupuesto gastado', value: `${financeSpent.toLocaleString()}` + (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''), icon: DollarSign },
-  ], [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]);
+  const statsPlanner = useMemo(
+    () => [
+      { label: 'Tareas asignadas', value: `${tasksMetrics.tasksTotal}`, icon: Calendar },
+      { label: 'Proveedores asignados', value: providersMetrics.providersAssigned, icon: User },
+      { label: 'Invitados confirmados', value: guestsMetrics.confirmedCount, icon: Users },
+      {
+        label: 'Presupuesto gastado',
+        value:
+          `${financeSpent.toLocaleString()}` +
+          (budgetTotal ? ` / ${budgetTotal.toLocaleString()}` : ''),
+        icon: DollarSign,
+      },
+    ],
+    [guestsMetrics, financeSpent, providersMetrics, tasksMetrics, budgetTotal]
+  );
 
-  const statsCommon = useMemo(() => 
-    role === 'particular' ? statsNovios : statsPlanner,
+  const statsCommon = useMemo(
+    () => (role === 'particular' ? statsNovios : statsPlanner),
     [role, statsNovios, statsPlanner]
   );
 
@@ -255,8 +330,14 @@ export default function HomePage() {
         {/* Header */}
         <header className="relative z-10 p-6 flex justify-between items-center">
           <div className="space-y-1">
-            <h1 className="page-title">Bienvenidos, {weddingName}{weddingName && displayName ? ' y ' : ''}{displayName}</h1>
-            <p className="text-4xl font-bold text-[color:var(--color-text)]">Cada detalle hace tu boda inolvidable</p>
+            <h1 className="page-title">
+              Bienvenidos, {weddingName}
+              {weddingName && displayName ? ' y ' : ''}
+              {displayName}
+            </h1>
+            <p className="text-4xl font-bold text-[color:var(--color-text)]">
+              Cada detalle hace tu boda inolvidable
+            </p>
           </div>
           <img
             src={`${import.meta.env.BASE_URL}logo-app.png`}
@@ -273,13 +354,7 @@ export default function HomePage() {
               className="h-4 rounded-full w-full"
               value={progress}
               max={100}
-              variant={
-                progress >= 100
-                  ? 'success'
-                  : progress >= 80
-                  ? 'primary'
-                  : 'destructive'
-              }
+              variant={progress >= 100 ? 'success' : progress >= 80 ? 'primary' : 'destructive'}
             />
             <p className="mt-2 text-sm font-medium text-[color:var(--color-text)]">
               {progress}% completado
@@ -318,7 +393,10 @@ export default function HomePage() {
           {statsCommon.map((stat, idx) => {
             const Icon = stat.icon;
             return (
-              <Card key={idx} className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition transform hover:scale-105">
+              <Card
+                key={idx}
+                className="p-4 bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition transform hover:scale-105"
+              >
                 <div className="flex items-center space-x-2">
                   <Icon className="text-[var(--color-primary)]" />
                   <p className="text-sm text-[color:var(--color-text)]">{stat.label}</p>
@@ -340,22 +418,31 @@ export default function HomePage() {
               </button>
             </Link>
             <div className="flex space-x-2">
-              <button onClick={scrollPrev} className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md">
+              <button
+                onClick={scrollPrev}
+                className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md"
+              >
                 <ChevronLeft className="text-[var(--color-primary)]" />
               </button>
-              <button onClick={scrollNext} className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md">
+              <button
+                onClick={scrollNext}
+                className="p-2 rounded-full bg-[var(--color-surface)]/80 backdrop-blur-md"
+              >
                 <ChevronRight className="text-[var(--color-primary)]" />
               </button>
             </div>
           </div>
-          <div 
-            ref={galleryRef} 
+          <div
+            ref={galleryRef}
             className="flex space-x-4 overflow-x-auto pb-4 snap-x scrollbar-hide"
           >
             {categoryImages.map((img, idx) => (
-              <div key={idx} className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden">
-                <img 
-                  src={img.src} 
+              <div
+                key={idx}
+                className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden"
+              >
+                <img
+                  src={img.src}
                   alt={img.alt}
                   className="w-full h-full object-cover transition transform hover:scale-110"
                 />
@@ -376,20 +463,38 @@ export default function HomePage() {
               </button>
             </Link>
           </div>
-        {newsPosts.length > 0 && (
+          {newsPosts.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {newsPosts.map((post) => (
-                <Card key={post.id} onClick={() => window.open(post.url, '_blank')} className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition">
+                <Card
+                  key={post.id}
+                  onClick={() => window.open(post.url, '_blank')}
+                  className="cursor-pointer p-0 overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md hover:shadow-lg transition"
+                >
                   {post.image && (
-                    <img src={backendBase ? `${backendBase}/api/image-proxy?u=${encodeURIComponent(post.image)}` : post.image} alt={post.title} className="w-full h-40 object-cover" />
+                    <img
+                      src={
+                        backendBase
+                          ? `${backendBase}/api/image-proxy?u=${encodeURIComponent(post.image)}`
+                          : post.image
+                      }
+                      alt={post.title}
+                      className="w-full h-40 object-cover"
+                    />
                   )}
-              <div className="p-4 space-y-1">
-                <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">{post.title}</h3>
-                <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">{post.description}</p>
-                <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
-                  Fuente: {post.source || ((post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0])}
-                </div>
-              </div>
+                  <div className="p-4 space-y-1">
+                    <h3 className="font-semibold text-[color:var(--color-text)] line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-[var(--color-text)]/70 line-clamp-2">
+                      {post.description}
+                    </p>
+                    <div className="pt-2 text-xs text-[var(--color-text)]/60 border-t border-[var(--color-text)]/10">
+                      Fuente:{' '}
+                      {post.source ||
+                        (post.url || '').replace(/^https?:\/\/(www\.)?/, '').split('/')[0]}
+                    </div>
+                  </div>
                 </Card>
               ))}
             </div>
@@ -398,7 +503,7 @@ export default function HomePage() {
 
         <Nav active="home" />
       </div>
-      
+
       {/* Modales */}
       {activeModal === 'proveedor' && <ProviderSearchModal onClose={() => setActiveModal(null)} />}
 
@@ -407,44 +512,44 @@ export default function HomePage() {
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
             <h2 className="text-xl font-bold mb-4">Añadir Invitado</h2>
             <div className="space-y-4">
-              <Input 
-                label="Nombre" 
-                value={guest.name} 
-                onChange={e => setGuest({...guest, name: e.target.value})} 
+              <Input
+                label="Nombre"
+                value={guest.name}
+                onChange={(e) => setGuest({ ...guest, name: e.target.value })}
               />
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1">Parte de</label>
-                  <select 
+                  <select
                     className="w-full p-2 border border-gray-300 rounded"
                     value={guest.side}
-                    onChange={e => setGuest({...guest, side: e.target.value})}
+                    onChange={(e) => setGuest({ ...guest, side: e.target.value })}
                   >
                     <option value="novia">Novia</option>
                     <option value="novio">Novio</option>
                     <option value="ambos">Ambos</option>
                   </select>
                 </div>
-                <Input 
-                  label="Contacto" 
-                  value={guest.contact} 
-                  onChange={e => setGuest({...guest, contact: e.target.value})} 
+                <Input
+                  label="Contacto"
+                  value={guest.contact}
+                  onChange={(e) => setGuest({ ...guest, contact: e.target.value })}
                 />
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
-              <button 
+              <button
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={() => {
                   const guests = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
-                  guests.push({...guest, id: Date.now()});
+                  guests.push({ ...guest, id: Date.now() });
                   localStorage.setItem('lovendaGuests', JSON.stringify(guests));
-                  setGuest({name:'',side:'novia',contact:''});
+                  setGuest({ name: '', side: 'novia', contact: '' });
                   setActiveModal(null);
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
@@ -461,29 +566,31 @@ export default function HomePage() {
           <div className="bg-[var(--color-surface)] p-6 rounded-lg w-96 max-w-full">
             <h2 className="text-xl font-bold mb-4">Nuevo Movimiento</h2>
             <div className="space-y-4">
-              <Input 
-                label="Concepto" 
-                value={newMovement.concept} 
-                onChange={e => setNewMovement({...newMovement, concept: e.target.value})} 
+              <Input
+                label="Concepto"
+                value={newMovement.concept}
+                onChange={(e) => setNewMovement({ ...newMovement, concept: e.target.value })}
               />
-              <Input 
-                label="Cantidad ()" 
+              <Input
+                label="Cantidad ()"
                 type="number"
-                value={newMovement.amount} 
-                onChange={e => setNewMovement({...newMovement, amount: parseFloat(e.target.value) || 0})} 
+                value={newMovement.amount}
+                onChange={(e) =>
+                  setNewMovement({ ...newMovement, amount: parseFloat(e.target.value) || 0 })
+                }
               />
-              <Input 
-                label="Fecha" 
+              <Input
+                label="Fecha"
                 type="date"
-                value={newMovement.date} 
-                onChange={e => setNewMovement({...newMovement, date: e.target.value})} 
+                value={newMovement.date}
+                onChange={(e) => setNewMovement({ ...newMovement, date: e.target.value })}
               />
               <div>
                 <label className="block text-sm font-medium mb-1">Tipo</label>
-                <select 
+                <select
                   className="w-full p-2 border border-gray-300 rounded"
                   value={newMovement.type}
-                  onChange={e => setNewMovement({...newMovement, type: e.target.value})}
+                  onChange={(e) => setNewMovement({ ...newMovement, type: e.target.value })}
                 >
                   <option value="expense">Gasto</option>
                   <option value="income">Ingreso</option>
@@ -491,18 +598,18 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
-              <button 
+              <button
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={() => {
                   const movs = JSON.parse(localStorage.getItem('quickMovements') || '[]');
-                  movs.push({...newMovement, id: Date.now()});
+                  movs.push({ ...newMovement, id: Date.now() });
                   localStorage.setItem('quickMovements', JSON.stringify(movs));
-                  setNewMovement({concept:'',amount:0,date:'',type:'expense'});
+                  setNewMovement({ concept: '', amount: 0, date: '', type: 'expense' });
                   setActiveModal(null);
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
@@ -523,20 +630,20 @@ export default function HomePage() {
                 className="w-full p-3 border border-gray-300 rounded h-32"
                 placeholder="Escribe tu nota aqu..."
                 value={noteText}
-                onChange={e => setNoteText(e.target.value)}
+                onChange={(e) => setNoteText(e.target.value)}
               ></textarea>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
-              <button 
+              <button
                 onClick={() => setActiveModal(null)}
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
                 Cancelar
               </button>
-              <button 
+              <button
                 onClick={() => {
                   const notes = JSON.parse(localStorage.getItem('lovendaNotes') || '[]');
-                  notes.push({text: noteText, id: Date.now()});
+                  notes.push({ text: noteText, id: Date.now() });
                   localStorage.setItem('lovendaNotes', JSON.stringify(notes));
                   setNoteText('');
                   setActiveModal(null);
@@ -552,7 +659,3 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
-
-
-
-

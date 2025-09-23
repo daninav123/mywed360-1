@@ -1,6 +1,17 @@
+import {
+  collection,
+  doc,
+  getDocs,
+  limit,
+  query,
+  setDoc,
+  writeBatch,
+  serverTimestamp,
+  deleteDoc,
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+
 import { db } from '../firebaseConfig';
-import { collection, doc, getDocs, limit, query, setDoc, writeBatch, serverTimestamp, deleteDoc } from 'firebase/firestore';
 // No exigimos autenticación explícita aquí; la ruta es de desarrollo
 
 function chunkArray(arr, size) {
@@ -29,7 +40,7 @@ export default function DevSeedGuests() {
         // Si no force y ya hay datos, salimos
         const [guestsSnap, tablesSnap] = await Promise.all([
           getDocs(query(guestsCol, limit(1))),
-          getDocs(query(collection(db, ...tablesColPath), limit(1)))
+          getDocs(query(collection(db, ...tablesColPath), limit(1))),
         ]);
         if (!force && (!guestsSnap.empty || !tablesSnap.empty)) {
           setStatus('Datos existentes detectados. Añade force=true para sobrescribir.');
@@ -41,10 +52,12 @@ export default function DevSeedGuests() {
           setStatus('Borrando datos anteriores...');
           const [allGuests, allTables] = await Promise.all([
             getDocs(collection(db, 'weddings', weddingId, 'guests')),
-            getDocs(collection(db, ...tablesColPath))
+            getDocs(collection(db, ...tablesColPath)),
           ]);
           const deletions = [];
-          allGuests.forEach((d) => deletions.push({ path: ['weddings', weddingId, 'guests', d.id] }));
+          allGuests.forEach((d) =>
+            deletions.push({ path: ['weddings', weddingId, 'guests', d.id] })
+          );
           allTables.forEach((d) => deletions.push({ path: [...tablesColPath, d.id] }));
           // Hacer deletes por lotes de 400
           for (const group of chunkArray(deletions, 400)) {
@@ -71,7 +84,7 @@ export default function DevSeedGuests() {
               tableId: tableId,
               table: tableId,
               createdAt: serverTimestamp(),
-            }
+            },
           });
         }
 
@@ -97,7 +110,7 @@ export default function DevSeedGuests() {
               y: 120 + Math.floor((t - 1) / 10) * 160,
               assignedGuests: assignedByTable[t] || [],
               createdAt: serverTimestamp(),
-            }
+            },
           });
         }
 
@@ -120,15 +133,21 @@ export default function DevSeedGuests() {
         // Asegurar documento de finanzas
         try {
           const financeDoc = doc(db, 'weddings', weddingId, 'finance', 'main');
-          await setDoc(financeDoc, {
-            movements: [],
-            updatedAt: serverTimestamp(),
-          }, { merge: true });
+          await setDoc(
+            financeDoc,
+            {
+              movements: [],
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
         } catch (e) {
           console.warn('No se pudo crear/actualizar finance/main:', e);
         }
 
-        setStatus(`✅ Insertados ${totalGuests} invitados y ${tablesNeeded} mesas en la boda ${weddingId}`);
+        setStatus(
+          `✅ Insertados ${totalGuests} invitados y ${tablesNeeded} mesas en la boda ${weddingId}`
+        );
       } catch (e) {
         console.error(e);
         setStatus('❌ Error durante el seeding');
@@ -143,7 +162,10 @@ export default function DevSeedGuests() {
       <p>{status}</p>
       {details && <pre style={{ whiteSpace: 'pre-wrap' }}>{details}</pre>}
       <p>Parámetros: weddingId, guests, perTable, force (true/false)</p>
-      <p>Ejemplo: /dev/seed-guests?weddingId=61ffb907-7fcb-4361-b764-0300b317fe06&guests=250&perTable=10&force=true</p>
+      <p>
+        Ejemplo:
+        /dev/seed-guests?weddingId=61ffb907-7fcb-4361-b764-0300b317fe06&guests=250&perTable=10&force=true
+      </p>
     </div>
   );
 }

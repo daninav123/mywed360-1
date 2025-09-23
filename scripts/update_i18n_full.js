@@ -1,7 +1,10 @@
-﻿const fs=require('fs');
+const fs=require('fs');
 function load(p){return JSON.parse(fs.readFileSync(p,'utf8'));}
 function save(p,o){fs.writeFileSync(p, JSON.stringify(o,null,2)+'\n','utf8');}
 function setPath(obj,path,val){const parts=path.split('.');let cur=obj;for(let i=0;i<parts.length-1;i++){const k=parts[i];if(!cur[k]||typeof cur[k]!=='object')cur[k]={};cur=cur[k];}cur[parts[parts.length-1]]=val;}
+function getPath(obj,path){const parts=path.split('.');let cur=obj;for(const k of parts){if(!cur||typeof cur!=='object')return undefined;cur=cur[k];}return cur;}
+function flatten(obj,prefix=''){const out={};if(!obj||typeof obj!=='object')return out;for(const [k,v] of Object.entries(obj)){const key=prefix?`${prefix}.${k}`:k;if(v&&typeof v==='object'&&!Array.isArray(v)){Object.assign(out, flatten(v,key));}else{out[key]=v;}}return out;}
+function fillMissingFrom(base,target){const flat=flatten(base);for(const [k,v] of Object.entries(flat)){const cur=getPath(target,k);if(typeof cur==='undefined'){setPath(target,k,v);} }}
 
 const paths={
   en:'src/i18n/locales/en/common.json',
@@ -37,5 +40,17 @@ const rsvpFR={ section:'RSVP', simulate:'Simuler des rappels', send:'Envoyer des
 function ensureRSVP(obj,map){ obj.rsvp = Object.assign({}, obj.rsvp||{}, map, obj.rsvp||{}); }
 ensureRSVP(en,rsvpEN); ensureRSVP(es,rsvpES); ensureRSVP(fr,rsvpFR);
 
+// Rellenar claves faltantes de EN en ES/FR sin sobrescribir lo existente
+fillMissingFrom(en, es);
+fillMissingFrom(en, fr);
+
+// Fusionar finance.json (ES) dentro de es/common.json bajo "finance" si existe
+try{
+  const esFinance = load('src/i18n/locales/es/finance.json');
+  if(esFinance && typeof esFinance==='object'){
+    es.finance = Object.assign({}, es.finance||{}, esFinance);
+  }
+}catch(_){/* optional */}
+
 save(paths.en,en); save(paths.es,es); save(paths.fr,fr);
-console.log('Updated tasks/forms/messages/rsvp in EN/ES/FR');
+console.log('Updated i18n: ensured tasks/forms/messages/rsvp; filled missing keys ES/FR from EN; merged es/finance.json');

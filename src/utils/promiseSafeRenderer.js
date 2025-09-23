@@ -38,7 +38,7 @@ export function safeMap(array, mapFn = (item) => item) {
   if (!Array.isArray(array)) {
     return [];
   }
-  
+
   // Si mapFn no es una función válida, usa identidad
   const mapper = typeof mapFn === 'function' ? mapFn : (item) => item;
 
@@ -73,11 +73,11 @@ export function safeExecute(fn, ...args) {
  */
 export function safeDangerouslySetInnerHTML(htmlContent) {
   const safeContent = ensureNotPromise(htmlContent);
-  
+
   if (typeof safeContent === 'string') {
     return { __html: safeContent };
   }
-  
+
   return null;
 }
 
@@ -88,11 +88,11 @@ export function safeDangerouslySetInnerHTML(htmlContent) {
  */
 export function useSafeState(initialValue) {
   const [state, setState] = useState(ensureNotPromise(initialValue));
-  
+
   const setSafeState = (newValue) => {
     setState(ensureNotPromise(newValue));
   };
-  
+
   return [state, setSafeState];
 }
 
@@ -102,5 +102,5 @@ export default {
   safeMap,
   safeExecute,
   safeDangerouslySetInnerHTML,
-  useSafeState
+  useSafeState,
 };

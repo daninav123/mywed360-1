@@ -12,7 +12,8 @@
 
 /* Ajustes de layout y legibilidad */
 /* Ajustar tamaño de texto del header para evitar solapes */
-._9w8d5, ._2q1Kt {
+._9w8d5,
+._2q1Kt {
   font-size: 0.75rem !important;
   white-space: nowrap !important;
   overflow: hidden !important;

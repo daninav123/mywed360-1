@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+
 import { getCurrentLanguage, formatDate, formatCurrency, formatNumber } from '../i18n';
 
 // Hook de traducciones y formateos localizados
@@ -12,13 +13,26 @@ const useTranslations = () => {
       let out = s.replace(/\uFFFD+/g, '');
       // Normalizaciones mínimas comunes
       const pairs = [
-        ['á', 'á'], ['é', 'é'], ['í', 'í'], ['ó', 'ó'], ['ú', 'ú'],
-        ['ñ', 'ñ'], ['Ã‰', 'É'], ['€', '€'], ['…', '…'],
-        ['–', '–'], ['—', '—'], ['“', '“'], ['â€\u009D', '”'], ['’', '’']
+        ['á', 'á'],
+        ['é', 'é'],
+        ['í', 'í'],
+        ['ó', 'ó'],
+        ['ú', 'ú'],
+        ['ñ', 'ñ'],
+        ['Ã‰', 'É'],
+        ['€', '€'],
+        ['…', '…'],
+        ['–', '–'],
+        ['—', '—'],
+        ['“', '“'],
+        ['â€\u009D', '”'],
+        ['’', '’'],
       ];
       for (const [bad, good] of pairs) out = out.split(bad).join(good);
       return out;
-    } catch { return s; }
+    } catch {
+      return s;
+    }
   };
 
   const translate = (key, options = {}) => {
@@ -31,22 +45,42 @@ const useTranslations = () => {
   const translateWithVars = (key, variables = {}) => t(key, variables);
 
   const formatters = {
-    date: (date, options = {}) => formatDate(date, { year: 'numeric', month: 'long', day: 'numeric', ...options }),
+    date: (date, options = {}) =>
+      formatDate(date, { year: 'numeric', month: 'long', day: 'numeric', ...options }),
     dateShort: (date) => formatDate(date, { year: 'numeric', month: 'short', day: 'numeric' }),
-    datetime: (date) => formatDate(date, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    datetime: (date) =>
+      formatDate(date, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
     time: (date) => formatDate(date, { hour: '2-digit', minute: '2-digit' }),
     currency: (amount, currency = 'EUR') => formatCurrency(amount, currency),
     number: (n) => formatNumber(n),
-    percentage: (value) => new Intl.NumberFormat(getCurrentLanguage(), { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(value / 100),
+    percentage: (value) =>
+      new Intl.NumberFormat(getCurrentLanguage(), {
+        style: 'percent',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      }).format(value / 100),
   };
 
   const wedding = {
     guestStatus: (status) => {
       const x = String(status || '').toLowerCase();
-      const norm = x === 'accepted' || x === 'confirmado' || x === 'confirmed' ? 'confirmed'
-        : x === 'rejected' || x === 'rechazado' || x === 'declined' ? 'declined'
-        : 'pending';
-      const map = { confirmed: translate('guests.confirmed'), pending: translate('guests.pending'), declined: translate('guests.declined') };
+      const norm =
+        x === 'accepted' || x === 'confirmado' || x === 'confirmed'
+          ? 'confirmed'
+          : x === 'rejected' || x === 'rechazado' || x === 'declined'
+            ? 'declined'
+            : 'pending';
+      const map = {
+        confirmed: translate('guests.confirmed'),
+        pending: translate('guests.pending'),
+        declined: translate('guests.declined'),
+      };
       return map[norm] || status;
     },
   };

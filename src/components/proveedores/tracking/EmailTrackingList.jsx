@@ -1,5 +1,6 @@
-import React from 'react';
 import { Clock, Mail, CheckCircle, AlertCircle, XCircle, Eye } from 'lucide-react';
+import React from 'react';
+
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
 
@@ -19,7 +20,7 @@ import Card from '../../../components/ui/Card';
 /**
  * Componente que muestra una lista de seguimiento de emails enviados a proveedores.
  * Permite filtrar por estado y ver detalles de cada email enviado.
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {EmailTrackingItem[]} [props.trackingItems=[]] - Lista de elementos de seguimiento de emails
  * @param {Function} props.onViewDetails - Función para ver detalles de un elemento de seguimiento
@@ -36,46 +37,46 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
           color: 'text-blue-600',
           bgColor: 'bg-blue-100',
           icon: <Mail size={16} />,
-          text: 'Enviado'
+          text: 'Enviado',
         };
       case 'entregado':
         return {
           color: 'text-green-600',
           bgColor: 'bg-green-100',
           icon: <CheckCircle size={16} />,
-          text: 'Entregado'
+          text: 'Entregado',
         };
       case 'leido':
         return {
           color: 'text-purple-600',
           bgColor: 'bg-purple-100',
           icon: <Eye size={16} />,
-          text: 'Leído'
+          text: 'Leído',
         };
       case 'error':
         return {
           color: 'text-red-600',
           bgColor: 'bg-red-100',
           icon: <XCircle size={16} />,
-          text: 'Error'
+          text: 'Error',
         };
       case 'pendiente':
         return {
           color: 'text-amber-600',
           bgColor: 'bg-amber-100',
           icon: <Clock size={16} />,
-          text: 'Pendiente'
+          text: 'Pendiente',
         };
       default:
         return {
           color: 'text-gray-600',
           bgColor: 'bg-gray-100',
           icon: <AlertCircle size={16} />,
-          text: 'Desconocido'
+          text: 'Desconocido',
         };
     }
   };
-  
+
   // Formatear fecha y hora
   const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
@@ -86,13 +87,13 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
         month: '2-digit',
         year: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       });
     } catch (e) {
       return dateStr;
     }
   };
-  
+
   // Ejemplos de datos para el seguimiento si no hay datos reales
   const demoTrackingItems = [
     {
@@ -103,7 +104,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
       sentAt: '2025-05-10T14:30:00',
       status: 'leido',
       lastUpdated: '2025-05-10T15:45:00',
-      openCount: 3
+      openCount: 3,
     },
     {
       id: 2,
@@ -113,7 +114,7 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
       sentAt: '2025-05-09T10:15:00',
       status: 'enviado',
       lastUpdated: '2025-05-09T10:15:00',
-      openCount: 0
+      openCount: 0,
     },
     {
       id: 3,
@@ -123,58 +124,59 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
       sentAt: '2025-05-08T16:20:00',
       status: 'entregado',
       lastUpdated: '2025-05-08T16:22:00',
-      openCount: 0
-    }
+      openCount: 0,
+    },
   ];
-  
+
   // Usar datos reales si están disponibles, o los datos de demostración
   const displayItems = trackingItems.length > 0 ? trackingItems : demoTrackingItems;
-  
+
   // Filtrar elementos según el filtro actual
-  const filteredItems = currentFilter === 'todos' 
-    ? displayItems 
-    : displayItems.filter(item => item.status === currentFilter);
-  
+  const filteredItems =
+    currentFilter === 'todos'
+      ? displayItems
+      : displayItems.filter((item) => item.status === currentFilter);
+
   return (
     <div className="space-y-4">
       {/* Filtros de estado */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {['todos', 'enviado', 'entregado', 'leido', 'error', 'pendiente'].map(filter => (
+        {['todos', 'enviado', 'entregado', 'leido', 'error', 'pendiente'].map((filter) => (
           <Button
             key={filter}
             onClick={() => onFilter(filter)}
             variant={filter === currentFilter ? 'default' : 'outline'}
             size="sm"
-            className={`capitalize ${
-              filter === currentFilter ? '' : 'text-gray-600'
-            }`}
+            className={`capitalize ${filter === currentFilter ? '' : 'text-gray-600'}`}
           >
             {filter === 'todos' ? 'Todos' : getStatusInfo(filter).text}
           </Button>
         ))}
       </div>
-      
+
       {/* Lista de elementos de seguimiento */}
       {filteredItems.length > 0 ? (
         <div className="space-y-3">
-          {filteredItems.map(item => {
+          {filteredItems.map((item) => {
             const statusInfo = getStatusInfo(item.status);
-            
+
             return (
               <Card key={item.id} className="hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-medium text-gray-900">{item.providerName}</h3>
-                      <span className={`text-xs ${statusInfo.color} ${statusInfo.bgColor} flex items-center gap-1 px-2 py-1 rounded-full`}>
+                      <span
+                        className={`text-xs ${statusInfo.color} ${statusInfo.bgColor} flex items-center gap-1 px-2 py-1 rounded-full`}
+                      >
                         {statusInfo.icon} {statusInfo.text}
                       </span>
                     </div>
-                    
+
                     <p className="text-sm font-medium text-gray-700 mb-1 truncate">
                       {item.subject}
                     </p>
-                    
+
                     <div className="flex items-center text-xs text-gray-500 gap-x-4">
                       <span>Enviado: {formatDateTime(item.sentAt)}</span>
                       {item.lastUpdated !== item.sentAt && (
@@ -182,17 +184,14 @@ const EmailTrackingList = ({ trackingItems = [], onViewDetails, onFilter, curren
                       )}
                       {item.openCount > 0 && (
                         <span className="text-green-600 flex items-center">
-                          <Eye size={12} className="mr-1" /> Abierto {item.openCount} {item.openCount === 1 ? 'vez' : 'veces'}
+                          <Eye size={12} className="mr-1" /> Abierto {item.openCount}{' '}
+                          {item.openCount === 1 ? 'vez' : 'veces'}
                         </span>
                       )}
                     </div>
                   </div>
-                  
-                  <Button 
-                    onClick={() => onViewDetails(item)} 
-                    variant="ghost" 
-                    size="sm"
-                  >
+
+                  <Button onClick={() => onViewDetails(item)} variant="ghost" size="sm">
                     Detalles
                   </Button>
                 </div>
@@ -218,4 +217,3 @@ export default React.memo(EmailTrackingList, (prevProps, nextProps) => {
     prevProps.currentFilter === nextProps.currentFilter
   );
 });
-

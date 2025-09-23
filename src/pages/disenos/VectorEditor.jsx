@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+
 import VectorEditor from '../../components/VectorEditor';
 import { useWedding } from '../../context/WeddingContext';
-import { useAuth } from '../../hooks/useAuth';
 import { db, firebaseReady } from '../../firebaseConfig';
+import { useAuth } from '../../hooks/useAuth';
 
 const fsImport = () => import('firebase/firestore');
 const stImport = () => import('firebase/storage');
@@ -15,7 +16,12 @@ export default function VectorEditorPage() {
   const [svg, setSvg] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [options, setOptions] = useState({ numberofcolors: 32, ltres: 0.1, qtres: 0.1, strokewidth: 1 });
+  const [options, setOptions] = useState({
+    numberofcolors: 32,
+    ltres: 0.1,
+    qtres: 0.1,
+    strokewidth: 1,
+  });
   const [mode, setMode] = useState('color');
   const [threshold, setThreshold] = useState(128);
   const editorRef = useRef(null);
@@ -30,12 +36,13 @@ export default function VectorEditorPage() {
     setLoading(true);
     setError('');
     try {
-      const endpoint = mode === 'mono' ? '/api/ai-image/vectorize-mono' : '/api/ai-image/vectorize-svg';
+      const endpoint =
+        mode === 'mono' ? '/api/ai-image/vectorize-mono' : '/api/ai-image/vectorize-svg';
       const payload = mode === 'mono' ? { url: imageUrl, threshold } : { url: imageUrl, options };
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const t = await res.text();
@@ -75,11 +82,22 @@ export default function VectorEditorPage() {
       }
     };
     load();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [svgUrl]);
 
   // Paleta por boda (branding)
-  const [palette, setPalette] = useState(["#1d4ed8","#dc2626","#0ea5e9","#22c55e","#f59e0b","#a855f7","#111827","#ffffff"]);
+  const [palette, setPalette] = useState([
+    '#1d4ed8',
+    '#dc2626',
+    '#0ea5e9',
+    '#22c55e',
+    '#f59e0b',
+    '#a855f7',
+    '#111827',
+    '#ffffff',
+  ]);
   useEffect(() => {
     const loadBrand = async () => {
       if (!activeWedding) return;
@@ -94,7 +112,9 @@ export default function VectorEditorPage() {
             setPalette(data.palette);
           }
         }
-      } catch (e) { console.warn('No se pudo cargar paleta', e); }
+      } catch (e) {
+        console.warn('No se pudo cargar paleta', e);
+      }
     };
     loadBrand();
   }, [activeWedding]);
@@ -103,7 +123,9 @@ export default function VectorEditorPage() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Editor vectorial (IA)</h1>
-        <Link to="/disenos" className="text-blue-600 hover:underline">Volver a Diseños</Link>
+        <Link to="/disenos" className="text-blue-600 hover:underline">
+          Volver a Diseños
+        </Link>
       </div>
 
       {!canVectorize && (
@@ -117,7 +139,11 @@ export default function VectorEditorPage() {
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex items-center gap-2">
               <label className="text-sm">Modo</label>
-              <select value={mode} onChange={(e)=>setMode(e.target.value)} className="border rounded p-1">
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value)}
+                className="border rounded p-1"
+              >
                 <option value="color">Color (ImageTracer)</option>
                 <option value="mono">Monocromo (Potrace)</option>
               </select>
@@ -126,27 +152,69 @@ export default function VectorEditorPage() {
               <>
                 <div>
                   <label className="block text-sm">Colores</label>
-                  <input type="number" min={2} max={64} value={options.numberofcolors}
-                    onChange={(e)=>setOptions((o)=>({ ...o, numberofcolors: Math.max(2, Math.min(64, Number(e.target.value)||32)) }))}
-                    className="border rounded p-1 w-28" />
+                  <input
+                    type="number"
+                    min={2}
+                    max={64}
+                    value={options.numberofcolors}
+                    onChange={(e) =>
+                      setOptions((o) => ({
+                        ...o,
+                        numberofcolors: Math.max(2, Math.min(64, Number(e.target.value) || 32)),
+                      }))
+                    }
+                    className="border rounded p-1 w-28"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm">ltres (0-1)</label>
-                  <input type="number" step={0.05} min={0} max={1} value={options.ltres}
-                    onChange={(e)=>setOptions((o)=>({ ...o, ltres: Math.max(0, Math.min(1, Number(e.target.value)||0.1)) }))}
-                    className="border rounded p-1 w-28" />
+                  <input
+                    type="number"
+                    step={0.05}
+                    min={0}
+                    max={1}
+                    value={options.ltres}
+                    onChange={(e) =>
+                      setOptions((o) => ({
+                        ...o,
+                        ltres: Math.max(0, Math.min(1, Number(e.target.value) || 0.1)),
+                      }))
+                    }
+                    className="border rounded p-1 w-28"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm">qtres (0-1)</label>
-                  <input type="number" step={0.05} min={0} max={1} value={options.qtres}
-                    onChange={(e)=>setOptions((o)=>({ ...o, qtres: Math.max(0, Math.min(1, Number(e.target.value)||0.1)) }))}
-                    className="border rounded p-1 w-28" />
+                  <input
+                    type="number"
+                    step={0.05}
+                    min={0}
+                    max={1}
+                    value={options.qtres}
+                    onChange={(e) =>
+                      setOptions((o) => ({
+                        ...o,
+                        qtres: Math.max(0, Math.min(1, Number(e.target.value) || 0.1)),
+                      }))
+                    }
+                    className="border rounded p-1 w-28"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm">Trazo</label>
-                  <input type="number" step={0.5} min={0} value={options.strokewidth}
-                    onChange={(e)=>setOptions((o)=>({ ...o, strokewidth: Math.max(0, Number(e.target.value)||1) }))}
-                    className="border rounded p-1 w-28" />
+                  <input
+                    type="number"
+                    step={0.5}
+                    min={0}
+                    value={options.strokewidth}
+                    onChange={(e) =>
+                      setOptions((o) => ({
+                        ...o,
+                        strokewidth: Math.max(0, Number(e.target.value) || 1),
+                      }))
+                    }
+                    className="border rounded p-1 w-28"
+                  />
                 </div>
               </>
             )}
@@ -154,18 +222,37 @@ export default function VectorEditorPage() {
               <>
                 <div>
                   <label className="block text-sm">Umbral (0-255)</label>
-                  <input type="number" min={0} max={255} value={threshold}
-                    onChange={(e)=>setThreshold(Math.max(0, Math.min(255, Number(e.target.value)||128)))}
-                    className="border rounded p-1 w-28" />
+                  <input
+                    type="number"
+                    min={0}
+                    max={255}
+                    value={threshold}
+                    onChange={(e) =>
+                      setThreshold(Math.max(0, Math.min(255, Number(e.target.value) || 128)))
+                    }
+                    className="border rounded p-1 w-28"
+                  />
                 </div>
               </>
             )}
-            <button onClick={doVectorize} disabled={loading}
-              className={`px-3 py-2 rounded ${loading? 'bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>{loading ? 'Vectorizando...' : 'Revectorizar'}</button>
-            <a href={imageUrl} target="_blank" rel="noreferrer" className="text-sm text-gray-600 hover:underline">Ver original</a>
+            <button
+              onClick={doVectorize}
+              disabled={loading}
+              className={`px-3 py-2 rounded ${loading ? 'bg-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+            >
+              {loading ? 'Vectorizando...' : 'Revectorizar'}
+            </button>
+            <a
+              href={imageUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-sm text-gray-600 hover:underline"
+            >
+              Ver original
+            </a>
             {activeWedding && (
               <button
-                onClick={async ()=>{
+                onClick={async () => {
                   try {
                     const content = editorRef.current?.getSvg?.();
                     if (!content) return alert('No hay SVG para guardar');
@@ -180,8 +267,13 @@ export default function VectorEditorPage() {
                     await uploadBytes(sRef(storage, path), blob);
                     const url = await getDownloadURL(sRef(storage, path));
                     await setDoc(newDoc, {
-                      type: 'vector', category, storagePath: path, url, sourceImage: imageUrl,
-                      createdAt: serverTimestamp(), createdBy: currentUser?.uid || 'unknown'
+                      type: 'vector',
+                      category,
+                      storagePath: path,
+                      url,
+                      sourceImage: imageUrl,
+                      createdAt: serverTimestamp(),
+                      createdBy: currentUser?.uid || 'unknown',
                     });
                     alert('SVG guardado en la boda');
                   } catch (e) {
@@ -205,14 +297,17 @@ export default function VectorEditorPage() {
             <h3 className="font-semibold">Paleta de la boda</h3>
             <button
               className="px-3 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-              onClick={async ()=>{
+              onClick={async () => {
                 try {
                   await firebaseReady;
                   const { doc, setDoc, serverTimestamp } = await fsImport();
                   const ref = doc(db, 'weddings', activeWedding, 'branding', 'main');
                   await setDoc(ref, { palette, updatedAt: serverTimestamp() }, { merge: true });
                   alert('Paleta guardada');
-                } catch (e) { console.error(e); alert('No se pudo guardar la paleta'); }
+                } catch (e) {
+                  console.error(e);
+                  alert('No se pudo guardar la paleta');
+                }
               }}
             >
               Guardar paleta
@@ -221,24 +316,37 @@ export default function VectorEditorPage() {
           <div className="flex flex-wrap gap-3 items-center">
             {palette.map((c, i) => (
               <div key={i} className="flex items-center gap-2">
-                <input type="color" value={c} onChange={(e)=>{
-                  const val = e.target.value;
-                  setPalette(prev => prev.map((p,j)=> j===i ? val : p));
-                }} className="w-10 h-8 p-0 border rounded" />
-                <input type="text" value={c} onChange={(e)=>{
-                  const val = e.target.value;
-                  setPalette(prev => prev.map((p,j)=> j===i ? val : p));
-                }} className="border rounded p-1 w-28 text-sm" />
+                <input
+                  type="color"
+                  value={c}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPalette((prev) => prev.map((p, j) => (j === i ? val : p)));
+                  }}
+                  className="w-10 h-8 p-0 border rounded"
+                />
+                <input
+                  type="text"
+                  value={c}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPalette((prev) => prev.map((p, j) => (j === i ? val : p)));
+                  }}
+                  className="border rounded p-1 w-28 text-sm"
+                />
               </div>
             ))}
-            <button className="px-2 py-1 border rounded" onClick={()=>setPalette(prev=>[...prev, '#000000'])}>+ color</button>
+            <button
+              className="px-2 py-1 border rounded"
+              onClick={() => setPalette((prev) => [...prev, '#000000'])}
+            >
+              + color
+            </button>
           </div>
         </div>
       )}
 
-      {error && (
-        <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>
-      )}
+      {error && <div className="p-3 border rounded bg-red-50 text-red-700">{error}</div>}
 
       {svg ? (
         <VectorEditor ref={editorRef} svg={svg} palette={palette} />
@@ -248,4 +356,3 @@ export default function VectorEditorPage() {
     </div>
   );
 }
-

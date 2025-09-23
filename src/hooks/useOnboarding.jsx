@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { db, auth } from '../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
+import { db, auth } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 
 /**
@@ -17,10 +18,11 @@ export const useOnboarding = () => {
   const { currentUser } = useAuth();
   const { weddings, activeWedding } = useWedding();
   // Si existe flag en localStorage, mostramos onboarding sí o sí
-  const forceFlag = typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
+  const forceFlag =
+    typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
   const [showOnboarding, setShowOnboarding] = useState(forceFlag);
   // No eliminamos el flag aquí; se quitará cuando se complete el tutorial.
-  
+
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +47,7 @@ export const useOnboarding = () => {
       // Solo usar localStorage - NO Firebase por ahora
       const localOnboardingKey = `onboarding_completed_${user.uid}`;
       const localCompleted = localStorage.getItem(localOnboardingKey);
-      
+
       if (localCompleted === 'true') {
         setOnboardingCompleted(true);
         setShowOnboarding(false);
@@ -54,13 +56,13 @@ export const useOnboarding = () => {
         setOnboardingCompleted(false);
         setShowOnboarding(true);
       }
-      
+
       setLoading(false);
     };
 
     // Usar onAuthStateChanged pero sin consultas a Firebase
     const unsubscribe = onAuthStateChanged(auth, checkOnboardingStatus);
-    
+
     return () => unsubscribe();
   }, [forceFlag]);
 
@@ -77,7 +79,7 @@ export const useOnboarding = () => {
     setShowOnboarding(false);
     setOnboardingCompleted(true);
     localStorage.removeItem('forceOnboarding');
-    
+
     // Guardar en localStorage como backup
     if (auth.currentUser && auth.currentUser.uid) {
       const localOnboardingKey = `onboarding_completed_${auth.currentUser.uid}`;
@@ -89,6 +91,6 @@ export const useOnboarding = () => {
     showOnboarding,
     onboardingCompleted,
     completeOnboarding,
-    loading
+    loading,
   };
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { useAuth } from '../../../hooks/useAuth';
 
 /**
@@ -57,24 +58,16 @@ const InboxContainerMinimal = () => {
       <div className="bg-white p-4 border-b shadow-sm">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-semibold text-gray-800">Bandeja de entrada (Modo Debug)</h1>
-          {user?.email && (
-            <p className="text-sm text-gray-600 mt-1">
-              Usuario: {user.email}
-            </p>
-          )}
+          {user?.email && <p className="text-sm text-gray-600 mt-1">Usuario: {user.email}</p>}
         </div>
       </div>
-      
+
       {/* Contenido principal */}
       <div className="flex-grow flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">📧</div>
-          <h2 className="text-xl font-medium text-gray-700 mb-2">
-            Bandeja de entrada vacía
-          </h2>
-          <p className="text-gray-500">
-            No hay emails para mostrar en este momento.
-          </p>
+          <h2 className="text-xl font-medium text-gray-700 mb-2">Bandeja de entrada vacía</h2>
+          <p className="text-gray-500">No hay emails para mostrar en este momento.</p>
           <p className="text-sm text-blue-600 mt-4">
             ✅ Componente cargado correctamente sin errores de Promise
           </p>
@@ -85,4 +78,3 @@ const InboxContainerMinimal = () => {
 };
 
 export default InboxContainerMinimal;
-

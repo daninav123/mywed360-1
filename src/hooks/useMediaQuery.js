@@ -13,18 +13,18 @@ export function useMediaQuery(query) {
     if (typeof window === 'undefined' || typeof window.matchMedia === 'undefined') {
       return;
     }
-    
+
     // Crear objeto MediaQueryList
     const mediaQuery = window.matchMedia(query);
-    
+
     // Función para actualizar el estado cuando cambia la coincidencia
     const updateMatches = () => {
       setMatches(mediaQuery.matches);
     };
-    
+
     // Establecer el valor inicial
     updateMatches();
-    
+
     // Añadir listener para cambios (usando la API más reciente si está disponible)
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', updateMatches);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import errorLogger from '../utils/errorLogger';
 
 /**
@@ -42,7 +43,7 @@ const DiagnosticPanel = () => {
 
   // Mostrar automáticamente si hay errores críticos (solo una vez)
   useEffect(() => {
-    const hasErrors = Object.values(diagnostics).some(d => d.status === 'error');
+    const hasErrors = Object.values(diagnostics).some((d) => d.status === 'error');
     if (hasErrors && !isVisible && !autoShown) {
       console.warn('🚨 Se detectaron errores críticos. Mostrando panel de diagnóstico...');
       setIsVisible(true);
@@ -52,19 +53,27 @@ const DiagnosticPanel = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'success': return '✅';
-      case 'warning': return '⚠️';
-      case 'error': return '❌';
-      default: return '⏳';
+      case 'success':
+        return '✅';
+      case 'warning':
+        return '⚠️';
+      case 'error':
+        return '❌';
+      default:
+        return '⏳';
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'success': return 'text-green-600';
-      case 'warning': return 'text-yellow-600';
-      case 'error': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'success':
+        return 'text-green-600';
+      case 'warning':
+        return 'text-yellow-600';
+      case 'error':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
     }
   };
 
@@ -78,18 +87,18 @@ const DiagnosticPanel = () => {
 
   // Botón flotante para mostrar/ocultar el panel
   const FloatingButton = () => {
-    const hasErrors = Object.values(diagnostics).some(d => d.status === 'error');
-    const hasWarnings = Object.values(diagnostics).some(d => d.status === 'warning');
-    
+    const hasErrors = Object.values(diagnostics).some((d) => d.status === 'error');
+    const hasWarnings = Object.values(diagnostics).some((d) => d.status === 'warning');
+
     return (
       <button
         onClick={toggleVisibility}
         className={`fixed bottom-4 right-4 z-50 p-3 rounded-full shadow-lg transition-all duration-300 ${
-          hasErrors 
-            ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-            : hasWarnings 
-            ? 'bg-yellow-500 hover:bg-yellow-600' 
-            : 'bg-green-500 hover:bg-green-600'
+          hasErrors
+            ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+            : hasWarnings
+              ? 'bg-yellow-500 hover:bg-yellow-600'
+              : 'bg-green-500 hover:bg-green-600'
         } text-white`}
         title="Panel de Diagnóstico"
       >
@@ -109,14 +118,11 @@ const DiagnosticPanel = () => {
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
         <div className="bg-gray-800 text-white p-4 flex justify-between items-center">
           <h2 className="text-xl font-bold">🔍 Panel de Diagnóstico MyWed360</h2>
-          <button
-            onClick={toggleVisibility}
-            className="text-gray-300 hover:text-white text-2xl"
-          >
+          <button onClick={toggleVisibility} className="text-gray-300 hover:text-white text-2xl">
             ×
           </button>
         </div>
-        
+
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {/* Resumen general */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
@@ -124,19 +130,19 @@ const DiagnosticPanel = () => {
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-green-100 p-3 rounded">
                 <div className="text-2xl font-bold text-green-600">
-                  {Object.values(diagnostics).filter(d => d.status === 'success').length}
+                  {Object.values(diagnostics).filter((d) => d.status === 'success').length}
                 </div>
                 <div className="text-sm text-green-700">Servicios OK</div>
               </div>
               <div className="bg-yellow-100 p-3 rounded">
                 <div className="text-2xl font-bold text-yellow-600">
-                  {Object.values(diagnostics).filter(d => d.status === 'warning').length}
+                  {Object.values(diagnostics).filter((d) => d.status === 'warning').length}
                 </div>
                 <div className="text-sm text-yellow-700">Advertencias</div>
               </div>
               <div className="bg-red-100 p-3 rounded">
                 <div className="text-2xl font-bold text-red-600">
-                  {Object.values(diagnostics).filter(d => d.status === 'error').length}
+                  {Object.values(diagnostics).filter((d) => d.status === 'error').length}
                 </div>
                 <div className="text-sm text-red-700">Errores</div>
               </div>
@@ -192,21 +198,24 @@ const DiagnosticPanel = () => {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-4">🚨 Errores Recientes</h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {errors.slice(-10).reverse().map((error) => (
-                  <div key={error.id} className="border-l-4 border-red-500 bg-red-50 p-3">
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="font-medium text-red-800">{error.type}</span>
-                      <span className="text-xs text-red-600">
-                        {new Date(error.timestamp).toLocaleString()}
-                      </span>
+                {errors
+                  .slice(-10)
+                  .reverse()
+                  .map((error) => (
+                    <div key={error.id} className="border-l-4 border-red-500 bg-red-50 p-3">
+                      <div className="flex justify-between items-start mb-1">
+                        <span className="font-medium text-red-800">{error.type}</span>
+                        <span className="text-xs text-red-600">
+                          {new Date(error.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="text-sm text-red-700">
+                        <pre className="whitespace-pre-wrap overflow-x-auto">
+                          {JSON.stringify(error.details, null, 2)}
+                        </pre>
+                      </div>
                     </div>
-                    <div className="text-sm text-red-700">
-                      <pre className="whitespace-pre-wrap overflow-x-auto">
-                        {JSON.stringify(error.details, null, 2)}
-                      </pre>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           )}
@@ -224,7 +233,7 @@ const DiagnosticPanel = () => {
                 <div className="text-sm text-orange-700">Errores recientes (5min)</div>
               </div>
             </div>
-            
+
             {stats.byType && Object.keys(stats.byType).length > 0 && (
               <div className="mt-4">
                 <h4 className="font-medium mb-2">Por tipo:</h4>

@@ -1,17 +1,17 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { initReactI18next } from 'react-i18next';
 
 // Local resources embebidos
-import esTranslations from './locales/es/common.json';
 import enTranslations from './locales/en/common.json';
-import frTranslations from './locales/fr/common.json';
+import esTranslations from './locales/es/common.json';
 import esFinance from './locales/es/finance.json';
+import frTranslations from './locales/fr/common.json';
 
 // Reparación ligera de mojibake en tiempo de lectura
 function fixMojibake(s) {
   if (typeof s !== 'string' || !s) return s;
-  if (!(/[Ã�ǟ]/.test(s))) return s; // heurística rápida
+  if (!/[Ã�ǟ]/.test(s)) return s; // heurística rápida
   try {
     const rec = decodeURIComponent(escape(s));
     return rec && rec !== s ? rec : s;
@@ -57,15 +57,16 @@ i18n.t = (key, opts) => fixMojibake(_origT(key, opts));
 
 export const changeLanguage = (lng) => i18n.changeLanguage(lng);
 export const getCurrentLanguage = () => i18n.language || 'es';
-export const getAvailableLanguages = () => ([
+export const getAvailableLanguages = () => [
   { code: 'es', name: 'Español', flag: '🇪🇸' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
-]);
+];
 
-export const formatDate = (date, options = {}) => new Intl.DateTimeFormat(getCurrentLanguage(), options).format(new Date(date));
-export const formatCurrency = (amount, currency = 'EUR') => new Intl.NumberFormat(getCurrentLanguage(), { style: 'currency', currency }).format(amount);
+export const formatDate = (date, options = {}) =>
+  new Intl.DateTimeFormat(getCurrentLanguage(), options).format(new Date(date));
+export const formatCurrency = (amount, currency = 'EUR') =>
+  new Intl.NumberFormat(getCurrentLanguage(), { style: 'currency', currency }).format(amount);
 export const formatNumber = (number) => new Intl.NumberFormat(getCurrentLanguage()).format(number);
 
 export default i18n;
-

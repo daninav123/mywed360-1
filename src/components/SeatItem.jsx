@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
+
 import { ItemTypes } from './GuestItem';
 
 export default function SeatItem({ seat, scale, offset, onAssignGuest, onToggleEnabled }) {

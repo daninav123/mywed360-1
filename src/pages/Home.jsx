@@ -1,4 +1,5 @@
 import React from 'react';
+
 import HomePage from '../components/HomePage';
 import { prefetchModule } from '../utils/prefetch';
 

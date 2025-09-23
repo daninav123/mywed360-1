@@ -3,11 +3,12 @@
  * Permite crear, eliminar, asignar y filtrar etiquetas para correos
  */
 
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
-import { _getStorage, loadJson, saveJson } from '../utils/storage.js';
+
 import { updateMailTags as updateMailTagsBackend } from './emailService';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { _getStorage, loadJson, saveJson } from '../utils/storage.js';
 
 // Caché en memoria para tests y runtime rápido
 const runtimeCustomTags = {};
@@ -19,10 +20,10 @@ const EMAIL_TAGS_MAPPING_KEY = 'lovenda_email_tags_mapping';
 // Etiquetas predefinidas por el sistema
 export const SYSTEM_TAGS = [
   { id: 'important', name: 'Importante', color: '#e53e3e' }, // Rojo
-  { id: 'work', name: 'Trabajo', color: '#3182ce' },         // Azul
-  { id: 'personal', name: 'Personal', color: '#38a169' },    // Verde
+  { id: 'work', name: 'Trabajo', color: '#3182ce' }, // Azul
+  { id: 'personal', name: 'Personal', color: '#38a169' }, // Verde
   { id: 'invitation', name: 'Invitación', color: '#805ad5' }, // Morado
-  { id: 'provider', name: 'Proveedor', color: '#dd6b20' },   // Naranja
+  { id: 'provider', name: 'Proveedor', color: '#dd6b20' }, // Naranja
 ];
 
 /**
@@ -32,7 +33,9 @@ export const SYSTEM_TAGS = [
  * @returns {Array} - Array de objetos de etiqueta
  */
 export const getUserTags = (userId) => {
-  try { refreshTagsFromCloud(userId); } catch {}
+  try {
+    refreshTagsFromCloud(userId);
+  } catch {}
   const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
   try {
     const storage = _getStorage();
@@ -104,7 +107,11 @@ export const createTag = (userId, tagName, color = '#64748b') => {
     const baseLower = finalName.toLowerCase();
     let counter = 0;
     // Buscar siguiente número libre
-    while (allTags.some(t => t.name.toLowerCase() === (counter === 0 ? baseLower : `${baseLower} (${counter})`))) {
+    while (
+      allTags.some(
+        (t) => t.name.toLowerCase() === (counter === 0 ? baseLower : `${baseLower} (${counter})`)
+      )
+    ) {
       counter += 1;
     }
     if (counter > 0) {
@@ -143,7 +150,7 @@ export const createTag = (userId, tagName, color = '#64748b') => {
 export const deleteTag = (userId, tagId) => {
   try {
     // Si es etiqueta del sistema, no se puede eliminar -> false
-    const isSystemTag = SYSTEM_TAGS.some(tag => tag.id === tagId);
+    const isSystemTag = SYSTEM_TAGS.some((tag) => tag.id === tagId);
     if (isSystemTag) {
       throw new Error('No se pueden eliminar etiquetas del sistema');
     }
@@ -151,13 +158,13 @@ export const deleteTag = (userId, tagId) => {
     const tags = getCustomTags(userId);
 
     // Comprobar si la etiqueta existe realmente
-    const exists = tags.some(tag => tag.id === tagId);
+    const exists = tags.some((tag) => tag.id === tagId);
     if (!exists) {
       return false; // Nada que eliminar
     }
 
     // Filtrar la etiqueta a eliminar
-    const updatedTags = tags.filter(tag => tag.id !== tagId);
+    const updatedTags = tags.filter((tag) => tag.id !== tagId);
 
     // Guardar etiquetas actualizadas
     saveUserTags(userId, updatedTags);
@@ -193,7 +200,9 @@ const saveUserTags = (userId, tags) => {
  */
 const getEmailTagsMapping = (userId) => {
   try {
-    try { refreshTagsMappingFromCloud(userId); } catch {}
+    try {
+      refreshTagsMappingFromCloud(userId);
+    } catch {}
     const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
     return loadJson(storageKey, {});
   } catch (error) {
@@ -254,34 +263,36 @@ export const addTagToEmail = (userId, emailId, tagId) => {
   try {
     // Verificar que la etiqueta existe
     let allTags = getUserTags(userId);
-    let tagExists = allTags.some(tag => tag.id === tagId);
+    let tagExists = allTags.some((tag) => tag.id === tagId);
 
     // Si no se encuentra, forzar recarga desde storage para evitar desincronización de caché
     if (!tagExists) {
       runtimeCustomTags[userId] = undefined; // invalidar caché
       allTags = getUserTags(userId);
-      tagExists = allTags.some(tag => tag.id === tagId);
+      tagExists = allTags.some((tag) => tag.id === tagId);
     }
 
     if (!tagExists) {
       throw new Error('La etiqueta especificada no existe');
     }
-    
+
     // Obtener mapeo actual
     const mapping = getEmailTagsMapping(userId);
-    
+
     // Inicializar array de etiquetas para este correo si no existe
     if (!mapping[emailId]) {
       mapping[emailId] = [];
     }
-    
+
     // Verificar si la etiqueta ya está asignada
     if (!mapping[emailId].includes(tagId)) {
       mapping[emailId].push(tagId);
       // Guardar mapeo actualizado
       saveEmailTagsMapping(userId, mapping);
       // Espejo en backend (best‑effort)
-      try { updateMailTagsBackend(emailId, { add: [tagId] }); } catch {}
+      try {
+        updateMailTagsBackend(emailId, { add: [tagId] });
+      } catch {}
     }
     return true;
   } catch (error) {
@@ -301,22 +312,24 @@ export const removeTagFromEmail = (userId, emailId, tagId) => {
   try {
     // Obtener mapeo actual
     const mapping = getEmailTagsMapping(userId);
-    
+
     // Si el correo no tiene etiquetas, no hay nada que hacer
     if (!mapping[emailId]) {
       return false;
     }
-    
+
     const originalLength = mapping[emailId].length;
     // Filtrar la etiqueta a quitar
-    mapping[emailId] = mapping[emailId].filter(id => id !== tagId);
+    mapping[emailId] = mapping[emailId].filter((id) => id !== tagId);
     if (mapping[emailId].length === originalLength) {
       return false; // No había la etiqueta
     }
     // Guardar mapeo actualizado
     saveEmailTagsMapping(userId, mapping);
     // Espejo en backend (best‑effort)
-    try { updateMailTagsBackend(emailId, { remove: [tagId] }); } catch {}
+    try {
+      updateMailTagsBackend(emailId, { remove: [tagId] });
+    } catch {}
     return true;
   } catch (error) {
     console.error('Error al quitar etiqueta de correo:', error);
@@ -335,15 +348,15 @@ export const removeTagFromAllEmails = (userId, tagId) => {
   try {
     // Obtener mapeo actual
     const mapping = getEmailTagsMapping(userId);
-    
+
     // Filtrar la etiqueta de todos los correos
-    Object.keys(mapping).forEach(emailId => {
-      mapping[emailId] = mapping[emailId].filter(id => id !== tagId);
+    Object.keys(mapping).forEach((emailId) => {
+      mapping[emailId] = mapping[emailId].filter((id) => id !== tagId);
     });
-    
+
     // Guardar mapeo actualizado
     saveEmailTagsMapping(userId, mapping);
-    
+
     return true;
   } catch (error) {
     console.error('Error al quitar etiqueta de todos los correos:', error);
@@ -377,11 +390,11 @@ export const getEmailTagsDetails = (userId, emailId) => {
   try {
     const tagIds = getEmailTags(userId, emailId);
     if (!tagIds.length) return [];
-    
+
     const allTags = getUserTags(userId);
     return tagIds
-      .map(tagId => allTags.find(tag => tag.id === tagId))
-      .filter(tag => tag !== undefined); // Filtrar etiquetas que ya no existen
+      .map((tagId) => allTags.find((tag) => tag.id === tagId))
+      .filter((tag) => tag !== undefined); // Filtrar etiquetas que ya no existen
   } catch (error) {
     console.error('Error al obtener detalles de etiquetas:', error);
     return [];
@@ -397,7 +410,7 @@ export const getEmailTagsDetails = (userId, emailId) => {
 export const getEmailsByTag = (userId, tagId) => {
   try {
     const mapping = getEmailTagsMapping(userId);
-    
+
     // Filtrar correos que tienen esta etiqueta
     return Object.entries(mapping)
       .filter(([_, tagIds]) => tagIds.includes(tagId))

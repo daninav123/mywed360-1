@@ -1,6 +1,7 @@
-import React from 'react';
-import Card from '../Card';
 import { AlertCircle, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import React from 'react';
+
+import Card from '../Card';
 
 export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
   // Calcular totales por categoría
@@ -18,24 +19,24 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
   const alerts = React.useMemo(() => {
     const result = [];
     const now = new Date();
-    
+
     // Verificar presupuestos por categoría
     Object.entries(categoryTotals).forEach(([category, { expense }]) => {
       const limit = budgetLimits[category] || 0;
       if (limit > 0) {
         const percentage = (expense / limit) * 100;
-        
+
         if (expense > limit) {
           result.push({
             type: 'error',
-          message: `Presupuesto excedido en ${category}! (${percentage.toFixed(0)}%)`,
-            icon: <AlertCircle className="text-[color:var(--color-danger)]" />
+            message: `Presupuesto excedido en ${category}! (${percentage.toFixed(0)}%)`,
+            icon: <AlertCircle className="text-[color:var(--color-danger)]" />,
           });
         } else if (percentage >= 90) {
           result.push({
             type: 'warning',
             message: `Cuidado: ${category} al ${percentage.toFixed(0)}% del presupuesto`,
-            icon: <AlertTriangle className="text-[color:var(--color-warning)]" />
+            icon: <AlertTriangle className="text-[color:var(--color-warning)]" />,
           });
         }
       }
@@ -43,7 +44,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
 
     // Verificar pagos pendientes
     const pendingPayments = transactions.filter(
-      t => t.status === 'pending' && new Date(t.paymentDate) < now
+      (t) => t.status === 'pending' && new Date(t.paymentDate) < now
     );
 
     if (pendingPayments.length > 0) {
@@ -51,11 +52,11 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
         type: 'warning',
         message: `${pendingPayments.length} pagos pendientes de vencimiento`,
         icon: <Clock className="text-yellow-500" />,
-        items: pendingPayments.map(p => ({
+        items: pendingPayments.map((p) => ({
           name: p.item,
           amount: p.realCost,
-          dueDate: p.paymentDate
-        }))
+          dueDate: p.paymentDate,
+        })),
       });
     }
 
@@ -63,7 +64,7 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
     if (result.length === 0) {
       result.push({
         type: 'success',
-        message: 'Todo en orden! No hay alertas importantes.'
+        message: 'Todo en orden! No hay alertas importantes.',
       });
     }
 
@@ -76,25 +77,32 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
         <AlertCircle className="text-[color:var(--color-primary)]" />
         Alertas de Presupuesto
       </h3>
-      
+
       <div className="space-y-3">
         {alerts.map((alert, index) => (
-          <div 
+          <div
             key={index}
             className={`p-3 rounded-lg border ${
-              alert.type === 'error' ? 'bg-[var(--color-danger)]/10 border-[color:var(--color-danger)]/30' :
-              alert.type === 'warning' ? 'bg-[var(--color-warning)]/10 border-[color:var(--color-warning)]/30' :
-              'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/30'
+              alert.type === 'error'
+                ? 'bg-[var(--color-danger)]/10 border-[color:var(--color-danger)]/30'
+                : alert.type === 'warning'
+                  ? 'bg-[var(--color-warning)]/10 border-[color:var(--color-warning)]/30'
+                  : 'bg-[var(--color-success)]/10 border-[color:var(--color-success)]/30'
             }`}
           >
             <div className="flex items-start gap-2">
-              {alert.icon || <CheckCircle className="text-[color:var(--color-success)] mt-0.5 flex-shrink-0" />}
+              {alert.icon || (
+                <CheckCircle className="text-[color:var(--color-success)] mt-0.5 flex-shrink-0" />
+              )}
               <div>
                 <p className="text-sm font-medium">{alert.message}</p>
                 {alert.items && (
                   <div className="mt-2 space-y-1">
                     {alert.items.map((item, i) => (
-                      <div key={i} className="text-xs text-[color:var(--color-text)]/70 flex justify-between">
+                      <div
+                        key={i}
+                        className="text-xs text-[color:var(--color-text)]/70 flex justify-between"
+                      >
                         <span>{item.name}</span>
                         <span className="font-medium">€{item.amount.toFixed(2)}</span>
                       </div>
@@ -109,4 +117,3 @@ export const BudgetAlerts = ({ transactions, budgetLimits = {} }) => {
     </Card>
   );
 };
-

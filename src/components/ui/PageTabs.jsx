@@ -11,7 +11,7 @@ import React from 'react';
 export default function PageTabs({ value, onChange, options = [], className = '' }) {
   return (
     <nav className={`tabs-nav ${className}`} aria-label="Pestañas de página">
-      {options.map(opt => (
+      {options.map((opt) => (
         <button
           key={opt.id}
           type="button"
@@ -24,4 +24,3 @@ export default function PageTabs({ value, onChange, options = [], className = ''
     </nav>
   );
 }
-

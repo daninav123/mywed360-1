@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
+
 import Button from '../../components/Button';
 
 describe('Button Component', () => {
@@ -36,7 +37,7 @@ describe('Button Component', () => {
   it('muestra el estado deshabilitado correctamente', () => {
     render(<Button disabled>Botón deshabilitado</Button>);
     const button = screen.getByRole('button');
-    
+
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-disabled', 'true');
     expect(button.className).toContain('disabled:opacity-60');
@@ -46,7 +47,7 @@ describe('Button Component', () => {
   it('llama al controlador de eventos onClick cuando se hace clic', () => {
     const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Botón con clic</Button>);
-    
+
     fireEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -64,7 +65,7 @@ describe('Button Component', () => {
   it('tiene los atributos de accesibilidad correctos', () => {
     render(<Button aria-label="Botón accesible">Click</Button>);
     const button = screen.getByRole('button');
-    
+
     expect(button).toHaveAttribute('aria-label', 'Botón accesible');
     // Verificar que tiene focus ring para accesibilidad con teclado
     expect(button.className).toContain('focus:outline-none');

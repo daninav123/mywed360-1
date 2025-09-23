@@ -1,6 +1,7 @@
-import { db } from '../firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { doc, getDoc, setDoc, enableNetwork, disableNetwork } from 'firebase/firestore';
+
+import { db } from '../firebaseConfig';
 
 /**
  * Realiza diagnóstico de la conexión a Firestore
@@ -14,7 +15,7 @@ export const diagnosticarFirestore = async () => {
     permisoEscritura: false,
     permisoLectura: false,
     errores: [],
-    solucionesIntentadas: []
+    solucionesIntentadas: [],
   };
 
   try {
@@ -22,7 +23,7 @@ export const diagnosticarFirestore = async () => {
     const auth = getAuth();
     const usuario = auth.currentUser;
     resultado.usuarioAutenticado = !!usuario;
-    
+
     if (!usuario) {
       resultado.errores.push('No hay usuario autenticado, requerido para operaciones en Firestore');
       return resultado;
@@ -32,9 +33,9 @@ export const diagnosticarFirestore = async () => {
     try {
       resultado.solucionesIntentadas.push('Desactivar/activar red para forzar reconexión');
       await disableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await enableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     } catch (error) {
       resultado.errores.push(`Error al reiniciar conexión: ${error.message}`);
     }
@@ -54,10 +55,14 @@ export const diagnosticarFirestore = async () => {
     if (resultado.permisoLectura) {
       try {
         const userDocRef = doc(db, 'users', usuario.uid);
-        await setDoc(userDocRef, { 
-          diagnosticCheck: new Date().toISOString(),
-          browser: navigator.userAgent
-        }, { merge: true });
+        await setDoc(
+          userDocRef,
+          {
+            diagnosticCheck: new Date().toISOString(),
+            browser: navigator.userAgent,
+          },
+          { merge: true }
+        );
         resultado.permisoEscritura = true;
       } catch (error) {
         resultado.errores.push(`Error al escribir documento de usuario: ${error.message}`);
@@ -70,12 +75,12 @@ export const diagnosticarFirestore = async () => {
       if (window.indexedDB) {
         // Probar acceso a IndexedDB
         const testRequest = window.indexedDB.open('test-indexeddb');
-        
-        testRequest.onerror = function() {
+
+        testRequest.onerror = function () {
           resultado.errores.push('IndexedDB está bloqueado o no disponible');
         };
-        
-        testRequest.onsuccess = function() {
+
+        testRequest.onsuccess = function () {
           resultado.solucionesIntentadas.push('Acceso a IndexedDB verificado correctamente');
           testRequest.result.close();
         };
@@ -85,7 +90,6 @@ export const diagnosticarFirestore = async () => {
     } catch (error) {
       resultado.errores.push(`Error al verificar IndexedDB: ${error.message}`);
     }
-
   } catch (error) {
     resultado.errores.push(`Error general: ${error.message}`);
   }
@@ -101,7 +105,7 @@ export const repararConexionFirestore = async () => {
   const resultado = {
     accionesRealizadas: [],
     errores: [],
-    exito: false
+    exito: false,
   };
 
   try {
@@ -109,11 +113,11 @@ export const repararConexionFirestore = async () => {
     try {
       resultado.accionesRealizadas.push('Desactivar red temporalmente');
       await disableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       resultado.accionesRealizadas.push('Reactivar red');
       await enableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
     } catch (error) {
       resultado.errores.push(`Error al reiniciar conexión: ${error.message}`);
     }
@@ -127,7 +131,6 @@ export const repararConexionFirestore = async () => {
       resultado.exito = false;
       resultado.errores.push('No se pudo restablecer la conexión');
     }
-
   } catch (error) {
     resultado.errores.push(`Error durante la reparación: ${error.message}`);
     resultado.exito = false;

@@ -1,8 +1,24 @@
 import { post } from './apiClient';
 
-export async function checkoutProviderDeposit({ providerId, providerName, amount = 100, currency = 'EUR', weddingId = null }) {
+export async function checkoutProviderDeposit({
+  providerId,
+  providerName,
+  amount = 100,
+  currency = 'EUR',
+  weddingId = null,
+}) {
   const desc = `Señal proveedor: ${providerName || providerId}`;
-  const res = await post('/api/payments/checkout', { amount, currency, description: desc, weddingId, metadata: { providerId, providerName, weddingId } }, { auth: true });
+  const res = await post(
+    '/api/payments/checkout',
+    {
+      amount,
+      currency,
+      description: desc,
+      weddingId,
+      metadata: { providerId, providerName, weddingId },
+    },
+    { auth: true }
+  );
   if (!res.ok) throw new Error(`checkout ${res.status}`);
   const data = await res.json();
   if (!data?.url) throw new Error('No session URL');

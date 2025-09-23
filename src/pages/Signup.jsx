@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
+
+import { useAuth } from '../hooks/useAuth';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -60,7 +61,10 @@ export default function Signup() {
           Registrarse
         </button>
         <p className="mt-4 text-sm">
-          ¿Ya tienes cuenta? <Link to="/" className="text-[var(--color-primary)] hover:underline">Inicia sesión</Link>
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/" className="text-[var(--color-primary)] hover:underline">
+            Inicia sesión
+          </Link>
         </p>
       </form>
     </div>

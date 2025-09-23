@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { clampTablesWithinCanvas } from '../seatingPlanUtils';
 
 // Helper: crea contenedor simulado con las dimensiones indicadas

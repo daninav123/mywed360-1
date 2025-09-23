@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 
 /**
- * @typedef {import('../../hooks/useProveedores').Provider} Provider
- */
-
-/**
  * Componente de formulario para crear o editar un proveedor.
  * Incluye validación de campos, previsualización de imágenes y manejo de estados.
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {Function} props.onSubmit - Función para enviar el formulario con los datos del proveedor
  * @param {Function} props.onCancel - Función para cancelar y cerrar el formulario
- * @param {Provider} [props.initialData] - Datos iniciales para edición (opcional, solo presente al editar)
- * @returns {React.ReactElement} Componente de formulario de proveedor
+ * @param {import('../../hooks/useProveedores').Provider} [props.initialData] - Datos iniciales para edición (opcional)
+ * @returns {React.ReactElement}
  */
 const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
@@ -30,59 +27,36 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     priceRange: '',
     status: 'Pendiente',
     snippet: '',
-    image: ''
+    image: '',
   });
 
   const [errors, setErrors] = useState({});
 
-  // Si hay datos iniciales, cargarlos en el formulario
+  // Cargar datos iniciales si existen (modo edición)
   useEffect(() => {
     if (initialData) {
-      setFormData(prevState => ({
-        ...prevState,
-        ...initialData
-      }));
+      setFormData((prev) => ({ ...prev, ...initialData }));
     }
   }, [initialData]);
 
-  // Manejar cambios en los campos del formulario
+  // Manejar cambios en los campos
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-    
-    // Limpiar error cuando el usuario comienza a corregir
-    if (errors[name]) {
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [name]: null
-      }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   // Validar formulario
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Validaciones básicas
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio';
-    }
-    
-    if (!formData.service.trim()) {
-      newErrors.service = 'El servicio es obligatorio';
-    }
-    
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
-    }
-    
-    if (formData.link && !formData.link.startsWith('http')) {
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
+    if (!formData.service.trim()) newErrors.service = 'El servicio es obligatorio';
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email inválido';
+    if (formData.link && !formData.link.startsWith('http'))
       newErrors.link = 'El enlace debe comenzar con http:// o https://';
-    }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -90,65 +64,14 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
   // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      onSubmit(formData);
-    }
-  };
-
-  // Reparador de texto mal codificado (mojibake)
-  const fixText = (s) => {
-    if (!s || typeof s !== 'string') return s;
-    try {
-      const cp1252Map = new Map([
-        [0x20AC, 0x80], [0x201A, 0x82], [0x0192, 0x83], [0x201E, 0x84], [0x2026, 0x85],
-        [0x2020, 0x86], [0x2021, 0x87], [0x02C6, 0x88], [0x2030, 0x89], [0x0160, 0x8A],
-        [0x2039, 0x8B], [0x0152, 0x8C], [0x017D, 0x8E], [0x2018, 0x91], [0x2019, 0x92],
-        [0x201C, 0x93], [0x201D, 0x94], [0x2022, 0x95], [0x2013, 0x96], [0x2014, 0x97],
-        [0x02DC, 0x98], [0x2122, 0x99], [0x0161, 0x9A], [0x203A, 0x9B], [0x0153, 0x9C],
-        [0x017E, 0x9E], [0x0178, 0x9F],
-      ]);
-      const bytes = [];
-      for (let i = 0; i < s.length; i++) {
-        const cp = s.codePointAt(i);
-        if (cp <= 0xFF) {
-          bytes.push(cp);
-        } else if (cp1252Map.has(cp)) {
-          bytes.push(cp1252Map.get(cp));
-        } else {
-          bytes.push(0x3F);
-        }
-        if (cp > 0xFFFF) i++;
-      }
-      let out = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
-      out = out.replace(//g, '');
-      const patterns = [
-        [/MÃ’ºsica/gi, 'Música'],
-        [/Música/gi, 'Música'],
-        [/Musica/gi, 'Música'],
-        [/VÃ’­deo/gi, 'Vídeo'],
-        [/Vídeo/gi, 'Vídeo'],
-        [/Video/gi, 'Vídeo'],
-        [/FotografÃ’­a/gi, 'Fotografía'],
-        [/Fotografía/gi, 'Fotografía'],
-        [/Fotografia/gi, 'Fotografía'],
-        [/Decoración/gi, 'Decoración'],
-        [/Iluminación/gi, 'Iluminación'],
-        [/Peluquería/gi, 'Peluquería'],
-        [/Joyería/gi, 'Joyería']
-      ];
-      for (const [re, rep] of patterns) out = out.replace(re, rep);
-      return out;
-    } catch {
-      return s;
-    }
+    if (validateForm()) onSubmit(formData);
   };
 
   // Lista de servicios disponibles
   const serviceOptions = [
     'Catering',
     'Fotografía',
-    'Video',
+    'Vídeo',
     'Música',
     'Decoración',
     'Flores',
@@ -168,17 +91,11 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     'Lugar de celebración',
     'Alojamiento',
     'Viaje de novios',
-    'Otro'
-  ].map(fixText);
+    'Otro',
+  ];
 
   // Lista de estados disponibles
-  const statusOptions = [
-    'Pendiente',
-    'Contactado',
-    'Seleccionado',
-    'Confirmado',
-    'Rechazado'
-  ];
+  const statusOptions = ['Pendiente', 'Contactado', 'Seleccionado', 'Confirmado', 'Rechazado'];
 
   return (
     <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -195,13 +112,13 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
           <X size={24} />
         </button>
       </div>
-      
+
       {/* Formulario con scroll */}
       <div className="overflow-y-auto p-4 flex-1">
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <h3 className="text-lg font-medium mb-4">Información básica</h3>
-            
+
             {/* Nombre y Servicio */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -214,16 +131,12 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full p-2 border ${
-                    errors.name ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
+                  className={`w-full p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                   placeholder="Nombre del proveedor"
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                )}
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
-              
+
               <div>
                 <label htmlFor="service" className="block mb-1 text-sm font-medium">
                   Servicio *
@@ -233,21 +146,19 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   name="service"
                   value={formData.service}
                   onChange={handleChange}
-                  className={`w-full p-2 border ${
-                    errors.service ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
+                  className={`w-full p-2 border ${errors.service ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                 >
                   <option value="">Seleccionar servicio</option>
-                  {serviceOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                  {serviceOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
-                {errors.service && (
-                  <p className="text-red-500 text-sm mt-1">{errors.service}</p>
-                )}
+                {errors.service && <p className="text-red-500 text-sm mt-1">{errors.service}</p>}
               </div>
             </div>
-            
+
             {/* Estado y Rango de precio */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -261,12 +172,14 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
                 >
-                  {statusOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                  {statusOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
               </div>
-              
+
               <div>
                 <label htmlFor="priceRange" className="block mb-1 text-sm font-medium">
                   Rango de precios
@@ -278,11 +191,11 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   value={formData.priceRange}
                   onChange={handleChange}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="Ej: 1000€ - 2000€"
+                  placeholder="Ej: 1000 € - 2000 €"
                 />
               </div>
             </div>
-            
+
             {/* Fecha */}
             <div className="mb-4">
               <label htmlFor="date" className="block mb-1 text-sm font-medium">
@@ -297,7 +210,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 className="w-full p-2 border border-gray-300 rounded-md"
               />
             </div>
-            
+
             {/* Descripción */}
             <div className="mb-4">
               <label htmlFor="snippet" className="block mb-1 text-sm font-medium">
@@ -308,12 +221,12 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 name="snippet"
                 value={formData.snippet}
                 onChange={handleChange}
-                rows="3"
+                rows={3}
                 className="w-full p-2 border border-gray-300 rounded-md"
                 placeholder="Descripción breve del proveedor"
-              ></textarea>
+              />
             </div>
-            
+
             {/* URL de imagen */}
             <div className="mb-4">
               <label htmlFor="image" className="block mb-1 text-sm font-medium">
@@ -330,10 +243,10 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
               />
             </div>
           </Card>
-          
+
           <Card>
             <h3 className="text-lg font-medium mb-4">Información de contacto</h3>
-            
+
             {/* Nombre de contacto */}
             <div className="mb-4">
               <label htmlFor="contact" className="block mb-1 text-sm font-medium">
@@ -349,7 +262,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 placeholder="Nombre del contacto"
               />
             </div>
-            
+
             {/* Email y Teléfono */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -362,16 +275,12 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full p-2 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  } rounded-md`}
+                  className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                   placeholder="email@ejemplo.com"
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
-              
+
               <div>
                 <label htmlFor="phone" className="block mb-1 text-sm font-medium">
                   Teléfono
@@ -387,7 +296,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 />
               </div>
             </div>
-            
+
             {/* Enlace web */}
             <div className="mb-4">
               <label htmlFor="link" className="block mb-1 text-sm font-medium">
@@ -399,16 +308,12 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
                 name="link"
                 value={formData.link}
                 onChange={handleChange}
-                className={`w-full p-2 border ${
-                  errors.link ? 'border-red-500' : 'border-gray-300'
-                } rounded-md`}
+                className={`w-full p-2 border ${errors.link ? 'border-red-500' : 'border-gray-300'} rounded-md`}
                 placeholder="https://www.ejemplo.com"
               />
-              {errors.link && (
-                <p className="text-red-500 text-sm mt-1">{errors.link}</p>
-              )}
+              {errors.link && <p className="text-red-500 text-sm mt-1">{errors.link}</p>}
             </div>
-            
+
             {/* Ubicación */}
             <div className="mb-4">
               <label htmlFor="location" className="block mb-1 text-sm font-medium">
@@ -427,7 +332,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
           </Card>
         </form>
       </div>
-      
+
       {/* Footer con botones */}
       <div className="border-t p-4 bg-gray-50 flex justify-end space-x-3">
         <Button variant="outline" onClick={onCancel}>
@@ -442,4 +347,3 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
 };
 
 export default ProveedorForm;
-

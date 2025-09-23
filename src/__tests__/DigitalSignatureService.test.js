@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
 import { createRequest, getStatus } from '../services/DigitalSignatureService';
 
 const okJson = (data) => Promise.resolve({ ok: true, json: () => Promise.resolve(data) });
@@ -42,4 +43,3 @@ describe('DigitalSignatureService', () => {
     expect(res.signature.status).toBe('requested');
   });
 });
-

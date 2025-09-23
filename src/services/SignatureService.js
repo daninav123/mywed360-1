@@ -1,6 +1,6 @@
 // SignatureService.js - Cliente frontend para /api/signature
-import { getBackendBase } from '../utils/backendBase';
 import { auth } from '../firebaseConfig';
+import { getBackendBase } from '../utils/backendBase';
 
 const base = () => `${getBackendBase()}/api/signature`;
 
@@ -30,7 +30,7 @@ export async function createSignatureRequest(weddingId, documentMeta, signers = 
     method: 'POST',
     headers: await authHeader({ 'Content-Type': 'application/json' }),
     credentials: 'include',
-    body: JSON.stringify({ weddingId, documentMeta, signers })
+    body: JSON.stringify({ weddingId, documentMeta, signers }),
   });
   if (!res.ok) throw new Error('createSignatureRequest failed');
   return res.json();
@@ -58,7 +58,7 @@ export async function updateSignatureStatus(weddingId, signatureId, updates) {
     method: 'POST',
     headers: await authHeader({ 'Content-Type': 'application/json' }),
     credentials: 'include',
-    body: JSON.stringify({ weddingId, updates })
+    body: JSON.stringify({ weddingId, updates }),
   });
   if (!res.ok) throw new Error('updateSignatureStatus failed');
   return res.json();

@@ -1,7 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
-import useSupplierBudgets from '../hooks/useSupplierBudgets';
 import { vi } from 'vitest';
+
 import * as WeddingCtx from '../context/WeddingContext';
+import useSupplierBudgets from '../hooks/useSupplierBudgets';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -36,6 +37,9 @@ describe('useSupplierBudgets', () => {
       expect(resp.success).toBe(true);
     });
 
-    expect(fetch).toHaveBeenCalledWith('/api/weddings/wed1/suppliers/sup1/budget', expect.any(Object));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/weddings/wed1/suppliers/sup1/budget',
+      expect.any(Object)
+    );
   });
 });

@@ -15,9 +15,9 @@ const Badge = ({ type = 'default', children, className = '', ...props }) => {
     warning: 'bg-yellow-100 text-yellow-800',
     error: 'bg-red-100 text-red-800',
   };
-  
+
   const badgeClasses = `inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${typeClasses[type] || typeClasses.default} ${className}`;
-  
+
   return (
     <span className={badgeClasses} {...props}>
       {children}

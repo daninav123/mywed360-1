@@ -1,7 +1,7 @@
 // Script para verificar el estado de la aplicación
 const fs = require('fs');
-const path = require('path');
 const os = require('os');
+const path = require('path');
 
 // Información sobre el sistema
 const systemInfo = {
@@ -11,8 +11,8 @@ const systemInfo = {
   arch: os.arch(),
   memory: {
     total: Math.round(os.totalmem() / (1024 * 1024 * 1024)) + ' GB',
-    free: Math.round(os.freemem() / (1024 * 1024 * 1024)) + ' GB'
-  }
+    free: Math.round(os.freemem() / (1024 * 1024 * 1024)) + ' GB',
+  },
 };
 
 // Verificar puertos
@@ -21,7 +21,7 @@ exec('netstat -ano | findstr "5173 5174"', (error, stdout, stderr) => {
   const portInfo = {
     error: error ? error.toString() : null,
     stderr: stderr ? stderr.toString() : null,
-    stdout: stdout ? stdout.toString() : null
+    stdout: stdout ? stdout.toString() : null,
   };
 
   // Verificar procesos Node
@@ -29,7 +29,7 @@ exec('netstat -ano | findstr "5173 5174"', (error, stdout, stderr) => {
     const nodeProcesses = {
       error: err ? err.toString() : null,
       stderr: stderror ? stderror.toString() : null,
-      stdout: out ? out.toString() : null
+      stdout: out ? out.toString() : null,
     };
 
     // Juntar toda la información
@@ -37,7 +37,7 @@ exec('netstat -ano | findstr "5173 5174"', (error, stdout, stderr) => {
       system: systemInfo,
       ports: portInfo,
       nodeProcesses: nodeProcesses,
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
     };
 
     // Guardar la información en un archivo
@@ -46,7 +46,7 @@ exec('netstat -ano | findstr "5173 5174"', (error, stdout, stderr) => {
       JSON.stringify(debugInfo, null, 2),
       'utf8'
     );
-    
+
     console.log('Información de depuración guardada en src/debug_info.json');
   });
 });

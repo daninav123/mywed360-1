@@ -1,8 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import FolderSelectionModal from '../../../components/email/FolderSelectionModal';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+import FolderSelectionModal from '../../../components/email/FolderSelectionModal';
 
 // Mock para el componente Button que se usa dentro del modal
 vi.mock('../../../components/Button', () => ({
@@ -10,7 +11,7 @@ vi.mock('../../../components/Button', () => ({
     <button onClick={onClick} {...props}>
       {children}
     </button>
-  )
+  ),
 }));
 
 describe('FolderSelectionModal Component', () => {
@@ -39,7 +40,7 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     expect(container.firstChild).toBeNull();
   });
 
@@ -60,7 +61,7 @@ describe('FolderSelectionModal Component', () => {
     expect(screen.getByText('Título de prueba')).toBeInTheDocument();
     expect(screen.getByText('Descripción de prueba')).toBeInTheDocument();
     expect(screen.getAllByPlaceholderText(/buscar carpetas/i)[0]).toBeInTheDocument();
-    
+
     // Verificar que todas las carpetas se renderizan
     expect(screen.getByText('Importante')).toBeInTheDocument();
     expect(screen.getByText('Trabajo')).toBeInTheDocument();
@@ -70,7 +71,7 @@ describe('FolderSelectionModal Component', () => {
   // Prueba de búsqueda de carpetas
   it('filtra correctamente las carpetas según el término de búsqueda', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <FolderSelectionModal
         isOpen={true}
@@ -79,16 +80,16 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     // Buscar una carpeta específica
     const searchInput = screen.getAllByPlaceholderText(/buscar carpetas/i)[0];
     await user.type(searchInput, 'Trabajo');
-    
+
     // Verificar que solo se muestra la carpeta buscada
     expect(screen.getByText('Trabajo')).toBeInTheDocument();
     expect(screen.queryByText('Importante')).not.toBeInTheDocument();
     expect(screen.queryByText('Personal')).not.toBeInTheDocument();
-    
+
     // Limpiar la búsqueda y verificar que todas las carpetas vuelven a aparecer
     await user.clear(searchInput);
     expect(screen.getByText('Importante')).toBeInTheDocument();
@@ -99,7 +100,7 @@ describe('FolderSelectionModal Component', () => {
   // Prueba de navegación por teclado
   it('permite navegación por teclado entre las carpetas', async () => {
     const user = userEvent.setup();
-    
+
     render(
       <FolderSelectionModal
         isOpen={true}
@@ -108,18 +109,20 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     // El input de búsqueda debería estar enfocado inicialmente
-    await waitFor(() => expect(screen.getAllByPlaceholderText(/buscar carpetas/i)[0]).toHaveFocus());
-    
+    await waitFor(() =>
+      expect(screen.getAllByPlaceholderText(/buscar carpetas/i)[0]).toHaveFocus()
+    );
+
     // Presionar Tab para mover el foco a la lista de carpetas
     await user.tab();
-    
+
     // Presionar flecha abajo para navegar por las carpetas
     const modalElement = screen.getByRole('dialog');
     fireEvent.keyDown(modalElement, { key: 'ArrowDown' });
     fireEvent.keyDown(modalElement, { key: 'ArrowDown' });
-    
+
     // Presionar Enter para seleccionar una carpeta
     fireEvent.keyDown(document.activeElement, { key: 'Enter' });
     expect(mockOnSelectFolder).toHaveBeenCalled();
@@ -135,7 +138,7 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     const closeButton = screen.getAllByLabelText(/cerrar diálogo/i)[0];
     fireEvent.click(closeButton);
     expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -151,7 +154,7 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     // Hacer clic en la primera carpeta
     const firstFolder = screen.getByText('Importante').closest('div');
     fireEvent.click(firstFolder);
@@ -168,16 +171,16 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     // Verificar los atributos ARIA del modal
     const modal = screen.getByRole('dialog');
     expect(modal).toHaveAttribute('aria-modal', 'true');
     expect(modal).toHaveAttribute('aria-labelledby', 'folder-modal-title');
-    
+
     // Verificar atributos de la lista
     const list = screen.getByRole('listbox');
     expect(list).toHaveAttribute('id', 'folder-list');
-    
+
     // Verificar atributos de los elementos de la lista
     const folderItems = screen.getAllByRole('option');
     expect(folderItems).toHaveLength(3);
@@ -194,7 +197,7 @@ describe('FolderSelectionModal Component', () => {
         onSelectFolder={mockOnSelectFolder}
       />
     );
-    
+
     expect(screen.getByText('No hay carpetas disponibles')).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 /**
- * Script de prueba de integración para validar el funcionamiento conjunto 
+ * Script de prueba de integración para validar el funcionamiento conjunto
  * del sistema de emails, calendario y plantillas de MyWed360.
- * 
+ *
  * Este script simula un flujo completo de usuario, desde recepción de emails
  * hasta la creación de eventos en calendario y uso de plantillas.
  */
@@ -25,7 +25,7 @@ const mockServices = {
         date: '2025-07-10T10:23:45',
         read: false,
         folder: 'inbox',
-        providerId: 'prov_001'
+        providerId: 'prov_001',
       },
       {
         id: 'email_002',
@@ -44,13 +44,13 @@ const mockServices = {
         attachments: [
           {
             name: 'Presupuesto-Boda-García.pdf',
-            size: 2458000
-          }
+            size: 2458000,
+          },
         ],
-        providerId: 'prov_002'
-      }
+        providerId: 'prov_002',
+      },
     ],
-    
+
     // Datos de prueba - Emails enviados
     sentEmails: [
       {
@@ -66,10 +66,10 @@ const mockServices = {
         <p>María García</p>`,
         date: '2025-07-08T09:15:22',
         read: true,
-        folder: 'sent'
-      }
+        folder: 'sent',
+      },
     ],
-    
+
     // Datos de prueba - Plantillas
     emailTemplates: [
       {
@@ -89,7 +89,7 @@ const mockServices = {
         <p>Saludos cordiales,</p>
         <p>{{nombre_novia}}</p>`,
         variables: ['servicio', 'nombre_proveedor', 'fecha_boda', 'nombre_novia'],
-        isSystem: true
+        isSystem: true,
       },
       {
         id: 'template_002',
@@ -102,33 +102,33 @@ const mockServices = {
         <p>Saludos cordiales,</p>
         <p>{{nombre_novia}}</p>`,
         variables: ['nombre_proveedor', 'fecha_cita', 'hora_cita', 'lugar_cita', 'nombre_novia'],
-        isSystem: true
-      }
+        isSystem: true,
+      },
     ],
-    
+
     // Métodos simulados
-    getMails: function(folder = 'inbox') {
+    getMails: function (folder = 'inbox') {
       if (folder === 'inbox') return this.inboxEmails;
       if (folder === 'sent') return this.sentEmails;
       return [];
     },
-    
-    getMailDetails: function(emailId) {
+
+    getMailDetails: function (emailId) {
       const allEmails = [...this.inboxEmails, ...this.sentEmails];
-      return allEmails.find(email => email.id === emailId) || null;
+      return allEmails.find((email) => email.id === emailId) || null;
     },
-    
-    getEmailTemplates: function() {
+
+    getEmailTemplates: function () {
       return this.emailTemplates;
     },
-    
-    saveEmailTemplate: function(template) {
+
+    saveEmailTemplate: function (template) {
       // Simular guardado
       console.log('Guardando plantilla:', template.name);
       return template;
     },
-    
-    sendMail: function(mailData) {
+
+    sendMail: function (mailData) {
       console.log('Enviando email:', mailData);
       return {
         id: `email_${Date.now()}`,
@@ -138,20 +138,20 @@ const mockServices = {
         body: mailData.body,
         date: new Date().toISOString(),
         read: true,
-        folder: 'sent'
+        folder: 'sent',
       };
     },
-    
-    markAsRead: function(emailId) {
+
+    markAsRead: function (emailId) {
       console.log('Marcando email como leído:', emailId);
       const email = this.getMailDetails(emailId);
       if (email) {
         email.read = true;
       }
       return email;
-    }
+    },
   },
-  
+
   CalendarService: {
     // Datos de prueba - Eventos
     events: [
@@ -163,25 +163,25 @@ const mockServices = {
         description: 'Primera prueba del vestido con posibles ajustes',
         attendees: ['María García', 'Carmen García (madre)', 'Elena Martínez (madrina)'],
         providerRelated: true,
-        providerId: 'prov_005'
-      }
+        providerId: 'prov_005',
+      },
     ],
-    
+
     // Métodos simulados
-    getEvents: function() {
+    getEvents: function () {
       return this.events;
     },
-    
-    addEvent: function(eventData) {
+
+    addEvent: function (eventData) {
       console.log('Añadiendo evento al calendario:', eventData.title);
       const newEvent = {
         id: `event_${Date.now()}`,
-        ...eventData
+        ...eventData,
       };
       this.events.push(newEvent);
       return newEvent;
-    }
-  }
+    },
+  },
 };
 
 // Simulación de componentes React para pruebas
@@ -189,128 +189,126 @@ const mockComponents = {
   // Simula el comportamiento del componente EmailInbox
   EmailInbox: {
     name: 'EmailInbox',
-    simulate: function() {
+    simulate: function () {
       console.log('\n--- SIMULANDO INTERACCIÓN CON BANDEJA DE ENTRADA ---');
-      
+
       // Obtener emails
       console.log('1. Cargando emails de la bandeja de entrada');
       const emails = mockServices.EmailService.getMails('inbox');
       console.log(`   ✓ ${emails.length} emails recuperados`);
-      
+
       // Seleccionar un email no leído
-      const unreadEmail = emails.find(email => !email.read);
+      const unreadEmail = emails.find((email) => !email.read);
       if (unreadEmail) {
         console.log('2. Seleccionando email no leído:', unreadEmail.subject);
-        
+
         // Marcar como leído
         const updatedEmail = mockServices.EmailService.markAsRead(unreadEmail.id);
         console.log('   ✓ Email marcado como leído');
-        
+
         // Detectar posibles fechas y eventos
         console.log('3. Detectando información de eventos en el email');
-        const hasEventInfo = unreadEmail.body.includes('sesión') && 
-                            (unreadEmail.body.includes('fecha') || 
-                             unreadEmail.body.match(/\d{1,2}\/\d{1,2}\/\d{4}/));
-        
+        const hasEventInfo =
+          unreadEmail.body.includes('sesión') &&
+          (unreadEmail.body.includes('fecha') || unreadEmail.body.match(/\d{1,2}\/\d{1,2}\/\d{4}/));
+
         if (hasEventInfo) {
           console.log('   ✓ Información de evento detectada, sugerencia de añadir al calendario');
         }
       }
-      
+
       // Comprobar emails importantes
-      const importantEmails = emails.filter(email => 
-        email.folder === 'important' || 
-        email.subject.toLowerCase().includes('urgente')
+      const importantEmails = emails.filter(
+        (email) => email.folder === 'important' || email.subject.toLowerCase().includes('urgente')
       );
-      
+
       console.log(`4. Emails importantes: ${importantEmails.length}`);
-      
+
       return { success: true };
-    }
+    },
   },
-  
+
   // Simula el comportamiento del componente EmailComposer con plantillas
   EmailComposer: {
     name: 'EmailComposer',
-    simulate: function() {
+    simulate: function () {
       console.log('\n--- SIMULANDO CREACIÓN DE EMAIL CON PLANTILLA ---');
-      
+
       // Cargar plantillas disponibles
       console.log('1. Cargando plantillas de email disponibles');
       const templates = mockServices.EmailService.getEmailTemplates();
       console.log(`   ✓ ${templates.length} plantillas disponibles`);
-      
+
       // Seleccionar una plantilla
       const selectedTemplate = templates[0]; // Solicitud de información
       console.log('2. Seleccionando plantilla:', selectedTemplate.name);
-      
+
       // Rellenar variables de la plantilla
       console.log('3. Rellenando variables de la plantilla');
-      const replacedSubject = selectedTemplate.subject
-        .replace('{{servicio}}', 'decoración floral');
-      
+      const replacedSubject = selectedTemplate.subject.replace('{{servicio}}', 'decoración floral');
+
       const replacedBody = selectedTemplate.body
         .replace('{{nombre_proveedor}}', 'Flores del Jardín')
         .replace('{{fecha_boda}}', '15/09/2025')
         .replace('{{servicio}}', 'decoración floral')
         .replace('{{nombre_novia}}', 'María García');
-      
+
       console.log('   ✓ Variables reemplazadas correctamente');
-      
+
       // Enviar email
       console.log('4. Enviando email basado en plantilla');
       const sentEmail = mockServices.EmailService.sendMail({
         to: 'flores.jardin@ejemplo.com',
         subject: replacedSubject,
-        body: replacedBody
+        body: replacedBody,
       });
-      
+
       console.log('   ✓ Email enviado correctamente con ID:', sentEmail.id);
-      
+
       return { success: true, emailId: sentEmail.id };
-    }
+    },
   },
-  
+
   // Simula el comportamiento del componente de integración con calendario
   CalendarIntegration: {
     name: 'CalendarIntegration',
-    simulate: function() {
+    simulate: function () {
       console.log('\n--- SIMULANDO INTEGRACIÓN CON CALENDARIO ---');
-      
+
       // Seleccionar un email con información de evento
       console.log('1. Seleccionando email con información de evento');
       const emailWithEvent = mockServices.EmailService.getMailDetails('email_001');
       console.log(`   ✓ Email seleccionado: "${emailWithEvent.subject}"`);
-      
+
       // Extraer información de fecha y hora
       console.log('2. Extrayendo información de fecha y hora del email');
       const dateMatch = emailWithEvent.body.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
       const timeMatch = emailWithEvent.body.match(/(\d{1,2}):(\d{2})/);
-      
+
       let extractedDate = '';
       let extractedTime = '';
-      
+
       if (dateMatch) {
         // Formato YYYY-MM-DD para fecha
         extractedDate = `${dateMatch[3]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[1].padStart(2, '0')}`;
         console.log(`   ✓ Fecha detectada: ${extractedDate}`);
       }
-      
+
       if (timeMatch) {
         // Formato HH:MM para hora
         extractedTime = `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
         console.log(`   ✓ Hora detectada: ${extractedTime}`);
       }
-      
+
       // Extraer información de ubicación
       console.log('3. Extrayendo información de ubicación');
       const locationMatch = emailWithEvent.body.match(/en ([^.,<]+)/);
       const extractedLocation = locationMatch ? locationMatch[1].trim() : '';
-      
+
       if (extractedLocation) {
         console.log(`   ✓ Ubicación detectada: ${extractedLocation}`);
       }
-      
+
       // Crear evento en calendario
       console.log('4. Creando evento en el calendario');
       const newEvent = mockServices.CalendarService.addEvent({
@@ -320,14 +318,14 @@ const mockComponents = {
         description: `Evento creado automáticamente desde email: "${emailWithEvent.subject}"`,
         attendees: ['María García', 'Fotógrafo'],
         providerRelated: true,
-        providerId: emailWithEvent.providerId
+        providerId: emailWithEvent.providerId,
       });
-      
+
       console.log('   ✓ Evento añadido al calendario con ID:', newEvent.id);
-      
+
       return { success: true, eventId: newEvent.id };
-    }
-  }
+    },
+  },
 };
 
 // Ejecutar prueba completa de integración
@@ -335,26 +333,29 @@ async function runIntegrationTest() {
   console.log('==========================================================');
   console.log('= PRUEBA DE INTEGRACIÓN DEL SISTEMA DE EMAILS DE LOVENDA =');
   console.log('==========================================================');
-  
+
   try {
     // Probar la bandeja de entrada unificada
     const inboxResult = mockComponents.EmailInbox.simulate();
-    
+
     // Probar el compositor con plantillas
     const composerResult = mockComponents.EmailComposer.simulate();
-    
+
     // Probar la integración con calendario
     const calendarResult = mockComponents.CalendarIntegration.simulate();
-    
+
     // Verificar resultados
     console.log('\n--- RESULTADOS DE LA PRUEBA DE INTEGRACIÓN ---');
     console.log(`1. Bandeja de entrada: ${inboxResult.success ? '✅ CORRECTO' : '❌ FALLÓ'}`);
-    console.log(`2. Compositor con plantillas: ${composerResult.success ? '✅ CORRECTO' : '❌ FALLÓ'}`);
-    console.log(`3. Integración con calendario: ${calendarResult.success ? '✅ CORRECTO' : '❌ FALLÓ'}`);
-    
+    console.log(
+      `2. Compositor con plantillas: ${composerResult.success ? '✅ CORRECTO' : '❌ FALLÓ'}`
+    );
+    console.log(
+      `3. Integración con calendario: ${calendarResult.success ? '✅ CORRECTO' : '❌ FALLÓ'}`
+    );
+
     console.log('\nPrueba de integración completada correctamente.');
     console.log('El sistema de emails personalizado de MyWed360 funciona según lo esperado.');
-    
   } catch (error) {
     console.error('\n❌ ERROR EN LA PRUEBA DE INTEGRACIÓN:', error);
   }

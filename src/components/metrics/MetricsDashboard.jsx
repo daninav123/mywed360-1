@@ -1,20 +1,34 @@
 /**
  * Panel de visualización de métricas del sistema de emails
- * 
+ *
  * Este componente muestra estadísticas y métricas de rendimiento
  * recopiladas por el sistema de monitoreo para el módulo de emails y plantillas.
- * 
+ *
  * @module components/metrics/MetricsDashboard
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-         LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { RefreshCw, Filter, ChevronDown, Download } from 'lucide-react';
-import Card from '../ui/Card';
-import Button from '../ui/Button';
-import { performanceMonitor } from '../../services/PerformanceMonitor';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
+
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { performanceMonitor } from '../../services/PerformanceMonitor';
+import Button from '../ui/Button';
+import Card from '../ui/Card';
 
 // Colores para los gráficos
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
@@ -29,22 +43,22 @@ const MetricsDashboard = () => {
     counters: {},
     timings: {},
     events: [],
-    errors: []
+    errors: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [timeRange, setTimeRange] = useState('24h'); // 24h, 7d, 30d, all
   const [filterCategory, setFilterCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Detectar dispositivos móviles
   const isMobile = useMediaQuery('(max-width: 768px)');
-  
+
   // Cargar métricas desde el servicio de monitoreo
   const loadMetrics = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       // En producción, estas métricas vendrían de una API
       // Por ahora usamos las métricas almacenadas en localStorage por el monitor
@@ -56,53 +70,53 @@ const MetricsDashboard = () => {
           counters: {},
           timings: {},
           events: [],
-          errors: []
+          errors: [],
         };
       }
-      
+
       // También añadimos las métricas actuales del monitor
       const currentMetrics = {
         counters: { ...performanceMonitor.metrics.counters },
         timings: { ...performanceMonitor.metrics.timings },
         events: [...performanceMonitor.metrics.events],
-        errors: [...performanceMonitor.metrics.errors]
+        errors: [...performanceMonitor.metrics.errors],
       };
-      
+
       // Combinamos ambas fuentes
       const combinedMetrics = {
         counters: { ...rawMetrics.counters, ...currentMetrics.counters },
         timings: { ...rawMetrics.timings, ...currentMetrics.timings },
         events: [...(rawMetrics.events || []), ...currentMetrics.events],
-        errors: [...(rawMetrics.errors || []), ...currentMetrics.errors]
+        errors: [...(rawMetrics.errors || []), ...currentMetrics.errors],
       };
-      
+
       // Filtrar por rango de tiempo si es necesario
       if (timeRange !== 'all') {
         const now = Date.now();
         let timeLimit;
-        
+
         switch (timeRange) {
           case '24h':
-            timeLimit = now - (24 * 60 * 60 * 1000);
+            timeLimit = now - 24 * 60 * 60 * 1000;
             break;
           case '7d':
-            timeLimit = now - (7 * 24 * 60 * 60 * 1000);
+            timeLimit = now - 7 * 24 * 60 * 60 * 1000;
             break;
           case '30d':
-            timeLimit = now - (30 * 24 * 60 * 60 * 1000);
+            timeLimit = now - 30 * 24 * 60 * 60 * 1000;
             break;
           default:
             timeLimit = 0;
         }
-        
+
         combinedMetrics.events = combinedMetrics.events.filter(
-          event => event.timestamp >= timeLimit
+          (event) => event.timestamp >= timeLimit
         );
         combinedMetrics.errors = combinedMetrics.errors.filter(
-          error => error.timestamp >= timeLimit
+          (error) => error.timestamp >= timeLimit
         );
       }
-      
+
       setMetrics(combinedMetrics);
     } catch (err) {
       console.error('Error al cargar métricas:', err);
@@ -111,38 +125,38 @@ const MetricsDashboard = () => {
       setLoading(false);
     }
   };
-  
+
   // Cargar métricas al iniciar el componente
   useEffect(() => {
     loadMetrics();
   }, [timeRange, filterCategory]);
-  
+
   // Preparar datos para el gráfico de uso de plantillas por categoría
   const templateUsageByCategory = useMemo(() => {
     const categoryCounters = {};
-    
+
     // Contar eventos por categoría
     metrics.events
-      .filter(event => event.name === 'template_usage')
-      .forEach(event => {
+      .filter((event) => event.name === 'template_usage')
+      .forEach((event) => {
         const category = event.data.category || 'Sin categoría';
         if (!categoryCounters[category]) {
           categoryCounters[category] = 0;
         }
         categoryCounters[category]++;
       });
-    
+
     // Convertir a formato para gráfico
     return Object.entries(categoryCounters).map(([category, count]) => ({
       name: category,
-      value: count
+      value: count,
     }));
   }, [metrics.events]);
-  
+
   // Preparar datos para el gráfico de tipos de operaciones
   const operationTypes = useMemo(() => {
     const operations = {};
-    
+
     // Buscar operaciones en contadores
     Object.entries(metrics.counters)
       .filter(([key]) => key.startsWith('template_') || key.startsWith('email_operation_'))
@@ -150,14 +164,14 @@ const MetricsDashboard = () => {
         const operation = key.replace('template_', '').replace('email_operation_', '');
         operations[operation] = value;
       });
-    
+
     // Convertir a formato para gráfico
     return Object.entries(operations).map(([name, value]) => ({
       name,
-      value
+      value,
     }));
   }, [metrics.counters]);
-  
+
   // Preparar datos para el gráfico de tiempos de operación
   const operationTimings = useMemo(() => {
     return Object.entries(metrics.timings)
@@ -166,62 +180,62 @@ const MetricsDashboard = () => {
         name: key.replace('email_', '').replace('template_', ''),
         avg: timing.total / timing.count,
         min: timing.min,
-        max: timing.max
+        max: timing.max,
       }));
   }, [metrics.timings]);
-  
+
   // Preparar lista de errores recientes
   const recentErrors = useMemo(() => {
     return metrics.errors
-      .filter(error => error.type.startsWith('email_') || error.type.includes('template'))
+      .filter((error) => error.type.startsWith('email_') || error.type.includes('template'))
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 5);
   }, [metrics.errors]);
-  
+
   // Descargar métricas en formato CSV
   const downloadMetrics = () => {
     // Crear contenido CSV
-    let csvContent = "data:text/csv;charset=utf-8,";
-    
+    let csvContent = 'data:text/csv;charset=utf-8,';
+
     // Encabezados
-    csvContent += "Tipo,Métrica,Valor,Timestamp\n";
-    
+    csvContent += 'Tipo,Métrica,Valor,Timestamp\n';
+
     // Contadores
     Object.entries(metrics.counters).forEach(([key, value]) => {
       csvContent += `Counter,${key},${value},${Date.now()}\n`;
     });
-    
+
     // Tiempos
     Object.entries(metrics.timings).forEach(([key, timing]) => {
       csvContent += `Timing,${key}_avg,${timing.total / timing.count},${Date.now()}\n`;
       csvContent += `Timing,${key}_min,${timing.min},${Date.now()}\n`;
       csvContent += `Timing,${key}_max,${timing.max},${Date.now()}\n`;
     });
-    
+
     // Eventos
-    metrics.events.forEach(event => {
+    metrics.events.forEach((event) => {
       csvContent += `Event,${event.name},1,${event.timestamp}\n`;
     });
-    
+
     // Errores
-    metrics.errors.forEach(error => {
+    metrics.errors.forEach((error) => {
       csvContent += `Error,${error.type},"${error.message.replace(/"/g, '""')}",${error.timestamp}\n`;
     });
-    
+
     // Crear enlace para descargar
     const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `lovenda_metrics_${new Date().toISOString().split('T')[0]}.csv`);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `lovenda_metrics_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
-    
+
     // Simular clic en el enlace
     link.click();
-    
+
     // Limpiar
     document.body.removeChild(link);
   };
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center p-12">
@@ -229,14 +243,14 @@ const MetricsDashboard = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-8 pb-8">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-2xl font-semibold">Dashboard de Métricas - Sistema de Emails</h2>
-        
+
         <div className="flex items-center gap-3">
-          <Button 
+          <Button
             onClick={() => setShowFilters(!showFilters)}
             type="secondary"
             size="sm"
@@ -244,9 +258,12 @@ const MetricsDashboard = () => {
           >
             <Filter size={16} />
             <span>Filtros</span>
-            <ChevronDown size={16} className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              size={16}
+              className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}
+            />
           </Button>
-          
+
           <Button
             onClick={loadMetrics}
             type="secondary"
@@ -256,7 +273,7 @@ const MetricsDashboard = () => {
             <RefreshCw size={16} />
             <span>Actualizar</span>
           </Button>
-          
+
           <Button
             onClick={downloadMetrics}
             type="primary"
@@ -268,16 +285,16 @@ const MetricsDashboard = () => {
           </Button>
         </div>
       </div>
-      
+
       {showFilters && (
         <Card className="mb-6 p-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
             <div>
               <label className="block text-sm mb-1">Rango de tiempo</label>
-              <select 
+              <select
                 className="border rounded px-3 py-1"
                 value={timeRange}
-                onChange={e => setTimeRange(e.target.value)}
+                onChange={(e) => setTimeRange(e.target.value)}
               >
                 <option value="24h">Últimas 24 horas</option>
                 <option value="7d">Últimos 7 días</option>
@@ -285,13 +302,13 @@ const MetricsDashboard = () => {
                 <option value="all">Todo</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm mb-1">Categoría</label>
-              <select 
+              <select
                 className="border rounded px-3 py-1"
                 value={filterCategory}
-                onChange={e => setFilterCategory(e.target.value)}
+                onChange={(e) => setFilterCategory(e.target.value)}
               >
                 <option value="all">Todas</option>
                 <option value="proveedores">Proveedores</option>
@@ -303,13 +320,13 @@ const MetricsDashboard = () => {
           </div>
         </Card>
       )}
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 p-4 rounded-md text-red-700 mb-6">
           {error}
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Gráfico de uso de plantillas por categoría */}
         <Card className="p-4">
@@ -336,7 +353,7 @@ const MetricsDashboard = () => {
             </ResponsiveContainer>
           </div>
         </Card>
-        
+
         {/* Gráfico de tipos de operaciones */}
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-4">Operaciones por tipo</h3>
@@ -352,7 +369,7 @@ const MetricsDashboard = () => {
             </ResponsiveContainer>
           </div>
         </Card>
-        
+
         {/* Gráfico de tiempos de operación */}
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-4">Tiempos de operación (ms)</h3>
@@ -371,7 +388,7 @@ const MetricsDashboard = () => {
             </ResponsiveContainer>
           </div>
         </Card>
-        
+
         {/* Errores recientes */}
         <Card className="p-4">
           <h3 className="text-lg font-medium mb-4">Errores recientes</h3>
@@ -390,9 +407,7 @@ const MetricsDashboard = () => {
                     <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
                       <td className="py-2 pr-4">{error.type}</td>
                       <td className="py-2 pr-4">{error.message}</td>
-                      <td className="py-2">
-                        {new Date(error.timestamp).toLocaleString()}
-                      </td>
+                      <td className="py-2">{new Date(error.timestamp).toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -403,7 +418,7 @@ const MetricsDashboard = () => {
           )}
         </Card>
       </div>
-      
+
       {/* Resumen de contadores */}
       <Card className="p-4">
         <h3 className="text-lg font-medium mb-4">Resumen de actividad</h3>
@@ -414,7 +429,9 @@ const MetricsDashboard = () => {
           </div>
           <div className="bg-green-50 p-4 rounded-md">
             <h4 className="text-sm text-green-700">Emails enviados</h4>
-            <p className="text-2xl font-semibold">{metrics.counters['email_operation_send'] || 0}</p>
+            <p className="text-2xl font-semibold">
+              {metrics.counters['email_operation_send'] || 0}
+            </p>
           </div>
           <div className="bg-purple-50 p-4 rounded-md">
             <h4 className="text-sm text-purple-700">Plantillas creadas</h4>
@@ -422,11 +439,11 @@ const MetricsDashboard = () => {
           </div>
           <div className="bg-amber-50 p-4 rounded-md">
             <h4 className="text-sm text-amber-700">Búsquedas realizadas</h4>
-            <p className="text-2xl font-semibold">{
-              Object.keys(metrics.counters)
-                .filter(key => key.includes('search'))
-                .reduce((sum, key) => sum + metrics.counters[key], 0)
-            }</p>
+            <p className="text-2xl font-semibold">
+              {Object.keys(metrics.counters)
+                .filter((key) => key.includes('search'))
+                .reduce((sum, key) => sum + metrics.counters[key], 0)}
+            </p>
           </div>
         </div>
       </Card>

@@ -1,4 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
+
 import { post as apiPost } from '../services/apiClient';
 
 /**
@@ -99,7 +107,8 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
     } else {
       node.setAttribute(targetAttr, color);
     }
-    if (targetAttr === 'fill') setFill(color); else setStroke(color);
+    if (targetAttr === 'fill') setFill(color);
+    else setStroke(color);
   };
 
   const handleFillChange = (e) => {
@@ -139,9 +148,13 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
     return new XMLSerializer().serializeToString(clone);
   };
 
-  useImperativeHandle(ref, () => ({
-    getSvg: () => serializeSvg(),
-  }), []);
+  useImperativeHandle(
+    ref,
+    () => ({
+      getSvg: () => serializeSvg(),
+    }),
+    []
+  );
 
   const downloadSvg = () => {
     const content = serializeSvg();
@@ -188,58 +201,114 @@ const VectorEditor = forwardRef(function VectorEditor({ svg, onExport, palette =
       <aside className="md:w-72 shrink-0 bg-white border rounded p-3 space-y-3">
         <h3 className="font-semibold">Editor vectorial</h3>
         <div className="flex gap-2">
-          <button className="px-2 py-1 border rounded" onClick={zoomOut}>-</button>
-          <span className="text-sm flex items-center">Zoom {Math.round(zoom*100)}%</span>
-          <button className="px-2 py-1 border rounded" onClick={zoomIn}>+</button>
+          <button className="px-2 py-1 border rounded" onClick={zoomOut}>
+            -
+          </button>
+          <span className="text-sm flex items-center">Zoom {Math.round(zoom * 100)}%</span>
+          <button className="px-2 py-1 border rounded" onClick={zoomIn}>
+            +
+          </button>
         </div>
         <div className="space-y-2">
-          <div className="text-sm text-gray-600">Capa seleccionada: {selectedIndex != null ? selectedIndex+1 : 'ninguna'}</div>
+          <div className="text-sm text-gray-600">
+            Capa seleccionada: {selectedIndex != null ? selectedIndex + 1 : 'ninguna'}
+          </div>
           <div className="flex items-center gap-2 text-xs">
             <span>Aplicar a:</span>
             <label className="inline-flex items-center gap-1">
-              <input type="radio" name="applyTarget" checked={applyTarget==='fill'} onChange={()=>setApplyTarget('fill')} />
+              <input
+                type="radio"
+                name="applyTarget"
+                checked={applyTarget === 'fill'}
+                onChange={() => setApplyTarget('fill')}
+              />
               Relleno
             </label>
             <label className="inline-flex items-center gap-1">
-              <input type="radio" name="applyTarget" checked={applyTarget==='stroke'} onChange={()=>setApplyTarget('stroke')} />
+              <input
+                type="radio"
+                name="applyTarget"
+                checked={applyTarget === 'stroke'}
+                onChange={() => setApplyTarget('stroke')}
+              />
               Trazo
             </label>
           </div>
           <label className="block text-sm">Relleno</label>
-          <input type="color" value={fill} onChange={handleFillChange} className="w-10 h-8 p-0 border rounded" />
+          <input
+            type="color"
+            value={fill}
+            onChange={handleFillChange}
+            className="w-10 h-8 p-0 border rounded"
+          />
           <label className="block text-sm mt-2">Trazo</label>
-          <input type="color" value={stroke} onChange={handleStrokeChange} className="w-10 h-8 p-0 border rounded" />
+          <input
+            type="color"
+            value={stroke}
+            onChange={handleStrokeChange}
+            className="w-10 h-8 p-0 border rounded"
+          />
           <label className="block text-sm mt-2">Grosor</label>
-          <input type="number" value={strokeWidth} min={0} step={0.5} onChange={handleStrokeWidth} className="w-full border rounded p-1" />
+          <input
+            type="number"
+            value={strokeWidth}
+            min={0}
+            step={0.5}
+            onChange={handleStrokeWidth}
+            className="w-full border rounded p-1"
+          />
           {Array.isArray(palette) && palette.length > 0 && (
             <div className="mt-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Paleta</span>
                 <label className="text-xs flex items-center gap-1">
-                  <input type="checkbox" checked={applyAllOfSame} onChange={(e)=>setApplyAllOfSame(e.target.checked)} />
+                  <input
+                    type="checkbox"
+                    checked={applyAllOfSame}
+                    onChange={(e) => setApplyAllOfSame(e.target.checked)}
+                  />
                   Reemplazar mismo color
                 </label>
               </div>
               <div className="mt-1 flex flex-wrap gap-2">
-                {palette.map((c,i)=> (
-                  <button key={i} title={c} onClick={()=>applyColor(c)} className="w-6 h-6 rounded border" style={{ backgroundColor: c }} />
+                {palette.map((c, i) => (
+                  <button
+                    key={i}
+                    title={c}
+                    onClick={() => applyColor(c)}
+                    className="w-6 h-6 rounded border"
+                    style={{ backgroundColor: c }}
+                  />
                 ))}
               </div>
             </div>
           )}
           <div className="flex gap-2 mt-2">
-            <button className="px-3 py-1 border rounded" onClick={handleDelete} disabled={selectedIndex==null}>Eliminar</button>
+            <button
+              className="px-3 py-1 border rounded"
+              onClick={handleDelete}
+              disabled={selectedIndex == null}
+            >
+              Eliminar
+            </button>
           </div>
         </div>
         <div className="pt-4 border-t mt-2 flex flex-col gap-2">
-          <button className="px-3 py-2 bg-blue-600 text-white rounded" onClick={downloadSvg}>Descargar SVG</button>
-          <button className="px-3 py-2 bg-emerald-600 text-white rounded" onClick={downloadPdf}>Exportar PDF</button>
+          <button className="px-3 py-2 bg-blue-600 text-white rounded" onClick={downloadSvg}>
+            Descargar SVG
+          </button>
+          <button className="px-3 py-2 bg-emerald-600 text-white rounded" onClick={downloadPdf}>
+            Exportar PDF
+          </button>
         </div>
       </aside>
 
       {/* Canvas */}
       <main className="flex-1 bg-gray-50 rounded p-3 overflow-auto">
-        <div className="border bg-white rounded shadow-sm overflow-auto" style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }}>
+        <div
+          className="border bg-white rounded shadow-sm overflow-auto"
+          style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }}
+        >
           <div ref={containerRef} className="p-2" />
         </div>
       </main>

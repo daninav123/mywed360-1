@@ -1,6 +1,7 @@
-import React from 'react';
-import { Card } from '../ui';
 import { AlertTriangle } from 'lucide-react';
+import React from 'react';
+
+import { Card } from '../ui';
 
 export default function PaymentAlerts({ overdueCount = 0, upcomingCount = 0, tr = (k) => k }) {
   if (!overdueCount && !upcomingCount) return null;
@@ -14,12 +15,16 @@ export default function PaymentAlerts({ overdueCount = 0, upcomingCount = 0, tr 
           </p>
           {overdueCount > 0 && (
             <p className="text-sm text-[color:var(--color-danger)]">
-              {tr('finance.transactions.alerts.overdue', { defaultValue: 'Pagos vencidos:' })} {overdueCount}
+              {tr('finance.transactions.alerts.overdue', { defaultValue: 'Pagos vencidos:' })}{' '}
+              {overdueCount}
             </p>
           )}
           {upcomingCount > 0 && (
             <p className="text-sm text-[color:var(--color-warning)]">
-              {tr('finance.transactions.alerts.upcoming', { defaultValue: 'Pagos proximos (7 dias):' })} {upcomingCount}
+              {tr('finance.transactions.alerts.upcoming', {
+                defaultValue: 'Pagos proximos (7 dias):',
+              })}{' '}
+              {upcomingCount}
             </p>
           )}
         </div>
@@ -27,4 +32,3 @@ export default function PaymentAlerts({ overdueCount = 0, upcomingCount = 0, tr 
     </Card>
   );
 }
-

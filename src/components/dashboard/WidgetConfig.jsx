@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { WidgetTypes } from './widgets/WidgetTypes';
 
 export const WidgetConfig = ({ config, onUpdate }) => {

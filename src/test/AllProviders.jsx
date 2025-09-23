@@ -1,7 +1,7 @@
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 
 /*
  * Wrapper de pruebas con los providers globales usados por la mayoría

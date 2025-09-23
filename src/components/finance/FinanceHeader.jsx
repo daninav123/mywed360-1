@@ -1,5 +1,6 @@
-﻿import React from 'react';
 import { Cloud, CloudOff } from 'lucide-react';
+import React from 'react';
+
 import useTranslations from '../../hooks/useTranslations';
 
 export default function FinanceHeader({ syncStatus }) {
@@ -12,11 +13,14 @@ export default function FinanceHeader({ syncStatus }) {
           {t('finance.overview.title', { defaultValue: 'Gestión Financiera' })}
         </h1>
         <p className="text-[color:var(--color-text)]/70 mt-1">
-          {t('finance.overview.subtitle', { defaultValue: 'Control completo del presupuesto y gastos de tu boda' })}
+          {t('finance.overview.subtitle', {
+            defaultValue: 'Control completo del presupuesto y gastos de tu boda',
+          })}
         </p>
         {syncStatus?.lastSyncTime && (
           <p className="text-xs text-[color:var(--color-text)]/50 mt-1">
-            {t('finance.overview.lastSync', { defaultValue: 'Última sincronización' })}: {new Date(syncStatus.lastSyncTime).toLocaleString()}
+            {t('finance.overview.lastSync', { defaultValue: 'Última sincronizaci�n' })}:{' '}
+            {new Date(syncStatus.lastSyncTime).toLocaleString()}
           </p>
         )}
       </div>
@@ -24,19 +28,19 @@ export default function FinanceHeader({ syncStatus }) {
         {syncStatus?.isOnline ? (
           <div className="flex items-center text-[color:var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
             <Cloud size={16} className="mr-2" />
-            <span className="text-sm font-medium">{t('finance.overview.synced', { defaultValue: 'Sincronizado' })}</span>
+            <span className="text-sm font-medium">
+              {t('finance.overview.synced', { defaultValue: 'Sincronizado' })}
+            </span>
           </div>
         ) : (
           <div className="flex items-center text-[color:var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
             <CloudOff size={16} className="mr-2" />
-            <span className="text-sm font-medium">{t('finance.overview.offline', { defaultValue: 'Sin conexión' })}</span>
+            <span className="text-sm font-medium">
+              {t('finance.overview.offline', { defaultValue: 'Sin conexión' })}
+            </span>
           </div>
         )}
       </div>
     </div>
   );
 }
-
-
-
-

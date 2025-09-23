@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Componente FormField reutilizable para formularios
  * Proporciona una estructura consistente para campos de formulario
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {string} props.label - Etiqueta del campo
  * @param {string} props.name - Nombre del campo
@@ -47,10 +47,7 @@ const FormField = ({
     w-full px-3 py-2 border rounded-md shadow-sm transition-colors
     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
     disabled:bg-gray-100 disabled:cursor-not-allowed
-    ${hasError 
-      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-      : 'border-gray-300'
-    }
+    ${hasError ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}
     ${icon ? 'pl-10' : ''}
     ${className}
   `;
@@ -120,10 +117,7 @@ const FormField = ({
     <div className="mb-4">
       {/* Etiqueta */}
       {label && (
-        <label 
-          htmlFor={name} 
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -147,11 +141,7 @@ const FormField = ({
       )}
 
       {/* Texto de ayuda */}
-      {helpText && !error && (
-        <p className="mt-1 text-sm text-gray-500">
-          {helpText}
-        </p>
-      )}
+      {helpText && !error && <p className="mt-1 text-sm text-gray-500">{helpText}</p>}
     </div>
   );
 };

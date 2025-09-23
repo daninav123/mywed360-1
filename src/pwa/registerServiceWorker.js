@@ -18,12 +18,14 @@ const updateSW = registerSW({
   onNeedRefresh() {
     // Notificar a la app que hay actualizacin disponible
     try {
-      window.dispatchEvent(new CustomEvent('pwa:need-refresh', { detail: { update: () => updateSW(true) } }));
+      window.dispatchEvent(
+        new CustomEvent('pwa:need-refresh', { detail: { update: () => updateSW(true) } })
+      );
     } catch {}
   },
   onOfflineReady() {
     try {
       window.dispatchEvent(new CustomEvent('pwa:offline-ready'));
     } catch {}
-  }
+  },
 });

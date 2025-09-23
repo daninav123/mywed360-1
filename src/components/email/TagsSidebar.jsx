@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Button from '../Button';
 
 /**
@@ -16,7 +17,7 @@ import Button from '../Button';
 const TagsSidebar = ({ tags = [], activeTagId = null, onSelectTag }) => {
   return (
     <nav className="flex flex-col p-2" data-testid="tags-sidebar">
-      {tags.map(tag => (
+      {tags.map((tag) => (
         <Button
           key={tag.id}
           variant={activeTagId === tag.id ? 'subtle' : 'ghost'}

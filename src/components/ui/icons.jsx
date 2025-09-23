@@ -1,5 +1,5 @@
 // Icon shim mapping legacy names to lucide-react components
-export { 
+export {
   ChevronDown as ChevronDownIcon,
   ChevronUp as ChevronUpIcon,
   CheckCircle as CheckCircleIcon,
@@ -9,5 +9,5 @@ export {
   Bell as BellIcon,
   AlertCircle as ExclamationCircleIcon,
   Paperclip as PaperclipIcon,
-  X as XIcon
+  X as XIcon,
 } from 'lucide-react';

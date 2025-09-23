@@ -4,16 +4,16 @@
 
 /* Variables de color (Claro / Oscuro) */
 :root {
-  --color-bg: #FFF9DB;
+  --color-bg: #fff9db;
   --color-surface: #ffffff;
   --color-text: #1f2937;
-  --color-primary: #8ACBFF;
-  --color-accent: #FFE4F2;
+  --color-primary: #8acbff;
+  --color-accent: #ffe4f2;
   /* Extended tokens */
   --color-success: #22c55e; /* green-500 */
   --color-warning: #f59e0b; /* amber-500 */
-  --color-danger: #ef4444;  /* red-500 */
-  --color-info: #0ea5e9;    /* sky-500 */
+  --color-danger: #ef4444; /* red-500 */
+  --color-info: #0ea5e9; /* sky-500 */
   /* Derived tokens */
   --color-border: rgba(31, 41, 55, 0.15);
   --color-muted: rgba(31, 41, 55, 0.7);
@@ -33,7 +33,6 @@
   --color-muted: rgba(243, 244, 246, 0.7);
 }
 
-
 /* Ocultar flechas de los inputs number */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
@@ -45,16 +44,23 @@ input[type='number'] {
 }
 @layer base {
   /* Dark mode base styles */
-  .dark body { /* Los colores se gestionan por variables */ }
+  .dark body {
+    /* Los colores se gestionan por variables */
+  }
   body {
     @apply font-sans transition-colors duration-300;
     background-color: var(--color-bg);
     color: var(--color-text);
   }
-  h1, .page-title {
+  h1,
+  .page-title {
     @apply font-sans font-semibold text-2xl mb-6 tracking-tight;
   }
-  h2, h3, h4, h5, h6 {
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold;
   }
   a {
@@ -64,7 +70,8 @@ input[type='number'] {
   p {
     @apply mb-4 leading-relaxed;
   }
-  ul, ol {
+  ul,
+  ol {
     @apply list-disc pl-5 mb-4;
   }
   button {
@@ -75,46 +82,104 @@ input[type='number'] {
   button:hover {
     background-color: var(--color-accent);
   }
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     @apply border rounded p-2 focus:outline-none focus:ring-2 focus:border-transparent;
     border-color: var(--color-text);
   }
-  input:focus, select:focus, textarea:focus {
+  input:focus,
+  select:focus,
+  textarea:focus {
     --tw-ring-color: var(--color-primary);
   }
 }
 
 /* Utilities semánticas basadas en tokens (para migración gradual) */
 @layer utilities {
-  .bg-app { background-color: var(--color-bg); }
-  .bg-surface { background-color: var(--color-surface); }
-  .text-body { color: var(--color-text); }
-  .text-muted { color: var(--color-muted); }
-  .border-soft { border-color: var(--color-border); }
-  .ring-primary { --tw-ring-color: var(--color-primary); }
-  .bg-primary { background-color: var(--color-primary); }
-  .text-primary { color: var(--color-primary); }
-  .bg-accent { background-color: var(--color-accent); }
-  .text-accent { color: var(--color-accent); }
-  .text-success { color: var(--color-success); }
-  .text-warning { color: var(--color-warning); }
-  .text-danger { color: var(--color-danger); }
-  .text-info { color: var(--color-info); }
-  .bg-success { background-color: var(--color-success); }
-  .bg-warning { background-color: var(--color-warning); }
-  .bg-danger { background-color: var(--color-danger); }
-  .bg-info { background-color: var(--color-info); }
+  .bg-app {
+    background-color: var(--color-bg);
+  }
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+  .text-body {
+    color: var(--color-text);
+  }
+  .text-muted {
+    color: var(--color-muted);
+  }
+  .border-soft {
+    border-color: var(--color-border);
+  }
+  .ring-primary {
+    --tw-ring-color: var(--color-primary);
+  }
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+  .text-primary {
+    color: var(--color-primary);
+  }
+  .bg-accent {
+    background-color: var(--color-accent);
+  }
+  .text-accent {
+    color: var(--color-accent);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+  .text-danger {
+    color: var(--color-danger);
+  }
+  .text-info {
+    color: var(--color-info);
+  }
+  .bg-success {
+    background-color: var(--color-success);
+  }
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .bg-danger {
+    background-color: var(--color-danger);
+  }
+  .bg-info {
+    background-color: var(--color-info);
+  }
 }
 
 /* Componentes reutilizables de layout (títulos y pestañas) */
 @layer components {
   /* Cabecera de página: título a la izquierda, acciones a la derecha */
-  .page-header { @apply flex items-center justify-between flex-wrap gap-2 mb-6; }
-  .page-actions { @apply flex gap-2; }
+  .page-header {
+    @apply flex items-center justify-between flex-wrap gap-2 mb-6;
+  }
+  .page-actions {
+    @apply flex gap-2;
+  }
 
   /* Navegación de pestañas (referencia: Proveedores) */
-  .tabs-nav { @apply flex gap-2 border-b; border-color: var(--color-border); }
-  .tab-trigger { @apply px-3 py-2 text-sm font-medium border-b-2 border-transparent; color: var(--color-text); opacity: .6; }
-  .tab-trigger:hover { opacity: 1; border-color: var(--color-border); }
-  .tab-trigger-active { border-color: var(--color-primary); color: var(--color-primary); opacity: 1; }
+  .tabs-nav {
+    @apply flex gap-2 border-b;
+    border-color: var(--color-border);
+  }
+  .tab-trigger {
+    @apply px-3 py-2 text-sm font-medium border-b-2 border-transparent;
+    color: var(--color-text);
+    opacity: 0.6;
+  }
+  .tab-trigger:hover {
+    opacity: 1;
+    border-color: var(--color-border);
+  }
+  .tab-trigger-active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    opacity: 1;
+  }
 }

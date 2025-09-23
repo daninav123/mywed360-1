@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { useEffect, useState } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
 
 /**
  * Carga presupuestos de un conjunto de proveedores (una sola vez por cambio de miembros)
@@ -48,4 +49,3 @@ export default function useGroupBudgets(memberIds = []) {
 
   return { budgetsBySupplier, loading, error };
 }
-

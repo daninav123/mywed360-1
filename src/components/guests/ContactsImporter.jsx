@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { UploadCloud, Check, X } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useRef, useState } from 'react';
+
 import { Button, Input } from '../ui';
 
 /**
@@ -14,7 +15,7 @@ const ContactsImporterFixed = ({ onImported }) => {
   const fileInputRef = useRef(null);
 
   const updateField = (idx, key, value) => {
-    setRows(prev => {
+    setRows((prev) => {
       const copy = [...prev];
       copy[idx] = { ...copy[idx], [key]: value };
       return copy;
@@ -28,7 +29,9 @@ const ContactsImporterFixed = ({ onImported }) => {
     }
 
     try {
-      const contacts = await navigator.contacts.select(['name', 'email', 'tel'], { multiple: true });
+      const contacts = await navigator.contacts.select(['name', 'email', 'tel'], {
+        multiple: true,
+      });
       if (!contacts.length) return;
 
       const now = Date.now();
@@ -63,8 +66,8 @@ const ContactsImporterFixed = ({ onImported }) => {
     // Parser básico para CSV sencillo (campos separados por coma, comillas opcionales)
     const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(Boolean);
     if (lines.length === 0) return [];
-    const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    const headers = rawHeaders.map(h => h.toLowerCase());
+    const rawHeaders = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
+    const headers = rawHeaders.map((h) => h.toLowerCase());
 
     const mapKey = (h) => {
       if (h.includes('name') || h.includes('nombre')) return 'name';
@@ -100,7 +103,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       }
       cols.push(cur.trim());
 
-      if (cols.every(v => v === '')) continue;
+      if (cols.every((v) => v === '')) continue;
       const obj = {};
       mappedHeaders.forEach((key, idx) => {
         const val = (cols[idx] || '').replace(/^"|"$/g, '');
@@ -165,16 +168,32 @@ const ContactsImporterFixed = ({ onImported }) => {
             {rows.map((g, idx) => (
               <tr key={g.id}>
                 <td className="border px-2 py-1">
-                  <input value={g.name} onChange={e => updateField(idx, 'name', e.target.value)} className="w-full" />
+                  <input
+                    value={g.name}
+                    onChange={(e) => updateField(idx, 'name', e.target.value)}
+                    className="w-full"
+                  />
                 </td>
                 <td className="border px-2 py-1">
-                  <input value={g.email} onChange={e => updateField(idx, 'email', e.target.value)} className="w-full" />
+                  <input
+                    value={g.email}
+                    onChange={(e) => updateField(idx, 'email', e.target.value)}
+                    className="w-full"
+                  />
                 </td>
                 <td className="border px-2 py-1">
-                  <input value={g.phone} onChange={e => updateField(idx, 'phone', e.target.value)} className="w-full" />
+                  <input
+                    value={g.phone}
+                    onChange={(e) => updateField(idx, 'phone', e.target.value)}
+                    className="w-full"
+                  />
                 </td>
                 <td className="border px-2 py-1 w-24 text-center">
-                  <input value={g.table} onChange={e => updateField(idx, 'table', e.target.value)} className="w-full text-center" />
+                  <input
+                    value={g.table}
+                    onChange={(e) => updateField(idx, 'table', e.target.value)}
+                    className="w-full text-center"
+                  />
                 </td>
               </tr>
             ))}
@@ -183,10 +202,16 @@ const ContactsImporterFixed = ({ onImported }) => {
 
         <div className="flex justify-end space-x-3">
           <Button variant="outline" onClick={() => setStep('form')} className="flex items-center">
-            <X size={16} className="mr-1" />Volver
+            <X size={16} className="mr-1" />
+            Volver
           </Button>
-          <Button variant="secondary" onClick={() => onImported?.(rows)} className="flex items-center">
-            <Check size={16} className="mr-1" />Importar {rows.length}
+          <Button
+            variant="secondary"
+            onClick={() => onImported?.(rows)}
+            className="flex items-center"
+          >
+            <Check size={16} className="mr-1" />
+            Importar {rows.length}
           </Button>
         </div>
       </div>
@@ -195,18 +220,36 @@ const ContactsImporterFixed = ({ onImported }) => {
 
   return (
     <div className="space-y-4">
-      <Input label="Mesa (opcional)" value={table} onChange={e => setTable(e.target.value)} placeholder="Ej. 5" />
+      <Input
+        label="Mesa (opcional)"
+        value={table}
+        onChange={(e) => setTable(e.target.value)}
+        placeholder="Ej. 5"
+      />
       <Button variant="secondary" onClick={pickContacts} className="flex items-center space-x-2">
         <UploadCloud size={16} />
         <span>Seleccionar contactos</span>
       </Button>
       <div>
-        <input ref={fileInputRef} type="file" accept=".csv" onChange={handleCSVSelected} className="hidden" />
-        <Button variant="outline" onClick={handleImportCSVClick} className="flex items-center space-x-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          onChange={handleCSVSelected}
+          className="hidden"
+        />
+        <Button
+          variant="outline"
+          onClick={handleImportCSVClick}
+          className="flex items-center space-x-2"
+        >
           <UploadCloud size={16} />
           <span>Importar CSV</span>
         </Button>
-        <p className="text-xs text-gray-500 mt-2">Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId</p>
+        <p className="text-xs text-gray-500 mt-2">
+          Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes,
+          companionGroupId
+        </p>
       </div>
     </div>
   );

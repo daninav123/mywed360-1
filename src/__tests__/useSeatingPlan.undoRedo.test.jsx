@@ -3,8 +3,9 @@
  * del hook useSeatingPlan.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { useSeatingPlan } from '../hooks/useSeatingPlan';
 
 // Mocks compartidos (los mismos que en useSeatingPlan.test.jsx)
@@ -13,18 +14,18 @@ vi.mock('../services/SyncService', () => ({
   saveData: vi.fn(),
   loadData: vi.fn(),
   subscribeSyncState: vi.fn(() => () => {}),
-  getSyncState: vi.fn(() => ({ status: 'synced' }))
+  getSyncState: vi.fn(() => ({ status: 'synced' })),
 }));
 vi.mock('../context/WeddingContext', () => ({
-  useWedding: () => ({ activeWedding: 'test-wedding-id' })
+  useWedding: () => ({ activeWedding: 'test-wedding-id' }),
 }));
 
 const mockCanvas = {
-  toDataURL: vi.fn(() => 'data:image/png;base64,test')
+  toDataURL: vi.fn(() => 'data:image/png;base64,test'),
 };
 
 vi.mock('html2canvas', () => ({
-  default: vi.fn(() => Promise.resolve(mockCanvas))
+  default: vi.fn(() => Promise.resolve(mockCanvas)),
 }));
 
 const mockPdfInstance = { addImage: vi.fn(), addPage: vi.fn(), save: vi.fn() };

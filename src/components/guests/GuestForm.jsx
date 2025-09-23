@@ -1,27 +1,29 @@
 import React, { useState, useCallback, useEffect } from 'react';
+
+import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
 import { Input } from '../ui';
-import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Formulario optimizado para añadir/editar invitados
  * Componente reutilizable con validación y UX mejorada
  */
-const GuestForm = ({ 
-  guest = null, 
-  onSave, 
-  onCancel, 
-  isLoading = false,
-  groupOptions = [],
-}) => {
+const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOptions = [] }) => {
   const { t, wedding } = useTranslations();
-  
+
   // Estado inicial del formulario
   const [formData, setFormData] = useState({
     name: guest?.name || '',
     email: guest?.email || '',
     phone: guest?.phone || '',
     address: guest?.address || '',
+    // Campos de dirección detallada (opcionales)
+    addressStreet: guest?.addressStreet || '',
+    addressStreet2: guest?.addressStreet2 || '',
+    addressCity: guest?.addressCity || '',
+    addressState: guest?.addressState || '',
+    addressZip: guest?.addressZip || '',
+    addressCountry: guest?.addressCountry || '',
     group: guest?.group || '',
     companion: guest?.companion || 0,
     companionType: guest?.companionType || 'none',
@@ -30,30 +32,43 @@ const GuestForm = ({
     response: guest?.response || 'Pendiente',
     status: guest?.status || 'pending',
     dietaryRestrictions: guest?.dietaryRestrictions || '',
-    notes: guest?.notes || ''
+    notes: guest?.notes || '',
   });
 
   // Estado de validación
   const [errors, setErrors] = useState({});
 
+  // Dirección completa (desplegable) y helper para componer
+  const [showAddressDetails, setShowAddressDetails] = useState(false);
+  const composeAddress = (fd) => {
+    const parts = [];
+    const line1 = [fd.addressStreet, fd.addressStreet2].filter(Boolean).join(', ').trim();
+    if (line1) parts.push(line1);
+    const cityLine = [fd.addressZip, fd.addressCity].filter(Boolean).join(' ').trim();
+    const stateLine = [fd.addressState, fd.addressCountry].filter(Boolean).join(', ').trim();
+    if (cityLine) parts.push(cityLine);
+    if (stateLine) parts.push(stateLine);
+    return parts.join(' · ');
+  };
+
   // Validar formulario
   const validateForm = useCallback(() => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = t('forms.fieldRequired');
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = t('forms.fieldRequired');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = t('forms.invalidEmail');
     }
-    
+
     if (formData.phone && !/^\+[1-9]\d{7,14}$/.test(formData.phone.replace(/\s+/g, ''))) {
       newErrors.phone = t('forms.invalidPhone');
     }
-    
+
     if (formData.companion < 0) {
       newErrors.companion = 'El número de acompañantes no puede ser negativo';
     }
@@ -70,46 +85,74 @@ const GuestForm = ({
   }, [formData, t]);
 
   // Manejar cambios en el formulario
-  const handleChange = useCallback((field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: undefined
-      }));
-    }
-  }, [errors]);
+  const handleChange = useCallback(
+    (field, value) => {
+      setFormData((prev) => {
+        const next = { ...prev, [field]: value };
+        // Si se editan campos de dirección detallada, recomponer 'address'
+        if (
+          field === 'addressStreet' ||
+          field === 'addressStreet2' ||
+          field === 'addressCity' ||
+          field === 'addressState' ||
+          field === 'addressZip' ||
+          field === 'addressCountry'
+        ) {
+          next.address = composeAddress(next);
+        }
+        return next;
+      });
+
+      // Limpiar error del campo cuando el usuario empiece a escribir
+      if (errors[field]) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: undefined,
+        }));
+      }
+    },
+    [errors]
+  );
 
   // Manejar envío del formulario
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    // Preparar datos para guardar
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        return;
+      }
+
+      // Preparar datos para guardar
       const guestData = {
         ...formData,
         companion: parseInt(formData.companion, 10) || 0,
         id: guest?.id || `guest-${Date.now()}`,
         createdAt: guest?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
-    
-    onSave(guestData);
-  }, [formData, validateForm, onSave, guest]);
+      // Si hay dirección detallada y el resumen está vacío, componerlo
+      const hasDetailed =
+        formData.addressStreet ||
+        formData.addressStreet2 ||
+        formData.addressCity ||
+        formData.addressState ||
+        formData.addressZip ||
+        formData.addressCountry;
+      if (hasDetailed && !guestData.address) {
+        guestData.address = composeAddress(formData);
+      }
+
+      onSave(guestData);
+    },
+    [formData, validateForm, onSave, guest]
+  );
 
   // Opciones de estado RSVP
   const rsvpOptions = [
     { value: 'pending', label: wedding.guestStatus('pending') },
     { value: 'confirmed', label: wedding.guestStatus('confirmed') },
-    { value: 'declined', label: wedding.guestStatus('declined') }
+    { value: 'declined', label: wedding.guestStatus('declined') },
   ];
 
   // Autosave cada 30 segundos
@@ -145,9 +188,7 @@ const GuestForm = ({
             className={errors.name ? 'border-red-500' : ''}
             disabled={isLoading}
           />
-          {errors.name && (
-            <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-          )}
+          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
         </div>
 
         <div>
@@ -162,9 +203,7 @@ const GuestForm = ({
             className={errors.email ? 'border-red-500' : ''}
             disabled={isLoading}
           />
-          {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-          )}
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
         </div>
       </div>
 
@@ -182,9 +221,7 @@ const GuestForm = ({
             className={errors.phone ? 'border-red-500' : ''}
             disabled={isLoading}
           />
-          {errors.phone && (
-            <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
-          )}
+          {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
         </div>
 
         <div>
@@ -197,7 +234,7 @@ const GuestForm = ({
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
           >
-            {rsvpOptions.map(option => (
+            {rsvpOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -257,14 +294,14 @@ const GuestForm = ({
             className={errors.companion ? 'border-red-500' : ''}
             disabled={isLoading}
           />
-          {errors.companion && (
-            <p className="text-red-500 text-xs mt-1">{errors.companion}</p>
-          )}
+          {errors.companion && <p className="text-red-500 text-xs mt-1">{errors.companion}</p>}
         </div>
 
         {/* Grupo de acompañantes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Grupo de acompañantes</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Grupo de acompañantes
+          </label>
           <div className="flex space-x-2">
             <Input
               value={formData.companionGroupId}
@@ -272,15 +309,21 @@ const GuestForm = ({
               placeholder="group-12345"
               disabled={isLoading}
             />
-            <Button type="button" variant="secondary" disabled={isLoading}
-              onClick={() => handleChange('companionGroupId', `group-${Date.now()}`)}>
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isLoading}
+              onClick={() => handleChange('companionGroupId', `group-${Date.now()}`)}
+            >
               Generar
             </Button>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de acompañante</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Tipo de acompañante
+          </label>
           <select
             value={formData.companionType}
             onChange={(e) => handleChange('companionType', e.target.value)}
@@ -328,9 +371,7 @@ const GuestForm = ({
 
       {/* Notas adicionales */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Notas adicionales
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Notas adicionales</label>
         <textarea
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
@@ -343,19 +384,10 @@ const GuestForm = ({
 
       {/* Botones de acción */}
       <div className="flex justify-end space-x-3 pt-4 border-t">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isLoading}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           {t('app.cancel')}
         </Button>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="min-w-[100px]"
-        >
+        <Button type="submit" disabled={isLoading} className="min-w-[100px]">
           {isLoading ? (
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

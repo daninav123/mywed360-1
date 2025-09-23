@@ -80,11 +80,16 @@ export default function EventsCalendar({
 
       <div className="rbc-calendar-container">
         <ErrorBoundaryComponent
-          fallback={(
+          fallback={
             <div>
               <div className="text-center mb-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-2">Error al cargar el calendario</h3>
-                <p className="text-gray-600">Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de la lista inferior.</p>
+                <h3 className="text-lg font-medium text-gray-800 mb-2">
+                  Error al cargar el calendario
+                </h3>
+                <p className="text-gray-600">
+                  Hubo un problema al cargar el calendario. Puedes gestionar tus eventos a través de
+                  la lista inferior.
+                </p>
               </div>
               <div className="space-y-4 max-h-[300px] overflow-y-auto p-2">
                 {safeEvents && safeEvents.length > 0 ? (
@@ -122,7 +127,12 @@ export default function EventsCalendar({
                           <div className={`font-medium`}>{eventTitle}</div>
                           <div className="text-xs text-gray-500">{formattedDate}</div>
                         </div>
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: categories[event.category || 'OTROS']?.color || '#ccc' }} />
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{
+                            backgroundColor: categories[event.category || 'OTROS']?.color || '#ccc',
+                          }}
+                        />
                       </div>
                     );
                   })
@@ -131,9 +141,12 @@ export default function EventsCalendar({
                 )}
               </div>
             </div>
-          )}
+          }
         >
-          <div className="calendar-container" style={{ height: `${containerHeight}px`, overflow: 'hidden' }}>
+          <div
+            className="calendar-container"
+            style={{ height: `${containerHeight}px`, overflow: 'hidden' }}
+          >
             <style>{`
               .calendar-container { display: flex; flex-direction: column; min-height: 0; }
               .calendar-container .rbc-calendar { width: 100%; height: 100%; flex: 1 1 auto; border: 1px solid #ddd; border-radius: 4px; }
@@ -151,7 +164,9 @@ export default function EventsCalendar({
               .calendar-container .rbc-row { display: flex; flex: 1 1 0; width: 100%; }
             `}</style>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm md:text-base font-semibold text-gray-700 select-none">{monthLabel}</div>
+              <div className="text-sm md:text-base font-semibold text-gray-700 select-none">
+                {monthLabel}
+              </div>
             </div>
             <Calendar
               localizer={localizer}
@@ -169,7 +184,14 @@ export default function EventsCalendar({
               components={{ event: EventComponent }}
               culture="es"
               onDoubleClickEvent={(event) => onEventEdit(event)}
-              messages={{ next: 'Siguiente', previous: 'Anterior', today: 'Hoy', month: 'Mes', week: 'Semana', day: 'Día' }}
+              messages={{
+                next: 'Siguiente',
+                previous: 'Anterior',
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+              }}
             />
           </div>
         </ErrorBoundaryComponent>

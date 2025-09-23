@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+
 import Modal from '../Modal';
 import { Button, Input } from '../ui';
 
@@ -19,11 +20,11 @@ export default function GroupManager({
 
   const groupList = useMemo(() => {
     const set = new Set();
-    (guests || []).forEach(g => {
+    (guests || []).forEach((g) => {
       if (g.group) set.add(String(g.group));
       if (g.companionGroupId) set.add(String(g.companionGroupId));
     });
-    return Array.from(set).sort((a,b)=>a.localeCompare(b));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [guests]);
 
   const selectedCount = Array.isArray(selectedIds) ? selectedIds.length : 0;
@@ -37,17 +38,33 @@ export default function GroupManager({
             <div className="font-medium mb-2">Asignar a seleccionados</div>
             <div className="text-sm text-gray-600 mb-3">Seleccionados: {selectedCount}</div>
             <div className="flex gap-2 items-center">
-              <select className="border rounded px-2 py-1" onChange={(e)=>setNewGroup(e.target.value)} value={newGroup}>
+              <select
+                className="border rounded px-2 py-1"
+                onChange={(e) => setNewGroup(e.target.value)}
+                value={newGroup}
+              >
                 <option value="">Nuevo grupo…</option>
-                {groupList.map(g=> (<option key={g} value={g}>{g}</option>))}
+                {groupList.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
               </select>
               {newGroup === '' && (
-                <Input placeholder="Nombre de grupo" value={newGroup} onChange={(e)=>setNewGroup(e.target.value)} />
+                <Input
+                  placeholder="Nombre de grupo"
+                  value={newGroup}
+                  onChange={(e) => setNewGroup(e.target.value)}
+                />
               )}
               <Button
                 disabled={!selectedCount || !newGroup}
-                onClick={() => { onAssignGroup?.(newGroup); }}
-              >Asignar</Button>
+                onClick={() => {
+                  onAssignGroup?.(newGroup);
+                }}
+              >
+                Asignar
+              </Button>
             </div>
           </div>
 
@@ -55,12 +72,29 @@ export default function GroupManager({
           <div className="border rounded p-4">
             <div className="font-medium mb-2">Renombrar grupo</div>
             <div className="flex gap-2 items-center">
-              <select className="border rounded px-2 py-1" value={renameFrom} onChange={(e)=>setRenameFrom(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={renameFrom}
+                onChange={(e) => setRenameFrom(e.target.value)}
+              >
                 <option value="">Origen…</option>
-                {groupList.map(g=> (<option key={g} value={g}>{g}</option>))}
+                {groupList.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
               </select>
-              <Input placeholder="Nuevo nombre" value={renameTo} onChange={(e)=>setRenameTo(e.target.value)} />
-              <Button disabled={!renameFrom || !renameTo} onClick={()=> onRenameGroup?.(renameFrom, renameTo)}>Renombrar</Button>
+              <Input
+                placeholder="Nuevo nombre"
+                value={renameTo}
+                onChange={(e) => setRenameTo(e.target.value)}
+              />
+              <Button
+                disabled={!renameFrom || !renameTo}
+                onClick={() => onRenameGroup?.(renameFrom, renameTo)}
+              >
+                Renombrar
+              </Button>
             </div>
           </div>
 
@@ -68,15 +102,36 @@ export default function GroupManager({
           <div className="border rounded p-4">
             <div className="font-medium mb-2">Fusionar grupos</div>
             <div className="flex gap-2 items-center">
-              <select className="border rounded px-2 py-1" value={mergeFrom} onChange={(e)=>setMergeFrom(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={mergeFrom}
+                onChange={(e) => setMergeFrom(e.target.value)}
+              >
                 <option value="">Origen…</option>
-                {groupList.map(g=> (<option key={g} value={g}>{g}</option>))}
+                {groupList.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
               </select>
-              <select className="border rounded px-2 py-1" value={mergeTo} onChange={(e)=>setMergeTo(e.target.value)}>
+              <select
+                className="border rounded px-2 py-1"
+                value={mergeTo}
+                onChange={(e) => setMergeTo(e.target.value)}
+              >
                 <option value="">Destino…</option>
-                {groupList.map(g=> (<option key={g} value={g}>{g}</option>))}
+                {groupList.map((g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ))}
               </select>
-              <Button disabled={!mergeFrom || !mergeTo || mergeFrom===mergeTo} onClick={()=> onMergeGroups?.(mergeFrom, mergeTo)}>Fusionar</Button>
+              <Button
+                disabled={!mergeFrom || !mergeTo || mergeFrom === mergeTo}
+                onClick={() => onMergeGroups?.(mergeFrom, mergeTo)}
+              >
+                Fusionar
+              </Button>
             </div>
           </div>
 
@@ -87,7 +142,7 @@ export default function GroupManager({
               <div className="text-sm text-gray-600">No hay grupos aún.</div>
             ) : (
               <ul className="list-disc pl-6 text-sm">
-                {groupList.map(g => (
+                {groupList.map((g) => (
                   <li key={g}>{g}</li>
                 ))}
               </ul>
@@ -96,10 +151,11 @@ export default function GroupManager({
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cerrar
+          </Button>
         </div>
       </div>
     </Modal>
   );
 }
-

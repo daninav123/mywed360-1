@@ -29,7 +29,7 @@ export default function useRoles(weddingId) {
   const addRole = async (userId, role) => {
     const key = `lovenda_roles_${weddingId}`;
     const current = await fetchRoles();
-    const updated = [...current.filter(r => r.userId !== userId), { userId, role }];
+    const updated = [...current.filter((r) => r.userId !== userId), { userId, role }];
     localStorage.setItem(key, JSON.stringify(updated));
     return true;
   };
@@ -37,7 +37,7 @@ export default function useRoles(weddingId) {
   const deleteRole = async (userId) => {
     const key = `lovenda_roles_${weddingId}`;
     const current = await fetchRoles();
-    const updated = current.filter(r => r.userId !== userId);
+    const updated = current.filter((r) => r.userId !== userId);
     localStorage.setItem(key, JSON.stringify(updated));
     return true;
   };
@@ -60,20 +60,26 @@ export default function useRoles(weddingId) {
   }, [weddingId]);
 
   // Asignar rol
-  const assignRole = useCallback(async (userId, role) => {
-    if (!weddingId) return false;
-    await addRole(userId, role);
-    setRoles(prev => [...prev.filter(r => r.userId !== userId), { userId, role }]);
-    return true;
-  }, [weddingId]);
+  const assignRole = useCallback(
+    async (userId, role) => {
+      if (!weddingId) return false;
+      await addRole(userId, role);
+      setRoles((prev) => [...prev.filter((r) => r.userId !== userId), { userId, role }]);
+      return true;
+    },
+    [weddingId]
+  );
 
   // Eliminar rol
-  const removeRole = useCallback(async (userId) => {
-    if (!weddingId) return false;
-    await deleteRole(userId);
-    setRoles(prev => prev.filter(r => r.userId !== userId));
-    return true;
-  }, [weddingId]);
+  const removeRole = useCallback(
+    async (userId) => {
+      if (!weddingId) return false;
+      await deleteRole(userId);
+      setRoles((prev) => prev.filter((r) => r.userId !== userId));
+      return true;
+    },
+    [weddingId]
+  );
 
   return { roles, loading, assignRole, removeRole };
 }

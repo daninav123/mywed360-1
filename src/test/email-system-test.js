@@ -11,24 +11,26 @@ const EmailService = {
     if (profile.emailAlias) {
       return `${profile.emailAlias}@lovenda.com`;
     }
-    
+
     if (profile.brideFirstName && profile.brideLastName) {
-      const normalizedName = `${profile.brideFirstName.toLowerCase()}.${profile.brideLastName.toLowerCase()}`
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
-        .replace(/[^a-z0-9.]/g, '.'); // Reemplazar caracteres no permitidos
+      const normalizedName =
+        `${profile.brideFirstName.toLowerCase()}.${profile.brideLastName.toLowerCase()}`
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+          .replace(/[^a-z0-9.]/g, '.'); // Reemplazar caracteres no permitidos
       return `${normalizedName}@lovenda.com`;
     }
-    
+
     return `user${profile.userId}@lovenda.com`;
   },
-  
+
   sendMail: async ({ to, subject, body }) => {
     console.log('\nSimulando envío de email:');
     console.log(`A: ${to}`);
     console.log(`Asunto: ${subject}`);
     console.log('Contenido: [Contenido HTML omitido]');
     if (body) console.log(`Vista previa: ${String(body).slice(0, 120)}...`);
-    
+
     // Simular respuesta exitosa
     return {
       id: 'email_' + Math.random().toString(36).substring(2, 10),
@@ -36,9 +38,9 @@ const EmailService = {
       to,
       subject,
       date: new Date().toISOString(),
-      status: 'sent'
+      status: 'sent',
     };
-  }
+  },
 };
 
 const EmailTrackingService = {
@@ -46,7 +48,7 @@ const EmailTrackingService = {
     console.log('\nCreando registro de seguimiento:');
     console.log(`Email ID: ${email.id}`);
     console.log(`Proveedor: ${provider.name} (${provider.id})`);
-    
+
     return {
       id: 'track_' + Math.random().toString(36).substring(2, 10),
       emailId: email.id,
@@ -54,9 +56,9 @@ const EmailTrackingService = {
       providerName: provider.name,
       status: 'waiting',
       lastEmailDate: new Date().toISOString(),
-      thread: [{ emailId: email.id, direction: 'outgoing', date: new Date().toISOString() }]
+      thread: [{ emailId: email.id, direction: 'outgoing', date: new Date().toISOString() }],
     };
-  }
+  },
 };
 
 // Perfil de usuario de prueba
@@ -75,18 +77,18 @@ const testProvider = {
   email: 'test@provider.com',
   service: 'fotografía',
   phone: '555-123456',
-  contact: 'Juan Pérez'
+  contact: 'Juan Pérez',
 };
 
 // Inicializa la prueba
 async function runEmailTest() {
   console.log('=== Iniciando prueba del sistema de emails de MyWed360 ===');
-  
+
   try {
     // 1. Inicializar el servicio con el perfil de usuario
     const userEmail = EmailService.initEmailService(testUserProfile);
     console.log(`✅ Email de usuario generado: ${userEmail}`);
-    
+
     // 2. Enviar un email de prueba
     console.log('\n>> Enviando email de prueba al proveedor...');
     const emailSubject = `Consulta sobre servicios de fotografía para boda`;
@@ -102,20 +104,23 @@ async function runEmailTest() {
       
       <p style="color:#888; font-size:12px;">Email de prueba - Sistema MyWed360</p>
     `;
-    
+
     const emailResult = await EmailService.sendMail({
       to: testProvider.email,
       subject: emailSubject,
-      body: emailBody
+      body: emailBody,
     });
-    
+
     if (emailResult && emailResult.id) {
       console.log(`✅ Email enviado correctamente con ID: ${emailResult.id}`);
-      
+
       // 3. Crear registro de seguimiento
       console.log('\n>> Creando registro de seguimiento...');
-      const trackingResult = await EmailTrackingService.createTrackingRecord(emailResult, testProvider);
-      
+      const trackingResult = await EmailTrackingService.createTrackingRecord(
+        emailResult,
+        testProvider
+      );
+
       if (trackingResult && trackingResult.id) {
         console.log(`✅ Registro de seguimiento creado con ID: ${trackingResult.id}`);
         console.log(`   Estado inicial: ${trackingResult.status}`);
@@ -123,21 +128,19 @@ async function runEmailTest() {
       } else {
         console.error('❌ Error al crear registro de seguimiento');
       }
-      
+
       // 4. Simular recepción de respuesta
       console.log('\n>> Simulando respuesta del proveedor...');
       // Esta parte depende de la implementación concreta del sistema
       // En producción, esto sería automático al detectar un email entrante
       console.log('ℹ️ En un entorno real, el sistema detectaría automáticamente la respuesta');
-      
     } else {
       console.error('❌ Error al enviar email');
     }
-    
   } catch (error) {
     console.error('❌ Error en la prueba:', error);
   }
-  
+
   console.log('\n=== Fin de la prueba ===');
 }
 
@@ -147,7 +150,7 @@ runEmailTest()
     console.log('Prueba completada');
     process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('Error fatal en la prueba:', err);
     process.exit(1);
   });

@@ -2,7 +2,7 @@
  * Servicio para gestionar recordatorios automáticos de seguimiento.
  * Cuando un correo enviado no recibe respuesta después de X días, se envía
  * automáticamente un recordatorio (Re:) al mismo destinatario.
- * 
+ *
  * Estrategia:
  *   1. Cada vez que se envía un correo con emailService.sendMail se almacena
  *      { reminderSent: false, reminderAt: ISODate } en el objeto del mail.
@@ -14,7 +14,7 @@
  *           (se determina buscando en localStorage un correo con inReplyTo === id)
  *      Si cumple las condiciones, envía un nuevo correo con asunto `Re: ...`
  *      y marca reminderSent = true.
- * 
+ *
  * Nota: Para entornos con backend, se recomienda mover esta lógica al servidor.
  */
 
@@ -56,7 +56,7 @@ async function runReminderJob(days) {
   try {
     const sentMails = await getMails('sent');
     let inboxMails = await getMails('inbox');
-    
+
     // Validar que sentMails e inboxMails sean arrays
     if (!Array.isArray(sentMails)) {
       console.warn('sentMails no es un array, saltando job de recordatorios');
@@ -66,7 +66,7 @@ async function runReminderJob(days) {
       console.warn('inboxMails no es un array, usando array vacío');
       inboxMails = [];
     }
-    
+
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
 
     for (const mail of sentMails) {
@@ -75,7 +75,9 @@ async function runReminderJob(days) {
 
       // Comprobar respuesta: buscamos correo en inbox con inReplyTo = mail.id o mismo asunto + Re:
       const replied = inboxMails.some(
-        m => m.inReplyTo === mail.id || (m.subject || '').startsWith('Re:') && (m.subject || '').includes(mail.subject)
+        (m) =>
+          m.inReplyTo === mail.id ||
+          ((m.subject || '').startsWith('Re:') && (m.subject || '').includes(mail.subject))
       );
       if (replied) continue;
 
@@ -89,11 +91,11 @@ async function runReminderJob(days) {
       // Marcar como enviado el recordatorio
       mail.reminderSent = true;
       // Persistir
-      const allSent = sentMails.map(m => (m.id === mail.id ? mail : m));
+      const allSent = sentMails.map((m) => (m.id === mail.id ? mail : m));
       // emailService expone saveLocal? no, usamos localStorage directo
       try {
         const stored = JSON.parse(localStorage.getItem('mywed360_mails') || '[]');
-        const updated = stored.map(m => (m.id === mail.id ? mail : m));
+        const updated = stored.map((m) => (m.id === mail.id ? mail : m));
         localStorage.setItem('mywed360_mails', JSON.stringify(updated));
       } catch (e) {
         console.error('Error actualizando estado de recordatorio:', e);

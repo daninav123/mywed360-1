@@ -1,10 +1,15 @@
 // @vitest-environment node
-import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import { getFirestore, doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { readFileSync } from 'fs';
 import { beforeAll, afterAll, describe, test } from 'vitest';
 
-const RUN_FIRESTORE_RULES = process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
+const RUN_FIRESTORE_RULES =
+  process.env.FIRESTORE_RULES_TESTS === 'true' || !!process.env.FIRESTORE_EMULATOR_HOST;
 const D = RUN_FIRESTORE_RULES ? describe : describe.skip;
 
 let testEnv;
@@ -22,14 +27,24 @@ beforeAll(async () => {
       ownerIds: ['ownerX'],
       plannerIds: ['plannerX'],
       assistantIds: ['assistantX'],
-      name: 'Wedding X'
+      name: 'Wedding X',
     });
 
     // Seed docs to read later
-    const subcollections = ['tasks', 'meetings', 'guests', 'seatingPlan', 'suppliers', 'weddingInvitations', 'tasksCompleted'];
-    await Promise.all(subcollections.map((col) =>
-      setDoc(doc(adminDb, 'weddings', 'wX', col, 'doc1'), { sample: true })
-    ));
+    const subcollections = [
+      'tasks',
+      'meetings',
+      'guests',
+      'seatingPlan',
+      'suppliers',
+      'weddingInvitations',
+      'tasksCompleted',
+    ];
+    await Promise.all(
+      subcollections.map((col) =>
+        setDoc(doc(adminDb, 'weddings', 'wX', col, 'doc1'), { sample: true })
+      )
+    );
 
     // weddingInfo is a single doc inside the wedding path
     await setDoc(doc(adminDb, 'weddings', 'wX', 'weddingInfo'), { banquetPlace: 'Salon Real' });
@@ -46,7 +61,7 @@ afterAll(async () => {
   }
 });
 
-const ctx = (uid) => uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext();
+const ctx = (uid) => (uid ? testEnv.authenticatedContext(uid) : testEnv.unauthenticatedContext());
 
 const COLLECTIONS = [
   'tasks',
@@ -55,7 +70,7 @@ const COLLECTIONS = [
   'seatingPlan',
   'suppliers',
   'weddingInvitations',
-  'tasksCompleted'
+  'tasksCompleted',
 ];
 
 D.each(COLLECTIONS)('%s subcollection permissions', (col) => {
@@ -124,7 +139,10 @@ D('wedding delete permissions', () => {
 
     // recreate for next test
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
-      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), { ownerIds: ['ownerX'], plannerIds: ['plannerX'] });
+      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), {
+        ownerIds: ['ownerX'],
+        plannerIds: ['plannerX'],
+      });
     });
 
     const dbPlanner = getFirestore(ctx('plannerX').app);
@@ -133,7 +151,10 @@ D('wedding delete permissions', () => {
 
   test('Assistant cannot DELETE wedding', async () => {
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
-      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), { ownerIds: ['ownerX'], assistantIds: ['assistantX'] });
+      await setDoc(doc(getFirestore(adminCtx.app), 'weddings', 'wX'), {
+        ownerIds: ['ownerX'],
+        assistantIds: ['assistantX'],
+      });
     });
     const db = getFirestore(ctx('assistantX').app);
     await assertFails(deleteDoc(doc(db, 'weddings', 'wX')));

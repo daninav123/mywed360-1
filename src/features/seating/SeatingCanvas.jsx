@@ -1,17 +1,15 @@
 import React, { forwardRef, memo, useRef, useMemo } from 'react';
 
-
-
+import ChairItem from '../../components/ChairItem';
 import FreeDrawCanvas from '../../components/FreeDrawCanvas';
 import TableItem from '../../components/TableItem';
-import ChairItem from '../../components/ChairItem';
 
 /**
  * SeatingCanvas
  * Envoltorio del lienzo con soporte de zoom/pan y renderizado de mesas/áreas.
  * Extraído desde SeatingPlan.jsx para mejorar la legibilidad.
  */
-  const SeatingCanvas = forwardRef(function SeatingCanvas(
+const SeatingCanvas = forwardRef(function SeatingCanvas(
   {
     tab,
     areas,
@@ -37,8 +35,8 @@ import ChairItem from '../../components/ChairItem';
     canPan = true,
     canMoveTables = true,
     onToggleSeat = () => {},
-    onDoubleClick = () => {}, 
-    onUpdateArea = () => {}, 
+    onDoubleClick = () => {},
+    onUpdateArea = () => {},
     hallSize = null,
     gridStep = 20,
     selectedIds = [],
@@ -48,7 +46,7 @@ import ChairItem from '../../components/ChairItem';
     globalMaxSeats = 0,
     suggestions = null,
   },
-  _forwardedRef,
+  _forwardedRef
 ) {
   const containerRef = useRef(null);
   // Helpers locales de validación
@@ -56,19 +54,43 @@ import ChairItem from '../../components/ChairItem';
     if (!table) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
     if (table.shape === 'circle') {
       const r = (table.diameter || 60) / 2;
-      return { minX: (table.x || 0) - r, minY: (table.y || 0) - r, maxX: (table.x || 0) + r, maxY: (table.y || 0) + r };
+      return {
+        minX: (table.x || 0) - r,
+        minY: (table.y || 0) - r,
+        maxX: (table.x || 0) + r,
+        maxY: (table.y || 0) + r,
+      };
     }
     const hw = (table.width || 80) / 2;
     const hh = (table.height || table.length || 60) / 2;
-    return { minX: (table.x || 0) - hw, minY: (table.y || 0) - hh, maxX: (table.x || 0) + hw, maxY: (table.y || 0) + hh };
+    return {
+      minX: (table.x || 0) - hw,
+      minY: (table.y || 0) - hh,
+      maxX: (table.x || 0) + hw,
+      maxY: (table.y || 0) + hh,
+    };
   };
-  const expandBox = (box, m) => ({ minX: box.minX - m, minY: box.minY - m, maxX: box.maxX + m, maxY: box.maxY + m });
-  const rectsOverlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+  const expandBox = (box, m) => ({
+    minX: box.minX - m,
+    minY: box.minY - m,
+    maxX: box.maxX + m,
+    maxY: box.maxY + m,
+  });
+  const rectsOverlap = (a, b) =>
+    !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
   const boundaryPoly = useMemo(() => {
     try {
-      const b = (areas || []).find(a => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3);
+      const b = (areas || []).find(
+        (a) =>
+          !Array.isArray(a) &&
+          a?.type === 'boundary' &&
+          Array.isArray(a?.points) &&
+          a.points.length >= 3
+      );
       return b ? b.points : null;
-    } catch (_) { return null; }
+    } catch (_) {
+      return null;
+    }
   }, [areas]);
   const obstaclesRects = useMemo(() => {
     try {
@@ -78,22 +100,29 @@ import ChairItem from '../../components/ChairItem';
         if (!(type === 'obstacle' || type === 'door')) return;
         const pts = Array.isArray(a?.points) ? a.points : [];
         if (!pts.length) return;
-        const xs = pts.map(p => p.x);
-        const ys = pts.map(p => p.y);
-        const minX = Math.min(...xs), maxX = Math.max(...xs);
-        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        const xs = pts.map((p) => p.x);
+        const ys = pts.map((p) => p.y);
+        const minX = Math.min(...xs),
+          maxX = Math.max(...xs);
+        const minY = Math.min(...ys),
+          maxY = Math.max(...ys);
         rects.push({ minX, minY, maxX, maxY });
       });
       return rects;
-    } catch (_) { return []; }
+    } catch (_) {
+      return [];
+    }
   }, [areas]);
   const pointInPoly = (px, py, pts) => {
     if (!Array.isArray(pts) || pts.length < 3) return true;
     let inside = false;
     for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-      const xi = pts[i].x, yi = pts[i].y;
-      const xj = pts[j].x, yj = pts[j].y;
-      const intersect = ((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / ((yj - yi) || 1e-9) + xi);
+      const xi = pts[i].x,
+        yi = pts[i].y;
+      const xj = pts[j].x,
+        yj = pts[j].y;
+      const intersect =
+        yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi || 1e-9) + xi;
       if (intersect) inside = !inside;
     }
     return inside;
@@ -106,89 +135,101 @@ import ChairItem from '../../components/ChairItem';
       { x: box.maxX, y: box.minY },
       { x: box.maxX, y: box.maxY },
     ];
-    return corners.every(c => pointInPoly(c.x, c.y, pts));
+    return corners.every((c) => pointInPoly(c.x, c.y, pts));
   };
   // Mapear drawMode externo a valores aceptados por FreeDrawCanvas
   const internalDrawMode =
-    drawMode === 'boundary' ? 'boundary'  // Usar el nuevo modo boundary
-  : drawMode === 'obstacle' ? 'rect'
-  : drawMode === 'door' ? 'rect'
-  : drawMode === 'aisle' ? 'line'
-  : drawMode;
+    drawMode === 'boundary'
+      ? 'boundary' // Usar el nuevo modo boundary
+      : drawMode === 'obstacle'
+        ? 'rect'
+        : drawMode === 'door'
+          ? 'rect'
+          : drawMode === 'aisle'
+            ? 'line'
+            : drawMode;
 
   return (
-
-      <div
-        className="flex-grow border border-gray-300 h-[800px] relative overflow-hidden" // adjusted height
-        onDoubleClick={onDoubleClick} // added event handler
-        onWheel={canPan ? handleWheel : undefined}
-        onPointerDown={canPan ? handlePointerDown : undefined}
-        role="main"
-        aria-label="Lienzo de plano"
-        ref={containerRef}
-        style={{
-          backgroundImage: 'linear-gradient(to right, #eaeaea 1px, transparent 1px), linear-gradient(to bottom, #eaeaea 1px, transparent 1px)',
-          backgroundSize: `${Math.max(5, gridStep) * scale}px ${Math.max(5, gridStep) * scale}px`,
-        }}
-      >
-        {/* Fondo calibrado (opcional) */}
-        {background?.dataUrl && (
-          <img
-            src={background.dataUrl}
-            alt="Plano de fondo"
-            style={{
-              position:'absolute',
-              left: offset.x,
-              top: offset.y,
-              width: (background.widthCm || (hallSize?.width||1800)) * scale,
-              height: 'auto',
-              opacity: background.opacity == null ? 0.5 : background.opacity,
-              pointerEvents: 'none',
-              zIndex: 0,
-            }}
-          />
-        )}
-        {/* Área del salón (solo banquete) */}
-        {tab==='banquet' && hallSize && (
-          <div
-            style={{
-              position:'absolute',
-              left: 0,
-              top: 0,
-              width: hallSize.width,
-              height: hallSize.height,
-              border: '3px dashed #4b5563',
-              background: '#ffffff',
-              transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
-              transformOrigin: 'top left',
-                                          pointerEvents: 'none',
-                            zIndex: 0,
-            }}
-          />
-        )}
-
-        {/* Canvas libre */}
-        <FreeDrawCanvas
-          areas={areas}
-          scale={scale}
-          offset={offset}
-          onFinalize={addArea}
-          onDeleteArea={onDeleteArea}
-          onUpdateArea={onUpdateArea}
-          drawMode={internalDrawMode}
-          semanticDrawMode={drawMode}
+    <div
+      className="flex-grow border border-gray-300 h-[800px] relative overflow-hidden" // adjusted height
+      onDoubleClick={onDoubleClick} // added event handler
+      onWheel={canPan ? handleWheel : undefined}
+      onPointerDown={canPan ? handlePointerDown : undefined}
+      role="main"
+      aria-label="Lienzo de plano"
+      ref={containerRef}
+      style={{
+        backgroundImage:
+          'linear-gradient(to right, #eaeaea 1px, transparent 1px), linear-gradient(to bottom, #eaeaea 1px, transparent 1px)',
+        backgroundSize: `${Math.max(5, gridStep) * scale}px ${Math.max(5, gridStep) * scale}px`,
+      }}
+    >
+      {/* Fondo calibrado (opcional) */}
+      {background?.dataUrl && (
+        <img
+          src={background.dataUrl}
+          alt="Plano de fondo"
+          style={{
+            position: 'absolute',
+            left: offset.x,
+            top: offset.y,
+            width: (background.widthCm || hallSize?.width || 1800) * scale,
+            height: 'auto',
+            opacity: background.opacity == null ? 0.5 : background.opacity,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
         />
+      )}
+      {/* Área del salón (solo banquete) */}
+      {tab === 'banquet' && hallSize && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: hallSize.width,
+            height: hallSize.height,
+            border: '3px dashed #4b5563',
+            background: '#ffffff',
+            transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+            transformOrigin: 'top left',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      )}
 
-{/* Sillas (solo ceremonia) */}
-        {tab==='ceremony' && seats.map((seat, idx) => (
-          <ChairItem key={`${seat.id}-${idx}`} seat={seat} scale={scale} offset={offset}
+      {/* Canvas libre */}
+      <FreeDrawCanvas
+        areas={areas}
+        scale={scale}
+        offset={offset}
+        onFinalize={addArea}
+        onDeleteArea={onDeleteArea}
+        onUpdateArea={onUpdateArea}
+        drawMode={internalDrawMode}
+        semanticDrawMode={drawMode}
+      />
+
+      {/* Sillas (solo ceremonia) */}
+      {tab === 'ceremony' &&
+        seats.map((seat, idx) => (
+          <ChairItem
+            key={`${seat.id}-${idx}`}
+            seat={seat}
+            scale={scale}
+            offset={offset}
             onToggleEnabled={onToggleSeat}
-            onAssignGuest={(seatId, guestId) => onAssignCeremonySeat ? onAssignCeremonySeat(seatId, guestId) : undefined}
+            onAssignGuest={(seatId, guestId) =>
+              onAssignCeremonySeat ? onAssignCeremonySeat(seatId, guestId) : undefined
+            }
           />
         ))}
 
-        {/* Mesas (solo banquete) */}
-        {tab==='banquet' && tables.map((t, idx) => {
+      {/* Mesas (solo banquete) */}
+      {tab === 'banquet' &&
+        tables.map((t, idx) => {
           // Validaciones adicionales si están habilitadas
           let danger = false;
           let dangerReason = '';
@@ -196,39 +237,53 @@ import ChairItem from '../../components/ChairItem';
             try {
               const aisle = typeof hallSize?.aisleMin === 'number' ? hallSize.aisleMin : 80;
               const selfBox = getTableBox(t);
-              const padded = expandBox(selfBox, aisle/2);
+              const padded = expandBox(selfBox, aisle / 2);
 
               // 1) Fuera de perímetro (si existe)
               if (boundaryPoly && !boxInsidePoly(selfBox, boundaryPoly)) {
-                danger = true; dangerReason = 'Fuera del perímetro';
+                danger = true;
+                dangerReason = 'Fuera del perímetro';
               }
               // 2) Colisión con obstáculo/puerta
-              if (!danger && obstaclesRects.some(o => rectsOverlap(padded, o))) {
-                danger = true; dangerReason = 'Colisión con obstáculo';
+              if (!danger && obstaclesRects.some((o) => rectsOverlap(padded, o))) {
+                danger = true;
+                dangerReason = 'Colisión con obstáculo';
               }
               // 3) Demasiado cerca de otra mesa (pasillo mínimo)
               if (!danger) {
-                const others = tables.filter(x => String(x?.id) !== String(t?.id));
-                const otherExpanded = others.map(getTableBox).map(b => expandBox(b, aisle/2));
-                if (otherExpanded.some(o => rectsOverlap(padded, o))) {
-                  danger = true; dangerReason = 'Distancia insuficiente entre mesas';
+                const others = tables.filter((x) => String(x?.id) !== String(t?.id));
+                const otherExpanded = others.map(getTableBox).map((b) => expandBox(b, aisle / 2));
+                if (otherExpanded.some((o) => rectsOverlap(padded, o))) {
+                  danger = true;
+                  dangerReason = 'Distancia insuficiente entre mesas';
                 }
               }
               // 4) Overbooking de capacidad
               if (!danger) {
-                const countFromGuests = (guests||[]).reduce((sum,g)=>{
-                  const matches = (()=>{
-                    if (g.tableId !== undefined && g.tableId !== null) return String(g.tableId)===String(t.id);
-                    if (g.table !== undefined && g.table !== null && String(g.table).trim()!=='') return String(g.table).trim()===String(t.id) || (t.name && String(g.table).trim()===String(t.name));
+                const countFromGuests = (guests || []).reduce((sum, g) => {
+                  const matches = (() => {
+                    if (g.tableId !== undefined && g.tableId !== null)
+                      return String(g.tableId) === String(t.id);
+                    if (g.table !== undefined && g.table !== null && String(g.table).trim() !== '')
+                      return (
+                        String(g.table).trim() === String(t.id) ||
+                        (t.name && String(g.table).trim() === String(t.name))
+                      );
                     return false;
                   })();
-                  if(!matches) return sum;
-                  const comp = parseInt(g.companion,10)||0; return sum+1+comp;
-                },0);
-                const cap = (parseInt(t.seats,10) || globalMaxSeats || 0);
-                if (cap>0 && countFromGuests>cap) { danger = true; dangerReason = 'Overbooking'; }
+                  if (!matches) return sum;
+                  const comp = parseInt(g.companion, 10) || 0;
+                  return sum + 1 + comp;
+                }, 0);
+                const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
+                if (cap > 0 && countFromGuests > cap) {
+                  danger = true;
+                  dangerReason = 'Overbooking';
+                }
               }
-            } catch(_) { /* ignore */ }
+            } catch (_) {
+              /* ignore */
+            }
           }
 
           // Highlight suggestions
@@ -238,10 +293,10 @@ import ChairItem from '../../components/ChairItem';
               const key = String(t.id);
               if (key in suggestions) highlightScore = suggestions[key] || 0;
             } else if (Array.isArray(suggestions)) {
-              const found = suggestions.find(s => String(s.tableId) === String(t.id));
+              const found = suggestions.find((s) => String(s.tableId) === String(t.id));
               if (found) highlightScore = found.score || 0;
             }
-          } catch(_) {}
+          } catch (_) {}
           return (
             <TableItem
               key={`${t.id}-${idx}`}
@@ -251,13 +306,20 @@ import ChairItem from '../../components/ChairItem';
               containerRef={containerRef}
               onMove={moveTable}
               onAssignGuest={onAssignGuest}
-              onAssignGuestSeat={(tableId, seatIndex, guestId) => onAssignGuestSeat ? onAssignGuestSeat(tableId, seatIndex, guestId) : (onAssignGuest && onAssignGuest(tableId, guestId))}
+              onAssignGuestSeat={(tableId, seatIndex, guestId) =>
+                onAssignGuestSeat
+                  ? onAssignGuestSeat(tableId, seatIndex, guestId)
+                  : onAssignGuest && onAssignGuest(tableId, guestId)
+              }
               onToggleEnabled={onToggleEnabled}
               onOpenConfig={setConfigTable}
               onSelect={onSelectTable}
               guests={guests}
               canMove={canMoveTables}
-              selected={(selectedTable && selectedTable.id === t.id) || (selectedIds && selectedIds.some(id => String(id) === String(t.id)))}
+              selected={
+                (selectedTable && selectedTable.id === t.id) ||
+                (selectedIds && selectedIds.some((id) => String(id) === String(t.id)))
+              }
               showNumbers={showSeatNumbers}
               danger={danger}
               dangerReason={dangerReason}
@@ -267,26 +329,51 @@ import ChairItem from '../../components/ChairItem';
           );
         })}
 
-        {/* Guías inteligentes (líneas) */}
-        {tab==='banquet' && selectedTable && (() => {
+      {/* Guías inteligentes (líneas) */}
+      {tab === 'banquet' &&
+        selectedTable &&
+        (() => {
           const lines = [];
-          const sx = selectedTable.shape === 'circle' ? (selectedTable.diameter||60)/2 : (selectedTable.width||80)/2;
-          const sy = selectedTable.shape === 'circle' ? (selectedTable.diameter||60)/2 : (selectedTable.height||selectedTable.length||60)/2;
-          const cx = (selectedTable.x||0) * scale + offset.x;
-          const cy = (selectedTable.y||0) * scale + offset.y;
-          const selLeft = ((selectedTable.x||0) - sx) * scale + offset.x;
-          const selRight = ((selectedTable.x||0) + sx) * scale + offset.x;
-          const selTop = ((selectedTable.y||0) - sy) * scale + offset.y;
-          const selBottom = ((selectedTable.y||0) + sy) * scale + offset.y;
+          const sx =
+            selectedTable.shape === 'circle'
+              ? (selectedTable.diameter || 60) / 2
+              : (selectedTable.width || 80) / 2;
+          const sy =
+            selectedTable.shape === 'circle'
+              ? (selectedTable.diameter || 60) / 2
+              : (selectedTable.height || selectedTable.length || 60) / 2;
+          const cx = (selectedTable.x || 0) * scale + offset.x;
+          const cy = (selectedTable.y || 0) * scale + offset.y;
+          const selLeft = ((selectedTable.x || 0) - sx) * scale + offset.x;
+          const selRight = ((selectedTable.x || 0) + sx) * scale + offset.x;
+          const selTop = ((selectedTable.y || 0) - sy) * scale + offset.y;
+          const selBottom = ((selectedTable.y || 0) + sy) * scale + offset.y;
           const tolPx = 8;
-          const addV = (x) => lines.push(<div key={`gv-${x}`} className="absolute top-0 bottom-0 border-l-2 border-blue-400 pointer-events-none" style={{ left: x, opacity:0.4 }} />);
-          const addH = (y) => lines.push(<div key={`gh-${y}`} className="absolute left-0 right-0 border-t-2 border-blue-400 pointer-events-none" style={{ top: y, opacity:0.4 }} />);
-          (tables||[]).forEach(t => {
-            if (!t || String(t.id)===String(selectedTable.id)) return;
-            const tx = (t.x||0)*scale + offset.x;
-            const ty = (t.y||0)*scale + offset.y;
-            const thx = (t.shape==='circle' ? (t.diameter||60)/2 : (t.width||80)/2) * scale;
-            const thy = (t.shape==='circle' ? (t.diameter||60)/2 : (t.height||t.length||60)/2) * scale;
+          const addV = (x) =>
+            lines.push(
+              <div
+                key={`gv-${x}`}
+                className="absolute top-0 bottom-0 border-l-2 border-blue-400 pointer-events-none"
+                style={{ left: x, opacity: 0.4 }}
+              />
+            );
+          const addH = (y) =>
+            lines.push(
+              <div
+                key={`gh-${y}`}
+                className="absolute left-0 right-0 border-t-2 border-blue-400 pointer-events-none"
+                style={{ top: y, opacity: 0.4 }}
+              />
+            );
+          (tables || []).forEach((t) => {
+            if (!t || String(t.id) === String(selectedTable.id)) return;
+            const tx = (t.x || 0) * scale + offset.x;
+            const ty = (t.y || 0) * scale + offset.y;
+            const thx =
+              (t.shape === 'circle' ? (t.diameter || 60) / 2 : (t.width || 80) / 2) * scale;
+            const thy =
+              (t.shape === 'circle' ? (t.diameter || 60) / 2 : (t.height || t.length || 60) / 2) *
+              scale;
             const left = tx - thx;
             const right = tx + thx;
             const top = ty - thy;
@@ -304,12 +391,7 @@ import ChairItem from '../../components/ChairItem';
           });
           return lines;
         })()}
-
-
-
-
-      </div>
-
+    </div>
   );
 });
 

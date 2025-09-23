@@ -3,8 +3,8 @@
  * Gestiona la configuración de ceremonia, banquete, espacio y plantillas
  */
 
-import React from 'react';
 import { X, Grid, Users, Maximize, Palette } from 'lucide-react';
+import React from 'react';
 
 const Modal = ({ isOpen, onClose, title, children, icon: Icon }) => {
   if (!isOpen) return null;
@@ -17,16 +17,11 @@ const Modal = ({ isOpen, onClose, title, children, icon: Icon }) => {
             {Icon && <Icon className="h-5 w-5 text-blue-600" />}
             <h3 className="text-lg font-semibold">{title}</h3>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded"
-          >
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">
-          {children}
-        </div>
+        <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)]">{children}</div>
       </div>
     </div>
   );
@@ -40,7 +35,7 @@ const SeatingPlanModals = ({
   backgroundOpen,
   capacityOpen,
   templateOpen,
-  
+
   // Handlers de cierre
   onCloseCeremonyConfig,
   onCloseBanquetConfig,
@@ -48,7 +43,7 @@ const SeatingPlanModals = ({
   onCloseBackground,
   onCloseCapacity,
   onCloseTemplate,
-  
+
   // Handlers de configuración
   onGenerateSeatGrid,
   onGenerateBanquetLayout,
@@ -56,14 +51,14 @@ const SeatingPlanModals = ({
   onSaveBackground,
   onSaveCapacity,
   onApplyTemplate,
-  
+
   // Estado actual
   hallSize,
   areas = [],
   guests = [],
   tables = [],
   background = null,
-  globalMaxSeats = 0
+  globalMaxSeats = 0,
 }) => {
   return (
     <>
@@ -74,10 +69,7 @@ const SeatingPlanModals = ({
         title="Configurar Ceremonia"
         icon={Grid}
       >
-        <CeremonyConfigForm
-          onGenerate={onGenerateSeatGrid}
-          onClose={onCloseCeremonyConfig}
-        />
+        <CeremonyConfigForm onGenerate={onGenerateSeatGrid} onClose={onCloseCeremonyConfig} />
       </Modal>
 
       {/* Modal de capacidad global */}
@@ -87,7 +79,11 @@ const SeatingPlanModals = ({
         title="Capacidad Global"
         icon={Users}
       >
-        <CapacityForm onSave={onSaveCapacity} onClose={onCloseCapacity} initialMax={globalMaxSeats} />
+        <CapacityForm
+          onSave={onSaveCapacity}
+          onClose={onCloseCapacity}
+          initialMax={globalMaxSeats}
+        />
       </Modal>
 
       {/* Modal de fondo/plano */}
@@ -111,10 +107,7 @@ const SeatingPlanModals = ({
         title="Configurar Banquete"
         icon={Users}
       >
-        <BanquetConfigForm
-          onGenerate={onGenerateBanquetLayout}
-          onClose={onCloseBanquetConfig}
-        />
+        <BanquetConfigForm onGenerate={onGenerateBanquetLayout} onClose={onCloseBanquetConfig} />
       </Modal>
 
       {/* Modal de configuración de espacio */}
@@ -132,12 +125,7 @@ const SeatingPlanModals = ({
       </Modal>
 
       {/* Modal de plantillas */}
-      <Modal
-        isOpen={templateOpen}
-        onClose={onCloseTemplate}
-        title="Plantillas"
-        icon={Palette}
-      >
+      <Modal isOpen={templateOpen} onClose={onCloseTemplate} title="Plantillas" icon={Palette}>
         <TemplateSelector
           onApply={onApplyTemplate}
           onClose={onCloseTemplate}
@@ -159,12 +147,19 @@ const CeremonyConfigForm = ({ onGenerate, onClose }) => {
     gap: 40,
     startX: 100,
     startY: 80,
-    aisleAfter: 6
+    aisleAfter: 6,
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGenerate(config.rows, config.cols, config.gap, config.startX, config.startY, config.aisleAfter);
+    onGenerate(
+      config.rows,
+      config.cols,
+      config.gap,
+      config.startX,
+      config.startY,
+      config.aisleAfter
+    );
     onClose();
   };
 
@@ -178,7 +173,7 @@ const CeremonyConfigForm = ({ onGenerate, onClose }) => {
             min="1"
             max="20"
             value={config.rows}
-            onChange={(e) => setConfig(prev => ({ ...prev, rows: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, rows: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -189,7 +184,7 @@ const CeremonyConfigForm = ({ onGenerate, onClose }) => {
             min="1"
             max="30"
             value={config.cols}
-            onChange={(e) => setConfig(prev => ({ ...prev, cols: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, cols: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -202,7 +197,7 @@ const CeremonyConfigForm = ({ onGenerate, onClose }) => {
           min="20"
           max="100"
           value={config.gap}
-          onChange={(e) => setConfig(prev => ({ ...prev, gap: parseInt(e.target.value) }))}
+          onChange={(e) => setConfig((prev) => ({ ...prev, gap: parseInt(e.target.value) }))}
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -214,7 +209,7 @@ const CeremonyConfigForm = ({ onGenerate, onClose }) => {
           min="0"
           max={config.cols}
           value={config.aisleAfter}
-          onChange={(e) => setConfig(prev => ({ ...prev, aisleAfter: parseInt(e.target.value) }))}
+          onChange={(e) => setConfig((prev) => ({ ...prev, aisleAfter: parseInt(e.target.value) }))}
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -247,7 +242,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
     gapX: 140,
     gapY: 160,
     startX: 120,
-    startY: 160
+    startY: 160,
   });
 
   const handleSubmit = (e) => {
@@ -266,7 +261,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
             min="1"
             max="10"
             value={config.rows}
-            onChange={(e) => setConfig(prev => ({ ...prev, rows: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, rows: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -277,7 +272,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
             min="1"
             max="15"
             value={config.cols}
-            onChange={(e) => setConfig(prev => ({ ...prev, cols: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, cols: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -290,7 +285,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
           min="2"
           max="20"
           value={config.seats}
-          onChange={(e) => setConfig(prev => ({ ...prev, seats: parseInt(e.target.value) }))}
+          onChange={(e) => setConfig((prev) => ({ ...prev, seats: parseInt(e.target.value) }))}
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -303,7 +298,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
             min="80"
             max="300"
             value={config.gapX}
-            onChange={(e) => setConfig(prev => ({ ...prev, gapX: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, gapX: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -314,7 +309,7 @@ const BanquetConfigForm = ({ onGenerate, onClose }) => {
             min="80"
             max="300"
             value={config.gapY}
-            onChange={(e) => setConfig(prev => ({ ...prev, gapY: parseInt(e.target.value) }))}
+            onChange={(e) => setConfig((prev) => ({ ...prev, gapY: parseInt(e.target.value) }))}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -362,8 +357,10 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
             type="number"
             min="2"
             max="50"
-            value={(dimensions.width/100).toString()}
-            onChange={(e) => setDimensions(prev => ({ ...prev, width: parseFloat(e.target.value)*100 }))}
+            value={(dimensions.width / 100).toString()}
+            onChange={(e) =>
+              setDimensions((prev) => ({ ...prev, width: parseFloat(e.target.value) * 100 }))
+            }
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -373,8 +370,10 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
             type="number"
             min="2"
             max="50"
-            value={(dimensions.height/100).toString()}
-            onChange={(e) => setDimensions(prev => ({ ...prev, height: parseFloat(e.target.value)*100 }))}
+            value={(dimensions.height / 100).toString()}
+            onChange={(e) =>
+              setDimensions((prev) => ({ ...prev, height: parseFloat(e.target.value) * 100 }))
+            }
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -388,14 +387,17 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
           max="300"
           step="10"
           value={dimensions.aisleMin}
-          onChange={(e) => setDimensions(prev => ({ ...prev, aisleMin: parseInt(e.target.value, 10) || 80 }))}
+          onChange={(e) =>
+            setDimensions((prev) => ({ ...prev, aisleMin: parseInt(e.target.value, 10) || 80 }))
+          }
           className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div className="bg-gray-50 p-3 rounded">
         <p className="text-sm text-gray-600">
-          <strong>Área total:</strong> {(dimensions.width * dimensions.height / 10000).toFixed(1)} m²
+          <strong>Área total:</strong> {((dimensions.width * dimensions.height) / 10000).toFixed(1)}{' '}
+          m²
         </p>
       </div>
 
@@ -419,56 +421,111 @@ const SpaceConfigForm = ({ hallSize, onSave, onClose }) => {
 };
 
 // Selector de plantillas
-const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize = { width: 1800, height: 1200, aisleMin: 80 }, areas = [] }) => {
+const TemplateSelector = ({
+  onApply,
+  onClose,
+  guests = [],
+  tables = [],
+  hallSize = { width: 1800, height: 1200, aisleMin: 80 },
+  areas = [],
+}) => {
   // Calcular necesidades a partir de datos reales
   const guestCount = Array.isArray(guests)
     ? guests.reduce((acc, g) => acc + 1 + (parseInt(g?.companion, 10) || 0), 0)
     : 0;
   const tableCount = Array.isArray(tables) ? tables.length : 0;
-  
+
   // Boundary y dimensiones efectivas
   const boundary = (() => {
-    const b = (areas || []).find(a => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3);
+    const b = (areas || []).find(
+      (a) =>
+        !Array.isArray(a) &&
+        a?.type === 'boundary' &&
+        Array.isArray(a?.points) &&
+        a.points.length >= 3
+    );
     return b ? b.points : null;
   })();
   const bbox = (() => {
     if (!boundary) return null;
-    const xs = boundary.map(p => p.x);
-    const ys = boundary.map(p => p.y);
-    return { minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) };
+    const xs = boundary.map((p) => p.x);
+    const ys = boundary.map((p) => p.y);
+    return {
+      minX: Math.min(...xs),
+      minY: Math.min(...ys),
+      maxX: Math.max(...xs),
+      maxY: Math.max(...ys),
+    };
   })();
   const centroid = (() => {
-    if (!boundary) return { x: (hallSize?.width||1800)/2, y: (hallSize?.height||1200)/2 };
-    let x = 0, y = 0; boundary.forEach(p => { x += p.x; y += p.y; });
-    const n = boundary.length || 1; return { x: x/n, y: y/n };
+    if (!boundary) return { x: (hallSize?.width || 1800) / 2, y: (hallSize?.height || 1200) / 2 };
+    let x = 0,
+      y = 0;
+    boundary.forEach((p) => {
+      x += p.x;
+      y += p.y;
+    });
+    const n = boundary.length || 1;
+    return { x: x / n, y: y / n };
   })();
-  const hallW = bbox ? Math.max(600, bbox.maxX - bbox.minX) : Math.max(600, hallSize?.width || 1800);
-  const hallH = bbox ? Math.max(400, bbox.maxY - bbox.minY) : Math.max(400, hallSize?.height || 1200);
+  const hallW = bbox
+    ? Math.max(600, bbox.maxX - bbox.minX)
+    : Math.max(600, hallSize?.width || 1800);
+  const hallH = bbox
+    ? Math.max(400, bbox.maxY - bbox.minY)
+    : Math.max(400, hallSize?.height || 1200);
   const aisle = Math.max(40, Math.min(300, hallSize?.aisleMin ?? 80));
 
   // Derivar forma y tamaño base de mesas actuales
-  const shapeCounts = tables.reduce((m,t)=>{ const s=(t?.shape||'rectangle'); m[s]=(m[s]||0)+1; return m; },{});
-  const defaultShape = (shapeCounts['circle']||0) > (shapeCounts['rectangle']||0) ? 'circle' : 'rectangle';
-  const baseDiameter = Math.max(50, Math.round(
-    (tables.map(t=>t?.diameter).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.diameter).filter(Boolean).length||1)) || 60
-  ));
-  const baseWidth = Math.max(60, Math.round(
-    (tables.map(t=>t?.width).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.width).filter(Boolean).length||1)) || 80
-  ));
-  const baseHeight = Math.max(50, Math.round(
-    (tables.map(t=>t?.height||t?.length).filter(Boolean).reduce((a,b)=>a+b,0) / (tables.map(t=>t?.height||t?.length).filter(Boolean).length||1)) || 60
-  ));
+  const shapeCounts = tables.reduce((m, t) => {
+    const s = t?.shape || 'rectangle';
+    m[s] = (m[s] || 0) + 1;
+    return m;
+  }, {});
+  const defaultShape =
+    (shapeCounts['circle'] || 0) > (shapeCounts['rectangle'] || 0) ? 'circle' : 'rectangle';
+  const baseDiameter = Math.max(
+    50,
+    Math.round(
+      tables
+        .map((t) => t?.diameter)
+        .filter(Boolean)
+        .reduce((a, b) => a + b, 0) /
+        (tables.map((t) => t?.diameter).filter(Boolean).length || 1) || 60
+    )
+  );
+  const baseWidth = Math.max(
+    60,
+    Math.round(
+      tables
+        .map((t) => t?.width)
+        .filter(Boolean)
+        .reduce((a, b) => a + b, 0) / (tables.map((t) => t?.width).filter(Boolean).length || 1) ||
+        80
+    )
+  );
+  const baseHeight = Math.max(
+    50,
+    Math.round(
+      tables
+        .map((t) => t?.height || t?.length)
+        .filter(Boolean)
+        .reduce((a, b) => a + b, 0) /
+        (tables.map((t) => t?.height || t?.length).filter(Boolean).length || 1) || 60
+    )
+  );
   const avgSeats = (() => {
     if (!tableCount) return 8;
-    const seats = tables.map(t => parseInt(t?.seats, 10) || 0).filter(n => n > 0);
+    const seats = tables.map((t) => parseInt(t?.seats, 10) || 0).filter((n) => n > 0);
     if (!seats.length) return 8;
-    const avg = Math.round(seats.reduce((a,b)=>a+b,0)/seats.length);
+    const avg = Math.round(seats.reduce((a, b) => a + b, 0) / seats.length);
     return Math.min(12, Math.max(6, avg));
   })();
 
   const suggestedBanquet = (() => {
     const seatsPerTable = avgSeats || 8;
-    const neededTables = guestCount > 0 ? Math.ceil(guestCount / seatsPerTable) : Math.max(1, tableCount || 6);
+    const neededTables =
+      guestCount > 0 ? Math.ceil(guestCount / seatsPerTable) : Math.max(1, tableCount || 6);
     const rows = Math.max(1, Math.floor(Math.sqrt(neededTables)));
     const cols = Math.max(1, Math.ceil(neededTables / rows));
     return { rows, cols, seats: seatsPerTable };
@@ -496,9 +553,18 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
         if (arr.length >= need) break;
         const cx = (c + 1) * cellW;
         const cy = (r + 1) * cellH;
-        arr.push(shape === 'circle'
-          ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats }
-          : { id: id++, x: cx, y: cy, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats }
+        arr.push(
+          shape === 'circle'
+            ? { id: id++, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats }
+            : {
+                id: id++,
+                x: cx,
+                y: cy,
+                shape: 'rectangle',
+                width: baseWidth,
+                height: baseHeight,
+                seats: avgSeats,
+              }
         );
       }
     }
@@ -511,21 +577,32 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
 
   const buildCircularRing = () => {
     const need = guestCount ? Math.ceil(guestCount / avgSeats) : Math.max(tableCount || 6, 6);
-    const centerX = centroid.x, centerY = centroid.y;
-    const radius = Math.min(hallW, hallH) * (ringParams.outerPct/100);
+    const centerX = centroid.x,
+      centerY = centroid.y;
+    const radius = Math.min(hallW, hallH) * (ringParams.outerPct / 100);
     const arr = [];
     for (let i = 0; i < need; i++) {
       const ang = (2 * Math.PI * i) / need;
       const cx = centerX + radius * Math.cos(ang);
       const cy = centerY + radius * Math.sin(ang);
-      arr.push({ id: i + 1, x: cx, y: cy, shape: 'circle', diameter: baseDiameter, seats: avgSeats });
+      arr.push({
+        id: i + 1,
+        x: cx,
+        y: cy,
+        shape: 'circle',
+        diameter: baseDiameter,
+        seats: avgSeats,
+      });
     }
     return arr;
   };
 
   const buildUShape = () => {
     const segments = 3; // izquierda, abajo, derecha
-    const perSeg = Math.max(2, Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 10) / segments));
+    const perSeg = Math.max(
+      2,
+      Math.ceil((guestCount ? Math.ceil(guestCount / avgSeats) : 10) / segments)
+    );
     const gap = Math.min(200, Math.max(aisle + 40, Math.floor(hallW / (perSeg + 1))));
     const arr = [];
     let id = 1;
@@ -533,19 +610,43 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     for (let i = 0; i < perSeg; i++) {
       const x = (bbox ? bbox.minX : 0) + (i + 1) * gap;
       const y = (bbox ? bbox.maxY : hallH) - 120;
-      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+      arr.push({
+        id: id++,
+        x,
+        y,
+        shape: 'rectangle',
+        width: baseWidth,
+        height: baseHeight,
+        seats: avgSeats,
+      });
     }
     // Barra izquierda
     for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
       const x = (bbox ? bbox.minX : 0) + 120;
       const y = (i + 1) * Math.min(200, Math.max(140, Math.floor(hallH / (perSeg / 2 + 2))));
-      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+      arr.push({
+        id: id++,
+        x,
+        y,
+        shape: 'rectangle',
+        width: baseWidth,
+        height: baseHeight,
+        seats: avgSeats,
+      });
     }
     // Barra derecha
     for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
       const x = (bbox ? bbox.maxX : hallW) - 120;
       const y = (i + 1) * Math.min(200, Math.max(140, Math.floor(hallH / (perSeg / 2 + 2))));
-      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+      arr.push({
+        id: id++,
+        x,
+        y,
+        shape: 'rectangle',
+        width: baseWidth,
+        height: baseHeight,
+        seats: avgSeats,
+      });
     }
     return arr;
   };
@@ -560,13 +661,29 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     for (let i = 0; i < perSeg; i++) {
       const x = (bbox ? bbox.minX : 0) + (i + 1) * gapX;
       const y = (bbox ? bbox.maxY : hallH) - 120;
-      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+      arr.push({
+        id: id++,
+        x,
+        y,
+        shape: 'rectangle',
+        width: baseWidth,
+        height: baseHeight,
+        seats: avgSeats,
+      });
     }
     // Vertical izquierda
     for (let i = 0; i < Math.max(2, Math.floor(perSeg / 2)); i++) {
       const x = (bbox ? bbox.minX : 0) + 120;
       const y = (bbox ? bbox.maxY : hallH) - 120 - (i + 1) * gapY;
-      arr.push({ id: id++, x, y, shape: 'rectangle', width: baseWidth, height: baseHeight, seats: avgSeats });
+      arr.push({
+        id: id++,
+        x,
+        y,
+        shape: 'rectangle',
+        width: baseWidth,
+        height: baseHeight,
+        seats: avgSeats,
+      });
     }
     return arr;
   };
@@ -589,17 +706,30 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
   };
 
   const buildPerimeter = () => {
-    if (!hallW || !hallH) return buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape);
+    if (!hallW || !hallH)
+      return buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape);
     const tables = [];
     const spacing = 200;
     const seatsPerTable = Math.max(6, avgSeats);
     for (let x = spacing; x < hallW - spacing; x += spacing) {
       tables.push({ id: `top-${x}`, shape: defaultShape, seats: seatsPerTable, x, y: spacing });
-      tables.push({ id: `bottom-${x}`, shape: defaultShape, seats: seatsPerTable, x, y: hallH - spacing });
+      tables.push({
+        id: `bottom-${x}`,
+        shape: defaultShape,
+        seats: seatsPerTable,
+        x,
+        y: hallH - spacing,
+      });
     }
     for (let y = spacing * 1.5; y < hallH - spacing * 1.5; y += spacing) {
       tables.push({ id: `left-${y}`, shape: defaultShape, seats: seatsPerTable, x: spacing, y });
-      tables.push({ id: `right-${y}`, shape: defaultShape, seats: seatsPerTable, x: hallW - spacing, y });
+      tables.push({
+        id: `right-${y}`,
+        shape: defaultShape,
+        seats: seatsPerTable,
+        x: hallW - spacing,
+        y,
+      });
     }
     return tables;
   };
@@ -608,8 +738,17 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     const arr = [];
     const width = Math.min(hallW * 0.85, Math.max(baseWidth * 2, 800));
     const height = Math.max(baseHeight, 100);
-    const cx = centroid.x, cy = centroid.y;
-    arr.push({ id: 1, x: cx, y: cy, shape: 'rectangle', width, height, seats: Math.max(guestCount, avgSeats) });
+    const cx = centroid.x,
+      cy = centroid.y;
+    arr.push({
+      id: 1,
+      x: cx,
+      y: cy,
+      shape: 'rectangle',
+      width,
+      height,
+      seats: Math.max(guestCount, avgSeats),
+    });
     return arr;
   };
 
@@ -667,22 +806,29 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
     {
       id: 'fill-space',
       name: 'Relleno según espacio',
-      description: `Cuadrícula adaptada a ${hallW/100|0}×${hallH/100|0} m`,
+      description: `Cuadrícula adaptada a ${(hallW / 100) | 0}×${(hallH / 100) | 0} m`,
       banquetTables: buildGridTables(suggestedBanquet.rows, suggestedBanquet.cols, defaultShape),
     },
   ];
 
   // Añadir plantillas guardadas por el usuario
   try {
-    const raw = localStorage.getItem('seatingPlan:local:userTemplates') || localStorage.getItem('userTemplates');
+    const raw =
+      localStorage.getItem('seatingPlan:local:userTemplates') ||
+      localStorage.getItem('userTemplates');
     const arr = raw ? JSON.parse(raw) : [];
     if (Array.isArray(arr) && arr.length) {
       templates = [
         ...templates,
-        ...arr.map((t) => ({ id: t.id || `user-${t.name}-${Date.now()}`, name: t.name || 'Mi plantilla', description: 'Plantilla guardada por el usuario', banquetTables: Array.isArray(t.banquetTables) ? t.banquetTables : [] }))
+        ...arr.map((t) => ({
+          id: t.id || `user-${t.name}-${Date.now()}`,
+          name: t.name || 'Mi plantilla',
+          description: 'Plantilla guardada por el usuario',
+          banquetTables: Array.isArray(t.banquetTables) ? t.banquetTables : [],
+        })),
       ];
     }
-  } catch(_) {}
+  } catch (_) {}
 
   if (tableCount > 0) {
     // Reordenar mesas existentes en cuadrícula
@@ -705,7 +851,14 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
             const t = tables[i++];
             const cx = startX + (c + 1) * cellW;
             const cy = startY + (r + 1) * cellH;
-            arr.push({ id: t.id, name: t.name, x: cx, y: cy, shape: t.shape || 'rectangle', seats: parseInt(t.seats, 10) || avgSeats });
+            arr.push({
+              id: t.id,
+              name: t.name,
+              x: cx,
+              y: cy,
+              shape: t.shape || 'rectangle',
+              seats: parseInt(t.seats, 10) || avgSeats,
+            });
           }
         }
         return arr;
@@ -719,14 +872,22 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       description: `Distribuye ${tableCount} mesas actuales en un círculo`,
       banquetTables: (() => {
         const arr = [];
-        const centerX = centroid.x, centerY = centroid.y;
+        const centerX = centroid.x,
+          centerY = centroid.y;
         const radius = Math.min(hallW, hallH) * 0.35;
         for (let i = 0; i < tables.length; i++) {
           const t = tables[i];
           const ang = (2 * Math.PI * i) / tables.length;
           const cx = centerX + radius * Math.cos(ang);
           const cy = centerY + radius * Math.sin(ang);
-          arr.push({ id: t.id, name: t.name, x: cx, y: cy, shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x: cx,
+            y: cy,
+            shape: t.shape || 'circle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
         }
         return arr;
       })(),
@@ -742,16 +903,28 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
         const rows = tableCount <= 8 ? 2 : 3;
         const perRow = Math.ceil(tableCount / rows);
         const gapX = Math.min(220, Math.max(aisle + 40, Math.floor(hallW / (perRow + 1))));
-        const rowYs = rows === 2
-          ? [ (bbox ? bbox.minY : 0) + hallH * 0.4, (bbox ? bbox.minY : 0) + hallH * 0.7 ]
-          : [ (bbox ? bbox.minY : 0) + hallH * 0.35, (bbox ? bbox.minY : 0) + hallH * 0.55, (bbox ? bbox.minY : 0) + hallH * 0.75 ];
+        const rowYs =
+          rows === 2
+            ? [(bbox ? bbox.minY : 0) + hallH * 0.4, (bbox ? bbox.minY : 0) + hallH * 0.7]
+            : [
+                (bbox ? bbox.minY : 0) + hallH * 0.35,
+                (bbox ? bbox.minY : 0) + hallH * 0.55,
+                (bbox ? bbox.minY : 0) + hallH * 0.75,
+              ];
         let i = 0;
         for (let r = 0; r < rows; r++) {
           for (let c = 0; c < perRow && i < tables.length; c++) {
             const t = tables[i++];
             const x = (bbox ? bbox.minX : 0) + (c + 1) * gapX;
             const y = rowYs[r];
-            arr.push({ id: t.id, name: t.name, x, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats });
+            arr.push({
+              id: t.id,
+              name: t.name,
+              x,
+              y,
+              shape: t.shape || 'rectangle',
+              seats: parseInt(t.seats, 10) || avgSeats,
+            });
           }
         }
         return arr;
@@ -765,7 +938,8 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       description: `Distribuye ${tableCount} mesas actuales en dos anillos`,
       banquetTables: (() => {
         const arr = [];
-        const cx = centroid.x, cy = centroid.y;
+        const cx = centroid.x,
+          cy = centroid.y;
         const rInner = Math.min(hallW, hallH) * 0.24;
         const rOuter = Math.min(hallW, hallH) * 0.42;
         const inner = Math.max(3, Math.floor(tables.length / 2));
@@ -775,13 +949,27 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
         for (let k = 0; k < inner && i < tables.length; k++) {
           const t = tables[i++];
           const ang = (2 * Math.PI * k) / inner;
-          arr.push({ id: t.id, name: t.name, x: cx + rInner * Math.cos(ang), y: cy + rInner * Math.sin(ang), shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x: cx + rInner * Math.cos(ang),
+            y: cy + rInner * Math.sin(ang),
+            shape: t.shape || 'circle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
         }
         // outer ring
         for (let k = 0; k < outer && i < tables.length; k++) {
           const t = tables[i++];
           const ang = (2 * Math.PI * k) / outer;
-          arr.push({ id: t.id, name: t.name, x: cx + rOuter * Math.cos(ang), y: cy + rOuter * Math.sin(ang), shape: t.shape || 'circle', seats: parseInt(t.seats,10) || avgSeats });
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x: cx + rOuter * Math.cos(ang),
+            y: cy + rOuter * Math.sin(ang),
+            shape: t.shape || 'circle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
         }
         return arr;
       })(),
@@ -799,17 +987,57 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
         const minY = (bbox ? bbox.minY : 0) + margin;
         const maxX = (bbox ? bbox.maxX : hallW) - margin;
         const maxY = (bbox ? bbox.maxY : hallH) - margin;
-        const perim = 2 * ((maxX - minX) + (maxY - minY));
+        const perim = 2 * (maxX - minX + (maxY - minY));
         const gap = Math.max(180, Math.floor(perim / Math.max(1, tables.length)));
         let i = 0;
         // top edge
-        for (let x = minX; x <= maxX && i < tables.length; x += gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x, y: minY, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        for (let x = minX; x <= maxX && i < tables.length; x += gap) {
+          const t = tables[i++];
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x,
+            y: minY,
+            shape: t.shape || 'rectangle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
+        }
         // right edge
-        for (let y = minY; y <= maxY && i < tables.length; y += gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x: maxX, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        for (let y = minY; y <= maxY && i < tables.length; y += gap) {
+          const t = tables[i++];
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x: maxX,
+            y,
+            shape: t.shape || 'rectangle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
+        }
         // bottom edge
-        for (let x = maxX; x >= minX && i < tables.length; x -= gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x, y: maxY, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        for (let x = maxX; x >= minX && i < tables.length; x -= gap) {
+          const t = tables[i++];
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x,
+            y: maxY,
+            shape: t.shape || 'rectangle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
+        }
         // left edge
-        for (let y = maxY; y >= minY && i < tables.length; y -= gap) { const t=tables[i++]; arr.push({ id: t.id, name: t.name, x: minX, y, shape: t.shape || 'rectangle', seats: parseInt(t.seats,10) || avgSeats }); }
+        for (let y = maxY; y >= minY && i < tables.length; y -= gap) {
+          const t = tables[i++];
+          arr.push({
+            id: t.id,
+            name: t.name,
+            x: minX,
+            y,
+            shape: t.shape || 'rectangle',
+            seats: parseInt(t.seats, 10) || avgSeats,
+          });
+        }
         return arr;
       })(),
     });
@@ -820,7 +1048,7 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
       <p className="text-sm text-gray-600">
         Selecciona una plantilla predefinida para comenzar rápidamente:
       </p>
-      
+
       {templates.map((template) => {
         const cerText = template.ceremony
           ? `Ceremonia: ${template.ceremony.rows}×${template.ceremony.cols} asientos`
@@ -842,15 +1070,11 @@ const TemplateSelector = ({ onApply, onClose, guests = [], tables = [], hallSize
           >
             <h4 className="font-medium">{template.name}</h4>
             <p className="text-sm text-gray-600 mb-2">{template.description}</p>
-            {info && (
-              <div className="text-xs text-gray-500">
-                {info}
-              </div>
-            )}
+            {info && <div className="text-xs text-gray-500">{info}</div>}
           </div>
         );
       })}
-      
+
       <div className="flex gap-2 pt-4">
         <button
           onClick={onClose}
@@ -868,13 +1092,15 @@ export default SeatingPlanModals;
 // Formulario de fondo calibrado
 const BackgroundForm = ({ background, onSave, onClose }) => {
   const [dataUrl, setDataUrl] = React.useState(background?.dataUrl || '');
-  const [widthM, setWidthM] = React.useState(background?.widthCm ? background.widthCm/100 : 18);
+  const [widthM, setWidthM] = React.useState(background?.widthCm ? background.widthCm / 100 : 18);
   const [opacity, setOpacity] = React.useState(background?.opacity ?? 0.5);
 
   const onFile = (file) => {
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (e) => { setDataUrl(String(e.target?.result || '')); };
+    reader.onload = (e) => {
+      setDataUrl(String(e.target?.result || ''));
+    };
     reader.readAsDataURL(file);
   };
 
@@ -889,9 +1115,18 @@ const BackgroundForm = ({ background, onSave, onClose }) => {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-1">Imagen de fondo</label>
-        <input type="file" accept="image/*" onChange={(e)=> onFile(e.target.files?.[0])} className="w-full text-sm" />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => onFile(e.target.files?.[0])}
+          className="w-full text-sm"
+        />
         {dataUrl && (
-          <img src={dataUrl} alt="preview" className="mt-2 max-h-40 object-contain border rounded" />
+          <img
+            src={dataUrl}
+            alt="preview"
+            className="mt-2 max-h-40 object-contain border rounded"
+          />
         )}
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -903,7 +1138,7 @@ const BackgroundForm = ({ background, onSave, onClose }) => {
             max="200"
             step="0.1"
             value={widthM}
-            onChange={(e)=> setWidthM(e.target.value)}
+            onChange={(e) => setWidthM(e.target.value)}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -915,14 +1150,25 @@ const BackgroundForm = ({ background, onSave, onClose }) => {
             max="1"
             step="0.05"
             value={opacity}
-            onChange={(e)=> setOpacity(e.target.value)}
+            onChange={(e) => setOpacity(e.target.value)}
             className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
       <div className="flex gap-2 pt-2">
-        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
-        <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Guardar
+        </button>
       </div>
     </form>
   );
@@ -941,11 +1187,29 @@ const CapacityForm = ({ onSave, onClose, initialMax = 8 }) => {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-1">Máximo invitados por mesa</label>
-        <input type="number" min="1" max="100" value={max} onChange={(e)=> setMax(e.target.value)} className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input
+          type="number"
+          min="1"
+          max="100"
+          value={max}
+          onChange={(e) => setMax(e.target.value)}
+          className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
       <div className="flex gap-2 pt-2">
-        <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Cancelar</button>
-        <button type="submit" className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Guardar
+        </button>
       </div>
     </form>
   );

@@ -1,14 +1,15 @@
-import { post } from "./apiClient";
+import { post } from './apiClient';
 
-const CONFIG_KEY = "lovenda.email.automation.config";
-const STATE_KEY = "lovenda.email.automation.state";
-const CLASSIFICATION_CACHE_KEY = "lovenda.email.automation.classification";
-const SCHEDULE_KEY = "lovenda.email.automation.schedule";
+const CONFIG_KEY = 'lovenda.email.automation.config';
+const STATE_KEY = 'lovenda.email.automation.state';
+const CLASSIFICATION_CACHE_KEY = 'lovenda.email.automation.classification';
+const SCHEDULE_KEY = 'lovenda.email.automation.schedule';
 const CLASSIFICATION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 const REPLY_INTERVAL_DEFAULT = 24; // hours
 
 const memoryStorage = new Map();
-const hasLocalStorage = () => typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+const hasLocalStorage = () =>
+  typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 
 const storageGet = (key) => {
   try {
@@ -45,51 +46,51 @@ const DEFAULT_CONFIG = {
   },
   autoReply: {
     enabled: false,
-    subjectTemplate: "Re: [Asunto]",
+    subjectTemplate: 'Re: [Asunto]',
     generalMessage:
-      "Hola [Nombre],\n\nHemos recibido tu mensaje y nuestro equipo lo revisar\u00e1 en breve. Te contactaremos lo antes posible.\n\n\u00a1Gracias por escribirnos!",
+      'Hola [Nombre],\n\nHemos recibido tu mensaje y nuestro equipo lo revisar\u00e1 en breve. Te contactaremos lo antes posible.\n\n\u00a1Gracias por escribirnos!',
     replyIntervalHours: REPLY_INTERVAL_DEFAULT,
     excludeSenders: [],
     categories: {
       Proveedor: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nGracias por tu propuesta. Estamos revisando los detalles y te responderemos en breve con la informaci\u00f3n necesaria.\n\nUn saludo,",
+          'Hola [Nombre],\n\nGracias por tu propuesta. Estamos revisando los detalles y te responderemos en breve con la informaci\u00f3n necesaria.\n\nUn saludo,',
       },
       Invitado: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\n\u00a1Gracias por tu mensaje! Hemos tomado nota y te responderemos pronto con m\u00e1s detalles.\n\nUn abrazo,",
+          'Hola [Nombre],\n\n\u00a1Gracias por tu mensaje! Hemos tomado nota y te responderemos pronto con m\u00e1s detalles.\n\nUn abrazo,',
       },
       Finanzas: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nGracias por la informaci\u00f3n. Nuestro equipo financiero lo revisar\u00e1 y te contactar\u00e1 en cuanto tengamos novedades.\n\nSaludos,",
+          'Hola [Nombre],\n\nGracias por la informaci\u00f3n. Nuestro equipo financiero lo revisar\u00e1 y te contactar\u00e1 en cuanto tengamos novedades.\n\nSaludos,',
       },
       Contratos: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nHemos recibido el contrato y nuestro equipo legal lo est\u00e1 revisando. Te enviaremos la respuesta en breve.\n\nSaludos,",
+          'Hola [Nombre],\n\nHemos recibido el contrato y nuestro equipo legal lo est\u00e1 revisando. Te enviaremos la respuesta en breve.\n\nSaludos,',
       },
       Facturas: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nGracias por enviarnos la factura. La estamos revisando y confirmaremos el pago en cuanto sea posible.\n\nSaludos,",
+          'Hola [Nombre],\n\nGracias por enviarnos la factura. La estamos revisando y confirmaremos el pago en cuanto sea posible.\n\nSaludos,',
       },
       Reuniones: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nGracias por proponer la reuni\u00f3n. Revisaremos nuestra agenda y te enviaremos la confirmaci\u00f3n muy pronto.\n\nSaludos,",
+          'Hola [Nombre],\n\nGracias por proponer la reuni\u00f3n. Revisaremos nuestra agenda y te enviaremos la confirmaci\u00f3n muy pronto.\n\nSaludos,',
       },
       RSVP: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\n\u00a1Gracias por tu confirmaci\u00f3n! Hemos registrado tu respuesta y te mantendremos informado con las novedades.\n\nUn abrazo,",
+          'Hola [Nombre],\n\n\u00a1Gracias por tu confirmaci\u00f3n! Hemos registrado tu respuesta y te mantendremos informado con las novedades.\n\nUn abrazo,',
       },
       Urgente: {
         enabled: true,
         message:
-          "Hola [Nombre],\n\nHemos recibido tu mensaje y estamos priorizando la respuesta. Te contactaremos lo antes posible.\n\nSaludos,",
+          'Hola [Nombre],\n\nHemos recibido tu mensaje y estamos priorizando la respuesta. Te contactaremos lo antes posible.\n\nSaludos,',
       },
     },
   },
@@ -116,7 +117,7 @@ function deepMerge(base, override) {
       result[key] = value.slice();
       return;
     }
-    if (value && typeof value === "object") {
+    if (value && typeof value === 'object') {
       const baseValue = base && base[key] ? base[key] : {};
       result[key] = deepMerge(baseValue, value);
       return;
@@ -131,7 +132,7 @@ function readJSON(key, fallback) {
   if (!raw) return fallback;
   try {
     const parsed = JSON.parse(raw);
-    if (fallback && typeof fallback === "object") {
+    if (fallback && typeof fallback === 'object') {
       return deepMerge(fallback, parsed);
     }
     return parsed;
@@ -198,9 +199,9 @@ function hashString(str) {
 }
 
 function getMailCacheKey(mail) {
-  if (!mail) return "unknown";
+  if (!mail) return 'unknown';
   if (mail.id) return `id:${mail.id}`;
-  const base = `${mail.subject || ""}::${mail.date || ""}::${(mail.from || "").toLowerCase()}`;
+  const base = `${mail.subject || ''}::${mail.date || ''}::${(mail.from || '').toLowerCase()}`;
   return `hash:${hashString(base)}`;
 }
 
@@ -239,7 +240,11 @@ function fallbackClassification(mail) {
       folder = folder || 'Reuniones';
     }
 
-    if (/proveedor|catering|fot(?:ó|o)grafo|dj|m(?:ú|u)sica|flor|banquete|venue|servicio/.test(textContent)) {
+    if (
+      /proveedor|catering|fot(?:ó|o)grafo|dj|m(?:ú|u)sica|flor|banquete|venue|servicio/.test(
+        textContent
+      )
+    ) {
       tags.add('Proveedor');
       folder = folder || 'Proveedores';
     }
@@ -295,22 +300,21 @@ function classifyEmail(mail, config) {
 }
 
 function extractEmailAddress(raw) {
-  if (!raw) return "";
+  if (!raw) return '';
   const match = String(raw).match(/<([^>]+)>/);
   const email = match ? match[1] : String(raw);
   return email.trim().toLowerCase();
 }
 
 function extractSenderName(raw) {
-  if (!raw) return "";
+  if (!raw) return '';
   const match = String(raw).match(/^([^<]+)</);
   if (match) return match[1].trim();
-  return String(raw).split("@")[0]?.replace(/[._]/g, " ") || "";
+  return String(raw).split('@')[0]?.replace(/[._]/g, ' ') || '';
 }
 
 function mapTagToCategory(tags = [], folder = null) {
-  const normalized = (Array.isArray(tags) ? tags : [])
-    .map((tag) => String(tag).toLowerCase());
+  const normalized = (Array.isArray(tags) ? tags : []).map((tag) => String(tag).toLowerCase());
   const folderValue = folder ? String(folder).toLowerCase() : '';
   const has = (...keywords) => normalized.some((value) => keywords.some((k) => value.includes(k)));
 
@@ -319,8 +323,23 @@ function mapTagToCategory(tags = [], folder = null) {
   if (has('reuniá³n', 'reunion', 'meeting', 'cita', 'llamada')) return 'Reuniones';
   if (has('rsvp', 'invitaciá³n', 'invitacion', 'confirmaciá³n', 'confirmacion')) return 'RSVP';
   if (has('guest', 'invitado')) return 'Invitado';
-  if (has('proveedor', 'catering', 'fotá³grafo', 'fotografo', 'dj', 'máºsica', 'musica', 'flor', 'banquete', 'venue')) return 'Proveedor';
-  if (has('finanzas', 'presupuesto', 'pago', 'importe', 'transferencia', 'budget')) return 'Finanzas';
+  if (
+    has(
+      'proveedor',
+      'catering',
+      'fotá³grafo',
+      'fotografo',
+      'dj',
+      'máºsica',
+      'musica',
+      'flor',
+      'banquete',
+      'venue'
+    )
+  )
+    return 'Proveedor';
+  if (has('finanzas', 'presupuesto', 'pago', 'importe', 'transferencia', 'budget'))
+    return 'Finanzas';
   if (has('urgente', 'emergencia', 'asap')) return 'Urgente';
 
   if (folderValue) {
@@ -338,17 +357,17 @@ function mapTagToCategory(tags = [], folder = null) {
 
 function getCurrentLovendaEmail() {
   try {
-    const raw = storageGet("lovenda.email.init");
-    if (!raw) return "";
+    const raw = storageGet('lovenda.email.init');
+    if (!raw) return '';
     const parsed = JSON.parse(raw);
-    return parsed?.myWed360Email || parsed?.email || "";
+    return parsed?.myWed360Email || parsed?.email || '';
   } catch {
-    return "";
+    return '';
   }
 }
 
 async function maybeAutoReply(mail, classification, config, state, sendMail) {
-  if (!config?.autoReply?.enabled || typeof sendMail !== "function") return false;
+  if (!config?.autoReply?.enabled || typeof sendMail !== 'function') return false;
   if (!mail || !mail.from) return false;
   const senderEmail = extractEmailAddress(mail.from);
   if (!senderEmail) return false;
@@ -374,12 +393,14 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
   const context = {
     name: extractSenderName(mail.from) || senderEmail,
     category,
-    subject: mail.subject || "",
-    date: new Date().toLocaleDateString("es-ES"),
+    subject: mail.subject || '',
+    date: new Date().toLocaleDateString('es-ES'),
   };
   const body = renderTemplate(templateMessage, context);
   if (!body.trim()) return false;
-  const subject = renderTemplate(config.autoReply.subjectTemplate || "Re: [Asunto]", context) || `Re: ${mail.subject || "tu mensaje"}`;
+  const subject =
+    renderTemplate(config.autoReply.subjectTemplate || 'Re: [Asunto]', context) ||
+    `Re: ${mail.subject || 'tu mensaje'}`;
   try {
     await sendMail({
       to: senderEmail,
@@ -397,7 +418,7 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
     state.lastAutoReplyBySender = nextState.lastAutoReplyBySender;
     return true;
   } catch (error) {
-    console.warn("[emailAutomation] auto-reply failed", error);
+    console.warn('[emailAutomation] auto-reply failed', error);
     return false;
   }
 }
@@ -428,7 +449,7 @@ export async function processIncomingEmails(emails = [], options = {}) {
       }
       await maybeAutoReply(clone, classification, config, state, sendMail);
     } catch (error) {
-      console.warn("[emailAutomation] processing mail failed", error);
+      console.warn('[emailAutomation] processing mail failed', error);
     }
     processed.push(clone);
   }
@@ -445,17 +466,19 @@ export function getScheduledHistory() {
 }
 
 export function scheduleEmailSend(payload, scheduledAt) {
-  if (!scheduledAt) throw new Error("scheduledAt requerido");
+  if (!scheduledAt) throw new Error('scheduledAt requerido');
   const date = new Date(scheduledAt);
   if (Number.isNaN(date.getTime())) {
-    throw new Error("Fecha programada no váÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡lida");
+    throw new Error('Fecha programada no váÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡lida');
   }
   if (payload?.attachments && payload.attachments.length) {
-    throw new Error("La programaciáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚³n con adjuntos no estáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡ soportada todaváÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚­a");
+    throw new Error(
+      'La programaciáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚³n con adjuntos no estáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡ soportada todaváÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚­a'
+    );
   }
   const now = Date.now();
   if (date.getTime() < now + 60 * 1000) {
-    throw new Error("La fecha programada debe ser al menos dentro de 1 minuto");
+    throw new Error('La fecha programada debe ser al menos dentro de 1 minuto');
   }
   const data = getScheduleData();
   const queue = Array.isArray(data.queue) ? data.queue.slice() : [];
@@ -465,7 +488,7 @@ export function scheduleEmailSend(payload, scheduledAt) {
     payload,
     scheduledAt: date.toISOString(),
     createdAt: new Date().toISOString(),
-    status: "scheduled",
+    status: 'scheduled',
   });
   saveScheduleData({ queue, history: data.history || [] });
   return id;
@@ -481,7 +504,7 @@ export function cancelScheduledEmail(id) {
 }
 
 export async function processScheduledEmails(sendMail) {
-  if (typeof sendMail !== "function") return;
+  if (typeof sendMail !== 'function') return;
   const data = getScheduleData();
   const queue = Array.isArray(data.queue) ? data.queue.slice() : [];
   const history = Array.isArray(data.history) ? data.history.slice() : [];
@@ -498,7 +521,7 @@ export async function processScheduledEmails(sendMail) {
       await sendMail(item.payload || {});
       history.push({
         ...item,
-        status: "sent",
+        status: 'sent',
         sentAt: new Date().toISOString(),
       });
     } catch (error) {
@@ -506,16 +529,16 @@ export async function processScheduledEmails(sendMail) {
       if (retries >= 3) {
         history.push({
           ...item,
-          status: "failed",
-          error: error?.message || "send_failed",
+          status: 'failed',
+          error: error?.message || 'send_failed',
           failedAt: new Date().toISOString(),
         });
       } else {
         remaining.push({
           ...item,
           retryCount: retries,
-          lastError: error?.message || "send_failed",
-          status: "scheduled",
+          lastError: error?.message || 'send_failed',
+          status: 'scheduled',
         });
       }
     }

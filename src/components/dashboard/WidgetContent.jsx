@@ -1,16 +1,16 @@
 import React from 'react';
-import { WidgetTypes } from './widgets/WidgetTypes';
 
 // Import widget components
-import { CalendarWidget } from './widgets/CalendarWidget';
-import { TasksWidget } from './widgets/TasksWidget';
 import { BudgetWidget } from './widgets/BudgetWidget';
+import { CalendarWidget } from './widgets/CalendarWidget';
 import { GuestListWidget } from './widgets/GuestListWidget';
+import { TasksWidget } from './widgets/TasksWidget';
 import { TimelineWidget } from './widgets/TimelineWidget';
+import { WidgetTypes } from './widgets/WidgetTypes';
 
 export const WidgetContent = ({ widget }) => {
   const { type, config } = widget;
-  
+
   const renderWidget = () => {
     switch (type) {
       case WidgetTypes.CALENDAR:
@@ -27,10 +27,6 @@ export const WidgetContent = ({ widget }) => {
         return <div>Widget no soportado: {type}</div>;
     }
   };
-  
-  return (
-    <div className="h-full">
-      {renderWidget()}
-    </div>
-  );
+
+  return <div className="h-full">{renderWidget()}</div>;
 };

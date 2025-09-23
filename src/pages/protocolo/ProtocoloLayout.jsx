@@ -1,13 +1,12 @@
-�import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+
 import PageTabs from '../../components/ui/PageTabs';
 
 // Definición estática de las pestañas para evitar recreaciones
 // Nota: 'Documentos Legales' se muestra como página independiente en el submenú,
 // por eso NO aparece como pestaña aquí.
-const tabs = [
-  { path: 'momentos-especiales', label: 'Momentos Especiales' },
-];
+const tabs = [{ path: 'momentos-especiales', label: 'Momentos Especiales' }];
 
 // Componente memoizado para evitar renders innecesarios
 const ProtocoloLayout = React.memo(() => {
@@ -22,9 +21,9 @@ const ProtocoloLayout = React.memo(() => {
   }, [location.pathname, navigate]);
 
   // Memoizamos la lista de pestañas con sus rutas completas
-  const navTabs = useMemo(() => tabs.map(t => ({ ...t, href: `/protocolo/${t.path}` })), []);
+  const navTabs = useMemo(() => tabs.map((t) => ({ ...t, href: `/protocolo/${t.path}` })), []);
   const activeId = useMemo(() => {
-    const m = navTabs.find(t => location.pathname.startsWith(t.href));
+    const m = navTabs.find((t) => location.pathname.startsWith(t.href));
     return m ? m.path : tabs[0]?.path;
   }, [location.pathname, navTabs]);
 
@@ -43,10 +42,14 @@ const ProtocoloLayout = React.memo(() => {
       {navTabs.length > 1 && (
         <>
           <h1 id="protocolo-heading" className="page-title">
-            {navTabs.find(t => location.pathname.startsWith(t.href))?.label || 'Protocolo'}
+            {navTabs.find((t) => location.pathname.startsWith(t.href))?.label || 'Protocolo'}
           </h1>
-          <nav role="tablist" aria-label="Secciones de Protocolo" className="flex overflow-x-auto space-x-2 pb-2">
-            {navTabs.map(tab => (
+          <nav
+            role="tablist"
+            aria-label="Secciones de Protocolo"
+            className="flex overflow-x-auto space-x-2 pb-2"
+          >
+            {navTabs.map((tab) => (
               <NavLink
                 key={tab.path}
                 to={tab.href}
@@ -65,11 +68,14 @@ const ProtocoloLayout = React.memo(() => {
             ))}
           </nav>
         </>
-
       )}
 
       {/* Contenido - Ya no envuelto en Card para permitir a cada componente tener sus propios Cards */}
-      <div className="focus:outline-none focus-visible:ring-2 ring-primary" role="region" aria-label="Contenido de Protocolo">
+      <div
+        className="focus:outline-none focus-visible:ring-2 ring-primary"
+        role="region"
+        aria-label="Contenido de Protocolo"
+      >
         <Outlet />
       </div>
 
@@ -82,4 +88,3 @@ const ProtocoloLayout = React.memo(() => {
 });
 
 export default ProtocoloLayout;
-

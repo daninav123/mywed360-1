@@ -1,12 +1,12 @@
-import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mocks para los servicios utilizados
 vi.mock('../../services/statsService', () => ({
   generateUserStats: vi.fn(),
-  getUserStats: vi.fn()
+  getUserStats: vi.fn(),
 }));
 
 // Mock de chart.js para evitar dependencias de canvas
@@ -29,7 +29,7 @@ vi.mock('react-chartjs-2', () => ({
   Bar: () => <div data-testid="bar-chart">Bar Chart</div>,
   Line: () => <div data-testid="line-chart">Line Chart</div>,
   Pie: () => <div data-testid="pie-chart">Pie Chart</div>,
-  Doughnut: () => <div data-testid="doughnut-chart">Doughnut Chart</div>
+  Doughnut: () => <div data-testid="doughnut-chart">Doughnut Chart</div>,
 }));
 
 // Mock para emailMetricsService para evitar llamadas reales a Firestore
@@ -48,31 +48,31 @@ describe('EmailStats', () => {
       totalSent: 150,
       totalReceived: 280,
       responseRate: 75,
-      averageResponseTime: '2.5h'
+      averageResponseTime: '2.5h',
     },
     timeline: {
       labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
       sent: [10, 20, 15, 30, 25, 50],
-      received: [15, 25, 20, 45, 55, 120]
+      received: [15, 25, 20, 45, 55, 120],
     },
     contacts: [
       { name: 'example@lovenda.com', count: 45 },
       { name: 'contact@example.com', count: 32 },
-      { name: 'info@provider.com', count: 28 }
+      { name: 'info@provider.com', count: 28 },
     ],
     folderDistribution: {
       labels: ['Bandeja', 'Enviados', 'Importantes', 'Trabajo'],
-      data: [45, 30, 15, 10]
+      data: [45, 30, 15, 10],
     },
     tagDistribution: {
       labels: ['Urgente', 'Personal', 'Trabajo', 'Facturas'],
-      data: [20, 35, 25, 20]
+      data: [20, 35, 25, 20],
     },
     hourlyActivity: {
       labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
-      data: [5, 15, 10, 20, 25, 15]
+      data: [5, 15, 10, 20, 25, 15],
     },
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   };
 
   beforeEach(() => {
@@ -87,9 +87,9 @@ describe('EmailStats', () => {
     // Configurar el mock para devolver una promesa que no se resuelve
     getUserStats.mockReturnValue({});
     generateUserStats.mockImplementation(() => new Promise(() => {}));
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     expect(screen.getByText('Cargando estadísticas...')).toBeInTheDocument();
   });
 
@@ -97,16 +97,16 @@ describe('EmailStats', () => {
     // Configurar el mock para devolver estadísticas recientes
     getUserStats.mockReturnValue({
       ...mockStats,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar que no se llamó a generateUserStats
     await waitFor(() => {
       expect(generateUserStats).not.toHaveBeenCalled();
     });
-    
+
     // Verificar que se muestran los datos principales
     expect(screen.getByText('150')).toBeInTheDocument(); // totalSent
     expect(screen.getByText('280')).toBeInTheDocument(); // totalReceived
@@ -116,14 +116,14 @@ describe('EmailStats', () => {
     // Configurar mocks
     getUserStats.mockReturnValue({});
     generateUserStats.mockResolvedValue(mockStats);
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar que se llamó a generateUserStats
     await waitFor(() => {
       expect(generateUserStats).toHaveBeenCalledWith('user123');
     });
-    
+
     // Verificar que se muestran los datos principales
     expect(screen.getByText('150')).toBeInTheDocument(); // totalSent
     expect(screen.getByText('280')).toBeInTheDocument(); // totalReceived
@@ -133,16 +133,16 @@ describe('EmailStats', () => {
     // Configurar el mock para devolver estadísticas desactualizadas (más de 1 hora)
     const oldDate = new Date();
     oldDate.setHours(oldDate.getHours() - 2); // 2 horas atrás
-    
+
     getUserStats.mockReturnValue({
       ...mockStats,
-      lastUpdated: oldDate.toISOString()
+      lastUpdated: oldDate.toISOString(),
     });
-    
+
     generateUserStats.mockResolvedValue(mockStats);
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar que se llamó a generateUserStats para actualizar los datos
     await waitFor(() => {
       expect(generateUserStats).toHaveBeenCalledWith('user123');
@@ -153,9 +153,9 @@ describe('EmailStats', () => {
     // Configurar mock para fallar
     getUserStats.mockReturnValue({});
     generateUserStats.mockRejectedValue(new Error('Error de prueba'));
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar mensaje de error
     await waitFor(() => {
       expect(screen.getByText('No se pudieron cargar las estadísticas')).toBeInTheDocument();
@@ -170,24 +170,24 @@ describe('EmailStats', () => {
       overview: {
         ...mockStats.overview,
         totalSent: 160, // Valor actualizado
-        totalReceived: 290
-      }
+        totalReceived: 290,
+      },
     });
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Esperar a que se carguen los datos iniciales
     await waitFor(() => {
       expect(screen.getByText('150')).toBeInTheDocument(); // totalSent inicial
     });
-    
+
     // Simular clic en botón de actualizar
     const user = userEvent.setup();
     await user.click(screen.getByLabelText(/actualizar estadísticas/i));
-    
+
     // Verificar que se llamó a generateUserStats
     expect(generateUserStats).toHaveBeenCalledTimes(1);
-    
+
     // Verificar valores actualizados
     await waitFor(() => {
       expect(screen.getByText('160')).toBeInTheDocument(); // totalSent actualizado
@@ -198,9 +198,9 @@ describe('EmailStats', () => {
   it('renderiza correctamente todas las secciones del dashboard', async () => {
     // Configurar mock
     getUserStats.mockReturnValue(mockStats);
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar secciones principales
     await waitFor(() => {
       // Tarjetas de resumen
@@ -208,7 +208,7 @@ describe('EmailStats', () => {
       expect(screen.getByText('Contactos')).toBeInTheDocument();
       expect(screen.getByText('Tasa de respuesta')).toBeInTheDocument();
       expect(screen.getByText('Tiempo medio de respuesta')).toBeInTheDocument();
-      
+
       // Gráficos
       expect(screen.getByTestId('line-chart')).toBeInTheDocument(); // Actividad
       expect(screen.getByTestId('pie-chart')).toBeInTheDocument(); // Distribución por carpeta
@@ -220,11 +220,11 @@ describe('EmailStats', () => {
   it('no hace nada si no hay userId', () => {
     // Renderizar sin userId
     render(<EmailStats />);
-    
+
     // Verificar que no se llamó a ninguna función de obtención de datos
     expect(getUserStats).not.toHaveBeenCalled();
     expect(generateUserStats).not.toHaveBeenCalled();
-    
+
     // Verificar que se muestra mensaje adecuado
     expect(screen.getByText('No hay estadísticas disponibles')).toBeInTheDocument();
   });
@@ -237,13 +237,13 @@ describe('EmailStats', () => {
         totalSent: 0,
         totalReceived: 0,
         responseRate: 0,
-        averageResponseTime: '0h'
+        averageResponseTime: '0h',
       },
-      emptyData: true
+      emptyData: true,
     });
-    
+
     render(<EmailStats userId="user123" />);
-    
+
     // Verificar mensaje de datos insuficientes
     await waitFor(() => {
       expect(screen.getByText(/no hay suficientes datos/i)).toBeInTheDocument();

@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
+
+import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
 import { Input } from '../ui';
-import useTranslations from '../../hooks/useTranslations';
 
 // Cabeceras estándar que soporta el pegado desde Excel / Sheets
 const DEFAULT_COLUMNS = [
@@ -76,10 +77,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
       if (row.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) {
         newErrors[`${idx}-email`] = t('forms.invalidEmail');
       }
-      if (
-        row.phone &&
-        !/^\+[1-9]\d{7,14}$/.test(String(row.phone).replace(/\s+/g, ''))
-      ) {
+      if (row.phone && !/^\+[1-9]\d{7,14}$/.test(String(row.phone).replace(/\s+/g, ''))) {
         newErrors[`${idx}-phone`] = t('forms.invalidPhone');
       }
     });
@@ -133,9 +131,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
                       disabled={isLoading}
                     />
                     {errors[`${rowIdx}-${col.key}`] && (
-                      <p className="text-xs text-red-500">
-                        {errors[`${rowIdx}-${col.key}`]}
-                      </p>
+                      <p className="text-xs text-red-500">{errors[`${rowIdx}-${col.key}`]}</p>
                     )}
                   </td>
                 ))}

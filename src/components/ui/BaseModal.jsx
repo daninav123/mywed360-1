@@ -1,10 +1,10 @@
-import React, { useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
+import React, { useEffect, useCallback } from 'react';
 
 /**
  * Componente Modal base avanzado y reutilizable
  * Proporciona funcionalidades comunes para todos los modales del proyecto
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.isOpen - Controla si el modal está abierto
  * @param {Function} props.onClose - Función para cerrar el modal
@@ -30,14 +30,17 @@ const BaseModal = ({
   showCloseButton = true,
   className = '',
   footer,
-  scrollable = true
+  scrollable = true,
 }) => {
   // Manejar cierre con tecla Escape
-  const handleKeyDown = useCallback((event) => {
-    if (event.key === 'Escape' && closeOnEscape && onClose) {
-      onClose();
-    }
-  }, [closeOnEscape, onClose]);
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Escape' && closeOnEscape && onClose) {
+        onClose();
+      }
+    },
+    [closeOnEscape, onClose]
+  );
 
   // Agregar/remover event listener para tecla Escape
   useEffect(() => {
@@ -58,11 +61,14 @@ const BaseModal = ({
   }, [isOpen]);
 
   // Manejar clic en overlay
-  const handleOverlayClick = useCallback((event) => {
-    if (event.target === event.currentTarget && closeOnOverlayClick && onClose) {
-      onClose();
-    }
-  }, [closeOnOverlayClick, onClose]);
+  const handleOverlayClick = useCallback(
+    (event) => {
+      if (event.target === event.currentTarget && closeOnOverlayClick && onClose) {
+        onClose();
+      }
+    },
+    [closeOnOverlayClick, onClose]
+  );
 
   // Obtener clases de tamaño
   const getSizeClasses = () => {
@@ -90,7 +96,7 @@ const BaseModal = ({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? "modal-title" : undefined}
+      aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
         className={`
@@ -104,10 +110,7 @@ const BaseModal = ({
         {(title || showCloseButton) && (
           <div className="flex justify-between items-center p-4 border-b border-gray-200 flex-shrink-0">
             {title && (
-              <h2 
-                id="modal-title"
-                className="text-lg font-semibold text-gray-800"
-              >
+              <h2 id="modal-title" className="text-lg font-semibold text-gray-800">
                 {title}
               </h2>
             )}
@@ -124,7 +127,7 @@ const BaseModal = ({
         )}
 
         {/* Contenido del modal */}
-        <div 
+        <div
           className={`
             flex-1 p-4 
             ${scrollable ? 'overflow-y-auto' : 'overflow-hidden'}
@@ -136,9 +139,7 @@ const BaseModal = ({
 
         {/* Pie del modal */}
         {footer && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-            {footer}
-          </div>
+          <div className="p-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">{footer}</div>
         )}
       </div>
     </div>

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { Sparkles, Search, X, RotateCw } from 'lucide-react';
+import React, { useState } from 'react';
 
 /**
  * Modal para buscar proveedores mediante IA
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.visible - Indica si el modal está visible
  * @param {Function} props.onClose - Función para cerrar el modal
@@ -13,16 +13,16 @@ import { Sparkles, Search, X, RotateCw } from 'lucide-react';
  * @param {boolean} props.cargando - Indica si está cargando la búsqueda
  * @returns {React.ReactElement} Modal de búsqueda por IA
  */
-const AIBusquedaModal = ({ 
-  visible, 
-  onClose, 
+const AIBusquedaModal = ({
+  visible,
+  onClose,
   onBuscar,
   onGuardar,
   resultado,
-  cargando = false
+  cargando = false,
 }) => {
   const [consulta, setConsulta] = useState('');
-  
+
   // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,9 +30,9 @@ const AIBusquedaModal = ({
       onBuscar(consulta);
     }
   };
-  
+
   if (!visible) return null;
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col">
@@ -40,16 +40,15 @@ const AIBusquedaModal = ({
         <div className="flex justify-between items-center p-5 border-b border-gray-200">
           <div className="flex items-center">
             <Sparkles className="text-purple-500 mr-2" size={20} />
-            <h3 className="font-semibold text-lg text-gray-800">Búsqueda inteligente de proveedores</h3>
+            <h3 className="font-semibold text-lg text-gray-800">
+              Búsqueda inteligente de proveedores
+            </h3>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100"
-          >
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
             <X size={20} className="text-gray-500" />
           </button>
         </div>
-        
+
         {/* Formulario de búsqueda */}
         <div className="p-5 border-b border-gray-200">
           <p className="text-gray-600 mb-3">
@@ -80,7 +79,7 @@ const AIBusquedaModal = ({
             </button>
           </form>
         </div>
-        
+
         {/* Resultados */}
         <div className="flex-1 overflow-y-auto p-5">
           {cargando ? (
@@ -96,33 +95,31 @@ const AIBusquedaModal = ({
                   {resultado.servicio}
                 </span>
               </div>
-              
+
               <div className="space-y-3">
-                {resultado.descripcion && (
-                  <p className="text-gray-600">{resultado.descripcion}</p>
-                )}
-                
+                {resultado.descripcion && <p className="text-gray-600">{resultado.descripcion}</p>}
+
                 {resultado.web && (
                   <div>
                     <span className="text-gray-500 text-sm">Web:</span>
-                    <a 
-                      href={resultado.web} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
+                    <a
+                      href={resultado.web}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="ml-2 text-blue-600 hover:underline break-all"
                     >
                       {resultado.web}
                     </a>
                   </div>
                 )}
-                
+
                 {resultado.ubicacion && (
                   <div>
                     <span className="text-gray-500 text-sm">Ubicación:</span>
                     <span className="ml-2">{resultado.ubicacion}</span>
                   </div>
                 )}
-                
+
                 {resultado.contacto && (
                   <div>
                     <span className="text-gray-500 text-sm">Contacto:</span>
@@ -130,7 +127,7 @@ const AIBusquedaModal = ({
                   </div>
                 )}
               </div>
-              
+
               <div className="mt-5 text-right">
                 <button
                   onClick={() => onGuardar(resultado)}
@@ -143,23 +140,29 @@ const AIBusquedaModal = ({
           ) : consulta && !cargando ? (
             <div className="text-center py-10">
               <p className="text-gray-600">No se encontraron resultados para tu búsqueda.</p>
-              <p className="text-sm text-gray-500 mt-1">Intenta con términos diferentes o más específicos.</p>
+              <p className="text-sm text-gray-500 mt-1">
+                Intenta con términos diferentes o más específicos.
+              </p>
             </div>
           ) : (
             <div className="text-center py-10">
               <Sparkles className="h-12 w-12 text-purple-300 mx-auto mb-3" />
-              <h4 className="text-lg font-medium text-gray-700 mb-2">Busca con inteligencia artificial</h4>
+              <h4 className="text-lg font-medium text-gray-700 mb-2">
+                Busca con inteligencia artificial
+              </h4>
               <p className="text-gray-500 max-w-md mx-auto">
-                Describe el tipo de proveedor que necesitas y la IA encontrará opciones perfectas para tu boda.
+                Describe el tipo de proveedor que necesitas y la IA encontrará opciones perfectas
+                para tu boda.
               </p>
             </div>
           )}
         </div>
-        
+
         {/* Pie del modal */}
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <p className="text-xs text-gray-500 text-center">
-            La información proporcionada es orientativa. Recomendamos verificar siempre los datos de contacto antes de contratar.
+            La información proporcionada es orientativa. Recomendamos verificar siempre los datos de
+            contacto antes de contratar.
           </p>
         </div>
       </div>

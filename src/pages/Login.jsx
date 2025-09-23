@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+
+import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   // Cargar email guardado si existe
-  const savedEmail = typeof window !== 'undefined' ? localStorage.getItem('lovenda_login_email') || '' : '';
+  const savedEmail =
+    typeof window !== 'undefined' ? localStorage.getItem('lovenda_login_email') || '' : '';
   const [username, setUsername] = useState(savedEmail);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [remember, setRemember] = useState(!!savedEmail);
   // Nuevo sistema unificado
   const { login: unifiedLogin, isAuthenticated: unifiedAuth, isLoading } = useAuth();
-  
+
   // Usar el nuevo sistema como principal, con fallback básico
   const authLogin = unifiedLogin;
   const authStatus = unifiedAuth;
@@ -25,8 +27,6 @@ export default function Login() {
       navigate('/home', { replace: true });
     }
   }, [authLoading, authStatus, navigate]);
-
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +42,6 @@ export default function Login() {
       } else {
         localStorage.removeItem('lovenda_login_email');
       }
-
     } catch (err) {
       setError('Usuario o contraseña inválidos');
     }
@@ -70,28 +69,35 @@ export default function Login() {
         />
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
         <div className="flex items-center mb-4">
-            <input
-              type="checkbox"
-              id="remember"
-              checked={remember}
-              onChange={(e) => {
+          <input
+            type="checkbox"
+            id="remember"
+            checked={remember}
+            onChange={(e) => {
               setRemember(e.target.checked);
               if (!e.target.checked) {
                 localStorage.removeItem('lovenda_login_email');
               }
             }}
-              className="mr-2"
-            />
-            <label htmlFor="remember" className="text-sm">Recuérdame</label>
-          </div>
-          <button
+            className="mr-2"
+          />
+          <label htmlFor="remember" className="text-sm">
+            Recuérdame
+          </label>
+        </div>
+        <button
           type="submit"
           className="bg-[var(--color-primary)] text-[color:var(--color-surface)] px-4 py-2 rounded w-full hover:bg-[var(--color-accent)] transition-colors"
           data-testid="login-button"
         >
           Entrar
         </button>
-        <p className="mt-4 text-sm">¿No tienes cuenta? <Link to="/signup" className="text-[var(--color-primary)] hover:underline">Regístrate</Link></p>
+        <p className="mt-4 text-sm">
+          ¿No tienes cuenta?{' '}
+          <Link to="/signup" className="text-[var(--color-primary)] hover:underline">
+            Regístrate
+          </Link>
+        </p>
       </form>
     </div>
   );

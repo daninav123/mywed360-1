@@ -1,37 +1,45 @@
-import React, { useState, useEffect } from 'react';
 import { Folder, Plus, Edit2, Trash2, X, Check, MoreVertical, FolderPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import Button from '../Button';
 
 /**
  * Componente para gestionar carpetas personalizadas de correo
  * Permite crear, editar y eliminar carpetas para organizar correos
  */
-const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFolder, onRenameFolder, onDeleteFolder }) => {
+const CustomFolders = ({
+  folders = [],
+  onSelectFolder,
+  activeFolder,
+  onCreateFolder,
+  onRenameFolder,
+  onDeleteFolder,
+}) => {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingFolderId, setEditingFolderId] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
   const [showMenuForId, setShowMenuForId] = useState(null);
-  
+
   // Manejar creación de nueva carpeta
   const handleCreateFolder = () => {
     if (!newFolderName.trim()) return;
-    
+
     onCreateFolder(newFolderName.trim());
     setNewFolderName('');
     setIsCreating(false);
   };
-  
+
   // Manejar renombrado de carpeta
   const handleRenameFolder = (folderId) => {
     if (!newFolderName.trim()) return;
-    
+
     onRenameFolder(folderId, newFolderName.trim());
     setNewFolderName('');
     setIsEditing(false);
     setEditingFolderId(null);
   };
-  
+
   // Iniciar edición de carpeta
   const startEditing = (folder) => {
     setIsEditing(true);
@@ -39,7 +47,7 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
     setNewFolderName(folder.name);
     setShowMenuForId(null);
   };
-  
+
   // Cancelar edición o creación
   const cancelAction = () => {
     setIsCreating(false);
@@ -47,13 +55,13 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
     setEditingFolderId(null);
     setNewFolderName('');
   };
-  
+
   // Cerrar menú contextual al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = () => {
       setShowMenuForId(null);
     };
-    
+
     if (showMenuForId) {
       document.addEventListener('click', handleClickOutside);
       return () => {
@@ -61,7 +69,7 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
       };
     }
   }, [showMenuForId]);
-  
+
   return (
     <div className="space-y-1 my-4">
       <div className="flex items-center justify-between px-2 mb-2">
@@ -72,15 +80,16 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
             setIsEditing(false);
             setNewFolderName('');
           }}
-          className="text-blue-600 hover:text-blue-800" data-testid="new-folder-button"
+          className="text-blue-600 hover:text-blue-800"
+          data-testid="new-folder-button"
           title="Crear carpeta"
         >
           <FolderPlus size={16} />
         </button>
       </div>
-      
+
       {/* Lista de carpetas */}
-      {folders.map(folder => (
+      {folders.map((folder) => (
         <div key={folder.id} className="relative">
           {isEditing && editingFolderId === folder.id ? (
             <div className="flex items-center px-1">
@@ -89,17 +98,18 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
                 className="flex-grow py-1 px-2 text-sm border rounded"
-                data-testid="folder-name-input" placeholder="Nombre de carpeta"
+                data-testid="folder-name-input"
+                placeholder="Nombre de carpeta"
                 autoFocus
               />
-              <button 
+              <button
                 onClick={() => handleRenameFolder(folder.id)}
                 className="p-1 text-green-600 hover:text-green-800"
                 title="Guardar"
               >
                 <Check size={16} />
               </button>
-              <button 
+              <button
                 onClick={cancelAction}
                 className="p-1 text-red-600 hover:text-red-800"
                 title="Cancelar"
@@ -108,7 +118,8 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
               </button>
             </div>
           ) : (
-            <div data-testid="folder-item" 
+            <div
+              data-testid="folder-item"
               className={`flex items-center justify-between py-1 px-2 rounded-md cursor-pointer ${
                 activeFolder === folder.id ? 'bg-blue-100' : 'hover:bg-gray-100'
               }`}
@@ -123,7 +134,7 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
                   </span>
                 )}
               </div>
-              
+
               {/* Menú de opciones */}
               <div className="relative">
                 <button
@@ -135,7 +146,7 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
                 >
                   <MoreVertical size={14} />
                 </button>
-                
+
                 {showMenuForId === folder.id && (
                   <div className="absolute right-0 mt-1 bg-white border rounded shadow-md z-10 w-32">
                     <button
@@ -153,7 +164,8 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
                         onDeleteFolder(folder.id);
                         setShowMenuForId(null);
                       }}
-                      className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 text-red-600" data-testid="delete-folder-button"
+                      className="flex items-center w-full text-left px-3 py-2 hover:bg-gray-100 text-red-600"
+                      data-testid="delete-folder-button"
                     >
                       <Trash2 size={14} className="mr-2" /> Eliminar
                     </button>
@@ -164,11 +176,12 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
           )}
         </div>
       ))}
-      
+
       {/* Formulario para nueva carpeta */}
       {isCreating && (
         <div className="flex items-center px-1 mt-1" data-testid="create-folder-modal">
-          <input data-testid="folder-name-input"
+          <input
+            data-testid="folder-name-input"
             type="text"
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
@@ -176,14 +189,15 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
             placeholder="Nombre de carpeta"
             autoFocus
           />
-          <button 
-            data-testid="save-folder-button" onClick={handleCreateFolder}
+          <button
+            data-testid="save-folder-button"
+            onClick={handleCreateFolder}
             className="p-1 text-green-600 hover:text-green-800"
             title="Guardar"
           >
             <Check size={16} />
           </button>
-          <button 
+          <button
             onClick={cancelAction}
             className="p-1 text-red-600 hover:text-red-800"
             title="Cancelar"
@@ -192,7 +206,7 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
           </button>
         </div>
       )}
-      
+
       {/* Mensaje si no hay carpetas */}
       {folders.length === 0 && !isCreating && (
         <div className="text-center py-2 text-sm text-gray-500">
@@ -200,7 +214,8 @@ const CustomFolders = ({ folders = [], onSelectFolder, activeFolder, onCreateFol
           <Button
             variant="ghost"
             size="sm"
-            className="mt-1" data-testid="new-folder-button"
+            className="mt-1"
+            data-testid="new-folder-button"
             onClick={() => setIsCreating(true)}
           >
             <Plus size={14} className="mr-1" /> Crear carpeta

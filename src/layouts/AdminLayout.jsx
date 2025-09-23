@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutGrid, 
-  Users, 
-  Settings, 
-  ChevronLeft, 
+import {
+  LayoutGrid,
+  Users,
+  Settings,
+  ChevronLeft,
   ChevronRight,
   LogOut,
   Zap,
-  Mail
+  Mail,
 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
 import { Button } from '../components/ui';
 import { useAuth } from '../hooks/useAuth';
 
@@ -21,87 +22,80 @@ const AdminLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
-  
+
   // Enlaces del menú de administración
   const menuItems = [
     {
       title: 'Dashboard',
       icon: <LayoutGrid className="w-5 h-5" />,
-      path: '/admin/dashboard'
+      path: '/admin/dashboard',
     },
     {
       title: 'Usuarios',
       icon: <Users className="w-5 h-5" />,
-      path: '/admin/users'
+      path: '/admin/users',
     },
     {
       title: 'Sistema de emails',
       icon: <Mail className="w-5 h-5" />,
-      path: '/admin/emails'
+      path: '/admin/emails',
     },
     {
       title: 'Rendimiento de caché',
       icon: <Zap className="w-5 h-5" />,
-      path: '/admin/cache'
+      path: '/admin/cache',
     },
     {
       title: 'Configuración',
       icon: <Settings className="w-5 h-5" />,
-      path: '/admin/settings'
-    }
+      path: '/admin/settings',
+    },
   ];
-  
+
   // Verificar si una ruta está activa
   const isActive = (path) => {
     return location.pathname === path;
   };
-  
+
   // Alternar estado de colapso del menú lateral
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
-  
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Menú lateral */}
-      <aside 
+      <aside
         className={`bg-white shadow-md transition-all duration-300 flex flex-col ${
           collapsed ? 'w-20' : 'w-64'
         }`}
       >
         {/* Logo y nombre */}
-        <div className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b`}>
+        <div
+          className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b`}
+        >
           <Link to="/admin" className="flex items-center">
-            <img 
-              src="/icon-192.png" 
-              alt="Lovenda" 
-              className="h-10 w-10"
-            />
+            <img src="/icon-192.png" alt="Lovenda" className="h-10 w-10" />
             {!collapsed && <span className="ml-3 text-xl font-medium">Admin</span>}
           </Link>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={toggleSidebar}
             className={collapsed ? 'hidden' : ''}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
         </div>
-        
+
         {/* Botón para expandir en modo colapsado */}
         {collapsed && (
-          <Button 
-            variant="ghost"
-            size="sm"
-            onClick={toggleSidebar}
-            className="mx-auto my-2"
-          >
+          <Button variant="ghost" size="sm" onClick={toggleSidebar} className="mx-auto my-2">
             <ChevronRight className="h-5 w-5" />
           </Button>
         )}
-        
+
         {/* Enlaces de navegación */}
         <nav className="flex-grow py-6">
           <ul className="space-y-1">
@@ -122,7 +116,7 @@ const AdminLayout = ({ children }) => {
             ))}
           </ul>
         </nav>
-        
+
         {/* Perfil y cerrar sesión */}
         <div className={`mt-auto p-4 border-t ${collapsed ? 'text-center' : ''}`}>
           {!collapsed && (
@@ -131,10 +125,10 @@ const AdminLayout = ({ children }) => {
               <p className="text-xs text-gray-500">{user?.email || ''}</p>
             </div>
           )}
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={logout}
             className={`${collapsed ? 'w-10 h-10 p-0 flex items-center justify-center' : 'w-full'}`}
           >
@@ -143,22 +137,18 @@ const AdminLayout = ({ children }) => {
           </Button>
         </div>
       </aside>
-      
+
       {/* Área de contenido principal */}
       <main className="flex-grow overflow-auto">
         {/* Cabecera */}
         <header className="bg-white shadow-sm p-4">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl font-semibold text-gray-800">
-              Panel de administración
-            </h1>
+            <h1 className="text-2xl font-semibold text-gray-800">Panel de administración</h1>
           </div>
         </header>
-        
+
         {/* Contenido */}
-        <div className="max-w-7xl mx-auto p-6">
-          {children}
-        </div>
+        <div className="max-w-7xl mx-auto p-6">{children}</div>
       </main>
     </div>
   );

@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
+import { render, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
 
 import FreeDrawCanvas from '../../components/FreeDrawCanvas.jsx';
 
@@ -9,7 +9,17 @@ function stubSvgRect(svg, { left = 0, top = 0, width = 800, height = 600 } = {})
   // jsdom doesn't lay out; stub bounding box for coordinate math
   Object.defineProperty(svg, 'getBoundingClientRect', {
     configurable: true,
-    value: () => ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top, toJSON: () => {} }),
+    value: () => ({
+      left,
+      top,
+      width,
+      height,
+      right: left + width,
+      bottom: top + height,
+      x: left,
+      y: top,
+      toJSON: () => {},
+    }),
   });
 }
 
@@ -55,7 +65,13 @@ describe('FreeDrawCanvas advanced interactions', () => {
 
   it('erase: dispara onDeleteArea al hacer click en un área', () => {
     const onDeleteArea = vi.fn();
-    const poly = [{ x: 0, y: 0 }, { x: 50, y: 0 }, { x: 50, y: 50 }, { x: 0, y: 50 }, { x: 0, y: 0 }];
+    const poly = [
+      { x: 0, y: 0 },
+      { x: 50, y: 0 },
+      { x: 50, y: 50 },
+      { x: 0, y: 50 },
+      { x: 0, y: 0 },
+    ];
     const { container } = render(
       <FreeDrawCanvas
         drawMode="erase"

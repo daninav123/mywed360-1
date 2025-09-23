@@ -1,270 +1,279 @@
-import React, { useCallback, useState } from 'react';
 import { Search, Filter, Plus, MessageSquare } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+
+import useTranslations from '../../hooks/useTranslations';
+import { getInviteTemplate, setInviteTemplate } from '../../services/MessageTemplateService';
+import wh from '../../utils/whDebug';
 import { Button } from '../ui';
 import { Input } from '../ui';
-import useTranslations from '../../hooks/useTranslations';
-import wh from '../../utils/whDebug';
-import { getInviteTemplate, setInviteTemplate } from '../../services/MessageTemplateService';
 import InviteTemplateModal from '../whatsapp/InviteTemplateModal';
 
 /**
  * Componente de filtros y acciones para la lista de invitados
  * Optimizado con memoización y UX mejorada
  */
-const GuestFilters = React.memo(({ 
-  searchTerm,
-  statusFilter,
-  tableFilter,
-  groupFilter,
-  groupOptions = [],
-  onSearchChange,
-  onStatusFilterChange,
-  onTableFilterChange,
-  onGroupFilterChange,
-  onAddGuest,
-  onBulkInvite,
-  onOpenRsvpSummary,
-  onOpenSaveTheDate,
-  guestCount = 0,
-  isLoading = false,
-  // selección múltiple
-  selectedCount = 0,
-  onSendSelectedApi,
-  onScheduleSelected,
-  onSendSelectedBroadcast,
-  onOpenGroupManager,
-  showApiButtons = true,
-}) => {
-  const { t, wedding } = useTranslations();
+const GuestFilters = React.memo(
+  ({
+    searchTerm,
+    statusFilter,
+    tableFilter,
+    groupFilter,
+    groupOptions = [],
+    onSearchChange,
+    onStatusFilterChange,
+    onTableFilterChange,
+    onGroupFilterChange,
+    onAddGuest,
+    onBulkInvite,
+    onOpenRsvpSummary,
+    onOpenSaveTheDate,
+    guestCount = 0,
+    isLoading = false,
+    // selección múltiple
+    selectedCount = 0,
+    onSendSelectedApi,
+    onScheduleSelected,
+    onSendSelectedBroadcast,
+    onOpenGroupManager,
+    showApiButtons = true,
+  }) => {
+    const { t, wedding } = useTranslations();
 
-  // Opciones de estado para el filtro
-  const statusOptions = [
-    { value: '', label: 'Todos los estados' },
-    { value: 'pending', label: wedding?.guestStatus?.('pending') || 'Pendiente' },
-    { value: 'confirmed', label: wedding?.guestStatus?.('confirmed') || 'Confirmado' },
-    { value: 'declined', label: wedding?.guestStatus?.('declined') || 'Rechazado' }
-  ];
+    // Opciones de estado para el filtro
+    const statusOptions = [
+      { value: '', label: 'Todos los estados' },
+      { value: 'pending', label: wedding?.guestStatus?.('pending') || 'Pendiente' },
+      { value: 'confirmed', label: wedding?.guestStatus?.('confirmed') || 'Confirmado' },
+      { value: 'declined', label: wedding?.guestStatus?.('declined') || 'Rechazado' },
+    ];
 
-  // Manejar cambios en los filtros
-  const handleSearchChange = useCallback((e) => {
-    onSearchChange?.(e.target.value);
-  }, [onSearchChange]);
+    // Manejar cambios en los filtros
+    const handleSearchChange = useCallback(
+      (e) => {
+        onSearchChange?.(e.target.value);
+      },
+      [onSearchChange]
+    );
 
-  const handleStatusChange = useCallback((e) => {
-    onStatusFilterChange?.(e.target.value);
-  }, [onStatusFilterChange]);
+    const handleStatusChange = useCallback(
+      (e) => {
+        onStatusFilterChange?.(e.target.value);
+      },
+      [onStatusFilterChange]
+    );
 
-  const handleTableChange = useCallback((e) => {
-    onTableFilterChange?.(e.target.value);
-  }, [onTableFilterChange]);
+    const handleTableChange = useCallback(
+      (e) => {
+        onTableFilterChange?.(e.target.value);
+      },
+      [onTableFilterChange]
+    );
 
-  // Funciones de acción
-  const handleAddGuest = useCallback(() => {
-    onAddGuest?.();
-  }, [onAddGuest]);
+    // Funciones de acción
+    const handleAddGuest = useCallback(() => {
+      onAddGuest?.();
+    }, [onAddGuest]);
 
-  const handleBulkInviteApi = useCallback(() => {
-    wh('UI – BulkInvite click', { guestCount });
-    if (guestCount === 0) {
-      alert('No hay invitados para enviar invitaciones');
-      wh('UI – BulkInvite cancel: sin invitados');
-      return;
-    }
-    onBulkInvite?.();
-  }, [guestCount, onBulkInvite]);
+    const handleBulkInviteApi = useCallback(() => {
+      wh('UI – BulkInvite click', { guestCount });
+      if (guestCount === 0) {
+        alert('No hay invitados para enviar invitaciones');
+        wh('UI – BulkInvite cancel: sin invitados');
+        return;
+      }
+      onBulkInvite?.();
+    }, [guestCount, onBulkInvite]);
 
-  const [showTemplateModal, setShowTemplateModal] = useState(false);
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-  const handleOpenRsvp = useCallback(() => {
-    onOpenRsvpSummary?.();
-  }, [onOpenRsvpSummary]);
+    const handleOpenRsvp = useCallback(() => {
+      onOpenRsvpSummary?.();
+    }, [onOpenRsvpSummary]);
 
-  const handleEditTemplate = useCallback(() => {
-    try { wh('UI – EditTemplate open'); } catch {}
-    setShowTemplateModal(true);
-  }, []);
+    const handleEditTemplate = useCallback(() => {
+      try {
+        wh('UI – EditTemplate open');
+      } catch {}
+      setShowTemplateModal(true);
+    }, []);
 
-  return (
-    <>
-    <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
-      {/* Título y contador */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            {t('guests.guestList')}
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {guestCount} {guestCount === 1 ? 'invitado' : 'invitados'} en total
-          </p>
-        </div>
-        
-        {/* Botón principal de añadir */}
-        <Button
-          onClick={handleAddGuest}
-          disabled={isLoading}
-          className="flex items-center"
-        >
-          <Plus size={20} className="mr-2" />
-          {t('guests.addGuest')}
-        </Button>
-      </div>
+    return (
+      <>
+        <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
+          {/* Título y contador */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">{t('guests.guestList')}</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {guestCount} {guestCount === 1 ? 'invitado' : 'invitados'} en total
+              </p>
+            </div>
 
-      {/* Filtros de búsqueda */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Búsqueda por texto */}
-        <div className="relative">
-          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Buscar por nombre, email o teléfono..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="pl-10"
-            disabled={isLoading}
-          />
-        </div>
+            {/* Botón principal de añadir */}
+            <Button onClick={handleAddGuest} disabled={isLoading} className="flex items-center">
+              <Plus size={20} className="mr-2" />
+              {t('guests.addGuest')}
+            </Button>
+          </div>
 
-        {/* Filtro por estado */}
-        <div className="relative">
-          <Filter size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <select
-            value={statusFilter}
-            onChange={handleStatusChange}
-            disabled={isLoading}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-          >
-            {statusOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* Filtros de búsqueda */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Búsqueda por texto */}
+            <div className="relative">
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
+              <Input
+                type="text"
+                placeholder="Buscar por nombre, email o teléfono..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="pl-10"
+                disabled={isLoading}
+              />
+            </div>
 
-        {/* Filtro por mesa */}
-        <div>
-          <Input
-            type="text"
-            placeholder="Filtrar por mesa..."
-            value={tableFilter}
-            onChange={handleTableChange}
-            disabled={isLoading}
-          />
-        </div>
+            {/* Filtro por estado */}
+            <div className="relative">
+              <Filter
+                size={20}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
+              <select
+                value={statusFilter}
+                onChange={handleStatusChange}
+                disabled={isLoading}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              >
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Filtro por grupo */}
-        <div>
-          <select
-            value={groupFilter || ''}
-            onChange={(e) => onGroupFilterChange?.(e.target.value)}
-            disabled={isLoading}
-            className="w-full pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-          >
-            <option value="">Todos los grupos</option>
-            {groupOptions.map(opt => (
-              <option key={String(opt)} value={String(opt)}>{String(opt)}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+            {/* Filtro por mesa */}
+            <div>
+              <Input
+                type="text"
+                placeholder="Filtrar por mesa..."
+                value={tableFilter}
+                onChange={handleTableChange}
+                disabled={isLoading}
+              />
+            </div>
 
-      {/* Acciones masivas */}
-      <div className="flex flex-wrap gap-3 pt-4 border-t">
-        <Button
-          variant="outline"
-          onClick={handleBulkInviteApi}
-          disabled={isLoading || guestCount === 0}
-          className="flex items-center"
-          title="Enviar invitaciones a todos los invitados vía WhatsApp API"
-        >
-          <MessageSquare size={16} className="mr-2" />
-          Invitaciones masivas (API)
-        </Button>
+            {/* Filtro por grupo */}
+            <div>
+              <select
+                value={groupFilter || ''}
+                onChange={(e) => onGroupFilterChange?.(e.target.value)}
+                disabled={isLoading}
+                className="w-full pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+              >
+                <option value="">Todos los grupos</option>
+                {groupOptions.map((opt) => (
+                  <option key={String(opt)} value={String(opt)}>
+                    {String(opt)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        <Button
-          variant="outline"
-          onClick={() => onOpenSaveTheDate?.()}
-          disabled={isLoading || guestCount === 0}
-          title="Enviar SAVE THE DATE por WhatsApp"
-        >
-          Enviar SAVE THE DATE
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleOpenRsvp}
-          disabled={isLoading}
-        >
-          Resumen RSVP
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={handleEditTemplate}
-          disabled={isLoading}
-        >
-          Editar mensaje (API)
-        </Button>
-
-        {/* Envío/Programación para seleccionados */}
-        <div className="flex items-center gap-2 ml-auto">
-          <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
-
-          {showApiButtons && (
+          {/* Acciones masivas */}
+          <div className="flex flex-wrap gap-3 pt-4 border-t">
             <Button
               variant="outline"
-              onClick={() => onSendSelectedApi?.()}
-              disabled={isLoading || selectedCount === 0}
+              onClick={handleBulkInviteApi}
+              disabled={isLoading || guestCount === 0}
               className="flex items-center"
+              title="Enviar invitaciones a todos los invitados vía WhatsApp API"
             >
               <MessageSquare size={16} className="mr-2" />
-              Enviar seleccionados (API)
+              Invitaciones masivas (API)
             </Button>
-          )}
 
-          {showApiButtons && (
             <Button
               variant="outline"
-              onClick={() => onScheduleSelected?.()}
-              disabled={isLoading || selectedCount === 0}
+              onClick={() => onOpenSaveTheDate?.()}
+              disabled={isLoading || guestCount === 0}
+              title="Enviar SAVE THE DATE por WhatsApp"
             >
-              Programar seleccionados
+              Enviar SAVE THE DATE
             </Button>
-          )}
 
-          {showApiButtons && (
-            <Button
-              variant="outline"
-              onClick={() => onSendSelectedBroadcast?.()}
-              disabled={isLoading || selectedCount === 0}
-              title="Enviar por difusión (requiere extensión)"
-            >
-              Difusión (extensión)
+            <Button variant="outline" onClick={handleOpenRsvp} disabled={isLoading}>
+              Resumen RSVP
             </Button>
-          )}
 
-          <Button className="hidden"
-            variant="outline"
-            onClick={() => onOpenGroupManager?.()}
-            disabled={isLoading}
-            title="Gestionar grupos y asignar"
-          >
-            Asignar / Grupos
-          </Button>
+            <Button variant="outline" onClick={handleEditTemplate} disabled={isLoading}>
+              Editar mensaje (API)
+            </Button>
+
+            {/* Envío/Programación para seleccionados */}
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
+
+              {showApiButtons && (
+                <Button
+                  variant="outline"
+                  onClick={() => onSendSelectedApi?.()}
+                  disabled={isLoading || selectedCount === 0}
+                  className="flex items-center"
+                >
+                  <MessageSquare size={16} className="mr-2" />
+                  Enviar seleccionados (API)
+                </Button>
+              )}
+
+              {showApiButtons && (
+                <Button
+                  variant="outline"
+                  onClick={() => onScheduleSelected?.()}
+                  disabled={isLoading || selectedCount === 0}
+                >
+                  Programar seleccionados
+                </Button>
+              )}
+
+              {showApiButtons && (
+                <Button
+                  variant="outline"
+                  onClick={() => onSendSelectedBroadcast?.()}
+                  disabled={isLoading || selectedCount === 0}
+                  title="Enviar por difusión (requiere extensión)"
+                >
+                  Difusión (extensión)
+                </Button>
+              )}
+
+              <Button
+                className="hidden"
+                variant="outline"
+                onClick={() => onOpenGroupManager?.()}
+                disabled={isLoading}
+                title="Gestionar grupos y asignar"
+              >
+                Asignar / Grupos
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <InviteTemplateModal
-      open={showTemplateModal}
-      onClose={() => setShowTemplateModal(false)}
-      onSaved={() => {
-        setShowTemplateModal(false);
-        alert('Plantilla actualizada');
-      }}
-    />
-    </>
-  );
-});
+        <InviteTemplateModal
+          open={showTemplateModal}
+          onClose={() => setShowTemplateModal(false)}
+          onSaved={() => {
+            setShowTemplateModal(false);
+            alert('Plantilla actualizada');
+          }}
+        />
+      </>
+    );
+  }
+);
 
 GuestFilters.displayName = 'GuestFilters';
 

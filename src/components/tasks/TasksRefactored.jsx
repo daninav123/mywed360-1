@@ -1,33 +1,38 @@
-�import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+﻿import {
+  serverTimestamp,
+  doc,
+  deleteDoc,
+  setDoc,
+  collection,
+  addDoc,
+  onSnapshot,
+  getDoc,
+} from 'firebase/firestore';
 import { ViewMode } from 'gantt-task-react';
-import { serverTimestamp, doc, deleteDoc, setDoc, collection, addDoc, onSnapshot, getDoc } from 'firebase/firestore';
-import { db, auth } from '../../firebaseConfig';
-import { subscribeSyncState, getSyncState } from '../../services/SyncService';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Importar componentes separados
-import ErrorBoundary from './ErrorBoundary';
 import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents';
+import ErrorBoundary from './ErrorBoundary';
 import EventsCalendar from './EventsCalendar';
+import { useGanttSizing } from './hooks/useGanttSizing';
+import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks';
+import { useSafeEvents } from './hooks/useSafeEvents';
+import LongTermTasksGantt from './LongTermTasksGantt';
+import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TasksHeader from './TasksHeader';
-import TaskForm from './TaskForm';
 //
 
 // Importar hooks de Firestore
+import { addMonths } from './utils/dateUtils';
 import { useWedding } from '../../context/WeddingContext';
+import { db, auth } from '../../firebaseConfig';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
-
-import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks';
-
-
-import LongTermTasksGantt from './LongTermTasksGantt';
-
-import { useSafeEvents } from './hooks/useSafeEvents';
 
 // FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
-import { addMonths } from './utils/dateUtils';
-import { useGanttSizing } from './hooks/useGanttSizing';
+import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
@@ -77,14 +82,16 @@ export default function Tasks() {
     assignee: '',
     completed: false,
   });
-  
+
   const [currentView, setCurrentView] = useState('month');
   const [calendarDate, setCalendarDate] = useState(new Date());
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
     try {
-      return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(calendarDate);
+      return new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(
+        calendarDate
+      );
     } catch (_) {
       return '';
     }
@@ -103,7 +110,7 @@ export default function Tasks() {
     window.addEventListener('resize', compute);
     return () => window.removeEventListener('resize', compute);
   }, []);
-  
+
   const [syncStatus, setSyncStatus] = useState(() => {
     try {
       return getSyncState();
@@ -112,11 +119,15 @@ export default function Tasks() {
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
-  
+
   // Suscripción a cambios del estado de sincronización (online/syncing/pending)
   useEffect(() => {
     const unsub = subscribeSyncState(setSyncStatus);
-    return () => { try { unsub && unsub(); } catch (_) {} };
+    return () => {
+      try {
+        unsub && unsub();
+      } catch (_) {}
+    };
   }, []);
   const [columnWidthState, setColumnWidthState] = useState(65);
   const [ganttPreSteps, setGanttPreSteps] = useState(0);
@@ -126,22 +137,25 @@ export default function Tasks() {
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
   // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del D�a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
-  const listCellWidth = "";
+  const listCellWidth = '';
   // Altura de fila del Gantt
   const rowHeight = 44;
-  
+
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
 
   // Manejar eventos de calendario externos// FunciÒ³n para aÒ±adir una reuniÒ³n
-  const addMeeting = useCallback(async (meeting) => {
-    await addMeetingFS({
-      ...meeting,
-      title: meeting.title || 'Nueva reuniÒ³n',
-      start: new Date(meeting.start),
-      end: new Date(meeting.end)
-    });
-  }, [addMeetingFS]);
+  const addMeeting = useCallback(
+    async (meeting) => {
+      await addMeetingFS({
+        ...meeting,
+        title: meeting.title || 'Nueva reuniÒ³n',
+        start: new Date(meeting.start),
+        end: new Date(meeting.end),
+      });
+    },
+    [addMeetingFS]
+  );
   // keep for future use (avoid unused-var warnings)
   // eslint-disable-next-line no-unused-expressions
   addMeeting && null;
@@ -151,17 +165,36 @@ export default function Tasks() {
   // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÒ³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÒ­os al inicio)// Sugerencia automÒ¡tica de categorÒ­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
-    if (texto.includes('lugar') || texto.includes('venue') || texto.includes('salon') || texto.includes('espacio')) {
+    if (
+      texto.includes('lugar') ||
+      texto.includes('venue') ||
+      texto.includes('salon') ||
+      texto.includes('espacio')
+    ) {
       return 'LUGAR';
     } else if (texto.includes('invita') || texto.includes('guest') || texto.includes('persona')) {
       return 'INVITADOS';
-    } else if (texto.includes('comida') || texto.includes('catering') || texto.includes('menu') || texto.includes('bebida')) {
+    } else if (
+      texto.includes('comida') ||
+      texto.includes('catering') ||
+      texto.includes('menu') ||
+      texto.includes('bebida')
+    ) {
       return 'COMIDA';
     } else if (texto.includes('decora') || texto.includes('adorno') || texto.includes('flor')) {
       return 'DECORACION';
-    } else if (texto.includes('invitacion') || texto.includes('papel') || texto.includes('tarjeta')) {
+    } else if (
+      texto.includes('invitacion') ||
+      texto.includes('papel') ||
+      texto.includes('tarjeta')
+    ) {
       return 'PAPELERIA';
-    } else if (texto.includes('mÒºsica') || texto.includes('music') || texto.includes('dj') || texto.includes('band')) {
+    } else if (
+      texto.includes('mÒºsica') ||
+      texto.includes('music') ||
+      texto.includes('dj') ||
+      texto.includes('band')
+    ) {
       return 'MUSICA';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
@@ -213,10 +246,14 @@ export default function Tasks() {
   // Resetear formulario
   const resetForm = () => {
     setFormData({
-      title: '', desc: '', category: 'OTROS', 
-      startDate: new Date().toISOString().slice(0, 10), 
-      startTime: '10:00', endDate: new Date().toISOString().slice(0, 10), 
-      endTime: '11:00', long: false
+      title: '',
+      desc: '',
+      category: 'OTROS',
+      startDate: new Date().toISOString().slice(0, 10),
+      startTime: '10:00',
+      endDate: new Date().toISOString().slice(0, 10),
+      endTime: '11:00',
+      long: false,
     });
   };
 
@@ -226,7 +263,7 @@ export default function Tasks() {
     setEditingId(null);
     resetForm();
   };
-  
+
   // AsignaciÒ³n automÒ¡tica de categorÒ­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
@@ -234,25 +271,47 @@ export default function Tasks() {
       // Primero intentamos con reglas simples
       const sugerida = sugerirCategoria(titulo, descripcion);
       if (sugerida !== 'OTROS') return sugerida;
-      
+
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
         LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÒ³n', 'jardÒ­n', 'terraza'],
-        INVITADOS: ['guests', 'invitados', 'personas', 'asistentes', 'confirmaciones', 'lista', 'rsvp'],
+        INVITADOS: [
+          'guests',
+          'invitados',
+          'personas',
+          'asistentes',
+          'confirmaciones',
+          'lista',
+          'rsvp',
+        ],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: ['decoraciÒ³n', 'flores', 'arreglos', 'centros de mesa', 'iluminaciÒ³n', 'ambientaciÒ³n'],
-        PAPELERIA: ['invitaciones', 'papelerÒ­a', 'save the date', 'tarjetas', 'programa', 'seating plan'],
+        DECORACION: [
+          'decoraciÒ³n',
+          'flores',
+          'arreglos',
+          'centros de mesa',
+          'iluminaciÒ³n',
+          'ambientaciÒ³n',
+        ],
+        PAPELERIA: [
+          'invitaciones',
+          'papelerÒ­a',
+          'save the date',
+          'tarjetas',
+          'programa',
+          'seating plan',
+        ],
         MUSICA: ['mÒºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
         FOTOGRAFO: ['fotografÒ­a', 'video', 'recuerdos', 'Ò¡lbum', 'sesiÒ³n'],
         VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÒ­a'],
       };
-      
+
       // Contar coincidencias por categorÒ­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
-        scores[cat] = palabras.filter(palabra => texto.includes(palabra)).length;
+        scores[cat] = palabras.filter((palabra) => texto.includes(palabra)).length;
       });
-      
+
       // Encontrar la categorÒ­a con mayor puntuaciÒ³n
       let maxScore = 0;
       let maxCat = 'OTROS';
@@ -262,7 +321,7 @@ export default function Tasks() {
           maxCat = cat;
         }
       });
-      
+
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
       console.error('Error al asignar categorÒ­a:', error);
@@ -278,43 +337,43 @@ export default function Tasks() {
         alert('Por favor ingresa un tÒ­tulo');
         return;
       }
-      
+
       if (!formData.startDate) {
         alert('Por favor selecciona una fecha de inicio');
         return;
       }
-      
+
       if (!formData.endDate) {
         alert('Por favor selecciona una fecha de fin');
         return;
       }
-      
+
       // Construir fechas completas
       const startDateStr = formData.startDate;
       const startTimeStr = formData.startTime || '00:00';
       const endDateStr = formData.endDate;
       const endTimeStr = formData.endTime || '23:59';
-      
+
       const startDate = new Date(`${startDateStr}T${startTimeStr}`);
       const endDate = new Date(`${endDateStr}T${endTimeStr}`);
-      
+
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         alert('Fechas no vÒ¡lidas');
         return;
       }
-      
+
       if (endDate < startDate) {
         alert('La fecha de fin debe ser posterior a la de inicio');
         return;
       }
-      
+
       // Asignar categorÒ­a con IA si no se especificÒ³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
       }
-      
+
       // Crear objeto de tarea/evento
       const taskData = {
         id: editingId || `task-${Date.now()}`,
@@ -323,9 +382,9 @@ export default function Tasks() {
         start: startDate,
         end: endDate,
         category: category,
-        ...(editingId ? {} : { createdAt: serverTimestamp() })
+        ...(editingId ? {} : { createdAt: serverTimestamp() }),
       };
-      
+
       // AÒ±adir/actualizar segÒºn sea una tarea de largo plazo o una reuniÒ³n
       if (formData.long) {
         // Para el diagrama Gantt
@@ -336,9 +395,9 @@ export default function Tasks() {
           type: 'task',
           isDisabled: false,
           dependencies: [],
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
         };
-        
+
         let savedId = editingId;
         if (editingId) {
           await updateTaskFS(editingId, ganttTask);
@@ -360,7 +419,11 @@ export default function Tasks() {
           const uid = auth?.currentUser?.uid;
           if (uid && db && (savedId || editingId)) {
             const mirrorId = savedId || editingId;
-            await setDoc(doc(db, 'users', uid, 'tasks', mirrorId), { ...ganttTask, id: mirrorId }, { merge: true });
+            await setDoc(
+              doc(db, 'users', uid, 'tasks', mirrorId),
+              { ...ganttTask, id: mirrorId },
+              { merge: true }
+            );
           }
         } catch (_) {}
       } else {
@@ -368,7 +431,7 @@ export default function Tasks() {
         let savedId = editingId;
         if (editingId) {
           // Buscar primero en tareas Gantt
-          if (tasksState.some(t => t.id === editingId)) {
+          if (tasksState.some((t) => t.id === editingId)) {
             await updateTaskFS(editingId, taskData);
           } else {
             await updateMeetingFS(editingId, taskData);
@@ -384,7 +447,11 @@ export default function Tasks() {
           if (uid && db) {
             const mirrorId = savedId || editingId || taskData.id;
             if (mirrorId) {
-              await setDoc(doc(db, 'users', uid, 'meetings', mirrorId), { ...taskData, id: mirrorId }, { merge: true });
+              await setDoc(
+                doc(db, 'users', uid, 'meetings', mirrorId),
+                { ...taskData, id: mirrorId },
+                { merge: true }
+              );
             }
           }
         } catch (_) {}
@@ -396,13 +463,17 @@ export default function Tasks() {
         if (activeWedding && finalId) {
           const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', finalId);
           if (formData.completed) {
-            await setDoc(compRef, { id: finalId, taskId: finalId, completedAt: serverTimestamp() }, { merge: true });
+            await setDoc(
+              compRef,
+              { id: finalId, taskId: finalId, completedAt: serverTimestamp() },
+              { merge: true }
+            );
           } else {
             await deleteDoc(compRef).catch(() => {});
           }
         }
       } catch (_) {}
-      
+
       // Cerrar modal y limpiar
       closeModal();
     } catch (error) {
@@ -428,7 +499,9 @@ export default function Tasks() {
       if (activeWedding && db) {
         ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
         ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'meetings', editingId)));
-        ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasksCompleted', editingId)).catch(() => {}));
+        ops.push(
+          deleteDoc(doc(db, 'weddings', activeWedding, 'tasksCompleted', editingId)).catch(() => {})
+        );
       }
       // Borrado espejo en users/{uid}/...
       try {
@@ -445,7 +518,9 @@ export default function Tasks() {
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
-      try { closeModal(); } catch (_) {}
+      try {
+        closeModal();
+      } catch (_) {}
     }
   };
 
@@ -455,11 +530,17 @@ export default function Tasks() {
 
   // FunciÒ³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
-  const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } = useSafeEvents(meetingsState);
+  const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } =
+    useSafeEvents(meetingsState);
 
   // Tareas Gantt normalizadas y acotadas
   const { uniqueGanttTasks } = useGanttNormalizedTasks(tasksState);
-  const ganttTasksBounded = useGanttBoundedTasks(uniqueGanttTasks, projectStart, projectEnd, meetingsState);
+  const ganttTasksBounded = useGanttBoundedTasks(
+    uniqueGanttTasks,
+    projectStart,
+    projectEnd,
+    meetingsState
+  );
 
   // Conjunto de tareas completadas (por id o por taskId)
   const completedIdSet = useMemo(() => {
@@ -476,20 +557,32 @@ export default function Tasks() {
   }, [completedDocs]);
 
   // Toggle rápido de completado (lista/fallback)
-  const toggleCompleteById = useCallback(async (id, nextCompleted) => {
-    try {
-      if (!activeWedding || !id) return;
-      const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', String(id));
-      if (nextCompleted) {
-        await setDoc(compRef, { id: String(id), taskId: String(id), completedAt: serverTimestamp() }, { merge: true });
-      } else {
-        await deleteDoc(compRef).catch(() => {});
-      }
-    } catch (_) {}
-  }, [activeWedding]);
+  const toggleCompleteById = useCallback(
+    async (id, nextCompleted) => {
+      try {
+        if (!activeWedding || !id) return;
+        const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', String(id));
+        if (nextCompleted) {
+          await setDoc(
+            compRef,
+            { id: String(id), taskId: String(id), completedAt: serverTimestamp() },
+            { merge: true }
+          );
+        } else {
+          await deleteDoc(compRef).catch(() => {});
+        }
+      } catch (_) {}
+    },
+    [activeWedding]
+  );
   const weddingMarkerDate = useMemo(() => {
     try {
-      const m = (Array.isArray(meetingsState) ? meetingsState : []).find(ev => ev?.id === 'wedding-day' || ev?.autoKey === 'wedding-day' || /boda/i.test(String(ev?.title || '')));
+      const m = (Array.isArray(meetingsState) ? meetingsState : []).find(
+        (ev) =>
+          ev?.id === 'wedding-day' ||
+          ev?.autoKey === 'wedding-day' ||
+          /boda/i.test(String(ev?.title || ''))
+      );
       if (m) {
         const any = m.start || m.date || m.when || m.end;
         if (any) {
@@ -520,7 +613,7 @@ export default function Tasks() {
     ganttViewMode,
     setGanttViewMode,
   });
-  
+
   // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÒ³n// CÒ¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
@@ -529,21 +622,29 @@ export default function Tasks() {
     if (!activeWedding || !db) return;
     try {
       const ref = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      const unsub = onSnapshot(ref, (snap) => {
+      const unsub = onSnapshot(
+        ref,
+        (snap) => {
+          try {
+            const info = snap.exists() ? snap.data() || {} : {};
+            let raw = info?.weddingDate || info?.date || null;
+            let wDate = null;
+            if (raw) {
+              wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+            }
+            if (wDate && !isNaN(wDate.getTime())) {
+              setProjectEnd(wDate);
+              setProjectStart(addMonths(wDate, -6));
+            }
+          } catch (_) {}
+        },
+        () => {}
+      );
+      return () => {
         try {
-          const info = snap.exists() ? (snap.data() || {}) : {};
-          let raw = info?.weddingDate || info?.date || null;
-          let wDate = null;
-          if (raw) {
-            wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
-          }
-          if (wDate && !isNaN(wDate.getTime())) {
-            setProjectEnd(wDate);
-            setProjectStart(addMonths(wDate, -6));
-          }
+          unsub && unsub();
         } catch (_) {}
-      }, () => {});
-      return () => { try { unsub && unsub(); } catch (_) {} };
+      };
     } catch (_) {}
   }, [activeWedding]);
 
@@ -553,8 +654,24 @@ export default function Tasks() {
       try {
         if (!activeWedding || !db) return;
         if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
-        const start = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), projectEnd.getDate(), 12, 0, 0, 0);
-        const end = new Date(projectEnd.getFullYear(), projectEnd.getMonth(), projectEnd.getDate(), 14, 0, 0, 0);
+        const start = new Date(
+          projectEnd.getFullYear(),
+          projectEnd.getMonth(),
+          projectEnd.getDate(),
+          12,
+          0,
+          0,
+          0
+        );
+        const end = new Date(
+          projectEnd.getFullYear(),
+          projectEnd.getMonth(),
+          projectEnd.getDate(),
+          14,
+          0,
+          0,
+          0
+        );
         const ref = doc(db, 'weddings', activeWedding, 'meetings', 'wedding-day');
         const snap = await getDoc(ref).catch(() => null);
         const prev = snap && snap.exists() ? snap.data() : null;
@@ -567,9 +684,12 @@ export default function Tasks() {
           end,
           createdAt: prev?.createdAt || serverTimestamp(),
         };
-        const same = prev && prev.start && prev.end &&
-          (new Date(prev.start).getTime() === start.getTime()) &&
-          (new Date(prev.end).getTime() === end.getTime());
+        const same =
+          prev &&
+          prev.start &&
+          prev.end &&
+          new Date(prev.start).getTime() === start.getTime() &&
+          new Date(prev.end).getTime() === end.getTime();
         if (!same) await setDoc(ref, next, { merge: true });
       } catch (_) {}
     })();
@@ -577,9 +697,14 @@ export default function Tasks() {
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
-      
-      <TasksHeader syncStatus={syncStatus} onNewTask={() => { resetForm(); setShowNewTask(true); }} />
-      
+      <TasksHeader
+        syncStatus={syncStatus}
+        onNewTask={() => {
+          resetForm();
+          setShowNewTask(true);
+        }}
+      />
+
       {/* Componente para el diagrama Gantt */}
       <LongTermTasksGantt
         containerRef={ganttContainerRef}
@@ -672,11 +797,11 @@ export default function Tasks() {
           />
         </div>
       </div>
-{/* Modal para nueva tarea */}
+      {/* Modal para nueva tarea */}
       {showNewTask && (
-        <TaskForm 
-          formData={formData} 
-          editingId={editingId} 
+        <TaskForm
+          formData={formData}
+          editingId={editingId}
           handleChange={handleChange}
           handleSaveTask={handleSaveTask}
           handleDeleteTask={handleDeleteTask}
@@ -684,31 +809,6 @@ export default function Tasks() {
           setFormData={setFormData}
         />
       )}
-
-      </div>
-   );
+    </div>
+  );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

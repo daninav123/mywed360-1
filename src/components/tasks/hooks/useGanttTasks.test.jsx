@@ -1,6 +1,7 @@
+import { render } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+
 import { useGanttNormalizedTasks, useGanttBoundedTasks } from './useGanttTasks';
 
 function GanttTest({ tasks, start, end, meetings, onResult }) {
@@ -35,4 +36,3 @@ describe('useGanttTasks', () => {
     expect(results.bounded.length).toBeGreaterThanOrEqual(2);
   });
 });
-

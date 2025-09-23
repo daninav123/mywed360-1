@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, Box, Tabs, Tab, Button, TextField, Switch, FormControlLabel, Divider, Alert } from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SaveIcon from '@mui/icons-material/Save';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Tabs,
+  Tab,
+  Button,
+  TextField,
+  Switch,
+  FormControlLabel,
+  Divider,
+  Alert,
+} from '@mui/material';
+import React, { useState, useEffect } from 'react';
 
 /**
  * Componente de configuración del sistema para administradores
  * Permite gestionar parámetros globales de la aplicación
- * 
+ *
  * @component
  * @example
  * ```jsx
@@ -18,7 +31,7 @@ function SystemSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(null);
-  
+
   // Estados para las diferentes configuraciones
   const [generalSettings, setGeneralSettings] = useState({
     siteName: 'MyWed360',
@@ -50,7 +63,7 @@ function SystemSettings() {
     twoFactorAuthDefault: false,
     ipWhitelist: '',
   });
-  
+
   // Manejo de cambios en las pestañas
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -61,7 +74,7 @@ function SystemSettings() {
     const { name, value, type, checked } = e.target;
     setGeneralSettings({
       ...generalSettings,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -69,7 +82,7 @@ function SystemSettings() {
     const { name, value, type, checked } = e.target;
     setEmailSettings({
       ...emailSettings,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -77,7 +90,7 @@ function SystemSettings() {
     const { name, value, type, checked } = e.target;
     setSecuritySettings({
       ...securitySettings,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -90,10 +103,10 @@ function SystemSettings() {
     // Simular una llamada API
     setTimeout(() => {
       setIsSaving(false);
-      
+
       // Simulamos éxito (en producción esto sería una llamada a la API)
       setSaveSuccess(true);
-      
+
       // Resetear el mensaje de éxito después de 3 segundos
       setTimeout(() => {
         setSaveSuccess(false);
@@ -103,20 +116,22 @@ function SystemSettings() {
 
   return (
     <div className="p-6">
-      <Typography variant="h4" className="mb-6">Configuración del Sistema</Typography>
-      
+      <Typography variant="h4" className="mb-6">
+        Configuración del Sistema
+      </Typography>
+
       {saveSuccess && (
         <Alert severity="success" className="mb-4">
           Configuración guardada correctamente
         </Alert>
       )}
-      
+
       {saveError && (
         <Alert severity="error" className="mb-4">
           Error al guardar la configuración: {saveError}
         </Alert>
       )}
-      
+
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={activeTab} onChange={handleTabChange} aria-label="configuración del sistema">
           <Tab label="General" />
@@ -124,14 +139,14 @@ function SystemSettings() {
           <Tab label="Seguridad" />
         </Tabs>
       </Box>
-      
+
       {/* Panel General */}
       {activeTab === 0 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
             <Typography variant="h6">Configuración General</Typography>
             <Divider />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
                 label="Nombre del Sitio"
@@ -141,7 +156,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Descripción del Sitio"
                 name="siteDescription"
@@ -150,7 +165,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Tamaño máximo de archivos (MB)"
                 name="maxUploadSize"
@@ -160,7 +175,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Tipos de archivos permitidos"
                 name="allowedFileTypes"
@@ -170,7 +185,7 @@ function SystemSettings() {
                 variant="outlined"
                 helperText="Separados por comas, ej: .jpg,.png,.pdf"
               />
-              
+
               <TextField
                 label="Email de Contacto"
                 name="contactEmail"
@@ -179,7 +194,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
                 <FormControlLabel
                   control={
@@ -191,7 +206,7 @@ function SystemSettings() {
                   }
                   label="Permitir registro de usuarios"
                 />
-                
+
                 <FormControlLabel
                   control={
                     <Switch
@@ -207,14 +222,14 @@ function SystemSettings() {
           </CardContent>
         </Card>
       )}
-      
+
       {/* Panel de Email */}
       {activeTab === 1 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
             <Typography variant="h6">Configuración de Correo Electrónico</Typography>
             <Divider />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
                 label="Dominio de email predeterminado"
@@ -224,7 +239,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Servidor SMTP"
                 name="smtpServer"
@@ -233,7 +248,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Puerto SMTP"
                 name="smtpPort"
@@ -243,7 +258,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <div className="flex items-center">
                 <FormControlLabel
                   control={
@@ -256,7 +271,7 @@ function SystemSettings() {
                   label="Usar SSL"
                 />
               </div>
-              
+
               <TextField
                 label="Usuario SMTP"
                 name="smtpUsername"
@@ -265,7 +280,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Contraseña SMTP"
                 name="smtpPassword"
@@ -275,7 +290,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Emails por hora"
                 name="emailsPerHour"
@@ -286,7 +301,7 @@ function SystemSettings() {
                 variant="outlined"
                 helperText="Límite para evitar bloqueos por spam"
               />
-              
+
               <TextField
                 label="Tamaño máximo de adjuntos (MB)"
                 name="maxAttachmentSize"
@@ -296,7 +311,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Firma predeterminada"
                 name="defaultSignature"
@@ -312,14 +327,14 @@ function SystemSettings() {
           </CardContent>
         </Card>
       )}
-      
+
       {/* Panel de Seguridad */}
       {activeTab === 2 && (
         <Card className="mt-4">
           <CardContent className="space-y-4">
             <Typography variant="h6">Configuración de Seguridad</Typography>
             <Divider />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <TextField
                 label="Tiempo de sesión (minutos)"
@@ -331,7 +346,7 @@ function SystemSettings() {
                 variant="outlined"
                 helperText="0 = sin límite"
               />
-              
+
               <TextField
                 label="Máximo de intentos de login"
                 name="maxLoginAttempts"
@@ -342,7 +357,7 @@ function SystemSettings() {
                 variant="outlined"
                 helperText="Bloqueo temporal después de X intentos"
               />
-              
+
               <TextField
                 label="Tiempo de validez para reset de contraseña (horas)"
                 name="passwordResetTimeHours"
@@ -352,7 +367,7 @@ function SystemSettings() {
                 fullWidth
                 variant="outlined"
               />
-              
+
               <TextField
                 label="Lista blanca de IPs"
                 name="ipWhitelist"
@@ -362,7 +377,7 @@ function SystemSettings() {
                 variant="outlined"
                 helperText="Separadas por comas, vacío = permitir todas"
               />
-              
+
               <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
                 <FormControlLabel
                   control={
@@ -374,7 +389,7 @@ function SystemSettings() {
                   }
                   label="Requerir contraseñas seguras"
                 />
-                
+
                 <FormControlLabel
                   control={
                     <Switch
@@ -390,18 +405,14 @@ function SystemSettings() {
           </CardContent>
         </Card>
       )}
-      
+
       <div className="flex justify-end mt-6 space-x-4">
-        <Button 
-          variant="outlined" 
-          color="secondary"
-          startIcon={<RefreshIcon />}
-        >
+        <Button variant="outlined" color="secondary" startIcon={<RefreshIcon />}>
           Restaurar Valores
         </Button>
-        
-        <Button 
-          variant="contained" 
+
+        <Button
+          variant="contained"
           color="primary"
           startIcon={<SaveIcon />}
           onClick={handleSaveSettings}

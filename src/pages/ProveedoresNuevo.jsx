@@ -1,32 +1,33 @@
-﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Card from "../components/ui/Card";
-import Button from "../components/ui/Button";
-import { Plus, Sparkles } from "lucide-react";
-import PageTabs from "../components/ui/PageTabs";
+﻿import { Plus, Sparkles } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
+
+import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
+import AISearchModal from '../components/proveedores/ai/AISearchModal';
+import BulkStatusModal from '../components/proveedores/BulkStatusModal';
+import CompareSelectedModal from '../components/proveedores/CompareSelectedModal';
+import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorModal';
+import ProveedorCard from '../components/proveedores/ProveedorCard';
+import ProveedorForm from '../components/proveedores/ProveedorForm';
+import ProveedorList from '../components/proveedores/ProveedorList';
+import ReservationModal from '../components/proveedores/ReservationModal';
+import SupplierOnboardingModal from '../components/proveedores/SupplierOnboardingModal';
+import TrackingModal from '../components/proveedores/tracking/TrackingModal';
+import WantedServicesModal from '../components/proveedores/WantedServicesModal';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import PageTabs from '../components/ui/PageTabs';
 
 // Componentes
-import ProveedorList from "../components/proveedores/ProveedorList";
-import CompareSelectedModal from "../components/proveedores/CompareSelectedModal";
-import SupplierOnboardingModal from "../components/proveedores/SupplierOnboardingModal";
-import ProveedorCard from "../components/proveedores/ProveedorCard";
-import ProveedorForm from "../components/proveedores/ProveedorForm";
-import ReservationModal from "../components/proveedores/ReservationModal";
-import AISearchModal from "../components/proveedores/ai/AISearchModal";
-import AIEmailModal from "../components/proveedores/ai/AIEmailModal";
-import TrackingModal from "../components/proveedores/tracking/TrackingModal";
-import BulkStatusModal from "../components/proveedores/BulkStatusModal";
-import DuplicateDetectorModal from "../components/proveedores/DuplicateDetectorModal";
-import WantedServicesModal from "../components/proveedores/WantedServicesModal";
 
 // Hooks
-import useProveedores from "../hooks/useProveedores";
-import useAISearch from "../hooks/useAISearch";
-import { useAuth } from "../hooks/useAuth";
-import useSupplierGroups from "../hooks/useSupplierGroups";
-import useActiveWeddingInfo from "../hooks/useActiveWeddingInfo";
-import { loadData, saveData } from "../services/SyncService";
-import { toast } from "react-toastify";
-import { useWedding } from "../context/WeddingContext";
+import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import useAISearch from '../hooks/useAISearch';
+import { useAuth } from '../hooks/useAuth';
+import useProveedores from '../hooks/useProveedores';
+import useSupplierGroups from '../hooks/useSupplierGroups';
+import { loadData, saveData } from '../services/SyncService';
 
 const Proveedores = () => {
   const {
@@ -81,7 +82,7 @@ const Proveedores = () => {
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [showAIEmailModal, setShowAIEmailModal] = useState(false);
   const [aiSelectedResult, setAiSelectedResult] = useState(null);
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState('info');
   const [showBulkStatus, setShowBulkStatus] = useState(false);
   const [showDupModal, setShowDupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -125,8 +126,8 @@ const Proveedores = () => {
         if (sortMode === 'name') {
           return collator.compare(a.name || '', b.name || '');
         }
-        const am = Number.isFinite(a.aiMatch) ? a.aiMatch : (Number.isFinite(a.match) ? a.match : 0);
-        const bm = Number.isFinite(b.aiMatch) ? b.aiMatch : (Number.isFinite(b.match) ? b.match : 0);
+        const am = Number.isFinite(a.aiMatch) ? a.aiMatch : Number.isFinite(a.match) ? a.match : 0;
+        const bm = Number.isFinite(b.aiMatch) ? b.aiMatch : Number.isFinite(b.match) ? b.match : 0;
         if (bm !== am) return bm - am;
         return collator.compare(a.name || '', b.name || '');
       });
@@ -170,10 +171,10 @@ const Proveedores = () => {
   const onboardingKey = useMemo(() => {
     if (typeof window === 'undefined') return null;
     if (activeWedding) return 'supplier_onboarding_done_' + activeWedding;
-    if (user?.uid) return 'supplier_onboarding_done_user_' + (user?.uid);
+    if (user?.uid) return 'supplier_onboarding_done_user_' + user?.uid;
     return null;
   }, [activeWedding, user?.uid]);
-const markOnboardingDone = useCallback(() => {
+  const markOnboardingDone = useCallback(() => {
     if (typeof window !== 'undefined' && onboardingKey) {
       localStorage.setItem(onboardingKey, '1');
     }
@@ -182,7 +183,7 @@ const markOnboardingDone = useCallback(() => {
   const saveWanted = async (list) => {
     setWantedServices(list);
     try {
-      await saveData("wantedServices", list, {
+      await saveData('wantedServices', list, {
         docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
         showNotification: false,
       });
@@ -222,7 +223,7 @@ const markOnboardingDone = useCallback(() => {
     let cancelled = false;
     (async () => {
       try {
-        const data = await loadData("wantedServices", {
+        const data = await loadData('wantedServices', {
           docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
           fallbackToLocal: true,
         });
@@ -234,13 +235,12 @@ const markOnboardingDone = useCallback(() => {
     };
   }, [activeWedding]);
 
-
   const missingServices = useMemo(() => {
     const confirmed = new Set(
       (providers || [])
-        .filter((p) => ["Confirmado", "Seleccionado"].includes(p.status))
+        .filter((p) => ['Confirmado', 'Seleccionado'].includes(p.status))
         .map((p) => p.service)
-        .filter(Boolean),
+        .filter(Boolean)
     );
     return normalizedWanted.filter((s) => !confirmed.has(s.name || s.id));
   }, [providers, normalizedWanted]);
@@ -248,7 +248,7 @@ const markOnboardingDone = useCallback(() => {
   // Handlers
   const handleViewDetail = (provider) => {
     setSelectedProvider(provider);
-    setActiveTab("info");
+    setActiveTab('info');
   };
   const handleNewProvider = () => setShowNewProviderForm(true);
   const handleEditProvider = () => setShowEditProviderForm(true);
@@ -273,64 +273,78 @@ const markOnboardingDone = useCallback(() => {
     setShowDupModal(true);
   };
 
-  const mapAIResultToProvider = useCallback((result, overrides = {}) => {
-    if (!result) return null;
-    const baseName = (result.name || result.title || 'Proveedor sugerido').trim();
-    const serviceName = (result.service || serviceFilter || 'Servicio para bodas').trim();
-    const sanitize = (value) =>
-      value.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^[.]+|[.]+$/g, '');
-    const fallbackEmail = result.email || (baseName ? `${sanitize(baseName)}@contacto.pro` : '');
-    const normalized = {
-      name: baseName,
-      service: serviceName,
-      contact: result.contact || '',
-      email: fallbackEmail,
-      phone: result.phone || '',
-      status: 'Pendiente',
-      snippet: result.snippet || result.aiSummary || '',
-      link: result.link || '',
-      image: result.image || '',
-      priceRange: result.priceRange || result.price || '',
-      location: result.location || '',
-      rating: result.rating || 0,
-      ratingCount: result.ratingCount || 0,
-      aiMatch: result.match || 0,
-      aiSummary: result.aiSummary || '',
-      tags: Array.isArray(result.tags) ? result.tags : [],
-      source: 'ai-search',
-      createdFromAI: true,
-    };
-    return { ...normalized, ...overrides };
-  }, [serviceFilter]);
+  const mapAIResultToProvider = useCallback(
+    (result, overrides = {}) => {
+      if (!result) return null;
+      const baseName = (result.name || result.title || 'Proveedor sugerido').trim();
+      const serviceName = (result.service || serviceFilter || 'Servicio para bodas').trim();
+      const sanitize = (value) =>
+        value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '.')
+          .replace(/^[.]+|[.]+$/g, '');
+      const fallbackEmail = result.email || (baseName ? `${sanitize(baseName)}@contacto.pro` : '');
+      const normalized = {
+        name: baseName,
+        service: serviceName,
+        contact: result.contact || '',
+        email: fallbackEmail,
+        phone: result.phone || '',
+        status: 'Pendiente',
+        snippet: result.snippet || result.aiSummary || '',
+        link: result.link || '',
+        image: result.image || '',
+        priceRange: result.priceRange || result.price || '',
+        location: result.location || '',
+        rating: result.rating || 0,
+        ratingCount: result.ratingCount || 0,
+        aiMatch: result.match || 0,
+        aiSummary: result.aiSummary || '',
+        tags: Array.isArray(result.tags) ? result.tags : [],
+        source: 'ai-search',
+        createdFromAI: true,
+      };
+      return { ...normalized, ...overrides };
+    },
+    [serviceFilter]
+  );
 
   const handleAISelect = useCallback(
     async (result, action) => {
       if (!result) return;
-      if (action === "view") {
+      if (action === 'view') {
         const normalized = mapAIResultToProvider(result);
         if (normalized) {
           setSelectedProvider(normalized);
-          setActiveTab("info");
+          setActiveTab('info');
         }
         setShowAISearchModal(false);
-      } else if (action === "add") {
+      } else if (action === 'add') {
         const normalized = mapAIResultToProvider(result);
         if (normalized) {
           await addProvider(normalized);
         }
         setShowAISearchModal(false);
-      } else if (action === "select") {
-        const normalized = mapAIResultToProvider(result, { status: "Seleccionado" });
+      } else if (action === 'select') {
+        const normalized = mapAIResultToProvider(result, { status: 'Seleccionado' });
         if (normalized) {
           await addProvider(normalized);
         }
         setShowAISearchModal(false);
-      } else if (action === "email") {
+      } else if (action === 'email') {
         setAiSelectedResult(result);
         setShowAIEmailModal(true);
       }
     },
-    [mapAIResultToProvider, addProvider, setActiveTab, setSelectedProvider, setShowAISearchModal, setAiSelectedResult, setShowAIEmailModal]
+    [
+      mapAIResultToProvider,
+      addProvider,
+      setActiveTab,
+      setSelectedProvider,
+      setShowAISearchModal,
+      setAiSelectedResult,
+      setShowAIEmailModal,
+    ]
   );
 
   const handleSubmitProvider = async (providerData) => {
@@ -344,14 +358,11 @@ const markOnboardingDone = useCallback(() => {
   };
 
   const handleSubmitReservation = async (reservationData) => {
-    if (
-      selectedProvider &&
-      !["Confirmado", "Seleccionado"].includes(selectedProvider.status)
-    ) {
+    if (selectedProvider && !['Confirmado', 'Seleccionado'].includes(selectedProvider.status)) {
       await addReservation(selectedProvider.id, reservationData);
       await updateProvider(selectedProvider.id, {
         ...selectedProvider,
-        status: "Contactado",
+        status: 'Contactado',
         date: reservationData.date,
       });
     }
@@ -385,9 +396,9 @@ const markOnboardingDone = useCallback(() => {
           value={tab}
           onChange={setTab}
           options={[
-            { id: "contratados", label: "Contratados" },
-            { id: "buscados", label: "Buscados" },
-            { id: "favoritos", label: "Favoritos" },
+            { id: 'contratados', label: 'Contratados' },
+            { id: 'buscados', label: 'Buscados' },
+            { id: 'favoritos', label: 'Favoritos' },
           ]}
         />
         {tab === 'buscados' && (
@@ -474,15 +485,15 @@ const markOnboardingDone = useCallback(() => {
           <span className="text-muted">Ordenar por:</span>
           <button
             type="button"
-            onClick={() => setSortMode("match")}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === "match" ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]" : "border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"}`}
+            onClick={() => setSortMode('match')}
+            className={`px-2 py-1 rounded border text-xs ${sortMode === 'match' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
           >
             Puntuacion IA
           </button>
           <button
             type="button"
-            onClick={() => setSortMode("name")}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === "name" ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]" : "border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10"}`}
+            onClick={() => setSortMode('name')}
+            className={`px-2 py-1 rounded border text-xs ${sortMode === 'name' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
           >
             Nombre
           </button>
@@ -502,7 +513,7 @@ const markOnboardingDone = useCallback(() => {
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {/* Placeholders de servicios faltantes */}
-          {tab === "contratados" && missingServices.length > 0 && (
+          {tab === 'contratados' && missingServices.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {missingServices.map((s) => (
                 <Card key={s.id || s.name} className="opacity-60 border-dashed">
@@ -533,7 +544,7 @@ const markOnboardingDone = useCallback(() => {
           )}
 
           {/* Lista de proveedores con filtros */}
-          {tab === "buscados" ? (
+          {tab === 'buscados' ? (
             <div className="space-y-6">
               {groupedByService.keys.map((svc) => (
                 <div key={svc}>
@@ -546,7 +557,7 @@ const markOnboardingDone = useCallback(() => {
                   >
                     <span className="text-lg font-semibold">{svc}</span>
                     <span className="text-xs text-muted">
-                      {expandedGroups?.[svc] === false ? "(mostrar)" : "(ocultar)"}
+                      {expandedGroups?.[svc] === false ? '(mostrar)' : '(ocultar)'}
                     </span>
                   </button>
                   {expandedGroups?.[svc] === false ? null : (
@@ -592,7 +603,6 @@ const markOnboardingDone = useCallback(() => {
               onClearSelection={clearSelection}
             />
           )}
-
         </div>
       )}
 
@@ -645,7 +655,7 @@ const markOnboardingDone = useCallback(() => {
             setAiSelectedResult(null);
           }}
           aiResult={aiSelectedResult}
-          searchQuery={aiLastQuery || ""}
+          searchQuery={aiLastQuery || ''}
         />
       )}
 
@@ -688,10 +698,7 @@ const markOnboardingDone = useCallback(() => {
           const primary = group.find((x) => x.id === primaryId) || group[0];
           const others = group.filter((x) => x.id !== primary.id);
           const aliases = Array.from(
-            new Set([
-              ...(primary.aliases || []),
-              ...others.map((o) => o.email).filter(Boolean),
-            ]),
+            new Set([...(primary.aliases || []), ...others.map((o) => o.email).filter(Boolean)])
           );
           await updateProvider(primary.id, { ...primary, aliases });
           for (const o of others) {
@@ -729,11 +736,3 @@ const markOnboardingDone = useCallback(() => {
 };
 
 export default Proveedores;
-
-
-
-
-
-
-
-

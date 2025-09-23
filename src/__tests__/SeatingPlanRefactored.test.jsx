@@ -3,8 +3,8 @@
  * Valida la integración y funcionalidad de los componentes modulares
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 // La importación del componente bajo prueba debe ir DESPUÉS de configurar los mocks
 
 // Mock de dependencias
@@ -41,7 +41,7 @@ vi.mock('../hooks/useSeatingPlan', () => {
     generateBanquetLayout: vi.fn(),
     exportPNG: vi.fn(),
     exportPDF: vi.fn(),
-    saveHallDimensions: vi.fn()
+    saveHallDimensions: vi.fn(),
   }));
   return { useSeatingPlan: mockFn };
 });
@@ -52,7 +52,7 @@ vi.mock('../components/seating/SeatingPlanTabs', () => ({
       <button onClick={() => onTabChange('ceremony')}>Ceremonia</button>
       <button onClick={() => onTabChange('banquet')}>Banquete</button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../components/seating/SeatingPlanToolbar', () => ({
@@ -62,7 +62,7 @@ vi.mock('../components/seating/SeatingPlanToolbar', () => ({
       <button onClick={onRedo}>Rehacer</button>
       <button onClick={onExportPNG}>Exportar PNG</button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../components/seating/SeatingPlanCanvas', () => ({
@@ -70,7 +70,7 @@ vi.mock('../components/seating/SeatingPlanCanvas', () => ({
     <div data-testid="seating-plan-canvas">
       <button onClick={() => onSelectTable(1)}>Seleccionar Mesa 1</button>
     </div>
-  )
+  ),
 }));
 
 vi.mock('../components/seating/SeatingPlanSidebar', () => ({
@@ -78,11 +78,11 @@ vi.mock('../components/seating/SeatingPlanSidebar', () => ({
     <div data-testid="seating-plan-sidebar">
       {selectedTable ? `Mesa ${selectedTable.id}` : 'Sin selección'}
     </div>
-  )
+  ),
 }));
 
 vi.mock('../components/seating/SeatingPlanModals', () => ({
-  default: () => <div data-testid="seating-plan-modals" />
+  default: () => <div data-testid="seating-plan-modals" />,
 }));
 
 import SeatingPlanRefactored from '../components/seating/SeatingPlanRefactored';
@@ -113,7 +113,7 @@ describe('SeatingPlanRefactored Component', () => {
 
     const tabs = screen.getAllByTestId('seating-plan-tabs')[0];
     const toolbar = screen.getAllByTestId('seating-plan-toolbar')[0];
-    
+
     expect(tabs).not.toBeNull();
     expect(toolbar).not.toBeNull();
   });
@@ -123,7 +123,7 @@ describe('SeatingPlanRefactored Component', () => {
 
     const canvas = screen.getAllByTestId('seating-plan-canvas')[0];
     const sidebar = screen.getAllByTestId('seating-plan-sidebar')[0];
-    
+
     expect(canvas).not.toBeNull();
     expect(sidebar).not.toBeNull();
   });

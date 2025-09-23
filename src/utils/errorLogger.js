@@ -13,7 +13,7 @@ class ErrorLogger {
       mailgun: { status: 'unknown', details: null },
       environment: { status: 'unknown', details: null },
       auth: { status: 'unknown', details: null },
-      wedding: { status: 'unknown', details: null }
+      wedding: { status: 'unknown', details: null },
     };
     this.isInitialized = false;
     this.setupGlobalErrorHandlers();
@@ -31,7 +31,7 @@ class ErrorLogger {
         filename: event.filename,
         lineno: event.lineno,
         colno: event.colno,
-        error: event.error?.stack || event.error
+        error: event.error?.stack || event.error,
       });
     });
 
@@ -39,7 +39,7 @@ class ErrorLogger {
     window.addEventListener('unhandledrejection', (event) => {
       this.logError('Unhandled Promise Rejection', {
         reason: event.reason,
-        stack: event.reason?.stack || 'No stack trace available'
+        stack: event.reason?.stack || 'No stack trace available',
       });
     });
 
@@ -58,10 +58,12 @@ class ErrorLogger {
         const response = await originalFetch(...args);
         if (!response.ok) {
           try {
-            const reqUrl = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+            const reqUrl = typeof args[0] === 'string' ? args[0] : args[0]?.url || '';
             const method = args[1]?.method || 'GET';
-            const isPublicWeddingCheck = method === 'GET' && reqUrl.includes('/api/public/weddings/');
-            const isBenignAsset404 = response.status === 404 && /\/logo\.png(\?|$)/.test(reqUrl || '');
+            const isPublicWeddingCheck =
+              method === 'GET' && reqUrl.includes('/api/public/weddings/');
+            const isBenignAsset404 =
+              response.status === 404 && /\/logo\.png(\?|$)/.test(reqUrl || '');
             // Silenciar 404/403 esperados por comprobación de slug público y assets benignos
             if (isPublicWeddingCheck && (response.status === 404 || response.status === 403)) {
               return response;
@@ -74,7 +76,7 @@ class ErrorLogger {
             url: args[0],
             status: response.status,
             statusText: response.statusText,
-            method: args[1]?.method || 'GET'
+            method: args[1]?.method || 'GET',
           });
         }
         return response;
@@ -82,7 +84,7 @@ class ErrorLogger {
         this.logError('Network Error', {
           url: args[0],
           error: error.message,
-          stack: error.stack
+          stack: error.stack,
         });
         throw error;
       }
@@ -99,11 +101,11 @@ class ErrorLogger {
       type,
       details,
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     };
 
     this.errors.push(errorEntry);
-    
+
     // Mantener solo los últimos 100 errores para evitar memory leaks
     if (this.errors.length > 100) {
       this.errors = this.errors.slice(-100);
@@ -146,7 +148,11 @@ class ErrorLogger {
         if (urlStr.includes('firestore') || urlStr.includes('firebase')) {
           this.diagnostics.firebase.status = 'error';
           this.diagnostics.firebase.details = details;
-        } else if (urlStr.includes('render.com') || urlStr.includes('localhost:3001') || urlStr.includes('localhost:4004')) {
+        } else if (
+          urlStr.includes('render.com') ||
+          urlStr.includes('localhost:3001') ||
+          urlStr.includes('localhost:4004')
+        ) {
           this.diagnostics.backend.status = 'error';
           this.diagnostics.backend.details = details;
         } else if (urlStr.includes('openai') || urlStr.includes('api.openai.com')) {
@@ -180,7 +186,10 @@ class ErrorLogger {
     if (info && info.activeWedding) {
       this.diagnostics.wedding = { status: 'success', details: info };
     } else {
-      this.diagnostics.wedding = { status: 'warning', details: info || { message: 'Sin boda activa' } };
+      this.diagnostics.wedding = {
+        status: 'warning',
+        details: info || { message: 'Sin boda activa' },
+      };
     }
   }
 
@@ -189,13 +198,13 @@ class ErrorLogger {
    */
   async startDiagnostics() {
     console.log('🔍 Iniciando diagnósticos del sistema...');
-    
+
     await Promise.all([
       this.checkEnvironmentVariables(),
       this.checkFirebaseConnection(),
       this.checkBackendConnection(),
       this.checkOpenAIConnection(),
-      this.checkMailgunConnection()
+      this.checkMailgunConnection(),
     ]);
 
     this.isInitialized = true;
@@ -212,13 +221,13 @@ class ErrorLogger {
         'VITE_FIREBASE_PROJECT_ID',
         'VITE_OPENAI_API_KEY',
         'VITE_MAILGUN_API_KEY',
-        'VITE_BACKEND_BASE_URL'
+        'VITE_BACKEND_BASE_URL',
       ];
 
       const missing = [];
       const present = [];
 
-      requiredVars.forEach(varName => {
+      requiredVars.forEach((varName) => {
         const value = import.meta.env[varName];
         if (!value || value === 'undefined' || value === '') {
           missing.push(varName);
@@ -234,14 +243,13 @@ class ErrorLogger {
           present,
           total: requiredVars.length,
           mode: import.meta.env.MODE,
-          dev: import.meta.env.DEV
-        }
+          dev: import.meta.env.DEV,
+        },
       };
-
     } catch (error) {
       this.diagnostics.environment = {
         status: 'error',
-        details: { error: error.message }
+        details: { error: error.message },
       };
     }
   }
@@ -254,26 +262,30 @@ class ErrorLogger {
       // Importar dinámicamente para evitar errores de inicialización
       const { getFirestore, doc, getDoc, setDoc } = await import('firebase/firestore');
       const { getAuth } = await import('firebase/auth');
-      
+
       const db = getFirestore();
       const auth = getAuth();
 
       // Intentar operación en colección pública primero
       try {
         const testDoc = doc(db, '_conexion_prueba', 'diagnostic');
-        await setDoc(testDoc, { 
-          timestamp: new Date().toISOString(),
-          source: 'diagnostic-system'
-        }, { merge: true });
-        
+        await setDoc(
+          testDoc,
+          {
+            timestamp: new Date().toISOString(),
+            source: 'diagnostic-system',
+          },
+          { merge: true }
+        );
+
         this.diagnostics.firebase = {
           status: 'success',
           details: {
             projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
             authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
             currentUser: auth.currentUser?.uid || 'No authenticated user',
-            connection: 'OK - Public collection accessible'
-          }
+            connection: 'OK - Public collection accessible',
+          },
         };
         return;
       } catch (publicError) {
@@ -281,29 +293,28 @@ class ErrorLogger {
         if (auth.currentUser) {
           const userDoc = doc(db, 'users', auth.currentUser.uid);
           await getDoc(userDoc);
-          
+
           this.diagnostics.firebase = {
             status: 'success',
             details: {
               projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
               authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
               currentUser: auth.currentUser.uid,
-              connection: 'OK - Authenticated access'
-            }
+              connection: 'OK - Authenticated access',
+            },
           };
         } else {
           throw new Error('No authenticated user and public access failed');
         }
       }
-
     } catch (error) {
       this.diagnostics.firebase = {
         status: 'error',
         details: {
           error: error.message,
           code: error.code,
-          stack: error.stack
-        }
+          stack: error.stack,
+        },
       };
     }
   }
@@ -321,8 +332,8 @@ class ErrorLogger {
       const response = await fetch(`${backendUrl}/health`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -332,20 +343,19 @@ class ErrorLogger {
           details: {
             url: backendUrl,
             response: data,
-            status: response.status
-          }
+            status: response.status,
+          },
         };
       } else {
         throw new Error(`Backend respondió con status ${response.status}`);
       }
-
     } catch (error) {
       this.diagnostics.backend = {
         status: 'error',
         details: {
           error: error.message,
-          url: import.meta.env.VITE_BACKEND_BASE_URL
-        }
+          url: import.meta.env.VITE_BACKEND_BASE_URL,
+        },
       };
     }
   }
@@ -363,9 +373,9 @@ class ErrorLogger {
       // Test simple de la API de OpenAI
       const response = await fetch('https://api.openai.com/v1/models', {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
       });
 
       if (response.ok) {
@@ -373,20 +383,19 @@ class ErrorLogger {
           status: 'success',
           details: {
             apiKeyPrefix: apiKey.substring(0, 10) + '...',
-            status: response.status
-          }
+            status: response.status,
+          },
         };
       } else {
         throw new Error(`OpenAI API respondió con status ${response.status}`);
       }
-
     } catch (error) {
       this.diagnostics.openai = {
         status: 'error',
         details: {
           error: error.message,
-          hasApiKey: !!import.meta.env.VITE_OPENAI_API_KEY
-        }
+          hasApiKey: !!import.meta.env.VITE_OPENAI_API_KEY,
+        },
       };
     }
   }
@@ -398,7 +407,7 @@ class ErrorLogger {
     try {
       const apiKey = import.meta.env.VITE_MAILGUN_API_KEY;
       const domain = import.meta.env.VITE_MAILGUN_DOMAIN;
-      
+
       if (!apiKey || !domain) {
         throw new Error('Variables de Mailgun no configuradas');
       }
@@ -409,15 +418,15 @@ class ErrorLogger {
         const response = await fetch(`${backendUrl}/api/mailgun/test`, {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json'
-          }
+            'Content-Type': 'application/json',
+          },
         });
 
         if (response.ok) {
           const data = await response.json();
           this.diagnostics.mailgun = {
             status: 'success',
-            details: data
+            details: data,
           };
         } else {
           throw new Error(`Mailgun test falló con status ${response.status}`);
@@ -429,19 +438,18 @@ class ErrorLogger {
           details: {
             message: 'Variables configuradas pero backend no disponible para test',
             domain,
-            hasApiKey: !!apiKey
-          }
+            hasApiKey: !!apiKey,
+          },
         };
       }
-
     } catch (error) {
       this.diagnostics.mailgun = {
         status: 'error',
         details: {
           error: error.message,
           hasApiKey: !!import.meta.env.VITE_MAILGUN_API_KEY,
-          hasDomain: !!import.meta.env.VITE_MAILGUN_DOMAIN
-        }
+          hasDomain: !!import.meta.env.VITE_MAILGUN_DOMAIN,
+        },
       };
     }
   }
@@ -462,18 +470,17 @@ class ErrorLogger {
 
     // Resumen general
     const services = Object.keys(this.diagnostics);
-    const successful = services.filter(s => this.diagnostics[s].status === 'success').length;
-    const errors = services.filter(s => this.diagnostics[s].status === 'error').length;
-    const warnings = services.filter(s => this.diagnostics[s].status === 'warning').length;
+    const successful = services.filter((s) => this.diagnostics[s].status === 'success').length;
+    const errors = services.filter((s) => this.diagnostics[s].status === 'error').length;
+    const warnings = services.filter((s) => this.diagnostics[s].status === 'warning').length;
 
     console.log(`📊 RESUMEN: ${successful} ✅ | ${warnings} ⚠️ | ${errors} ❌`);
     console.log('');
 
     // Detalles por servicio
     Object.entries(this.diagnostics).forEach(([service, data]) => {
-      const icon = data.status === 'success' ? '✅' : 
-                   data.status === 'warning' ? '⚠️' : '❌';
-      
+      const icon = data.status === 'success' ? '✅' : data.status === 'warning' ? '⚠️' : '❌';
+
       console.group(`${icon} ${service.toUpperCase()}`);
       console.log('Status:', data.status);
       console.log('Details:', data.details);
@@ -484,7 +491,7 @@ class ErrorLogger {
     if (this.errors.length > 0) {
       console.log('');
       console.group('🚨 ERRORES RECIENTES');
-      this.errors.slice(-5).forEach(error => {
+      this.errors.slice(-5).forEach((error) => {
         console.log(`[${error.timestamp}] ${error.type}:`, error.details);
       });
       console.groupEnd();
@@ -507,8 +514,8 @@ class ErrorLogger {
         userAgent: navigator.userAgent,
         url: window.location.href,
         mode: import.meta.env.MODE,
-        dev: import.meta.env.DEV
-      }
+        dev: import.meta.env.DEV,
+      },
     };
   }
 
@@ -536,12 +543,12 @@ class ErrorLogger {
     const stats = {
       total: this.errors.length,
       byType: {},
-      recent: this.errors.filter(e => 
-        new Date(e.timestamp) > new Date(Date.now() - 5 * 60 * 1000)
-      ).length
+      recent: this.errors.filter(
+        (e) => new Date(e.timestamp) > new Date(Date.now() - 5 * 60 * 1000)
+      ).length,
     };
 
-    this.errors.forEach(error => {
+    this.errors.forEach((error) => {
       stats.byType[error.type] = (stats.byType[error.type] || 0) + 1;
     });
 

@@ -3,10 +3,11 @@
  * Permite crear, editar, eliminar y mover correos entre carpetas
  */
 
-import { v4 as uuidv4 } from 'uuid';
-import { _getStorage } from '../utils/storage.js';
-import { db } from '../firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
+
+import { db } from '../firebaseConfig';
+import { _getStorage } from '../utils/storage.js';
 
 // Clave para almacenamiento local
 const FOLDERS_STORAGE_KEY = 'lovenda_email_folders';
@@ -20,15 +21,17 @@ const EMAIL_FOLDER_MAPPING_KEY = 'lovenda_email_folder_mapping';
 export const getUserFolders = (userId) => {
   try {
     // Best‑effort: refrescar desde Firestore sin bloquear
-    try { refreshFoldersFromCloud(userId); } catch {}
+    try {
+      refreshFoldersFromCloud(userId);
+    } catch {}
     // Formato de clave: lovenda_email_folders_[userId]
     const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
     const foldersJson = _getStorage().getItem(storageKey);
-    
+
     if (!foldersJson) {
       return [];
     }
-    
+
     return JSON.parse(foldersJson);
   } catch (error) {
     console.error('Error al obtener carpetas:', error);
@@ -45,28 +48,28 @@ export const getUserFolders = (userId) => {
 export const createFolder = (userId, folderName) => {
   try {
     const folders = getUserFolders(userId);
-    
+
     // Verificar si ya existe una carpeta con el mismo nombre
-    const folderExists = folders.some(folder => 
-      folder.name.toLowerCase() === folderName.toLowerCase()
+    const folderExists = folders.some(
+      (folder) => folder.name.toLowerCase() === folderName.toLowerCase()
     );
-    
+
     if (folderExists) {
       throw new Error('Ya existe una carpeta con ese nombre');
     }
-    
+
     // Crear nueva carpeta
     const newFolder = {
       id: uuidv4(),
       name: folderName,
       createdAt: new Date().toISOString(),
-      unread: 0
+      unread: 0,
     };
-    
+
     // Guardar carpetas actualizadas
     const updatedFolders = [...folders, newFolder];
     saveUserFolders(userId, updatedFolders);
-    
+
     return newFolder;
   } catch (error) {
     console.error('Error al crear carpeta:', error);
@@ -84,29 +87,28 @@ export const createFolder = (userId, folderName) => {
 export const renameFolder = (userId, folderId, newName) => {
   try {
     const folders = getUserFolders(userId);
-    
+
     // Verificar si ya existe otra carpeta con el mismo nombre
-    const folderExists = folders.some(folder => 
-      folder.name.toLowerCase() === newName.toLowerCase() && 
-      folder.id !== folderId
+    const folderExists = folders.some(
+      (folder) => folder.name.toLowerCase() === newName.toLowerCase() && folder.id !== folderId
     );
-    
+
     if (folderExists) {
       throw new Error('Ya existe otra carpeta con ese nombre');
     }
-    
+
     // Encontrar y actualizar la carpeta
-    const updatedFolders = folders.map(folder => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.id === folderId) {
         return { ...folder, name: newName };
       }
       return folder;
     });
-    
+
     // Guardar carpetas actualizadas
     saveUserFolders(userId, updatedFolders);
-    
-    return updatedFolders.find(folder => folder.id === folderId);
+
+    return updatedFolders.find((folder) => folder.id === folderId);
   } catch (error) {
     console.error('Error al renombrar carpeta:', error);
     throw error;
@@ -122,15 +124,15 @@ export const renameFolder = (userId, folderId, newName) => {
 export const deleteFolder = (userId, folderId) => {
   try {
     const folders = getUserFolders(userId);
-    
+
     // Verificar existencia
-    const exists = folders.some(folder => folder.id === folderId);
+    const exists = folders.some((folder) => folder.id === folderId);
     if (!exists) {
       return false;
     }
 
     // Filtrar la carpeta a eliminar
-    const updatedFolders = folders.filter(folder => folder.id !== folderId);
+    const updatedFolders = folders.filter((folder) => folder.id !== folderId);
 
     // Guardar carpetas actualizadas
     saveUserFolders(userId, updatedFolders);
@@ -155,7 +157,9 @@ const saveUserFolders = (userId, folders) => {
   const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(folders));
   // Espejo en Firestore (best‑effort)
-  try { mirrorFoldersToCloud(userId, folders); } catch {}
+  try {
+    mirrorFoldersToCloud(userId, folders);
+  } catch {}
 };
 
 /**
@@ -167,14 +171,16 @@ const saveUserFolders = (userId, folders) => {
 const getEmailFolderMapping = (userId) => {
   try {
     // Best‑effort: refrescar desde Firestore sin bloquear
-    try { refreshFolderMappingFromCloud(userId); } catch {}
+    try {
+      refreshFolderMappingFromCloud(userId);
+    } catch {}
     const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
     const mappingJson = _getStorage().getItem(storageKey);
-    
+
     if (!mappingJson) {
       return {};
     }
-    
+
     return JSON.parse(mappingJson);
   } catch (error) {
     console.error('Error al obtener mapeo de correos a carpetas:', error);
@@ -192,7 +198,9 @@ const saveEmailFolderMapping = (userId, mapping) => {
   const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(mapping));
   // Espejo en Firestore (best‑effort)
-  try { mirrorFolderMappingToCloud(userId, mapping); } catch {}
+  try {
+    mirrorFolderMappingToCloud(userId, mapping);
+  } catch {}
 };
 
 async function mirrorFoldersToCloud(userId, folders) {
@@ -251,22 +259,22 @@ export const assignEmailToFolder = (userId, emailId, folderId) => {
   try {
     // Verificar que la carpeta existe
     const folders = getUserFolders(userId);
-    const folderExists = folders.some(folder => folder.id === folderId);
-    
+    const folderExists = folders.some((folder) => folder.id === folderId);
+
     if (!folderExists) {
       // Si la carpeta no existe, no se asigna y se devuelve false
       return false;
     }
-    
+
     // Obtener mapeo actual
     const mapping = getEmailFolderMapping(userId);
-    
+
     // Actualizar mapeo
     mapping[emailId] = folderId;
-    
+
     // Guardar mapeo actualizado
     saveEmailFolderMapping(userId, mapping);
-    
+
     return true;
   } catch (error) {
     console.error('Error al asignar correo a carpeta:', error);
@@ -284,13 +292,13 @@ export const removeEmailFromFolder = (userId, emailId) => {
   try {
     // Obtener mapeo actual
     const mapping = getEmailFolderMapping(userId);
-    
+
     // Eliminar la asignación del correo
     delete mapping[emailId];
-    
+
     // Guardar mapeo actualizado
     saveEmailFolderMapping(userId, mapping);
-    
+
     return true;
   } catch (error) {
     console.error('Error al quitar correo de carpeta:', error);
@@ -309,19 +317,19 @@ const removeEmailsFromFolder = (userId, folderId) => {
   try {
     // Obtener mapeo actual
     const mapping = getEmailFolderMapping(userId);
-    
+
     // Filtrar mapeos para eliminar los de esta carpeta
     const updatedMapping = {};
-    
+
     for (const [emailId, mappedFolderId] of Object.entries(mapping)) {
       if (mappedFolderId !== folderId) {
         updatedMapping[emailId] = mappedFolderId;
       }
     }
-    
+
     // Guardar mapeo actualizado
     saveEmailFolderMapping(userId, updatedMapping);
-    
+
     return true;
   } catch (error) {
     console.error('Error al eliminar correos de carpeta:', error);
@@ -354,7 +362,7 @@ export const getEmailFolder = (userId, emailId) => {
 export const getEmailsInFolder = (userId, folderId) => {
   try {
     const mapping = getEmailFolderMapping(userId);
-    
+
     // Filtrar correos que pertenecen a esta carpeta
     return Object.entries(mapping)
       .filter(([_, mappedFolderId]) => mappedFolderId === folderId)
@@ -374,20 +382,20 @@ export const getEmailsInFolder = (userId, folderId) => {
 export const updateFolderUnreadCount = (userId, folderId, unreadCount) => {
   try {
     const folders = getUserFolders(userId);
-    
+
     // Actualizar contador de no leídos
-    const updatedFolders = folders.map(folder => {
+    const updatedFolders = folders.map((folder) => {
       if (folder.id === folderId) {
         return { ...folder, unread: unreadCount };
       }
       return folder;
     });
-    
+
     // Guardar carpetas actualizadas
     saveUserFolders(userId, updatedFolders);
-    
+
     // Devolver carpeta actualizada o null si no encontrada
-    return updatedFolders.find(folder => folder.id === folderId) || null;
+    return updatedFolders.find((folder) => folder.id === folderId) || null;
   } catch (error) {
     console.error('Error al actualizar contador de no leídos:', error);
     return false;

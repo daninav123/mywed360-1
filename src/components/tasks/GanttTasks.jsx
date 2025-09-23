@@ -1,5 +1,5 @@
-�import React, { useEffect, useRef, useState } from 'react';
 import { Gantt, ViewMode } from 'gantt-task-react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'gantt-task-react/dist/index.css';
 
 // Componente para el diagrama Gantt
@@ -15,26 +15,37 @@ export const GanttChart = ({
   viewDate,
   markerDate, // fecha para marcar con una ldnea roja (p.ej., boda)
   gridStartDate,
-  gridEndDate,   // tope visual estricto del grid (fin)
+  gridEndDate, // tope visual estricto del grid (fin)
 }) => {
   // Debug opt-in: activa con localStorage.setItem('lovenda_gantt_debug','1') o window.__GANTT_DEBUG__=true
   const debugEnabled = (() => {
     try {
       if (typeof window !== 'undefined' && window.__GANTT_DEBUG__) return true;
-      const v = (typeof localStorage !== 'undefined') ? localStorage.getItem('lovenda_gantt_debug') : null;
+      const v =
+        typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
       return v === '1' || /^true$/i.test(String(v || ''));
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   })();
-  const dbg = (...args) => { if (debugEnabled) console.log('[GanttDebug]', ...args); };
-  try { dbg('GanttDebug init', { debugEnabled, viewMode, columnWidth, markerDate }); } catch {}
+  const dbg = (...args) => {
+    if (debugEnabled) console.log('[GanttDebug]', ...args);
+  };
+  try {
+    dbg('GanttDebug init', { debugEnabled, viewMode, columnWidth, markerDate });
+  } catch {}
   // ErrorBoundary local para evitar que la pÒ��¡gina caiga si la librerÒ��­a falla
   class LocalErrorBoundary extends React.Component {
     constructor(props) {
       super(props);
       this.state = { hasError: false };
     }
-    static getDerivedStateFromError() { return { hasError: true }; }
-    componentDidCatch(err) { console.error('[GanttChart] Error atrapado:', err); }
+    static getDerivedStateFromError() {
+      return { hasError: true };
+    }
+    componentDidCatch(err) {
+      console.error('[GanttChart] Error atrapado:', err);
+    }
     render() {
       if (this.state.hasError) {
         return (
@@ -147,7 +158,9 @@ export const GanttChart = ({
     // Buscar el contenedor scrollable interno del Gantt (preferir verticalContainer de la librería)
     let scroller = null;
     try {
-      const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+      const vertical = root.querySelector(
+        'div[class*="ganttVerticalContainer"], .ganttVerticalContainer'
+      );
       if (vertical && vertical.scrollWidth > vertical.clientWidth) scroller = vertical;
     } catch {}
     if (!scroller) {
@@ -156,7 +169,10 @@ export const GanttChart = ({
         try {
           const style = window.getComputedStyle(el);
           const hasOverflowX = /(auto|scroll)/.test(style.overflowX || '');
-          if (hasOverflowX && el.scrollWidth > el.clientWidth + 2) { scroller = el; break; }
+          if (hasOverflowX && el.scrollWidth > el.clientWidth + 2) {
+            scroller = el;
+            break;
+          }
         } catch {}
       }
     }
@@ -176,7 +192,7 @@ export const GanttChart = ({
     return () => {
       scroller.removeEventListener('scroll', onScroll);
       if (scrollerRef.current === scroller) scrollerRef.current = null;
-      setScrollerNode(prev => (prev === scroller ? null : prev));
+      setScrollerNode((prev) => (prev === scroller ? null : prev));
       setVerticalNode(null);
     };
   }, [viewMode, columnWidth, cleanTasks.length]);
@@ -186,7 +202,9 @@ export const GanttChart = ({
     const root = wrapperRef.current;
     if (!root) return;
     // El contenedor suele llevar una clase ofuscada que contiene 'ganttVerticalContainer'
-    const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+    const vertical = root.querySelector(
+      'div[class*="ganttVerticalContainer"], .ganttVerticalContainer'
+    );
     if (!vertical) return;
     const onScroll = () => setContainerScrollLeft(vertical.scrollLeft || 0);
     onScroll();
@@ -218,11 +236,13 @@ export const GanttChart = ({
       let best = null;
       for (const g of svgs) {
         const attr = g.getAttribute && g.getAttribute('transform');
-        const css = (typeof window !== 'undefined' && window.getComputedStyle)
-          ? window.getComputedStyle(g).transform
-          : '';
+        const css =
+          typeof window !== 'undefined' && window.getComputedStyle
+            ? window.getComputedStyle(g).transform
+            : '';
         if ((attr && /translate|matrix/i.test(attr)) || (css && css !== 'none')) {
-          best = g; break;
+          best = g;
+          break;
         }
       }
       return best;
@@ -232,29 +252,39 @@ export const GanttChart = ({
       try {
         if (!tr) return 0;
         // translate3d(x, y, z)
-        let m = tr.match(/translate3d\(([-0-9\.]+)[ ,]/i);
+        let m = tr.match(/translate3d\(([-0-9.]+)[ ,]/i);
         if (m) return parseFloat(m[1]);
         // translate(x[, y])
-        m = tr.match(/translate\(([-0-9\.]+)[ ,]/i);
+        m = tr.match(/translate\(([-0-9.]+)[ ,]/i);
         if (m) return parseFloat(m[1]);
         // matrix(a,b,c,d,e,f) => e = translateX
-        m = tr.match(/matrix\(([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+)\)/i);
+        m = tr.match(
+          /matrix\(([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+)\)/i
+        );
         if (m) return parseFloat(m[5]);
         return 0;
-      } catch { return 0; }
+      } catch {
+        return 0;
+      }
     };
 
     const g = findMovingGroup();
     if (!g) return;
     movingGroupRef.current = g;
     // Inicial
-    const tr0 = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
+    const tr0 =
+      (g.getAttribute && g.getAttribute('transform')) ||
+      (window.getComputedStyle ? window.getComputedStyle(g).transform : '') ||
+      '';
     setContentOffsetX(-parseTX(tr0));
 
     const obs = new MutationObserver((records) => {
       for (const r of records) {
         if (r.type === 'attributes') {
-          const tr = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
+          const tr =
+            (g.getAttribute && g.getAttribute('transform')) ||
+            (window.getComputedStyle ? window.getComputedStyle(g).transform : '') ||
+            '';
           setContentOffsetX(-parseTX(tr));
         }
       }
@@ -270,26 +300,33 @@ export const GanttChart = ({
     const parseTX = (tr) => {
       try {
         if (!tr) return 0;
-        let m = tr.match(/translate3d\(([-0-9\.]+)[ ,]/i);
+        let m = tr.match(/translate3d\(([-0-9.]+)[ ,]/i);
         if (m) return parseFloat(m[1]);
-        m = tr.match(/translate\(([-0-9\.]+)[ ,]/i);
+        m = tr.match(/translate\(([-0-9.]+)[ ,]/i);
         if (m) return parseFloat(m[1]);
-        m = tr.match(/matrix\(([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+),\s*([-0-9\.]+)\)/i);
+        m = tr.match(
+          /matrix\(([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+),\s*([-0-9.]+)\)/i
+        );
         if (m) return parseFloat(m[5]);
         return 0;
-      } catch { return 0; }
+      } catch {
+        return 0;
+      }
     };
     const tick = () => {
       try {
         const s = scrollerRef.current;
         if (s) {
-          const sl = (s?.scrollLeft ?? containerScrollLeft ?? 0);
+          const sl = s?.scrollLeft ?? containerScrollLeft ?? 0;
           // Evitar sets redundantes para no encadenar renders
           setScrollLeft((prev) => (prev !== sl ? sl : prev));
         }
         const g = movingGroupRef.current;
         if (g) {
-          const tr = (g.getAttribute && g.getAttribute('transform')) || (window.getComputedStyle ? window.getComputedStyle(g).transform : '') || '';
+          const tr =
+            (g.getAttribute && g.getAttribute('transform')) ||
+            (window.getComputedStyle ? window.getComputedStyle(g).transform : '') ||
+            '';
           const tx = -parseTX(tr);
           setContentOffsetX((prev) => (prev !== tx ? tx : prev));
         }
@@ -297,7 +334,9 @@ export const GanttChart = ({
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
-    return () => { if (rafId) cancelAnimationFrame(rafId); };
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Forzar el ancho scrollable (fin del scroll) exactamente hasta gridEndDate (modo Mes)
@@ -307,15 +346,21 @@ export const GanttChart = ({
       const scroller = scrollerRef.current;
       if (!scroller) return;
       const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
-      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
-        ? gridStartDate
-        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      const base =
+        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
+          ? gridStartDate
+          : viewDate instanceof Date && !isNaN(viewDate.getTime())
+            ? viewDate
+            : cleanTasks[0]?.start || null;
       if (!endOk || !base) return;
 
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
       const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
-      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
+      const monthsInclusive =
+        (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 +
+        (gridEnd.getMonth() - gridStart.getMonth()) +
+        1;
       const wantedWidth = Math.max(1, monthsInclusive * colW);
 
       // 1) Contenedor scrolleable (div) que determina el fin del scroll
@@ -333,7 +378,12 @@ export const GanttChart = ({
       }
       try {
         const s = scrollerRef.current;
-        if (debugEnabled && s) dbg('ScrollWidth forzado', { wantedWidth, clientWidth: s.clientWidth, scrollWidth: s.scrollWidth });
+        if (debugEnabled && s)
+          dbg('ScrollWidth forzado', {
+            wantedWidth,
+            clientWidth: s.clientWidth,
+            scrollWidth: s.scrollWidth,
+          });
       } catch {}
     } catch {}
   }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
@@ -344,28 +394,40 @@ export const GanttChart = ({
       if (viewMode !== ViewMode.Month) return;
       if (!wrapperRef.current) return;
       const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
-      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
-        ? gridStartDate
-        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      const base =
+        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
+          ? gridStartDate
+          : viewDate instanceof Date && !isNaN(viewDate.getTime())
+            ? viewDate
+            : cleanTasks[0]?.start || null;
       if (!endOk || !base) return;
 
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
       const gridEnd = new Date(gridEndDate.getFullYear(), gridEndDate.getMonth(), 1);
-      const monthsInclusive = (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 + (gridEnd.getMonth() - gridStart.getMonth()) + 1;
+      const monthsInclusive =
+        (gridEnd.getFullYear() - gridStart.getFullYear()) * 12 +
+        (gridEnd.getMonth() - gridStart.getMonth()) +
+        1;
       const wantedWidth = Math.max(1, monthsInclusive * colW);
 
       const root = wrapperRef.current;
-      const vertical = root.querySelector('div[class*="ganttVerticalContainer"], .ganttVerticalContainer');
+      const vertical = root.querySelector(
+        'div[class*="ganttVerticalContainer"], .ganttVerticalContainer'
+      );
       if (!vertical) return;
-      const horizontal = vertical.querySelector('div[class*="horizontalContainer"], .horizontalContainer');
+      const horizontal = vertical.querySelector(
+        'div[class*="horizontalContainer"], .horizontalContainer'
+      );
       const svgs = vertical.querySelectorAll('svg');
 
       if (horizontal) {
         horizontal.style.width = `${wantedWidth}px`;
       }
-      svgs.forEach(svg => {
-        try { svg.setAttribute('width', String(wantedWidth)); } catch {}
+      svgs.forEach((svg) => {
+        try {
+          svg.setAttribute('width', String(wantedWidth));
+        } catch {}
       });
     } catch {}
   }, [viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
@@ -380,26 +442,50 @@ export const GanttChart = ({
       if (!s || !root) return;
       const endOk = gridEndDate instanceof Date && !isNaN(gridEndDate.getTime());
       if (!endOk) return;
-      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
-        ? gridStartDate
-        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      const base =
+        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
+          ? gridStartDate
+          : viewDate instanceof Date && !isNaN(viewDate.getTime())
+            ? viewDate
+            : cleanTasks[0]?.start || null;
       if (!base) return;
       const colW = Math.max(8, Number(columnWidth) || 65);
       const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
       const today = new Date();
-      const monthsDiff = (today.getFullYear() - gridStart.getFullYear()) * 12 + (today.getMonth() - gridStart.getMonth());
+      const monthsDiff =
+        (today.getFullYear() - gridStart.getFullYear()) * 12 +
+        (today.getMonth() - gridStart.getMonth());
       const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
       const dayIndex = Math.max(0, Math.min(daysInMonth, today.getDate())) - 1;
       const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
       const todayLeft = Math.max(0, (monthsDiff + frac) * colW);
-      const targetLeft = Math.max(0, Math.min(todayLeft - (s.clientWidth * 0.35), Math.max(0, s.scrollWidth - s.clientWidth)));
+      const targetLeft = Math.max(
+        0,
+        Math.min(todayLeft - s.clientWidth * 0.35, Math.max(0, s.scrollWidth - s.clientWidth))
+      );
       if (Math.abs((s.scrollLeft || 0) - targetLeft) > 2) {
         s.scrollTo({ left: targetLeft, behavior: 'auto' });
-        try { if (debugEnabled) dbg('Auto-centering to current month', { targetLeft, todayLeft, clientW: s.clientWidth, scrollW: s.scrollWidth }); } catch {}
+        try {
+          if (debugEnabled)
+            dbg('Auto-centering to current month', {
+              targetLeft,
+              todayLeft,
+              clientW: s.clientWidth,
+              scrollW: s.scrollWidth,
+            });
+        } catch {}
       }
       if (autoCenteredRef) autoCenteredRef.current = true;
     } catch {}
-  }, [scrollerNode, viewMode, columnWidth, gridStartDate, gridEndDate, viewDate, cleanTasks.length]);
+  }, [
+    scrollerNode,
+    viewMode,
+    columnWidth,
+    gridStartDate,
+    gridEndDate,
+    viewDate,
+    cleanTasks.length,
+  ]);
 
   // Calcular offset horizontal en px para el marcador (modo Month fiable)
   let markerLeftPx = null;
@@ -407,16 +493,25 @@ export const GanttChart = ({
   try {
     const markerOk = markerDate instanceof Date && !isNaN(markerDate.getTime());
     if (markerOk) {
-      const base = (gridStartDate instanceof Date && !isNaN(gridStartDate.getTime()))
-        ? gridStartDate
-        : ((viewDate instanceof Date && !isNaN(viewDate.getTime())) ? viewDate : (cleanTasks[0]?.start || null));
+      const base =
+        gridStartDate instanceof Date && !isNaN(gridStartDate.getTime())
+          ? gridStartDate
+          : viewDate instanceof Date && !isNaN(viewDate.getTime())
+            ? viewDate
+            : cleanTasks[0]?.start || null;
       if (base) {
         if (viewMode === ViewMode.Month) {
           // En Month, columnWidth representa el ancho por MES en gantt-task-react
           const colW = Math.max(8, Number(columnWidth) || 65);
           const gridStart = new Date(base.getFullYear(), base.getMonth(), 1);
-          const monthsDiff = (markerDate.getFullYear() - gridStart.getFullYear()) * 12 + (markerDate.getMonth() - gridStart.getMonth());
-          const daysInMonth = new Date(markerDate.getFullYear(), markerDate.getMonth() + 1, 0).getDate();
+          const monthsDiff =
+            (markerDate.getFullYear() - gridStart.getFullYear()) * 12 +
+            (markerDate.getMonth() - gridStart.getMonth());
+          const daysInMonth = new Date(
+            markerDate.getFullYear(),
+            markerDate.getMonth() + 1,
+            0
+          ).getDate();
           const dayIndex = Math.max(0, Math.min(daysInMonth, markerDate.getDate())) - 1;
           const frac = daysInMonth > 0 ? dayIndex / daysInMonth : 0;
           markerLeftPx = Math.max(0, (monthsDiff + frac) * colW);
@@ -430,32 +525,36 @@ export const GanttChart = ({
               const viewportRect = s?.getBoundingClientRect ? s.getBoundingClientRect() : null;
               baseOffset = viewportRect ? Math.max(0, Math.round(viewportRect.left - wr.left)) : 0;
 
-              const inner = (s || wrapperRef.current)?.querySelector?.('div[class*="horizontalContainer"], .horizontalContainer')
-                || (s || wrapperRef.current)?.querySelector?.('svg');
-              const contentRect = inner?.getBoundingClientRect ? inner.getBoundingClientRect() : null;
-              delta = (contentRect && viewportRect)
-                ? Math.round(contentRect.left - viewportRect.left)
-                : 0;
+              const inner =
+                (s || wrapperRef.current)?.querySelector?.(
+                  'div[class*="horizontalContainer"], .horizontalContainer'
+                ) || (s || wrapperRef.current)?.querySelector?.('svg');
+              const contentRect = inner?.getBoundingClientRect
+                ? inner.getBoundingClientRect()
+                : null;
+              delta =
+                contentRect && viewportRect ? Math.round(contentRect.left - viewportRect.left) : 0;
             } catch {}
 
             markerViewportLeftPx = Math.max(0, baseOffset + markerLeftPx + delta);
-            if (debugEnabled) console.log('[GanttDebug] Marker calculado', {
-              base,
-              gridStart: gridStart.toISOString(),
-              markerDate: markerDate?.toISOString?.() || markerDate,
-              colW,
-              monthsDiff,
-              daysInMonth,
-              dayIndex,
-              frac,
-              markerLeftPx,
-              baseOffset,
-              delta,
-              markerViewportLeftPx,
-              wrapperW: wrapperRef.current?.clientWidth,
-              scrollerW: s?.clientWidth,
-              scrollerSW: s?.scrollWidth
-            });
+            if (debugEnabled)
+              console.log('[GanttDebug] Marker calculado', {
+                base,
+                gridStart: gridStart.toISOString(),
+                markerDate: markerDate?.toISOString?.() || markerDate,
+                colW,
+                monthsDiff,
+                daysInMonth,
+                dayIndex,
+                frac,
+                markerLeftPx,
+                baseOffset,
+                delta,
+                markerViewportLeftPx,
+                wrapperW: wrapperRef.current?.clientWidth,
+                scrollerW: s?.clientWidth,
+                scrollerSW: s?.scrollWidth,
+              });
           }
         }
       }
@@ -468,13 +567,15 @@ export const GanttChart = ({
 
   // Right mask placeholder\n
   return (
-        <LocalErrorBoundary>
+    <LocalErrorBoundary>
       <div
         ref={wrapperRef}
         style={{ position: 'relative', overflow: 'hidden' }}
         onWheelCapture={(e) => {
           // Evita que el handler interno de la librer�a encadene actualizaciones excesivas
-          try { e.stopPropagation(); } catch {}
+          try {
+            e.stopPropagation();
+          } catch {}
         }}
       >
         <Gantt
@@ -500,52 +601,80 @@ export const GanttChart = ({
           onSelect={(task) => handleClick(task)}
           onDoubleClick={(task) => handleClick(task)}
         />
-        {wrapperRef.current && typeof markerViewportLeftPx === 'number' && markerViewportLeftPx >= 0 && (
-          <div
-            data-testid="wedding-marker"
-            title="Dia de la boda"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: Math.max(0, markerViewportLeftPx),
-              height: (wrapperRef.current ? (wrapperRef.current.clientHeight || '100%') : '100%'),
-              pointerEvents: 'none',
-              zIndex: 4
-            }}
-          >
-            {/* Poste vertical */}
-            <div style={{ position: 'absolute', top: 0, left: -1, width: 2, height: '100%', background: '#ef4444', opacity: 0.95 }} />
-            {/* Bandera tipo F1 (chequered) */}
-            <svg
-              width="18"
-              height="14"
-              viewBox="0 0 18 14"
-              style={{ position: 'absolute', top: 6, left: 2, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))' }}
-              aria-hidden="true"
-              focusable="false"
+        {wrapperRef.current &&
+          typeof markerViewportLeftPx === 'number' &&
+          markerViewportLeftPx >= 0 && (
+            <div
+              data-testid="wedding-marker"
+              title="Dia de la boda"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: Math.max(0, markerViewportLeftPx),
+                height: wrapperRef.current ? wrapperRef.current.clientHeight || '100%' : '100%',
+                pointerEvents: 'none',
+                zIndex: 4,
+              }}
             >
-              {/* paÒ��±o blanco */}
-              <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="#ffffff" opacity="0.95" />
-              {/* cuadros negros */}
-              <rect x="4" y="2" width="3" height="3" fill="#111" />
-              <rect x="10" y="2" width="3" height="3" fill="#111" />
-              <rect x="7" y="5" width="3" height="3" fill="#111" />
-              <rect x="13" y="5" width="3" height="3" fill="#111" />
-              {/* borde rojo fino para armonizar con el poste */}
-              <rect x="4" y="2" width="12" height="8" rx="1" ry="1" fill="none" stroke="#ef4444" strokeWidth="0.8" opacity="0.9" />
-            </svg>
-          </div>
-        )}
+              {/* Poste vertical */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: -1,
+                  width: 2,
+                  height: '100%',
+                  background: '#ef4444',
+                  opacity: 0.95,
+                }}
+              />
+              {/* Bandera tipo F1 (chequered) */}
+              <svg
+                width="18"
+                height="14"
+                viewBox="0 0 18 14"
+                style={{
+                  position: 'absolute',
+                  top: 6,
+                  left: 2,
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.25))',
+                }}
+                aria-hidden="true"
+                focusable="false"
+              >
+                {/* paÒ��±o blanco */}
+                <rect
+                  x="4"
+                  y="2"
+                  width="12"
+                  height="8"
+                  rx="1"
+                  ry="1"
+                  fill="#ffffff"
+                  opacity="0.95"
+                />
+                {/* cuadros negros */}
+                <rect x="4" y="2" width="3" height="3" fill="#111" />
+                <rect x="10" y="2" width="3" height="3" fill="#111" />
+                <rect x="7" y="5" width="3" height="3" fill="#111" />
+                <rect x="13" y="5" width="3" height="3" fill="#111" />
+                {/* borde rojo fino para armonizar con el poste */}
+                <rect
+                  x="4"
+                  y="2"
+                  width="12"
+                  height="8"
+                  rx="1"
+                  ry="1"
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth="0.8"
+                  opacity="0.9"
+                />
+              </svg>
+            </div>
+          )}
       </div>
     </LocalErrorBoundary>
   );
 };
-
-
-
-
-
-
-
-
-

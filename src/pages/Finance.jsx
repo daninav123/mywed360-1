@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import PageWrapper from '../components/PageWrapper';
-import PageTabs from '../components/ui/PageTabs';
-import FinanceOverview from '../components/finance/FinanceOverview';
 
-import TransactionManager from '../components/finance/TransactionManager';
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
+import FinanceOverview from '../components/finance/FinanceOverview';
+import TransactionManager from '../components/finance/TransactionManager';
+import PageWrapper from '../components/PageWrapper';
+import PageTabs from '../components/ui/PageTabs';
+
 // Lazy load analytics charts to reduce initial bundle
 const FinanceCharts = React.lazy(() => import('../components/finance/FinanceCharts'));
 import useFinance from '../hooks/useFinance';
@@ -54,7 +55,7 @@ function Finance() {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager gestionará la apertura del modal
+      // El TransactionManager Gestionará la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
@@ -85,14 +86,22 @@ function Finance() {
   };
 
   return (
-    <PageWrapper title={t('navigation.finance', { defaultValue: 'Finanzas' })} className="max-w-7xl mx-auto">
+    <PageWrapper
+      title={t('navigation.finance', { defaultValue: 'Finanzas' })}
+      className="max-w-7xl mx-auto"
+    >
       <div className="space-y-6">
         {/* Mostrar errores si existen */}
         {error && (
-          <div className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30" aria-live="polite">
+          <div
+            className="rounded-md p-4 bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30"
+            aria-live="polite"
+          >
             <div className="flex">
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">Error en Gestión financiera</h3>
+                <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
+                  Error en Gestión financiera
+                </h3>
                 <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
                 </div>
@@ -107,9 +116,15 @@ function Finance() {
           onChange={setActiveTab}
           options={[
             { id: 'overview', label: t('finance.tabs.overview', { defaultValue: 'Resumen' }) },
-            { id: 'transactions', label: t('finance.tabs.transactions', { defaultValue: 'Transacciones' }) },
+            {
+              id: 'transactions',
+              label: t('finance.tabs.transactions', { defaultValue: 'Transacciones' }),
+            },
             { id: 'budget', label: t('finance.tabs.budget', { defaultValue: 'Presupuesto' }) },
-            { id: 'contributions', label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }) },
+            {
+              id: 'contributions',
+              label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }),
+            },
             { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'Análisis' }) },
           ]}
           className="w-full"
@@ -136,10 +151,24 @@ function Finance() {
               <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div>
-                    <p className="font-medium text-[var(--color-primary)]">{t('finance.connectBank.title', { defaultValue: 'Conecta tu banco para importar movimientos' })}</p>
-                    <p className="text-sm text-[color:var(--color-text)]/70">{t('finance.connectBank.desc', { defaultValue: 'Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.' })}</p>
+                    <p className="font-medium text-[var(--color-primary)]">
+                      {t('finance.connectBank.title', {
+                        defaultValue: 'Conecta tu banco para importar movimientos',
+                      })}
+                    </p>
+                    <p className="text-sm text-[color:var(--color-text)]/70">
+                      {t('finance.connectBank.desc', {
+                        defaultValue:
+                          'Acelera el registro de gastos e ingresos conectando tu cuenta bancaria.',
+                      })}
+                    </p>
                   </div>
-                  <a href="/finance/bank-connect" className="inline-flex items-center px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-110">{t('finance.connectBank.button', { defaultValue: 'Conectar banco' })}</a>
+                  <a
+                    href="/finance/bank-connect"
+                    className="inline-flex items-center px-3 py-2 rounded-md bg-[var(--color-primary)] text-white hover:brightness-110"
+                  >
+                    {t('finance.connectBank.button', { defaultValue: 'Conectar banco' })}
+                  </a>
                 </div>
               </div>
             )}
@@ -196,4 +225,3 @@ function Finance() {
 }
 
 export default Finance;
-

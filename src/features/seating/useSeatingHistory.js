@@ -14,13 +14,12 @@ export default function useSeatingHistory(tab, setTablesCeremony, setTablesBanqu
       const key = tab;
       const hist = historyRef.current[key];
       const ptr = pointerRef.current[key] + 1;
-      historyRef.current[key] = [
-        ...hist.slice(0, ptr),
-        JSON.parse(JSON.stringify(snapshot)),
-      ].slice(-50);
+      historyRef.current[key] = [...hist.slice(0, ptr), JSON.parse(JSON.stringify(snapshot))].slice(
+        -50
+      );
       pointerRef.current[key] = Math.min(49, hist.slice(0, ptr).length);
     },
-    [tab],
+    [tab]
   );
 
   const undo = useCallback(() => {

@@ -1,19 +1,20 @@
-﻿�import React, { useState, useEffect, useMemo, useRef, useCallback, useDeferredValue } from 'react';
-import { Card, Button } from '../ui';
-import VirtualizedTransactionList from './VirtualizedTransactionList';
 import { Plus, Edit3, Trash2, Download, Upload, AlertTriangle, Paperclip } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, useDeferredValue } from 'react';
+import { toast } from 'react-toastify';
+
+import { Card, Button } from '../ui';
+import BankImportModal from './BankImportModal';
+import VirtualizedTransactionList from './VirtualizedTransactionList';
 import { formatCurrency, formatDate } from '../../utils/formatUtils';
 import Modal from '../Modal';
-import TransactionForm from './TransactionForm';
-import { toast } from 'react-toastify';
-import useTranslations from '../../hooks/useTranslations';
-import FinanceStatsHeader from './FinanceStatsHeader';
-import TransactionFilterBar from './TransactionFilterBar';
-import BankImportModal from './BankImportModal';
 import CsvImportModal from './CsvImportModal';
-import { parseCSVToRows as parseCSVToRowsUtil, autoDetectCSVMapping } from '../../utils/csv';
+import FinanceStatsHeader from './FinanceStatsHeader';
 import PaymentAlerts from './PaymentAlerts';
+import TransactionFilterBar from './TransactionFilterBar';
+import TransactionForm from './TransactionForm';
 import TransactionRow from './TransactionRow';
+import useTranslations from '../../hooks/useTranslations';
+import { parseCSVToRows as parseCSVToRowsUtil, autoDetectCSVMapping } from '../../utils/csv';
 
 const FILTERS_STORAGE_KEY = 'finance.transactions.filters';
 export default function TransactionManager({
@@ -45,13 +46,22 @@ export default function TransactionManager({
   const [showCsvModal, setShowCsvModal] = useState(false);
   const [csvHeaders, setCsvHeaders] = useState([]);
   const [csvRows, setCsvRows] = useState([]);
-  const [csvMapping, setCsvMapping] = useState({ date: -1, desc: -1, amount: -1, type: -1, category: -1 });
+  const [csvMapping, setCsvMapping] = useState({
+    date: -1,
+    desc: -1,
+    amount: -1,
+    type: -1,
+    category: -1,
+  });
   const [csvError, setCsvError] = useState('');
   const [filtersLoaded, setFiltersLoaded] = useState(false);
   const externalAppliedRef = useRef(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') { setFiltersLoaded(true); return; }
+    if (typeof window === 'undefined') {
+      setFiltersLoaded(true);
+      return;
+    }
     try {
       const raw = window.localStorage.getItem(FILTERS_STORAGE_KEY);
       if (raw) {
@@ -62,7 +72,8 @@ export default function TransactionManager({
           if (typeof saved.categoryFilter === 'string') setCategoryFilter(saved.categoryFilter);
           if (typeof saved.providerFilter === 'string') setProviderFilter(saved.providerFilter);
           if (typeof saved.dateRange === 'string') setDateRange(saved.dateRange);
-          if (typeof saved.onlyUncategorized === 'boolean') setOnlyUncategorized(saved.onlyUncategorized);
+          if (typeof saved.onlyUncategorized === 'boolean')
+            setOnlyUncategorized(saved.onlyUncategorized);
           if (typeof saved.sortBy === 'string') setSortBy(saved.sortBy);
         }
       }
@@ -90,7 +101,16 @@ export default function TransactionManager({
     } catch (err) {
       console.warn('[TransactionManager] Could not persist filters', err);
     }
-  }, [filtersLoaded, searchTerm, typeFilter, categoryFilter, providerFilter, dateRange, onlyUncategorized, sortBy]);
+  }, [
+    filtersLoaded,
+    searchTerm,
+    typeFilter,
+    categoryFilter,
+    providerFilter,
+    dateRange,
+    onlyUncategorized,
+    sortBy,
+  ]);
 
   useEffect(() => {
     if (!externalFilters || typeof externalFilters !== 'object') return;
@@ -102,7 +122,8 @@ export default function TransactionManager({
     if (filters.categoryFilter !== undefined) setCategoryFilter(String(filters.categoryFilter));
     if (filters.providerFilter !== undefined) setProviderFilter(String(filters.providerFilter));
     if (filters.dateRange !== undefined) setDateRange(String(filters.dateRange));
-    if (filters.onlyUncategorized !== undefined) setOnlyUncategorized(Boolean(filters.onlyUncategorized));
+    if (filters.onlyUncategorized !== undefined)
+      setOnlyUncategorized(Boolean(filters.onlyUncategorized));
     if (filters.sortBy !== undefined) setSortBy(String(filters.sortBy));
   }, [externalFilters]);
 
@@ -111,10 +132,13 @@ export default function TransactionManager({
   const deferredSearchTerm = useDeferredValue(searchTerm);
   const filteredTransactions = useMemo(() => {
     const now = new Date();
-    const msInDay = 24*60*60*1000;
+    const msInDay = 24 * 60 * 60 * 1000;
     const minDate = dateRange ? new Date(now.getTime() - Number(dateRange) * msInDay) : null;
-    let list = transactions.filter(t => {
-      const haystack = [t.concept, t.description, t.provider].filter(Boolean).join(' ').toLowerCase();
+    let list = transactions.filter((t) => {
+      const haystack = [t.concept, t.description, t.provider]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
       const matchesSearch = haystack.includes((deferredSearchTerm || '').toLowerCase());
       const matchesType = !typeFilter || t.type === typeFilter;
       const cat = t.category || '';
@@ -123,10 +147,17 @@ export default function TransactionManager({
       const matchesProvider = !providerFilter || provider === providerFilter;
       const matchesUncat = !onlyUncategorized || !cat;
       const matchesDate = !minDate || (t.date && new Date(t.date) >= minDate);
-      return matchesSearch && matchesType && matchesCategory && matchesProvider && matchesUncat && matchesDate;
+      return (
+        matchesSearch &&
+        matchesType &&
+        matchesCategory &&
+        matchesProvider &&
+        matchesUncat &&
+        matchesDate
+      );
     });
     // Sort
-    list.sort((a,b) => {
+    list.sort((a, b) => {
       const aDate = a.date ? new Date(a.date).getTime() : 0;
       const bDate = b.date ? new Date(b.date).getTime() : 0;
       const aAmt = Number(a.amount) || 0;
@@ -138,16 +169,27 @@ export default function TransactionManager({
       return 0;
     });
     return list;
-  }, [transactions, deferredSearchTerm, typeFilter, categoryFilter, providerFilter, dateRange, onlyUncategorized, sortBy]);
+  }, [
+    transactions,
+    deferredSearchTerm,
+    typeFilter,
+    categoryFilter,
+    providerFilter,
+    dateRange,
+    onlyUncategorized,
+    sortBy,
+  ]);
 
   const shouldVirtualize = filteredTransactions.length > 300;
 
   const categories = useMemo(() => {
-    return [...new Set(transactions.map(t => t.category).filter(Boolean))].sort();
+    return [...new Set(transactions.map((t) => t.category).filter(Boolean))].sort();
   }, [transactions]);
 
   const providers = useMemo(() => {
-    return [...new Set(transactions.map(t => (t.provider || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    return [...new Set(transactions.map((t) => (t.provider || '').trim()).filter(Boolean))].sort(
+      (a, b) => a.localeCompare(b, 'es')
+    );
   }, [transactions]);
 
   const getPaidValue = useCallback((transaction) => {
@@ -187,7 +229,11 @@ export default function TransactionManager({
           pendingExpenses += outstanding;
           if (transaction.dueDate) {
             const due = new Date(transaction.dueDate);
-            if (!Number.isNaN(due.getTime()) && due < now && (transaction.status || '') !== 'paid') {
+            if (
+              !Number.isNaN(due.getTime()) &&
+              due < now &&
+              (transaction.status || '') !== 'paid'
+            ) {
               overdueExpenses += outstanding;
             }
           }
@@ -242,28 +288,66 @@ export default function TransactionManager({
   // Simple virtualization calculations
   // no virtualization constants required
 
-  const handleAddTransaction = () => { setEditingTransaction(null); setShowTransactionModal(true); };
-  const handleEditTransaction = (tx) => { setEditingTransaction(tx); setShowTransactionModal(true); };
+  const handleAddTransaction = () => {
+    setEditingTransaction(null);
+    setShowTransactionModal(true);
+  };
+  const handleEditTransaction = (tx) => {
+    setEditingTransaction(tx);
+    setShowTransactionModal(true);
+  };
   const handleSaveTransaction = async (data) => {
     try {
       let result;
       if (editingTransaction) result = await onUpdateTransaction(editingTransaction.id, data);
       else result = await onCreateTransaction(data);
-      if (result?.success) { setShowTransactionModal(false); setEditingTransaction(null); toast.success(t('finance.transactions.saved', { defaultValue: 'Transaction saved' })); }
-      else toast.error(`Error: ${result?.error || 'Error desconocido'}`);
-    } catch { toast.error(t('finance.transactions.saveUnexpected', { defaultValue: 'Unexpected error saving transaction' })); }
+      if (result?.success) {
+        setShowTransactionModal(false);
+        setEditingTransaction(null);
+        toast.success(t('finance.transactions.saved', { defaultValue: 'Transacci�n guardada' }));
+      } else toast.error(`Error: ${result?.error || 'Error desconocido'}`);
+    } catch {
+      toast.error(
+        t('finance.transactions.saveUnexpected', {
+          defaultValue: 'Error inesperado al guardar la transacci�n',
+        })
+      );
+    }
   };
   const handleDeleteTransaction = async (tx) => {
-    if (!window.confirm(`Estas seguro de eliminar la transaccion "${tx.concept || tx.description || ''}"?`)) return;
+    if (
+      !window.confirm(
+        `Estas seguro de eliminar la transaccion "${tx.concept || tx.description || ''}"?`
+      )
+    )
+      return;
     const result = await onDeleteTransaction(tx.id);
     if (!result?.success) {
-      toast.error(t('finance.transactions.deleteErrorPrefix', { defaultValue: 'Error deleting transaction:' }) + ' ' + (result?.error || 'Unknown'));
-    } else toast.success(t('finance.transactions.deleted', { defaultValue: 'Transaction deleted' }));
+      toast.error(
+        t('finance.transactions.deleteErrorPrefix', {
+          defaultValue: 'Error eliminando transacci�n:',
+        }) +
+          ' ' +
+          (result?.error || 'Unknown')
+      );
+    } else
+      toast.success(t('finance.transactions.deleted', { defaultValue: 'Transacci�n eliminada' }));
   };
 
   const handleExportCSV = () => {
     const escapeCsv = (value = '') => `"${String(value).replace(/"/g, '""')}"`;
-    const headers = ['Fecha', 'Concepto', 'Proveedor', 'Tipo', 'Categoria', 'Estado', 'Fecha limite', 'Monto', 'Pagado', 'Pendiente'];
+    const headers = [
+      'Fecha',
+      'Concepto',
+      'Proveedor',
+      'Tipo',
+      'Categoria',
+      'Estado',
+      'Fecha limite',
+      'Monto',
+      'Pagado',
+      'Pendiente',
+    ];
     const rows = filteredTransactions.map((t) => {
       const amount = Number(t.amount) || 0;
       const paid = getPaidValue(t);
@@ -293,11 +377,12 @@ export default function TransactionManager({
 
   const handleClickImportCSV = () => fileInputRef.current?.click();
   const parseCSVToRows = (text) => {
-    const lines = text.split(/\r?\n/).filter(l => l && l.trim().length > 0);
+    const lines = text.split(/\r?\n/).filter((l) => l && l.trim().length > 0);
     if (lines.length === 0) return { headers: [], rows: [] };
     // Detect delimiter: prefer comma, fallback to semicolon
     const sample = lines[0];
-    const delimiter = (sample.match(/,/g) || []).length >= (sample.match(/;/g) || []).length ? ',' : ';';
+    const delimiter =
+      (sample.match(/,/g) || []).length >= (sample.match(/;/g) || []).length ? ',' : ';';
     const splitLine = (line) => {
       const result = [];
       let current = '';
@@ -305,8 +390,12 @@ export default function TransactionManager({
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
         if (ch === '"') {
-          if (inQuotes && line[i+1] === '"') { current += '"'; i++; }
-          else { inQuotes = !inQuotes; }
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
         } else if (ch === delimiter && !inQuotes) {
           result.push(current.trim());
           current = '';
@@ -317,30 +406,49 @@ export default function TransactionManager({
       result.push(current.trim());
       return result;
     };
-    const headers = splitLine(lines[0]).map(h => h.trim());
-    const rows = lines.slice(1).map(line => splitLine(line));
+    const headers = splitLine(lines[0]).map((h) => h.trim());
+    const rows = lines.slice(1).map((line) => splitLine(line));
     return { headers, rows };
   };
   const autoDetectMapping = (headers) => {
-    const lower = headers.map(h => (h || '').toLowerCase());
+    const lower = headers.map((h) => (h || '').toLowerCase());
     return {
-      date: lower.findIndex(h => /fecha|date/.test(h)),
-      desc: lower.findIndex(h => /concepto|descripcion|descripciÒ�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¾Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¾Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a�¦Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a�¦Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�³n|description/.test(h)),
-      amount: lower.findIndex(h => /importe|monto|amount|valor/.test(h)),
-      type: lower.findIndex(h => /tipo|type/.test(h)),
-      category: lower.findIndex(h => /categoria|categorÒ�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¾Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¾Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a�¦Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a�¦Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�­a|category/.test(h)),
+      date: lower.findIndex((h) => /fecha|date/.test(h)),
+      desc: lower.findIndex((h) =>
+        /concepto|descripcion|descripci�?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?�n|description/.test(
+          h
+        )
+      ),
+      amount: lower.findIndex((h) => /importe|monto|amount|valor/.test(h)),
+      type: lower.findIndex((h) => /tipo|type/.test(h)),
+      category: lower.findIndex((h) =>
+        /categoria|categor�?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��??�Ң�?a�?&��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�??�Ң�??�?��?a?��?? ?"Ң�?a�?&��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"Ң�?a�?��??�Ң�??�?�Ң�??�?��?? ?"�?�????�?�??��?a?��?? ?"�?a?��??�Ң�??�?��??��?�??��?a?��?? ?"Ң�?a�?��?�??��?a?��?? ?"�?�????�?�??�Ң�?a��?~��?? ?"�?a?��??�Ң�?a�?&��?a?��?�??��?a?��?? ?"�?�????�??�Ң�??�?��??��?? ?"Ң�?a�?&��?�??��?a?�a|category/.test(
+          h
+        )
+      ),
     };
   };
-  const handleCSVSelected = useCallback(async (e)=>{
-    try{
-      const file = e.target.files?.[0]; if(!file) return;
+  const handleCSVSelected = useCallback(async (e) => {
+    try {
+      const file = e.target.files?.[0];
+      if (!file) return;
       setCsvLoading(true);
       const text = await file.text();
       const { headers, rows } = parseCSVToRowsUtil(text);
-      if (!headers.length || !rows.length) { setCsvError('El CSV no contiene datos'); return; }
-      setCsvError(''); setCsvHeaders(headers); setCsvRows(rows); setCsvMapping(autoDetectCSVMapping(headers)); setShowCsvModal(true);
-    } finally { setCsvLoading(false); if(fileInputRef.current) fileInputRef.current.value=''; }
-  },[]);
+      if (!headers.length || !rows.length) {
+        setCsvError('El CSV no contiene datos');
+        return;
+      }
+      setCsvError('');
+      setCsvHeaders(headers);
+      setCsvRows(rows);
+      setCsvMapping(autoDetectCSVMapping(headers));
+      setShowCsvModal(true);
+    } finally {
+      setCsvLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -349,7 +457,7 @@ export default function TransactionManager({
         stats={stats}
         isLoading={isLoading}
         csvLoading={csvLoading}
-        onConnectBank={()=>setShowBankModal(true)}
+        onConnectBank={() => setShowBankModal(true)}
         onImportCSV={handleClickImportCSV}
         onExportCSV={handleExportCSV}
         onNew={handleAddTransaction}
@@ -376,19 +484,41 @@ export default function TransactionManager({
           providers={providers}
         />
         <div className="mt-3">
-          <Button variant="outline" onClick={()=>{ setSearchTerm(''); setTypeFilter(''); setCategoryFilter(''); setProviderFilter(''); setDateRange(''); setOnlyUncategorized(false); setSortBy('date_desc'); }} className="w-full md:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSearchTerm('');
+              setTypeFilter('');
+              setCategoryFilter('');
+              setProviderFilter('');
+              setDateRange('');
+              setOnlyUncategorized(false);
+              setSortBy('date_desc');
+            }}
+            className="w-full md:w-auto"
+          >
             {t('finance.transactions.clear', { defaultValue: 'Limpiar' })}
           </Button>
         </div>
       </Card>
 
-      <PaymentAlerts overdueCount={paymentAlerts.overdue.length} upcomingCount={paymentAlerts.upcoming.length} tr={t} />
+      <PaymentAlerts
+        overdueCount={paymentAlerts.overdue.length}
+        upcomingCount={paymentAlerts.upcoming.length}
+        tr={t}
+      />
 
       <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         {filteredTransactions.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-[color:var(--color-text)]/60">{t('finance.transactions.empty', { defaultValue: 'No hay transacciones que mostrar' })}</p>
-            <Button className="mt-4" onClick={handleAddTransaction} leftIcon={<Plus size={16} />}>{t('finance.transactions.createFirst', { defaultValue: 'Create first transaction' })}</Button>
+            <p className="text-[color:var(--color-text)]/60">
+              {t('finance.transactions.empty', {
+                defaultValue: 'No hay transacciones que mostrar',
+              })}
+            </p>
+            <Button className="mt-4" onClick={handleAddTransaction} leftIcon={<Plus size={16} />}>
+              {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacci�n' })}
+            </Button>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -403,20 +533,34 @@ export default function TransactionManager({
             <table className="w-full" style={{ display: shouldVirtualize ? 'none' : undefined }}>
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.category', { defaultValue: 'Categor�a' })}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.type', { defaultValue: 'Tipo' })}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.status', { defaultValue: 'Estado' })}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.amount', { defaultValue: 'Monto' })}</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.actions', { defaultValue: 'Acciones' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.category', { defaultValue: 'categor�a' })}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.type', { defaultValue: 'Tipo' })}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.status', { defaultValue: 'Estado' })}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.amount', { defaultValue: 'Monto' })}
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">
+                    {t('finance.transactions.headers.actions', { defaultValue: 'Acciones' })}
+                  </th>
                 </tr>
               </thead>
               {/* redundant thead removed
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.date', { defaultValue: 'Fecha' })}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.concept', { defaultValue: 'Concepto' })}</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.category', { defaultValue: 'Categor�a' })}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.category', { defaultValue: 'categor�a' })}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.type', { defaultValue: 'Tipo' })}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.status', { defaultValue: 'Estado' })}</th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--color-text)]/60 uppercase tracking-wider">{t('finance.transactions.headers.amount', { defaultValue: 'Monto' })}</th>
@@ -432,73 +576,115 @@ export default function TransactionManager({
                   const outstanding = Math.max(0, amount - paid);
                   const isExpense = t.type === 'expense';
                   const dueDate = t.dueDate ? new Date(t.dueDate) : null;
-                  const isOverdue = Boolean(isExpense && dueDate && !Number.isNaN(dueDate.getTime()) && dueDate < new Date() && status !== 'paid');
+                  const isOverdue = Boolean(
+                    isExpense &&
+                      dueDate &&
+                      !Number.isNaN(dueDate.getTime()) &&
+                      dueDate < new Date() &&
+                      status !== 'paid'
+                  );
 
                   return (
                     <tr key={t.id} className="hover:bg-[var(--color-accent)]/10">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]">{formatDate(t.date)}</td>
-                    <td className="px-6 py-4 text-sm text-[color:var(--color-text)]">
-                      <div className="max-w-xs font-medium text-[color:var(--color-text)] truncate">
-                        {t.concept || t.description || t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}
-                      </div>
-                      {(t.provider || t.dueDate) && (
-                        <div className="mt-1 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
-                          {t.provider && <div>{t.provider}</div>}
-                          {t.dueDate && (
-                            <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
-                              {t('finance.transactions.dueOn', { defaultValue: 'Vence:' })} {formatDate(t.dueDate)}
-                            </div>
-                          )}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]">
+                        {formatDate(t.date)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-[color:var(--color-text)]">
+                        <div className="max-w-xs font-medium text-[color:var(--color-text)] truncate">
+                          {t.concept ||
+                            t.description ||
+                            t('finance.transactions.noConcept', { defaultValue: 'Sin concepto' })}
                         </div>
-                      )}
-                      {Array.isArray(t.attachments) && t.attachments.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text)]/70">
-                          {t.attachments.map((att, index) => {
-                            const label = att?.filename || `${t('finance.transactions.attachment', { defaultValue: 'Adjunto' })} ${index + 1}`;
-                            return att?.url ? (
-                              <a
-                                key={att.url || index}
-                                href={att.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[color:var(--color-primary)] hover:underline"
-                              >
-                                <Paperclip size={12} />
-                                {label}
-                              </a>
-                            ) : (
-                              <span key={index} className="inline-flex items-center gap-1">
-                                <Paperclip size={12} />
-                                {label}
-                              </span>
-                            );
-                          })}
+                        {(t.provider || t.dueDate) && (
+                          <div className="mt-1 text-xs text-[color:var(--color-text)]/60 space-y-0.5">
+                            {t.provider && <div>{t.provider}</div>}
+                            {t.dueDate && (
+                              <div className={isOverdue ? 'text-[color:var(--color-danger)]' : ''}>
+                                {t('finance.transactions.dueOn', { defaultValue: 'Vence:' })}{' '}
+                                {formatDate(t.dueDate)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {Array.isArray(t.attachments) && t.attachments.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--color-text)]/70">
+                            {t.attachments.map((att, index) => {
+                              const label =
+                                att?.filename ||
+                                `${t('finance.transactions.attachment', { defaultValue: 'Adjunto' })} ${index + 1}`;
+                              return att?.url ? (
+                                <a
+                                  key={att.url || index}
+                                  href={att.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[color:var(--color-primary)] hover:underline"
+                                >
+                                  <Paperclip size={12} />
+                                  {label}
+                                </a>
+                              ) : (
+                                <span key={index} className="inline-flex items-center gap-1">
+                                  <Paperclip size={12} />
+                                  {label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">
+                          {t.category ||
+                            t('finance.transactions.noCategory', { defaultValue: 'No category' })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${t.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}
+                        >
+                          {t.type === 'income'
+                            ? t('finance.transactions.income', { defaultValue: 'Ingreso' })
+                            : t('finance.transactions.expense', { defaultValue: 'Gasto' })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'}`}
+                        >
+                          {statusLabels[status] || status}
+                        </span>
+                      </td>
+                      <td
+                        className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${t.type === 'income' ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}
+                      >
+                        {t.type === 'income' ? '+' : '-'}
+                        {formatCurrency(Math.abs(displayAmount))}
+                        {outstanding > 0 && (
+                          <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                            {t(
+                              t.type === 'expense'
+                                ? 'finance.transactions.outstandingExpense'
+                                : 'finance.transactions.outstandingIncome',
+                              { defaultValue: t.type === 'expense' ? 'Pendiente:' : 'Por recibir:' }
+                            )}{' '}
+                            {formatCurrency(outstanding)}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            aria-label="Eliminar transacción"
+                            onClick={() => handleDeleteTransaction(t)}
+                            className="text-[color:var(--color-danger)] hover:brightness-110"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--color-text)]/60"><span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]">{t.category || t('finance.transactions.noCategory', { defaultValue: 'No category' })}</span></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm"><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${t.type === 'income' ? 'bg-[var(--color-success)]/15 text-[color:var(--color-success)]' : 'bg-[var(--color-danger)]/15 text-[color:var(--color-danger)]'}`}>{t.type === 'income' ? t('finance.transactions.income', { defaultValue: 'Ingreso' }) : t('finance.transactions.expense', { defaultValue: 'Gasto' })}</span></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status] || 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'}`}>
-                        {statusLabels[status] || status}
-                      </span>
-                    </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${t.type === 'income' ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}>
-                      {t.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(displayAmount))}
-                      {outstanding > 0 && (
-                        <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
-                          {t(t.type === 'expense' ? 'finance.transactions.outstandingExpense' : 'finance.transactions.outstandingIncome', { defaultValue: t.type === 'expense' ? 'Pendiente:' : 'Por recibir:' })} {formatCurrency(outstanding)}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button aria-label="Editar transacciÒ�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¾Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¾Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a� Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¾Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��šÒ�a�¦Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a� Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò��¢Ò¢â�a¬�&¾Ò�a�¢Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¬Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò�a�¦Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò¢â�a¬� Ò��¢Ò¢â��š�¬Ò¢â��ž�¢Ò�� �"Ò⬠â����Ò�â��šÒ�a�¢Ò�� �"Ò�a�¢Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�â��šÒ�a�¬Ò�� �"Ò¢â�a¬�¦Ò�â��šÒ�a�¡Ò�� �"Ò⬠â����Ò�â�� Ò¢â�a¬â�~¢Ò�� �"Ò�a�¢Ò��¢Ò¢â�a¬�&¡Ò�a�¬Ò�â��¦Ò�a�¡Ò�� �"Ò⬠â����Ò��¢Ò¢â��š�¬Ò⬦�¡Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�³n" onClick={() => handleEditTransaction(t)} className="text-[var(--color-primary)] hover:brightness-110"><Edit3 size={16} /></button>
-                        <button aria-label="Eliminar transacci�n" onClick={() => handleDeleteTransaction(t)} className="text-[color:var(--color-danger)] hover:brightness-110"><Trash2 size={16} /></button>
-                      </div>
-                    </td>
-                  </tr>
-                );
+                      </td>
+                    </tr>
+                  );
                 })}
               </tbody>
             </table>
@@ -506,19 +692,74 @@ export default function TransactionManager({
         )}
       </Card>
 
-      <input type="file" accept=".csv,text/csv" ref={fileInputRef} style={{ display: 'none' }} onChange={handleCSVSelected} />
+      <input
+        type="file"
+        accept=".csv,text/csv"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={handleCSVSelected}
+      />
 
       <CsvImportModal
         t={t}
         open={showCsvModal}
-        onClose={()=>setShowCsvModal(false)}
+        onClose={() => setShowCsvModal(false)}
         csvError={csvError}
         csvHeaders={csvHeaders}
         csvRows={csvRows}
         csvMapping={csvMapping}
         setCsvMapping={setCsvMapping}
         csvLoading={csvLoading}
-        onImport={async ()=>{ try{ setCsvLoading(true); let imported=0; let skipped=0; const sig = (o)=> `${(o.date||'').slice(0,10)}|${(o.concept||'').toLowerCase().trim()}|${Number(o.amount)||0}|${o.type}`; const existing = new Set(transactions.map(t => sig({ date:t.date, concept:t.concept||t.description, amount:t.amount, type:t.type }))); for (const row of csvRows){ const get=(i)=> i>=0 && i<row.length ? row[i] : ''; const rawAmount=Number((get(csvMapping.amount)||'').replace(/[^0-9.-]/g,''))||0; let type=(get(csvMapping.type)||'').toLowerCase(); if(!type) type=rawAmount<0?'expense':'income'; if(type.includes('gasto')||type==='expense') type='expense'; else type='income'; const tx={ date:(get(csvMapping.date)||'').slice(0,10), concept:(get(csvMapping.desc)||'').replace(/^\"|\"$/g,''), amount:Math.abs(rawAmount), type, category:get(csvMapping.category)||'OTROS', source:'csv' }; const k=sig(tx); if(existing.has(k)){ skipped++; continue; } await onCreateTransaction(tx); existing.add(k); imported++; } toast.success(`Importadas ${imported}. Duplicadas omitidas ${skipped}`); setShowCsvModal(false);} catch(e){ toast.error('No se pudo importar CSV'); } finally { setCsvLoading(false);} }}
+        onImport={async () => {
+          try {
+            setCsvLoading(true);
+            let imported = 0;
+            let skipped = 0;
+            const sig = (o) =>
+              `${(o.date || '').slice(0, 10)}|${(o.concept || '').toLowerCase().trim()}|${Number(o.amount) || 0}|${o.type}`;
+            const existing = new Set(
+              transactions.map((t) =>
+                sig({
+                  date: t.date,
+                  concept: t.concept || t.description,
+                  amount: t.amount,
+                  type: t.type,
+                })
+              )
+            );
+            for (const row of csvRows) {
+              const get = (i) => (i >= 0 && i < row.length ? row[i] : '');
+              const rawAmount =
+                Number((get(csvMapping.amount) || '').replace(/[^0-9.-]/g, '')) || 0;
+              let type = (get(csvMapping.type) || '').toLowerCase();
+              if (!type) type = rawAmount < 0 ? 'expense' : 'income';
+              if (type.includes('gasto') || type === 'expense') type = 'expense';
+              else type = 'income';
+              const tx = {
+                date: (get(csvMapping.date) || '').slice(0, 10),
+                concept: (get(csvMapping.desc) || '').replace(/^\"|\"$/g, ''),
+                amount: Math.abs(rawAmount),
+                type,
+                category: get(csvMapping.category) || 'OTROS',
+                source: 'csv',
+              };
+              const k = sig(tx);
+              if (existing.has(k)) {
+                skipped++;
+                continue;
+              }
+              await onCreateTransaction(tx);
+              existing.add(k);
+              imported++;
+            }
+            toast.success(`Importadas ${imported}. Duplicadas omitidas ${skipped}`);
+            setShowCsvModal(false);
+          } catch (e) {
+            toast.error('No se pudo importar CSV');
+          } finally {
+            setCsvLoading(false);
+          }
+        }}
       />
 
       <BankImportModal
@@ -536,29 +777,7 @@ export default function TransactionManager({
         }}
       />
 
-        {/* removed legacy filters */}
-        
+      {/* removed legacy filters */}
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

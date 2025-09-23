@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { 
+
+import {
   loadTrackingRecords,
   saveTrackingRecords,
   createTrackingRecord,
   updateTrackingStatus,
   getTrackingNeedingFollowup,
-  TRACKING_STATUS
+  TRACKING_STATUS,
 } from '../services/EmailTrackingService';
 
 // Clave usada por el servicio
@@ -14,7 +15,9 @@ const KEY = 'lovenda_email_tracking';
 describe('EmailTrackingService (mínimo)', () => {
   beforeEach(() => {
     // Limpiar almacenamiento antes de cada prueba
-    try { localStorage.removeItem(KEY); } catch {}
+    try {
+      localStorage.removeItem(KEY);
+    } catch {}
   });
 
   it('crea un seguimiento en estado WAITING con un hilo inicial', () => {
@@ -39,18 +42,20 @@ describe('EmailTrackingService (mínimo)', () => {
     const past = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000); // 5 días atrás
 
     // Guardar manualmente un registro de prueba en WAITING con fecha antigua
-    const records = [{
-      id: 't1',
-      emailId: 'e1',
-      providerId: 'p1',
-      providerName: 'Proveedor Antiguo',
-      providerEmail: 'old@demo.com',
-      subject: 'Seguimiento antiguo',
-      status: TRACKING_STATUS.WAITING,
-      tags: [],
-      lastEmailDate: past,
-      thread: []
-    }];
+    const records = [
+      {
+        id: 't1',
+        emailId: 'e1',
+        providerId: 'p1',
+        providerName: 'Proveedor Antiguo',
+        providerEmail: 'old@demo.com',
+        subject: 'Seguimiento antiguo',
+        status: TRACKING_STATUS.WAITING,
+        tags: [],
+        lastEmailDate: past,
+        thread: [],
+      },
+    ];
     saveTrackingRecords(records);
 
     const needing = getTrackingNeedingFollowup(3);

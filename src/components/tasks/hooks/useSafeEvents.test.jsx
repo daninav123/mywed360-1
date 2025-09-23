@@ -1,6 +1,7 @@
+import { render } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+
 import { useSafeEvents } from './useSafeEvents';
 
 function SafeEventsTest({ meetings, onResult }) {

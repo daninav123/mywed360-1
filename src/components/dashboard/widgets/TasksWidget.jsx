@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+
 import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
 
 // Devuelve prioridad calculada según cercanía de la fecha
@@ -72,10 +73,14 @@ export const TasksWidget = ({ config }) => {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -83,33 +88,34 @@ export const TasksWidget = ({ config }) => {
     <div className="h-full">
       <div className="space-y-2">
         {items.length > 0 ? (
-          items.map(task => (
-            <div 
-              key={task.id} 
+          items.map((task) => (
+            <div
+              key={task.id}
               className={`p-2 rounded border ${
                 task.completed ? 'bg-gray-50 opacity-70' : 'bg-white'
               }`}
             >
               <div className="flex items-start">
-                <input 
-                  type="checkbox" 
-                  checked={task.completed}
-                  readOnly
-                  className="mt-1 mr-2"
-                />
+                <input type="checkbox" checked={task.completed} readOnly className="mt-1 mr-2" />
                 <div className="flex-1">
                   <div className={`flex justify-between ${task.completed ? 'line-through' : ''}`}>
                     <span>{task.title}</span>
                     <span className="text-sm text-gray-500">
                       {task.dueDate.toLocaleDateString('es-ES', {
                         day: '2-digit',
-                        month: 'short'
+                        month: 'short',
                       })}
                     </span>
                   </div>
                   {!task.completed && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded ${getPriorityColor(task.priority)}`}>
-                      {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Baja'}
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded ${getPriorityColor(task.priority)}`}
+                    >
+                      {task.priority === 'high'
+                        ? 'Alta'
+                        : task.priority === 'medium'
+                          ? 'Media'
+                          : 'Baja'}
                     </span>
                   )}
                 </div>
@@ -117,9 +123,7 @@ export const TasksWidget = ({ config }) => {
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-500 py-4">
-            No hay tareas pendientes
-          </div>
+          <div className="text-center text-gray-500 py-4">No hay tareas pendientes</div>
         )}
       </div>
       <div className="mt-4 text-right">

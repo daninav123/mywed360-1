@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Modal from '../Modal';
-import { getInviteTemplate, setInviteTemplate, renderInviteMessage } from '../../services/MessageTemplateService';
+
+import {
+  getInviteTemplate,
+  setInviteTemplate,
+  renderInviteMessage,
+} from '../../services/MessageTemplateService';
 import wh from '../../utils/whDebug';
+import Modal from '../Modal';
 
 function InviteTemplateModal({ open, onClose, onSaved }) {
   const [value, setValue] = useState('');
@@ -10,7 +15,9 @@ function InviteTemplateModal({ open, onClose, onSaved }) {
     if (open) {
       const current = getInviteTemplate();
       setValue(current);
-      try { wh('TemplateModal – open', { length: current?.length || 0 }); } catch {}
+      try {
+        wh('TemplateModal – open', { length: current?.length || 0 });
+      } catch {}
     }
   }, [open]);
 
@@ -19,7 +26,9 @@ function InviteTemplateModal({ open, onClose, onSaved }) {
   const handleSave = () => {
     const ok = setInviteTemplate(value);
     if (ok) {
-      try { wh('TemplateModal – saved', { length: value.length }); } catch {}
+      try {
+        wh('TemplateModal – saved', { length: value.length });
+      } catch {}
       onSaved?.(value);
     } else {
       alert('No se pudo guardar la plantilla');
@@ -40,20 +49,20 @@ function InviteTemplateModal({ open, onClose, onSaved }) {
             onChange={(e) => setValue(e.target.value)}
             placeholder="¡Hola {guestName}! …"
           />
-          <div className="text-xs text-gray-500 mt-1">Ejemplo de variable: {`{guestName}`} → María</div>
+          <div className="text-xs text-gray-500 mt-1">
+            Ejemplo de variable: {`{guestName}`} → María
+          </div>
         </div>
 
         <div>
           <div className="text-sm font-medium text-gray-700 mb-1">Previsualización</div>
-          <div className="border rounded-md p-3 bg-gray-50 text-sm whitespace-pre-wrap">{preview}</div>
+          <div className="border rounded-md p-3 bg-gray-50 text-sm whitespace-pre-wrap">
+            {preview}
+          </div>
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            className="px-3 py-2 text-sm border rounded-md"
-            onClick={onClose}
-          >
+          <button type="button" className="px-3 py-2 text-sm border rounded-md" onClick={onClose}>
             Cancelar
           </button>
           <button

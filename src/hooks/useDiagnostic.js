@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import errorLogger from '../utils/errorLogger';
+
 import diagnosticService from '../services/diagnosticService';
+import errorLogger from '../utils/errorLogger';
 
 /**
  * Hook personalizado para el sistema de diagnóstico
@@ -23,7 +24,7 @@ export const useDiagnostic = () => {
   useEffect(() => {
     const initDiagnostic = async () => {
       setIsLoading(true);
-      
+
       // Esperar a que errorLogger esté inicializado
       const waitForInit = () => {
         if (errorLogger.isInitialized) {
@@ -33,7 +34,7 @@ export const useDiagnostic = () => {
           setTimeout(waitForInit, 100);
         }
       };
-      
+
       waitForInit();
     };
 
@@ -41,7 +42,7 @@ export const useDiagnostic = () => {
 
     // Actualizar cada 10 segundos
     const interval = setInterval(updateData, 10000);
-    
+
     return () => clearInterval(interval);
   }, [updateData]);
 
@@ -50,21 +51,27 @@ export const useDiagnostic = () => {
     return errors.length;
   }, [errors]);
 
-  const getRecentErrors = useCallback((minutes = 5) => {
-    const cutoff = new Date(Date.now() - minutes * 60 * 1000);
-    return errors.filter(error => new Date(error.timestamp) > cutoff);
-  }, [errors]);
+  const getRecentErrors = useCallback(
+    (minutes = 5) => {
+      const cutoff = new Date(Date.now() - minutes * 60 * 1000);
+      return errors.filter((error) => new Date(error.timestamp) > cutoff);
+    },
+    [errors]
+  );
 
-  const getServiceStatus = useCallback((service) => {
-    return diagnostics[service]?.status || 'unknown';
-  }, [diagnostics]);
+  const getServiceStatus = useCallback(
+    (service) => {
+      return diagnostics[service]?.status || 'unknown';
+    },
+    [diagnostics]
+  );
 
   const hasErrors = useCallback(() => {
-    return Object.values(diagnostics).some(d => d.status === 'error');
+    return Object.values(diagnostics).some((d) => d.status === 'error');
   }, [diagnostics]);
 
   const hasWarnings = useCallback(() => {
-    return Object.values(diagnostics).some(d => d.status === 'warning');
+    return Object.values(diagnostics).some((d) => d.status === 'warning');
   }, [diagnostics]);
 
   const getOverallStatus = useCallback(() => {
@@ -137,10 +144,13 @@ export const useDiagnostic = () => {
   }, [updateData]);
 
   // Log manual de error
-  const logError = useCallback((type, details) => {
-    errorLogger.logError(type, details);
-    updateData();
-  }, [updateData]);
+  const logError = useCallback(
+    (type, details) => {
+      errorLogger.logError(type, details);
+      updateData();
+    },
+    [updateData]
+  );
 
   return {
     // Estado
@@ -148,7 +158,7 @@ export const useDiagnostic = () => {
     errors,
     isLoading,
     lastUpdate,
-    
+
     // Funciones de consulta
     getErrorCount,
     getRecentErrors,
@@ -156,18 +166,18 @@ export const useDiagnostic = () => {
     hasErrors,
     hasWarnings,
     getOverallStatus,
-    
+
     // Funciones de diagnóstico
     runEmailDiagnostic,
     runAIDiagnostic,
     runFirebaseDiagnostic,
     runFullDiagnostic,
-    
+
     // Funciones de utilidad
     copyReport,
     clearErrors,
     logError,
-    updateData
+    updateData,
   };
 };
 

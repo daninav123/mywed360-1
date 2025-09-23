@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 /**
  * Componente SafeRenderer para manejar funciones que pueden retornar Promesas
  * y prevenir el error "Objects are not valid as a React child (found: [object Promise])"
- * 
+ *
  * @param {Object} props
  * @param {Function} props.render - Función que puede retornar una Promesa o contenido JSX
  * @param {React.ReactNode} props.fallback - Contenido a mostrar mientras se resuelve la Promesa
@@ -19,10 +19,10 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         // Ejecutar la función de renderizado
         const result = render();
-        
+
         // Si es una Promesa, esperarla
         if (result && typeof result.then === 'function') {
           const resolvedResult = await result;
@@ -80,9 +80,9 @@ export const useSafeAsync = (asyncFunction, defaultValue = null) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const result = asyncFunction();
-        
+
         if (result && typeof result.then === 'function') {
           const resolvedResult = await result;
           setValue(resolvedResult);
@@ -112,13 +112,13 @@ export const useSafeAsync = (asyncFunction, defaultValue = null) => {
 export const safeExecute = (fn, fallback = '') => {
   try {
     const result = fn();
-    
+
     // Si es una Promesa, retornar el fallback
     if (result && typeof result.then === 'function') {
       console.warn('safeExecute: Función retornó una Promesa, usando fallback');
       return fallback;
     }
-    
+
     return result;
   } catch (error) {
     console.error('Error en safeExecute:', error);

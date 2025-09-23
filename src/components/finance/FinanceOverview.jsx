@@ -1,9 +1,10 @@
+import { AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import React from 'react';
+
 import { Card } from '../ui';
 import StatCard from './StatCard';
-import { AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '../../utils/formatUtils';
 import useTranslations from '../../hooks/useTranslations';
+import { formatCurrency } from '../../utils/formatUtils';
 
 const toFinite = (value) => {
   const num = Number(value);
@@ -36,8 +37,10 @@ export default function FinanceOverview({
   const dangerThreshold = thresholds?.danger ?? 90;
 
   const getBudgetStatusColor = (percentage) => {
-    if (percentage >= dangerThreshold) return 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10';
-    if (percentage >= warnThreshold) return 'text-[color:var(--color-warning)] bg-[var(--color-warning)]/10';
+    if (percentage >= dangerThreshold)
+      return 'text-[color:var(--color-danger)] bg-[var(--color-danger)]/10';
+    if (percentage >= warnThreshold)
+      return 'text-[color:var(--color-warning)] bg-[var(--color-warning)]/10';
     return 'text-[color:var(--color-success)] bg-[var(--color-success)]/10';
   };
 
@@ -51,7 +54,8 @@ export default function FinanceOverview({
   const expectedIncome = toFinite(stats?.expectedIncome);
   const totalBudget = toFinite(stats?.totalBudget);
   const totalSpent = toFinite(stats?.totalSpent);
-  const effectiveTotal = expectedIncome > 0 ? expectedIncome : totalBudget > 0 ? totalBudget : fallbackTotal;
+  const effectiveTotal =
+    expectedIncome > 0 ? expectedIncome : totalBudget > 0 ? totalBudget : fallbackTotal;
   const budgetPercent = effectiveTotal > 0 ? (totalSpent / effectiveTotal) * 100 : 0;
 
   const safeStats = {
@@ -72,12 +76,15 @@ export default function FinanceOverview({
   const clickableCardProps = (filters) => ({
     role: 'button',
     tabIndex: 0,
-    className: 'p-6 cursor-pointer transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40',
+    className:
+      'p-6 cursor-pointer transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40',
     onClick: () => handleNavigate(filters),
     onKeyDown: (event) => handleAccessibleClick(event, () => handleNavigate(filters)),
   });
 
-  const alertCategories = safeBudget.filter((cat) => !cat.muted && toFinite(cat.percentage) >= warnThreshold);
+  const alertCategories = safeBudget.filter(
+    (cat) => !cat.muted && toFinite(cat.percentage) >= warnThreshold
+  );
 
   // Build monthly series for sparklines and deltas (last 12 months)
   const monthly = React.useMemo(() => {
@@ -128,8 +135,6 @@ export default function FinanceOverview({
 
   return (
     <div className="space-y-6">
-
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           {...clickableCardProps({ typeFilter: 'expense' })}
@@ -147,7 +152,11 @@ export default function FinanceOverview({
           {...clickableCardProps({ typeFilter: 'expense' })}
           aria-label={t('finance.overview.totalSpent', { defaultValue: 'Total Gastado' })}
           title={t('finance.overview.totalSpent', { defaultValue: 'Total Gastado' })}
-          value={<span className="text-[color:var(--color-danger)]">{formatCurrency(safeStats.totalSpent)}</span>}
+          value={
+            <span className="text-[color:var(--color-danger)]">
+              {formatCurrency(safeStats.totalSpent)}
+            </span>
+          }
           subtitle={`${budgetPercent.toFixed(1)}% ${t('finance.overview.ofBudget', { defaultValue: 'del presupuesto' })}`}
           icon={<TrendingDown className="w-5 h-5" />}
           tone="danger"
@@ -163,11 +172,23 @@ export default function FinanceOverview({
           aria-label={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
           title={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
           value={
-            <span className={safeStats.currentBalance >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}>
+            <span
+              className={
+                safeStats.currentBalance >= 0
+                  ? 'text-[color:var(--color-success)]'
+                  : 'text-[color:var(--color-danger)]'
+              }
+            >
               {formatCurrency(safeStats.currentBalance)}
             </span>
           }
-          icon={safeStats.currentBalance >= 0 ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+          icon={
+            safeStats.currentBalance >= 0 ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertTriangle className="w-5 h-5" />
+            )
+          }
           tone={safeStats.currentBalance >= 0 ? 'success' : 'danger'}
           loading={isLoading}
           tooltip={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
@@ -181,7 +202,11 @@ export default function FinanceOverview({
           {...clickableCardProps({ typeFilter: 'income' })}
           aria-label={t('finance.overview.expectedIncome', { defaultValue: 'Ingresos Esperados' })}
           title={t('finance.overview.expectedIncome', { defaultValue: 'Ingresos Esperados' })}
-          value={<span className="text-[color:var(--color-success)]">{formatCurrency(safeStats.expectedIncome)}</span>}
+          value={
+            <span className="text-[color:var(--color-success)]">
+              {formatCurrency(safeStats.expectedIncome)}
+            </span>
+          }
           icon={<TrendingUp className="w-5 h-5" />}
           tone="success"
           loading={isLoading}
@@ -198,10 +223,13 @@ export default function FinanceOverview({
           <div className="flex items-start space-x-3">
             <AlertTriangle className="w-5 h-5 text-[color:var(--color-warning)] mt-0.5" />
             <div>
-              <h3 className="font-medium text-[color:var(--color-warning)]">{t('finance.alerts.budget', { defaultValue: 'Alertas de Presupuesto' })}</h3>
+              <h3 className="font-medium text-[color:var(--color-warning)]">
+                {t('finance.alerts.budget', { defaultValue: 'Alertas de Presupuesto' })}
+              </h3>
               <div className="mt-2 space-y-1">
                 {alertCategories.map((cat, index) => {
-                  const action = () => handleNavigate({ categoryFilter: cat.name, typeFilter: 'expense' });
+                  const action = () =>
+                    handleNavigate({ categoryFilter: cat.name, typeFilter: 'expense' });
                   return (
                     <p
                       key={index}
@@ -211,8 +239,11 @@ export default function FinanceOverview({
                       onClick={action}
                       onKeyDown={(event) => handleAccessibleClick(event, action)}
                     >
-                      <span className="font-medium">{cat.name}</span>: {toFinite(cat.percentage).toFixed(1)}% {t('finance.overview.used', { defaultValue: 'utilizado' })}
-                      {toFinite(cat.percentage) >= 100 && ` ${t('finance.overview.exceededNote', { defaultValue: '(Presupuesto excedido!)' })}`}
+                      <span className="font-medium">{cat.name}</span>:{' '}
+                      {toFinite(cat.percentage).toFixed(1)}%{' '}
+                      {t('finance.overview.used', { defaultValue: 'utilizado' })}
+                      {toFinite(cat.percentage) >= 100 &&
+                        ` ${t('finance.overview.exceededNote', { defaultValue: '(Presupuesto excedido!)' })}`}
                     </p>
                   );
                 })}
@@ -224,12 +255,15 @@ export default function FinanceOverview({
 
       <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-4">
-          {t('finance.overview.categoryStatus', { defaultValue: 'Estado del Presupuesto por Categoras' })}
+          {t('finance.overview.categoryStatus', {
+            defaultValue: 'Estado del Presupuesto por Categor�as',
+          })}
         </h3>
         <div className="space-y-3">
           {safeBudget.map((category, index) => {
             const percentage = toFinite(category.percentage);
-            const action = () => handleNavigate({ categoryFilter: category.name, typeFilter: 'expense' });
+            const action = () =>
+              handleNavigate({ categoryFilter: category.name, typeFilter: 'expense' });
             return (
               <div
                 key={index}
@@ -241,8 +275,12 @@ export default function FinanceOverview({
               >
                 <div className="flex-1 pr-4">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-[color:var(--color-text)]/80">{category.name}</span>
-                    <span className="text-sm text-[color:var(--color-text)]/60">{formatCurrency(category.spent)} / {formatCurrency(category.amount)}</span>
+                    <span className="text-sm font-medium text-[color:var(--color-text)]/80">
+                      {category.name}
+                    </span>
+                    <span className="text-sm text-[color:var(--color-text)]/60">
+                      {formatCurrency(category.spent)} / {formatCurrency(category.amount)}
+                    </span>
                   </div>
                   <div className="w-full rounded-full h-2 bg-[color:var(--color-text)]/10">
                     <div
@@ -250,14 +288,16 @@ export default function FinanceOverview({
                         percentage >= 100
                           ? 'bg-[var(--color-danger)]'
                           : percentage >= warnThreshold
-                          ? 'bg-[var(--color-warning)]'
-                          : 'bg-[var(--color-success)]'
+                            ? 'bg-[var(--color-warning)]'
+                            : 'bg-[var(--color-success)]'
                       }`}
                       style={{ width: `${Math.min(percentage, 100)}%` }}
                     />
                   </div>
                 </div>
-                <div className={`ml-3 px-2 py-1 rounded-full text-xs font-medium ${getBudgetStatusColor(percentage)}`}>
+                <div
+                  className={`ml-3 px-2 py-1 rounded-full text-xs font-medium ${getBudgetStatusColor(percentage)}`}
+                >
                   <div className="flex items-center space-x-1">
                     {getBudgetIcon(percentage)}
                     <span>{percentage.toFixed(0)}%</span>

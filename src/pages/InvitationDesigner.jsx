@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import useHistory from '../hooks/useHistory';
-import TemplateGallery from '../components/invitations/TemplateGallery';
+
+import InvitationCanvas from '../components/invitations/InvitationCanvas';
 import LayerPanel from '../components/invitations/LayerPanel';
 import PropertyPanel from '../components/invitations/PropertyPanel';
-import { exportElementToPdf } from '../utils/pdfExport';
+import TemplateGallery from '../components/invitations/TemplateGallery';
 import Toolbar from '../components/invitations/Toolbar';
-import InvitationCanvas from '../components/invitations/InvitationCanvas';
-
+import useHistory from '../hooks/useHistory';
+import { exportElementToPdf } from '../utils/pdfExport';
 
 function InvitationDesigner() {
   const [template, setTemplate] = useState(null);
@@ -85,8 +85,12 @@ function InvitationDesigner() {
           updateElement={(mutator) =>
             setElements((prev) =>
               prev.map((el) =>
-                el.id === selectedId ? (typeof mutator === 'function' ? mutator(el) : { ...el, ...mutator }) : el,
-              ),
+                el.id === selectedId
+                  ? typeof mutator === 'function'
+                    ? mutator(el)
+                    : { ...el, ...mutator }
+                  : el
+              )
             )
           }
         />

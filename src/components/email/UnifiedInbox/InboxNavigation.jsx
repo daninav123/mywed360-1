@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { 
-  Inbox, 
-  Send, 
-  Star, 
-  Trash, 
-  Plus, 
-  Mail, 
-  Tag, 
+import {
+  Inbox,
+  Send,
+  Star,
+  Trash,
+  Plus,
+  Mail,
+  Tag,
   Settings,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
-import Button from "../../Button";
+import React, { useState } from 'react';
+
+import Button from '../../Button';
 
 /**
  * Componente de navegación lateral para la bandeja de entrada unificada
@@ -24,12 +25,7 @@ import Button from "../../Button";
  * @param {Function} props.onComposeNew - Función para crear nuevo email
  * @returns {JSX.Element} Componente de navegación
  */
-const InboxNavigation = ({ 
-  currentFolder, 
-  onFolderChange, 
-  folderStats, 
-  onComposeNew 
-}) => {
+const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onComposeNew }) => {
   const [isLabelsExpanded, setIsLabelsExpanded] = useState(true);
   const [isContactsExpanded, setIsContactsExpanded] = useState(false);
 
@@ -38,7 +34,7 @@ const InboxNavigation = ({
     { id: 'inbox', name: 'Bandeja de entrada', icon: <Inbox size={18} />, system: true },
     { id: 'sent', name: 'Enviados', icon: <Send size={18} />, system: true },
     { id: 'important', name: 'Importantes', icon: <Star size={18} />, system: true },
-    { id: 'trash', name: 'Papelera', icon: <Trash size={18} />, system: true }
+    { id: 'trash', name: 'Papelera', icon: <Trash size={18} />, system: true },
   ];
 
   // Etiquetas disponibles
@@ -46,7 +42,7 @@ const InboxNavigation = ({
     { id: 'providers', name: 'Proveedores', color: 'bg-blue-500' },
     { id: 'guests', name: 'Invitados', color: 'bg-green-500' },
     { id: 'important', name: 'Importantes', color: 'bg-yellow-500' },
-    { id: 'personal', name: 'Personal', color: 'bg-purple-500' }
+    { id: 'personal', name: 'Personal', color: 'bg-purple-500' },
   ];
 
   return (
@@ -78,14 +74,16 @@ const InboxNavigation = ({
             >
               <span className="mr-2">{folder.icon}</span>
               {folder.name}
-              
+
               {/* Contador de no leídos o total */}
               {folderStats[folder.id] && (
-                <span className={`ml-auto ${
-                  folderStats[folder.id].unread > 0 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-                } text-xs rounded-full w-6 h-6 flex items-center justify-center`}>
+                <span
+                  className={`ml-auto ${
+                    folderStats[folder.id].unread > 0
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  } text-xs rounded-full w-6 h-6 flex items-center justify-center`}
+                >
                   {folderStats[folder.id].unread || folderStats[folder.id].total || 0}
                 </span>
               )}
@@ -117,7 +115,7 @@ const InboxNavigation = ({
                   {label.name}
                 </div>
               ))}
-              
+
               {/* Añadir nueva etiqueta */}
               <div className="flex items-center px-3 py-1 hover:bg-gray-100 rounded cursor-pointer text-sm text-blue-600">
                 <Plus size={14} className="mr-1" />
@@ -151,13 +149,11 @@ const InboxNavigation = ({
 
         {/* Configuración */}
         <div className="pt-4 border-t mt-4">
-          <button
-            className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
-          >
+          <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">
             <Settings size={16} className="mr-2" />
             <span>Configuración</span>
           </button>
-          
+
           <div className="text-xs text-gray-500 mt-4 px-3">
             Almacenamiento: <span className="font-medium">23% usado</span>
             <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">

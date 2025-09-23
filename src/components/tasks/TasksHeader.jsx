@@ -1,5 +1,5 @@
-import React from 'react';
 import { Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import React from 'react';
 
 export default function TasksHeader({ syncStatus, onNewTask }) {
   return (
@@ -23,8 +23,8 @@ export default function TasksHeader({ syncStatus, onNewTask }) {
               ? syncStatus?.isSyncing
                 ? 'Sincronizando...'
                 : syncStatus?.pendingChanges
-                ? 'Cambios pendientes'
-                : 'Sincronizado'
+                  ? 'Cambios pendientes'
+                  : 'Sincronizado'
               : 'Sin conexión'}
           </div>
         </div>
@@ -40,4 +40,3 @@ export default function TasksHeader({ syncStatus, onNewTask }) {
     </div>
   );
 }
-

@@ -1,7 +1,17 @@
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  updateDoc,
+  doc,
+  getDoc,
+  deleteDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { useState, useEffect, useCallback } from 'react';
-import { collection, addDoc, onSnapshot, updateDoc, doc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+
 import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
 
 /**
  * Gestiona grupos manuales de proveedores (unificar/separar tarjetas)
@@ -36,7 +46,8 @@ export default function useSupplierGroups() {
   const createGroup = useCallback(
     async ({ name, memberIds = [], notes = '' }) => {
       if (!activeWedding) return { success: false, error: 'No wedding' };
-      if (!name || memberIds.length < 2) return { success: false, error: 'Nombre y al menos 2 proveedores' };
+      if (!name || memberIds.length < 2)
+        return { success: false, error: 'Nombre y al menos 2 proveedores' };
       try {
         const col = collection(db, 'weddings', activeWedding, 'supplierGroups');
         const now = serverTimestamp();
@@ -90,7 +101,8 @@ export default function useSupplierGroups() {
 
   const removeMember = useCallback(
     async (groupId, memberId) => {
-      if (!activeWedding || !groupId || !memberId) return { success: false, error: 'Missing params' };
+      if (!activeWedding || !groupId || !memberId)
+        return { success: false, error: 'Missing params' };
       try {
         const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
         const gSnap = await getDoc(gRef);
@@ -118,7 +130,8 @@ export default function useSupplierGroups() {
 
   const addMembers = useCallback(
     async (groupId, memberIds = []) => {
-      if (!activeWedding || !groupId || memberIds.length === 0) return { success: false, error: 'Missing params' };
+      if (!activeWedding || !groupId || memberIds.length === 0)
+        return { success: false, error: 'Missing params' };
       try {
         const gRef = doc(db, 'weddings', activeWedding, 'supplierGroups', groupId);
         const gSnap = await getDoc(gRef);
@@ -177,5 +190,14 @@ export default function useSupplierGroups() {
     [activeWedding]
   );
 
-  return { groups, loading, error, createGroup, dissolveGroup, removeMember, addMembers, updateGroup };
+  return {
+    groups,
+    loading,
+    error,
+    createGroup,
+    dissolveGroup,
+    removeMember,
+    addMembers,
+    updateGroup,
+  };
 }

@@ -1,9 +1,18 @@
-import { useState } from 'react';
-import { sendEmail, validateEmail, checkUsernameAvailability } from '../../services/mailgunService';
-import { 
-  Box, Button, TextField, Typography, Paper, Grid, 
-  Snackbar, Alert, CircularProgress, Divider
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Grid,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  Divider,
 } from '@mui/material';
+import { useState } from 'react';
+
+import { sendEmail, validateEmail, checkUsernameAvailability } from '../../services/mailgunService';
 
 /**
  * Componente para probar las funcionalidades de Mailgun
@@ -18,48 +27,48 @@ function MailgunTester() {
     subject: 'Prueba de Mailgun desde myWed360',
     text: 'Este es un correo de prueba enviado desde la aplicación myWed360.',
   });
-  
+
   // Estado para validación de email
   const [validating, setValidating] = useState(false);
   const [emailToValidate, setEmailToValidate] = useState('');
   const [validationResult, setValidationResult] = useState(null);
-  
+
   // Estado para verificación de disponibilidad de username
   const [checking, setChecking] = useState(false);
   const [usernameToCheck, setUsernameToCheck] = useState('');
   const [availabilityResult, setAvailabilityResult] = useState(null);
-  
+
   // Estado para notificaciones
   const [notification, setNotification] = useState({
     open: false,
     message: '',
-    severity: 'info'
+    severity: 'info',
   });
 
   // Manejar cambios en el formulario de email
   const handleEmailFormChange = (e) => {
     const { name, value } = e.target;
-    setEmailForm(prev => ({ ...prev, [name]: value }));
+    setEmailForm((prev) => ({ ...prev, [name]: value }));
   };
 
   // Enviar email de prueba
   const handleSendEmail = async (e) => {
     e.preventDefault();
     setSending(true);
-    
+
     try {
       const result = await sendEmail(emailForm);
       setNotification({
         open: true,
         message: `Email enviado correctamente! ID: ${result.messageId}`,
-        severity: 'success'
+        severity: 'success',
       });
       console.log('Respuesta del servidor:', result);
     } catch (error) {
       setNotification({
         open: true,
         message: `Error al enviar email: ${error.message}`,
-        severity: 'error'
+        severity: 'error',
       });
       console.error('Error al enviar:', error);
     } finally {
@@ -71,22 +80,22 @@ function MailgunTester() {
   const handleValidateEmail = async (e) => {
     e.preventDefault();
     setValidating(true);
-    
+
     try {
       const result = await validateEmail(emailToValidate);
       setValidationResult(result);
       setNotification({
         open: true,
-        message: result.isValid 
-          ? 'El email es válido' 
+        message: result.isValid
+          ? 'El email es válido'
           : `El email no es válido: ${result.reason || 'formato incorrecto'}`,
-        severity: result.isValid ? 'success' : 'warning'
+        severity: result.isValid ? 'success' : 'warning',
       });
     } catch (error) {
       setNotification({
         open: true,
         message: `Error al validar: ${error.message}`,
-        severity: 'error'
+        severity: 'error',
       });
       setValidationResult(null);
     } finally {
@@ -98,22 +107,22 @@ function MailgunTester() {
   const handleCheckAvailability = async (e) => {
     e.preventDefault();
     setChecking(true);
-    
+
     try {
       const isAvailable = await checkUsernameAvailability(usernameToCheck);
       setAvailabilityResult(isAvailable);
       setNotification({
         open: true,
-        message: isAvailable 
-          ? `El nombre de usuario "${usernameToCheck}" está disponible` 
+        message: isAvailable
+          ? `El nombre de usuario "${usernameToCheck}" está disponible`
           : `El nombre de usuario "${usernameToCheck}" ya está en uso`,
-        severity: isAvailable ? 'success' : 'warning'
+        severity: isAvailable ? 'success' : 'warning',
       });
     } catch (error) {
       setNotification({
         open: true,
         message: `Error al verificar disponibilidad: ${error.message}`,
-        severity: 'error'
+        severity: 'error',
       });
       setAvailabilityResult(null);
     } finally {
@@ -126,7 +135,7 @@ function MailgunTester() {
       <Typography variant="h4" gutterBottom>
         Probador de Mailgun myWed360
       </Typography>
-      
+
       <Grid container spacing={4}>
         {/* Sección de envío de correo */}
         <Grid item xs={12}>
@@ -174,10 +183,10 @@ function MailgunTester() {
                 rows={4}
                 required
               />
-              <Button 
-                type="submit" 
-                variant="contained" 
-                color="primary" 
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
                 sx={{ mt: 2 }}
                 disabled={sending}
               >
@@ -186,7 +195,7 @@ function MailgunTester() {
             </Box>
           </Paper>
         </Grid>
-        
+
         {/* Sección de validación de email */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
@@ -203,19 +212,22 @@ function MailgunTester() {
                 required
                 placeholder="ejemplo@gmail.com"
               />
-              <Button 
-                type="submit" 
-                variant="contained" 
-                color="secondary" 
+              <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
                 sx={{ mt: 2 }}
                 disabled={validating}
               >
                 {validating ? <CircularProgress size={24} /> : 'Validar'}
               </Button>
-              
+
               {validationResult && (
                 <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-                  <Typography variant="body1" color={validationResult.isValid ? 'success.main' : 'error.main'}>
+                  <Typography
+                    variant="body1"
+                    color={validationResult.isValid ? 'success.main' : 'error.main'}
+                  >
                     {validationResult.isValid ? '✅ Email válido' : '❌ Email inválido'}
                   </Typography>
                 </Box>
@@ -223,7 +235,7 @@ function MailgunTester() {
             </Box>
           </Paper>
         </Grid>
-        
+
         {/* Sección de verificación de disponibilidad */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
@@ -241,21 +253,24 @@ function MailgunTester() {
                 placeholder="nombre"
                 helperText="Solo el nombre sin @mywed360.com"
               />
-              <Button 
-                type="submit" 
-                variant="contained" 
-                color="secondary" 
+              <Button
+                type="submit"
+                variant="contained"
+                color="secondary"
                 sx={{ mt: 2 }}
                 disabled={checking}
               >
                 {checking ? <CircularProgress size={24} /> : 'Verificar Disponibilidad'}
               </Button>
-              
+
               {availabilityResult !== null && (
                 <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-                  <Typography variant="body1" color={availabilityResult ? 'success.main' : 'error.main'}>
-                    {availabilityResult 
-                      ? `✅ "${usernameToCheck}@mywed360.com" está disponible` 
+                  <Typography
+                    variant="body1"
+                    color={availabilityResult ? 'success.main' : 'error.main'}
+                  >
+                    {availabilityResult
+                      ? `✅ "${usernameToCheck}@mywed360.com" está disponible`
                       : `❌ "${usernameToCheck}@mywed360.com" ya está en uso`}
                   </Typography>
                 </Box>
@@ -264,14 +279,14 @@ function MailgunTester() {
           </Paper>
         </Grid>
       </Grid>
-      
-      <Snackbar 
-        open={notification.open} 
-        autoHideDuration={6000} 
-        onClose={() => setNotification({...notification, open: false})}
+
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={() => setNotification({ ...notification, open: false })}
       >
-        <Alert 
-          onClose={() => setNotification({...notification, open: false})} 
+        <Alert
+          onClose={() => setNotification({ ...notification, open: false })}
           severity={notification.severity}
           variant="filled"
           sx={{ width: '100%' }}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { Trash } from 'lucide-react';
-import * as CommentService from '../../services/commentService';
+import React, { useState, useEffect } from 'react';
+
 import { useAuth } from '../../hooks/useAuth';
+import * as CommentService from '../../services/commentService';
 
 /**
  * Panel de comentarios internos para un email.
@@ -31,7 +32,7 @@ const EmailComments = ({ emailId }) => {
     CommentService.addComment(userId, emailId, {
       authorId: userId,
       authorName: userProfile?.name || 'Yo',
-      body
+      body,
     });
     setNewComment('');
     loadComments();
@@ -54,10 +55,15 @@ const EmailComments = ({ emailId }) => {
 
       <ul className="space-y-2 max-h-56 overflow-y-auto pr-2">
         {comments.map((c) => (
-          <li key={c.id} className="bg-gray-50 border border-gray-200 p-2 rounded-md flex justify-between">
+          <li
+            key={c.id}
+            className="bg-gray-50 border border-gray-200 p-2 rounded-md flex justify-between"
+          >
             <div>
               <p className="text-sm text-gray-800 whitespace-pre-line">{c.body}</p>
-              <span className="text-xs text-gray-500">{c.authorName} · {new Date(c.date).toLocaleString('es-ES')}</span>
+              <span className="text-xs text-gray-500">
+                {c.authorName} · {new Date(c.date).toLocaleString('es-ES')}
+              </span>
             </div>
             {c.authorId === userId && (
               <button
@@ -92,4 +98,3 @@ const EmailComments = ({ emailId }) => {
 };
 
 export default EmailComments;
-

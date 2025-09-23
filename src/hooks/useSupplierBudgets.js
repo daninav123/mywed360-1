@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
+import { useState, useEffect, useCallback } from 'react';
+
 import { useWedding } from '../context/WeddingContext';
+import { db } from '../firebaseConfig';
 import { put as apiPut } from '../services/apiClient';
 
 /**
@@ -36,17 +37,24 @@ export default function useSupplierBudgets(supplierId) {
   }, [activeWedding, supplierId]);
 
   // Aceptar o rechazar
-  const updateBudgetStatus = useCallback(async (budgetId, action) => {
-    try {
-      const resp = await apiPut(`/api/weddings/${activeWedding}/suppliers/${supplierId}/budget`, { action, budgetId }, { auth: true });
-      const json = await resp.json();
-      if (!resp.ok) throw new Error(json.error || 'Error');
-      return { success: true };
-    } catch (err) {
-      console.error('Error actualizando presupuesto:', err);
-      return { success: false, error: err.message };
-    }
-  }, [activeWedding, supplierId]);
+  const updateBudgetStatus = useCallback(
+    async (budgetId, action) => {
+      try {
+        const resp = await apiPut(
+          `/api/weddings/${activeWedding}/suppliers/${supplierId}/budget`,
+          { action, budgetId },
+          { auth: true }
+        );
+        const json = await resp.json();
+        if (!resp.ok) throw new Error(json.error || 'Error');
+        return { success: true };
+      } catch (err) {
+        console.error('Error actualizando presupuesto:', err);
+        return { success: false, error: err.message };
+      }
+    },
+    [activeWedding, supplierId]
+  );
 
   return { budgets, loading, error, updateBudgetStatus };
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Modal from './Modal';
 
 // Plantillas dinámicas basadas en el número total de mesas (count)
@@ -62,7 +63,13 @@ const tableTemplates = [
         tables.push({ id: id++, x: rightX, y: startY + i * 100, shape: 'rect', seats: 8 });
       const base = count - side * 2;
       for (let i = 0; i < base && id <= count; i++)
-        tables.push({ id: id++, x: leftX + 120 + i * 110, y: startY + side * 100, shape: 'rect', seats: 8 });
+        tables.push({
+          id: id++,
+          x: leftX + 120 + i * 110,
+          y: startY + side * 100,
+          shape: 'rect',
+          seats: 8,
+        });
       return tables;
     },
   },
@@ -72,7 +79,7 @@ const tableTemplates = [
 const chairTemplates = [
   {
     id: 'rows',
-    label: (n) => `Filas (${n} sillas)` ,
+    label: (n) => `Filas (${n} sillas)`,
     generate: (count) => {
       const cols = 10; // máximo 10 sillas por fila
       const rows = Math.ceil(count / cols);
@@ -88,7 +95,7 @@ const chairTemplates = [
         }
       }
       return seats;
-    }
+    },
   },
   {
     id: 'circle',
@@ -113,7 +120,7 @@ export default function TemplatesModal({ open, onApply, onClose, count = 1, tab 
   return (
     <Modal open={open} title="Plantillas de diseño" onClose={onClose}>
       <div className="space-y-3">
-        {(tab==='ceremony' ? chairTemplates : tableTemplates).map((tpl) => (
+        {(tab === 'ceremony' ? chairTemplates : tableTemplates).map((tpl) => (
           <div key={tpl.id} className="flex justify-between items-center border p-2 rounded">
             <span>{tpl.label(count)}</span>
             <button

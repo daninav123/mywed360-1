@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+
 import useFinance from '../../../hooks/useFinance';
 
 export const BudgetWidget = ({ config = {} }) => {
@@ -24,11 +25,14 @@ export const BudgetWidget = ({ config = {} }) => {
       <div className="mb-4">
         <div className="flex justify-between mb-1">
           <span className="text-sm font-medium">Presupuesto total</span>
-          <span className="text-sm font-semibold">{total.toLocaleString()}{currency}</span>
+          <span className="text-sm font-semibold">
+            {total.toLocaleString()}
+            {currency}
+          </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div 
-            className="bg-blue-600 h-2.5 rounded-full" 
+          <div
+            className="bg-blue-600 h-2.5 rounded-full"
             style={{ width: `${percentageSpent}%` }}
           ></div>
         </div>
@@ -41,11 +45,17 @@ export const BudgetWidget = ({ config = {} }) => {
       <div className="space-y-3">
         <div className="flex justify-between">
           <span className="text-sm">Total gastado:</span>
-          <span className="font-medium">{spent.toLocaleString()}{currency}</span>
+          <span className="font-medium">
+            {spent.toLocaleString()}
+            {currency}
+          </span>
         </div>
         <div className="flex justify-between">
           <span className="text-sm">Restante:</span>
-          <span className="font-medium">{remaining.toLocaleString()}{currency}</span>
+          <span className="font-medium">
+            {remaining.toLocaleString()}
+            {currency}
+          </span>
         </div>
       </div>
 
@@ -55,20 +65,20 @@ export const BudgetWidget = ({ config = {} }) => {
           {categories.map((category, index) => {
             const categoryPercentage = Math.round((category.spent / category.budget) * 100) || 0;
             const isOverBudget = category.spent > category.budget;
-            
+
             return (
               <div key={index} className="text-sm">
                 <div className="flex justify-between mb-1">
                   <span>{category.name}</span>
                   <span className={isOverBudget ? 'text-red-600' : ''}>
-                    {category.spent.toLocaleString()}{currency} / {category.budget.toLocaleString()}{currency}
+                    {category.spent.toLocaleString()}
+                    {currency} / {category.budget.toLocaleString()}
+                    {currency}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5">
-                  <div 
-                    className={`h-1.5 rounded-full ${
-                      isOverBudget ? 'bg-red-500' : 'bg-green-500'
-                    }`} 
+                  <div
+                    className={`h-1.5 rounded-full ${isOverBudget ? 'bg-red-500' : 'bg-green-500'}`}
                     style={{ width: `${Math.min(categoryPercentage, 100)}%` }}
                   ></div>
                 </div>

@@ -1,5 +1,6 @@
-import React from 'react';
 import { Folder, Plus } from 'lucide-react';
+import React from 'react';
+
 import Button from '../Button';
 
 /**

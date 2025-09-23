@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../firebaseConfig';
 import { collection, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+
+import { db } from '../firebaseConfig';
 
 export default function DevEnsureFinance() {
   const [status, setStatus] = useState('');
@@ -11,14 +12,19 @@ export default function DevEnsureFinance() {
       try {
         setStatus('Buscando bodas...');
         const weddingsSnap = await getDocs(collection(db, 'weddings'));
-        const ids = weddingsSnap.docs.map(d => d.id);
+        const ids = weddingsSnap.docs.map((d) => d.id);
         setDetails(`Encontradas ${ids.length} bodas`);
 
-        let ok = 0, fail = 0;
+        let ok = 0,
+          fail = 0;
         for (const wid of ids) {
           try {
             const financeRef = doc(db, 'weddings', wid, 'finance', 'main');
-            await setDoc(financeRef, { movements: [], updatedAt: serverTimestamp() }, { merge: true });
+            await setDoc(
+              financeRef,
+              { movements: [], updatedAt: serverTimestamp() },
+              { merge: true }
+            );
             ok++;
           } catch (e) {
             console.warn('Fallo en', wid, e);
@@ -39,7 +45,10 @@ export default function DevEnsureFinance() {
       <h1>Dev Ensure Finance</h1>
       <p>{status}</p>
       {details && <pre style={{ whiteSpace: 'pre-wrap' }}>{details}</pre>}
-      <p>Nota: Usa permisos del usuario actual en Firestore. Si no tienes permisos de lectura/escritura sobre todas las bodas, algunos writes fallarán.</p>
+      <p>
+        Nota: Usa permisos del usuario actual en Firestore. Si no tienes permisos de
+        lectura/escritura sobre todas las bodas, algunos writes fallarán.
+      </p>
     </div>
   );
 }

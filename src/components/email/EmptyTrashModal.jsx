@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Button from '../Button';
 
 /**
@@ -31,7 +32,9 @@ const EmptyTrashModal = ({ isOpen, onConfirm, onClose }) => {
           </button>
         </div>
         <div className="p-4 space-y-4">
-          <p className="text-sm text-gray-700">¿Seguro que deseas vaciar la carpeta Papelera? Esta acción no se puede deshacer.</p>
+          <p className="text-sm text-gray-700">
+            ¿Seguro que deseas vaciar la carpeta Papelera? Esta acción no se puede deshacer.
+          </p>
           <div className="flex justify-end space-x-2">
             <Button variant="ghost" size="sm" onClick={onClose}>
               Cancelar

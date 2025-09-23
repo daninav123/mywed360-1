@@ -23,7 +23,7 @@ export default function useHistory(initialState) {
       });
       setPointer((p) => p + 1);
     },
-    [pointer],
+    [pointer]
   );
 
   const undo = useCallback(() => {
@@ -34,5 +34,9 @@ export default function useHistory(initialState) {
     setPointer((p) => (p < history.length - 1 ? p + 1 : p));
   }, [history.length]);
 
-  return [current, set, { undo, redo, canUndo: pointer > 0, canRedo: pointer < history.length - 1 }];
+  return [
+    current,
+    set,
+    { undo, redo, canUndo: pointer > 0, canRedo: pointer < history.length - 1 },
+  ];
 }

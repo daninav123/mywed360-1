@@ -14,7 +14,7 @@ export function Tabs({
   children,
   className = '',
 }) {
-    // Soporta modo controlado y no controlado.
+  // Soporta modo controlado y no controlado.
   const [internalValue, setInternalValue] = useState(defaultValue);
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
@@ -35,7 +35,11 @@ export function Tabs({
 
 /** Lista de pestañas (encabezados) */
 export function TabsList({ children, className = '' }) {
-  return <div role="tablist" className={className}>{children}</div>;
+  return (
+    <div role="tablist" className={className}>
+      {children}
+    </div>
+  );
 }
 
 /**

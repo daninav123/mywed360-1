@@ -43,9 +43,11 @@ export default function GuestDragBoard({ tables = [], guestsByTable = {}, moveGu
                 <h3 className="text-sm font-semibold mb-2">
                   {droppableId === 'sin-mesa' ? 'Sin mesa' : droppableId}
                 </h3>
-                {(guestsByTable[droppableId === 'sin-mesa' ? 'sin-mesa' : droppableId] || []).map((guest, idx) => (
-                  <GuestCard guest={guest} index={idx} key={guest.id} />
-                ))}
+                {(guestsByTable[droppableId === 'sin-mesa' ? 'sin-mesa' : droppableId] || []).map(
+                  (guest, idx) => (
+                    <GuestCard guest={guest} index={idx} key={guest.id} />
+                  )
+                )}
                 {provided.placeholder}
               </div>
             )}

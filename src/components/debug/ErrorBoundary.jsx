@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 
 /**
@@ -30,7 +31,9 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="p-8 text-center">
           <h1 className="text-2xl font-semibold mb-4">Algo ha ido mal</h1>
-          <p className="text-gray-600 mb-4">Se ha producido un error inesperado. Nuestro equipo ha sido notificado.</p>
+          <p className="text-gray-600 mb-4">
+            Se ha producido un error inesperado. Nuestro equipo ha sido notificado.
+          </p>
           {process.env.NODE_ENV !== 'production' && (
             <div className="text-left max-w-3xl mx-auto">
               {this.state.error && (

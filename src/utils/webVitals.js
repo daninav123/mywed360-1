@@ -1,4 +1,5 @@
 import { onCLS, onFID, onLCP, onFCP, onINP, onTTFB } from 'web-vitals';
+
 import { post } from '@/services/apiClient';
 
 const ENABLED = (() => {

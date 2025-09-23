@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { saveData, loadData } from '../services/SyncService';
-import SyncIndicator from '../components/SyncIndicator';
+
 import PageWrapper from '../components/PageWrapper';
+import SyncIndicator from '../components/SyncIndicator';
 import PageTabs from '../components/ui/PageTabs';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
+import { saveData, loadData } from '../services/SyncService';
 
 export default function Ideas() {
   const { currentUser } = useAuth();
@@ -25,12 +26,25 @@ export default function Ideas() {
     (async () => {
       try {
         const [loadedNotes, loadedFolders, loadedPhotos] = await Promise.all([
-          loadData('ideasNotes', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true }) ,
-          loadData('ideasFolders', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true }),
-          loadData('ideasUserPhotos', { firestore: useFirestore, collection: 'userIdeas', fallbackToLocal: true })
+          loadData('ideasNotes', {
+            firestore: useFirestore,
+            collection: 'userIdeas',
+            fallbackToLocal: true,
+          }),
+          loadData('ideasFolders', {
+            firestore: useFirestore,
+            collection: 'userIdeas',
+            fallbackToLocal: true,
+          }),
+          loadData('ideasUserPhotos', {
+            firestore: useFirestore,
+            collection: 'userIdeas',
+            fallbackToLocal: true,
+          }),
         ]);
         setNotes(Array.isArray(loadedNotes) ? loadedNotes : []);
-        const f = Array.isArray(loadedFolders) && loadedFolders.length ? loadedFolders : ['General'];
+        const f =
+          Array.isArray(loadedFolders) && loadedFolders.length ? loadedFolders : ['General'];
         setFolders(f);
         setCurrentFolder(f.includes('General') ? 'General' : f[0]);
         setPhotos(Array.isArray(loadedPhotos) ? loadedPhotos : []);
@@ -38,17 +52,25 @@ export default function Ideas() {
         setLoading(false);
       }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
   // Persistencia reactiva de notas y carpetas
   useEffect(() => {
     if (loading) return;
-    saveData('ideasNotes', notes, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+    saveData('ideasNotes', notes, {
+      firestore: useFirestore,
+      collection: 'userIdeas',
+      showNotification: false,
+    });
   }, [notes, useFirestore, loading]);
   useEffect(() => {
     if (loading) return;
-    saveData('ideasFolders', folders, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+    saveData('ideasFolders', folders, {
+      firestore: useFirestore,
+      collection: 'userIdeas',
+      showNotification: false,
+    });
   }, [folders, useFirestore, loading]);
 
   useEffect(() => {
@@ -62,16 +84,24 @@ export default function Ideas() {
   return (
     <PageWrapper title="Ideas" className="max-w-5xl mx-auto">
       <SyncIndicator />
-      <PageTabs value={view} onChange={setView} options={[{ id: 'notes', label: 'Notas' }, { id: 'photos', label: 'Fotos' }]} className="mb-4" />
-      {view==='notes' && (
+      <PageTabs
+        value={view}
+        onChange={setView}
+        options={[
+          { id: 'notes', label: 'Notas' },
+          { id: 'photos', label: 'Fotos' },
+        ]}
+        className="mb-4"
+      />
+      {view === 'notes' && (
         <div>
           {/* Selector de carpetas */}
           <div className="flex items-center space-x-2 mb-4">
-            {folders.map(folder => (
+            {folders.map((folder) => (
               <button
                 key={folder}
                 onClick={() => setCurrentFolder(folder)}
-                className={`px-2 py-1 rounded-full text-sm ${currentFolder===folder ? 'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
+                className={`px-2 py-1 rounded-full text-sm ${currentFolder === folder ? 'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 {folder}
               </button>
@@ -92,14 +122,14 @@ export default function Ideas() {
           <textarea
             value={noteText}
             ref={textareaRef}
-            onChange={e => setNoteText(e.target.value)}
+            onChange={(e) => setNoteText(e.target.value)}
             className="w-full border rounded p-2 mb-2"
             placeholder="Escribe tu nota..."
           />
           <button
             onClick={() => {
               if (noteText) {
-                setNotes(prev => [...prev, { folder: currentFolder, text: noteText.trim() }]);
+                setNotes((prev) => [...prev, { folder: currentFolder, text: noteText.trim() }]);
                 setNoteText('');
               }
             }}
@@ -108,34 +138,48 @@ export default function Ideas() {
             Añadir Nota
           </button>
           <ul className="mt-4 list-disc list-inside">
-            {notes.filter(n => n.folder===currentFolder).map((n,i) => (<li key={i}>{n.text}</li>))}
+            {notes
+              .filter((n) => n.folder === currentFolder)
+              .map((n, i) => (
+                <li key={i}>{n.text}</li>
+              ))}
           </ul>
         </div>
       )}
-      
-      {view==='photos' && (
+
+      {view === 'photos' && (
         <div>
           <input
             type="file"
             accept="image/*"
             multiple
-            onChange={async e => {
+            onChange={async (e) => {
               const files = Array.from(e.target.files || []);
               if (!files.length) return;
               // Reutilizamos el uploader de adjuntos con una ruta separada lldave (userId)
               const uploaded = await uploadFilesToStorage(files, uid, 'ideas');
-              const mapped = uploaded.map(u => ({ url: u.url, name: u.filename, size: u.size }));
+              const mapped = uploaded.map((u) => ({ url: u.url, name: u.filename, size: u.size }));
               const next = [...photos, ...mapped];
               setPhotos(next);
-              await saveData('ideasUserPhotos', next, { firestore: useFirestore, collection: 'userIdeas', showNotification: false });
+              await saveData('ideasUserPhotos', next, {
+                firestore: useFirestore,
+                collection: 'userIdeas',
+                showNotification: false,
+              });
               e.target.value = '';
             }}
           />
           <div className="mt-4 grid grid-cols-3 gap-2">
-            {photos.map((p,i) => (
+            {photos.map((p, i) => (
               <div key={i} className="relative">
-                <img src={p.url} alt={p.name || `Foto ${i}`} className="w-full h-32 object-cover rounded" />
-                <div className="absolute bottom-1 left-1 right-1 text-[10px] bg-black/40 text-white px-1 py-0.5 rounded truncate">{p.name || `Foto ${i+1}`}</div>
+                <img
+                  src={p.url}
+                  alt={p.name || `Foto ${i}`}
+                  className="w-full h-32 object-cover rounded"
+                />
+                <div className="absolute bottom-1 left-1 right-1 text-[10px] bg-black/40 text-white px-1 py-0.5 rounded truncate">
+                  {p.name || `Foto ${i + 1}`}
+                </div>
               </div>
             ))}
           </div>

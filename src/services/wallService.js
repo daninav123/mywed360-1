@@ -9,24 +9,27 @@ const DEMO_IMAGES = [
   {
     id: 'demo_1',
     url: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=800&q=60',
-    thumb: 'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=400&q=60',
+    thumb:
+      'https://images.unsplash.com/photo-1529634896862-08db0e0ea1cf?auto=format&fit=crop&w=400&q=60',
     tags: ['decoración', 'flores'],
-    source: 'demo'
+    source: 'demo',
   },
   {
     id: 'demo_2',
     url: 'https://images.unsplash.com/photo-1499955085172-a104c9463ece?auto=format&fit=crop&w=800&q=60',
-    thumb: 'https://images.unsplash.com/photo-1499955085172-a104c9463ece?auto=format&fit=crop&w=400&q=60',
+    thumb:
+      'https://images.unsplash.com/photo-1499955085172-a104c9463ece?auto=format&fit=crop&w=400&q=60',
     tags: ['ceremonia'],
-    source: 'demo'
+    source: 'demo',
   },
   {
     id: 'demo_3',
     url: 'https://images.unsplash.com/photo-1502920917128-1aa500764b1c?auto=format&fit=crop&w=800&q=60',
-    thumb: 'https://images.unsplash.com/photo-1502920917128-1aa500764b1c?auto=format&fit=crop&w=400&q=60',
+    thumb:
+      'https://images.unsplash.com/photo-1502920917128-1aa500764b1c?auto=format&fit=crop&w=400&q=60',
     tags: ['flores', 'vestido'],
-    source: 'demo'
-  }
+    source: 'demo',
+  },
 ];
 
 /**
@@ -105,7 +108,7 @@ export async function fetchWall(page = 1, query = 'wedding') {
     localStorage.removeItem(lastFailureKey);
   } else {
     // Si falló hace menos de 30 minutos, usar datos demo directamente
-    if (lastFailure && (now - parseInt(lastFailure)) < 30 * 60 * 1000) {
+    if (lastFailure && now - parseInt(lastFailure) < 30 * 60 * 1000) {
       console.log('wallService: usando datos demo (circuit breaker activo)');
       return DEMO_IMAGES;
     }
@@ -113,7 +116,6 @@ export async function fetchWall(page = 1, query = 'wedding') {
 
   // Permitir solicitudes duplicadas; React 18 Strict Mode monta/desmonta componentes causando dobles peticiones.
   // Si el backend está caído activaremos igualmente el circuit-breaker mediante lastFailureKey.
-
 
   // Marcar timestamp del request
   localStorage.setItem(lastRequestKey, now.toString());
@@ -133,7 +135,7 @@ export async function fetchWall(page = 1, query = 'wedding') {
     let data = (resp && resp.data ? resp.data : []).map(normalize).filter(Boolean);
     // Permitir imágenes de Pinterest y dominios pinimg siempre que se hayan proxificado correctamente.
     // Solo descartamos si la URL proxificada aún apunta al dominio bloqueado (lo que indicaría un fallo en el proxy).
-    data = data.filter(p => {
+    data = data.filter((p) => {
       const origBlocked = /(pinimg|pinterest)\./i.test(p.original_url || '');
       const proxiedOk = p.url && p.url.startsWith(`${API_BASE}/api/image-proxy`);
       // Si es dominio bloqueado pero está proxificado, se acepta.

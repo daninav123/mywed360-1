@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+
 import { get as apiGet, post as apiPost } from '../services/apiClient';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
@@ -28,7 +29,9 @@ export default function EmailInsights({ mailId, userId, email }) {
         if (!ignore) setLoading(false);
       }
     })();
-    return () => { ignore = true; };
+    return () => {
+      ignore = true;
+    };
   }, [mailId]);
 
   // Si no hay insights y hay clave OpenAI en cliente, intentar análisis automático una vez
@@ -41,7 +44,7 @@ export default function EmailInsights({ mailId, userId, email }) {
       // Evita bucle: lanzar una sola vez
       if (!analyzing) analyzeNow();
     } catch {}
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mailId, insights]);
 
   const analyzeNow = useCallback(async () => {
@@ -66,12 +69,26 @@ export default function EmailInsights({ mailId, userId, email }) {
       const text = `${email?.subject || ''} \n ${email?.body || ''}`.toLowerCase();
       const tags = [];
       let folder = null;
-      if (/presupuesto|budget|factura|pago/.test(text)) { tags.push('Presupuesto'); folder = folder || 'Finanzas'; }
-      if (/contrato|firma|acuerdo/.test(text)) { tags.push('Contrato'); folder = folder || 'Contratos'; }
-      if (/fot[oó]grafo|catering|m[úu]sica|dj|flor/i.test(text)) { tags.push('Proveedor'); folder = folder || 'Proveedores'; }
-      if (/invitaci[óo]n|rsvp|confirmaci[óo]n/.test(text)) { tags.push('Invitación'); folder = folder || 'RSVP'; }
+      if (/presupuesto|budget|factura|pago/.test(text)) {
+        tags.push('Presupuesto');
+        folder = folder || 'Finanzas';
+      }
+      if (/contrato|firma|acuerdo/.test(text)) {
+        tags.push('Contrato');
+        folder = folder || 'Contratos';
+      }
+      if (/fot[oó]grafo|catering|m[úu]sica|dj|flor/i.test(text)) {
+        tags.push('Proveedor');
+        folder = folder || 'Proveedores';
+      }
+      if (/invitaci[óo]n|rsvp|confirmaci[óo]n/.test(text)) {
+        tags.push('Invitación');
+        folder = folder || 'RSVP';
+      }
       return { tags: Array.from(new Set(tags)), folder };
-    } catch { return { tags: [], folder: null }; }
+    } catch {
+      return { tags: [], folder: null };
+    }
   }, [email]);
 
   useEffect(() => {
@@ -85,7 +102,9 @@ export default function EmailInsights({ mailId, userId, email }) {
     try {
       if (classification.folder) {
         const existing = getUserFolders(userId);
-        let folder = existing.find(f => f.name.toLowerCase() === classification.folder.toLowerCase());
+        let folder = existing.find(
+          (f) => f.name.toLowerCase() === classification.folder.toLowerCase()
+        );
         if (!folder) {
           folder = createFolder(userId, classification.folder);
         }
@@ -93,39 +112,51 @@ export default function EmailInsights({ mailId, userId, email }) {
       }
       if (classification.tags && classification.tags.length) {
         const allTags = getUserTags(userId);
-        classification.tags.forEach(tagName => {
-          let tag = allTags.find(t => t.name.toLowerCase() === tagName.toLowerCase() || t.id === tagName);
-          if (!tag) { try { tag = createTag(userId, tagName); } catch {} }
-          if (tag?.id) { try { addTagToEmail(userId, mailId, tag.id); } catch {} }
+        classification.tags.forEach((tagName) => {
+          let tag = allTags.find(
+            (t) => t.name.toLowerCase() === tagName.toLowerCase() || t.id === tagName
+          );
+          if (!tag) {
+            try {
+              tag = createTag(userId, tagName);
+            } catch {}
+          }
+          if (tag?.id) {
+            try {
+              addTagToEmail(userId, mailId, tag.id);
+            } catch {}
+          }
         });
       }
-    } finally { setApplying(false); }
+    } finally {
+      setApplying(false);
+    }
   }, [userId, mailId, classification]);
 
   // Despachar Reuniónes solo una vez cuando se reciban
   useEffect(() => {
-  if (!insights || dispatchedRef.current) return;
-  if (insights.meetings && insights.meetings.length > 0) {
-    insights.meetings.forEach(m => {
-      try {
-        const start = m.start || m.date || m.when;
-        if (!start) return;
-        const startDate = new Date(start);
-        if (isNaN(startDate.getTime())) return;
-        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-        const meeting = {
-          title: m.title || 'Reunión',
-          start: startDate.toISOString(),
-          end: endDate.toISOString()
-        };
-        window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }));
-      } catch (err) {
-        console.warn('No se pudo despachar Reunión:', err);
-      }
-    });
-  }
-  dispatchedRef.current = true;
-}, [insights]);
+    if (!insights || dispatchedRef.current) return;
+    if (insights.meetings && insights.meetings.length > 0) {
+      insights.meetings.forEach((m) => {
+        try {
+          const start = m.start || m.date || m.when;
+          if (!start) return;
+          const startDate = new Date(start);
+          if (isNaN(startDate.getTime())) return;
+          const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+          const meeting = {
+            title: m.title || 'Reunión',
+            start: startDate.toISOString(),
+            end: endDate.toISOString(),
+          };
+          window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }));
+        } catch (err) {
+          console.warn('No se pudo despachar Reunión:', err);
+        }
+      });
+    }
+    dispatchedRef.current = true;
+  }, [insights]);
 
   if (!mailId) return null;
   if (loading) return <p className="text-sm text-gray-500">Cargando IA…</p>;
@@ -143,7 +174,11 @@ export default function EmailInsights({ mailId, userId, email }) {
         {classification && (classification.tags?.length || classification.folder) && (
           <div className="mt-3 text-xs text-gray-700">
             <div>Sugerencias de clasificación:</div>
-            {classification.folder && <div>Carpeta: <span className="font-medium">{classification.folder}</span></div>}
+            {classification.folder && (
+              <div>
+                Carpeta: <span className="font-medium">{classification.folder}</span>
+              </div>
+            )}
             {classification.tags?.length > 0 && <div>Tags: {classification.tags.join(', ')}</div>}
             {userId && (
               <button
@@ -170,7 +205,9 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Tareas</h4>
           <ul className="list-disc list-inside text-sm">
             {tasks.map((t, i) => (
-              <li key={i}>{t.title} {t.due && `(para ${t.due})`}</li>
+              <li key={i}>
+                {t.title} {t.due && `(para ${t.due})`}
+              </li>
             ))}
           </ul>
         </section>
@@ -182,14 +219,18 @@ export default function EmailInsights({ mailId, userId, email }) {
           className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
           onClick={() => {
             try {
-              const defaultTitle = (tasks && tasks[0]?.title) || (email?.subject ? `Tarea: ${email.subject}` : 'Tarea de email');
+              const defaultTitle =
+                (tasks && tasks[0]?.title) ||
+                (email?.subject ? `Tarea: ${email.subject}` : 'Tarea de email');
               const title = prompt('Título de la tarea', defaultTitle);
               if (!title) return;
               const task = { title, due: tasks && tasks[0]?.due ? tasks[0].due : null };
               window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { task } }));
             } catch (_) {}
           }}
-        >Crear tarea</button>
+        >
+          Crear tarea
+        </button>
         <button
           className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
           onClick={() => {
@@ -205,11 +246,17 @@ export default function EmailInsights({ mailId, userId, email }) {
                 startIso = new Date(now.getTime() + 30 * 60 * 1000).toISOString();
               }
               const endIso = new Date(new Date(startIso).getTime() + 60 * 60 * 1000).toISOString();
-              const meeting = { title: email?.subject ? `Reunión: ${email.subject}` : 'Reunión', start: startIso, end: endIso };
+              const meeting = {
+                title: email?.subject ? `Reunión: ${email.subject}` : 'Reunión',
+                start: startIso,
+                end: endIso,
+              };
               window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }));
             } catch (_) {}
           }}
-        >Añadir Reunión</button>
+        >
+          Añadir Reunión
+        </button>
       </div>
 
       {meetings.length > 0 && (
@@ -217,7 +264,9 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Reuniónes</h4>
           <ul className="list-disc list-inside text-sm">
             {meetings.map((m, i) => (
-              <li key={i}>{m.title} — {m.date}</li>
+              <li key={i}>
+                {m.title} — {m.date}
+              </li>
             ))}
           </ul>
         </section>
@@ -228,7 +277,9 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Presupuestos</h4>
           <ul className="list-disc list-inside text-sm">
             {budgets.map((b, i) => (
-              <li key={i}>{b.client}: {b.amount} {b.currency || 'EUR'}</li>
+              <li key={i}>
+                {b.client}: {b.amount} {b.currency || 'EUR'}
+              </li>
             ))}
           </ul>
         </section>
@@ -239,7 +290,9 @@ export default function EmailInsights({ mailId, userId, email }) {
           <h4 className="font-medium">Contratos</h4>
           <ul className="list-disc list-inside text-sm">
             {contracts.map((c, i) => (
-              <li key={i}>{c.party} — {c.type} ({c.action})</li>
+              <li key={i}>
+                {c.party} — {c.type} ({c.action})
+              </li>
             ))}
           </ul>
         </section>
@@ -247,7 +300,3 @@ export default function EmailInsights({ mailId, userId, email }) {
     </div>
   );
 }
-
-
-
-

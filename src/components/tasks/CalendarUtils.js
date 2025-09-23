@@ -2,14 +2,14 @@
 
 // Formatea una fecha para formato ICS
 export function formatICalDate(date) {
-  const pad = n => String(n).padStart(2,'0');
-  return `${date.getUTCFullYear()}${pad(date.getUTCMonth()+1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}T${pad(date.getUTCHours())}${pad(date.getUTCMinutes())}${pad(date.getUTCSeconds())}Z`;
 }
 
 // Genera un archivo ICS completo a partir de eventos
 export function generateFullICS(events) {
-  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MyWed360//WeddingApp//ES'];
-  events.forEach(evt => {
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MyWed360//WeddingApp//ES'];
+  events.forEach((evt) => {
     lines.push('BEGIN:VEVENT');
     lines.push(`UID:${evt.id}`);
     lines.push(`DTSTAMP:${formatICalDate(new Date())}`);

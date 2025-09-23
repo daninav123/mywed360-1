@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+
 import Card from '../../components/ui/Card';
 
 // Pestañas iniciales para la sección Diseños
@@ -24,18 +25,28 @@ const DiseñosLayout = React.memo(() => {
     }
   }, [location.pathname, navigate]);
 
-  const navTabs = useMemo(() => tabs.map(t => ({ ...t, href: `/disenos/${t.path}` })), []);
+  const navTabs = useMemo(() => tabs.map((t) => ({ ...t, href: `/disenos/${t.path}` })), []);
 
   if (location.pathname === '/disenos' || location.pathname === '/disenos/') {
-    return <div className="p-6" role="status" aria-live="polite">Cargando...</div>;
+    return (
+      <div className="p-6" role="status" aria-live="polite">
+        Cargando...
+      </div>
+    );
   }
 
   return (
     <section className="p-6 flex flex-col gap-6" aria-labelledby="disenos-heading">
-      <h1 id="disenos-heading" className="text-2xl font-bold text-gray-800">Diseños</h1>
+      <h1 id="disenos-heading" className="text-2xl font-bold text-gray-800">
+        Diseños
+      </h1>
 
-      <nav role="tablist" aria-label="Secciones de Diseño" className="flex overflow-x-auto space-x-2 pb-2">
-        {navTabs.map(tab => (
+      <nav
+        role="tablist"
+        aria-label="Secciones de Diseño"
+        className="flex overflow-x-auto space-x-2 pb-2"
+      >
+        {navTabs.map((tab) => (
           <NavLink
             key={tab.path}
             to={tab.href}
@@ -54,7 +65,11 @@ const DiseñosLayout = React.memo(() => {
         ))}
       </nav>
 
-      <Card className="overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500" role="region" aria-label="Contenido de Diseños">
+      <Card
+        className="overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        role="region"
+        aria-label="Contenido de Diseños"
+      >
         <div className="p-6">
           <Outlet />
         </div>
@@ -64,4 +79,3 @@ const DiseñosLayout = React.memo(() => {
 });
 
 export default DiseñosLayout;
-

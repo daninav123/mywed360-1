@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { FixedSizeList } from 'react-window';
+
 import GuestItem from '../../components/GuestItem';
 
 /**
@@ -20,8 +21,7 @@ const GuestPanel = ({
   // Filtro de invitados libres según texto y mesas asignadas
   const availableGuests = guests.filter(
     (g) =>
-      g.name.toLowerCase().includes(search.toLowerCase()) &&
-      !tables.some((t) => t.guestId === g.id)
+      g.name.toLowerCase().includes(search.toLowerCase()) && !tables.some((t) => t.guestId === g.id)
   );
 
   return (
@@ -42,9 +42,7 @@ const GuestPanel = ({
         id="guestPanel"
         className={`md:w-1/4 border rounded p-2 h-96 overflow-y-auto bg-gray-50 ${
           guestOpen ? 'block md:block' : 'hidden md:block'
-        } ${
-          guestOpen ? 'fixed inset-0 z-50 bg-white md:static md:bg-gray-50' : ''
-        }`}
+        } ${guestOpen ? 'fixed inset-0 z-50 bg-white md:static md:bg-gray-50' : ''}`}
         role="dialog"
         aria-modal={guestOpen}
         aria-label="Lista de invitados"
@@ -60,12 +58,7 @@ const GuestPanel = ({
         />
 
         {/* Virtualized list */}
-        <FixedSizeList
-          height={400}
-          width={300}
-          itemSize={50}
-          itemCount={availableGuests.length}
-        >
+        <FixedSizeList height={400} width={300} itemSize={50} itemCount={availableGuests.length}>
           {({ index, style }) => (
             <div style={style}>
               <GuestItem guest={availableGuests[index]} />

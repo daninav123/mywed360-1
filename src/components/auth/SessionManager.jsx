@@ -3,9 +3,10 @@
  * Proporciona notificaciones, modales de reautenticación y gestión de errores
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, RefreshCw, LogOut, Shield, Clock, Wifi, WifiOff } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
+
 import { useAuth } from '../../hooks/useAuth';
 
 /**
@@ -42,11 +43,11 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
           <Shield className="h-6 w-6 text-yellow-500 mr-2" />
           <h2 className="text-lg font-semibold">Reautenticación Requerida</h2>
         </div>
-        
+
         <p className="text-gray-600 mb-4">
           Tu sesión ha expirado. Por favor, confirma tu contraseña para continuar.
         </p>
-        
+
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
             <div className="flex">
@@ -55,7 +56,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
             </div>
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -71,7 +72,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
               autoFocus
             />
           </div>
-          
+
           <div className="flex space-x-3">
             <button
               type="submit"
@@ -85,7 +86,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
               )}
               {isLoading ? 'Verificando...' : 'Confirmar'}
             </button>
-            
+
             <button
               type="button"
               onClick={onClose}
@@ -117,14 +118,10 @@ const ConnectionStatus = ({ isOnline, lastSync }) => {
         }`}
         onClick={() => setShowDetails(!showDetails)}
       >
-        {isOnline ? (
-          <Wifi className="h-4 w-4 mr-2" />
-        ) : (
-          <WifiOff className="h-4 w-4 mr-2" />
-        )}
+        {isOnline ? <Wifi className="h-4 w-4 mr-2" /> : <WifiOff className="h-4 w-4 mr-2" />}
         {isOnline ? 'Conectado' : 'Sin conexión'}
       </div>
-      
+
       {showDetails && (
         <div className="absolute top-12 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-48">
           <div className="text-xs text-gray-600">
@@ -158,9 +155,7 @@ const SessionWarning = ({ timeLeft, onExtend, onLogout }) => {
       <div className="flex items-start">
         <Clock className="h-5 w-5 text-yellow-400 mr-3 mt-0.5" />
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-yellow-800">
-            Sesión próxima a expirar
-          </h3>
+          <h3 className="text-sm font-medium text-yellow-800">Sesión próxima a expirar</h3>
           <p className="text-sm text-yellow-700 mt-1">
             Tu sesión expirará en {minutes} minuto{minutes !== 1 ? 's' : ''}
           </p>
@@ -188,18 +183,12 @@ const SessionWarning = ({ timeLeft, onExtend, onLogout }) => {
  * Componente principal de gestión de sesiones
  */
 const SessionManager = ({ children }) => {
-  const { 
-    isAuthenticated, 
-    logout, 
-    reauthenticate, 
-    currentUser,
-    isLoading 
-  } = useAuth();
-  
+  const { isAuthenticated, logout, reauthenticate, currentUser, isLoading } = useAuth();
+
   const error = null;
   const clearError = useCallback(() => {}, []);
   const getErrorMessage = useCallback((code) => code || 'Error de autenticación', []);
-  
+
   // Estados locales
   const [showReauthModal, setShowReauthModal] = useState(false);
   const [sessionTimeLeft, setSessionTimeLeft] = useState(null);
@@ -210,22 +199,25 @@ const SessionManager = ({ children }) => {
   /**
    * Maneja la reautenticación
    */
-  const handleReauth = useCallback(async (password) => {
-    try {
-      setReauthError(null);
-      const result = await reauthenticate(password);
-      
-      if (result.success) {
-        setShowReauthModal(false);
-        clearError();
-      } else {
-        setReauthError(getErrorMessage(result.error?.code));
+  const handleReauth = useCallback(
+    async (password) => {
+      try {
+        setReauthError(null);
+        const result = await reauthenticate(password);
+
+        if (result.success) {
+          setShowReauthModal(false);
+          clearError();
+        } else {
+          setReauthError(getErrorMessage(result.error?.code));
+        }
+      } catch (error) {
+        setReauthError(error.message);
+        throw error;
       }
-    } catch (error) {
-      setReauthError(error.message);
-      throw error;
-    }
-  }, [reauthenticate, clearError, getErrorMessage]);
+    },
+    [reauthenticate, clearError, getErrorMessage]
+  );
 
   /**
    * Maneja el cierre de sesión
@@ -267,7 +259,7 @@ const SessionManager = ({ children }) => {
       setLastSync(Date.now());
       toast.success('Conexión restaurada');
     };
-    
+
     const handleOffline = () => {
       setIsOnline(false);
       toast.warning('Sin conexión a internet');
@@ -317,13 +309,14 @@ const SessionManager = ({ children }) => {
       // Simular tiempo restante de sesión (en una app real vendría del token)
       const now = Date.now();
       const sessionStart = localStorage.getItem('lovenda_last_activity');
-      
+
       if (sessionStart) {
         const elapsed = now - parseInt(sessionStart);
         const sessionDuration = 60 * 60 * 1000; // 1 hora
         const remaining = sessionDuration - elapsed;
-        
-        if (remaining <= 5 * 60 * 1000 && remaining > 0) { // 5 minutos
+
+        if (remaining <= 5 * 60 * 1000 && remaining > 0) {
+          // 5 minutos
           setSessionTimeLeft(remaining);
         } else if (remaining <= 0) {
           handleLogout();
@@ -342,10 +335,10 @@ const SessionManager = ({ children }) => {
   return (
     <>
       {children}
-      
+
       {/* Indicador de conexión */}
       <ConnectionStatus isOnline={isOnline} lastSync={lastSync} />
-      
+
       {/* Advertencia de sesión próxima a expirar */}
       {sessionTimeLeft && (
         <SessionWarning
@@ -354,7 +347,7 @@ const SessionManager = ({ children }) => {
           onLogout={handleLogout}
         />
       )}
-      
+
       {/* Modal de reautenticación */}
       <ReauthModal
         isOpen={showReauthModal}

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { subscribeSyncState, getSyncState } from '../services/SyncService';
 
 /**
@@ -24,11 +25,13 @@ export default function SyncIndicator({ position = 'bottom-right', showText = tr
     'bottom-right': 'bottom-4 right-4',
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
-    'top-left': 'top-4 left-4'
+    'top-left': 'top-4 left-4',
   };
 
   return (
-    <div className={`fixed ${positionClasses[position]} z-50 flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-md`}>
+    <div
+      className={`fixed ${positionClasses[position]} z-50 flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-md`}
+    >
       {syncStatus === 'online' ? (
         <>
           <Cloud size={18} className="text-green-500" />

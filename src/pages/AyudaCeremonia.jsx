@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { MessageSquare, Clock, RefreshCcw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import PageWrapper from '../components/PageWrapper';
+import { useAuth } from '../hooks/useAuth';
 
 const sampleBlocks = [
   { name: 'Ceremonia', items: ['Entrada novios', 'Lectura de votos', 'Anillos'] },
@@ -15,7 +16,9 @@ export default function AyudaCeremonia() {
   const role = currentUser?.role;
   const allowed = ['ayudante', 'wedding_planner', 'admin'];
   if (!allowed.includes(role)) {
-    return <div className="p-6 text-red-600">Acceso denegado. Solo ayudantes o wedding planners.</div>;
+    return (
+      <div className="p-6 text-red-600">Acceso denegado. Solo ayudantes o wedding planners.</div>
+    );
   }
 
   const [selectedMoment, setSelectedMoment] = useState('');
@@ -36,7 +39,7 @@ export default function AyudaCeremonia() {
     setVersions([v, ...versions]);
   };
 
-  const handleRevert = v => {
+  const handleRevert = (v) => {
     setText(v.text);
     setSelectedMoment(v.moment);
   };
@@ -47,17 +50,16 @@ export default function AyudaCeremonia() {
 
   return (
     <PageWrapper title="Ayuda Ceremonia">
-      
       <div className="flex items-center gap-2">
         <label>Momento:</label>
         <select
           value={selectedMoment}
-          onChange={e => setSelectedMoment(e.target.value)}
+          onChange={(e) => setSelectedMoment(e.target.value)}
           className="border rounded px-2 py-1"
         >
           <option value="">Selecciona momento</option>
-          {sampleBlocks.flatMap(b =>
-            b.items.map(item => (
+          {sampleBlocks.flatMap((b) =>
+            b.items.map((item) => (
               <option key={`${b.name}-${item}`} value={`${b.name}|${item}`}>
                 {b.name} - {item}
               </option>
@@ -70,7 +72,7 @@ export default function AyudaCeremonia() {
         <label>Texto de lectura:</label>
         <textarea
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={(e) => setText(e.target.value)}
           className="w-full h-32 border rounded p-2"
         />
       </div>
@@ -108,13 +110,10 @@ export default function AyudaCeremonia() {
       <div>
         <h3 className="font-semibold">Historial de Versiones</h3>
         <ul className="list-disc pl-5 space-y-1">
-          {versions.map(v => (
+          {versions.map((v) => (
             <li key={v.id} className="flex justify-between items-center">
               <span>{new Date(v.timestamp).toLocaleString()}</span>
-              <button
-                onClick={() => handleRevert(v)}
-                className="text-blue-600 hover:underline"
-              >
+              <button onClick={() => handleRevert(v)} className="text-blue-600 hover:underline">
                 Revertir
               </button>
             </li>
@@ -124,4 +123,3 @@ export default function AyudaCeremonia() {
     </PageWrapper>
   );
 }
-

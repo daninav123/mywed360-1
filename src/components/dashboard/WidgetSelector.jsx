@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { WidgetTypes } from './widgets/WidgetTypes';
 
 const WIDGET_OPTIONS = [
@@ -36,12 +37,12 @@ const WIDGET_OPTIONS = [
 
 export const WidgetSelector = ({ onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const handleAddWidget = (widgetType) => {
     onSelect(widgetType);
     setIsOpen(false);
   };
-  
+
   return (
     <div className="relative">
       <button
@@ -51,7 +52,7 @@ export const WidgetSelector = ({ onSelect }) => {
         <span className="text-2xl mb-2">+</span>
         <span>Agregar Widget</span>
       </button>
-      
+
       {isOpen && (
         <div className="absolute z-10 w-64 mt-2 bg-white rounded-md shadow-lg overflow-hidden">
           <div className="py-1">

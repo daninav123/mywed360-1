@@ -1,38 +1,41 @@
-import React, { useState } from 'react';
-import { Card, Button } from '../ui';
 import { Users, RefreshCw, Calculator } from 'lucide-react';
-import { formatCurrency } from '../../utils/formatUtils';
+import React, { useState } from 'react';
+
 import useTranslations from '../../hooks/useTranslations';
+import { formatCurrency } from '../../utils/formatUtils';
+import { Card, Button } from '../ui';
 
 /**
  * Configuración de aportaciones y regalos
  */
-export default function ContributionSettings({ 
-  contributions, 
-  onUpdateContributions, 
-  onLoadGuestCount, 
-  isLoading 
+export default function ContributionSettings({
+  contributions,
+  onUpdateContributions,
+  onLoadGuestCount,
+  isLoading,
 }) {
   const { t } = useTranslations();
   const [localContributions, setLocalContributions] = useState(contributions);
   const [hasChanges, setHasChanges] = useState(false);
 
   React.useEffect(() => {
-    setLocalContributions(contributions || {
-      initA: 0,
-      initB: 0,
-      monthlyA: 0,
-      monthlyB: 0,
-      extras: 0,
-      giftPerGuest: 0,
-      guestCount: 0,
-    });
+    setLocalContributions(
+      contributions || {
+        initA: 0,
+        initB: 0,
+        monthlyA: 0,
+        monthlyB: 0,
+        extras: 0,
+        giftPerGuest: 0,
+        guestCount: 0,
+      }
+    );
     setHasChanges(false);
   }, [contributions]);
 
   const handleChange = (field, value) => {
     const numValue = Number(value) || 0;
-    setLocalContributions(prev => ({ ...prev, [field]: numValue }));
+    setLocalContributions((prev) => ({ ...prev, [field]: numValue }));
     setHasChanges(true);
   };
 
@@ -50,16 +53,21 @@ export default function ContributionSettings({
   const monthlyTotal = localContributions.monthlyA + localContributions.monthlyB;
   const initialTotal = localContributions.initA + localContributions.initB;
   const expectedGifts = localContributions.giftPerGuest * localContributions.guestCount;
-  const totalExpectedIncome = initialTotal + monthlyTotal + localContributions.extras + expectedGifts;
+  const totalExpectedIncome =
+    initialTotal + monthlyTotal + localContributions.extras + expectedGifts;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">{t('finance.contributions.title', { defaultValue: 'Configuración de Aportaciones' })}</h2>
+          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
+            {t('finance.contributions.title', { defaultValue: 'Configuración de Aportaciones' })}
+          </h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.contributions.subtitle', { defaultValue: 'Configura las aportaciones y estima los ingresos esperados' })}
+            {t('finance.contributions.subtitle', {
+              defaultValue: 'Configura las aportaciones y estima los ingresos esperados',
+            })}
           </p>
         </div>
         <Button
@@ -111,7 +119,10 @@ export default function ContributionSettings({
               </div>
               <div className="pt-2 border-t border-[color:var(--color-text)]/10">
                 <p className="text-sm text-[color:var(--color-text)]/70">
-                  {t('finance.contributions.initial.total', { defaultValue: 'Total inicial:' })} <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(initialTotal)}</span>
+                  {t('finance.contributions.initial.total', { defaultValue: 'Total inicial:' })}{' '}
+                  <span className="font-medium text-[color:var(--color-text)]">
+                    {formatCurrency(initialTotal)}
+                  </span>
                 </p>
               </div>
             </div>
@@ -125,7 +136,9 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  {t('finance.contributions.monthly.personA', { defaultValue: 'Persona A (€/mes)' })}
+                  {t('finance.contributions.monthly.personA', {
+                    defaultValue: 'Persona A (€/mes)',
+                  })}
                 </label>
                 <input
                   type="number"
@@ -139,7 +152,9 @@ export default function ContributionSettings({
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  {t('finance.contributions.monthly.personB', { defaultValue: 'Persona B (€/mes)' })}
+                  {t('finance.contributions.monthly.personB', {
+                    defaultValue: 'Persona B (€/mes)',
+                  })}
                 </label>
                 <input
                   type="number"
@@ -153,7 +168,10 @@ export default function ContributionSettings({
               </div>
               <div className="pt-2 border-t border-[color:var(--color-text)]/10">
                 <p className="text-sm text-[color:var(--color-text)]/70">
-                  {t('finance.contributions.monthly.total', { defaultValue: 'Total mensual:' })} <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(monthlyTotal)}</span>
+                  {t('finance.contributions.monthly.total', { defaultValue: 'Total mensual:' })}{' '}
+                  <span className="font-medium text-[color:var(--color-text)]">
+                    {formatCurrency(monthlyTotal)}
+                  </span>
                 </p>
               </div>
             </div>
@@ -167,7 +185,9 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  {t('finance.contributions.extras.totalLabel', { defaultValue: 'Total extras (familia, otros ingresos) (€)' })}
+                  {t('finance.contributions.extras.totalLabel', {
+                    defaultValue: 'Total extras (familia, otros ingresos) (€)',
+                  })}
                 </label>
                 <input
                   type="number"
@@ -179,7 +199,9 @@ export default function ContributionSettings({
                   placeholder="0.00"
                 />
                 <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
-                  {t('finance.contributions.extras.help', { defaultValue: 'Incluye regalos de familia, aportaciones de padres, etc.' })}
+                  {t('finance.contributions.extras.help', {
+                    defaultValue: 'Incluye regalos familiares, aportaciones de padres, etc.',
+                  })}
                 </p>
               </div>
             </div>
@@ -193,7 +215,9 @@ export default function ContributionSettings({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  {t('finance.contributions.gifts.giftPerGuest', { defaultValue: 'Regalo estimado por invitado (€)' })}
+                  {t('finance.contributions.gifts.giftPerGuest', {
+                    defaultValue: 'Regalo estimado por invitado (€)',
+                  })}
                 </label>
                 <input
                   type="number"
@@ -207,7 +231,9 @@ export default function ContributionSettings({
               </div>
               <div>
                 <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-                  {t('finance.contributions.gifts.guestCount', { defaultValue: 'Número de invitados' })}
+                  {t('finance.contributions.gifts.guestCount', {
+                    defaultValue: 'Número de invitados',
+                  })}
                 </label>
                 <div className="flex space-x-2">
                   <input
@@ -228,12 +254,20 @@ export default function ContributionSettings({
                   </Button>
                 </div>
                 <p className="mt-1 text-xs text-[color:var(--color-text)]/60">
-                  {t('finance.contributions.gifts.loadHint', { defaultValue: 'Haz clic en el icono para cargar automáticamente desde tu lista de invitados' })}
+                  {t('finance.contributions.gifts.loadHint', {
+                    defaultValue:
+                      'Haz clic en el icono para cargar automáticamente desde tu lista de invitados',
+                  })}
                 </p>
               </div>
               <div className="pt-2 border-t border-[color:var(--color-text)]/10">
                 <p className="text-sm text-[color:var(--color-text)]/70">
-                  {t('finance.contributions.gifts.total', { defaultValue: 'Total estimado en regalos:' })} <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(expectedGifts)}</span>
+                  {t('finance.contributions.gifts.total', {
+                    defaultValue: 'Total estimado en regalos:',
+                  })}{' '}
+                  <span className="font-medium text-[color:var(--color-text)]">
+                    {formatCurrency(expectedGifts)}
+                  </span>
                 </p>
               </div>
             </div>
@@ -241,10 +275,12 @@ export default function ContributionSettings({
 
           {/* Botones de acción */}
           {hasChanges && (
-          <Card className="p-4 bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30">
+            <Card className="p-4 bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30">
               <div className="flex justify-between items-center">
                 <p className="text-sm text-[var(--color-primary)]">
-                  {t('finance.contributions.unsaved', { defaultValue: 'Tienes cambios sin guardar' })}
+                  {t('finance.contributions.unsaved', {
+                    defaultValue: 'Tienes cambios sin guardar',
+                  })}
                 </p>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" onClick={handleReset}>
@@ -269,34 +305,64 @@ export default function ContributionSettings({
               </div>
               <div>
                 <h3 className="text-lg font-medium text-[color:var(--color-text)]">
-                  {t('finance.contributions.summary.title', { defaultValue: 'Resumen de Ingresos Esperados' })}
+                  {t('finance.contributions.summary.title', {
+                    defaultValue: 'Resumen de Ingresos Esperados',
+                  })}
                 </h3>
                 <p className="text-sm text-[color:var(--color-text)]/70">
-                  {t('finance.contributions.summary.subtitle', { defaultValue: 'Proyección total basada en tus configuraciones' })}
+                  {t('finance.contributions.summary.subtitle', {
+                    defaultValue: 'Proyección total basada en tus configuraciones',
+                  })}
                 </p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">{t('finance.contributions.summary.initial', { defaultValue: 'Aportaciones iniciales' })}</span>
-                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(initialTotal)}</span>
+                <span className="text-sm text-[color:var(--color-text)]/70">
+                  {t('finance.contributions.summary.initial', {
+                    defaultValue: 'Aportaciones iniciales',
+                  })}
+                </span>
+                <span className="font-medium text-[color:var(--color-text)]">
+                  {formatCurrency(initialTotal)}
+                </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">{t('finance.contributions.summary.monthly', { defaultValue: 'Aportaciones mensuales' })}</span>
-                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(monthlyTotal)}</span>
+                <span className="text-sm text-[color:var(--color-text)]/70">
+                  {t('finance.contributions.summary.monthly', {
+                    defaultValue: 'Aportaciones mensuales',
+                  })}
+                </span>
+                <span className="font-medium text-[color:var(--color-text)]">
+                  {formatCurrency(monthlyTotal)}
+                </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">{t('finance.contributions.summary.extras', { defaultValue: 'Aportaciones extras' })}</span>
-                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(localContributions.extras)}</span>
+                <span className="text-sm text-[color:var(--color-text)]/70">
+                  {t('finance.contributions.summary.extras', {
+                    defaultValue: 'Aportaciones extras',
+                  })}
+                </span>
+                <span className="font-medium text-[color:var(--color-text)]">
+                  {formatCurrency(localContributions.extras)}
+                </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-[color:var(--color-text)]/10">
-                <span className="text-sm text-[color:var(--color-text)]/70">{t('finance.contributions.summary.gifts', { defaultValue: 'Regalos estimados' })}</span>
-                <span className="font-medium text-[color:var(--color-text)]">{formatCurrency(expectedGifts)}</span>
+                <span className="text-sm text-[color:var(--color-text)]/70">
+                  {t('finance.contributions.summary.gifts', { defaultValue: 'Regalos estimados' })}
+                </span>
+                <span className="font-medium text-[color:var(--color-text)]">
+                  {formatCurrency(expectedGifts)}
+                </span>
               </div>
               <div className="flex justify-between items-center py-3 bg-[var(--color-success)]/10 px-4 rounded-lg">
-                <span className="font-medium text-[color:var(--color-success)]">{t('finance.contributions.summary.total', { defaultValue: 'Total Esperado' })}</span>
-                <span className="text-xl font-bold text-[color:var(--color-success)]">{formatCurrency(totalExpectedIncome)}</span>
+                <span className="font-medium text-[color:var(--color-success)]">
+                  {t('finance.contributions.summary.total', { defaultValue: 'Total Esperado' })}
+                </span>
+                <span className="text-xl font-bold text-[color:var(--color-success)]">
+                  {formatCurrency(totalExpectedIncome)}
+                </span>
               </div>
             </div>
           </Card>
@@ -310,25 +376,55 @@ export default function ContributionSettings({
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
-                  <strong>{t('finance.contributions.tips.emergencyTitle', { defaultValue: 'Fondo de emergencia:' })}</strong> {t('finance.contributions.tips.emergencyText', { defaultValue: 'Considera reservar un 10-15% del presupuesto total para gastos imprevistos.' })}
+                  <strong>
+                    {t('finance.contributions.tips.emergencyTitle', {
+                      defaultValue: 'Fondo de emergencia:',
+                    })}
+                  </strong>{' '}
+                  {t('finance.contributions.tips.emergencyText', {
+                    defaultValue:
+                      'Considera reservar un 10-15% del presupuesto total para gastos imprevistos.',
+                  })}
                 </p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
-                  <strong>{t('finance.contributions.tips.giftsTitle', { defaultValue: 'Regalos conservadores:' })}</strong> {t('finance.contributions.tips.giftsText', { defaultValue: 'Es mejor subestimar los regalos de boda que sobreestimarlos.' })}
+                  <strong>
+                    {t('finance.contributions.tips.giftsTitle', {
+                      defaultValue: 'Regalos conservadores:',
+                    })}
+                  </strong>{' '}
+                  {t('finance.contributions.tips.giftsText', {
+                    defaultValue: 'Es mejor subestimar los regalos de boda que sobreestimarlos.',
+                  })}
                 </p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
-                  <strong>{t('finance.contributions.tips.reviewTitle', { defaultValue: 'Seguimiento regular:' })}</strong> {t('finance.contributions.tips.reviewText', { defaultValue: 'Revisa y actualiza estas proyecciones mensualmente.' })}
+                  <strong>
+                    {t('finance.contributions.tips.reviewTitle', {
+                      defaultValue: 'Seguimiento regular:',
+                    })}
+                  </strong>{' '}
+                  {t('finance.contributions.tips.reviewText', {
+                    defaultValue: 'Revisa y actualiza estas proyecciones mensualmente.',
+                  })}
                 </p>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-[var(--color-primary)]/100 rounded-full mt-2"></div>
                 <p>
-                  <strong>{t('finance.contributions.tips.balanceTitle', { defaultValue: 'Aportaciones equilibradas:' })}</strong> {t('finance.contributions.tips.balanceText', { defaultValue: 'Mantén un balance justo entre las aportaciones de ambas personas.' })}
+                  <strong>
+                    {t('finance.contributions.tips.balanceTitle', {
+                      defaultValue: 'Aportaciones equilibradas:',
+                    })}
+                  </strong>{' '}
+                  {t('finance.contributions.tips.balanceText', {
+                    defaultValue:
+                      'Mantén un balance justo entre las aportaciones de ambas personas.',
+                  })}
                 </p>
               </div>
             </div>

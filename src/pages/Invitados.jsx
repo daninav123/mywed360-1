@@ -1,29 +1,30 @@
-import React, { useState } from 'react';
 import { Cloud, CloudOff } from 'lucide-react';
-import Modal from '../components/Modal';
+import React, { useState } from 'react';
+
+import ContactsImporter from '../components/guests/ContactsImporter';
+import GroupManager from '../components/guests/GroupManager';
+import GuestBulkGrid from '../components/guests/GuestBulkGrid';
+import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
 import GuestList from '../components/guests/GuestList';
-import GuestFilters from '../components/guests/GuestFilters';
+import Modal from '../components/Modal';
+import { Button } from '../components/ui';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
+import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
+import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
+import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
+import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import { useAuth } from '../hooks/useAuth';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
-import { useWedding } from '../context/WeddingContext';
-import { useAuth } from '../hooks/useAuth';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
-import ContactsImporter from '../components/guests/ContactsImporter';
-import GuestBulkGrid from '../components/guests/GuestBulkGrid';
-import { Button } from '../components/ui';
-import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
-import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
-import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
-import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
-import GroupManager from '../components/guests/GroupManager';
 import { post as apiPost } from '../services/apiClient';
-import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
+import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 
 /**
  * Página de gestión de invitados completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
- * 
+ *
  * OPTIMIZACIONES IMPLEMENTADAS:
  * - Eliminada complejidad anterior (597 líneas → 140 líneas)
  * - Arquitectura modular con componentes especializados
@@ -51,7 +52,7 @@ function Invitados() {
   const { currentUser } = useAuth();
   const { weddings, activeWedding } = useWedding();
   const { info: activeWeddingInfo } = useActiveWeddingInfo();
-    
+
   // Datos provenientes de Firebase mediante hooks
   const {
     guests,
@@ -75,7 +76,7 @@ function Invitados() {
     importFromContacts,
     exportToCSV,
     updateFilters,
-    utils
+    utils,
   } = useGuests();
 
   // Mensaje por defecto para SAVE THE DATE
@@ -83,29 +84,54 @@ function Invitados() {
     try {
       // Prioriza weddingInfo del doc principal
       const wi = activeWeddingInfo?.weddingInfo || {};
-      const wList = (weddings || []).find(x => x.id === activeWedding) || {};
+      const wList = (weddings || []).find((x) => x.id === activeWedding) || {};
 
       // Nombres pareja
-      let p1 = '', p2 = '';
-      const coupleRaw = wi.coupleName || wList.coupleName || wList.name || wi.brideAndGroom || wList.brideAndGroom || wi.nombrePareja || '';
+      let p1 = '',
+        p2 = '';
+      const coupleRaw =
+        wi.coupleName ||
+        wList.coupleName ||
+        wList.name ||
+        wi.brideAndGroom ||
+        wList.brideAndGroom ||
+        wi.nombrePareja ||
+        '';
       if (coupleRaw) {
-        const parts = String(coupleRaw).trim().split(/\s*&\s*|\s+y\s+/i);
+        const parts = String(coupleRaw)
+          .trim()
+          .split(/\s*&\s*|\s+y\s+/i);
         p1 = (parts[0] || '').trim();
         p2 = (parts[1] || '').trim();
       } else if (wi.bride || wi.groom || wList.bride || wList.groom) {
         p1 = String(wi.bride || wList.bride || '').trim();
         p2 = String(wi.groom || wList.groom || '').trim();
       }
-      if (!p1 && !p2) { p1 = 'pareja1'; p2 = 'pareja2'; }
+      if (!p1 && !p2) {
+        p1 = 'pareja1';
+        p2 = 'pareja2';
+      }
 
       // Fecha de la boda
-      const dateRaw = wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
+      const dateRaw =
+        wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
       let fechaFmt = '';
       if (dateRaw) {
         try {
-          const d = typeof dateRaw === 'string' ? new Date(dateRaw) : (dateRaw?.seconds ? new Date(dateRaw.seconds * 1000) : new Date(dateRaw));
-          fechaFmt = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
-        } catch { fechaFmt = String(dateRaw); }
+          const d =
+            typeof dateRaw === 'string'
+              ? new Date(dateRaw)
+              : dateRaw?.seconds
+                ? new Date(dateRaw.seconds * 1000)
+                : new Date(dateRaw);
+          fechaFmt = d.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          });
+        } catch {
+          fechaFmt = String(dateRaw);
+        }
       } else {
         fechaFmt = 'la fecha de la boda';
       }
@@ -120,14 +146,16 @@ function Invitados() {
   const groupOptions = React.useMemo(() => {
     try {
       const set = new Set();
-      (guests || []).forEach(g => {
+      (guests || []).forEach((g) => {
         if (g.group) set.add(String(g.group));
         if (g.companionGroupId) set.add(String(g.companionGroupId));
       });
-      return Array.from(set).sort((a,b)=>String(a).localeCompare(String(b)));
-    } catch { return []; }
+      return Array.from(set).sort((a, b) => String(a).localeCompare(String(b)));
+    } catch {
+      return [];
+    }
   }, [guests]);
-                          
+
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
     setEditingGuest(null);
@@ -143,7 +171,7 @@ function Invitados() {
   // Manejar guardado de invitado (nuevo o editado)
   const handleSaveGuest = async (guestData) => {
     setIsSaving(true);
-    
+
     try {
       let result;
       if (editingGuest) {
@@ -151,7 +179,7 @@ function Invitados() {
       } else {
         result = await addGuest(guestData);
       }
-      
+
       if (result.success) {
         setShowGuestModal(false);
         setEditingGuest(null);
@@ -169,12 +197,23 @@ function Invitados() {
   // Difusión (lista de difusión vía extensión)
   const handleSendSelectedBroadcast = async () => {
     try {
-      if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedBroadcast click', { selectedCount: selectedIds.length });
-      if (!selectedIds.length) { alert('No hay invitados seleccionados'); return; }
-      const custom = window.prompt('Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.', '');
+      if (import.meta.env.DEV)
+        console.log('[Invitados] handleSendSelectedBroadcast click', {
+          selectedCount: selectedIds.length,
+        });
+      if (!selectedIds.length) {
+        alert('No hay invitados seleccionados');
+        return;
+      }
+      const custom = window.prompt(
+        'Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.',
+        ''
+      );
       const r = await inviteSelectedWhatsAppBroadcastViaExtension(selectedIds, custom || undefined);
       if (r?.notAvailable) {
-        const doFallback = window.confirm('No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?');
+        const doFallback = window.confirm(
+          'No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?'
+        );
         if (doFallback) {
           const rb = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
           if (rb?.success && !rb?.notAvailable) {
@@ -187,7 +226,8 @@ function Invitados() {
       }
       if (r?.success) {
         if (r?.mode === 'broadcast') alert(`Difusión enviada a ${r?.count || 0} destinatarios.`);
-        else if (r?.mode === 'fallback_individual') alert(`Envío individual fallback. Éxitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
+        else if (r?.mode === 'fallback_individual')
+          alert(`Envío individual fallback. Éxitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
         return;
       }
       alert('No se pudo completar la difusión: ' + (r?.error || 'desconocido'));
@@ -223,10 +263,18 @@ function Invitados() {
   // Envío masivo API para todos los invitados (usado por GuestFilters)
   const bulkInviteAllApi = async () => {
     try {
-      if (!guests || guests.length === 0) { alert('No hay invitados'); return; }
-      const ids = guests.filter(g => g.phone).map(g => g.id);
-      if (!ids.length) { alert('Los invitados no tienen teléfonos válidos'); return; }
-      const confirm = window.confirm(`¿Enviar invitaciones vía WhatsApp API a ${ids.length} invitados?`);
+      if (!guests || guests.length === 0) {
+        alert('No hay invitados');
+        return;
+      }
+      const ids = guests.filter((g) => g.phone).map((g) => g.id);
+      if (!ids.length) {
+        alert('Los invitados no tienen teléfonos válidos');
+        return;
+      }
+      const confirm = window.confirm(
+        `¿Enviar invitaciones vía WhatsApp API a ${ids.length} invitados?`
+      );
       if (!confirm) return;
       const res = await inviteSelectedWhatsAppApi(ids);
       if (res?.success) {
@@ -250,14 +298,16 @@ function Invitados() {
   const handleToggleSelect = (id, checked) => {
     setSelectedIds((prev) => {
       const set = new Set(prev);
-      if (checked) set.add(id); else set.delete(id);
+      if (checked) set.add(id);
+      else set.delete(id);
       return Array.from(set);
     });
   };
   const handleToggleSelectAll = (ids, checked) => {
     setSelectedIds((prev) => {
       const set = new Set(prev);
-      if (checked) ids.forEach((id) => set.add(id)); else ids.forEach((id) => set.delete(id));
+      if (checked) ids.forEach((id) => set.add(id));
+      else ids.forEach((id) => set.delete(id));
       return Array.from(set);
     });
   };
@@ -265,16 +315,28 @@ function Invitados() {
   // Enviar API a seleccionados
   const handleSendSelectedApi = async () => {
     try {
-      if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi click', { selectedCount: selectedIds.length });
+      if (import.meta.env.DEV)
+        console.log('[Invitados] handleSendSelectedApi click', {
+          selectedCount: selectedIds.length,
+        });
       if (!selectedIds.length) {
         alert('No hay invitados seleccionados');
         return;
       }
       const res = await inviteSelectedWhatsAppApi(selectedIds);
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
-      if (res?.cancelled) { alert('Acción cancelada'); return; }
-      if (res?.error && !res?.success) { alert('Error enviando a seleccionados: ' + res.error); return; }
-      if (res?.success) { alert(`Envío completado. Éxitos: ${res?.ok || 0}, Fallos: ${res?.fail || 0}`); return; }
+      if (res?.cancelled) {
+        alert('Acción cancelada');
+        return;
+      }
+      if (res?.error && !res?.success) {
+        alert('Error enviando a seleccionados: ' + res.error);
+        return;
+      }
+      if (res?.success) {
+        alert(`Envío completado. Éxitos: ${res?.ok || 0}, Fallos: ${res?.fail || 0}`);
+        return;
+      }
       alert('No se pudo iniciar el envío por API');
     } catch (e) {
       console.warn('Error envío seleccionados (API):', e);
@@ -285,22 +347,32 @@ function Invitados() {
   // Enviar por móvil personal (preferir "una sola acción" vía extensión)
   const handleSendSelectedMobile = async () => {
     try {
-      if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedMobile click', { selectedCount: selectedIds.length });
+      if (import.meta.env.DEV)
+        console.log('[Invitados] handleSendSelectedMobile click', {
+          selectedCount: selectedIds.length,
+        });
       if (!selectedIds.length) {
         alert('No hay invitados seleccionados');
         return;
       }
-      const custom = window.prompt('Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:', '');
+      const custom = window.prompt(
+        'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
+        ''
+      );
       // 1) Intentar envío en una sola acción usando extensión (WhatsApp Web automation)
       try {
         const r = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
         if (r?.success && !r?.notAvailable) {
-          alert(`Envío iniciado en WhatsApp Web para ${r?.count || selectedIds.length} invitado(s).`);
+          alert(
+            `Envío iniciado en WhatsApp Web para ${r?.count || selectedIds.length} invitado(s).`
+          );
           return;
         }
         if (r?.notAvailable) {
           // 2) Fallback opcional: abrir chats en pestañas (no recomendado para >50)
-          const doFallback = window.confirm('No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?');
+          const doFallback = window.confirm(
+            'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?'
+          );
           if (doFallback) {
             const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
             if (fr?.success) alert(`Se abrieron ${fr?.opened || 0} chats en WhatsApp`);
@@ -329,27 +401,47 @@ function Invitados() {
         alert('No hay invitados seleccionados');
         return;
       }
-      const whenStr = window.prompt('Fecha y hora (local) para programar (YYYY-MM-DD HH:mm):', '2025-09-10 10:00');
+      const whenStr = window.prompt(
+        'Fecha y hora (local) para programar (YYYY-MM-DD HH:mm):',
+        '2025-09-10 10:00'
+      );
       if (!whenStr) return;
       const whenIso = new Date(whenStr.replace(' ', 'T')).toISOString();
       // Construir items: to (E.164), message (con RSVP si es posible)
       const idSet = new Set(selectedIds);
-      const targets = (guests || []).filter(g => idSet.has(g.id) && g.phone);
+      const targets = (guests || []).filter((g) => idSet.has(g.id) && g.phone);
       const items = [];
       for (const g of targets) {
         // Generar enlace RSVP si es posible
         let link = '';
         try {
-          const resp = await apiPost(`/api/guests/${activeWedding}/id/${g.id}/rsvp-link`, {}, { auth: true });
-          if (resp.ok) { const json = await resp.json(); link = json.link; }
+          const resp = await apiPost(
+            `/api/guests/${activeWedding}/id/${g.id}/rsvp-link`,
+            {},
+            { auth: true }
+          );
+          if (resp.ok) {
+            const json = await resp.json();
+            link = json.link;
+          }
         } catch {}
         const msg = link
           ? `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
           : `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
         const to = toE164(g.phone);
-        if (to) items.push({ to, message: msg, weddingId: activeWedding, guestId: g.id, metadata: { guestName: g.name || '', rsvpFlow: true } });
+        if (to)
+          items.push({
+            to,
+            message: msg,
+            weddingId: activeWedding,
+            guestId: g.id,
+            metadata: { guestName: g.name || '', rsvpFlow: true },
+          });
       }
-      if (!items.length) { alert('Los seleccionados no tienen teléfonos válidos'); return; }
+      if (!items.length) {
+        alert('Los seleccionados no tienen teléfonos válidos');
+        return;
+      }
       const result = await scheduleWhats(items, whenIso);
       if (result?.success) {
         alert(`Programados ${items.length} envíos para ${whenIso}`);
@@ -386,15 +478,18 @@ function Invitados() {
     try {
       if (!importedGuests || importedGuests.length === 0) return;
       // Deduplicación por email/teléfono
-      const existingEmails = new Set((guests || []).map(g => utils.normalize(g?.email || '')));
-      const existingPhones = new Set((guests || []).map(g => utils.phoneClean(g?.phone || '')));
+      const existingEmails = new Set((guests || []).map((g) => utils.normalize(g?.email || '')));
+      const existingPhones = new Set((guests || []).map((g) => utils.phoneClean(g?.phone || '')));
 
       let added = 0;
       let skipped = 0;
       for (const guest of importedGuests) {
         const emailKey = utils.normalize(guest?.email || '');
         const phoneKey = utils.phoneClean(guest?.phone || '');
-        if ((emailKey && existingEmails.has(emailKey)) || (phoneKey && existingPhones.has(phoneKey))) {
+        if (
+          (emailKey && existingEmails.has(emailKey)) ||
+          (phoneKey && existingPhones.has(phoneKey))
+        ) {
           skipped++;
           continue;
         }
@@ -406,7 +501,9 @@ function Invitados() {
         if (phoneKey) existingPhones.add(phoneKey);
         added++;
       }
-      alert(`${added} invitados importados correctamente${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
+      alert(
+        `${added} invitados importados correctamente${skipped ? `, ${skipped} duplicados omitidos` : ''}`
+      );
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
@@ -424,15 +521,18 @@ function Invitados() {
         setShowBulkModal(false);
         return;
       }
-      const existingEmails = new Set((guests || []).map(g => utils.normalize(g?.email || '')));
-      const existingPhones = new Set((guests || []).map(g => utils.phoneClean(g?.phone || '')));
+      const existingEmails = new Set((guests || []).map((g) => utils.normalize(g?.email || '')));
+      const existingPhones = new Set((guests || []).map((g) => utils.phoneClean(g?.phone || '')));
 
       let added = 0;
       let skipped = 0;
       for (const r of rows) {
         const emailKey = utils.normalize(r?.email || '');
         const phoneKey = utils.phoneClean(r?.phone || '');
-        if ((emailKey && existingEmails.has(emailKey)) || (phoneKey && existingPhones.has(phoneKey))) {
+        if (
+          (emailKey && existingEmails.has(emailKey)) ||
+          (phoneKey && existingPhones.has(phoneKey))
+        ) {
           skipped++;
           continue;
         }
@@ -442,7 +542,10 @@ function Invitados() {
           phone: r?.phone || '',
           address: r?.address || '',
           companion: parseInt(r?.companion, 10) || parseInt(r?.companions, 10) || 0,
-          companionType: (parseInt(r?.companions, 10) || parseInt(r?.companion, 10) || 0) > 0 ? 'plus_one' : 'none',
+          companionType:
+            (parseInt(r?.companions, 10) || parseInt(r?.companion, 10) || 0) > 0
+              ? 'plus_one'
+              : 'none',
           companionGroupId: '',
           table: r?.table || '',
           response: 'Pendiente',
@@ -473,8 +576,11 @@ function Invitados() {
   const handlePrintRsvpPdf = () => {
     try {
       const confirmedGuests = (guests || [])
-        .filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted' || g.response === 'Sí'; })
-        .map(g => ({ name: g.name || '', table: g.table || '' }));
+        .filter((g) => {
+          const s = String(g.status || '').toLowerCase();
+          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+        })
+        .map((g) => ({ name: g.name || '', table: g.table || '' }));
 
       // Ordenar por mesa y nombre
       confirmedGuests.sort((a, b) => {
@@ -489,13 +595,17 @@ function Invitados() {
       const title = 'Listado confirmados - Nombre y Mesa';
       const date = new Date().toLocaleString();
 
-      const rowsHtml = confirmedGuests.map((g, idx) => `
+      const rowsHtml = confirmedGuests
+        .map(
+          (g, idx) => `
         <tr>
           <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${idx + 1}</td>
           <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${g.name}</td>
           <td style="padding: 6px 8px; border-bottom: 1px solid #eee; text-align:center;">${g.table || '-'}</td>
         </tr>
-      `).join('');
+      `
+        )
+        .join('');
 
       const html = `<!doctype html>
         <html>
@@ -541,7 +651,9 @@ function Invitados() {
       win.document.close();
       // Opcional: lanzar print automático tras cargar
       win.onload = () => {
-        try { win.print(); } catch (_) {}
+        try {
+          win.print();
+        } catch (_) {}
       };
     } catch (err) {
       console.error('Error generando PDF:', err);
@@ -561,14 +673,10 @@ function Invitados() {
         {/* Header con indicador de sincronización */}
         <div className="page-header">
           <div>
-            <h1 className="page-title">
-              {t('guests.guestList')}
-            </h1>
-            <p className="text-muted mt-1">
-              Gestiona tu lista de invitados de forma eficiente
-            </p>
+            <h1 className="page-title">{t('guests.guestList')}</h1>
+            <p className="text-muted mt-1">Gestiona tu lista de invitados de forma eficiente</p>
           </div>
-          
+
           {/* Indicador de sincronización */}
           <div className="flex items-center space-x-2">
             {syncStatus?.isOnline ? (
@@ -612,21 +720,29 @@ function Invitados() {
         {/* Debug info para verificar estado */}
         {import.meta.env.DEV && (
           <div className="p-4 rounded-lg text-sm bg-[var(--color-primary)]/10">
-            <strong>Debug Info:</strong><br/>
-            - activeWedding: {activeWedding || 'null'}<br/>
-            - weddings count: {weddings?.length || 0}<br/>
-            - guests count: {guests?.length || 0}<br/>
-            - isLoading: {isLoading ? 'true' : 'false'}<br/>
-            - Firebase Auth: {window.auth?.currentUser?.email || 'No autenticado'}<br/>
-            - Usuario Context: {currentUser ? JSON.stringify({uid: currentUser.uid, email: currentUser.email}) : 'null'}<br/>
-            - Ruta Firestore: weddings/{activeWedding || 'null'}/guests<br/>
-            <button 
+            <strong>Debug Info:</strong>
+            <br />- activeWedding: {activeWedding || 'null'}
+            <br />- weddings count: {weddings?.length || 0}
+            <br />- guests count: {guests?.length || 0}
+            <br />- isLoading: {isLoading ? 'true' : 'false'}
+            <br />- Firebase Auth: {window.auth?.currentUser?.email || 'No autenticado'}
+            <br />- Usuario Context:{' '}
+            {currentUser
+              ? JSON.stringify({ uid: currentUser.uid, email: currentUser.email })
+              : 'null'}
+            <br />- Ruta Firestore: weddings/{activeWedding || 'null'}/guests
+            <br />
+            <button
               onClick={() => {
                 import('../firebaseConfig').then(({ auth }) => {
                   import('firebase/auth').then(({ signInWithEmailAndPassword }) => {
-                    signInWithEmailAndPassword(auth, 'danielnavarrocampos@icloud.com', 'password123')
+                    signInWithEmailAndPassword(
+                      auth,
+                      'danielnavarrocampos@icloud.com',
+                      'password123'
+                    )
                       .then(() => console.log('Login manual exitoso'))
-                      .catch(err => console.error('Login manual falló:', err));
+                      .catch((err) => console.error('Login manual falló:', err));
                   });
                 });
               }}
@@ -638,7 +754,7 @@ function Invitados() {
         )}
 
         {/* Fallback temporal: sin bodas visibles para el usuario */}
-        {(!isLoading && Array.isArray(weddings) && weddings.length === 0) && (
+        {!isLoading && Array.isArray(weddings) && weddings.length === 0 && (
           <div className="text-sm text-gray-600">
             {activeWedding
               ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.'
@@ -682,8 +798,12 @@ function Invitados() {
           ) : (
             <Tabs defaultValue="manual">
               <TabsList className="flex space-x-6 border-b mb-4">
-                <TabsTrigger value="manual" className="pb-2">Manual</TabsTrigger>
-                <TabsTrigger value="import" className="pb-2">Desde contactos</TabsTrigger>
+                <TabsTrigger value="manual" className="pb-2">
+                  Manual
+                </TabsTrigger>
+                <TabsTrigger value="import" className="pb-2">
+                  Desde contactos
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="manual">
                 <GuestForm
@@ -719,12 +839,7 @@ function Invitados() {
         </Modal>
 
         {/* Modal Resumen RSVP */}
-        <Modal
-          open={showRsvpModal}
-          onClose={handleCloseRsvpSummary}
-          title="Resumen RSVP"
-          size="lg"
-        >
+        <Modal open={showRsvpModal} onClose={handleCloseRsvpSummary} title="Resumen RSVP" size="lg">
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg border">
@@ -732,15 +847,36 @@ function Invitados() {
                 <div className="text-sm text-gray-600">Total invitados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-green-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted'; }).length}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {
+                    (guests || []).filter((g) => {
+                      const s = String(g.status || '').toLowerCase();
+                      return s === 'confirmed' || s === 'accepted';
+                    }).length
+                  }
+                </div>
                 <div className="text-sm text-gray-600">Confirmados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-yellow-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === '' || s === 'pending'; }).length}</div>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {
+                    (guests || []).filter((g) => {
+                      const s = String(g.status || '').toLowerCase();
+                      return s === '' || s === 'pending';
+                    }).length
+                  }
+                </div>
                 <div className="text-sm text-gray-600">Pendientes</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-red-600">{(guests || []).filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'declined' || s === 'rejected'; }).length}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {
+                    (guests || []).filter((g) => {
+                      const s = String(g.status || '').toLowerCase();
+                      return s === 'declined' || s === 'rejected';
+                    }).length
+                  }
+                </div>
                 <div className="text-sm text-gray-600">Rechazados</div>
               </div>
             </div>
@@ -757,9 +893,16 @@ function Invitados() {
                   </thead>
                   <tbody>
                     {(guests || [])
-                      .filter(g => { const s = String(g.status || '').toLowerCase(); return s === 'confirmed' || s === 'accepted' || g.response === 'Sí'; })
-                      .sort((a, b) => String(a.table || '').localeCompare(String(b.table || '')) || String(a.name || '').localeCompare(String(b.name || '')))
-                      .map(g => (
+                      .filter((g) => {
+                        const s = String(g.status || '').toLowerCase();
+                        return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+                      })
+                      .sort(
+                        (a, b) =>
+                          String(a.table || '').localeCompare(String(b.table || '')) ||
+                          String(a.name || '').localeCompare(String(b.name || ''))
+                      )
+                      .map((g) => (
                         <tr key={g.id} className="border-t">
                           <td className="px-3 py-2">{g.name}</td>
                           <td className="px-3 py-2 text-center">{g.table || '-'}</td>
@@ -771,7 +914,9 @@ function Invitados() {
             </div>
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={handleCloseRsvpSummary}>Cerrar</Button>
+              <Button variant="outline" onClick={handleCloseRsvpSummary}>
+                Cerrar
+              </Button>
               <Button onClick={handlePrintRsvpPdf}>Imprimir / PDF</Button>
             </div>
           </div>
@@ -783,7 +928,7 @@ function Invitados() {
           onClose={closeWhatsBatch}
           guests={guests || []}
           weddingId={activeWedding}
-          onBatchCreated={(res)=>{
+          onBatchCreated={(res) => {
             alert(`Lote creado con ${res.items?.length || 0} mensajes`);
           }}
         />
@@ -803,9 +948,15 @@ function Invitados() {
           open={showWhatsModal}
           onClose={handleCloseWhatsModal}
           guest={whatsGuest}
-          defaultMessage={whatsGuest ? `¡Hola ${whatsGuest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?` : ''}
+          defaultMessage={
+            whatsGuest
+              ? `¡Hola ${whatsGuest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`
+              : ''
+          }
           onSendDeeplink={async (g, msg) => {
-            try { await inviteViaWhatsAppDeeplinkCustom(g, msg); } catch {}
+            try {
+              await inviteViaWhatsAppDeeplinkCustom(g, msg);
+            } catch {}
           }}
           onSendApi={async (g, msg) => {
             try {
@@ -814,7 +965,9 @@ function Invitados() {
             } catch {}
           }}
           onSendApiBulk={async () => {
-            try { await bulkInviteWhatsAppApi(); } catch {}
+            try {
+              await bulkInviteWhatsAppApi();
+            } catch {}
           }}
         />
 
@@ -827,32 +980,46 @@ function Invitados() {
           onAssignGroup={async (groupName) => {
             try {
               const setIds = new Set(selectedIds);
-              const targets = (guests || []).filter(g => setIds.has(g.id));
+              const targets = (guests || []).filter((g) => setIds.has(g.id));
               for (const g of targets) {
                 await updateGuest(g.id, { group: groupName });
                 // Propagar a companions del mismo grupo de acompañantes si aplica
                 if (g.companionGroupId) {
-                  const companions = (guests || []).filter(x => x.companionGroupId === g.companionGroupId && x.id !== g.id);
-                  for (const c of companions) { await updateGuest(c.id, { group: groupName }); }
+                  const companions = (guests || []).filter(
+                    (x) => x.companionGroupId === g.companionGroupId && x.id !== g.id
+                  );
+                  for (const c of companions) {
+                    await updateGuest(c.id, { group: groupName });
+                  }
                 }
               }
               alert(`Asignado grupo "${groupName}" a ${targets.length} invitado(s).`);
               closeGroupManager();
-            } catch (e) { alert('Error asignando grupo'); }
+            } catch (e) {
+              alert('Error asignando grupo');
+            }
           }}
           onRenameGroup={async (from, to) => {
             try {
-              const targets = (guests || []).filter(g => String(g.group || '') === String(from));
-              for (const g of targets) { await updateGuest(g.id, { group: to }); }
+              const targets = (guests || []).filter((g) => String(g.group || '') === String(from));
+              for (const g of targets) {
+                await updateGuest(g.id, { group: to });
+              }
               alert(`Grupo renombrado: ${from} → ${to} (${targets.length} invitados actualizados)`);
-            } catch (e) { alert('Error renombrando grupo'); }
+            } catch (e) {
+              alert('Error renombrando grupo');
+            }
           }}
           onMergeGroups={async (from, to) => {
             try {
-              const targets = (guests || []).filter(g => String(g.group || '') === String(from));
-              for (const g of targets) { await updateGuest(g.id, { group: to }); }
+              const targets = (guests || []).filter((g) => String(g.group || '') === String(from));
+              for (const g of targets) {
+                await updateGuest(g.id, { group: to });
+              }
               alert(`Fusionados ${targets.length} invitado(s) de "${from}" en "${to}".`);
-            } catch (e) { alert('Error fusionando grupos'); }
+            } catch (e) {
+              alert('Error fusionando grupos');
+            }
           }}
         />
       </div>

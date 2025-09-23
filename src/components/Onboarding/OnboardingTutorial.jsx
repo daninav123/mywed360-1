@@ -1,9 +1,19 @@
-﻿import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
+﻿import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import {
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Calendar,
+  Users,
+  ShoppingBag,
+  Settings,
+  Image,
+} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import { db } from '../../firebaseConfig';
-import { ChevronRight, ChevronLeft, Check, Calendar, Users, ShoppingBag, Settings, Image } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
 
 /**
  * Tutorial de onboarding para nuevos usuarios
@@ -17,7 +27,7 @@ const OnboardingTutorial = ({ onComplete }) => {
     fecha: '',
     lugar: '',
     presupuesto: '',
-    imagen: ''
+    imagen: '',
   });
   // Paso de timing se implementará más adelante
   const [loading, setLoading] = useState(false);
@@ -26,7 +36,7 @@ const OnboardingTutorial = ({ onComplete }) => {
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!currentUser?.uid) return;
-      
+
       try {
         const profileDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (profileDoc.exists()) {
@@ -38,7 +48,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               fecha: data.weddingInfo.weddingDate || '',
               lugar: data.weddingInfo.celebrationPlace || '',
               presupuesto: data.weddingInfo.budget || '',
-              imagen: data.weddingInfo.profileImage || ''
+              imagen: data.weddingInfo.profileImage || '',
             });
           }
         }
@@ -52,7 +62,7 @@ const OnboardingTutorial = ({ onComplete }) => {
 
   const steps = [
     {
-      title: "¡Bienvenido a Lovenda!",
+      title: '¡Bienvenido a Lovenda!',
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
@@ -60,24 +70,26 @@ const OnboardingTutorial = ({ onComplete }) => {
           </div>
           <h2 className="text-2xl font-bold mb-4">¡Comienza a planificar tu boda!</h2>
           <p className="mb-6 text-gray-600">
-            Te guiaremos a través de los primeros pasos para configurar tu boda en Lovenda.
-            Este tutorial te ayudará a personalizar la app y conocer sus funcionalidades principales.
+            Te guiaremos a través de los primeros pasos para configurar tu boda en Lovenda. Este
+            tutorial te ayudará a personalizar la app y conocer sus funcionalidades principales.
           </p>
         </div>
-      )
+      ),
     },
     {
-      title: "Datos básicos",
+      title: 'Datos básicos',
       content: (
         <div>
           <h2 className="text-xl font-semibold mb-4">Completa los datos básicos de tu boda</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombres de la pareja</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Nombres de la pareja
+              </label>
               <input
                 type="text"
                 value={profileData.nombres}
-                onChange={(e) => setProfileData({...profileData, nombres: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, nombres: e.target.value })}
                 placeholder="Ej: María y Juan"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
@@ -87,7 +99,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               <input
                 type="text"
                 value={profileData.apellidos}
-                onChange={(e) => setProfileData({...profileData, apellidos: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, apellidos: e.target.value })}
                 placeholder="Ej: García y Pérez"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
@@ -97,36 +109,40 @@ const OnboardingTutorial = ({ onComplete }) => {
               <input
                 type="date"
                 value={profileData.fecha}
-                onChange={(e) => setProfileData({...profileData, fecha: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, fecha: e.target.value })}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Lugar de celebración</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Lugar de celebración
+              </label>
               <input
                 type="text"
                 value={profileData.lugar}
-                onChange={(e) => setProfileData({...profileData, lugar: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, lugar: e.target.value })}
                 placeholder="Ej: Madrid"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Presupuesto estimado</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Presupuesto estimado
+              </label>
               <input
                 type="number"
                 value={profileData.presupuesto}
-                onChange={(e) => setProfileData({...profileData, presupuesto: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, presupuesto: e.target.value })}
                 placeholder="Ej: 15000"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
           </div>
         </div>
-      )
+      ),
     },
     {
-      title: "Gestión de invitados",
+      title: 'Gestión de invitados',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -157,10 +173,10 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
           </ul>
         </div>
-      )
+      ),
     },
     {
-      title: "Proveedores y Presupuesto",
+      title: 'Proveedores y Presupuesto',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -170,7 +186,8 @@ const OnboardingTutorial = ({ onComplete }) => {
           </div>
           <h2 className="text-xl font-semibold mb-2 text-center">Proveedores</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Gestiona tus proveedores, consulta con IA y lleva el seguimiento de todos los servicios contratados.
+            Gestiona tus proveedores, consulta con IA y lleva el seguimiento de todos los servicios
+            contratados.
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
@@ -191,10 +208,10 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
           </ul>
         </div>
-      )
+      ),
     },
     {
-      title: "Calendario y Tareas",
+      title: 'Calendario y Tareas',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -225,10 +242,10 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
           </ul>
         </div>
-      )
+      ),
     },
     {
-      title: "Diseños e Invitaciones",
+      title: 'Diseños e Invitaciones',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -259,10 +276,10 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
           </ul>
         </div>
-      )
+      ),
     },
     {
-      title: "¡Listo para empezar!",
+      title: '¡Listo para empezar!',
       content: (
         <div className="text-center">
           <div className="mb-6 flex items-center justify-center">
@@ -272,16 +289,16 @@ const OnboardingTutorial = ({ onComplete }) => {
           </div>
           <h2 className="text-2xl font-bold mb-4">¡Todo listo!</h2>
           <p className="mb-6 text-gray-600">
-            Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de Lovenda para 
-            planificar la boda de tus sueños.
+            Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de
+            Lovenda para planificar la boda de tus sueños.
           </p>
           <p className="text-sm text-gray-500">
-            Recuerda que puedes acceder a la configuración en cualquier momento para modificar tus datos o 
-            consultar esta guía nuevamente.
+            Recuerda que puedes acceder a la configuración en cualquier momento para modificar tus
+            datos o consultar esta guía nuevamente.
           </p>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   const handleNext = () => {
@@ -328,9 +345,11 @@ const OnboardingTutorial = ({ onComplete }) => {
 
       // Marcar onboarding completado en users/{uid}
       const profileRef = doc(db, 'users', currentUser.uid);
-      await setDoc(profileRef, { onboardingCompleted: true, lastUpdated: new Date().toISOString() }, { merge: true });
-      
-
+      await setDoc(
+        profileRef,
+        { onboardingCompleted: true, lastUpdated: new Date().toISOString() },
+        { merge: true }
+      );
 
       /* Crear evento en calendario si hay fecha de boda
       if (profileData.fecha) {
@@ -377,40 +396,37 @@ const OnboardingTutorial = ({ onComplete }) => {
             <div className="flex mt-2">
               {steps.map((_, index) => (
                 <div
-                key={index}
-                className={`h-1 rounded-full mr-1 flex-1 ${
-                  index <= currentStep ? 'bg-white' : 'bg-white bg-opacity-30'
-                }`}
-              />
-            ))}
+                  key={index}
+                  className={`h-1 rounded-full mr-1 flex-1 ${
+                    index <= currentStep ? 'bg-white' : 'bg-white bg-opacity-30'
+                  }`}
+                />
+              ))}
             </div>
           </div>
           {/* Botón saltar */}
-          <button
-            onClick={handleComplete}
-            className="text-xs underline hover:text-gray-200"
-          >
+          <button onClick={handleComplete} className="text-xs underline hover:text-gray-200">
             Saltar
           </button>
         </div>
-        
+
         {/* Contenido */}
-        <div className="px-6 py-6">
-          {steps[currentStep].content}
-        </div>
-        
+        <div className="px-6 py-6">{steps[currentStep].content}</div>
+
         {/* Botones */}
         <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-between">
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
             className={`px-4 py-2 rounded flex items-center ${
-              currentStep === 0 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-200'
+              currentStep === 0
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-gray-700 hover:bg-gray-200'
             }`}
           >
             <ChevronLeft className="w-5 h-5 mr-1" /> Anterior
           </button>
-          
+
           {currentStep < steps.length - 1 ? (
             <button
               onClick={handleNext}
@@ -436,6 +452,3 @@ const OnboardingTutorial = ({ onComplete }) => {
 };
 
 export default OnboardingTutorial;
-
-
-

@@ -1,6 +1,7 @@
 # UI Kit (base)
 
 Componentes reutilizables recomendados:
+
 - Button, IconButton
 - Input, Select, Textarea, Checkbox, Switch
 - Modal, Drawer
@@ -9,6 +10,7 @@ Componentes reutilizables recomendados:
 - Loader (spinners)
 
 Estándares:
+
 - Tamaños: `sm`, `md`, `lg`.
 - Variantes: `primary`, `secondary`, `ghost`, `danger`.
 - Estados: `disabled`, `loading`, `aria-*` y focus visible.

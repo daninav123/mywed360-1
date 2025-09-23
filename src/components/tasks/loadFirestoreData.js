@@ -1,4 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore';
+
 import { db } from '../../firebaseConfig';
 import { loadData } from '../../services/SyncService';
 
@@ -15,7 +16,7 @@ export async function loadFirestoreData(path) {
         if (segments.length >= 2) {
           const ref = doc(db, ...segments);
           const snap = await getDoc(ref);
-          const d = snap.exists() ? (snap.data()?.weddingInfo || {}) : {};
+          const d = snap.exists() ? snap.data()?.weddingInfo || {} : {};
           if (d && Object.keys(d).length > 0) data = d;
         }
       } catch {}
@@ -31,7 +32,7 @@ export async function loadFirestoreData(path) {
       // 3) Fallback a perfil de usuario
       if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
         const profile = await loadData('lovendaProfile', { collection: 'userProfiles' });
-        data = (profile && profile.weddingInfo) ? profile.weddingInfo : (profile || {});
+        data = profile && profile.weddingInfo ? profile.weddingInfo : profile || {};
       }
     } else if (path.endsWith('/tasksCompleted')) {
       data = await loadData('tasksCompleted', { docPath: path });
@@ -45,4 +46,3 @@ export async function loadFirestoreData(path) {
     return {};
   }
 }
-

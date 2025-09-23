@@ -153,10 +153,13 @@
     "optionalDependencies":  {
                                  "@rollup/rollup-linux-x64-gnu":  "^4.46.4"
                              },
-    "lint-staged":  {
-                        "*.{js,jsx,ts,tsx,json,css,md}":  [
-                                                              "eslint --fix",
-                                                              "prettier --write"
-                                                          ]
-                    }
+    "lint-staged": {
+      "*.{js,jsx,ts,tsx}": [
+        "eslint --fix",
+        "prettier --write"
+      ],
+      "*.{json,css,md}": [
+        "prettier --write"
+      ]
+    }
 }

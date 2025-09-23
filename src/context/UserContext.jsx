@@ -1,8 +1,14 @@
 import React, { createContext, useContext } from 'react';
+
 import { useAuth } from '../hooks/useAuth';
 
 // Contexto mínimo y estable para compatibilidad con código legacy y tests
-const UserContext = createContext({ user: null, role: null, isAuthenticated: false, loading: true });
+const UserContext = createContext({
+  user: null,
+  role: null,
+  isAuthenticated: false,
+  loading: true,
+});
 
 export const useUserContext = () => useContext(UserContext);
 
@@ -18,4 +24,3 @@ export default function UserProvider({ children }) {
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
-

@@ -28,8 +28,10 @@ export function polySelfIntersects(pts = []) {
     for (let j = i + 1; j < pts.length - 1; j++) {
       if (Math.abs(i - j) <= 1) continue; // segmentos adyacentes
       if (i === 0 && j === pts.length - 2) continue; // primer y último segmento comparten vértice
-      const a1 = pts[i], a2 = pts[i + 1];
-      const b1 = pts[j], b2 = pts[j + 1];
+      const a1 = pts[i],
+        a2 = pts[i + 1];
+      const b1 = pts[j],
+        b2 = pts[j + 1];
       if (segmentsIntersect(a1, a2, b1, b2)) return true;
     }
   }

@@ -1,5 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 function PropertyPanel({ element, updateElement }) {
   if (!element) {
@@ -27,7 +27,9 @@ function PropertyPanel({ element, updateElement }) {
             type="number"
             className="w-full border px-2 py-1 rounded"
             value={element.fontSize || 16}
-            onChange={(e) => updateElement((prev) => ({ ...prev, fontSize: parseInt(e.target.value, 10) }))}
+            onChange={(e) =>
+              updateElement((prev) => ({ ...prev, fontSize: parseInt(e.target.value, 10) }))
+            }
           />
         </>
       )}

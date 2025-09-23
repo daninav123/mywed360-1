@@ -1,4 +1,5 @@
 import React from 'react';
+
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
 import Button from '../Button';
 import Card from '../ui/Card';
@@ -33,8 +34,12 @@ export default function ProveedorBudgets({ supplierId }) {
             </div>
             {b.status === 'pending' && (
               <div className="flex space-x-2">
-                <Button size="sm" onClick={() => handleAction(b.id, 'accept')}>Aceptar</Button>
-                <Button variant="outline" size="sm" onClick={() => handleAction(b.id, 'reject')}>Rechazar</Button>
+                <Button size="sm" onClick={() => handleAction(b.id, 'accept')}>
+                  Aceptar
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleAction(b.id, 'reject')}>
+                  Rechazar
+                </Button>
               </div>
             )}
           </li>
