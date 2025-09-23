@@ -27,7 +27,6 @@ const OnboardingTutorial = ({ onComplete }) => {
     nombres: '',
     fecha: '',
     lugar: '',
-    presupuesto: '',
     imagen: '',
   });
   // Paso de timing se implementar� Más adelante
@@ -47,7 +46,6 @@ const OnboardingTutorial = ({ onComplete }) => {
               nombres: data.weddingInfo.brideAndGroom || '',
               fecha: data.weddingInfo.weddingDate || '',
               lugar: data.weddingInfo.celebrationPlace || '',
-              presupuesto: data.weddingInfo.budget || '',
               imagen: data.weddingInfo.profileImage || '',
             });
           }
@@ -115,18 +113,6 @@ const OnboardingTutorial = ({ onComplete }) => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Presupuesto estimado
-              </label>
-              <input
-                type="number"
-                value={profileData.presupuesto}
-                onChange={(e) => setProfileData({ ...profileData, presupuesto: e.target.value })}
-                placeholder="Ej: 15000"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              />
-            </div>
           </div>
         </div>
       ),
@@ -166,7 +152,6 @@ const OnboardingTutorial = ({ onComplete }) => {
       ),
     },
     {
-      title: 'Proveedores y Presupuesto',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -186,7 +171,6 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Añade detalles, presupuestos y contratos</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
@@ -324,7 +308,6 @@ const OnboardingTutorial = ({ onComplete }) => {
         brideAndGroom: profileData.nombres,
         weddingDate: profileData.fecha,
         celebrationPlace: profileData.lugar,
-        budget: profileData.presupuesto,
         profileImage: profileData.imagen,
       };
 

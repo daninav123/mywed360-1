@@ -49,24 +49,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
     );
   }
 
-  if (!results.length && query) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12">
-        {usedFallback && (
-          <div className="mb-4 w-full max-w-lg flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
-            <AlertTriangle size={18} className="mt-0.5" />
-            <div className="text-sm">
-              Mostrando resultados locales mientras el servicio de búsqueda no está disponible.
-            </div>
-          </div>
-        )}
-        <p className="text-lg font-medium text-gray-700">No se encontraron resultados</p>
-        <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-          Intenta reformular tu búsqueda o utilizar términos más generales
-        </p>
-      </div>
-    );
-  }
+  // Mensaje "sin resultados" se pospone hasta después de definir displayResults
 
   if (!query) {
     return (
@@ -84,7 +67,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   }
 
   // Ejemplo de datos para mostrar en modo de demostración
-  const demoResults = [
+  // DEMO DATA\n  const demoResults = [
     {
       id: 1,
       name: 'Fotografía Naturaleza Viva',
@@ -130,7 +113,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   ];
 
   // Usar datos reales si están disponibles, o los datos de demostración
-  const displayResults = results.length > 0 ? results : demoResults;
+  const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
 
   return (
     <div className="space-y-6">
@@ -240,3 +223,4 @@ export default React.memo(AIResultList, (prevProps, nextProps) => {
     prevProps.onSelect === nextProps.onSelect
   );
 });
+

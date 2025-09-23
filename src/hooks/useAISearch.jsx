@@ -156,12 +156,17 @@ function refineResults(list, ctx) {
   const locRef = String(ctx?.location || '').toLowerCase();
   if (!Array.isArray(list) || (!serviceRef && !locRef)) return list || [];
 
-  const byService = serviceRef
+  let byService = serviceRef
     ? (list || []).filter((it) => {
         const service = String(it?.service || '').toLowerCase();
         return includesWord(service, serviceRef) || includesWord(serviceRef, service);
       })
     : (list || []).slice();
+
+  // Si el filtro de servicio no produce coincidencias (p. ej., servicio no reconocido), usar la lista completa
+  if (serviceRef && byService.length === 0) {
+    byService = (list || []).slice();
+  }
 
   const scored = byService.map((it) => {
     const src = it || {};
@@ -201,4 +206,3 @@ function includesWord(haystack, needle) {
   const nw = n.split(/[\s,/-]+/);
   return hw.some((w) => nw.includes(w));
 }
-
