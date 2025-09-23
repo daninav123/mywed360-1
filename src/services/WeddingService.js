@@ -419,33 +419,69 @@ export async function addPlannerToWedding(weddingId, plannerUid) {
  * en el intervalo [weddingDate - 12 meses, weddingDate].
  * No crea ni elimina tareas; solo actualiza start/end si existen.
  */
-export async function fixParentBlockDates(weddingId) {
+export async function fixParentBlockDates(weddingId, ganttStart = null, ganttEnd = null) {
   if (!weddingId) return { updated: 0 };
-  // Obtener weddingDate desde root o subdoc info/weddingInfo
-  let wDate = null;
-  try {
-    const snap = await getDoc(doc(db, 'weddings', weddingId));
-    if (snap.exists()) {
-      const data = snap.data() || {};
-      const raw = data?.weddingDate || data?.weddingdate || data?.date || null;
-      if (raw) wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
-    }
-  } catch (_) {}
-  if (!wDate) {
+  // Utilidades de fechas basadas en días completos para evitar desfases DST
+  const toLocalMidday = (d) => {
     try {
-      const info = await getDoc(doc(db, 'weddings', weddingId, 'info', 'weddingInfo'));
-      if (info.exists()) {
-        const data = info.data() || {};
-        const raw = data?.weddingDate || data?.weddingdate || null;
+      const x = d instanceof Date ? d : new Date(d);
+      return new Date(x.getFullYear(), x.getMonth(), x.getDate(), 12, 0, 0, 0);
+    } catch {
+      return null;
+    }
+  };
+  const diffDays = (a, b) => {
+    const am = toLocalMidday(a);
+    const bm = toLocalMidday(b);
+    if (!am || !bm) return 0;
+    const MS = 24 * 60 * 60 * 1000;
+    return Math.round((bm.getTime() - am.getTime()) / MS);
+  };
+  const addDays = (base, days) => {
+    const bm = toLocalMidday(base);
+    if (!bm) return null;
+    const out = new Date(bm);
+    out.setDate(out.getDate() + days);
+    return out;
+  };
+
+  // Determinar intervalo base: preferir proyecto (Gantt) si llega desde UI; si no, usar [weddingDate-12m, weddingDate]
+  let startBase = null;
+  let endBase = null;
+  if (ganttStart instanceof Date && !isNaN(ganttStart)) startBase = ganttStart;
+  if (ganttEnd instanceof Date && !isNaN(ganttEnd)) endBase = ganttEnd;
+
+  if (!startBase || !endBase) {
+    // Fallback: obtener weddingDate y asumir 12 meses antes
+    let wDate = null;
+    try {
+      const snap = await getDoc(doc(db, 'weddings', weddingId));
+      if (snap.exists()) {
+        const data = snap.data() || {};
+        const raw = data?.weddingDate || data?.weddingdate || data?.date || null;
         if (raw) wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
       }
     } catch (_) {}
+    if (!wDate) {
+      try {
+        const info = await getDoc(doc(db, 'weddings', weddingId, 'info', 'weddingInfo'));
+        if (info.exists()) {
+          const data = info.data() || {};
+          const raw = data?.weddingDate || data?.weddingdate || null;
+          if (raw) wDate = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+        }
+      } catch (_) {}
+    }
+    if (!wDate || isNaN(wDate)) throw new Error('weddingDate no disponible para ' + weddingId);
+    startBase = addMonths(wDate, -12);
+    endBase = wDate;
   }
-  if (!wDate || isNaN(wDate)) throw new Error('weddingDate no disponible para ' + weddingId);
 
-  const startBase = addMonths(wDate, -12);
-  const span = Math.max(1, wDate.getTime() - startBase.getTime());
-  const at = (p) => new Date(startBase.getTime() + span * p);
+  const totalDays = Math.max(1, diffDays(startBase, endBase));
+  const at = (p) => {
+    const offset = Math.round(totalDays * p);
+    return addDays(startBase, offset);
+  };
 
   const blocks = [
     { name: 'Fundamentos', p0: 0.0, p1: 0.2 },
@@ -479,7 +515,7 @@ export async function fixParentBlockDates(weddingId) {
     try {
       await setDoc(
         doc(db, 'weddings', weddingId, 'tasks', '_seed_meta'),
-        { lastAlignedAt: Timestamp.now(), lastAlignedWeddingDate: wDate },
+        { lastAlignedAt: Timestamp.now(), lastAlignedRangeStart: toLocalMidday(startBase), lastAlignedRangeEnd: toLocalMidday(endBase) },
         { merge: true }
       );
     } catch (_) {}

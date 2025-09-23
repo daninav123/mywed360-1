@@ -5,6 +5,12 @@ export function validateAndNormalizeDate(date) {
   let validDate = date;
   if (date && typeof date.toDate === 'function') {
     validDate = date.toDate();
+  } else if (typeof date === 'object' && date !== null && typeof date.seconds === 'number') {
+    try {
+      validDate = new Date(date.seconds * 1000);
+    } catch {
+      return null;
+    }
   } else if (!(date instanceof Date)) {
     try {
       if (typeof date === 'string') {
@@ -33,6 +39,10 @@ export function normalizeAnyDate(d) {
     if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
     if (typeof d?.toDate === 'function') {
       const x = d.toDate();
+      return isNaN(x.getTime()) ? null : x;
+    }
+    if (typeof d === 'object' && d !== null && typeof d.seconds === 'number') {
+      const x = new Date(d.seconds * 1000);
       return isNaN(x.getTime()) ? null : x;
     }
     if (typeof d === 'number') {

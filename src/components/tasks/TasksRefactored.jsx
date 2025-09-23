@@ -26,7 +26,7 @@ import DebugTasksPanel from './DebugTasksPanel.jsx';
 //
 
 // Importar hooks de Firestore
-import { addMonths } from './utils/dateUtils.js';
+import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
@@ -35,13 +35,13 @@ import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 
-// FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÃƒâ€™Ã‚Â³n helper para cargar datos de Firestore de forma segura con fallbacks
 
 import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÒ³n segura con manejo de errores
+  // Estados - InicializaciÃƒâ€™Ã‚Â³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -74,7 +74,7 @@ export default function Tasks() {
   // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks/{parentId}/subtasks/*
   const { data: nestedSubtasks = [] } = useWeddingCollectionGroup('subtasks', activeWedding);
 
-  // Migración suave de subtareas planas -> anidadas (una vez por boda)
+  // MigraciÃƒÂ³n suave de subtareas planas -> anidadas (una vez por boda)
   useEffect(() => {
     (async () => {
       try {
@@ -90,7 +90,7 @@ export default function Tasks() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
-  // (movido más abajo tras declarar debugEnabled)
+  // (movido mÃƒÂ¡s abajo tras declarar debugEnabled)
 
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
@@ -128,19 +128,8 @@ export default function Tasks() {
     }
   }, []);
 
-  // Exponer helpers en modo debug para corrección in-situ
-  useEffect(() => {
-    if (!debugEnabled) return;
-    try {
-      window.mywed = window.mywed || {};
-      window.mywed.fixParentBlockDates = async () => {
-        if (!activeWedding) return { ok: false };
-        const res = await fixParentBlockDates(activeWedding);
-        console.log('[Debug] fixParentBlockDates', res);
-        return res;
-      };
-    } catch (_) {}
-  }, [debugEnabled, activeWedding]);
+  // Exponer helpers en modo debug para correcciÃƒÂ³n in-situ
+  // (movido mÃƒÂ¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
@@ -153,7 +142,7 @@ export default function Tasks() {
     }
   }, [calendarDate]);
 
-  // Altura del contenedor del calendario (reactiva al tama�o de ventana)
+  // Altura del contenedor del calendario (reactiva al tamaÃ¯Â¿Â½o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
   useEffect(() => {
     const compute = () => {
@@ -171,12 +160,12 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÒ³n:', error);
+      console.error('Error al obtener estado de sincronizaciÃƒâ€™Ã‚Â³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
 
-  // Suscripción a cambios del estado de sincronización (online/syncing/pending)
+  // SuscripciÃƒÂ³n a cambios del estado de sincronizaciÃƒÂ³n (online/syncing/pending)
   useEffect(() => {
     const unsub = subscribeSyncState(setSyncStatus);
     return () => {
@@ -192,7 +181,23 @@ export default function Tasks() {
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del D�a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del DÃ¯Â¿Â½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Exponer helpers en modo debug para corrección in-situ
+  useEffect(() => {
+    if (!debugEnabled) return;
+    try {
+      window.mywed = window.mywed || {};
+      window.mywed.fixParentBlockDates = async () => {
+        if (!activeWedding) return { ok: false };
+        const startForBlocks = projectEnd instanceof Date && !isNaN(projectEnd)
+          ? addMonths(projectEnd, -12)
+          : projectStart;
+        const res = await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
+        console.log('[Debug] fixParentBlockDates', res);
+        return res;
+      };
+    } catch (_) {}
+  }, [debugEnabled, activeWedding, projectStart, projectEnd]);
   const listCellWidth = '';
   // Altura de fila del Gantt
   const rowHeight = 44;
@@ -200,12 +205,12 @@ export default function Tasks() {
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
 
-  // Manejar eventos de calendario externos// FunciÒ³n para aÒ±adir una reuniÒ³n
+  // Manejar eventos de calendario externos// FunciÃƒâ€™Ã‚Â³n para aÃƒâ€™Ã‚Â±adir una reuniÃƒâ€™Ã‚Â³n
   const addMeeting = useCallback(
     async (meeting) => {
       await addMeetingFS({
         ...meeting,
-        title: meeting.title || 'Nueva reuniÒ³n',
+        title: meeting.title || 'Nueva reuniÃƒâ€™Ã‚Â³n',
         start: new Date(meeting.start),
         end: new Date(meeting.end),
       });
@@ -216,9 +221,9 @@ export default function Tasks() {
   // eslint-disable-next-line no-unused-expressions
   addMeeting && null;
 
-  // GeneraciÒ³n automÒ¡tica de timeline si estÒ¡ vacÒ­o// Estado para tareas completadas (inicial vacÒ­o, se cargarÒ¡ asÒ­ncronamente)
+  // GeneraciÃƒâ€™Ã‚Â³n automÃƒâ€™Ã‚Â¡tica de timeline si estÃƒâ€™Ã‚Â¡ vacÃƒâ€™Ã‚Â­o// Estado para tareas completadas (inicial vacÃƒâ€™Ã‚Â­o, se cargarÃƒâ€™Ã‚Â¡ asÃƒâ€™Ã‚Â­ncronamente)
 
-  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÒ³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÒ­os al inicio)// Sugerencia automÒ¡tica de categorÒ­a
+  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÃƒâ€™Ã‚Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒâ€™Ã‚Â­os al inicio)// Sugerencia automÃƒâ€™Ã‚Â¡tica de categorÃƒâ€™Ã‚Â­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (
@@ -246,7 +251,7 @@ export default function Tasks() {
     ) {
       return 'PAPELERIA';
     } else if (
-      texto.includes('mÒºsica') ||
+      texto.includes('mÃƒâ€™Ã‚Âºsica') ||
       texto.includes('music') ||
       texto.includes('dj') ||
       texto.includes('band')
@@ -269,7 +274,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÒ­a si se cambia el tÒ­tulo y la categorÒ­a es OTROS
+      // 1. Sugerir categorÃƒâ€™Ã‚Â­a si se cambia el tÃƒâ€™Ã‚Â­tulo y la categorÃƒâ€™Ã‚Â­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -282,7 +287,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÒ­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒâ€™Ã‚Â­a por defecto
         }
       }
 
@@ -321,7 +326,7 @@ export default function Tasks() {
     resetForm();
   };
 
-  // AsignaciÒ³n automÒ¡tica de categorÒ­a con IA
+  // AsignaciÃƒâ€™Ã‚Â³n automÃƒâ€™Ã‚Â¡tica de categorÃƒâ€™Ã‚Â­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -331,7 +336,7 @@ export default function Tasks() {
 
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÒ³n', 'jardÒ­n', 'terraza'],
+        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒâ€™Ã‚Â³n', 'jardÃƒâ€™Ã‚Â­n', 'terraza'],
         INVITADOS: [
           'guests',
           'invitados',
@@ -343,33 +348,33 @@ export default function Tasks() {
         ],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
         DECORACION: [
-          'decoraciÒ³n',
+          'decoraciÃƒâ€™Ã‚Â³n',
           'flores',
           'arreglos',
           'centros de mesa',
-          'iluminaciÒ³n',
-          'ambientaciÒ³n',
+          'iluminaciÃƒâ€™Ã‚Â³n',
+          'ambientaciÃƒâ€™Ã‚Â³n',
         ],
         PAPELERIA: [
           'invitaciones',
-          'papelerÒ­a',
+          'papelerÃƒâ€™Ã‚Â­a',
           'save the date',
           'tarjetas',
           'programa',
           'seating plan',
         ],
-        MUSICA: ['mÒºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografÒ­a', 'video', 'recuerdos', 'Ò¡lbum', 'sesiÒ³n'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÒ­a'],
+        MUSICA: ['mÃƒâ€™Ã‚Âºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
+        FOTOGRAFO: ['fotografÃƒâ€™Ã‚Â­a', 'video', 'recuerdos', 'Ãƒâ€™Ã‚Â¡lbum', 'sesiÃƒâ€™Ã‚Â³n'],
+        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒâ€™Ã‚Â­a'],
       };
 
-      // Contar coincidencias por categorÒ­a
+      // Contar coincidencias por categorÃƒâ€™Ã‚Â­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter((palabra) => texto.includes(palabra)).length;
       });
 
-      // Encontrar la categorÒ­a con mayor puntuaciÒ³n
+      // Encontrar la categorÃƒâ€™Ã‚Â­a con mayor puntuaciÃƒâ€™Ã‚Â³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -381,17 +386,17 @@ export default function Tasks() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÒ­a:', error);
+      console.error('Error al asignar categorÃƒâ€™Ã‚Â­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÒ³n de la boda
+  // Guardar una tarea en la subcolecciÃƒâ€™Ã‚Â³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÒ¡sico
+      // Validar formulario bÃƒâ€™Ã‚Â¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÒ­tulo');
+        alert('Por favor ingresa un tÃƒâ€™Ã‚Â­tulo');
         return;
       }
 
@@ -416,7 +421,7 @@ export default function Tasks() {
 
       // Validar fechas
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no vÒ¡lidas');
+        alert('Fechas no vÃƒâ€™Ã‚Â¡lidas');
         return;
       }
 
@@ -425,7 +430,7 @@ export default function Tasks() {
         return;
       }
 
-      // Asignar categorÒ­a con IA si no se especificÒ³
+      // Asignar categorÃƒâ€™Ã‚Â­a con IA si no se especificÃƒâ€™Ã‚Â³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -442,9 +447,9 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() }),
       };
 
-      // AÒ±adir/actualizar segÒºn sea una tarea de largo plazo o una reuniÒ³n
+      // AÃƒâ€™Ã‚Â±adir/actualizar segÃƒâ€™Ã‚Âºn sea una tarea de largo plazo o una reuniÃƒâ€™Ã‚Â³n
       if (formData.long) {
-        // Si no se eligió tarea padre, asignar por defecto a "OTROS"
+        // Si no se eligiÃƒÂ³ tarea padre, asignar por defecto a "OTROS"
         try {
           if (!formData.parentTaskId) {
             const arr = Array.isArray(tasksState) ? tasksState : [];
@@ -504,7 +509,7 @@ export default function Tasks() {
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // Ò��&¡ltimo recurso: generar id local si todo falla
+          // Ãƒâ€™Ã¯Â¿Â½Ã¯Â¿Â½&Ã‚Â¡ltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
@@ -530,7 +535,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÒ³n (evento puntual del calendario)
+          // Nueva reuniÃƒâ€™Ã‚Â³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -607,7 +612,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÒ³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃƒâ€™Ã‚Â³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -621,7 +626,7 @@ export default function Tasks() {
 
   // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
 
-  // FunciÒ³n auxiliar para validar y normalizar fechas
+  // FunciÃƒâ€™Ã‚Â³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
   const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } =
     useSafeEvents(meetingsState);
@@ -656,16 +661,16 @@ export default function Tasks() {
       });
 
       // Si tras todo lo anterior no hay ninguna tarea padre en el rango,
-      // intentar un fallback directo desde tasksState (por si algún normalizador filtró de más)
+      // intentar un fallback directo desde tasksState (por si algÃƒÂºn normalizador filtrÃƒÂ³ de mÃƒÂ¡s)
       const hasParent = injected.some((x) => String(x?.type || 'task') === 'task');
       if (!hasParent) {
         const raw = Array.isArray(tasksState) ? tasksState : [];
         const parents = raw
           .filter((x) => x && String(x.type || 'task') === 'task' && x.start && x.end)
           .map((x) => {
-            const s = x.start instanceof Date ? x.start : (typeof x.start?.toDate === 'function' ? x.start.toDate() : new Date(x.start));
-            const e = x.end instanceof Date ? x.end : (typeof x.end?.toDate === 'function' ? x.end.toDate() : new Date(x.end));
-            if (!s || !e || isNaN(s) || isNaN(e) || e < s) return null;
+            const s = normalizeAnyDate(x.start);
+            const e = normalizeAnyDate(x.end);
+            if (!s || !e || e < s) return null;
             return {
               id: String(x.id || `${x.title}-${s.getTime()}-${e.getTime()}`),
               name: x.name || x.title || 'Tarea',
@@ -785,7 +790,7 @@ export default function Tasks() {
     }
   }, [subtaskEvents, completedIdSet]);
 
-  // Acción manual para crear tareas por defecto
+  // AcciÃƒÂ³n manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
     try {
       if (!activeWedding || !db) return;
@@ -809,54 +814,54 @@ export default function Tasks() {
 
       const blocks = [
         { key: 'A', name: 'Bloque A - Fundamentos', p0: 0.0, p1: 0.2, items: [
-          'Difundir la noticia y organizar la planificación (perfil, invitar pareja, anillo, presupuesto inicial)',
-          'Crear primera versión de la lista de invitados',
-          'Investigar lugares de celebración y comenzar visitas',
+          'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+          'Crear primera versiÃƒÂ³n de la lista de invitados',
+          'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
           'Decidir cortejo nupcial',
         ]},
         { key: 'B', name: 'Bloque B - Proveedores Clave', p0: 0.1, p1: 0.8, items: [
-          'Fotografía → contacto inicial pronto, cierre de contrato a mitad del proceso',
-          'Videografía → decisión temprana, reuniones finales hacia el final',
-          'Catering → investigación inicial, prueba de menú, cierre cercano a la boda',
-          'Florista → inspiración y primeras ideas, confirmación en la fase final',
-          'Música → banda/DJ reservados pronto, reunión final más tarde',
-          'Repostería → búsqueda inicial, prueba de sabores meses después, pedido final cerca de la boda',
+          'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
+          'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
+          'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
+          'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
+          'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
+          'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
         ]},
         { key: 'C', name: 'Bloque C - Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
-          'Novia → visitas iniciales, decisión intermedia, pruebas finales en los últimos meses',
-          'Novio → compra traje en mitad del proceso, ajustes finales poco antes',
-          'Cortejo → definir vestidos/trajes, confirmar tallas y ajustes finales más tarde',
+          'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
+          'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
+          'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
         ]},
         { key: 'D', name: 'Bloque D - Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
           'Invitaciones digitales y save-the-dates (inicio medio)',
-          'Invitaciones físicas y papelería (fase intermedia)',
-          'Decoración y DIY (se puede trabajar meses antes y ultimar al final)',
-          'Recuerdos y regalos (elección temprana, cierre antes del evento)',
+          'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
+          'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
+          'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
         ]},
-        { key: 'E', name: 'Bloque E - Organización y Logística', p0: 0.3, p1: 1.0, items: [
+        { key: 'E', name: 'Bloque E - OrganizaciÃƒÂ³n y LogÃƒÂ­stica', p0: 0.3, p1: 1.0, items: [
           'Transporte (se puede definir pronto, confirmar al final)',
-          'Extras y básicos del día (ir acumulando, revisión final cercana a la boda)',
-          'Confirmaciones con proveedores (últimas semanas)',
+          'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
+          'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
           'Plan B clima (al final)',
-          'Ensayo general (última fase)',
+          'Ensayo general (ÃƒÂºltima fase)',
         ]},
         { key: 'F', name: 'Bloque F - Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
-          'Eventos adicionales (preboda, brunch…)',
-          'Despedidas (planificación antes, celebración final)',
+          'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
+          'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
           'Votos y discursos (escribir con calma, repasar justo antes)',
         ]},
         { key: 'G', name: 'Bloque G - Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
-          'Reservas peluquería/maquillaje con antelación',
+          'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
           'Pruebas intermedias',
-          'Rutinas de cuidado personal (últimos meses)',
+          'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
         ]},
         { key: 'H', name: 'Bloque H - Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
           'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-          'Planificar luna de miel (elección pronto, reservas intermedias, maletas al final)',
+          'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
         ]},
-        { key: 'I', name: 'Bloque I - Después de la Boda', p0: 1.0, p1: 1.05, items: [
+        { key: 'I', name: 'Bloque I - DespuÃƒÂ©s de la Boda', p0: 1.0, p1: 1.05, items: [
           'Disfrutar inicio del matrimonio',
-          'Organizar álbum y recuerdos',
+          'Organizar ÃƒÂ¡lbum y recuerdos',
         ]},
       ];
 
@@ -903,7 +908,7 @@ export default function Tasks() {
     }
   }, [activeWedding, db, projectStart, projectEnd]);
 
-  // Seed automático de Bloques A-I (padres + subtareas) si no hay tareas
+  // Seed automÃƒÂ¡tico de Bloques A-I (padres + subtareas) si no hay tareas
   useEffect(() => {
     (async () => {
       try {
@@ -916,7 +921,7 @@ export default function Tasks() {
         const seedSnap = await getDoc(seedRef).catch(() => null);
         if (seedSnap && seedSnap.exists()) return;
 
-        // Permitir seed aunque aún no haya weddingDate: usar fallbacks razonables
+        // Permitir seed aunque aÃƒÂºn no haya weddingDate: usar fallbacks razonables
         // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
         const endBase =
           projectEnd instanceof Date && !isNaN(projectEnd.getTime())
@@ -931,54 +936,54 @@ export default function Tasks() {
 
         const blocks = [
           { key: 'A', name: 'Fundamentos', p0: 0.0, p1: 0.2, items: [
-            'Difundir la noticia y organizar la planificación (perfil, invitar pareja, anillo, presupuesto inicial)',
-            'Crear primera versión de la lista de invitados',
-            'Investigar lugares de celebración y comenzar visitas',
+            'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+            'Crear primera versiÃƒÂ³n de la lista de invitados',
+            'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
             'Decidir cortejo nupcial',
           ]},
           { key: 'B', name: 'Proveedores Clave', p0: 0.1, p1: 0.8, items: [
-            'Fotografía → contacto inicial pronto, cierre de contrato a mitad del proceso',
-            'Videografía → decisión temprana, reuniones finales hacia el final',
-            'Catering → investigación inicial, prueba de menú, cierre cercano a la boda',
-            'Florista → inspiración y primeras ideas, confirmación en la fase final',
-            'Música → banda/DJ reservados pronto, reunión final más tarde',
-            'Repostería → búsqueda inicial, prueba de sabores meses después, pedido final cerca de la boda',
+            'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
+            'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
+            'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
+            'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
+            'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
+            'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
           ]},
           { key: 'C', name: 'Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
-            'Novia → visitas iniciales, decisión intermedia, pruebas finales en los últimos meses',
-            'Novio → compra traje en mitad del proceso, ajustes finales poco antes',
-            'Cortejo → definir vestidos/trajes, confirmar tallas y ajustes finales más tarde',
+            'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
+            'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
+            'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
           ]},
           { key: 'D', name: 'Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
             'Invitaciones digitales y save-the-dates (inicio medio)',
-            'Invitaciones físicas y papelería (fase intermedia)',
-            'Decoración y DIY (se puede trabajar meses antes y ultimar al final)',
-            'Recuerdos y regalos (elección temprana, cierre antes del evento)',
+            'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
+            'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
+            'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
           ]},
-          { key: 'E', name: 'Organización y Logística', p0: 0.3, p1: 1.0, items: [
+          { key: 'E', name: 'OrganizaciÃƒÂ³n y LogÃƒÂ­stica', p0: 0.3, p1: 1.0, items: [
             'Transporte (se puede definir pronto, confirmar al final)',
-            'Extras y básicos del día (ir acumulando, revisión final cercana a la boda)',
-            'Confirmaciones con proveedores (últimas semanas)',
+            'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
+            'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
             'Plan B clima (al final)',
-            'Ensayo general (última fase)',
+            'Ensayo general (ÃƒÂºltima fase)',
           ]},
           { key: 'F', name: 'Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
-            'Eventos adicionales (preboda, brunch…)',
-            'Despedidas (planificación antes, celebración final)',
+            'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
+            'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
             'Votos y discursos (escribir con calma, repasar justo antes)',
           ]},
           { key: 'G', name: 'Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
-            'Reservas peluquería/maquillaje con antelación',
+            'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
             'Pruebas intermedias',
-            'Rutinas de cuidado personal (últimos meses)',
+            'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
           ]},
           { key: 'H', name: 'Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
             'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-            'Planificar luna de miel (elección pronto, reservas intermedias, maletas al final)',
+            'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
           ]},
-          { key: 'I', name: 'Después de la Boda', p0: 1.0, p1: 1.05, items: [
+          { key: 'I', name: 'DespuÃƒÂ©s de la Boda', p0: 1.0, p1: 1.05, items: [
             'Disfrutar inicio del matrimonio',
-            'Organizar álbum y recuerdos',
+            'Organizar ÃƒÂ¡lbum y recuerdos',
           ]},
         ];
 
@@ -1024,7 +1029,7 @@ export default function Tasks() {
       }
     })();
   }, [activeWedding, db, projectStart, projectEnd, tasksState, tasksLoading]);
-  // Toggle rápido de completado (lista/fallback)
+  // Toggle rÃƒÂ¡pido de completado (lista/fallback)
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
       try {
@@ -1063,18 +1068,18 @@ export default function Tasks() {
     setGanttViewMode,
   });
 
-  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÒ³n// CÒ¡lculo de progreso - asegurando que los estados sean arrays
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒâ€™Ã‚Â³n// CÃƒâ€™Ã‚Â¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
   useEffect(() => {
-    // Deshabilitado: sólo usar weddings/{id}.weddingDate como fuente
+    // Deshabilitado: sÃƒÂ³lo usar weddings/{id}.weddingDate como fuente
     return;
     if (!activeWedding || !db) return;
     try {
       const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
       const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      // Variación en minúsculas que algunos entornos crean: weddings/{id}/weddinginfo
+      // VariaciÃƒÂ³n en minÃƒÂºsculas que algunos entornos crean: weddings/{id}/weddinginfo
       const refLower = doc(db, 'weddings', activeWedding, 'weddinginfo');
       const handler = (snap) => {
         try {
@@ -1102,7 +1107,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta común)
+  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comÃƒÂºn)
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1154,7 +1159,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a) Fallback adicional: leer weddingDate del documento raíz weddings/{id}
+  // 1a) Fallback adicional: leer weddingDate del documento raÃƒÂ­z weddings/{id}
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1187,7 +1192,7 @@ export default function Tasks() {
               const iso = new Date(raw);
               if (!isNaN(iso.getTime())) d = iso;
               else {
-                const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]+)\s+de\s+(\d{4})/);
+                const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/);
                 if (m) {
                   const day = parseInt(m[1], 10);
                   const name = m[2].toLowerCase();
@@ -1234,7 +1239,7 @@ export default function Tasks() {
             const iso = new Date(raw);
             if (!isNaN(iso.getTime())) d = iso;
             else {
-              const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZñÑáéíóúÁÉÍÓÚ]+)\s+de\s+(\d{4})/);
+              const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/);
               if (m) {
                 const day = parseInt(m[1], 10);
                 const name = m[2].toLowerCase();
@@ -1246,7 +1251,7 @@ export default function Tasks() {
             }
           }
         }
-        // Fallback adicional: colección de perfiles si existiese
+        // Fallback adicional: colecciÃƒÂ³n de perfiles si existiese
         if (!d) {
           try {
             const pref = await getDoc(doc(db, 'userProfiles', uid)).catch(() => null);
@@ -1265,7 +1270,7 @@ export default function Tasks() {
     })();
   }, [auth?.currentUser?.uid, db]);
 
-  // 2) Crear/actualizar automáticamente el evento 'wedding-day' si hay fecha
+  // 2) Crear/actualizar automÃƒÂ¡ticamente el evento 'wedding-day' si hay fecha
   useEffect(() => {
     (async () => {
       try {
@@ -1295,7 +1300,7 @@ export default function Tasks() {
         const next = {
           id: 'wedding-day',
           autoKey: 'wedding-day',
-          title: prev?.title || 'Día de la boda',
+          title: prev?.title || 'DÃƒÂ­a de la boda',
           category: prev?.category || 'OTROS',
           start,
           end,
@@ -1318,10 +1323,11 @@ export default function Tasks() {
       try {
         if (!activeWedding) return;
         if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
-        await fixParentBlockDates(activeWedding);
+        const startForBlocks = addMonths(projectEnd, -12);
+        await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
       } catch (_) {}
     })();
-  }, [activeWedding, projectEnd]);
+  }, [activeWedding, projectStart, projectEnd]);
 
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
