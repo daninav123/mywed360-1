@@ -1,6 +1,6 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+﻿import React, { useMemo, useRef, useEffect } from 'react';
 
-import { addMonths } from './utils/dateUtils.js';
+import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
 
 export default function LongTermTasksGantt({
@@ -15,6 +15,7 @@ export default function LongTermTasksGantt({
   projectEnd,
   onTaskClick,
   extendMonthsAfterEnd = 0,
+  leftColumnWidth = 220,
 }) {
   const colW = Math.max(60, Number(columnWidth) || 90);
 
@@ -36,11 +37,11 @@ export default function LongTermTasksGantt({
       const arr = Array.isArray(tasks) ? tasks.slice() : [];
       const raw = markerDate || projectEnd || null;
       if (!raw) return arr;
-      const wd = raw instanceof Date ? raw : new Date(raw);
-      if (isNaN(wd.getTime())) return arr;
+      const wd = normalizeAnyDate(raw);
+      if (!wd || isNaN(wd.getTime())) return arr;
       const exists = arr.some((t) => {
         const isM = String(t?.type || '') === 'milestone' || t?.milestone === true;
-        const s = t?.start instanceof Date ? t.start : t?.start ? new Date(t.start) : null;
+        const s = normalizeAnyDate(t?.start);
         return (
           isM &&
           s &&
@@ -73,8 +74,8 @@ export default function LongTermTasksGantt({
         if (!t) return null;
         const startRaw = t.start ?? t.startDate ?? t.date ?? t.when;
         const endRaw = t.end ?? t.endDate ?? t.until ?? t.finish ?? t.to;
-        const s = toDateSafe(startRaw);
-        const e = toDateSafe(endRaw);
+        const s = normalizeAnyDate(startRaw);
+        const e = normalizeAnyDate(endRaw);
         if (!s || !e || e < s) return null;
         const type = t?.type ? String(t.type) : t?.milestone ? 'milestone' : 'task';
         const id = String(t.id || `${t.title || 't'}-${s.getTime()}-${e.getTime()}`);
@@ -87,7 +88,7 @@ export default function LongTermTasksGantt({
   // 3) Rango del timeline
   const registrationDate = useMemo(() => {
     // Prioridad absoluta: projectStart proveniente de Firestore (users/{uid}.createdAt)
-    const ps = toDateSafe(projectStart);
+    const ps = normalizeAnyDate(projectStart);
     if (ps) return ps;
     // Fallback: metadata de Auth
     try {
@@ -95,7 +96,7 @@ export default function LongTermTasksGantt({
       const d = cs ? new Date(cs) : null;
       if (d && !isNaN(d.getTime())) return d;
     } catch {}
-    // Últimos recursos
+    // Ãšltimos recursos
     if (normalizedTasks.length > 0) return new Date(normalizedTasks[0].start);
     return new Date();
   }, [projectStart, normalizedTasks]);
@@ -104,7 +105,7 @@ export default function LongTermTasksGantt({
     // Prioridad: projectEnd (weddingDate de Firestore). Fallback: markerDate
     const raw = projectEnd || markerDate || null;
     if (!raw) return null;
-    const d = toDateSafe(raw);
+    const d = normalizeAnyDate(raw);
     return d;
   }, [projectEnd, markerDate]);
 
@@ -265,13 +266,65 @@ export default function LongTermTasksGantt({
           </span>
         </div>
       )}
-      <div
-        ref={containerRef || scrollRef}
-        className="w-full overflow-x-auto overflow-y-hidden mb-4 border border-gray-100 rounded-lg"
-        style={{ minHeight: contentHeight }}
-        data-testid="longterm-gantt-scroll"
-      >
-        {/* Cabecera: años + meses */}
+      <div className="w-full flex items-stretch gap-3">
+        {/* Columna izquierda fija con nombre de tarea */}
+        <div
+          className="shrink-0 rounded-lg border border-gray-100 bg-white"
+          style={{ width: leftColumnWidth, minHeight: contentHeight }}
+        >
+          {/* Encabezado de la columna izquierda */}
+          <div
+            style={{
+              height: 56,
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 10px',
+              borderBottom: '1px solid #eee',
+              fontWeight: 600,
+              color: '#111827',
+            }}
+          >
+            Tarea
+          </div>
+          {/* Filas alineadas con las barras */}
+          <div style={{ position: 'relative', minHeight: Math.max(0, contentHeight - 56) }}>
+            {bars.map((bar, i) => (
+              <div
+                key={`left-${bar.key}`}
+                onClick={() => handleClick(bar)}
+                title={bar?.task?.name || bar?.task?.title || ''}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 40 + i * rowHeight,
+                  height: rowHeight,
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '2px 10px',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer',
+                  color: '#111827',
+                  fontSize: 13,
+                  borderBottom: '1px dashed #f0f0f0',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {bar.task?.name || bar.task?.title || 'Tarea'}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          ref={containerRef || scrollRef}
+          className="grow overflow-x-auto overflow-y-hidden mb-4 border border-gray-100 rounded-lg"
+          style={{ minHeight: contentHeight }}
+          data-testid="longterm-gantt-scroll"
+        >
+        {/* Cabecera: aÃ±os + meses */}
         <div
           style={{
             position: 'relative',
@@ -448,34 +501,7 @@ export default function LongTermTasksGantt({
   );
 }
 
-function toDateSafe(d) {
-  try {
-    if (!d) return null;
-    if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
-    if (typeof d?.toDate === 'function') {
-      const x = d.toDate();
-      return isNaN(x.getTime()) ? null : x;
-    }
-    if (typeof d === 'number') {
-      const n = new Date(d);
-      return isNaN(n.getTime()) ? null : n;
-    }
-    if (typeof d === 'string') {
-      const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (m) {
-        const y = parseInt(m[1], 10);
-        const mo = parseInt(m[2], 10) - 1;
-        const da = parseInt(m[3], 10);
-        const local = new Date(y, mo, da, 0, 0, 0, 0);
-        return isNaN(local.getTime()) ? null : local;
-      }
-    }
-    const parsed = new Date(d);
-    return isNaN(parsed.getTime()) ? null : parsed;
-  } catch {
-    return null;
-  }
-}
+// normalizeAnyDate cubre Date, Timestamp, {seconds}, ISO y YYYY-MM-DD
 
 function diffMonths(a, b) {
   const y = b.getFullYear() - a.getFullYear();
@@ -483,7 +509,7 @@ function diffMonths(a, b) {
   return y * 12 + m;
 }
 
-// Fracción del día dentro de su mes (0–1)
+// Fraccion del dia dentro de su mes (0..1)
 function dayFraction(d) {
   try {
     if (!(d instanceof Date)) return 0;
@@ -494,4 +520,5 @@ function dayFraction(d) {
     return 0;
   }
 }
+
 
