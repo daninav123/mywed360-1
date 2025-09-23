@@ -611,7 +611,8 @@ export default function Tasks() {
   // Inyectar progreso calculado en tareas padre visibles en el Gantt
   const ganttDisplayTasks = useMemo(() => {
     try {
-      return (Array.isArray(ganttTasksBounded) ? ganttTasksBounded : []).map((t) => {
+      const bounded = Array.isArray(ganttTasksBounded) ? ganttTasksBounded : [];
+      const injected = bounded.map((t) => {
         if (!t) return t;
         const ty = String(t.type || 'task');
         if (ty !== 'task') return t;
@@ -622,10 +623,39 @@ export default function Tasks() {
         }
         return t;
       });
+
+      // Si tras todo lo anterior no hay ninguna tarea padre en el rango,
+      // intentar un fallback directo desde tasksState (por si algún normalizador filtró de más)
+      const hasParent = injected.some((x) => String(x?.type || 'task') === 'task');
+      if (!hasParent) {
+        const raw = Array.isArray(tasksState) ? tasksState : [];
+        const parents = raw
+          .filter((x) => x && String(x.type || 'task') === 'task' && x.start && x.end)
+          .map((x) => {
+            const s = x.start instanceof Date ? x.start : (typeof x.start?.toDate === 'function' ? x.start.toDate() : new Date(x.start));
+            const e = x.end instanceof Date ? x.end : (typeof x.end?.toDate === 'function' ? x.end.toDate() : new Date(x.end));
+            if (!s || !e || isNaN(s) || isNaN(e) || e < s) return null;
+            return {
+              id: String(x.id || `${x.title}-${s.getTime()}-${e.getTime()}`),
+              name: x.name || x.title || 'Tarea',
+              title: x.title || x.name || 'Tarea',
+              start: s,
+              end: e,
+              type: 'task',
+              progress: Number(x.progress) || 0,
+              isDisabled: Boolean(x.isDisabled) || false,
+              category: x.category || 'OTROS',
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.start - b.start);
+        return parents;
+      }
+      return injected;
     } catch {
       return Array.isArray(ganttTasksBounded) ? ganttTasksBounded : [];
     }
-  }, [ganttTasksBounded, parentProgressMap]);
+  }, [ganttTasksBounded, parentProgressMap, tasksState]);
 
   // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
   const subtaskEvents = useMemo(() => {
