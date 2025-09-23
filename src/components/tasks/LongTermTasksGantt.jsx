@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useEffect } from 'react';
 
-import { addMonths } from './utils/dateUtils';
+import { addMonths } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
 
 export default function LongTermTasksGantt({

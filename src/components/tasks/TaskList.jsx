@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { categories } from './CalendarComponents';
+import { categories } from './CalendarComponents.jsx';
 
 // Componente para mostrar la lista de próximas tareas
 const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete }) => {

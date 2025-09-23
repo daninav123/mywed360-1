@@ -79,6 +79,10 @@ export async function createWedding(uid, extraData = {}) {
   // Seed de tareas predeterminadas (padres en Gantt, subtareas en lista)
   try {
     await seedDefaultTasksForWedding(weddingId, base);
+    // Si ya hay weddingDate, alinear fechas de bloques por porcentajes
+    try {
+      if (base?.weddingDate) await fixParentBlockDates(weddingId);
+    } catch (_) {}
   } catch (e) {
     console.warn('No se pudieron crear las tareas predeterminadas para', weddingId, e);
   }
@@ -472,6 +476,13 @@ export async function fixParentBlockDates(weddingId) {
       await updateDoc(d.ref, { start: s, end: e });
       updated++;
     }
+    try {
+      await setDoc(
+        doc(db, 'weddings', weddingId, 'tasks', '_seed_meta'),
+        { lastAlignedAt: Timestamp.now(), lastAlignedWeddingDate: wDate },
+        { merge: true }
+      );
+    } catch (_) {}
   } catch (e) {
     console.warn('fixParentBlockDates error:', e);
   }

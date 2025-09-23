@@ -1,7 +1,7 @@
 import { Search, X, Sparkles } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import AIResultList from './AIResultList';
+import AIResultList from './AIResultList.jsx';
 import Button from '../../../components/ui/Button';
 
 // Modal de búsqueda inteligente con filtros mínimos (sólo Servicio)

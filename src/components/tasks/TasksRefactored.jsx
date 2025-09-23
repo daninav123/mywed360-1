@@ -12,21 +12,21 @@ import {
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Importar componentes separados
-import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents';
-import ErrorBoundary from './ErrorBoundary';
-import EventsCalendar from './EventsCalendar';
-import { useGanttSizing } from './hooks/useGanttSizing';
-import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks';
-import { useSafeEvents } from './hooks/useSafeEvents';
-import LongTermTasksGantt from './LongTermTasksGantt';
-import TaskForm from './TaskForm';
-import TaskList from './TaskList';
-import TasksHeader from './TasksHeader';
-import DebugTasksPanel from './DebugTasksPanel';
+import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents.jsx';
+import ErrorBoundary from './ErrorBoundary.jsx';
+import EventsCalendar from './EventsCalendar.jsx';
+import { useGanttSizing } from './hooks/useGanttSizing.js';
+import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks.js';
+import { useSafeEvents } from './hooks/useSafeEvents.js';
+import LongTermTasksGantt from './LongTermTasksGantt.jsx';
+import TaskForm from './TaskForm.jsx';
+import TaskList from './TaskList.jsx';
+import TasksHeader from './TasksHeader.jsx';
+import DebugTasksPanel from './DebugTasksPanel.jsx';
 //
 
 // Importar hooks de Firestore
-import { addMonths } from './utils/dateUtils';
+import { addMonths } from './utils/dateUtils.js';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
@@ -1308,6 +1308,17 @@ export default function Tasks() {
           new Date(prev.start).getTime() === start.getTime() &&
           new Date(prev.end).getTime() === end.getTime();
         if (!same) await setDoc(ref, next, { merge: true });
+      } catch (_) {}
+    })();
+  }, [activeWedding, projectEnd]);
+
+  // Alinear fechas de tareas padre cada vez que cambia la fecha de la boda
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!activeWedding) return;
+        if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
+        await fixParentBlockDates(activeWedding);
       } catch (_) {}
     })();
   }, [activeWedding, projectEnd]);
