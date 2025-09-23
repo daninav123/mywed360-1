@@ -16,6 +16,12 @@ import NotificationWatcher from './notifications/NotificationWatcher';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
 import { useOnboarding } from '../hooks/useOnboarding';
+import TaskEventBridge from './tasks/TaskEventBridge';
+import FinanceEventBridge from './finance/FinanceEventBridge';
+import SupplierEventBridge from './proveedores/SupplierEventBridge';
+import ConfigEventBridge from './config/ConfigEventBridge';
+import GuestEventBridge from './guests/GuestEventBridge';
+import TaskNotificationWatcher from './tasks/TaskNotificationWatcher';
 
 export default function MainLayout() {
   const { t } = useTranslation();
@@ -82,6 +88,7 @@ export default function MainLayout() {
       <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
         {/* Centro de notificaciones y watcher */}
         <NotificationWatcher intervalMs={3000} />
+        <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
         <NotificationCenter />
         {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge />}
         <div className="hidden md:block">
@@ -166,6 +173,11 @@ export default function MainLayout() {
 
       <main className="container flex-grow mx-auto px-4 pt-8 pb-36">
         {showWeddingSelector && <WeddingSelector />}
+        <TaskEventBridge />
+        <FinanceEventBridge />
+        <SupplierEventBridge />
+        <ConfigEventBridge />
+        <GuestEventBridge />
         <Outlet />
       </main>
       <Nav />

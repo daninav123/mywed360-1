@@ -78,39 +78,29 @@ const MomentosEspeciales = () => {
     };
   }, []);
   const [playingId, setPlayingId] = useState(null);
-
-  // Estado de conexión con Spotify (opcional para reproducción remota)
-  const [spotifyLoading, setSpotifyLoading] = useState(false);
-  const [spotifyStatus, setSpotifyStatus] = useState({ connected: false, profile: null });
-
-  const checkSpotifyStatus = async () => {
-    try {
-      setSpotifyLoading(true);
-      const res = await apiPost('/api/spotify/status', {}, { auth: true });
-      if (res?.ok) {
-        const data = await res.json();
-        setSpotifyStatus({ connected: !!data.connected, profile: data.profile || null });
-      }
-    } catch {
-    } finally {
-      setSpotifyLoading(false);
-    }
-  };
+  const [playerOpen, setPlayerOpen] = useState(false);
+  const [playerState, setPlayerState] = useState({ currentId: null, currentTime: 0, duration: 0, volume: 1, paused: true });
 
   useEffect(() => {
-    checkSpotifyStatus();
+    try {
+      const unsub = Playback.subscribe((s) => {
+        setPlayerState(s || {});
+        if (!s?.currentId) setPlayingId(null);
+      });
+      return () => { try { unsub && unsub(); } catch {} };
+    } catch {}
   }, []);
 
-  const connectSpotify = () => {
+  const formatTime = (s) => {
     try {
-      const current = typeof window !== 'undefined' ? window.location.href : '';
-      const base = import.meta?.env?.VITE_BACKEND_BASE_URL || '';
-      const loginUrl = base
-        ? `${base}/api/spotify/login?return=${encodeURIComponent(current)}`
-        : `/api/spotify/login?return=${encodeURIComponent(current)}`;
-      window.location.assign(loginUrl);
-    } catch {}
+      const sec = Math.max(0, Math.floor(Number(s) || 0));
+      const m = Math.floor(sec / 60);
+      const r = sec % 60;
+      return `${m}:${String(r).padStart(2, '0')}`;
+    } catch { return '0:00'; }
   };
+
+  // (Se eliminó la sección de conexión con Spotify)
 
   // Extrae un embed URL de Spotify si el campo "canción" contiene un enlace válido
   const getSpotifyEmbedUrl = (raw) => {
@@ -158,6 +148,7 @@ const MomentosEspeciales = () => {
     await Playback.stop();
     const ok = await Playback.playTrack(item);
     setPlayingId(ok ? item.id : null);
+    if (ok) setPlayerOpen(true);
   };
 
   // Búsqueda por nombre (iTunes)
@@ -293,22 +284,7 @@ const MomentosEspeciales = () => {
   return (
     <PageWrapper title="Momentos Especiales">
       <div className="space-y-6">
-        {/* Conexión opcional con Spotify para reproducción remota */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium">Spotify</div>
-              <div className="text-sm text-gray-600">
-                {spotifyLoading
-                  ? 'Comprobando estado...'
-                  : spotifyStatus.connected
-                    ? `Conectado${spotifyStatus.profile?.display_name ? ` como ${spotifyStatus.profile.display_name}` : ''}`
-                    : 'Conecta tu cuenta para controlar la reproducción en tu dispositivo'}
-              </div>
-            </div>
-            {!spotifyStatus.connected && <Button onClick={connectSpotify}>Conectar Spotify</Button>}
-          </div>
-        </Card>
+        {/* Se eliminó la tarjeta de conexión con Spotify */}
         {/* Preferencias músicales (movidas desde Perfil) */}
         <Card className="space-y-4 p-5">
           <h3 className="text-md font-medium flex items-center gap-2">
@@ -432,6 +408,77 @@ const MomentosEspeciales = () => {
 
         {/* Content */}
         <Card className="space-y-5 p-5">
+          {/* Mini reproductor (desplegable) para previews HTML5 */}
+          {playerState?.currentId ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 truncate mr-2">
+                  Reproduciendo vista previa
+                </div>
+                <button
+                  className="text-xs border rounded px-2 py-1 hover:bg-gray-50"
+                  onClick={() => setPlayerOpen((v) => !v)}
+                >
+                  {playerOpen ? 'Ocultar' : 'Reproductor'}
+                </button>
+              </div>
+              {playerOpen && (
+                <div className="border rounded-md p-3 bg-white shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <button
+                      onClick={async () => {
+                        if (playerState.paused) await Playback.resume(); else await Playback.pause();
+                      }}
+                      className="p-1 text-gray-700 hover:text-blue-600"
+                      title={playerState.paused ? 'Reproducir' : 'Pausar'}
+                    >
+                      {playerState.paused ? <Play size={16} /> : <Pause size={16} />}
+                    </button>
+                    <button
+                      onClick={async () => { await Playback.stop(); setPlayerOpen(false); }}
+                      className="p-1 text-gray-500 hover:text-gray-700"
+                      title="Detener"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  {/* Barra de progreso */}
+                  <div className="space-y-1 mb-2">
+                    <input
+                      type="range"
+                      min={0}
+                      max={playerState?.duration || 0}
+                      step={0.1}
+                      value={Math.min(playerState?.currentTime || 0, playerState?.duration || 0)}
+                      onChange={(e) => {
+                        const v = Number(e.target.value || 0);
+                        Playback.seek(v);
+                      }}
+                      className="w-full"
+                      disabled={!playerState?.duration}
+                    />
+                    <div className="text-[11px] text-gray-500 flex justify-between">
+                      <span>{formatTime(playerState?.currentTime || 0)}</span>
+                      <span>{formatTime(playerState?.duration || 0)}</span>
+                    </div>
+                  </div>
+                  {/* Volumen */}
+                  <div className="space-y-1">
+                    <div className="text-xs text-gray-600">Volumen</div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={typeof playerState?.volume === 'number' ? playerState.volume : 1}
+                      onChange={(e) => Playback.setVolume(Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : null}
           {/* Inspiración */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -795,9 +842,9 @@ const MomentosEspeciales = () => {
             </div>
           )}
 
-          {/* Lista de momentos */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
+        {/* Lista de momentos */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
               <h3 className="font-medium">
                 {TABS.find((t) => t.key === activeTab)?.label || 'Momentos'}
               </h3>

@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getBackendBase } from '@/utils/backendBase.js';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
+import ExternalImage from '@/components/ExternalImage';
 import { fetchWeddingNews } from '../services/blogService';
 
 export default function Blog() {
@@ -30,6 +31,34 @@ export default function Blog() {
       try {
         console.log('[BlogDebug]', ...args);
       } catch {}
+    }
+  };
+
+  // Visual mode: ?visual=1, localStorage.newsVisual='1' o VITE_NEWS_VISUAL='1'
+  const visualMode = React.useMemo(() => {
+    try {
+      const usp = new URLSearchParams(window.location.search);
+      if (usp.has('visual')) return usp.get('visual') !== '0';
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('newsVisual') === '1')
+        return true;
+      if (import.meta?.env?.VITE_NEWS_VISUAL === '1') return true;
+    } catch {}
+    return false;
+  }, []);
+
+  const isLikelyCover = (url, feedSource) => {
+    try {
+      const u = new URL(url);
+      const host = u.hostname.replace(/^www\./, '').toLowerCase();
+      const path = (u.pathname || '').toLowerCase();
+      if (/\.svg(\?|$)/i.test(url)) return false;
+      const blockHosts = new Set(['gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
+      if (host === 'news.google.com' || blockHosts.has(host)) return false;
+      const patterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
+      if (patterns.some((p) => path.includes(p))) return false;
+      return true;
+    } catch {
+      return true;
     }
   };
 
@@ -173,6 +202,8 @@ export default function Blog() {
           })();
           // Solo aceptar noticias con imagen http(s)
           if (!(typeof p.image === 'string' && /^https?:\/\//i.test(p.image))) continue;
+          // En modo visual: evitar logos/miniaturas genéricas
+          if (visualMode && !isLikelyCover(p.image, p.feedSource)) continue;
           // Guardar como candidato global para posibles rellenos (sin duplicados)
           if (!candidates.some((x) => x.url === p.url || x.id === p.id)) {
             candidates.push(p);
@@ -194,68 +225,7 @@ export default function Blog() {
         });
       }
 
-      // Fallback: si tras buscar no llenamos el bloque, relajamos dominio y buscamos en ingles
-      if (newPosts.length < targetLength) {
-        dbg('enter fallback EN', { current: newPosts.length, targetLength });
-        fetchPage = 1;
-        consecutiveErrors = 0;
-        let emptyBatchesEn = 0;
-        let fetchesEn = 0;
-        while (
-          newPosts.length < targetLength &&
-          fetchPage <= MAX_LOOKAHEAD &&
-          fetchesEn < MAX_FETCHES_PER_LOAD &&
-          emptyBatchesEn <= MAX_EMPTY_BATCHES
-        ) {
-          let batch = [];
-          try {
-            dbg('fetch attempt', { phase: 'en', fetchPage, pageSize: 10, lang: 'en' });
-            batch = await fetchWeddingNews(fetchPage, 10, 'en');
-            consecutiveErrors = 0;
-          } catch (err) {
-            console.error(err);
-            dbg('fetch error', { phase: 'en', fetchPage, err: err?.message || String(err) });
-            consecutiveErrors++;
-            if (consecutiveErrors >= 3) break;
-          }
-          fetchPage++;
-          fetchesEn++;
-          dbg('fetch result', { phase: 'en', length: Array.isArray(batch) ? batch.length : -1 });
-          if (!Array.isArray(batch) || batch.length === 0) {
-            emptyBatchesEn++;
-            continue;
-          } else {
-            emptyBatchesEn = 0;
-          }
-          for (const p of batch) {
-            if (!p?.url) continue;
-            const dom = (() => {
-              try {
-                return new URL(p.url).hostname.replace(/^www\./, '');
-              } catch {
-                return 'unk';
-              }
-            })();
-            if (!(typeof p.image === 'string' && /^https?:\/\//i.test(p.image))) continue;
-            if (!candidates.some((x) => x.url === p.url || x.id === p.id)) {
-              candidates.push(p);
-            }
-            if ((domainCounts[dom] || 0) >= 1) continue;
-            if (newPosts.some((x) => x.url === p.url || x.id === p.id)) continue;
-            domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-            newPosts.push(p);
-            if (newPosts.length >= targetLength) break;
-          }
-          dbg('loop progress', {
-            phase: 'en',
-            newPosts: newPosts.length,
-            candidates: candidates.length,
-            domainCounts: { ...domainCounts },
-            fetchesEn,
-            emptyBatchesEn,
-          });
-        }
-      }
+            // Sin fallback a EN: respetar idioma del usuario\r\n      }
 
       // Relleno final: si no hay suficientes dominios unicos, permitir hasta 2 por dominio
       if (newPosts.length < targetLength && candidates.length) {
@@ -305,7 +275,7 @@ export default function Blog() {
             if (!r.ok) return [];
             const arr = await r.json();
             return (Array.isArray(arr) ? arr : []).filter(
-              (p) => typeof p.image === 'string' && /^https?:\/\//i.test(p.image)
+              (p) => typeof p.image === 'string' && /^https?:\/\//i.test(p.image) && (!visualMode || isLikelyCover(p.image, p.feedSource))
             );
           };
           let fb = await getList(lang);
@@ -358,6 +328,7 @@ export default function Blog() {
         <ArticleCard
           key={p.url || p.id || idx}
           post={p}
+          visual={visualMode}
           ref={idx === posts.length - 1 ? lastRef : null}
         />
       ))}
@@ -370,7 +341,7 @@ export default function Blog() {
   );
 }
 
-const ArticleCard = React.forwardRef(({ post }, ref) => {
+const ArticleCard = React.forwardRef(({ post, visual = false }, ref) => {
   const base = getBackendBase();
   // Resolver URL de imagen relativa respecto al enlace de la noticia
   let resolvedImage = post.image || null;
@@ -379,33 +350,23 @@ const ArticleCard = React.forwardRef(({ post }, ref) => {
       resolvedImage = new URL(post.image, post.url).toString();
     }
   } catch {}
-  const isHttpUrl = typeof resolvedImage === 'string' && /^https?:\/\//i.test(resolvedImage);
-  const [useProxy, setUseProxy] = React.useState(false);
-  const [imgFailed, setImgFailed] = React.useState(false);
-  const imgSrc = resolvedImage
-    ? useProxy && base && isHttpUrl
-      ? `${base}/api/image-proxy?u=${encodeURIComponent(resolvedImage)}`
-      : resolvedImage
-    : null;
-  if (imgFailed) return null;
+  const blockHosts = post.feedSource === 'google-news'
+    ? ['news.google.com', 'gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']
+    : [];
   return (
     <div
       ref={ref}
       className="border border-soft bg-[var(--color-surface)] rounded-lg overflow-hidden shadow hover:shadow-md transition"
     >
-      {imgSrc && (
-        <img
-          src={imgSrc}
+      {resolvedImage && (
+        <ExternalImage
+          src={resolvedImage}
           alt={post.title}
           className="w-full h-48 object-cover"
-          loading="lazy"
-          onError={() => {
-            if (!useProxy && base && isHttpUrl) {
-              setUseProxy(true);
-            } else {
-              setImgFailed(true);
-            }
-          }}
+          requireCover={true}
+          minWidth={visual ? 900 : 600}
+          minHeight={visual ? 500 : 300}
+          extraBlockHosts={blockHosts}
         />
       )}
       <div className="p-4 space-y-2">
@@ -427,3 +388,4 @@ const ArticleCard = React.forwardRef(({ post }, ref) => {
     </div>
   );
 });
+

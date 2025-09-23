@@ -7,7 +7,7 @@ import { useWedding } from '../context/WeddingContext';
 import { getTransactions } from '../services/bankService';
 import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
-import { transactionSchema, transactionUpdateSchema } from '../schemas/transaction';
+import { transactionSchema, transactionUpdateSchema } from '../schemas/transaction.js';
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [

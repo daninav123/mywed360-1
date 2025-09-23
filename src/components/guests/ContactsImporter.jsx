@@ -1,6 +1,7 @@
 import { UploadCloud, Check, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
+import useTranslations from '../../hooks/useTranslations';
 
 import { Button, Input } from '../ui';
 
@@ -9,6 +10,7 @@ import { Button, Input } from '../ui';
  * Utiliza la Contact Picker API y permite revisar/editar los contactos antes de importarlos.
  */
 const ContactsImporterFixed = ({ onImported }) => {
+  const { t } = useTranslations();
   const [step, setStep] = useState('form'); // 'form' | 'review'
   const [table, setTable] = useState('');
   const [rows, setRows] = useState([]);
@@ -24,7 +26,11 @@ const ContactsImporterFixed = ({ onImported }) => {
 
   const pickContacts = async () => {
     if (!('contacts' in navigator) || !navigator.contacts?.select) {
-      alert('Este dispositivo/navegador no soporta la selección de contactos.');
+      alert(
+        t('guests.contacts.unsupported', {
+          defaultValue: 'Este dispositivo/navegador no soporta la selección de contactos.',
+        })
+      );
       return;
     }
 
@@ -37,16 +43,18 @@ const ContactsImporterFixed = ({ onImported }) => {
       const now = Date.now();
       const imported = contacts.map((c, i) => ({
         id: `imported-${now}-${i}`,
-        name: c.name?.[0] || 'Sin nombre',
+        name: c.name?.[0] || t('guests.contacts.noName', { defaultValue: 'Sin nombre' }),
         email: c.email?.[0] || '',
         phone: c.tel?.[0] || '',
         address: '',
         companion: 0,
         table: table || '',
-        response: 'Pendiente',
+        response: t('guests.status.pending', { defaultValue: 'Pendiente' }),
         status: 'pending',
         dietaryRestrictions: '',
-        notes: 'Importado desde contactos',
+        notes: t('guests.contacts.importedFromPicker', {
+          defaultValue: 'Importado desde contactos',
+        }),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }));
@@ -55,7 +63,11 @@ const ContactsImporterFixed = ({ onImported }) => {
       setStep('review');
     } catch (err) {
       console.error(err);
-      alert('Error al acceder a los contactos.');
+      alert(
+        t('guests.contacts.errorAccess', {
+          defaultValue: 'Error al acceder a los contactos.',
+        })
+      );
     }
   };
 
@@ -121,7 +133,11 @@ const ContactsImporterFixed = ({ onImported }) => {
       const text = await file.text();
       const parsed = parseCSV(text);
       if (!parsed.length) {
-        alert('El CSV no contiene filas válidas');
+        alert(
+          t('guests.contacts.csvEmpty', {
+            defaultValue: 'El CSV no contiene filas válidas',
+          })
+        );
         return;
       }
       // Normalizar y preparar preview
@@ -134,10 +150,11 @@ const ContactsImporterFixed = ({ onImported }) => {
         address: r.address || '',
         companion: parseInt(r.companion, 10) || 0,
         table: r.table || table || '',
-        response: 'Pendiente',
+        response: t('guests.status.pending', { defaultValue: 'Pendiente' }),
         status: 'pending',
         dietaryRestrictions: r.dietaryRestrictions || '',
-        notes: r.notes || 'Importado desde CSV',
+        notes:
+          r.notes || t('guests.contacts.importedFromCsv', { defaultValue: 'Importado desde CSV' }),
         companionGroupId: r.companionGroupId || '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -146,7 +163,11 @@ const ContactsImporterFixed = ({ onImported }) => {
       setStep('review');
     } catch (err) {
       console.error('Error leyendo CSV:', err);
-      alert('No se pudo leer el archivo CSV');
+      alert(
+        t('guests.contacts.csvReadError', {
+          defaultValue: 'No se pudo leer el archivo CSV',
+        })
+      );
     } finally {
       e.target.value = '';
     }
@@ -158,10 +179,10 @@ const ContactsImporterFixed = ({ onImported }) => {
         <table className="w-full text-sm border">
           <thead className="bg-gray-50">
             <tr>
-              <th className="border px-2 py-1">Nombre</th>
-              <th className="border px-2 py-1">Email</th>
-              <th className="border px-2 py-1">Teléfono</th>
-              <th className="border px-2 py-1">Mesa</th>
+              <th className="border px-2 py-1">{t('guests.fields.name', { defaultValue: 'Nombre' })}</th>
+              <th className="border px-2 py-1">{t('guests.fields.email', { defaultValue: 'Email' })}</th>
+              <th className="border px-2 py-1">{t('guests.fields.phone', { defaultValue: 'Teléfono' })}</th>
+              <th className="border px-2 py-1">{t('guests.fields.table', { defaultValue: 'Mesa' })}</th>
             </tr>
           </thead>
           <tbody>
@@ -203,7 +224,7 @@ const ContactsImporterFixed = ({ onImported }) => {
         <div className="flex justify-end space-x-3">
           <Button variant="outline" onClick={() => setStep('form')} className="flex items-center">
             <X size={16} className="mr-1" />
-            Volver
+            {t('app.back', { defaultValue: 'Volver' })}
           </Button>
           <Button
             variant="secondary"
@@ -211,7 +232,7 @@ const ContactsImporterFixed = ({ onImported }) => {
             className="flex items-center"
           >
             <Check size={16} className="mr-1" />
-            Importar {rows.length}
+            {t('guests.contacts.importCount', { defaultValue: 'Importar {{count}}', count: rows.length })}
           </Button>
         </div>
       </div>
@@ -221,14 +242,14 @@ const ContactsImporterFixed = ({ onImported }) => {
   return (
     <div className="space-y-4">
       <Input
-        label="Mesa (opcional)"
+        label={t('guests.fields.tableOptional', { defaultValue: 'Mesa (opcional)' })}
         value={table}
         onChange={(e) => setTable(e.target.value)}
-        placeholder="Ej. 5"
+        placeholder={t('guests.examples.table', { defaultValue: 'Ej. 5' })}
       />
       <Button variant="secondary" onClick={pickContacts} className="flex items-center space-x-2">
         <UploadCloud size={16} />
-        <span>Seleccionar contactos</span>
+        <span>{t('guests.contacts.selectContacts', { defaultValue: 'Seleccionar contactos' })}</span>
       </Button>
       <div>
         <input
@@ -244,11 +265,13 @@ const ContactsImporterFixed = ({ onImported }) => {
           className="flex items-center space-x-2"
         >
           <UploadCloud size={16} />
-          <span>Importar CSV</span>
+          <span>{t('guests.contacts.importCsv', { defaultValue: 'Importar CSV' })}</span>
         </Button>
         <p className="text-xs text-gray-500 mt-2">
-          Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes,
-          companionGroupId
+          {t('guests.contacts.supportedColumns', {
+            defaultValue:
+              'Columnas soportadas: name, email, phone, table, companion, dietaryRestrictions, notes, companionGroupId',
+          })}
         </p>
       </div>
     </div>

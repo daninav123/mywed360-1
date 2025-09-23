@@ -141,7 +141,8 @@ export default function LongTermTasksGantt({
     return normalizedTasks
       .filter((t) => {
         const ty = String(t.type || 'task');
-        return ty !== 'milestone' && ty !== 'project';
+        // Ocultar subtareas del diagrama; solo tareas largas visibles
+        return ty !== 'milestone' && ty !== 'project' && ty !== 'subtask';
       })
       .map((t, idx) => {
         const cs = new Date(Math.max(t.start.getTime(), timelineStart.getTime()));
@@ -398,13 +399,17 @@ export default function LongTermTasksGantt({
                 position: 'absolute',
                 left: bar.left,
                 top: 40 + i * rowHeight,
-                height: Math.max(16, rowHeight * 0.5),
+                height:
+                  (bar.task?.type === 'subtask')
+                    ? Math.max(12, rowHeight * 0.35)
+                    : Math.max(16, rowHeight * 0.5),
                 width: bar.width,
-                background: '#a5b4fc',
+                background: (bar.task?.type === 'subtask') ? '#c7d2fe' : '#a5b4fc',
                 borderRadius: 6,
                 cursor: 'pointer',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
                 overflow: 'hidden',
+                border: (bar.task?.type === 'subtask') ? '1px dashed #818cf8' : 'none',
               }}
             >
               <div
@@ -414,7 +419,9 @@ export default function LongTermTasksGantt({
                   top: 0,
                   bottom: 0,
                   width: `${Math.max(0, Math.min(100, Number(bar.task.progress ?? 0)))}%`,
-                  background: 'linear-gradient(90deg, #818cf8, #6366f1)',
+                  background: (bar.task?.type === 'subtask')
+                    ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
+                    : 'linear-gradient(90deg, #818cf8, #6366f1)',
                 }}
               />
               <div
@@ -427,7 +434,7 @@ export default function LongTermTasksGantt({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  color: '#0f172a',
+                  color: (bar.task?.type === 'subtask') ? '#1e293b' : '#0f172a',
                   fontSize: 12,
                 }}
               >

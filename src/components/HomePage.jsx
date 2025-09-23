@@ -73,6 +73,16 @@ export default function HomePage() {
   const { i18n } = useTranslation();
   const lang = normalizeLang(i18n.language);
   const backendBase = getBackendBase();
+  // Visual mode toggle similar a Blog
+  const visualMode = useMemo(() => {
+    try {
+      const usp = new URLSearchParams(window.location.search);
+      if (usp.has('visual')) return usp.get('visual') !== '0';
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('newsVisual') === '1') return true;
+      if (import.meta?.env?.VITE_NEWS_VISUAL === '1') return true;
+    } catch {}
+    return false;
+  }, []);
 
   // Cargar primera imagen de cada categora
   useEffect(() => {
@@ -102,12 +112,26 @@ export default function HomePage() {
       let consecutiveErrors = 0;
 
       const hasHttpImage = (p) => typeof p?.image === 'string' && /^https?:\/\//i.test(p.image);
+      const isLikelyCover = (url, feedSource) => {
+        try {
+          const u = new URL(url);
+          const host = u.hostname.replace(/^www\./, '').toLowerCase();
+          const path = (u.pathname || '').toLowerCase();
+          if (/\.svg(\?|$)/i.test(url)) return false;
+          const blockHosts = new Set(['gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
+          if (host === 'news.google.com' || blockHosts.has(host)) return false;
+          const patterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
+          if (patterns.some((p) => path.includes(p))) return false;
+          return true;
+        } catch { return true; }
+      };
       while (results.length < desired && page <= 20) {
         try {
           const batch = await fetchWeddingNews(page, 10, lang);
           consecutiveErrors = 0;
           for (const post of batch) {
             if (!post?.url || !hasHttpImage(post)) continue;
+            if (visualMode && !isLikelyCover(post.image, post.feedSource)) continue;
             const dom = (() => {
               try {
                 return new URL(post.url).hostname.replace(/^www\./, '');
@@ -130,39 +154,7 @@ export default function HomePage() {
         }
       }
 
-      // fallback: si a?n faltan, relajamos l?mite
-      const canTranslate = !!import.meta?.env?.VITE_TRANSLATE_KEY;
-      if (results.length < desired && (lang === 'en' || canTranslate)) {
-        page = 1;
-        consecutiveErrors = 0;
-        while (results.length < desired && page <= 20) {
-          try {
-            const batch = await fetchWeddingNews(page, 10, lang === 'en' ? 'en' : 'en');
-            consecutiveErrors = 0;
-          for (const post of batch) {
-            if (!post?.url || !hasHttpImage(post)) continue;
-              const dom = (() => {
-                try {
-                  return new URL(post.url).hostname.replace(/^www\./, '');
-                } catch {
-                  return 'unk';
-                }
-              })();
-              if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-              if (results.some((x) => x.url === post.url)) continue;
-              domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-              results.push(post);
-              if (results.length >= desired) break;
-            }
-          } catch (err) {
-            console.error(err);
-            consecutiveErrors++;
-            if (consecutiveErrors >= 3 && results.length) break;
-          } finally {
-            page++;
-          }
-        }
-      }
+      // Sin fallback a EN: respetar idioma del usuario
 
       // Sin placeholders: solo mantener items con imagen real (ya filtrado arriba)
       setNewsPosts(results.slice(0, desired));
@@ -446,6 +438,10 @@ export default function HomePage() {
                       src={post.image}
                       alt={post.title}
                       className="w-full h-40 object-cover"
+                      requireCover={true}
+                      minWidth={visualMode ? 900 : 600}
+                      minHeight={visualMode ? 500 : 300}
+                      extraBlockHosts={post.feedSource === 'google-news' ? ['news.google.com','gstatic.com','ssl.gstatic.com','googleusercontent.com'] : []}
                     />
                   )}
                   <div className="p-4 space-y-1">

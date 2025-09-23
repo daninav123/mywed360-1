@@ -8,7 +8,7 @@
   onSnapshot,
   getDoc,
 } from 'firebase/firestore';
-import { ViewMode } from 'gantt-task-react';
+// View mode string kept for internal sizing logic (no external lib)
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Importar componentes separados
@@ -29,7 +29,10 @@ import { addMonths } from './utils/dateUtils';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 import { useFirestoreCollection } from '../../hooks/useFirestoreCollection';
+import { useWeddingCollection } from '../../hooks/useWeddingCollection';
+import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup';
 import { useUserCollection } from '../../hooks/useUserCollection';
+import { migrateFlatSubtasksToNested } from '../../services/WeddingService';
 
 // FunciÒ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
@@ -67,6 +70,25 @@ export default function Tasks() {
     loading: completedLoading,
   } = useFirestoreCollection('tasksCompleted', []);
 
+  // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks/{parentId}/subtasks/*
+  const { data: nestedSubtasks = [] } = useWeddingCollectionGroup('subtasks', activeWedding);
+
+  // Migración suave de subtareas planas -> anidadas (una vez por boda)
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!activeWedding) return;
+        const flatCount = Array.isArray(tasksState)
+          ? tasksState.filter((t) => String(t?.type || '') === 'subtask').length
+          : 0;
+        const nestedCount = Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0;
+        if (flatCount > 0 && nestedCount < flatCount) {
+          await migrateFlatSubtasksToNested(activeWedding);
+        }
+      } catch (_) {}
+    })();
+  }, [activeWedding, tasksState, nestedSubtasks]);
+
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
   const [showNewTask, setShowNewTask] = useState(false);
@@ -80,12 +102,14 @@ export default function Tasks() {
     endDate: new Date().toISOString().slice(0, 10),
     endTime: '11:00',
     long: false,
+    parentTaskId: '',
     assignee: '',
     completed: false,
   });
 
   const [currentView, setCurrentView] = useState('month');
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [seedingDefaults, setSeedingDefaults] = useState(false);
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
@@ -133,7 +157,7 @@ export default function Tasks() {
   const [columnWidthState, setColumnWidthState] = useState(65);
   const [ganttPreSteps, setGanttPreSteps] = useState(0);
   const [ganttViewDate, setGanttViewDate] = useState(null);
-  const [ganttViewMode, setGanttViewMode] = useState(ViewMode.Month);
+  const [ganttViewMode, setGanttViewMode] = useState('month');
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
@@ -255,6 +279,7 @@ export default function Tasks() {
       endDate: new Date().toISOString().slice(0, 10),
       endTime: '11:00',
       long: false,
+      parentTaskId: '',
     });
   };
 
@@ -393,7 +418,8 @@ export default function Tasks() {
           ...taskData,
           name: taskData.title,
           progress: 0,
-          type: 'task',
+          type: formData.parentTaskId ? 'subtask' : 'task',
+          parentId: formData.parentTaskId || undefined,
           isDisabled: false,
           dependencies: [],
           createdAt: serverTimestamp(),
@@ -543,6 +569,78 @@ export default function Tasks() {
     meetingsState
   );
 
+  // Progreso por tarea padre: % de subtareas completadas
+  // (se declara tras completedIdSet para evitar dependencias circulares)
+  let parentProgressMap = new Map();
+
+  // Inyectar progreso calculado en tareas padre visibles en el Gantt
+  const ganttDisplayTasks = useMemo(() => {
+    try {
+      return (Array.isArray(ganttTasksBounded) ? ganttTasksBounded : []).map((t) => {
+        if (!t) return t;
+        const ty = String(t.type || 'task');
+        if (ty !== 'task') return t;
+        const pid = String(t.id || '');
+        const pct = parentProgressMap.get(pid);
+        if (typeof pct === 'number' && Number.isFinite(pct)) {
+          return { ...t, progress: Math.max(0, Math.min(100, pct)) };
+        }
+        return t;
+      });
+    } catch {
+      return Array.isArray(ganttTasksBounded) ? ganttTasksBounded : [];
+    }
+  }, [ganttTasksBounded, parentProgressMap]);
+
+  // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
+  const subtaskEvents = useMemo(() => {
+    try {
+      const flat = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
+        .filter((t) => String(t.type || 'task') === 'subtask')
+        .map((t) => ({
+          id: String(t.id),
+          title: t.name || t.title || 'Subtarea',
+          desc: t.desc || '',
+          category: t.category || 'OTROS',
+          start: t.start instanceof Date ? t.start : new Date(t.start),
+          end: t.end instanceof Date ? t.end : new Date(t.end),
+          assignee: t.assignee || '',
+          parentId: t.parentId || '',
+          __kind: 'subtask',
+        }));
+
+      const nested = (Array.isArray(nestedSubtasks) ? nestedSubtasks : []).map((s) => {
+        const start = s.start instanceof Date ? s.start : (s.start && typeof s.start.toDate === 'function' ? s.start.toDate() : new Date(s.start || Date.now()));
+        const end = s.end instanceof Date ? s.end : (s.end && typeof s.end.toDate === 'function' ? s.end.toDate() : new Date(s.end || start));
+        return {
+          id: String(s.id),
+          title: s.name || s.title || 'Subtarea',
+          desc: s.desc || '',
+          category: s.category || 'OTROS',
+          start,
+          end,
+          assignee: s.assignee || '',
+          parentId: s.parentId || '',
+          __kind: 'subtask',
+        };
+      });
+
+      // Unir por id, priorizando nested
+      const byId = new Map();
+      for (const it of flat) if (!byId.has(it.id)) byId.set(it.id, it);
+      for (const it of nested) byId.set(it.id, it);
+      return Array.from(byId.values());
+    } catch {
+      return [];
+    }
+  }, [uniqueGanttTasks, nestedSubtasks]);
+
+  const taskListItems = useMemo(() => {
+    const a = Array.isArray(safeMeetingsFiltered) ? safeMeetingsFiltered : [];
+    const b = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+    return [...a, ...b];
+  }, [safeMeetingsFiltered, subtaskEvents]);
+
   // Conjunto de tareas completadas (por id o por taskId)
   const completedIdSet = useMemo(() => {
     const s = new Set();
@@ -555,8 +653,280 @@ export default function Tasks() {
       }
     } catch (_) {}
     return s;
-  }, [completedDocs]);
 
+  }, [completedDocs]);
+  const parentTaskOptions = useMemo(() => {
+    try {
+      return (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
+        .filter((t) => String(t.type || 'task') === 'task' && !t.isDisabled)
+        .map((t) => ({ id: String(t.id), name: t.name || t.title || 'Tarea' }));
+    } catch {
+      return [];
+    }
+  }, [uniqueGanttTasks]);
+
+  parentProgressMap = useMemo(() => {
+    try {
+      const parents = new Map(); // id -> {done,total}
+      const source = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+      for (const st of source) {
+        if (!st) continue;
+        const pid = String(st.parentId || '');
+        if (!pid) continue;
+        const entry = parents.get(pid) || { done: 0, total: 0 };
+        entry.total += 1;
+        if (completedIdSet.has(String(st.id))) entry.done += 1;
+        parents.set(pid, entry);
+      }
+      const out = new Map();
+      for (const [pid, agg] of parents.entries()) {
+        const pct = agg.total > 0 ? Math.round((agg.done / agg.total) * 100) : 0;
+        out.set(pid, pct);
+      }
+      return out;
+    } catch {
+      return new Map();
+    }
+  }, [subtaskEvents, completedIdSet]);
+
+  // Acción manual para crear tareas por defecto
+  const handleSeedDefaultTasks = useCallback(async () => {
+    try {
+      if (!activeWedding || !db) return;
+      setSeedingDefaults(true);
+      const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '__seed__');
+      const seedSnap = await getDoc(seedRef).catch(() => null);
+      if (seedSnap && seedSnap.exists()) {
+        setSeedingDefaults(false);
+        return;
+      }
+      const startBase =
+        projectStart instanceof Date && !isNaN(projectStart.getTime())
+          ? projectStart
+          : new Date();
+      const endBase =
+        projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+          ? projectEnd
+          : addMonths(startBase, 12);
+      const span = Math.max(1, endBase.getTime() - startBase.getTime());
+      const at = (p) => new Date(startBase.getTime() + span * p);
+
+      const blocks = [
+        { key: 'A', name: 'Bloque A - Fundamentos', p0: 0.0, p1: 0.2, items: [
+          'Difundir la noticia y organizar la planificación (perfil, invitar pareja, anillo, presupuesto inicial)',
+          'Crear primera versión de la lista de invitados',
+          'Investigar lugares de celebración y comenzar visitas',
+          'Decidir cortejo nupcial',
+        ]},
+        { key: 'B', name: 'Bloque B - Proveedores Clave', p0: 0.1, p1: 0.8, items: [
+          'Fotografía → contacto inicial pronto, cierre de contrato a mitad del proceso',
+          'Videografía → decisión temprana, reuniones finales hacia el final',
+          'Catering → investigación inicial, prueba de menú, cierre cercano a la boda',
+          'Florista → inspiración y primeras ideas, confirmación en la fase final',
+          'Música → banda/DJ reservados pronto, reunión final más tarde',
+          'Repostería → búsqueda inicial, prueba de sabores meses después, pedido final cerca de la boda',
+        ]},
+        { key: 'C', name: 'Bloque C - Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
+          'Novia → visitas iniciales, decisión intermedia, pruebas finales en los últimos meses',
+          'Novio → compra traje en mitad del proceso, ajustes finales poco antes',
+          'Cortejo → definir vestidos/trajes, confirmar tallas y ajustes finales más tarde',
+        ]},
+        { key: 'D', name: 'Bloque D - Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
+          'Invitaciones digitales y save-the-dates (inicio medio)',
+          'Invitaciones físicas y papelería (fase intermedia)',
+          'Decoración y DIY (se puede trabajar meses antes y ultimar al final)',
+          'Recuerdos y regalos (elección temprana, cierre antes del evento)',
+        ]},
+        { key: 'E', name: 'Bloque E - Organización y Logística', p0: 0.3, p1: 1.0, items: [
+          'Transporte (se puede definir pronto, confirmar al final)',
+          'Extras y básicos del día (ir acumulando, revisión final cercana a la boda)',
+          'Confirmaciones con proveedores (últimas semanas)',
+          'Plan B clima (al final)',
+          'Ensayo general (última fase)',
+        ]},
+        { key: 'F', name: 'Bloque F - Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
+          'Eventos adicionales (preboda, brunch…)',
+          'Despedidas (planificación antes, celebración final)',
+          'Votos y discursos (escribir con calma, repasar justo antes)',
+        ]},
+        { key: 'G', name: 'Bloque G - Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
+          'Reservas peluquería/maquillaje con antelación',
+          'Pruebas intermedias',
+          'Rutinas de cuidado personal (últimos meses)',
+        ]},
+        { key: 'H', name: 'Bloque H - Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
+          'Comprar anillos (se puede hacer pronto, recoger justo antes)',
+          'Planificar luna de miel (elección pronto, reservas intermedias, maletas al final)',
+        ]},
+        { key: 'I', name: 'Bloque I - Después de la Boda', p0: 1.0, p1: 1.05, items: [
+          'Disfrutar inicio del matrimonio',
+          'Organizar álbum y recuerdos',
+        ]},
+      ];
+
+      const colRef = collection(db, 'weddings', activeWedding, 'tasks');
+      for (const b of blocks) {
+        const parent = {
+          title: b.name,
+          name: b.name,
+          type: 'task',
+          start: at(b.p0),
+          end: at(b.p1),
+          progress: 0,
+          isDisabled: false,
+          createdAt: serverTimestamp(),
+          category: 'OTROS',
+        };
+        const pDoc = await addDoc(colRef, parent);
+        await setDoc(pDoc, { id: pDoc.id }, { merge: true });
+        for (const item of b.items) {
+          const s = at(b.p0 + (Math.random() * (b.p1 - b.p0) * 0.6));
+          const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
+          const sub = {
+            title: item,
+            name: item,
+            parentId: pDoc.id,
+            weddingId: activeWedding,
+            start: s,
+            end: e.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : e,
+            progress: 0,
+            isDisabled: false,
+            createdAt: serverTimestamp(),
+            category: 'OTROS',
+          };
+          const subCol = collection(db, 'weddings', activeWedding, 'tasks', pDoc.id, 'subtasks');
+          const sDoc = await addDoc(subCol, sub);
+          await setDoc(sDoc, { id: sDoc.id }, { merge: true });
+        }
+      }
+
+      await setDoc(seedRef, { seededAt: serverTimestamp(), version: 1 }, { merge: true });
+    } catch (_) {
+    } finally {
+      setSeedingDefaults(false);
+    }
+  }, [activeWedding, db, projectStart, projectEnd]);
+
+  // Seed automático de Bloques A-I (padres + subtareas) si no hay tareas
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!activeWedding || !db) return;
+        const hasAny = Array.isArray(tasksState) && tasksState.length > 0;
+        if (hasAny) return;
+
+        // Evitar doble seed con flag en weddings/{id}/tasks/__seed__ (evita depender de 'config')
+        const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '__seed__');
+        const seedSnap = await getDoc(seedRef).catch(() => null);
+        if (seedSnap && seedSnap.exists()) return;
+
+        // Permitir seed aunque aún no haya weddingDate: usar fallbacks razonables
+        const startBase =
+          projectStart instanceof Date && !isNaN(projectStart.getTime())
+            ? projectStart
+            : new Date();
+        const endBase =
+          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+            ? projectEnd
+            : addMonths(startBase, 12);
+        const span = Math.max(1, endBase.getTime() - startBase.getTime());
+        const at = (p) => new Date(startBase.getTime() + span * p);
+
+        const blocks = [
+          { key: 'A', name: 'Bloque A - Fundamentos', p0: 0.0, p1: 0.2, items: [
+            'Difundir la noticia y organizar la planificación (perfil, invitar pareja, anillo, presupuesto inicial)',
+            'Crear primera versión de la lista de invitados',
+            'Investigar lugares de celebración y comenzar visitas',
+            'Decidir cortejo nupcial',
+          ]},
+          { key: 'B', name: 'Bloque B - Proveedores Clave', p0: 0.1, p1: 0.8, items: [
+            'Fotografía → contacto inicial pronto, cierre de contrato a mitad del proceso',
+            'Videografía → decisión temprana, reuniones finales hacia el final',
+            'Catering → investigación inicial, prueba de menú, cierre cercano a la boda',
+            'Florista → inspiración y primeras ideas, confirmación en la fase final',
+            'Música → banda/DJ reservados pronto, reunión final más tarde',
+            'Repostería → búsqueda inicial, prueba de sabores meses después, pedido final cerca de la boda',
+          ]},
+          { key: 'C', name: 'Bloque C - Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
+            'Novia → visitas iniciales, decisión intermedia, pruebas finales en los últimos meses',
+            'Novio → compra traje en mitad del proceso, ajustes finales poco antes',
+            'Cortejo → definir vestidos/trajes, confirmar tallas y ajustes finales más tarde',
+          ]},
+          { key: 'D', name: 'Bloque D - Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
+            'Invitaciones digitales y save-the-dates (inicio medio)',
+            'Invitaciones físicas y papelería (fase intermedia)',
+            'Decoración y DIY (se puede trabajar meses antes y ultimar al final)',
+            'Recuerdos y regalos (elección temprana, cierre antes del evento)',
+          ]},
+          { key: 'E', name: 'Bloque E - Organización y Logística', p0: 0.3, p1: 1.0, items: [
+            'Transporte (se puede definir pronto, confirmar al final)',
+            'Extras y básicos del día (ir acumulando, revisión final cercana a la boda)',
+            'Confirmaciones con proveedores (últimas semanas)',
+            'Plan B clima (al final)',
+            'Ensayo general (última fase)',
+          ]},
+          { key: 'F', name: 'Bloque F - Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
+            'Eventos adicionales (preboda, brunch…)',
+            'Despedidas (planificación antes, celebración final)',
+            'Votos y discursos (escribir con calma, repasar justo antes)',
+          ]},
+          { key: 'G', name: 'Bloque G - Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
+            'Reservas peluquería/maquillaje con antelación',
+            'Pruebas intermedias',
+            'Rutinas de cuidado personal (últimos meses)',
+          ]},
+          { key: 'H', name: 'Bloque H - Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
+            'Comprar anillos (se puede hacer pronto, recoger justo antes)',
+            'Planificar luna de miel (elección pronto, reservas intermedias, maletas al final)',
+          ]},
+          { key: 'I', name: 'Bloque I - Después de la Boda', p0: 1.0, p1: 1.05, items: [
+            'Disfrutar inicio del matrimonio',
+            'Organizar álbum y recuerdos',
+          ]},
+        ];
+
+        const colRef = collection(db, 'weddings', activeWedding, 'tasks');
+        for (const b of blocks) {
+          const parent = {
+            title: b.name,
+            name: b.name,
+            type: 'task',
+            start: at(b.p0),
+            end: at(b.p1),
+            progress: 0,
+            isDisabled: false,
+            createdAt: serverTimestamp(),
+            category: 'OTROS',
+          };
+          const pDoc = await addDoc(colRef, parent);
+          await setDoc(pDoc, { id: pDoc.id }, { merge: true });
+          for (const item of b.items) {
+            const s = at(b.p0 + (Math.random() * (b.p1 - b.p0) * 0.6));
+            const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
+            const sub = {
+              title: item,
+              name: item,
+              parentId: pDoc.id,
+              weddingId: activeWedding,
+              start: s,
+              end: e.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : e,
+              progress: 0,
+              isDisabled: false,
+              createdAt: serverTimestamp(),
+              category: 'OTROS',
+            };
+            const subCol = collection(db, 'weddings', activeWedding, 'tasks', pDoc.id, 'subtasks');
+            const sDoc = await addDoc(subCol, sub);
+            await setDoc(sDoc, { id: sDoc.id }, { merge: true });
+          }
+        }
+
+        await setDoc(seedRef, { seededAt: serverTimestamp(), version: 1 }, { merge: true });
+      } catch (e) {
+        console.warn('[Tasks] Seed de bloques no completado:', e);
+      }
+    })();
+  }, [activeWedding, db, projectStart, projectEnd, tasksState, tasksLoading]);
   // Toggle rápido de completado (lista/fallback)
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
@@ -858,7 +1228,7 @@ export default function Tasks() {
       {/* Componente para el diagrama Gantt */}
       <LongTermTasksGantt
         containerRef={ganttContainerRef}
-        tasks={ganttTasksBounded}
+        tasks={ganttDisplayTasks}
         columnWidth={columnWidthState}
         rowHeight={rowHeight}
         preSteps={ganttPreSteps}
@@ -878,6 +1248,7 @@ export default function Tasks() {
             endDate: task.end.toISOString().slice(0, 10),
             endTime: task.end.toTimeString().slice(0, 5),
             long: true,
+            parentTaskId: task.parentId || '',
             assignee: task.assignee || '',
             completed: completedIdSet.has(String(task.id)),
           });
@@ -924,7 +1295,7 @@ export default function Tasks() {
         />
         <div className="w-full lg:w-1/3">
           <TaskList
-            tasks={safeMeetingsFiltered}
+            tasks={taskListItems}
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             onTaskClick={(event) => {
@@ -939,7 +1310,8 @@ export default function Tasks() {
                 startTime: eventStart.toTimeString().slice(0, 5),
                 endDate: eventEnd.toISOString().slice(0, 10),
                 endTime: eventEnd.toTimeString().slice(0, 5),
-                long: false,
+                long: event.__kind === 'subtask' ? true : false,
+                parentTaskId: event.__kind === 'subtask' ? (event.parentId || '') : '',
                 assignee: event.assignee || '',
                 completed: completedIdSet.has(String(event.id)),
               });
@@ -958,8 +1330,10 @@ export default function Tasks() {
           handleDeleteTask={handleDeleteTask}
           closeModal={closeModal}
           setFormData={setFormData}
+          parentOptions={parentTaskOptions}
         />
       )}
     </div>
   );
 }
+

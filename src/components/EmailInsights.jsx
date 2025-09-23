@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { get as apiGet, post as apiPost } from '../services/apiClient';
+import { useAuth } from '../hooks/useAuth';
 import { getUserFolders, createFolder, assignEmailToFolder } from '../services/folderService';
 import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
 
 export default function EmailInsights({ mailId, userId, email }) {
+  const { user: authUser } = (typeof useAuth === 'function' ? useAuth() : {}) || {};
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -47,21 +49,64 @@ export default function EmailInsights({ mailId, userId, email }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mailId, insights]);
 
+  // Fallback local de análisis (heurístico simple)
+  const localAnalyze = useCallback(() => {
+    try {
+      const text = `${email?.subject || ''} \n ${email?.body || ''}`.toLowerCase();
+      const out = { tasks: [], meetings: [], budgets: [], contracts: [] };
+      if (/presupuesto|budget|enviar|pendiente|confirmar|pago|factura/.test(text)) {
+        out.tasks.push({
+          title: email?.subject ? `Revisar: ${email.subject}` : 'Revisar correo',
+          due: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        });
+      }
+      if (/reuni[óo]n|meeting|llamada|call/.test(text)) {
+        const start = email?.date || new Date(Date.now() + 60 * 60 * 1000).toISOString();
+        const startDate = new Date(start);
+        const end = new Date(startDate.getTime() + 60 * 60 * 1000).toISOString();
+        out.meetings.push({ title: email?.subject || 'Reunión', start, end });
+      }
+      if (/presupuesto|budget|importe|precio|quote/.test(text)) {
+        out.budgets.push({ client: email?.from || 'Contacto', amount: '—', currency: 'EUR' });
+      }
+      if (/contrato|acuerdo|firma|sign/.test(text)) {
+        out.contracts.push({ party: email?.from || 'Parte', type: 'Contrato', action: 'Revisar' });
+      }
+      return out;
+    } catch {
+      return { tasks: [], meetings: [], budgets: [], contracts: [] };
+    }
+  }, [email]);
+
   const analyzeNow = useCallback(async () => {
     if (!mailId || analyzing) return;
     setAnalyzing(true);
     try {
-      await apiPost('/api/email-insights/analyze', { mailId }, { auth: true, silent: true });
+      const resp = await apiPost(
+        '/api/email-insights/analyze',
+        {
+          mailId,
+          id: mailId,
+          messageId: mailId,
+          user: String(authUser?.email || '').toLowerCase(),
+          userId: authUser?.uid || userId || undefined,
+        },
+        { auth: true, silent: true }
+      );
+      if (!resp?.ok) {
+        setInsights(localAnalyze());
+        return;
+      }
       // Refrescar insights tras analizar
       const res = await apiGet(`/api/email-insights/${mailId}`, { auth: true });
       const json = await res.json();
-      setInsights(json);
+      setInsights(json && Object.keys(json || {}).length ? json : localAnalyze());
     } catch (err) {
-      console.error('Error analizando:', err);
+      setInsights(localAnalyze());
     } finally {
       setAnalyzing(false);
     }
-  }, [mailId, analyzing]);
+  }, [mailId, analyzing, authUser, userId, localAnalyze]);
 
   // Clasificación local simple (heurística)
   const classifyLocal = useCallback(() => {

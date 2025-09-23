@@ -33,6 +33,12 @@ function MetricsDashboard() {
   const [selectedTimeframe, setSelectedTimeframe] = useState('day'); // day, week, month
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [errorList, setErrorList] = useState([]);
+  const [errorFilterText, setErrorFilterText] = useState('');
+  const [errorFilterSource, setErrorFilterSource] = useState('all');
+  const [errorFilterType, setErrorFilterType] = useState('all');
+  const [aggregate, setAggregate] = useState({ counters: {}, timings: {}, eventsTotal: 0 });
+  const [webVitals, setWebVitals] = useState([]);
 
   // Colores para gráficos
   const colors = {
@@ -132,6 +138,54 @@ function MetricsDashboard() {
     return () => clearInterval(intervalId);
   }, [selectedTimeframe]);
 
+  // Cargar lista de errores y agregados del backend admin
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
+        const [errsRes, aggRes] = await Promise.all([
+          apiGet(`${endpoint}/errors?timeframe=${selectedTimeframe}&limit=1000`, { auth: true }),
+          apiGet(`${endpoint}/aggregate?timeframe=${selectedTimeframe}`, { auth: true }),
+        ]);
+        if (errsRes?.ok) {
+          const data = await errsRes.json();
+          setErrorList(Array.isArray(data.items) ? data.items : []);
+        } else {
+          setErrorList([]);
+        }
+        if (aggRes?.ok) {
+          const data = await aggRes.json();
+          setAggregate({ counters: data.counters || {}, timings: data.timings || {}, eventsTotal: data.eventsTotal || 0 });
+        } else {
+          setAggregate({ counters: {}, timings: {}, eventsTotal: 0 });
+        }
+      } catch {
+        setErrorList([]);
+        setAggregate({ counters: {}, timings: {}, eventsTotal: 0 });
+      }
+    };
+    load();
+  }, [selectedTimeframe]);
+
+  // Load web vitals from admin API
+  useEffect(() => {
+    const loadWebVitals = async () => {
+      try {
+        const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
+        const res = await apiGet(`${endpoint}/web-vitals?timeframe=${selectedTimeframe}&limit=200`, { auth: true });
+        if (res?.ok) {
+          const data = await res.json();
+          setWebVitals(Array.isArray(data.items) ? data.items : []);
+        } else {
+          setWebVitals([]);
+        }
+      } catch {
+        setWebVitals([]);
+      }
+    };
+    loadWebVitals();
+  }, [selectedTimeframe]);
+
   // Eliminado: generación de datos mock
 
   // Procesar los datos de rendimiento para el gráfico de barras
@@ -144,6 +198,19 @@ function MetricsDashboard() {
     }));
   }, [metrics]);
 
+  // Fallbacks para agregados si backend no devuelve datos
+  const displayCounters = useMemo(() => {
+    const hasAgg = aggregate && aggregate.counters && Object.keys(aggregate.counters).length > 0;
+    if (hasAgg) return aggregate.counters;
+    return (metrics && metrics.counters) ? metrics.counters : {};
+  }, [aggregate, metrics]);
+
+  const displayTimings = useMemo(() => {
+    const hasAgg = aggregate && aggregate.timings && Object.keys(aggregate.timings).length > 0;
+    if (hasAgg) return aggregate.timings;
+    return (metrics && metrics.timings) ? metrics.timings : {};
+  }, [aggregate, metrics]);
+
   // Punto Más reciente de la serie temporal (seguro)
   const lastPoint = useMemo(() => {
     try {
@@ -153,11 +220,188 @@ function MetricsDashboard() {
     return null;
   }, [metrics]);
 
+  const errorTypes = useMemo(() => {
+    const set = new Set(errorList.map((e) => e.type || 'error'));
+    return Array.from(set);
+  }, [errorList]);
+
+  const filteredErrors = useMemo(() => {
+    const base = errorList.length > 0 ? errorList : (metrics?.errors || []);
+    return base.filter((e) => {
+      if (errorFilterSource !== 'all' && (e.source || 'unknown') !== errorFilterSource) return false;
+      if (errorFilterType !== 'all' && (e.type || 'error') !== errorFilterType) return false;
+      if (errorFilterText) {
+        const t = errorFilterText.toLowerCase();
+        const hay = `${e.message || ''} ${e.type || ''}`.toLowerCase();
+        if (!hay.includes(t)) return false;
+      }
+      return true;
+    });
+  }, [errorList, errorFilterSource, errorFilterType, errorFilterText]);
+
   // Si está cargando, mostrar indicador
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+
+      {/* Agregados y lista de errores */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-medium text-gray-700 mb-4">Contadores agregados</h3>
+          <div className="overflow-auto max-h-80">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-2">Metrica</th>
+                  <th className="text-right py-2 px-2">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(displayCounters).map(([k, v]) => (
+                  <tr key={k} className="border-b">
+                    <td className="py-2 px-2">{k}</td>
+                    <td className="py-2 px-2 text-right">{v}</td>
+                  </tr>
+                ))}
+                {Object.keys(displayCounters).length === 0 && (
+                  <tr><td className="py-2 px-2" colSpan={2}>Sin datos</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-medium text-gray-700 mb-4">Tiempos agregados</h3>
+          <div className="overflow-auto max-h-80">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2 px-2">Operacion</th>
+                  <th className="text-right py-2 px-2">Promedio (ms)</th>
+                  <th className="text-right py-2 px-2">p95 (ms)</th>
+                  <th className="text-right py-2 px-2">p99 (ms)</th>
+                  <th className="text-right py-2 px-2">Min (ms)</th>
+                  <th className="text-right py-2 px-2">Max (ms)</th>
+                  <th className="text-right py-2 px-2">Muestras</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(displayTimings).map(([k, t]) => (
+                  <tr key={k} className="border-b">
+                    <td className="py-2 px-2">{k}</td>
+                    <td className="py-2 px-2 text-right">{t.count ? Math.round(t.total / t.count) : 0}</td>
+                    <td className="py-2 px-2 text-right">{Math.round((t.p95 || 0))}</td>
+                    <td className="py-2 px-2 text-right">{Math.round((t.p99 || 0))}</td>
+                    <td className="py-2 px-2 text-right">{Math.round(t.min || 0)}</td>
+                    <td className="py-2 px-2 text-right">{Math.round(t.max || 0)}</td>
+                    <td className="py-2 px-2 text-right">{t.count || 0}</td>
+                  </tr>
+                ))}
+                {Object.keys(displayTimings).length === 0 && (
+                  <tr><td className="py-2 px-2" colSpan={5}>Sin datos</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-lg font-medium text-gray-700 mb-4">Errores del sistema</h3>
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <input
+            type="text"
+            placeholder="Buscar..."
+            className="border rounded px-3 py-2"
+            value={errorFilterText}
+            onChange={(e) => setErrorFilterText(e.target.value)}
+          />
+          <select
+            className="border rounded px-3 py-2"
+            value={errorFilterSource}
+            onChange={(e) => setErrorFilterSource(e.target.value)}
+          >
+            <option value="all">Todas las fuentes</option>
+            <option value="server">Servidor</option>
+            <option value="ingest">Ingesta</option>
+          </select>
+          <select
+            className="border rounded px-3 py-2"
+            value={errorFilterType}
+            onChange={(e) => setErrorFilterType(e.target.value)}
+          >
+            <option value="all">Todos los tipos</option>
+            {errorTypes.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+          <span className="text-sm text-gray-500">{filteredErrors.length} de {(errorList.length || (metrics?.errors?.length || 0))}</span>
+        </div>
+      <div className="mt-8">
+        <h3 className="text-lg font-medium text-gray-700 mb-4">Top rutas backend (HTTP)</h3>
+        <HttpRoutesTable />
+      </div>
+        <div className="overflow-auto max-h-96">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-2 px-2">Fecha</th>
+                <th className="text-left py-2 px-2">Fuente</th>
+                <th className="text-left py-2 px-2">Tipo</th>
+                <th className="text-left py-2 px-2">Mensaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredErrors.map((e, i) => (
+                <tr key={i} className="border-b align-top">
+                  <td className="py-2 px-2 whitespace-nowrap">{new Date(e.timestamp || Date.now()).toLocaleString()}</td>
+                  <td className="py-2 px-2">{e.source || 'unknown'}</td>
+                  <td className="py-2 px-2">{e.type || 'error'}</td>
+                  <td className="py-2 px-2">{e.message || ''}</td>
+                </tr>
+              ))}
+              {filteredErrors.length === 0 && (
+                <tr><td className="py-2 px-2" colSpan={4}>Sin errores en el rango seleccionado</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-lg font-medium text-gray-700 mb-4">Web Vitals recientes</h3>
+        <div className="overflow-auto max-h-80">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-2 px-2">Fecha</th>
+                <th className="text-left py-2 px-2">Nombre</th>
+                <th className="text-right py-2 px-2">Valor</th>
+                <th className="text-left py-2 px-2">Label</th>
+                <th className="text-right py-2 px-2">Delta</th>
+                <th className="text-left py-2 px-2">Nav</th>
+              </tr>
+            </thead>
+            <tbody>
+              {webVitals.map((v, i) => (
+                <tr key={i} className="border-b">
+                  <td className="py-2 px-2 whitespace-nowrap">{new Date(v.ts || Date.now()).toLocaleString()}</td>
+                  <td className="py-2 px-2">{v.name}</td>
+                  <td className="py-2 px-2 text-right">{Math.round(v.value || 0)}</td>
+                  <td className="py-2 px-2">{v.label || ''}</td>
+                  <td className="py-2 px-2 text-right">{Math.round(v.delta || 0)}</td>
+                  <td className="py-2 px-2">{v.navigationType || ''}</td>
+                </tr>
+              ))}
+              {webVitals.length === 0 && (
+                <tr><td className="py-2 px-2" colSpan={6}>Sin datos</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
@@ -394,3 +638,135 @@ function StatCard({ title, value, trend, icon }) {
 }
 
 export default MetricsDashboard;
+
+
+function HttpRoutesTable() {
+  const [data, setData] = React.useState({ routes: [], totals: { totalRequests: 0, totalErrors: 0, errorRate: 0 } });
+  const [loading, setLoading] = React.useState(true);
+  const [err, setErr] = React.useState('');
+
+  React.useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const endpoint = import.meta.env.VITE_BACKEND_BASE_URL || '';
+        const url = (endpoint ? ${endpoint} : '') + '/api/admin/metrics/http?limit=50';
+        const res = await apiGet(url, { auth: true, silent: true });
+        if (!mounted) return;
+        if (res?.ok) {
+          const json = await res.json();
+          setData(json);
+          setErr('');
+        } else {
+          setErr('No disponible');
+        }
+      } catch (e) {
+        if (mounted) setErr('No disponible');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loading) return <div className="text-sm text-gray-500">Cargando rutas...</div>;
+  if (err) return <div className="text-sm text-red-600">{err}</div>;
+
+  return (
+    <div className="overflow-auto max-h-96">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left py-2 px-2">M�todo</th>
+            <th className="text-left py-2 px-2">Ruta</th>
+            <th className="text-right py-2 px-2">Total</th>
+            <th className="text-right py-2 px-2">Errores</th>
+            <th className="text-right py-2 px-2">Error rate</th>
+            <th className="text-right py-2 px-2">Avg (s)</th>
+            <th className="text-right py-2 px-2">p95 (s)</th>
+            <th className="text-right py-2 px-2">p99 (s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.routes.map((r, i) => (
+            <tr key={i} className="border-b">
+              <td className="py-2 px-2">{r.method}</td>
+              <td className="py-2 px-2">{r.route}</td>
+              <td className="py-2 px-2 text-right">{r.total}</td>
+              <td className="py-2 px-2 text-right">{r.errors}</td>
+              <td className="py-2 px-2 text-right">{(r.errorRate * 100).toFixed(1)}%</td>
+              <td className="py-2 px-2 text-right">{(r.avg).toFixed(3)}</td>
+              <td className="py-2 px-2 text-right">{(r.p95).toFixed(3)}</td>
+              <td className="py-2 px-2 text-right">{(r.p99).toFixed(3)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+
+function UsersWithErrors() {
+  const [data, setData] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [err, setErr] = React.useState('');
+
+  React.useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
+        const res = await apiGet(${endpoint}/errors/by-user?timeframe=day, { auth: true, silent: true });
+        if (!mounted) return;
+        if (res?.ok) {
+          const json = await res.json();
+          setData(json.items || []);
+          setErr('');
+        } else {
+          setErr('No disponible');
+        }
+      } catch (e) {
+        if (mounted) setErr('No disponible');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  if (loading) return <div className=\"text-sm text-gray-500\">Cargando usuarios...</div>;
+  if (err) return <div className=\"text-sm text-red-600\">{err}</div>;
+
+  return (
+    <div className=\"overflow-auto max-h-80\">
+      <table className=\"min-w-full text-sm\">
+        <thead>
+          <tr className=\"border-b\">
+            <th className=\"text-left py-2 px-2\">Usuario</th>
+            <th className=\"text-right py-2 px-2\">Errores</th>
+            <th className=\"text-left py-2 px-2\">Fuentes</th>
+            <th className=\"text-left py-2 px-2\">�ltimo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((r, i) => (
+            <tr key={i} className=\"border-b\">
+              <td className=\"py-2 px-2\">{r.user?.email || r.user?.uid || 'unknown'}</td>
+              <td className=\"py-2 px-2 text-right\">{r.count}</td>
+              <td className=\"py-2 px-2\">{(r.sources || []).join(', ')}</td>
+              <td className=\"py-2 px-2\">{new Date(r.lastTimestamp || Date.now()).toLocaleString()}</td>
+            </tr>
+          ))}
+          {data.length === 0 && (
+            <tr><td className=\"py-2 px-2\" colSpan={4}>Sin usuarios con errores recientes</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}

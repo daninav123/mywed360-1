@@ -19,6 +19,10 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   const [toast, setToast] = useState(null);
 
   const modalRef = useRef(null);
+  const ENABLE_BACKEND_AI =
+    (import.meta?.env?.VITE_ENABLE_AI_SUPPLIERS || import.meta?.env?.VITE_AI_SUPPLIERS || '')
+      .toString()
+      .match(/^(1|true)$/i);
 
   // Cerrar al hacer clic fuera usando referencia (por si overlay pierde eventos)
   useEffect(() => {
@@ -121,8 +125,18 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       try {
         let profile = {};
         if (activeWedding) {
-          const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'weddingInfo'));
-          if (infoSnap.exists()) profile = infoSnap.data();
+          // Intentar ruta válida de subdocumento: weddings/{id}/info/weddingInfo
+          try {
+            const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'info', 'weddingInfo'));
+            if (infoSnap.exists()) profile = infoSnap.data();
+          } catch (_) {}
+          // Fallback: leer weddingInfo anidado del doc principal
+          if (!profile || Object.keys(profile).length === 0) {
+            try {
+              const wedSnap = await getDoc(doc(db, 'weddings', activeWedding));
+              if (wedSnap.exists() && wedSnap.data().weddingInfo) profile = wedSnap.data().weddingInfo;
+            } catch (_) {}
+          }
         }
 
         // Extraer información de ubicación del perfil
@@ -136,6 +150,10 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
 
         // Intentar realizar la búsqueda a través del API proxy (apiClient, con auth opcional)
         try {
+          if (!ENABLE_BACKEND_AI) {
+            await fetchOpenAi();
+            return;
+          }
           const res = await apiPost(
             '/api/ai-suppliers',
             {
@@ -201,8 +219,16 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     try {
       let profile = {};
       if (activeWedding) {
-        const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'weddingInfo'));
-        if (infoSnap.exists()) profile = infoSnap.data();
+        try {
+          const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'info', 'weddingInfo'));
+          if (infoSnap.exists()) profile = infoSnap.data();
+        } catch (_) {}
+        if (!profile || Object.keys(profile).length === 0) {
+          try {
+            const wedSnap = await getDoc(doc(db, 'weddings', activeWedding));
+            if (wedSnap.exists() && wedSnap.data().weddingInfo) profile = wedSnap.data().weddingInfo;
+          } catch (_) {}
+        }
       }
 
       // Extraer datos relevantes del perfil

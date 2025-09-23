@@ -1,4 +1,4 @@
-﻿﻿﻿import express from 'express';
+import express from 'express';
 import LRU from 'lru-cache';
 import Parser from 'rss-parser';
 import axios from 'axios';
@@ -47,7 +47,18 @@ const RSS_FEEDS = {
 // Resolver imagen OG/Twitter si falta en un item
 async function resolveOgImage(pageUrl) {
   try {
-    const res = await axios.get(pageUrl, { timeout: 5000, responseType: 'text' });
+    const commonHeaders = {
+      'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116 Safari/537.36',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+      Referer: 'https://news.google.com/',
+    };
+    const res = await axios.get(pageUrl, {
+      timeout: 8000,
+      responseType: 'text',
+      maxRedirects: 5,
+      headers: commonHeaders,
+    });
     const html = String(res.data || '');
     const patterns = [
       /<meta\s+property=["']og:image:secure_url["']\s+content=["']([^"']+)["'][^>]*>/i,
@@ -71,7 +82,12 @@ async function resolveOgImage(pageUrl) {
         if (m2 && m2[1]) {
           const canonical = new URL(m2[1], pageUrl).toString();
           try {
-            const res2 = await axios.get(canonical, { timeout: 5000, responseType: 'text' });
+            const res2 = await axios.get(canonical, {
+              timeout: 8000,
+              responseType: 'text',
+              maxRedirects: 5,
+              headers: commonHeaders,
+            });
             const html2 = String(res2.data || '');
             for (const re of patterns) {
               const m3 = html2.match(re);
@@ -176,7 +192,8 @@ router.get('/', async (req, res) => {
       results.sort((a, b) => new Date(b.published) - new Date(a.published));
       const MIN_SOURCES = 10;
       const distinct = new Set(results.map(r => r.source));
-      if (distinct.size < MIN_SOURCES && RSS_FEEDS['en']) {
+      // No mezclar idiomas: solo rellenar con 'en' si el idioma solicitado es 'en'
+      if (distinct.size < MIN_SOURCES && lang === 'en' && RSS_FEEDS['en']) {
         try {
           const extraPromises = RSS_FEEDS['en'].map(async (url) => {
             try { const feed = await parser.parseURL(url); return mapItems(feed, url); } catch { return []; }
@@ -261,19 +278,64 @@ router.get('/', async (req, res) => {
       }
     }
 
-    // Completar imagen de portada cuando falte
+    // Completar imagen de portada cuando falte y sustituir enlaces de Google News por el medio original
     const withImages = [];
+    const blockedHosts = new Set(['news.google.com', 'gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
+    const badPatterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
+    const canonicalRe = /<link[^>]+rel=['"]canonical['"][^>]+href=['"]([^'\"]+)['"][^>]*>/i;
+    const ogUrlRe = /<meta\s+property=['"]og:url['"]\s+content=['"]([^'\"]+)['"][^>]*>/i;
+    const reqCfg = {
+      timeout: 8000,
+      responseType: 'text',
+      maxRedirects: 5,
+      headers: {
+        'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app) Mozilla/5.0',
+        Referer: 'https://news.google.com/',
+        'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+      },
+    };
     for (const item of pageItems) {
       let img = item.image;
-      if (!(typeof img === 'string' && /^https?:\/\//i.test(img)) && item.url) {
+      let finalUrl = item.url;
+      const isHttp = (u) => typeof u === 'string' && /^https?:\/\//i.test(u);
+      const shouldTryResolve = () => {
         try {
-          const found = await resolveOgImage(item.url);
-          if (found && /^https?:\/\//i.test(found)) img = found;
+          if (!isHttp(img)) return true;
+          const u = new URL(img);
+          const host = u.hostname.replace(/^www\./, '').toLowerCase();
+          const path = (u.pathname || '').toLowerCase();
+          if (blockedHosts.has(host)) return true;
+          if (/\.svg(\?|$)/i.test(path)) return true;
+          if (badPatterns.some((p) => path.includes(p))) return true;
+        } catch {}
+        return false;
+      };
+      // Si el enlace es de Google News, resolver canonical al medio original
+      try {
+        const h = new URL(finalUrl).hostname;
+        if (/news\.google\.com$/i.test(h)) {
+          try {
+            const r = await axios.get(finalUrl, reqCfg);
+            const html = String(r.data || '');
+            const m = html.match(canonicalRe) || html.match(ogUrlRe);
+            if (m && m[1]) {
+              finalUrl = new URL(m[1], finalUrl).toString();
+            }
+          } catch {}
+        }
+      } catch {}
+      if (finalUrl && shouldTryResolve()) {
+        try {
+          const found = await resolveOgImage(finalUrl);
+          if (isHttp(found)) img = found;
         } catch {}
       }
       // Asegurar absoluta si es relativa
-      try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, item.url).toString(); } catch {}
-      withImages.push({ ...item, image: img || item.image || null });
+      try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, finalUrl).toString(); } catch {}
+      // Recalcular fuente desde la URL final
+      let sourceHost = item.source;
+      try { sourceHost = new URL(finalUrl).hostname.replace('www.', ''); } catch {}
+      withImages.push({ ...item, url: finalUrl, source: sourceHost, image: img || item.image || null });
     }
 
     res.status(200).json(withImages);

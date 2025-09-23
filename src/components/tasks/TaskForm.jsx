@@ -12,6 +12,7 @@ const TaskForm = ({
   handleDeleteTask,
   closeModal,
   setFormData,
+  parentOptions = [],
 }) => {
   const modal = (
     <div
@@ -112,6 +113,25 @@ const TaskForm = ({
             />
             <span>Proceso (Gantt)</span>
           </label>
+          {formData.long && (
+            <div>
+              <label className="text-xs">Tarea padre (opcional)</label>
+              <select
+                name="parentTaskId"
+                value={formData.parentTaskId || ''}
+                onChange={handleChange}
+                className="w-full border rounded px-3 py-1"
+              >
+                <option value="">— Tarea raíz (sin padre) —</option>
+                {Array.isArray(parentOptions) &&
+                  parentOptions.map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           <label className="flex items-center space-x-2 text-sm">
             <input
               type="checkbox"

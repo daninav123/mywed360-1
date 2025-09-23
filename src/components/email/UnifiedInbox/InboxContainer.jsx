@@ -325,7 +325,13 @@ const InboxContainer = () => {
                         try {
                           const res = await apiPost(
                             '/api/email-insights/analyze',
-                            { mailId: cand },
+                            {
+                              mailId: cand,
+                              id: cand,
+                              messageId: cand,
+                              user: String(user?.email || '').toLowerCase(),
+                              userId: user?.uid || undefined,
+                            },
                             { auth: true, silent: true }
                           );
                           if (res && res.ok) { ok = true; break; }
@@ -340,12 +346,17 @@ const InboxContainer = () => {
                     };
 
                     let success = 0;
-                    for (const id of ids) {
-                      const emailObj = list.find((e) => e?.id === id || e?.apiId === id) || null;
-                      const ok = await tryAnalyze(id, emailObj);
-                      if (ok) success++;
+                    const enableBackend = String(import.meta.env.VITE_ENABLE_EMAIL_ANALYZE || '').trim() === '1';
+                    if (enableBackend) {
+                      for (const id of ids) {
+                        const emailObj = list.find((e) => e?.id === id || e?.apiId === id) || null;
+                        const ok = await tryAnalyze(id, emailObj);
+                        if (ok) success++;
+                      }
+                      console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
+                    } else {
+                      console.log(`[IA] Análisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
                     }
-                    console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
                   } catch (e) {
                     console.error('Error analizando correos', e);
                   } finally {

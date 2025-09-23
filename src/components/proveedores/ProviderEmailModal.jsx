@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import { useAuth } from '../../hooks/useAuth';
+import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import { useProviderEmail } from '../../hooks/useProviderEmail';
 import * as EmailService from '../../services/EmailService';
 
@@ -17,6 +18,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
     generateDefaultEmailBody,
   } = useProviderEmail();
   const { profile } = useAuth();
+  const { info: weddingInfo } = useActiveWeddingInfo();
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [templates, setTemplates] = useState([]);
@@ -53,7 +55,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
     const fmtDate = (d) => {
       try {
         if (!d) return '';
-        const dt = new Date(d);
+        const dt = typeof d?.toDate === 'function' ? d.toDate() : new Date(d);
         if (Number.isNaN(dt.getTime())) return '';
         return dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
       } catch {
@@ -69,11 +71,13 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
       return couple || profile?.name || '';
     };
 
+    const wi = weddingInfo || {};
     const data = {
       providerName: provider?.name || '',
-      weddingDate: fmtDate(profile?.weddingDate),
-      weddingPlace: profile?.weddingPlace || profile?.weddingLocation || '',
-      coupleName: profile?.coupleName || coupleFromProfile(),
+      weddingDate: fmtDate(wi.weddingDate || wi.date || wi.eventDate || profile?.weddingDate),
+      weddingPlace:
+        wi.celebrationPlace || wi.weddingPlace || wi.location || wi.city || profile?.weddingPlace || profile?.weddingLocation || '',
+      coupleName: wi.coupleName || wi.coupleNames || profile?.coupleName || coupleFromProfile(),
       userName: profile?.name || coupleFromProfile(),
       userPhone: profile?.phone || profile?.contactPhone || '',
       userEmail: userEmail || profile?.email || '',

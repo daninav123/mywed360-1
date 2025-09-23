@@ -337,6 +337,10 @@ const GestionProveedores = () => {
     setResultadoBusquedaIA(null);
 
     try {
+      const ENABLE_BACKEND_AI =
+        (import.meta?.env?.VITE_ENABLE_AI_SUPPLIERS || import.meta?.env?.VITE_AI_SUPPLIERS || '')
+          .toString()
+          .match(/^(1|true)$/i);
       const profile = (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
       const location =
         profile.celebrationPlace ||
@@ -360,11 +364,23 @@ const GestionProveedores = () => {
         return '';
       };
 
-      const res = await apiPost(
-        '/api/ai-suppliers',
-        { query: consulta, service: guessService(consulta), budget, profile, location, weddingId: activeWedding || '' },
-        { auth: true }
-      );
+      if (!ENABLE_BACKEND_AI) {
+        // Backend deshabilitado: usar flujo simulado
+        const mapped = {
+          nombre: `Proveedor para: ${consulta}`,
+          servicio: guessService(consulta) || 'Servicio para bodas',
+          descripcion: `Búsqueda local (demo) para "${consulta}" en ${location || 'España'}`,
+          web: 'https://www.bodas.net',
+          ubicacion: location || 'España',
+          contacto: '',
+          email: '',
+          telefono: '',
+        };
+        setResultadoBusquedaIA(mapped);
+        return;
+      }
+
+      const res = await apiPost('/api/ai-suppliers', { query: consulta, service: guessService(consulta), budget, profile, location, weddingId: activeWedding || '' }, { auth: true });
 
       if (!res.ok) throw new Error('ai-suppliers failed');
       const list = await res.json();

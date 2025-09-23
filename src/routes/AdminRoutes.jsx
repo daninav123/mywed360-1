@@ -10,6 +10,7 @@ const UserManagement = lazy(() => import('../components/admin/UserManagement'));
 const SystemSettings = lazy(() => import('../components/admin/SystemSettings'));
 const CachePerformancePanel = lazy(() => import('../components/admin/CachePerformancePanel'));
 const MetricsDashboard = lazy(() => import('../components/admin/MetricsDashboard'));
+const AdminHealth = lazy(() => import('../components/admin/AdminHealth'));
 
 // Componente para mostrar durante la carga
 const LoadingFallback = () => (
@@ -34,6 +35,7 @@ const AdminRoutes = () => {
           <Route path="/settings" element={<SystemSettings />} />
           <Route path="/cache" element={<CachePerformancePanel />} />
           <Route path="/metrics" element={<MetricsDashboard />} />
+          <Route path="/health" element={<AdminHealth />} />
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </Suspense>

@@ -136,9 +136,18 @@ function Invitados() {
         fechaFmt = 'la fecha de la boda';
       }
 
-      return `Hola somos ${p1}${p2 ? ' y ' + p2 : ''}, tenemos un noticion super importante que compartir contigo! NOS CASAMOS!! Reservate el ${fechaFmt} porque queremos contar contigo!`;
+      return t('guests.saveTheDate.message', {
+        defaultValue:
+          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
+        p1,
+        p2: p2 || undefined,
+        date: fechaFmt,
+      });
     } catch {
-      return 'Hola! Tenemos un noticion super importante que compartir contigo! NOS CASAMOS!! Reservate la fecha porque queremos contar contigo!';
+      return t('guests.saveTheDate.messageFallback', {
+        defaultValue:
+          '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
+      });
     }
   }, [weddings, activeWedding, activeWeddingInfo]);
 
@@ -202,7 +211,7 @@ function Invitados() {
           selectedCount: selectedIds.length,
         });
       if (!selectedIds.length) {
-        alert('No hay invitados seleccionados');
+        alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
       }
       const custom = window.prompt(
@@ -273,18 +282,32 @@ function Invitados() {
         return;
       }
       const confirm = window.confirm(
-        `¿Enviar invitaciones vía WhatsApp API a ${ids.length} invitados?`
+        t('guests.whatsapp.confirmBulkApi', {
+          defaultValue: '¿Enviar invitaciones vía WhatsApp API a {{count}} invitados?',
+          count: ids.length,
+        })
       );
       if (!confirm) return;
       const res = await inviteSelectedWhatsAppApi(ids);
       if (res?.success) {
-        alert(`Envío completado. Éxitos: ${res.ok || 0}, Fallos: ${res.fail || 0}`);
+        alert(
+          t('guests.whatsapp.bulkApiDone', {
+            defaultValue: 'Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}',
+            ok: res.ok || 0,
+            fail: res.fail || 0,
+          })
+        );
       } else {
-        alert('Error en envío masivo: ' + (res?.error || 'desconocido'));
+        alert(
+          t('guests.whatsapp.bulkApiError', {
+            defaultValue: 'Error en envío masivo: {{error}}',
+            error: res?.error || 'desconocido',
+          })
+        );
       }
     } catch (e) {
       console.warn('bulkInviteAllApi error:', e);
-      alert('Error en envío masivo API');
+      alert(t('guests.whatsapp.bulkApiUnexpected', { defaultValue: 'Error en envío masivo API' }));
     }
   };
 
@@ -320,7 +343,7 @@ function Invitados() {
           selectedCount: selectedIds.length,
         });
       if (!selectedIds.length) {
-        alert('No hay invitados seleccionados');
+        alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
       }
       const res = await inviteSelectedWhatsAppApi(selectedIds);
@@ -330,17 +353,32 @@ function Invitados() {
         return;
       }
       if (res?.error && !res?.success) {
-        alert('Error enviando a seleccionados: ' + res.error);
+        alert(
+          t('guests.whatsapp.selectedApiError', {
+            defaultValue: 'Error enviando a seleccionados: {{error}}',
+            error: res.error,
+          })
+        );
         return;
       }
       if (res?.success) {
-        alert(`Envío completado. Éxitos: ${res?.ok || 0}, Fallos: ${res?.fail || 0}`);
+        alert(
+          t('guests.whatsapp.bulkApiDone', {
+            defaultValue: 'Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}',
+            ok: res?.ok || 0,
+            fail: res?.fail || 0,
+          })
+        );
         return;
       }
-      alert('No se pudo iniciar el envío por API');
+      alert(
+        t('guests.whatsapp.apiStartFailed', {
+          defaultValue: 'No se pudo iniciar el envío por API',
+        })
+      );
     } catch (e) {
       console.warn('Error envío seleccionados (API):', e);
-      alert('Error enviando a seleccionados');
+      alert(t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' }));
     }
   };
 
@@ -356,7 +394,10 @@ function Invitados() {
         return;
       }
       const custom = window.prompt(
-        'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
+        t('guests.whatsapp.customPrompt', {
+          defaultValue:
+            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
+        }),
         ''
       );
       // 1) Intentar envío en una sola acción usando extensión (WhatsApp Web automation)
@@ -364,33 +405,60 @@ function Invitados() {
         const r = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
         if (r?.success && !r?.notAvailable) {
           alert(
-            `Envío iniciado en WhatsApp Web para ${r?.count || selectedIds.length} invitado(s).`
+            t('guests.whatsapp.webStarted', {
+              defaultValue: 'Envío iniciado en WhatsApp Web para {{count}} invitado(s).',
+              count: r?.count || selectedIds.length,
+            })
           );
           return;
         }
         if (r?.notAvailable) {
           // 2) Fallback opcional: abrir chats en pestañas (no recomendado para >50)
           const doFallback = window.confirm(
-            'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?'
+            t('guests.whatsapp.extensionMissingConfirm', {
+              defaultValue:
+                'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?',
+            })
           );
           if (doFallback) {
             const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
-            if (fr?.success) alert(`Se abrieron ${fr?.opened || 0} chats en WhatsApp`);
+            if (fr?.success)
+              alert(
+                t('guests.whatsapp.chatsOpened', {
+                  defaultValue: 'Se abrieron {{opened}} chats en WhatsApp',
+                  opened: fr?.opened || 0,
+                })
+              );
           }
           return;
         }
         // Si no es success y tampoco es notAvailable, informar del error
-        alert('No se pudo iniciar el envío en una sola acción: ' + (r?.error || 'desconocido'));
+        alert(
+          t('guests.whatsapp.oneClickFailed', {
+            defaultValue: 'No se pudo iniciar el envío en una sola acción: {{error}}',
+            error: r?.error || 'desconocido',
+          })
+        );
         return;
       } catch (e) {
         console.warn('Extensión WhatsApp Web no disponible o falló, usando fallback:', e);
         const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
-        if (fr?.success) alert(`Se abrieron ${fr?.opened || 0} chats en WhatsApp`);
+        if (fr?.success)
+          alert(
+            t('guests.whatsapp.chatsOpened', {
+              defaultValue: 'Se abrieron {{opened}} chats en WhatsApp',
+              opened: fr?.opened || 0,
+            })
+          );
         return;
       }
     } catch (e) {
       console.warn('Error envío seleccionados (Móvil):', e);
-      alert('Error enviando a seleccionados (Móvil)');
+      alert(
+        t('guests.whatsapp.mobileUnexpected', {
+          defaultValue: 'Error enviando a seleccionados (Móvil)',
+        })
+      );
     }
   };
 
@@ -915,9 +983,11 @@ function Invitados() {
 
             <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={handleCloseRsvpSummary}>
-                Cerrar
+                {t('app.close', { defaultValue: 'Cerrar' })}
               </Button>
-              <Button onClick={handlePrintRsvpPdf}>Imprimir / PDF</Button>
+              <Button onClick={handlePrintRsvpPdf}>
+                {t('guests.rsvp.printPdf', { defaultValue: 'Imprimir / PDF' })}
+              </Button>
             </div>
           </div>
         </Modal>
@@ -929,7 +999,12 @@ function Invitados() {
           guests={guests || []}
           weddingId={activeWedding}
           onBatchCreated={(res) => {
-            alert(`Lote creado con ${res.items?.length || 0} mensajes`);
+            alert(
+              t('guests.whatsapp.batchCreated', {
+                defaultValue: 'Lote creado con {{count}} mensajes',
+                count: res.items?.length || 0,
+              })
+            );
           }}
         />
 
@@ -950,7 +1025,11 @@ function Invitados() {
           guest={whatsGuest}
           defaultMessage={
             whatsGuest
-              ? `¡Hola ${whatsGuest.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`
+              ? t('guests.whatsapp.dm', {
+                  defaultValue:
+                    '¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?',
+                  name: whatsGuest?.name || '',
+                })
               : ''
           }
           onSendDeeplink={async (g, msg) => {

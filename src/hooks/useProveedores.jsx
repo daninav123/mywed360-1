@@ -92,7 +92,7 @@ export const useProveedores = () => {
 
   const getCollectionPath = useCallback(() => {
     if (activeWedding) return `weddings/${activeWedding}/suppliers`;
-    if (user?.uid) return `usuarios/${user.uid}/proveedores`;
+    if (user?.uid) return `users/${user.uid}/suppliers`;
     return null;
   }, [activeWedding, user]);
 
@@ -105,13 +105,38 @@ export const useProveedores = () => {
     setLoading(true);
 
     try {
-      const path = getCollectionPath();
-      if (!path) {
+      const primaryPath = getCollectionPath();
+      if (!primaryPath) {
         setLoading(false);
         return;
       }
-      const proveedoresRef = collection(db, path);
-      const snapshot = await getDocs(proveedoresRef);
+      const tryLoad = async (path) => {
+        const proveedoresRef = collection(db, path);
+        return await getDocs(proveedoresRef);
+      };
+
+      let snapshot;
+      try {
+        snapshot = await tryLoad(primaryPath);
+      } catch (e) {
+        // Intentar rutas alternativas si hay error de permisos u otros
+        const fallbacks = [];
+        if (activeWedding) fallbacks.push(`weddings_public/${activeWedding}/suppliers`);
+        if (user?.uid) {
+          fallbacks.push(`users/${user.uid}/suppliers`);
+          fallbacks.push(`usuarios/${user.uid}/proveedores`); // legacy
+        }
+        for (const p of fallbacks) {
+          try {
+            const snap = await tryLoad(p);
+            snapshot = snap;
+            if (snap && !snap.empty) break;
+          } catch {}
+        }
+      }
+      if (!snapshot) {
+        snapshot = { docs: [], empty: true };
+      }
       const toIso = (d) => {
         try {
           if (!d) return '';
@@ -135,7 +160,12 @@ export const useProveedores = () => {
       setLoading(false);
     } catch (err) {
       console.error('Error al cargar los proveedores:', err);
-      setError('No se pudieron cargar los proveedores. Inténtalo de nuevo más tarde.');
+      try { setProviders([]); applyFilters([]); } catch {}
+      if (String(err?.message || '').toLowerCase().includes('permission')) {
+        setError('No tienes permisos para ver los proveedores de esta boda.');
+      } else {
+        setError('No se pudieron cargar los proveedores.');
+      }
       setLoading(false);
     }
   }, [user, getCollectionPath]);
@@ -520,3 +550,6 @@ export const useProveedores = () => {
 };
 
 export default useProveedores;
+
+
+

@@ -296,7 +296,7 @@ export async function getEmailTemplates() {
   // Intento backend (tolerante a fallos / endpoint opcional)
   if (USE_BACKEND) {
     try {
-      const res = await fetch(`${BASE}/api/email/templates`, { headers: await buildAuthHeaders() });
+      const res = await apiGet(`/api/email/templates`, { auth: true });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) return data;

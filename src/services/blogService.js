@@ -59,7 +59,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
       };
       const timeoutMs = isProbablyLocal(base) ? 5000 : 10000;
       const resp = await axios.get(url, {
-        params: { page, pageSize, lang: language },
+        params: { page, pageSize, lang: language, bust: 1 },
         timeout: timeoutMs,
         validateStatus: () => true,
       });

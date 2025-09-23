@@ -15,7 +15,7 @@ function main() {
   let html = fs.readFileSync(DIST_INDEX, 'utf8');
 
   const metaRe = /<meta\s+http-equiv="Content-Security-Policy"[^>]*>/i;
-  const strictMeta = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; base-uri \'self\'; frame-ancestors \'self\'; object-src \'none\'; connect-src \'self\' https: wss:; img-src \'self\' data: blob: https:; font-src \'self\' data: https:; style-src \'self\' \'unsafe-inline\' https:; script-src \'self\' https:;">';
+  const strictMeta = '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; base-uri \'self\'; frame-ancestors \'self\'; object-src \'none\'; frame-src \'self\' https://open.spotify.com; media-src \'self\' https: data: blob:; connect-src \'self\' https: wss:; img-src \'self\' data: blob: https:; font-src \'self\' data: https:; style-src \'self\' \'unsafe-inline\' https:; script-src \'self\' https:;">';
 
   if (metaRe.test(html)) {
     html = html.replace(metaRe, strictMeta);

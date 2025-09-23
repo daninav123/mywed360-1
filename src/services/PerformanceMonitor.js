@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { post as apiPost } from './apiClient';
 /**
  * Servicio de monitoreo de rendimiento para la aplicación Lovenda
  *
@@ -52,6 +53,8 @@ class PerformanceMonitor {
       counters: {},
     };
 
+    this.user = null; // user context { uid, email }
+
     this.enabled = this.config.enabled;
     this.pendingFlush = false;
     this.startTime = Date.now();
@@ -67,7 +70,15 @@ class PerformanceMonitor {
       log_level: this.config.logLevel,
     });
 
-    console.info('🔍 Monitor de rendimiento inicializado');
+    console.info("[perfmon] Monitor de rendimiento inicializado");
+    // Try to derive user context from localStorage (best-effort)
+    try {
+      const raw = localStorage.getItem('authUser');
+      if (raw) {
+        const u = JSON.parse(raw);
+        if (u && (u.uid || u.email)) this.user = { uid: u.uid || null, email: u.email || null };
+      }
+    } catch {}
   }
 
   /**
@@ -85,6 +96,18 @@ class PerformanceMonitor {
     }
 
     this.logEvent('monitor_state_change', { enabled: state });
+  }
+
+  setUserContext(user) {
+    try {
+      if (user && (user.uid || user.email)) {
+        this.user = { uid: user.uid || null, email: user.email || null };
+      } else {
+        this.user = null;
+      }
+    } catch {
+      this.user = null;
+    }
   }
 
   /**
@@ -140,12 +163,14 @@ class PerformanceMonitor {
   logError(errorType, error, context = {}) {
     if (!this.enabled || this.config.logLevel < 1) return;
 
+    const ctx = { ...(context || {}) };
+    if (this.user && !ctx.user) ctx.user = this.user;
     const errorData = {
       type: errorType,
       timestamp: Date.now(),
       message: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
-      context,
+      context: ctx,
     };
 
     this.metrics.errors.push(errorData);
@@ -336,7 +361,7 @@ class PerformanceMonitor {
       } else {
         // Si no hay URL, guardar localmente para desarrollo
         if (this.config.logLevel >= 2) {
-          console.info('📊 Métricas recopiladas:', metricsToSend);
+          console.info("[perfmon] Monitor de rendimiento inicializado");
         }
 
         // Almacenar últimas métricas en localStorage para debugging
@@ -595,3 +620,10 @@ export function useComponentLoadTime(componentName) {
     };
   }, [componentName]);
 }
+
+
+
+
+
+
+

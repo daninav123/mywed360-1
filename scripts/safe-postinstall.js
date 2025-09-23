@@ -24,12 +24,6 @@ try {
   console.warn('[postinstall] Backend install falló, continuando:', e?.message || e);
 }
 
-try {
-  console.log('[postinstall] Parchando gantt-task-react…');
-  run('node scripts/patch-gantt.js');
-} catch (e) {
-  console.warn('[postinstall] patch-gantt falló, continuando:', e?.message || e);
-}
+// Omitido: ya no usamos gantt-task-react
 
 console.log('[postinstall] Hecho.');
-

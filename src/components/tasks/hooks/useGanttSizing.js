@@ -1,4 +1,4 @@
-import { ViewMode } from 'gantt-task-react';
+// Internal view mode strings (no external dependency)
 import { useEffect } from 'react';
 
 // Calcula el ancho de columna y el modo de vista del Gantt para encajar el rango
@@ -35,28 +35,28 @@ export function useGanttSizing({
 
     const msSpan = Math.max(1, maxEnd.getTime() - minStart.getTime());
     const daysSpan = Math.max(1, Math.ceil(msSpan / (1000 * 60 * 60 * 24)));
-    let targetMode = ViewMode.Month;
-    if (daysSpan > 730) targetMode = ViewMode.Year;
-    else if (daysSpan > 120) targetMode = ViewMode.Month;
-    else if (daysSpan > 21) targetMode = ViewMode.Week;
-    else targetMode = ViewMode.Day;
+    let targetMode = 'month';
+    if (daysSpan > 730) targetMode = 'year';
+    else if (daysSpan > 120) targetMode = 'month';
+    else if (daysSpan > 21) targetMode = 'week';
+    else targetMode = 'day';
 
     let units = 1;
-    if (targetMode === ViewMode.Year) {
+    if (targetMode === 'year') {
       const startYear = minStart.getFullYear();
       const endYear = maxEnd.getFullYear();
       units = endYear - startYear + 1;
-    } else if (targetMode === ViewMode.Month) {
+    } else if (targetMode === 'month') {
       const startMonth = new Date(minStart.getFullYear(), minStart.getMonth(), 1);
       const endMonth = new Date(maxEnd.getFullYear(), maxEnd.getMonth(), 1);
       units =
         (endMonth.getFullYear() - startMonth.getFullYear()) * 12 +
         (endMonth.getMonth() - startMonth.getMonth()) +
         1;
-    } else if (targetMode === ViewMode.Week) {
+    } else if (targetMode === 'week') {
       const msPerWeek = 7 * 24 * 60 * 60 * 1000;
       units = Math.max(1, Math.ceil((maxEnd - minStart) / msPerWeek) + 1);
-    } else if (targetMode === ViewMode.Day) {
+    } else if (targetMode === 'day') {
       units = daysSpan;
     }
 
@@ -67,7 +67,7 @@ export function useGanttSizing({
       (endMonth.getFullYear() - startMonth.getFullYear()) * 12 +
       (endMonth.getMonth() - startMonth.getMonth()) +
       1;
-    targetMode = ViewMode.Month;
+    targetMode = 'month';
 
     const pre = 0;
     const totalUnits = units + pre;
@@ -132,7 +132,7 @@ export function useGanttSizing({
           startMonth.getTime()
       )
         setGanttViewDate(startMonth);
-      if (ganttViewMode !== ViewMode.Month) setGanttViewMode(ViewMode.Month);
+      if (ganttViewMode !== 'month') setGanttViewMode('month');
     };
 
     const el = containerRef.current;

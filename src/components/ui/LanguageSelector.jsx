@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { changeLanguage, getCurrentLanguage, getAvailableLanguages } from '../../i18n';
+import { useAuth } from '../../hooks/useAuth';
+import { auth, db } from '../../firebaseConfig';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 // Selector de idioma con dropdown
 const LanguageSelector = ({
@@ -10,8 +13,10 @@ const LanguageSelector = ({
   showFlag = true,
   showText = true,
   variant = 'button',
+  persist = true,
 }) => {
   const { t } = useTranslation();
+  const { currentUser, userProfile, updateUserProfile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
 
@@ -30,6 +35,34 @@ const LanguageSelector = ({
       await changeLanguage(languageCode);
       // Persistir preferencia para el detector de i18next
       localStorage.setItem('i18nextLng', languageCode);
+      // Update Firebase Auth language if available
+      try {
+        if (auth) auth.languageCode = languageCode;
+      } catch {}
+
+      if (persist) {
+        // Persist in local profile (useAuth)
+        try {
+          const prefs = (userProfile && userProfile.preferences) || {};
+          if (updateUserProfile) {
+            await updateUserProfile({ preferences: { ...prefs, language: languageCode } });
+          }
+        } catch (e) {
+          console.warn('Could not update local user profile language', e);
+        }
+
+        // Persist in Firestore (if user available)
+        try {
+          if (currentUser?.uid && db) {
+            await updateDoc(doc(db, 'users', currentUser.uid), {
+              'preferences.language': languageCode,
+              updatedAt: serverTimestamp(),
+            });
+          }
+        } catch (e) {
+          console.warn('Could not save language to Firestore; using localStorage only', e);
+        }
+      }
     } catch (err) {
       console.error('Error cambiando idioma:', err);
     } finally {

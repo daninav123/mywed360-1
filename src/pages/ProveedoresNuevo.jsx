@@ -66,6 +66,8 @@ const Proveedores = () => {
   const {
     results: aiResults,
     loading: aiLoading,
+    usedFallback: aiUsedFallback,
+    error: aiSearchError,
     lastQuery: aiLastQuery,
     searchProviders,
   } = useAISearch();
@@ -632,19 +634,12 @@ const Proveedores = () => {
         onSearch={searchProviders}
         onSelect={handleAISelect}
         isLoading={aiLoading}
+        results={aiResults}
+        usedFallback={aiUsedFallback}
+        error={aiSearchError}
         providers={providers}
         serviceFilter={serviceFilter}
         setServiceFilter={setServiceFilter}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        dateFrom={dateFrom}
-        setDateFrom={setDateFrom}
-        dateTo={dateTo}
-        setDateTo={setDateTo}
-        ratingMin={ratingMin}
-        setRatingMin={setRatingMin}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
       />
 
       {showAIEmailModal && aiSelectedResult && (

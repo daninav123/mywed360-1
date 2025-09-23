@@ -13,6 +13,7 @@ export default function Checklist() {
   const [dateFilter, setDateFilter] = useState({ from: '', to: '' });
   const [selected, setSelected] = useState([]);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [newTask, setNewTask] = useState({ title: '', type: '', responsible: '', due: '' });
   const [completed, setCompleted] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('checklistCompleted') || '{}');
@@ -21,10 +22,24 @@ export default function Checklist() {
     }
   });
 
+  const [customTasks, setCustomTasks] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('checklistCustomTasks') || '[]');
+    } catch {
+      return [];
+    }
+  });
+
   // Actualizar localStorage cuando cambie el estado de completadas
   useEffect(() => {
     localStorage.setItem('checklistCompleted', JSON.stringify(completed));
   }, [completed]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('checklistCustomTasks', JSON.stringify(customTasks || []));
+    } catch {}
+  }, [customTasks]);
 
   const blocks = [
     {
@@ -61,6 +76,25 @@ export default function Checklist() {
 
   const toggleCompleted = (id) => {
     setCompleted((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const resetNewTask = () => setNewTask({ title: '', type: '', responsible: '', due: '' });
+  const handleSaveNewTask = (e) => {
+    e?.preventDefault?.();
+    const title = String(newTask.title || '').trim();
+    if (!title) return;
+    const id = Date.now();
+    const task = {
+      id,
+      title,
+      type: String(newTask.type || '').trim() || 'general',
+      responsible: String(newTask.responsible || '').trim() || 'Equipo',
+      due: String(newTask.due || '').trim() || '',
+      status: 'Pendiente',
+    };
+    setCustomTasks((prev) => [...prev, task]);
+    setShowNewModal(false);
+    resetNewTask();
   };
 
   return (
@@ -141,9 +175,10 @@ export default function Checklist() {
               </tr>
             </thead>
             <tbody>
+              {/* Tareas predefinidas */}
               {blocks.flatMap((block) =>
                 block.tasks.map((t) => (
-                  <tr key={t.id} className={completed[t.id] ? 'opacity-60 line-through' : ''}>
+                  <tr key={`preset-${t.id}`} className={completed[t.id] ? 'opacity-60 line-through' : ''}>
                     <td>
                       <button
                         aria-label="Marcar completada"
@@ -165,6 +200,29 @@ export default function Checklist() {
                   </tr>
                 ))
               )}
+              {/* Tareas personalizadas */}
+              {customTasks.map((t) => (
+                <tr key={`custom-${t.id}`} className={completed[t.id] ? 'opacity-60 line-through' : ''}>
+                  <td>
+                    <button
+                      aria-label="Marcar completada"
+                      onClick={() => toggleCompleted(t.id)}
+                      className="focus:outline-none"
+                    >
+                      {completed[t.id] ? (
+                        <CheckCircle className="text-[color:var(--color-success)]" size={20} />
+                      ) : (
+                        <Circle className="text-[color:var(--color-text)]/40" size={20} />
+                      )}
+                    </button>
+                  </td>
+                  <td>{t.title}</td>
+                  <td>{t.type}</td>
+                  <td>{t.responsible}</td>
+                  <td>{t.due}</td>
+                  <td>{completed[t.id] ? 'Completada' : t.status}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
@@ -174,10 +232,62 @@ export default function Checklist() {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <Card className="p-4 shadow w-80">
               <h3 className="font-semibold mb-2">Nueva Tarea</h3>
-              {/* TODO: formulario */}
-              <Button variant="danger" onClick={() => setShowNewModal(false)} className="mt-2">
-                Cerrar
-              </Button>
+              <form onSubmit={handleSaveNewTask} className="space-y-3">
+                <div>
+                  <label className="block text-sm mb-1">Título</label>
+                  <input
+                    type="text"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask((p) => ({ ...p, title: e.target.value }))}
+                    placeholder="Descripción de la tarea"
+                    className="w-full border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm mb-1">Tipo</label>
+                    <select
+                      value={newTask.type}
+                      onChange={(e) => setNewTask((p) => ({ ...p, type: e.target.value }))}
+                      className="w-full border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+                    >
+                      <option value="">General</option>
+                      <option value="ensayo">Ensayo</option>
+                      <option value="montaje">Montaje</option>
+                      <option value="audio/vídeo">Audio/Vídeo</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm mb-1">Responsable</label>
+                    <select
+                      value={newTask.responsible}
+                      onChange={(e) => setNewTask((p) => ({ ...p, responsible: e.target.value }))}
+                      className="w-full border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+                    >
+                      <option value="">Equipo</option>
+                      <option value="Rollout">Rollout</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm mb-1">Fecha límite</label>
+                  <input
+                    type="date"
+                    value={newTask.due}
+                    onChange={(e) => setNewTask((p) => ({ ...p, due: e.target.value }))}
+                    className="w-full border rounded px-2 py-1 border-[color:var(--color-text)]/20 bg-[var(--color-surface)] text-[color:var(--color-text)]"
+                  />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button type="button" variant="secondary" onClick={() => { setShowNewModal(false); resetNewTask(); }}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" variant="primary">
+                    Guardar
+                  </Button>
+                </div>
+              </form>
             </Card>
           </div>
         )}

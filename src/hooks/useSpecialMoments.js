@@ -54,7 +54,6 @@ export default function useSpecialMoments() {
     // LocalStorage siempre
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(moments));
-      window.dispatchEvent(new Event('moments-updated'));
     } catch {}
 
     // Firestore: evitar loops comparando con último snapshot remoto
@@ -78,11 +77,18 @@ export default function useSpecialMoments() {
     })();
   }, [moments, activeWedding]);
 
-  // Escuchar cambios desde otras pestañas/componentes y Firestore
+  // Escuchar cambios de localStorage desde otras pestañas (evento 'storage' no se dispara en la pestaña emisora)
   useEffect(() => {
-    const handler = () => setMoments(load());
-    window.addEventListener('moments-updated', handler);
-    return () => window.removeEventListener('moments-updated', handler);
+    const onStorage = (e) => {
+      try {
+        if (e && e.key === STORAGE_KEY && typeof e.newValue === 'string') {
+          const parsed = JSON.parse(e.newValue);
+          setMoments(parsed);
+        }
+      } catch {}
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   // Suscribirse a Firestore para sincronización en vivo
@@ -104,13 +110,11 @@ export default function useSpecialMoments() {
       const data = snap.data() || {};
       // El documento guarda el objeto directamente con claves de bloques
       const { updatedAt: _updatedAt, ...payload } = data;
-      try {
-        const json = JSON.stringify(payload);
-        lastRemoteRef.current = json;
-      } catch {
-        lastRemoteRef.current = null;
-      }
-      setMoments((prev) => ({ ...prev, ...payload }));
+      setMoments((prev) => {
+        const next = { ...prev, ...payload };
+        try { lastRemoteRef.current = JSON.stringify(next); } catch { lastRemoteRef.current = null; }
+        return next;
+      });
     });
     unsubRef.current = unsub;
     return () => {

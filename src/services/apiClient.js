@@ -1,5 +1,6 @@
 // Lightweight API client with optional auth header
 import { auth } from '../firebaseConfig';
+import { performanceMonitor } from './PerformanceMonitor';
 
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || '';
 
@@ -49,6 +50,39 @@ export async function post(path, body, opts = {}) {
     headers: await buildHeaders(opts),
     body: body ? JSON.stringify(body) : undefined,
   });
+  try {
+    const isParseDialog = String(u2 || '').endsWith('/api/ai/parse-dialog') || String(path || '').includes('/api/ai/parse-dialog');
+    if (isParseDialog && res && res.ok) {
+      const seemsCommand = /\b(agrega|añade|anade|crea|programa|planifica|borra|elimina|actualiza|modifica|cambia|mueve|reprograma|marca|completa|asigna|busca|importa|env[ií]a|enviar)\b/i.test(
+        (body && body.text) || ''
+      );
+      res
+        .clone()
+        .json()
+        .then((data) => {
+          try {
+            const ex = data?.extracted || {};
+            const hasAny = Boolean(
+              (ex.commands && ex.commands.length) ||
+                (ex.guests && ex.guests.length) ||
+                (ex.tasks && ex.tasks.length) ||
+                (ex.meetings && ex.meetings.length) ||
+                (ex.movements && ex.movements.length) ||
+                (ex.budgetMovements && ex.budgetMovements.length)
+            );
+            if (seemsCommand && !hasAny) {
+              performanceMonitor.logError('chat_command_unhandled', 'No se encontró comando ejecutable', {
+                text: (body && body.text) || '',
+              });
+              performanceMonitor.incrementCounter('chat_unhandled');
+              performanceMonitor.logEvent('chat_alert', { reason: 'unhandled_command', text: (body && body.text) || '' });
+              performanceMonitor.flushMetrics?.();
+            }
+          } catch {}
+        })
+        .catch(() => {});
+    }
+  } catch {}
   return res;
 }
 

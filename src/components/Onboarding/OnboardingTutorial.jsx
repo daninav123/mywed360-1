@@ -1,4 +1,4 @@
-﻿import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import {
   ChevronRight,
   ChevronLeft,
@@ -12,6 +12,7 @@ import {
 import React, { useState, useEffect } from 'react';
 
 import { db } from '../../firebaseConfig';
+import { useWedding } from '../../context/WeddingContext';
 import { useAuth } from '../../hooks/useAuth';
 import { createWedding, getWeddingIdForOwner } from '../../services/WeddingService';
 
@@ -20,16 +21,16 @@ import { createWedding, getWeddingIdForOwner } from '../../services/WeddingServi
  */
 const OnboardingTutorial = ({ onComplete }) => {
   const { currentUser } = useAuth();
+  const { setActiveWedding } = useWedding();
   const [currentStep, setCurrentStep] = useState(0);
   const [profileData, setProfileData] = useState({
     nombres: '',
-    apellidos: '',
     fecha: '',
     lugar: '',
     presupuesto: '',
     imagen: '',
   });
-  // Paso de timing se implementará más adelante
+  // Paso de timing se implementar� Más adelante
   const [loading, setLoading] = useState(false);
 
   // Carga datos del perfil si existen
@@ -44,7 +45,6 @@ const OnboardingTutorial = ({ onComplete }) => {
           if (data.weddingInfo) {
             setProfileData({
               nombres: data.weddingInfo.brideAndGroom || '',
-              apellidos: data.weddingInfo.surnames || '',
               fecha: data.weddingInfo.weddingDate || '',
               lugar: data.weddingInfo.celebrationPlace || '',
               presupuesto: data.weddingInfo.budget || '',
@@ -62,16 +62,16 @@ const OnboardingTutorial = ({ onComplete }) => {
 
   const steps = [
     {
-      title: '¡Bienvenido a Lovenda!',
+      title: '�Bienvenido a Lovenda!',
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
             <img src="/icon-192.png" alt="Lovenda" className="w-20 h-20" />
           </div>
-          <h2 className="text-2xl font-bold mb-4">¡Comienza a planificar tu boda!</h2>
+          <h2 className="text-2xl font-bold mb-4">�Comienza a planificar tu boda!</h2>
           <p className="mb-6 text-gray-600">
-            Te guiaremos a través de los primeros pasos para configurar tu boda en Lovenda. Este
-            tutorial te ayudará a personalizar la app y conocer sus funcionalidades principales.
+            Te guiaremos a trav�s de los primeros pasos para configurar tu boda en Lovenda. Este
+            tutorial te ayudar� a personalizar la app y conocer sus funcionalidades principales.
           </p>
         </div>
       ),
@@ -95,16 +95,6 @@ const OnboardingTutorial = ({ onComplete }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Apellidos</label>
-              <input
-                type="text"
-                value={profileData.apellidos}
-                onChange={(e) => setProfileData({ ...profileData, apellidos: e.target.value })}
-                placeholder="Ej: García y Pérez"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-700">Fecha de la boda</label>
               <input
                 type="date"
@@ -115,7 +105,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Lugar de celebración
+                Lugar de celebraci�n
               </label>
               <input
                 type="text"
@@ -157,7 +147,7 @@ const OnboardingTutorial = ({ onComplete }) => {
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Añade invitados y sus acompañantes</span>
+              <span>Añade invitados y sus acompa�antes</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
@@ -169,7 +159,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Diseña el plano de mesas con arrastrar y soltar</span>
+              <span>Dise�a el plano de mesas con arrastrar y soltar</span>
             </li>
           </ul>
         </div>
@@ -204,7 +194,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Registra pagos y señales para control financiero</span>
+              <span>Registra pagos y Señales para control financiero</span>
             </li>
           </ul>
         </div>
@@ -219,7 +209,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Calendar className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Planificación</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">Planificaci�n</h2>
           <p className="mb-4 text-gray-600 text-center">
             Organiza todo tu calendario y listas de tareas para llevar un control perfecto.
           </p>
@@ -255,31 +245,31 @@ const OnboardingTutorial = ({ onComplete }) => {
           </div>
           <h2 className="text-xl font-semibold mb-2 text-center">Diseños con IA</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Crea invitaciones, menús y otros elementos visuales para tu boda con ayuda de IA.
+            Crea invitaciones, men�s y otros elementos visuales para tu boda con ayuda de IA.
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Genera diseños personalizados con IA</span>
+              <span>Genera Diseños personalizados con IA</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Crea invitaciones, menús y señalización</span>
+              <span>Crea invitaciones, men�s y Señalización</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Diseña tu logo de boda personalizado</span>
+              <span>Dise�a tu logo de boda personalizado</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Exporta en alta resolución para imprimir</span>
+              <span>Exporta en alta resoluci�n para imprimir</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
-      title: '¡Listo para empezar!',
+      title: '�Listo para empezar!',
       content: (
         <div className="text-center">
           <div className="mb-6 flex items-center justify-center">
@@ -287,14 +277,14 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Check className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-4">¡Todo listo!</h2>
+          <h2 className="text-2xl font-bold mb-4">�Todo listo!</h2>
           <p className="mb-6 text-gray-600">
             Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de
-            Lovenda para planificar la boda de tus sueños.
+            Lovenda para planificar la boda de tus sue�os.
           </p>
           <p className="text-sm text-gray-500">
-            Recuerda que puedes acceder a la configuración en cualquier momento para modificar tus
-            datos o consultar esta guía nuevamente.
+            Recuerda que puedes acceder a la Configuración en cualquier momento para modificar tus
+            datos o consultar esta Guía nuevamente.
           </p>
         </div>
       ),
@@ -332,16 +322,39 @@ const OnboardingTutorial = ({ onComplete }) => {
 
       const weddingInfoPayload = {
         brideAndGroom: profileData.nombres,
-        surnames: profileData.apellidos,
         weddingDate: profileData.fecha,
         celebrationPlace: profileData.lugar,
         budget: profileData.presupuesto,
         profileImage: profileData.imagen,
       };
 
-      await setDoc(doc(db, 'weddings', wid, 'weddingInfo'), weddingInfoPayload, { merge: true });
+      // Guardar weddingInfo como un campo del documento principal de la boda
+      await setDoc(doc(db, 'weddings', wid), { weddingInfo: weddingInfoPayload }, { merge: true });
+      // Y tambi�n en la ruta de Configuración legacy: weddings/{id}/info/weddingInfo
+      try {
+        await setDoc(doc(db, 'weddings', wid, 'info', 'weddingInfo'), weddingInfoPayload, {
+          merge: true,
+        });
+      } catch (_) {}
 
-      // Timing automático se implementará más adelante
+      // Asegurar que la boda aparece en users/{uid}/weddings (para carga en WeddingContext)
+      try {
+        await setDoc(
+          doc(db, 'users', currentUser.uid, 'weddings', wid),
+          {
+            id: wid,
+            name: profileData.nombres || 'Mi Boda',
+            weddingDate: profileData.fecha || '',
+            location: profileData.lugar || '',
+            progress: 0,
+            active: true,
+            lastUpdated: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      } catch (_) {}
+
+      // Timing autom�tico se implementar� Más adelante
 
       // Marcar onboarding completado en users/{uid}
       const profileRef = doc(db, 'users', currentUser.uid);
@@ -354,7 +367,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       /* Crear evento en calendario si hay fecha de boda
       if (profileData.fecha) {
         try {
-          // Asegurar autenticación con Google; si el usuario no concede, se ignora
+          // Asegurar autenticaci�n con Google; si el usuario no concede, se ignora
           await googleCalendarService.loadClient().catch(() => {});
           if (!googleCalendarService.isAuthenticated()) {
             await googleCalendarService.signIn().catch(() => {});
@@ -376,6 +389,11 @@ const OnboardingTutorial = ({ onComplete }) => {
         }
       }
       */
+
+      // Establecer la boda activa en el contexto/localStorage
+      try {
+        setActiveWedding?.(wid);
+      } catch {}
 
       // Llamar al callback cuando se completa
       onComplete && onComplete();
@@ -404,7 +422,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               ))}
             </div>
           </div>
-          {/* Botón saltar */}
+          {/* Bot�n saltar */}
           <button onClick={handleComplete} className="text-xs underline hover:text-gray-200">
             Saltar
           </button>

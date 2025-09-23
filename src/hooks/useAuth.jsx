@@ -17,6 +17,7 @@ import { setAuthContext as registerNotificationAuthContext } from '../services/n
 import { initReminderService, stopReminderService } from '../services/reminderService';
 import { setAuthContext as registerWhatsappAuthContext } from '../services/whatsappService';
 import errorLogger from '../utils/errorLogger';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);
@@ -98,7 +99,7 @@ export const AuthProvider = ({ children }) => {
         profile: userProfile,
       });
     } else {
-      errorLogger.setAuthInfo(null);
+      errorLogger.setAuthInfo(null); try { performanceMonitor.setUserContext(null); } catch {}
     }
   }, [loading, currentUser, userProfile]);
 
@@ -351,3 +352,4 @@ export const useAuth = () => {
   return context;
 };
 export default useAuth;
+

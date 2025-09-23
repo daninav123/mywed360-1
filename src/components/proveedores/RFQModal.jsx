@@ -50,9 +50,10 @@ export default function RFQModal({
     const dateStr = (() => {
       try {
         const d = typeof dateVal?.toDate === 'function' ? dateVal.toDate() : new Date(dateVal);
-        return d.toLocaleDateString('es-ES');
+        if (Number.isNaN(d.getTime())) return 'fecha por determinar';
+        return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
       } catch {
-        return String(dateVal || '');
+        return 'fecha por determinar';
       }
     })();
     return {

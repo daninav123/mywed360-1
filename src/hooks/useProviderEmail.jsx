@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
 import { useAuth } from './useAuth';
+import useActiveWeddingInfo from './useActiveWeddingInfo';
 import EmailService from '../services/emailService';
 import { createTrackingRecord } from '../services/EmailTrackingService';
 import { addTagToEmail } from '../services/tagService';
@@ -13,6 +14,7 @@ import { addTagToEmail } from '../services/tagService';
  */
 export const useProviderEmail = () => {
   const { user, profile } = useAuth();
+  const { info: weddingDoc } = useActiveWeddingInfo();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState('');
@@ -137,13 +139,18 @@ export const useProviderEmail = () => {
         ? `${profile.brideFirstName}${profile.brideLastName ? ' ' + profile.brideLastName : ''}`
         : 'Futuros novios';
 
-      const fechaBoda = profile.weddingDate
-        ? new Date(profile.weddingDate).toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })
-        : 'fecha por determinar';
+      const wi = (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
+      const rawDate = wi.weddingDate || wi.date || wi.eventDate || profile.weddingDate;
+      const fechaBoda = (() => {
+        try {
+          if (!rawDate) return 'fecha por determinar';
+          const d = typeof rawDate?.toDate === 'function' ? rawDate.toDate() : new Date(rawDate);
+          if (Number.isNaN(d.getTime())) return 'fecha por determinar';
+          return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch {
+          return 'fecha por determinar';
+        }
+      })();
 
       return `
       <p>Estimado/a ${provider?.name || 'Proveedor'}:</p>
@@ -169,7 +176,7 @@ export const useProviderEmail = () => {
       <p style="color:#888; font-size:12px;">Email enviado desde Lovenda - Tu plataforma para organización de bodas</p>
     `;
     },
-    [profile]
+    [profile, weddingDoc]
   );
 
   return {

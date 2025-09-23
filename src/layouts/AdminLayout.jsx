@@ -38,7 +38,12 @@ const AdminLayout = ({ children }) => {
     {
       title: 'Sistema de emails',
       icon: <Mail className="w-5 h-5" />,
-      path: '/admin/emails',
+      path: '/admin/metrics',
+    },
+    {
+      title: 'Salud',
+      icon: <Zap className="w-5 h-5" />,
+      path: '/admin/health',
     },
     {
       title: 'Rendimiento de caché',

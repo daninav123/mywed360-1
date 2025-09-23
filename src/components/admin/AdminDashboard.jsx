@@ -9,9 +9,10 @@ import {
   Activity,
   ShoppingBag,
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
+import { get as apiGet } from '../../services/apiClient';
 
 /**
  * Panel de administración principal
@@ -28,6 +29,13 @@ const AdminDashboard = () => {
     alerts: 0,
   });
 
+  const [metricsSummary, setMetricsSummary] = useState({
+    timeSeriesData: [],
+    performanceData: {},
+    timestamp: 0,
+    error: null,
+  });
+
   // Simular carga de datos
   useEffect(() => {
     // En una implementación real, estos datos vendrían de una API
@@ -42,6 +50,57 @@ const AdminDashboard = () => {
       });
     }, 800);
   }, []);
+
+  // Cargar resumen de métricas del backend admin
+  useEffect(() => {
+    let cancelled = false;
+    const loadSummary = async () => {
+      try {
+        const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
+        const res = await apiGet(`${metricsEndpoint}/dashboard`, { auth: true, silent: true });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!cancelled) setMetricsSummary({ ...data, error: null });
+      } catch (e) {
+        // Fallback a métricas locales del PerformanceMonitor
+        try {
+          const raw = localStorage.getItem('lovenda_last_metrics');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const t = parsed?.timings || {};
+            const counters = parsed?.counters || {};
+            const now = Date.now();
+            const timeSeriesData = [{
+              date: new Date(now).toLocaleTimeString(),
+              emailSent: Number(counters['email_operation_send'] || 0),
+              emailReceived: 0,
+              searchCount: Number(t['search']?.count || 0),
+              eventsDetected: 0,
+            }];
+            const performanceData = {
+              emailSendAvgMs: t['email_delivery']?.count ? (t['email_delivery'].total / t['email_delivery'].count) : 0,
+              emailSearchAvgMs: t['search']?.count ? (t['search'].total / t['search'].count) : 0,
+              notificationDispatchMs: t['notification_rendering']?.count ? (t['notification_rendering'].total / t['notification_rendering'].count) : 0,
+              eventDetectionMs: t['event_detection']?.count ? (t['event_detection'].total / t['event_detection'].count) : 0,
+            };
+            if (!cancelled) setMetricsSummary({ timeSeriesData, performanceData, timestamp: now, error: 'local' });
+            return;
+          }
+        } catch {}
+        if (!cancelled) setMetricsSummary((prev) => ({ ...prev, error: 'No disponible' }));
+      }
+    };
+    loadSummary();
+    return () => { cancelled = true; };
+  }, []);
+
+  const lastPoint = useMemo(() => {
+    try {
+      const ts = metricsSummary?.timeSeriesData;
+      if (Array.isArray(ts) && ts.length > 0) return ts[ts.length - 1];
+    } catch {}
+    return null;
+  }, [metricsSummary]);
 
   // Tarjetas de métricas para el dashboard
   const metricsCards = [
@@ -164,6 +223,55 @@ const AdminDashboard = () => {
                 Visualiza la actividad del sistema en tiempo real, incluyendo sesiones de usuarios,
                 transacciones y eventos del sistema.
               </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Salud del sistema (resumen métricas) */}
+      <Typography variant="h5" className="mt-8 mb-4">
+        Salud del sistema
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Box className="bg-gray-50 rounded p-4">
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Emails enviados (último tramo)
+                  </Typography>
+                  <Typography variant="h5">{lastPoint?.emailSent ?? 0}</Typography>
+                </Box>
+                <Box className="bg-gray-50 rounded p-4">
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Búsquedas (último tramo)
+                  </Typography>
+                  <Typography variant="h5">{lastPoint?.searchCount ?? 0}</Typography>
+                </Box>
+                <Box className="bg-gray-50 rounded p-4">
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Avg entrega email (ms)
+                  </Typography>
+                  <Typography variant="h5">{Math.round(metricsSummary?.performanceData?.emailSendAvgMs || 0)}</Typography>
+                </Box>
+                <Box className="bg-gray-50 rounded p-4">
+                  <Typography variant="overline" display="block" color="textSecondary">
+                    Avg detección eventos (ms)
+                  </Typography>
+                  <Typography variant="h5">{Math.round(metricsSummary?.performanceData?.eventDetectionMs || 0)}</Typography>
+                </Box>
+              </Box>
+              <Box className="mt-3 text-right text-sm text-gray-500">
+                {metricsSummary.error ? (
+                  <span>Error de métricas: {metricsSummary.error}</span>
+                ) : (
+                  <span>
+                    Última actualización:{' '}
+                    {metricsSummary?.timestamp ? new Date(metricsSummary.timestamp).toLocaleString() : 'N/A'}
+                  </span>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>

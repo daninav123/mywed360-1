@@ -1,4 +1,4 @@
-import { Check, Plus, ArrowRight, Loader2, Mail, Search, X } from 'lucide-react';
+import { Check, Plus, ArrowRight, Loader2, Mail, Search, X, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 
 import Button from '../../../components/ui/Button';
@@ -21,7 +21,7 @@ import Card from '../../../components/ui/Card';
  * @param {string} [props.error] - Mensaje de error, si existe
  * @returns {React.ReactElement} Componente de lista de resultados de búsqueda con IA
  */
-const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
+const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFallback }) => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -52,6 +52,14 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
   if (!results.length && query) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
+        {usedFallback && (
+          <div className="mb-4 w-full max-w-lg flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
+            <AlertTriangle size={18} className="mt-0.5" />
+            <div className="text-sm">
+              Mostrando resultados locales mientras el servicio de búsqueda no está disponible.
+            </div>
+          </div>
+        )}
         <p className="text-lg font-medium text-gray-700">No se encontraron resultados</p>
         <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
           Intenta reformular tu búsqueda o utilizar términos más generales
@@ -126,6 +134,14 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error }) => {
 
   return (
     <div className="space-y-6">
+      {usedFallback && query && (
+        <div className="w-full flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
+          <AlertTriangle size={18} className="mt-0.5" />
+          <div className="text-sm">
+            Mostrando resultados locales (demo) por indisponibilidad del servidor.
+          </div>
+        </div>
+      )}
       {/* Resumen de la búsqueda */}
       <div className="mb-4">
         <p className="text-sm text-gray-500">

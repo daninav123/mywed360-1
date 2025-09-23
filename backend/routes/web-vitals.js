@@ -4,6 +4,15 @@ import { getOrCreateCounter, getOrCreateHistogram } from '../services/metrics.js
 
 const router = express.Router();
 
+// In-memory buffer for recent web-vitals (for admin dashboard)
+const recentWebVitals = [];
+const MAX_WEB_VITALS = 2000;
+
+export function getRecentWebVitals(limit = 200) {
+  const n = Math.max(1, Math.min(Number(limit) || 200, MAX_WEB_VITALS));
+  return recentWebVitals.slice(-n);
+}
+
 // Accepts single metric or an array of metrics from web-vitals
 // Body shape: { metrics: [{name, value, id, label, delta, navigationType}], context?: {...} }
 router.post('/', express.json({ limit: '50kb' }), async (req, res) => {
@@ -15,6 +24,13 @@ router.post('/', express.json({ limit: '50kb' }), async (req, res) => {
     for (const m of list) {
       const { name, value, id, label, delta, navigationType } = m || {};
       logger.info(`[web-vitals] ${name}=${value} delta=${delta} id=${id} label=${label} nav=${navigationType || ''}`);
+      // Buffer for admin queries (best-effort)
+      try {
+        recentWebVitals.push({ ts: Date.now(), name, value, id, label, delta, navigationType, context: context || null });
+        if (recentWebVitals.length > MAX_WEB_VITALS) {
+          recentWebVitals.splice(0, recentWebVitals.length - MAX_WEB_VITALS);
+        }
+      } catch {}
       // Best-effort Prometheus metrics
       try {
         const c = await getOrCreateCounter(

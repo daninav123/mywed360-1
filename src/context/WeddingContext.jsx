@@ -42,10 +42,55 @@ export default function WeddingProvider({ children }) {
     isCypress && Array.isArray(mock?.weddings) ? mock.weddings : []
   );
   const { currentUser } = useAuth();
+  // Helper: compute storage key for active wedding per user
+  const storageKeyForUser = useCallback(
+    (uid) => (uid ? `lovenda_active_wedding_user_${uid}` : 'lovenda_active_wedding'),
+    []
+  );
+
+  // Helper: read active wedding from storage for a user (with legacy fallback)
+  const readActiveWeddingFromStorage = useCallback(
+    (uid) => {
+      try {
+        const userKey = storageKeyForUser(uid);
+        const byUser = localStorage.getItem(userKey);
+        if (byUser) return byUser;
+        // If we know the user, do not inherit legacy global key from a previous session
+        if (uid) return '';
+        const legacy = localStorage.getItem('lovenda_active_wedding');
+        return legacy || '';
+      } catch {
+        return '';
+      }
+    },
+    [storageKeyForUser]
+  );
+
+  // Helper: clear active wedding keys for a given user and legacy
+  const clearActiveWeddingStorage = useCallback(
+    (uid) => {
+      try {
+        const userKey = storageKeyForUser(uid);
+        localStorage.removeItem(userKey);
+        localStorage.removeItem('lovenda_active_wedding');
+        localStorage.removeItem('lovenda_active_wedding_name');
+      } catch {}
+    },
+    [storageKeyForUser]
+  );
+
   const [activeWedding, setActiveWeddingState] = useState(() => {
     if (isCypress && mock?.activeWedding?.id) return mock.activeWedding.id;
-    return localStorage.getItem('lovenda_active_wedding') || '';
+    return '';
   });
+
+  // When auth user changes, load active wedding from user-scoped storage (with fallback)
+  useEffect(() => {
+    if (isCypress && mock?.activeWedding?.id) return; // already set from mock
+    const uid = currentUser?.uid;
+    const stored = readActiveWeddingFromStorage(uid);
+    setActiveWeddingState(stored || '');
+  }, [currentUser, isCypress, mock, readActiveWeddingFromStorage]);
 
   // Actualizar diagnóstico cuando cambian bodas o la boda activa
   useEffect(() => {
@@ -63,15 +108,20 @@ export default function WeddingProvider({ children }) {
   // Sincronizar activeWedding entre pestañas (localStorage)
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key !== 'lovenda_active_wedding') return;
       try {
-        const id = localStorage.getItem('lovenda_active_wedding') || '';
-        setActiveWeddingState(id);
+        const uid = currentUser?.uid;
+        const keysToWatch = [
+          'lovenda_active_wedding',
+          storageKeyForUser(uid),
+        ];
+        if (!keysToWatch.includes(e.key)) return;
+        const id = readActiveWeddingFromStorage(uid);
+        setActiveWeddingState(id || '');
       } catch {}
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, []);
+  }, [currentUser, readActiveWeddingFromStorage, storageKeyForUser]);
 
   // Cargar lista de bodas del planner desde Firestore (omitido en Cypress con mock)
   useEffect(() => {
@@ -88,8 +138,10 @@ export default function WeddingProvider({ children }) {
         return;
       }
       if (!currentUser) {
-        console.log('[WeddingContext] Sin usuario autenticado, limpiando bodas');
+        console.log('[WeddingContext] Sin usuario autenticado, limpiando bodas y activeWedding');
         setWeddings([]);
+        setActiveWeddingState('');
+        clearActiveWeddingStorage(undefined);
         return;
       }
 
@@ -191,12 +243,17 @@ export default function WeddingProvider({ children }) {
             console.log('[WeddingContext] Estableciendo nueva activeWedding:', list[0].id);
             // Persistimos también en localStorage para que quede sincronizado
             setActiveWeddingState(list[0].id);
-            localStorage.setItem('lovenda_active_wedding', list[0].id);
+            try {
+              localStorage.setItem('lovenda_active_wedding', list[0].id);
+              localStorage.setItem(storageKeyForUser(currentUser.uid), list[0].id);
+            } catch {}
           } else {
             console.log('[WeddingContext] activeWedding ya existe y es válida:', activeWedding);
           }
         } else {
-          console.log('[WeddingContext] No hay bodas disponibles');
+          console.log('[WeddingContext] No hay bodas disponibles; limpiando activeWedding');
+          setActiveWeddingState('');
+          clearActiveWeddingStorage(currentUser.uid);
         }
       } catch (error) {
         console.error('[WeddingContext] Error cargando bodas:', error);
@@ -205,14 +262,17 @@ export default function WeddingProvider({ children }) {
     }
 
     listenWeddings();
-  }, [currentUser]);
+  }, [currentUser, activeWedding, clearActiveWeddingStorage, storageKeyForUser]);
 
   const setActiveWedding = useCallback((id) => {
     setActiveWeddingState(id);
     try {
       localStorage.setItem('lovenda_active_wedding', id);
+      if (currentUser?.uid) {
+        localStorage.setItem(storageKeyForUser(currentUser.uid), id);
+      }
     } catch {}
-  }, []);
+  }, [currentUser, storageKeyForUser]);
 
   const value = useMemo(
     () => ({ weddings, activeWedding, setActiveWedding }),

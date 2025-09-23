@@ -315,6 +315,114 @@ app.get('/metrics', requireAdmin, async (req, res) => {
   }
 });
 
+// HTTP metrics summary for admin (JSON)
+app.get('/api/admin/metrics/http', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, async (req, res) => {
+  try {
+    await ensureMetrics();
+    if (!metrics.loaded) return res.status(503).json({ error: 'metrics-unavailable' });
+
+    // Extract counters by method/route/status
+    const totalMetric = metrics.httpRequestsTotal;
+    const histMetric = metrics.httpRequestDuration;
+    const totals = {};
+    const byRoute = new Map(); // key: method|route
+
+    try {
+      const data = totalMetric?.get()?.values || [];
+      for (const v of data) {
+        if (!v || !v.labels) continue;
+        const method = String(v.labels.method || 'GET');
+        const route = String(v.labels.route || 'unknown');
+        const status = String(v.labels.status || '0');
+        const key = `${method} ${route}`;
+        const entry = byRoute.get(key) || { method, route, total: 0, byStatus: {} };
+        entry.total += Number(v.value || 0);
+        entry.byStatus[status] = (entry.byStatus[status] || 0) + Number(v.value || 0);
+        byRoute.set(key, entry);
+      }
+    } catch {}
+
+    // Derive errors and averages from histogram buckets
+    const hist = {};
+    try {
+      const values = histMetric?.get()?.values || [];
+      for (const v of values) {
+        const l = v.labels || {};
+        const method = String(l.method || 'GET');
+        const route = String(l.route || 'unknown');
+        const status = String(l.status || '0');
+        const key = `${method} ${route} ${status}`;
+        const typ = (typeof l.le !== 'undefined') ? 'bucket' : (l.quantile ? 'quantile' : (l.stat || 'value'));
+        const rec = hist[key] || { buckets: [], sum: 0, count: 0 };
+        if (Object.prototype.hasOwnProperty.call(l, 'le')) {
+          const le = Number(l.le);
+          rec.buckets.push({ le, value: Number(v.value || 0) });
+        } else if (l && l.hasOwnProperty('sum')) {
+          rec.sum = Number(v.value || 0);
+        } else if (l && l.hasOwnProperty('count')) {
+          rec.count = Number(v.value || 0);
+        }
+        hist[key] = rec;
+      }
+    } catch {}
+
+    // Compute per route stats aggregating by status
+    const results = [];
+    for (const [key, entry] of byRoute.entries()) {
+      const [method, route] = key.split(' ', 2);
+      let errors = 0;
+      for (const [st, n] of Object.entries(entry.byStatus)) {
+        const sc = Number(st);
+        if (sc >= 400) errors += Number(n);
+      }
+      // Aggregate histogram across statuses for approximate avg/p95/p99
+      let sum = 0, count = 0; const buckets = [];
+      for (const st of Object.keys(entry.byStatus)) {
+        const hkey = `${method} ${route} ${st}`;
+        const rec = hist[hkey];
+        if (!rec) continue;
+        sum += rec.sum || 0;
+        count += rec.count || 0;
+        for (const b of (rec.buckets || [])) buckets.push(b);
+      }
+      // Merge buckets by le
+      const bucketMap = new Map();
+      for (const b of buckets) {
+        const prev = bucketMap.get(b.le) || 0;
+        bucketMap.set(b.le, prev + Number(b.value || 0));
+      }
+      const merged = Array.from(bucketMap.entries()).map(([le, value]) => ({ le: Number(le), value: Number(value) }))
+        .sort((a, b) => a.le - b.le);
+      const getPct = (p) => {
+        if (!merged.length || count === 0) return 0;
+        const target = p * count;
+        let acc = 0;
+        for (const b of merged) {
+          acc += b.value;
+          if (acc >= target) return b.le;
+        }
+        return merged[merged.length - 1].le;
+      };
+      const avg = count ? (sum / count) : 0;
+      const p95 = getPct(0.95);
+      const p99 = getPct(0.99);
+      results.push({ method, route, total: entry.total, errors, errorRate: entry.total ? (errors / entry.total) : 0, avg, p95, p99, byStatus: entry.byStatus });
+    }
+
+    // Sort by total desc and limit
+    const limit = Math.max(1, Math.min(200, Number(req.query.limit || 50)));
+    results.sort((a, b) => b.total - a.total);
+    const routes = results.slice(0, limit);
+
+    const totalRequests = routes.reduce((s, r) => s + r.total, 0);
+    const totalErrors = routes.reduce((s, r) => s + r.errors, 0);
+    const errorRate = totalRequests ? (totalErrors / totalRequests) : 0;
+    return res.json({ routes, totals: { totalRequests, totalErrors, errorRate }, timestamp: Date.now() });
+  } catch (e) {
+    res.status(500).json({ error: 'http-metrics-failed' });
+  }
+});
+
 // Rutas públicas (sin autenticación)
 // Allowlist y rate limit específico para webhooks
 if (MAILGUN_WEBHOOK_IP_ALLOWLIST.length) {
@@ -547,7 +655,8 @@ app.use((err, req, res, _next) => {
     const status = Number(err?.status || err?.statusCode || 500);
     const code = String(err?.code || 'internal_error');
     const message = String(err?.message || 'Internal server error');
-    logger.error(`[${requestId || 'n/a'}] ${req?.method || ''} ${req?.originalUrl || ''} -> ${status} ${code}`, err);
+    const uid = (req?.user && req.user.uid) ? req.user.uid : 'anon';
+    logger.error(`[${requestId || 'n/a'}] uid:${uid} ${req?.method || ''} ${req?.originalUrl || ''} -> ${status} ${code}`, err);
     res.status(status).json({ success: false, error: { code, message }, requestId });
   } catch (e) {
     res.status(500).json({ success: false, error: { code: 'internal_error', message: 'Internal server error' } });

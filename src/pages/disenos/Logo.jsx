@@ -102,13 +102,8 @@ export default function Logo() {
           // Actualizamos el logo en el contexto de usuario si se desea
           try {
             if (!activeWedding) return;
-            const infoRef = doc(db, 'weddings', activeWedding, 'weddingInfo');
-            const infoSnap = await getDoc(infoRef);
-            if (infoSnap.exists()) {
-              await updateDoc(infoRef, { logoUrl: image.url });
-            } else {
-              await setDoc(infoRef, { logoUrl: image.url });
-            }
+            // Guardar logo en el campo anidado weddingInfo.logoUrl del doc principal
+            await updateDoc(doc(db, 'weddings', activeWedding), { 'weddingInfo.logoUrl': image.url });
             // Notificar a la aplicación que el logo ha cambiado
             window.dispatchEvent(new Event('lovenda-profile-updated'));
           } catch (err) {

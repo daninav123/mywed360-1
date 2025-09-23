@@ -39,11 +39,11 @@ export default function BudgetManager({
   const handleSaveCategory = () => {
     const amount = Number(newCategory.amount);
     if (!newCategory.name.trim()) {
-      alert('El nombre de la categoría es obligatorio');
+      alert('El nombre de la categorï¿½a es obligatorio');
       return;
     }
     if (isNaN(amount) || amount < 0) {
-      alert('El monto debe ser un número valido');
+      alert('El monto debe ser un NÃºmero valido');
       return;
     }
     if (editingCategory) {
@@ -62,7 +62,7 @@ export default function BudgetManager({
   };
 
   const handleDeleteCategory = (index, categoryName) => {
-    if (window.confirm(`Estas seguro de eliminar la categoría "${categoryName}"?`)) {
+    if (window.confirm(`Estas seguro de eliminar la categorï¿½a "${categoryName}"?`)) {
       onRemoveCategory(index);
     }
   };
@@ -75,16 +75,16 @@ export default function BudgetManager({
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
-            {t('finance.budget.title', { defaultValue: 'Gestión de presupuesto' })}
+            {t('finance.budget.title', { defaultValue: 'GestiÃ³n de presupuesto' })}
           </h2>
           <p className="text-sm text-[color:var(--color-text)]/70">
             {t('finance.budget.subtitle', {
-              defaultValue: 'Organiza y controla el presupuesto por categorías',
+              defaultValue: 'Organiza y controla el presupuesto por categorï¿½as',
             })}
           </p>
         </div>
         <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-          {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+          {t('finance.budget.newCategory', { defaultValue: 'Nueva categorï¿½a' })}
         </Button>
       </div>
 
@@ -180,13 +180,13 @@ export default function BudgetManager({
       <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10">
           <h3 className="text-lg font-medium text-[color:var(--color-text)]">
-            {t('finance.budget.categoriesTitle', { defaultValue: 'categorías de presupuesto' })}
+            {t('finance.budget.categoriesTitle', { defaultValue: 'categorï¿½as de presupuesto' })}
           </h3>
         </div>
         {budgetUsage.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-[color:var(--color-text)]/70 mb-4">
-              {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
+              {t('finance.budget.empty', { defaultValue: 'No hay categorï¿½as de presupuesto' })}
             </p>
             <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
               {t('finance.budget.createFirst', { defaultValue: 'Crear primera categorï¿½a' })}
@@ -225,7 +225,7 @@ export default function BudgetManager({
                       <Edit3 size={16} />
                     </button>
                     <button
-                      aria-label="Eliminar categoría"
+                      aria-label="Eliminar categorï¿½a"
                       onClick={() => handleDeleteCategory(index, category.name)}
                       className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
                     >
@@ -290,7 +290,7 @@ export default function BudgetManager({
         title={
           editingCategory
             ? t('finance.budget.modal.editTitle', { defaultValue: 'Editar categorï¿½a' })
-            : t('finance.budget.modal.newTitle', { defaultValue: 'Nueva categoría' })
+            : t('finance.budget.modal.newTitle', { defaultValue: 'Nueva categorï¿½a' })
         }
       >
         <div className="space-y-4">

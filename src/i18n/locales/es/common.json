@@ -345,6 +345,14 @@
     "completedTasks": "Completed Tasks",
     "upcomingTasks": "Upcoming Tasks"
   },
+  "profile": {
+    "synced": "Sincronizado",
+    "subscription": {
+      "type": "Tipo de suscripción",
+      "free": "Gratis",
+      "premium": "Premium"
+    }
+  },
   "forms": {
     "required": "Obligatorio",
     "optional": "Opcional",

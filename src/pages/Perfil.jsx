@@ -1,10 +1,12 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Card, Button, Input } from '../components/ui';
 import LanguageSelector from '../components/ui/LanguageSelector';
+import { useTranslation } from 'react-i18next';
+import { changeLanguage, getCurrentLanguage } from '../i18n';
 import { useWedding } from '../context/WeddingContext';
 import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
@@ -13,6 +15,7 @@ import { loadData, subscribeSyncState, getSyncState } from '../services/SyncServ
 import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService';
 
 function Perfil() {
+  const { t } = useTranslation();
   const [subscription, setSubscription] = useState('free');
   const [account, setAccount] = useState({
     name: '',
@@ -66,7 +69,7 @@ function Perfil() {
     removeRole,
   } = useRoles(weddingId);
 
-  // Actualiza nÃºmero de invitados (con muestra local si no hay datos)
+  // Actualiza nÃƒÂºmero de invitados (con muestra local si no hay datos)
   useEffect(() => {
     function updateGuestCount() {
       let guests = [];
@@ -165,10 +168,10 @@ function Perfil() {
       toast.error('No se pudo determinar tu usuario');
       return;
     }
-    // Validaciones rÃ¡pidas
+    // Validaciones rÃƒÂ¡pidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrÃ³nico invÃ¡lido');
+        toast.error('Correo electrÃƒÂ³nico invÃƒÂ¡lido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -178,7 +181,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÃ¡lida');
+          toast.error('Fecha de boda invÃƒÂ¡lida');
           return;
         }
       }
@@ -215,6 +218,19 @@ function Perfil() {
           if (d.account) setAccount((prev) => ({ ...prev, ...d.account }));
           if (d.subscription) setSubscription(d.subscription);
           if (d.billing) setBilling(d.billing);
+          // Apply saved language preference if any
+          try {
+            const savedLang = d?.preferences?.language;
+            if (savedLang && savedLang !== getCurrentLanguage()) {
+              await changeLanguage(savedLang);
+              try {
+                localStorage.setItem('i18nextLng', savedLang);
+              } catch {}
+              try {
+                if (auth) auth.languageCode = savedLang;
+              } catch {}
+            }
+          } catch {}
           // Preferencias musicales ahora se gestionan desde Momentos Especiales
           try {
             if (d.updatedAt && typeof d.updatedAt.toDate === 'function') {
@@ -257,7 +273,7 @@ function Perfil() {
   return (
     <div className="p-4 max-w-3xl mx-auto space-y-6">
       <div className="page-header">
-        <h1 className="page-title">Perfil</h1>
+        <h1 className="page-title">{t('navigation.profile', { defaultValue: 'Perfil' })}</h1>
         <div className="mt-2">
           <LanguageSelector />
         </div>
@@ -267,55 +283,42 @@ function Perfil() {
           ></div>
           <span>
             {!syncStatus.isOnline
-              ? 'Sin conexi\u00F3n (modo offline)'
+              ? t('profile.offline', { defaultValue: 'Sin conexiÃ³n (modo offline)' })
               : syncStatus.isSyncing
-                ? 'Sincronizando...'
+                ? t('profile.syncing', { defaultValue: 'Sincronizando...' })
                 : syncStatus.pendingChanges
-                  ? 'Cambios pendientes'
-                  : 'Sincronizado'}
+                  ? t('profile.pending', { defaultValue: 'Cambios pendientes' })
+                  : t('profile.synced', { defaultValue: 'Sincronizado' })}
           </span>
           {lastSavedAt && (
             <span className="text-muted">
-              {'ï¿½altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}
+              {'Ã¯Â¿Â½altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}
             </span>
           )}
         </div>
       </div>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{'Tipo de suscripci\u00F3n'}</h2>
+        <h2 className="text-lg font-medium">{t('profile.subscription.type', { defaultValue: 'Tipo de suscripciÃ³n' })}</h2>
         <div className="flex gap-4">
           <Button
             variant={subscription === 'free' ? 'primary' : 'outline'}
             onClick={() => setSubscription('free')}
           >
-            Gratis
+            {t('profile.subscription.free', { defaultValue: 'Gratis' })}
           </Button>
           <Button
             variant={subscription === 'premium' ? 'primary' : 'outline'}
             onClick={() => setSubscription('premium')}
           >
-            Premium
+            {t('profile.subscription.premium', { defaultValue: 'Premium' })}
           </Button>
         </div>
       </Card>
 
-      <Card className="space-y-4">
-        <h2 className="text-lg font-medium flex items-center gap-2">Preferencias musicales</h2>
-
-        <div className="p-2">
-          <p className="text-sm text-gray-600">
-            Las preferencias musicales ahora se configuran desde
-            <a className="ml-1 text-blue-600 hover:underline" href="/protocolo/momentos-especiales">
-              Protocolo – Momentos Especiales
-            </a>
-            .
-          </p>
-        </div>
-      </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{'Informaci\u00F3n de la cuenta'}</h2>
+        <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'Información de la cuenta' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre" name="name" value={account.name} onChange={handleAccountChange} />
           <Input
@@ -359,12 +362,12 @@ function Perfil() {
           />
         </div>
         <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
+          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
         </div>
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{'Informaci\u00F3n de la boda'}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'Información de la boda' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Nombre de la pareja"
@@ -450,12 +453,12 @@ function Perfil() {
           />
         </div>
         <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
+          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
         </div>
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{'Informaci\u00F3n importante de la boda'}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'Información importante de la boda' })}</h2>
         <textarea
           className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder={
@@ -465,7 +468,7 @@ function Perfil() {
           onChange={(e) => setImportantInfo(e.target.value)}
         />
         <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
+          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
         </div>
       </Card>
 
@@ -476,29 +479,32 @@ function Perfil() {
         </h2>
         <div className="flex flex-col sm:flex-row items-center gap-2 mb-4">
           <Input
-            placeholder="Email del planner"
+            placeholder={t('profile.collaborators.plannerEmail', { defaultValue: 'Email del planner' })}
             value={plannerEmail}
             onChange={(e) => setPlannerEmail(e.target.value)}
             className="flex-1"
           />
           <Button onClick={handleCreateInvite} disabled={inviteLoading || !plannerEmail}>
-            {inviteLoading ? 'Creando...' : 'Crear enlace'}
+            {inviteLoading
+              ? t('profile.collaborators.creating', { defaultValue: 'Creando...' })
+              : t('profile.collaborators.createLink', { defaultValue: 'Crear enlace' })}
           </Button>
         </div>
         {inviteLink && (
           <p className="text-sm text-green-700 break-all mb-4 select-all">
-            Enlace generado: <span className="underline">{inviteLink}</span>
+            {t('profile.collaborators.linkGenerated', { defaultValue: 'Enlace generado:' })}{' '}
+            <span className="underline">{inviteLink}</span>
           </p>
         )}
         {rolesLoading ? (
-          <p>Cargando...</p>
+          <p>{t('app.loading', { defaultValue: 'Cargando...' })}</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b">
-                <th className="text-left p-2">Usuario</th>
-                <th className="text-left p-2">Rol</th>
-                <th className="p-2 text-center">Acciones</th>
+                <th className="text-left p-2">{t('profile.collaborators.user', { defaultValue: 'Usuario' })}</th>
+                <th className="text-left p-2">{t('profile.collaborators.role', { defaultValue: 'Rol' })}</th>
+                <th className="p-2 text-center">{t('profile.collaborators.actions', { defaultValue: 'Acciones' })}</th>
               </tr>
             </thead>
             <tbody>
@@ -535,7 +541,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{'Datos de facturaci\u00F3n'}</h2>
+        <h2 className="text-lg font-medium">{t('profile.billing.title', { defaultValue: 'Datos de facturación' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Nombre completo"
@@ -571,7 +577,7 @@ function Perfil() {
           <Input label="DNI" name="dni" value={billing.dni} onChange={handleBillingChange} />
         </div>
         <div className="text-right">
-          <Button onClick={saveProfile}>Guardar</Button>
+          <Button onClick={saveProfile}>{t('app.save', { defaultValue: 'Guardar' })}</Button>
         </div>
       </Card>
     </div>

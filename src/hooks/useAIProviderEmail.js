@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 
 import { useProviderEmail } from './useProviderEmail';
+import useActiveWeddingInfo from './useActiveWeddingInfo';
 import * as EmailService from '../services/emailService';
 import EmailTemplateService from '../services/EmailTemplateService';
 
@@ -14,6 +15,19 @@ export const useAIProviderEmail = () => {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
   const { userEmail, sendEmailToProvider } = useProviderEmail();
+  const { info: weddingDoc } = useActiveWeddingInfo();
+
+  const getWeddingProfile = () => (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
+  const fmtWeddingDate = (raw) => {
+    try {
+      if (!raw) return '';
+      const d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch {
+      return '';
+    }
+  };
 
   /**
    * Genera un asunto personalizado basado en el resultado de la búsqueda AI
@@ -27,21 +41,23 @@ export const useAIProviderEmail = () => {
       const templateService = new EmailTemplateService();
 
       // Datos para la plantilla
+      const profile = getWeddingProfile();
       const templateData = {
         providerName: aiResult.name,
-        date: new Date().toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        date: fmtWeddingDate(
+          profile.weddingDate || profile.date || profile.eventDate || profile.ceremonyDate
+        ),
         userName: userEmail ? userEmail.split('@')[0] : 'Usuario',
-        guests: '100', // Valor por defecto
+        guests:
+          String(
+            profile.guestsTotal || profile.guestCount || profile.aforo || profile.invitados || ''
+          ) || '100',
       };
 
       // Generar asunto personalizado usando plantilla según categoría
       return templateService.generateSubjectFromTemplate(aiResult.service, templateData);
     },
-    [userEmail]
+    [userEmail, weddingDoc]
   );
 
   /**
@@ -60,25 +76,34 @@ export const useAIProviderEmail = () => {
       const aiInsight = aiResult.aiSummary ? `${aiResult.aiSummary}` : '';
 
       // Datos para la plantilla
+      const profile = getWeddingProfile();
       const templateData = {
         providerName: aiResult.name,
         searchQuery: searchQuery || 'servicios de calidad',
         aiInsight,
-        date: new Date().toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        date: fmtWeddingDate(
+          profile.weddingDate || profile.date || profile.eventDate || profile.ceremonyDate
+        ),
         price: aiResult.price || '',
-        location: aiResult.location || '',
+        location:
+          aiResult.location ||
+          profile.celebrationPlace ||
+          profile.location ||
+          profile.city ||
+          profile.ceremonyLocation ||
+          profile.receptionVenue ||
+          '',
         userName: userEmail ? userEmail.split('@')[0] : 'Usuario',
-        guests: '100', // Valor por defecto
+        guests:
+          String(
+            profile.guestsTotal || profile.guestCount || profile.aforo || profile.invitados || ''
+          ) || '100',
       };
 
       // Generar cuerpo de email utilizando plantilla según categoría
       return templateService.generateBodyFromTemplate(aiResult.service, templateData);
     },
-    [userEmail]
+    [userEmail, weddingDoc]
   );
 
   /**

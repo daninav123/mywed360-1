@@ -16,7 +16,6 @@ const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [activeTab, setActiveTab] = useState('all');
   const [isLoading, setIsLoading] = useState(false);
 
   const notificationRef = useRef(null);
@@ -27,7 +26,7 @@ const NotificationCenter = () => {
     if (isOpen) {
       loadNotifications();
     }
-  }, [isOpen, activeTab]);
+  }, [isOpen]);
 
   // Cerrar al hacer clic fuera del componente
   useEffect(() => {
@@ -63,8 +62,7 @@ const NotificationCenter = () => {
     setIsLoading(true);
 
     try {
-      const filter = activeTab !== 'all' ? activeTab : undefined;
-      const notificationData = await NotificationService.getNotifications(filter);
+      const notificationData = await NotificationService.getNotifications();
 
       setNotifications(notificationData.notifications || []);
       setUnreadCount(notificationData.unreadCount || 0);
@@ -361,39 +359,7 @@ const NotificationCenter = () => {
             </div>
           </div>
 
-          {/* Pestañas de filtro */}
-          <div className="flex border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'all'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Todas
-            </button>
-            <button
-              onClick={() => setActiveTab('email')}
-              className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'email'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Emails
-            </button>
-            <button
-              onClick={() => setActiveTab('event')}
-              className={`flex-grow py-2 text-sm font-medium ${
-                activeTab === 'event'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Eventos
-            </button>
-          </div>
+          {/* Sin pestañas: se muestran todas las notificaciones */}
 
           {/* Lista de notificaciones */}
           <div className="max-h-80 overflow-y-auto">

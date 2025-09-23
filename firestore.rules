@@ -1,6 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ---- Helpers for tasks/processes ----
+    function _isSignedIn() { return request.auth != null; }
+    function _isWeddingCollaborator(wid) {
+      return _isSignedIn() && (
+        (get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.ownerIds) ||
+        (get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.plannerIds) ||
+        (get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds != null && request.auth.uid in get(/databases/$(database)/documents/weddings/$(wid)).data.assistantIds)
+      );
+    }
+
+    function _progressValid() {
+      return !('progress' in request.resource.data) ||
+             (request.resource.data.progress is number && request.resource.data.progress >= 0 && request.resource.data.progress <= 100);
+    }
+
+    function _datesValid() {
+      return !('start' in request.resource.data && 'end' in request.resource.data) ||
+             (request.resource.data.start <= request.resource.data.end);
+    }
 
     // Weddings collection
     match /weddings/{weddingId} {
@@ -28,6 +47,19 @@ service cloud.firestore {
           (request.resource.data.plannerIds is list) &&
           request.auth.uid in request.resource.data.plannerIds &&
           (!(resource.data.plannerIds is list) || !(request.auth.uid in resource.data.plannerIds));
+      }
+    }
+
+    // Specific rules for processes/items (Gantt)
+    match /weddings/{weddingId}/processes/{pid} {
+      allow read: if _isWeddingCollaborator(weddingId);
+      allow create, update: if _isWeddingCollaborator(weddingId) && _progressValid() && _datesValid();
+      allow delete: if _isWeddingCollaborator(weddingId);
+
+      match /items/{tid} {
+        allow read: if _isWeddingCollaborator(weddingId);
+        allow create, update: if _isWeddingCollaborator(weddingId) && _progressValid() && _datesValid();
+        allow delete: if _isWeddingCollaborator(weddingId);
       }
     }
 
