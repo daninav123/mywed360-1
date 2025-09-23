@@ -623,6 +623,8 @@ export default function Tasks() {
     try {
       const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
       const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
+      // Variación en minúsculas que algunos entornos crean: weddings/{id}/weddinginfo
+      const refLower = doc(db, 'weddings', activeWedding, 'weddinginfo');
       const handler = (snap) => {
         try {
           if (!snap || !snap.exists()) return;
@@ -634,9 +636,11 @@ export default function Tasks() {
       };
       const unsub1 = onSnapshot(refPrimary, handler, () => {});
       const unsub2 = onSnapshot(refLegacy, handler, () => {});
+      const unsub3 = onSnapshot(refLower, handler, () => {});
       return () => {
         try { unsub1 && unsub1(); } catch (_) {}
         try { unsub2 && unsub2(); } catch (_) {}
+        try { unsub3 && unsub3(); } catch (_) {}
       };
     } catch (_) {}
   }, [activeWedding, db]);
@@ -654,6 +658,17 @@ export default function Tasks() {
           const data = snap.data() || {};
           const raw = data?.createdAt || data?.created_at || data?.created || null;
           if (raw) d = typeof raw?.toDate === 'function' ? raw.toDate() : new Date(raw);
+        }
+        // Fallback adicional: colección de perfiles si existiese
+        if (!d) {
+          try {
+            const pref = await getDoc(doc(db, 'userProfiles', uid)).catch(() => null);
+            if (pref && pref.exists()) {
+              const pdata = pref.data() || {};
+              const praw = pdata?.createdAt || pdata?.created_at || pdata?.created || null;
+              if (praw) d = typeof praw?.toDate === 'function' ? praw.toDate() : new Date(praw);
+            }
+          } catch (_) {}
         }
         if (!d && auth?.currentUser?.metadata?.creationTime) {
           d = new Date(auth.currentUser.metadata.creationTime);

@@ -26,6 +26,8 @@ const InboxContainer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [folder, setFolder] = useState('inbox'); // 'inbox' | 'sent'
+  const [inboxCounts, setInboxCounts] = useState({ total: 0, unread: 0 });
+  const [sentCounts, setSentCounts] = useState({ total: 0, unread: 0 });
 
   // Cargar emails al montar el componente
   const refreshEmails = useCallback(async (targetFolder = folder) => {
@@ -54,6 +56,20 @@ const InboxContainer = () => {
     }
   }, [folder]);
 
+  // Contadores por carpeta
+  const refreshCounts = useCallback(async () => {
+    try {
+      const [inboxList, sentList] = await Promise.all([
+        EmailService.getMails('inbox').catch(() => []),
+        EmailService.getMails('sent').catch(() => []),
+      ]);
+      const i = Array.isArray(inboxList) ? inboxList : [];
+      const s = Array.isArray(sentList) ? sentList : [];
+      setInboxCounts({ total: i.length, unread: i.filter((m) => !m.read).length });
+      setSentCounts({ total: s.length, unread: s.filter((m) => !m.read).length });
+    } catch {}
+  }, []);
+
   // Inicializar EmailService al tener usuario y refrescar lista
   useEffect(() => {
     let cancelled = false;
@@ -62,7 +78,7 @@ const InboxContainer = () => {
         try {
           await EmailService.initEmailService({ email: user.email, ...user });
           if (!cancelled) {
-            await refreshEmails(folder);
+            await Promise.all([refreshEmails(folder), refreshCounts()]);
           }
         } catch (err) {
           console.error('Error inicializando EmailService:', err);
@@ -74,7 +90,7 @@ const InboxContainer = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, folder, refreshEmails]);
+  }, [user, folder, refreshEmails, refreshCounts]);
 
   // Marcar email como leído
   const markAsRead = useCallback(async (emailId) => {
@@ -270,28 +286,37 @@ const InboxContainer = () => {
         </div>
       </div>
 
-      {/* Tabs carpeta */}
-      <div className="bg-white px-4 pb-2 border-b">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center space-x-3">
-            <button
-              className={`px-3 py-1 rounded-full text-sm border ${folder === 'inbox' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-              onClick={() => { setSelectedEmailId(null); setFolder('inbox'); }}
-            >
-              Recibidos
-            </button>
-            <button
-              className={`px-3 py-1 rounded-full text-sm border ${folder === 'sent' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300'}`}
-              onClick={() => { setSelectedEmailId(null); setFolder('sent'); }}
-            >
-              Enviados
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Contenido principal */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar de carpetas */}
+        <aside className="w-60 border-r bg-white p-4">
+          <nav className="space-y-2">
+            <button
+              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
+                folder === 'inbox' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => { setSelectedEmailId(null); setFolder('inbox'); }}
+            >
+              <span>Recibidos</span>
+              <span className="text-xs rounded-full px-2 py-0.5 bg-blue-600 text-white">
+                {inboxCounts.unread > 0 ? `${inboxCounts.unread}/${inboxCounts.total}` : inboxCounts.total}
+              </span>
+            </button>
+            <button
+              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
+                folder === 'sent' ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => { setSelectedEmailId(null); setFolder('sent'); }}
+            >
+              <span>Enviados</span>
+              <span className="text-xs rounded-full px-2 py-0.5 bg-gray-700 text-white">
+                {sentCounts.total}
+              </span>
+            </button>
+          </nav>
+        </aside>
+
+        {/* Lista/Detalle */}
         {viewMode === 'list' || !selectedEmail ? (
           <div className="flex-1">
             <EmailList
@@ -310,7 +335,6 @@ const InboxContainer = () => {
               onDelete={() => handleEmailDelete(selectedEmail.id)}
               onReply={() => {
                 setShowComposer(true);
-                // Pre-llenar datos de respuesta si es necesario
               }}
             />
           </div>

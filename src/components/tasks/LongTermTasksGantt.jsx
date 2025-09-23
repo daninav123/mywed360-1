@@ -17,6 +17,18 @@ export default function LongTermTasksGantt({
 }) {
   const colW = Math.max(60, Number(columnWidth) || 90);
 
+  // Debug (solo en dev o si se habilita con localStorage 'lovenda_gantt_debug')
+  const debugEnabled = (() => {
+    try {
+      const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
+      const isDev = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() !== 'production';
+      const flag = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
+      return isDev || flag === '1' || /^true$/i.test(String(flag || ''));
+    } catch {
+      return false;
+    }
+  })();
+
   // 1) Inyectar el hito de la boda si no existe
   const withWedding = useMemo(() => {
     try {
@@ -207,6 +219,42 @@ export default function LongTermTasksGantt({
   return (
     <div className="bg-[var(--color-surface)] rounded-xl shadow-md p-6 transition-all hover:shadow-lg" data-testid="longterm-gantt-new">
       <h2 className="text-xl font-semibold mb-4">Tareas a Largo Plazo</h2>
+      {debugEnabled && (
+        <div
+          data-testid="gantt-debug"
+          style={{
+            marginBottom: 8,
+            fontSize: 12,
+            color: '#4b5563',
+            display: 'flex',
+            gap: 12,
+            alignItems: 'center',
+          }}
+        >
+          <span>
+            Inicio:
+            {' '}
+            {(() => {
+              try {
+                return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineStart);
+              } catch {
+                return timelineStart?.toISOString?.().slice(0, 10) || String(timelineStart);
+              }
+            })()}
+          </span>
+          <span>
+            Fin:
+            {' '}
+            {(() => {
+              try {
+                return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: '2-digit' }).format(timelineEnd);
+              } catch {
+                return timelineEnd?.toISOString?.().slice(0, 10) || String(timelineEnd);
+              }
+            })()}
+          </span>
+        </div>
+      )}
       <div
         ref={containerRef || scrollRef}
         className="w-full overflow-x-auto overflow-y-hidden mb-4 border border-gray-100 rounded-lg"

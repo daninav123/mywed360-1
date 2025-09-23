@@ -100,12 +100,13 @@ export default function HomePage() {
       const PER_DOMAIN_LIMIT = 1;
       let consecutiveErrors = 0;
 
+      const hasHttpImage = (p) => typeof p?.image === 'string' && /^https?:\/\//i.test(p.image);
       while (results.length < desired && page <= 20) {
         try {
           const batch = await fetchWeddingNews(page, 10, lang);
           consecutiveErrors = 0;
           for (const post of batch) {
-            if (!post?.url || !post.image) continue;
+            if (!post?.url || !hasHttpImage(post)) continue;
             const dom = (() => {
               try {
                 return new URL(post.url).hostname.replace(/^www\./, '');
@@ -137,8 +138,8 @@ export default function HomePage() {
           try {
             const batch = await fetchWeddingNews(page, 10, lang === 'en' ? 'en' : 'en');
             consecutiveErrors = 0;
-            for (const post of batch) {
-              if (!post?.url || !post.image) continue;
+          for (const post of batch) {
+            if (!post?.url || !hasHttpImage(post)) continue;
               const dom = (() => {
                 try {
                   return new URL(post.url).hostname.replace(/^www\./, '');
@@ -162,39 +163,7 @@ export default function HomePage() {
         }
       }
 
-      // ?ltimo recurso: completar hasta 4 con placeholder si falta imagen
-      if (results.length < desired) {
-        page = 1;
-        consecutiveErrors = 0;
-        const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
-        while (results.length < desired && page <= 20) {
-          try {
-            const batch = await fetchWeddingNews(page, 10, lang);
-            consecutiveErrors = 0;
-            for (const post of batch) {
-              if (!post?.url) continue;
-              const dom = (() => {
-                try {
-                  return new URL(post.url).hostname.replace(/^www\./, '');
-                } catch {
-                  return 'unk';
-                }
-              })();
-              if ((domainCounts[dom] || 0) >= PER_DOMAIN_LIMIT) continue;
-              if (results.some((x) => x.url === post.url)) continue;
-              domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-              results.push(post.image ? post : { ...post, image: placeholder });
-              if (results.length >= desired) break;
-            }
-          } catch (err) {
-            console.error(err);
-            consecutiveErrors++;
-            if (consecutiveErrors >= 3 && results.length) break;
-          } finally {
-            page++;
-          }
-        }
-      }
+      // Sin placeholders: solo mantener items con imagen real (ya filtrado arriba)
       setNewsPosts(results.slice(0, desired));
     };
     loadNews();

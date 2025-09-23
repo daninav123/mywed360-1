@@ -171,17 +171,17 @@ export default function Blog() {
               return 'unk';
             }
           })();
-          const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
-          const withImage = p.image ? p : { ...p, image: placeholder };
-          // Guardar como candidato global para posibles rellenos
-          if (!candidates.some((x) => x.url === withImage.url || x.id === withImage.id)) {
-            candidates.push(withImage);
+          // Solo aceptar noticias con imagen http(s)
+          if (!(typeof p.image === 'string' && /^https?:\/\//i.test(p.image))) continue;
+          // Guardar como candidato global para posibles rellenos (sin duplicados)
+          if (!candidates.some((x) => x.url === p.url || x.id === p.id)) {
+            candidates.push(p);
           }
           // Estricto: 1 por dominio por bloque
           if ((domainCounts[dom] || 0) >= 1) continue;
-          if (newPosts.some((x) => x.url === withImage.url || x.id === withImage.id)) continue;
+          if (newPosts.some((x) => x.url === p.url || x.id === p.id)) continue;
           domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-          newPosts.push(withImage);
+          newPosts.push(p);
           if (newPosts.length >= targetLength) break;
         }
         dbg('loop progress', {
@@ -236,15 +236,14 @@ export default function Blog() {
                 return 'unk';
               }
             })();
-            const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
-            const withImage = p.image ? p : { ...p, image: placeholder };
-            if (!candidates.some((x) => x.url === withImage.url || x.id === withImage.id)) {
-              candidates.push(withImage);
+            if (!(typeof p.image === 'string' && /^https?:\/\//i.test(p.image))) continue;
+            if (!candidates.some((x) => x.url === p.url || x.id === p.id)) {
+              candidates.push(p);
             }
             if ((domainCounts[dom] || 0) >= 1) continue;
-            if (newPosts.some((x) => x.url === withImage.url || x.id === withImage.id)) continue;
+            if (newPosts.some((x) => x.url === p.url || x.id === p.id)) continue;
             domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-            newPosts.push(withImage);
+            newPosts.push(p);
             if (newPosts.length >= targetLength) break;
           }
           dbg('loop progress', {
@@ -301,13 +300,12 @@ export default function Blog() {
             const u = base ? `${base}/api/wedding-news` : '/api/wedding-news';
             return `${u}?page=1&pageSize=10&lang=${lg}`;
           };
-          const placeholder = `${import.meta.env.BASE_URL}logo-app.png`;
           const getList = async (lg) => {
             const r = await fetch(mk(lg));
             if (!r.ok) return [];
             const arr = await r.json();
-            return (Array.isArray(arr) ? arr : []).map((p) =>
-              p.image ? p : { ...p, image: placeholder }
+            return (Array.isArray(arr) ? arr : []).filter(
+              (p) => typeof p.image === 'string' && /^https?:\/\//i.test(p.image)
             );
           };
           let fb = await getList(lang);
