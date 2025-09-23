@@ -7,6 +7,14 @@ import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 
+// Bloques por defecto para inicializar el Timing
+const DEFAULT_BLOCKS = [
+  { id: 'ceremonia', name: 'Ceremonia' },
+  { id: 'coctel', name: 'Cóctel' },
+  { id: 'banquete', name: 'Banquete' },
+  { id: 'disco', name: 'Disco' },
+];
+
 const Timing = () => {
   const { activeWedding } = useWedding();
   const {
@@ -33,6 +41,29 @@ const Timing = () => {
     });
     return () => unsub();
   }, [activeWedding]);
+
+  // Inicializar automáticamente los bloques de timing si no existen
+  useEffect(() => {
+    try {
+      if (!activeWedding) return;
+      if (loading) return;
+      if (Array.isArray(timeline) && timeline.length > 0) return;
+
+      // Crear bloques por defecto alineados con Momentos Especiales
+      const initial = DEFAULT_BLOCKS.map((b) => ({
+        id: b.id,
+        name: b.name,
+        startTime: '',
+        endTime: '',
+        status: 'on-time',
+        moments: [],
+      }));
+
+      persistTimeline(initial);
+    } catch (e) {
+      console.warn('No se pudo inicializar el timing por defecto:', e);
+    }
+  }, [activeWedding, loading, timeline]);
 
   const getStatusColor = (status) => {
     switch (status) {

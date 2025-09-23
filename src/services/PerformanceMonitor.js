@@ -1,5 +1,12 @@
 import { useEffect } from "react";
 import { post as apiPost } from './apiClient';
+
+// Detectar entorno de tests para evitar timers que mantengan vivo el proceso
+const IS_TEST = (
+  (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) ||
+  (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
+  (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
+);
 /**
  * Servicio de monitoreo de rendimiento para la aplicación Lovenda
  *
@@ -10,7 +17,8 @@ import { post as apiPost } from './apiClient';
 // Configuración para el monitoreo
 const CONFIG = {
   // Activar/desactivar el monitoreo
-  enabled: true,
+  // Deshabilitado en tests para que Vitest/Jest no se queden colgados por timers pendientes
+  enabled: !IS_TEST,
 
   // Nivel de detalle del monitoreo
   // 0: solo errores críticos
@@ -20,7 +28,7 @@ const CONFIG = {
   logLevel: 2,
 
   // Intervalo para enviar métricas al servidor (ms)
-  reportInterval: 60000, // 1 minuto
+  reportInterval: IS_TEST ? 0 : 60000, // 1 minuto (0 en tests)
 
   // URL del endpoint para enviar métricas
   reportUrl: import.meta.env.VITE_METRICS_ENDPOINT || '',

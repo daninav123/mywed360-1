@@ -1,4 +1,4 @@
-﻿import {
+import {
   serverTimestamp,
   doc,
   deleteDoc,
@@ -729,7 +729,7 @@ export default function Tasks() {
     try {
       if (!activeWedding || !db) return;
       setSeedingDefaults(true);
-      const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '__seed__');
+      const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '_seed_meta');
       const seedSnap = await getDoc(seedRef).catch(() => null);
       if (seedSnap && seedSnap.exists()) {
         setSeedingDefaults(false);
@@ -850,8 +850,8 @@ export default function Tasks() {
         const hasAny = Array.isArray(tasksState) && tasksState.length > 0;
         if (hasAny) return;
 
-        // Evitar doble seed con flag en weddings/{id}/tasks/__seed__ (evita depender de 'config')
-        const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '__seed__');
+        // Evitar doble seed con flag en weddings/{id}/tasks/_seed_meta (evita depender de 'config')
+        const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '_seed_meta');
         const seedSnap = await getDoc(seedRef).catch(() => null);
         if (seedSnap && seedSnap.exists()) return;
 

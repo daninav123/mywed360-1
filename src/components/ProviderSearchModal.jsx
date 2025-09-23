@@ -194,7 +194,9 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         // Intentar motor web como fallback
         try {
           const q = [aiQuery, serviceFilter, formattedLocation].filter(Boolean).join(' ');
-          const res2 = await fetch(${import.meta.env.VITE_BACKEND_BASE_URL || ''}/api/ai/search-suppliers?q=);
+          const base = (import.meta.env.VITE_BACKEND_BASE_URL || '').replace(/\/$/, '');
+          const url = `${base}/api/ai/search-suppliers?q=${encodeURIComponent(q)}`;
+          const res2 = await fetch(url);
           if (res2.ok) {
             const js = await res2.json();
             if (Array.isArray(js?.results) && js.results.length) {

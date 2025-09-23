@@ -1,5 +1,5 @@
 import { Check, Plus, ArrowRight, Loader2, Mail, Search, X, AlertTriangle } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import Button from '../../../components/ui/Button';
 import Card from '../../../components/ui/Card';
@@ -29,7 +29,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
           <Loader2 size={40} className="text-blue-500" />
         </div>
         <p className="text-lg font-medium text-gray-700">Buscando proveedores...</p>
-        <p className="text-sm text-gray-500 mt-2">Analizando tu consulta: &quot;{query}&quot;</p>
+        <p className="text-sm text-gray-500 mt-2">Analizando tu consulta: "{query}"</p>
       </div>
     );
   }
@@ -67,7 +67,8 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   }
 
   // Ejemplo de datos para mostrar en modo de demostración
-  // DEMO DATA\n  const demoResults = [
+  // DEMO DATA
+  const demoResults = [
     {
       id: 1,
       name: 'Fotografía Naturaleza Viva',
@@ -80,7 +81,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
       location: 'Madrid',
       price: '1200€ - 2500€',
       aiSummary:
-        'Este fotógrafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imágenes capturen momentos espontáneos con iluminación natural, ideal para lo que buscas.',
+        'Este fotógrafo tiene un estilo natural y documental perfecto para bodas en exteriores. Sus imágenes capturan momentos espontáneos con iluminación natural, ideal para lo que buscas.',
     },
     {
       id: 2,

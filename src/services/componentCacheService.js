@@ -263,7 +263,8 @@ export const useCacheMonitor = () => {
 };
 
 // Limpiar caché expirado cada 5 minutos
-setInterval(cleanExpiredEntries, 5 * 60 * 1000);
+const __IS_TEST__ = ((typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) || (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) || (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test'))));
+if (!__IS_TEST__) { setInterval(cleanExpiredEntries, 5 * 60 * 1000); }
 
 export default {
   useCachedComputation,
@@ -274,3 +275,4 @@ export default {
   clearCache,
   useCacheMonitor,
 };
+

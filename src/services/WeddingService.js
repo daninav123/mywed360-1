@@ -20,6 +20,7 @@ import {
   addDoc,
   collection,
   Timestamp,
+  deleteDoc,
 } from 'firebase/firestore';
 import { collectionGroup, documentId } from 'firebase/firestore';
 import { query, where, getDocs, limit } from 'firebase/firestore';
@@ -123,7 +124,7 @@ function toDateSafe(raw) {
 async function seedDefaultTasksForWedding(weddingId, weddingData) {
   if (!weddingId) return;
   // Evitar doble seed
-  const seedRef = doc(db, 'weddings', weddingId, 'tasks', '__seed__');
+  const seedRef = doc(db, 'weddings', weddingId, 'tasks', '_seed_meta');
   const seedSnap = await getDoc(seedRef).catch(() => null);
   if (seedSnap && seedSnap.exists()) return;
 
@@ -253,12 +254,17 @@ export async function migrateFlatSubtasksToNested(weddingId) {
         { merge: true }
       );
       moved++;
-      // Opcional: marcar en origen para evitar re-migración
-      await setDoc(
-        doc(db, 'weddings', weddingId, 'tasks', snap.id),
-        { migratedToNested: true },
-        { merge: true }
-      );
+      // Eliminar la subtarea plana original tras migrar (limpieza)
+      try {
+        await deleteDoc(doc(db, 'weddings', weddingId, 'tasks', snap.id));
+      } catch (_) {
+        // Si no se puede borrar, al menos marcar como migrada
+        await setDoc(
+          doc(db, 'weddings', weddingId, 'tasks', snap.id),
+          { migratedToNested: true },
+          { merge: true }
+        );
+      }
     } catch (_) {}
   }
   return { moved };

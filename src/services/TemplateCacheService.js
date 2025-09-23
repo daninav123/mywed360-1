@@ -14,6 +14,13 @@
 
 import { performanceMonitor } from './PerformanceMonitor';
 
+// Evitar timers globales durante tests para que el runner no quede colgado
+const IS_TEST = (
+  (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.vitest || globalThis.jest)) ||
+  (typeof process !== 'undefined' && process.env && (process.env.VITEST || process.env.NODE_ENV === 'test')) ||
+  (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
+);
+
 // Constantes para configuración de caché
 const CACHE_VERSION = '1.0.0';
 const CACHE_PREFIX = 'lovenda_template_cache';
@@ -642,10 +649,10 @@ export const preloadPopularTemplates = async (fetchFunction) => {
 };
 
 // Guardar estadísticas periódicamente
-setInterval(saveStats, 5 * 60 * 1000); // Cada 5 minutos
+if (!IS_TEST) { setInterval(saveStats, 5 * 60 * 1000); // Cada 5 minutos
 
 // Limpiar caché periódicamente
-setInterval(cleanupCache, 60 * 60 * 1000); // Cada hora
+  setInterval(cleanupCache, 60 * 60 * 1000); } // Cada hora
 
 // Inicializar caché al cargar
 initCache();
@@ -667,3 +674,5 @@ const templateCache = {
 
 export { templateCache };
 export default templateCache;
+
+
