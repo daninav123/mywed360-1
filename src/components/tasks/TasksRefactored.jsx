@@ -35,13 +35,13 @@ import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 
-// FunciÃƒâ€™Ã‚Â³n helper para cargar datos de Firestore de forma segura con fallbacks
+// Función helper para cargar datos de Firestore de forma segura con fallbacks
 
 import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÃƒâ€™Ã‚Â³n segura con manejo de errores
+  // Estados - Inicialización segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -766,6 +766,23 @@ export default function Tasks() {
     }
   }, [uniqueGanttTasks]);
 
+  // Mapa id->nombre para contextualizar subtareas en la lista lateral
+  const parentNameMap = useMemo(() => {
+    try {
+      const out = {};
+      const arr = Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
+      for (const t of arr) {
+        if (String(t?.type || 'task') !== 'task') continue;
+        const id = String(t.id || '');
+        if (!id) continue;
+        out[id] = t.name || t.title || 'Tarea';
+      }
+      return out;
+    } catch {
+      return {};
+    }
+  }, [uniqueGanttTasks]);
+
   parentProgressMap = useMemo(() => {
     try {
       const parents = new Map(); // id -> {done,total}
@@ -1340,9 +1357,45 @@ export default function Tasks() {
       />
 
       {/* Componente para el diagrama Gantt */}
-       param($m) $block=$m.Groups[1].Value; if ($block -notmatch 'subtasks=') { $block += "
-        subtasks={subtaskEvents}
-      " }; return "<LongTermTasksGantt$block/>" 
+      <div className="mt-6 mb-8" ref={ganttContainerRef}>
+        <h2 className="text-xl font-semibold mb-4">Planificación a Largo Plazo</h2>
+        <div className="bg-white rounded-lg shadow p-4">
+          <LongTermTasksGantt 
+            tasks={ganttDisplayTasks || []}
+            subtasks={subtaskEvents || []}
+            projectStart={projectStart || new Date()}
+            projectEnd={projectEnd || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)} // Default to 30 days from now
+            containerRef={ganttContainerRef}
+            columnWidth={120}
+            rowHeight={40}
+            onTaskClick={(task) => {
+              if (!task) return;
+              try {
+                const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
+                const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
+                setEditingId(task.id);
+                setFormData(prev => ({
+                  ...prev,
+                  title: task.title || '',
+                  desc: task.desc || '',
+                  category: task.category || 'OTROS',
+                  startDate: eventStart.toISOString().slice(0, 10),
+                  startTime: eventStart.toTimeString().slice(0, 5),
+                  endDate: eventEnd.toISOString().slice(0, 10),
+                  endTime: eventEnd.toTimeString().slice(0, 5),
+                  long: task.__kind === 'subtask',
+                  parentTaskId: task.__kind === 'subtask' ? (task.parentId || '') : '',
+                  assignee: task.assignee || '',
+                  completed: completedIdSet?.has?.(String(task.id)) || false,
+                }));
+                setShowNewTask(true);
+              } catch (error) {
+                console.error('Error al manejar clic en tarea:', error);
+              }
+            }}
+          />
+        </div>
+      </div>
 
       {/* Contenedor responsivo para Calendario y Lista */}
       <div className="flex flex-col lg:flex-row gap-6">
@@ -1386,6 +1439,7 @@ export default function Tasks() {
             tasks={taskListItems}
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
+            parentNameMap={parentNameMap}
             onTaskClick={(event) => {
               const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
               const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);

@@ -38,6 +38,7 @@ const SeatingPlanCanvas = ({
   background = null,
   globalMaxSeats = 0,
   focusTableId = null,
+  onViewportChange,
 }) => {
   // DnDProvider se gestiona en el componente padre (SeatingPlanRefactored)
 
@@ -123,12 +124,13 @@ const SeatingPlanCanvas = ({
       setScale(newScale);
       setMinScale(newScale);
       setOffset(newOffset);
+      try { typeof onViewportChange === 'function' && onViewportChange({ scale: newScale, offset: newOffset }); } catch {}
     } catch (e) {
       // fallback
       setScale(1);
       setOffset({ x: 0, y: 0 });
     }
-  }, [areas, tables, seats, hallSize, canvasRef]);
+  }, [areas, tables, seats, hallSize, canvasRef, onViewportChange]);
 
   // Recalcular minScale (fit) cuando cambie el contenido, sin alterar el zoom actual
   useEffect(() => {
@@ -348,6 +350,11 @@ const SeatingPlanCanvas = ({
       return () => raf && cancelAnimationFrame(raf);
     } catch (_) {}
   }, [focusTableId]);
+
+  // Notificar cambios de viewport a quien lo necesite
+  useEffect(() => {
+    try { typeof onViewportChange === 'function' && onViewportChange({ scale, offset }); } catch {}
+  }, [scale, offset, onViewportChange]);
 
   // Atajos de teclado para zoom: Ctrl/Cmd + '+', '-', '0'
   useEffect(() => {

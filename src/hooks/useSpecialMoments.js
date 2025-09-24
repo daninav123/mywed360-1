@@ -12,40 +12,120 @@ import { db } from '../firebaseConfig';
 */
 const STORAGE_KEY = 'lovendaSpecialMoments';
 
+// Bloques por defecto (alineados con páginas existentes)
+const DEFAULT_BLOCKS = [
+  { id: 'ceremonia', name: 'Ceremonia' },
+  // Nota: en Momentos Especiales históricamente se usa "coctail" mientras en Timing aparece "coctel".
+  // Conservamos la clave "coctail" por compatibilidad y normalizamos en los componentes cuando sea necesario.
+  { id: 'coctail', name: 'Cóctel' },
+  { id: 'banquete', name: 'Banquete' },
+  { id: 'disco', name: 'Disco' },
+];
+
 // Estructura inicial por defecto
 const defaultData = {
-  ceremonia: [
-    { id: 1, order: 1, title: 'Entrada Novio', song: 'Canon in D – Pachelbel' },
-    { id: 2, order: 2, title: 'Entrada Novia', song: 'Bridal Chorus – Wagner' },
-    { id: 3, order: 3, title: 'Lectura 1', song: 'A Thousand Years' },
-    { id: 4, order: 4, title: 'Lectura 2', song: '' },
-    { id: 5, order: 5, title: 'Intercambio de Anillos', song: '' },
-    { id: 6, order: 6, title: 'Salida', song: '' },
-  ],
-  coctail: [{ id: 7, order: 1, title: 'Entrada', song: '' }],
-  banquete: [
-    { id: 8, order: 1, title: 'Entrada Novios', song: '' },
-    { id: 9, order: 2, title: 'Corte Pastel', song: '' },
-    { id: 10, order: 3, title: 'Discursos', song: '' },
-  ],
-  disco: [
-    { id: 11, order: 1, title: 'Primer Baile', song: '' },
-    { id: 12, order: 2, title: 'Animar pista', song: '' },
-    { id: 13, order: 3, title: 'Último tema', song: '' },
-  ],
+  blocks: DEFAULT_BLOCKS,
+  moments: {
+    ceremonia: [
+      {
+        id: 1,
+        order: 1,
+        title: 'Entrada Novio',
+        song: 'Canon in D – Pachelbel',
+        time: '', // Hora (hh:mm)
+        duration: '', // Duración (min) o texto corto
+        type: 'entrada', // entrada | lectura | votos | anillos | baile | corte_pastel | discurso | otro
+        location: '',
+        responsables: [], // [{ role, name, contact }]
+        requirements: '', // necesidades especiales (sonido, proyección...)
+        suppliers: [], // referencias/proveedores asociados (ids o strings)
+        optional: false,
+        state: 'pendiente', // pendiente | confirmado | ensayo
+        key: '', // primer_baile | corte_tarta | ramo | liga | ...
+      },
+      {
+        id: 2,
+        order: 2,
+        title: 'Entrada Novia',
+        song: 'Bridal Chorus – Wagner',
+        time: '',
+        duration: '',
+        type: 'entrada',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      {
+        id: 3,
+        order: 3,
+        title: 'Lectura 1',
+        song: 'A Thousand Years',
+        time: '',
+        duration: '',
+        type: 'lectura',
+        location: '',
+        responsables: [],
+        requirements: '',
+        suppliers: [],
+        optional: false,
+        state: 'pendiente',
+        key: '',
+      },
+      { id: 4, order: 4, title: 'Lectura 2', song: '', time: '', duration: '', type: 'lectura', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 5, order: 5, title: 'Intercambio de Anillos', song: '', time: '', duration: '', type: 'anillos', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 6, order: 6, title: 'Salida', song: '', time: '', duration: '', type: 'salida', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+    ],
+    coctail: [{ id: 7, order: 1, title: 'Entrada', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' }],
+    banquete: [
+      { id: 8, order: 1, title: 'Entrada Novios', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 9, order: 2, title: 'Corte Pastel', song: '', time: '', duration: '', type: 'corte_pastel', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'corte_tarta' },
+      { id: 10, order: 3, title: 'Discursos', song: '', time: '', duration: '', type: 'discurso', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+    ],
+    disco: [
+      { id: 11, order: 1, title: 'Primer Baile', song: '', time: '', duration: '', type: 'baile', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'primer_baile' },
+      { id: 12, order: 2, title: 'Animar pista', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 13, order: 3, title: 'Último tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+    ],
+  },
 };
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Compatibilidad hacia atrás: si viene plano (con claves de bloques), migrar a { moments, blocks }
+      if (parsed && !parsed.moments) {
+        const keys = Object.keys(parsed || {});
+        const known = new Set(['ceremonia', 'coctail', 'banquete', 'disco']);
+        const legacyMoments = {};
+        keys.forEach((k) => {
+          if (known.has(k) && Array.isArray(parsed[k])) legacyMoments[k] = parsed[k];
+        });
+        return {
+          blocks: DEFAULT_BLOCKS,
+          moments: Object.keys(legacyMoments).length ? legacyMoments : defaultData.moments,
+        };
+      }
+      // Asegurar blocks por defecto si faltan
+      return {
+        blocks: Array.isArray(parsed.blocks) && parsed.blocks.length ? parsed.blocks : DEFAULT_BLOCKS,
+        moments: parsed.moments || defaultData.moments,
+      };
+    }
   } catch {}
   return defaultData;
 }
 
 export default function useSpecialMoments() {
   const { activeWedding } = useWedding();
-  const [moments, setMoments] = useState(load);
+  const initial = load();
+  const [blocks, setBlocks] = useState(initial.blocks || DEFAULT_BLOCKS);
+  const [moments, setMoments] = useState(initial.moments || defaultData.moments);
   const lastRemoteRef = useRef(null);
   const unsubRef = useRef(null);
 
@@ -53,13 +133,13 @@ export default function useSpecialMoments() {
   useEffect(() => {
     // LocalStorage siempre
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(moments));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ blocks, moments }));
     } catch {}
 
     // Firestore: evitar loops comparando con último snapshot remoto
     const json = (() => {
       try {
-        return JSON.stringify(moments);
+        return JSON.stringify({ blocks, moments });
       } catch {
         return null;
       }
@@ -70,12 +150,16 @@ export default function useSpecialMoments() {
     (async () => {
       try {
         const ref = doc(db, 'weddings', activeWedding, 'specialMoments', 'main');
-        await setDoc(ref, { ...moments, updatedAt: serverTimestamp() }, { merge: true });
+        await setDoc(
+          ref,
+          { blocks, moments, updatedAt: serverTimestamp() },
+          { merge: true }
+        );
       } catch (e) {
         console.warn('No se pudieron guardar Momentos Especiales en Firestore:', e?.message || e);
       }
     })();
-  }, [moments, activeWedding]);
+  }, [blocks, moments, activeWedding]);
 
   // Escuchar cambios de localStorage desde otras pestañas (evento 'storage' no se dispara en la pestaña emisora)
   useEffect(() => {
@@ -83,7 +167,8 @@ export default function useSpecialMoments() {
       try {
         if (e && e.key === STORAGE_KEY && typeof e.newValue === 'string') {
           const parsed = JSON.parse(e.newValue);
-          setMoments(parsed);
+          setBlocks(parsed.blocks || DEFAULT_BLOCKS);
+          setMoments(parsed.moments || defaultData.moments);
         }
       } catch {}
     };
@@ -108,13 +193,28 @@ export default function useSpecialMoments() {
     const unsub = onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
       const data = snap.data() || {};
-      // El documento guarda el objeto directamente con claves de bloques
-      const { updatedAt: _updatedAt, ...payload } = data;
-      setMoments((prev) => {
-        const next = { ...prev, ...payload };
-        try { lastRemoteRef.current = JSON.stringify(next); } catch { lastRemoteRef.current = null; }
-        return next;
-      });
+      // Compatibilidad: aceptar tanto forma nueva { moments, blocks } como la antigua plana
+      if (data.moments) {
+        const next = {
+          blocks: Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS,
+          moments: data.moments || {},
+        };
+        setBlocks(next.blocks);
+        setMoments((prev) => {
+          const merged = { ...prev, ...next.moments };
+          try { lastRemoteRef.current = JSON.stringify({ blocks: next.blocks, moments: merged }); } catch { lastRemoteRef.current = null; }
+          return merged;
+        });
+      } else {
+        // Antigua: data contiene directamente las claves de cada bloque
+        const { updatedAt: _updatedAt, ...payload } = data;
+        setBlocks(DEFAULT_BLOCKS);
+        setMoments((prev) => {
+          const merged = { ...prev, ...payload };
+          try { lastRemoteRef.current = JSON.stringify({ blocks: DEFAULT_BLOCKS, moments: merged }); } catch { lastRemoteRef.current = null; }
+          return merged;
+        });
+      }
     });
     unsubRef.current = unsub;
     return () => {
@@ -130,7 +230,27 @@ export default function useSpecialMoments() {
   const addMoment = useCallback((blockId, moment) => {
     setMoments((prev) => {
       const next = { ...prev };
-      next[blockId] = [...(prev[blockId] || []), { ...moment, id: Date.now() }];
+      next[blockId] = [
+        ...(prev[blockId] || []),
+        {
+          // defaults seguros para nuevo modelo
+          id: Date.now(),
+          order: (prev[blockId]?.length || 0) + 1,
+          title: 'Nuevo momento',
+          song: '',
+          time: '',
+          duration: '',
+          type: 'otro',
+          location: '',
+          responsables: [],
+          requirements: '',
+          suppliers: [],
+          optional: false,
+          state: 'pendiente',
+          key: '',
+          ...moment,
+        },
+      ];
       return next;
     });
   }, []);
@@ -196,13 +316,58 @@ export default function useSpecialMoments() {
     });
   }, []);
 
+  // --- Gestión de bloques/secciones ---
+  const addBlock = useCallback((name) => {
+    const slug = String(name)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    const id = slug || `bloque-${Date.now()}`;
+    setBlocks((prev) => [...prev, { id, name }]);
+    setMoments((prev) => ({ ...prev, [id]: [] }));
+  }, []);
+
+  const renameBlock = useCallback((id, newName) => {
+    setBlocks((prev) => prev.map((b) => (b.id === id ? { ...b, name: newName } : b)));
+  }, []);
+
+  const removeBlock = useCallback((id) => {
+    setBlocks((prev) => prev.filter((b) => b.id !== id));
+    setMoments((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }, []);
+
+  const reorderBlocks = useCallback((fromIndex, toIndex) => {
+    setBlocks((prev) => {
+      if (fromIndex < 0 || fromIndex >= prev.length) return prev;
+      if (toIndex < 0 || toIndex >= prev.length) return prev;
+      const arr = [...prev];
+      const [item] = arr.splice(fromIndex, 1);
+      arr.splice(toIndex, 0, item);
+      return arr;
+    });
+  }, []);
+
   return {
+    // datos
+    blocks,
     moments,
+    // momentos
     addMoment,
     removeMoment,
     updateMoment,
     reorderMoment,
     moveMoment,
     duplicateMoment,
+    // bloques
+    addBlock,
+    renameBlock,
+    removeBlock,
+    reorderBlocks,
   };
 }

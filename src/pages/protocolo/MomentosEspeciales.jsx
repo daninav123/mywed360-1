@@ -1,4 +1,4 @@
-﻿import {
+import {
   Music,
   Edit2,
   Play,
@@ -21,16 +21,22 @@ import useSpecialMoments from '../../hooks/useSpecialMoments';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
 
-const TABS = [
-  { key: 'ceremonia', label: 'Ceremonia' },
-  { key: 'coctail', label: 'Cóctel' },
-  { key: 'banquete', label: 'Banquete' },
-  { key: 'disco', label: 'Disco' },
-];
+// Tabs pasan a ser dinámicas desde el hook (blocks)
 
 const MomentosEspeciales = () => {
-  const { moments, addMoment, updateMoment, removeMoment, reorderMoment, duplicateMoment } =
-    useSpecialMoments();
+  const {
+    blocks,
+    moments,
+    addMoment,
+    updateMoment,
+    removeMoment,
+    reorderMoment,
+    duplicateMoment,
+    addBlock,
+    renameBlock,
+    removeBlock,
+    reorderBlocks,
+  } = useSpecialMoments();
 
   // Estado básico
   const [activeTab, setActiveTab] = useState('ceremonia');
@@ -69,6 +75,15 @@ const MomentosEspeciales = () => {
       }
     } catch {}
   }, []);
+  // Asegura que la pestaña activa exista entre los bloques dinámicos
+  useEffect(() => {
+    try {
+      if (!Array.isArray(blocks) || !blocks.length) return;
+      if (!blocks.find((b) => b.id === activeTab)) {
+        setActiveTab(blocks[0]?.id || 'ceremonia');
+      }
+    } catch {}
+  }, [blocks]);
   // Cleanup al desmontar
   useEffect(() => {
     return () => {
@@ -386,24 +401,36 @@ const MomentosEspeciales = () => {
           Planifica cada instante clave con la música y el momento adecuados.
         </p>
 
-        {/* Tabs */}
+        {/* Tabs (dinámicas desde blocks) */}
         <div className="border-b flex gap-4">
-          {TABS.map((tab) => (
+          {(blocks || []).map((tab) => (
             <button
-              key={tab.key}
-              className={`pb-2 -mb-px font-medium ${activeTab === tab.key ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}
+              key={tab.id}
+              className={`pb-2 -mb-px font-medium ${activeTab === tab.id ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'}`}
               onClick={() => {
                 stopAudio();
-                setActiveTab(tab.key);
+                setActiveTab(tab.id);
                 setResults([]);
                 setSearch('');
                 setAiSongs([]);
                 setAiError(null);
               }}
+              title={tab.name}
             >
-              {tab.label}
+              {tab.name}
             </button>
           ))}
+          <button
+            className="ml-auto text-xs border rounded px-2 py-1 hover:bg-gray-50"
+            onClick={() => {
+              const name = prompt('Nombre de la nueva sección (ej. Ensayo, Brunch...)');
+              if (!name) return;
+              try { addBlock(name); } catch {}
+            }}
+            title="Añadir sección personalizada"
+          >
+            Añadir sección
+          </button>
         </div>
 
         {/* Content */}

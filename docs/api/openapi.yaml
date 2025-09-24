@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: MyWed360 Backend API
+  version: 0.1.0
+  description: |
+    Especificación OpenAPI 3 del backend de MyWed360.
+
+    Seguridad principal: Firebase Auth (Bearer token). En desarrollo puede estar activo el bypass de tokens mock (`ALLOW_MOCK_TOKENS`).
+
+    Documentación relacionada:
+    - Arquitectura: ../ARCHITECTURE.md
+    - Onboarding: ../ONBOARDING.md
+    - Monitoreo: ../monitoring/README.md
+servers:
+  - url: http://localhost:3001
+    description: Local (desarrollo)
+  - url: https://mywed360-backend.onrender.com
+    description: Render (staging/producción)
+
+tags:
+  - name: health
+    description: Endpoints de salud del servicio
+  - name: rsvp
+    description: Confirmaciones de asistencia por token y recordatorios
+  - name: whatsapp
+    description: Webhooks y endpoints de mensajería WhatsApp
+  - name: mailgun
+    description: Webhooks de Mailgun
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cronToken:
+      type: apiKey
+      in: header
+      name: X-Cron-Token
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        time:
+          type: string
+          format: date-time
+        env:
+          type: object
+          properties:
+            nodeEnv: { type: string }
+            allowedOrigin: { type: string, nullable: true }
+            frontendBaseUrl: { type: string, nullable: true }
+            backendBaseUrl: { type: string, nullable: true }
+        push:
+          type: object
+          properties:
+            vapidConfigured: { type: boolean }
+            webPushAvailable: { type: boolean }
+            subscriptions:
+              type: object
+              properties:
+                countSampled: { type: integer }
+                sample:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      uid: { type: string, nullable: true }
+                      endpointPreview: { type: string, nullable: true }
+        integrations:
+          type: object
+          properties:
+            mailgun: { type: object, properties: { configured: { type: boolean } } }
+            openai: { type: object, properties: { configured: { type: boolean } } }
+            stripe: { type: object, properties: { configured: { type: boolean } } }
+            whatsapp:
+              type: object
+              properties:
+                provider: { type: string }
+                configured: { type: boolean }
+    RSVPGetResponse:
+      type: object
+      properties:
+        name: { type: string }
+        status: { type: string, enum: [pending, accepted, rejected] }
+        companions: { type: integer, minimum: 0 }
+        allergens: { type: string }
+    RSVPPutRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [accepted, rejected]
+        companions:
+          type: integer
+          minimum: 0
+          default: 0
+        allergens:
+          type: string
+          maxLength: 500
+          default: ""
+    RSVPRemindersRequest:
+      type: object
+      required: [weddingId]
+      properties:
+        weddingId: { type: string }
+        limit: { type: integer, minimum: 1, maximum: 1000, default: 100 }
+        dryRun: { type: boolean, default: true }
+        minIntervalMinutes: { type: integer, minimum: 0, maximum: 10080, default: 1440 }
+        force: { type: boolean, default: false }
+    GenericOk:
+      type: object
+      properties:
+        ok: { type: boolean }
+
+paths:
+  /api/health:
+    get:
+      tags: [health]
+      summary: Estado de salud del backend
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/health/livez:
+    get:
+      tags: [health]
+      summary: Señal de liveness
+      security: []
+      responses:
+        '200': { description: Alive }
+  /api/health/readyz:
+    get:
+      tags: [health]
+      summary: Señal de readiness (comprueba Firestore superficialmente)
+      security: []
+      responses:
+        '200': { description: Ready }
+        '503': { description: Not Ready }
+
+  /api/rsvp/by-token/{token}:
+    get:
+      tags: [rsvp]
+      summary: Obtiene el estado de RSVP por token público
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Datos básicos de RSVP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RSVPGetResponse'
+        '404': { description: Not found }
+    put:
+      tags: [rsvp]
+      summary: Actualiza el estado de RSVP por token público
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVPPutRequest'
+      responses:
+        '200':
+          description: Actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericOk'
+        '400': { description: Invalid payload }
+        '404': { description: Not found }
+
+  /api/rsvp/reminders:
+    post:
+      tags: [rsvp]
+      summary: Envía recordatorios por email a invitados pendientes (requiere rol planner)
+      description: |
+        Requiere autenticación (Firebase) y rol `planner` (verificado en el backend).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RSVPRemindersRequest'
+      responses:
+        '200': { description: OK }
+        '400': { description: Bad request }
+        '401': { description: Unauthorized }
+
+  /api/whatsapp/webhook/twilio:
+    post:
+      tags: [whatsapp]
+      summary: Webhook de estados y mensajes entrantes de Twilio
+      description: |
+        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` está configurado. Acepta `application/x-www-form-urlencoded`.
+        Procesa actualizaciones de estado y mensajes entrantes para el flujo de RSVP.
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200': { description: Siempre responde 200 para evitar reintentos agresivos }
+
+  /api/mailgun/webhook:
+    post:
+      tags: [mailgun]
+      summary: Webhook de Mailgun con verificación HMAC-SHA256
+      description: |
+        Verifica la firma usando `MAILGUN_SIGNING_KEY`. Acepta `application/x-www-form-urlencoded`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                timestamp: { type: string }
+                token: { type: string }
+                signature: { type: string }
+              additionalProperties: true
+      responses:
+        '200': { description: OK }
+        '403': { description: Invalid signature }
+        '400': { description: Bad request }
+
+x-frontend-mapping:
+  rsvp:
+    components:
+      - src/pages/Invitados.jsx
+      - src/hooks/useGuests.js
+  whatsapp:
+    components:
+      - src/pages/Invitados.jsx
+      - src/hooks/useGuests.js
+  mailgun:
+    components:
+      - src/components/email/InboxContainer.jsx
+      - src/services/EmailService.js

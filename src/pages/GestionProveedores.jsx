@@ -13,11 +13,13 @@ import { Sparkles, Plus, Settings } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 // Firebase
 
 import AIBusquedaModal from '../components/proveedores/AIBusquedaModal';
 import ProveedorCardNuevo from '../components/proveedores/ProveedorCardNuevo';
+import ServicesBoard from '../components/proveedores/ServicesBoard';
+import SupplierKanban from '../components/proveedores/SupplierKanban';
+import ProviderSearchDrawer from '../components/proveedores/ProviderSearchDrawer';
 
 // Componentes
 import ProveedorDetalle from '../components/proveedores/ProveedorDetalle';
@@ -59,6 +61,7 @@ const GestionProveedores = () => {
   // Estados para búsqueda IA
   const [resultadoBusquedaIA, setResultadoBusquedaIA] = useState(null);
   const [cargandoBusquedaIA, setCargandoBusquedaIA] = useState(false);
+  const [drawerBusquedaOpen, setDrawerBusquedaOpen] = useState(false);
 
   // Estado para comunicaciones
   const [comunicaciones, setComunicaciones] = useState([]);
@@ -429,8 +432,51 @@ const GestionProveedores = () => {
 
     // Cerrar modal IA y abrir formulario
     setModalAIVisible(false);
+    setDrawerBusquedaOpen(false);
     setModalFormularioVisible(true);
   };
+
+  // Atajos de UI para tablero / drawer
+  const abrirNuevoProveedorConServicio = (serv) => {
+    setProveedorEditar({ servicio: serv || '', estado: 'Nuevo', favorito: false });
+    setModalFormularioVisible(true);
+  };
+
+  // Mover proveedor de columna (kanban)
+  const moverProveedorEstado = async (prov, targetKey) => {
+    try {
+      const mapLabel = {
+        vacio: 'Nuevo',
+        proceso: 'Contactado',
+        presupuestos: 'Presupuestos',
+        contratado: 'Contratado',
+        rechazado: 'Rechazado',
+      };
+      const nuevoEstado = mapLabel[targetKey] || prov.estado || 'Nuevo';
+      const userId = currentUser?.uid || 'user123';
+      const ref = doc(db, `users/${userId}/proveedores`, prov.id);
+      await updateDoc(ref, { estado: nuevoEstado, updatedAt: new Date().toISOString() });
+      // Actualizar estado local optimista
+      setProveedores((prev) => prev.map((p) => (p.id === prov.id ? { ...p, estado: nuevoEstado } : p)));
+      setProveedoresFiltrados((prev) => prev.map((p) => (p.id === prov.id ? { ...p, estado: nuevoEstado } : p)));
+    } catch (e) {
+      console.error('Error moviendo proveedor:', e);
+    }
+  };
+
+  // KPIs y métricas globales para panel lateral
+  const kpi = (() => {
+    const asignado = proveedores.reduce((s, p) => s + (parseFloat(p.presupuestoAsignado || p.presupuesto) || 0), 0);
+    const gastado = proveedores.reduce((s, p) => s + (parseFloat(p.gastado) || 0), 0);
+    const presupPend = proveedores.filter((p) => /presup/i.test(p?.estado || '')).length;
+    const deadlines = proveedores
+      .map((p) => ({ p, d: p?.fechaLimite ? new Date(p.fechaLimite) : null }))
+      .filter((x) => x.d && !isNaN(x.d))
+      .sort((a, b) => a.d - b.d);
+    const proximoDeadline = deadlines.length ? deadlines[0].d : null;
+    const recordatorios = proveedores.filter((p) => !!p?.recordatorioProximo).length;
+    return { asignado, gastado, presupPend, proximoDeadline, recordatorios };
+  })();
 
   // Determinar contenido principal
   let contenidoPrincipal;
@@ -472,52 +518,66 @@ const GestionProveedores = () => {
       />
     );
   } else {
-    // Lista de proveedores
+    // Nueva vista: Tablero de servicios + Kanban por estado, con panel lateral de KPIs
     contenidoPrincipal = (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {proveedoresFiltrados.length > 0 ? (
-          proveedoresFiltrados.map((proveedor) => (
-            <ProveedorCardNuevo
-              key={proveedor.id}
-              proveedor={proveedor}
-              onClick={verDetalleProveedor}
-              onToggleFavorito={toggleFavorito}
-              onEditar={() => editarProveedor(proveedor)}
-              onEliminar={eliminarProveedor}
-            />
-          ))
-        ) : (
-          <div className="col-span-full flex flex-col items-center justify-center py-16">
-            <svg
-              className="h-12 w-12 text-gray-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">No hay proveedores</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {textoBusqueda
-                ? 'No se encontraron resultados para tu búsqueda.'
-                : 'Comienza añadiendo un nuevo proveedor.'}
-            </p>
-            <div className="mt-6">
-              <button
-                onClick={() => setModalFormularioVisible(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                Añadir proveedor
-              </button>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-6">
+        <div className="space-y-6">
+          {/* Tablero de servicios */}
+          <ServicesBoard
+            proveedores={proveedores}
+            onOpenSearch={(serv) => {
+              setDrawerBusquedaOpen(true);
+            }}
+            onOpenNew={(serv) => abrirNuevoProveedorConServicio(serv)}
+            onOpenAI={(serv) => {
+              setDrawerBusquedaOpen(true);
+            }}
+          />
+
+          {/* Kanban por estado */}
+          <SupplierKanban
+            proveedores={proveedoresFiltrados}
+            onMove={moverProveedorEstado}
+            onClick={verDetalleProveedor}
+          />
+        </div>
+
+        {/* Panel lateral de KPIs */}
+        <aside className="bg-white border rounded-lg p-4 h-min sticky top-4">
+          <div className="text-sm font-semibold mb-2">Resumen financiero</div>
+          <div className="text-xs text-gray-600 space-y-1">
+            <div className="flex justify-between">
+              <span>Asignado</span>
+              <span>€ {kpi.asignado.toFixed(0)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Gastado</span>
+              <span>€ {kpi.gastado.toFixed(0)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Presupuestos pendientes</span>
+              <span>{kpi.presupPend}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Recordatorios</span>
+              <span>{kpi.recordatorios}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Próximo deadline</span>
+              <span>{kpi.proximoDeadline ? kpi.proximoDeadline.toLocaleDateString() : '--'}</span>
             </div>
           </div>
-        )}
+          <div className="mt-3 border-t pt-3">
+            <div className="text-sm font-semibold mb-2">Filtros globales</div>
+            <ProveedorFiltro
+              filtroActivo={filtroActivo}
+              onCambioFiltro={cambiarFiltro}
+              textoBusqueda={textoBusqueda}
+              onCambioTexto={cambiarTextoBusqueda}
+              onBuscar={buscar}
+            />
+          </div>
+        </aside>
       </div>
     );
   }
@@ -535,7 +595,7 @@ const GestionProveedores = () => {
         {!proveedorSeleccionado && (
           <div className="mt-4 sm:mt-0 sm:ml-16 flex space-x-3">
             <button
-              onClick={() => setModalAIVisible(true)}
+              onClick={() => setDrawerBusquedaOpen(true)}
               className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
               <Sparkles className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -552,21 +612,13 @@ const GestionProveedores = () => {
         )}
       </div>
 
-      {/* Filtros solo visibles si no hay proveedor seleccionado */}
-      {!proveedorSeleccionado && (
-        <ProveedorFiltro
-          filtroActivo={filtroActivo}
-          onCambioFiltro={cambiarFiltro}
-          textoBusqueda={textoBusqueda}
-          onCambioTexto={cambiarTextoBusqueda}
-          onBuscar={buscar}
-        />
-      )}
+      {/* En la nueva vista, los filtros globales se han movido al panel lateral */}
 
       {/* Contenido principal */}
       {contenidoPrincipal}
 
       {/* Modales */}
+
       <ProveedorFormModal
         visible={modalFormularioVisible}
         onClose={() => {
@@ -583,6 +635,16 @@ const GestionProveedores = () => {
           setModalAIVisible(false);
           setResultadoBusquedaIA(null);
         }}
+        onBuscar={buscarConIAReal}
+        onGuardar={guardarProveedorIA}
+        resultado={resultadoBusquedaIA}
+        cargando={cargandoBusquedaIA}
+      />
+
+      {/* Drawer IA contextual */}
+      <ProviderSearchDrawer
+        open={drawerBusquedaOpen}
+        onClose={() => setDrawerBusquedaOpen(false)}
         onBuscar={buscarConIAReal}
         onGuardar={guardarProveedorIA}
         resultado={resultadoBusquedaIA}

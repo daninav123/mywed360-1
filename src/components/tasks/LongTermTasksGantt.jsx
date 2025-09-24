@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
+import { ChevronRight, ChevronDown } from 'lucide-react';
 
 function diffMonths(a, b) {
   const y = b.getFullYear() - a.getFullYear();
@@ -200,11 +201,39 @@ export default function LongTermTasksGantt({
   }, [parentTasks, subtasksByParent]);
 
   // 8) Filas: padre -> segmentos -> (opcional) subtareas
-  const [expandedParents, setExpandedParents] = useState(() => new Set());
-  const [expandedSegments, setExpandedSegments] = useState(() => new Set());
+  const [expandedParents, setExpandedParents] = useState(() => {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed_gantt_expanded_parents') : null;
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch { return new Set(); }
+  });
+  const [expandedSegments, setExpandedSegments] = useState(() => {
+    try {
+      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed_gantt_expanded_segments') : null;
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch { return new Set(); }
+  });
 
   const toggleParent = (id) => setExpandedParents((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   const toggleSegment = (id) => setExpandedSegments((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+
+  // Persistir estado de expansión
+  useEffect(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('mywed_gantt_expanded_parents', JSON.stringify(Array.from(expandedParents)));
+      }
+    } catch {}
+  }, [expandedParents]);
+  useEffect(() => {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('mywed_gantt_expanded_segments', JSON.stringify(Array.from(expandedSegments)));
+      }
+    } catch {}
+  }, [expandedSegments]);
 
   const rows = useMemo(() => {
     const out = [];
@@ -230,6 +259,18 @@ export default function LongTermTasksGantt({
     const out = [];
     rows.forEach((row, rowIndex) => {
       if (row.kind === 'parent') {
+        // Span global del padre (inicio-fin) como rectángulo transparente
+        const p = row.task;
+        const ps = normalizeAnyDate(p?.start);
+        const pe = normalizeAnyDate(p?.end);
+        if (ps && pe && pe >= ps) {
+          const sM0 = diffMonths(monthStart, ps);
+          const eM0 = diffMonths(monthStart, pe);
+          const left0 = Math.max(0, (sM0 + dayFraction(ps)) * colW);
+          const right0 = Math.max(0, (eM0 + dayFraction(pe)) * colW);
+          const width0 = Math.max(2, right0 - left0 + Math.max(2, Math.floor(colW * 0.1)));
+          out.push({ key: `${row.id}-parent-span`, left: left0, width: width0, rowIndex, type: 'parent-span', task: row.task });
+        }
         const segs = segmentsByParent.get(String(row.id)) || [];
         segs.forEach((seg, j) => {
           const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
@@ -321,16 +362,65 @@ export default function LongTermTasksGantt({
               const isSegment = row.kind === 'segment';
               const t = row.task || {};
               const leftPad = isParent ? 0 : isSegment ? 12 : 24;
-              const indicator = isParent ? (expandedParents.has(row.id) ? '▼' : '▶') : isSegment ? (expandedSegments.has(row.id) ? '▾' : '▸') : '•';
+              const parentExpanded = expandedParents.has(row.id);
+              const segmentExpanded = expandedSegments.has(row.id);
               const onClick = () => {
                 if (isParent) toggleParent(row.id);
                 else if (isSegment) toggleSegment(row.id);
                 else handleClick({ task: t });
               };
+              const progressPct = Math.max(0, Math.min(100, Number(t?.progress ?? 0)));
+              // Color de fondo semáforo muy tenue para padres
+              const parentBg = isParent
+                ? `linear-gradient(90deg, rgba(16,185,129,${0.06 * (progressPct / 100)}), rgba(16,185,129,0))`
+                : 'transparent';
               return (
-                <div key={`left-${row.kind}-${row.id}-${i}`} onClick={onClick} title={t?.name || t?.title || ''} style={{ position: 'absolute', left: 0, right: 0, top: 40 + i * rowHeight, height: rowHeight, display: 'flex', alignItems: 'center', padding: '2px 10px', boxSizing: 'border-box', cursor: 'pointer', color: '#111827', fontSize: 13, borderBottom: '1px dashed #f0f0f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>{indicator}</span>
+                <div
+                  key={`left-${row.kind}-${row.id}-${i}`}
+                  id={isParent ? `gantt-row-parent-${row.id}` : undefined}
+                  onClick={onClick}
+                  title={t?.name || t?.title || ''}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: 40 + i * rowHeight,
+                    height: rowHeight,
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '2px 10px',
+                    boxSizing: 'border-box',
+                    cursor: 'pointer',
+                    color: '#111827',
+                    fontSize: 13,
+                    borderBottom: '1px dashed #f0f0f0',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    background: parentBg,
+                  }}
+                >
+                  {(isParent || isSegment) ? (
+                    <button
+                      type="button"
+                      aria-label={isParent ? (parentExpanded ? 'ocultar subtareas' : 'ver subtareas') : (segmentExpanded ? 'ocultar tareas del segmento' : 'ver tareas del segmento')}
+                      aria-expanded={isParent ? parentExpanded : segmentExpanded}
+                      onClick={(e) => { e.stopPropagation(); isParent ? toggleParent(row.id) : toggleSegment(row.id); }}
+                      style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
+                    >
+                      {isParent ? (parentExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />) : (segmentExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />)}
+                    </button>
+                  ) : (
+                    <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>•</span>
+                  )}
+                  {/* Guía vertical/árbol según nivel */}
+                  {!isParent && (
+                    <span style={{ position: 'absolute', left: 28 + (isSegment ? 0 : 12), top: 0, bottom: 0, width: 1, background: '#e5e7eb' }} />
+                  )}
                   <span style={{ marginLeft: leftPad }}>{t?.name || t?.title || (isSegment ? 'Segmento' : 'Tarea')}</span>
+                  {isParent && (
+                    <span style={{ marginLeft: 8, fontSize: 11, padding: '2px 6px', borderRadius: 10, background: '#eef2ff', color: '#3730a3' }}>{progressPct}%</span>
+                  )}
                 </div>
               );
             })}
@@ -359,9 +449,76 @@ export default function LongTermTasksGantt({
             ))}
 
             {bars.map((bar) => (
-              <div key={bar.key} onClick={() => handleClick(bar)} style={{ position: 'absolute', left: bar.left, top: 40 + bar.rowIndex * rowHeight, height: bar.type === 'subtask' ? Math.max(12, rowHeight * 0.35) : bar.type === 'segment' ? Math.max(14, rowHeight * 0.45) : Math.max(16, rowHeight * 0.5), width: bar.width, background: bar.type === 'subtask' ? '#c7d2fe' : bar.type === 'segment' ? '#93c5fd' : '#a5b4fc', borderRadius: 6, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.12)', overflow: 'hidden', border: bar.type === 'subtask' ? '1px dashed #818cf8' : 'none' }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, Number(bar.task?.progress ?? 0)))}%`, background: bar.type === 'subtask' ? 'linear-gradient(90deg, #93c5fd, #60a5fa)' : 'linear-gradient(90deg, #818cf8, #6366f1)' }} />
-                <div style={{ position: 'absolute', left: 8, top: 2, right: 8, bottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#0f172a', fontSize: 12 }}>{bar.task?.name || ''}</div>
+              <div
+                key={bar.key}
+                onClick={() => handleClick(bar)}
+                style={{
+                  position: 'absolute',
+                  left: bar.left,
+                  top: 40 + bar.rowIndex * rowHeight,
+                  height:
+                    bar.type === 'subtask'
+                      ? Math.max(12, rowHeight * 0.35)
+                      : bar.type === 'segment'
+                      ? Math.max(14, rowHeight * 0.45)
+                      : Math.max(16, rowHeight * 0.5),
+                  width: bar.width,
+                  background:
+                    bar.type === 'subtask'
+                      ? '#c7d2fe'
+                      : bar.type === 'segment'
+                      ? '#93c5fd'
+                      : bar.type === 'parent-span'
+                      ? 'transparent'
+                      : '#a5b4fc',
+                  borderRadius: 6,
+                  cursor: bar.type === 'parent-span' ? 'default' : 'pointer',
+                  boxShadow: bar.type === 'parent-span' ? 'none' : '0 2px 6px rgba(0,0,0,0.12)',
+                  overflow: 'hidden',
+                  border:
+                    bar.type === 'subtask'
+                      ? '1px dashed #818cf8'
+                      : bar.type === 'segment'
+                      ? '1px solid #60a5fa'
+                      : bar.type === 'parent-span'
+                      ? '1px solid rgba(99,102,241,0.35)'
+                      : 'none',
+                  pointerEvents: bar.type === 'parent-span' ? 'none' : 'auto',
+                }}
+              >
+                {bar.type !== 'parent-span' && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: `${Math.max(0, Math.min(100, Number(bar.task?.progress ?? 0)))}%`,
+                      background:
+                        bar.type === 'subtask'
+                          ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
+                          : 'linear-gradient(90deg, #818cf8, #6366f1)',
+                    }}
+                  />
+                )}
+                {bar.type !== 'parent-span' && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 8,
+                      top: 2,
+                      right: 8,
+                      bottom: 2,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      color: '#0f172a',
+                      fontSize: 12,
+                    }}
+                  >
+                    {bar.task?.name || ''}
+                  </div>
+                )}
               </div>
             ))}
           </div>

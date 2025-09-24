@@ -8,9 +8,12 @@ import { toast } from 'react-toastify';
 
 import SeatingPlanCanvas from './SeatingPlanCanvas';
 import SeatingPlanModals from './SeatingPlanModals';
-import SeatingPlanSidebar from './SeatingPlanSidebar';
 import SeatingPlanTabs from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
+import SeatingLibraryPanel from './SeatingLibraryPanel';
+import SeatingInspectorPanel from './SeatingInspectorPanel';
+import SeatingGuestDrawer from './SeatingGuestDrawer';
+
 import { useWedding } from '../../context/WeddingContext';
 import { useSeatingPlan } from '../../hooks/useSeatingPlan';
 import { post as apiPost } from '../../services/apiClient';
@@ -124,6 +127,29 @@ const SeatingPlanRefactored = () => {
       : { width: 1800, height: 1200 };
 
   const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
+
+  // Drawer de invitados pendientes y viewport del canvas
+  const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
+  const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
+
+  // Invitados pendientes sin mesa
+  const pendingGuests = React.useMemo(() => {
+    try {
+      return safeGuests.filter((g) => !g?.table && !g?.tableId);
+    } catch (_) {
+      return [];
+    }
+  }, [safeGuests]);
+
+  // Invitados asignados a la mesa seleccionada
+  const assignedToSelected = React.useMemo(() => {
+    try {
+      if (!selectedTable) return [];
+      return safeGuests.filter((g) => g?.tableId === selectedTable?.id);
+    } catch (_) {
+      return [];
+    }
+  }, [safeGuests, selectedTable]);
 
   /* ---- atajos Ctrl/Cmd + Z / Y ---- */
   useEffect(() => {
@@ -616,56 +642,31 @@ const SeatingPlanRefactored = () => {
           />
         </div>
 
-        {/* Cuerpo */}
-        <div className="flex-1 flex">
-          {/* Sidebar */}
-          <div className="w-80 flex-shrink-0">
-            <SeatingPlanSidebar
-              selectedTable={selectedTable}
-              onTableDimensionChange={handleTableDimensionChange}
-              onToggleTableShape={toggleSelectedTableShape}
-              onConfigureTable={handleConfigureTable}
-              guests={safeGuests}
-              tab={tab}
+        {/* Cuerpo principal: Biblioteca (izqda) · Canvas (centro) · Inspector (dcha) */}
+        <div className="flex-1 grid grid-cols-[18rem_1fr_20rem] gap-3 px-4 pb-3">
+          {/* Biblioteca y capas */}
+          <div className="min-h-0">
+            <SeatingLibraryPanel
               drawMode={drawMode}
               onDrawModeChange={setDrawMode}
-              onAssignGuest={handleAssignGuest}
-              onUnassignGuest={handleUnassignGuest}
-              deleteTable={deleteTable}
-              duplicateTable={duplicateTable}
-              toggleTableLocked={toggleTableLocked}
-              conflicts={Array.isArray(conflicts) ? conflicts : []}
-              onFixTable={(id) => {
-                try {
-                  fixTablePosition?.(id);
-                  toast.info('Mesa ajustada');
-                } catch (_) {}
-              }}
-              onFocusTable={(id) => {
-                try {
-                  handleSelectTable(id, false);
-                  setFocusTableId(id);
-                } catch (_) {}
-              }}
-              onSelectTable={(id, add) => handleSelectTable(id, add)}
-              guidedGuestId={guidedGuestId}
-              onGuideGuest={(id) => setGuidedGuestId(id || null)}
-              suggestForGuest={(gid) => {
-                try {
-                  return suggestTablesForGuest?.(gid) || [];
-                } catch (_) {
-                  return [];
-                }
-              }}
-              scoringWeights={scoringWeights}
-              onUpdateScoringWeights={(p) => setScoringWeights?.(p)}
-              globalMaxSeats={globalMaxSeats}
-              className="h-full"
+              onOpenTemplates={handleOpenTemplates}
+              showTables={showTables}
+              onToggleShowTables={toggleShowTables}
+              showRulers={showRulers}
+              onToggleRulers={() => setShowRulers((v) => !v)}
+              snapToGrid={!!snapToGrid}
+              onToggleSnap={() => setSnapToGrid((v) => !v)}
+              showSeatNumbers={showSeatNumbers}
+              onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
+              gridStep={gridStep}
+              onAddTable={addTable}
+              onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+              pendingCount={pendingGuests.length}
             />
           </div>
 
-          {/* Canvas */}
-          <div className="flex-1">
+          {/* Canvas central */}
+          <div className="min-h-0">
             <SeatingPlanCanvas
               tab={tab}
               areas={safeAreas}
@@ -711,9 +712,49 @@ const SeatingPlanRefactored = () => {
               validationsEnabled={validationsEnabled}
               suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
               focusTableId={focusTableId}
+              onViewportChange={(vp) => setViewport(vp)}
+            />
+          </div>
+
+          {/* Inspector contextual */}
+          <div className="min-h-0">
+            <SeatingInspectorPanel
+              selectedTable={selectedTable}
+              tab={tab}
+              globalMaxSeats={globalMaxSeats}
+              onTableDimensionChange={handleTableDimensionChange}
+              onToggleTableShape={toggleSelectedTableShape}
+              onConfigureTable={handleConfigureTable}
+              duplicateTable={duplicateTable}
+              deleteTable={deleteTable}
+              toggleTableLocked={toggleTableLocked}
+              assignedGuests={assignedToSelected}
+              onUnassignGuest={handleUnassignGuest}
+              className="h-full"
             />
           </div>
         </div>
+
+        {/* Barra inferior de estado */}
+        <div className="flex-shrink-0 px-4 pb-4">
+          <div className="flex items-center gap-4 text-xs text-gray-600 bg-white border rounded-lg px-3 py-2">
+            <div>Zoom: {Math.round((viewport?.scale || 1) * 100)}%</div>
+            <div>Dimensiones: {(safeHallSize.width / 100).toFixed(1)} × {(safeHallSize.height / 100).toFixed(1)} m</div>
+            <div>Conflictos: {Array.isArray(conflicts) ? conflicts.length : 0}</div>
+            <button className="ml-auto px-2 py-1 border rounded hover:bg-gray-50" onClick={() => setGuestDrawerOpen(true)}>
+              Pendientes: {pendingGuests.length}
+            </button>
+          </div>
+        </div>
+
+        {/* Drawer de invitados */}
+        <SeatingGuestDrawer
+          open={guestDrawerOpen}
+          onClose={() => setGuestDrawerOpen(false)}
+          guests={safeGuests}
+          selectedTableId={selectedTable?.id}
+          onAssignGuest={handleAssignGuest}
+        />
 
         {/* Modales */}
         <SeatingPlanModals

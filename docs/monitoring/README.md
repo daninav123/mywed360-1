@@ -81,3 +81,36 @@ Archivo: `docs/monitoring/alertmanager.yml`
 - `/metrics` devuelve 503: instala `prom-client` o comprueba que no se eliminó la ruta.
 - No aparecen métricas de rutas: asegura que las peticiones alcanzan el backend y el `metrics` middleware está antes de las rutas.
 - Grafana no grafica p95: valida que `http_request_duration_seconds_bucket` existe; si no, `prom-client` no se cargó.
+
+## Playbook Operacional
+
+1. Verificación rápida de salud
+   - Backend: `GET /health` y `GET /api/health` (comprueba integraciones: Mailgun/OpenAI/Twilio)
+   - Readiness: `GET /api/health/readyz` (Firestore)
+   - Liveness: `GET /api/health/livez`
+
+2. Métricas y paneles
+   - Prometheus: verificar `GET /metrics` (requiere rol admin)
+   - Grafana: importar `docs/monitoring/grafana/http-overview.json` y paneles de dominio (seating, RSVP)
+
+3. Alertas
+   - Cargar `docs/monitoring/alerting_rules.yml` en Prometheus
+   - Alertmanager: configurar Slack y/o SMTP en `docs/monitoring/alertmanager.yml`
+
+4. Notificaciones
+   - Slack: canal de alertas (configurar webhook en alertmanager)
+   - SMTP: servidor, remitente y destinatarios en `alertmanager.yml`
+
+5. Escalado y respuesta
+   - Identificar ruta con mayor `errorRate` vía `GET /api/admin/metrics/http` (requiere admin + allowlist IP)
+   - Revisar logs (nivel error) y requestId correlacionado (`X-Request-ID`)
+
+## Alertas críticas (respuestas sugeridas)
+
+- HighErrorRate (5xx > 5 en 5m)
+  - Acciones: identificar rutas con mayor errorRate, revisar dependencias externas (Mailgun/Twilio/OpenAI), aplicar rollback si supera SLO de 2min
+  - Responsables: Backend on-call
+
+- SlowRequestsP95 (>1s durante 2m)
+  - Acciones: revisar `http_request_duration_seconds` por ruta, evaluar p95/p99, revisar cuellos de botella (DB/terceros)
+  - Responsables: Backend on-call / Dev del módulo
