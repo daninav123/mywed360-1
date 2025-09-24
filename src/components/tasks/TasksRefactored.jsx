@@ -19,6 +19,7 @@ import { useGanttSizing } from './hooks/useGanttSizing.js';
 import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks.js';
 import { useSafeEvents } from './hooks/useSafeEvents.js';
 import LongTermTasksGantt from './LongTermTasksGantt.jsx';
+import AllTasksModal from './AllTasksModal.jsx';
 import TaskForm from './TaskForm.jsx';
 import TaskList from './TaskList.jsx';
 import TasksHeader from './TasksHeader.jsx';
@@ -95,6 +96,7 @@ export default function Tasks() {
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
   const [showNewTask, setShowNewTask] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -119,10 +121,12 @@ export default function Tasks() {
     try {
       if (typeof window !== 'undefined' && window.__GANTT_DEBUG__) return true;
       const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-      const q = qs ? (qs.get('debug') || qs.get('ganttDebug') || qs.get('debugGantt')) : '';
-      const ls1 = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
-      const ls2 = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_debug') : null;
-      return [q, ls1, ls2].some((v) => v && (/^1|true$/i.test(String(v))));
+      const q = qs ? qs.get('debug') || qs.get('ganttDebug') || qs.get('debugGantt') : '';
+      const ls1 =
+        typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
+      const ls2 =
+        typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_debug') : null;
+      return [q, ls1, ls2].some((v) => v && /^1|true$/i.test(String(v)));
     } catch {
       return false;
     }
@@ -189,9 +193,12 @@ export default function Tasks() {
       window.mywed = window.mywed || {};
       window.mywed.fixParentBlockDates = async () => {
         if (!activeWedding) return { ok: false };
-        const startForBlocks = (projectStart instanceof Date && !isNaN(projectStart))
-          ? projectStart
-          : (projectEnd instanceof Date && !isNaN(projectEnd) ? addMonths(projectEnd, -12) : null);
+        const startForBlocks =
+          projectStart instanceof Date && !isNaN(projectStart)
+            ? projectStart
+            : projectEnd instanceof Date && !isNaN(projectEnd)
+              ? addMonths(projectEnd, -12)
+              : null;
         const res = await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
         console.log('[Debug] fixParentBlockDates', res);
         return res;
@@ -336,7 +343,16 @@ export default function Tasks() {
 
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: ['venue', 'location', 'lugar', 'sitio', 'espacio', 'salÃƒâ€™Ã‚Â³n', 'jardÃƒâ€™Ã‚Â­n', 'terraza'],
+        LUGAR: [
+          'venue',
+          'location',
+          'lugar',
+          'sitio',
+          'espacio',
+          'salÃƒâ€™Ã‚Â³n',
+          'jardÃƒâ€™Ã‚Â­n',
+          'terraza',
+        ],
         INVITADOS: [
           'guests',
           'invitados',
@@ -363,9 +379,30 @@ export default function Tasks() {
           'programa',
           'seating plan',
         ],
-        MUSICA: ['mÃƒâ€™Ã‚Âºsica', 'dj', 'banda', 'playlist', 'sonido', 'baile', 'entretenimiento'],
-        FOTOGRAFO: ['fotografÃƒâ€™Ã‚Â­a', 'video', 'recuerdos', 'Ãƒâ€™Ã‚Â¡lbum', 'sesiÃƒâ€™Ã‚Â³n'],
-        VESTUARIO: ['vestido', 'traje', 'accesorios', 'zapatos', 'maquillaje', 'peluquerÃƒâ€™Ã‚Â­a'],
+        MUSICA: [
+          'mÃƒâ€™Ã‚Âºsica',
+          'dj',
+          'banda',
+          'playlist',
+          'sonido',
+          'baile',
+          'entretenimiento',
+        ],
+        FOTOGRAFO: [
+          'fotografÃƒâ€™Ã‚Â­a',
+          'video',
+          'recuerdos',
+          'Ãƒâ€™Ã‚Â¡lbum',
+          'sesiÃƒâ€™Ã‚Â³n',
+        ],
+        VESTUARIO: [
+          'vestido',
+          'traje',
+          'accesorios',
+          'zapatos',
+          'maquillaje',
+          'peluquerÃƒâ€™Ã‚Â­a',
+        ],
       };
 
       // Contar coincidencias por categorÃƒâ€™Ã‚Â­a
@@ -456,13 +493,22 @@ export default function Tasks() {
             let others = arr.find(
               (t) =>
                 String(t?.type || 'task') === 'task' &&
-                ((String(t?.name || '').trim().toUpperCase() === 'OTROS') ||
-                  (String(t?.title || '').trim().toUpperCase() === 'OTROS'))
+                (String(t?.name || '')
+                  .trim()
+                  .toUpperCase() === 'OTROS' ||
+                  String(t?.title || '')
+                    .trim()
+                    .toUpperCase() === 'OTROS')
             );
             if (!others && activeWedding && db) {
-              const pStart = (projectStart instanceof Date && !isNaN(projectStart)) ? projectStart : startDate;
-              const pEndBase = (projectEnd instanceof Date && !isNaN(projectEnd)) ? projectEnd : endDate;
-              const pEnd = pEndBase && pEndBase > pStart ? pEndBase : new Date(pStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+              const pStart =
+                projectStart instanceof Date && !isNaN(projectStart) ? projectStart : startDate;
+              const pEndBase =
+                projectEnd instanceof Date && !isNaN(projectEnd) ? projectEnd : endDate;
+              const pEnd =
+                pEndBase && pEndBase > pStart
+                  ? pEndBase
+                  : new Date(pStart.getTime() + 7 * 24 * 60 * 60 * 1000);
               const colRef = collection(db, 'weddings', activeWedding, 'tasks');
               const docRef = await addDoc(colRef, {
                 title: 'OTROS',
@@ -711,8 +757,18 @@ export default function Tasks() {
         }));
 
       const nested = (Array.isArray(nestedSubtasks) ? nestedSubtasks : []).map((s) => {
-        const start = s.start instanceof Date ? s.start : (s.start && typeof s.start.toDate === 'function' ? s.start.toDate() : new Date(s.start || Date.now()));
-        const end = s.end instanceof Date ? s.end : (s.end && typeof s.end.toDate === 'function' ? s.end.toDate() : new Date(s.end || start));
+        const start =
+          s.start instanceof Date
+            ? s.start
+            : s.start && typeof s.start.toDate === 'function'
+              ? s.start.toDate()
+              : new Date(s.start || Date.now());
+        const end =
+          s.end instanceof Date
+            ? s.end
+            : s.end && typeof s.end.toDate === 'function'
+              ? s.end.toDate()
+              : new Date(s.end || start);
         return {
           id: String(s.id),
           title: s.name || s.title || 'Subtarea',
@@ -754,7 +810,6 @@ export default function Tasks() {
       }
     } catch (_) {}
     return s;
-
   }, [completedDocs]);
   const parentTaskOptions = useMemo(() => {
     try {
@@ -818,68 +873,117 @@ export default function Tasks() {
         setSeedingDefaults(false);
         return;
       }
-        const endBase =
-          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-            ? projectEnd
-            : new Date();
-        const startBase =
-          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-            ? addMonths(projectEnd, -12)
-            : addMonths(endBase, -12);
-        const span = Math.max(1, endBase.getTime() - startBase.getTime());
-        const at = (p) => new Date(startBase.getTime() + span * p);
+      const endBase =
+        projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
+      const startBase =
+        projectEnd instanceof Date && !isNaN(projectEnd.getTime())
+          ? addMonths(projectEnd, -12)
+          : addMonths(endBase, -12);
+      const span = Math.max(1, endBase.getTime() - startBase.getTime());
+      const at = (p) => new Date(startBase.getTime() + span * p);
 
       const blocks = [
-        { key: 'A', name: 'Bloque A - Fundamentos', p0: 0.0, p1: 0.2, items: [
-          'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-          'Crear primera versiÃƒÂ³n de la lista de invitados',
-          'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
-          'Decidir cortejo nupcial',
-        ]},
-        { key: 'B', name: 'Bloque B - Proveedores Clave', p0: 0.1, p1: 0.8, items: [
-          'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
-          'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
-          'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
-          'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
-          'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
-          'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
-        ]},
-        { key: 'C', name: 'Bloque C - Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
-          'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
-          'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
-          'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
-        ]},
-        { key: 'D', name: 'Bloque D - Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
-          'Invitaciones digitales y save-the-dates (inicio medio)',
-          'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
-          'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
-          'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
-        ]},
-        { key: 'E', name: 'Bloque E - OrganizaciÃƒÂ³n y LogÃƒÂ­stica', p0: 0.3, p1: 1.0, items: [
-          'Transporte (se puede definir pronto, confirmar al final)',
-          'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
-          'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
-          'Plan B clima (al final)',
-          'Ensayo general (ÃƒÂºltima fase)',
-        ]},
-        { key: 'F', name: 'Bloque F - Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
-          'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
-          'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
-          'Votos y discursos (escribir con calma, repasar justo antes)',
-        ]},
-        { key: 'G', name: 'Bloque G - Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
-          'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
-          'Pruebas intermedias',
-          'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
-        ]},
-        { key: 'H', name: 'Bloque H - Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
-          'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-          'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
-        ]},
-        { key: 'I', name: 'Bloque I - DespuÃƒÂ©s de la Boda', p0: 1.0, p1: 1.05, items: [
-          'Disfrutar inicio del matrimonio',
-          'Organizar ÃƒÂ¡lbum y recuerdos',
-        ]},
+        {
+          key: 'A',
+          name: 'Bloque A - Fundamentos',
+          p0: 0.0,
+          p1: 0.2,
+          items: [
+            'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+            'Crear primera versiÃƒÂ³n de la lista de invitados',
+            'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
+            'Decidir cortejo nupcial',
+          ],
+        },
+        {
+          key: 'B',
+          name: 'Bloque B - Proveedores Clave',
+          p0: 0.1,
+          p1: 0.8,
+          items: [
+            'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
+            'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
+            'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
+            'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
+            'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
+            'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
+          ],
+        },
+        {
+          key: 'C',
+          name: 'Bloque C - Vestuario y Moda',
+          p0: 0.15,
+          p1: 0.9,
+          items: [
+            'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
+            'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
+            'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
+          ],
+        },
+        {
+          key: 'D',
+          name: 'Bloque D - Estilo y Detalles',
+          p0: 0.2,
+          p1: 0.95,
+          items: [
+            'Invitaciones digitales y save-the-dates (inicio medio)',
+            'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
+            'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
+            'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
+          ],
+        },
+        {
+          key: 'E',
+          name: 'Bloque E - OrganizaciÃƒÂ³n y LogÃƒÂ­stica',
+          p0: 0.3,
+          p1: 1.0,
+          items: [
+            'Transporte (se puede definir pronto, confirmar al final)',
+            'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
+            'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
+            'Plan B clima (al final)',
+            'Ensayo general (ÃƒÂºltima fase)',
+          ],
+        },
+        {
+          key: 'F',
+          name: 'Bloque F - Celebraciones y Emociones',
+          p0: 0.4,
+          p1: 0.95,
+          items: [
+            'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
+            'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
+            'Votos y discursos (escribir con calma, repasar justo antes)',
+          ],
+        },
+        {
+          key: 'G',
+          name: 'Bloque G - Belleza y Cuidado',
+          p0: 0.6,
+          p1: 0.95,
+          items: [
+            'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
+            'Pruebas intermedias',
+            'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
+          ],
+        },
+        {
+          key: 'H',
+          name: 'Bloque H - Anillos y Luna de Miel',
+          p0: 0.7,
+          p1: 1.0,
+          items: [
+            'Comprar anillos (se puede hacer pronto, recoger justo antes)',
+            'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
+          ],
+        },
+        {
+          key: 'I',
+          name: 'Bloque I - DespuÃƒÂ©s de la Boda',
+          p0: 1.0,
+          p1: 1.05,
+          items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÂ¡lbum y recuerdos'],
+        },
       ];
 
       const colRef = collection(db, 'weddings', activeWedding, 'tasks');
@@ -898,7 +1002,7 @@ export default function Tasks() {
         const pDoc = await addDoc(colRef, parent);
         await setDoc(pDoc, { id: pDoc.id }, { merge: true });
         for (const item of b.items) {
-          const s = at(b.p0 + (Math.random() * (b.p1 - b.p0) * 0.6));
+          const s = at(b.p0 + Math.random() * (b.p1 - b.p0) * 0.6);
           const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
           const sub = {
             title: item,
@@ -941,9 +1045,7 @@ export default function Tasks() {
         // Permitir seed aunque aÃƒÂºn no haya weddingDate: usar fallbacks razonables
         // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
         const endBase =
-          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-            ? projectEnd
-            : new Date();
+          projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
         const startBase =
           projectEnd instanceof Date && !isNaN(projectEnd.getTime())
             ? addMonths(projectEnd, -12)
@@ -952,56 +1054,107 @@ export default function Tasks() {
         const at = (p) => new Date(startBase.getTime() + span * p);
 
         const blocks = [
-          { key: 'A', name: 'Fundamentos', p0: 0.0, p1: 0.2, items: [
-            'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-            'Crear primera versiÃƒÂ³n de la lista de invitados',
-            'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
-            'Decidir cortejo nupcial',
-          ]},
-          { key: 'B', name: 'Proveedores Clave', p0: 0.1, p1: 0.8, items: [
-            'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
-            'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
-            'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
-            'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
-            'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
-            'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
-          ]},
-          { key: 'C', name: 'Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
-            'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
-            'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
-            'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
-          ]},
-          { key: 'D', name: 'Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
-            'Invitaciones digitales y save-the-dates (inicio medio)',
-            'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
-            'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
-            'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
-          ]},
-          { key: 'E', name: 'OrganizaciÃƒÂ³n y LogÃƒÂ­stica', p0: 0.3, p1: 1.0, items: [
-            'Transporte (se puede definir pronto, confirmar al final)',
-            'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
-            'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
-            'Plan B clima (al final)',
-            'Ensayo general (ÃƒÂºltima fase)',
-          ]},
-          { key: 'F', name: 'Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
-            'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
-            'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
-            'Votos y discursos (escribir con calma, repasar justo antes)',
-          ]},
-          { key: 'G', name: 'Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
-            'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
-            'Pruebas intermedias',
-            'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
-          ]},
-          { key: 'H', name: 'Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
-            'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-            'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
-          ]},
-          { key: 'I', name: 'DespuÃƒÂ©s de la Boda', p0: 1.0, p1: 1.05, items: [
-            'Disfrutar inicio del matrimonio',
-            'Organizar ÃƒÂ¡lbum y recuerdos',
-          ]},
+          {
+            key: 'A',
+            name: 'Fundamentos',
+            p0: 0.0,
+            p1: 0.2,
+            items: [
+              'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+              'Crear primera versiÃƒÂ³n de la lista de invitados',
+              'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
+              'Decidir cortejo nupcial',
+            ],
+          },
+          {
+            key: 'B',
+            name: 'Proveedores Clave',
+            p0: 0.1,
+            p1: 0.8,
+            items: [
+              'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
+              'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
+              'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
+              'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
+              'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
+              'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
+            ],
+          },
+          {
+            key: 'C',
+            name: 'Vestuario y Moda',
+            p0: 0.15,
+            p1: 0.9,
+            items: [
+              'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
+              'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
+              'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
+            ],
+          },
+          {
+            key: 'D',
+            name: 'Estilo y Detalles',
+            p0: 0.2,
+            p1: 0.95,
+            items: [
+              'Invitaciones digitales y save-the-dates (inicio medio)',
+              'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
+              'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
+              'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
+            ],
+          },
+          {
+            key: 'E',
+            name: 'OrganizaciÃƒÂ³n y LogÃƒÂ­stica',
+            p0: 0.3,
+            p1: 1.0,
+            items: [
+              'Transporte (se puede definir pronto, confirmar al final)',
+              'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
+              'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
+              'Plan B clima (al final)',
+              'Ensayo general (ÃƒÂºltima fase)',
+            ],
+          },
+          {
+            key: 'F',
+            name: 'Celebraciones y Emociones',
+            p0: 0.4,
+            p1: 0.95,
+            items: [
+              'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
+              'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
+              'Votos y discursos (escribir con calma, repasar justo antes)',
+            ],
+          },
+          {
+            key: 'G',
+            name: 'Belleza y Cuidado',
+            p0: 0.6,
+            p1: 0.95,
+            items: [
+              'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
+              'Pruebas intermedias',
+              'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
+            ],
+          },
+          {
+            key: 'H',
+            name: 'Anillos y Luna de Miel',
+            p0: 0.7,
+            p1: 1.0,
+            items: [
+              'Comprar anillos (se puede hacer pronto, recoger justo antes)',
+              'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
+            ],
+          },
+          {
+            key: 'I',
+            name: 'DespuÃƒÂ©s de la Boda',
+            p0: 1.0,
+            p1: 1.05,
+            items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÂ¡lbum y recuerdos'],
+          },
         ];
 
         const colRef = collection(db, 'weddings', activeWedding, 'tasks');
@@ -1020,7 +1173,7 @@ export default function Tasks() {
           const pDoc = await addDoc(colRef, parent);
           await setDoc(pDoc, { id: pDoc.id }, { merge: true });
           for (const item of b.items) {
-            const s = at(b.p0 + (Math.random() * (b.p1 - b.p0) * 0.6));
+            const s = at(b.p0 + Math.random() * (b.p1 - b.p0) * 0.6);
             const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
             const sub = {
               title: item,
@@ -1109,7 +1262,8 @@ export default function Tasks() {
             info?.eventDate ||
             info?.eventdate ||
             null;
-          const d = raw && typeof raw?.toDate === 'function' ? raw.toDate() : raw ? new Date(raw) : null;
+          const d =
+            raw && typeof raw?.toDate === 'function' ? raw.toDate() : raw ? new Date(raw) : null;
           if (d && !isNaN(d.getTime())) setProjectEnd(d);
         } catch (_) {}
       };
@@ -1117,9 +1271,15 @@ export default function Tasks() {
       const unsub2 = onSnapshot(refLegacy, handler, () => {});
       const unsub3 = onSnapshot(refLower, handler, () => {});
       return () => {
-        try { unsub1 && unsub1(); } catch (_) {}
-        try { unsub2 && unsub2(); } catch (_) {}
-        try { unsub3 && unsub3(); } catch (_) {}
+        try {
+          unsub1 && unsub1();
+        } catch (_) {}
+        try {
+          unsub2 && unsub2();
+        } catch (_) {}
+        try {
+          unsub3 && unsub3();
+        } catch (_) {}
       };
     } catch (_) {}
   }, [activeWedding, db]);
@@ -1136,14 +1296,16 @@ export default function Tasks() {
             if (!snap || !snap.exists()) return;
             const info = snap.data() || {};
             const raw =
-              (info?.weddingInfo && (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
+              (info?.weddingInfo &&
+                (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
               info?.weddingDate ||
               info?.weddingdate ||
               info?.date ||
               null;
             let d = null;
             if (raw && typeof raw?.toDate === 'function') d = raw.toDate();
-            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') d = new Date(raw.seconds * 1000);
+            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number')
+              d = new Date(raw.seconds * 1000);
             else if (typeof raw === 'number') d = new Date(raw < 1e12 ? raw * 1000 : raw);
             else if (typeof raw === 'string') {
               const ymd = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -1163,7 +1325,9 @@ export default function Tasks() {
               }
             }
             if (d && !isNaN(d.getTime())) {
-              try { console.log('[Tasks] projectEnd from root', d); } catch(_){}
+              try {
+                console.log('[Tasks] projectEnd from root', d);
+              } catch (_) {}
               setProjectEnd(d);
             }
           } catch (_) {}
@@ -1171,7 +1335,9 @@ export default function Tasks() {
         () => {}
       );
       return () => {
-        try { unsub && unsub(); } catch (_) {}
+        try {
+          unsub && unsub();
+        } catch (_) {}
       };
     } catch (_) {}
   }, [activeWedding, db]);
@@ -1188,14 +1354,16 @@ export default function Tasks() {
             if (!snap || !snap.exists()) return;
             const info = snap.data() || {};
             const raw =
-              (info?.weddingInfo && (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
+              (info?.weddingInfo &&
+                (info.weddingInfo.weddingDate || info.weddingInfo.weddingdate)) ||
               info?.weddingDate ||
               info?.weddingdate ||
               info?.date ||
               null;
             let d = null;
             if (raw && typeof raw?.toDate === 'function') d = raw.toDate();
-            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') d = new Date(raw.seconds * 1000);
+            else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number')
+              d = new Date(raw.seconds * 1000);
             else if (typeof raw === 'number') d = new Date(raw < 1e12 ? raw * 1000 : raw);
             else if (typeof raw === 'string') {
               const ymd0 = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -1209,19 +1377,37 @@ export default function Tasks() {
               const iso = new Date(raw);
               if (!isNaN(iso.getTime())) d = iso;
               else {
-                const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/);
+                const m = raw.match(
+                  /(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/
+                );
                 if (m) {
                   const day = parseInt(m[1], 10);
                   const name = m[2].toLowerCase();
                   const year = parseInt(m[3], 10);
-                  const map = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11 };
+                  const map = {
+                    enero: 0,
+                    febrero: 1,
+                    marzo: 2,
+                    abril: 3,
+                    mayo: 4,
+                    junio: 5,
+                    julio: 6,
+                    agosto: 7,
+                    septiembre: 8,
+                    setiembre: 8,
+                    octubre: 9,
+                    noviembre: 10,
+                    diciembre: 11,
+                  };
                   const mon = map[name];
                   if (mon !== undefined) d = new Date(year, mon, day);
                 }
               }
             }
             if (d && !isNaN(d.getTime())) {
-              try { console.log('[Tasks] projectEnd from subdoc info/weddingInfo', d); } catch(_){}
+              try {
+                console.log('[Tasks] projectEnd from subdoc info/weddingInfo', d);
+              } catch (_) {}
               setProjectEnd(d);
             }
           } catch (_) {}
@@ -1229,7 +1415,9 @@ export default function Tasks() {
         () => {}
       );
       return () => {
-        try { unsub && unsub(); } catch (_) {}
+        try {
+          unsub && unsub();
+        } catch (_) {}
       };
     } catch (_) {}
   }, [activeWedding, db]);
@@ -1245,7 +1433,8 @@ export default function Tasks() {
         let d = null;
         if (snap && snap.exists()) {
           const data = snap.data() || {};
-          const raw = data?.createdAt || data?.created_at || data?.created || data?.createdat || null;
+          const raw =
+            data?.createdAt || data?.created_at || data?.created || data?.createdat || null;
           if (raw && typeof raw?.toDate === 'function') {
             d = raw.toDate();
           } else if (raw && typeof raw === 'object' && typeof raw.seconds === 'number') {
@@ -1256,12 +1445,28 @@ export default function Tasks() {
             const iso = new Date(raw);
             if (!isNaN(iso.getTime())) d = iso;
             else {
-              const m = raw.match(/(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/);
+              const m = raw.match(
+                /(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/
+              );
               if (m) {
                 const day = parseInt(m[1], 10);
                 const name = m[2].toLowerCase();
                 const year = parseInt(m[3], 10);
-                const map = { enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11 };
+                const map = {
+                  enero: 0,
+                  febrero: 1,
+                  marzo: 2,
+                  abril: 3,
+                  mayo: 4,
+                  junio: 5,
+                  julio: 6,
+                  agosto: 7,
+                  septiembre: 8,
+                  setiembre: 8,
+                  octubre: 9,
+                  noviembre: 10,
+                  diciembre: 11,
+                };
                 const mon = map[name];
                 if (mon !== undefined) d = new Date(year, mon, day);
               }
@@ -1340,7 +1545,10 @@ export default function Tasks() {
       try {
         if (!activeWedding) return;
         if (!(projectEnd instanceof Date) || isNaN(projectEnd.getTime())) return;
-        const startForBlocks = (projectStart instanceof Date && !isNaN(projectStart)) ? projectStart : addMonths(projectEnd, -12);
+        const startForBlocks =
+          projectStart instanceof Date && !isNaN(projectStart)
+            ? projectStart
+            : addMonths(projectEnd, -12);
         await fixParentBlockDates(activeWedding, startForBlocks, projectEnd);
       } catch (_) {}
     })();
@@ -1350,6 +1558,7 @@ export default function Tasks() {
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       <TasksHeader
         syncStatus={syncStatus}
+        onShowAllTasks={() => setShowAllTasks(true)}
         onNewTask={() => {
           resetForm();
           setShowNewTask(true);
@@ -1360,7 +1569,7 @@ export default function Tasks() {
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
         <h2 className="text-xl font-semibold mb-4">Planificación a Largo Plazo</h2>
         <div className="bg-white rounded-lg shadow p-4">
-          <LongTermTasksGantt 
+          <LongTermTasksGantt
             tasks={ganttDisplayTasks || []}
             subtasks={subtaskEvents || []}
             projectStart={projectStart || new Date()}
@@ -1374,7 +1583,7 @@ export default function Tasks() {
                 const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
                 const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
                 setEditingId(task.id);
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
                   title: task.title || '',
                   desc: task.desc || '',
@@ -1384,7 +1593,7 @@ export default function Tasks() {
                   endDate: eventEnd.toISOString().slice(0, 10),
                   endTime: eventEnd.toTimeString().slice(0, 5),
                   long: task.__kind === 'subtask',
-                  parentTaskId: task.__kind === 'subtask' ? (task.parentId || '') : '',
+                  parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
                   assignee: task.assignee || '',
                   completed: completedIdSet?.has?.(String(task.id)) || false,
                 }));
@@ -1453,7 +1662,7 @@ export default function Tasks() {
                 endDate: eventEnd.toISOString().slice(0, 10),
                 endTime: eventEnd.toTimeString().slice(0, 5),
                 long: event.__kind === 'subtask' ? true : false,
-                parentTaskId: event.__kind === 'subtask' ? (event.parentId || '') : '',
+                parentTaskId: event.__kind === 'subtask' ? event.parentId || '' : '',
                 assignee: event.assignee || '',
                 completed: completedIdSet.has(String(event.id)),
               });
@@ -1467,11 +1676,49 @@ export default function Tasks() {
         <DebugTasksPanel
           projectStart={projectStart}
           projectEnd={projectEnd}
-          parentsRaw={(Array.isArray(tasksState) ? tasksState : []).filter((t)=>String(t?.type||'task')==='task')}
+          parentsRaw={(Array.isArray(tasksState) ? tasksState : []).filter(
+            (t) => String(t?.type || 'task') === 'task'
+          )}
           uniqueGanttTasks={uniqueGanttTasks}
           ganttTasksBounded={ganttTasksBounded}
           ganttDisplayTasks={ganttDisplayTasks}
           nestedSubtasks={nestedSubtasks}
+        />
+      )}
+      {/* Modal: Todas las tareas agrupadas por padre */}
+      {showAllTasks && (
+        <AllTasksModal
+          isOpen={showAllTasks}
+          onClose={() => setShowAllTasks(false)}
+          parents={uniqueGanttTasks}
+          subtasks={subtaskEvents}
+          completedSet={completedIdSet}
+          onToggleComplete={(id, val) => toggleCompleteById(id, val)}
+          onTaskClick={(task) => {
+            if (!task) return;
+            try {
+              const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
+              const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
+              setEditingId(task.id);
+              setFormData((prev) => ({
+                ...prev,
+                title: task.title || '',
+                desc: task.desc || '',
+                category: task.category || 'OTROS',
+                startDate: eventStart.toISOString().slice(0, 10),
+                startTime: eventStart.toTimeString().slice(0, 5),
+                endDate: eventEnd.toISOString().slice(0, 10),
+                endTime: eventEnd.toTimeString().slice(0, 5),
+                long: task.__kind === 'subtask',
+                parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
+                assignee: task.assignee || '',
+                completed: completedIdSet?.has?.(String(task.id)) || false,
+              }));
+              setShowNewTask(true);
+            } catch (error) {
+              console.error('Error al abrir tarea desde el modal:', error);
+            }
+          }}
         />
       )}
       {/* Modal para nueva tarea */}
@@ -1490,8 +1737,3 @@ export default function Tasks() {
     </div>
   );
 }
-
-
-
-
-
