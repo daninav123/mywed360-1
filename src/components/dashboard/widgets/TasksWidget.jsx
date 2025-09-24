@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useFirestoreCollection } from '../../../hooks/useFirestoreCollection';
 
@@ -27,6 +28,7 @@ const normalizeDate = (d) => {
 };
 
 export const TasksWidget = ({ config }) => {
+  const navigate = useNavigate();
   const { data: meetings = [] } = useFirestoreCollection('meetings', []);
 
   const items = useMemo(() => {
@@ -127,10 +129,14 @@ export const TasksWidget = ({ config }) => {
         )}
       </div>
       <div className="mt-4 text-right">
-        <button className="text-sm text-blue-600 hover:text-blue-800">
+        <button
+          className="text-sm text-blue-600 hover:text-blue-800"
+          onClick={() => navigate('/tasks?showAllTasks=1')}
+        >
           Ver todas las tareas →
         </button>
       </div>
     </div>
   );
 };
+

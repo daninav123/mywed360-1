@@ -79,6 +79,7 @@ import spotifyRouter from './routes/spotify.js';
 import playbackRouter from './routes/playback.js';
 import bankRouter from './routes/bank.js';
 import emailActionsRouter from './routes/email-actions.js';
+import providersRouter from './routes/providers.js';
 import weddingsRouter from './routes/weddings.js';
 import { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } from './config.js';
 import ipAllowlist from './middleware/ipAllowlist.js';
@@ -502,6 +503,7 @@ app.use('/api/legal-docs', requireAuth, legalDocsRouter);
 app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
+app.use('/api/providers', requireAuth, providersRouter);
 if (WHATSAPP_WEBHOOK_IP_ALLOWLIST.length) {
   app.use('/api/whatsapp/webhook/twilio', ipAllowlist(WHATSAPP_WEBHOOK_IP_ALLOWLIST));
 }

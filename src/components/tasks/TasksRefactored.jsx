@@ -96,7 +96,16 @@ export default function Tasks() {
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
   const [showNewTask, setShowNewTask] = useState(false);
-  const [showAllTasks, setShowAllTasks] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(() => {
+    try {
+      const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const raw = qs ? (qs.get('showAllTasks') || qs.get('allTasks') || qs.get('view') || '') : '';
+      const v = String(raw).toLowerCase();
+      return v === '1' || v === 'true' || v === 'yes' || v === 'all-tasks';
+    } catch (_) {
+      return false;
+    }
+  });
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
