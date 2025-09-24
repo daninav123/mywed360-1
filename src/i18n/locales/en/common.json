@@ -314,13 +314,71 @@
     },
     "transactions": {
       "title": "Transactions",
+      "new": "New Transaction",
+      "empty": "No transactions to show",
+      "createFirst": "Create first transaction",
+      "searchPlaceholder": "Search by concept...",
+      "allTypes": "All types",
+      "incomes": "Incomes",
+      "expenses": "Expenses",
+      "allCategories": "All categories",
+      "allProviders": "All providers",
+      "allDays": "All days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "onlyUncategorized": "Only uncategorized",
+      "clear": "Clear",
       "headers": {
         "date": "Date",
         "concept": "Concept",
         "category": "Category",
         "type": "Type",
         "amount": "Amount",
+        "status": "Status",
         "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (newest first)",
+        "dateAsc": "Date (oldest first)",
+        "amountDesc": "Amount (highest first)",
+        "amountAsc": "Amount (lowest first)"
+      },
+      "status": {
+        "pending": "Pending",
+        "partial": "Partial payment",
+        "paid": "Paid",
+        "expected": "Expected",
+        "received": "Received"
+      },
+      "saved": "Transaction saved",
+      "deleted": "Transaction deleted",
+      "deleteErrorPrefix": "Error deleting transaction:",
+      "saveUnexpected": "Unexpected error saving the transaction",
+      "noConcept": "No concept",
+      "noCategory": "No category",
+      "dueOn": "Due:",
+      "attachment": "Attachment",
+      "balanceLabel": "Balance:",
+      "pendingAmount": "Pending:",
+      "overdueAmount": "Overdue:",
+      "outstandingExpense": "Pending:",
+      "outstandingIncome": "To receive:",
+      "alerts": {
+        "title": "Important payments",
+        "overdue": "Overdue payments:",
+        "upcoming": "Upcoming payments (7 days):"
+      },
+      "csv": {
+        "title": "Import CSV - Column mapping",
+        "fields": {
+          "date": "Date",
+          "description": "Description",
+          "amount": "Amount",
+          "type": "Type",
+          "category": "Category"
+        },
+        "none": "None",
+        "preview": "Preview"
       }
     }
   },

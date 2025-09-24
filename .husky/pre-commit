@@ -9,4 +9,5 @@ cd "$repo_root"
 npm run validate:i18n || true
 
 # Run lint-staged for auto-fixes, but never fail the commit.
-npx lint-staged -c package.json || true
+# Let lint-staged autodetect config from package.json (avoids "No valid configuration found").
+npx lint-staged || true

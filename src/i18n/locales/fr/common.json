@@ -307,20 +307,78 @@
         "route": "Backend avec la route /api/bank dÒ©ployÒ©e"
       },
       "alternative": "Alternative temporaire : importez les mouvements manuellement depuis Finances › Transactions › \"Importer Banque\".",
-      "requisition": "RÒ©quisition :",
-      "checkStatus": "VÒ©rifier l'Ò©tat",
+      "requisition": "Réquisition :",
+      "checkStatus": "Vérifier l’état",
       "availableAccounts": "Comptes disponibles",
       "useThis": "Utiliser ce compte"
     },
     "transactions": {
       "title": "Transactions",
+      "new": "Nouvelle transaction",
+      "empty": "Aucune transaction à afficher",
+      "createFirst": "Créer la première transaction",
+      "searchPlaceholder": "Rechercher par concept...",
+      "allTypes": "Tous les types",
+      "incomes": "Revenus",
+      "expenses": "Dépenses",
+      "allCategories": "Toutes les catégories",
+      "allProviders": "Tous les prestataires",
+      "allDays": "Tous les jours",
+      "last30": "30 derniers jours",
+      "last90": "90 derniers jours",
+      "onlyUncategorized": "Seulement sans catégorie",
+      "clear": "Effacer",
       "headers": {
         "date": "Date",
         "concept": "Concept",
-        "category": "CatÒ©gorie",
+        "category": "Catégorie",
         "type": "Type",
         "amount": "Montant",
+        "status": "Statut",
         "actions": "Actions"
+      },
+      "sort": {
+        "dateDesc": "Date (plus récents d'abord)",
+        "dateAsc": "Date (plus anciens d'abord)",
+        "amountDesc": "Montant (plus élevé d'abord)",
+        "amountAsc": "Montant (plus bas d'abord)"
+      },
+      "status": {
+        "pending": "En attente",
+        "partial": "Paiement partiel",
+        "paid": "Payé",
+        "expected": "Attendu",
+        "received": "Reçu"
+      },
+      "saved": "Transaction enregistrée",
+      "deleted": "Transaction supprimée",
+      "deleteErrorPrefix": "Erreur lors de la suppression de la transaction :",
+      "saveUnexpected": "Erreur inattendue lors de l'enregistrement de la transaction",
+      "noConcept": "Sans concept",
+      "noCategory": "Sans catégorie",
+      "dueOn": "Échéance :",
+      "attachment": "Pièce jointe",
+      "balanceLabel": "Solde :",
+      "pendingAmount": "En attente :",
+      "overdueAmount": "En retard :",
+      "outstandingExpense": "En attente :",
+      "outstandingIncome": "À recevoir :",
+      "alerts": {
+        "title": "Paiements importants",
+        "overdue": "Paiements en retard :",
+        "upcoming": "Paiements à venir (7 jours) :"
+      },
+      "csv": {
+        "title": "Importer CSV - Correspondance des colonnes",
+        "fields": {
+          "date": "Date",
+          "description": "Description",
+          "amount": "Montant",
+          "type": "Type",
+          "category": "Catégorie"
+        },
+        "none": "Aucun",
+        "preview": "Aperçu"
       }
     }
   },
