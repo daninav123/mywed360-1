@@ -5,6 +5,7 @@ import logger from '../logger.js';
 import { db } from '../db.js';
 import admin from 'firebase-admin';
 import { Buffer } from 'buffer';
+import { seenOrMark } from '../utils/idempotency.js';
 
 // Asegura que variables estén disponibles
 dotenv.config();
@@ -87,6 +88,19 @@ router.post('/', async (req, res) => {
 
     // Normalizar evento
     const event = req.body['event-data'] || req.body;
+
+    // Idempotencia: descartar eventos ya procesados (6h TTL)
+    try {
+      const baseId = String(event?.id || '').trim();
+      const sigTok = String(req.body?.signature?.token || event?.signature?.token || '').trim();
+      const msgId = (event?.message?.headers?.['message-id'] || event?.MessageId || '').toString();
+      const ts = String(event?.timestamp || '');
+      const key = baseId || `${msgId}:${event?.event || event?.eventName || 'evt'}:${ts || sigTok}`;
+      if (key) {
+        const duplicate = await seenOrMark(`mg:${key}`, 6 * 60 * 60);
+        if (duplicate) return res.status(200).json({ success: true, duplicate: true });
+      }
+    } catch {}
 
     logger.info('Webhook Mailgun recibido', {
       verified: Boolean(isVerified || !signingKey),

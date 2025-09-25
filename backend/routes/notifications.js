@@ -143,4 +143,26 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// PATCH /api/notifications/:id (actualización genérica)
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const patch = req.body || {};
+    const allowed = ['read', 'type', 'message', 'title', 'payload', 'date'];
+    const data = {};
+    for (const k of allowed) {
+      if (Object.prototype.hasOwnProperty.call(patch, k)) data[k] = patch[k];
+    }
+    if (Object.keys(data).length === 0) return res.status(400).json({ error: 'no-fields' });
+    const ref = db.collection('notifications').doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(404).json({ error: 'Not found' });
+    await ref.set(data, { merge: true });
+    return res.json({ id, ...snap.data(), ...data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error patching notification' });
+  }
+});
+
 export default router;

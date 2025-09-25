@@ -46,8 +46,8 @@ export default function useSupplierGroups() {
   const createGroup = useCallback(
     async ({ name, memberIds = [], notes = '' }) => {
       if (!activeWedding) return { success: false, error: 'No wedding' };
-      if (!name || memberIds.length < 2)
-        return { success: false, error: 'Nombre y al menos 2 proveedores' };
+      if (!name || memberIds.length < 1)
+        return { success: false, error: 'Nombre y al menos 1 proveedor' };
       try {
         const col = collection(db, 'weddings', activeWedding, 'supplierGroups');
         const now = serverTimestamp();

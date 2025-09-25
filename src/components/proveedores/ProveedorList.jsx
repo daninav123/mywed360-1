@@ -21,10 +21,27 @@ const ProveedorList = ({
   toggleFavorite,
   toggleSelect,
   onEdit,
+  onDelete,
+  onReserve,
+  onShowTracking,
   onOpenCompare,
   onOpenBulkStatus,
   onOpenDuplicates,
   onClearSelection,
+  // filtros
+  searchTerm,
+  setSearchTerm,
+  serviceFilter,
+  setServiceFilter,
+  statusFilter,
+  setStatusFilter,
+  dateFrom,
+  setDateFrom,
+  dateTo,
+  setDateTo,
+  ratingMin,
+  setRatingMin,
+  clearFilters,
 }) => {
   const navigate = useNavigate();
 
@@ -96,6 +113,96 @@ const ProveedorList = ({
     );
   };
 
+  const renderFilters = () => {
+    const services = Array.from(new Set((providers || []).map((p) => p.service).filter(Boolean)));
+    const statuses = ['Pendiente', 'Contactado', 'Seleccionado', 'Confirmado', 'Rechazado'];
+    return (
+      <div className="w-full border rounded-md p-3 bg-white">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <div className="col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Buscar</label>
+            <input
+              type="text"
+              value={searchTerm || ''}
+              onChange={(e) => setSearchTerm?.(e.target.value)}
+              placeholder="Nombre, servicio, estado, descripción..."
+              className="w-full border rounded p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Servicio</label>
+            <select
+              className="w-full border rounded p-2"
+              value={serviceFilter || ''}
+              onChange={(e) => setServiceFilter?.(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {services.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Estado</label>
+            <select
+              className="w-full border rounded p-2"
+              value={statusFilter || ''}
+              onChange={(e) => setStatusFilter?.(e.target.value)}
+            >
+              <option value="">Todos</option>
+              {statuses.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Desde</label>
+            <input
+              type="date"
+              className="w-full border rounded p-2"
+              value={dateFrom || ''}
+              onChange={(e) => setDateFrom?.(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Hasta</label>
+            <input
+              type="date"
+              className="w-full border rounded p-2"
+              value={dateTo || ''}
+              onChange={(e) => setDateTo?.(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Rating mínimo</label>
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.5"
+              className="w-full border rounded p-2"
+              value={Number.isFinite(ratingMin) ? ratingMin : 0}
+              onChange={(e) => setRatingMin?.(Number(e.target.value) || 0)}
+            />
+          </div>
+          <div className="md:col-span-2 lg:col-span-6 text-right">
+            <button
+              type="button"
+              onClick={() => clearFilters?.()}
+              className="px-3 py-2 text-sm border rounded-md bg-white hover:bg-gray-50"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderSelectionBar = () => {
     if (!selectedCount) return null;
     return (
@@ -157,6 +264,9 @@ const ProveedorList = ({
                   onToggleFavorite={toggleFavorite}
                   onCreateContract={handleCreateContract}
                   onEdit={onEdit ? () => onEdit(provider) : undefined}
+                  onDelete={onDelete ? () => onDelete(provider.id) : undefined}
+                  onReserve={onReserve ? () => onReserve(provider) : undefined}
+                  onShowTracking={onShowTracking}
                 />
               ))
             ) : (
@@ -185,6 +295,9 @@ const ProveedorList = ({
             onToggleFavorite={toggleFavorite}
             onCreateContract={handleCreateContract}
             onEdit={onEdit ? () => onEdit(provider) : undefined}
+            onDelete={onDelete ? () => onDelete(provider.id) : undefined}
+            onReserve={onReserve ? () => onReserve(provider) : undefined}
+            onShowTracking={onShowTracking}
           />
         </div>
       );
@@ -217,6 +330,7 @@ const ProveedorList = ({
   return (
     <div className="w-full space-y-4">
       {renderTabs()}
+      {renderFilters()}
       {renderSelectionBar()}
       {renderList()}
     </div>

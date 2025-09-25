@@ -1,11 +1,9 @@
-import { collectionGroup, onSnapshot } from 'firebase/firestore';
-// Construimos la query con where/orderBy de forma segura (fallback sin order)
-import { query as fQuery, where as fWhere, orderBy as fOrderBy } from 'firebase/firestore';
+import { collectionGroup, onSnapshot, query as fQuery } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 
 import { db } from '../firebaseConfig';
 
-// Escucha una collectionGroup y filtra por weddingId.
+// Escucha una collectionGroup y filtra por weddingId (por campo o por ruta)
 // Devuelve { data, loading, error }
 export function useWeddingCollectionGroup(groupName, weddingId) {
   const [data, setData] = useState([]);
@@ -18,33 +16,45 @@ export function useWeddingCollectionGroup(groupName, weddingId) {
       setLoading(false);
       return;
     }
+
     const cg = collectionGroup(db, groupName);
-    // Se espera que los docs incluyan weddingId
-    let qy = null;
-    try {
-      qy = fQuery(cg, fWhere('weddingId', '==', weddingId), fOrderBy('createdAt', 'asc'));
-    } catch (_) {
-      // Fallback sin order si no hay índice
-      try {
-        qy = fQuery(cg, fWhere('weddingId', '==', weddingId));
-      } catch {
-        qy = cg;
-      }
-    }
+    const qy = fQuery(cg);
     const unsub = onSnapshot(
       qy,
       (snap) => {
-        let arr = snap.docs.map((d) => ({ id: d.id, __path: d.ref.path, ...d.data() }));
-        // Orden local por start o createdAt
         try {
+          let arr = snap.docs.map((d) => ({ ...d.data(), id: d.id, __path: d.ref.path }));
+          try {
+            console.log(`[CG:${groupName}] raw=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
+          } catch {}
+          // Filtrar por boda: por campo weddingId si existe o por ruta
+          arr = arr.filter((doc) => {
+            try {
+              if (String(doc?.weddingId || '') === String(weddingId)) return true;
+              const p = String(doc?.__path || '');
+              return p.includes(`/weddings/${weddingId}/`);
+            } catch {
+              return false;
+            }
+          });
+          try {
+            console.log(`[CG:${groupName}] wedding=${weddingId} afterFilter=${arr.length}`, arr.slice(0, 3).map((x) => x.__path || x.id));
+            window.mywed = window.mywed || {};
+            window.mywed._cg = window.mywed._cg || {};
+            window.mywed._cg[groupName] = { total: arr.length, sample: arr.slice(0, 10) };
+          } catch {}
+          // Orden local por start o createdAt
           arr = arr.slice().sort((a, b) => {
-            const as = a?.start?.toDate ? a.start.toDate() : new Date(a?.start || 0);
-            const bs = b?.start?.toDate ? b.start.toDate() : new Date(b?.start || 0);
+            const as = a?.start?.toDate ? a.start.toDate() : new Date(a?.start || a?.createdAt?.toDate?.() || 0);
+            const bs = b?.start?.toDate ? b.start.toDate() : new Date(b?.start || b?.createdAt?.toDate?.() || 0);
             return (as?.getTime?.() || 0) - (bs?.getTime?.() || 0);
           });
-        } catch {}
-        setData(arr);
-        setLoading(false);
+          setData(arr);
+          setLoading(false);
+        } catch (err) {
+          setError(err);
+          setLoading(false);
+        }
       },
       (e) => {
         setError(e);

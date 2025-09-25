@@ -82,6 +82,17 @@ vi.mock('firebase-admin', () => {
   };
 });
 
+// Bypass auth middleware to avoid real token verification
+vi.mock('../middleware/authMiddleware.js', () => ({
+  __esModule: true,
+  default: () => (req, _res, next) => next(),
+  requireAuth: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
+  requireAdmin: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin' }; next(); },
+  requirePlanner: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'planner' }; next(); },
+  requireMailAccess: (req, _res, next) => { req.user = { uid: 'u1' }; req.userProfile = { role: 'admin', email: 'user@example.com' }; next(); },
+  optionalAuth: (_req, _res, next) => next(),
+}));
+
 // Infra mocks
 vi.mock('helmet', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
 vi.mock('cors', () => ({ __esModule: true, default: () => (req, _res, next) => next() }));
@@ -93,7 +104,7 @@ beforeAll(async () => {
   app = (await import('../index.js')).default;
 });
 
-describe.skip('Providers API', () => {
+describe('Providers API', () => {
   const auth = { Authorization: 'Bearer mock-uid1-user@example.com' };
 
   it('GET /api/providers -> 200 empty list by default', async () => {
@@ -108,5 +119,3 @@ describe.skip('Providers API', () => {
     expect(res.status).toBe(400);
   });
 });
-
-

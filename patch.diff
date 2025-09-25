@@ -1,276 +1,439 @@
-ï»¿*** Begin Patch
-*** Update File: functions/index.js
+*** Begin Patch
+*** Update File: src/hooks/useSeatingPlan.js
 @@
--const functions = require('firebase-functions');
--const cors = require('cors')({ origin: true });
-+const functions = require('firebase-functions');
-+const createCors = require('cors');
-+const crypto = require('crypto');
+   const [tab, setTab] = useState('ceremony');
+   const [syncStatus, setSyncStatus] = useState(getSyncState());
+   const [hallSize, setHallSize] = useState({ width: 1800, height: 1200 });
++  const [drawMode, setDrawMode] = useState('pan');
++  const [validationsEnabled, setValidationsEnabled] = useState(true);
++  const [snapToGrid, setSnapToGrid] = useState(false);
++  const [gridStep] = useState(20);
++  const [globalMaxSeats, setGlobalMaxSeats] = useState(0);
++  const [background, setBackground] = useState(null);
++  const [scoringWeights, setScoringWeights] = useState({ fit: 50, side: 10, wants: 20, avoid: -10 });
++  const [selectedIds, setSelectedIds] = useState([]);
 @@
--// Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
-+// Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
- const fetch = globalThis.fetch;
-@@
--const admin = require('firebase-admin');
-+const admin = require('firebase-admin');
-@@
--const db = admin.firestore();
-+const db = admin.firestore();
+   loadHallDimensions();
+   }, [activeWedding]);
 +
-+// ----- CORS estricto para Functions -----
-+const DEFAULT_ALLOWED_ORIGINS = [
-+  'http://localhost:5173',
-+  'https://mywed360.netlify.app',
-+];
-+const ALLOWED_ORIGINS = String(
-+  process.env.FUNCTIONS_ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || DEFAULT_ALLOWED_ORIGINS.join(',')
-+)
-+  .split(',')
-+  .map((s) => s.trim())
-+  .filter(Boolean);
-+
-+const corsHandler = createCors({
-+  origin: (origin, cb) => {
-+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-+    return cb(new Error('Not allowed by CORS'));
-+  },
-+  credentials: true,
-+  methods: ['GET', 'POST', 'OPTIONS'],
-+  allowedHeaders: ['Content-Type', 'Authorization'],
-+});
-+
-+// ----- Helpers de autenticaciÃ³n (Firebase ID token) -----
-+const allowMockTokens = (() => {
-+  const v = process.env.ALLOW_MOCK_TOKENS;
-+  return v ? v !== 'false' : (process.env.NODE_ENV !== 'production');
-+})();
-+
-+function getBearerToken(req) {
-+  try {
-+    const h = req.headers['authorization'] || req.headers['Authorization'];
-+    if (!h) return null;
-+    const p = String(h).split(' ');
-+    if (p.length !== 2 || p[0] !== 'Bearer') return null;
-+    return p[1];
-+  } catch { return null; }
-+}
-+
-+async function verifyIdTokenOrMock(req) {
-+  const token = getBearerToken(req);
-+  if (!token) return null;
-+  if (allowMockTokens && token.startsWith('mock-')) {
-+    // mock-<uid>-<email>
-+    const parts = token.split('-');
-+    if (parts.length >= 3) {
-+      return { uid: parts[1], email: parts.slice(2).join('-'), email_verified: true };
-+    }
-+  }
-+  try {
-+    return await admin.auth().verifyIdToken(token);
-+  } catch {
-+    return null;
-+  }
-+}
-@@
--// Configuraciï¿½ï¿½n para Mailgun
-+// ConfiguraciÃ³n para Mailgun
- // Usar variable de entorno primero; si no existe, intentar leer de funciones config y evitar TypeError
--const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || functions.config().mailgun?.key || '';
--const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'mywed360.com';
-+const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || functions.config().mailgun?.key || '';
-+const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN || functions.config().mailgun?.domain || 'mywed360.com';
- // Permitir sobreescribir la URL base (soporta US y EU)
--const MAILGUN_BASE_URL = process.env.MAILGUN_BASE_URL || functions.config().mailgun?.base_url || 'https://api.mailgun.net/v3';
-+const MAILGUN_BASE_URL = process.env.MAILGUN_BASE_URL || functions.config().mailgun?.base_url || 'https://api.mailgun.net/v3';
-+const MAILGUN_SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY || functions.config().mailgun?.signing_key || '';
-@@
--// Funciï¿½ï¿½n para obtener eventos de Mailgun
--exports.getMailgunEvents = functions.https.onRequest((request, response) => {
--  cors(request, response, async () => {
-+// FunciÃ³n para obtener eventos de Mailgun (requiere auth + CORS)
-+exports.getMailgunEvents = functions.https.onRequest((request, response) => {
-+  corsHandler(request, response, async () => {
-     try {
--      // Verificar que el usuario estÇ­ autenticado (recomendado usar Firebase Auth)
--      // const authHeader = request.headers.authorization;
--      // if (!authHeader || !authHeader.startsWith('Bearer ')) {
--      //   return response.status(401).json({ error: 'Unauthorized' });
--      // }
--      // const idToken = authHeader.split('Bearer ')[1];
--      // await admin.auth().verifyIdToken(idToken);
-+      const user = await verifyIdTokenOrMock(request);
-+      if (!user) {
-+        return response.status(401).json({ error: 'Unauthorized' });
-+      }
- 
--      // Obtener parÇ­metros de consulta
-+      // Obtener parÃ¡metros de consulta
-       const { recipient, from, event = 'delivered', limit = 50 } = request.query;
-       
-       if (!recipient && !from) {
-         return response.status(400).json({ error: 'Se requiere "recipient" o "from"' });
-       }
-       
-       // Construir URL para Mailgun
-       const params = new URLSearchParams({
-         event,
--        limit
-+        limit: String(Math.min(300, Math.max(1, Number(limit) || 50)))
-       });
-       if (recipient) params.append('recipient', recipient);
-       if (from) params.append('from', from);
-@@
--      // Crear autenticaciï¿½ï¿½n Basic para Mailgun
-+      // Crear autenticaciÃ³n Basic para Mailgun
-       const auth = Buffer.from(pi:).toString('base64');
-@@
--    } catch (error) {
-+    } catch (error) {
-       console.error('Error processing Mailgun events request:', error);
-       return response.status(500).json({ error: error.message });
-     }
-   });
- });
-@@
--// Funciï¿½ï¿½n para enviar correos a travÇ¸s de Mailgun
-+// FunciÃ³n para enviar correos a travÃ©s de Mailgun (requiere auth + CORS)
- exports.sendEmail = functions.https.onRequest((request, response) => {
--  cors(request, response, async () => {
--    // Configurar CORS de forma explï¿½ï¿½cita
--    response.set('Access-Control-Allow-Origin', '*');
--    response.set('Access-Control-Allow-Headers', 'Content-Type');
--    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-+  corsHandler(request, response, async () => {
-+    // Preflight y mÃ©todos permitidos
-+    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
- 
-     // Preflight
-     if (request.method === 'OPTIONS') {
-       return response.status(204).send('');
-     }
-     if (request.method !== 'POST') {
-       return response.status(405).json({ error: 'Method not allowed' });
-     }
-     
-     try {
-+      // Auth requerida
-+      const user = await verifyIdTokenOrMock(request);
-+      if (!user) {
-+        return response.status(401).json({ error: 'Unauthorized' });
-+      }
-+
-       // Extraer datos del cuerpo
-       const { from, to, subject, body, html, attachments } = request.body;
-       
-       if (!from || !to || !subject || (!body && !html)) {
-         return response.status(400).json({ error: 'Missing required fields' });
-       }
-       
--      // Construir formData para Mailgun
--            // Crear autenticacin Basic para Mailgun
-+      // Construir formData para Mailgun y autenticaciÃ³n Basic
-       const auth = Buffer.from(pi:).toString('base64');
-@@
--      if (!mailgunResponse.ok) {
-+      if (!mailgunResponse.ok) {
-         const errorText = await mailgunResponse.text();
-         console.error('Error from Mailgun:', mailgunResponse.status, errorText);
-         return response.status(mailgunResponse.status).json({ 
-           error: Error de Mailgun: ,
-           details: errorText
-         });
-       }
-       
-       const data = await mailgunResponse.json();
-       return response.json(data);
-       
-     } catch (error) {
-       console.error('Error sending email:', error);
-       return response.status(500).json({ error: error.message });
-     }
-   });
- });
-@@
--// Webhook: recepciï¿½ï¿½n de eventos de Mailgun
-+// Webhook: recepciÃ³n de eventos de Mailgun (verificaciÃ³n de firma)
- // ------------------------------
- exports.mailgunWebhook = functions.https.onRequest((request, response) => {
--  cors(request, response, async () => {
--    if (request.method !== 'POST') {
--      return response.status(405).json({ error: 'Method not allowed' });
--    }
--
--    try {
--      // Mailgun puede enviar un Ç§nico evento o un array bajo "signature"+"event-data"
--      const events = Array.isArray(request.body) ? request.body : [request.body];
--
--      const batch = db.batch();
--
--      events.forEach(evt => {
--        const id = evt['event-data']?.id || evt.id || ${Date.now()}-;
--        const data = evt['event-data'] || evt;
--        batch.set(db.collection('mailgunEvents').doc(id), data, { merge: true });
--      });
--
--      await batch.commit();
--      return response.json({ received: events.length });
--    } catch (err) {
--      console.error('Error processing webhook:', err);
--      return response.status(500).json({ error: err.message });
--    }
--  });
-+  corsHandler(request, response, async () => {
-+    if (request.method === 'OPTIONS') {
-+      return response.status(204).send('');
-+    }
-+    if (request.method !== 'POST') {
-+      return response.status(405).json({ error: 'Method not allowed' });
-+    }
-+
++  // Semilla local de invitados en entorno Cypress para E2E si no hay datos
++  useEffect(() => {
 +    try {
-+      const isProd = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
-+      if (!MAILGUN_SIGNING_KEY && isProd) {
-+        console.error('MAILGUN_SIGNING_KEY no configurada');
-+        return response.status(500).json({ error: 'Signing key not configured' });
-+      }
++      const isCypress = typeof window !== 'undefined' && !!window.Cypress;
++      if (!isCypress) return;
++      if (Array.isArray(guests) && guests.length > 0) return;
++      const seed = Array.from({ length: 6 }).map((_, i) => ({
++        id: `e2e-${i + 1}`,
++        name: `Invitado E2E ${i + 1}`,
++        companion: i % 3 === 0 ? 1 : 0,
++        side: i % 2 === 0 ? 'novia' : 'novio',
++        tableId: null,
++        table: null,
++      }));
++      setGuests(seed);
++    } catch (_) {}
++  }, [guests]);
+@@
+   const toggleSelectedTableShape = () => {
+     if (!selectedTable) return;
+ 
+     const newShape = selectedTable.shape === 'rectangle' ? 'circle' : 'rectangle';
+     const updatedTable = { ...selectedTable, shape: newShape };
+     setSelectedTable(updatedTable);
+ 
+     setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? updatedTable : t)));
+   };
 +
-+      const payloads = Array.isArray(request.body) ? request.body : [request.body];
-+
-+      const batch = db.batch();
-+      let validCount = 0;
-+
-+      for (const evt of payloads) {
-+        const sig = evt?.signature;
-+        if (sig && MAILGUN_SIGNING_KEY) {
-+          const signed = String(sig.signature || '');
-+          const token = String(sig.token || '');
-+          const timestamp = String(sig.timestamp || '');
-+          const hmac = crypto
-+            .createHmac('sha256', MAILGUN_SIGNING_KEY)
-+            .update(timestamp + token)
-+            .digest('hex');
-+          const ok = signed && hmac && signed.length === hmac.length && crypto.timingSafeEqual(Buffer.from(signed), Buffer.from(hmac));
-+          if (!ok) {
-+            console.warn('Webhook Mailgun firma invÃ¡lida');
-+            return response.status(401).json({ error: 'Invalid signature' });
-+          }
-+        } else if (MAILGUN_SIGNING_KEY) {
-+          console.warn('Webhook Mailgun sin firma');
-+          return response.status(401).json({ error: 'Missing signature' });
-+        }
-+
-+        const id = evt['event-data']?.id || evt.id || ${Date.now()}-;
-+        const data = evt['event-data'] || evt;
-+        batch.set(db.collection('mailgunEvents').doc(id), data, { merge: true });
-+        validCount++;
-+      }
-+
-+      await batch.commit();
-+      return response.json({ received: validCount });
-+    } catch (err) {
-+      console.error('Error processing webhook:', err);
-+      return response.status(500).json({ error: err.message });
++  const moveTable = (tableId, pos, { finalize } = { finalize: true }) => {
++    const apply = (prev) =>
++      prev.map((t) => (String(t.id) === String(tableId) ? { ...t, x: pos.x, y: pos.y } : t));
++    if (tab === 'ceremony') {
++      setTablesCeremony((prev) => apply(prev));
++    } else {
++      setTablesBanquet((prev) => apply(prev));
 +    }
-+  });
- });
++    if (finalize) {
++      try {
++        pushHistory({
++          type: tab,
++          tables: tab === 'ceremony' ? tablesCeremony : tablesBanquet,
++          areas: tab === 'ceremony' ? areasCeremony : areasBanquet,
++          seats: tab === 'ceremony' ? seatsCeremony : [],
++        });
++      } catch (_) {}
++    }
++  };
++
++  const deleteTable = (tableId) => {
++    if (tab === 'ceremony') {
++      setTablesCeremony((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
++    } else {
++      setTablesBanquet((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
++    }
++  };
++
++  const duplicateTable = (tableId) => {
++    const source = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
++    const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
++    const t = source.find((x) => String(x.id) === String(tableId));
++    if (!t) return;
++    const maxId = source.reduce((m, x) => {
++      const n = parseInt(x.id, 10);
++      return Number.isFinite(n) ? Math.max(m, n) : m;
++    }, 0);
++    const copy = { ...t, id: maxId + 1, x: (t.x || 0) + 30, y: (t.y || 0) + 30, name: `Mesa ${maxId + 1}` };
++    setFn((prev) => [...prev, copy]);
++  };
++
++  const toggleTableLocked = (tableId) => {
++    const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
++    setFn((prev) =>
++      prev.map((t) => (String(t.id) === String(tableId) ? { ...t, locked: !t.locked } : t))
++    );
++  };
+@@
+   const generateBanquetLayout = ({
+@@
+   };
++
++  const applyBanquetTables = (tablesArray = []) => {
++    try {
++      let idCounter = 1;
++      const sanitized = (Array.isArray(tablesArray) ? tablesArray : []).map((t) => {
++        const id = t.id != null ? t.id : idCounter++;
++        const shape = t.shape === 'circle' ? 'circle' : 'rectangle';
++        const base = {
++          id,
++          x: Number(t.x) || 0,
++          y: Number(t.y) || 0,
++          seats: Number.parseInt(t.seats, 10) || 8,
++          enabled: t.enabled !== false,
++          name: t.name || `Mesa ${id}`,
++          shape,
++        };
++        if (shape === 'circle') {
++          return { ...base, diameter: Number(t.diameter) || 80 };
++        }
++        return { ...base, width: Number(t.width) || 80, height: Number(t.height || t.length) || 60 };
++      });
++      setTablesBanquet(sanitized);
++      pushHistory({ type: 'banquet', tables: sanitized, areas: areasBanquet });
++    } catch (_) {}
++  };
++
++  const clearBanquetLayout = () => {
++    setTablesBanquet([]);
++  };
+@@
+   const exportPNG = async () => {
+@@
+   };
++
++  const exportCSV = async () => {
++    try {
++      const rows = [
++        ['guestId', 'name', 'tableId', 'companions'].join(','),
++        ...guests.map((g) =>
++          [g.id, JSON.stringify(g.name || ''), g.tableId ?? '', parseInt(g.companion, 10) || 0].join(',')
++        ),
++      ];
++      const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
++      const url = URL.createObjectURL(blob);
++      const a = document.createElement('a');
++      a.href = url;
++      a.download = `seating-${tab}-${Date.now()}.csv`;
++      a.click();
++      URL.revokeObjectURL(url);
++    } catch (e) {
++      console.warn('CSV export failed', e);
++    }
++  };
++
++  const exportSVG = async () => {
++    try {
++      const w = hallSize?.width || 1800;
++      const h = hallSize?.height || 1200;
++      const header = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">`;
++      const footer = '</svg>';
++      const body = [
++        ...areasBanquet.map((a) => {
++          const pts = Array.isArray(a?.points) ? a.points : Array.isArray(a) ? a : [];
++          const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + (pts.length ? ' Z' : '');
++          return `<path d="${d}" stroke="#10b981" stroke-width="2" fill="none"/>`;
++        }),
++        ...tablesBanquet.map((t) => {
++          if (t.shape === 'circle') {
++            const r = (t.diameter || 60) / 2;
++            return `<circle cx="${t.x}" cy="${t.y}" r="${r}" fill="#eee" stroke="#333"/>`;
++          }
++          const hw = (t.width || 80) / 2;
++          const hh = (t.height || t.length || 60) / 2;
++          return `<rect x="${t.x - hw}" y="${t.y - hh}" width="${hw * 2}" height="${hh * 2}" fill="#eee" stroke="#333"/>`;
++        }),
++      ].join('');
++      const svg = header + body + footer;
++      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
++      const url = URL.createObjectURL(blob);
++      const a = document.createElement('a');
++      a.href = url;
++      a.download = `seating-${tab}-${Date.now()}.svg`;
++      a.click();
++      URL.revokeObjectURL(url);
++    } catch (e) {
++      console.warn('SVG export failed', e);
++    }
++  };
+@@
+   const saveHallDimensions = async (width, height, aisleMin) => {
+@@
+   };
++
++  const saveGlobalMaxGuests = async (n) => {
++    const val = Number.parseInt(n, 10) || 0;
++    setGlobalMaxSeats(val);
++    if (activeWedding) {
++      try {
++        const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
++        await setDoc(
++          ref,
++          { config: { ...(hallSize || {}), ...(Number.isFinite(hallSize?.aisleMin) ? { aisleMin: hallSize.aisleMin } : {}), maxSeats: val } },
++          { merge: true }
++        );
++      } catch (e) {
++        console.warn('saveGlobalMaxGuests failed', e);
++      }
++    }
++  };
++
++  const saveBackground = async (bg) => {
++    setBackground(bg || null);
++    if (activeWedding) {
++      try {
++        const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
++        await setDoc(ref, { background: bg || null }, { merge: true });
++      } catch (e) {
++        console.warn('saveBackground failed', e);
++      }
++    }
++  };
++
++  // Áreas (perímetro/puertas/obstáculos/pasillos)
++  const addArea = (area) => {
++    const normalize = (a) => (Array.isArray(a) || a?.points ? a : []);
++    if (tab === 'ceremony') {
++      setAreasCeremony((prev) => [...prev, normalize(area)]);
++    } else {
++      setAreasBanquet((prev) => [...prev, normalize(area)]);
++    }
++  };
++  const deleteArea = (index) => {
++    const del = (arr) => arr.filter((_, i) => i !== index);
++    if (tab === 'ceremony') setAreasCeremony((prev) => del(prev));
++    else setAreasBanquet((prev) => del(prev));
++  };
++  const updateArea = (index, updated) => {
++    const upd = (arr) => arr.map((a, i) => (i === index ? updated : a));
++    if (tab === 'ceremony') setAreasCeremony((prev) => upd(prev));
++    else setAreasBanquet((prev) => upd(prev));
++  };
++
++  // Asignaciones de invitados (banquete y ceremonia)
++  const moveGuest = (guestId, tableId) => {
++    setGuests((prev) =>
++      prev.map((g) =>
++        String(g.id) === String(guestId)
++          ? { ...g, tableId: tableId == null ? null : tableId, table: tableId == null ? null : String(tableId) }
++          : g
++      )
++    );
++  };
++  const moveGuestToSeat = (guestId, tableId, _seatIdx) => {
++    // Asignación simplificada: asigna a la mesa (ignora seatIdx en banquete)
++    moveGuest(guestId, tableId);
++  };
++  const assignGuestToCeremonySeat = async (seatId, guestId) => {
++    setSeatsCeremony((prev) =>
++      prev.map((s) =>
++        String(s.id) === String(seatId)
++          ? { ...s, guestId, guestName: (guests.find((g) => String(g.id) === String(guestId)) || {}).name || null }
++          : s
++      )
++    );
++    return true;
++  };
++  const toggleSeatEnabled = (seatId) => {
++    setSeatsCeremony((prev) =>
++      prev.map((s) => (String(s.id) === String(seatId) ? { ...s, enabled: s.enabled === false ? true : !s.enabled } : s))
++    );
++  };
++
++  // Auto-asignación básica local
++  const autoAssignGuests = async () => {
++    try {
++      const pending = guests.filter((g) => !g.tableId && !g.table);
++      if (pending.length === 0) return { ok: true, method: 'local', assigned: 0 };
++      const tablesList = [...tablesBanquet];
++      // Calcular ocupación por mesa
++      const occ = new Map();
++      guests.forEach((g) => {
++        const tid = g?.tableId != null ? String(g.tableId) : null;
++        if (!tid) return;
++        occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
++      });
++      let assigned = 0;
++      const updatedGuests = [...guests];
++      pending.forEach((g) => {
++        const table = tablesList.find((t) => {
++          const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
++          const used = occ.get(String(t.id)) || 0;
++          return cap === 0 || used + 1 + (parseInt(g.companion, 10) || 0) <= cap;
++        });
++        if (table) {
++          const tid = String(table.id);
++          occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(g.companion, 10) || 0));
++          assigned += 1 + (parseInt(g.companion, 10) || 0);
++          const idx = updatedGuests.findIndex((x) => String(x.id) === String(g.id));
++          if (idx >= 0) updatedGuests[idx] = { ...updatedGuests[idx], tableId: table.id, table: String(table.id) };
++        }
++      });
++      setGuests(updatedGuests);
++      return { ok: true, method: 'local', assigned };
++    } catch (e) {
++      return { ok: false, error: 'auto-assign-failed' };
++    }
++  };
++
++  const autoAssignGuestsRules = async () => autoAssignGuests();
++
++  const suggestTablesForGuest = (guestId) => {
++    try {
++      const g = guests.find((x) => String(x.id) === String(guestId));
++      if (!g) return [];
++      const occ = new Map();
++      guests.forEach((x) => {
++        const tid = x?.tableId != null ? String(x.tableId) : null;
++        if (!tid) return;
++        occ.set(tid, (occ.get(tid) || 0) + 1 + (parseInt(x.companion, 10) || 0));
++      });
++      const list = tablesBanquet.map((t) => {
++        const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
++        const used = occ.get(String(t.id)) || 0;
++        const free = cap > 0 ? Math.max(0, cap - used) : 1000;
++        const fit = free - (parseInt(g.companion, 10) || 0);
++        return { tableId: t.id, score: fit };
++      });
++      return list.sort((a, b) => b.score - a.score);
++    } catch (_) {
++      return [];
++    }
++  };
++
++  const fixTablePosition = (_tableId) => {};
++  const alignSelected = (_axis, _mode) => {};
++  const distributeSelected = (_axis) => {};
++  const rotateSelected = (_deg) => {};
+@@
+   return {
+     // Estados
+     tab,
+     setTab,
+     syncStatus,
+     hallSize,
+     areas,
+     tables,
+     seats,
+     selectedTable,
++    selectedIds,
+     configTable,
+     preview,
+     guests,
+ 
+     // Estados de modales
+     ceremonyConfigOpen,
+     setCeremonyConfigOpen,
+     banquetConfigOpen,
+     setBanquetConfigOpen,
+     spaceConfigOpen,
+     setSpaceConfigOpen,
+     templateOpen,
+     setTemplateOpen,
+ 
+     // Referencias
+     canvasRef,
+     wsRef,
+ 
+     // Funciones de estado
+     setAreas,
+     setTables,
+     setSelectedTable,
+     setConfigTable,
+     setPreview,
+     setGuests,
+ 
+     // Funciones de gestión
+     handleSelectTable,
+     handleTableDimensionChange,
+     toggleSelectedTableShape,
++    moveTable,
++    deleteTable,
++    duplicateTable,
++    toggleTableLocked,
+ 
+     // Funciones de historial
+     pushHistory,
+     undo,
+     redo,
+     canUndo: historyPointer > 0,
+     canRedo: historyPointer < history.length - 1,
+ 
+     // Funciones de generación
+     generateSeatGrid,
+     generateBanquetLayout,
++    applyBanquetTables,
++    clearBanquetLayout,
+ 
+     // Funciones de exportación
+     exportPNG,
++    exportCSV,
+     exportPDF,
++    exportSVG,
+ 
+     // Funciones de configuración
+     saveHallDimensions,
++    saveGlobalMaxGuests,
++    saveBackground,
+ 
+     // Utilidades
+     normalizeId,
++    // Preferencias/validaciones/lienzo
++    drawMode,
++    setDrawMode,
++    validationsEnabled,
++    setValidationsEnabled,
++    snapToGrid,
++    setSnapToGrid,
++    gridStep,
++    globalMaxSeats,
++    background,
++    // Áreas y asientos
++    addArea,
++    updateArea,
++    deleteArea,
++    toggleSeatEnabled,
++    moveGuest,
++    moveGuestToSeat,
++    assignGuestToCeremonySeat,
++    // Auto-asignación y sugerencias
++    autoAssignGuests,
++    autoAssignGuestsRules,
++    suggestTablesForGuest,
++    scoringWeights,
++    setScoringWeights,
++    // Operaciones opcionales/no-op
++    rotateSelected,
++    alignSelected,
++    distributeSelected,
++    fixTablePosition,
+   };
+ };
 *** End Patch

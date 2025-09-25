@@ -379,6 +379,9 @@ export async function markAsRead(id) {
   return true;
 }
 
+// Alias de compatibilidad con componentes que usan EmailService.sendEmail
+export const sendEmail = sendMail;
+
 export async function markAsUnread(id) {
   if (USE_BACKEND) {
     const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/unread`, {}, { auth: true, silent: true });

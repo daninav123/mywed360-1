@@ -73,12 +73,14 @@ import gdprRouter from './routes/gdpr.js';
 import pushRouter from './routes/push.js';
 import paymentsRouter from './routes/payments.js';
 import paymentsWebhookRouter from './routes/payments-webhook.js';
+import contractsRouter from './routes/contracts.js';
 import healthRouter from './routes/health.js';
 import calendarFeedRouter from './routes/calendar-feed.js';
 import spotifyRouter from './routes/spotify.js';
 import playbackRouter from './routes/playback.js';
 import bankRouter from './routes/bank.js';
 import emailActionsRouter from './routes/email-actions.js';
+import emailsRouter from './routes/emails.js';
 import providersRouter from './routes/providers.js';
 import weddingsRouter from './routes/weddings.js';
 import { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } from './config.js';
@@ -459,6 +461,8 @@ app.use('/api/mailgun/events', requireMailAccess, mailgunEventsRouter); // Event
 app.use('/api/mailgun', optionalAuth, mailgunTestRouter); // Rutas generales de Mailgun (incluye /test)
 app.use('/api/mailgun-debug', requireMailAccess, mailgunDebugRoutes);
 app.use('/api/email-insights', requireMailAccess, emailInsightsRouter);
+// Emails API (alias de /api/mail con rutas adicionales)
+app.use('/api/emails', requireMailAccess, emailsRouter);
 
 // Rutas que requieren autenticación general
 app.use('/api/notifications', requireAuth, notificationsRouter);
@@ -525,6 +529,7 @@ app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/gdpr', gdprRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/contracts', requireAuth, contractsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
@@ -681,6 +686,4 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
-
-
 

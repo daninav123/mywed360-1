@@ -16,6 +16,7 @@ export default function AllTasksModal({
   completedSet, // Set de ids completados
   onToggleComplete, // (id, checked) => void
   onTaskClick, // (task) => void
+  onQuickSchedule, // (subtask, {start, end}) => void
 }) {
   // Filtros
   const [query, setQuery] = useState('');
@@ -141,10 +142,19 @@ export default function AllTasksModal({
     }
   }, [parents, grouped, passesFilters]);
 
+  const [quickOpenId, setQuickOpenId] = useState(null);
+  const [drafts, setDrafts] = useState({});
+
   const renderSubtaskCell = useCallback(
     (st) => {
       const cat = categories[st.category] || categories.OTROS;
       const isCompleted = completedSet ? completedSet.has(String(st.id)) : false;
+      const isUnscheduled = !st.start;
+      const d = drafts[String(st.id)] || {};
+      const ds = d.ds || new Date().toISOString().slice(0, 10);
+      const ts = d.ts || '10:00';
+      const de = d.de || ds;
+      const te = d.te || '11:00';
       return (
         <div
           key={st.id}
@@ -177,6 +187,11 @@ export default function AllTasksModal({
               >
                 {cat.name}
               </span>
+              {isUnscheduled && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full border border-dashed text-orange-700 bg-orange-50">
+                  Sin fecha
+                </span>
+              )}
             </div>
             {st.start && (
               <div className="text-xs text-gray-600">
@@ -189,11 +204,68 @@ export default function AllTasksModal({
               </div>
             )}
             {st.assignee && <div className="text-xs text-gray-500">Asignado a: {st.assignee}</div>}
+            {isUnscheduled && (
+              <div className="mt-2 text-xs text-gray-600">
+                <button
+                  type="button"
+                  className="text-indigo-600 hover:underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQuickOpenId((prev) => (prev === st.id ? null : st.id));
+                    setDrafts((prev) => ({ ...prev, [String(st.id)]: { ds, ts, de, te } }));
+                  }}
+                >
+                  Programar
+                </button>
+                {quickOpenId === st.id && (
+                  <div className="mt-2 p-2 border rounded bg-gray-50" onClick={(e) => e.stopPropagation()}>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      <div>
+                        <label className="block text-[10px] text-gray-500">Inicio</label>
+                        <div className="flex gap-1">
+                          <input type="date" value={ds} onChange={(e)=>setDrafts((p)=>({ ...p, [String(st.id)]: { ds: e.target.value, ts, de, te } }))} className="border rounded px-2 py-1 text-xs w-full" />
+                          <input type="time" value={ts} onChange={(e)=>setDrafts((p)=>({ ...p, [String(st.id)]: { ds, ts: e.target.value, de, te } }))} className="border rounded px-2 py-1 text-xs w-full" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-gray-500">Fin</label>
+                        <div className="flex gap-1">
+                          <input type="date" value={de} onChange={(e)=>setDrafts((p)=>({ ...p, [String(st.id)]: { ds, ts, de: e.target.value, te } }))} className="border rounded px-2 py-1 text-xs w-full" />
+                          <input type="time" value={te} onChange={(e)=>setDrafts((p)=>({ ...p, [String(st.id)]: { ds, ts, de, te: e.target.value } }))} className="border rounded px-2 py-1 text-xs w-full" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <button type="button" className="px-2 py-1 text-xs border rounded" onClick={(e)=>{ e.stopPropagation(); setQuickOpenId(null); }}>Cancelar</button>
+                      <button
+                        type="button"
+                        className="px-2 py-1 text-xs bg-indigo-600 text-white rounded"
+                        onClick={(e)=>{
+                          e.stopPropagation();
+                          try {
+                            if (typeof onQuickSchedule === 'function') {
+                              const sDate = new Date(`${ds}T${ts}`);
+                              const eDate = new Date(`${de}T${te}`);
+                              onQuickSchedule(st, { start: sDate, end: eDate });
+                              setQuickOpenId(null);
+                            } else if (typeof onTaskClick === 'function') {
+                              onTaskClick(st);
+                            }
+                          } catch {}
+                        }}
+                      >
+                        Guardar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       );
     },
-    [completedSet, onToggleComplete, onTaskClick]
+    [completedSet, onToggleComplete, onTaskClick, drafts, quickOpenId, onQuickSchedule]
   );
 
   // Preparar columnas: una por tarea padre; si hay subtareas sin padre, añadir columna "Sin padre"

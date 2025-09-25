@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -19,8 +19,8 @@ import { get as apiGet } from '../../services/apiClient';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 
 /**
- * Dashboard para visualizar métricas de rendimiento del sistema
- * Especialmente enfocado en el sistema de correo electrónico personalizado
+ * Dashboard para visualizar mÃ©tricas de rendimiento del sistema
+ * Especialmente enfocado en el sistema de correo electrÃ³nico personalizado
  *
  * @component
  * @example
@@ -40,7 +40,7 @@ function MetricsDashboard() {
   const [aggregate, setAggregate] = useState({ counters: {}, timings: {}, eventsTotal: 0 });
   const [webVitals, setWebVitals] = useState([]);
 
-  // Colores para gráficos
+  // Colores para grÃ¡ficos
   const colors = {
     email: '#8884d8',
     search: '#82ca9d',
@@ -49,14 +49,14 @@ function MetricsDashboard() {
     error: '#ff0000',
   };
 
-  // Cargar datos de métricas al montar el componente
+  // Cargar datos de mÃ©tricas al montar el componente
   useEffect(() => {
     const fetchMetrics = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Intentar obtener métricas de localStorage (modo desarrollo)
+        // Intentar obtener mÃ©tricas de localStorage (modo desarrollo)
         let localMetrics = null;
         try {
           const storedMetrics = localStorage.getItem('lovenda_last_metrics');
@@ -64,10 +64,10 @@ function MetricsDashboard() {
             localMetrics = JSON.parse(storedMetrics);
           }
         } catch (e) {
-          console.log('No se encontraron métricas locales');
+          console.log('No se encontraron mÃ©tricas locales');
         }
 
-        // Si hay un endpoint de métricas configurado, obtener de allí
+        // Si hay un endpoint de mÃ©tricas configurado, obtener de allÃ­
         let remoteMetrics = null;
         const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT;
 
@@ -78,11 +78,11 @@ function MetricsDashboard() {
           if (response.ok) {
             remoteMetrics = await response.json();
           } else {
-            throw new Error(`Error al obtener métricas: ${response.statusText}`);
+            throw new Error(`Error al obtener mÃ©tricas: ${response.statusText}`);
           }
         }
 
-        // Usar métricas remotas si están disponibles, sino las locales (sin mocks)
+        // Usar mÃ©tricas remotas si estÃ¡n disponibles, sino las locales (sin mocks)
         setMetrics(
           remoteMetrics ||
             localMetrics || {
@@ -117,8 +117,8 @@ function MetricsDashboard() {
             }
           }
         } catch {}
-        console.error('Error al cargar métricas:', err);
-        setError('No se pudieron cargar las métricas.');
+        console.error('Error al cargar mÃ©tricas:', err);
+        setError('No se pudieron cargar las mÃ©tricas.');
         setMetrics({
           timeSeriesData: [],
           performanceData: {},
@@ -133,7 +133,7 @@ function MetricsDashboard() {
 
     fetchMetrics();
 
-    // Programar actualización de métricas cada minuto
+    // Programar actualizaciÃ³n de mÃ©tricas cada minuto
     const intervalId = setInterval(fetchMetrics, 60000);
     return () => clearInterval(intervalId);
   }, [selectedTimeframe]);
@@ -186,9 +186,9 @@ function MetricsDashboard() {
     loadWebVitals();
   }, [selectedTimeframe]);
 
-  // Eliminado: generación de datos mock
+  // Eliminado: generaciÃ³n de datos mock
 
-  // Procesar los datos de rendimiento para el gráfico de barras
+  // Procesar los datos de rendimiento para el grÃ¡fico de barras
   const processedPerformanceData = useMemo(() => {
     if (!metrics || !metrics.performanceData) return [];
 
@@ -211,7 +211,7 @@ function MetricsDashboard() {
     return (metrics && metrics.timings) ? metrics.timings : {};
   }, [aggregate, metrics]);
 
-  // Punto Más reciente de la serie temporal (seguro)
+  // Punto MÃ¡s reciente de la serie temporal (seguro)
   const lastPoint = useMemo(() => {
     try {
       const ts = metrics?.timeSeriesData;
@@ -239,9 +239,10 @@ function MetricsDashboard() {
     });
   }, [errorList, errorFilterSource, errorFilterType, errorFilterText]);
 
-  // Si está cargando, mostrar indicador
+  // Si estÃ¡ cargando, mostrar indicador
   if (isLoading) {
     return (
+      <>
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
@@ -403,13 +404,14 @@ function MetricsDashboard() {
           </table>
         </div>
       </div>
+      </>
     );
   }
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Panel de Métricas</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Panel de MÃ©tricas</h2>
 
         <div className="flex space-x-2">
           <button
@@ -420,7 +422,7 @@ function MetricsDashboard() {
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            Día
+            DÃ­a
           </button>
           <button
             onClick={() => setSelectedTimeframe('week')}
@@ -448,7 +450,7 @@ function MetricsDashboard() {
       {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">{error}</div>}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico de actividad de email */}
+        {/* GrÃ¡fico de actividad de email */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Actividad de Email</h3>
           <div className="h-80">
@@ -480,7 +482,7 @@ function MetricsDashboard() {
           </div>
         </div>
 
-        {/* Gráfico de rendimiento */}
+        {/* GrÃ¡fico de rendimiento */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-lg font-medium text-gray-700 mb-4">Tiempo de Respuesta (ms)</h3>
           <div className="h-80">
@@ -564,7 +566,7 @@ function MetricsDashboard() {
                           ? colors.email
                           : entry.name.includes('Email recibidos')
                             ? colors.notification
-                            : entry.name.includes('Búsquedas')
+                            : entry.name.includes('BÃºsquedas')
                               ? colors.search
                               : colors.eventDetection
                       }
@@ -579,40 +581,40 @@ function MetricsDashboard() {
 
       <div className="mt-6">
         <h3 className="text-lg font-medium text-gray-700 mb-3">
-          Estadísticas de Uso del Sistema de Emails
+          EstadÃ­sticas de Uso del Sistema de Emails
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Tarjetas de estadísticas */}
+          {/* Tarjetas de estadÃ­sticas */}
           <StatCard
             title="Emails enviados hoy"
             value={lastPoint?.emailSent || 0}
             trend={10}
-            icon="�x�"
+            icon="ï¿½xï¿½"
           />
           <StatCard
             title="Emails recibidos hoy"
             value={lastPoint?.emailReceived || 0}
             trend={15}
-            icon="�x�"
+            icon="ï¿½xï¿½"
           />
           <StatCard
-            title="Búsquedas realizadas"
+            title="BÃºsquedas realizadas"
             value={lastPoint?.searchCount || 0}
             trend={-5}
-            icon="�x�"
+            icon="ï¿½xï¿½"
           />
           <StatCard
             title="Eventos detectados"
             value={lastPoint?.eventsDetected || 0}
             trend={20}
-            icon="�x&"
+            icon="ï¿½x&"
           />
         </div>
       </div>
 
-      {/* �altima actualización */}
+      {/* ï¿½altima actualizaciÃ³n */}
       <div className="mt-6 text-right text-sm text-gray-500">
-        �altima actualización:{' '}
+        ï¿½altima actualizaciÃ³n:{' '}
         {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleString() : 'N/A'}
       </div>
     </div>
@@ -620,7 +622,7 @@ function MetricsDashboard() {
 }
 
 /**
- * Tarjeta para mostrar estadísticas individuales
+ * Tarjeta para mostrar estadÃ­sticas individuales
  */
 function StatCard({ title, value, trend, icon }) {
   return (
@@ -628,7 +630,7 @@ function StatCard({ title, value, trend, icon }) {
       <div className="flex justify-between items-start">
         <span className="text-2xl">{icon}</span>
         <span className={`text-sm font-medium ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-          {trend >= 0 ? '� ' : '� '} {Math.abs(trend)}%
+          {trend >= 0 ? 'ï¿½ ' : 'ï¿½ '} {Math.abs(trend)}%
         </span>
       </div>
       <h4 className="mt-2 text-gray-500 text-sm">{title}</h4>
@@ -651,7 +653,7 @@ function HttpRoutesTable() {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_BACKEND_BASE_URL || '';
-        const url = (endpoint ? ${endpoint} : '') + '/api/admin/metrics/http?limit=50';
+        const url = (endpoint ? `${endpoint}` : '') + '/api/admin/metrics/http?limit=50';
         const res = await apiGet(url, { auth: true, silent: true });
         if (!mounted) return;
         if (res?.ok) {
@@ -679,7 +681,7 @@ function HttpRoutesTable() {
       <table className="min-w-full text-sm">
         <thead>
           <tr className="border-b">
-            <th className="text-left py-2 px-2">M�todo</th>
+            <th className="text-left py-2 px-2">Método</th>
             <th className="text-left py-2 px-2">Ruta</th>
             <th className="text-right py-2 px-2">Total</th>
             <th className="text-right py-2 px-2">Errores</th>
@@ -720,7 +722,7 @@ function UsersWithErrors() {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(${endpoint}/errors/by-user?timeframe=day, { auth: true, silent: true });
+        const res = await apiGet(`${endpoint}/errors/by-user?timeframe=day`, { auth: true, silent: true });
         if (!mounted) return;
         if (res?.ok) {
           const json = await res.json();
@@ -739,34 +741,35 @@ function UsersWithErrors() {
     return () => { mounted = false; };
   }, []);
 
-  if (loading) return <div className=\"text-sm text-gray-500\">Cargando usuarios...</div>;
-  if (err) return <div className=\"text-sm text-red-600\">{err}</div>;
+  if (loading) return <div className="text-sm text-gray-500">Cargando usuarios...</div>;
+  if (err) return <div className="text-sm text-red-600">{err}</div>;
 
   return (
-    <div className=\"overflow-auto max-h-80\">
-      <table className=\"min-w-full text-sm\">
+    <div className="overflow-auto max-h-80">
+      <table className="min-w-full text-sm">
         <thead>
-          <tr className=\"border-b\">
-            <th className=\"text-left py-2 px-2\">Usuario</th>
-            <th className=\"text-right py-2 px-2\">Errores</th>
-            <th className=\"text-left py-2 px-2\">Fuentes</th>
-            <th className=\"text-left py-2 px-2\">�ltimo</th>
+          <tr className="border-b">
+            <th className="text-left py-2 px-2">Usuario</th>
+            <th className="text-right py-2 px-2">Errores</th>
+            <th className="text-left py-2 px-2">Fuentes</th>
+            <th className="text-left py-2 px-2">�ltimo</th>
           </tr>
         </thead>
         <tbody>
           {data.map((r, i) => (
-            <tr key={i} className=\"border-b\">
-              <td className=\"py-2 px-2\">{r.user?.email || r.user?.uid || 'unknown'}</td>
-              <td className=\"py-2 px-2 text-right\">{r.count}</td>
-              <td className=\"py-2 px-2\">{(r.sources || []).join(', ')}</td>
-              <td className=\"py-2 px-2\">{new Date(r.lastTimestamp || Date.now()).toLocaleString()}</td>
+            <tr key={i} className="border-b">
+              <td className="py-2 px-2">{r.user?.email || r.user?.uid || 'unknown'}</td>
+              <td className="py-2 px-2 text-right">{r.count}</td>
+              <td className="py-2 px-2">{(r.sources || []).join(', ')}</td>
+              <td className="py-2 px-2">{new Date(r.lastTimestamp || Date.now()).toLocaleString()}</td>
             </tr>
           ))}
           {data.length === 0 && (
-            <tr><td className=\"py-2 px-2\" colSpan={4}>Sin usuarios con errores recientes</td></tr>
+            <tr><td className="py-2 px-2" colSpan={4}>Sin usuarios con errores recientes</td></tr>
           )}
         </tbody>
       </table>
     </div>
   );
 }
+

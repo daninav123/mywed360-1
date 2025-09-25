@@ -824,4 +824,19 @@ exports.validateEmail = functions.https.onRequest((request, response) => {
 });
 
 
+// Scheduled cleanup for webhook idempotency markers (TTL simulation)
+exports.cleanupWebhookDedup = functions.pubsub
+  .schedule('0 */6 * * *') // every 6 hours
+  .timeZone('Europe/Madrid')
+  .onRun(async () => {
+    const now = new Date();
+    const snap = await db.collection('webhookDedup').where('expireAt', '<=', now).limit(500).get();
+    if (snap.empty) return null;
+    const batch = db.batch();
+    snap.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+    console.log(`cleanupWebhookDedup: removed ${snap.size} expired docs`);
+    return null;
+  });
+
 

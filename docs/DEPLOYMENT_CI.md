@@ -1,4 +1,4 @@
-# Despliegue y CI
+﻿# Despliegue y CI
 
 ## Despliegue Frontend
 
@@ -19,6 +19,11 @@ Pasos mínimos:
 3. Ejecutar tests unitarios (cuando existan)
 4. Ejecutar E2E seating smoke (modo headless) contra preview
 5. Build
+
+### Webhook de pagos (Stripe) en CI/tests
+- Validación lógica del webhook sin firma: STRIPE_TEST_DISABLE_SIGNATURE=true y POST /api/payments/webhook con un JSON que siga la forma del evento de Stripe.
+- En producción no activar este flag; requerir STRIPE_SECRET_KEY y STRIPE_WEBHOOK_SECRET con verificación de firma.
+
 
 ## Cypress en CI
 
@@ -60,3 +65,6 @@ jobs:
           CYPRESS_BASE_URL: ${{ secrets.PREVIEW_URL }}
       - run: npm run build
 ```
+
+
+

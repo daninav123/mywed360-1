@@ -1,5 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import { z, validate } from '../utils/validation.js';
 
 const router = express.Router();
 
@@ -30,10 +31,17 @@ async function listProviders({ category, status, q, limit = 20 }) {
 }
 
 // GET /api/providers
-router.get('/', async (req, res) => {
+const listQuery = z.object({
+  q: z.string().optional().default(''),
+  category: z.string().optional().default(''),
+  status: z.string().optional().default(''),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
+router.get('/', validate(listQuery, 'query'), async (req, res) => {
   try {
-    const { q = '', category = '', status = '', page = '1', limit = '20' } = req.query || {};
-    const l = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+    const { q = '', category = '', status = '', page = 1, limit = 20 } = req.query || {};
+    const l = Number(limit);
     const items = await listProviders({ q, category, status, limit: l });
     // Paginación simple: de momento se devuelve la primera página
     res.json({ items, page: Number(page) || 1, limit: l, total: items.length });
@@ -43,12 +51,23 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/providers
-router.post('/', express.json(), async (req, res) => {
+const createBody = z.object({
+  name: z.string().min(1),
+  category: z.string().optional().nullable(),
+  status: z.enum(['prospect', 'active', 'archived']).optional().default('prospect'),
+  phone: z.string().optional().nullable(),
+  email: z.string().email().optional().nullable(),
+  location: z.string().optional().nullable(),
+  services: z.array(z.any()).optional().default([]),
+  rating: z.number().min(0).max(5).optional().nullable(),
+  notes: z.string().optional().nullable(),
+});
+router.post('/', express.json(), validate(createBody), async (req, res) => {
   try {
     const body = req.body || {};
     const name = String(body.name || '').trim();
-    if (!name) return res.status(400).json({ success: false, error: 'name requerido' });
-    const now = admin.firestore.FieldValue.serverTimestamp();
+    let now;
+    try { now = admin.firestore.FieldValue.serverTimestamp(); } catch { try { now = admin.firestore().FieldValue.serverTimestamp(); } catch { now = new Date(); } }
     const doc = {
       name,
       category: body.category || null,
@@ -70,7 +89,8 @@ router.post('/', express.json(), async (req, res) => {
 });
 
 // GET /api/providers/:id
-router.get('/:id', async (req, res) => {
+const idParams = z.object({ id: z.string().min(1) });
+router.get('/:id', validate(idParams, 'params'), async (req, res) => {
   try {
     const id = req.params.id;
     const snap = await admin.firestore().collection('providers').doc(id).get();
@@ -82,7 +102,18 @@ router.get('/:id', async (req, res) => {
 });
 
 // PATCH /api/providers/:id
-router.patch('/:id', express.json(), async (req, res) => {
+const patchBody = z.object({
+  name: z.string().min(1).optional(),
+  category: z.string().optional().nullable(),
+  status: z.enum(['prospect', 'active', 'archived']).optional(),
+  phone: z.string().optional().nullable(),
+  email: z.string().email().optional().nullable(),
+  location: z.string().optional().nullable(),
+  services: z.array(z.any()).optional(),
+  rating: z.number().min(0).max(5).optional().nullable(),
+  notes: z.string().optional().nullable(),
+}).strict();
+router.patch('/:id', express.json(), validate(idParams, 'params'), validate(patchBody), async (req, res) => {
   try {
     const id = req.params.id;
     const patch = req.body || {};
@@ -106,7 +137,8 @@ router.patch('/:id', express.json(), async (req, res) => {
       if (!['prospect', 'active', 'archived'].includes(st))
         return res.status(400).json({ success: false, error: 'status inválido' });
     }
-    data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    try { data.updatedAt = admin.firestore.FieldValue.serverTimestamp(); }
+    catch { try { data.updatedAt = admin.firestore().FieldValue.serverTimestamp(); } catch { data.updatedAt = new Date(); } }
     await admin.firestore().collection('providers').doc(id).set(data, { merge: true });
     res.json({ success: true });
   } catch (e) {
@@ -115,7 +147,7 @@ router.patch('/:id', express.json(), async (req, res) => {
 });
 
 // DELETE /api/providers/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validate(idParams, 'params'), async (req, res) => {
   try {
     const id = req.params.id;
     await admin.firestore().collection('providers').doc(id).delete();
@@ -126,11 +158,10 @@ router.delete('/:id', async (req, res) => {
 });
 
 // GET /api/providers/search
-router.get('/search', async (req, res) => {
+const searchQuery = z.object({ q: z.string().min(1) });
+router.get('/search', validate(searchQuery, 'query'), async (req, res) => {
   try {
     const { q } = req.query || {};
-    if (!q || String(q).trim().length === 0)
-      return res.status(400).json({ success: false, error: 'q requerido' });
     const items = await listProviders({ q: String(q), limit: 50 });
     res.json({ items });
   } catch (e) {

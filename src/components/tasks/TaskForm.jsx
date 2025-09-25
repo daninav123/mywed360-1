@@ -69,6 +69,7 @@ const TaskForm = ({
                 value={formData.startDate}
                 onChange={handleChange}
                 className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
               />
             </div>
             <div className="flex-1">
@@ -79,6 +80,7 @@ const TaskForm = ({
                 value={formData.startTime}
                 onChange={handleChange}
                 className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
               />
             </div>
           </div>
@@ -91,6 +93,7 @@ const TaskForm = ({
                 value={formData.endDate}
                 onChange={handleChange}
                 className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
               />
             </div>
             <div className="flex-1">
@@ -101,6 +104,7 @@ const TaskForm = ({
                 value={formData.endTime}
                 onChange={handleChange}
                 className="w-full border rounded px-2 py-1"
+                disabled={formData.long && formData.parentTaskId && formData.unscheduled}
               />
             </div>
           </div>
@@ -130,6 +134,50 @@ const TaskForm = ({
                     </option>
                   ))}
               </select>
+              {formData.parentTaskId && (
+                <label className="flex items-center space-x-2 text-sm mt-2">
+                  <input
+                    type="checkbox"
+                    checked={!!formData.unscheduled}
+                    onChange={(e) => setFormData({ ...formData, unscheduled: e.target.checked })}
+                  />
+                  <span>Subtarea sin fecha (aún)</span>
+                </label>
+              )}
+              {!formData.parentTaskId && (
+                <div className="mt-3 space-y-2 border-t pt-3">
+                  <div className="text-xs text-gray-600">Rango automático del bloque</div>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <select
+                      value={formData.rangeMode || 'auto'}
+                      onChange={(e) => setFormData({ ...formData, rangeMode: e.target.value })}
+                      className="border rounded px-2 py-1"
+                    >
+                      <option value="auto">Auto</option>
+                      <option value="manual">Manual</option>
+                    </select>
+                    <select
+                      value={formData.autoAdjust || 'expand_only'}
+                      onChange={(e) => setFormData({ ...formData, autoAdjust: e.target.value })}
+                      className="border rounded px-2 py-1"
+                      disabled={(formData.rangeMode || 'auto') !== 'auto'}
+                    >
+                      <option value="expand_only">Expandir solo</option>
+                      <option value="expand_and_shrink">Expandir y contraer</option>
+                      <option value="none">Sin ajustar</option>
+                    </select>
+                    <input
+                      type="number"
+                      min="0"
+                      className="border rounded px-2 py-1"
+                      value={Number(formData.bufferDays ?? 0)}
+                      onChange={(e) => setFormData({ ...formData, bufferDays: Math.max(0, Number(e.target.value || 0)) })}
+                      placeholder="Margen (dias)"
+                      disabled={(formData.rangeMode || 'auto') !== 'auto'}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <label className="flex items-center space-x-2 text-sm">

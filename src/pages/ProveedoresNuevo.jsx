@@ -93,6 +93,7 @@ const Proveedores = () => {
   const [originFilter, setOriginFilter] = useState('all');
   const [statusView, setStatusView] = useState('all');
   const [expandedGroups, setExpandedGroups] = useState({});
+  const [trackingItem, setTrackingItem] = useState(null);
 
   // Servicios deseados
   const [wantedServices, setWantedServices] = useState([]);
@@ -220,6 +221,21 @@ const Proveedores = () => {
     if (user) loadProviders();
   }, [user, loadProviders]);
 
+  // Mostrar onboarding inicial si no se ha completado y faltan datos básicos
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!onboardingKey) return;
+    try {
+      const done = localStorage.getItem(onboardingKey) === '1';
+      const noProviders = (providers || []).length === 0;
+      const noWanted = (normalizedWanted || []).length === 0;
+      if (!done && (noProviders || noWanted)) {
+        setShowOnboardingModal(true);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onboardingKey, providers?.length, normalizedWanted?.length]);
+
   // Cargar servicios deseados por boda
   useEffect(() => {
     let cancelled = false;
@@ -260,6 +276,34 @@ const Proveedores = () => {
   };
   const handleCloseDetail = () => setSelectedProvider(null);
   const handleOpenAISearch = () => setShowAISearchModal(true);
+
+  const handleEdit = (provider) => {
+    if (provider) setSelectedProvider(provider);
+    setShowEditProviderForm(true);
+  };
+
+  const handleDelete = async (providerId) => {
+    if (!providerId) return;
+    try {
+      const ok = typeof window !== 'undefined' ? window.confirm('¿Eliminar este proveedor?') : true;
+      if (!ok) return;
+      await deleteProvider(providerId);
+    } catch {}
+  };
+
+  const handleOpenGroups = (groupId) => {
+    try {
+      if (!groupId) return;
+      const g = (groups || []).find((x) => x.id === groupId);
+      if (g) {
+        setTab('buscados');
+        setSearchTerm(g.name || '');
+        if (typeof window !== 'undefined') {
+          toast.info(`Grupo: ${g.name}`);
+        }
+      }
+    } catch {}
+  };
 
   const openCompareModal = () => {
     if (!selectedProviderIds.length) return;
@@ -548,6 +592,40 @@ const Proveedores = () => {
           {/* Lista de proveedores con filtros */}
           {tab === 'buscados' ? (
             <div className="space-y-6">
+              {/* Barra de acciones para seleccionados */}
+              {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                  <span>{selectedProviderIds.length} seleccionados</span>
+                  <button
+                    type="button"
+                    onClick={openCompareModal}
+                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                  >
+                    Comparar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openBulkStatusModal}
+                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                  >
+                    Cambiar estado
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openDuplicatesModal}
+                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                  >
+                    Revisar duplicados
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearSelection}
+                    className="px-3 py-1 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              )}
               {groupedByService.keys.map((svc) => (
                 <div key={svc}>
                   <button
@@ -572,6 +650,14 @@ const Proveedores = () => {
                           onToggleSelect={() => toggleSelectProvider(provider.id)}
                           onViewDetail={() => handleViewDetail(provider)}
                           onToggleFavorite={toggleFavoriteProvider}
+                          onEdit={() => handleEdit(provider)}
+                          onDelete={() => handleDelete(provider.id)}
+                          onReserve={() => handleReserveProvider(provider)}
+                          onShowTracking={(item) => {
+                            setTrackingItem(item || null);
+                            setShowTrackingModal(!!item);
+                          }}
+                          onOpenGroups={handleOpenGroups}
                         />
                       ))}
                     </div>
@@ -599,6 +685,14 @@ const Proveedores = () => {
               selected={selectedProviderIds}
               toggleSelect={toggleSelectProvider}
               toggleFavorite={toggleFavoriteProvider}
+              onEdit={handleEdit}
+              onDelete={(id) => handleDelete(id)}
+              onReserve={(p) => handleReserveProvider(p)}
+              onShowTracking={(item) => {
+                setTrackingItem(item || null);
+                setShowTrackingModal(!!item);
+              }}
+              onOpenGroups={handleOpenGroups}
               onOpenCompare={openCompareModal}
               onOpenBulkStatus={openBulkStatusModal}
               onOpenDuplicates={openDuplicatesModal}
@@ -716,7 +810,7 @@ const Proveedores = () => {
         <TrackingModal
           isOpen={showTrackingModal}
           onClose={() => setShowTrackingModal(false)}
-          trackingItem={null}
+          trackingItem={trackingItem}
         />
       )}
 

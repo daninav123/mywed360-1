@@ -1,13 +1,13 @@
-openapi: 3.0.3
+﻿openapi: 3.0.3
 info:
   title: MyWed360 Backend API
   version: 0.1.0
   description: |
-    Especificación OpenAPI 3 del backend de MyWed360.
+    EspecificaciÃ³n OpenAPI 3 del backend de MyWed360.
 
     Seguridad principal: Firebase Auth (Bearer token). En desarrollo puede estar activo el bypass de tokens mock (`ALLOW_MOCK_TOKENS`).
 
-    Documentación relacionada:
+    DocumentaciÃ³n relacionada:
     - Arquitectura: ../ARCHITECTURE.md
     - Onboarding: ../ONBOARDING.md
     - Monitoreo: ../monitoring/README.md
@@ -15,7 +15,7 @@ servers:
   - url: http://localhost:3001
     description: Local (desarrollo)
   - url: https://mywed360-backend.onrender.com
-    description: Render (staging/producción)
+    description: Render (staging/producciÃ³n)
 
 tags:
   - name: health
@@ -23,7 +23,7 @@ tags:
   - name: rsvp
     description: Confirmaciones de asistencia por token y recordatorios
   - name: whatsapp
-    description: Webhooks y endpoints de mensajería WhatsApp
+    description: Webhooks y endpoints de mensajerÃ­a WhatsApp
   - name: mailgun
     description: Webhooks de Mailgun
 
@@ -124,7 +124,7 @@ components:
         ok:
           type: boolean
           nullable: true
-          description: Indicador heurístico opcional si se realiza verificación activa
+          description: Indicador heurÃ­stico opcional si se realiza verificaciÃ³n activa
         message:
           type: string
           nullable: true
@@ -250,14 +250,14 @@ paths:
   /api/health/livez:
     get:
       tags: [health]
-      summary: Señal de liveness
+      summary: SeÃ±al de liveness
       security: []
       responses:
         '200': { description: Alive }
   /api/health/readyz:
     get:
       tags: [health]
-      summary: Señal de readiness (comprueba Firestore superficialmente)
+      summary: SeÃ±al de readiness (comprueba Firestore superficialmente)
       security: []
       responses:
         '200': { description: Ready }
@@ -266,7 +266,7 @@ paths:
   /api/rsvp/by-token/{token}:
     get:
       tags: [rsvp]
-      summary: Obtiene el estado de RSVP por token público
+      summary: Obtiene el estado de RSVP por token pÃºblico
       security: []
       parameters:
         - name: token
@@ -275,7 +275,7 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Datos básicos de RSVP
+          description: Datos bÃ¡sicos de RSVP
           content:
             application/json:
               schema:
@@ -283,7 +283,7 @@ paths:
         '404': { description: Not found }
     put:
       tags: [rsvp]
-      summary: Actualiza el estado de RSVP por token público
+      summary: Actualiza el estado de RSVP por token pÃºblico
       security: []
       parameters:
         - name: token
@@ -309,9 +309,9 @@ paths:
   /api/rsvp/reminders:
     post:
       tags: [rsvp]
-      summary: Envía recordatorios por email a invitados pendientes (requiere rol planner)
+      summary: EnvÃ­a recordatorios por email a invitados pendientes (requiere rol planner)
       description: |
-        Requiere autenticación (Firebase) y rol `planner` (verificado en el backend).
+        Requiere autenticaciÃ³n (Firebase) y rol `planner` (verificado en el backend).
       security:
         - bearerAuth: []
       requestBody:
@@ -321,7 +321,18 @@ paths:
             schema:
               $ref: '#/components/schemas/RSVPRemindersRequest'
       responses:
-        '200': { description: OK }
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret: { type: string }
+              examples:
+                sample:
+                  value:
+                    clientSecret: pi_abc_secret_123
         '400': { description: Bad request }
         '401': { description: Unauthorized }
 
@@ -330,7 +341,7 @@ paths:
       tags: [whatsapp]
       summary: Webhook de estados y mensajes entrantes de Twilio
       description: |
-        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` está configurado. Acepta `application/x-www-form-urlencoded`.
+        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` estÃ¡ configurado. Acepta `application/x-www-form-urlencoded`.
         Procesa actualizaciones de estado y mensajes entrantes para el flujo de RSVP.
       security: []
       requestBody:
@@ -348,8 +359,8 @@ paths:
       tags: [whatsapp]
       summary: Estado del proveedor de WhatsApp (health superficial)
       description: |
-        Expone si el proveedor (p. ej., Twilio) está configurado mediante variables de entorno.
-        Puede incluir señal `ok` y `message` cuando exista verificación activa.
+        Expone si el proveedor (p. ej., Twilio) estÃ¡ configurado mediante variables de entorno.
+        Puede incluir seÃ±al `ok` y `message` cuando exista verificaciÃ³n activa.
       security: []
       responses:
         '200':
@@ -362,7 +373,7 @@ paths:
   /api/mailgun/webhook:
     post:
       tags: [mailgun]
-      summary: Webhook de Mailgun con verificación HMAC-SHA256
+      summary: Webhook de Mailgun con verificaciÃ³n HMAC-SHA256
       description: |
         Verifica la firma usando `MAILGUN_SIGNING_KEY`. Acepta `application/x-www-form-urlencoded`.
       security: []
@@ -478,7 +489,7 @@ paths:
   /api/providers/search:
     get:
       tags: [providers]
-      summary: Búsqueda con IA de proveedores
+      summary: BÃºsqueda con IA de proveedores
       security:
         - bearerAuth: []
       parameters:
@@ -558,7 +569,7 @@ paths:
   /api/contracts/{id}/send:
     post:
       tags: [contracts]
-      summary: Envío del contrato para firma
+      summary: EnvÃ­o del contrato para firma
       security:
         - bearerAuth: []
       responses:
@@ -570,13 +581,19 @@ paths:
       summary: Lista pagos
       security:
         - bearerAuth: []
+      parameters:
+        - in: query
+          name: contractId
+          schema: { type: string }
+          required: false
+          description: Filtra pagos por contrato
       responses:
         '200': { description: OK }
 
   /api/payments/intent:
     post:
       tags: [payments]
-      summary: Crea intención de pago
+      summary: Crea intenciÃ³n de pago
       security:
         - bearerAuth: []
       requestBody:
@@ -619,7 +636,7 @@ paths:
   /api/emails/send:
     post:
       tags: [emails]
-      summary: Envío de email
+      summary: EnvÃ­o de email
       security:
         - bearerAuth: []
       requestBody:
@@ -634,7 +651,7 @@ paths:
   /api/emails/analyze:
     post:
       tags: [emails]
-      summary: Análisis IA de email
+      summary: AnÃ¡lisis IA de email
       security:
         - bearerAuth: []
       requestBody:
@@ -661,7 +678,7 @@ paths:
         '200': { description: OK }
     post:
       tags: [notifications]
-      summary: Crea una notificación
+      summary: Crea una notificaciÃ³n
       security:
         - bearerAuth: []
       requestBody:
@@ -676,7 +693,7 @@ paths:
   /api/notifications/{id}:
     patch:
       tags: [notifications]
-      summary: Actualiza estado o preferencias de una notificación
+      summary: Actualiza estado o preferencias de una notificaciÃ³n
       security:
         - bearerAuth: []
       parameters:
@@ -696,7 +713,7 @@ paths:
   /api/admin/metrics/http:
     get:
       tags: [metrics]
-      summary: Resumen de métricas HTTP (admin)
+      summary: Resumen de mÃ©tricas HTTP (admin)
       security:
         - bearerAuth: []
       responses:
@@ -715,3 +732,26 @@ x-frontend-mapping:
     components:
       - src/components/email/InboxContainer.jsx
       - src/services/EmailService.js
+  /api/contracts/{id}/payments:
+    get:
+      tags: [payments]
+      summary: Lista pagos de un contrato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'

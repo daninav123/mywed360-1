@@ -1,5 +1,5 @@
-﻿import { X, Star, Phone, Mail, Globe, Calendar, Edit2, Clock, MapPin } from 'lucide-react';
-import React, { useState } from 'react';
+﻿import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ProveedorBudgets from './ProveedorBudgets.jsx';
@@ -7,33 +7,27 @@ import RFQModal from './RFQModal';
 import { useWedding } from '../../context/WeddingContext';
 import useSupplierGroups from '../../hooks/useSupplierGroups';
 import useSupplierRFQHistory from '../../hooks/useSupplierRFQHistory';
-import { post as apiPost } from '../../services/apiClient';
+import useProveedores from '../../hooks/useProveedores';
+import { post as apiPost, get as apiGet } from '../../services/apiClient';
+import EmailTrackingList from './tracking/EmailTrackingList';
+import TrackingModal from './tracking/TrackingModal';
+import { loadTrackingRecords } from '../../services/EmailTrackingService';
 import Modal from '../Modal';
 import Toast from '../Toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
  */
 
-/**
- * Componente que muestra los detalles completos de un proveedor seleccionado.
- * Incluye información de contacto, calificaciones, notas y opciones para editar.
- * También permite añadir valoraciones y mostrar el historial de interacciones.
- *
- * @param {Object} props - Propiedades del componente
- * @param {Provider} props.provider - Proveedor a mostrar en detalle
- * @param {Function} props.onClose - Función para cerrar el panel de detalles
- * @param {Function} props.onEdit - Función para editar el proveedor
- * @param {string} props.activeTab - pestaña activa dentro del panel de detalles ('info', 'contacto', 'notas', 'historial')
- * @param {Function} props.setActiveTab - Función para cambiar la pestaña activa
- * @returns {React.ReactElement} Componente de detalle de proveedor
- */
 const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
-  const [rating, setRating] = useState(
-    provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0
-  );
+  const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
+  const [ratingDirty, setRatingDirty] = useState(false);
+  const [savingRating, setSavingRating] = useState(false);
+  const { updateProvider } = useProveedores();
+
   const { activeWedding } = useWedding();
   const [generating, setGenerating] = useState(false);
   const [genError, setGenError] = useState(null);
@@ -47,6 +41,11 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
   const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
   const [preview, setPreview] = useState({ open: false, url: '', type: '' });
+
+  const [trackingFilter, setTrackingFilter] = useState('todos');
+  const [selectedTracking, setSelectedTracking] = useState(null);
+  const [remoteEvents, setRemoteEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -70,9 +69,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         },
         saveMeta: true,
       };
-      const res = await apiPost('/api/legal-docs/generate', payload, {
-        auth: true,
-      });
+      const res = await apiPost('/api/legal-docs/generate', payload, { auth: true });
       const json = await res.json();
       if (!res.ok || !json?.success) throw new Error(json?.error || 'error');
       const b64 = json?.document?.pdfBase64;
@@ -108,34 +105,52 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     });
   };
 
-  // Renderizar estrellas para calificación
-  const renderRatingStars = (currentRating, interactive = false) => {
-    return (
-      <div className="flex">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            size={interactive ? 24 : 20}
-            className={`${
-              star <= currentRating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer' : ''}`}
-            onClick={() => interactive && setRating(star)}
-          />
-        ))}
-      </div>
-    );
+  const renderRatingStars = (currentRating, interactive = false) => (
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          size={interactive ? 24 : 20}
+          className={`${star <= currentRating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'} ${
+            interactive ? 'cursor-pointer' : ''
+          }`}
+          onClick={() => {
+            if (!interactive) return;
+            setRating(star);
+            setRatingDirty(true);
+          }}
+        />
+      ))}
+    </div>
+  );
+
+  const saveRating = async () => {
+    if (!provider?.id || !ratingDirty) return;
+    try {
+      setSavingRating(true);
+      const baseSum = Number(provider.rating || 0);
+      const baseCount = Number(provider.ratingCount || 0);
+      const newData = {
+        ...provider,
+        rating: baseSum + Math.max(1, Math.min(5, Math.round(rating))),
+        ratingCount: baseCount + 1,
+        lastRatedAt: new Date().toISOString(),
+      };
+      await updateProvider(provider.id, newData);
+      setRatingDirty(false);
+      setToast({ type: 'success', message: 'Valoracion guardada' });
+    } catch (e) {
+      setToast({ type: 'error', message: 'No se pudo guardar la valoracion' });
+    } finally {
+      setSavingRating(false);
+    }
   };
 
-  // Formatear fecha para mostrar
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     try {
       const date = new Date(dateStr);
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
     } catch (e) {
       return dateStr;
     }
@@ -145,16 +160,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     if (!ts) return '';
     try {
       const d = typeof ts?.toDate === 'function' ? ts.toDate() : new Date(ts);
-      return d.toLocaleString('es-ES', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      });
+      return d.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
     } catch (_) {
       return '';
     }
   };
 
-  // Color según estado del proveedor
   const getStatusColor = (status) => {
     switch (status) {
       case 'Confirmado':
@@ -170,32 +181,90 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   };
 
+  const trackingItemsLocal = useMemo(() => {
+    try {
+      const all = loadTrackingRecords();
+      const list = Array.isArray(all) ? all : [];
+      if (!provider) return [];
+      return list.filter((it) => it.providerId === provider.id || it.providerEmail === provider.email);
+    } catch {
+      return [];
+    }
+  }, [provider?.id, provider?.email]);
+
+  // Fetch Mailgun events for recipient
+  const refreshMailEvents = async () => {
+    if (!provider?.email) return;
+    try {
+      setLoadingEvents(true);
+      const res = await apiGet(`/api/mailgun/events?recipient=${encodeURIComponent(provider.email)}&limit=50`, { auth: true, silent: true });
+      const json = await res.json();
+      const items = Array.isArray(json?.items) ? json.items : [];
+      const mapped = items.map((ev, idx) => {
+        const tsSec = ev?.timestamp || ev?.event_timestamp || Date.now() / 1000;
+        const dateIso = new Date(tsSec * 1000).toISOString();
+        const evType = String(ev?.event || '').toLowerCase();
+        let status = 'enviado';
+        if (evType === 'delivered') status = 'entregado';
+        else if (evType === 'opened') status = 'leido';
+        else if (evType === 'failed') status = 'error';
+        else if (evType === 'clicked') status = 'leido';
+        return {
+          id: `mg_${idx}_${tsSec}`,
+          providerId: provider.id,
+          providerName: provider.name,
+          subject: `Evento ${evType || 'mailgun'}`,
+          status,
+          sentAt: dateIso,
+          lastUpdated: dateIso,
+          openCount: evType === 'opened' ? 1 : 0,
+          recipientEmail: provider.email,
+        };
+      });
+      setRemoteEvents(mapped);
+    } catch (e) {
+      // silencioso
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  // Auto-refresh when switching to tracking tab
+  React.useEffect(() => {
+    if (activeTab === 'tracking' && provider?.email) {
+      refreshMailEvents();
+    }
+  }, [activeTab, provider?.email]);
+
+  const trackingItems = useMemo(() => {
+    const local = Array.isArray(trackingItemsLocal) ? trackingItemsLocal : [];
+    const remote = Array.isArray(remoteEvents) ? remoteEvents : [];
+    // naive merge
+    return [...remote, ...local];
+  }, [trackingItemsLocal, remoteEvents]);
+
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          {/* Header con título y botón de cierre */}
           <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-xl font-semibold">{provider.name}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-              aria-label="Cerrar"
-            >
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
               <X size={24} />
             </button>
           </div>
 
-          {/* pestañas de navegación */}
           <div className="flex border-b">
             <button
               className={`py-2 px-4 ${activeTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('info')}
             >
-              Información
+              Informacion
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+              className={`py-2 px-4 ${
+                activeTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'
+              }`}
               onClick={() => setActiveTab('communications')}
             >
               Comunicaciones
@@ -208,29 +277,36 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             </button>
           </div>
 
-          {/* Contenido principal con scroll */}
           <div className="overflow-y-auto p-4 flex-1">
             {activeTab === 'info' && (
               <div className="space-y-6">
-                {/* Información principal */}
                 <Card>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center flex-wrap gap-2">
-                      <span
-                        className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}
-                      >
+                      <span className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}>
                         {provider.status}
                       </span>
                       <span className="ml-2 text-gray-500">{provider.service}</span>
                       {!!provider.groupName && !groupCleared && (
                         <button
                           type="button"
-                          onClick={() => onOpenGroups?.(provider.groupId)}
+                          onClick={() => {
+                            if (onOpenGroups) {
+                              onOpenGroups(provider.groupId);
+                            } else {
+                              setToast({ type: 'info', message: `Grupo: ${provider.groupName}` });
+                            }
+                          }}
                           className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
                           title={`Ir al grupo: ${provider.groupName}`}
                         >
                           Grupo: {provider.groupName}
                         </button>
+                      )}
+                      {!provider.groupId && (
+                        <Button size="xs" variant="outline" onClick={() => setAssignOpen(true)}>
+                          Asignar a grupo
+                        </Button>
                       )}
                     </div>
                     {onEdit && (
@@ -242,16 +318,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       <Button
                         onClick={async () => {
                           if (removing) return;
-                          const ok = window.confirm('¿Quitar este proveedor del grupo?');
+                          const ok = window.confirm('Quitar este proveedor del grupo?');
                           if (!ok) return;
                           try {
                             setRemoving(true);
                             await removeMember(provider.groupId, provider.id);
                             setGroupCleared(true);
-                            setToast({
-                              type: 'success',
-                              message: 'Proveedor quitado del grupo',
-                            });
+                            setToast({ type: 'success', message: 'Proveedor quitado del grupo' });
                           } finally {
                             setRemoving(false);
                           }
@@ -266,28 +339,19 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
                   </div>
 
-                  {/* Imagen principal si existe */}
                   {provider.image && (
                     <div className="w-full h-64 overflow-hidden rounded-lg mb-4">
-                      <img
-                        src={provider.image}
-                        alt={provider.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={provider.image} alt={provider.name} className="w-full h-full object-cover" />
                     </div>
                   )}
 
-                  {/* Descripción o snippet */}
                   {provider.snippet && <p className="text-gray-700 mb-4">{provider.snippet}</p>}
 
-                  {/* Detalles de contacto */}
                   <div className="space-y-3 mt-4">
                     {provider.contact && (
                       <div className="flex items-center">
                         <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                          <span className="text-blue-600 font-medium">
-                            {provider.contact.charAt(0)}
-                          </span>
+                          <span className="text-blue-600 font-medium">{provider.contact.charAt(0)}</span>
                         </div>
                         <div>
                           <p className="font-medium">Contacto</p>
@@ -302,7 +366,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <Phone size={16} className="text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Teléfono</p>
+                          <p className="font-medium">Telefono</p>
                           <p className="text-sm text-gray-600">{provider.phone}</p>
                         </div>
                       </div>
@@ -315,10 +379,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         </div>
                         <div className="overflow-hidden">
                           <p className="font-medium">Email</p>
-                          <a
-                            href={`mailto:${provider.email}`}
-                            className="text-sm text-blue-600 hover:underline truncate block"
-                          >
+                          <a href={`mailto:${provider.email}`} className="text-sm text-blue-600 hover:underline truncate block">
                             {provider.email}
                           </a>
                         </div>
@@ -362,10 +423,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Ubicación</p>
-                          <p className="text-sm text-gray-600">
-                            {provider.location || provider.address}
-                          </p>
+                          <p className="font-medium">Ubicacion</p>
+                          <p className="text-sm text-gray-600">{provider.location || provider.address}</p>
                         </div>
                       </div>
                     )}
@@ -378,18 +437,22 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
                   </div>
 
-                  {/* Calificación */}
                   <div className="mt-6">
-                    <p className="font-medium mb-1">Calificación</p>
+                    <p className="font-medium mb-1">Calificacion</p>
                     <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
                         {rating.toFixed(1)} de 5 ({provider.ratingCount || 0} valoraciones)
                       </span>
+                      <Button size="sm" variant="outline" disabled={savingRating || !ratingDirty} onClick={saveRating}>
+                        {savingRating ? 'Guardando...' : 'Guardar valoracion'}
+                      </Button>
                     </div>
                   </div>
                 </Card>
+
                 <ProveedorBudgets supplierId={provider.id} />
+
                 <Card>
                   <div className="flex items-center justify-between">
                     <div>
@@ -400,16 +463,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       <Button onClick={handleOpenLegalDocs} variant="outline">
                         Crear contrato en Documentos
                       </Button>
-                      <Button
-                        onClick={handleGenerateContract}
-                        disabled={!activeWedding || generating}
-                      >
-                        {generating ? 'Generandoâ¬¦' : 'Generar ahora'}
+                      <Button onClick={handleGenerateContract} disabled={!activeWedding || generating}>
+                        {generating ? 'Generando...' : 'Generar ahora'}
                       </Button>
                     </div>
                   </div>
                 </Card>
-                {/* RFQ enviados */}
+
                 <Card>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-medium">RFQ enviados</h3>
@@ -426,24 +486,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             );
                             const json = await res.json();
                             if (json?.url) {
-                              try {
-                                await navigator.clipboard?.writeText?.(json.url);
-                              } catch {}
-                              setToast({
-                                type: 'success',
-                                message: 'Enlace del portal copiado',
-                              });
+                              try { await navigator.clipboard?.writeText?.(json.url); } catch {}
+                              setToast({ type: 'success', message: 'Enlace del portal copiado' });
                             } else {
-                              setToast({
-                                type: 'info',
-                                message: 'Token generado',
-                              });
+                              setToast({ type: 'info', message: 'Token generado' });
                             }
                           } catch (e) {
-                            setToast({
-                              type: 'error',
-                              message: 'No se pudo generar el enlace del portal',
-                            });
+                            setToast({ type: 'error', message: 'No se pudo generar el enlace del portal' });
                           }
                         }}
                       >
@@ -452,10 +501,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                       <Button
                         variant="outline"
                         onClick={() => {
-                          setRfqDefaults({
-                            subject: `Solicitud de presupuesto - ${provider?.service || ''}`.trim(),
-                            body: '',
-                          });
+                          setRfqDefaults({ subject: `Solicitud de presupuesto - ${provider?.service || ''}`.trim(), body: '' });
                           setRfqOpen(true);
                         }}
                       >
@@ -464,7 +510,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     </div>
                   </div>
                   {rfqLoading ? (
-                    <p className="text-sm text-gray-500">Cargando.....</p>
+                    <p className="text-sm text-gray-500">Cargando...</p>
                   ) : rfqHistory.length === 0 ? (
                     <p className="text-sm text-gray-500">Sin RFQs previos.</p>
                   ) : (
@@ -475,18 +521,13 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
                               {r.subject || 'Sin asunto'}
                             </p>
-                            <p className="text-xs text-gray-600">
-                              {r.email || provider?.email} · {formatDateTime(r.sentAt)}
-                            </p>
+                            <p className="text-xs text-gray-600">{r.email || provider?.email} – {formatDateTime(r.sentAt)}</p>
                           </div>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => {
-                              setRfqDefaults({
-                                subject: r.subject || '',
-                                body: r.body || '',
-                              });
+                              setRfqDefaults({ subject: r.subject || '', body: r.body || '' });
                               setRfqOpen(true);
                             }}
                           >
@@ -504,7 +545,6 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Comunicaciones</h3>
-                  {/* Aquí se renderizarían las comunicaciones */}
                   <p className="text-gray-500">Historial de comunicaciones con este proveedor.</p>
                 </Card>
               </div>
@@ -513,56 +553,53 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             {activeTab === 'tracking' && (
               <div className="space-y-4">
                 <Card>
-                  <h3 className="text-lg font-medium mb-3">Seguimiento</h3>
-                  {/* Aquí se renderizaría el seguimiento */}
-                  <p className="text-gray-500">
-                    Historial de seguimiento de comunicaciones con este proveedor.
-                  </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-medium">Seguimiento</h3>
+                    <Button size="sm" variant="outline" onClick={refreshMailEvents} disabled={loadingEvents}>
+                      {loadingEvents ? 'Actualizando…' : 'Actualizar eventos'}
+                    </Button>
+                  </div>
+                  <EmailTrackingList
+                    trackingItems={trackingItems}
+                    currentFilter={trackingFilter}
+                    onFilter={setTrackingFilter}
+                    onViewDetails={(item) => setSelectedTracking(item)}
+                  />
                 </Card>
               </div>
             )}
           </div>
 
-          {/* Footer con botones de acción */}
           <div className="border-t p-4 bg-gray-50 flex justify-end space-x-3">
-            <Button variant="outline" onClick={onClose}>
-              Cerrar
-            </Button>
+            <Button variant="outline" onClick={onClose}>Cerrar</Button>
           </div>
         </div>
       </div>
+
       {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-          duration={2500}
-        />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={2500} />
       )}
+
+      {selectedTracking && (
+        <TrackingModal isOpen={!!selectedTracking} onClose={() => setSelectedTracking(null)} trackingItem={selectedTracking} />
+      )}
+
       {preview.open && (
-        <Modal
-          open={preview.open}
-          onClose={() => setPreview({ open: false, url: '', type: '' })}
-          title="Vista previa"
-        >
+        <Modal open={preview.open} onClose={() => setPreview({ open: false, url: '', type: '' })} title="Vista previa">
           <div className="min-h-[60vh]">
             {preview.type === 'image' ? (
               <img src={preview.url} alt="preview" className="max-h-[70vh] mx-auto" />
             ) : preview.type === 'pdf' ? (
               <iframe src={preview.url} className="w-full h-[70vh]" title="PDF" />
             ) : (
-              <a
-                href={preview.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 underline"
-              >
+              <a href={preview.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
                 Abrir en nueva pestaña
               </a>
             )}
           </div>
         </Modal>
       )}
+
       <RFQModal
         open={rfqOpen}
         onClose={() => setRfqOpen(false)}
@@ -570,16 +607,22 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         defaultSubject={rfqDefaults.subject}
         defaultBody={rfqDefaults.body}
       />
+      {assignOpen && (
+        <AssignSupplierToGroupModal
+          open={assignOpen}
+          onClose={() => setAssignOpen(false)}
+          provider={provider}
+        />
+      )}
     </>
   );
 };
 
-// Optimizar renderizado con React.memo para evitar renderizados innecesarios
 export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
   return (
     prevProps.provider?.id === nextProps.provider?.id &&
     prevProps.activeTab === nextProps.activeTab &&
-    // Solo re-renderizar si cambia el proveedor o la pestaña activa
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
+  const [assignOpen, setAssignOpen] = useState(false);

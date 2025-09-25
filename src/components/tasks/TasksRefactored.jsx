@@ -1,4 +1,4 @@
-import {
+﻿import {
   serverTimestamp,
   doc,
   deleteDoc,
@@ -7,6 +7,7 @@ import {
   addDoc,
   onSnapshot,
   getDoc,
+  updateDoc,
 } from 'firebase/firestore';
 // View mode string kept for internal sizing logic (no external lib)
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -36,13 +37,13 @@ import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 
-// Función helper para cargar datos de Firestore de forma segura con fallbacks
+// FunciÃ³n helper para cargar datos de Firestore de forma segura con fallbacks
 
 import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - Inicialización segura con manejo de errores
+  // Estados - InicializaciÃ³n segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
@@ -72,10 +73,14 @@ export default function Tasks() {
     loading: completedLoading,
   } = useFirestoreCollection('tasksCompleted', []);
 
-  // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks/{parentId}/subtasks/*
+  // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks|task/{parentId}/subtasks/*
   const { data: nestedSubtasks = [] } = useWeddingCollectionGroup('subtasks', activeWedding);
 
-  // MigraciÃƒÂ³n suave de subtareas planas -> anidadas (una vez por boda)
+  // Fallback para estructura con colecciÃ³n singular 'task':
+  // Escucha weddings/{id}/task/*/subtasks/* si el collectionGroup no devuelve nada
+  
+
+  // MigraciÃƒÆ’Ã‚Â³n suave de subtareas planas -> anidadas (una vez por boda)
   useEffect(() => {
     (async () => {
       try {
@@ -91,7 +96,7 @@ export default function Tasks() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
-  // (movido mÃƒÂ¡s abajo tras declarar debugEnabled)
+  // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar debugEnabled)
 
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
@@ -107,6 +112,7 @@ export default function Tasks() {
     }
   });
   const [editingId, setEditingId] = useState(null);
+  const [editingPath, setEditingPath] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     desc: '',
@@ -119,6 +125,11 @@ export default function Tasks() {
     parentTaskId: '',
     assignee: '',
     completed: false,
+    // Nuevos campos de planificaciÃ³n
+    unscheduled: false, // para subtareas sin fecha
+    rangeMode: 'auto', // para tareas padre: 'auto' | 'manual'
+    autoAdjust: 'expand_only', // 'expand_only' | 'expand_and_shrink' | 'none'
+    bufferDays: 3,
   });
 
   const [currentView, setCurrentView] = useState('month');
@@ -141,8 +152,8 @@ export default function Tasks() {
     }
   }, []);
 
-  // Exponer helpers en modo debug para correcciÃƒÂ³n in-situ
-  // (movido mÃƒÂ¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
+  // Exponer helpers en modo debug para correcciÃƒÆ’Ã‚Â³n in-situ
+  // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
@@ -155,7 +166,7 @@ export default function Tasks() {
     }
   }, [calendarDate]);
 
-  // Altura del contenedor del calendario (reactiva al tamaÃ¯Â¿Â½o de ventana)
+  // Altura del contenedor del calendario (reactiva al tamaÃƒÂ¯Ã‚Â¿Ã‚Â½o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
   useEffect(() => {
     const compute = () => {
@@ -173,12 +184,12 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÃƒâ€™Ã‚Â³n:', error);
+      console.error('Error al obtener estado de sincronizaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
 
-  // SuscripciÃƒÂ³n a cambios del estado de sincronizaciÃƒÂ³n (online/syncing/pending)
+  // SuscripciÃƒÆ’Ã‚Â³n a cambios del estado de sincronizaciÃƒÆ’Ã‚Â³n (online/syncing/pending)
   useEffect(() => {
     const unsub = subscribeSyncState(setSyncStatus);
     return () => {
@@ -194,8 +205,8 @@ export default function Tasks() {
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del DÃ¯Â¿Â½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
-  // Exponer helpers en modo debug para corrección in-situ
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del DÃƒÂ¯Ã‚Â¿Ã‚Â½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Exponer helpers en modo debug para correcciÃ³n in-situ
   useEffect(() => {
     if (!debugEnabled) return;
     try {
@@ -221,12 +232,12 @@ export default function Tasks() {
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
 
-  // Manejar eventos de calendario externos// FunciÃƒâ€™Ã‚Â³n para aÃƒâ€™Ã‚Â±adir una reuniÃƒâ€™Ã‚Â³n
+  // Manejar eventos de calendario externos// FunciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n para aÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â±adir una reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
   const addMeeting = useCallback(
     async (meeting) => {
       await addMeetingFS({
         ...meeting,
-        title: meeting.title || 'Nueva reuniÃƒâ€™Ã‚Â³n',
+        title: meeting.title || 'Nueva reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
         start: new Date(meeting.start),
         end: new Date(meeting.end),
       });
@@ -237,9 +248,9 @@ export default function Tasks() {
   // eslint-disable-next-line no-unused-expressions
   addMeeting && null;
 
-  // GeneraciÃƒâ€™Ã‚Â³n automÃƒâ€™Ã‚Â¡tica de timeline si estÃƒâ€™Ã‚Â¡ vacÃƒâ€™Ã‚Â­o// Estado para tareas completadas (inicial vacÃƒâ€™Ã‚Â­o, se cargarÃƒâ€™Ã‚Â¡ asÃƒâ€™Ã‚Â­ncronamente)
+  // GeneraciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de timeline si estÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡ vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­o// Estado para tareas completadas (inicial vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­o, se cargarÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡ asÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­ncronamente)
 
-  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÃƒâ€™Ã‚Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒâ€™Ã‚Â­os al inicio)// Sugerencia automÃƒâ€™Ã‚Â¡tica de categorÃƒâ€™Ã‚Â­a
+  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­os al inicio)// Sugerencia automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (
@@ -267,7 +278,7 @@ export default function Tasks() {
     ) {
       return 'PAPELERIA';
     } else if (
-      texto.includes('mÃƒâ€™Ã‚Âºsica') ||
+      texto.includes('mÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºsica') ||
       texto.includes('music') ||
       texto.includes('dj') ||
       texto.includes('band')
@@ -290,7 +301,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃƒâ€™Ã‚Â­a si se cambia el tÃƒâ€™Ã‚Â­tulo y la categorÃƒâ€™Ã‚Â­a es OTROS
+      // 1. Sugerir categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a si se cambia el tÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­tulo y la categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -303,7 +314,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒâ€™Ã‚Â­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a por defecto
         }
       }
 
@@ -339,10 +350,11 @@ export default function Tasks() {
   const closeModal = () => {
     setShowNewTask(false);
     setEditingId(null);
+    setEditingPath(null);
     resetForm();
   };
 
-  // AsignaciÃƒâ€™Ã‚Â³n automÃƒâ€™Ã‚Â¡tica de categorÃƒâ€™Ã‚Â­a con IA
+  // AsignaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -358,8 +370,8 @@ export default function Tasks() {
           'lugar',
           'sitio',
           'espacio',
-          'salÃƒâ€™Ã‚Â³n',
-          'jardÃƒâ€™Ã‚Â­n',
+          'salÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
+          'jardÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­n',
           'terraza',
         ],
         INVITADOS: [
@@ -373,23 +385,23 @@ export default function Tasks() {
         ],
         COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
         DECORACION: [
-          'decoraciÃƒâ€™Ã‚Â³n',
+          'decoraciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
           'flores',
           'arreglos',
           'centros de mesa',
-          'iluminaciÃƒâ€™Ã‚Â³n',
-          'ambientaciÃƒâ€™Ã‚Â³n',
+          'iluminaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
+          'ambientaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
         ],
         PAPELERIA: [
           'invitaciones',
-          'papelerÃƒâ€™Ã‚Â­a',
+          'papelerÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
           'save the date',
           'tarjetas',
           'programa',
           'seating plan',
         ],
         MUSICA: [
-          'mÃƒâ€™Ã‚Âºsica',
+          'mÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºsica',
           'dj',
           'banda',
           'playlist',
@@ -398,11 +410,11 @@ export default function Tasks() {
           'entretenimiento',
         ],
         FOTOGRAFO: [
-          'fotografÃƒâ€™Ã‚Â­a',
+          'fotografÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
           'video',
           'recuerdos',
-          'Ãƒâ€™Ã‚Â¡lbum',
-          'sesiÃƒâ€™Ã‚Â³n',
+          'ÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lbum',
+          'sesiÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
         ],
         VESTUARIO: [
           'vestido',
@@ -410,17 +422,17 @@ export default function Tasks() {
           'accesorios',
           'zapatos',
           'maquillaje',
-          'peluquerÃƒâ€™Ã‚Â­a',
+          'peluquerÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
         ],
       };
 
-      // Contar coincidencias por categorÃƒâ€™Ã‚Â­a
+      // Contar coincidencias por categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter((palabra) => texto.includes(palabra)).length;
       });
 
-      // Encontrar la categorÃƒâ€™Ã‚Â­a con mayor puntuaciÃƒâ€™Ã‚Â³n
+      // Encontrar la categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con mayor puntuaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -432,26 +444,29 @@ export default function Tasks() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃƒâ€™Ã‚Â­a:', error);
+      console.error('Error al asignar categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃƒâ€™Ã‚Â³n de la boda
+  // Guardar una tarea en la subcolecciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃƒâ€™Ã‚Â¡sico
+      // Validar formulario bÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡sico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃƒâ€™Ã‚Â­tulo');
+        alert('Por favor ingresa un tÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­tulo');
         return;
       }
 
-      if (!formData.startDate) {
+      const isSubtask = !!(formData.long && formData.parentTaskId);
+      const unscheduled = Boolean(formData.unscheduled);
+
+      if (!formData.startDate && !(isSubtask && unscheduled)) {
         alert('Por favor selecciona una fecha de inicio');
         return;
       }
 
-      if (!formData.endDate) {
+      if (!formData.endDate && !(isSubtask && unscheduled)) {
         alert('Por favor selecciona una fecha de fin');
         return;
       }
@@ -462,21 +477,21 @@ export default function Tasks() {
       const endDateStr = formData.endDate;
       const endTimeStr = formData.endTime || '23:59';
 
-      const startDate = new Date(`${startDateStr}T${startTimeStr}`);
-      const endDate = new Date(`${endDateStr}T${endTimeStr}`);
+      const startDate = startDateStr ? new Date(`${startDateStr}T${startTimeStr}`) : null;
+      const endDate = endDateStr ? new Date(`${endDateStr}T${endTimeStr}`) : null;
 
       // Validar fechas
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        alert('Fechas no vÃƒâ€™Ã‚Â¡lidas');
+      if (!(isSubtask && unscheduled) && (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))) {
+        alert('Fechas no vÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lidas');
         return;
       }
 
-      if (endDate < startDate) {
+      if (!(isSubtask && unscheduled) && endDate < startDate) {
         alert('La fecha de fin debe ser posterior a la de inicio');
         return;
       }
 
-      // Asignar categorÃƒâ€™Ã‚Â­a con IA si no se especificÃƒâ€™Ã‚Â³
+      // Asignar categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con IA si no se especificÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -487,15 +502,14 @@ export default function Tasks() {
         id: editingId || `task-${Date.now()}`,
         title: formData.title,
         desc: formData.desc,
-        start: startDate,
-        end: endDate,
+        ...(isSubtask && unscheduled ? {} : { start: startDate, end: endDate }),
         category: category,
         ...(editingId ? {} : { createdAt: serverTimestamp() }),
       };
 
-      // AÃƒâ€™Ã‚Â±adir/actualizar segÃƒâ€™Ã‚Âºn sea una tarea de largo plazo o una reuniÃƒâ€™Ã‚Â³n
+      // AÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â±adir/actualizar segÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºn sea una tarea de largo plazo o una reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
       if (formData.long) {
-        // Si no se eligiÃƒÂ³ tarea padre, asignar por defecto a "OTROS"
+        // Si no se eligiÃƒÆ’Ã‚Â³ tarea padre, asignar por defecto a "OTROS"
         try {
           if (!formData.parentTaskId) {
             const arr = Array.isArray(tasksState) ? tasksState : [];
@@ -539,6 +553,52 @@ export default function Tasks() {
             }
           }
         } catch (_) {}
+
+        // Replicar subtareas al modelo anidado para el modal y Gantt
+        try {
+          if (formData.parentTaskId) {
+            const subId = editingId || savedId || taskData.id;
+            const nestedSubtask = {
+              id: String(subId),
+              title: taskData.title,
+              name: taskData.title,
+              desc: taskData.desc || '',
+              category,
+              assignee: formData.assignee || '',
+              parentId: String(formData.parentTaskId),
+              weddingId: activeWedding,
+              mode: unscheduled ? 'unscheduled' : 'scheduled',
+              ...(unscheduled ? {} : { start: startDate, end: endDate }),
+              updatedAt: serverTimestamp(),
+              ...(editingId ? {} : { createdAt: serverTimestamp() }),
+            };
+            const targetRef = doc(
+              db,
+              'weddings', activeWedding,
+              'tasks', String(formData.parentTaskId),
+              'subtasks', String(subId)
+            );
+            await setDoc(targetRef, nestedSubtask, { merge: true });
+
+            // Si estamos editando y el padre cambi3, eliminar el documento antiguo
+            try {
+              if (editingPath) {
+                const parts = String(editingPath).split('/');
+                const idx = parts.indexOf('tasks');
+                const oldPid = idx >= 0 && parts.length > idx + 1 ? parts[idx + 1] : null;
+                if (oldPid && oldPid !== String(formData.parentTaskId)) {
+                  const oldRef = doc(db, ...String(editingPath).split('/'));
+                  await deleteDoc(oldRef).catch(() => {});
+                }
+              }
+            } catch (_) {}
+
+            // Evitar duplicados: eliminar la subtarea plana en tasks/{id} si existe
+            try {
+              await deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', String(subId)));
+            } catch (_) {}
+          }
+        } catch (_) {}
         // Para el diagrama Gantt
         const ganttTask = {
           ...taskData,
@@ -549,6 +609,10 @@ export default function Tasks() {
           isDisabled: false,
           dependencies: [],
           createdAt: serverTimestamp(),
+          mode: formData.parentTaskId ? (formData.unscheduled ? 'unscheduled' : 'scheduled') : undefined,
+          rangeMode: formData.rangeMode || 'auto',
+          autoAdjust: formData.autoAdjust || 'expand_only',
+          bufferDays: Number(formData.bufferDays ?? 0),
         };
 
         let savedId = editingId;
@@ -564,7 +628,7 @@ export default function Tasks() {
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // Ãƒâ€™Ã¯Â¿Â½Ã¯Â¿Â½&Ã‚Â¡ltimo recurso: generar id local si todo falla
+          // ÃƒÆ’Ã¢â‚¬â„¢ÃƒÂ¯Ã‚Â¿Ã‚Â½ÃƒÂ¯Ã‚Â¿Ã‚Â½&Ãƒâ€šÃ‚Â¡ltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
@@ -590,7 +654,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÃƒâ€™Ã‚Â³n (evento puntual del calendario)
+          // Nueva reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n (evento puntual del calendario)
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -627,6 +691,13 @@ export default function Tasks() {
         }
       } catch (_) {}
 
+      // Ajustar rango del padre si procede (modo automÃ¡tico)
+      try {
+        if (formData.parentTaskId) {
+          await computeAndUpdateParentRange(String(formData.parentTaskId));
+        }
+      } catch (_) {}
+
       // Cerrar modal y limpiar
       closeModal();
     } catch (error) {
@@ -635,7 +706,6 @@ export default function Tasks() {
     }
   };
 
-  // Eliminar una tarea
   const handleDeleteTask = () => {
     try {
       console.log('[Tasks] Eliminar clicado', { editingId, isProcess: !!formData.long });
@@ -650,7 +720,16 @@ export default function Tasks() {
       // Ejecutar las eliminaciones en background (ambas colecciones + hooks)
       const ops = [];
       if (activeWedding && db) {
-        ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
+        // Si es una subtarea anidada, borrar usando la ruta del documento
+        if (editingPath && String(editingPath).includes('/subtasks/')) {
+          try {
+            ops.push(deleteDoc(doc(db, ...String(editingPath).split('/'))));
+          } catch (_) {
+            ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
+          }
+        } else {
+          ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'tasks', editingId)));
+        }
         ops.push(deleteDoc(doc(db, 'weddings', activeWedding, 'meetings', editingId)));
         ops.push(
           deleteDoc(doc(db, 'weddings', activeWedding, 'tasksCompleted', editingId)).catch(() => {})
@@ -667,7 +746,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃƒâ€™Ã‚Â³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -681,7 +760,7 @@ export default function Tasks() {
 
   // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
 
-  // FunciÃƒâ€™Ã‚Â³n auxiliar para validar y normalizar fechas
+  // FunciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
   const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } =
     useSafeEvents(meetingsState);
@@ -716,7 +795,7 @@ export default function Tasks() {
       });
 
       // Si tras todo lo anterior no hay ninguna tarea padre en el rango,
-      // intentar un fallback directo desde tasksState (por si algÃƒÂºn normalizador filtrÃƒÂ³ de mÃƒÂ¡s)
+      // intentar un fallback directo desde tasksState (por si algÃƒÆ’Ã‚Âºn normalizador filtrÃƒÆ’Ã‚Â³ de mÃƒÆ’Ã‚Â¡s)
       const hasParent = injected.some((x) => String(x?.type || 'task') === 'task');
       if (!hasParent) {
         const raw = Array.isArray(tasksState) ? tasksState : [];
@@ -751,6 +830,7 @@ export default function Tasks() {
   // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
   const subtaskEvents = useMemo(() => {
     try {
+      // a) Subtareas planas visibles (con fechas válidas)
       const flat = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'subtask')
         .map((t) => ({
@@ -765,19 +845,34 @@ export default function Tasks() {
           __kind: 'subtask',
         }));
 
-      const nested = (Array.isArray(nestedSubtasks) ? nestedSubtasks : []).map((s) => {
-        const start =
-          s.start instanceof Date
-            ? s.start
-            : s.start && typeof s.start.toDate === 'function'
-              ? s.start.toDate()
-              : new Date(s.start || Date.now());
-        const end =
-          s.end instanceof Date
-            ? s.end
-            : s.end && typeof s.end.toDate === 'function'
-              ? s.end.toDate()
-              : new Date(s.end || start);
+      // b) Subtareas anidadas (modelo nuevo)
+      const nestedSource = Array.isArray(nestedSubtasks) ? nestedSubtasks : [];
+      const nested = nestedSource.map((s) => {
+        const mode = String(s?.mode || '').toLowerCase() || (s?.start ? 'scheduled' : 'unscheduled');
+        const start = mode === 'unscheduled'
+          ? null
+          : (s.start instanceof Date
+              ? s.start
+              : s.start && typeof s.start.toDate === 'function'
+                ? s.start.toDate()
+                : (s.start ? new Date(s.start) : null));
+        const end = mode === 'unscheduled'
+          ? null
+          : (s.end instanceof Date
+              ? s.end
+              : s.end && typeof s.end.toDate === 'function'
+                ? s.end.toDate()
+                : (s.end ? new Date(s.end) : (start || null)));
+        // Derivar parentId desde el path si no viene
+        const parentFromPath = (() => {
+          try {
+            const parts = String(s.__path || '').split('/');
+            let idx = parts.indexOf('tasks');
+            if (idx < 0) idx = parts.indexOf('task');
+            if (idx >= 0 && parts.length > idx + 1) return String(parts[idx + 1]);
+          } catch {}
+          return '';
+        })();
         return {
           id: String(s.id),
           title: s.name || s.title || 'Subtarea',
@@ -786,20 +881,56 @@ export default function Tasks() {
           start,
           end,
           assignee: s.assignee || '',
-          parentId: s.parentId || '',
+          parentId: s.parentId || s.parentTaskId || s.parent || parentFromPath || '',
           __kind: 'subtask',
+          __path: s.__path || undefined,
         };
       });
 
-      // Unir por id, priorizando nested
-      const byId = new Map();
-      for (const it of flat) if (!byId.has(it.id)) byId.set(it.id, it);
-      for (const it of nested) byId.set(it.id, it);
-      return Array.from(byId.values());
+      // c) Fallback: si no hay nested, incluir todas las planas (aunque no tengan fecha)
+      let flatAll = [];
+      if (nested.length === 0) {
+        const src = Array.isArray(tasksState) ? tasksState : [];
+        flatAll = src
+          .filter((t) => String(t?.type || '') === 'subtask')
+          .map((t) => {
+            const s = t?.start?.toDate ? t.start.toDate() : (t?.start ? new Date(t.start) : null);
+            const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
+            return {
+              id: String(t.id),
+              title: t.name || t.title || 'Subtarea',
+              desc: t.desc || '',
+              category: t.category || 'OTROS',
+              start: s || null,
+              end: e || null,
+              assignee: t.assignee || '',
+              parentId: t.parentId || '',
+              __kind: 'subtask',
+            };
+          });
+      }
+
+      // Unir por clave única evitando colisiones de id entre distintos padres
+      const byKey = new Map();
+      for (const it of flat) {
+        const k = `flat:${it.parentId || ''}:${it.id}`;
+        if (!byKey.has(k)) byKey.set(k, it);
+      }
+      for (const it of nested) {
+        const k = String(it.__path || `nested:${it.parentId || ''}:${it.id}`);
+        byKey.set(k, it);
+      }
+      for (const it of flatAll) {
+        const k = `flatAll:${it.parentId || ''}:${it.id}`;
+        if (!byKey.has(k)) byKey.set(k, it);
+      }
+      return Array.from(byKey.values());
     } catch {
       return [];
     }
-  }, [uniqueGanttTasks, nestedSubtasks]);
+  }, [uniqueGanttTasks, nestedSubtasks, tasksState]);
+
+  // (se declara mÃ¡s abajo tras parentNameMap)
 
   const taskListItems = useMemo(() => {
     const a = Array.isArray(safeMeetingsFiltered) ? safeMeetingsFiltered : [];
@@ -829,6 +960,98 @@ export default function Tasks() {
       return [];
     }
   }, [uniqueGanttTasks]);
+
+  // Recalcular y actualizar el rango del padre basado en sus subtareas programadas
+  const computeAndUpdateParentRange = useCallback(async (parentId) => {
+    try {
+      if (!activeWedding || !db || !parentId) return;
+      const MS_DAY = 24 * 60 * 60 * 1000;
+      const kids = (Array.isArray(subtaskEvents) ? subtaskEvents : [])
+        .filter((st) => String(st.parentId || '') === String(parentId) && (st.start instanceof Date));
+      if (!kids.length) {
+        const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+        const psnap = await getDoc(pref).catch(() => null);
+        if (!psnap || !psnap.exists()) return;
+        const parent = psnap.data() || {};
+        const update = { computedStart: null, computedEnd: null };
+        if (String(parent?.rangeMode || 'auto') === 'auto' && String(parent?.autoAdjust || 'expand_only') === 'expand_and_shrink') {
+          update.start = parent.manualStart || parent.start || null;
+          update.end = parent.manualEnd || parent.end || null;
+        }
+        await updateDoc(pref, update).catch(() => {});
+        return;
+      }
+      const starts = kids.map((k) => k.start);
+      const ends = kids.map((k) => (k.end instanceof Date ? k.end : k.start));
+      const envStart = new Date(Math.min.apply(null, starts.map((d) => d.getTime())));
+      const envEnd = new Date(Math.max.apply(null, ends.map((d) => d.getTime())));
+      const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+      const psnap = await getDoc(pref).catch(() => null);
+      if (!psnap || !psnap.exists()) return;
+      const parent = psnap.data() || {};
+      const bufferDays = Number(parent?.bufferDays ?? 0);
+      const computedStart = new Date(envStart.getTime() - Math.max(0, bufferDays) * MS_DAY);
+      const computedEnd = new Date(envEnd.getTime() + Math.max(0, bufferDays) * MS_DAY);
+      const rangeMode = String(parent?.rangeMode || 'auto');
+      const autoAdjust = String(parent?.autoAdjust || 'expand_only');
+      const update = { computedStart, computedEnd };
+      if (rangeMode === 'auto') {
+        const prevStart = parent?.start?.toDate ? parent.start.toDate() : (parent?.start ? new Date(parent.start) : null);
+        const prevEnd = parent?.end?.toDate ? parent.end.toDate() : (parent?.end ? new Date(parent.end) : null);
+        if (autoAdjust === 'expand_and_shrink') {
+          update.start = computedStart;
+          update.end = computedEnd;
+        } else if (autoAdjust === 'expand_only') {
+          update.start = (prevStart && prevStart <= computedStart) ? prevStart : computedStart;
+          update.end = (prevEnd && prevEnd >= computedEnd) ? prevEnd : computedEnd;
+        }
+      }
+      await updateDoc(pref, update).catch(() => {});
+    } catch (_) {}
+  }, [activeWedding, db, subtaskEvents]);
+
+  // Padres para el modal: combinar padres reales y los derivados de subtareas
+  const modalParents = useMemo(() => {
+    try {
+      const parentsReal = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
+        .filter((t) => String(t.type || 'task') === 'task' && !t.isDisabled)
+        .map((t) => ({ id: String(t.id), name: t.name || t.title || 'Tarea', start: t.start instanceof Date ? t.start : new Date(t.start), type: 'task' }));
+
+      const byId = new Map();
+      parentsReal.forEach((p) => byId.set(p.id, p));
+      const nameById = new Map();
+      try {
+        const arr = Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
+        for (const t of arr) {
+          if (String(t?.type || 'task') !== 'task') continue;
+          const id = String(t.id || '');
+          if (!id) continue;
+          nameById.set(id, t.name || t.title || 'Tarea');
+        }
+      } catch {}
+
+      const subs = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+      const grouped = new Map();
+      for (const st of subs) {
+        const pid = String(st.parentId || '');
+        if (!pid) continue;
+        const cur = grouped.get(pid) || { id: pid, name: (nameById.get(pid) || 'Tarea'), start: st.start instanceof Date ? st.start : new Date(st.start), type: 'task' };
+        const stStart = st.start instanceof Date ? st.start : new Date(st.start);
+        if (!cur.start || (stStart && stStart < cur.start)) cur.start = stStart;
+        grouped.set(pid, cur);
+      }
+      for (const [pid, p] of grouped.entries()) {
+        if (!byId.has(pid)) byId.set(pid, p);
+      }
+      return Array.from(byId.values()).sort((a, b) => (a.start?.getTime?.() || 0) - (b.start?.getTime?.() || 0));
+    } catch {
+      return [];
+    }
+  }, [uniqueGanttTasks, subtaskEvents]);
+
+  
+
+  
 
   // Mapa id->nombre para contextualizar subtareas en la lista lateral
   const parentNameMap = useMemo(() => {
@@ -871,7 +1094,7 @@ export default function Tasks() {
     }
   }, [subtaskEvents, completedIdSet]);
 
-  // AcciÃƒÂ³n manual para crear tareas por defecto
+  // AcciÃƒÆ’Ã‚Â³n manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
     try {
       if (!activeWedding || !db) return;
@@ -898,9 +1121,9 @@ export default function Tasks() {
           p0: 0.0,
           p1: 0.2,
           items: [
-            'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-            'Crear primera versiÃƒÂ³n de la lista de invitados',
-            'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
+            'Difundir la noticia y organizar la planificaciÃƒÆ’Ã‚Â³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+            'Crear primera versiÃƒÆ’Ã‚Â³n de la lista de invitados',
+            'Investigar lugares de celebraciÃƒÆ’Ã‚Â³n y comenzar visitas',
             'Decidir cortejo nupcial',
           ],
         },
@@ -910,12 +1133,12 @@ export default function Tasks() {
           p0: 0.1,
           p1: 0.8,
           items: [
-            'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
-            'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
-            'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
-            'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
-            'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
-            'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
+            'FotografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ contacto inicial pronto, cierre de contrato a mitad del proceso',
+            'VideografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ decisiÃƒÆ’Ã‚Â³n temprana, reuniones finales hacia el final',
+            'Catering ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ investigaciÃƒÆ’Ã‚Â³n inicial, prueba de menÃƒÆ’Ã‚Âº, cierre cercano a la boda',
+            'Florista ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ inspiraciÃƒÆ’Ã‚Â³n y primeras ideas, confirmaciÃƒÆ’Ã‚Â³n en la fase final',
+            'MÃƒÆ’Ã‚Âºsica ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ banda/DJ reservados pronto, reuniÃƒÆ’Ã‚Â³n final mÃƒÆ’Ã‚Â¡s tarde',
+            'ReposterÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ bÃƒÆ’Ã‚Âºsqueda inicial, prueba de sabores meses despuÃƒÆ’Ã‚Â©s, pedido final cerca de la boda',
           ],
         },
         {
@@ -924,9 +1147,9 @@ export default function Tasks() {
           p0: 0.15,
           p1: 0.9,
           items: [
-            'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
-            'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
-            'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
+            'Novia ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ visitas iniciales, decisiÃƒÆ’Ã‚Â³n intermedia, pruebas finales en los ÃƒÆ’Ã‚Âºltimos meses',
+            'Novio ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ compra traje en mitad del proceso, ajustes finales poco antes',
+            'Cortejo ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÆ’Ã‚Â¡s tarde',
           ],
         },
         {
@@ -936,22 +1159,22 @@ export default function Tasks() {
           p1: 0.95,
           items: [
             'Invitaciones digitales y save-the-dates (inicio medio)',
-            'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
-            'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
-            'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
+            'Invitaciones fÃƒÆ’Ã‚Â­sicas y papelerÃƒÆ’Ã‚Â­a (fase intermedia)',
+            'DecoraciÃƒÆ’Ã‚Â³n y DIY (se puede trabajar meses antes y ultimar al final)',
+            'Recuerdos y regalos (elecciÃƒÆ’Ã‚Â³n temprana, cierre antes del evento)',
           ],
         },
         {
           key: 'E',
-          name: 'Bloque E - OrganizaciÃƒÂ³n y LogÃƒÂ­stica',
+          name: 'Bloque E - OrganizaciÃƒÆ’Ã‚Â³n y LogÃƒÆ’Ã‚Â­stica',
           p0: 0.3,
           p1: 1.0,
           items: [
             'Transporte (se puede definir pronto, confirmar al final)',
-            'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
-            'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
+            'Extras y bÃƒÆ’Ã‚Â¡sicos del dÃƒÆ’Ã‚Â­a (ir acumulando, revisiÃƒÆ’Ã‚Â³n final cercana a la boda)',
+            'Confirmaciones con proveedores (ÃƒÆ’Ã‚Âºltimas semanas)',
             'Plan B clima (al final)',
-            'Ensayo general (ÃƒÂºltima fase)',
+            'Ensayo general (ÃƒÆ’Ã‚Âºltima fase)',
           ],
         },
         {
@@ -960,8 +1183,8 @@ export default function Tasks() {
           p0: 0.4,
           p1: 0.95,
           items: [
-            'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
-            'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
+            'Eventos adicionales (preboda, brunchÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦)',
+            'Despedidas (planificaciÃƒÆ’Ã‚Â³n antes, celebraciÃƒÆ’Ã‚Â³n final)',
             'Votos y discursos (escribir con calma, repasar justo antes)',
           ],
         },
@@ -971,9 +1194,9 @@ export default function Tasks() {
           p0: 0.6,
           p1: 0.95,
           items: [
-            'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
+            'Reservas peluquerÃƒÆ’Ã‚Â­a/maquillaje con antelaciÃƒÆ’Ã‚Â³n',
             'Pruebas intermedias',
-            'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
+            'Rutinas de cuidado personal (ÃƒÆ’Ã‚Âºltimos meses)',
           ],
         },
         {
@@ -983,15 +1206,15 @@ export default function Tasks() {
           p1: 1.0,
           items: [
             'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-            'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
+            'Planificar luna de miel (elecciÃƒÆ’Ã‚Â³n pronto, reservas intermedias, maletas al final)',
           ],
         },
         {
           key: 'I',
-          name: 'Bloque I - DespuÃƒÂ©s de la Boda',
+          name: 'Bloque I - DespuÃƒÆ’Ã‚Â©s de la Boda',
           p0: 1.0,
           p1: 1.05,
-          items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÂ¡lbum y recuerdos'],
+          items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÆ’Ã‚Â¡lbum y recuerdos'],
         },
       ];
 
@@ -1038,7 +1261,7 @@ export default function Tasks() {
     }
   }, [activeWedding, db, projectStart, projectEnd]);
 
-  // Seed automÃƒÂ¡tico de Bloques A-I (padres + subtareas) si no hay tareas
+  // Seed automÃƒÆ’Ã‚Â¡tico de Bloques A-I (padres + subtareas) si no hay tareas
   useEffect(() => {
     (async () => {
       try {
@@ -1051,7 +1274,7 @@ export default function Tasks() {
         const seedSnap = await getDoc(seedRef).catch(() => null);
         if (seedSnap && seedSnap.exists()) return;
 
-        // Permitir seed aunque aÃƒÂºn no haya weddingDate: usar fallbacks razonables
+        // Permitir seed aunque aÃƒÆ’Ã‚Âºn no haya weddingDate: usar fallbacks razonables
         // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
         const endBase =
           projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
@@ -1069,9 +1292,9 @@ export default function Tasks() {
             p0: 0.0,
             p1: 0.2,
             items: [
-              'Difundir la noticia y organizar la planificaciÃƒÂ³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-              'Crear primera versiÃƒÂ³n de la lista de invitados',
-              'Investigar lugares de celebraciÃƒÂ³n y comenzar visitas',
+              'Difundir la noticia y organizar la planificaciÃƒÆ’Ã‚Â³n (perfil, invitar pareja, anillo, presupuesto inicial)',
+              'Crear primera versiÃƒÆ’Ã‚Â³n de la lista de invitados',
+              'Investigar lugares de celebraciÃƒÆ’Ã‚Â³n y comenzar visitas',
               'Decidir cortejo nupcial',
             ],
           },
@@ -1081,12 +1304,12 @@ export default function Tasks() {
             p0: 0.1,
             p1: 0.8,
             items: [
-              'FotografÃƒÂ­a Ã¢â€ â€™ contacto inicial pronto, cierre de contrato a mitad del proceso',
-              'VideografÃƒÂ­a Ã¢â€ â€™ decisiÃƒÂ³n temprana, reuniones finales hacia el final',
-              'Catering Ã¢â€ â€™ investigaciÃƒÂ³n inicial, prueba de menÃƒÂº, cierre cercano a la boda',
-              'Florista Ã¢â€ â€™ inspiraciÃƒÂ³n y primeras ideas, confirmaciÃƒÂ³n en la fase final',
-              'MÃƒÂºsica Ã¢â€ â€™ banda/DJ reservados pronto, reuniÃƒÂ³n final mÃƒÂ¡s tarde',
-              'ReposterÃƒÂ­a Ã¢â€ â€™ bÃƒÂºsqueda inicial, prueba de sabores meses despuÃƒÂ©s, pedido final cerca de la boda',
+              'FotografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ contacto inicial pronto, cierre de contrato a mitad del proceso',
+              'VideografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ decisiÃƒÆ’Ã‚Â³n temprana, reuniones finales hacia el final',
+              'Catering ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ investigaciÃƒÆ’Ã‚Â³n inicial, prueba de menÃƒÆ’Ã‚Âº, cierre cercano a la boda',
+              'Florista ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ inspiraciÃƒÆ’Ã‚Â³n y primeras ideas, confirmaciÃƒÆ’Ã‚Â³n en la fase final',
+              'MÃƒÆ’Ã‚Âºsica ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ banda/DJ reservados pronto, reuniÃƒÆ’Ã‚Â³n final mÃƒÆ’Ã‚Â¡s tarde',
+              'ReposterÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ bÃƒÆ’Ã‚Âºsqueda inicial, prueba de sabores meses despuÃƒÆ’Ã‚Â©s, pedido final cerca de la boda',
             ],
           },
           {
@@ -1095,9 +1318,9 @@ export default function Tasks() {
             p0: 0.15,
             p1: 0.9,
             items: [
-              'Novia Ã¢â€ â€™ visitas iniciales, decisiÃƒÂ³n intermedia, pruebas finales en los ÃƒÂºltimos meses',
-              'Novio Ã¢â€ â€™ compra traje en mitad del proceso, ajustes finales poco antes',
-              'Cortejo Ã¢â€ â€™ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÂ¡s tarde',
+              'Novia ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ visitas iniciales, decisiÃƒÆ’Ã‚Â³n intermedia, pruebas finales en los ÃƒÆ’Ã‚Âºltimos meses',
+              'Novio ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ compra traje en mitad del proceso, ajustes finales poco antes',
+              'Cortejo ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÆ’Ã‚Â¡s tarde',
             ],
           },
           {
@@ -1107,22 +1330,22 @@ export default function Tasks() {
             p1: 0.95,
             items: [
               'Invitaciones digitales y save-the-dates (inicio medio)',
-              'Invitaciones fÃƒÂ­sicas y papelerÃƒÂ­a (fase intermedia)',
-              'DecoraciÃƒÂ³n y DIY (se puede trabajar meses antes y ultimar al final)',
-              'Recuerdos y regalos (elecciÃƒÂ³n temprana, cierre antes del evento)',
+              'Invitaciones fÃƒÆ’Ã‚Â­sicas y papelerÃƒÆ’Ã‚Â­a (fase intermedia)',
+              'DecoraciÃƒÆ’Ã‚Â³n y DIY (se puede trabajar meses antes y ultimar al final)',
+              'Recuerdos y regalos (elecciÃƒÆ’Ã‚Â³n temprana, cierre antes del evento)',
             ],
           },
           {
             key: 'E',
-            name: 'OrganizaciÃƒÂ³n y LogÃƒÂ­stica',
+            name: 'OrganizaciÃƒÆ’Ã‚Â³n y LogÃƒÆ’Ã‚Â­stica',
             p0: 0.3,
             p1: 1.0,
             items: [
               'Transporte (se puede definir pronto, confirmar al final)',
-              'Extras y bÃƒÂ¡sicos del dÃƒÂ­a (ir acumulando, revisiÃƒÂ³n final cercana a la boda)',
-              'Confirmaciones con proveedores (ÃƒÂºltimas semanas)',
+              'Extras y bÃƒÆ’Ã‚Â¡sicos del dÃƒÆ’Ã‚Â­a (ir acumulando, revisiÃƒÆ’Ã‚Â³n final cercana a la boda)',
+              'Confirmaciones con proveedores (ÃƒÆ’Ã‚Âºltimas semanas)',
               'Plan B clima (al final)',
-              'Ensayo general (ÃƒÂºltima fase)',
+              'Ensayo general (ÃƒÆ’Ã‚Âºltima fase)',
             ],
           },
           {
@@ -1131,8 +1354,8 @@ export default function Tasks() {
             p0: 0.4,
             p1: 0.95,
             items: [
-              'Eventos adicionales (preboda, brunchÃ¢â‚¬Â¦)',
-              'Despedidas (planificaciÃƒÂ³n antes, celebraciÃƒÂ³n final)',
+              'Eventos adicionales (preboda, brunchÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦)',
+              'Despedidas (planificaciÃƒÆ’Ã‚Â³n antes, celebraciÃƒÆ’Ã‚Â³n final)',
               'Votos y discursos (escribir con calma, repasar justo antes)',
             ],
           },
@@ -1142,9 +1365,9 @@ export default function Tasks() {
             p0: 0.6,
             p1: 0.95,
             items: [
-              'Reservas peluquerÃƒÂ­a/maquillaje con antelaciÃƒÂ³n',
+              'Reservas peluquerÃƒÆ’Ã‚Â­a/maquillaje con antelaciÃƒÆ’Ã‚Â³n',
               'Pruebas intermedias',
-              'Rutinas de cuidado personal (ÃƒÂºltimos meses)',
+              'Rutinas de cuidado personal (ÃƒÆ’Ã‚Âºltimos meses)',
             ],
           },
           {
@@ -1154,15 +1377,15 @@ export default function Tasks() {
             p1: 1.0,
             items: [
               'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-              'Planificar luna de miel (elecciÃƒÂ³n pronto, reservas intermedias, maletas al final)',
+              'Planificar luna de miel (elecciÃƒÆ’Ã‚Â³n pronto, reservas intermedias, maletas al final)',
             ],
           },
           {
             key: 'I',
-            name: 'DespuÃƒÂ©s de la Boda',
+            name: 'DespuÃƒÆ’Ã‚Â©s de la Boda',
             p0: 1.0,
             p1: 1.05,
-            items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÂ¡lbum y recuerdos'],
+            items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÆ’Ã‚Â¡lbum y recuerdos'],
           },
         ];
 
@@ -1208,7 +1431,7 @@ export default function Tasks() {
       }
     })();
   }, [activeWedding, db, projectStart, projectEnd, tasksState, tasksLoading]);
-  // Toggle rÃƒÂ¡pido de completado (lista/fallback)
+  // Toggle rÃƒÆ’Ã‚Â¡pido de completado (lista/fallback)
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
       try {
@@ -1247,18 +1470,18 @@ export default function Tasks() {
     setGanttViewMode,
   });
 
-  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒâ€™Ã‚Â³n// CÃƒâ€™Ã‚Â¡lculo de progreso - asegurando que los estados sean arrays
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n// CÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
   useEffect(() => {
-    // Deshabilitado: sÃƒÂ³lo usar weddings/{id}.weddingDate como fuente
+    // Deshabilitado: sÃƒÆ’Ã‚Â³lo usar weddings/{id}.weddingDate como fuente
     return;
     if (!activeWedding || !db) return;
     try {
       const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
       const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      // VariaciÃƒÂ³n en minÃƒÂºsculas que algunos entornos crean: weddings/{id}/weddinginfo
+      // VariaciÃƒÆ’Ã‚Â³n en minÃƒÆ’Ã‚Âºsculas que algunos entornos crean: weddings/{id}/weddinginfo
       const refLower = doc(db, 'weddings', activeWedding, 'weddinginfo');
       const handler = (snap) => {
         try {
@@ -1293,7 +1516,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comÃƒÂºn)
+  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comÃƒÆ’Ã‚Âºn)
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1351,7 +1574,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a) Fallback adicional: leer weddingDate del documento raÃƒÂ­z weddings/{id}
+  // 1a) Fallback adicional: leer weddingDate del documento raÃƒÆ’Ã‚Â­z weddings/{id}
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1387,7 +1610,7 @@ export default function Tasks() {
               if (!isNaN(iso.getTime())) d = iso;
               else {
                 const m = raw.match(
-                  /(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/
+                  /(\d{1,2})\s+de\s+([a-zA-ZÃƒÆ’Ã‚Â±ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡]+)\s+de\s+(\d{4})/
                 );
                 if (m) {
                   const day = parseInt(m[1], 10);
@@ -1455,7 +1678,7 @@ export default function Tasks() {
             if (!isNaN(iso.getTime())) d = iso;
             else {
               const m = raw.match(
-                /(\d{1,2})\s+de\s+([a-zA-ZÃƒÂ±Ãƒâ€˜ÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡]+)\s+de\s+(\d{4})/
+                /(\d{1,2})\s+de\s+([a-zA-ZÃƒÆ’Ã‚Â±ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡]+)\s+de\s+(\d{4})/
               );
               if (m) {
                 const day = parseInt(m[1], 10);
@@ -1482,7 +1705,7 @@ export default function Tasks() {
             }
           }
         }
-        // Fallback adicional: colecciÃƒÂ³n de perfiles si existiese
+        // Fallback adicional: colecciÃƒÆ’Ã‚Â³n de perfiles si existiese
         if (!d) {
           try {
             const pref = await getDoc(doc(db, 'userProfiles', uid)).catch(() => null);
@@ -1501,7 +1724,7 @@ export default function Tasks() {
     })();
   }, [auth?.currentUser?.uid, db]);
 
-  // 2) Crear/actualizar automÃƒÂ¡ticamente el evento 'wedding-day' si hay fecha
+  // 2) Crear/actualizar automÃƒÆ’Ã‚Â¡ticamente el evento 'wedding-day' si hay fecha
   useEffect(() => {
     (async () => {
       try {
@@ -1531,7 +1754,7 @@ export default function Tasks() {
         const next = {
           id: 'wedding-day',
           autoKey: 'wedding-day',
-          title: prev?.title || 'DÃƒÂ­a de la boda',
+          title: prev?.title || 'DÃƒÆ’Ã‚Â­a de la boda',
           category: prev?.category || 'OTROS',
           start,
           end,
@@ -1563,20 +1786,60 @@ export default function Tasks() {
     })();
   }, [activeWedding, projectStart, projectEnd]);
 
-  return (
+  
+  // Exponer utilidades de debug en consola: mywed.tasks.*
+  useEffect(() => {
+    try {
+      window.mywed = window.mywed || {};
+      const parents = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : []).filter((t)=>String(t?.type||'task')==='task');
+      window.mywed.tasks = {
+        activeWedding,
+        parentsCount: () => parents.length,
+        nestedCount: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0),
+        subtaskEventsCount: () => (Array.isArray(subtaskEvents) ? subtaskEvents.length : 0),
+        listNestedPaths: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.map(s=>s.__path || s.id) : []),
+        sampleNested: (n=5) => (Array.isArray(nestedSubtasks) ? nestedSubtasks.slice(0,n) : []),
+        sampleSubtasks: (n=10) => (Array.isArray(subtaskEvents) ? subtaskEvents.slice(0,n) : []),
+        byParent: () => {
+          const map = {};
+          const arr = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+          for (const st of arr) {
+            const pid = String(st.parentId || '');
+            if (!pid) continue;
+            (map[pid] ||= []).push({ id: st.id, title: st.title, start: st.start, end: st.end, path: st.__path });
+          }
+          return map;
+        },
+        explainMissing: () => {
+          try {
+            return {
+              activeWedding,
+              parents: parents.map(p=>({id:String(p.id), name:p.name||p.title})),
+              nestedTotal: Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0,
+              subtaskEventsTotal: Array.isArray(subtaskEvents) ? subtaskEvents.length : 0,
+              parentsWithKids: Object.keys((window.mywed.tasks.byParent())).length,
+            };
+          } catch (e) { return { error: String(e) }; }
+        },
+      };
+      console.log('[Tasks Debug] Usa mywed.tasks.explainMissing() para ver el estado');
+    } catch {}
+  }, [activeWedding, uniqueGanttTasks, nestedSubtasks, subtaskEvents]);return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       <TasksHeader
         syncStatus={syncStatus}
         onShowAllTasks={() => setShowAllTasks(true)}
         onNewTask={() => {
           resetForm();
+          setEditingId(null);
+          setEditingPath(null);
           setShowNewTask(true);
         }}
       />
 
       {/* Componente para el diagrama Gantt */}
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
-        <h2 className="text-xl font-semibold mb-4">Planificación a Largo Plazo</h2>
+        <h2 className="text-xl font-semibold mb-4">PlanificaciÃ³n a Largo Plazo</h2>
         <div className="bg-white rounded-lg shadow p-4">
           <LongTermTasksGantt
             tasks={ganttDisplayTasks || []}
@@ -1592,6 +1855,7 @@ export default function Tasks() {
                 const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
                 const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
                 setEditingId(task.id);
+                setEditingPath(task.__path || null);
                 setFormData((prev) => ({
                   ...prev,
                   title: task.title || '',
@@ -1637,6 +1901,7 @@ export default function Tasks() {
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
             const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
             setEditingId(event.id);
+            setEditingPath(event.__path || null);
             setFormData({
               title: event.title,
               desc: event.desc || '',
@@ -1658,15 +1923,16 @@ export default function Tasks() {
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
-            onTaskClick={(event) => {
-              const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
-              const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
-              setEditingId(event.id);
-              setFormData({
-                title: event.title,
-                desc: event.desc || '',
-                category: event.category || 'OTROS',
-                startDate: eventStart.toISOString().slice(0, 10),
+          onTaskClick={(event) => {
+            const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
+            const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
+            setEditingId(event.id);
+            setEditingPath(event.__path || null);
+            setFormData({
+              title: event.title,
+              desc: event.desc || '',
+              category: event.category || 'OTROS',
+              startDate: eventStart.toISOString().slice(0, 10),
                 startTime: eventStart.toTimeString().slice(0, 5),
                 endDate: eventEnd.toISOString().slice(0, 10),
                 endTime: eventEnd.toTimeString().slice(0, 5),
@@ -1699,7 +1965,7 @@ export default function Tasks() {
         <AllTasksModal
           isOpen={showAllTasks}
           onClose={() => setShowAllTasks(false)}
-          parents={uniqueGanttTasks}
+          parents={modalParents.length ? modalParents : uniqueGanttTasks}
           subtasks={subtaskEvents}
           completedSet={completedIdSet}
           onToggleComplete={(id, val) => toggleCompleteById(id, val)}
@@ -1709,6 +1975,7 @@ export default function Tasks() {
               const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
               const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
               setEditingId(task.id);
+              setEditingPath(task.__path || null);
               setFormData((prev) => ({
                 ...prev,
                 title: task.title || '',
@@ -1728,6 +1995,14 @@ export default function Tasks() {
               console.error('Error al abrir tarea desde el modal:', error);
             }
           }}
+          onQuickSchedule={async (st, range) => {
+            try {
+              if (!activeWedding || !db || !st?.id || !st?.parentId) return;
+              const ref = doc(db, 'weddings', activeWedding, 'tasks', String(st.parentId), 'subtasks', String(st.id));
+              await setDoc(ref, { start: range.start, end: range.end, mode: 'scheduled', updatedAt: serverTimestamp() }, { merge: true });
+              try { await computeAndUpdateParentRange(String(st.parentId)); } catch {}
+            } catch (e) { console.warn('quickSchedule error', e); }
+          }}
         />
       )}
       {/* Modal para nueva tarea */}
@@ -1746,3 +2021,12 @@ export default function Tasks() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+

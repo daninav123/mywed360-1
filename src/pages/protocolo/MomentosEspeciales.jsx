@@ -873,7 +873,7 @@ const MomentosEspeciales = () => {
         <div className="space-y-3">
           <div className="flex justify-between items-center">
               <h3 className="font-medium">
-                {TABS.find((t) => t.key === activeTab)?.label || 'Momentos'}
+                {blocks?.find((b) => (b.id || b.key) === activeTab)?.name || 'Momentos'}
               </h3>
               <Button
                 onClick={handleAddMoment}

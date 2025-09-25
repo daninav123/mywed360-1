@@ -2,6 +2,7 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import admin from 'firebase-admin';
 import logger from '../logger.js';
+import { z, validate } from '../utils/validation.js';
 
 // ------------ Firestore Init -------------
 // Se asume que ya existe inicialización global en otro punto del backend.
@@ -25,11 +26,18 @@ const router = express.Router();
  * Crea un invitado y devuelve link personalizado de RSVP.
  */
 // Ruta: POST /api/guests/:weddingId/invite
-router.post('/:weddingId/invite', async (req, res) => {
+const inviteBodySchema = z.object({
+  name: z.string().min(1, 'name required'),
+  phone: z.string().min(5).max(50).optional(),
+  email: z.string().email().optional(),
+  eventId: z.string().min(1).default('default'),
+});
+const inviteParamsSchema = z.object({ weddingId: z.string().min(1) });
+
+router.post('/:weddingId/invite', validate(inviteParamsSchema, 'params'), validate(inviteBodySchema), async (req, res) => {
   try {
     const { weddingId } = req.params;
-    const { name, phone = '', email = '', eventId = 'default' } = req.body || {};
-    if (!name) return res.status(400).json({ error: 'name-required' });
+    const { name, phone = '', email = '', eventId = 'default' } = req.body;
 
     const token = uuidv4();
     const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(token);
@@ -67,7 +75,8 @@ router.post('/:weddingId/invite', async (req, res) => {
  * Devuelve datos del invitado (sin datos sensibles).
  */
 // Ruta: GET /api/guests/:weddingId/:token
-router.get('/:weddingId/:token', async (req, res) => {
+const getGuestParams = z.object({ weddingId: z.string().min(1), token: z.string().min(1) });
+router.get('/:weddingId/:token', validate(getGuestParams, 'params'), async (req, res) => {
   try {
     const { weddingId, token } = req.params;
     const snap = await db.collection('weddings').doc(weddingId).collection('guests').doc(token).get();
@@ -86,11 +95,16 @@ router.get('/:weddingId/:token', async (req, res) => {
  * Actualiza la respuesta del invitado.
  */
 // Ruta: PUT /api/guests/:weddingId/:token
-router.put('/:weddingId/:token', async (req, res) => {
+const updateGuestParams = z.object({ weddingId: z.string().min(1), token: z.string().min(1) });
+const updateGuestBody = z.object({
+  status: z.enum(['accepted', 'rejected']),
+  companions: z.coerce.number().int().min(0).max(20).default(0),
+  allergens: z.string().max(500).optional(),
+});
+router.put('/:weddingId/:token', validate(updateGuestParams, 'params'), validate(updateGuestBody), async (req, res) => {
   try {
     const { weddingId, token } = req.params;
-    const { status, companions = 0, allergens = '' } = req.body || {};
-    if (!['accepted', 'rejected'].includes(status)) return res.status(400).json({ error: 'invalid-status' });
+    const { status, companions = 0, allergens = '' } = req.body;
 
     const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(token);
     await docRef.update({ status, companions, allergens, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
@@ -108,7 +122,8 @@ router.put('/:weddingId/:token', async (req, res) => {
  * Devuelve { link, token }
  */
 // Ruta: POST /api/guests/:weddingId/id/:docId/rsvp-link
-router.post('/:weddingId/id/:docId/rsvp-link', async (req, res) => {
+const rsvpLinkParams = z.object({ weddingId: z.string().min(1), docId: z.string().min(1) });
+router.post('/:weddingId/id/:docId/rsvp-link', validate(rsvpLinkParams, 'params'), async (req, res) => {
   try {
     const { weddingId, docId } = req.params;
     const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(docId);

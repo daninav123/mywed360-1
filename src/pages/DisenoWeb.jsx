@@ -66,6 +66,71 @@ export default function DisenoWeb() {
     },
   };
 
+  // Mejora de prompts de plantillas para orientar mejor el diseno sin cambiar API
+  try {
+    templates.personalizada.desc = 'Crea una pagina web totalmente personalizada segun tus indicaciones';
+    if (templates.clasica) {
+      templates.clasica.name = 'Clasica';
+      templates.clasica.desc = 'Elegante con dorados y marfil, ideal para bodas tradicionales';
+      templates.clasica.prompt = [
+        'Estilo clasico y elegante con dorado y marfil.',
+        "Usa Google Fonts: 'Playfair Display' (titulos) y 'Inter' (texto).",
+        'Paleta: primary #C5A572, secondary #FAF8F2, text #2A2A2A, bg #FFFFFF.',
+        'Separadores ornamentales sutiles, bordes suaves y sombras ligeras.',
+        'Hero con nombres grandes, fecha y un sutil degradado dorado.',
+      ].join(' ');
+    }
+    if (templates.moderna) {
+      templates.moderna.desc = 'Minimalista, limpia y contemporanea, con tipografias sans-serif';
+      templates.moderna.prompt = [
+        'Estilo moderno minimalista con mucho espacio en blanco.',
+        "Usa Google Fonts: 'Poppins' (titulos) y 'Inter' (texto).",
+        'Paleta: primary #6C63FF, secondary #F5E7EC, text #111111, bg #FFFFFF.',
+        'Componentes con bordes redondeados, sombras suaves y microinteracciones.',
+        'Anade contador regresivo si hay fecha y botones claros para RSVP.',
+      ].join(' ');
+    }
+    if (templates.rustica) {
+      templates.rustica.name = 'Rustica';
+      templates.rustica.desc = 'Campestre con tonos tierra, madera y acentos verdes';
+      templates.rustica.prompt = [
+        'Estilo rustico/campestre con acentos de madera y naturaleza.',
+        "Usa Google Fonts: 'Merriweather' (titulos) y 'Lato' (texto).",
+        'Paleta: primary #8B6A3B, secondary #B9C4A7, text #2A2A2A, bg #FAF7F1.',
+        'Ornamentos de hojas/ramas en SVG sutiles y texturas ligeras.',
+      ].join(' ');
+    }
+    if (templates.playa) {
+      templates.playa.desc = 'Costera, fresca y luminosa con azules y arena';
+      templates.playa.prompt = [
+        'Estilo costero con sensacion fresca y luminosa.',
+        "Usa Google Fonts: 'Quicksand' (titulos) y 'Inter' (texto).",
+        'Paleta: primary #2EC4B6, secondary #F4EBD0, text #123A49, bg #FFFFFF.',
+        'Incorpora ondas en SVG, degradados de azul y botones redondeados.',
+      ].join(' ');
+    }
+  } catch (e) {
+    console.warn('No se pudo enriquecer templates', e);
+  }
+
+  // Plantilla romantica/floral adicional
+  try {
+    if (!templates.romantica) {
+      templates.romantica = {
+        name: 'Romantica',
+        desc: 'Floral, romantica y elegante (mas flores y detalles)',
+        prompt: [
+          'Estilo romantico y floral con detalles elegantes.',
+          "Usa Google Fonts: 'Great Vibes' (nombres), 'Playfair Display' (titulos) y 'Inter' (texto).",
+          'Paleta sugerida: primary #C5A572, secondary #FAF7F1, text #2A2A2A, bg #FFFFFF.',
+          'Incluye separadores ornamentales, esquinas florales en SVG y sombras suaves.',
+        ].join(' '),
+      };
+    }
+  } catch (e) {
+    console.warn('No se pudo anadir plantilla romantica', e);
+  }
+
   // Cargar datos de perfil (usuario + boda activa) y versiones
   useEffect(() => {
     if (!uid) return;
@@ -303,7 +368,7 @@ export default function DisenoWeb() {
         const contact = [safe(weddingInfo.contactEmail), safe(weddingInfo.contactPhone)]
           .filter(Boolean)
           .join(' · ');
-        const demo = `<!doctype html>
+        let demo = `<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -365,6 +430,142 @@ export default function DisenoWeb() {
     </footer>
   </body>
 </html>`;
+        // Versión mejorada con más detalles florales y estilos
+        const demoEnhanced = `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${names ? `${names} - Web de boda` : 'Nuestra boda'}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root{ --primary:#c5a572; --secondary:#faf7f1; --text:#222; --bg:#ffffff; --muted:#666 }
+      *{box-sizing:border-box}
+      body{margin:0; color:var(--text); background:var(--bg); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
+      .container{max-width:1040px; margin:0 auto; padding:24px 16px}
+      .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:999px; background:var(--primary); color:#fff; text-decoration:none; border:none; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.08)}
+      .btn:hover{filter:brightness(0.95)}
+      header.hero{position:relative; padding:80px 16px 56px; text-align:center; overflow:hidden; background:linear-gradient(140deg, rgba(197,165,114,0.15), rgba(255,255,255,0))}
+      header.hero:before{content:""; position:absolute; inset:-120px -60px auto auto; width:360px; height:360px; background:radial-gradient(circle at 30% 30%, rgba(197,165,114,.25), transparent 60%); transform:rotate(18deg)}
+      header.hero .names{font-family:"Great Vibes", cursive; font-size: clamp(40px, 8vw, 72px); margin:0; color:#1f2937}
+      header.hero .subtitle{margin-top:6px; color:#6b7280}
+      .pill{display:inline-block; padding:6px 12px; border-radius:999px; background:#faf5ee; color:#8a5b20; font-size:12px; border:1px solid rgba(197,165,114,.35)}
+      .grid{display:grid; grid-template-columns:1fr; gap:18px}
+      @media(min-width:820px){ .grid{ grid-template-columns: 1fr 1fr } }
+      .card{border:1px solid #eee; border-radius:16px; padding:18px 16px; background:#fff; box-shadow:0 8px 28px rgba(0,0,0,.05)}
+      h2{font-family:"Playfair Display", serif; font-weight:600; font-size: clamp(20px, 2.6vw, 28px); margin:0 0 8px}
+      .section-title{display:flex; align-items:center; justify-content:center; gap:12px; margin:28px 0 18px; color:#374151}
+      .sep{width:72px; height:14px; color:var(--primary)}
+      .sep path{stroke:currentColor; stroke-width:1.2; fill:none}
+      .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+      .gallery div{background:#f5f5f4; border-radius:12px; padding-top:70%; position:relative; overflow:hidden}
+      .gallery div:after{content:"Foto"; position:absolute; inset:auto 0 8px 8px; font-size:12px; color:#666}
+      footer{border-top:1px solid #eee; text-align:center; padding:28px; color:#6b7280; font-size:14px}
+      .ornament{position:absolute; opacity:.18; filter:blur(.2px)}
+      .ornament.top-left{top:-24px; left:-24px; transform:rotate(-12deg)}
+      .ornament.bottom-right{bottom:-24px; right:-24px; transform:rotate(8deg)}
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="pill">Estilo: ${styleTitle} - Paleta: ${palette}</div>
+      <h1 class="names">${names || 'Nuestra boda'}</h1>
+      ${date ? '<div class="subtitle">' + date + '</div>' : ''}
+      <svg class="ornament top-left" width="200" height="160" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="currentColor" fill="none" opacity="0.9">
+          <path d="M10,120 C40,60 90,40 140,70" />
+          <path d="M20,130 C50,70 100,50 150,80" />
+          <circle cx="70" cy="70" r="10" />
+          <circle cx="110" cy="90" r="6" />
+        </g>
+      </svg>
+      <svg class="ornament bottom-right" width="220" height="180" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+        <g stroke="currentColor" fill="none" opacity="0.9">
+          <path d="M80,20 C120,60 160,80 190,120" />
+          <path d="M60,40 C100,80 140,100 170,140" />
+          <circle cx="140" cy="60" r="10" />
+          <circle cx="170" cy="90" r="7" />
+        </g>
+      </svg>
+    </header>
+    <main class="container">
+      <section class="grid">
+        <div class="card">
+          <h2>La ceremonia</h2>
+          <div>${ceremony || 'Pronto mas detalles'}</div>
+          ${weddingInfo.ceremonyAddress ? '<div class="subtitle">' + weddingInfo.ceremonyAddress + '</div>' : ''}
+        </div>
+        <div class="card">
+          <h2>La recepcion</h2>
+          <div>${reception || 'Pronto mas detalles'}</div>
+          ${weddingInfo.receptionAddress ? '<div class="subtitle">' + weddingInfo.receptionAddress + '</div>' : ''}
+        </div>
+      </section>
+      <div class="section-title">
+        <svg class="sep" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2,10 C20,2 40,18 50,10 C60,2 80,18 98,10" />
+        </svg>
+        <span style="font-family:Playfair Display,serif;font-weight:600">Nuestra historia</span>
+        <svg class="sep" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2,10 C20,2 40,18 50,10 C60,2 80,18 98,10" />
+        </svg>
+      </div>
+      <section class="card">
+        <p>Nos conocimos, viajamos y hoy celebramos con familia y amigos. Aqui ira tu historia.</p>
+      </section>
+      <div class="section-title">
+        <svg class="sep" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2,10 C20,2 40,18 50,10 C60,2 80,18 98,10" />
+        </svg>
+        <span style="font-family:Playfair Display,serif;font-weight:600">Galeria</span>
+        <svg class="sep" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2,10 C20,2 40,18 50,10 C60,2 80,18 98,10" />
+        </svg>
+      </div>
+      <section class="card">
+        <div class="gallery">
+          <div></div><div></div><div></div>
+          <div></div><div></div><div></div>
+        </div>
+      </section>
+      <section class="card" style="margin-top:16px">
+        <h2>Contacto</h2>
+        <div>${contact || ''}</div>
+      </section>
+    </main>
+    <footer>
+      <span style="color:var(--primary);font-weight:600">Gracias</span> por acompanarnos en este dia.
+    </footer>
+    <script>
+      (function(){
+        var dateStr = '${date}';
+        if(!dateStr) return;
+        try {
+          var target = new Date(dateStr).getTime();
+          var el = document.createElement("div");
+          el.style.margin = "16px auto";
+          el.style.textAlign = "center";
+          el.style.color = "#6b7280";
+          el.style.fontSize = "14px";
+          document.querySelector(".container").prepend(el);
+          function pad(n){ return (n<10?"0":"")+n }
+          function tick(){
+            var now = Date.now();
+            var diff = Math.max(0, target - now);
+            var d = Math.floor(diff/86400000);
+            var h = Math.floor(diff%86400000/3600000);
+            var m = Math.floor(diff%3600000/60000);
+            el.textContent = "Faltan " + d + " dias, " + pad(h) + " h, " + pad(m) + " min";
+          }
+          tick(); setInterval(tick, 60000);
+        } catch(e){}
+      })();
+    </script>
+  </body>
+</html>`;
+        demo = demoEnhanced;
         setHtml(demo);
         return;
       }
@@ -397,6 +598,49 @@ export default function DisenoWeb() {
         weddingStyle: profile?.weddingStyle || 'Clásico',
         colorScheme: profile?.colorScheme || 'Blanco y dorado',
         additionalInfo: profile?.additionalInfo || '',
+      };
+
+      // Derivar sugerencias de tema (paleta y tipografias) a partir del perfil/plantilla
+      const toLower = (s) => String(s || '').toLowerCase();
+      const styleL = toLower(weddingInfo.weddingStyle);
+      const schemeL = toLower(weddingInfo.colorScheme);
+      const pick = (obj, keys) => keys.map((k) => obj[k]).filter(Boolean)[0];
+
+      const colorLex = {
+        dorado: '#C5A572', oro: '#C5A572', 'oro rosado': '#E5C1CD',
+        marfil: '#FAF8F2', crema: '#FAF7F1', beige: '#E9DCC9', arena: '#F4EBD0',
+        blanco: '#FFFFFF', negro: '#111111', gris: '#6B7280',
+        azul: '#2B6CB0', 'azul marino': '#1F2937', turquesa: '#2EC4B6', cielo: '#BEE3F8',
+        verde: '#2E7D32', salvia: '#B9C4A7', rosa: '#EFB8C8', lavanda: '#B497BD', violeta: '#6C63FF',
+        burdeos: '#7D2E46', vino: '#7D2E46', coral: '#FF7F50', melocoton: '#FAD1AF',
+      };
+
+      const presetByTemplate = {
+        clasica: { fonts: ["Playfair Display", 'Inter'], palette: { primary: '#C5A572', secondary: '#FAF8F2', text: '#2A2A2A', bg: '#FFFFFF' } },
+        moderna: { fonts: ['Poppins', 'Inter'], palette: { primary: '#6C63FF', secondary: '#F5E7EC', text: '#111111', bg: '#FFFFFF' } },
+        rustica: { fonts: ['Merriweather', 'Lato'], palette: { primary: '#8B6A3B', secondary: '#B9C4A7', text: '#2A2A2A', bg: '#FAF7F1' } },
+        playa: { fonts: ['Quicksand', 'Inter'], palette: { primary: '#2EC4B6', secondary: '#F4EBD0', text: '#123A49', bg: '#FFFFFF' } },
+        personalizada: { fonts: ['Cormorant Garamond', 'Inter'], palette: { primary: '#b5812d', secondary: '#F5F5F4', text: '#222222', bg: '#FFFFFF' } },
+      };
+
+      const colorWords = Object.keys(colorLex).filter((w) => schemeL.includes(w));
+      const inferred = {
+        primary: pick(colorLex, [colorWords[0]]) || undefined,
+        secondary: pick(colorLex, [colorWords[1]]) || undefined,
+      };
+      const templateKey = selectedTemplate || 'personalizada';
+      const baseTheme = presetByTemplate[templateKey] || presetByTemplate.personalizada;
+      const wantsFloral = (templateKey !== 'moderna') || styleL.includes('roman') || schemeL.includes('rosa') || schemeL.includes('flor');
+      const themeHints = {
+        fonts: baseTheme.fonts,
+        palette: {
+          primary: inferred.primary || baseTheme.palette.primary,
+          secondary: inferred.secondary || baseTheme.palette.secondary,
+          text: baseTheme.palette.text,
+          bg: baseTheme.palette.bg,
+        },
+        aesthetic: templateKey,
+        notes: 'Usar variables CSS --primary, --secondary, --text, --bg y tamanos fluidos. Contraste AA.' + (wantsFloral ? ' Incluir motivos florales sutiles (ornamentos, marcos, separadores) y patrones SVG.' : ' Estilo limpio; adornos discretos si se usan.')
       };
 
       // Instrucciones detalladas para el sistema
@@ -453,9 +697,35 @@ export default function DisenoWeb() {
       console.log('DEBUG OpenAI_KEY length:', OPENAI_KEY?.length || 'undefined');
       const modelName = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o';
 
+      // Mensaje de sistema minimo: todo el diseno viene del prompt del usuario
+      const sys2 = `Devuelve unicamente un documento HTML completo (head+style+body) segun las instrucciones del usuario. No anadas texto fuera del codigo.`;
+
+      const userMessage2 = `
+      Crea un sitio web completo para esta boda con los siguientes datos.
+      
+      DATOS DE LA BODA:
+      - Novia: ${weddingInfo.bride}
+      - Novio: ${weddingInfo.groom}
+      - Fecha: ${weddingInfo.date}
+      - Ceremonia: ${weddingInfo.ceremonyTime} en ${weddingInfo.ceremonyLocation}
+      - Direccion ceremonia: ${weddingInfo.ceremonyAddress}
+      - Recepcion: ${weddingInfo.receptionTime} en ${weddingInfo.receptionVenue}
+      - Direccion recepcion: ${weddingInfo.receptionAddress}
+      - Transporte: ${weddingInfo.transportation}
+      - Fecha limite RSVP: ${weddingInfo.rsvpDeadline}
+      - Telefono de contacto: ${weddingInfo.contactPhone}
+      - Email de contacto: ${weddingInfo.contactEmail}
+      - Estilo de boda: ${weddingInfo.weddingStyle}
+      - Paleta de colores (texto): ${weddingInfo.colorScheme}
+      - Informacion adicional: ${weddingInfo.additionalInfo}
+      
+      REQUISITOS ESPECIFICOS DEL USUARIO (todo el diseno y estilo lo define este prompt):
+      ${prompt}
+      `;
+
       const messages = [
-        { role: 'system', content: sys },
-        { role: 'user', content: userMessage },
+        { role: 'system', content: sys2 },
+        { role: 'user', content: userMessage2 },
       ];
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -861,20 +1131,7 @@ export default function DisenoWeb() {
                 ))}
               </div>
             )}
-            {slugSuggestions.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>Sugerencias:</span>
-                {slugSuggestions.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setPublishSlug(s)}
-                    className={`px-2 py-1 rounded border ${publishSlug === s ? 'bg-blue-50 border-blue-400' : 'border-gray-300 hover:border-blue-300'}`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Bloque duplicado de sugerencias eliminado para evitar redundancia */}
             <button
               disabled={Boolean(slugError) || slugAvailable === false}
               onClick={async () => {

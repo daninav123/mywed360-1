@@ -2,6 +2,7 @@ import { Eye, Edit2, Trash2, Calendar, Star, MapPin, Users } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react';
 
 import ProveedorDetail from './ProveedorDetail';
+import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
 import ProviderEmailModal from './ProviderEmailModal';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
@@ -35,11 +36,14 @@ const ProveedorCard = ({
   onReserve,
   onToggleFavorite,
   onCreateContract,
+  onShowTracking,
+  onOpenGroups,
 }) => {
   const [showDetail, setShowDetail] = useState(false);
   const [detailTab, setDetailTab] = useState('info');
   const [showEmail, setShowEmail] = useState(false);
   const [tracking, setTracking] = useState(null);
+  const [showAssign, setShowAssign] = useState(false);
 
   const refreshTracking = () => {
     try {
@@ -261,6 +265,17 @@ const ProveedorCard = ({
             </Button>
           )}
 
+          {!provider.groupId && (
+            <Button
+              onClick={() => setShowAssign(true)}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              Asignar a grupo
+            </Button>
+          )}
+
           {onDelete && (
             <Button
               onClick={() => onDelete?.(provider.id)}
@@ -297,6 +312,33 @@ const ProveedorCard = ({
             >
               Ver correo
             </a>
+            {typeof onShowTracking === 'function' && (
+              <button
+                type="button"
+                className="text-blue-600 hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  try {
+                    onShowTracking({
+                      id: tracking.id || provider.id,
+                      providerId: provider.id,
+                      providerName: provider.name,
+                      subject: tracking.subject || `Mensaje para ${provider.name}`,
+                      status: tracking.status || 'pendiente',
+                      sentAt: tracking.lastEmailDate || new Date().toISOString(),
+                      lastUpdated: tracking.lastEmailDate || new Date().toISOString(),
+                      openCount: tracking.openCount || 0,
+                      recipientEmail: tracking.providerEmail || provider.email || '',
+                    });
+                  } catch {
+                    onShowTracking(null);
+                  }
+                }}
+                title="Ver detalles de seguimiento"
+              >
+                Detalles
+              </button>
+            )}
           </div>
         )}
       </Card>
@@ -308,6 +350,14 @@ const ProveedorCard = ({
           onEdit={onEdit}
           activeTab={detailTab}
           setActiveTab={setDetailTab}
+          onOpenGroups={onOpenGroups}
+        />
+      )}
+      {showAssign && (
+        <AssignSupplierToGroupModal
+          open={showAssign}
+          onClose={() => setShowAssign(false)}
+          provider={provider}
         />
       )}
       {showEmail && (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SquaresPlus, Ruler, Layers, DoorOpen, Hexagon, Minus, Square, Circle, Grid, Eye, EyeOff, Magnet, Rows, Palette, Users } from 'lucide-react';
+import { PlusSquare, Ruler, Layers, DoorOpen, Hexagon, Minus, Square, Circle, Grid, Eye, EyeOff, Magnet, Rows, Palette, Users } from 'lucide-react';
 
 const Section = ({ title, icon: Icon, children }) => (
   <div className="px-4 py-3 border-b">
@@ -31,7 +31,7 @@ export default function SeatingLibraryPanel({
   return (
     <div className="bg-white border rounded-lg h-full overflow-hidden">
       {/* Biblioteca */}
-      <Section title="Biblioteca" icon={SquaresPlus}>
+      <Section title="Biblioteca" icon={PlusSquare}>
         <div className="space-y-2">
           <div className="text-xs text-gray-500 mb-1">Perímetro y estructuras</div>
           <div className="grid grid-cols-2 gap-2">
