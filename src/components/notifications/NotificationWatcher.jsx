@@ -20,7 +20,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
     let intervalId = null;
 
     try {
-      const raw = localStorage.getItem('lovenda_notif_seen');
+      const raw = localStorage.getItem('mywed360_notif_seen');
       if (raw) {
         const arr = JSON.parse(raw);
         if (Array.isArray(arr)) arr.forEach((id) => seenRef.current.add(id));
@@ -144,7 +144,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
           }
         }
         try {
-          localStorage.setItem('lovenda_notif_seen', JSON.stringify(Array.from(seenRef.current)));
+          localStorage.setItem('mywed360_notif_seen', JSON.stringify(Array.from(seenRef.current)));
         } catch {}
       } catch {}
     };
@@ -184,3 +184,5 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
 
   return null;
 }
+
+

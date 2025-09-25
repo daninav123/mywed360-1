@@ -1,4 +1,4 @@
-import {
+﻿import {
   collection,
   query,
   where,
@@ -17,14 +17,14 @@ import { useNavigate } from 'react-router-dom';
 
 import AIBusquedaModal from '../components/proveedores/AIBusquedaModal';
 import ProveedorCardNuevo from '../components/proveedores/ProveedorCardNuevo';
-import ServicesBoard from '../components/proveedores/ServicesBoard';
-import SupplierKanban from '../components/proveedores/SupplierKanban';
-import ProviderSearchDrawer from '../components/proveedores/ProviderSearchDrawer';
 
 // Componentes
 import ProveedorDetalle from '../components/proveedores/ProveedorDetalle';
 import ProveedorFiltro from '../components/proveedores/ProveedorFiltro';
 import ProveedorFormModal from '../components/proveedores/ProveedorFormModal';
+import ProviderSearchDrawer from '../components/proveedores/ProviderSearchDrawer';
+import ServicesBoard from '../components/proveedores/ServicesBoard';
+import SupplierKanban from '../components/proveedores/SupplierKanban';
 import { useWedding } from '../context/WeddingContext';
 import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { useAuth } from '../hooks/useAuth';
@@ -42,23 +42,23 @@ const GestionProveedores = () => {
   const { activeWedding } = useWedding();
   const { info: weddingDoc } = useActiveWeddingInfo();
 
-  // Estados para proveedores
+  // Estaños para proveedores
   const [proveedores, setProveedores] = useState([]);
-  const [proveedoresFiltrados, setProveedoresFiltrados] = useState([]);
+  const [proveedoresFiltraños, setProveedoresFiltraños] = useState([]);
   const [proveedorSeleccionado, setProveedorSeleccionado] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
-  // Estados para filtros y búsqueda
+  // Estaños para filtros y búsqueda
   const [filtroActivo, setFiltroActivo] = useState('todos');
   const [textoBusqueda, setTextoBusqueda] = useState('');
 
-  // Estados para modales
+  // Estaños para modales
   const [modalFormularioVisible, setModalFormularioVisible] = useState(false);
   const [modalAIVisible, setModalAIVisible] = useState(false);
   const [proveedorEditar, setProveedorEditar] = useState(null);
 
-  // Estados para búsqueda IA
+  // Estaños para búsqueda IA
   const [resultadoBusquedaIA, setResultadoBusquedaIA] = useState(null);
   const [cargandoBusquedaIA, setCargandoBusquedaIA] = useState(false);
   const [drawerBusquedaOpen, setDrawerBusquedaOpen] = useState(false);
@@ -107,10 +107,10 @@ const GestionProveedores = () => {
 
     // Aplicar filtro por categoría
     switch (filtro) {
-      case 'contratados':
+      case 'contrataños':
         resultado = resultado.filter((p) => p.estado === 'Contratado');
         break;
-      case 'contactados':
+      case 'contactaños':
         resultado = resultado.filter((p) => p.estado === 'Contactado');
         break;
       case 'favoritos':
@@ -132,7 +132,7 @@ const GestionProveedores = () => {
       );
     }
 
-    setProveedoresFiltrados(resultado);
+    setProveedoresFiltraños(resultado);
   };
 
   // Cambiar filtro activo
@@ -152,8 +152,8 @@ const GestionProveedores = () => {
   };
 
   // Guardar nuevo proveedor
-  const guardarProveedor = async (datosProveedor) => {
-    console.log('guardarProveedor llamado con datos:', datosProveedor);
+  const guardarProveedor = async (dañosProveedor) => {
+    console.log('guardarProveedor llamado con daños:', dañosProveedor);
 
     // Usar ID de usuario por defecto si no hay usuario autenticado (solo para desarrollo)
     const userId = currentUser?.uid || 'user123';
@@ -162,18 +162,18 @@ const GestionProveedores = () => {
     try {
       console.log('Intentando guardar proveedor en Firestore...');
       // Si tiene ID, actualizar
-      if (datosProveedor.id) {
-        console.log('Actualizando proveedor existente con ID:', datosProveedor.id);
-        const proveedorRef = doc(db, `users/${userId}/proveedores`, datosProveedor.id);
-        const { id, ...datosActualizar } = datosProveedor;
-        await updateDoc(proveedorRef, datosActualizar);
+      if (dañosProveedor.id) {
+        console.log('Actualizando proveedor existente con ID:', dañosProveedor.id);
+        const proveedorRef = doc(db, `users/${userId}/proveedores`, dañosProveedor.id);
+        const { id, ...dañosActualizar } = dañosProveedor;
+        await updateDoc(proveedorRef, dañosActualizar);
         // Proveedor actualizado correctamente
       } else {
         // Si no tiene ID, crear nuevo
         // Creando nuevo proveedor
         const proveedoresRef = collection(db, `users/${userId}/proveedores`);
         const docRef = await addDoc(proveedoresRef, {
-          ...datosProveedor,
+          ...dañosProveedor,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
@@ -206,7 +206,7 @@ const GestionProveedores = () => {
 
       // Actualizar estado local
       setProveedores((prev) => prev.filter((p) => p.id !== proveedorId));
-      setProveedoresFiltrados((prev) => prev.filter((p) => p.id !== proveedorId));
+      setProveedoresFiltraños((prev) => prev.filter((p) => p.id !== proveedorId));
 
       // Si era el proveedor seleccionado, deseleccionar
       if (proveedorSeleccionado?.id === proveedorId) {
@@ -239,8 +239,8 @@ const GestionProveedores = () => {
         prev.map((p) => (p.id === proveedorId ? { ...p, favorito: !p.favorito } : p))
       );
 
-      // Actualizar filtrados también
-      setProveedoresFiltrados((prev) =>
+      // Actualizar filtraños también
+      setProveedoresFiltraños((prev) =>
         prev.map((p) => (p.id === proveedorId ? { ...p, favorito: !p.favorito } : p))
       );
 
@@ -360,10 +360,10 @@ const GestionProveedores = () => {
         '';
       const guessService = (q) => {
         const t = String(q || '').toLowerCase();
-        if (t.includes('foto')) return 'Fotografia';
+        if (t.includes('foto')) return 'Fotografía';
         if (t.includes('video')) return 'Video';
         if (t.includes('catering')) return 'Catering';
-        if (t.includes('dj') || t.includes('musica')) return 'Musica';
+        if (t.includes('dj') || t.includes('másica')) return 'Música';
         if (t.includes('flor')) return 'Flores';
         return '';
       };
@@ -392,8 +392,8 @@ const GestionProveedores = () => {
         const item = list[0];
         const mapped = {
           nombre: item.title || item.name || 'Proveedor sugerido',
-          servicio: item.service || guessService(consulta) || 'Servicio para bodas',
-          descripcion: item.snippet || '',
+          servicio: itemáservice || guessService(consulta) || 'Servicio para bodas',
+          descripcion: itemásnippet || '',
           web: item.link || '',
           ubicacion: item.location || location || '',
           contacto: item.contact || '',
@@ -436,7 +436,7 @@ const GestionProveedores = () => {
     setModalFormularioVisible(true);
   };
 
-  // Atajos de UI para tablero / drawer
+  // Ataños de UI para tablero / drawer
   const abrirNuevoProveedorConServicio = (serv) => {
     setProveedorEditar({ servicio: serv || '', estado: 'Nuevo', favorito: false });
     setModalFormularioVisible(true);
@@ -456,9 +456,9 @@ const GestionProveedores = () => {
       const userId = currentUser?.uid || 'user123';
       const ref = doc(db, `users/${userId}/proveedores`, prov.id);
       await updateDoc(ref, { estado: nuevoEstado, updatedAt: new Date().toISOString() });
-      // Actualizar estado local optimista
+      // Actualizar estado local optimásta
       setProveedores((prev) => prev.map((p) => (p.id === prov.id ? { ...p, estado: nuevoEstado } : p)));
-      setProveedoresFiltrados((prev) => prev.map((p) => (p.id === prov.id ? { ...p, estado: nuevoEstado } : p)));
+      setProveedoresFiltraños((prev) => prev.map((p) => (p.id === prov.id ? { ...p, estado: nuevoEstado } : p)));
     } catch (e) {
       console.error('Error moviendo proveedor:', e);
     }
@@ -473,9 +473,9 @@ const GestionProveedores = () => {
       .map((p) => ({ p, d: p?.fechaLimite ? new Date(p.fechaLimite) : null }))
       .filter((x) => x.d && !isNaN(x.d))
       .sort((a, b) => a.d - b.d);
-    const proximoDeadline = deadlines.length ? deadlines[0].d : null;
+    const próximoDeadline = deadlines.length ? deadlines[0].d : null;
     const recordatorios = proveedores.filter((p) => !!p?.recordatorioProximo).length;
-    return { asignado, gastado, presupPend, proximoDeadline, recordatorios };
+    return { asignado, gastado, presupPend, próximoDeadline, recordatorios };
   })();
 
   // Determinar contenido principal
@@ -502,7 +502,7 @@ const GestionProveedores = () => {
     );
   } else if (cargando) {
     contenidoPrincipal = (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex justify-center itemás-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -536,7 +536,7 @@ const GestionProveedores = () => {
 
           {/* Kanban por estado */}
           <SupplierKanban
-            proveedores={proveedoresFiltrados}
+            proveedores={proveedoresFiltraños}
             onMove={moverProveedorEstado}
             onClick={verDetalleProveedor}
           />
@@ -564,7 +564,7 @@ const GestionProveedores = () => {
             </div>
             <div className="flex justify-between">
               <span>Próximo deadline</span>
-              <span>{kpi.proximoDeadline ? kpi.proximoDeadline.toLocaleDateString() : '--'}</span>
+              <span>{kpi.próximoDeadline ? kpi.próximoDeadline.toLocaleDateString() : '--'}</span>
             </div>
           </div>
           <div className="mt-3 border-t pt-3">
@@ -584,7 +584,7 @@ const GestionProveedores = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="sm:flex sm:items-center sm:justify-between mb-6">
+      <div className="sm:flex sm:itemás-center sm:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Gestión de Proveedores</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -596,14 +596,14 @@ const GestionProveedores = () => {
           <div className="mt-4 sm:mt-0 sm:ml-16 flex space-x-3">
             <button
               onClick={() => setDrawerBusquedaOpen(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="inline-flex itemás-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
               <Sparkles className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               Buscar con IA
             </button>
             <button
               onClick={() => setModalFormularioVisible(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex itemás-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               Añadir proveedor
@@ -655,3 +655,4 @@ const GestionProveedores = () => {
 };
 
 export default GestionProveedores;
+

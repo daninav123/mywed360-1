@@ -16,8 +16,8 @@ import {
 describe('folderService', () => {
   // Constantes para pruebas
   const USER_ID = 'testuser123';
-  const FOLDERS_STORAGE_KEY = 'lovenda_email_folders_testuser123';
-  const EMAIL_FOLDER_MAPPING_KEY = 'lovenda_email_folder_mapping_testuser123';
+  const FOLDERS_STORAGE_KEY = 'mywed360_email_folders_testuser123';
+  const EMAIL_FOLDER_MAPPING_KEY = 'MYWED360_email_folder_mapping_testuser123';
 
   // Mock para localStorage
   const localStorageMock = (() => {
@@ -395,3 +395,6 @@ describe('folderService', () => {
     });
   });
 });
+
+
+

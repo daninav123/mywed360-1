@@ -72,7 +72,7 @@ const ComposeEmail = () => {
     const loadShared = async () => {
       try {
         const db = await new Promise((resolve, reject) => {
-          const req = indexedDB.open('lovenda-share-target', 1);
+          const req = indexedDB.open('mywed360-share-target', 1);
           req.onupgradeneeded = () => {
             const db = req.result;
             if (!db.objectStoreNames.contains('shares')) {
@@ -305,3 +305,4 @@ const ComposeEmail = () => {
 };
 
 export default ComposeEmail;
+

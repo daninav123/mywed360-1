@@ -17,7 +17,7 @@ const parser = new Parser({
   requestOptions: {
     headers: {
       // Algunos hosts bloquean user-agents desconocidos
-      'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app)'
+      'User-Agent': 'MyWed360Bot/1.0 (+https://mywed360.com)'
     },
   },
 });
@@ -48,7 +48,7 @@ const RSS_FEEDS = {
 async function resolveOgImage(pageUrl) {
   try {
     const commonHeaders = {
-      'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116 Safari/537.36',
+      'User-Agent': 'MyWed360Bot/1.0 (+https://mywed360.com) Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116 Safari/537.36',
       Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
       Referer: 'https://news.google.com/',
@@ -289,7 +289,7 @@ router.get('/', async (req, res) => {
       responseType: 'text',
       maxRedirects: 5,
       headers: {
-        'User-Agent': 'LovendaBot/1.0 (+https://lovenda.app) Mozilla/5.0',
+        'User-Agent': 'MyWed360Bot/1.0 (+https://mywed360.com) Mozilla/5.0',
         Referer: 'https://news.google.com/',
         'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
       },

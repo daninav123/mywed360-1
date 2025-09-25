@@ -1,4 +1,4 @@
-import { User, Mail, Moon, LogOut } from 'lucide-react';
+﻿import { User, Mail, Moon, LogOut } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, Link, useLocation } from 'react-router-dom';
@@ -34,7 +34,7 @@ export default function MainLayout() {
 
   // Autenticación y rol
   const { hasRole, userProfile, isLoading, logout: logoutUnified } = useAuth();
-  const role = userProfile?.role || 'particular';
+  const _role = userProfile?.role || 'particular';
 
   const [openMenu, setOpenMenu] = useState(false);
   const location = useLocation();
@@ -186,3 +186,4 @@ export default function MainLayout() {
     </div>
   );
 }
+

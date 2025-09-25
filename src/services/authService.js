@@ -32,10 +32,10 @@ const AUTH_CONFIG = {
   MAX_RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000, // 1 segundo
   STORAGE_KEYS: {
-    USER: 'lovenda_user_session',
-    PREFERENCES: 'lovenda_user_preferences',
-    LAST_ACTIVITY: 'lovenda_last_activity',
-    LOGIN_EMAIL: 'lovenda_login_email',
+    USER: 'mywed360_user_session',
+    PREFERENCES: 'mywed360_user_preferences',
+    LAST_ACTIVITY: 'mywed360_last_activity',
+    LOGIN_EMAIL: 'mywed360_login_email',
   },
 };
 
@@ -564,3 +564,4 @@ export default {
   refreshAuthToken,
   AuthError,
 };
+

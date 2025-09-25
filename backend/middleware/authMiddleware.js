@@ -25,7 +25,7 @@ if (!admin.apps.length) {
       if (serviceAccountObj) {
         if (!admin.apps.length) admin.initializeApp({
           credential: admin.credential.cert(serviceAccountObj),
-          projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountObj.project_id || 'lovenda-98c77'
+          projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountObj.project_id || 'mywed360'
         });
       } else {
         // Fallback a archivo
@@ -41,12 +41,12 @@ if (!admin.apps.length) {
           if (!admin.apps.length) admin.initializeApp({
             credential: admin.credential.cert(serviceAccountFile),
             projectId:
-              process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'lovenda-98c77'
+              process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'mywed360'
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
           if (!admin.apps.length) admin.initializeApp({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
+            projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
           });
         }
       }
@@ -64,19 +64,19 @@ if (!admin.apps.length) {
           const serviceAccountFile = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
           if (!admin.apps.length) admin.initializeApp({
             credential: admin.credential.cert(serviceAccountFile),
-            projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'lovenda-98c77'
+            projectId: process.env.FIREBASE_PROJECT_ID || serviceAccountFile.project_id || 'mywed360'
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
           // Último recurso: inicialización sin credenciales explícitas (usará ADC si existe)
           if (!admin.apps.length) admin.initializeApp({
-            projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
+            projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
           });
         }
       } catch (fileErr) {
         console.error('[AuthMiddleware] Error leyendo serviceAccount.json:', fileErr);
         if (!admin.apps.length) admin.initializeApp({
-          projectId: process.env.FIREBASE_PROJECT_ID || 'lovenda-98c77'
+          projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
         });
       }
     }

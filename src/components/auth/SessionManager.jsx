@@ -308,7 +308,7 @@ const SessionManager = ({ children }) => {
     const checkSessionTime = () => {
       // Simular tiempo restante de sesión (en una app real vendría del token)
       const now = Date.now();
-      const sessionStart = localStorage.getItem('lovenda_last_activity');
+      const sessionStart = localStorage.getItem('mywed360_last_activity');
 
       if (sessionStart) {
         const elapsed = now - parseInt(sessionStart);
@@ -360,3 +360,5 @@ const SessionManager = ({ children }) => {
 };
 
 export default SessionManager;
+
+

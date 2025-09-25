@@ -1,16 +1,23 @@
 describe('Tareas - Modal "Ver todas las tareas" muestra subtareas', () => {
   before(() => {
-    // Login simulado y boda activa mock para evitar dependencias reales
-    cy.loginToLovenda();
-    cy.mockWeddingMinimal();
+    // nada: inyectamos el mock justo en cy.visit via onBeforeLoad
   });
 
   it('crea bloque padre y subtarea, la programa desde el modal y ajusta el rango del padre', () => {
     const parentTitle = `Padre QA ${Date.now()}`;
     const subTitle = `Sub QA ${Date.now()}`;
 
-    // Ir a Tareas
-    cy.visit('/tasks');
+    // Ir a Tareas con boda mock inyectada antes de que la app cargue
+    cy.visit('/tasks', {
+      onBeforeLoad: (win) => {
+        win.__MOCK_WEDDING__ = {
+          weddings: [{ id: 'w1', name: 'Demo Wedding' }],
+          activeWedding: { id: 'w1', name: 'Demo Wedding' },
+        };
+      },
+    });
+    // Login simulado tras cargar
+    cy.loginToLovenda();
     cy.closeDiagnostic();
 
     // Crear tarea padre (bloque Gantt)

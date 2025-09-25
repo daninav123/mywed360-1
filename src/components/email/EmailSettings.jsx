@@ -162,7 +162,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
         <div>
           <h3 className="text-md font-medium mb-2">Tu dirección de correo</h3>
           <p className="text-gray-600 mb-1">
-            Esta es tu dirección de correo electrónico actual en Lovenda:
+            Esta es tu dirección de correo electrónico actual en MyWed360:
           </p>
           <div className="bg-gray-50 p-3 rounded-md border">
             <p className="font-medium">{emailAddress}</p>
@@ -192,7 +192,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
                   placeholder={emailAlias || 'tunombre'}
                 />
                 <span className="bg-gray-100 p-2 border-r border-t border-b rounded-r-md flex items-center">
-                  @lovenda.com
+                  @MyWed360.com
                 </span>
               </div>
               <p className="text-xs text-gray-500 mt-1">
@@ -485,3 +485,4 @@ Hemos recibido tu mensaje y te responderemos en breve.
 };
 
 export default EmailSettings;
+

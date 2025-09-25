@@ -197,7 +197,7 @@ function generateTemplateHTML(id, region = 'ES', data = {}) {
         <p>Firma y sello: ___________________________</p>
       </body></html>`;
     default:
-      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Plantilla</title><style>${styles}</style></head><body>${commonHeader}<p>Plantilla genérica.</p></body></html>`;
+      return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Plantilla</title><style>${styles}</style></head><body>${commonHeader}<p>Plantilla genâ‚¬)rica.</p></body></html>`;
   }
 }
 

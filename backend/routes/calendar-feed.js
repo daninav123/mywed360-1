@@ -57,7 +57,7 @@ function icsEscape(str = '') {
 }
 
 // Construir ICS a partir de eventos [{ id, title, desc, start, end, location }]
-function buildICS({ events = [], prodId = '-//Lovenda//Calendar Feed//ES', calName = 'Lovenda' }) {
+function buildICS({ events = [], prodId = '-//MyWed360//Calendar Feed//ES', calName = 'MyWed360' }) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -74,7 +74,7 @@ function buildICS({ events = [], prodId = '-//Lovenda//Calendar Feed//ES', calNa
   for (const ev of events) {
     if (!ev?.start || !ev?.end) continue;
     const uidCore = `${ev.googleEventId || ev.id || Math.random().toString(36).slice(2)}`;
-    const uid = `${uidCore}@lovenda`;
+    const uid = `${uidCore}@mywed360`;
     const isLongTask = ev.type === 'task' || ev.long === true;
 
     const summary = icsEscape(ev.title || ev.name || 'Evento');

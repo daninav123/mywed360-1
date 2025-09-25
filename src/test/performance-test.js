@@ -80,7 +80,7 @@ function generateTestData(type, size = 'medium') {
         result.push({
           id: `email_${i}`,
           from: `sender${i % 100}@example.com`,
-          to: 'usuario@lovenda.com',
+          to: 'usuario@mywed360.com',
           subject: `Asunto de prueba #${i} para evaluación de rendimiento`,
           body: generateRandomText(CONFIG.emailBodySize[size]),
           date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -522,7 +522,7 @@ async function testNotificationRendering(params) {
 async function runAllTests() {
   console.log(`
   =======================================================
-  🚀 INICIANDO PRUEBAS DE RENDIMIENTO DE LOVENDA EMAIL
+  🚀 INICIANDO PRUEBAS DE RENDIMIENTO DE MYWED360 EMAIL
   =======================================================
   
   Configuración:
@@ -686,3 +686,6 @@ async function runAllTests() {
 runAllTests().catch((error) => {
   console.error('❌ Error durante la ejecución de las pruebas:', error);
 });
+
+
+

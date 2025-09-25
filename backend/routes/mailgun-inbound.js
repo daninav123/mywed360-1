@@ -1,16 +1,17 @@
-import express from 'express';
+﻿import express from 'express';
 import crypto from 'crypto';
 import multer from 'multer';
 import { db } from '../db.js'; // Firestore
 import admin from 'firebase-admin';
 import { analyzeEmail } from '../services/emailAnalysis.js';
+import { FieldValue } from 'firebase-admin/firestore';
 import { applyEmailInsightsToSystem } from '../services/emailActionRouter.js';
 import { extractTextFromAttachment } from '../services/attachmentText.js';
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
 
-// Comprueba la firma que Mailgun envía en cada webhook.
+// Comprueba la firma que Mailgun envÃ­a en cada webhook.
 // Docs: https://documentation.mailgun.com/en/latest/user_manual.html#webhooks
 function verifyMailgunSignature(timestamp, token, signature, apiKey) {
   try {
@@ -46,12 +47,12 @@ router.post('/', upload.any(), async (req, res) => {
   if (anyKey) {
     const ok = verifyWithAnyKey({ timestamp, token, signature });
     if (!ok) {
-      console.warn('Webhook Mailgun firma no válida');
+      console.warn('Webhook Mailgun firma no vÃ¡lida');
       return res.status(403).json({ success: false, message: 'Invalid signature' });
     }
   } else {
     // Entorno local / CI sin clave: continuar pero advertir
-    console.warn('MAILGUN_SIGNING_KEY no definido; se omite verificación de firma (solo dev)');
+    console.warn('MAILGUN_SIGNING_KEY no definido; se omite verificaciÃ³n de firma (solo dev)');
   }
 
   // Extraer campos principales del mensaje
@@ -102,7 +103,7 @@ router.post('/', upload.any(), async (req, res) => {
         attachments: attachmentsTmp
       });
 
-      // Guardar ID también en el documento
+      // Guardar ID tambiÃ©n en el documento
       try {
         const fixed = (attachmentsTmp || []).map(a => ({ ...a, url: `/api/mail/${mailRef.id}/attachments/${a.id}` }));
         await db.collection('mails').doc(mailRef.id).update({ id: mailRef.id, attachments: fixed });
@@ -110,7 +111,7 @@ router.post('/', upload.any(), async (req, res) => {
         // best-effort only
       }
 
-      // Guardar adjuntos exclusivamente en Storage (si está configurado), evitando inline
+      // Guardar adjuntos exclusivamente en Storage (si estÃ¡ configurado), evitando inline
       try {
         const bucketName = process.env.FIREBASE_STORAGE_BUCKET || process.env.VITE_FIREBASE_STORAGE_BUCKET || null;
         if (bucketName) {
@@ -130,7 +131,7 @@ router.post('/', upload.any(), async (req, res) => {
             }
           }
         } else {
-          // Fallback: si no hay bucket, guardar inline solo si es pequeño
+          // Fallback: si no hay bucket, guardar inline solo si es pequeÃ±o
           for (const d of attachmentDocs) {
             let dataBase64 = null;
             try { if (d.buffer && d.buffer.length <= 250 * 1024) dataBase64 = d.buffer.toString('base64'); } catch {}
@@ -148,7 +149,7 @@ router.post('/', upload.any(), async (req, res) => {
         console.warn('Could not persist inbound attachments:', attErr?.message || attErr);
       }
 
-      // Guardar copia bajo subcolección del usuario si podemos resolverlo por email
+      // Guardar copia bajo subcolecciÃ³n del usuario si podemos resolverlo por email
       try {
         let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
         if (userSnap.empty) {
@@ -177,7 +178,7 @@ router.post('/', upload.any(), async (req, res) => {
         console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
       }
 
-      // Análisis IA automático -> extraer texto de adjuntos, guardar insights y generar notificaciones
+      // AnÃ¡lisis IA automÃ¡tico -> extraer texto de adjuntos, guardar insights y generar notificaciones
       try {
         let attachmentsText = [];
         try {
@@ -222,7 +223,7 @@ router.post('/', upload.any(), async (req, res) => {
           } catch {}
         }
 
-        // Notificaciones por reuniones detectadas (aceptación desde UI)
+        // Notificaciones por reuniones detectadas (aceptaciÃ³n desde UI)
         if (weddingId) {
           try {
             const { createNotification } = await import('../services/notificationService.js');
@@ -230,10 +231,10 @@ router.post('/', upload.any(), async (req, res) => {
             for (const m of meetings) {
               const when = m?.start || m?.date || m?.when;
               if (!when) continue;
-              const title = m?.title || subject || 'Reunión';
+              const title = m?.title || subject || 'ReuniÃ³n';
               await createNotification({
                 type: 'event',
-                message: `Se detectó una reunión: ${title}`,
+                message: `Se detectÃ³ una reuniÃ³n: ${title}`,
                 payload: {
                   kind: 'meeting_suggested',
                   mailId: mailRef.id,
@@ -245,7 +246,7 @@ router.post('/', upload.any(), async (req, res) => {
           } catch (e) { console.warn('notification failed', e?.message || e); }
         }
 
-        // Notificaciones por presupuestos detectados (aceptación desde UI)
+        // Notificaciones por presupuestos detectados (aceptaciÃ³n desde UI)
         if (weddingId) {
           try {
             const { createNotification } = await import('../services/notificationService.js');
@@ -267,6 +268,44 @@ router.post('/', upload.any(), async (req, res) => {
           } catch (e) { console.warn('notification failed', e?.message || e); }
         }
 
+        // Crear presupuesto básico si se puede resolver proveedor por email
+        if (weddingId) {
+          try {
+            const supSnap = await db
+              .collection('weddings')
+              .doc(weddingId)
+              .collection('suppliers')
+              .where('email', '==', senderNorm)
+              .limit(1)
+              .get();
+            if (!supSnap.empty) {
+              const supDoc = supSnap.docs[0];
+              const supplierId = supDoc.id;
+              const supplierData = supDoc.data() || {};
+              const budgetArr = Array.isArray(insights?.budgets) ? insights.budgets : [];
+              const primary = budgetArr[0] || {};
+              const amount = typeof primary.amount === 'number' ? primary.amount : null;
+              const currency = primary.currency || 'EUR';
+              const description = (primary.description || subject || 'Presupuesto').toString().slice(0, 200);
+              const budRef = db
+                .collection('weddings').doc(weddingId)
+                .collection('suppliers').doc(supplierId)
+                .collection('budgets').doc();
+              await budRef.set({
+                id: budRef.id,
+                mailId: mailRef.id,
+                supplierEmail: senderNorm,
+                supplierName: supplierData.name || null,
+                description,
+                amount,
+                currency,
+                status: 'pending',
+                createdAt: FieldValue.serverTimestamp(),
+                updatedAt: FieldValue.serverTimestamp(),
+              });
+            }
+          } catch (e) { console.warn('auto-create budget failed', e?.message || e); }
+        }
         // Notificaciones por tareas detectadas
         if (weddingId) {
           try {
@@ -291,7 +330,7 @@ router.post('/', upload.any(), async (req, res) => {
             }
           } catch (e) { console.warn('notification failed', e?.message || e); }
         }
-        // Aplicación automática opcional de insights al sistema
+        // AplicaciÃ³n automÃ¡tica opcional de insights al sistema
         try {
           if (process.env.EMAIL_INSIGHTS_AUTO_APPLY === 'true' && weddingId) {
             await applyEmailInsightsToSystem({ weddingId, sender: senderNorm, mailId: mailRef.id, insights, subject });
@@ -324,4 +363,5 @@ router.post('/', upload.any(), async (req, res) => {
 });
 
 export default router;
+
 

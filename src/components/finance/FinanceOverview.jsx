@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
+﻿import { AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import React from 'react';
 
 import { Card } from '../ui';
@@ -256,7 +256,7 @@ export default function FinanceOverview({
       <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-4">
           {t('finance.overview.categoryStatus', {
-            defaultValue: 'Estado del Presupuesto por Categor�as',
+            defaultValue: 'Estado del Presupuesto por Categor€)as',
           })}
         </h3>
         <div className="space-y-3">
@@ -311,3 +311,4 @@ export default function FinanceOverview({
     </div>
   );
 }
+

@@ -31,7 +31,7 @@ describe('EmailNotificationBadge', () => {
   const mockNavigate = vi.fn();
 
   // Mock de datos de usuario y correos
-  const mockUserProfile = { id: 'user123', email: 'usuario@lovenda.com' };
+  const mockUserProfile = { id: 'user123', email: 'usuario@mywed360.com' };
 
   // Correos de ejemplo
   const mockEmails = [
@@ -201,3 +201,6 @@ describe('EmailNotificationBadge', () => {
     expect(getMails).not.toHaveBeenCalled();
   });
 });
+
+
+

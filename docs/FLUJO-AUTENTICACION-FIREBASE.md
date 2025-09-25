@@ -15,8 +15,8 @@ import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
-  projectId: 'lovenda-98c77',
-  authDomain: 'lovenda-98c77.firebaseapp.com',
+  projectId: 'mywed360',
+  authDomain: 'mywed360.firebaseapp.com',
   // ... resto de configuración
 };
 
@@ -76,14 +76,14 @@ firestore/
 ```javascript
 // users/{userId}
 {
-  uid: "user123",
-  email: "usuario@example.com",
-  displayName: "Nombre Usuario",
-  photoURL: "https://...",
+  uid:  – user123 – ,
+  email:  – usuario@example.com – ,
+  displayName:  – Nombre Usuario – ,
+  photoURL:  – https://... – ,
   createdAt: timestamp,
   updatedAt: timestamp,
   preferences: {
-    language: "es",
+    language:  – es – ,
     notifications: true
   }
 }
@@ -94,9 +94,9 @@ firestore/
 ```javascript
 // users/{userId}/weddings/{weddingId}
 {
-  id: "wedding123",
-  name: "Mi Boda",
-  roles: ["owner"], // o ["planner"], ["assistant"]
+  id:  – wedding123 – ,
+  name:  – Mi Boda – ,
+  roles: [ – owner – ], // o [ – planner – ], [ – assistant – ]
   updatedAt: timestamp
 }
 ```
@@ -106,12 +106,12 @@ firestore/
 ```javascript
 // weddings/{weddingId}
 {
-  id: "wedding123",
-  name: "Boda de Juan y María",
+  id:  – wedding123 – ,
+  name:  – Boda de Juan y María – ,
   date: timestamp,
-  ownerIds: ["user123"],
-  plannerIds: ["planner456"],
-  assistantIds: ["assistant789"],
+  ownerIds: [ – user123 – ],
+  plannerIds: [ – planner456 – ],
+  assistantIds: [ – assistant789 – ],
   createdAt: timestamp,
   updatedAt: timestamp
 }
@@ -280,7 +280,7 @@ const useWeddingCollection = (collectionName, weddingId) => {
 
 ## 🚨 6. TROUBLESHOOTING - ERRORES COMUNES
 
-### 6.1 "Missing or insufficient permissions"
+### 6.1  – Missing or insufficient permissions – 
 
 **Causa:** Usuario no tiene permisos para acceder a la colección/documento
 **Solución:**
@@ -288,7 +288,7 @@ const useWeddingCollection = (collectionName, weddingId) => {
 2. Verificar que el usuario esté en los arrays de permisos de la boda
 3. Usar subcolección `users/{uid}/weddings` en lugar de consultas por roles
 
-### 6.2 "FirebaseError: Permission denied"
+### 6.2  – FirebaseError: Permission denied – 
 
 **Causa:** Reglas de Firestore bloquean el acceso
 **Solución:**
@@ -296,7 +296,7 @@ const useWeddingCollection = (collectionName, weddingId) => {
 2. Asegurar que el usuario esté incluido en `ownerIds`, `plannerIds` o `assistantIds`
 3. Para desarrollo, usar reglas más permisivas temporalmente
 
-### 6.3 "No authenticated user"
+### 6.3  – No authenticated user – 
 
 **Causa:** Usuario no está autenticado en Firebase Auth
 **Solución:**
@@ -304,7 +304,7 @@ const useWeddingCollection = (collectionName, weddingId) => {
 2. Usar login manual: `signInWithEmailAndPassword(auth, email, password)`
 3. Verificar configuración de Firebase en `firebaseConfig.js`
 
-### 6.4 "Cannot read properties of undefined"
+### 6.4  – Cannot read properties of undefined – 
 
 **Causa:** Contextos no están inicializados o hooks se ejecutan antes de tiempo
 **Solución:**
@@ -399,3 +399,4 @@ deleteGuest → deleteDoc(doc(db, 'weddings', weddingId, 'guests', guestId))
 **Última actualización:** 2025-09-03  
 **Versión:** 1.0  
 **Autor:** Sistema MyWed360
+

@@ -8,12 +8,12 @@
 - [ ] **Entrada de presupuesto total**
   - Campo numérico con validación
   - Selección de moneda (EUR, USD, etc.)
-  - Opción "No estoy seguro" → IA sugiere rangos típicos
+  - Opción  – No estoy seguro –  → IA sugiere rangos típicos
   - Guardado en `/weddings/{weddingId}/budget/total`
 
 - [ ] **Sugerencias de IA basadas en contexto**
   - Análisis de: ubicación, número de invitados, tipo de boda
-  - "Para una boda de 120 invitados en Madrid, el presupuesto típico es 20.000-35.000€"
+  -  – Para una boda de 120 invitados en Madrid, el presupuesto típico es 20.000-35.000€ – 
   - Comparación con bodas similares en la plataforma
   - Factores que influyen en el costo
 
@@ -22,14 +22,14 @@
 - [ ] **Categorías predefinidas con porcentajes típicos**
   ```javascript
   const defaultCategories = {
-    venue: { name: "Lugar/Venue", percentage: 40, color: "#FF6B6B" },
-    catering: { name: "Catering", percentage: 25, color: "#4ECDC4" },
-    photography: { name: "Fotografía", percentage: 10, color: "#45B7D1" },
-    flowers: { name: "Flores/Decoración", percentage: 8, color: "#96CEB4" },
-    music: { name: "Música/DJ", percentage: 5, color: "#FFEAA7" },
-    dress: { name: "Vestido/Traje", percentage: 5, color: "#DDA0DD" },
-    transport: { name: "Transporte", percentage: 3, color: "#FFB347" },
-    other: { name: "Otros/Imprevistos", percentage: 4, color: "#A8A8A8" }
+    venue: { name:  – Lugar/Venue – , percentage: 40, color:  – #FF6B6B –  },
+    catering: { name:  – Catering – , percentage: 25, color:  – #4ECDC4 –  },
+    photography: { name:  – Fotografía – , percentage: 10, color:  – #45B7D1 –  },
+    flowers: { name:  – Flores/Decoración – , percentage: 8, color:  – #96CEB4 –  },
+    music: { name:  – Música/DJ – , percentage: 5, color:  – #FFEAA7 –  },
+    dress: { name:  – Vestido/Traje – , percentage: 5, color:  – #DDA0DD –  },
+    transport: { name:  – Transporte – , percentage: 3, color:  – #FFB347 –  },
+    other: { name:  – Otros/Imprevistos – , percentage: 4, color:  – #A8A8A8 –  }
   }
   ```
 
@@ -204,43 +204,43 @@
 // /weddings/{weddingId}/budget
 {
   total: 25000,
-  currency: "EUR",
+  currency:  – EUR – ,
   categories: {
     venue: { 
       budgeted: 10000, 
       spent: 8500, 
       percentage: 40,
-      color: "#FF6B6B"
+      color:  – #FF6B6B – 
     },
     catering: { 
       budgeted: 6250, 
       spent: 0, 
       percentage: 25,
-      color: "#4ECDC4"
+      color:  – #4ECDC4 – 
     }
     // ... más categorías
   },
   transactions: [
     {
-      id: "tx_001",
-      concept: "Señal venue Hotel Majestic",
+      id:  – tx_001 – ,
+      concept:  – Señal venue Hotel Majestic – ,
       amount: 2000,
-      category: "venue",
-      date: "2024-01-15",
-      provider: "hotel_majestic",
-      paymentMethod: "transfer",
-      status: "paid",
-      receipt: "receipt_001.pdf",
-      notes: "Señal 20% del total"
+      category:  – venue – ,
+      date:  – 2024-01-15 – ,
+      provider:  – hotel_majestic – ,
+      paymentMethod:  – transfer – ,
+      status:  – paid – ,
+      receipt:  – receipt_001.pdf – ,
+      notes:  – Señal 20% del total – 
     }
   ],
   contributions: [
     {
-      contributor: "Padres Ana",
+      contributor:  – Padres Ana – ,
       committed: 5000,
       received: 5000,
-      date: "2024-01-10",
-      status: "received"
+      date:  – 2024-01-10 – ,
+      status:  – received – 
     }
   ],
   alerts: {

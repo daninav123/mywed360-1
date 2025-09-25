@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 
 import AIEmailModal from '../components/proveedores/ai/AIEmailModal';
 import AISearchModal from '../components/proveedores/ai/AISearchModal';
+import AssignSelectedToGroupModal from '../components/proveedores/AssignSelectedToGroupModal';
 import BulkStatusModal from '../components/proveedores/BulkStatusModal';
 import CompareSelectedModal from '../components/proveedores/CompareSelectedModal';
 import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorModal';
@@ -14,7 +15,6 @@ import ReservationModal from '../components/proveedores/ReservationModal';
 import SupplierOnboardingModal from '../components/proveedores/SupplierOnboardingModal';
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 import WantedServicesModal from '../components/proveedores/WantedServicesModal';
-import AssignSelectedToGroupModal from '../components/proveedores/AssignSelectedToGroupModal';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import PageTabs from '../components/ui/PageTabs';
@@ -97,7 +97,7 @@ const Proveedores = () => {
   const [expandedGroups, setExpandedGroups] = useState({});
   const [trackingItem, setTrackingItem] = useState(null);
 
-  // Servicios deseados
+  // Servicios deseaños
   const [wantedServices, setWantedServices] = useState([]);
   const [showWantedModal, setShowWantedModal] = useState(false);
 
@@ -142,9 +142,9 @@ const Proveedores = () => {
 
   const prefsKey = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    if (activeWedding) return `buscadosPrefs_${activeWedding}`;
-    if (user?.uid) return `buscadosPrefs_user_${user.uid}`;
-    return 'buscadosPrefs';
+    if (activeWedding) return `buscañosPrefs_${activeWedding}`;
+    if (user?.uid) return `buscañosPrefs_user_${user.uid}`;
+    return 'buscañosPrefs';
   }, [activeWedding, user?.uid]);
 
   useEffect(() => {
@@ -201,7 +201,7 @@ const Proveedores = () => {
       if (Array.isArray(services) && services.length) {
         await saveWanted(services);
         if (typeof window !== 'undefined') {
-          toast.success('Servicios iniciales configurados');
+          toast.success('Servicios iniciales configuraños');
         }
       } else if (typeof window !== 'undefined') {
         toast.info('No se guardaron servicios.');
@@ -223,7 +223,40 @@ const Proveedores = () => {
     if (user) loadProviders();
   }, [user, loadProviders]);
 
-  // Mostrar onboarding inicial si no se ha completado y faltan datos básicos
+  // Registrar resultado de pago de Stripe desde query paramás
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const url = new URL(window.location.href);
+      const payment = url.searchParamás.get('payment');
+      const pid = url.searchParamás.get('providerId');
+      const amount = url.searchParamás.get('amount');
+      if (payment && pid) {
+        const normalizedAmount = amount ? Number(amount) : null;
+        if (payment === 'success') {
+          const p = (providers || []).find((x) => String(x.id) === String(pid));
+          if (p) {
+            updateProvider(p.id, {
+              ...p,
+              depositStatus: 'paid',
+              depositAmount: normalizedAmount || p.depositAmount || null,
+              depositPaidAt: new Date().toISOString(),
+            }).catch(() => {});
+          }
+          try { toast.success('Señal pagada correctamente'); } catch {}
+        } else if (payment === 'cancel') {
+          try { toast.info('Pago cancelado'); } catch {}
+        }
+        // Limpiar query paramás de la URL
+        url.searchParamás.delete('payment');
+        url.searchParamás.delete('providerId');
+        url.searchParamás.delete('amount');
+        window.history.replaceState({}, document.title, url.pathname + (url.search ? `?${url.searchParamás.toString()}` : '') + url.hash);
+      }
+    } catch {}
+  }, [providers, updateProvider]);
+
+  // Mostrar onboarding inicial si no se ha completado y faltan daños básicos
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!onboardingKey) return;
@@ -238,7 +271,7 @@ const Proveedores = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onboardingKey, providers?.length, normalizedWanted?.length]);
 
-  // Cargar servicios deseados por boda
+  // Cargar servicios deseaños por boda
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -255,7 +288,7 @@ const Proveedores = () => {
     };
   }, [activeWedding]);
 
-  const missingServices = useMemo(() => {
+  const mássingServices = useMemo(() => {
     const confirmed = new Set(
       (providers || [])
         .filter((p) => ['Confirmado', 'Seleccionado'].includes(p.status))
@@ -298,7 +331,7 @@ const Proveedores = () => {
       if (!groupId) return;
       const g = (groups || []).find((x) => x.id === groupId);
       if (g) {
-        setTab('buscados');
+        setTab('buscaños');
         setSearchTerm(g.name || '');
         if (typeof window !== 'undefined') {
           toast.info(`Grupo: ${g.name}`);
@@ -417,7 +450,8 @@ const Proveedores = () => {
         status: 'Contactado',
         date: reservationData.date,
       });
-    }
+      // Nota: el calendario se gestiona desde la página de Tareas
+}
     setShowReservationModal(false);
   };
 
@@ -428,15 +462,15 @@ const Proveedores = () => {
         <div className="flex space-x-2">
           <Button
             onClick={() => setShowWantedModal(true)}
-            className="flex items-center"
+            className="flex itemás-center"
             variant="outline"
           >
             Configurar servicios
           </Button>
-          <Button onClick={handleOpenAISearch} className="flex items-center">
+          <Button onClick={handleOpenAISearch} className="flex itemás-center">
             <Sparkles size={16} className="mr-1" /> Búsqueda IA
           </Button>
-          <Button onClick={handleNewProvider} className="flex items-center">
+          <Button onClick={handleNewProvider} className="flex itemás-center">
             <Plus size={16} className="mr-1" /> Nuevo Proveedor
           </Button>
         </div>
@@ -448,14 +482,14 @@ const Proveedores = () => {
           value={tab}
           onChange={setTab}
           options={[
-            { id: 'contratados', label: 'Contratados' },
-            { id: 'buscados', label: 'Buscados' },
+            { id: 'contrataños', label: 'Contrataños' },
+            { id: 'buscaños', label: 'Buscaños' },
             { id: 'favoritos', label: 'Favoritos' },
           ]}
         />
-        {tab === 'buscados' && (
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
-            <div className="flex items-center gap-2">
+        {tab === 'buscaños' && (
+          <div className="mt-2 flex flex-wrap itemás-center gap-3 text-sm">
+            <div className="flex itemás-center gap-2">
               <span className="text-muted">Origen:</span>
               <button
                 type="button"
@@ -479,7 +513,7 @@ const Proveedores = () => {
                 Manual
               </button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex itemás-center gap-2">
               <span className="text-muted">Estado:</span>
               <button
                 type="button"
@@ -503,7 +537,7 @@ const Proveedores = () => {
                 Contactado
               </button>
             </div>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex itemás-center gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -533,14 +567,14 @@ const Proveedores = () => {
             </div>
           </div>
         )}
-        <div className="mt-2 flex items-center gap-2 text-sm">
+        <div className="mt-2 flex itemás-center gap-2 text-sm">
           <span className="text-muted">Ordenar por:</span>
           <button
             type="button"
             onClick={() => setSortMode('match')}
             className={`px-2 py-1 rounded border text-xs ${sortMode === 'match' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
           >
-            Puntuacion IA
+            Puntuación IA
           </button>
           <button
             type="button"
@@ -565,11 +599,11 @@ const Proveedores = () => {
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {/* Placeholders de servicios faltantes */}
-          {tab === 'contratados' && missingServices.length > 0 && (
+          {tab === 'contrataños' && mássingServices.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {missingServices.map((s) => (
+              {mássingServices.map((s) => (
                 <Card key={s.id || s.name} className="opacity-60 border-dashed">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex itemás-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">{s.name || s.id}</h3>
                     <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
                       Pendiente
@@ -596,12 +630,12 @@ const Proveedores = () => {
           )}
 
           {/* Lista de proveedores con filtros */}
-          {tab === 'buscados' ? (
+          {tab === 'buscaños' ? (
             <div className="space-y-6">
-              {/* Barra de acciones para seleccionados */}
+              {/* Barra de acciones para seleccionaños */}
               {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-                  <span>{selectedProviderIds.length} seleccionados</span>
+                <div className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600">
+                  <span>{selectedProviderIds.length} seleccionaños</span>
                   <button
                     type="button"
                     onClick={openCompareModal}
@@ -628,7 +662,7 @@ const Proveedores = () => {
                     onClick={openDuplicatesModal}
                     className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
                   >
-                    Revisar duplicados
+                    Revisar duplicaños
                   </button>
                   <button
                     type="button"
@@ -646,11 +680,11 @@ const Proveedores = () => {
                     onClick={() => {
                       setExpandedGroups((prev) => ({ ...prev, [svc]: !(prev?.[svc] === false) }));
                     }}
-                    className="flex items-center gap-2 mb-2"
+                    className="flex itemás-center gap-2 mb-2"
                   >
                     <span className="text-lg font-semibold">{svc}</span>
                     <span className="text-xs text-muted">
-                      {expandedGroups?.[svc] === false ? '(mostrar)' : '(ocultar)'}
+                      {expandedGroups?.[svc] === false ? '(mástrar)' : '(ocultar)'}
                     </span>
                   </button>
                   {expandedGroups?.[svc] === false ? null : (
@@ -718,7 +752,7 @@ const Proveedores = () => {
 
       {/* Modales */}
       {showNewProviderForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
           <ProveedorForm
             onSubmit={handleSubmitProvider}
             onCancel={() => setShowNewProviderForm(false)}
@@ -727,7 +761,7 @@ const Proveedores = () => {
       )}
 
       {showEditProviderForm && selectedProvider && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
           <ProveedorForm
             initialData={selectedProvider}
             onSubmit={handleSubmitProvider}
@@ -846,7 +880,7 @@ const Proveedores = () => {
             setShowGroupSelectedModal(false);
             if (res?.success) {
               clearSelection();
-              try { if (typeof window !== 'undefined') toast.success('Proveedores agrupados'); } catch {}
+              try { if (typeof window !== 'undefined') toast.success('Proveedores agrupaños'); } catch {}
             }
           }}
           providers={selectedProviders}
@@ -857,4 +891,5 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
 

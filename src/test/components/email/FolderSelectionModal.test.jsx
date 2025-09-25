@@ -201,3 +201,6 @@ describe('FolderSelectionModal Component', () => {
     expect(screen.getByText('No hay carpetas disponibles')).toBeInTheDocument();
   });
 });
+
+
+

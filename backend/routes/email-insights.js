@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import { db } from '../db.js';
 import OpenAI from 'openai';
 import logger from '../logger.js';
@@ -31,6 +31,8 @@ function heuristicAnalyze({ subject = '', body = '' }) {
   const meetings = [];
   const budgets = [];
   const contracts = [];
+  const payments = [];
+
 
   try {
     // Detectar fechas simples (YYYY-MM-DD o DD/MM/YYYY)
@@ -72,7 +74,7 @@ function heuristicAnalyze({ subject = '', body = '' }) {
     }
   } catch (e) {}
 
-  return { tasks, meetings, budgets, contracts };
+  return { tasks, meetings, budgets, contracts, payments };
 }
 
 // Heurística de clasificación (tags + carpeta sugerida)
@@ -165,7 +167,7 @@ router.post('/analyze', async (req, res) => {
   "tasks": [{"title": string, "due": string|null}],
   "meetings": [{"title": string, "date": string|null, "when": string|null}],
   "budgets": [{"client": string, "amount": string, "currency": string|null}],
-  "contracts": [{"party": string, "type": string, "action": string}]
+  "contracts": [{\"party\": string, \"type\": string, \"action\": string}],\n  \"payments\": [{\"amount\": string, \"currency\": string|null, \"direction\": \"incoming|outgoing\"|null, \"method\": string|null, \"date\": string|null, \"note\": string|null}]
 }
 Responde SOLO el JSON. Email:
 Asunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
@@ -229,7 +231,7 @@ router.post('/reanalyze/:mailId', async (req, res) => {
     if (apiKey) {
       try {
         const openai = new OpenAI({ apiKey, project: process.env.OPENAI_PROJECT_ID });
-        const prompt = `Eres un asistente de boda. A partir del siguiente email, extrae acciones estructuradas en JSON con este esquema exacto:\n{\n  "tasks": [{"title": string, "due": string|null}],\n  "meetings": [{"title": string, "date": string|null, "when": string|null}],\n  "budgets": [{"client": string, "amount": string, "currency": string|null}],\n  "contracts": [{"party": string, "type": string, "action": string}]\n}\nResponde SOLO el JSON. Email:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
+        const prompt = `Eres un asistente de boda. A partir del siguiente email, extrae acciones estructuradas en JSON con este esquema exacto:\n{\n  "tasks": [{"title": string, "due": string|null}],\n  "meetings": [{"title": string, "date": string|null, "when": string|null}],\n  "budgets": [{"client": string, "amount": string, "currency": string|null}],\n  "contracts": [{\"party\": string, \"type\": string, \"action\": string}],\n  \"payments\": [{\"amount\": string, \"currency\": string|null, \"direction\": \"incoming|outgoing\"|null, \"method\": string|null, \"date\": string|null, \"note\": string|null}]\n}\nResponde SOLO el JSON. Email:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 5000)}${Array.isArray(attachmentsText) && attachmentsText.length ? "\nAdjuntos extraídos:" + attachmentsText.map(a=>`\n[${a.filename||'archivo'}] ${a.text.slice(0, 3000)}`).join('') : ''}`;
         const completion = await openai.chat.completions.create({
           model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
           temperature: 0,
@@ -256,3 +258,6 @@ router.post('/reanalyze/:mailId', async (req, res) => {
     return res.status(500).json({ error: 'internal' });
   }
 });
+
+
+

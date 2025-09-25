@@ -65,14 +65,14 @@ export const useSeatingPlan = () => {
   const ceremonySaveTimerRef = useRef(null);
   const banquetSaveTimerRef = useRef(null);
 
-  // Estados computados basados en la pestaÃ±a activa
+  // Estados computados basados en la pestaña activa
   const areas = tab === 'ceremony' ? areasCeremony : areasBanquet;
   const setAreas = tab === 'ceremony' ? setAreasCeremony : setAreasBanquet;
   const tables = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
   const seats = tab === 'ceremony' ? seatsCeremony : [];
   const setTables = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
 
-  // Cargar dimensiones del salÃ³n (y compatibilidad con estructura nueva/legacy)
+  // Cargar dimensiones del salón (y compatibilidad con estructura nueva/legacy)
   useEffect(() => {
     if (!activeWedding) return;
     const loadHallDimensions = async () => {
@@ -109,13 +109,13 @@ export const useSeatingPlan = () => {
           }
         }
       } catch (err) {
-        console.warn('No se pudieron cargar dimensiones del salÃ³n:', err);
+        console.warn('No se pudieron cargar dimensiones del salón:', err);
       }
     };
     loadHallDimensions();
   }, [activeWedding]);
 
-  // Suscribirse a cambios en el estado de sincronizaciÃ³n
+  // Suscribirse a cambios en el estado de sincronización
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
     return () => unsubscribe();
@@ -159,7 +159,7 @@ export const useSeatingPlan = () => {
             (!payload.seats || payload.seats.length === 0) &&
             (!payload.tables || payload.tables.length === 0) &&
             (!payload.areas || payload.areas.length === 0);
-          if (isEmpty) return; // Evitar crear doc vacÃ­o
+          if (isEmpty) return; // Evitar crear doc vacío
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
           console.warn('[useSeatingPlan] Autosave ceremony error:', e);
@@ -199,7 +199,7 @@ export const useSeatingPlan = () => {
           const hasAreas = Array.isArray(payload.areas) && payload.areas.length > 0;
           const hasConfig = !!(cfg.width && cfg.height);
           const isEmpty = !hasTables && !hasAreas && !hasConfig;
-          if (isEmpty) return; // Evitar crear doc vacÃ­o
+          if (isEmpty) return; // Evitar crear doc vacío
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
           console.warn('[useSeatingPlan] Autosave banquet error:', e);
@@ -257,7 +257,7 @@ export const useSeatingPlan = () => {
     return null;
   };
 
-  // GestiÃ³n de mesas
+  // Gestión de mesas
   const handleSelectTable = (id, multi = false) => {
     const table = tables.find((t) => String(t.id) === String(id));
     if (!multi) {
@@ -337,12 +337,12 @@ export const useSeatingPlan = () => {
     }
   };
 
-  // Ãreas (perÃ­metro/puertas/obstÃ¡culos/pasillos)
+  // Áreas (perímetro/puertas/obstáculos/pasillos)
   const addArea = (area) => {
     const normalize = (a) => (Array.isArray(a) || a?.points ? a : []);
     if (tab === 'ceremony') setAreasCeremony((prev) => [...prev, normalize(area)]);
     else setAreasBanquet((prev) => [...prev, normalize(area)]);
-    // Guardar en historial tras aÃ±adir Ã¡rea
+    // Guardar en historial tras añadir área
     try { pushHistory(); } catch (_) {}
   };
   const deleteArea = (index) => {
@@ -354,7 +354,7 @@ export const useSeatingPlan = () => {
     if (tab === 'ceremony') setAreasCeremony((prev) => upd(prev)); else setAreasBanquet((prev) => upd(prev));
   };
 
-  // GeneraciÃ³n de layouts
+  // Generación de layouts
   const generateSeatGrid = (rows = 10, cols = 12, gap = 40, startX = 100, startY = 80, aisleAfter = 6) => {
     const newSeats = [];
     let seatId = 1;
@@ -430,7 +430,7 @@ export const useSeatingPlan = () => {
     } catch (_) {}
   };
 
-  // Auto-asignaciÃ³n y sugerencias bÃ¡sicas
+  // Auto-asignación y sugerencias básicas
   const autoAssignGuests = async () => {
     try {
       const pending = guests.filter((g) => !g.tableId && !g.table);
@@ -487,7 +487,7 @@ export const useSeatingPlan = () => {
     }
   };
 
-  // Conflictos: perÃ­metro, obstÃ¡culos/puertas, pasillos (espaciado) y overbooking
+  // Conflictos: perímetro, obstáculos/puertas, pasillos (espaciado) y overbooking
   const conflicts = useMemo(() => {
     if (!validationsEnabled) return [];
     try {
@@ -564,17 +564,17 @@ export const useSeatingPlan = () => {
         const box = getTableBox(t);
         const padded = expandBox(box, aisle / 2);
         const tid = String(t.id);
-        // 1) PerÃ­metro
+        // 1) Perímetro
         if (boundary && !boxInsidePoly(box, boundary)) {
-          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del perÃ­metro' });
-          return; // prioriza perÃ­metro
+          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del perímetro' });
+          return; // prioriza perímetro
         }
-        // 2) ObstÃ¡culos/puertas
+        // 2) Obstáculos/puertas
         if (obstacles.some((o) => rectsOverlap(padded, o))) {
-          out.push({ type: 'obstacle', tableId: t.id, message: 'ColisiÃ³n con obstÃ¡culo/puerta' });
+          out.push({ type: 'obstacle', tableId: t.id, message: 'Colisión con obstáculo/puerta' });
           return;
         }
-        // 3) Espaciado mÃ­nimo entre mesas
+        // 3) Espaciado mínimo entre mesas
         const others = (tablesBanquet || []).filter((x) => String(x?.id) !== tid);
         const otherExpanded = others.map(getTableBox).map((b) => expandBox(b, aisle / 2));
         if (otherExpanded.some((o) => rectsOverlap(padded, o))) {
@@ -698,7 +698,7 @@ export const useSeatingPlan = () => {
     } catch (e) { console.warn('SVG export failed', e); }
   };
 
-  // Guardado de configuraciÃ³n
+  // Guardado de configuración
   const saveHallDimensions = async (width, height, aisleMin) => {
     const nextHall = { width, height };
     if (Number.isFinite(aisleMin)) nextHall.aisleMin = aisleMin;
@@ -709,7 +709,7 @@ export const useSeatingPlan = () => {
         const toSave = { width, height };
         if (Number.isFinite(aisleMin)) toSave.aisleMin = aisleMin;
         await setDoc(cfgRef, toSave, { merge: true });
-      } catch (err) { console.error('Error guardando dimensiones del salÃ³n:', err); }
+      } catch (err) { console.error('Error guardando dimensiones del salón:', err); }
     }
   };
   const saveGlobalMaxGuests = async (n) => {
@@ -882,7 +882,7 @@ export const useSeatingPlan = () => {
     setPreview,
     setGuests,
 
-    // Funciones de gestiÃ³n
+    // Funciones de gestión
     handleSelectTable,
     handleTableDimensionChange,
     toggleSelectedTableShape,
@@ -902,7 +902,7 @@ export const useSeatingPlan = () => {
     canUndo: historyPointer > 0,
     canRedo: historyPointer < history.length - 1,
 
-    // GeneraciÃ³n
+    // Generación
     generateSeatGrid,
     generateBanquetLayout,
     applyBanquetTables,
@@ -914,7 +914,7 @@ export const useSeatingPlan = () => {
     exportPDF,
     exportSVG,
 
-    // ConfiguraciÃ³n
+    // Configuración
     saveHallDimensions,
     saveGlobalMaxGuests,
     saveBackground,
@@ -931,7 +931,7 @@ export const useSeatingPlan = () => {
     globalMaxSeats,
     background,
 
-    // Invitados / auto-asignaciÃ³n / sugerencias
+    // Invitados / auto-asignación / sugerencias
     moveGuest,
     moveGuestToSeat,
     assignGuestToCeremonySeat,

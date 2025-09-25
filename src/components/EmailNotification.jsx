@@ -20,7 +20,7 @@ export default function EmailNotification() {
       try {
         // Inicializar servicio de email una sola vez cuando tengamos perfil
         if (!serviceInitialized) {
-          const profile = await loadData('lovendaProfile', {});
+          const profile = await loadData('mywed360Profile', {});
           if (profile && Object.keys(profile).length) {
             initEmailService(profile);
             setServiceInitialized(true);
@@ -148,3 +148,5 @@ export default function EmailNotification() {
     </div>
   );
 }
+
+

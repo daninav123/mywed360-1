@@ -11,14 +11,14 @@ import EmailComposer from '../EmailComposer';
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
- * VersiÃ³n completa con todas las correcciones aplicadas para evitar errores de Promise
+ * Versión completa con todas las correcciones aplicadas para evitar errores de Promise
  */
 const InboxContainer = () => {
   const authContext = useAuth();
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
 
-  // Establecer el contexto de autenticaciÃ³n en EmailService
+  // Establecer el contexto de autenticación en EmailService
   useEffect(() => {
     setAuthContext(authContext);
   }, [authContext]);
@@ -42,14 +42,14 @@ const InboxContainer = () => {
         setEmails(res);
         setError(null);
       } else if (res && typeof res === 'object') {
-        // El servicio devolviÃ³ un objeto con error o estructura inesperada
-        console.warn('EmailService devolviÃ³ estructura no esperada:', res);
+        // El servicio devolvió un objeto con error o estructura inesperada
+        console.warn('EmailService devolvió estructura no esperada:', res);
         setEmails([]);
         setError(res.error || 'No se pudieron cargar los emails');
       } else {
         // Valor totalmente inesperado
         setEmails([]);
-        setError('Respuesta de EmailService no vÃ¡lida');
+        setError('Respuesta de EmailService no válida');
       }
     } catch (err) {
       console.error('Error cargando emails:', err);
@@ -95,7 +95,7 @@ const InboxContainer = () => {
     };
   }, [user, folder, refreshEmails, refreshCounts]);
 
-  // Marcar email como leÃ­do
+  // Marcar email como leído
   const markAsRead = useCallback(async (emailId) => {
     try {
       await EmailService.markAsRead(emailId);
@@ -142,7 +142,7 @@ const InboxContainer = () => {
     ? safeEmails.find((email) => email.id === selectedEmailId)
     : null;
 
-  // Filtrar emails segÃºn bÃºsqueda y estado
+  // Filtrar emails según búsqueda y estado
   const filteredEmails = safeEmails.filter((email) => {
     const matchesSearch =
       !searchTerm ||
@@ -164,7 +164,7 @@ const InboxContainer = () => {
       setSelectedEmailId(emailId);
       setViewMode('detail');
 
-      // Marcar como leÃ­do si no lo estÃ¡
+      // Marcar como leído si no lo está
       const email = emails.find((e) => e.id === emailId);
       if (email && !email.read) {
         markAsRead(emailId);
@@ -203,7 +203,7 @@ const InboxContainer = () => {
           setShowComposer(false);
           await refreshEmails(); // Refrescar lista tras envío\n          try { await refreshCounts(); } catch {}
 
-          // Track operation si estÃ¡ disponible
+          // Track operation si está disponible
           if (trackOperation) {
             trackOperation('email_sent', { success: true });
           }
@@ -270,7 +270,7 @@ const InboxContainer = () => {
             </div>
           </div>
 
-          {/* Barra de bÃºsqueda y filtros */}
+          {/* Barra de búsqueda y filtros */}
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <input
@@ -287,8 +287,8 @@ const InboxContainer = () => {
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Todos</option>
-              <option value="unread">No leÃ­dos</option>
-              <option value="read">LeÃ­dos</option>
+              <option value="unread">No leídos</option>
+              <option value="read">Leídos</option>
             </select>
           </div>
 

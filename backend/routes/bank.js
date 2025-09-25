@@ -75,7 +75,7 @@ router.post('/requisition', async (req, res) => {
     const payload = {
       redirect,
       institution_id,
-      reference: reference || `lovenda_${Date.now()}`,
+      reference: reference || `mywed360_${Date.now()}`,
       agree: true,
       user_language: 'ES',
     };

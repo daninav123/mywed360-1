@@ -33,9 +33,9 @@ vi.mock('../../services/EmailService', async (importOriginal) => {
   return {
     ...actual,
     // Variables de entorno simuladas
-    BASE: 'https://api.test.lovenda.com',
+    BASE: 'https://api.test.mywed360.com',
     MAILGUN_API_KEY: 'key-test123456789',
-    MAILGUN_DOMAIN: 'test.lovenda.com',
+    MAILGUN_DOMAIN: 'test.mywed360.com',
     USE_MAILGUN: true,
     USE_BACKEND: false,
     MAX_ATTACHMENT_SIZE_MB: 10, // 10MB límite para pruebas
@@ -54,7 +54,7 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
   const mockEmail = {
     id: 'email123',
     from: 'remitente@example.com',
-    to: 'usuario@test.lovenda.com',
+    to: 'usuario@test.mywed360.com',
     subject: 'Asunto de prueba',
     body: '<p>Contenido de prueba</p>',
     date: '2025-07-10T10:00:00Z',
@@ -454,3 +454,6 @@ describe('EmailService - Casos Límite y Manejo de Errores', () => {
     });
   });
 });
+
+
+

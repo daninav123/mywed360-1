@@ -4,7 +4,7 @@ import { getBackendBase } from '@/utils/backendBase.js';
 
 import { translateText } from './translationService.js';
 
-// Evita spam de peticiones al backend si estÃ¡ caÃ­do/no iniciado (reservado para uso futuro)
+// Evita spam de peticiones al backend si está caído/no iniciado (reservado para uso futuro)
 let _BACKEND_BACKOFF_UNTIL = 0;
 const _backendAvailable = () => Date.now() > _BACKEND_BACKOFF_UNTIL;
 const _backoffBackend = (ms = 60_000) => {
@@ -35,7 +35,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
     envBase ? envBase.replace(/\/$/, '') : undefined,
     derivedBase ? derivedBase.replace(/\/$/, '') : undefined,
     'https://mywed360-backend.onrender.com',
-    '', // como Ãºltimo recurso: proxy de Vite o mismo origen
+    '', // como último recurso: proxy de Vite o mismo origen
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
   // Prioritize Render backend to avoid slow/failing local attempts first
@@ -65,7 +65,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
       });
       if (resp.status < 400 && Array.isArray(resp.data)) {
         if (resp.data.length > 0) return resp.data;
-        // Si el backend de este candidato devuelve array vacÃ­o, probar el siguiente candidato
+        // Si el backend de este candidato devuelve array vacío, probar el siguiente candidato
         continue;
       }
       // Estado no exitoso: marcar como error para posible backoff
@@ -74,7 +74,7 @@ async function fetchFromBackend({ page, pageSize, language }) {
       sawError = true;
     }
   }
-  // Si hubo errores en candidatos, devolver null para diferenciar de "vacÃ­o"
+  // Si hubo errores en candidatos, devolver null para diferenciar de "vacío"
   return sawError ? null : [];
 }
 
@@ -389,7 +389,7 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
     }
     return [];
   }
-  // Si el backend respondiÃ³ OK pero sin datos, intentar NewsAPI si hay clave
+  // Si el backend respondió OK pero sin datos, intentar NewsAPI si hay clave
   if (!Array.isArray(rssData) || !rssData.length) {
     if (API_KEY) {
       try {

@@ -44,12 +44,19 @@ router.post('/checkout', validate(checkoutSchema), async (req, res) => {
       return res.status(503).json({ error: 'stripe-not-installed' });
     }
     const stripe = new Stripe(STRIPE_KEY);
+    // Añadir providerId/amount a la URL de retorno para poder marcar estado en el frontend
+    const base = (process.env.FRONTEND_BASE_URL || 'http://localhost:5173');
+    const providerId = (metadata && (metadata.providerId || metadata.provider_id)) || '';
+    const amountParam = String(amount || '');
+    const successPath = `/proveedores?payment=success${providerId ? `&providerId=${encodeURIComponent(String(providerId))}` : ''}${amountParam ? `&amount=${encodeURIComponent(amountParam)}` : ''}`;
+    const cancelPath = `/proveedores?payment=cancel${providerId ? `&providerId=${encodeURIComponent(String(providerId))}` : ''}${amountParam ? `&amount=${encodeURIComponent(amountParam)}` : ''}`;
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [{ price_data: { currency: currency.toLowerCase(), product_data: { name: description }, unit_amount: cents }, quantity: 1 }],
-      success_url: (process.env.FRONTEND_BASE_URL || 'http://localhost:5173') + '/proveedores?payment=success',
-      cancel_url: (process.env.FRONTEND_BASE_URL || 'http://localhost:5173') + '/proveedores?payment=cancel',
+      success_url: base + successPath,
+      cancel_url: base + cancelPath,
       metadata: { ...metadata, weddingId: weddingId || metadata.weddingId || '' },
     });
     return res.json({ url: session.url });

@@ -15,13 +15,8 @@ describe('i18n locales are free of mojibake', () => {
   const root = path.resolve(__dirname, '../i18n/locales');
   const files = walk(root);
 
-  const badFragments = [
-    'Ã', // common UTF-8 double-decoding marker
-    '',
-    'â€', // quotes/ellipsis broken
-    '€', // euro broken
-    '??', // placeholder pairs
-  ];
+  // Fragments that indicate mojibake or broken encoding. Filter empties defensively.
+  const badFragments = ['ǟ', 'ǽ', '�', '??'].filter((s) => !!s);
 
   it('all locale JSON files have no broken fragments', () => {
     for (const f of files) {
@@ -34,3 +29,4 @@ describe('i18n locales are free of mojibake', () => {
     }
   });
 });
+

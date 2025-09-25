@@ -131,7 +131,7 @@ router.post('/seed/seating', async (req, res) => {
 
 router.post('/seed/emails', async (req, res) => {
   try {
-    const to = String(req.body?.to || 'usuario.test@lovenda.com');
+    const to = String(req.body?.to || 'usuario.test@mywed360.com');
     const from = String(req.body?.from || 'proveedor@example.com');
     const now = new Date().toISOString();
     const sent = await db.collection('mails').add({ id: '', from, to, subject: 'Presupuesto catering', body: 'Adjunto presupuesto de catering para 120 personas.', date: now, folder: 'inbox', read: false });

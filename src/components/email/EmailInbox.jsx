@@ -35,7 +35,7 @@ const defaultMailsTest = [
     id: 'email-1',
     subject: 'Asunto importante',
     from: 'remitente@ejemplo.com',
-    to: 'usuario@lovenda.app',
+    to: 'usuario@mywed360.com',
     date: '2025-07-10T10:30:00Z',
     read: false,
     folder: 'inbox',
@@ -45,7 +45,7 @@ const defaultMailsTest = [
     id: 'email-2',
     subject: 'Recordatorio reunión',
     from: 'team@empresa.com',
-    to: 'usuario@lovenda.app',
+    to: 'usuario@mywed360.com',
     date: '2025-07-09T08:15:00Z',
     read: true,
     folder: 'inbox',
@@ -54,7 +54,7 @@ const defaultMailsTest = [
   {
     id: 'email-3',
     subject: 'Borrador enviado',
-    from: 'usuario@lovenda.app',
+    from: 'usuario@mywed360.com',
     to: 'destinatario@empresa.com',
     date: '2025-07-08T14:45:00Z',
     read: true,
@@ -535,3 +535,4 @@ export default function EmailInbox() {
     </div>
   );
 }
+

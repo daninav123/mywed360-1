@@ -176,7 +176,7 @@ export default function MailViewer({
                   try {
                     await updateMailTags(mail.id, { add: [tid] });
                   } catch {}
-                  window.dispatchEvent(new Event('lovenda-email-tags'));
+                  window.dispatchEvent(new Event('mywed360-email-tags'));
                 } catch (_) {}
                 e.target.value = '';
               }}
@@ -229,7 +229,7 @@ export default function MailViewer({
                     onClick={() => {
                       try {
                         removeTagFromEmail(userId || '', mail.id, t.id);
-                        window.dispatchEvent(new Event('lovenda-email-tags'));
+                        window.dispatchEvent(new Event('mywed360-email-tags'));
                       } catch (_) {}
                     }}
                   >
@@ -286,3 +286,4 @@ export default function MailViewer({
     </div>
   );
 }
+

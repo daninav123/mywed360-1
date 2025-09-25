@@ -17,7 +17,7 @@ export default function useRoles(weddingId) {
   // --------- API simulada (reemplazar por backend real) ---------
   const fetchRoles = async () => {
     // Simulación: devolvemos lista vacía o almacenada en localStorage
-    const key = `lovenda_roles_${weddingId}`;
+    const key = `mywed360_roles_${weddingId}`;
     try {
       const stored = JSON.parse(localStorage.getItem(key));
       return Array.isArray(stored) ? stored : [];
@@ -27,7 +27,7 @@ export default function useRoles(weddingId) {
   };
 
   const addRole = async (userId, role) => {
-    const key = `lovenda_roles_${weddingId}`;
+    const key = `mywed360_roles_${weddingId}`;
     const current = await fetchRoles();
     const updated = [...current.filter((r) => r.userId !== userId), { userId, role }];
     localStorage.setItem(key, JSON.stringify(updated));
@@ -35,7 +35,7 @@ export default function useRoles(weddingId) {
   };
 
   const deleteRole = async (userId) => {
-    const key = `lovenda_roles_${weddingId}`;
+    const key = `mywed360_roles_${weddingId}`;
     const current = await fetchRoles();
     const updated = current.filter((r) => r.userId !== userId);
     localStorage.setItem(key, JSON.stringify(updated));
@@ -83,3 +83,4 @@ export default function useRoles(weddingId) {
 
   return { roles, loading, assignRole, removeRole };
 }
+

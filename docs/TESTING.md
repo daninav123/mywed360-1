@@ -47,16 +47,16 @@ Para testear el webhook sin firma de Stripe en entornos de prueba/CI, se habilit
 Ejemplo de evento (checkout.session.completed):
 ```
 {
-  "type": "checkout.session.completed",
-  "data": {
-    "object": {
-      "id": "cs_test_123",
-      "currency": "eur",
-      "amount_total": 1000,
-      "metadata": {
-        "contractId": "c1",
-        "providerId": "p1",
-        "weddingId": "w1"
+   – type – :  – checkout.session.completed – ,
+   – data – : {
+     – object – : {
+       – id – :  – cs_test_123 – ,
+       – currency – :  – eur – ,
+       – amount_total – : 1000,
+       – metadata – : {
+         – contractId – :  – c1 – ,
+         – providerId – :  – p1 – ,
+         – weddingId – :  – w1 – 
       }
     }
   }
@@ -66,10 +66,10 @@ Ejemplo de evento (checkout.session.completed):
 Curl de ejemplo:
 ```
 curl -X POST \
-  -H "Content-Type: application/json" \
+  -H  – Content-Type: application/json –  \
   -d '{
-        "type":"checkout.session.completed",
-        "data": {"object": {"id": "cs_test_123", "currency":"eur", "amount_total":1000, "metadata": {"contractId":"c1"}}}
+         – type – : – checkout.session.completed – ,
+         – data – : { – object – : { – id – :  – cs_test_123 – ,  – currency – : – eur – ,  – amount_total – :1000,  – metadata – : { – contractId – : – c1 – }}}
       }' \
   http://localhost:3001/api/payments/webhook
 ```

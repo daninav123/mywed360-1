@@ -18,7 +18,7 @@ describe('ComposeEmailModal', () => {
   const defaultProps = {
     isOpen: true,
     onClose: vi.fn(),
-    userEmail: 'usuario@lovenda.com',
+    userEmail: 'usuario@mywed360.com',
   };
 
   beforeEach(() => {
@@ -179,3 +179,6 @@ describe('ComposeEmailModal', () => {
     expect(sendMail).not.toHaveBeenCalled();
   });
 });
+
+
+

@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 export default function Login() {
   // Cargar email guardado si existe
   const savedEmail =
-    typeof window !== 'undefined' ? localStorage.getItem('lovenda_login_email') || '' : '';
+    typeof window !== 'undefined' ? localStorage.getItem('mywed360_login_email') || '' : '';
   const [username, setUsername] = useState(savedEmail);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -46,9 +46,9 @@ export default function Login() {
       }
       // Guarda o elimina el email según la preferencia
       if (remember) {
-        localStorage.setItem('lovenda_login_email', username);
+        localStorage.setItem('mywed360_login_email', username);
       } else {
-        localStorage.removeItem('lovenda_login_email');
+        localStorage.removeItem('mywed360_login_email');
       }
     } catch (err) {
       setError('Usuario o contraseña inválidos');
@@ -84,7 +84,7 @@ export default function Login() {
             onChange={(e) => {
               setRemember(e.target.checked);
               if (!e.target.checked) {
-                localStorage.removeItem('lovenda_login_email');
+                localStorage.removeItem('mywed360_login_email');
               }
             }}
             className="mr-2"
@@ -110,3 +110,4 @@ export default function Login() {
     </div>
   );
 }
+

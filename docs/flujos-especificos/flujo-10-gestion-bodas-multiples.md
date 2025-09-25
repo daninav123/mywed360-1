@@ -8,7 +8,7 @@
 - [ ] **Interfaz de selección de bodas**
   - Componente: `WeddingSelector.jsx`
   - Dashboard con lista de bodas activas
-  - Botón "Nueva Boda" prominente
+  - Botón  – Nueva Boda –  prominente
   - Vista previa de cada boda (fecha, estado, progreso)
 
 - [ ] **Proceso de creación**
@@ -133,7 +133,7 @@
 ### Creación de Nuevas Bodas
 **Pasos detallados:**
 - [ ] **Proceso simplificado**
-  - Botón "Nueva Boda" en dashboard de wedding planner
+  - Botón  – Nueva Boda –  en dashboard de wedding planner
   - Formulario básico con datos del cliente
   - Asignación automática del wedding planner como gestor
   - Configuración inicial con plantillas base
@@ -194,85 +194,85 @@
 ```javascript
 // /users/{userId}/profile
 {
-  id: "user_123",
-  email: "ana@email.com",
-  role: "wedding_planner", // owner, wedding_planner, assistant
+  id:  – user_123 – ,
+  email:  – ana@email.com – ,
+  role:  – wedding_planner – , // owner, wedding_planner, assistant
   
   preferences: {
-    defaultWeddingTemplate: "classic",
+    defaultWeddingTemplate:  – classic – ,
     notifications: {
       email: true,
       push: true,
       sms: false
     },
-    language: "es",
-    timezone: "Europe/Madrid"
+    language:  – es – ,
+    timezone:  – Europe/Madrid – 
   },
   
   // Solo para wedding planners
-  activeWeddings: ["wedding_001", "wedding_002"],
-  archivedWeddings: ["wedding_archive_001"],
-  lastActiveWedding: "wedding_001",
+  activeWeddings: [ – wedding_001 – ,  – wedding_002 – ],
+  archivedWeddings: [ – wedding_archive_001 – ],
+  lastActiveWedding:  – wedding_001 – ,
   
   // Solo para wedding planners
   trustedProviders: [
     {
-      id: "provider_001",
-      name: "Catering Deluxe",
-      category: "catering",
+      id:  – provider_001 – ,
+      name:  – Catering Deluxe – ,
+      category:  – catering – ,
       rating: 5,
-      notes: "Excelente servicio, muy profesionales",
-      lastUsed: "2024-01-15"
+      notes:  – Excelente servicio, muy profesionales – ,
+      lastUsed:  – 2024-01-15 – 
     }
   ]
 }
 
 // /users/{userId}/weddingAccess
 {
-  "wedding_001": {
-    role: "owner",
-    permissions: ["all"],
-    addedAt: "2024-01-01T00:00:00Z",
-    addedBy: "self"
+   – wedding_001 – : {
+    role:  – owner – ,
+    permissions: [ – all – ],
+    addedAt:  – 2024-01-01T00:00:00Z – ,
+    addedBy:  – self – 
   },
-  "wedding_002": {
-    role: "wedding_planner",
-    permissions: ["all_except_delete"],
-    addedAt: "2024-01-15T10:00:00Z",
-    addedBy: "user_456"
+   – wedding_002 – : {
+    role:  – wedding_planner – ,
+    permissions: [ – all_except_delete – ],
+    addedAt:  – 2024-01-15T10:00:00Z – ,
+    addedBy:  – user_456 – 
   },
-  "wedding_003": {
-    role: "assistant",
-    permissions: ["all_except_delete"],
-    addedAt: "2024-02-01T12:00:00Z",
-    addedBy: "user_789",
-    restrictedTo: "wedding_003"
+   – wedding_003 – : {
+    role:  – assistant – ,
+    permissions: [ – all_except_delete – ],
+    addedAt:  – 2024-02-01T12:00:00Z – ,
+    addedBy:  – user_789 – ,
+    restrictedTo:  – wedding_003 – 
   }
 }
 
 // /weddings/{weddingId}/collaborators
 {
-  "user_123": {
-    role: "owner",
-    permissions: ["all"],
-    status: "active",
+   – user_123 – : {
+    role:  – owner – ,
+    permissions: [ – all – ],
+    status:  – active – ,
     invitedAt: null,
-    acceptedAt: "2024-01-01T00:00:00Z"
+    acceptedAt:  – 2024-01-01T00:00:00Z – 
   },
-  "user_456": {
-    role: "wedding_planner",
-    permissions: ["all_except_delete"],
-    status: "active", 
-    invitedAt: "2024-01-10T09:00:00Z",
-    acceptedAt: "2024-01-10T14:30:00Z"
+   – user_456 – : {
+    role:  – wedding_planner – ,
+    permissions: [ – all_except_delete – ],
+    status:  – active – , 
+    invitedAt:  – 2024-01-10T09:00:00Z – ,
+    acceptedAt:  – 2024-01-10T14:30:00Z – 
   },
-  "user_789": {
-    role: "assistant",
-    permissions: ["all_except_delete"],
-    status: "active",
-    invitedAt: "2024-01-20T16:00:00Z",
-    acceptedAt: "2024-01-22T10:00:00Z",
-    assignedBy: "user_456"
+   – user_789 – : {
+    role:  – assistant – ,
+    permissions: [ – all_except_delete – ],
+    status:  – active – ,
+    invitedAt:  – 2024-01-20T16:00:00Z – ,
+    acceptedAt:  – 2024-01-22T10:00:00Z – ,
+    assignedBy:  – user_456 – 
   }
 }
 ```

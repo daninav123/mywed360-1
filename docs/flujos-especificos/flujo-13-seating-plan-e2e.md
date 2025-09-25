@@ -56,7 +56,7 @@ Selectores y UI usados:
 ### 2) seating_ceremony.cy.js (Ceremonia)
 Valida que:
 - Se puede abrir “Configurar Ceremonia” y generar sillas.
-- Aparecen elementos de silla (`div[aria-label^="Silla"]`).
+- Aparecen elementos de silla (`div[aria-label^= – Silla – ]`).
 - Al hacer click en una silla, cambia el estilo (borde dashed), validando el toggle de habilitado.
 
 ## Estado de Implementación

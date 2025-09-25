@@ -7,7 +7,7 @@ import LanguageSelector from './ui/LanguageSelector';
 import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 
-// Devuelve los Ò�� �"Ò�a�­tems de navegaciÒ�� �"Ò�a�³n segÒ�� �"Ò�a�ºn rol
+// Devuelve los Ò€)€) €)"Ò€)a€)­tems de navegaciÒ€)€) €)"Ò€)a€)³n segÒ€)€) €)"Ò€)a€)ºn rol
 function getNavItems(role, t) {
   const roleMap = {
     pareja: 'owner',
@@ -113,7 +113,7 @@ function getNavItems(role, t) {
     ];
   }
   if (normalizedRole === 'planner') {
-    // Planner no ve finanzas, pero puede tener otras secciones especÒ�� �"Ò�a�­ficas
+    // Planner no ve finanzas, pero puede tener otras secciones especÒ€)€) €)"Ò€)a€)­ficas
     return [
       { path: '/home', label: 'Inicio' },
       { path: '/tasks', label: 'Tareas' },
@@ -122,7 +122,7 @@ function getNavItems(role, t) {
     ];
   }
   if (normalizedRole === 'assistant') {
-    // Asistente: solo tareas y protocolo (mÒ�� �"Ò�a�¡s se mantiene)
+    // Asistente: solo tareas y protocolo (mÒ€)€) €)"Ò€)a€)¡s se mantiene)
     return [
       { path: '/tasks', label: 'Tareas' },
       { path: '/protocolo', label: t('navigation.protocol') },
@@ -142,7 +142,7 @@ function Nav() {
   // Hook de traducciones
   const { t } = useTranslations();
 
-  // Usar el nuevo sistema para el rol, con fallback bÒ�� �"Ò�a�¡sico
+  // Usar el nuevo sistema para el rol, con fallback bÒ€)€) €)"Ò€)a€)¡sico
   const role = userProfile?.role || 'owner';
   const navItems = React.useMemo(() => getNavItems(role, t), [role, t]);
 
@@ -160,7 +160,7 @@ function Nav() {
 
   return (
     <nav className="fixed bottom-0 w-full bg-[var(--color-primary)] text-[color:var(--color-text)] shadow-md flex justify-between items-center p-3 z-30">
-      {/* NavegaciÒ�� �"Ò�a�³n principal */}
+      {/* NavegaciÒ€)€) €)"Ò€)a€)³n principal */}
       <div className="flex justify-around flex-1">
         {navItems.map(({ path, label }, idx) => {
           const isActive = location.pathname.startsWith(path);

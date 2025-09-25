@@ -93,7 +93,7 @@ function classifyMailClientSide(m) {
 export function setAuthContext(ctx) {
   try {
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('lovenda.email.auth', JSON.stringify({ t: Date.now(), ctx: !!ctx }));
+      localStorage.setItem('mywed360.email.auth', JSON.stringify({ t: Date.now(), ctx: !!ctx }));
     }
   } catch {}
 }
@@ -101,7 +101,7 @@ export function setAuthContext(ctx) {
 export async function initEmailService(opts = {}) {
   try {
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('lovenda.email.init', JSON.stringify({ t: Date.now(), ...opts }));
+      localStorage.setItem('mywed360.email.init', JSON.stringify({ t: Date.now(), ...opts }));
     }
   } catch {}
   return opts?.myWed360Email || opts?.email || '';
@@ -110,7 +110,7 @@ export async function initEmailService(opts = {}) {
 function resolveCurrentEmail() {
   try {
     if (typeof localStorage === 'undefined') return '';
-    const raw = localStorage.getItem('lovenda.email.init');
+    const raw = localStorage.getItem('mywed360.email.init');
     if (!raw) return '';
     const parsed = JSON.parse(raw);
     return parsed?.myWed360Email || parsed?.email || '';
@@ -546,3 +546,4 @@ export function logAIEmailActivity(aiResultId, searchQuery) {
 }
 
 export default api;
+

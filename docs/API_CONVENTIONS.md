@@ -3,15 +3,15 @@
 ## Formato de respuesta
 - Éxito
 ```
-{ "success": true, "data": { /* payload */ } }
+{  – success – : true,  – data – : { /* payload */ } }
 ```
 - Error
 ```
-{ "success": false, "error": { "code": "<slug>", "message": "<humano>" }, "requestId": "<uuid>" }
+{  – success – : false,  – error – : {  – code – :  – <slug> – ,  – message – :  – <humano> –  },  – requestId – :  – <uuid> –  }
 ```
 - Paginación (cuando aplique)
 ```
-{ "success": true, "data": { "items": [/*...*/], "nextCursor": "abc" } }
+{  – success – : true,  – data – : {  – items – : [/*...*/],  – nextCursor – :  – abc –  } }
 ```
 
 ## Errores y códigos

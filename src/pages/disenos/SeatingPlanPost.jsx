@@ -48,7 +48,7 @@ export default function SeatingPlanPost() {
   const getSeatingInfo = () => {
     try {
       const guests = dbGuests;
-      const tables = loadData('lovendaTables', { defaultValue: [], collection: 'userTables' });
+      const tables = loadData('mywed360Tables', { defaultValue: [], collection: 'userTables' });
 
       // Si no hay datos suficientes, devolver cadena vacía
       if (!Array.isArray(guests) || guests.length === 0 || !tables.length) return '';
@@ -109,3 +109,4 @@ export default function SeatingPlanPost() {
     </div>
   );
 }
+

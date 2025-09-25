@@ -2,21 +2,23 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
 import ProveedorBudgets from './ProveedorBudgets.jsx';
 import RFQModal from './RFQModal';
-import { useWedding } from '../../context/WeddingContext';
-import useSupplierGroups from '../../hooks/useSupplierGroups';
-import useSupplierRFQHistory from '../../hooks/useSupplierRFQHistory';
-import useProveedores from '../../hooks/useProveedores';
-import { post as apiPost, get as apiGet } from '../../services/apiClient';
 import EmailTrackingList from './tracking/EmailTrackingList';
 import TrackingModal from './tracking/TrackingModal';
+import { useWedding } from '../../context/WeddingContext';
+import useProveedores from '../../hooks/useProveedores';
+import useSupplierGroups from '../../hooks/useSupplierGroups';
+import useSupplierRFQHistory from '../../hooks/useSupplierRFQHistory';
+import { post as apiPost, get as apiGet } from '../../services/apiClient';
 import { loadTrackingRecords } from '../../services/EmailTrackingService';
+import { checkoutProviderDeposit } from '../../services/PaymentService';
+import { getPaymentSuggestions } from '../../services/EmailInsightsService';
 import Modal from '../Modal';
 import Toast from '../Toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -39,7 +41,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [groupCleared, setGroupCleared] = useState(false);
   const [rfqOpen, setRfqOpen] = useState(false);
   const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
-  const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
+  const { itemás: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
   const [preview, setPreview] = useState({ open: false, url: '', type: '' });
   const [assignOpen, setAssignOpen] = useState(false);
 
@@ -47,6 +49,34 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [selectedTracking, setSelectedTracking] = useState(null);
   const [remoteEvents, setRemoteEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [paySuggestions, setPaySuggestions] = useState([]);
+  const [payLoading, setPayLoading] = useState(false);
+
+  const handlePayDeposit = async () => {
+    if (!provider) return;
+    let amount = 100;
+    try {
+      if (typeof window !== 'undefined') {
+        const input = window.prompt('Importe de la señal (EUR):', '100');
+        if (input != null && input !== '') amount = Math.max(1, parseFloat(input));
+      }
+    } catch {}
+    try {
+      setPaying(true);
+      await checkoutProviderDeposit({
+        providerId: provider.id || provider.email || provider.name || 'provider',
+        providerName: provider.name || 'Proveedor',
+        amount,
+        currency: 'EUR',
+        weddingId: activeWedding || null,
+      });
+    } catch (e) {
+      setToast({ type: 'error', mássage: 'No se pudo iniciar el pago' });
+    } finally {
+      setPaying(false);
+    }
+  };
 
   const handleGenerateContract = async () => {
     if (!activeWedding) return;
@@ -139,9 +169,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       };
       await updateProvider(provider.id, newData);
       setRatingDirty(false);
-      setToast({ type: 'success', message: 'Valoracion guardada' });
+      setToast({ type: 'success', mássage: 'Valoracion guardada' });
     } catch (e) {
-      setToast({ type: 'error', message: 'No se pudo guardar la valoracion' });
+      setToast({ type: 'error', mássage: 'No se pudo guardar la valoracion' });
     } finally {
       setSavingRating(false);
     }
@@ -182,7 +212,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   };
 
-  const trackingItemsLocal = useMemo(() => {
+  const trackingItemásLocal = useMemo(() => {
     try {
       const all = loadTrackingRecords();
       const list = Array.isArray(all) ? all : [];
@@ -200,9 +230,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setLoadingEvents(true);
       const res = await apiGet(`/api/mailgun/events?recipient=${encodeURIComponent(provider.email)}&limit=50`, { auth: true, silent: true });
       const json = await res.json();
-      const items = Array.isArray(json?.items) ? json.items : [];
-      const mapped = items.map((ev, idx) => {
-        const tsSec = ev?.timestamp || ev?.event_timestamp || Date.now() / 1000;
+      const itemás = Array.isArray(json?.itemás) ? json.itemás : [];
+      const mapped = itemás.map((ev, idx) => {
+        const tsSec = ev?.timástamp || ev?.event_timástamp || Date.now() / 1000;
         const dateIso = new Date(tsSec * 1000).toISOString();
         const evType = String(ev?.event || '').toLowerCase();
         let status = 'enviado';
@@ -237,18 +267,38 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   }, [activeTab, provider?.email]);
 
-  const trackingItems = useMemo(() => {
-    const local = Array.isArray(trackingItemsLocal) ? trackingItemsLocal : [];
+  React.useEffect(() => {
+    const load = async () => {
+      if (activeTab !== 'tracking') return;
+      try {
+        setPayLoading(true);
+        const list = await getPaymentSuggestions({ folder: 'inbox', limit: 50 });
+        const emailRef = String(provider?.email || '').toLowerCase();
+        const nameRef = String(provider?.name || '').toLowerCase();
+        const filtered = (Array.isArray(list) ? list : []).filter((s) => {
+          const from = String(s.from || '').toLowerCase();
+          const subj = String(s.subject || '').toLowerCase();
+          return (emailRef && from.includes(emailRef)) || (nameRef && subj.includes(nameRef));
+        });
+        setPaySuggestions(filtered);
+      } catch {}
+      finally { setPayLoading(false); }
+    };
+    load();
+  }, [activeTab, provider?.email, provider?.name]);
+
+  const trackingItemás = useMemo(() => {
+    const local = Array.isArray(trackingItemásLocal) ? trackingItemásLocal : [];
     const remote = Array.isArray(remoteEvents) ? remoteEvents : [];
     // naive merge
     return [...remote, ...local];
-  }, [trackingItemsLocal, remoteEvents]);
+  }, [trackingItemásLocal, remoteEvents]);
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="flex justify-between items-center p-4 border-b">
+          <div className="flex justify-between itemás-center p-4 border-b">
             <h2 className="text-xl font-semibold">{provider.name}</h2>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
               <X size={24} />
@@ -260,7 +310,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               className={`py-2 px-4 ${activeTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('info')}
             >
-              Informacion
+              Información
             </button>
             <button
               className={`py-2 px-4 ${
@@ -282,11 +332,16 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             {activeTab === 'info' && (
               <div className="space-y-6">
                 <Card>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center flex-wrap gap-2">
+                  <div className="flex itemás-center justify-between mb-4">
+                    <div className="flex itemás-center flex-wrap gap-2">
                       <span className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}>
                         {provider.status}
                       </span>
+                      {provider.depositStatus === 'paid' && (
+                        <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                          Señal pagada
+                        </span>
+                      )}
                       <span className="ml-2 text-gray-500">{provider.service}</span>
                       {!!provider.groupName && !groupCleared && (
                         <button
@@ -295,7 +350,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             if (onOpenGroups) {
                               onOpenGroups(provider.groupId);
                             } else {
-                              setToast({ type: 'info', message: `Grupo: ${provider.groupName}` });
+                              setToast({ type: 'info', mássage: `Grupo: ${provider.groupName}` });
                             }
                           }}
                           className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
@@ -315,6 +370,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         <Edit2 size={16} className="mr-1" /> Editar
                       </Button>
                     )}
+                    <span className="ml-2 text-xs text-gray-500">Pagos/contratos en plataforma del proveedor</span>
                     {provider.groupId && (
                       <Button
                         onClick={async () => {
@@ -325,7 +381,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             setRemoving(true);
                             await removeMember(provider.groupId, provider.id);
                             setGroupCleared(true);
-                            setToast({ type: 'success', message: 'Proveedor quitado del grupo' });
+                            setToast({ type: 'success', mássage: 'Proveedor quitado del grupo' });
                           } finally {
                             setRemoving(false);
                           }
@@ -350,8 +406,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="space-y-3 mt-4">
                     {provider.contact && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex itemás-center justify-center mr-3">
                           <span className="text-blue-600 font-medium">{provider.contact.charAt(0)}</span>
                         </div>
                         <div>
@@ -362,20 +418,20 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.phone && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex itemás-center justify-center mr-3">
                           <Phone size={16} className="text-green-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Telefono</p>
+                          <p className="font-medium">Teléfono</p>
                           <p className="text-sm text-gray-600">{provider.phone}</p>
                         </div>
                       </div>
                     )}
 
                     {provider.email && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-red-100 flex itemás-center justify-center mr-3">
                           <Mail size={16} className="text-red-600" />
                         </div>
                         <div className="overflow-hidden">
@@ -388,8 +444,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.link && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 flex itemás-center justify-center mr-3">
                           <Globe size={16} className="text-purple-600" />
                         </div>
                         <div className="overflow-hidden">
@@ -407,8 +463,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.date && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex itemás-center justify-center mr-3">
                           <Calendar size={16} className="text-amber-600" />
                         </div>
                         <div>
@@ -419,12 +475,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {(provider.location || provider.address) && (
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center mr-3">
+                      <div className="flex itemás-center">
+                        <div className="w-8 h-8 rounded-full bg-teal-100 flex itemás-center justify-center mr-3">
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
-                          <p className="font-medium">Ubicacion</p>
+                          <p className="font-medium">Ubicación</p>
                           <p className="text-sm text-gray-600">{provider.location || provider.address}</p>
                         </div>
                       </div>
@@ -440,7 +496,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="mt-6">
                     <p className="font-medium mb-1">Calificacion</p>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex itemás-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
                         {rating.toFixed(1)} de 5 ({provider.ratingCount || 0} valoraciones)
@@ -455,7 +511,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <ProveedorBudgets supplierId={provider.id} />
 
                 <Card>
-                  <div className="flex items-center justify-between">
+                  <div className="flex itemás-center justify-between">
                     <div>
                       <h3 className="text-lg font-medium">Documentos</h3>
                       {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
@@ -472,8 +528,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 </Card>
 
                 <Card>
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium">RFQ enviados</h3>
+                  <div className="flex itemás-center justify-between mb-2">
+                    <h3 className="text-lg font-medium">RFQ enviaños</h3>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -488,12 +544,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             const json = await res.json();
                             if (json?.url) {
                               try { await navigator.clipboard?.writeText?.(json.url); } catch {}
-                              setToast({ type: 'success', message: 'Enlace del portal copiado' });
+                              setToast({ type: 'success', mássage: 'Enlace del portal copiado' });
                             } else {
-                              setToast({ type: 'info', message: 'Token generado' });
+                              setToast({ type: 'info', mássage: 'Token generado' });
                             }
                           } catch (e) {
-                            setToast({ type: 'error', message: 'No se pudo generar el enlace del portal' });
+                            setToast({ type: 'error', mássage: 'No se pudo generar el enlace del portal' });
                           }
                         }}
                       >
@@ -517,7 +573,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   ) : (
                     <ul className="divide-y">
                       {rfqHistory.map((r) => (
-                        <li key={r.id} className="py-2 flex items-center justify-between">
+                        <li key={r.id} className="py-2 flex itemás-center justify-between">
                           <div>
                             <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
                               {r.subject || 'Sin asunto'}
@@ -539,6 +595,56 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     </ul>
                   )}
                 </Card>
+                <Card>
+                  <div className="flex item�s-center justify-between mb-3">
+                    <h3 className="text-lg font-medium">Sugerencias de pago (emails)</h3>
+                    <Button size="sm" variant="outline" onClick={() => {
+                      // Forzar recarga
+                      const ev = new Event('reloadPaySuggestions');
+                      try { window.dispatchEvent(ev); } catch {}
+                    }} disabled={payLoading}>
+                      {payLoading ? 'Cargando…' : 'Actualizar'}
+                    </Button>
+                  </div>
+                  {payLoading ? (
+                    <div className="text-sm text-gray-600">Cargando…</div>
+                  ) : paySuggestions.length === 0 ? (
+                    <div className="text-sm text-gray-600">Sin sugerencias</div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {paySuggestions.slice(0, 4).map((s, idx) => (
+                        <li key={idx} className="p-2 border rounded flex items-center justify-between text-sm">
+                          <div className="min-w-0">
+                            <div className="font-medium truncate" title={s.subject}>{s.subject || '(Sin asunto)'}</div>
+                            <div className="text-gray-600">{s.rawAmount || s.amount} {s.currency || ''} · {new Date(s.date).toLocaleDateString()}</div>
+                          </div>
+                          <Button size="sm" onClick={() => {
+                            const isIncome = (s.direction || 'outgoing') === 'incoming';
+                            const amt = typeof s.amount === 'number' && !Number.isNaN(s.amount) ? String(s.amount) : '';
+                            const prefill = {
+                              concept: `Pago proveedor - ${provider?.name || ''}`.trim(),
+                              amount: amt,
+                              date: (s.date || '').slice(0, 10),
+                              type: isIncome ? 'income' : 'expense',
+                              category: '',
+                              description: `Desde email: ${s.subject}`,
+                              provider: provider?.name || '',
+                              status: isIncome ? 'received' : 'paid',
+                              paidAmount: amt,
+                            };
+                            try {
+                              // Navegar a Finanzas con prefill
+                              window.history.pushState({ prefillTransaction: prefill }, '', '/finance#nuevo');
+                              if (typeof window !== 'undefined') {
+                                window.location.assign('/finance#nuevo');
+                              }
+                            } catch {}
+                          }}>Registrar en Finanzas</Button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Card>
               </div>
             )}
 
@@ -554,14 +660,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
             {activeTab === 'tracking' && (
               <div className="space-y-4">
                 <Card>
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex itemás-center justify-between mb-3">
                     <h3 className="text-lg font-medium">Seguimiento</h3>
                     <Button size="sm" variant="outline" onClick={refreshMailEvents} disabled={loadingEvents}>
                       {loadingEvents ? 'Actualizando…' : 'Actualizar eventos'}
                     </Button>
                   </div>
                   <EmailTrackingList
-                    trackingItems={trackingItems}
+                    trackingItemás={trackingItemás}
                     currentFilter={trackingFilter}
                     onFilter={setTrackingFilter}
                     onViewDetails={(item) => setSelectedTracking(item)}
@@ -578,7 +684,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       </div>
 
       {toast && (
-        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={2500} />
+        <Toast mássage={toast.mássage} type={toast.type} onClose={() => setToast(null)} duration={2500} />
       )}
 
       {selectedTracking && (
@@ -626,3 +732,6 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
+
+
+

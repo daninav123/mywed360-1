@@ -10,7 +10,7 @@ async function getAuthToken() {
     if (user?.getIdToken) {
       return await user.getIdToken();
     }
-    const profile = JSON.parse(localStorage.getItem('lovendaProfile') || '{}');
+    const profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
     if (profile?.email || profile?.account?.email) {
       const uid = profile?.uid || 'local';
       const email = profile?.email || profile?.account?.email;
@@ -63,3 +63,4 @@ export async function updateSignatureStatus(weddingId, signatureId, updates) {
   if (!res.ok) throw new Error('updateSignatureStatus failed');
   return res.json();
 }
+

@@ -1,10 +1,10 @@
 /* eslint-disable no-undef */
 import { post } from './apiClient';
 
-const CONFIG_KEY = 'lovenda.email.automation.config';
-const STATE_KEY = 'lovenda.email.automation.state';
-const CLASSIFICATION_CACHE_KEY = 'lovenda.email.automation.classification';
-const SCHEDULE_KEY = 'lovenda.email.automation.schedule';
+const CONFIG_KEY = 'mywed360.email.automation.config';
+const STATE_KEY = 'mywed360.email.automation.state';
+const CLASSIFICATION_CACHE_KEY = 'mywed360.email.automation.classification';
+const SCHEDULE_KEY = 'mywed360.email.automation.schedule';
 const CLASSIFICATION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 const REPLY_INTERVAL_DEFAULT = 24; // hours
 
@@ -358,7 +358,7 @@ function mapTagToCategory(tags = [], folder = null) {
 
 function getCurrentLovendaEmail() {
   try {
-    const raw = storageGet('lovenda.email.init');
+    const raw = storageGet('mywed360.email.init');
     if (!raw) return '';
     const parsed = JSON.parse(raw);
     return parsed?.myWed360Email || parsed?.email || '';
@@ -547,3 +547,5 @@ export async function processScheduledEmails(sendMail) {
   const trimmedHistory = history.slice(-100);
   saveScheduleData({ queue: remaining, history: trimmedHistory });
 }
+
+

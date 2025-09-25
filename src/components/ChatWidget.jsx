@@ -1,4 +1,4 @@
-﻿import { motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -7,42 +7,41 @@ import { toast } from 'react-toastify';
 import Spinner from './Spinner';
 import { useAuth } from '../hooks/useAuth';
 import { post as apiPost } from '../services/apiClient';
-import { performanceMonitor } from '../services/PerformanceMonitor';
 import { getBackendBase } from '../utils/backendBase';
 
 // --- Modo debug opcional ---
-// ActÃ­valo desde la consola con: window.lovendaDebug = true
+// Actívalo desde la consola con: (window.mywed360Debug || window.lovendaDebug) = true
 const chatDebug = (...args) => {
-  if (typeof window !== 'undefined' && window.lovendaDebug) {
+  if (typeof window !== 'undefined' && (window.mywed360Debug || window.lovendaDebug)) {
     // eslint-disable-next-line no-console
     console.debug('[ChatWidget]', ...args);
   }
 };
 
-// --- ConfiguraciÃ³n de memoria conversacional ---
-const MAX_MESSAGES = 50; // CuÃ¡ntos mensajes â€œfrescosâ€ mantener en memoria corta
-const SHORT_HISTORY = 6; // CuÃ¡ntos mensajes recientes se envÃ­an a la IA
+// --- Configuración de memoria conversacional ---
+const MAX_MESSAGES = 50; // Cuántos mensajes â€œfrescosâ€ mantener en memoria corta
+const SHORT_HISTORY = 6; // Cuántos mensajes recientes se envían a la IA
 
-// FunciÃ³n para normalizar texto de categorÃ­a: elimina acentos y convierte a mayÃºsculas
+// Función para normalizar texto de categoría: elimina acentos y convierte a mayúsculas
 const normalizeCategory = (cat = 'OTROS') =>
   cat
     .normalize('NFD')
     .replace(/[^\w\s]|_/g, '')
     .replace(/\s+/g, '')
     .toUpperCase();
-// Intenta adivinar la categorÃ­a en base al tÃ­tulo/descripcion de la tarea
+// Intenta adivinar la categoría en base al título/descripcion de la tarea
 const guessCategory = (title = '') => {
   const t = title.toLowerCase();
-  if (/lugar|finca|sal[oÃ³]n/.test(t)) return 'LUGAR';
-  if (/foto|fot[oÃ³]graf/.test(t)) return 'FOTOGRAFO';
-  if (/m[uÃº]sica|dj|banda/.test(t)) return 'MUSICA';
+  if (/lugar|finca|sal[oó]n/.test(t)) return 'LUGAR';
+  if (/foto|fot[oó]graf/.test(t)) return 'FOTOGRAFO';
+  if (/m[uú]sica|dj|banda/.test(t)) return 'MUSICA';
   if (/vestido|traje|vestuari|zapato/.test(t)) return 'VESTUARIO';
-  if (/catering|banquete|men[uÃº]/.test(t)) return 'CATERING';
+  if (/catering|banquete|men[uú]/.test(t)) return 'CATERING';
   return 'OTROS';
 };
 
 export default function ChatWidget() {
-  const { user, getIdToken } = useAuth();
+  const { user: _user, getIdToken } = useAuth();
   const [open, setOpen] = useState(() => {
     const saved = localStorage.getItem('chatOpen');
     return saved ? JSON.parse(saved) : false;
@@ -73,7 +72,7 @@ export default function ChatWidget() {
           const notes = JSON.parse(localStorage.getItem('importantNotes') || '[]');
           notes.push({ text: copy[idx].text, date: Date.now() });
           localStorage.setItem('importantNotes', JSON.stringify(notes));
-          window.dispatchEvent(new Event('lovenda-important-note'));
+          window.dispatchEvent(new Event('mywed360-important-note'));
           toast.success('Nota marcada como importante');
         } catch {
           /* ignore */
@@ -113,7 +112,7 @@ export default function ChatWidget() {
     return rest;
   };
 
-  // Parser local muy bÃ¡sico para comandos en espaÃ±ol (fallback sin backend)
+  // Parser local muy básico para comandos en español (fallback sin backend)
   /* eslint-disable no-useless-escape */
   const parseLocalCommands = (text) => {
     try {
@@ -121,17 +120,17 @@ export default function ChatWidget() {
       const out = { commands: [], reply: '' };
       const has = (re) => re.test(t);
 
-      // Reprogramar reuniones: "reprograma/mueve/cambia la reuniÃ³n ... al 20/10 a las 11:00"
-      if (has(/(reprogram|reagend|mueve|cambia|pospon|adelant)/i) && has(/reuni[oÃ³]n|cita|llamada|meeting/i)) {
+      // Reprogramar reuniones: "reprograma/mueve/cambia la reunión ... al 20/10 a las 11:00"
+      if (has(/(reprogram|reagend|mueve|cambia|pospon|adelant)/i) && has(/reuni[oó]n|cita|llamada|meeting/i)) {
         const titleMatch =
-          t.match(/reuni[oÃ³]n\s+(?:de\s+|sobre\s+)?([^\n,.]+?)(?:\s+(?:al|para|el)\s+|\s+a\s+las|[\.,]|$)/i) ||
+          t.match(/reuni[oó]n\s+(?:de\s+|sobre\s+)?([^\n,.]+?)(?:\s+(?:al|para|el)\s+|\s+a\s+las|[\.,]|$)/i) ||
           t.match(/(?:sobre|para|con)\s+([^\n,.]+)(?:[\.,]|$)/i);
         const title = (titleMatch ? titleMatch[1] : '').trim();
 
         const now = new Date();
         let start = null;
         let end = null;
-        const rel = t.match(/\b(hoy|ma(?:n|Ã±)ana|pasado\s+ma(?:n|Ã±)ana)\b.*?(?:a\s+las\s+)?(\d{1,2})(?::|h|\.|,)?(\d{2})?/i);
+        const rel = t.match(/\b(hoy|ma(?:n|ñ)ana|pasado\s+ma(?:n|ñ)ana)\b.*?(?:a\s+las\s+)?(\d{1,2})(?::|h|\.|,)?(\d{2})?/i);
         if (rel) {
           const base = new Date();
           const kw = (rel[1] || '').toLowerCase();
@@ -159,9 +158,9 @@ export default function ChatWidget() {
           out.commands.push({
             entity: 'meeting',
             action: 'update',
-            payload: { title: title || 'ReuniÃ³n', start: start.toISOString(), end: end.toISOString() },
+            payload: { title: title || 'Reunión', start: start.toISOString(), end: end.toISOString() },
           });
-          out.reply = `ReuniÃ³n${title ? ` "${title}"` : ''} reprogramada al ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
+          out.reply = `Reunión${title ? ` "${title}"` : ''} reprogramada al ${start.toLocaleDateString('es-ES')} ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
           return out;
         }
       }
@@ -176,7 +175,7 @@ export default function ChatWidget() {
   // Utilidad para aplicar comandos de la IA
   const applyCommands = async (commands = []) => {
     if (!commands.length) return;
-    let meetings = JSON.parse(localStorage.getItem('lovendaMeetings') || '[]');
+    let meetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
     let completed = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
     let changed = false;
 
@@ -191,14 +190,14 @@ export default function ChatWidget() {
       if (entity === 'task' || entity === 'meeting') {
         switch (action) {
           case 'add': {
-            // asegurar id Ãºnico
+            // asegurar id único
             const newId = payload.id || `ai-${Date.now()}`;
             const startDate = payload.start ? new Date(payload.start) : new Date();
             const endDate = payload.end ? new Date(payload.end) : startDate;
             meetings.push({
               id: newId,
-              title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'ReuniÃ³n'),
-              name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'ReuniÃ³n'),
+              title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
+              name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
               desc: payload.desc || '',
               start: startDate.toISOString(),
               end: endDate.toISOString(),
@@ -207,12 +206,12 @@ export default function ChatWidget() {
                 payload.category || guessCategory(payload.title || payload.name || '')
               ),
             });
-            // Persistir tambiÃ©n en Firestore a travÃ©s del puente de eventos
+            // Persistir también en Firestore a través del puente de eventos
             try {
               const base = {
                 id: newId,
-                title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'ReuniÃ³n'),
-                name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'ReuniÃ³n'),
+                title: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
+                name: payload.title || payload.name || (entity === 'task' ? 'Tarea' : 'Reunión'),
                 desc: payload.desc || '',
                 start: startDate,
                 end: endDate,
@@ -222,9 +221,9 @@ export default function ChatWidget() {
                 ),
               };
               const detail = entity === 'meeting' ? { meeting: base } : { task: base };
-              window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail }));
+              window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
             } catch (_) {}
-            toast.success(entity === 'task' ? 'Tarea aÃ±adida' : 'ReuniÃ³n aÃ±adida');
+            toast.success(entity === 'task' ? 'Tarea añadida' : 'Reunión añadida');
             changed = true;
             break;
           }
@@ -252,7 +251,7 @@ export default function ChatWidget() {
                   category: meetings[idx].category,
                 };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'update' } : { task: base, action: 'update' };
-                window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -271,7 +270,7 @@ export default function ChatWidget() {
               try {
                 const base = { id: payload.id || null, title: payload.title || '' };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'delete' } : { task: base, action: 'delete' };
-                window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -288,7 +287,7 @@ export default function ChatWidget() {
               try {
                 const base = { id: meetings[idx].id, title: meetings[idx].title };
                 const detail = entity === 'meeting' ? { meeting: base, action: 'complete' } : { task: base, action: 'complete' };
-                window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail }));
+                window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail }));
               } catch (_) {}
               changed = true;
             }
@@ -299,7 +298,7 @@ export default function ChatWidget() {
         }
       } else if (entity === 'guest') {
         // ----- GUESTS LOGIC -----
-        let guests = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
+        let guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
         let changedG = false;
         const findGuestIdx = (identifier) => {
           const idxById = guests.findIndex((g) => g.id === identifier);
@@ -319,13 +318,13 @@ export default function ChatWidget() {
               response: payload.response || 'Pendiente',
             };
             guests.push(guestObj);
-            // Intentar persistir a Firestore vÃ­a puente de eventos
+            // Intentar persistir a Firestore vía puente de eventos
             try {
               window.dispatchEvent(
-                new CustomEvent('lovenda-guests', { detail: { guest: { ...guestObj } } })
+                new CustomEvent('mywed360-guests', { detail: { guest: { ...guestObj } } })
               );
             } catch (_) {}
-            toast.success('Invitado aÃ±adido');
+            toast.success('Invitado añadido');
             changedG = true;
             break;
           }
@@ -340,7 +339,7 @@ export default function ChatWidget() {
               // Bridge: update invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-guests', { detail: { guest: { ...guests[idx] }, action: 'update' } })
+                  new CustomEvent('mywed360-guests', { detail: { guest: { ...guests[idx] }, action: 'update' } })
                 );
               } catch (_) {}
               changedG = true;
@@ -358,7 +357,7 @@ export default function ChatWidget() {
               // Bridge: delete invitado
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-guests', { detail: { guest: { id: payload.id || null, name: payload.name || '' }, action: 'delete' } })
+                  new CustomEvent('mywed360-guests', { detail: { guest: { id: payload.id || null, name: payload.name || '' }, action: 'delete' } })
                 );
               } catch (_) {}
               changedG = true;
@@ -369,8 +368,8 @@ export default function ChatWidget() {
             break;
         }
         if (changedG) {
-          localStorage.setItem('lovendaGuests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('lovenda-guests'));
+          localStorage.setItem('mywed360Guests', JSON.stringify(guests));
+          window.dispatchEvent(new Event('mywed360-guests'));
         }
       } else if (
         entity === 'movement' ||
@@ -379,7 +378,7 @@ export default function ChatWidget() {
         entity === 'ingreso'
       ) {
         // ----- MOVEMENTS LOGIC -----
-        let movements = JSON.parse(localStorage.getItem('lovendaMovements') || '[]');
+        let movements = JSON.parse(localStorage.getItem('mywed360Movements') || '[]');
         let changedM = false;
         const findMovIdx = (identifier) => {
           const idxById = movements.findIndex((m) => m.id === identifier);
@@ -397,13 +396,13 @@ export default function ChatWidget() {
               type: payload.type === 'income' ? 'income' : 'expense',
             };
             movements.push(mov);
-            // Persistir vÃ­a puente de finanzas
+            // Persistir vía puente de finanzas
             try {
               window.dispatchEvent(
-                new CustomEvent('lovenda-finance', { detail: { movement: { ...mov }, action: 'add' } })
+                new CustomEvent('mywed360-finance', { detail: { movement: { ...mov }, action: 'add' } })
               );
             } catch (_) {}
-            toast.success('Movimiento aÃ±adido');
+            toast.success('Movimiento añadido');
             changedM = true;
             break;
           }
@@ -415,10 +414,10 @@ export default function ChatWidget() {
             if (idx !== -1) {
               movements[idx] = { ...movements[idx], ...payload };
               toast.success('Movimiento actualizado');
-              // Persistir vÃ­a puente de finanzas
+              // Persistir vía puente de finanzas
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-finance', {
+                  new CustomEvent('mywed360-finance', {
                     detail: { movement: { ...movements[idx] }, action: 'update' },
                   })
                 );
@@ -439,10 +438,10 @@ export default function ChatWidget() {
             );
             if (movements.length < before) {
               toast.success('Movimiento eliminado');
-              // Persistir vÃ­a puente de finanzas (delete)
+              // Persistir vía puente de finanzas (delete)
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-finance', {
+                  new CustomEvent('mywed360-finance', {
                     detail: {
                       movement: { id: payload.id || null, name: payload.concept || payload.name || '' },
                       action: 'delete',
@@ -458,8 +457,8 @@ export default function ChatWidget() {
             break;
         }
         if (changedM) {
-          localStorage.setItem('lovendaMovements', JSON.stringify(movements));
-          window.dispatchEvent(new Event('lovenda-movements'));
+          localStorage.setItem('mywed360Movements', JSON.stringify(movements));
+          window.dispatchEvent(new Event('mywed360-movements'));
         }
       } else if (entity === 'supplier') {
         // ----- SUPPLIER LOGIC -----
@@ -470,15 +469,15 @@ export default function ChatWidget() {
               const apiBase =
                 import.meta.env.VITE_BACKEND_URL ||
                 (window.location.hostname === 'localhost'
-                  ? 'http://localhost:3001'
-                  : 'https://api.lovenda.app');
+                  ? 'http://localhost:4004'
+                  : 'https://mywed360-backend.onrender.com');
               const resp = await fetch(
                 `${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`
               );
               const dataS = await resp.json();
               if (dataS.results) {
-                localStorage.setItem('lovendaSuppliers', JSON.stringify(dataS.results));
-                window.dispatchEvent(new Event('lovenda-suppliers'));
+                localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
+                window.dispatchEvent(new Event('mywed360-suppliers'));
                 toast.success(`Encontrados ${dataS.results.length} proveedores`);
               } else {
                 toast.info('No se encontraron proveedores');
@@ -501,19 +500,19 @@ export default function ChatWidget() {
             snippet: payload.snippet || payload.desc || '',
           };
           try {
-            const stored = JSON.parse(localStorage.getItem('lovendaSuppliers') || '[]');
-            localStorage.setItem('lovendaSuppliers', JSON.stringify([supplier, ...stored]));
-            window.dispatchEvent(new Event('lovenda-suppliers'));
+            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
+            localStorage.setItem('mywed360Suppliers', JSON.stringify([supplier, ...stored]));
+            window.dispatchEvent(new Event('mywed360-suppliers'));
           } catch {}
           try {
             window.dispatchEvent(
-              new CustomEvent('lovenda-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
+              new CustomEvent('mywed360-suppliers', { detail: { supplier: { ...supplier }, action: 'add' } })
             );
           } catch {}
-          toast.success('Proveedor aÃ±adido');
+          toast.success('Proveedor añadido');
         } else if (action === 'update' || action === 'edit' || action === 'editar' || action === 'modificar') {
           try {
-            const stored = JSON.parse(localStorage.getItem('lovendaSuppliers') || '[]');
+            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
             const findIdx = (idOrName) => {
               const byId = stored.findIndex((s) => s.id === idOrName);
               if (byId !== -1) return byId;
@@ -523,11 +522,11 @@ export default function ChatWidget() {
             if (idx !== -1) {
               const updated = { ...stored[idx], ...payload };
               stored[idx] = updated;
-              localStorage.setItem('lovendaSuppliers', JSON.stringify(stored));
-              window.dispatchEvent(new Event('lovenda-suppliers'));
+              localStorage.setItem('mywed360Suppliers', JSON.stringify(stored));
+              window.dispatchEvent(new Event('mywed360-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-suppliers', {
+                  new CustomEvent('mywed360-suppliers', {
                     detail: { supplier: { ...updated }, action: 'update' },
                   })
                 );
@@ -537,7 +536,7 @@ export default function ChatWidget() {
           } catch {}
         } else if (action === 'delete' || action === 'remove') {
           try {
-            const stored = JSON.parse(localStorage.getItem('lovendaSuppliers') || '[]');
+            const stored = JSON.parse(localStorage.getItem('mywed360Suppliers') || '[]');
             const before = stored.length;
             const filtered = stored.filter(
               (s) => !(
@@ -545,11 +544,11 @@ export default function ChatWidget() {
               )
             );
             if (filtered.length < before) {
-              localStorage.setItem('lovendaSuppliers', JSON.stringify(filtered));
-              window.dispatchEvent(new Event('lovenda-suppliers'));
+              localStorage.setItem('mywed360Suppliers', JSON.stringify(filtered));
+              window.dispatchEvent(new Event('mywed360-suppliers'));
               try {
                 window.dispatchEvent(
-                  new CustomEvent('lovenda-suppliers', {
+                  new CustomEvent('mywed360-suppliers', {
                     detail: { supplier: { id: payload.id || null, name: payload.name || payload.title || payload.provider || '' }, action: 'delete' },
                   })
                 );
@@ -560,7 +559,7 @@ export default function ChatWidget() {
         }
       } else if (entity === 'table') {
         // ----- TABLE MOVE LOGIC -----
-        let guests = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
+        let guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
         let changedT = false;
         const idx = guests.findIndex(
           (g) =>
@@ -576,21 +575,21 @@ export default function ChatWidget() {
           // Bridge: update mesa
           try {
             window.dispatchEvent(
-              new CustomEvent('lovenda-guests', {
+              new CustomEvent('mywed360-guests', {
                 detail: { guest: { ...guests[idx] }, action: 'update' },
               })
             );
           } catch (_) {}
         }
         if (changedT) {
-          localStorage.setItem('lovendaGuests', JSON.stringify(guests));
-          window.dispatchEvent(new Event('lovenda-guests'));
+          localStorage.setItem('mywed360Guests', JSON.stringify(guests));
+          window.dispatchEvent(new Event('mywed360-guests'));
         }
       } else if (entity === 'config') {
         // ----- CONFIG LOGIC -----
         let profile = {};
         try {
-          profile = JSON.parse(localStorage.getItem('lovendaProfile') || '{}');
+          profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
         } catch {
           profile = {};
         }
@@ -599,16 +598,16 @@ export default function ChatWidget() {
         // merge payload into weddingInfo at top level too (for generic)
         profile.weddingInfo = { ...profile.weddingInfo, ...payload };
         Object.assign(profile, payload.root || {});
-        localStorage.setItem('lovendaProfile', JSON.stringify(profile));
-        window.dispatchEvent(new Event('lovenda-profile'));
-        toast.success('ConfiguraciÃ³n actualizada');
+        localStorage.setItem('mywed360Profile', JSON.stringify(profile));
+        window.dispatchEvent(new Event('mywed360-profile'));
+        toast.success('Configuración actualizada');
       }
     });
 
     if (changed) {
-      localStorage.setItem('lovendaMeetings', JSON.stringify(meetings));
+      localStorage.setItem('mywed360Meetings', JSON.stringify(meetings));
       localStorage.setItem('tasksCompleted', JSON.stringify(completed));
-      window.dispatchEvent(new Event('lovenda-tasks'));
+      window.dispatchEvent(new Event('mywed360-tasks'));
     }
   };
 
@@ -621,7 +620,7 @@ export default function ChatWidget() {
     setLoading(true);
     let timeoutId;
     try {
-      // Parseo local rÃ¡pido (reprogramar reuniÃ³n) para mejor UX sin esperar backend
+      // Parseo local rápido (reprogramar reunión) para mejor UX sin esperar backend
       const local = parseLocalCommands(input);
       if (local && local.commands && local.commands.length) {
         await applyCommands(local.commands);
@@ -650,13 +649,13 @@ export default function ChatWidget() {
       timeoutId = setTimeout(() => {
         controller.abort();
         console.error('Timeout en la llamada a la API de IA');
-        toast.error('La IA estÃ¡ tardando demasiado. Reintentando con respuesta local...');
-      }, 30000); // 30 segundos mÃ¡ximo para mejor UX
+        toast.error('La IA está tardando demasiado. Reintentando con respuesta local...');
+      }, 30000); // 30 segundos máximo para mejor UX
 
-      // Obtener token de autenticaciÃ³n usando el sistema unificado
+      // Obtener token de autenticación usando el sistema unificado
       const token = getIdToken ? await getIdToken() : null;
       if (!token) {
-        throw new Error('No se pudo generar el token de autenticaciÃ³n');
+        throw new Error('No se pudo generar el token de autenticación');
       }
 
       const response = await apiPost(
@@ -666,7 +665,7 @@ export default function ChatWidget() {
       );
 
       clearTimeout(timeoutId);
-      chatDebug('DuraciÃ³n peticiÃ³n IA:', (performance.now() - fetchStart).toFixed(0), 'ms');
+      chatDebug('Duración petición IA:', (performance.now() - fetchStart).toFixed(0), 'ms');
 
       if (!response.ok) {
         throw new Error(`Error de API: ${response.status} ${response.statusText}`);
@@ -675,7 +674,7 @@ export default function ChatWidget() {
       const data = await response.json();
 
       // Flag para registrar si se aplicó al menos una acción
-      let anyAction = false;
+      let _anyAction = false;
 
       // Debug: Log completo de la respuesta del backend
       console.log('ðŸ¤– Respuesta completa del backend IA:', data);
@@ -684,12 +683,12 @@ export default function ChatWidget() {
       // --- Procesar comandos si existen ---
       if (data.extracted?.commands?.length) {
         await applyCommands(data.extracted.commands);
-        anyAction = true;
+        _anyAction = true;
       }
 
-      // --- Persistir invitados extraÃ­dos ---
+      // --- Persistir invitados extraídos ---
       if (data.extracted?.guests?.length) {
-        const stored = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
+        const stored = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
         let nextId = stored.length ? Math.max(...stored.map((g) => g.id)) + 1 : 1;
         const mapped = data.extracted.guests.map((g) => ({
           id: nextId++,
@@ -701,16 +700,16 @@ export default function ChatWidget() {
           response: 'Pendiente',
         }));
         const updated = [...stored, ...mapped];
-        localStorage.setItem('lovendaGuests', JSON.stringify(updated));
-        window.dispatchEvent(new Event('lovenda-guests'));
+        localStorage.setItem('mywed360Guests', JSON.stringify(updated));
+        window.dispatchEvent(new Event('mywed360-guests'));
         toast.success(
-          `${mapped.length} invitado${mapped.length > 1 ? 's' : ''} aÃ±adido${mapped.length > 1 ? 's' : ''}`
+          `${mapped.length} invitado${mapped.length > 1 ? 's' : ''} añadido${mapped.length > 1 ? 's' : ''}`
         );
       }
 
-      // --- Persistir tareas extraÃ­das ---
+      // --- Persistir tareas extraídas ---
       if (data.extracted?.tasks?.length) {
-        const storedMeetings = JSON.parse(localStorage.getItem('lovendaMeetings') || '[]');
+        const storedMeetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
         let nextId = storedMeetings.length ? Date.now() : Date.now();
         const mappedT = data.extracted.tasks.map((t) => {
           // Priorizar campo "due" (ISO), luego date/start/end si vienen de la IA
@@ -729,23 +728,23 @@ export default function ChatWidget() {
           };
         });
         const updatedM = [...storedMeetings, ...mappedT];
-        localStorage.setItem('lovendaMeetings', JSON.stringify(updatedM));
-        window.dispatchEvent(new Event('lovenda-tasks'));
-        window.dispatchEvent(new Event('lovenda-meetings'));
+        localStorage.setItem('mywed360Meetings', JSON.stringify(updatedM));
+        window.dispatchEvent(new Event('mywed360-tasks'));
+        window.dispatchEvent(new Event('mywed360-meetings'));
         // Disparar eventos detallados para persistir en Firestore
         try {
           mappedT.forEach((task) =>
-            window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { task } }))
+            window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { task } }))
           );
         } catch (_) {}
         toast.success(
-          `${mappedT.length} tarea${mappedT.length > 1 ? 's' : ''} aÃ±adida${mappedT.length > 1 ? 's' : ''}`
+          `${mappedT.length} tarea${mappedT.length > 1 ? 's' : ''} añadida${mappedT.length > 1 ? 's' : ''}`
         );
       }
 
-      // --- Persistir reuniones extraÃ­das ---
+      // --- Persistir reuniones extraídas ---
       if (data.extracted?.meetings?.length) {
-        const storedMeetings = JSON.parse(localStorage.getItem('lovendaMeetings') || '[]');
+        const storedMeetings = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
         let nextId = Date.now();
         const mappedR = data.extracted.meetings.map((r) => {
           const startIso = r.start || r.date || r.when || r.begin;
@@ -754,8 +753,8 @@ export default function ChatWidget() {
           const endDate = endIso ? new Date(endIso) : startDate;
           return {
             id: `ai-${nextId++}`,
-            title: r.title || r.name || 'ReuniÃ³n',
-            name: r.title || r.name || 'ReuniÃ³n',
+            title: r.title || r.name || 'Reunión',
+            name: r.title || r.name || 'Reunión',
             desc: r.desc || r.description || '',
             start: startDate,
             end: endDate,
@@ -764,24 +763,24 @@ export default function ChatWidget() {
           };
         });
         const updatedR = [...storedMeetings, ...mappedR];
-        localStorage.setItem('lovendaMeetings', JSON.stringify(updatedR));
-        window.dispatchEvent(new Event('lovenda-tasks'));
-        window.dispatchEvent(new Event('lovenda-meetings'));
+        localStorage.setItem('mywed360Meetings', JSON.stringify(updatedR));
+        window.dispatchEvent(new Event('mywed360-tasks'));
+        window.dispatchEvent(new Event('mywed360-meetings'));
         // Disparar eventos detallados para el bridge
         try {
           mappedR.forEach((meeting) =>
-            window.dispatchEvent(new CustomEvent('lovenda-tasks', { detail: { meeting } }))
+            window.dispatchEvent(new CustomEvent('mywed360-tasks', { detail: { meeting } }))
           );
         } catch (_) {}
         toast.success(
-          `${mappedR.length} reuniÃ³n${mappedR.length > 1 ? 'es' : ''} aÃ±adida${mappedR.length > 1 ? 's' : ''}`
+          `${mappedR.length} reunión${mappedR.length > 1 ? 'es' : ''} añadida${mappedR.length > 1 ? 's' : ''}`
         );
       }
 
-      // --- Persistir movimientos extraÃ­dos ---
+      // --- Persistir movimientos extraídos ---
       const extMovs = data.extracted?.movements || data.extracted?.budgetMovements;
       if (extMovs?.length) {
-        const storedMov = JSON.parse(localStorage.getItem('lovendaMovements') || '[]');
+        const storedMov = JSON.parse(localStorage.getItem('mywed360Movements') || '[]');
         let nextId = storedMov.length ? Date.now() : Date.now();
         const mappedMov = extMovs.map((m) => ({
           id: `mov-${nextId++}`,
@@ -791,18 +790,18 @@ export default function ChatWidget() {
           type: m.type === 'income' ? 'income' : 'expense',
         }));
         const updatedMov = [...storedMov, ...mappedMov];
-        localStorage.setItem('lovendaMovements', JSON.stringify(updatedMov));
-        window.dispatchEvent(new Event('lovenda-movements'));
+        localStorage.setItem('mywed360Movements', JSON.stringify(updatedMov));
+        window.dispatchEvent(new Event('mywed360-movements'));
         // Disparar eventos detallados para persistencia
         try {
           mappedMov.forEach((movement) =>
             window.dispatchEvent(
-              new CustomEvent('lovenda-finance', { detail: { movement, action: 'add' } })
+              new CustomEvent('mywed360-finance', { detail: { movement, action: 'add' } })
             )
           );
         } catch (_) {}
         toast.success(
-          `${mappedMov.length} movimiento${mappedMov.length > 1 ? 's' : ''} aÃ±adido${mappedMov.length > 1 ? 's' : ''}`
+          `${mappedMov.length} movimiento${mappedMov.length > 1 ? 's' : ''} añadido${mappedMov.length > 1 ? 's' : ''}`
         );
       }
       let text;
@@ -813,18 +812,18 @@ export default function ChatWidget() {
       } else if (data.reply) {
         text = data.reply;
       } else if (data.extracted && Object.keys(data.extracted).length) {
-        text = 'Datos extraÃ­dos:\n' + JSON.stringify(data.extracted, null, 2);
+        text = 'Datos extraídos:\n' + JSON.stringify(data.extracted, null, 2);
       } else if (data.error) {
         text = 'Error: ' + data.error;
         console.error('Backend AI error:', data.error, data.details);
       } else {
-        text = 'No se detectaron datos para extraer. Â¿Puedes darme mÃ¡s detalles?';
+        text = 'No se detectaron datos para extraer. ¿Puedes darme más detalles?';
       }
       const botMsg = { from: 'bot', text };
       setMessages((prev) => compactMessages([...prev, botMsg]));
     } catch (error) {
       console.error('Error en chat de IA:', error);
-      // Respuesta de emergencia local cuando falla la conexiÃ³n con el backend
+      // Respuesta de emergencia local cuando falla la conexión con el backend
       let errMsg;
       if (
         error.name === 'AbortError' ||
@@ -834,20 +833,20 @@ export default function ChatWidget() {
         console.error('Timeout en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'assistant',
-          text: 'Parece que hay problemas de conexiÃ³n con el servidor. Puedo ayudarte con consultas bÃ¡sicas sobre tu boda mientras se restablece la conexiÃ³n. Â¿QuÃ© deseas saber?',
+          text: 'Parece que hay problemas de conexión con el servidor. Puedo ayudarte con consultas básicas sobre tu boda mientras se restablece la conexión. ¿Qué deseas saber?',
         };
         toast.error('Tiempo de espera agotado', { autoClose: 3000 });
       } else if (error.message.includes('fetch') || error.message.includes('network')) {
         console.error('Error de red en la llamada a la API de IA:', error.message);
         errMsg = {
           from: 'system',
-          text: `No se pudo conectar con el servidor de IA. Por favor, verifica tu conexiÃ³n y vuelve a intentarlo.`,
+          text: `No se pudo conectar con el servidor de IA. Por favor, verifica tu conexión y vuelve a intentarlo.`,
         };
-        toast.error('Error de conexiÃ³n', { autoClose: 3000 });
+        toast.error('Error de conexión', { autoClose: 3000 });
       } else {
-        console.error('Error genÃ©rico en la API de IA:', error.message);
+        console.error('Error genérico en la API de IA:', error.message);
         errMsg = { from: 'system', text: `Ha ocurrido un error: ${error.message}` };
-        toast.error('Error en la comunicaciÃ³n', { autoClose: 3000 });
+        toast.error('Error en la comunicación', { autoClose: 3000 });
       }
 
       setMessages((prev) => [...prev, errMsg]);
@@ -924,6 +923,7 @@ export default function ChatWidget() {
     </>
   );
 }
+
 
 
 

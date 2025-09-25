@@ -42,7 +42,7 @@ export default function PostDiseno() {
   // Obtener información del perfil para personalizar los prompts si es posible
   const getProfileInfo = () => {
     try {
-      const profile = loadData('lovendaProfile', { defaultValue: {}, collection: 'userProfiles' });
+      const profile = loadData('mywed360Profile', { defaultValue: {}, collection: 'userProfiles' });
       const names = [];
 
       if (profile.brideFirstName && profile.groomFirstName) {
@@ -102,3 +102,4 @@ export default function PostDiseno() {
     </div>
   );
 }
+

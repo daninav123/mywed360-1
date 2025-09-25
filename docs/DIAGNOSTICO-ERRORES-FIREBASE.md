@@ -2,12 +2,12 @@
 
 ## 🚨 ERRORES ACTUALES DETECTADOS
 
-### Error 1: "Missing or insufficient permissions"
+### Error 1:  – Missing or insufficient permissions – 
 **Ubicación:** WeddingContext.jsx línea 120  
 **Causa:** Búsqueda por roles en colección principal sin permisos  
 **Estado:** ✅ SOLUCIONADO - Cambiado a subcolección users/{uid}/weddings
 
-### Error 2: "No authenticated user" 
+### Error 2:  – No authenticated user –  
 **Ubicación:** Firebase Auth  
 **Causa:** Usuario no autenticado correctamente  
 **Estado:** 🔄 EN PROGRESO - Requiere login manual
@@ -85,7 +85,7 @@ import('../firebaseConfig').then(({ auth }) => {
 ## 🔄 FLUJO DE RECUPERACIÓN
 
 1. **Recargar página** - Verificar que no hay errores críticos
-2. **Click "Login Manual"** - Autenticar usuario
+2. **Click  – Login Manual – ** - Autenticar usuario
 3. **Verificar logs** - Confirmar carga de bodas
 4. **Navegar a Invitados** - Verificar funcionamiento
 5. **Reintegrar hooks** - Paso a paso cuando sea estable

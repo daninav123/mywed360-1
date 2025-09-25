@@ -193,3 +193,6 @@ describe('EmailDetail Component', () => {
     expect(screen.queryByText(/adjuntos/i)).not.toBeInTheDocument();
   });
 });
+
+
+

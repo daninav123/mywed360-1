@@ -17,7 +17,7 @@ import { useProviderEmail } from '../../hooks/useProviderEmail';
  * @param {Object} props - Propiedades del componente
  * @param {Provider} props.provider - Proveedor con el que se desea agendar la cita
  * @param {Function} props.onClose - Función para cerrar el modal
- * @param {Function} props.onSubmit - Función para enviar los datos de la reserva
+ * @param {Function} props.onSubmit - Función para enviar los daños de la reserva
  * @returns {React.ReactElement} Modal para agendar citas
  */
 const ReservationModal = ({ provider, onClose, onSubmit }) => {
@@ -65,7 +65,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
     }
   };
 
-  // Inicializar datos del email cuando se muestra el formulario
+  // Inicializar daños del email cuando se muestra el formulario
   const initializeEmailData = () => {
     setEmailData({
       subject: generateDefaultSubject(provider),
@@ -132,7 +132,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4"
       onClick={onClose}
     >
       <div
@@ -140,7 +140,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between itemás-center p-4 border-b">
           <h2 className="text-xl font-semibold">Reservar cita con {provider.name}</h2>
           <button
             onClick={onClose}
@@ -224,7 +224,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
 
               {/* Información de contacto del proveedor */}
               <div className="mt-6 p-4 bg-blue-50 rounded-md">
-                <h3 className="font-medium mb-2 flex items-center">
+                <h3 className="font-medium mb-2 flex itemás-center">
                   <Calendar size={16} className="mr-1 text-blue-600" />
                   Información de contacto
                 </h3>
@@ -256,7 +256,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Sección de email */}
         {!showEmailForm && !emailSent && (
           <div className="p-4 border-t bg-gray-50">
-            <div className="flex items-center mb-2">
+            <div className="flex itemás-center mb-2">
               <Mail size={18} className="mr-2 text-blue-600" />
               <h3 className="font-medium">Contacto por email</h3>
             </div>
@@ -268,7 +268,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               type="button"
               variant="outline"
               onClick={initializeEmailData}
-              className="w-full flex items-center justify-center"
+              className="w-full flex itemás-center justify-center"
             >
               <Mail size={16} className="mr-2" />
               Redactar email al proveedor
@@ -279,8 +279,8 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Formulario de email */}
         {showEmailForm && (
           <div className="p-4 border-t bg-gray-50">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="font-medium flex items-center">
+            <div className="flex justify-between itemás-center mb-3">
+              <h3 className="font-medium flex itemás-center">
                 <Mail size={18} className="mr-2 text-blue-600" />
                 Enviar email al proveedor
               </h3>
@@ -330,7 +330,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
               type="button"
               onClick={handleSendEmail}
               disabled={emailLoading}
-              className="w-full flex items-center justify-center"
+              className="w-full flex itemás-center justify-center"
             >
               {emailLoading ? 'Enviando...' : 'Enviar email'}
             </Button>
@@ -340,7 +340,7 @@ const ReservationModal = ({ provider, onClose, onSubmit }) => {
         {/* Confirmación de email enviado */}
         {emailSent && (
           <div className="p-4 border-t bg-green-50">
-            <div className="flex items-center text-green-700 mb-2">
+            <div className="flex itemás-center text-green-700 mb-2">
               <CheckCircle size={18} className="mr-2" />
               <span className="font-medium">Email enviado correctamente</span>
             </div>

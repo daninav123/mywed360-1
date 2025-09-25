@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { WidgetTypes } from '../components/dashboard/widgets/WidgetTypes';
 
-const WIDGETS_STORAGE_KEY = 'lovenda_dashboard_widgets';
+const WIDGETS_STORAGE_KEY = 'mywed360_dashboard_widgets';
 
 const DEFAULT_WIDGETS = [
   {
@@ -138,3 +138,4 @@ const getDefaultConfig = (type) => {
       return { title: 'Nuevo Widget' };
   }
 };
+

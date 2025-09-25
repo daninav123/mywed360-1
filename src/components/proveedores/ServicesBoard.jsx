@@ -1,5 +1,5 @@
-import React from 'react';
 import { Camera, Utensils, Music2, Flower2, Video, Sparkles, ShoppingBag } from 'lucide-react';
+import React from 'react';
 
 const serviceIcon = (service = '') => {
   const s = String(service || '').toLowerCase();

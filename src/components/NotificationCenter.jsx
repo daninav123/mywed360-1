@@ -50,10 +50,10 @@ const NotificationCenter = () => {
       }
     };
 
-    window.addEventListener('lovenda-toast', handleToastEvent);
+    window.addEventListener('mywed360-toast', handleToastEvent);
 
     return () => {
-      window.removeEventListener('lovenda-toast', handleToastEvent);
+      window.removeEventListener('mywed360-toast', handleToastEvent);
     };
   }, []);
 
@@ -579,3 +579,5 @@ const NotificationCenter = () => {
 };
 
 export default NotificationCenter;
+
+

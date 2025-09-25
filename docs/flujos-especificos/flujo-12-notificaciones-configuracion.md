@@ -252,15 +252,15 @@
 ```javascript
 // /users/{userId}/notificationSettings
 {
-  id: "user_123",
+  id:  – user_123 – ,
   
   channels: {
     push: {
       enabled: true,
       quietHours: {
-        start: "22:00",
-        end: "08:00",
-        timezone: "Europe/Madrid"
+        start:  – 22:00 – ,
+        end:  – 08:00 – ,
+        timezone:  – Europe/Madrid – 
       },
       categories: {
         tasks: true,
@@ -272,7 +272,7 @@
     
     email: {
       enabled: true,
-      frequency: "immediate", // immediate, daily, weekly
+      frequency:  – immediate – , // immediate, daily, weekly
       categories: {
         tasks: true,
         rsvp: true,
@@ -281,14 +281,14 @@
       },
       digest: {
         enabled: true,
-        time: "09:00",
-        days: ["monday", "wednesday", "friday"]
+        time:  – 09:00 – ,
+        days: [ – monday – ,  – wednesday – ,  – friday – ]
       }
     },
     
     sms: {
       enabled: false,
-      phone: "+34 600 123 456",
+      phone:  – +34 600 123 456 – ,
       verified: false,
       categories: {
         critical_only: true
@@ -297,34 +297,34 @@
   },
   
   preferences: {
-    language: "es",
-    timezone: "Europe/Madrid",
-    urgencyThreshold: "medium",
+    language:  – es – ,
+    timezone:  – Europe/Madrid – ,
+    urgencyThreshold:  – medium – ,
     groupSimilar: true,
     smartFiltering: true
   },
   
   automationRules: [
     {
-      id: "rule_001",
-      name: "Recordatorio RSVP",
+      id:  – rule_001 – ,
+      name:  – Recordatorio RSVP – ,
       trigger: {
-        type: "date_relative",
-        event: "rsvp_deadline",
+        type:  – date_relative – ,
+        event:  – rsvp_deadline – ,
         offset: -7 // 7 días antes
       },
       conditions: [
         {
-          field: "rsvp_responses",
-          operator: "less_than",
-          value: "80%"
+          field:  – rsvp_responses – ,
+          operator:  – less_than – ,
+          value:  – 80% – 
         }
       ],
       actions: [
         {
-          type: "send_notification",
-          channel: "email",
-          template: "rsvp_reminder"
+          type:  – send_notification – ,
+          channel:  – email – ,
+          template:  – rsvp_reminder – 
         }
       ],
       enabled: true
@@ -334,45 +334,45 @@
 
 // /weddings/{weddingId}/notifications/{notificationId}
 {
-  id: "notification_001",
-  type: "task_reminder",
-  priority: "medium", // low, medium, high, critical
+  id:  – notification_001 – ,
+  type:  – task_reminder – ,
+  priority:  – medium – , // low, medium, high, critical
   
   content: {
-    title: "Recordatorio: Confirmar menú con catering",
-    message: "La fecha límite para confirmar el menú es mañana",
-    actionUrl: "/proveedores/catering",
-    actionText: "Ver detalles"
+    title:  – Recordatorio: Confirmar menú con catering – ,
+    message:  – La fecha límite para confirmar el menú es mañana – ,
+    actionUrl:  – /proveedores/catering – ,
+    actionText:  – Ver detalles – 
   },
   
-  recipients: ["user_123", "user_456"],
+  recipients: [ – user_123 – ,  – user_456 – ],
   
   delivery: {
-    channels: ["push", "email"],
-    sentAt: "2024-01-25T10:00:00Z",
+    channels: [ – push – ,  – email – ],
+    sentAt:  – 2024-01-25T10:00:00Z – ,
     deliveryStatus: {
-      "user_123": {
-        push: "delivered",
-        email: "opened"
+       – user_123 – : {
+        push:  – delivered – ,
+        email:  – opened – 
       },
-      "user_456": {
-        push: "pending",
-        email: "delivered"
+       – user_456 – : {
+        push:  – pending – ,
+        email:  – delivered – 
       }
     }
   },
   
   metadata: {
-    source: "automation_rule",
-    ruleId: "rule_001",
-    relatedEntity: "task_456",
-    expiresAt: "2024-01-26T23:59:59Z"
+    source:  – automation_rule – ,
+    ruleId:  – rule_001 – ,
+    relatedEntity:  – task_456 – ,
+    expiresAt:  – 2024-01-26T23:59:59Z – 
   },
   
   interactions: {
-    "user_123": {
-      readAt: "2024-01-25T10:15:00Z",
-      actionTaken: "clicked_action",
+     – user_123 – : {
+      readAt:  – 2024-01-25T10:15:00Z – ,
+      actionTaken:  – clicked_action – ,
       dismissed: false
     }
   }

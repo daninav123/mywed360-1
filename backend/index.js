@@ -1,4 +1,4 @@
-// Express backend for Lovenda
+// Express backend for MyWed360
 
 // Provides:
 //   GET /api/transactions - proxy or mock to bank aggregator (Nordigen)
@@ -550,7 +550,7 @@ app.use('/api/test', simpleTestRouter);
 app.use('/api/metrics', metricsSeatingRouter);
 
 app.get('/', (_req, res) => {
-  res.send({ status: 'ok', service: 'lovenda-backend' });
+  res.send({ status: 'ok', service: 'mywed360-backend' });
 });
 
 // Health check explícito para plataformas de despliegue
@@ -681,9 +681,8 @@ process.on('uncaughtException', (err) => {
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`Lovenda backend up on http://localhost:${PORT}`);
+    console.log(`MyWed360 backend up on http://localhost:${PORT}`);
   });
 }
 
 export default app;
-

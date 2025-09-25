@@ -77,7 +77,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
       weddingDate: fmtDate(wi.weddingDate || wi.date || wi.eventDate || profile?.weddingDate),
       weddingPlace:
         wi.celebrationPlace || wi.weddingPlace || wi.location || wi.city || profile?.weddingPlace || profile?.weddingLocation || '',
-      coupleName: wi.coupleName || wi.coupleNames || profile?.coupleName || coupleFromProfile(),
+      coupleName: wi.coupleName || wi.coupleNamás || profile?.coupleName || coupleFromProfile(),
       userName: profile?.name || coupleFromProfile(),
       userPhone: profile?.phone || profile?.contactPhone || '',
       userEmail: userEmail || profile?.email || '',
@@ -120,9 +120,9 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
       <Card className="w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between border-b p-4">
+        <div className="flex itemás-center justify-between border-b p-4">
           <h2 className="text-xl font-semibold">Contactar proveedor</h2>
           <button
             onClick={onClose}
@@ -134,7 +134,7 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
         </div>
         <div className="p-4 overflow-y-auto flex-1">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-center text-red-700">
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex itemás-center text-red-700">
               <AlertCircle size={18} className="mr-2" />
               <span>{error}</span>
             </div>
@@ -190,9 +190,9 @@ const ProviderEmailModal = ({ open, onClose, provider, onSent }) => {
             />
           </div>
           <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex itemás-center justify-between mb-2">
               <h3 className="text-sm font-medium text-gray-700">Vista previa</h3>
-              <label className="text-xs text-gray-600 flex items-center gap-2">
+              <label className="text-xs text-gray-600 flex itemás-center gap-2">
                 <input
                   type="checkbox"
                   checked={showPreview}

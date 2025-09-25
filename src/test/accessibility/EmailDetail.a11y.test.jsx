@@ -16,7 +16,7 @@ const TestWrapper = ({ children }) => <BrowserRouter>{children}</BrowserRouter>;
 const mockEmail = {
   id: 'email123',
   from: 'remitente@example.com',
-  to: 'usuario@lovenda.com',
+  to: 'usuario@mywed360.com',
   subject: 'Asunto de prueba accesibilidad',
   body: '<p>Este es un email de <strong>prueba</strong> para verificar la accesibilidad.</p>',
   date: '2025-07-10T15:30:00Z',
@@ -71,3 +71,6 @@ describe('Pruebas de accesibilidad para EmailDetail', () => {
     });
   });
 });
+
+
+

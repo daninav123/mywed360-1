@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Componente Toolbar modernizado para el plan de asientos
  * Interfaz mejorada con iconos claros y mejor UX
  */
@@ -25,6 +25,7 @@ import {
   AlertTriangle,
   Users,
 } from 'lucide-react';
+import { Keyboard } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
@@ -76,7 +77,7 @@ const SeatingPlanToolbar = ({
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showAlignMenu, setShowAlignMenu] = useState(false);
-  const [showSnaps, setShowSnaps] = useState(false);
+  const [showSnaps, setShowSnaps] = useState(false);\n  const [showHotkeys, setShowHotkeys] = useState(false);
   const [snapshotName, setSnapshotName] = useState('');
   const [snapshotError, setSnapshotError] = useState('');
   const exportRef = useRef(null);
@@ -485,19 +486,19 @@ const SeatingPlanToolbar = ({
                 type="button"
                 onClick={onRotateLeft}
                 className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-                title="Rotar -5°"
+                title="Rotar -5Â°"
               >
                 <RotateCcw className="h-4 w-4" />
-                <span className="hidden sm:inline">-5°</span>
+                <span className="hidden sm:inline">-5Â°</span>
               </button>
               <button
                 type="button"
                 onClick={onRotateRight}
                 className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-                title="Rotar +5°"
+                title="Rotar +5Â°"
               >
                 <RotateCw className="h-4 w-4" />
-                <span className="hidden sm:inline">+5°</span>
+                <span className="hidden sm:inline">+5Â°</span>
               </button>
             </>
           )}
@@ -712,7 +713,29 @@ const SeatingPlanToolbar = ({
         </div>
       )}
 
-      {/* Snapshots menu */}
+            {showHotkeys && (
+        <div className="px-3 pb-3">
+          <div className="bg-white border rounded shadow w-[22rem] max-w-[92vw] p-3 text-xs leading-5">
+            <div className="font-semibold text-gray-800 mb-1">{t('seating.hotkeys.title', { defaultValue: 'Atajos de teclado' })}</div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <div className="text-gray-600">Ctrl/Cmd + Z / Y</div><div>{t('seating.hotkeys.items.undoRedo', { defaultValue: 'Deshacer / Rehacer' })}</div>
+              <div className="text-gray-600">1..6</div><div>{t('seating.hotkeys.items.tools', { defaultValue: 'Herramientas (Pan, Mover, Perímetro, Puertas, Obstáculos, Pasillos)' })}</div>
+              <div className="text-gray-600">Ctrl/Cmd + + / - / 0</div><div>{t('seating.hotkeys.items.zoomFit', { defaultValue: 'Zoom in / out / Ajustar' })}</div>
+              <div className="text-gray-600">Ctrl/Cmd + A</div><div>{t('seating.hotkeys.items.selectAll', { defaultValue: 'Seleccionar todo' })}</div>
+              <div className="text-gray-600">Esc</div><div>{t('seating.hotkeys.items.escape', { defaultValue: 'Limpiar selección / cerrar menús' })}</div>
+              <div className="text-gray-600">Q / E</div><div>{t('seating.hotkeys.items.rotate', { defaultValue: 'Rotar -5° / +5° (Shift: ±15°)' })}</div>
+              <div className="text-gray-600">Alt + ←/→/↑/↓</div><div>{t('seating.hotkeys.items.align', { defaultValue: 'Alinear (inicio/fin)' })}</div>
+              <div className="text-gray-600">Shift + Alt + ←/→/↑/↓</div><div>{t('seating.hotkeys.items.distribute', { defaultValue: 'Distribuir (X/Y)' })}</div>
+              <div className="text-gray-600">Ctrl/Cmd + ←/→</div><div>{t('seating.hotkeys.items.tabs', { defaultValue: 'Cambiar pestaña (Ceremonia/Banquete)' })}</div>
+              <div className="text-gray-600">R / N / V</div><div>{t('seating.hotkeys.items.toggles', { defaultValue: 'Reglas / Números / Validaciones' })}</div>
+              <div className="text-gray-600">P / S</div><div>{t('seating.hotkeys.items.panels', { defaultValue: 'Plantillas / Configurar espacio' })}</div>
+              <div className="text-gray-600">Enter / Esc</div><div>{t('seating.hotkeys.items.drawFinalizeCancel', { defaultValue: 'Finalizar / Cancelar dibujo' })}</div>
+              <div className="text-gray-600">Backspace/Delete</div><div>{t('seating.hotkeys.items.backspaceDelete', { defaultValue: 'Deshacer punto / Eliminar mesa' })}</div>
+              <div className="text-gray-600">Tab (perímetro)</div><div>{t('seating.hotkeys.items.tabExactLength', { defaultValue: 'Longitud exacta del segmento' })}</div>
+            </div>
+          </div>
+        </div>
+      )}\n      {/* Snapshots menu */}
       <div className="px-3 pb-3">
         <div ref={snapsRef} className="relative inline-block">
           <button
@@ -810,3 +833,6 @@ const SeatingPlanToolbar = ({
 };
 
 export default React.memo(SeatingPlanToolbar);
+
+
+

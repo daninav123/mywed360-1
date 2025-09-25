@@ -8,7 +8,7 @@ import { addTagToEmail } from '../services/tagService';
 
 /**
  * Hook personalizado que proporciona funcionalidades para enviar y gestionar
- * emails a proveedores utilizando el sistema de correo personalizado de Lovenda.
+ * emails a proveedores utilizando el sistema de correo personalizado de MyWed360.
  *
  * @returns {Object} Funciones y estados para la gestión de emails a proveedores
  */
@@ -173,7 +173,7 @@ export const useProviderEmail = () => {
       <p>Saludos cordiales,<br>
       ${nombreUsuario}</p>
       
-      <p style="color:#888; font-size:12px;">Email enviado desde Lovenda - Tu plataforma para organización de bodas</p>
+      <p style="color:#888; font-size:12px;">Email enviado desde MyWed360 - Tu plataforma para organización de bodas</p>
     `;
     },
     [profile, weddingDoc]
@@ -190,3 +190,4 @@ export const useProviderEmail = () => {
 };
 
 export default useProviderEmail;
+

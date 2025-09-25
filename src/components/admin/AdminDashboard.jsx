@@ -64,7 +64,7 @@ const AdminDashboard = () => {
       } catch (e) {
         // Fallback a métricas locales del PerformanceMonitor
         try {
-          const raw = localStorage.getItem('lovenda_last_metrics');
+          const raw = localStorage.getItem('mywed360_last_metrics');
           if (raw) {
             const parsed = JSON.parse(raw);
             const t = parsed?.timings || {};
@@ -281,3 +281,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+

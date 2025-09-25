@@ -50,8 +50,8 @@
   - Límite de caracteres en notas
 
 - [ ] **Guardado**
-  - Botón "Guardar y añadir otro"
-  - Botón "Guardar y finalizar"
+  - Botón  – Guardar y añadir otro – 
+  - Botón  – Guardar y finalizar – 
   - Auto-guardado cada 30 segundos
   - Confirmación visual de guardado
 
@@ -150,7 +150,7 @@
 ## 3.3 Envío de Invitaciones
 **Objetivo:** Enviar invitaciones ya diseñadas a los invitados
 
-**Nota:** El diseño de las invitaciones se realiza en la página de "Diseños". Esta sección solo gestiona el envío.
+**Nota:** El diseño de las invitaciones se realiza en la página de  – Diseños – . Esta sección solo gestiona el envío.
 
 ### Configurar RSVP
 **Pasos detallados:**

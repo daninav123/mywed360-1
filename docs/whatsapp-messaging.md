@@ -18,7 +18,7 @@ Este módulo permite enviar invitaciones y recordatorios por WhatsApp desde Gest
 ## Endpoints Backend
 
 - `POST /api/whatsapp/send` (autenticado): body `{ to, message, weddingId, guestId, templateId?, scheduleAt?, metadata? }`
-- `POST /api/whatsapp/webhook/twilio` (público): webhook para estados de Twilio (statusCallback) y también para mensajes entrantes ("A message comes in").
+- `POST /api/whatsapp/webhook/twilio` (público): webhook para estados de Twilio (statusCallback) y también para mensajes entrantes ( – A message comes in – ).
 - `GET /api/whatsapp/provider-status` (público): devuelve `{ success, configured, provider }`
 
 Estados procesados (Twilio): `queued`, `sent`, `delivered`, `read`, `failed`, `undelivered`.
@@ -48,7 +48,7 @@ En `.env` (se documentan en `.env.example`):
 - TWILIO_AUTH_TOKEN=xxxxxxxx
 - TWILIO_WHATSAPP_FROM=+14155238886   # No anteponer whatsapp:
 - WHATSAPP_STATUS_CALLBACK_URL=https://<tu-backend>/api/whatsapp/webhook/twilio (opcional; fallback a BACKEND_BASE_URL)
-  - Configura en Twilio tanto el `Status Callback` (mensajes salientes) como el webhook de "A message comes in" (mensajes entrantes) apuntando a este endpoint.
+  - Configura en Twilio tanto el `Status Callback` (mensajes salientes) como el webhook de  – A message comes in –  (mensajes entrantes) apuntando a este endpoint.
 - DEFAULT_COUNTRY_CODE=+34
 - VITE_DEFAULT_COUNTRY_CODE=+34
 

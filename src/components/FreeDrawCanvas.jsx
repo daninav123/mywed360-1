@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+﻿import React, { useRef, useState, useEffect } from 'react';
 
 import useTranslations from '../hooks/useTranslations';
 
@@ -193,7 +193,7 @@ function FreeDrawCanvasComp({
     }
   };
 
-  // Chaikin smoothing – one iteration
+  // Chaikin smoothing â€“ one iteration
   const smooth = (pts) => {
     if (pts.length < 2) return pts;
     const out = [];
@@ -215,11 +215,11 @@ function FreeDrawCanvasComp({
 
   const handlePointerDown = (e) => {
     e.preventDefault();
-    const pt = toSvgPoint(e, points[points.length - 1]);
+    const _pt = toSvgPoint(e, points[points.length - 1]);
 
     if (drawMode === 'line') {
       setDrawing(true);
-      setPoints([pt]);
+      setPoints([_pt]);
       return;
     }
     if (drawMode === 'boundary') {
@@ -243,22 +243,22 @@ function FreeDrawCanvasComp({
       // Modo perímetro: siempre agregar punto, mantener drawing activo
       if (points.length === 0) {
         setDrawing(true);
-        setPoints([pt]);
+        setPoints([_pt]);
       } else {
         // Agregar punto al perímetro existente
-        setPoints((prev) => [...prev, pt]);
+        setPoints((prev) => [...prev, _pt]);
       }
       return;
     }
     if (drawMode === 'rect') {
       setDrawing(true);
-      startRef.current = pt;
-      setPoints([pt]);
+      startRef.current = _pt;
+      setPoints([_pt]);
       return;
     }
     if (drawMode === 'free' || drawMode === 'curve') {
       setDrawing(true);
-      setPoints([pt]);
+      setPoints([_pt]);
     }
   };
 
@@ -315,14 +315,14 @@ function FreeDrawCanvasComp({
     if (!drawing) return;
 
     if (drawMode === 'line') {
-      const pt = toSvgPoint(e, points[points.length - 1]);
-      setPoints((prev) => (prev.length === 1 ? [prev[0], pt] : [prev[0], pt]));
+      const _pt = toSvgPoint(e, points[points.length - 1]);
+      setPoints((prev) => (prev.length === 1 ? [prev[0], _pt] : [prev[0], _pt]));
       return;
     }
     if (drawMode === 'boundary') {
       // En modo perímetro, mostrar línea de preview al cursor
       if (points.length > 0) {
-        const pt = toSvgPoint(e, points[points.length - 1]);
+        const _pt = toSvgPoint(e, points[points.length - 1]);
         // No modificar los puntos existentes, solo mostrar preview
         // El preview se maneja en el render
       }
@@ -337,9 +337,9 @@ function FreeDrawCanvasComp({
       return;
     }
     if (drawMode === 'free' || drawMode === 'curve') {
-      const pt = toSvgPoint(e, points[points.length - 1]);
+      const _pt = toSvgPoint(e, points[points.length - 1]);
       // Límite de puntos para evitar degradación de performance
-      setPoints((prev) => (prev.length > 4000 ? [...prev.slice(-4000), pt] : [...prev, pt]));
+      setPoints((prev) => (prev.length > 4000 ? [...prev.slice(-4000), _pt] : [...prev, _pt]));
     }
   };
 
@@ -358,8 +358,8 @@ function FreeDrawCanvasComp({
   const handlePointerUp = (e) => {
     if (!drawing) return;
     if (drawMode === 'line') {
-      const pt = toSvgPoint(e, points[points.length - 1]);
-      const line = points.length === 2 ? points : [points[0], pt];
+      const _pt = toSvgPoint(e, points[points.length - 1]);
+      const line = points.length === 2 ? points : [points[0], _pt];
       onFinalize && onFinalize({ type: semanticDrawMode || drawMode, points: line });
       setPoints([]);
       setDrawing(false);
@@ -584,7 +584,7 @@ function FreeDrawCanvasComp({
           style={{ left: cursorPos.x + 10, top: cursorPos.y + 10 }}
         >
           {(segLength / 100).toFixed(2)} m
-          {segAngleDeg != null && <span className="ml-1">{segAngleDeg.toFixed(0)}°</span>}
+          {segAngleDeg != null && <span className="ml-1">{segAngleDeg.toFixed(0)}Â°</span>}
         </div>
       )}
 
@@ -622,3 +622,7 @@ function FreeDrawCanvasComp({
 }
 
 export default React.memo(FreeDrawCanvasComp);
+
+
+
+

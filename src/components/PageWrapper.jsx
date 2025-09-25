@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 import Button from './Button';
 
@@ -24,3 +24,4 @@ export default function PageWrapper({ title, actions = null, className = '', chi
     </div>
   );
 }
+

@@ -50,13 +50,13 @@ const POINT_SYSTEM = {
 #### **1.2 Niveles de Usuario**
 ```javascript
 const USER_LEVELS = [
-  { level: 1, name: "Novato", minPoints: 0, maxPoints: 100 },
-  { level: 2, name: "Planificador", minPoints: 101, maxPoints: 300 },
-  { level: 3, name: "Organizador", minPoints: 301, maxPoints: 600 },
-  { level: 4, name: "Coordinador", minPoints: 601, maxPoints: 1000 },
-  { level: 5, name: "Maestro de Bodas", minPoints: 1001, maxPoints: 1500 },
-  { level: 6, name: "Experto Wedding", minPoints: 1501, maxPoints: 2500 },
-  { level: 7, name: "Leyenda Nupcial", minPoints: 2501, maxPoints: null }
+  { level: 1, name:  – Novato – , minPoints: 0, maxPoints: 100 },
+  { level: 2, name:  – Planificador – , minPoints: 101, maxPoints: 300 },
+  { level: 3, name:  – Organizador – , minPoints: 301, maxPoints: 600 },
+  { level: 4, name:  – Coordinador – , minPoints: 601, maxPoints: 1000 },
+  { level: 5, name:  – Maestro de Bodas – , minPoints: 1001, maxPoints: 1500 },
+  { level: 6, name:  – Experto Wedding – , minPoints: 1501, maxPoints: 2500 },
+  { level: 7, name:  – Leyenda Nupcial – , minPoints: 2501, maxPoints: null }
 ];
 ```
 
@@ -65,29 +65,29 @@ const USER_LEVELS = [
 #### **2.1 Categorías de Logros**
 
 ##### **Logros de Progreso**
-- 🎯 **"Primer Paso"** - Completar primera tarea
-- 📅 **"Planificador Nato"** - Crear timeline completo
-- 💰 **"Contador Experto"** - Mantener presupuesto actualizado por 30 días
-- 👥 **"Anfitrión Perfecto"** - Añadir más de 100 invitados
-- 🪑 **"Maestro del Espacio"** - Completar seating plan sin conflictos
+- 🎯 ** – Primer Paso – ** - Completar primera tarea
+- 📅 ** – Planificador Nato – ** - Crear timeline completo
+- 💰 ** – Contador Experto – ** - Mantener presupuesto actualizado por 30 días
+- 👥 ** – Anfitrión Perfecto – ** - Añadir más de 100 invitados
+- 🪑 ** – Maestro del Espacio – ** - Completar seating plan sin conflictos
 
 ##### **Logros de Velocidad**
-- ⚡ **"Rayo"** - Completar 5 tareas en un día
-- 🔥 **"En Racha"** - Completar tareas 7 días consecutivos
-- 🚀 **"Súper Productivo"** - Completar 20 tareas en una semana
-- ⏰ **"Madrugador"** - Completar tarea antes de las 8 AM
+- ⚡ ** – Rayo – ** - Completar 5 tareas en un día
+- 🔥 ** – En Racha – ** - Completar tareas 7 días consecutivos
+- 🚀 ** – Súper Productivo – ** - Completar 20 tareas en una semana
+- ⏰ ** – Madrugador – ** - Completar tarea antes de las 8 AM
 
 ##### **Logros de Calidad**
-- ⭐ **"Perfeccionista"** - Completar todas las tareas de una categoría
-- 🎨 **"Diseñador"** - Personalizar completamente el sitio web
-- 📧 **"Comunicador"** - Enviar más de 50 emails desde la plataforma
-- 📊 **"Analista"** - Revisar métricas de presupuesto semanalmente
+- ⭐ ** – Perfeccionista – ** - Completar todas las tareas de una categoría
+- 🎨 ** – Diseñador – ** - Personalizar completamente el sitio web
+- 📧 ** – Comunicador – ** - Enviar más de 50 emails desde la plataforma
+- 📊 ** – Analista – ** - Revisar métricas de presupuesto semanalmente
 
 ##### **Logros Especiales**
-- 💎 **"Diamante"** - Completar boda con puntuación perfecta
-- 🏆 **"Campeón"** - Estar en top 10% de usuarios del mes
-- 🎉 **"Celebrador"** - Completar boda y recibir 5⭐ de satisfacción
-- 🤝 **"Colaborador"** - Trabajar exitosamente con wedding planner
+- 💎 ** – Diamante – ** - Completar boda con puntuación perfecta
+- 🏆 ** – Campeón – ** - Estar en top 10% de usuarios del mes
+- 🎉 ** – Celebrador – ** - Completar boda y recibir 5⭐ de satisfacción
+- 🤝 ** – Colaborador – ** - Trabajar exitosamente con wedding planner
 
 #### **2.2 Notificaciones de Logros**
 ```javascript
@@ -149,65 +149,65 @@ const WEDDING_PROGRESS_CATEGORIES = {
 ```jsx
 const EnhancedProgressBar = () => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className= – bg-white rounded-xl shadow-lg p-6 – >
       {/* Header con nivel y puntos */}
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+      <div className= – flex justify-between items-center mb-4 – >
+        <div className= – flex items-center space-x-3 – >
+          <div className= – w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold – >
             {userLevel}
           </div>
           <div>
-            <h3 className="font-semibold text-lg">{levelName}</h3>
-            <p className="text-sm text-gray-600">{currentPoints} / {nextLevelPoints} puntos</p>
+            <h3 className= – font-semibold text-lg – >{levelName}</h3>
+            <p className= – text-sm text-gray-600 – >{currentPoints} / {nextLevelPoints} puntos</p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-green-600">{overallProgress}%</div>
-          <div className="text-sm text-gray-500">Completado</div>
+        <div className= – text-right – >
+          <div className= – text-2xl font-bold text-green-600 – >{overallProgress}%</div>
+          <div className= – text-sm text-gray-500 – >Completado</div>
         </div>
       </div>
 
       {/* Barra de progreso principal */}
-      <div className="mb-6">
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+      <div className= – mb-6 – >
+        <div className= – w-full bg-gray-200 rounded-full h-4 mb-2 – >
           <div 
-            className="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-500"
+            className= – bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-500 – 
             style={{ width: `${overallProgress}%` }}
           />
         </div>
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className= – flex justify-between text-xs text-gray-500 – >
           <span>Inicio</span>
           <span>¡Boda Perfecta!</span>
         </div>
       </div>
 
       {/* Progreso por categorías */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className= – grid grid-cols-2 md:grid-cols-5 gap-4 – >
         {categories.map(category => (
-          <div key={category.id} className="text-center">
-            <div className="relative w-16 h-16 mx-auto mb-2">
-              <svg className="w-16 h-16 transform -rotate-90">
+          <div key={category.id} className= – text-center – >
+            <div className= – relative w-16 h-16 mx-auto mb-2 – >
+              <svg className= – w-16 h-16 transform -rotate-90 – >
                 <circle
-                  cx="32" cy="32" r="28"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="transparent"
-                  className="text-gray-200"
+                  cx= – 32 –  cy= – 32 –  r= – 28 – 
+                  stroke= – currentColor – 
+                  strokeWidth= – 4 – 
+                  fill= – transparent – 
+                  className= – text-gray-200 – 
                 />
                 <circle
-                  cx="32" cy="32" r="28"
+                  cx= – 32 –  cy= – 32 –  r= – 28 – 
                   stroke={category.color}
-                  strokeWidth="4"
-                  fill="transparent"
+                  strokeWidth= – 4 – 
+                  fill= – transparent – 
                   strokeDasharray={`${category.progress * 1.76} 176`}
-                  className="transition-all duration-500"
+                  className= – transition-all duration-500 – 
                 />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-semibold">{category.progress}%</span>
+              <div className= – absolute inset-0 flex items-center justify-center – >
+                <span className= – text-sm font-semibold – >{category.progress}%</span>
               </div>
             </div>
-            <p className="text-xs font-medium">{category.name}</p>
+            <p className= – text-xs font-medium – >{category.name}</p>
           </div>
         ))}
       </div>
@@ -222,14 +222,14 @@ const EnhancedProgressBar = () => {
 ```javascript
 const WEEKLY_OBJECTIVES = {
   week_1: [
-    { task: "Definir fecha de boda", points: 50, priority: "high" },
-    { task: "Crear presupuesto inicial", points: 40, priority: "high" },
-    { task: "Hacer lista de invitados", points: 30, priority: "medium" }
+    { task:  – Definir fecha de boda – , points: 50, priority:  – high –  },
+    { task:  – Crear presupuesto inicial – , points: 40, priority:  – high –  },
+    { task:  – Hacer lista de invitados – , points: 30, priority:  – medium –  }
   ],
   week_2: [
-    { task: "Buscar 3 venues", points: 60, priority: "high" },
-    { task: "Contactar fotógrafo", points: 45, priority: "medium" },
-    { task: "Definir estilo de boda", points: 25, priority: "low" }
+    { task:  – Buscar 3 venues – , points: 60, priority:  – high –  },
+    { task:  – Contactar fotógrafo – , points: 45, priority:  – medium –  },
+    { task:  – Definir estilo de boda – , points: 25, priority:  – low –  }
   ]
   // ... más semanas
 };
@@ -238,26 +238,26 @@ const WEEKLY_OBJECTIVES = {
 #### **4.2 Desafíos Especiales**
 ```javascript
 const SPECIAL_CHALLENGES = {
-  "productivity_week": {
-    name: "Semana Productiva",
-    description: "Completa 15 tareas esta semana",
+   – productivity_week – : {
+    name:  – Semana Productiva – ,
+    description:  – Completa 15 tareas esta semana – ,
     reward: 200,
     duration: 7, // días
-    type: "limited_time"
+    type:  – limited_time – 
   },
-  "budget_master": {
-    name: "Maestro del Presupuesto",
-    description: "Mantén el presupuesto actualizado por 30 días",
+   – budget_master – : {
+    name:  – Maestro del Presupuesto – ,
+    description:  – Mantén el presupuesto actualizado por 30 días – ,
     reward: 300,
     duration: 30,
-    type: "consistency"
+    type:  – consistency – 
   },
-  "social_butterfly": {
-    name: "Mariposa Social",
-    description: "Añade 50 invitados en 3 días",
+   – social_butterfly – : {
+    name:  – Mariposa Social – ,
+    description:  – Añade 50 invitados en 3 días – ,
     reward: 150,
     duration: 3,
-    type: "sprint"
+    type:  – sprint – 
   }
 };
 ```
@@ -279,11 +279,11 @@ const SPECIAL_CHALLENGES = {
 #### **5.3 Sistema de Canje**
 ```javascript
 const REWARD_STORE = {
-  "premium_template": { cost: 500, type: "template" },
-  "planner_consultation": { cost: 1000, type: "service" },
-  "provider_discount": { cost: 750, type: "discount" },
-  "custom_theme": { cost: 300, type: "cosmetic" },
-  "priority_support": { cost: 1200, type: "service" }
+   – premium_template – : { cost: 500, type:  – template –  },
+   – planner_consultation – : { cost: 1000, type:  – service –  },
+   – provider_discount – : { cost: 750, type:  – discount –  },
+   – custom_theme – : { cost: 300, type:  – cosmetic –  },
+   – priority_support – : { cost: 1200, type:  – service –  }
 };
 ```
 
@@ -296,23 +296,23 @@ const REWARD_STORE = {
 #### **Perfil de Gamificación**
 ```javascript
 {
-  userId: "user_123",
-  weddingId: "wedding_456",
+  userId:  – user_123 – ,
+  weddingId:  – wedding_456 – ,
   gamification: {
     totalPoints: 1250,
     level: 4,
-    levelName: "Coordinador",
+    levelName:  – Coordinador – ,
     achievements: [
       {
-        id: "first_step",
-        unlockedAt: "2024-08-26T10:00:00Z",
+        id:  – first_step – ,
+        unlockedAt:  – 2024-08-26T10:00:00Z – ,
         points: 25
       }
     ],
     streaks: {
       current: 5,
       longest: 12,
-      lastActivity: "2024-08-26"
+      lastActivity:  – 2024-08-26 – 
     },
     weeklyObjectives: {
       week: 34,
@@ -393,7 +393,7 @@ const ProgressDashboard = () => {
   const categoryProgress = calculateCategoryProgress(activeWedding);
   
   return (
-    <div className="space-y-6">
+    <div className= – space-y-6 – >
       <UserLevelCard stats={userStats} />
       <OverallProgressBar progress={overallProgress} />
       <CategoryProgress categories={categoryProgress} />

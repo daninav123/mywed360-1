@@ -3,7 +3,7 @@ import logger from '../logger.js';
 
 const router = express.Router();
 
-// Plantillas de email predefinidas para Lovenda
+// Plantillas de email predefinidas para MyWed360
 const EMAIL_TEMPLATES = [
   {
     id: 'wedding-invitation',

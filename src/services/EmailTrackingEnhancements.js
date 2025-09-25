@@ -5,7 +5,7 @@ export function tagProviderEmail(emailId, providerId) {
   try {
     const userRaw =
       typeof window !== 'undefined' && window.localStorage
-        ? window.localStorage.getItem('lovenda_user')
+        ? window.localStorage.getItem('mywed360_user')
         : null;
     const userId = userRaw ? JSON.parse(userRaw)?.uid || 'local' : 'local';
     const providerTagId = (SYSTEM_TAGS.find((t) => t.id === 'provider') || { id: 'provider' }).id;
@@ -16,3 +16,4 @@ export function tagProviderEmail(emailId, providerId) {
     return false;
   }
 }
+

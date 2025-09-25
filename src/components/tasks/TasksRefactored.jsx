@@ -11,6 +11,7 @@
 } from 'firebase/firestore';
 // View mode string kept for internal sizing logic (no external lib)
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Importar componentes separados
 import { localizer, categories, eventStyleGetter, Event } from './CalendarComponents.jsx';
@@ -37,16 +38,17 @@ import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
 
-// FunciÃ³n helper para cargar datos de Firestore de forma segura con fallbacks
+// Funcin helper para cargar datos de Firestore de forma segura con fallbacks
 
 import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
-  // Estados - InicializaciÃ³n segura con manejo de errores
+  // Estados - Inicializacin segura con manejo de errores
 
   // Contexto de boda activa
   const { activeWedding } = useWedding();
+  const navigate = useNavigate();
 
   // Hooks Firestore para tasks y meetings dentro de la boda
   const {
@@ -76,11 +78,80 @@ export default function Tasks() {
   // Subtareas anidadas (nuevo modelo): weddings/{id}/tasks|task/{parentId}/subtasks/*
   const { data: nestedSubtasks = [] } = useWeddingCollectionGroup('subtasks', activeWedding);
 
-  // Fallback para estructura con colecciÃ³n singular 'task':
+  // Fallback listener: if collectionGroup('subtasks') returns nothing
+  // (e.g., due to rules in some environments), subscribe each parent's
+  // subtasks subcollection and merge results locally.
+  const [nestedSubtasksFallback, setNestedSubtasksFallback] = useState([]);
+  const nestedFallbackUnsubsRef = useRef([]);
+  useEffect(() => {
+    try {
+      const hasCG = Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0;
+      if (hasCG) {
+        try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+        nestedFallbackUnsubsRef.current = [];
+        setNestedSubtasksFallback([]);
+        return;
+      }
+      if (!activeWedding || !db) return;
+      try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+      nestedFallbackUnsubsRef.current = [];
+
+      const parents = (Array.isArray(tasksState) ? tasksState : [])
+        .filter((t) => String(t?.type || 'task') === 'task' && t?.id)
+        .map((t) => String(t.id));
+      if (parents.length === 0) { setNestedSubtasksFallback([]); return; }
+
+      const acc = new Map();
+      parents.forEach((pid) => {
+        try {
+          const colRef = collection(db, 'weddings', activeWedding, 'tasks', pid, 'subtasks');
+          const unsub = onSnapshot(colRef, (snap) => {
+            try {
+              for (const [k, v] of Array.from(acc.entries())) {
+                if (String(v.__path || '').includes(`/tasks/${pid}/subtasks/`)) acc.delete(k);
+              }
+              snap.docs.forEach((d) => {
+                const data = d.data() || {};
+                const docObj = { ...data, id: d.id, __path: d.ref.path, parentId: data.parentId || pid, weddingId: activeWedding };
+                acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
+              });
+              setNestedSubtasksFallback(Array.from(acc.values()));
+            } catch {}
+          }, () => {});
+          nestedFallbackUnsubsRef.current.push(unsub);
+        } catch {}
+        // Intentar también ruta singular 'task/{pid}/subtasks' por compatibilidad
+        try {
+          const colRefAlt = collection(db, 'weddings', activeWedding, 'task', pid, 'subtasks');
+          const unsubAlt = onSnapshot(colRefAlt, (snap) => {
+            try {
+              for (const [k, v] of Array.from(acc.entries())) {
+                if (String(v.__path || '').includes(`/task/${pid}/subtasks/`)) acc.delete(k);
+              }
+              snap.docs.forEach((d) => {
+                const data = d.data() || {};
+                const docObj = { ...data, id: d.id, __path: d.ref.path, parentId: data.parentId || pid, weddingId: activeWedding };
+                acc.set(docObj.__path || `${pid}:${d.id}`, docObj);
+              });
+              setNestedSubtasksFallback(Array.from(acc.values()));
+            } catch {}
+          }, () => {});
+          nestedFallbackUnsubsRef.current.push(unsubAlt);
+        } catch {}
+      });
+
+      return () => {
+        try { nestedFallbackUnsubsRef.current.forEach((u) => u && u()); } catch {}
+        nestedFallbackUnsubsRef.current = [];
+      };
+    } catch (_) {}
+  }, [activeWedding, db, tasksState, nestedSubtasks]);
+
+  // Fallback para estructura con coleccin singular 'task':
   // Escucha weddings/{id}/task/*/subtasks/* si el collectionGroup no devuelve nada
   
 
-  // MigraciÃƒÆ’Ã‚Â³n suave de subtareas planas -> anidadas (una vez por boda)
+  // Migracin suave de subtareas planas -> anidadas (una vez por boda)
   useEffect(() => {
     (async () => {
       try {
@@ -96,7 +167,7 @@ export default function Tasks() {
     })();
   }, [activeWedding, tasksState, nestedSubtasks]);
 
-  // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar debugEnabled)
+  // (movido mÍs abajo tras declarar debugEnabled)
 
   // --- Los hooks de Firestore gestionan la carga reactiva ---
 
@@ -125,7 +196,7 @@ export default function Tasks() {
     parentTaskId: '',
     assignee: '',
     completed: false,
-    // Nuevos campos de planificaciÃ³n
+    // Nuevos campos de planificacin
     unscheduled: false, // para subtareas sin fecha
     rangeMode: 'auto', // para tareas padre: 'auto' | 'manual'
     autoAdjust: 'expand_only', // 'expand_only' | 'expand_and_shrink' | 'none'
@@ -143,17 +214,75 @@ export default function Tasks() {
       const qs = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
       const q = qs ? qs.get('debug') || qs.get('ganttDebug') || qs.get('debugGantt') : '';
       const ls1 =
-        typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
+        typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_gantt_debug') : null;
       const ls2 =
-        typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_debug') : null;
+        typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_debug') : null;
       return [q, ls1, ls2].some((v) => v && /^1|true$/i.test(String(v)));
     } catch {
       return false;
     }
   }, []);
 
-  // Exponer helpers en modo debug para correcciÃƒÆ’Ã‚Â³n in-situ
-  // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
+  // Quick intents: algunas tareas abren rutas espec)ficas de la app
+  // Quick intents mapping (route by title/category)
+  const getQuickRouteForTask = useCallback((task) => {
+    try {
+      const raw = String(task?.title || task?.name || '').toLowerCase();
+      const category = String(task?.category || '').toUpperCase();
+      let title = raw;
+      try { title = raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g, ''); } catch {}
+
+      // Guests / RSVP
+      if (category === 'INVITADOS') return '/invitados';
+      if (title.includes('invitad') || title.includes('rsvp') || title.includes('lista de invitados') || title.includes('confirmaciones')) return '/invitados';
+
+      // Website / design
+      if (title.includes('pagina web') || title.includes('hacer pagina web') || title.includes('crear web') || title.includes('diseno web') || title.includes('wedding site') || title.includes('web boda') || title.includes('diseno-web')) return '/diseno-web';
+      // Public website
+      if (title.includes('web publica') || title.includes('publicar web') || title.includes('editar web publica')) return '/web';
+
+      // Invitations / stationery
+      if (category === 'PAPELERIA' || title.includes('invitacion') || title.includes('invitaciones') || title.includes('save-the-date') || title.includes('save the date') || title.includes('papeleria')) return '/disenos/invitaciones';
+
+      // Seating plan
+      if (title.includes('plano de mesas') || title.includes('seating') || title.includes('asiento') || title.includes('colocar mesas')) return '/disenos/seating-plan';
+
+      // Menu / catering
+      if (category === 'COMIDA' || title.includes('menu') || title.includes('catering') || title.includes('degustacion')) return '/disenos/menu-catering';
+
+      // Suppliers (contracts and budgets)
+      if (title.includes('contrato') || title.includes('firmar contrato')) return '/proveedores/contratos';
+      if (title.includes('presupuesto') || title.includes('proveedor')) return '/proveedores';
+
+      // Protocol
+      if (title.includes('lista de verificacion') || title.includes('checklist')) return '/protocolo/checklist';
+      if (title.includes('momentos especiales') || title.includes('votos') || title.includes('discurso')) return '/protocolo/momentos-especiales';
+      if (title.includes('ensayo') || title.includes('timing') || title.includes('cronograma')) return '/protocolo/timing';
+      if (title.includes('documentos legales') || title.includes('documentacion')) return '/protocolo/documentos';
+
+      // Ideas / inspiration
+      if (title.includes('ideas') || title.includes('inspiracion') || title.includes('moodboard')) return '/inspiracion';
+
+      // Finance
+      if (title.includes('presupuesto general') || title.includes('gastos') || title.includes('pagos') || title.includes('facturas') || title.includes('deposito') || title.includes('senal')) return '/finance';
+
+      return null;
+    } catch { return null; }
+  }, []);
+  const handleTaskIntent = useCallback((task, fallback) => {
+    const route = getQuickRouteForTask(task);
+    if (route) {
+      try { navigate(route); } catch {}
+      // Cerrar modales si se abri) desde el modal de "todas las tareas"
+      try { setShowAllTasks(false); } catch {}
+      return true;
+    }
+    if (typeof fallback === 'function') fallback();
+    return false;
+  }, [getQuickRouteForTask, navigate]);
+
+  // Exponer helpers en modo debug para correccin in-situ
+  // (movido mÍs abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
   // Si no hay boda activa, mostrar aviso claro y no renderizar resto
   if (false && !activeWedding) {
@@ -162,7 +291,7 @@ export default function Tasks() {
         <h1 className="page-title">Gestión de Tareas</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
           <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
-          <div className="text-sm">No hay boda activa en este momento. Ve a la sección "Bodas" para seleccionar una existente o crear una nueva.</div>
+          <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n "Bodas" para seleccionar una existente o crear una nueva.</div>
         </div>
       </div>
     );
@@ -179,7 +308,7 @@ export default function Tasks() {
     }
   }, [calendarDate]);
 
-  // Altura del contenedor del calendario (reactiva al tamaÃƒÂ¯Ã‚Â¿Ã‚Â½o de ventana)
+  // Altura del contenedor del calendario (reactiva al tamaï½o de ventana)
   const [calendarContainerHeight, setCalendarContainerHeight] = useState(520);
   useEffect(() => {
     const compute = () => {
@@ -197,12 +326,12 @@ export default function Tasks() {
     try {
       return getSyncState();
     } catch (error) {
-      console.error('Error al obtener estado de sincronizaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n:', error);
+      console.error('Error al obtener estado de sincronización’Â³n:', error);
       return { isOnline: navigator.onLine, isSyncing: false };
     }
   });
 
-  // SuscripciÃƒÆ’Ã‚Â³n a cambios del estado de sincronizaciÃƒÆ’Ã‚Â³n (online/syncing/pending)
+  // Suscripcin a cambios del estado de sincronizaciónn (online/syncing/pending)
   useEffect(() => {
     const unsub = subscribeSyncState(setSyncStatus);
     return () => {
@@ -218,8 +347,8 @@ export default function Tasks() {
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
-  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del DÃƒÂ¯Ã‚Â¿Ã‚Â½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
-  // Exponer helpers en modo debug para correcciÃ³n in-situ
+  // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del Dï½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
+  // Exponer helpers en modo debug para correccin in-situ
   useEffect(() => {
     if (!debugEnabled) return;
     try {
@@ -245,12 +374,12 @@ export default function Tasks() {
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
 
-  // Manejar eventos de calendario externos// FunciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n para aÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â±adir una reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
+  // Manejar eventos de calendario externos// FunciÃ’Â³n para aÃ’Â±adir una reuniÃ’Â³n
   const addMeeting = useCallback(
     async (meeting) => {
       await addMeetingFS({
         ...meeting,
-        title: meeting.title || 'Nueva reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
+        title: meeting.title || 'Nueva reunion',
         start: new Date(meeting.start),
         end: new Date(meeting.end),
       });
@@ -261,15 +390,15 @@ export default function Tasks() {
   // eslint-disable-next-line no-unused-expressions
   addMeeting && null;
 
-  // GeneraciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de timeline si estÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡ vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­o// Estado para tareas completadas (inicial vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­o, se cargarÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡ asÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­ncronamente)
+  // GeneraciÃ’Â³n automÃ’Âtica de timeline si estÃ’Â vacÃ’Â­o// Estado para tareas completadas (inicial vacÃ’Â­o, se cargarÃ’Â asÃ’Â­ncronamente)
 
-  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronizaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­os al inicio)// Sugerencia automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a
+  // Cargar tareas completadas de Firestore/Storage sin bloquear render// Suscribirse al estado de sincronización’Â³n// Guardar cambios cuando cambie el estado (evitando sobrescribir con datos vacÃ’Â­os al inicio)// Sugerencia automÃ’Âtica de categorÃ’Â­a
   const sugerirCategoria = (titulo, descripcion) => {
     const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
     if (
       texto.includes('lugar') ||
       texto.includes('venue') ||
-      texto.includes('salon') ||
+      texto.includes('saln') ||
       texto.includes('espacio')
     ) {
       return 'LUGAR';
@@ -283,20 +412,20 @@ export default function Tasks() {
     ) {
       return 'COMIDA';
     } else if (texto.includes('decora') || texto.includes('adorno') || texto.includes('flor')) {
-      return 'DECORACION';
+      return 'decoración';
     } else if (
       texto.includes('invitacion') ||
       texto.includes('papel') ||
       texto.includes('tarjeta')
     ) {
-      return 'PAPELERIA';
+      return 'papelería';
     } else if (
-      texto.includes('mÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºsica') ||
+      texto.includes('mÃ’Âºsica') ||
       texto.includes('music') ||
       texto.includes('dj') ||
       texto.includes('band')
     ) {
-      return 'MUSICA';
+      return 'música';
     } else if (texto.includes('foto') || texto.includes('video') || texto.includes('grafia')) {
       return 'FOTOGRAFO';
     } else if (texto.includes('vestido') || texto.includes('traje') || texto.includes('ropa')) {
@@ -314,7 +443,7 @@ export default function Tasks() {
     setFormData((prevForm) => {
       let updated = { ...prevForm, [field]: rawValue };
 
-      // 1. Sugerir categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a si se cambia el tÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­tulo y la categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a es OTROS
+      // 1. Sugerir categorÃ’Â­a si se cambia el tÃ’Â­tulo y la categorÃ’Â­a es OTROS
       if (field === 'title' && (!prevForm.category || prevForm.category === 'OTROS')) {
         const sugerida = sugerirCategoria(rawValue, prevForm.desc);
         if (sugerida !== 'OTROS') {
@@ -327,7 +456,7 @@ export default function Tasks() {
         const start = new Date(rawValue);
         const end = new Date(prevForm.endDate);
         if (!prevForm.endDate || end < start) {
-          updated.endDate = rawValue; // Ajustar fin al mismo dÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a por defecto
+          updated.endDate = rawValue; // Ajustar fin al mismo dÃ’Â­a por defecto
         }
       }
 
@@ -367,7 +496,7 @@ export default function Tasks() {
     resetForm();
   };
 
-  // AsignaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n automÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡tica de categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con IA
+  // AsignaciÃ’Â³n automÃ’Âtica de categorÃ’Â­a con IA
   const asignarCategoriaConIA = async (titulo, descripcion) => {
     try {
       const texto = (titulo + ' ' + (descripcion || '')).toLowerCase();
@@ -377,75 +506,23 @@ export default function Tasks() {
 
       // Si las reglas simples no funcionan, usamos IA
       const palabrasClave = {
-        LUGAR: [
-          'venue',
-          'location',
-          'lugar',
-          'sitio',
-          'espacio',
-          'salÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
-          'jardÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­n',
-          'terraza',
-        ],
-        INVITADOS: [
-          'guests',
-          'invitados',
-          'personas',
-          'asistentes',
-          'confirmaciones',
-          'lista',
-          'rsvp',
-        ],
-        COMIDA: ['catering', 'food', 'comida', 'bebida', 'menu', 'bocadillos', 'pastel', 'torta'],
-        DECORACION: [
-          'decoraciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
-          'flores',
-          'arreglos',
-          'centros de mesa',
-          'iluminaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
-          'ambientaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
-        ],
-        PAPELERIA: [
-          'invitaciones',
-          'papelerÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
-          'save the date',
-          'tarjetas',
-          'programa',
-          'seating plan',
-        ],
-        MUSICA: [
-          'mÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºsica',
-          'dj',
-          'banda',
-          'playlist',
-          'sonido',
-          'baile',
-          'entretenimiento',
-        ],
-        FOTOGRAFO: [
-          'fotografÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
-          'video',
-          'recuerdos',
-          'ÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lbum',
-          'sesiÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n',
-        ],
-        VESTUARIO: [
-          'vestido',
-          'traje',
-          'accesorios',
-          'zapatos',
-          'maquillaje',
-          'peluquerÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a',
-        ],
-      };
+  LUGAR: ['venue','location','lugar','sitio','espacio','salón','jardín','terraza'],
+  INVITADOS: ['guests','invitados','personas','asistentes','confirmaciones','lista','rsvp'],
+  COMIDA: ['catering','food','comida','bebida','menu','bocadillos','pastel','torta'],
+  DECORACION: ['decoración','flores','arreglos','centros de mesa','iluminación','ambientación'],
+  PAPELERIA: ['invitaciones','papelería','save the date','tarjetas','programa','seating plan'],
+  MUSICA: ['música','dj','banda','playlist','sonido','baile','entretenimiento'],
+  FOTOGRAFO: ['fotografía','video','recuerdos','álbum','sesión'],
+  VESTUARIO: ['vestido','traje','accesorios','zapatos','maquillaje','peluquería'],
+};
 
-      // Contar coincidencias por categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a
+      // Contar coincidencias por categorÃ’Â­a
       const scores = {};
       Object.entries(palabrasClave).forEach(([cat, palabras]) => {
         scores[cat] = palabras.filter((palabra) => texto.includes(palabra)).length;
       });
 
-      // Encontrar la categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con mayor puntuaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
+      // Encontrar la categorÃ’Â­a con mayor puntuaciÃ’Â³n
       let maxScore = 0;
       let maxCat = 'OTROS';
       Object.entries(scores).forEach(([cat, score]) => {
@@ -457,17 +534,17 @@ export default function Tasks() {
 
       return maxScore > 0 ? maxCat : 'OTROS';
     } catch (error) {
-      console.error('Error al asignar categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a:', error);
+      console.error('Error al asignar categorÃ’Â­a:', error);
       return 'OTROS';
     }
   };
 
-  // Guardar una tarea en la subcolecciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n de la boda
+  // Guardar una tarea en la subcolecciÃ’Â³n de la boda
   const handleSaveTask = async () => {
     try {
-      // Validar formulario bÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡sico
+      // Validar formulario bÃ’Âsico
       if (!formData.title.trim()) {
-        alert('Por favor ingresa un tÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­tulo');
+        alert('Por favor ingresa un tÃ’Â­tulo');
         return;
       }
 
@@ -495,7 +572,7 @@ export default function Tasks() {
 
       // Validar fechas
       if (!(isSubtask && unscheduled) && (isNaN(startDate?.getTime?.() || NaN) || isNaN(endDate?.getTime?.() || NaN))) {
-        alert('Fechas no vÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lidas');
+        alert('Fechas no vÃ’Âlidas');
         return;
       }
 
@@ -504,7 +581,7 @@ export default function Tasks() {
         return;
       }
 
-      // Asignar categorÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â­a con IA si no se especificÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³
+      // Asignar categorÃ’Â­a con IA si no se especificÃ’Â³
       let category = formData.category;
       if (category === 'OTROS') {
         category = await asignarCategoriaConIA(formData.title, formData.desc);
@@ -520,9 +597,9 @@ export default function Tasks() {
         ...(editingId ? {} : { createdAt: serverTimestamp() }),
       };
 
-      // AÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â±adir/actualizar segÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Âºn sea una tarea de largo plazo o una reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n
+      // AÃ’Â±adir/actualizar segÃ’Âºn sea una tarea de largo plazo o una reuniÃ’Â³n
       if (formData.long) {
-        // Si no se eligiÃƒÆ’Ã‚Â³ tarea padre, asignar por defecto a "OTROS"
+        // Si no se eligi tarea padre, asignar por defecto a "OTROS"
         try {
           if (!formData.parentTaskId) {
             const arr = Array.isArray(tasksState) ? tasksState : [];
@@ -641,7 +718,7 @@ export default function Tasks() {
             const docRef = await addDoc(colRef, { ...ganttTask, createdAt: serverTimestamp() });
             savedId = docRef.id;
           }
-          // ÃƒÆ’Ã¢â‚¬â„¢ÃƒÂ¯Ã‚Â¿Ã‚Â½ÃƒÂ¯Ã‚Â¿Ã‚Â½&Ãƒâ€šÃ‚Â¡ltimo recurso: generar id local si todo falla
+          // Ã’ï½ï½&ÂÚltimo recurso: generar id local si todo falla
           if (!savedId) savedId = taskData.id;
         }
         // Espejo opcional para feeds antiguos que leen users/{uid}/tasks
@@ -667,7 +744,7 @@ export default function Tasks() {
             await updateMeetingFS(editingId, taskData);
           }
         } else {
-          // Nueva reuniÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n (evento puntual del calendario)
+          // Nueva reunión
           const saved = await addMeetingFS({ ...taskData, createdAt: serverTimestamp() });
           savedId = saved?.id || taskData.id;
         }
@@ -704,7 +781,7 @@ export default function Tasks() {
         }
       } catch (_) {}
 
-      // Ajustar rango del padre si procede (modo automÃ¡tico)
+      // Ajustar rango del padre si procede (modo automtico)
       try {
         if (formData.parentTaskId) {
           await computeAndUpdateParentRange(String(formData.parentTaskId));
@@ -759,7 +836,7 @@ export default function Tasks() {
       ops.push(Promise.resolve(deleteTaskFS(editingId)).catch(() => {}));
       ops.push(Promise.resolve(deleteMeetingFS(editingId)).catch(() => {}));
       Promise.allSettled(ops)
-        .then(() => console.log('[Tasks] EliminaciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n completada', editingId))
+        .then(() => console.log('[Tasks] EliminaciÃ’Â³n completada', editingId))
         .catch(() => {});
     } catch (error) {
       console.error('Error eliminando tarea/proceso:', error);
@@ -773,7 +850,7 @@ export default function Tasks() {
 
   // Procesar eventos para calendario/lista: SOLO tareas puntuales (meetings)
 
-  // FunciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n auxiliar para validar y normalizar fechas
+  // FunciÃ’Â³n auxiliar para validar y normalizar fechas
   // Eventos y listas seguras via hooks
   const { safeEvents, sortedEvents, safeMeetings, safeMeetingsFiltered } =
     useSafeEvents(meetingsState);
@@ -808,7 +885,7 @@ export default function Tasks() {
       });
 
       // Si tras todo lo anterior no hay ninguna tarea padre en el rango,
-      // intentar un fallback directo desde tasksState (por si algÃƒÆ’Ã‚Âºn normalizador filtrÃƒÆ’Ã‚Â³ de mÃƒÆ’Ã‚Â¡s)
+      // intentar un fallback directo desde tasksState (por si algn normalizador filtr de mÍs)
       const hasParent = injected.some((x) => String(x?.type || 'task') === 'task');
       if (!hasParent) {
         const raw = Array.isArray(tasksState) ? tasksState : [];
@@ -843,7 +920,7 @@ export default function Tasks() {
   // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
   const subtaskEvents = useMemo(() => {
     try {
-      // a) Subtareas planas visibles (con fechas válidas)
+      // a) Subtareas planas visibles (con fechas v)lidas)
       const flat = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'subtask')
         .map((t) => ({
@@ -859,7 +936,9 @@ export default function Tasks() {
         }));
 
       // b) Subtareas anidadas (modelo nuevo)
-      const nestedSource = Array.isArray(nestedSubtasks) ? nestedSubtasks : [];
+      const nestedSource = (Array.isArray(nestedSubtasks) && nestedSubtasks.length > 0)
+        ? nestedSubtasks
+        : (Array.isArray(nestedSubtasksFallback) ? nestedSubtasksFallback : []);
       const nested = nestedSource.map((s) => {
         const mode = String(s?.mode || '').toLowerCase() || (s?.start ? 'scheduled' : 'unscheduled');
         const start = mode === 'unscheduled'
@@ -923,7 +1002,7 @@ export default function Tasks() {
           });
       }
 
-      // Unir por clave única evitando colisiones de id entre distintos padres
+      // Unir por clave )nica evitando colisiones de id entre distintos padres
       const byKey = new Map();
       for (const it of flat) {
         const k = `flat:${it.parentId || ''}:${it.id}`;
@@ -943,7 +1022,7 @@ export default function Tasks() {
     }
   }, [uniqueGanttTasks, nestedSubtasks, tasksState]);
 
-  // (se declara mÃ¡s abajo tras parentNameMap)
+  // (se declara ms abajo tras parentNameMap)
 
   const taskListItems = useMemo(() => {
     const a = Array.isArray(safeMeetingsFiltered) ? safeMeetingsFiltered : [];
@@ -1130,7 +1209,7 @@ export default function Tasks() {
     }
   }, [subtaskEvents, completedIdSet]);
 
-  // AcciÃƒÆ’Ã‚Â³n manual para crear tareas por defecto
+  // Accin manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
     try {
       if (!activeWedding || !db) return;
@@ -1157,9 +1236,9 @@ export default function Tasks() {
           p0: 0.0,
           p1: 0.2,
           items: [
-            'Difundir la noticia y organizar la planificaciÃƒÆ’Ã‚Â³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-            'Crear primera versiÃƒÆ’Ã‚Â³n de la lista de invitados',
-            'Investigar lugares de celebraciÃƒÆ’Ã‚Â³n y comenzar visitas',
+            'Difundir la noticia y organizar la planificacin (perfil, invitar pareja, anillo, presupuesto inicial)',
+            'Crear primera versin de la lista de invitados',
+            'Investigar lugares de celebracin y comenzar visitas',
             'Decidir cortejo nupcial',
           ],
         },
@@ -1169,12 +1248,12 @@ export default function Tasks() {
           p0: 0.1,
           p1: 0.8,
           items: [
-            'FotografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ contacto inicial pronto, cierre de contrato a mitad del proceso',
-            'VideografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ decisiÃƒÆ’Ã‚Â³n temprana, reuniones finales hacia el final',
-            'Catering ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ investigaciÃƒÆ’Ã‚Â³n inicial, prueba de menÃƒÆ’Ã‚Âº, cierre cercano a la boda',
-            'Florista ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ inspiraciÃƒÆ’Ã‚Â³n y primeras ideas, confirmaciÃƒÆ’Ã‚Â³n en la fase final',
-            'MÃƒÆ’Ã‚Âºsica ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ banda/DJ reservados pronto, reuniÃƒÆ’Ã‚Â³n final mÃƒÆ’Ã‚Â¡s tarde',
-            'ReposterÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ bÃƒÆ’Ã‚Âºsqueda inicial, prueba de sabores meses despuÃƒÆ’Ã‚Â©s, pedido final cerca de la boda',
+            'fotografía â†’ contacto inicial pronto, cierre de contrato a mitad del proceso',
+            'Videografa â†’ decisin temprana, reuniones finales hacia el final',
+            'Catering â†’ investigacin inicial, prueba de men, cierre cercano a la boda',
+            'Florista â†’ inspiracin y primeras ideas, confirmacin en la fase final',
+            'música â†’ banda/DJ reservados pronto, reunin final mÍs tarde',
+            'Repostera â†’ búsqueda inicial, prueba de sabores meses despus, pedido final cerca de la boda',
           ],
         },
         {
@@ -1183,9 +1262,9 @@ export default function Tasks() {
           p0: 0.15,
           p1: 0.9,
           items: [
-            'Novia ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ visitas iniciales, decisiÃƒÆ’Ã‚Â³n intermedia, pruebas finales en los ÃƒÆ’Ã‚Âºltimos meses',
-            'Novio ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ compra traje en mitad del proceso, ajustes finales poco antes',
-            'Cortejo ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÆ’Ã‚Â¡s tarde',
+            'Novia â†’ visitas iniciales, decisin intermedia, pruebas finales en los Últimos meses',
+            'Novio â†’ compra traje en mitad del proceso, ajustes finales poco antes',
+            'Cortejo â†’ definir vestidos/trajes, confirmar tallas y ajustes finales mÍs tarde',
           ],
         },
         {
@@ -1195,22 +1274,22 @@ export default function Tasks() {
           p1: 0.95,
           items: [
             'Invitaciones digitales y save-the-dates (inicio medio)',
-            'Invitaciones fÃƒÆ’Ã‚Â­sicas y papelerÃƒÆ’Ã‚Â­a (fase intermedia)',
-            'DecoraciÃƒÆ’Ã‚Â³n y DIY (se puede trabajar meses antes y ultimar al final)',
-            'Recuerdos y regalos (elecciÃƒÆ’Ã‚Â³n temprana, cierre antes del evento)',
+            'Invitaciones fsicas y papelería (fase intermedia)',
+            'decoración y DIY (se puede trabajar meses antes y ultimar al final)',
+            'Recuerdos y regalos (eleccin temprana, cierre antes del evento)',
           ],
         },
         {
           key: 'E',
-          name: 'Bloque E - OrganizaciÃƒÆ’Ã‚Â³n y LogÃƒÆ’Ã‚Â­stica',
+          name: 'Bloque E - Organizacin y Logstica',
           p0: 0.3,
           p1: 1.0,
           items: [
             'Transporte (se puede definir pronto, confirmar al final)',
-            'Extras y bÃƒÆ’Ã‚Â¡sicos del dÃƒÆ’Ã‚Â­a (ir acumulando, revisiÃƒÆ’Ã‚Â³n final cercana a la boda)',
-            'Confirmaciones con proveedores (ÃƒÆ’Ã‚Âºltimas semanas)',
+            'Extras y bÍsicos del da (ir acumulando, revisin final cercana a la boda)',
+            'Confirmaciones con proveedores (Últimas semanas)',
             'Plan B clima (al final)',
-            'Ensayo general (ÃƒÆ’Ã‚Âºltima fase)',
+            'Ensayo general (Última fase)',
           ],
         },
         {
@@ -1219,8 +1298,8 @@ export default function Tasks() {
           p0: 0.4,
           p1: 0.95,
           items: [
-            'Eventos adicionales (preboda, brunchÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦)',
-            'Despedidas (planificaciÃƒÆ’Ã‚Â³n antes, celebraciÃƒÆ’Ã‚Â³n final)',
+            'Eventos adicionales (preboda, brunchâ€¦)',
+            'Despedidas (planificacin antes, celebracin final)',
             'Votos y discursos (escribir con calma, repasar justo antes)',
           ],
         },
@@ -1230,9 +1309,9 @@ export default function Tasks() {
           p0: 0.6,
           p1: 0.95,
           items: [
-            'Reservas peluquerÃƒÆ’Ã‚Â­a/maquillaje con antelaciÃƒÆ’Ã‚Â³n',
+            'Reservas peluquería/maquillaje con antelacin',
             'Pruebas intermedias',
-            'Rutinas de cuidado personal (ÃƒÆ’Ã‚Âºltimos meses)',
+            'Rutinas de cuidado personal (Últimos meses)',
           ],
         },
         {
@@ -1242,15 +1321,15 @@ export default function Tasks() {
           p1: 1.0,
           items: [
             'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-            'Planificar luna de miel (elecciÃƒÆ’Ã‚Â³n pronto, reservas intermedias, maletas al final)',
+            'Planificar luna de miel (eleccin pronto, reservas intermedias, maletas al final)',
           ],
         },
         {
           key: 'I',
-          name: 'Bloque I - DespuÃƒÆ’Ã‚Â©s de la Boda',
+          name: 'Bloque I - Despus de la Boda',
           p0: 1.0,
           p1: 1.05,
-          items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÆ’Ã‚Â¡lbum y recuerdos'],
+          items: ['Disfrutar inicio del matrimonio', 'Organizar Ílbum y recuerdos'],
         },
       ];
 
@@ -1297,7 +1376,7 @@ export default function Tasks() {
     }
   }, [activeWedding, db, projectStart, projectEnd]);
 
-  // Seed automÃƒÆ’Ã‚Â¡tico de Bloques A-I (padres + subtareas) si no hay tareas
+  // Seed automÍtico de Bloques A-I (padres + subtareas) si no hay tareas
   useEffect(() => {
     (async () => {
       try {
@@ -1310,7 +1389,7 @@ export default function Tasks() {
         const seedSnap = await getDoc(seedRef).catch(() => null);
         if (seedSnap && seedSnap.exists()) return;
 
-        // Permitir seed aunque aÃƒÆ’Ã‚Âºn no haya weddingDate: usar fallbacks razonables
+        // Permitir seed aunque an no haya weddingDate: usar fallbacks razonables
         // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
         const endBase =
           projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
@@ -1328,9 +1407,9 @@ export default function Tasks() {
             p0: 0.0,
             p1: 0.2,
             items: [
-              'Difundir la noticia y organizar la planificaciÃƒÆ’Ã‚Â³n (perfil, invitar pareja, anillo, presupuesto inicial)',
-              'Crear primera versiÃƒÆ’Ã‚Â³n de la lista de invitados',
-              'Investigar lugares de celebraciÃƒÆ’Ã‚Â³n y comenzar visitas',
+              'Difundir la noticia y organizar la planificacin (perfil, invitar pareja, anillo, presupuesto inicial)',
+              'Crear primera versin de la lista de invitados',
+              'Investigar lugares de celebracin y comenzar visitas',
               'Decidir cortejo nupcial',
             ],
           },
@@ -1340,12 +1419,12 @@ export default function Tasks() {
             p0: 0.1,
             p1: 0.8,
             items: [
-              'FotografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ contacto inicial pronto, cierre de contrato a mitad del proceso',
-              'VideografÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ decisiÃƒÆ’Ã‚Â³n temprana, reuniones finales hacia el final',
-              'Catering ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ investigaciÃƒÆ’Ã‚Â³n inicial, prueba de menÃƒÆ’Ã‚Âº, cierre cercano a la boda',
-              'Florista ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ inspiraciÃƒÆ’Ã‚Â³n y primeras ideas, confirmaciÃƒÆ’Ã‚Â³n en la fase final',
-              'MÃƒÆ’Ã‚Âºsica ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ banda/DJ reservados pronto, reuniÃƒÆ’Ã‚Â³n final mÃƒÆ’Ã‚Â¡s tarde',
-              'ReposterÃƒÆ’Ã‚Â­a ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ bÃƒÆ’Ã‚Âºsqueda inicial, prueba de sabores meses despuÃƒÆ’Ã‚Â©s, pedido final cerca de la boda',
+              'fotografía â†’ contacto inicial pronto, cierre de contrato a mitad del proceso',
+              'Videografa â†’ decisin temprana, reuniones finales hacia el final',
+              'Catering â†’ investigacin inicial, prueba de men, cierre cercano a la boda',
+              'Florista â†’ inspiracin y primeras ideas, confirmacin en la fase final',
+              'música â†’ banda/DJ reservados pronto, reunin final mÍs tarde',
+              'Repostera â†’ búsqueda inicial, prueba de sabores meses despus, pedido final cerca de la boda',
             ],
           },
           {
@@ -1354,9 +1433,9 @@ export default function Tasks() {
             p0: 0.15,
             p1: 0.9,
             items: [
-              'Novia ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ visitas iniciales, decisiÃƒÆ’Ã‚Â³n intermedia, pruebas finales en los ÃƒÆ’Ã‚Âºltimos meses',
-              'Novio ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ compra traje en mitad del proceso, ajustes finales poco antes',
-              'Cortejo ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ definir vestidos/trajes, confirmar tallas y ajustes finales mÃƒÆ’Ã‚Â¡s tarde',
+              'Novia â†’ visitas iniciales, decisin intermedia, pruebas finales en los Últimos meses',
+              'Novio â†’ compra traje en mitad del proceso, ajustes finales poco antes',
+              'Cortejo â†’ definir vestidos/trajes, confirmar tallas y ajustes finales mÍs tarde',
             ],
           },
           {
@@ -1366,22 +1445,22 @@ export default function Tasks() {
             p1: 0.95,
             items: [
               'Invitaciones digitales y save-the-dates (inicio medio)',
-              'Invitaciones fÃƒÆ’Ã‚Â­sicas y papelerÃƒÆ’Ã‚Â­a (fase intermedia)',
-              'DecoraciÃƒÆ’Ã‚Â³n y DIY (se puede trabajar meses antes y ultimar al final)',
-              'Recuerdos y regalos (elecciÃƒÆ’Ã‚Â³n temprana, cierre antes del evento)',
+              'Invitaciones fsicas y papelería (fase intermedia)',
+              'decoración y DIY (se puede trabajar meses antes y ultimar al final)',
+              'Recuerdos y regalos (eleccin temprana, cierre antes del evento)',
             ],
           },
           {
             key: 'E',
-            name: 'OrganizaciÃƒÆ’Ã‚Â³n y LogÃƒÆ’Ã‚Â­stica',
+            name: 'Organizacin y Logstica',
             p0: 0.3,
             p1: 1.0,
             items: [
               'Transporte (se puede definir pronto, confirmar al final)',
-              'Extras y bÃƒÆ’Ã‚Â¡sicos del dÃƒÆ’Ã‚Â­a (ir acumulando, revisiÃƒÆ’Ã‚Â³n final cercana a la boda)',
-              'Confirmaciones con proveedores (ÃƒÆ’Ã‚Âºltimas semanas)',
+              'Extras y bÍsicos del da (ir acumulando, revisin final cercana a la boda)',
+              'Confirmaciones con proveedores (Últimas semanas)',
               'Plan B clima (al final)',
-              'Ensayo general (ÃƒÆ’Ã‚Âºltima fase)',
+              'Ensayo general (Última fase)',
             ],
           },
           {
@@ -1390,8 +1469,8 @@ export default function Tasks() {
             p0: 0.4,
             p1: 0.95,
             items: [
-              'Eventos adicionales (preboda, brunchÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦)',
-              'Despedidas (planificaciÃƒÆ’Ã‚Â³n antes, celebraciÃƒÆ’Ã‚Â³n final)',
+              'Eventos adicionales (preboda, brunchâ€¦)',
+              'Despedidas (planificacin antes, celebracin final)',
               'Votos y discursos (escribir con calma, repasar justo antes)',
             ],
           },
@@ -1401,9 +1480,9 @@ export default function Tasks() {
             p0: 0.6,
             p1: 0.95,
             items: [
-              'Reservas peluquerÃƒÆ’Ã‚Â­a/maquillaje con antelaciÃƒÆ’Ã‚Â³n',
+              'Reservas peluquería/maquillaje con antelacin',
               'Pruebas intermedias',
-              'Rutinas de cuidado personal (ÃƒÆ’Ã‚Âºltimos meses)',
+              'Rutinas de cuidado personal (Últimos meses)',
             ],
           },
           {
@@ -1413,15 +1492,15 @@ export default function Tasks() {
             p1: 1.0,
             items: [
               'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-              'Planificar luna de miel (elecciÃƒÆ’Ã‚Â³n pronto, reservas intermedias, maletas al final)',
+              'Planificar luna de miel (eleccin pronto, reservas intermedias, maletas al final)',
             ],
           },
           {
             key: 'I',
-            name: 'DespuÃƒÆ’Ã‚Â©s de la Boda',
+            name: 'Despus de la Boda',
             p0: 1.0,
             p1: 1.05,
-            items: ['Disfrutar inicio del matrimonio', 'Organizar ÃƒÆ’Ã‚Â¡lbum y recuerdos'],
+            items: ['Disfrutar inicio del matrimonio', 'Organizar Ílbum y recuerdos'],
           },
         ];
 
@@ -1467,7 +1546,7 @@ export default function Tasks() {
       }
     })();
   }, [activeWedding, db, projectStart, projectEnd, tasksState, tasksLoading]);
-  // Toggle rÃƒÆ’Ã‚Â¡pido de completado (lista/fallback)
+  // Toggle rÍpido de completado (lista/fallback)
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
       try {
@@ -1506,18 +1585,18 @@ export default function Tasks() {
     setGanttViewMode,
   });
 
-  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â³n// CÃƒÆ’Ã¢â‚¬â„¢Ãƒâ€šÃ‚Â¡lculo de progreso - asegurando que los estados sean arrays
+  // Calcular columna y vista (zoom) para que quepa todo el proceso en una vista// Ajuste reactivo del ancho mediante ResizeObserver para ocupar todo el ancho de la secciÃ’Â³n// CÃ’Âlculo de progreso - asegurando que los estados sean arrays
   // Indicador de progreso eliminado
 
   // 1) Escuchar info de la boda para fijar projectEnd (weddings/{id}/weddingInfo.weddingDate)
   useEffect(() => {
-    // Deshabilitado: sÃƒÆ’Ã‚Â³lo usar weddings/{id}.weddingDate como fuente
+    // Deshabilitado: slo usar weddings/{id}.weddingDate como fuente
     return;
     if (!activeWedding || !db) return;
     try {
       const refPrimary = doc(db, 'weddings', activeWedding, 'weddingInfo');
       const refLegacy = doc(db, 'weddings', activeWedding, 'info', 'weddingInfo');
-      // VariaciÃƒÆ’Ã‚Â³n en minÃƒÆ’Ã‚Âºsculas que algunos entornos crean: weddings/{id}/weddinginfo
+      // Variacin en minsculas que algunos entornos crean: weddings/{id}/weddinginfo
       const refLower = doc(db, 'weddings', activeWedding, 'weddinginfo');
       const handler = (snap) => {
         try {
@@ -1552,7 +1631,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comÃƒÆ’Ã‚Âºn)
+  // 1a-bis) Leer weddingDate desde weddings/{id}/info/weddingInfo (ruta comn)
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1610,7 +1689,7 @@ export default function Tasks() {
     } catch (_) {}
   }, [activeWedding, db]);
 
-  // 1a) Fallback adicional: leer weddingDate del documento raÃƒÆ’Ã‚Â­z weddings/{id}
+  // 1a) Fallback adicional: leer weddingDate del documento raz weddings/{id}
   useEffect(() => {
     if (!activeWedding || !db) return;
     try {
@@ -1646,7 +1725,7 @@ export default function Tasks() {
               if (!isNaN(iso.getTime())) d = iso;
               else {
                 const m = raw.match(
-                  /(\d{1,2})\s+de\s+([a-zA-ZÃƒÆ’Ã‚Â±ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡]+)\s+de\s+(\d{4})/
+                  /(\d{1,2})\s+de\s+([a-zA-ZÑÍÁÉÃÓÚ]+)\s+de\s+(\d{4})/
                 );
                 if (m) {
                   const day = parseInt(m[1], 10);
@@ -1714,7 +1793,7 @@ export default function Tasks() {
             if (!isNaN(iso.getTime())) d = iso;
             else {
               const m = raw.match(
-                /(\d{1,2})\s+de\s+([a-zA-ZÃƒÆ’Ã‚Â±ÃƒÆ’Ã¢â‚¬ËœÃƒÆ’Ã‚Â¡ÃƒÆ’Ã‚Â©ÃƒÆ’Ã‚Â­ÃƒÆ’Ã‚Â³ÃƒÆ’Ã‚ÂºÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Â°ÃƒÆ’Ã‚ÂÃƒÆ’Ã¢â‚¬Å“ÃƒÆ’Ã…Â¡]+)\s+de\s+(\d{4})/
+                /(\d{1,2})\s+de\s+([a-zA-ZÑÍÁÉÃÓÚ]+)\s+de\s+(\d{4})/
               );
               if (m) {
                 const day = parseInt(m[1], 10);
@@ -1741,7 +1820,7 @@ export default function Tasks() {
             }
           }
         }
-        // Fallback adicional: colecciÃƒÆ’Ã‚Â³n de perfiles si existiese
+        // Fallback adicional: coleccin de perfiles si existiese
         if (!d) {
           try {
             const pref = await getDoc(doc(db, 'userProfiles', uid)).catch(() => null);
@@ -1760,7 +1839,7 @@ export default function Tasks() {
     })();
   }, [auth?.currentUser?.uid, db]);
 
-  // 2) Crear/actualizar automÃƒÆ’Ã‚Â¡ticamente el evento 'wedding-day' si hay fecha
+  // 2) Crear/actualizar automÍticamente el evento 'wedding-day' si hay fecha
   useEffect(() => {
     (async () => {
       try {
@@ -1790,7 +1869,7 @@ export default function Tasks() {
         const next = {
           id: 'wedding-day',
           autoKey: 'wedding-day',
-          title: prev?.title || 'DÃƒÆ’Ã‚Â­a de la boda',
+          title: prev?.title || 'Día de la boda',
           category: prev?.category || 'OTROS',
           start,
           end,
@@ -1883,7 +1962,7 @@ export default function Tasks() {
         <h1 className="page-title">Gestión de Tareas</h1>
         <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
           <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
-          <div className="text-sm">No hay boda activa en este momento. Ve a la sección \"Bodas\" para seleccionar una existente o crear una nueva.</div>
+          <div className="text-sm">No hay boda activa en este momento. Ve a la secci)n \"Bodas\" para seleccionar una existente o crear una nueva.</div>
         </div>
       </div>
     );
@@ -1904,7 +1983,7 @@ export default function Tasks() {
 
       {/* Componente para el diagrama Gantt */}
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
-        <h2 className="text-xl font-semibold mb-4">PlanificaciÃ³n a Largo Plazo</h2>
+        <h2 className="text-xl font-semibold mb-4">Planificacin a Largo Plazo</h2>
         <div className="bg-white rounded-lg shadow p-4">
           <LongTermTasksGantt
             tasks={ganttDisplayTasks || []}
@@ -1916,6 +1995,8 @@ export default function Tasks() {
             rowHeight={40}
             onTaskClick={(task) => {
               if (!task) return;
+              // Intento de Navegacin rpida a otra secci)n si aplica
+              if (handleTaskIntent(task)) return;
               try {
                 const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
                 const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
@@ -1989,6 +2070,7 @@ export default function Tasks() {
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
           onTaskClick={(event) => {
+            if (handleTaskIntent(event)) return;
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
             const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
             setEditingId(event.id);
@@ -2036,6 +2118,8 @@ export default function Tasks() {
           onToggleComplete={(id, val) => toggleCompleteById(id, val)}
           onTaskClick={(task) => {
             if (!task) return;
+            // Navegacin rpida desde el modal si corresponde
+            if (handleTaskIntent(task)) return;
             try {
               const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
               const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
@@ -2109,5 +2193,10 @@ export default function Tasks() {
     </div>
   );
 }
+
+
+
+
+
 
 

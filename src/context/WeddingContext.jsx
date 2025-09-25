@@ -44,7 +44,7 @@ export default function WeddingProvider({ children }) {
   const { currentUser } = useAuth();
   // Helper: compute storage key for active wedding per user
   const storageKeyForUser = useCallback(
-    (uid) => (uid ? `lovenda_active_wedding_user_${uid}` : 'lovenda_active_wedding'),
+    (uid) => (uid ? `mywed360_active_wedding_user_${uid}` : 'mywed360_active_wedding'),
     []
   );
 
@@ -57,7 +57,7 @@ export default function WeddingProvider({ children }) {
         if (byUser) return byUser;
         // If we know the user, do not inherit legacy global key from a previous session
         if (uid) return '';
-        const legacy = localStorage.getItem('lovenda_active_wedding');
+        const legacy = localStorage.getItem('mywed360_active_wedding');
         return legacy || '';
       } catch {
         return '';
@@ -72,8 +72,8 @@ export default function WeddingProvider({ children }) {
       try {
         const userKey = storageKeyForUser(uid);
         localStorage.removeItem(userKey);
-        localStorage.removeItem('lovenda_active_wedding');
-        localStorage.removeItem('lovenda_active_wedding_name');
+        localStorage.removeItem('mywed360_active_wedding');
+        localStorage.removeItem('mywed360_active_wedding_name');
       } catch {}
     },
     [storageKeyForUser]
@@ -111,7 +111,7 @@ export default function WeddingProvider({ children }) {
       try {
         const uid = currentUser?.uid;
         const keysToWatch = [
-          'lovenda_active_wedding',
+          'mywed360_active_wedding',
           storageKeyForUser(uid),
         ];
         if (!keysToWatch.includes(e.key)) return;
@@ -132,7 +132,7 @@ export default function WeddingProvider({ children }) {
           if (Array.isArray(mock.weddings)) setWeddings(mock.weddings);
           if (mock.activeWedding?.id) {
             setActiveWeddingState(mock.activeWedding.id);
-            localStorage.setItem('lovenda_active_wedding', mock.activeWedding.id);
+            localStorage.setItem('mywed360_active_wedding', mock.activeWedding.id);
           }
         } catch (_) {}
         return;
@@ -244,7 +244,7 @@ export default function WeddingProvider({ children }) {
             // Persistimos también en localStorage para que quede sincronizado
             setActiveWeddingState(list[0].id);
             try {
-              localStorage.setItem('lovenda_active_wedding', list[0].id);
+              localStorage.setItem('mywed360_active_wedding', list[0].id);
               localStorage.setItem(storageKeyForUser(currentUser.uid), list[0].id);
             } catch {}
           } else {
@@ -267,7 +267,7 @@ export default function WeddingProvider({ children }) {
   const setActiveWedding = useCallback((id) => {
     setActiveWeddingState(id);
     try {
-      localStorage.setItem('lovenda_active_wedding', id);
+      localStorage.setItem('mywed360_active_wedding', id);
       if (currentUser?.uid) {
         localStorage.setItem(storageKeyForUser(currentUser.uid), id);
       }
@@ -283,3 +283,4 @@ export default function WeddingProvider({ children }) {
 }
 
 export { WeddingProvider };
+

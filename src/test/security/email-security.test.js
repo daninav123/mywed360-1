@@ -6,7 +6,7 @@ import { mockUsers, mockEmails } from '../mocks/emailMocks';
 // Mock para módulos de autenticación
 vi.mock('../../auth/authService', () => ({
   default: {
-    getCurrentUser: () => ({ id: 'user1', email: 'user1@lovenda.com' }),
+    getCurrentUser: () => ({ id: 'user1', email: 'user1@mywed360.com' }),
     validateUserPermission: vi.fn().mockImplementation((userId, resourceId) => {
       // Simula validación de permisos
       if (userId === 'user1' && (resourceId.startsWith('email1') || !resourceId)) {
@@ -190,3 +190,6 @@ describe('Pruebas de Seguridad para el Sistema de Correo', () => {
     });
   });
 });
+
+
+

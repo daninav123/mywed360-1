@@ -102,7 +102,7 @@ components:
         allergens:
           type: string
           maxLength: 500
-          default: ""
+          default:  –  – 
     RSVPRemindersRequest:
       type: object
       required: [weddingId]

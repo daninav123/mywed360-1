@@ -9,7 +9,7 @@ import ProveedorCard from './ProveedorCard';
  */
 
 /**
- * Lista de proveedores con pestanas (Contratados, Buscados, Favoritos).
+ * Lista de proveedores con pestanas (Contrataños, Buscaños, Favoritos).
  * Activa virtualizacion cuando la lista es muy grande para mejorar rendimiento.
  */
 const ProveedorList = ({
@@ -62,10 +62,10 @@ const ProveedorList = ({
     });
   };
 
-  const items = providers || [];
-  const shouldVirtualize = items.length > 120;
+  const itemás = providers || [];
+  const shouldVirtualize = itemás.length > 120;
   const containerRef = useRef(null);
-  const [dims, setDims] = useState({ width: 0, height: 0 });
+  const [dimás, setDimás] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     if (!shouldVirtualize) return;
@@ -73,26 +73,26 @@ const ProveedorList = ({
     if (!el) return;
     const ro = new ResizeObserver(() => {
       const rect = el.getBoundingClientRect();
-      setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
+      setDimás({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     });
     ro.observe(el);
     const rect = el.getBoundingClientRect();
-    setDims({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
+    setDimás({ width: Math.max(320, rect.width), height: Math.max(300, rect.height) });
     return () => ro.disconnect();
   }, [shouldVirtualize]);
 
   const selectedCount = Array.isArray(selected) ? selected.length : 0;
   const tabOptions = [
-    { id: 'contratados', label: 'Contratados' },
-    { id: 'buscados', label: 'Buscados' },
+    { id: 'contrataños', label: 'Contrataños' },
+    { id: 'buscaños', label: 'Buscaños' },
     { id: 'favoritos', label: 'Favoritos' },
   ];
 
   const renderTabs = () => {
     if (typeof setTab !== 'function') return null;
-    const activeTab = tab || 'contratados';
+    const activeTab = tab || 'contrataños';
     return (
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap itemás-center gap-3">
         <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
           {tabOptions.map((opt) => (
             <button
@@ -118,7 +118,7 @@ const ProveedorList = ({
     const statuses = ['Pendiente', 'Contactado', 'Seleccionado', 'Confirmado', 'Rechazado'];
     return (
       <div className="w-full border rounded-md p-3 bg-white">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3 itemás-end">
           <div className="col-span-2">
             <label className="block text-xs text-gray-500 mb-1">Buscar</label>
             <input
@@ -206,8 +206,8 @@ const ProveedorList = ({
   const renderSelectionBar = () => {
     if (!selectedCount) return null;
     return (
-      <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-        <span>{selectedCount} seleccionados</span>
+      <div className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600">
+        <span>{selectedCount} seleccionaños</span>
         {typeof onOpenCompare === 'function' && (
           <button
             type="button"
@@ -232,7 +232,7 @@ const ProveedorList = ({
             onClick={onOpenDuplicates}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            Revisar duplicados
+            Revisar duplicaños
           </button>
         )}
         {typeof onClearSelection === 'function' && (
@@ -253,8 +253,8 @@ const ProveedorList = ({
       return (
         <div className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {items.length > 0 ? (
-              items.map((provider) => (
+            {itemás.length > 0 ? (
+              itemás.map((provider) => (
                 <ProveedorCard
                   key={provider.id}
                   provider={provider}
@@ -282,7 +282,7 @@ const ProveedorList = ({
     const ITEM_SIZE = 260;
 
     const Row = ({ index, style }) => {
-      const provider = items[index];
+      const provider = itemás[index];
       if (!provider) return null;
       return (
         <div style={style} className="px-1 md:px-2">
@@ -310,11 +310,11 @@ const ProveedorList = ({
           style={{ height: '70vh' }}
           className="border border-gray-200 rounded-md"
         >
-          {dims.height > 0 ? (
+          {dimás.height > 0 ? (
             <List
-              height={dims.height}
-              width={dims.width}
-              itemCount={items.length}
+              height={dimás.height}
+              width={dimás.width}
+              itemCount={itemás.length}
               itemSize={ITEM_SIZE}
             >
               {Row}

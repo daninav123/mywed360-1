@@ -6,13 +6,13 @@
 - Ceremonia, cóctel, banquete, fiesta
 - Ocurren el día de la boda
 - Tienen ubicación, horario, duración
-- Se configuran en "Configuración de Boda"
+- Se configuran en  – Configuración de Boda – 
 
 ### Tareas/Eventos (Preparación)
 - Reuniones, citas, tareas por hacer
 - Ocurren ANTES del día de la boda
 - Tienen fechas límite, responsables, estado
-- Se gestionan en "Timeline y Tareas"
+- Se gestionan en  – Timeline y Tareas – 
 
 ## 5.1 Creación de Timeline de Preparación
 **Objetivo:** Organizar todas las tareas necesarias antes de la boda
@@ -188,9 +188,9 @@
 ### Tutorial Conversacional
 **Pasos detallados:**
 - [ ] **Bienvenida contextual**
-  - "¡Hola de nuevo! Veo que quieres organizar el timeline de tu boda"
+  -  – ¡Hola de nuevo! Veo que quieres organizar el timeline de tu boda – 
   - Análisis de datos existentes (fecha, tipo de boda)
-  - "Basándome en tu boda del [fecha], te he preparado un plan personalizado"
+  -  – Basándome en tu boda del [fecha], te he preparado un plan personalizado – 
 
 - [ ] **Presentación del timeline generado**
   - Mostrar timeline automático creado
@@ -199,13 +199,13 @@
   - Permitir ajustes inmediatos
 
 - [ ] **Personalización guiada**
-  - "¿Hay alguna tarea específica que ya tienes en mente?"
-  - "¿Prefieres empezar por proveedores o por invitados?"
-  - "¿Tienes restricciones de tiempo o fechas fijas?"
+  -  – ¿Hay alguna tarea específica que ya tienes en mente? – 
+  -  – ¿Prefieres empezar por proveedores o por invitados? – 
+  -  – ¿Tienes restricciones de tiempo o fechas fijas? – 
   - Ajuste del timeline según respuestas
 
 - [ ] **Configuración de notificaciones**
-  - "¿Cómo prefieres que te recuerde las tareas?"
+  -  – ¿Cómo prefieres que te recuerde las tareas? – 
   - Opciones: email, push, SMS, calendario
   - Frecuencia de recordatorios
   - Personas adicionales a notificar
@@ -214,79 +214,79 @@
 ```javascript
 // /weddings/{weddingId}/tasks/{taskId}
 {
-  id: "task_001",
-  title: "Contratar fotógrafo",
-  description: "Buscar y contratar fotógrafo para la boda",
-  category: "proveedores",
-  priority: "high",
-  status: "pending", // pending, in_progress, completed, cancelled
-  dueDate: "2024-03-15",
-  createdDate: "2024-01-15",
-  assignedTo: "bride",
+  id:  – task_001 – ,
+  title:  – Contratar fotógrafo – ,
+  description:  – Buscar y contratar fotógrafo para la boda – ,
+  category:  – proveedores – ,
+  priority:  – high – ,
+  status:  – pending – , // pending, in_progress, completed, cancelled
+  dueDate:  – 2024-03-15 – ,
+  createdDate:  – 2024-01-15 – ,
+  assignedTo:  – bride – ,
   estimatedHours: 8,
-  dependencies: ["task_venue_confirmed"],
+  dependencies: [ – task_venue_confirmed – ],
   subtasks: [
     {
-      id: "subtask_001",
-      title: "Investigar fotógrafos recomendados",
+      id:  – subtask_001 – ,
+      title:  – Investigar fotógrafos recomendados – ,
       completed: true
     },
     {
-      id: "subtask_002", 
-      title: "Solicitar presupuestos",
+      id:  – subtask_002 – , 
+      title:  – Solicitar presupuestos – ,
       completed: false
     }
   ],
   reminders: [
     {
-      type: "email",
+      type:  – email – ,
       daysBefore: 7,
       sent: false
     }
   ],
-  notes: "Presupuesto máximo: 2000€",
-  attachments: ["photographer_quotes.pdf"],
-  relatedVendor: "photographer_123",
+  notes:  – Presupuesto máximo: 2000€ – ,
+  attachments: [ – photographer_quotes.pdf – ],
+  relatedVendor:  – photographer_123 – ,
   milestone: false,
   aiGenerated: true,
-  createdAt: "2024-01-15T10:00:00Z"
+  createdAt:  – 2024-01-15T10:00:00Z – 
 }
 
 // /weddings/{weddingId}/appointments/{appointmentId}
 {
-  id: "appointment_001",
-  title: "Cita con fotógrafo María García",
-  type: "vendor_meeting",
-  vendorId: "photographer_123",
-  date: "2024-03-20",
-  startTime: "16:00",
+  id:  – appointment_001 – ,
+  title:  – Cita con fotógrafo María García – ,
+  type:  – vendor_meeting – ,
+  vendorId:  – photographer_123 – ,
+  date:  – 2024-03-20 – ,
+  startTime:  – 16:00 – ,
   duration: 90, // minutos
   location: {
-    name: "Estudio María García",
-    address: "Calle Fotógrafo 15, Madrid"
+    name:  – Estudio María García – ,
+    address:  – Calle Fotógrafo 15, Madrid – 
   },
   attendees: [
-    { uid: "bride_uid", confirmed: true },
-    { uid: "groom_uid", confirmed: false }
+    { uid:  – bride_uid – , confirmed: true },
+    { uid:  – groom_uid – , confirmed: false }
   ],
   agenda: [
-    "Ver portfolio completo",
-    "Discutir estilo de fotos",
-    "Revisar paquetes y precios",
-    "Confirmar disponibilidad fecha boda"
+     – Ver portfolio completo – ,
+     – Discutir estilo de fotos – ,
+     – Revisar paquetes y precios – ,
+     – Confirmar disponibilidad fecha boda – 
   ],
   preparation: {
-    documentsToTake: ["wedding_info.pdf"],
-    questionsToAsk: ["¿Incluye álbum?", "¿Cuántas horas de cobertura?"],
+    documentsToTake: [ – wedding_info.pdf – ],
+    questionsToAsk: [ – ¿Incluye álbum? – ,  – ¿Cuántas horas de cobertura? – ],
     budgetRange: { min: 1500, max: 2000 }
   },
   outcome: {
-    decision: "pending", // confirmed, rejected, pending
-    notes: "",
+    decision:  – pending – , // confirmed, rejected, pending
+    notes:  –  – ,
     followUpTasks: [],
     nextAppointment: null
   },
-  createdAt: "2024-01-15T10:00:00Z"
+  createdAt:  – 2024-01-15T10:00:00Z – 
 }
 ```
 

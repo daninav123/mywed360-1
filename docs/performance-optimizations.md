@@ -25,8 +25,8 @@ Este documento detalla las optimizaciones de rendimiento implementadas para mejo
 import { LazyTasks, LazyFinance } from '../components/performance/LazyComponentLoader';
 
 // En rutas
-<Route path="/tasks" element={<LazyTasks />} />
-<Route path="/finance" element={<LazyFinance />} />
+<Route path= – /tasks –  element={<LazyTasks />} />
+<Route path= – /finance –  element={<LazyFinance />} />
 ```
 
 ### 2. imageOptimizationService.js
@@ -49,10 +49,10 @@ import { LazyTasks, LazyFinance } from '../components/performance/LazyComponentL
 import { OptimizedImage } from '../services/imageOptimizationService';
 
 <OptimizedImage 
-  src="/path/to/image.jpg"
+  src= – /path/to/image.jpg – 
   width={400}
   height={300}
-  alt="Descripción"
+  alt= – Descripción – 
 />
 ```
 

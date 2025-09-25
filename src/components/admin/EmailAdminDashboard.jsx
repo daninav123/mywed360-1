@@ -1,4 +1,4 @@
-﻿import {
+import {
   Card,
   CardContent,
   Tabs,
@@ -14,8 +14,8 @@
 } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 
-// Eliminando importación problemática de @mui/icons-material
-// Vamos a usar alternativas simples de texto para los íconos
+// Eliminando importacin problemtica de @mui/icons-material
+// Vamos a usar alternativas simples de texto para los conos
 import { useNavigate } from 'react-router-dom';
 
 import MetricsDashboard from './MetricsDashboard';
@@ -23,8 +23,8 @@ import { get as apiGet } from '../../services/apiClient';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
 
 /**
- * Panel de administración para el sistema de correo electrónico
- * Proporciona acceso a métricas, configuración y feedback de usuarios
+ * Panel de administracin para el sistema de correo electrnico
+ * Proporciona acceso a mtricas, configuracin y feedback de usuarios
  *
  * @component
  * @example
@@ -52,12 +52,12 @@ function EmailAdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Cargar datos de estadísticas
+    // Cargar datos de estadsticas
     const loadStats = async () => {
       setIsLoading(true);
 
       try {
-        // Stats básicas de correo desde backend
+        // Stats bsicas de correo desde backend
         let core = { total: 0, unread: 0, byFolder: {} };
         try {
           const res = await apiGet('/api/mail/stats', { auth: true });
@@ -79,10 +79,10 @@ function EmailAdminDashboard() {
             {
               id: 1,
               rating: 5,
-              comment: 'Me encanta la detección automática de eventos',
+              comment: 'Me encanta la deteccin automtica de eventos',
               date: '2025-07-12',
             },
-            { id: 2, rating: 4, comment: 'Muy útil, aunque a veces es lento', date: '2025-07-10' },
+            { id: 2, rating: 4, comment: 'Muy til, aunque a veces es lento', date: '2025-07-10' },
             { id: 3, rating: 3, comment: 'Necesita mejores plantillas', date: '2025-07-09' },
           ],
         });
@@ -92,7 +92,7 @@ function EmailAdminDashboard() {
           tab: activeTab,
         });
       } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
+        console.error('Error al cargar estadsticas:', error);
       } finally {
         setIsLoading(false);
       }
@@ -101,7 +101,7 @@ function EmailAdminDashboard() {
     loadStats();
   }, [activeTab]);
 
-  // Manejador para cambiar de pestaña
+  // Manejador para cambiar de pestaa
   const handleTabChange = (event, newTab) => {
     setActiveTab(newTab);
     performanceMonitor.logEvent('admin_tab_change', { tab: newTab });
@@ -111,25 +111,25 @@ function EmailAdminDashboard() {
   const handleExportReport = (format) => {
     performanceMonitor.logEvent('export_report', { format, tab: activeTab });
 
-    // Simulamos la exportación
+    // Simulamos la exportacin
     alert(`Informe exportado en formato ${format}`);
   };
 
-  // Estado para el menú desplegable de exportación
+  // Estado para el men desplegable de exportacin
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
   const openExportMenu = Boolean(exportAnchorEl);
 
-  // Abrir menú de exportación
+  // Abrir men de exportacin
   const handleExportClick = (event) => {
     setExportAnchorEl(event.currentTarget);
   };
 
-  // Cerrar menú de exportación
+  // Cerrar men de exportacin
   const handleExportClose = () => {
     setExportAnchorEl(null);
   };
 
-  // Manejador para ir a la configuración de emails
+  // Manejador para ir a la configuracin de emails
   const handleGoToEmailSettings = () => {
     navigate('/settings/email');
   };
@@ -137,11 +137,11 @@ function EmailAdminDashboard() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h4">Panel de Administración de Email</Typography>
+        <Typography variant="h4">Panel de Administracin de Email</Typography>
         <Button
           variant="contained"
           onClick={() => navigate('/admin/metrics')}
-          // Eliminado el icono problemático
+          // Eliminado el icono problemtico
         >
           Ver Dashboard Completo
         </Button>
@@ -155,7 +155,7 @@ function EmailAdminDashboard() {
             <Button
               variant="outlined"
               onClick={handleExportClick}
-              // Eliminado el icono problemático
+              // Eliminado el icono problemtico
             >
               Exportar Informe
             </Button>
@@ -190,9 +190,9 @@ function EmailAdminDashboard() {
           <Button
             variant="contained"
             onClick={handleGoToEmailSettings}
-            // Eliminado el icono problemático
+            // Eliminado el icono problemtico
           >
-            Configuración de Email
+            Configuracin de Email
           </Button>
         </Box>
       </Box>
@@ -272,7 +272,7 @@ function EmailAdminDashboard() {
       </Box>
 
       <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 4 }}>
-        <Tab value="metrics" label="Métricas" />
+        <Tab value="metrics" label="Mtricas" />
         <Tab value="feedback" label="Feedback de Usuarios" />
         <Tab value="accounts" label="Cuentas de Email" />
       </Tabs>
@@ -290,7 +290,7 @@ function EmailAdminDashboard() {
             <div className="d-flex align-items-center mb-3">
               <div className="me-3">
                 <span className="h3 mb-0">{feedbackStats.averageRating.toFixed(1)}</span>
-                <div className="text-muted">Valoración media</div>
+                <div className="text-muted">Valoracin media</div>
               </div>
               <div className="ms-4">
                 <div className="ratings">
@@ -299,7 +299,7 @@ function EmailAdminDashboard() {
                       key={star}
                       className={`h4 ${star <= Math.round(feedbackStats.averageRating) ? 'text-warning' : 'text-muted'}`}
                     >
-                      ★
+                      ?
                     </span>
                   ))}
                 </div>
@@ -325,7 +325,7 @@ function EmailAdminDashboard() {
                             key={i}
                             className={`small ${i < item.rating ? 'text-warning' : 'text-muted'}`}
                           >
-                            ★
+                            ?
                           </span>
                         ))}
                       </div>
@@ -342,7 +342,7 @@ function EmailAdminDashboard() {
 
       {activeTab === 'accounts' && (
         <Paper elevation={1} sx={{ p: 4, mb: 4 }}>
-          <h3 className="h5 mb-3">Gestión de Cuentas</h3>
+          <h3 className="h5 mb-3">Gestin de Cuentas</h3>
 
           <div className="table-responsive">
             <table className="table table-hover">
@@ -357,8 +357,8 @@ function EmailAdminDashboard() {
               </thead>
               <tbody>
                 <tr>
-                  <td>juan@lovenda.com</td>
-                  <td>Juan Pérez</td>
+                  <td>juan@mywed360.com</td>
+                  <td>Juan Prez</td>
                   <td>10/06/2025</td>
                   <td>
                     <span className="badge bg-success">Activo</span>
@@ -373,8 +373,8 @@ function EmailAdminDashboard() {
                   </td>
                 </tr>
                 <tr>
-                  <td>maria@lovenda.com</td>
-                  <td>María García</td>
+                  <td>maria@mywed360.com</td>
+                  <td>Mara Garca</td>
                   <td>15/06/2025</td>
                   <td>
                     <span className="badge bg-success">Activo</span>
@@ -389,8 +389,8 @@ function EmailAdminDashboard() {
                   </td>
                 </tr>
                 <tr>
-                  <td>carlos@lovenda.com</td>
-                  <td>Carlos López</td>
+                  <td>carlos@mywed360.com</td>
+                  <td>Carlos Lpez</td>
                   <td>20/06/2025</td>
                   <td>
                     <span className="badge bg-warning text-dark">Suspendido</span>
@@ -450,3 +450,5 @@ function EmailAdminDashboard() {
 }
 
 export default EmailAdminDashboard;
+
+

@@ -13,7 +13,7 @@ import { auth, db, firebaseReady } from '../firebaseConfig';
 import { post as apiPost } from '../services/apiClient';
 
 // Helpers para localStorage (caché offline por boda)
-const localKey = (wid, name) => `lovenda_${wid}_${name}`;
+const localKey = (wid, name) => `mywed360_${wid}_${name}`;
 const lsGet = (wid, name, fallback) => {
   try {
     const stored = localStorage.getItem(localKey(wid, name));
@@ -23,7 +23,7 @@ const lsGet = (wid, name, fallback) => {
 };
 const lsSet = (wid, name, data) => {
   localStorage.setItem(localKey(wid, name), JSON.stringify(data));
-  window.dispatchEvent(new Event(`lovenda-${wid}-${name}`));
+  window.dispatchEvent(new Event(`mywed360-${wid}-${name}`));
 };
 
 /**
@@ -342,7 +342,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
   // Sincronización intra‑pestaña (evento custom) y entre pestañas (evento storage)
   useEffect(() => {
     if (!weddingId) return;
-    const evtName = `lovenda-${weddingId}-${subName}`;
+    const evtName = `mywed360-${weddingId}-${subName}`;
     const onLocal = () => {
       try {
         // Evitar eco inmediato de nuestra propia escritura
@@ -475,3 +475,4 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 };
 
 export default useWeddingCollection;
+

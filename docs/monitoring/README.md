@@ -56,7 +56,7 @@ Esta guía te permite desplegar Prometheus + Grafana + Alertmanager para monitor
 Archivo: `docs/monitoring/alerting_rules.yml`
 
 - HighErrorRate
-  - `increase(http_requests_total{status=~"5.."}[5m]) > 5` durante 1m
+  - `increase(http_requests_total{status=~ – 5.. – }[5m]) > 5` durante 1m
   - `severity: warning`
 - SlowRequestsP95
   - `histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1` durante 2m

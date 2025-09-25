@@ -9,7 +9,7 @@ const IS_TEST = (
   (typeof import.meta !== 'undefined' && (import.meta.vitest || (import.meta.env && import.meta.env.MODE === 'test')))
 );
 /**
- * Servicio de monitoreo de rendimiento para la aplicación Lovenda
+ * Servicio de monitoreo de rendimiento para la aplicación MyWed360
  *
  * Este servicio permite monitorizar el rendimiento de diferentes componentes
  * y funcionalidades críticas, especialmente el sistema de emails personalizados.
@@ -375,7 +375,7 @@ class PerformanceMonitor {
 
         // Almacenar últimas métricas en localStorage para debugging
         try {
-          localStorage.setItem('lovenda_last_metrics', JSON.stringify(metricsToSend));
+          localStorage.setItem('MyWed360_last_metrics', JSON.stringify(metricsToSend));
         } catch (e) {
           // Ignorar errores de localStorage
         }
@@ -629,6 +629,7 @@ export function useComponentLoadTime(componentName) {
     };
   }, [componentName]);
 }
+
 
 
 

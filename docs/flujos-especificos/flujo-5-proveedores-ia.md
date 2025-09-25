@@ -1,148 +1,148 @@
-# 5. Flujo de Gestión de Proveedores con IA (Detallado)
+﻿# 5. Flujo de GestiÃ³n de Proveedores con IA (Detallado)
 
 ## 5.1 Mini-Tutorial IA para Proveedores
-**Objetivo:** Guiar al usuario en la selección de servicios necesarios
+**Objetivo:** Guiar al usuario en la selecciÃ³n de servicios necesarios
 
 ### Tutorial Conversacional Inicial
 **Pasos detallados:**
 - [ ] **Bienvenida contextual**
-  - "¡Perfecto! Vamos a organizar los proveedores para tu boda"
-  - Análisis de datos existentes (tipo de boda, presupuesto, fecha)
-  - "Basándome en tu boda [tipo] del [fecha], estos son los servicios esenciales"
+  -  â€“ Â¡Perfecto! Vamos a organizar los proveedores para tu boda â€“ 
+  - AnÃ¡lisis de datos existentes (tipo de boda, presupuesto, fecha)
+  -  â€“ BasÃ¡ndome en tu boda [tipo] del [fecha], estos son los servicios esenciales â€“ 
 
-- [ ] **Identificación de servicios necesarios**
-  - IA pregunta: "¿Qué servicios crees que vas a necesitar?"
+- [ ] **IdentificaciÃ³n de servicios necesarios**
+  - IA pregunta:  â€“ Â¿QuÃ© servicios crees que vas a necesitar? â€“ 
   - Lista de servicios esenciales vs opcionales
-  - Priorización según presupuesto disponible
+  - PriorizaciÃ³n segÃºn presupuesto disponible
   - Sugerencias basadas en tipo de boda
 
 - [ ] **Servicios esenciales identificados**
-  - **Obligatorios:** Lugar/venue, catering, fotografía
-  - **Muy importantes:** Música/DJ, flores, transporte
-  - **Opcionales:** Videografía, wedding planner, animación
-  - **Específicos:** Según tipo (religiosa: música sacra, civil: oficiante)
+  - **Obligatorios:** Lugar/venue, catering, fotografÃ­a
+  - **Muy importantes:** MÃºsica/DJ, flores, transporte
+  - **Opcionales:** VideografÃ­a, wedding planner, animaciÃ³n
+  - **EspecÃ­ficos:** SegÃºn tipo (religiosa: mÃºsica sacra, civil: oficiante)
 
-- [ ] **Configuración de tarjetas de servicios**
-  - Generación automática de tarjetas vacías
+- [ ] **ConfiguraciÃ³n de tarjetas de servicios**
+  - GeneraciÃ³n automÃ¡tica de tarjetas vacÃ­as
   - Una tarjeta por cada servicio identificado
-  - Estado inicial: "Sin contratar" (transparente)
-  - Información básica: presupuesto estimado, prioridad
+  - Estado inicial:  â€“ Sin contratar â€“  (transparente)
+  - InformaciÃ³n bÃ¡sica: presupuesto estimado, prioridad
 
-## 5.2 Dashboard de Proveedores con Tarjetas Vacías
+## 5.2 Dashboard de Proveedores con Tarjetas VacÃ­as
 **Objetivo:** Visualizar servicios pendientes y contratados
 
-### Sistema de Tarjetas Dinámicas
+### Sistema de Tarjetas DinÃ¡micas
 **Pasos detallados:**
-- [ ] **Tarjetas vacías/transparentes**
-  - Diseño semitransparente para servicios sin contratar
+- [ ] **Tarjetas vacÃ­as/transparentes**
+  - DiseÃ±o semitransparente para servicios sin contratar
   - Icono del tipo de servicio
-  - Título del servicio
-  - "Buscar proveedor" como acción principal
+  - TÃ­tulo del servicio
+  -  â€“ Buscar proveedor â€“  como acciÃ³n principal
   - Presupuesto estimado por IA
 
 - [ ] **Estados de tarjetas**
-  - **Vacía:** Sin proveedor asignado (transparente)
+  - **VacÃ­a:** Sin proveedor asignado (transparente)
   - **En proceso:** Contactando proveedores (amarillo)
-  - **Presupuestos recibidos:** Esperando decisión (azul)
+  - **Presupuestos recibidos:** Esperando decisiÃ³n (azul)
   - **Contratado:** Proveedor confirmado (verde)
   - **Rechazado:** Servicio descartado (gris)
 
-- [ ] **Información por tarjeta**
+- [ ] **InformaciÃ³n por tarjeta**
   - Nombre del servicio
   - Presupuesto asignado vs gastado
-  - Fecha límite para contratar
+  - Fecha lÃ­mite para contratar
   - Estado del proceso
   - Proveedor actual (si existe)
-  - Próxima acción requerida
+  - PrÃ³xima acciÃ³n requerida
 
-### Gestión Visual de Servicios
+### GestiÃ³n Visual de Servicios
 **Pasos detallados:**
 - [ ] **Filtros y vistas**
   - Ver todos los servicios
   - Solo servicios pendientes
   - Solo servicios contratados
   - Filtrar por presupuesto
-  - Ordenar por prioridad/fecha límite
+  - Ordenar por prioridad/fecha lÃ­mite
 
-- [ ] **Acciones rápidas**
-  - "Buscar proveedor" → Búsqueda con IA
-  - "No necesito este servicio" → Marcar como descartado
-  - "Ya tengo proveedor" → Añadir proveedor externo
-  - "Cambiar presupuesto" → Ajustar asignación
+- [ ] **Acciones rÃ¡pidas**
+  -  â€“ Buscar proveedor â€“  â†’ BÃºsqueda con IA
+  -  â€“ No necesito este servicio â€“  â†’ Marcar como descartado
+  -  â€“ Ya tengo proveedor â€“  â†’ AÃ±adir proveedor externo
+  -  â€“ Cambiar presupuesto â€“  â†’ Ajustar asignaciÃ³n
 
-## 5.3 Búsqueda de Proveedores con IA
-**Objetivo:** Encontrar proveedores adecuados según criterios específicos
+## 5.3 BÃºsqueda de Proveedores con IA
+**Objetivo:** Encontrar proveedores adecuados segÃºn criterios especÃ­ficos
 
-### Búsqueda Inteligente
+### BÃºsqueda Inteligente
 **Pasos detallados:**
-- [ ] **Criterios de búsqueda**
-  - Ubicación (radio desde venue)
+- [ ] **Criterios de bÃºsqueda**
+  - UbicaciÃ³n (radio desde venue)
   - Presupuesto disponible
   - Fecha de la boda (disponibilidad)
-  - Estilo de boda (clásico, moderno, rústico)
-  - Valoraciones mínimas
-  - Servicios específicos requeridos
+  - Estilo de boda (clÃ¡sico, moderno, rÃºstico)
+  - Valoraciones mÃ­nimas
+  - Servicios especÃ­ficos requeridos
 
 - [ ] **Base de datos de proveedores**
   - Directorio integrado de proveedores locales
-  - Información verificada: precios, disponibilidad, portfolio
-  - Sistema de valoraciones y reseñas
-  - Integración con APIs de proveedores externos
+  - InformaciÃ³n verificada: precios, disponibilidad, portfolio
+  - Sistema de valoraciones y reseÃ±as
+  - IntegraciÃ³n con APIs de proveedores externos
 
 - [ ] **Resultados personalizados**
   - Lista ordenada por compatibilidad
-  - Puntuación IA basada en criterios
-  - Comparativa rápida de precios
+  - PuntuaciÃ³n IA basada en criterios
+  - Comparativa rÃ¡pida de precios
   - Disponibilidad en tiempo real
   - Recomendaciones especiales
 
-### Análisis de Compatibilidad
+### AnÃ¡lisis de Compatibilidad
 **Pasos detallados:**
 - [ ] **Algoritmo de matching**
-  - Análisis de estilo vs portfolio del proveedor
+  - AnÃ¡lisis de estilo vs portfolio del proveedor
   - Compatibilidad de presupuesto
   - Experiencia en tipo de boda similar
-  - Proximidad geográfica
+  - Proximidad geogrÃ¡fica
   - Disponibilidad confirmada
 
-- [ ] **Puntuación compuesta**
+- [ ] **PuntuaciÃ³n compuesta**
   - Calidad del servicio (40%)
   - Ajuste al presupuesto (30%)
   - Disponibilidad (20%)
   - Proximidad (10%)
   - Bonificaciones por recomendaciones
 
-## 5.4 Contacto Automático con IA
+## 5.4 Contacto AutomÃ¡tico con IA
 **Objetivo:** Automatizar el proceso de solicitud de presupuestos
 
-### Generación Automática de Emails
+### GeneraciÃ³n AutomÃ¡tica de Emails
 **Pasos detallados:**
 - [ ] **Plantilla personalizada por IA**
-  - Análisis del proveedor y su estilo de comunicación
-  - Personalización según información de la boda
-  - Tono apropiado (formal/informal según proveedor)
-  - Información relevante incluida automáticamente
+  - AnÃ¡lisis del proveedor y su estilo de comunicaciÃ³n
+  - PersonalizaciÃ³n segÃºn informaciÃ³n de la boda
+  - Tono apropiado (formal/informal segÃºn proveedor)
+  - InformaciÃ³n relevante incluida automÃ¡ticamente
 
 - [ ] **Contenido del email generado**
   - Saludo personalizado
-  - Presentación de los novios
+  - PresentaciÃ³n de los novios
   - Detalles de la boda (fecha, lugar, tipo)
-  - Servicios específicos requeridos
+  - Servicios especÃ­ficos requeridos
   - Presupuesto aproximado (opcional)
   - Solicitud de disponibilidad y presupuesto
-  - Información de contacto
+  - InformaciÃ³n de contacto
 
 - [ ] **Ejemplo de email generado:**
 ```
-Asunto: Consulta para fotografía de boda - Ana & Carlos - 15 Junio 2024
+Asunto: Consulta para fotografÃ­a de boda - Ana & Carlos - 15 Junio 2024
 
-Estimado/a [Nombre Fotógrafo],
+Estimado/a [Nombre FotÃ³grafo],
 
 Mi nombre es Ana y junto con mi pareja Carlos estamos organizando nuestra boda 
 para el 15 de junio de 2024 en el Hotel Majestic de Madrid.
 
-Hemos visto su trabajo y nos encanta su estilo [natural/clásico/artístico]. 
-Estamos buscando un fotógrafo para cubrir tanto la ceremonia (17:00h) como 
+Hemos visto su trabajo y nos encanta su estilo [natural/clÃ¡sico/artÃ­stico]. 
+Estamos buscando un fotÃ³grafo para cubrir tanto la ceremonia (17:00h) como 
 el banquete posterior.
 
 Detalles de nuestra boda:
@@ -150,165 +150,165 @@ Detalles de nuestra boda:
 - Ceremonia: 17:00h en Iglesia San Miguel
 - Banquete: 20:00h en Hotel Majestic
 - Invitados aproximados: 120 personas
-- Estilo: clásico elegante
+- Estilo: clÃ¡sico elegante
 
-¿Estaría disponible para esa fecha? Nos gustaría conocer sus paquetes y 
-precios para poder tomar una decisión informada.
+Â¿EstarÃ­a disponible para esa fecha? Nos gustarÃ­a conocer sus paquetes y 
+precios para poder tomar una decisiÃ³n informada.
 
 Quedamos a la espera de su respuesta.
 
 Un saludo cordial,
-Ana García y Carlos López
-Teléfono: [teléfono]
+Ana GarcÃ­a y Carlos LÃ³pez
+TelÃ©fono: [telÃ©fono]
 Email: [email]
 ```
 
-### Envío y Seguimiento
+### EnvÃ­o y Seguimiento
 **Pasos detallados:**
-- [ ] **Envío automático**
-  - Revisión previa del email por el usuario
-  - Opción de editar antes del envío
-  - Envío desde email personal del usuario
+- [ ] **EnvÃ­o automÃ¡tico**
+  - RevisiÃ³n previa del email por el usuario
+  - OpciÃ³n de editar antes del envÃ­o
+  - EnvÃ­o desde email personal del usuario
   - Copia oculta al sistema para seguimiento
 
-- [ ] **Seguimiento automático**
-  - Detección de respuestas recibidas
-  - Análisis del contenido de la respuesta
-  - Extracción de información clave (precios, disponibilidad)
-  - Notificación al usuario de respuestas recibidas
+- [ ] **Seguimiento automÃ¡tico**
+  - DetecciÃ³n de respuestas recibidas
+  - AnÃ¡lisis del contenido de la respuesta
+  - ExtracciÃ³n de informaciÃ³n clave (precios, disponibilidad)
+  - NotificaciÃ³n al usuario de respuestas recibidas
 
-- [ ] **Recordatorios automáticos**
-  - Si no hay respuesta en 3 días → recordatorio suave
-  - Si no hay respuesta en 7 días → segundo recordatorio
-  - Si no hay respuesta en 14 días → marcar como no disponible
+- [ ] **Recordatorios automÃ¡ticos**
+  - Si no hay respuesta en 3 dÃ­as â†’ recordatorio suave
+  - Si no hay respuesta en 7 dÃ­as â†’ segundo recordatorio
+  - Si no hay respuesta en 14 dÃ­as â†’ marcar como no disponible
 
-## 5.5 Análisis Automático de Respuestas
-**Objetivo:** Procesar y analizar automáticamente las respuestas de proveedores
+## 5.5 AnÃ¡lisis AutomÃ¡tico de Respuestas
+**Objetivo:** Procesar y analizar automÃ¡ticamente las respuestas de proveedores
 
 ### Procesamiento con IA
 **Pasos detallados:**
-- [ ] **Análisis de contenido**
-  - Extracción de precios mencionados
-  - Identificación de disponibilidad
+- [ ] **AnÃ¡lisis de contenido**
+  - ExtracciÃ³n de precios mencionados
+  - IdentificaciÃ³n de disponibilidad
   - Servicios incluidos/excluidos
   - Condiciones especiales
   - Tono y profesionalidad de la respuesta
 
-- [ ] **Estructuración de datos**
-  - Conversión de texto libre a datos estructurados
-  - Normalización de precios (por hora, por evento, etc.)
-  - Identificación de paquetes ofrecidos
-  - Extracción de fechas y horarios
+- [ ] **EstructuraciÃ³n de datos**
+  - ConversiÃ³n de texto libre a datos estructurados
+  - NormalizaciÃ³n de precios (por hora, por evento, etc.)
+  - IdentificaciÃ³n de paquetes ofrecidos
+  - ExtracciÃ³n de fechas y horarios
 
-- [ ] **Ejemplo de análisis:**
+- [ ] **Ejemplo de anÃ¡lisis:**
 ```javascript
 // Respuesta original del proveedor
-"Hola Ana y Carlos, gracias por contactarnos. Sí tenemos disponibilidad 
+ â€“ Hola Ana y Carlos, gracias por contactarnos. SÃ­ tenemos disponibilidad 
 para el 15 de junio. Nuestro paquete completo incluye 8 horas de cobertura, 
-300 fotos editadas y álbum digital por 1.800€. También ofrecemos álbum 
-físico por 300€ adicionales..."
+300 fotos editadas y Ã¡lbum digital por 1.800â‚¬. TambiÃ©n ofrecemos Ã¡lbum 
+fÃ­sico por 300â‚¬ adicionales... â€“ 
 
-// Datos extraídos por IA
+// Datos extraÃ­dos por IA
 {
   availability: true,
   packages: [
     {
-      name: "Paquete completo",
+      name:  â€“ Paquete completo â€“ ,
       price: 1800,
-      currency: "EUR",
+      currency:  â€“ EUR â€“ ,
       includes: [
-        "8 horas de cobertura",
-        "300 fotos editadas", 
-        "álbum digital"
+         â€“ 8 horas de cobertura â€“ ,
+         â€“ 300 fotos editadas â€“ , 
+         â€“ Ã¡lbum digital â€“ 
       ],
       duration: 8
     }
   ],
   addOns: [
     {
-      name: "Álbum físico",
+      name:  â€“ Ãlbum fÃ­sico â€“ ,
       price: 300,
-      currency: "EUR"
+      currency:  â€“ EUR â€“ 
     }
   ],
-  responseTime: "2 horas",
+  responseTime:  â€“ 2 horas â€“ ,
   professionalismScore: 8.5,
-  nextSteps: ["Solicitar portfolio", "Programar reunión"]
+  nextSteps: [ â€“ Solicitar portfolio â€“ ,  â€“ Programar reuniÃ³n â€“ ]
 }
 ```
 
-### Presentación al Usuario
+### PresentaciÃ³n al Usuario
 **Pasos detallados:**
 - [ ] **Dashboard de respuestas**
   - Resumen ejecutivo de cada respuesta
-  - Comparativa automática de precios
-  - Puntuación de cada propuesta
-  - Recomendación de IA
+  - Comparativa automÃ¡tica de precios
+  - PuntuaciÃ³n de cada propuesta
+  - RecomendaciÃ³n de IA
   - Acciones sugeridas
 
-- [ ] **Notificación inteligente**
-  - "Has recibido 3 respuestas para fotografía"
-  - "El presupuesto promedio es 1.650€"
-  - "Te recomiendo contactar con [Proveedor X] por su excelente relación calidad-precio"
-  - Botones de acción rápida
+- [ ] **NotificaciÃ³n inteligente**
+  -  â€“ Has recibido 3 respuestas para fotografÃ­a â€“ 
+  -  â€“ El presupuesto promedio es 1.650â‚¬ â€“ 
+  -  â€“ Te recomiendo contactar con [Proveedor X] por su excelente relaciÃ³n calidad-precio â€“ 
+  - Botones de acciÃ³n rÃ¡pida
 
-## 5.6 Proceso de Decisión Asistido
-**Objetivo:** Ayudar al usuario a tomar la mejor decisión
+## 5.6 Proceso de DecisiÃ³n Asistido
+**Objetivo:** Ayudar al usuario a tomar la mejor decisiÃ³n
 
-### Comparativa Automática
+### Comparativa AutomÃ¡tica
 **Pasos detallados:**
 - [ ] **Tabla comparativa**
   - Precios normalizados
   - Servicios incluidos (checkmarks)
-  - Valoraciones y reseñas
+  - Valoraciones y reseÃ±as
   - Tiempo de respuesta
   - Profesionalismo percibido
 
-- [ ] **Análisis de valor**
-  - Relación calidad-precio
-  - Servicios únicos ofrecidos
+- [ ] **AnÃ¡lisis de valor**
+  - RelaciÃ³n calidad-precio
+  - Servicios Ãºnicos ofrecidos
   - Flexibilidad en condiciones
   - Experiencia en bodas similares
 
-### Recomendación Final de IA
+### RecomendaciÃ³n Final de IA
 **Pasos detallados:**
-- [ ] **Conversación de decisión**
-  - "He analizado las 4 respuestas que recibiste para fotografía"
-  - "Basándome en tu presupuesto de 2.000€ y estilo clásico, te recomiendo..."
-  - Explicación de la recomendación
-  - Pros y contras de cada opción
+- [ ] **ConversaciÃ³n de decisiÃ³n**
+  -  â€“ He analizado las 4 respuestas que recibiste para fotografÃ­a â€“ 
+  -  â€“ BasÃ¡ndome en tu presupuesto de 2.000â‚¬ y estilo clÃ¡sico, te recomiendo... â€“ 
+  - ExplicaciÃ³n de la recomendaciÃ³n
+  - Pros y contras de cada opciÃ³n
 
-- [ ] **Confirmación de elección**
+- [ ] **ConfirmaciÃ³n de elecciÃ³n**
   - Usuario selecciona proveedor preferido
-  - IA genera email de confirmación
-  - Programación automática de reunión
-  - Actualización de tarjeta de servicio
+  - IA genera email de confirmaciÃ³n
+  - ProgramaciÃ³n automÃ¡tica de reuniÃ³n
+  - ActualizaciÃ³n de tarjeta de servicio
 
-- [ ] **Seguimiento post-decisión**
-  - Actualización automática de presupuesto
-  - Creación de tareas relacionadas
-  - Programación de recordatorios
-  - Integración con timeline general
+- [ ] **Seguimiento post-decisiÃ³n**
+  - ActualizaciÃ³n automÃ¡tica de presupuesto
+  - CreaciÃ³n de tareas relacionadas
+  - ProgramaciÃ³n de recordatorios
+  - IntegraciÃ³n con timeline general
 
 ## 5.7 Oferta de Wedding Planner
 **Objetivo:** Ofrecer servicios de wedding planner en el momento apropiado
 
-### Detección del Momento Óptimo
+### DetecciÃ³n del Momento Ã“ptimo
 **Pasos detallados:**
 - [ ] **Triggers para ofrecer servicio**
   - Usuario ha contactado con 3+ proveedores
-  - Presupuesto total > 15.000€
+  - Presupuesto total > 15.000â‚¬
   - Fecha de boda < 6 meses
-  - Usuario muestra signos de estrés/agobio
-  - Múltiples servicios sin contratar
+  - Usuario muestra signos de estrÃ©s/agobio
+  - MÃºltiples servicios sin contratar
 
 - [ ] **Mensaje contextual de IA**
-  - "Veo que estás gestionando muchos proveedores..."
-  - "¿Te gustaría que un wedding planner profesional te ayude?"
-  - "Puedo conectarte con planners especializados en tu zona"
-  - Explicación de beneficios específicos
+  -  â€“ Veo que estÃ¡s gestionando muchos proveedores... â€“ 
+  -  â€“ Â¿Te gustarÃ­a que un wedding planner profesional te ayude? â€“ 
+  -  â€“ Puedo conectarte con planners especializados en tu zona â€“ 
+  - ExplicaciÃ³n de beneficios especÃ­ficos
 
-### Integración de Wedding Planners
+### IntegraciÃ³n de Wedding Planners
 **Pasos detallados:**
 - [ ] **Base de datos de planners**
   - Planners verificados por zona
@@ -317,81 +317,81 @@ físico por 300€ adicionales..."
   - Valoraciones de clientes anteriores
 
 - [ ] **Matching inteligente**
-  - Análisis de necesidades específicas
+  - AnÃ¡lisis de necesidades especÃ­ficas
   - Compatibilidad de estilo
   - Presupuesto disponible para planner
   - Disponibilidad para la fecha
 
-- [ ] **Proceso de contratación**
-  - Presentación de 2-3 planners recomendados
-  - Contacto automático similar a otros proveedores
-  - Reunión de presentación gratuita
-  - Integración completa si se contrata
+- [ ] **Proceso de contrataciÃ³n**
+  - PresentaciÃ³n de 2-3 planners recomendados
+  - Contacto automÃ¡tico similar a otros proveedores
+  - ReuniÃ³n de presentaciÃ³n gratuita
+  - IntegraciÃ³n completa si se contrata
 
 **Estructura de datos:**
 ```javascript
 // /weddings/{weddingId}/vendors/{vendorId}
 {
-  id: "vendor_photographer_001",
-  serviceType: "photography",
-  status: "contacted", // empty, contacted, quoted, contracted, rejected
-  name: "María García Fotografía",
+  id:  â€“ vendor_photographer_001 â€“ ,
+  serviceType:  â€“ photography â€“ ,
+  status:  â€“ contacted â€“ , // empty, contacted, quoted, contracted, rejected
+  name:  â€“ MarÃ­a GarcÃ­a FotografÃ­a â€“ ,
   contact: {
-    email: "maria@fotografiabodas.com",
-    phone: "+34600123456",
-    website: "www.mariafotografia.com"
+    email:  â€“ maria@fotografiabodas.com â€“ ,
+    phone:  â€“ +34600123456 â€“ ,
+    website:  â€“ www.mariafotografia.com â€“ 
   },
   location: {
-    city: "Madrid",
+    city:  â€“ Madrid â€“ ,
     distance: 5.2 // km from venue
   },
   communication: [
     {
-      id: "comm_001",
-      type: "outbound_email",
-      date: "2024-01-15T10:00:00Z",
-      subject: "Consulta para fotografía de boda",
-      content: "...",
+      id:  â€“ comm_001 â€“ ,
+      type:  â€“ outbound_email â€“ ,
+      date:  â€“ 2024-01-15T10:00:00Z â€“ ,
+      subject:  â€“ Consulta para fotografÃ­a de boda â€“ ,
+      content:  â€“ ... â€“ ,
       aiGenerated: true
     },
     {
-      id: "comm_002", 
-      type: "inbound_email",
-      date: "2024-01-15T12:30:00Z",
-      subject: "Re: Consulta para fotografía de boda",
-      content: "...",
+      id:  â€“ comm_002 â€“ , 
+      type:  â€“ inbound_email â€“ ,
+      date:  â€“ 2024-01-15T12:30:00Z â€“ ,
+      subject:  â€“ Re: Consulta para fotografÃ­a de boda â€“ ,
+      content:  â€“ ... â€“ ,
       aiAnalyzed: {
         availability: true,
         pricing: [
-          { package: "Básico", price: 1200, currency: "EUR" },
-          { package: "Completo", price: 1800, currency: "EUR" }
+          { package:  â€“ BÃ¡sico â€“ , price: 1200, currency:  â€“ EUR â€“  },
+          { package:  â€“ Completo â€“ , price: 1800, currency:  â€“ EUR â€“  }
         ],
         responseTime: 2.5, // hours
         professionalismScore: 8.5,
-        nextSteps: ["schedule_meeting", "request_portfolio"]
+        nextSteps: [ â€“ schedule_meeting â€“ ,  â€“ request_portfolio â€“ ]
       }
     }
   ],
   quotes: [
     {
-      id: "quote_001",
-      package: "Paquete Completo",
+      id:  â€“ quote_001 â€“ ,
+      package:  â€“ Paquete Completo â€“ ,
       price: 1800,
-      currency: "EUR",
-      includes: ["8 horas cobertura", "300 fotos editadas", "álbum digital"],
-      validUntil: "2024-02-15",
+      currency:  â€“ EUR â€“ ,
+      includes: [ â€“ 8 horas cobertura â€“ ,  â€“ 300 fotos editadas â€“ ,  â€“ Ã¡lbum digital â€“ ],
+      validUntil:  â€“ 2024-02-15 â€“ ,
       aiScore: 8.2
     }
   ],
   aiRecommendation: {
     score: 8.2,
-    reasons: ["Excelente relación calidad-precio", "Estilo compatible", "Respuesta rápida"],
-    concerns: ["Portfolio limitado en bodas clásicas"]
+    reasons: [ â€“ Excelente relaciÃ³n calidad-precio â€“ ,  â€“ Estilo compatible â€“ ,  â€“ Respuesta rÃ¡pida â€“ ],
+    concerns: [ â€“ Portfolio limitado en bodas clÃ¡sicas â€“ ]
   },
   contracted: false,
   contractDate: null,
   finalPrice: null,
-  createdAt: "2024-01-15T10:00:00Z"
+  createdAt:  â€“ 2024-01-15T10:00:00Z â€“ 
 }
 ```
 
@@ -405,18 +405,19 @@ físico por 300€ adicionales..."
 - `WeddingPlannerOffer.jsx`
 
 **APIs/Servicios:**
-- OpenAI para generación y análisis de emails
-- Email service para envío automático
+- OpenAI para generaciÃ³n y anÃ¡lisis de emails
+- Email service para envÃ­o automÃ¡tico
 - Vendor database/API
 - Calendar integration para reuniones
 - Payment processing para contrataciones
-## Estado de Implementación
+## Estado de ImplementaciÃ³n
 
 ### Completado
 - Documento base del flujo de proveedores con IA
 
 ### En Desarrollo
-- Definición de integraciones y componentes de UI
+- DefiniciÃ³n de integraciones y componentes de UI
 
 ### Pendiente
-- Contrastar con la implementación y marcar entregables por módulo
+- Contrastar con la implementaciÃ³n y marcar entregables por mÃ³dulo
+\n\n## Nota de alcance (pagos/contratos)\n- Los pagos a proveedores y los contratos legales se gestionan en la plataforma del proveedor.\n- La aplicación no procesa pagos ni genera contratos propios.\n- Se pueden reflejar enlaces/estados (p.ej., ‘señal pagada’, ‘contrato firmado’) de forma informativa.\n- El calendario operativo se gestiona en la página de Tareas.\n- La tarjeta del proveedor muestra los correos relacionados con ese proveedor desde el buzón unificado.\n

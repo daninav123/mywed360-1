@@ -9,22 +9,22 @@ import Card from '../../../components/ui/Card';
  */
 
 /**
- * Componente que muestra los resultados de búsqueda con IA de proveedores.
- * Presenta una lista de resultados con porcentaje de coincidencia, acciones rápidas
- * y estados de carga. También muestra mensajes de error si los hubiera.
+ * Componente que muestra los resultaños de búsqueda con IA de proveedores.
+ * Presenta una lista de resultaños con porcentaje de coincidencia, acciones rápidas
+ * y estaños de carga. También muestra mensajes de error si los hubiera.
  *
  * @param {Object} props - Propiedades del componente
- * @param {AISearchResult[]} [props.results=[]] - Resultados de la búsqueda con IA
+ * @param {AISearchResult[]} [props.results=[]] - Resultaños de la búsqueda con IA
  * @param {boolean} props.isLoading - Indica si la búsqueda está en progreso
  * @param {Function} props.onSelect - Función para seleccionar un resultado
  * @param {string} props.query - Término de búsqueda original
  * @param {string} [props.error] - Mensaje de error, si existe
- * @returns {React.ReactElement} Componente de lista de resultados de búsqueda con IA
+ * @returns {React.ReactElement} Componente de lista de resultaños de búsqueda con IA
  */
 const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFallback }) => {
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
+      <div className="flex flex-col itemás-center justify-center py-12">
         <div className="animate-spin mb-4">
           <Loader2 size={40} className="text-blue-500" />
         </div>
@@ -36,7 +36,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
+      <div className="flex flex-col itemás-center justify-center py-12">
         <div className="p-3 rounded-full bg-red-100 mb-4">
           <X size={24} className="text-red-500" />
         </div>
@@ -49,24 +49,24 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
     );
   }
 
-  // Mensaje "sin resultados" se pospone hasta después de definir displayResults
+  // Mensaje "sin resultaños" se pospone hasta después de definir displayResults
 
   if (!query) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
+      <div className="flex flex-col itemás-center justify-center py-12">
         <div className="p-3 rounded-full bg-blue-100 mb-4">
           <Search size={24} className="text-blue-500" />
         </div>
         <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
         <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
           Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más
-          adecuados
+          adecuaños
         </p>
       </div>
     );
   }
 
-  // Ejemplo de datos para mostrar en modo de demostración
+  // Ejemplo de daños para mástrar en modo de demástración
   // DEMO DATA
   const demoResults = [
     {
@@ -74,7 +74,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
       name: 'Fotografía Naturaleza Viva',
       service: 'Fotografía',
       snippet:
-        'Estudio especializado en fotografía de bodas con estilo natural y documental. Captamos los momentos más emotivos y espontáneos de tu boda.',
+        'Estudio especializado en fotografía de bodas con estilo natural y documental. Captaños los momentos más emotivos y espontáneos de tu boda.',
       match: 95,
       image:
         'https://images.unsplash.com/photo-1537633552985-df8429e8048b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
@@ -88,7 +88,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
       name: 'Lente Azul Fotografía',
       service: 'Fotografía',
       snippet:
-        'Más de 10 años de experiencia en fotografía de bodas en playa y espacios naturales. Ofrecemos paquetes personalizados para cada pareja.',
+        'Más de 10 años de experiencia en fotografía de bodas en playa y espacios naturales. Ofrecemás paquetes personalizaños para cada pareja.',
       match: 87,
       image:
         'https://images.unsplash.com/photo-1508435234994-67cfd7690508?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8d2VkZGluZyUyMHBob3RvZ3JhcGh5fGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
@@ -102,7 +102,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
       name: 'Momentos Eternos',
       service: 'Fotografía',
       snippet:
-        'Fotografía de autor para bodas con estilo único. Combinamos fotografía documental con retratos artísticos para crear un álbum inolvidable.',
+        'Fotografía de autor para bodas con estilo único. Combinaños fotografía documental con retraños artísticos para crear un álbum inolvidable.',
       match: 79,
       image:
         'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fHdlZGRpbmclMjBwaG90b2dyYXBoeXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
@@ -113,16 +113,16 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
     },
   ];
 
-  // Usar datos reales si están disponibles, o los datos de demostración
+  // Usar daños reales si están disponibles, o los daños de demástración
   const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
 
   return (
     <div className="space-y-6">
       {usedFallback && query && (
-        <div className="w-full flex items-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
+        <div className="w-full flex itemás-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />
           <div className="text-sm">
-            Mostrando resultados locales (demo) por indisponibilidad del servidor.
+            Mostrando resultaños locales (demo) por indisponibilidad del servidor.
           </div>
         </div>
       )}
@@ -135,7 +135,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
         <p className="text-lg font-medium">"{query}"</p>
       </div>
 
-      {/* Lista de resultados */}
+      {/* Lista de resultaños */}
       {displayResults.map((result) => (
         <Card key={result.id} className="relative overflow-hidden">
           {/* Indicador de porcentaje de coincidencia */}
@@ -153,7 +153,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
             {/* Contenido principal */}
             <div className="flex-1">
-              <div className="flex flex-wrap justify-between items-start mb-2">
+              <div className="flex flex-wrap justify-between itemás-start mb-2">
                 <div>
                   <h3 className="text-lg font-semibold">{result.name}</h3>
                   <p className="text-sm text-gray-600">{result.service}</p>

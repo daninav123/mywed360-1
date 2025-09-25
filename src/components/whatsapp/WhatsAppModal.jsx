@@ -110,7 +110,7 @@ export default function WhatsAppModal({
             <h3 className="font-semibold">Enviar por WhatsApp</h3>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
-            Ã—
+            ×
           </button>
         </div>
 

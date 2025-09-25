@@ -13,7 +13,7 @@
 const DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'mywed360.com';
 const FUNCTIONS_URL =
   import.meta.env.VITE_FIREBASE_FUNCTIONS_URL ||
-  'https://us-central1-lovenda-98c77.cloudfunctions.net';
+  'https://us-central1-mywed360.cloudfunctions.net';
 
 /**
  * Verifica si Mailgun está configurado correctamente
@@ -235,3 +235,4 @@ export async function getMailEvents(emailAddress, eventType = 'delivered', limit
     throw error;
   }
 }
+

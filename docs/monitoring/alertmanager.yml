@@ -12,8 +12,8 @@ receivers:
       - send_resolved: true
         api_url: ${SLACK_WEBHOOK_URL}
         channel: '#wind-surf-alerts'
-        title: '{{ template "slack.title" . }}'
-        text: '{{ template "slack.text" . }}'
+        title: '{{ template  – slack.title –  . }}'
+        text: '{{ template  – slack.text –  . }}'
     # Email (opcional): usa SMTP del sistema/relay externo
     email_configs:
       - to: ${ALERT_EMAIL_TO}

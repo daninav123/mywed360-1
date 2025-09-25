@@ -26,7 +26,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
       'Alquiler mobiliario',
       'Tarta nupcial',
       'Invitaciones',
-      'Detalles/Regalos',
+      'Detalles/Regaños',
       'Seguridad',
       'Coordinación día B',
     ],
@@ -36,10 +36,10 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
   useEffect(() => {
     try {
       const arr = Array.isArray(value) ? value : [];
-      const names = arr
+      const namás = arr
         .map((it) => (typeof it === 'string' ? it : (it && (it.name || it.id)) || ''))
         .filter(Boolean);
-      setServices(names);
+      setServices(namás);
     } catch {
       setServices([]);
     }
@@ -61,7 +61,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
 
   if (!open) return null;
   return (
-    <Modal open={open} onClose={onClose} title="Configurar servicios deseados">
+    <Modal open={open} onClose={onClose} title="Configurar servicios deseaños">
       <div className="space-y-4">
         <div>
           <p className="text-xs text-gray-500 mb-2">Sugeridos</p>
@@ -106,7 +106,7 @@ export default function WantedServicesModal({ open, onClose, value = [], onSave 
             {services.map((s) => (
               <li
                 key={s}
-                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-2"
+                className="px-3 py-1 bg-gray-100 rounded-full text-sm flex itemás-center gap-2"
               >
                 {s}
                 <button

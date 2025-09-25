@@ -240,47 +240,47 @@
 ```javascript
 // /weddings/{weddingId}/contracts/{contractId}
 {
-  id: "contract_001",
-  type: "vendor_contract",
-  category: "catering",
+  id:  – contract_001 – ,
+  type:  – vendor_contract – ,
+  category:  – catering – ,
   
   basicInfo: {
-    title: "Contrato de Catering - Boda Ana & Carlos",
-    description: "Servicio completo de catering para 120 invitados",
-    language: "es",
-    jurisdiction: "Spain",
-    currency: "EUR"
+    title:  – Contrato de Catering - Boda Ana & Carlos – ,
+    description:  – Servicio completo de catering para 120 invitados – ,
+    language:  – es – ,
+    jurisdiction:  – Spain – ,
+    currency:  – EUR – 
   },
   
   parties: {
     client: {
-      name: "Ana García López",
-      address: "Calle Mayor 123, Madrid",
-      dni: "12345678A",
-      email: "ana@email.com",
-      phone: "+34 600 123 456"
+      name:  – Ana García López – ,
+      address:  – Calle Mayor 123, Madrid – ,
+      dni:  – 12345678A – ,
+      email:  – ana@email.com – ,
+      phone:  – +34 600 123 456 – 
     },
     vendor: {
-      companyName: "Catering Deluxe S.L.",
-      cif: "B12345678",
-      address: "Polígono Industrial, Madrid",
-      representative: "José Martínez",
-      email: "jose@cateringdeluxe.com",
-      phone: "+34 91 123 4567"
+      companyName:  – Catering Deluxe S.L. – ,
+      cif:  – B12345678 – ,
+      address:  – Polígono Industrial, Madrid – ,
+      representative:  – José Martínez – ,
+      email:  – jose@cateringdeluxe.com – ,
+      phone:  – +34 91 123 4567 – 
     }
   },
   
   terms: {
-    serviceDate: "2024-06-15T19:00:00Z",
-    serviceLocation: "Finca El Olivar, Madrid",
+    serviceDate:  – 2024-06-15T19:00:00Z – ,
+    serviceLocation:  – Finca El Olivar, Madrid – ,
     guestCount: 120,
-    menuType: "premium",
+    menuType:  – premium – ,
     
     pricing: {
       basePrice: 8500.00,
       extras: [
         {
-          item: "Barra libre premium",
+          item:  – Barra libre premium – ,
           price: 1200.00
         }
       ],
@@ -292,131 +292,131 @@
       {
         percentage: 30,
         amount: 3494.10,
-        dueDate: "2024-03-15T23:59:59Z",
-        status: "paid",
-        paidAt: "2024-03-10T10:30:00Z"
+        dueDate:  – 2024-03-15T23:59:59Z – ,
+        status:  – paid – ,
+        paidAt:  – 2024-03-10T10:30:00Z – 
       },
       {
         percentage: 40,
         amount: 4658.80,
-        dueDate: "2024-05-15T23:59:59Z",
-        status: "pending"
+        dueDate:  – 2024-05-15T23:59:59Z – ,
+        status:  – pending – 
       },
       {
         percentage: 30,
         amount: 3494.10,
-        dueDate: "2024-06-15T23:59:59Z",
-        status: "pending"
+        dueDate:  – 2024-06-15T23:59:59Z – ,
+        status:  – pending – 
       }
     ]
   },
   
   clauses: [
     {
-      id: "clause_001",
-      title: "Cancelación",
-      content: "En caso de cancelación con más de 30 días...",
-      type: "cancellation",
+      id:  – clause_001 – ,
+      title:  – Cancelación – ,
+      content:  – En caso de cancelación con más de 30 días... – ,
+      type:  – cancellation – ,
       negotiable: true,
-      riskLevel: "medium"
+      riskLevel:  – medium – 
     },
     {
-      id: "clause_002", 
-      title: "Fuerza Mayor",
-      content: "Ninguna de las partes será responsable...",
-      type: "force_majeure",
+      id:  – clause_002 – , 
+      title:  – Fuerza Mayor – ,
+      content:  – Ninguna de las partes será responsable... – ,
+      type:  – force_majeure – ,
       negotiable: false,
-      riskLevel: "low"
+      riskLevel:  – low – 
     }
   ],
   
   status: {
-    current: "signed", // draft, review, negotiation, approved, signed, executed, terminated
-    createdAt: "2024-01-15T10:00:00Z",
-    lastModified: "2024-02-20T14:30:00Z",
-    signedAt: "2024-02-25T16:45:00Z",
+    current:  – signed – , // draft, review, negotiation, approved, signed, executed, terminated
+    createdAt:  – 2024-01-15T10:00:00Z – ,
+    lastModified:  – 2024-02-20T14:30:00Z – ,
+    signedAt:  – 2024-02-25T16:45:00Z – ,
     expiresAt: null
   },
   
   signatures: [
     {
-      party: "client",
-      signedBy: "Ana García López",
-      signedAt: "2024-02-25T16:45:00Z",
-      ipAddress: "192.168.1.100",
-      method: "digital_signature",
-      certificateId: "cert_12345"
+      party:  – client – ,
+      signedBy:  – Ana García López – ,
+      signedAt:  – 2024-02-25T16:45:00Z – ,
+      ipAddress:  – 192.168.1.100 – ,
+      method:  – digital_signature – ,
+      certificateId:  – cert_12345 – 
     },
     {
-      party: "vendor",
-      signedBy: "José Martínez",
-      signedAt: "2024-02-25T17:00:00Z",
-      ipAddress: "10.0.0.50",
-      method: "digital_signature",
-      certificateId: "cert_67890"
+      party:  – vendor – ,
+      signedBy:  – José Martínez – ,
+      signedAt:  – 2024-02-25T17:00:00Z – ,
+      ipAddress:  – 10.0.0.50 – ,
+      method:  – digital_signature – ,
+      certificateId:  – cert_67890 – 
     }
   ],
   
   attachments: [
     {
-      id: "attachment_001",
-      name: "Menu_Detallado.pdf",
-      type: "menu_specification",
-      url: "https://secure-storage.com/file123",
-      uploadedAt: "2024-02-20T12:00:00Z",
-      hash: "sha256:abc123def456..."
+      id:  – attachment_001 – ,
+      name:  – Menu_Detallado.pdf – ,
+      type:  – menu_specification – ,
+      url:  – https://secure-storage.com/file123 – ,
+      uploadedAt:  – 2024-02-20T12:00:00Z – ,
+      hash:  – sha256:abc123def456... – 
     }
   ],
   
   compliance: {
     requiredDocuments: [
       {
-        type: "liability_insurance",
-        status: "verified",
-        expiryDate: "2024-12-31T23:59:59Z",
-        documentId: "insurance_001"
+        type:  – liability_insurance – ,
+        status:  – verified – ,
+        expiryDate:  – 2024-12-31T23:59:59Z – ,
+        documentId:  – insurance_001 – 
       },
       {
-        type: "food_safety_certificate",
-        status: "pending",
-        requiredBy: "2024-05-01T23:59:59Z"
+        type:  – food_safety_certificate – ,
+        status:  – pending – ,
+        requiredBy:  – 2024-05-01T23:59:59Z – 
       }
     ],
     
     legalReview: {
       required: true,
-      reviewedBy: "legal_advisor_001",
-      reviewedAt: "2024-02-22T09:00:00Z",
-      status: "approved",
-      notes: "Contrato estándar, sin observaciones"
+      reviewedBy:  – legal_advisor_001 – ,
+      reviewedAt:  – 2024-02-22T09:00:00Z – ,
+      status:  – approved – ,
+      notes:  – Contrato estándar, sin observaciones – 
     }
   },
   
   workflow: {
-    currentStep: "execution",
+    currentStep:  – execution – ,
     steps: [
       {
-        name: "draft",
-        completedAt: "2024-01-20T15:00:00Z",
-        completedBy: "user_123"
+        name:  – draft – ,
+        completedAt:  – 2024-01-20T15:00:00Z – ,
+        completedBy:  – user_123 – 
       },
       {
-        name: "review",
-        completedAt: "2024-02-10T11:00:00Z",
-        completedBy: "user_456"
+        name:  – review – ,
+        completedAt:  – 2024-02-10T11:00:00Z – ,
+        completedBy:  – user_456 – 
       },
       {
-        name: "signature",
-        completedAt: "2024-02-25T17:00:00Z",
-        completedBy: "system"
+        name:  – signature – ,
+        completedAt:  – 2024-02-25T17:00:00Z – ,
+        completedBy:  – system – 
       }
     ],
     
     nextActions: [
       {
-        action: "verify_insurance",
-        dueDate: "2024-05-01T23:59:59Z",
-        assignedTo: "user_123"
+        action:  – verify_insurance – ,
+        dueDate:  – 2024-05-01T23:59:59Z – ,
+        assignedTo:  – user_123 – 
       }
     ]
   }
@@ -424,36 +424,36 @@
 
 // /weddings/{weddingId}/documents/{documentId}
 {
-  id: "document_001",
-  type: "invoice",
-  category: "catering",
+  id:  – document_001 – ,
+  type:  – invoice – ,
+  category:  – catering – ,
   
   metadata: {
-    title: "Factura CateringDeluxe - Anticipo",
-    filename: "Factura_001_CateringDeluxe.pdf",
-    mimeType: "application/pdf",
+    title:  – Factura CateringDeluxe - Anticipo – ,
+    filename:  – Factura_001_CateringDeluxe.pdf – ,
+    mimeType:  – application/pdf – ,
     size: 245760,
     pages: 2,
-    language: "es"
+    language:  – es – 
   },
   
   extractedData: {
-    invoiceNumber: "FAC-2024-001",
-    issueDate: "2024-03-01T00:00:00Z",
-    dueDate: "2024-03-15T23:59:59Z",
+    invoiceNumber:  – FAC-2024-001 – ,
+    issueDate:  – 2024-03-01T00:00:00Z – ,
+    dueDate:  – 2024-03-15T23:59:59Z – ,
     amount: 3494.10,
-    currency: "EUR",
+    currency:  – EUR – ,
     taxAmount: 582.35,
     
     vendor: {
-      name: "Catering Deluxe S.L.",
-      cif: "B12345678",
-      address: "Polígono Industrial, Madrid"
+      name:  – Catering Deluxe S.L. – ,
+      cif:  – B12345678 – ,
+      address:  – Polígono Industrial, Madrid – 
     },
     
     items: [
       {
-        description: "Anticipo servicio catering (30%)",
+        description:  – Anticipo servicio catering (30%) – ,
         quantity: 1,
         unitPrice: 2912.75,
         taxRate: 0.21,
@@ -463,62 +463,62 @@
   },
   
   storage: {
-    url: "https://secure-storage.com/documents/doc001",
-    hash: "sha256:def789ghi012...",
-    encryptionKey: "encrypted_key_reference",
+    url:  – https://secure-storage.com/documents/doc001 – ,
+    hash:  – sha256:def789ghi012... – ,
+    encryptionKey:  – encrypted_key_reference – ,
     backupLocations: [
-      "backup_location_1",
-      "backup_location_2"
+       – backup_location_1 – ,
+       – backup_location_2 – 
     ]
   },
   
   access: {
     permissions: [
       {
-        userId: "user_123",
-        level: "full_access",
-        grantedAt: "2024-03-01T10:00:00Z"
+        userId:  – user_123 – ,
+        level:  – full_access – ,
+        grantedAt:  – 2024-03-01T10:00:00Z – 
       },
       {
-        userId: "user_456", 
-        level: "read_only",
-        grantedAt: "2024-03-01T10:00:00Z"
+        userId:  – user_456 – , 
+        level:  – read_only – ,
+        grantedAt:  – 2024-03-01T10:00:00Z – 
       }
     ],
     
     auditLog: [
       {
-        action: "document_uploaded",
-        userId: "user_123",
-        timestamp: "2024-03-01T10:00:00Z",
-        ipAddress: "192.168.1.100"
+        action:  – document_uploaded – ,
+        userId:  – user_123 – ,
+        timestamp:  – 2024-03-01T10:00:00Z – ,
+        ipAddress:  – 192.168.1.100 – 
       },
       {
-        action: "document_viewed",
-        userId: "user_456",
-        timestamp: "2024-03-02T14:30:00Z",
-        ipAddress: "10.0.0.25"
+        action:  – document_viewed – ,
+        userId:  – user_456 – ,
+        timestamp:  – 2024-03-02T14:30:00Z – ,
+        ipAddress:  – 10.0.0.25 – 
       }
     ]
   },
   
   relationships: {
-    contractId: "contract_001",
-    relatedDocuments: ["document_002", "document_003"],
-    linkedTransactions: ["payment_001"]
+    contractId:  – contract_001 – ,
+    relatedDocuments: [ – document_002 – ,  – document_003 – ],
+    linkedTransactions: [ – payment_001 – ]
   },
   
   processing: {
-    ocrStatus: "completed",
+    ocrStatus:  – completed – ,
     ocrConfidence: 0.95,
-    extractionStatus: "completed",
-    validationStatus: "verified",
+    extractionStatus:  – completed – ,
+    validationStatus:  – verified – ,
     
     aiAnalysis: {
-      riskLevel: "low",
+      riskLevel:  – low – ,
       anomalies: [],
       suggestions: [
-        "Documento estándar, sin observaciones"
+         – Documento estándar, sin observaciones – 
       ]
     }
   }

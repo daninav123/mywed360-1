@@ -1,6 +1,6 @@
 ﻿/**
  * Componente Canvas especializado para el plan de asientos
- * Maneja la visualizaciÃ³n y interacciÃ³n con mesas y sillas
+ * Maneja la visualización y interacción con mesas y sillas
  */
 
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
@@ -100,7 +100,7 @@ const SeatingPlanCanvas = ({
         extend(s.x || 0, s.y || 0);
       });
 
-      // Hall (ayuda a no dejar bounds vacÃ­os en banquete)
+      // Hall (ayuda a no dejar bounds vacíos en banquete)
       if (hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number') {
         extend(0, 0);
         extend(hallSize.width, hallSize.height);
@@ -388,15 +388,15 @@ const SeatingPlanCanvas = ({
     [drawMode, offset, scale, onSelectTable, tables, selStart, selEnd, selWorldStart, selectedIds]
   );
 
-  // No necesitamos manejar move/up aquÃ­ porque el drag de pan
+  // No necesitamos manejar move/up aquí porque el drag de pan
   // se gestiona con listeners globales registrados en pointerdown.
-  // Aun asÃ­, dejamos handlers defensivos para prevenir scroll/gestos
+  // Aun así, dejamos handlers defensivos para prevenir scroll/gestos
   // inesperados cuando el modo no es pan.
   const handlePointerMove = useCallback(
     (e) => {
       if (drawMode !== 'pan') return;
-      // El movimiento real estÃ¡ gestionado por los listeners aÃ±adidos en pointerdown.
-      // Evitamos que el navegador haga selecciÃ³n de texto u otros gestos.
+      // El movimiento real está gestionado por los listeners añadidos en pointerdown.
+      // Evitamos que el navegador haga selección de texto u otros gestos.
       e.preventDefault();
     },
     [drawMode]
@@ -571,7 +571,7 @@ const SeatingPlanCanvas = ({
           globalMaxSeats={globalMaxSeats}
         />
 
-        {/* RectÃ¡ngulo de selecciÃ³n */}
+        {/* Rectángulo de selección */}
         {isSelecting && selStart && selEnd && (
           <div
             className="absolute border-2 border-blue-500 bg-blue-200/20 pointer-events-none"
@@ -684,10 +684,10 @@ const SeatingPlanCanvas = ({
           </>
         )}
 
-        {/* Indicadores de dimensiones del salÃ³n y pasillo mÃ­nimo */}
+        {/* Indicadores de dimensiones del salón y pasillo mínimo */}
         <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs text-gray-600">
           <div>
-            {(hallSize.width / 100).toFixed(1)} Ã— {(hallSize.height / 100).toFixed(1)} m
+            {(hallSize.width / 100).toFixed(1)} × {(hallSize.height / 100).toFixed(1)} m
           </div>
           <div>Pasillo: {hallSize.aisleMin ?? 80} cm</div>
         </div>
@@ -722,5 +722,4 @@ const SeatingPlanCanvas = ({
 };
 
 export default React.memo(SeatingPlanCanvas);
-
 

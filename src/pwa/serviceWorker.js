@@ -13,7 +13,7 @@ const STATIC_CACHE = 'mywed360-static-v1';
 const DYNAMIC_CACHE = 'mywed360-dynamic-v1';
 const API_CACHE = 'mywed360-api-v1';
 // Share Target storage
-const SHARE_DB_NAME = 'lovenda-share-target';
+const SHARE_DB_NAME = 'mywed360-share-target';
 const SHARE_STORE = 'shares';
 const SHARE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
 
@@ -505,3 +505,4 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 console.log('[SW] Service Worker cargado correctamente');
+

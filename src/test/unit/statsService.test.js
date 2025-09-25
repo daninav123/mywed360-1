@@ -48,7 +48,7 @@ describe('statsService', () => {
     {
       id: 'email1',
       from: 'contact@example.com',
-      to: 'user@lovenda.com',
+      to: 'user@mywed360.com',
       subject: 'Asunto 1',
       body: 'Contenido 1',
       date: '2025-05-01T10:00:00Z',
@@ -58,7 +58,7 @@ describe('statsService', () => {
     {
       id: 'email2',
       from: 'info@company.com',
-      to: 'user@lovenda.com',
+      to: 'user@mywed360.com',
       subject: 'Asunto 2',
       body: 'Contenido 2',
       date: '2025-05-02T15:30:00Z',
@@ -68,7 +68,7 @@ describe('statsService', () => {
     {
       id: 'email3',
       from: 'contact@example.com',
-      to: 'user@lovenda.com',
+      to: 'user@mywed360.com',
       subject: 'Re: Asunto 1',
       body: 'Respuesta',
       date: '2025-05-03T11:20:00Z',
@@ -81,7 +81,7 @@ describe('statsService', () => {
   const mockSentEmails = [
     {
       id: 'sent1',
-      from: 'user@lovenda.com',
+      from: 'user@mywed360.com',
       to: 'contact@example.com',
       subject: 'Asunto 1',
       body: 'Contenido original',
@@ -90,7 +90,7 @@ describe('statsService', () => {
     },
     {
       id: 'sent2',
-      from: 'user@lovenda.com',
+      from: 'user@mywed360.com',
       to: 'info@provider.com',
       subject: 'Consulta',
       body: 'Pregunta',
@@ -103,7 +103,7 @@ describe('statsService', () => {
     {
       id: 'trash1',
       from: 'spam@example.com',
-      to: 'user@lovenda.com',
+      to: 'user@mywed360.com',
       subject: 'Promoción',
       body: 'Oferta',
       date: '2025-04-15T10:00:00Z',
@@ -156,7 +156,7 @@ describe('statsService', () => {
     it('devuelve un objeto vacío si no hay estadísticas guardadas', () => {
       const stats = getUserStats(mockUserId);
       expect(stats).toEqual({});
-      expect(localStorageMock.getItem).toHaveBeenCalledWith(`lovenda_email_stats_${mockUserId}`);
+      expect(localStorageMock.getItem).toHaveBeenCalledWith(`mywed360_email_stats_${mockUserId}`);
     });
 
     it('devuelve estadísticas si existen en localStorage', () => {
@@ -186,7 +186,7 @@ describe('statsService', () => {
       saveUserStats(mockUserId, stats);
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        `lovenda_email_stats_${mockUserId}`,
+        `mywed360_email_stats_${mockUserId}`,
         JSON.stringify(stats)
       );
     });
@@ -299,3 +299,6 @@ describe('statsService', () => {
     });
   });
 });
+
+
+

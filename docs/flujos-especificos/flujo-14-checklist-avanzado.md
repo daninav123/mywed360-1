@@ -243,38 +243,38 @@
 ```javascript
 // /weddings/{weddingId}/checklist/{taskId}
 {
-  id: "task_001",
-  title: "Confirmar menú final con catering",
-  description: "Revisar y aprobar el menú definitivo, incluyendo opciones vegetarianas",
+  id:  – task_001 – ,
+  title:  – Confirmar menú final con catering – ,
+  description:  – Revisar y aprobar el menú definitivo, incluyendo opciones vegetarianas – ,
   
-  category: "catering",
-  subcategory: "menu_planning",
-  priority: "high", // low, medium, high, critical
-  difficulty: "medium", // easy, medium, hard
+  category:  – catering – ,
+  subcategory:  – menu_planning – ,
+  priority:  – high – , // low, medium, high, critical
+  difficulty:  – medium – , // easy, medium, hard
   
   timing: {
-    createdAt: "2024-01-15T10:00:00Z",
-    dueDate: "2024-05-01T23:59:59Z",
+    createdAt:  – 2024-01-15T10:00:00Z – ,
+    dueDate:  – 2024-05-01T23:59:59Z – ,
     estimatedDuration: 120, // minutos
     reminderDates: [
-      "2024-04-24T09:00:00Z",
-      "2024-04-30T09:00:00Z"
+       – 2024-04-24T09:00:00Z – ,
+       – 2024-04-30T09:00:00Z – 
     ]
   },
   
   assignment: {
-    assignedTo: ["user_123", "user_456"],
-    createdBy: "user_123",
+    assignedTo: [ – user_123 – ,  – user_456 – ],
+    createdBy:  – user_123 – ,
     approvalRequired: true,
-    approvers: ["user_123"],
+    approvers: [ – user_123 – ],
     escalationRules: {
       overdueDays: 2,
-      escalateTo: ["user_789"]
+      escalateTo: [ – user_789 – ]
     }
   },
   
   status: {
-    current: "in_progress", // pending, in_progress, completed, cancelled, overdue
+    current:  – in_progress – , // pending, in_progress, completed, cancelled, overdue
     completedAt: null,
     completedBy: null,
     progress: 60, // porcentaje
@@ -282,32 +282,32 @@
   },
   
   dependencies: {
-    dependsOn: ["task_045"], // tareas que deben completarse antes
-    blocks: ["task_067"], // tareas que dependen de esta
-    related: ["task_023", "task_089"] // tareas relacionadas
+    dependsOn: [ – task_045 – ], // tareas que deben completarse antes
+    blocks: [ – task_067 – ], // tareas que dependen de esta
+    related: [ – task_023 – ,  – task_089 – ] // tareas relacionadas
   },
   
   resources: {
     attachments: [
       {
-        name: "Propuesta_Menu_Final.pdf",
-        url: "https://storage.com/file123",
-        uploadedBy: "user_456",
-        uploadedAt: "2024-04-15T14:30:00Z"
+        name:  – Propuesta_Menu_Final.pdf – ,
+        url:  – https://storage.com/file123 – ,
+        uploadedBy:  – user_456 – ,
+        uploadedAt:  – 2024-04-15T14:30:00Z – 
       }
     ],
     links: [
       {
-        title: "Página del catering",
-        url: "https://catering-example.com"
+        title:  – Página del catering – ,
+        url:  – https://catering-example.com – 
       }
     ],
     contacts: [
       {
-        name: "Chef María González",
-        role: "Jefe de cocina",
-        phone: "+34 600 123 456",
-        email: "maria@catering.com"
+        name:  – Chef María González – ,
+        role:  – Jefe de cocina – ,
+        phone:  – +34 600 123 456 – ,
+        email:  – maria@catering.com – 
       }
     ]
   },
@@ -315,37 +315,37 @@
   collaboration: {
     comments: [
       {
-        id: "comment_001",
-        userId: "user_456",
-        text: "He revisado la propuesta, todo correcto excepto...",
-        createdAt: "2024-04-20T16:45:00Z",
-        mentions: ["user_123"]
+        id:  – comment_001 – ,
+        userId:  – user_456 – ,
+        text:  – He revisado la propuesta, todo correcto excepto... – ,
+        createdAt:  – 2024-04-20T16:45:00Z – ,
+        mentions: [ – user_123 – ]
       }
     ],
     activity: [
       {
-        type: "status_change",
-        from: "pending",
-        to: "in_progress",
-        userId: "user_123",
-        timestamp: "2024-04-18T09:00:00Z"
+        type:  – status_change – ,
+        from:  – pending – ,
+        to:  – in_progress – ,
+        userId:  – user_123 – ,
+        timestamp:  – 2024-04-18T09:00:00Z – 
       }
     ]
   },
   
   automation: {
     autoCreated: true,
-    templateId: "catering_standard",
+    templateId:  – catering_standard – ,
     triggers: [
       {
-        type: "date_based",
-        condition: "90_days_before_wedding"
+        type:  – date_based – ,
+        condition:  – 90_days_before_wedding – 
       }
     ],
     nextActions: [
       {
-        taskId: "task_067",
-        condition: "on_completion"
+        taskId:  – task_067 – ,
+        condition:  – on_completion – 
       }
     ]
   }
@@ -359,33 +359,33 @@
     inProgressTasks: 23,
     overdueTasks: 5,
     completionPercentage: 57.1,
-    estimatedCompletionDate: "2024-05-20T00:00:00Z"
+    estimatedCompletionDate:  – 2024-05-20T00:00:00Z – 
   },
   
   byCategory: {
-    "venue": { total: 25, completed: 20, percentage: 80 },
-    "catering": { total: 18, completed: 12, percentage: 66.7 },
-    "photography": { total: 12, completed: 8, percentage: 66.7 },
-    "music": { total: 8, completed: 6, percentage: 75 }
+     – venue – : { total: 25, completed: 20, percentage: 80 },
+     – catering – : { total: 18, completed: 12, percentage: 66.7 },
+     – photography – : { total: 12, completed: 8, percentage: 66.7 },
+     – music – : { total: 8, completed: 6, percentage: 75 }
   },
   
   byAssignee: {
-    "user_123": { assigned: 45, completed: 32, percentage: 71.1 },
-    "user_456": { assigned: 38, completed: 25, percentage: 65.8 }
+     – user_123 – : { assigned: 45, completed: 32, percentage: 71.1 },
+     – user_456 – : { assigned: 38, completed: 25, percentage: 65.8 }
   },
   
   timeline: {
-    "2024-01": { created: 45, completed: 12 },
-    "2024-02": { created: 23, completed: 18 },
-    "2024-03": { created: 15, completed: 25 },
-    "2024-04": { created: 8, completed: 34 }
+     – 2024-01 – : { created: 45, completed: 12 },
+     – 2024-02 – : { created: 23, completed: 18 },
+     – 2024-03 – : { created: 15, completed: 25 },
+     – 2024-04 – : { created: 8, completed: 34 }
   },
   
   insights: {
     averageCompletionTime: 3.2, // días
-    mostProblematicCategory: "photography",
-    recommendedFocus: ["catering", "music"],
-    riskLevel: "medium" // low, medium, high
+    mostProblematicCategory:  – photography – ,
+    recommendedFocus: [ – catering – ,  – music – ],
+    riskLevel:  – medium –  // low, medium, high
   }
 }
 ```

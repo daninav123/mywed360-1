@@ -243,13 +243,13 @@ app.use('/api/protected', requireAuth);
 ```javascript
 // Ejemplo de log de autenticación
 {
-  "timestamp": "2025-01-24T00:56:22Z",
-  "event": "login_success",
-  "userId": "user123",
-  "email": "user@example.com",
-  "role": "particular",
-  "sessionDuration": 3600000,
-  "rememberMe": true
+   – timestamp – :  – 2025-01-24T00:56:22Z – ,
+   – event – :  – login_success – ,
+   – userId – :  – user123 – ,
+   – email – :  – user@example.com – ,
+   – role – :  – particular – ,
+   – sessionDuration – : 3600000,
+   – rememberMe – : true
 }
 ```
 
@@ -267,7 +267,7 @@ VITE_FIREBASE_PROJECT_ID=your_project_id
 **Backend (.env):**
 ```env
 FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
+FIREBASE_SERVICE_ACCOUNT_KEY={ – type – : – service_account – ,...}
 ```
 
 ## 🧪 Testing

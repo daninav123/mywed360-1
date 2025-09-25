@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import {
   ChevronRight,
   ChevronLeft,
@@ -6,7 +6,6 @@ import {
   Calendar,
   Users,
   ShoppingBag,
-  Settings,
   Image,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -29,7 +28,7 @@ const OnboardingTutorial = ({ onComplete }) => {
     lugar: '',
     imagen: '',
   });
-  // Paso de timing se implementar� Más adelante
+  // Paso de timing se implementar Ms adelante
   const [loading, setLoading] = useState(false);
 
   // Carga datos del perfil si existen
@@ -60,25 +59,25 @@ const OnboardingTutorial = ({ onComplete }) => {
 
   const steps = [
     {
-      title: '�Bienvenido a Lovenda!',
+      title: 'Bienvenido a MyWed360!',
       content: (
         <div className="text-center">
           <div className="mx-auto w-32 h-32 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-            <img src="/icon-192.png" alt="Lovenda" className="w-20 h-20" />
+            <img src="/icon-192.png" alt="MyWed360" className="w-20 h-20" />
           </div>
-          <h2 className="text-2xl font-bold mb-4">�Comienza a planificar tu boda!</h2>
+          <h2 className="text-2xl font-bold mb-4">Comienza a planificar tu boda!</h2>
           <p className="mb-6 text-gray-600">
-            Te guiaremos a trav�s de los primeros pasos para configurar tu boda en Lovenda. Este
-            tutorial te ayudar� a personalizar la app y conocer sus funcionalidades principales.
+            Te guiaremos a travs de los primeros pasos para configurar tu boda en MyWed360. Este
+            tutorial te ayudar a personalizar la app y conocer sus funcionalidades principales.
           </p>
         </div>
       ),
     },
     {
-      title: 'Datos básicos',
+      title: 'Datos bsicos',
       content: (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Completa los datos básicos de tu boda</h2>
+          <h2 className="text-xl font-semibold mb-4">Completa los datos bsicos de tu boda</h2>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -88,7 +87,7 @@ const OnboardingTutorial = ({ onComplete }) => {
                 type="text"
                 value={profileData.nombres}
                 onChange={(e) => setProfileData({ ...profileData, nombres: e.target.value })}
-                placeholder="Ej: María y Juan"
+                placeholder="Ej: Mara y Juan"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
             </div>
@@ -103,7 +102,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Lugar de celebraci�n
+                Lugar de celebracin
               </label>
               <input
                 type="text"
@@ -118,7 +117,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       ),
     },
     {
-      title: 'Gestión de invitados',
+      title: 'Gestin de invitados',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -126,14 +125,14 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Users className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Gestión de Invitados</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">Gestin de Invitados</h2>
           <p className="mb-4 text-gray-600 text-center">
             Organiza tu lista de invitados, confirma asistencia y asigna mesas para la ceremonia.
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Añade invitados y sus acompa�antes</span>
+              <span>Aade invitados y sus acompaantes</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
@@ -141,11 +140,11 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Confirma asistencias y alérgenos</span>
+              <span>Confirma asistencias y alrgenos</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Dise�a el plano de mesas con arrastrar y soltar</span>
+              <span>Disea el plano de mesas con arrastrar y soltar</span>
             </li>
           </ul>
         </div>
@@ -178,7 +177,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Registra pagos y Señales para control financiero</span>
+              <span>Registra pagos y Seales para control financiero</span>
             </li>
           </ul>
         </div>
@@ -193,7 +192,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Calendar className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Planificaci�n</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">Planificacin</h2>
           <p className="mb-4 text-gray-600 text-center">
             Organiza todo tu calendario y listas de tareas para llevar un control perfecto.
           </p>
@@ -219,7 +218,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       ),
     },
     {
-      title: 'Diseños e Invitaciones',
+      title: 'Diseos e Invitaciones',
       content: (
         <div>
           <div className="mb-6 flex items-center justify-center">
@@ -227,33 +226,33 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Image className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-center">Diseños con IA</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">Diseos con IA</h2>
           <p className="mb-4 text-gray-600 text-center">
-            Crea invitaciones, men�s y otros elementos visuales para tu boda con ayuda de IA.
+            Crea invitaciones, mens y otros elementos visuales para tu boda con ayuda de IA.
           </p>
           <ul className="space-y-3">
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Genera Diseños personalizados con IA</span>
+              <span>Genera Diseos personalizados con IA</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Crea invitaciones, men�s y Señalización</span>
+              <span>Crea invitaciones, mens y Sealizacin</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Dise�a tu logo de boda personalizado</span>
+              <span>Disea tu logo de boda personalizado</span>
             </li>
             <li className="flex items-center">
               <Check className="w-5 h-5 text-green-500 mr-2" />
-              <span>Exporta en alta resoluci�n para imprimir</span>
+              <span>Exporta en alta resolucin para imprimir</span>
             </li>
           </ul>
         </div>
       ),
     },
     {
-      title: '�Listo para empezar!',
+      title: 'Listo para empezar!',
       content: (
         <div className="text-center">
           <div className="mb-6 flex items-center justify-center">
@@ -261,14 +260,14 @@ const OnboardingTutorial = ({ onComplete }) => {
               <Check className="w-8 h-8 text-green-600" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-4">�Todo listo!</h2>
+          <h2 className="text-2xl font-bold mb-4">Todo listo!</h2>
           <p className="mb-6 text-gray-600">
             Has completado el tutorial inicial. Ya puedes comenzar a utilizar todas las funciones de
-            Lovenda para planificar la boda de tus sue�os.
+            MyWed360 para planificar la boda de tus sueos.
           </p>
           <p className="text-sm text-gray-500">
-            Recuerda que puedes acceder a la Configuración en cualquier momento para modificar tus
-            datos o consultar esta Guía nuevamente.
+            Recuerda que puedes acceder a la Configuracin en cualquier momento para modificar tus
+            datos o consultar esta Gua nuevamente.
           </p>
         </div>
       ),
@@ -313,7 +312,7 @@ const OnboardingTutorial = ({ onComplete }) => {
 
       // Guardar weddingInfo como un campo del documento principal de la boda
       await setDoc(doc(db, 'weddings', wid), { weddingInfo: weddingInfoPayload }, { merge: true });
-      // Y tambi�n en la ruta de Configuración legacy: weddings/{id}/info/weddingInfo
+      // Y tambin en la ruta de Configuracin legacy: weddings/{id}/info/weddingInfo
       try {
         await setDoc(doc(db, 'weddings', wid, 'info', 'weddingInfo'), weddingInfoPayload, {
           merge: true,
@@ -337,7 +336,7 @@ const OnboardingTutorial = ({ onComplete }) => {
         );
       } catch (_) {}
 
-      // Timing autom�tico se implementar� Más adelante
+      // Timing automtico se implementar Ms adelante
 
       // Marcar onboarding completado en users/{uid}
       const profileRef = doc(db, 'users', currentUser.uid);
@@ -350,7 +349,7 @@ const OnboardingTutorial = ({ onComplete }) => {
       /* Crear evento en calendario si hay fecha de boda
       if (profileData.fecha) {
         try {
-          // Asegurar autenticaci�n con Google; si el usuario no concede, se ignora
+          // Asegurar autenticacin con Google; si el usuario no concede, se ignora
           await googleCalendarService.loadClient().catch(() => {});
           if (!googleCalendarService.isAuthenticated()) {
             await googleCalendarService.signIn().catch(() => {});
@@ -360,7 +359,7 @@ const OnboardingTutorial = ({ onComplete }) => {
             const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000);
             await googleCalendarService.createEvent({
               title: 'Boda',
-              desc: 'Fecha de la boda planificada en Lovenda',
+              desc: 'Fecha de la boda planificada en MyWed360',
               start: startDate,
               end: endDate,
               location: profileData.lugar || undefined,
@@ -405,7 +404,7 @@ const OnboardingTutorial = ({ onComplete }) => {
               ))}
             </div>
           </div>
-          {/* Bot�n saltar */}
+          {/* Botn saltar */}
           <button onClick={handleComplete} className="text-xs underline hover:text-gray-200">
             Saltar
           </button>
@@ -453,3 +452,6 @@ const OnboardingTutorial = ({ onComplete }) => {
 };
 
 export default OnboardingTutorial;
+
+
+

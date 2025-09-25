@@ -153,9 +153,9 @@ A continuación se detalla el orden sugerido para crear correctamente un plano d
   - Notas especiales
 
 - [ ] **Acciones rápidas**
-  - Botón "Eliminar de mesa" (vuelve a lista)
-  - "Intercambiar con..." (swap entre mesas)
-  - "Ver detalles" (modal con info completa)
+  - Botón  – Eliminar de mesa –  (vuelve a lista)
+  -  – Intercambiar con... –  (swap entre mesas)
+  -  – Ver detalles –  (modal con info completa)
 
 ### Zona Inferior Derecha - Configuración de Mesas
 **Pasos detallados:**
@@ -217,19 +217,19 @@ A continuación se detalla el orden sugerido para crear correctamente un plano d
 **Pasos detallados:**
 - [ ] **Detección de prerequisitos**
   - Verificar si existen invitados añadidos
-  - Si no hay invitados: "Veo que aún no has añadido invitados a tu boda"
-  - "Para crear un plan de asientos necesitas tener tu lista de invitados lista"
-  - Botón: "Añadir invitados primero" → redirecciona a gestión de invitados
+  - Si no hay invitados:  – Veo que aún no has añadido invitados a tu boda – 
+  -  – Para crear un plan de asientos necesitas tener tu lista de invitados lista – 
+  - Botón:  – Añadir invitados primero –  → redirecciona a gestión de invitados
 
 - [ ] **Bienvenida con invitados existentes**
-  - "Perfecto! Veo que tienes [X] invitados confirmados"
-  - "Ahora vamos a crear el plan de asientos perfecto para tu boda"
-  - "Primero necesito conocer el espacio donde será el banquete"
+  -  – Perfecto! Veo que tienes [X] invitados confirmados – 
+  -  – Ahora vamos a crear el plan de asientos perfecto para tu boda – 
+  -  – Primero necesito conocer el espacio donde será el banquete – 
 
 - [ ] **Guía de configuración del espacio**
-  - "Empecemos definiendo las dimensiones del salón"
-  - "Luego dibujaremos el perímetro del espacio"
-  - "Y finalmente añadiremos las mesas"
+  -  – Empecemos definiendo las dimensiones del salón – 
+  -  – Luego dibujaremos el perímetro del espacio – 
+  -  – Y finalmente añadiremos las mesas – 
   - Tutorial paso a paso con highlights visuales
 
 - [ ] **Validación continua**
@@ -244,7 +244,7 @@ A continuación se detalla el orden sugerido para crear correctamente un plano d
 **Pasos detallados:**
 - [ ] **Verificación antes de asignación**
   - Comprobar que existen invitados en la base de datos
-  - Mostrar contador: "X invitados confirmados, Y asientos disponibles"
+  - Mostrar contador:  – X invitados confirmados, Y asientos disponibles – 
   - Si no hay invitados: mostrar mensaje y botón para añadir
   - Si hay desbalance: alertar y sugerir ajustes
 
@@ -317,7 +317,7 @@ A continuación se detalla el orden sugerido para crear correctamente un plano d
 - [ ] **Herramientas de resolución**
   - Alertas visuales en mesas problemáticas
   - Sugerencias automáticas de reubicación
-  - Simulador de "qué pasaría si..."
+  - Simulador de  – qué pasaría si... – 
   - Consulta con organizadores
 
 - [ ] **Documentación de decisiones**

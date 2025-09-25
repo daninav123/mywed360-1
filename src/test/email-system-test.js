@@ -9,7 +9,7 @@ const EmailService = {
   initEmailService: (profile) => {
     // Simula la lógica de generación de emails
     if (profile.emailAlias) {
-      return `${profile.emailAlias}@lovenda.com`;
+      return `${profile.emailAlias}@mywed360.com`;
     }
 
     if (profile.brideFirstName && profile.brideLastName) {
@@ -18,10 +18,10 @@ const EmailService = {
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
           .replace(/[^a-z0-9.]/g, '.'); // Reemplazar caracteres no permitidos
-      return `${normalizedName}@lovenda.com`;
+      return `${normalizedName}@mywed360.com`;
     }
 
-    return `user${profile.userId}@lovenda.com`;
+    return `user${profile.userId}@mywed360.com`;
   },
 
   sendMail: async ({ to, subject, body }) => {
@@ -34,7 +34,7 @@ const EmailService = {
     // Simular respuesta exitosa
     return {
       id: 'email_' + Math.random().toString(36).substring(2, 10),
-      from: 'usuario@lovenda.com',
+      from: 'usuario@mywed360.com',
       to,
       subject,
       date: new Date().toISOString(),
@@ -154,3 +154,6 @@ runEmailTest()
     console.error('Error fatal en la prueba:', err);
     process.exit(1);
   });
+
+
+

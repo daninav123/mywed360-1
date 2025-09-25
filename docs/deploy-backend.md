@@ -42,10 +42,10 @@
 - Eventos Mailgun: `GET https://<backend>/api/mailgun/events?recipient=tu@correo.com&event=delivered&limit=10`.
 - Envío de prueba: `POST https://<backend>/api/mail/test-personal-email` con JSON:
   {
-    "from": "usuario@mywed360.com",
-    "to": "destino@dominio.com",
-    "subject": "Prueba",
-    "message": "Hola"
+     – from – :  – usuario@mywed360.com – ,
+     – to – :  – destino@dominio.com – ,
+     – subject – :  – Prueba – ,
+     – message – :  – Hola – 
   }
 
 ## Seguridad y buenas prácticas

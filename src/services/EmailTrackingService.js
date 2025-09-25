@@ -3,7 +3,7 @@ import { saveData, loadData } from './SyncService';
 import { addTagToEmail, SYSTEM_TAGS } from './tagService';
 import { auth } from '../firebaseConfig';
 
-const TRACKING_STORAGE_KEY = 'lovenda_email_tracking';
+const TRACKING_STORAGE_KEY = 'mywed360_email_tracking';
 
 // Estados posibles para seguimiento de correos
 export const TRACKING_STATUS = {
@@ -296,7 +296,7 @@ export function tagProviderEmail_old(emailId, providerId) {
   try {
     const profile = (() => {
       try {
-        return JSON.parse(localStorage.getItem('lovenda_user_profile') || '{}');
+        return JSON.parse(localStorage.getItem('mywed360_user_profile') || '{}');
       } catch {
         return {};
       }
@@ -310,3 +310,4 @@ export function tagProviderEmail_old(emailId, providerId) {
     return false;
   }
 }
+

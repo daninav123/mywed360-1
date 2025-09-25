@@ -1,5 +1,5 @@
 /**
- * Hook centralizado para la autenticación en Lovenda
+ * Hook centralizado para la autenticación en MyWed360
  * Este hook proporciona funcionalidades de autenticación y gestión de perfil de usuario
  */
 
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         setCurrentUser(user);
 
         // Crear o cargar perfil
-        const savedProfile = localStorage.getItem('lovenda_user_profile');
+        const savedProfile = localStorage.getItem('MyWed360_user_profile');
         let profile;
 
         if (savedProfile) {
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         setUserProfile(profile);
-        localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
+        localStorage.setItem('MyWed360_user_profile', JSON.stringify(profile));
       } else {
         // No hay usuario autenticado
         console.log('[useAuth] No hay usuario Firebase autenticado');
@@ -146,7 +146,7 @@ export const AuthProvider = ({ children }) => {
         },
       };
       setUserProfile(profile);
-      localStorage.setItem('lovenda_user_profile', JSON.stringify(profile));
+      localStorage.setItem('MyWed360_user_profile', JSON.stringify(profile));
       return { success: true, user };
     } catch (error) {
       console.error('Error al registrar usuario:', error);
@@ -178,18 +178,18 @@ export const AuthProvider = ({ children }) => {
       if (!userProfile) {
         const defaultProfile = {
           id: user.uid,
-          name: user.displayName || 'Usuario Lovenda',
+          name: user.displayName || 'Usuario',
           email: user.email,
           preferences: {
             emailNotifications: true,
-            emailSignature: 'Enviado desde Lovenda',
+            emailSignature: 'Enviado desde MyWed360',
             theme: 'light',
             remindersEnabled: true,
             reminderDays: 3,
           },
         };
         setUserProfile(defaultProfile);
-        localStorage.setItem('lovenda_user_profile', JSON.stringify(defaultProfile));
+        localStorage.setItem('MyWed360_user_profile', JSON.stringify(defaultProfile));
       }
 
       return { success: true, user };
@@ -246,7 +246,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       // El estado se limpia automáticamente por onAuthStateChanged
-      localStorage.removeItem('lovenda_user_profile');
+      localStorage.removeItem('MyWed360_user_profile');
       console.log('✅ Sesión cerrada correctamente');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
@@ -263,7 +263,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const updatedProfile = { ...userProfile, ...profileData };
       setUserProfile(updatedProfile);
-      localStorage.setItem('lovenda_user_profile', JSON.stringify(updatedProfile));
+      localStorage.setItem('MyWed360_user_profile', JSON.stringify(updatedProfile));
       return { success: true, profile: updatedProfile };
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
@@ -352,4 +352,7 @@ export const useAuth = () => {
   return context;
 };
 export default useAuth;
+
+
+
 

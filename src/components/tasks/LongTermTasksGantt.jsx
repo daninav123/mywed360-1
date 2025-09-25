@@ -1,7 +1,8 @@
+import { ChevronRight, ChevronDown } from 'lucide-react';
 import React, { useMemo, useRef, useEffect, useState } from 'react';
+
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
-import { ChevronRight, ChevronDown } from 'lucide-react';
 
 function diffMonths(a, b) {
   const y = b.getFullYear() - a.getFullYear();
@@ -44,7 +45,7 @@ export default function LongTermTasksGantt({
     try {
       const env = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (typeof process !== 'undefined' ? process.env : {});
       const isDev = String(env?.MODE || env?.NODE_ENV || '').toLowerCase() !== 'production';
-      const flag = typeof localStorage !== 'undefined' ? localStorage.getItem('lovenda_gantt_debug') : null;
+      const flag = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed360_gantt_debug') : null;
       return isDev || flag === '1' || /^true$/i.test(String(flag || ''));
     } catch {
       return false;
@@ -527,4 +528,6 @@ export default function LongTermTasksGantt({
     </div>
   );
 }
+
+
 

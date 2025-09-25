@@ -193,3 +193,6 @@ function calculatePercentage(covered, total) {
 
 // Ejecutar el análisis
 analyzeCoverage();
+
+
+

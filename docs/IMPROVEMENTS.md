@@ -1,7 +1,7 @@
 # Mejoras aplicadas (backend/API y CI)
 
 - Unificación de Node a 20.x:
-  - `functions/package.json` engines pasa a `"node": "20"`.
+  - `functions/package.json` engines pasa a ` – node – :  – 20 – `.
   - `test-email-system.yml` ahora usa Node 20.x.
 
 - CORS y preflight:

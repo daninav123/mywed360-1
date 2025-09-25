@@ -11,7 +11,7 @@ class EmailCache {
   constructor() {
     this.memoryCache = {};
     this.initialized = false;
-    this.storageKey = 'lovenda_unified_inbox_cache';
+    this.storageKey = 'mywed360_unified_inbox_cache';
     this.maxCacheAge = 15 * 60 * 1000; // 15 minutos por defecto
     this.folderMaxItems = {
       inbox: 100, // máx 100 emails en caché para la bandeja de entrada
@@ -238,3 +238,5 @@ class EmailCache {
 
 // Exportar una única instancia para toda la aplicación
 export const emailCache = new EmailCache();
+
+

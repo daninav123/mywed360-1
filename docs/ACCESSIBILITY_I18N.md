@@ -2,7 +2,7 @@
 
 ## Accesibilidad (a11y)
 - Usar etiquetas ARIA descriptivas en componentes interactivos.
-- Ejemplo Seating: elementos de silla con `aria-label="Silla #"` (tests E2E los referencian).
+- Ejemplo Seating: elementos de silla con `aria-label= – Silla # – ` (tests E2E los referencian).
 - Contraste suficiente y foco visible en controles.
 - Navegación por teclado en toolbars y modales (Seating/Tasks).
 

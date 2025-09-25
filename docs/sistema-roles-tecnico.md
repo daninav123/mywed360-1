@@ -27,7 +27,7 @@ match /weddings/{weddingId} {
 #### **Componentes UI Específicos:**
 - Dashboard principal sin selector de bodas
 - Acceso directo a `activeWedding` desde contexto
-- Botón "Invitar Ayudante" (solo plan Plus)
+- Botón  – Invitar Ayudante –  (solo plan Plus)
 
 ---
 
@@ -106,7 +106,7 @@ match /weddings/{weddingId}/settings {
 #### **Componentes UI Específicos:**
 - Dashboard igual que owner pero sin configuración crítica
 - Sin acceso a `BillingSettings.jsx`
-- Sin botón "Invitar Ayudante"
+- Sin botón  – Invitar Ayudante – 
 
 ---
 
@@ -117,13 +117,13 @@ match /weddings/{weddingId}/settings {
 #### **Colección `users`:**
 ```javascript
 {
-  uid: "user123",
-  email: "user@example.com",
-  role: "owner" | "wedding_planner" | "assistant",
+  uid:  – user123 – ,
+  email:  – user@example.com – ,
+  role:  – owner –  |  – wedding_planner –  |  – assistant – ,
   profile: {
-    name: "Juan Pérez",
-    phone: "+34600000000",
-    plan: "plus" | "wedding_planner_1" | "teams",
+    name:  – Juan Pérez – ,
+    phone:  – +34600000000 – ,
+    plan:  – plus –  |  – wedding_planner_1 –  |  – teams – ,
     planExpiry: timestamp
   },
   trustedProviders: [] // Solo para wedding_planner
@@ -133,13 +133,13 @@ match /weddings/{weddingId}/settings {
 #### **Colección `weddings`:**
 ```javascript
 {
-  id: "wedding123",
-  ownerId: "user123",
-  plannerId: "planner456", // Opcional
-  assistants: ["assistant789"], // Array de UIDs
-  title: "Boda Juan & María",
+  id:  – wedding123 – ,
+  ownerId:  – user123 – ,
+  plannerId:  – planner456 – , // Opcional
+  assistants: [ – assistant789 – ], // Array de UIDs
+  title:  – Boda Juan & María – ,
   date: timestamp,
-  status: "active" | "completed" | "archived",
+  status:  – active –  |  – completed –  |  – archived – ,
   permissions: {
     canInviteAssistants: boolean,
     maxAssistants: number
@@ -280,7 +280,7 @@ const WeddingSelector = () => {
   }
 
   return (
-    <div className="wedding-selector">
+    <div className= – wedding-selector – >
       <select 
         value={activeWedding?.id || ''} 
         onChange={(e) => {
@@ -288,7 +288,7 @@ const WeddingSelector = () => {
           setActiveWedding(selected);
         }}
       >
-        <option value="">Seleccionar boda...</option>
+        <option value= –  – >Seleccionar boda...</option>
         {availableWeddings.map(wedding => (
           <option key={wedding.id} value={wedding.id}>
             {wedding.title} - {new Date(wedding.date.toDate()).toLocaleDateString()}
@@ -451,7 +451,7 @@ describe('Sistema de Roles', () => {
 ### **Owner (Pareja):**
 - Dashboard principal sin selector
 - Acceso completo a su boda
-- Botón "Invitar Ayudante" (plan Plus)
+- Botón  – Invitar Ayudante –  (plan Plus)
 - Configuración de facturación
 
 ### **Wedding Planner:**
@@ -471,7 +471,7 @@ describe('Sistema de Roles', () => {
 ## 🔄 Flujo de Invitación de Ayudantes
 
 ### **Proceso Técnico:**
-1. **Owner con plan Plus** hace clic en "Invitar Ayudante"
+1. **Owner con plan Plus** hace clic en  – Invitar Ayudante – 
 2. **Modal de invitación** solicita email del ayudante
 3. **Validación** de límites de plan y permisos
 4. **Envío de invitación** por email con token único

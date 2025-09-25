@@ -10,7 +10,7 @@ Formato: entradas agrupadas por fecha (YYYY-MM-DD). Referencias a documentación
 
 ## 2025-09 (anteriores)
 - i18n completo con `react-i18next`, selector de idioma y documentación (`docs/i18n.md`).
-- Refactor Seating Plan en módulos: `useSeatingPlan`, `SeatingPlanCanvas`, etc. Documentación en `docs/seating-plan-refactor.md`.
+- Refactor Seating Plan en módulos: `useSeatingPlan`, `SeatingPlanCanvas`, etc. Documentación en `docs/archive/seating-plan-refactor.md`.
 - Refactor Finance en arquitectura modular (`useFinance.js`, componentes especializados). Documentación en `docs/finance-refactor.md`.
 - Corrección del flujo de autenticación Firebase (Auth real, eliminación de mock), orden de providers (Auth → Wedding), y reglas de Firestore. Ver `FLUJO-AUTENTICACION-FIREBASE.md` y `DIAGNOSTICO-ERRORES-FIREBASE.md`.
 - WhatsApp RSVP: endpoints backend (`/api/whatsapp/*`), sesiones conversacionales y documentado en `docs/whatsapp-messaging.md`.

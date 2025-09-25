@@ -288,3 +288,6 @@ describe('AIEmailTrackingService', () => {
     expect(comparison.categoryBreakdown[0].category).toBe('fotografía');
   });
 });
+
+
+

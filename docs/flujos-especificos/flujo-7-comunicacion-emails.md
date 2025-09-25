@@ -21,8 +21,8 @@
 ### Acceso al Buzón de Emails
 **Pasos detallados:**
 - [ ] **Múltiples puntos de acceso**
-  - Menú principal: "Buzón de Emails"
-  - Perfil de usuario: opción "Buzón"
+  - Menú principal:  – Buzón de Emails – 
+  - Perfil de usuario: opción  – Buzón – 
   - URL directa: `/buzon`
   - Notificación de nuevos emails
 
@@ -38,7 +38,7 @@
 ### Composición y Envío
 **Pasos detallados:**
 - [ ] **Editor de emails**
-  - Botón "Nuevo Email" prominente
+  - Botón  – Nuevo Email –  prominente
   - Editor WYSIWYG con formato básico
   - Campos: Para, CC, CCO, Asunto, Cuerpo
   - Autocompletado de direcciones frecuentes
@@ -52,7 +52,7 @@
   - Barra de progreso de subida
 
 - [ ] **Programación de envío**
-  - Opción "Enviar más tarde"
+  - Opción  – Enviar más tarde – 
   - Selector de fecha y hora
   - Confirmación antes del envío programado
   - Lista de emails programados
@@ -60,10 +60,10 @@
 ### Respuestas y Reenvíos
 **Pasos detallados:**
 - [ ] **Responder**
-  - Botón "Responder" en vista de email
+  - Botón  – Responder –  en vista de email
   - Citado automático del mensaje original
   - Mantenimiento del hilo de conversación
-  - Autocompletado del campo "Para"
+  - Autocompletado del campo  – Para – 
 
 - [ ] **Responder a todos**
   - Inclusión automática de todos los destinatarios
@@ -72,7 +72,7 @@
 
 - [ ] **Reenviar**
   - Preservación de adjuntos originales
-  - Prefijo "Fwd:" en asunto
+  - Prefijo  – Fwd: –  en asunto
   - Opción de añadir comentarios
 
 ## 7.3 Sistema de Plantillas para IA
@@ -89,7 +89,7 @@
 - [ ] **Plantillas específicas por categoría**
   ```
   Solicitud Automática de Presupuesto (para uso de IA):
-  "Estimado/a {{nombre_proveedor}},
+   – Estimado/a {{nombre_proveedor}},
   
   Nos ponemos en contacto desde MyWed360 en nombre de {{nombre_novios}} 
   para solicitar un presupuesto para su boda del {{fecha_boda}} en {{ubicacion_boda}}.
@@ -103,7 +103,7 @@
   Por favor, envíe su propuesta a este mismo email.
   
   Saludos cordiales,
-  Equipo MyWed360 en nombre de {{nombre_novios}}"
+  Equipo MyWed360 en nombre de {{nombre_novios}} – 
   ```
 
 ### Configuración de Plantillas IA
@@ -132,7 +132,7 @@
   - Extracción de participantes
 
 - [ ] **Sugerencias de eventos**
-  - Botón "Añadir al calendario" en emails relevantes
+  - Botón  – Añadir al calendario –  en emails relevantes
   - Formulario precompletado con datos detectados
   - Opción de editar antes de guardar
   - Vinculación del evento con el email original
@@ -203,22 +203,22 @@
 - [ ] **Plantillas predefinidas**
   ```
   General:
-  "Gracias por contactarnos sobre nuestra boda del {{fecha_boda}}. 
+   – Gracias por contactarnos sobre nuestra boda del {{fecha_boda}}. 
   Hemos recibido tu mensaje y te responderemos en las próximas 24-48 horas.
   
   Para consultas urgentes, puedes contactarnos al {{telefono_contacto}}.
   
   ¡Gracias por ser parte de nuestro día especial!
-  {{nombre_novios}}"
+  {{nombre_novios}} – 
   
   Proveedores:
-  "Estimado/a proveedor,
+   – Estimado/a proveedor,
   
   Gracias por su email. Estamos revisando su propuesta y nos pondremos 
   en contacto en un plazo máximo de 3 días laborables.
   
   Saludos cordiales,
-  {{nombre_novios}}"
+  {{nombre_novios}} – 
   ```
 
 ## 7.7 Centro de Notificaciones
@@ -288,36 +288,36 @@
 ```javascript
 // /weddings/{weddingId}/emails
 {
-  weddingEmail: "ana.carlos.boda2024@mywed360.com",
+  weddingEmail:  – ana.carlos.boda2024@mywed360.com – ,
   settings: {
     forwardToPersonal: false,
-    personalEmails: ["ana@email.com", "carlos@email.com"],
+    personalEmails: [ – ana@email.com – ,  – carlos@email.com – ],
     autoReply: {
       enabled: true,
-      general: "Gracias por contactarnos...",
-      providers: "Estimado proveedor...",
-      guests: "Gracias por tu mensaje..."
+      general:  – Gracias por contactarnos... – ,
+      providers:  – Estimado proveedor... – ,
+      guests:  – Gracias por tu mensaje... – 
     },
-    signature: "Ana & Carlos\nBoda 15 Junio 2024\nana.carlos.boda2024@mywed360.com"
+    signature:  – Ana & Carlos\nBoda 15 Junio 2024\nana.carlos.boda2024@mywed360.com – 
   },
   emails: [
     {
-      id: "email_001",
-      from: "proveedor@flores.com",
-      to: ["ana.carlos.boda2024@mywed360.com"],
-      subject: "Presupuesto decoración floral",
-      body: "Adjunto presupuesto...",
-      date: "2024-01-15T10:30:00Z",
-      category: "providers",
+      id:  – email_001 – ,
+      from:  – proveedor@flores.com – ,
+      to: [ – ana.carlos.boda2024@mywed360.com – ],
+      subject:  – Presupuesto decoración floral – ,
+      body:  – Adjunto presupuesto... – ,
+      date:  – 2024-01-15T10:30:00Z – ,
+      category:  – providers – ,
       read: false,
-      attachments: ["presupuesto_flores.pdf"],
+      attachments: [ – presupuesto_flores.pdf – ],
       aiSuggestions: {
         addToCalendar: {
           suggested: true,
           event: {
-            title: "Reunión flores",
-            date: "2024-01-20",
-            time: "16:00"
+            title:  – Reunión flores – ,
+            date:  – 2024-01-20 – ,
+            time:  – 16:00 – 
           }
         }
       }
@@ -325,11 +325,11 @@
   ],
   templates: [
     {
-      id: "template_001",
-      name: "Solicitud presupuesto",
-      category: "providers",
-      subject: "Solicitud de presupuesto - Boda {{fecha_boda}}",
-      body: "Estimado/a {{nombre_proveedor}}..."
+      id:  – template_001 – ,
+      name:  – Solicitud presupuesto – ,
+      category:  – providers – ,
+      subject:  – Solicitud de presupuesto - Boda {{fecha_boda}} – ,
+      body:  – Estimado/a {{nombre_proveedor}}... – 
     }
   ]
 }

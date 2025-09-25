@@ -33,7 +33,7 @@ import Tasks from './pages/Tasks';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
 import AdminRoutes from './routes/AdminRoutes';
-// Nota: especificamos la extensi�n .jsx para asegurar la resoluci�n en entornos Linux/CI
+// Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
 // Nueva bandeja de entrada (UI definitiva)
@@ -56,6 +56,8 @@ const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'
 const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
 const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
 // (dedupe) WebEditor ya importado arriba
+// Seating Plan interactivo
+const SeatingPlan = React.lazy(() => import('./pages/SeatingPlan.jsx'));
 const DisenosLayout = React.lazy(() => import('./pages/disenos/DisenosLayout'));
 const DisenosInvitaciones = React.lazy(() => import('./pages/disenos/Invitaciones'));
 const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo'));
@@ -69,6 +71,7 @@ const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
+const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
 // (dedupe) rutas públicas ya importadas arriba
@@ -142,6 +145,7 @@ function App() {
                   <Route path="finance" element={<Finance />} />
                   <Route path="finance/bank-connect" element={<BankConnect />} />
                   <Route path="invitados" element={<Invitados />} />
+                  <Route path="invitados/seating" element={<SeatingPlan />} />
                   <Route path="invitados/invitaciones" element={<Invitaciones />} />
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
                   <Route path="proveedores" element={<Proveedores />} />
@@ -216,6 +220,12 @@ function App() {
                           />
                         )
                       : null
+                  }
+                  {
+                    ((typeof window !== 'undefined' && window.Cypress) ||
+                      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production')) && (
+                      <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+                    )
                   }
 
                   {/* Admin */}

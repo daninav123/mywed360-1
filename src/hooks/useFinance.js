@@ -678,7 +678,7 @@ export default function useFinance() {
           docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
           showNotification: false,
         });
-        window.dispatchEvent(new Event('lovenda-movements'));
+        window.dispatchEvent(new Event('mywed360-movements'));
 
         return { success: true, data: saved };
       } catch (err) {
@@ -934,3 +934,4 @@ export default function useFinance() {
     hasBankAccount,
   };
 }
+

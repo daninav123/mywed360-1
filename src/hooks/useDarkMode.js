@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 export default function useDarkMode() {
   const [enabled, setEnabled] = useState(() => {
     if (typeof window === 'undefined') return false;
-    const saved = localStorage.getItem('lovenda-dark');
+    const saved = localStorage.getItem('mywed360-dark');
     return saved ? JSON.parse(saved) : false;
   });
 
@@ -19,10 +19,11 @@ export default function useDarkMode() {
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('lovenda-dark', JSON.stringify(enabled));
+    localStorage.setItem('mywed360-dark', JSON.stringify(enabled));
   }, [enabled]);
 
   const toggle = () => setEnabled((prev) => !prev);
 
   return [enabled, toggle];
 }
+

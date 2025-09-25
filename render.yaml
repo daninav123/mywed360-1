@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lovenda-backend
+    name: mywed360-backend
     env: node
     plan: free
     rootDir: .

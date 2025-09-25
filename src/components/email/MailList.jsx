@@ -37,8 +37,8 @@ export default function MailList({
 
   useEffect(() => {
     const h = () => setTick((t) => t + 1);
-    window.addEventListener('lovenda-email-tags', h);
-    return () => window.removeEventListener('lovenda-email-tags', h);
+    window.addEventListener('mywed360-email-tags', h);
+    return () => window.removeEventListener('mywed360-email-tags', h);
   }, []);
 
   useEffect(() => {
@@ -290,3 +290,4 @@ export default function MailList({
     </div>
   );
 }
+

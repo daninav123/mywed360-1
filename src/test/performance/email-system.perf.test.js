@@ -191,3 +191,6 @@ describe('Pruebas de rendimiento para el sistema de correo', () => {
     fs.writeFileSync(reportPath, JSON.stringify(await flow.getFlowResult(), null, 2));
   });
 });
+
+
+

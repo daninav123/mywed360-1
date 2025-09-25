@@ -227,53 +227,53 @@
 ```javascript
 // /content/articles/{articleId}
 {
-  id: "article_001",
-  title: "10 Tendencias de Decoración para Bodas 2024",
-  slug: "tendencias-decoracion-bodas-2024",
+  id:  – article_001 – ,
+  title:  – 10 Tendencias de Decoración para Bodas 2024 – ,
+  slug:  – tendencias-decoracion-bodas-2024 – ,
   
   content: {
-    excerpt: "Descubre las últimas tendencias...",
-    body: "# Introducción\n\nLas bodas de 2024...",
+    excerpt:  – Descubre las últimas tendencias... – ,
+    body:  – # Introducción\n\nLas bodas de 2024... – ,
     wordCount: 1250,
     readingTime: 5 // minutos
   },
   
   metadata: {
     author: {
-      id: "author_001",
-      name: "María García",
-      bio: "Experta en decoración de bodas"
+      id:  – author_001 – ,
+      name:  – María García – ,
+      bio:  – Experta en decoración de bodas – 
     },
-    publishedAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-01-16T14:30:00Z",
-    status: "published", // draft, published, archived
+    publishedAt:  – 2024-01-15T10:00:00Z – ,
+    updatedAt:  – 2024-01-16T14:30:00Z – ,
+    status:  – published – , // draft, published, archived
     featured: true
   },
   
   taxonomy: {
-    categories: ["decoracion", "tendencias"],
-    tags: ["2024", "colores", "flores", "centros-mesa"],
-    difficulty: "beginner", // beginner, intermediate, advanced
-    weddingTypes: ["clasica", "moderna", "rustica"]
+    categories: [ – decoracion – ,  – tendencias – ],
+    tags: [ – 2024 – ,  – colores – ,  – flores – ,  – centros-mesa – ],
+    difficulty:  – beginner – , // beginner, intermediate, advanced
+    weddingTypes: [ – clasica – ,  – moderna – ,  – rustica – ]
   },
   
   seo: {
-    metaTitle: "10 Tendencias de Decoración para Bodas 2024 | MyWed360",
-    metaDescription: "Descubre las tendencias más populares...",
-    focusKeyword: "tendencias decoración bodas 2024",
-    canonicalUrl: "https://mywed360.com/blog/tendencias-decoracion-bodas-2024"
+    metaTitle:  – 10 Tendencias de Decoración para Bodas 2024 | MyWed360 – ,
+    metaDescription:  – Descubre las tendencias más populares... – ,
+    focusKeyword:  – tendencias decoración bodas 2024 – ,
+    canonicalUrl:  – https://mywed360.com/blog/tendencias-decoracion-bodas-2024 – 
   },
   
   media: {
     featuredImage: {
-      url: "https://cdn.mywed360.com/articles/featured-001.jpg",
-      alt: "Decoración moderna para boda",
-      caption: "Ejemplo de decoración minimalista"
+      url:  – https://cdn.mywed360.com/articles/featured-001.jpg – ,
+      alt:  – Decoración moderna para boda – ,
+      caption:  – Ejemplo de decoración minimalista – 
     },
     gallery: [
       {
-        url: "https://cdn.mywed360.com/articles/gallery-001-1.jpg",
-        alt: "Centro de mesa con flores",
+        url:  – https://cdn.mywed360.com/articles/gallery-001-1.jpg – ,
+        alt:  – Centro de mesa con flores – ,
         position: 1
       }
     ]
@@ -288,32 +288,32 @@
     bounceRate: 0.35
   },
   
-  related: ["article_002", "article_015", "article_028"]
+  related: [ – article_002 – ,  – article_015 – ,  – article_028 – ]
 }
 
 // /content/inspiration/{collectionId}
 {
-  id: "inspiration_001",
-  title: "Bodas Rústicas en Jardín",
-  description: "Inspiración para bodas al aire libre",
+  id:  – inspiration_001 – ,
+  title:  – Bodas Rústicas en Jardín – ,
+  description:  – Inspiración para bodas al aire libre – ,
   
   curator: {
-    userId: "user_123",
-    name: "Ana García",
+    userId:  – user_123 – ,
+    name:  – Ana García – ,
     isPublic: true
   },
   
   items: [
     {
-      id: "item_001",
-      type: "image",
-      url: "https://cdn.mywed360.com/inspiration/rustic-001.jpg",
-      title: "Ceremonia en jardín",
-      description: "Altar rústico con flores silvestres",
-      tags: ["rustico", "jardin", "altar", "flores"],
-      source: "Pinterest",
-      sourceUrl: "https://pinterest.com/pin/123456789",
-      addedAt: "2024-01-10T15:30:00Z"
+      id:  – item_001 – ,
+      type:  – image – ,
+      url:  – https://cdn.mywed360.com/inspiration/rustic-001.jpg – ,
+      title:  – Ceremonia en jardín – ,
+      description:  – Altar rústico con flores silvestres – ,
+      tags: [ – rustico – ,  – jardin – ,  – altar – ,  – flores – ],
+      source:  – Pinterest – ,
+      sourceUrl:  – https://pinterest.com/pin/123456789 – ,
+      addedAt:  – 2024-01-10T15:30:00Z – 
     }
   ],
   
@@ -334,38 +334,38 @@
 
 // /content/userGenerated/{submissionId}
 {
-  id: "ugc_001",
-  type: "wedding_story",
+  id:  – ugc_001 – ,
+  type:  – wedding_story – ,
   
   user: {
-    id: "user_456",
-    name: "Carlos y María",
-    email: "carlos.maria@email.com",
+    id:  – user_456 – ,
+    name:  – Carlos y María – ,
+    email:  – carlos.maria@email.com – ,
     verified: true
   },
   
   content: {
-    title: "Nuestra boda en la playa",
-    story: "Después de dos años de planificación...",
-    weddingDate: "2023-08-15",
-    location: "Málaga, España",
+    title:  – Nuestra boda en la playa – ,
+    story:  – Después de dos años de planificación... – ,
+    weddingDate:  – 2023-08-15 – ,
+    location:  – Málaga, España – ,
     guestCount: 120,
-    budget: "15000-20000"
+    budget:  – 15000-20000 – 
   },
   
   media: [
     {
-      type: "image",
-      url: "https://cdn.mywed360.com/ugc/wedding-001-1.jpg",
-      caption: "Ceremonia en la playa al atardecer"
+      type:  – image – ,
+      url:  – https://cdn.mywed360.com/ugc/wedding-001-1.jpg – ,
+      caption:  – Ceremonia en la playa al atardecer – 
     }
   ],
   
   moderation: {
-    status: "approved", // pending, approved, rejected
-    reviewedBy: "moderator_001",
-    reviewedAt: "2024-01-12T09:00:00Z",
-    notes: "Historia inspiradora, fotos de calidad"
+    status:  – approved – , // pending, approved, rejected
+    reviewedBy:  – moderator_001 – ,
+    reviewedAt:  – 2024-01-12T09:00:00Z – ,
+    notes:  – Historia inspiradora, fotos de calidad – 
   },
   
   engagement: {
@@ -373,7 +373,7 @@
     comments: 23,
     shares: 12,
     featured: true,
-    featuredAt: "2024-01-15T10:00:00Z"
+    featuredAt:  – 2024-01-15T10:00:00Z – 
   }
 }
 ```

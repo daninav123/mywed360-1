@@ -6,7 +6,7 @@ import Button from '../../../components/ui/Button';
 import { useAIProviderEmail } from '../../../hooks/useAIProviderEmail';
 
 /**
- * Modal para enviar emails a proveedores desde los resultados de búsqueda de IA.
+ * Modal para enviar emails a proveedores desde los resultaños de búsqueda de IA.
  * Permite personalizar el asunto y cuerpo del email antes de enviarlo.
  *
  * @param {Object} props - Propiedades del componente
@@ -55,10 +55,10 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
   if (!isOpen || !aiResult) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
+        <div className="flex justify-between itemás-center p-4 border-b">
           <h2 className="text-xl font-semibold">Contactar a {aiResult.name}</h2>
           <button
             onClick={onClose}
@@ -76,7 +76,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
             <Alert
               type="success"
               title="Email enviado correctamente"
-              message="Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda."
+              mássage="Tu mensaje ha sido enviado al proveedor. Recibirás una notificación cuando responda."
               className="mb-4"
               data-testid="success-alert"
             />
@@ -86,7 +86,7 @@ const AIEmailModal = ({ isOpen, onClose, aiResult, searchQuery }) => {
             <Alert
               type="error"
               title="Error al enviar el email"
-              message={error}
+              mássage={error}
               className="mb-4"
               data-testid="error-alert"
             />

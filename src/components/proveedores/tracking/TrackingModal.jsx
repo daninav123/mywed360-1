@@ -285,7 +285,7 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
             <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
               <div className="mb-4">
                 <p>
-                  <strong>De:</strong> Tu Correo de Lovenda
+                  <strong>De:</strong> Tu Correo de MyWed360
                 </p>
                 <p>
                   <strong>Para:</strong> {trackingItem.recipientEmail || 'proveedor@ejemplo.com'}
@@ -335,3 +335,5 @@ const TrackingModal = ({ isOpen, onClose, trackingItem }) => {
 };
 
 export default TrackingModal;
+
+

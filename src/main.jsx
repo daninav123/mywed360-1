@@ -9,6 +9,8 @@ import ErrorBoundary from './components/debug/ErrorBoundary';
 import './debug/setupDebug';
 // Registrar comandos de diagnóstico globales antes de montar la aplicación
 import './utils/consoleCommands';
+// Compat: migración de claves/eventos lovenda_* -> mywed360_*
+import './utils/compatMigration';
 import './index.css';
 // Registrar SW solo si PWA está habilitado
 if (import.meta.env?.VITE_ENABLE_PWA === '1') {

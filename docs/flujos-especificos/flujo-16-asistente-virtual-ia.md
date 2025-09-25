@@ -28,20 +28,20 @@ Sistema de asistente virtual conversacional integrado en la interfaz mediante ch
 #### **2.1 Consultas Generales**
 - **Trigger**: Usuario escribe pregunta libre
 - **Ejemplos**:
-  - "¿Cuándo debo enviar las invitaciones?"
-  - "¿Qué presupuesto necesito para 100 invitados?"
-  - "¿Cómo funciona el seating plan?"
+  -  – ¿Cuándo debo enviar las invitaciones? – 
+  -  – ¿Qué presupuesto necesito para 100 invitados? – 
+  -  – ¿Cómo funciona el seating plan? – 
 
 #### **2.2 Ayuda Contextual**
 - **Trigger**: Usuario está en página específica
 - **Comportamiento**: Asistente ofrece ayuda sobre funcionalidad actual
 - **Ejemplos**:
-  - En Presupuesto: "¿Te ayudo a categorizar tus gastos?"
-  - En Invitados: "¿Quieres que importe invitados desde un archivo?"
-  - En Seating Plan: "¿Necesitas ayuda con la distribución automática?"
+  - En Presupuesto:  – ¿Te ayudo a categorizar tus gastos? – 
+  - En Invitados:  – ¿Quieres que importe invitados desde un archivo? – 
+  - En Seating Plan:  – ¿Necesitas ayuda con la distribución automática? – 
 
 #### **2.3 Planificación Automática**
-- **Trigger**: "Ayúdame a planificar mi boda"
+- **Trigger**:  – Ayúdame a planificar mi boda – 
 - **Proceso**:
   1. Recopila información básica (fecha, ubicación, invitados)
   2. Genera timeline personalizado
@@ -51,15 +51,15 @@ Sistema de asistente virtual conversacional integrado en la interfaz mediante ch
 #### **2.4 Sugerencias Proactivas**
 - **Trigger**: Análisis automático de datos
 - **Ejemplos**:
-  - "Veo que tu boda es en 3 meses, ¿ya tienes fotógrafo?"
-  - "Tu presupuesto de flores parece alto, ¿quieres alternativas?"
-  - "Hay 5 invitados sin asignar mesa, ¿los ubico automáticamente?"
+  -  – Veo que tu boda es en 3 meses, ¿ya tienes fotógrafo? – 
+  -  – Tu presupuesto de flores parece alto, ¿quieres alternativas? – 
+  -  – Hay 5 invitados sin asignar mesa, ¿los ubico automáticamente? – 
 
 ### 3. Funcionalidades Específicas
 
 #### **3.1 Generación de Timeline**
 ```
-Usuario: "Crea un timeline para mi boda"
+Usuario:  – Crea un timeline para mi boda – 
 Asistente: 
 - Analiza fecha de boda
 - Genera cronograma de 12 meses
@@ -70,7 +70,7 @@ Asistente:
 
 #### **3.2 Optimización de Presupuesto**
 ```
-Usuario: "Mi presupuesto se está pasando"
+Usuario:  – Mi presupuesto se está pasando – 
 Asistente:
 - Analiza gastos actuales
 - Identifica categorías más altas
@@ -80,7 +80,7 @@ Asistente:
 
 #### **3.3 Búsqueda Inteligente de Proveedores**
 ```
-Usuario: "Necesito un fotógrafo en Madrid por 1500€"
+Usuario:  – Necesito un fotógrafo en Madrid por 1500€ – 
 Asistente:
 - Busca en base de datos de proveedores
 - Filtra por ubicación y presupuesto
@@ -90,7 +90,7 @@ Asistente:
 
 #### **3.4 Resolución de Problemas**
 ```
-Usuario: "No puedo añadir más invitados"
+Usuario:  – No puedo añadir más invitados – 
 Asistente:
 - Identifica límite de plan actual
 - Explica restricciones
@@ -124,15 +124,15 @@ const sendMessage = async (userMessage) => {
   };
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model:  – gpt-4 – ,
     messages: [
       {
-        role: "system",
+        role:  – system – ,
         content: `Eres un asistente especializado en bodas. 
         Contexto actual: ${JSON.stringify(contextData)}`
       },
       ...messages,
-      { role: "user", content: userMessage }
+      { role:  – user – , content: userMessage }
     ]
   });
 };
@@ -143,18 +143,18 @@ const sendMessage = async (userMessage) => {
 #### **Conversación**
 ```javascript
 {
-  id: "conv_123",
-  userId: "user_456",
-  weddingId: "wedding_789",
+  id:  – conv_123 – ,
+  userId:  – user_456 – ,
+  weddingId:  – wedding_789 – ,
   messages: [
     {
-      id: "msg_1",
-      role: "user" | "assistant",
-      content: "texto del mensaje",
+      id:  – msg_1 – ,
+      role:  – user –  |  – assistant – ,
+      content:  – texto del mensaje – ,
       timestamp: Date,
       context: {
-        page: "/presupuesto",
-        action: "budget_help"
+        page:  – /presupuesto – ,
+        action:  – budget_help – 
       }
     }
   ],
@@ -166,11 +166,11 @@ const sendMessage = async (userMessage) => {
 #### **Sugerencias Contextuales**
 ```javascript
 {
-  page: "/invitados",
+  page:  – /invitados – ,
   suggestions: [
-    "¿Te ayudo a importar invitados desde Excel?",
-    "¿Quieres que genere códigos QR para las invitaciones?",
-    "¿Necesitas ayuda con las categorías de invitados?"
+     – ¿Te ayudo a importar invitados desde Excel? – ,
+     – ¿Quieres que genere códigos QR para las invitaciones? – ,
+     – ¿Necesitas ayuda con las categorías de invitados? – 
   ]
 }
 ```
@@ -220,36 +220,36 @@ const searchProvidersFromChat = async (criteria) => {
 
 ### **Caso 1: Usuario Nuevo**
 ```
-Asistente: "¡Hola! Veo que es tu primera vez aquí. 
-¿Te gustaría que te ayude a configurar tu boda paso a paso?"
+Asistente:  – ¡Hola! Veo que es tu primera vez aquí. 
+¿Te gustaría que te ayude a configurar tu boda paso a paso? – 
 
-Usuario: "Sí, por favor"
+Usuario:  – Sí, por favor – 
 
-Asistente: "Perfecto. Empecemos con lo básico:
+Asistente:  – Perfecto. Empecemos con lo básico:
 1. ¿Cuál es la fecha de tu boda?
 2. ¿Dónde será la celebración?
-3. ¿Cuántos invitados aproximadamente?"
+3. ¿Cuántos invitados aproximadamente? – 
 
 [Proceso de onboarding guiado]
 ```
 
 ### **Caso 2: Optimización de Presupuesto**
 ```
-Usuario: "Mi presupuesto se está yendo de las manos"
+Usuario:  – Mi presupuesto se está yendo de las manos – 
 
-Asistente: "Entiendo tu preocupación. He revisado tu presupuesto actual:
+Asistente:  – Entiendo tu preocupación. He revisado tu presupuesto actual:
 - Total gastado: 18,500€ de 20,000€ presupuestados
 - Categoría más alta: Catering (45% del total)
 
 ¿Te gustaría que busque alternativas más económicas para el catering 
-o prefieres ajustar otras categorías?"
+o prefieres ajustar otras categorías? – 
 ```
 
 ### **Caso 3: Planificación de Timeline**
 ```
-Usuario: "No sé por dónde empezar con la planificación"
+Usuario:  – No sé por dónde empezar con la planificación – 
 
-Asistente: "Te ayudo a crear un plan personalizado. 
+Asistente:  – Te ayudo a crear un plan personalizado. 
 Veo que tu boda es el 15 de junio de 2025 (en 8 meses).
 
 He creado un timeline optimizado:
@@ -259,20 +259,20 @@ He creado un timeline optimizado:
 📅 Marzo 2025: Enviar invitaciones
 📅 Mayo 2025: Confirmaciones finales
 
-¿Quieres que cree estas tareas en tu calendario?"
+¿Quieres que cree estas tareas en tu calendario? – 
 ```
 
 ### **Caso 4: Resolución de Problemas Técnicos**
 ```
-Usuario: "No puedo subir fotos a la galería"
+Usuario:  – No puedo subir fotos a la galería – 
 
-Asistente: "Veo el problema. Las fotos deben ser menores a 10MB 
+Asistente:  – Veo el problema. Las fotos deben ser menores a 10MB 
 y en formato JPG, PNG o WEBP.
 
 ¿Te gustaría que:
 1. Te muestre cómo comprimir las imágenes?
 2. Te ayude a subirlas una por una?
-3. Te enseñe a usar la subida masiva?"
+3. Te enseñe a usar la subida masiva? – 
 ```
 
 ---

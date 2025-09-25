@@ -37,7 +37,7 @@ export default function Checklist() {
 
   // Checkpoints manuales (localStorage por boda)
   const MANUAL_LS_KEY = useMemo(
-    () => `lovenda_manual_checkpoints_${activeWedding || 'general'}`,
+    () => `mywed360_manual_checkpoints_${activeWedding || 'general'}`,
     [activeWedding]
   );
   const [manualChecks, setManualChecks] = useState(() => {
@@ -254,3 +254,4 @@ export default function Checklist() {
     </PageWrapper>
   );
 }
+

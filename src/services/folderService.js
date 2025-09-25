@@ -10,8 +10,8 @@ import { db } from '../firebaseConfig';
 import { _getStorage } from '../utils/storage.js';
 
 // Clave para almacenamiento local
-const FOLDERS_STORAGE_KEY = 'lovenda_email_folders';
-const EMAIL_FOLDER_MAPPING_KEY = 'lovenda_email_folder_mapping';
+const FOLDERS_STORAGE_KEY = 'mywed360_email_folders';
+const EMAIL_FOLDER_MAPPING_KEY = 'mywed360_email_folder_mapping';
 
 /**
  * Obtener todas las carpetas del usuario actual
@@ -24,7 +24,7 @@ export const getUserFolders = (userId) => {
     try {
       refreshFoldersFromCloud(userId);
     } catch {}
-    // Formato de clave: lovenda_email_folders_[userId]
+    // Formato de clave: mywed360_email_folders_[userId]
     const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
     const foldersJson = _getStorage().getItem(storageKey);
 
@@ -412,3 +412,4 @@ export const isEmailInCustomFolder = (userId, emailId) => {
   const mapping = getEmailFolderMapping(userId);
   return !!mapping[emailId];
 };
+

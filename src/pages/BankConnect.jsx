@@ -48,7 +48,7 @@ export default function BankConnect() {
       setRequisition(ref);
       if (ref?.link) window.open(ref.link, '_blank');
     } catch (e) {
-      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculaciÃ³n' }));
+      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculación' }));
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function BankConnect() {
 
   const handleCheck = async () => {
     if (!requisition?.id) {
-      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisiciÃ³n iniciada' }));
+      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisición iniciada' }));
       return;
     }
     try {
@@ -104,7 +104,7 @@ export default function BankConnect() {
         <div className="flex gap-3 items-end">
           <div>
             <label className="block text-sm text-gray-700 mb-1">
-              {t('finance.bank.country', { defaultValue: 'PaÃ­s' })}
+              {t('finance.bank.country', { defaultValue: 'País' })}
             </label>
             <select
               value={country}
@@ -112,7 +112,7 @@ export default function BankConnect() {
               className="border rounded px-2 py-1"
             >
               <option value="ES">
-                {t('finance.bank.countries.es', { defaultValue: 'EspaÃ±a' })}
+                {t('finance.bank.countries.es', { defaultValue: 'España' })}
               </option>
               <option value="FR">
                 {t('finance.bank.countries.fr', { defaultValue: 'Francia' })}

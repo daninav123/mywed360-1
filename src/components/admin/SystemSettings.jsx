@@ -40,12 +40,12 @@ function SystemSettings() {
     allowedFileTypes: '.jpg,.png,.pdf,.docx,.xlsx',
     enableUserRegistration: true,
     maintenanceMode: false,
-    contactEmail: 'soporte@lovenda.com',
+    contactEmail: 'soporte@mywed360.com',
   });
 
   const [emailSettings, setEmailSettings] = useState({
-    defaultEmailDomain: 'lovenda.com',
-    smtpServer: 'smtp.lovenda.com',
+    defaultEmailDomain: 'mywed360.com',
+    smtpServer: 'smtp.mywed360.com',
     smtpPort: 587,
     smtpUseSSL: true,
     smtpUsername: '',
@@ -426,3 +426,4 @@ function SystemSettings() {
 }
 
 export default SystemSettings;
+

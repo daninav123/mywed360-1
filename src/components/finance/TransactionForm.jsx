@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -53,7 +53,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     ],
   };
 
-  // Inicializar formulario con datos de Transacci�n existente
+  // Inicializar formulario con datos de Transacción existente
   useEffect(() => {
     if (transaction) {
       const defaultStatus = transaction.type === 'income' ? 'expected' : 'pending';
@@ -117,7 +117,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       });
     } else if (formData.type === 'expense' && formData.status === 'partial' && paidValue <= 0) {
       newErrors.paidAmount = t('finance.form.errors.paidAmountRequired', {
-        defaultValue: 'Registra cu�nto has pagado para marcar el estado como parcial',
+        defaultValue: 'Registra cunto has pagado para marcar el estado como parcial',
       });
     }
 
@@ -273,10 +273,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Tipo de transacci�n */}
+      {/* Tipo de transacción */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-2">
-          {t('finance.form.type', { defaultValue: 'Tipo de transacci�n' })}
+          {t('finance.form.type', { defaultValue: 'Tipo de transacción' })}
         </label>
         <div className="flex space-x-4">
           <label className="flex items-center">
@@ -345,7 +345,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         />
         <p className="mt-1 text-sm text-[color:var(--color-text)]/70">
           {t('finance.form.providerHint', {
-            defaultValue: 'Identifica con qui�n se contrata o de d�nde proviene el dinero.',
+            defaultValue: 'Identifica con quin se contrata o de dnde proviene el dinero.',
           })}
         </p>
       </div>
@@ -353,7 +353,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       {/* Monto */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-          {t('finance.form.amount', { defaultValue: 'Monto (�)' })} *
+          {t('finance.form.amount', { defaultValue: 'Monto (€)' })} *
         </label>
         <input
           type="number"
@@ -602,16 +602,16 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         </div>
       </div>
 
-      {/* Descripci�n adicional (opcional) */}
+      {/* Descripción adicional (opcional) */}
       <div>
         <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-          {t('finance.form.description', { defaultValue: 'Descripci�n adicional' })}
+          {t('finance.form.description', { defaultValue: 'Descripción adicional' })}
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => handleChange('description', e.target.value)}
           placeholder={t('finance.form.descriptionPlaceholder', {
-            defaultValue: 'Detalles adicionales sobre la transacci�n...',
+            defaultValue: 'Detalles adicionales sobre la transacción...',
           })}
           rows={3}
           className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
@@ -629,9 +629,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             : transaction
               ? t('app.update', { defaultValue: 'Actualizar' })
               : t('app.create', { defaultValue: 'Crear' })}{' '}
-          {t('finance.form.transaction', { defaultValue: 'Transacci�n' })}
+          {t('finance.form.transaction', { defaultValue: 'Transacción' })}
         </Button>
       </div>
     </form>
   );
 }
+

@@ -74,7 +74,7 @@ export default function Buzon() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const userProfile = await loadData('lovendaProfile', {});
+        const userProfile = await loadData('mywed360Profile', {});
         setProfile(userProfile);
 
         const storedProviders = await loadData('providers', { defaultValue: [] });
@@ -145,7 +145,7 @@ export default function Buzon() {
       // Actualizar perfil
       if (profile) {
         const updatedProfile = { ...profile, emailAlias };
-        await saveData('lovendaProfile', updatedProfile);
+        await saveData('mywed360Profile', updatedProfile);
         setProfile(updatedProfile);
       }
     } catch (error) {
@@ -246,11 +246,11 @@ export default function Buzon() {
   const handleApplyTemplate = (templateId) => {
     if (!templateId) return;
 
-    const result = applyTemplate(templateId, {
-      userName: profile?.name || 'Usuario',
-      companyName: 'Lovenda',
-      providerName: form.to.split('@')[0] || 'Proveedor',
-    });
+      const result = applyTemplate(templateId, {
+        userName: profile?.name || 'Usuario',
+      companyName: 'MyWed360',
+        providerName: form.to.split('@')[0] || 'Proveedor',
+      });
 
     setForm({
       ...form,
@@ -302,3 +302,4 @@ export default function Buzon() {
     </div>
   );
 }
+

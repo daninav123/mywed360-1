@@ -50,6 +50,7 @@
     "i18n:update": "node scripts/update_i18n_full.js && node scripts/fixLocalesMojibake.js && node scripts/validateI18n.js",
     "i18n:sync": "node scripts/syncLocales.js es fr",
     "fix:mojibake": "node scripts/fixSpanishMojibake.js",
+    "docs:fix-encoding": "node scripts/fixDocsMojibake.js",
     "ci:check": "npm run lint && npm run test:unit && npm run validate:i18n && npm run check:bundle",
     "issues:create": "node scripts/gh-create-issues.js",
     "issues:dry": "cross-env DRY_RUN=1 node scripts/gh-create-issues.js"

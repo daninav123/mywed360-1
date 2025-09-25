@@ -56,8 +56,8 @@ export default function HomePage() {
     currentUser?.displayName ||
     currentUser?.email?.split('@')[0] ||
     '';
-  const weddingName = localStorage.getItem('lovenda_active_wedding_name') || '';
-  const progress = Number(localStorage.getItem('lovenda_progress') || 0);
+  const weddingName = localStorage.getItem('mywed360_active_wedding_name') || '';
+  const progress = Number(localStorage.getItem('mywed360_progress') || 0);
   const logoUrl = userProfile?.logoUrl || '';
 
   // Datos derivados ya calculados ms arriba
@@ -190,7 +190,7 @@ export default function HomePage() {
   // --- Mtricas dinmicas (memoizadas para performance) ---
   const guestsMetrics = useMemo(() => {
     try {
-      const guestsArr = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
+      const guestsArr = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
       const confirmedCount = guestsArr.filter(
         (g) => (g.response || g.status || '').toLowerCase() === 'confirmado'
       ).length;
@@ -203,7 +203,7 @@ export default function HomePage() {
   const tasksMetrics = useMemo(() => {
     try {
       const tasksCompletedMap = JSON.parse(localStorage.getItem('tasksCompleted') || '{}');
-      const meetingsArr = JSON.parse(localStorage.getItem('lovendaMeetings') || '[]');
+      const meetingsArr = JSON.parse(localStorage.getItem('mywed360Meetings') || '[]');
       const longTasksArr = JSON.parse(localStorage.getItem('lovendaLongTasks') || '[]');
       const allTasks = [...meetingsArr, ...longTasksArr];
       const tasksTotal = allTasks.length;
@@ -508,9 +508,9 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => {
-                  const guests = JSON.parse(localStorage.getItem('lovendaGuests') || '[]');
+                  const guests = JSON.parse(localStorage.getItem('mywed360Guests') || '[]');
                   guests.push({ ...guest, id: Date.now() });
-                  localStorage.setItem('lovendaGuests', JSON.stringify(guests));
+                  localStorage.setItem('mywed360Guests', JSON.stringify(guests));
                   setGuest({ name: '', side: 'novia', contact: '' });
                   setActiveModal(null);
                 }}
@@ -621,3 +621,5 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
+
+

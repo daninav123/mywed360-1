@@ -5,7 +5,7 @@
  * deberían delegarse a la API.
  */
 
-const COMMENTS_KEY_PREFIX = 'lovenda_email_comments_';
+const COMMENTS_KEY_PREFIX = 'mywed360_email_comments_';
 
 function getStorageKey(userId) {
   return `${COMMENTS_KEY_PREFIX}${userId}`;
@@ -74,3 +74,4 @@ export function deleteComment(userId, emailId, commentId) {
   saveAllComments(userId, mapping);
   return mapping[emailId];
 }
+

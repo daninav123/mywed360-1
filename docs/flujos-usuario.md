@@ -31,7 +31,7 @@
 
 **Pasos detallados:**
 - [ ] **Acceso a registro**
-  - Usuario hace clic en "Registrarse" desde landing page
+  - Usuario hace clic en  – Registrarse –  desde landing page
   - Redirección a `/register`
   - Componente: `RegisterForm.jsx`
 
@@ -39,7 +39,7 @@
   - Campos: email, contraseña, confirmar contraseña, nombre, apellidos
   - Validación en tiempo real (email válido, contraseña fuerte)
   - Términos y condiciones checkbox
-  - Botón "Crear cuenta"
+  - Botón  – Crear cuenta – 
 
 - [ ] **Procesamiento**
   - Llamada a Firebase Auth `createUserWithEmailAndPassword()`
@@ -59,7 +59,7 @@
 
 - [ ] **Redirección**
   - Si email verificado → Dashboard principal
-  - Si no verificado → Página "Verifica tu email"
+  - Si no verificado → Página  – Verifica tu email – 
 
 **Componentes necesarios:**
 - `RegisterForm.jsx`
@@ -76,15 +76,15 @@
 
 **Pasos detallados:**
 - [ ] **Acceso a login**
-  - Usuario hace clic en "Iniciar sesión"
+  - Usuario hace clic en  – Iniciar sesión – 
   - Redirección a `/login`
   - Componente: `LoginForm.jsx`
 
 - [ ] **Formulario de login**
   - Campos: email, contraseña
-  - Checkbox "Recordarme"
-  - Link "¿Olvidaste tu contraseña?"
-  - Botón "Iniciar sesión"
+  - Checkbox  – Recordarme – 
+  - Link  – ¿Olvidaste tu contraseña? – 
+  - Botón  – Iniciar sesión – 
   - Opciones sociales: Google, Facebook
 
 - [ ] **Autenticación**
@@ -113,14 +113,14 @@
 
 **Pasos detallados:**
 - [ ] **Solicitud de reset**
-  - Usuario hace clic en "¿Olvidaste tu contraseña?"
+  - Usuario hace clic en  – ¿Olvidaste tu contraseña? – 
   - Redirección a `/forgot-password`
   - Formulario con campo email
   - Validación de email existente
 
 - [ ] **Envío de email**
   - Llamada a Firebase Auth `sendPasswordResetEmail()`
-  - Confirmación visual "Email enviado"
+  - Confirmación visual  – Email enviado – 
   - Instrucciones para revisar bandeja de entrada
 
 - [ ] **Verificación y cambio**
@@ -154,17 +154,17 @@
 
 - [ ] **Bienvenida conversacional**
   - Avatar de wedding planner IA
-  - Mensaje: "¡Hola! Soy Sofia, tu wedding planner virtual. Te ayudaré a organizar tu boda perfecta. ¿Cómo te llamas?"
+  - Mensaje:  – ¡Hola! Soy Sofia, tu wedding planner virtual. Te ayudaré a organizar tu boda perfecta. ¿Cómo te llamas? – 
   - Input de chat conversacional
   - Procesamiento de respuesta con OpenAI
 
 - [ ] **Recopilación de datos básicos (conversacional)**
   - IA pregunta de forma natural:
-    - "¿Cuál es el nombre de tu pareja?"
-    - "¿Ya tienen fecha para la boda o aún la están decidiendo?"
-    - "¿Tienen idea de dónde les gustaría celebrarla?"
-    - "¿Cuántos invitados aproximadamente esperan?"
-    - "¿Cuál es su presupuesto estimado?"
+    -  – ¿Cuál es el nombre de tu pareja? – 
+    -  – ¿Ya tienen fecha para la boda o aún la están decidiendo? – 
+    -  – ¿Tienen idea de dónde les gustaría celebrarla? – 
+    -  – ¿Cuántos invitados aproximadamente esperan? – 
+    -  – ¿Cuál es su presupuesto estimado? – 
   - Cada respuesta se procesa y almacena
   - IA adapta siguientes preguntas según respuestas
 
@@ -173,8 +173,8 @@
   - Formato: `[nombre].[pareja].boda[año]@mywed360.com`
   - Verificación de disponibilidad del email
   - Si no está disponible, añadir número: `ana.carlos.boda2024.2@mywed360.com`
-  - Presentación al usuario: "He creado un email especial para tu boda: [email]"
-  - "Este email te servirá para toda la comunicación relacionada con tu boda"
+  - Presentación al usuario:  – He creado un email especial para tu boda: [email] – 
+  -  – Este email te servirá para toda la comunicación relacionada con tu boda – 
   - Configuración automática de redirección a email personal
   - Almacenamiento en perfil de usuario
 
@@ -223,38 +223,38 @@
 ```javascript
 // /weddings/{weddingId}
 {
-  id: "wedding_123",
-  bride: { name: "Ana", email: "ana@email.com" },
-  groom: { name: "Carlos", email: "carlos@email.com" },
-  weddingEmail: "ana.carlos.boda2024@mywed360.com", // Email interno generado
-  date: "2024-06-15",
+  id:  – wedding_123 – ,
+  bride: { name:  – Ana – , email:  – ana@email.com –  },
+  groom: { name:  – Carlos – , email:  – carlos@email.com –  },
+  weddingEmail:  – ana.carlos.boda2024@mywed360.com – , // Email interno generado
+  date:  – 2024-06-15 – ,
   location: {
-    name: "Hotel Majestic",
-    address: "Calle Mayor 123, Madrid",
+    name:  – Hotel Majestic – ,
+    address:  – Calle Mayor 123, Madrid – ,
     coordinates: { lat: 40.4168, lng: -3.7038 }
   },
-  type: "civil",
-  style: "moderna",
+  type:  – civil – ,
+  style:  – moderna – ,
   estimatedGuests: 120,
   budget: 25000,
-  currency: "EUR",
-  language: "es",
-  timezone: "Europe/Madrid",
-  dressCode: "formal",
+  currency:  – EUR – ,
+  language:  – es – ,
+  timezone:  – Europe/Madrid – ,
+  dressCode:  – formal – ,
   organizers: [
-    { uid: "user1", role: "bride", permissions: ["all"] },
-    { uid: "user2", role: "groom", permissions: ["all"] }
+    { uid:  – user1 – , role:  – bride – , permissions: [ – all – ] },
+    { uid:  – user2 – , role:  – groom – , permissions: [ – all – ] }
   ],
   emailSettings: {
     forwardToPersonal: true,
-    personalEmails: ["ana@email.com", "carlos@email.com"],
+    personalEmails: [ – ana@email.com – ,  – carlos@email.com – ],
     autoReply: {
       enabled: true,
-      message: "Gracias por contactarnos sobre nuestra boda. Te responderemos pronto."
+      message:  – Gracias por contactarnos sobre nuestra boda. Te responderemos pronto. – 
     }
   },
-  createdAt: "2024-01-15T10:00:00Z",
-  updatedAt: "2024-01-15T10:00:00Z"
+  createdAt:  – 2024-01-15T10:00:00Z – ,
+  updatedAt:  – 2024-01-15T10:00:00Z – 
 }
 ```
 
@@ -309,27 +309,27 @@
 ```javascript
 // /weddings/{weddingId}/moments/{momentId}
 {
-  id: "ceremony_1",
-  name: "Ceremonia",
-  type: "ceremony",
+  id:  – ceremony_1 – ,
+  name:  – Ceremonia – ,
+  type:  – ceremony – ,
   required: true,
-  date: "2024-06-15",
-  startTime: "17:00",
+  date:  – 2024-06-15 – ,
+  startTime:  – 17:00 – ,
   duration: 45, // minutos
   location: {
-    name: "Iglesia San Miguel",
-    address: "Plaza Mayor 1, Madrid",
+    name:  – Iglesia San Miguel – ,
+    address:  – Plaza Mayor 1, Madrid – ,
     coordinates: { lat: 40.4168, lng: -3.7038 }
   },
   capacity: 150,
   settings: {
-    ceremonyType: "religious",
+    ceremonyType:  – religious – ,
     musicRequired: true,
-    decorationStyle: "classic",
-    specialRequirements: ["altar flowers", "red carpet"]
+    decorationStyle:  – classic – ,
+    specialRequirements: [ – altar flowers – ,  – red carpet – ]
   },
-  vendors: ["photographer_1", "musician_1"],
-  createdAt: "2024-01-15T10:00:00Z"
+  vendors: [ – photographer_1 – ,  – musician_1 – ],
+  createdAt:  – 2024-01-15T10:00:00Z – 
 }
 ```
 
@@ -337,18 +337,18 @@
 **Pasos detallados:**
 - [ ] **Resumen de información recopilada**
   - IA presenta resumen de datos recopilados
-  - "Perfecto, ya tengo la información básica de tu boda..."
+  -  – Perfecto, ya tengo la información básica de tu boda... – 
   - Confirmación de datos por parte del usuario
   - Opción de corregir información
 
 - [ ] **Presentación del dashboard**
-  - "Ahora te voy a mostrar tu panel de control..."
+  -  – Ahora te voy a mostrar tu panel de control... – 
   - Tour guiado por las diferentes secciones
   - Explicación de qué puede hacer en cada área
   - Énfasis en que puede empezar por donde prefiera
 
 - [ ] **Elección de siguiente paso**
-  - "¿Por dónde te gustaría empezar?"
+  -  – ¿Por dónde te gustaría empezar? – 
   - Opciones: Invitados, Presupuesto, Proveedores, Plan de Asientos, Timeline
   - Redirección a mini-tutorial de la sección elegida
   - Posibilidad de cambiar de sección en cualquier momento

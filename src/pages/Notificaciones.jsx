@@ -35,8 +35,8 @@ export default function Notificaciones() {
   useEffect(() => {
     refresh();
     const handler = () => refresh();
-    window.addEventListener('lovenda-notif', handler);
-    return () => window.removeEventListener('lovenda-notif', handler);
+    window.addEventListener('mywed360-notif', handler);
+    return () => window.removeEventListener('mywed360-notif', handler);
   }, []);
 
   useEffect(() => {
@@ -158,3 +158,4 @@ export default function Notificaciones() {
     </PageWrapper>
   );
 }
+

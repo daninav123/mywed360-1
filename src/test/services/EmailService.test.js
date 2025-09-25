@@ -33,9 +33,9 @@ vi.mock('../../services/EmailService', async (importOriginal) => {
   return {
     ...actual,
     // Variables de entorno simuladas
-    BASE: 'https://api.test.lovenda.com',
+    BASE: 'https://api.test.mywed360.com',
     MAILGUN_API_KEY: 'key-test123456789',
-    MAILGUN_DOMAIN: 'test.lovenda.com',
+    MAILGUN_DOMAIN: 'test.mywed360.com',
     USE_MAILGUN: true,
     USE_BACKEND: false,
   };
@@ -53,7 +53,7 @@ describe('EmailService', () => {
   const mockEmail = {
     id: 'email123',
     from: 'remitente@example.com',
-    to: 'usuario@test.lovenda.com',
+    to: 'usuario@test.mywed360.com',
     subject: 'Asunto de prueba',
     body: '<p>Contenido de prueba</p>',
     date: '2025-07-10T10:00:00Z',
@@ -81,21 +81,21 @@ describe('EmailService', () => {
   describe('initEmailService', () => {
     it('devuelve una dirección de email válida basada en el perfil', () => {
       const email = EmailService.initEmailService(mockProfile);
-      expect(email).toBe('maria.garcia@test.lovenda.com');
+      expect(email).toBe('maria.garcia@test.mywed360.com');
       expect(EmailService.CURRENT_USER).toBe(mockProfile);
-      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.lovenda.com');
+      expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.mywed360.com');
     });
 
     it('usa el emailAlias si está definido', () => {
       const profileWithAlias = { ...mockProfile, emailAlias: 'miboda' };
       const email = EmailService.initEmailService(profileWithAlias);
-      expect(email).toBe('miboda@test.lovenda.com');
+      expect(email).toBe('miboda@test.mywed360.com');
     });
 
     it('usa solo nombre si no hay apellido', () => {
       const profileNoLastName = { ...mockProfile, brideLastName: '' };
       const email = EmailService.initEmailService(profileNoLastName);
-      expect(email).toBe('maria@test.lovenda.com');
+      expect(email).toBe('maria@test.mywed360.com');
     });
 
     it('usa userId si no hay nombre', () => {
@@ -105,7 +105,7 @@ describe('EmailService', () => {
         brideLastName: '',
       };
       const email = EmailService.initEmailService(profileNoName);
-      expect(email).toBe('useruser123@test.lovenda.com');
+      expect(email).toBe('useruser123@test.mywed360.com');
     });
   });
 
@@ -392,3 +392,6 @@ describe('EmailService', () => {
     });
   });
 });
+
+
+

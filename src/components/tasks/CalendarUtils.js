@@ -30,7 +30,9 @@ export function downloadAllICS(events) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'lovenda-eventos.ics';
+  a.download = 'mywed360-eventos.ics';
   a.click();
   URL.revokeObjectURL(url);
 }
+
+

@@ -25,18 +25,18 @@
 
 - Ejecutar un spec concreto (smoke):
 ```
-$env:CYPRESS_BASE_URL="http://localhost:5173"; npm run cypress:run -- --spec "cypress/e2e/seating/seating_smoke.cy.js"
+$env:CYPRESS_BASE_URL= – http://localhost:5173 – ; npm run cypress:run -- --spec  – cypress/e2e/seating/seating_smoke.cy.js – 
 ```
 
 - Ejecutar specs clave (fit y toasts):
 ```
-$env:CYPRESS_BASE_URL="http://localhost:5173"; npm run cypress:run -- --spec "cypress/e2e/seating/seating_fit.cy.js"
-$env:CYPRESS_BASE_URL="http://localhost:5173"; npm run cypress:run -- --spec "cypress/e2e/seating/seating_toasts.cy.js"
+$env:CYPRESS_BASE_URL= – http://localhost:5173 – ; npm run cypress:run -- --spec  – cypress/e2e/seating/seating_fit.cy.js – 
+$env:CYPRESS_BASE_URL= – http://localhost:5173 – ; npm run cypress:run -- --spec  – cypress/e2e/seating/seating_toasts.cy.js – 
 ```
 
 - Ejecutar todo Seating con stubs útiles (incluye capacidad):
 ```
-$env:CYPRESS_BASE_URL="http://localhost:5173"; $env:STUB_RSVP="true"; npm run cypress:run -- --spec "cypress/e2e/seating/*.cy.js"
+$env:CYPRESS_BASE_URL= – http://localhost:5173 – ; $env:STUB_RSVP= – true – ; npm run cypress:run -- --spec  – cypress/e2e/seating/*.cy.js – 
 ```
 
 ## Tips de estabilidad
@@ -47,13 +47,13 @@ $env:CYPRESS_BASE_URL="http://localhost:5173"; $env:STUB_RSVP="true"; npm run cy
 
 ## Mapeo rápido spec → UI
 
-- Plantillas: botón `title="Plantillas"` y modal `h3: Plantillas`.
-- Configuración: `title="Configurar espacio"` (Espacio), `title="Configurar ceremonia"` (Ceremonia), `title="Configurar banquete"` (Banquete).
+- Plantillas: botón `title= – Plantillas – ` y modal `h3: Plantillas`.
+- Configuración: `title= – Configurar espacio – ` (Espacio), `title= – Configurar ceremonia – ` (Ceremonia), `title= – Configurar banquete – ` (Banquete).
 - Herramientas: botones “Navegar”, “Mover mesas”, “Perímetro”, “Puertas”, “Obstáculos”, “Pasillos”.
-- Ajuste de vista: botón `title="Ajustar a pantalla"` (⌂).
-- Ceremonia: sillas con `aria-label="Silla X"`.
-- Invitados: `aria-label="Invitado Nombre"` y panel “Pendientes (N)”, botón “Mostrar Invitados”.
-- Mesas: `data-testid^="table-item-"`, badge ocupación X/Y y botón ✖ para desasignar.
+- Ajuste de vista: botón `title= – Ajustar a pantalla – ` (⌂).
+- Ceremonia: sillas con `aria-label= – Silla X – `.
+- Invitados: `aria-label= – Invitado Nombre – ` y panel “Pendientes (N)”, botón “Mostrar Invitados”.
+- Mesas: `data-testid^= – table-item- – `, badge ocupación X/Y y botón ✖ para desasignar.
 
 ## Notas
 

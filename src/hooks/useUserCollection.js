@@ -9,7 +9,7 @@ import {
   deleteItem as deleteItemFS,
 } from '../utils/firestoreCollection';
 
-const localKey = (name) => `lovendaUser_${name}`;
+const localKey = (name) => `mywed360User_${name}`;
 const lsGet = (name, fallback) => {
   try {
     const stored = localStorage.getItem(localKey(name));
@@ -19,7 +19,7 @@ const lsGet = (name, fallback) => {
 };
 const lsSet = (name, data) => {
   localStorage.setItem(localKey(name), JSON.stringify(data));
-  window.dispatchEvent(new Event(`lovenda-user-${name}`));
+  window.dispatchEvent(new Event(`mywed360-user-${name}`));
 };
 
 // Hook de colección bajo users/{uid}/{collectionName}
@@ -55,7 +55,7 @@ export function useUserCollection(collectionName, fallback = []) {
     }
 
     const handler = () => setData(lsGet(collectionName, fallback));
-    window.addEventListener(`lovenda-user-${collectionName}`, handler);
+    window.addEventListener(`mywed360-user-${collectionName}`, handler);
     setLoading(false);
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -66,7 +66,7 @@ export function useUserCollection(collectionName, fallback = []) {
       }
     });
     return () => {
-      window.removeEventListener(`lovenda-user-${collectionName}`, handler);
+      window.removeEventListener(`mywed360-user-${collectionName}`, handler);
       unsubAuth();
       if (typeof unsubFS === 'function') unsubFS();
     };
@@ -119,4 +119,5 @@ export function useUserCollection(collectionName, fallback = []) {
 
   return { data, loading, addItem, updateItem, deleteItem };
 }
+
 

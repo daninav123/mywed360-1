@@ -1,4 +1,4 @@
-﻿import {
+import {
   Music,
   Edit2,
   Play,
@@ -21,7 +21,7 @@ import useSpecialMoments from '../../hooks/useSpecialMoments';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
 
-// Tabs pasan a ser dinÃ¡micas desde el hook (blocks)
+// Tabs pasan a ser dinmicas desde el hook (blocks)
 
 const MomentosEspeciales = () => {
   const {
@@ -38,14 +38,14 @@ const MomentosEspeciales = () => {
     reorderBlocks,
   } = useSpecialMoments();
 
-  // Estado bÃ¡sico
+  // Estado bsico
   const [activeTab, setActiveTab] = useState('ceremonia');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [errorSearch, setErrorSearch] = useState(null);
 
-  // IA e Inspiración
+  // IA e Inspiracin
   const [aiPrompt, setAiPrompt] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -60,7 +60,7 @@ const MomentosEspeciales = () => {
   // Cargar preferencias guardadas en Perfil desde localStorage si existen
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('lovenda_music_prefs');
+      const raw = localStorage.getItem('mywed360_music_prefs');
       if (raw) {
         const parsed = JSON.parse(raw);
         setProfilePrefs({
@@ -68,14 +68,14 @@ const MomentosEspeciales = () => {
           genres: Array.isArray(parsed?.genres) ? parsed.genres : [],
           decades: Array.isArray(parsed?.decades) ? parsed.decades : [],
         });
-        // Prefijar idiomási viene vacÃ­o
+        // Prefijar idiomsi viene vaco
         if (!aiLanguage && parsed?.languages?.length) {
           setAiLanguage(parsed.languages[0]);
         }
       }
     } catch {}
   }, []);
-  // Asegura que la pestaÃ±a activa exista entre los bloques dinÃ¡micos
+  // Asegura que la pestaa activa exista entre los bloques dinmicos
   useEffect(() => {
     try {
       if (!Array.isArray(blocks) || !blocks.length) return;
@@ -115,9 +115,9 @@ const MomentosEspeciales = () => {
     } catch { return '0:00'; }
   };
 
-  // (Se eliminÃ³ la sección de conexión con Spotify)
+  // (Se elimin la seccin de conexin con Spotify)
 
-  // Extrae un embed URL de Spotify si el campo "Canción" contiene un enlace vÃ¡lido
+  // Extrae un embed URL de Spotify si el campo "Cancin" contiene un enlace vlido
   const getSpotifyEmbedUrl = (raw) => {
     if (!raw || typeof raw !== 'string') return null;
     try {
@@ -138,10 +138,10 @@ const MomentosEspeciales = () => {
     }
   };
 
-  // Guardar Preferencias músicales en localStorage
+  // Guardar Preferencias msi$1les en localStorage
   const saveProfilePrefs = () => {
     try {
-      localStorage.setItem('lovenda_music_prefs', JSON.stringify(profilePrefs));
+      localStorage.setItem('mywed360_music_prefs', JSON.stringify(profilePrefs));
       if (Array.isArray(profilePrefs.languages) && profilePrefs.languages.length) {
         setAiLanguage(profilePrefs.languages[0]);
       }
@@ -166,7 +166,7 @@ const MomentosEspeciales = () => {
     if (ok) setPlayerOpen(true);
   };
 
-  // BÃºsqueda por nombre (iTunes)
+  // Bsqueda por nombre (iTunes)
   const handleSearch = async () => {
     const term = search.trim();
     if (!term) {
@@ -195,15 +195,15 @@ const MomentosEspeciales = () => {
         setResults([]);
       }
     } catch (err) {
-      console.error('Error buscando Canciónes', err);
-      setErrorSearch('No se pudo buscar Canciónes. Inténtalo más tarde.');
+      console.error('Error buscando Canciones', err);
+      setErrorSearch('No se pudo buscar Canciones. Intntalo ms tarde.');
       setResults([]);
     } finally {
       setLoadingSearch(false);
     }
   };
 
-  // Añadir momento
+  // Aadir momento
   const handleAddMoment = () => {
     const nextOrder = (moments[activeTab]?.length || 0) + 1;
     addMoment(activeTab, {
@@ -214,7 +214,7 @@ const MomentosEspeciales = () => {
     });
   };
 
-  // BÃºsqueda con IA via backend
+  // Bsqueda con IA via backend
   const handleAISearch = async () => {
     const prompt = aiPrompt.trim();
     if (!prompt) {
@@ -225,20 +225,20 @@ const MomentosEspeciales = () => {
     setAiError(null);
     try {
       const prefs = [];
-      // Idioma explÃ­cito del selector
-      if (aiLanguage === 'es') prefs.push('idioma espaÃ±ol');
-      else if (aiLanguage === 'en') prefs.push('idioma inglÃ©s');
-      // Si no hay gÃ©nero/decada en UI, usa preferencias del perfil
+      // Idioma explcito del selector
+      if (aiLanguage === 'es') prefs.push('idioma espaol');
+      else if (aiLanguage === 'en') prefs.push('idioma ingls');
+      // Si no hay gnero/decada en UI, usa preferencias del perfil
       if (aiTempo) prefs.push(`tempo ${aiTempo}`);
-      if (aiEra) prefs.push(`dÃ©cada ${aiEra}`);
-      if (aiGenre) prefs.push(`gÃ©nero ${aiGenre}`);
+      if (aiEra) prefs.push(`dcada ${aiEra}`);
+      if (aiGenre) prefs.push(`gnero ${aiGenre}`);
       if (!aiGenre && profilePrefs.genres?.length)
-        prefs.push(`gÃ©neros: ${profilePrefs.genres.join(', ')}`);
+        prefs.push(`gneros: ${profilePrefs.genres.join(', ')}`);
       if (!aiEra && profilePrefs.decades?.length)
-        prefs.push(`dÃ©cadas: ${profilePrefs.decades.join(', ')}`);
+        prefs.push(`dcadas: ${profilePrefs.decades.join(', ')}`);
       // Idiomas adicionales como pista
       const extraLangs = (profilePrefs.languages || []).filter((l) => l !== aiLanguage);
-      if (extraLangs.length) prefs.push(`tambiÃ©n considerar Idiomas: ${extraLangs.join(', ')}`);
+      if (extraLangs.length) prefs.push(`tambin considerar Idiomas: ${extraLangs.join(', ')}`);
       const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
       const res = await apiPost(
         '/api/ai-songs/recommend',
@@ -250,7 +250,7 @@ const MomentosEspeciales = () => {
       const items = Array.isArray(data?.songs) ? data.songs : [];
       const mapped = items.map((s, i) => ({
         id: `${Date.now()}-${i}`,
-        title: s.title || s.name || 'Canción',
+        title: s.title || s.name || 'Cancin',
         artist: s.artist || s.author || '',
         reason: s.reason || s.why || '',
         mood: s.mood || '',
@@ -281,8 +281,8 @@ const MomentosEspeciales = () => {
       };
       const enriched = [];
       for (let i = 0; i < mapped.length; i++) {
-        // Secuencial para evitar rÃ¡fagas innecesarias
-        // Se puede mejorar con lÃ­mite de concurrencia si hiciera falta
+        // Secuencial para evitar rfagas innecesarias
+        // Se puede mejorar con lmite de concurrencia si hiciera falta
         // eslint-disable-next-line no-await-in-loop
         enriched.push(await enrich(mapped[i]));
       }
@@ -299,11 +299,11 @@ const MomentosEspeciales = () => {
   return (
     <PageWrapper title="Momentos Especiales">
       <div className="space-y-6">
-        {/* Se eliminÃ³ la tarjeta de conexión con Spotify */}
-        {/* Preferencias músicales (movidas desde Perfil) */}
+        {/* Se elimin la tarjeta de conexin con Spotify */}
+        {/* Preferencias msi$1les (movidas desde Perfil) */}
         <Card className="space-y-4 p-5">
           <h3 className="text-md font-medium flex items-center gap-2">
-            <Music size={16} /> Preferencias músicales
+            <Music size={16} /> Preferencias msi$1les
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -333,7 +333,7 @@ const MomentosEspeciales = () => {
             </div>
 
             <div>
-              <div className="text-sm font-medium mb-1">Géneros</div>
+              <div className="text-sm font-medium mb-1">Gneros</div>
               <div className="flex flex-wrap gap-2">
                 {[
                   'pop',
@@ -368,7 +368,7 @@ const MomentosEspeciales = () => {
             </div>
 
             <div>
-              <div className="text-sm font-medium mb-1">Décadas</div>
+              <div className="text-sm font-medium mb-1">Dcadas</div>
               <div className="flex flex-wrap gap-2">
                 {['70s', '80s', '90s', '2000s', '2010s', 'actual'].map((dec) => (
                   <label
@@ -398,10 +398,10 @@ const MomentosEspeciales = () => {
           </div>
         </Card>
         <p className="text-gray-600">
-          Planifica cada instante clave con la música y el momento adecuados.
+          Planifica cada instante clave con la msi$1 y el momento adecuados.
         </p>
 
-        {/* Tabs (dinÃ¡micas desde blocks) */}
+        {/* Tabs (dinmicas desde blocks) */}
         <div className="border-b flex gap-4">
           {(blocks || []).map((tab) => (
             <button
@@ -423,13 +423,13 @@ const MomentosEspeciales = () => {
           <button
             className="ml-auto text-xs border rounded px-2 py-1 hover:bg-gray-50"
             onClick={() => {
-              const name = prompt('Nombre de la nueva sección (ej. Ensayo, Brunch...)');
+              const name = prompt('Nombre de la nueva seccin (ej. Ensayo, Brunch...)');
               if (!name) return;
               try { addBlock(name); } catch {}
             }}
-            title="Añadir sección personalizada"
+            title="Aadir seccin personalizada"
           >
-            Añadir sección
+            Aadir seccin
           </button>
         </div>
 
@@ -506,11 +506,11 @@ const MomentosEspeciales = () => {
               )}
             </div>
           ) : null}
-          {/* Inspiración */}
+          {/* Inspiracin */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles size={16} className="text-yellow-600" />
-              <h3 className="font-medium">Inspiración</h3>
+              <h3 className="font-medium">Inspiracin</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(MUSIC_INSPIRATION[activeTab] || {}).map(([cat, songs]) => (
@@ -537,7 +537,7 @@ const MomentosEspeciales = () => {
                             </div>
                             {s.tags?.length ? (
                               <div className="text-xs text-gray-500 truncate">
-                                {s.tags.join(' Â· ')}
+                                {s.tags.join(' · ')}
                               </div>
                             ) : null}
                           </div>
@@ -576,7 +576,7 @@ const MomentosEspeciales = () => {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles size={16} className="text-purple-600" />
-              <h3 className="font-medium">Encuentra la Canción perfecta (IA)</h3>
+              <h3 className="font-medium">Encuentra la Cancin perfecta (IA)</h3>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <label className="text-gray-600">Idioma</label>
@@ -585,8 +585,8 @@ const MomentosEspeciales = () => {
                 value={aiLanguage}
                 onChange={(e) => setAiLanguage(e.target.value)}
               >
-                <option value="es">Español</option>
-                <option value="en">Inglés</option>
+                <option value="es">Espaol</option>
+                <option value="en">Ingls</option>
               </select>
               <label className="text-gray-600">Tempo</label>
               <select
@@ -597,9 +597,9 @@ const MomentosEspeciales = () => {
                 <option value="">Cualquiera</option>
                 <option value="lento">Lento</option>
                 <option value="medio">Medio</option>
-                <option value="rÃ¡pido">RÃ¡pido</option>
+                <option value="rpido">Rpido</option>
               </select>
-              <label className="text-gray-600">DÃ©cada</label>
+              <label className="text-gray-600">Dcada</label>
               <select
                 className="border rounded px-2 py-1"
                 value={aiEra}
@@ -612,7 +612,7 @@ const MomentosEspeciales = () => {
                 <option value="2010s">2010s</option>
                 <option value="actual">Actual</option>
               </select>
-              <label className="text-gray-600">GÃ©nero</label>
+              <label className="text-gray-600">Gnero</label>
               <select
                 className="border rounded px-2 py-1"
                 value={aiGenre}
@@ -623,7 +623,7 @@ const MomentosEspeciales = () => {
                 <option value="rock">Rock</option>
                 <option value="jazz">Jazz</option>
                 <option value="latino">Latino</option>
-                <option value="clÃ¡sica">ClÃ¡sica</option>
+                <option value="clsica">Clsica</option>
                 <option value="indie">Indie</option>
                 <option value="r&b">R&B</option>
               </select>
@@ -633,7 +633,7 @@ const MomentosEspeciales = () => {
                 rows={2}
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="Describe el momento: 'primer baile, balada en espaÃ±ol'"
+                placeholder="Describe el momento: 'primer baile, balada en espaol'"
                 className="flex-1 border rounded px-3 py-2"
               />
               <button
@@ -667,8 +667,8 @@ const MomentosEspeciales = () => {
                           </div>
                           {(s.mood || s.tempo || s.era || s.tags?.length) && (
                             <div className="text-xs text-gray-500 truncate">
-                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' Â· ')}
-                              {s.tags?.length ? ` Â· ${s.tags.join(' Â· ')}` : ''}
+                              {[s.mood, s.tempo, s.era].filter(Boolean).join(' · ')}
+                              {s.tags?.length ? ` · ${s.tags.join(' · ')}` : ''}
                             </div>
                           )}
                           {s.reason && (
@@ -684,7 +684,7 @@ const MomentosEspeciales = () => {
                             >
                               YouTube
                             </a>
-                            <span> Â· </span>
+                            <span> · </span>
                             <a
                               className="hover:underline"
                               href={`https://open.spotify.com/search/${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
@@ -693,7 +693,7 @@ const MomentosEspeciales = () => {
                             >
                               Spotify
                             </a>
-                            <span> Â· </span>
+                            <span> · </span>
                             <a
                               className="hover:underline"
                               href={`https://music.apple.com/search?term=${encodeURIComponent(`${s.title} ${s.artist || ''}`)}`}
@@ -743,13 +743,13 @@ const MomentosEspeciales = () => {
             )}
           </div>
 
-          {/* Buscador de Canciónes (por nombre) */}
+          {/* Buscador de Canciones (por nombre) */}
           <div className="flex gap-2 items-center">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar Canción por nombre..."
+              placeholder="Buscar Cancin por nombre..."
               className="flex-1 border rounded px-3 py-2"
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
@@ -761,11 +761,11 @@ const MomentosEspeciales = () => {
             </button>
           </div>
 
-          {/* Estado bÃºsqueda */}
+          {/* Estado búsqueda */}
           {loadingSearch && <p className="text-sm text-gray-500">Buscando...</p>}
           {errorSearch && <p className="text-sm text-red-600">{errorSearch}</p>}
 
-          {/* Resultados bÃºsqueda */}
+          {/* Resultados búsqueda */}
           {results.length > 0 && (
             <div className="border rounded-md overflow-hidden">
               <div className="bg-gray-50 p-2 border-b text-sm font-medium">
@@ -805,7 +805,7 @@ const MomentosEspeciales = () => {
                           >
                             YouTube
                           </a>
-                          <span> Â· </span>
+                          <span> · </span>
                           <a
                             className="hover:underline"
                             href={`https://open.spotify.com/search/${encodeURIComponent(`${song.title} ${song.artist}`)}`}
@@ -814,7 +814,7 @@ const MomentosEspeciales = () => {
                           >
                             Spotify
                           </a>
-                          <span> Â· </span>
+                          <span> · </span>
                           <a
                             className="hover:underline"
                             href={
@@ -878,7 +878,7 @@ const MomentosEspeciales = () => {
                   try {
                     const current = (blocks || []).find((b) => (b.id || b.key) === activeTab);
                     if (!current) return;
-                    const newName = prompt('Nuevo nombre de la sección:', current.name || '');
+                    const newName = prompt('Nuevo nombre de la seccin:', current.name || '');
                     if (!newName) return;
                     renameBlock(current.id || current.key, newName);
                   } catch {}
@@ -889,11 +889,11 @@ const MomentosEspeciales = () => {
                     if (!Array.isArray(blocks) || !blocks.length) return;
                     const idx = blocks.findIndex((b) => (b.id || b.key) === activeTab);
                     if (idx === -1) return;
-                    const action = prompt('Acción: eliminar | mover-izquierda | mover-derecha');
+                    const action = prompt('Accin: eliminar | mover-izquierda | mover-derecha');
                     if (!action) return;
                     const lower = action.trim().toLowerCase();
                     if (lower.startsWith('elimi')) {
-                      if (!confirm(`Eliminar sección "${blocks[idx].name}"?`)) return;
+                      if (!confirm(`Eliminar seccin "${blocks[idx].name}"?`)) return;
                       const nextIdx = idx > 0 ? idx - 1 : (blocks.length > 1 ? 1 : -1);
                       removeBlock(blocks[idx].id || blocks[idx].key);
                       if (nextIdx !== -1 && blocks[nextIdx]) setActiveTab(blocks[nextIdx].id || blocks[nextIdx].key);
@@ -906,7 +906,7 @@ const MomentosEspeciales = () => {
                     }
                   } catch {}
                 }}
-                title="Doble clic para renombrar sección (clic derecho para más opciones)"
+                title="Doble clic para renombrar seccin (clic derecho para ms opciones)"
               >
                 {blocks?.find((b) => (b.id || b.key) === activeTab)?.name || 'Momentos'}
               </h3>
@@ -914,12 +914,12 @@ const MomentosEspeciales = () => {
                 onClick={handleAddMoment}
                 className="py-1 px-3 text-sm flex items-center gap-1"
               >
-                <Plus size={14} /> Añadir momento
+                <Plus size={14} /> Aadir momento
               </Button>
             </div>
 
             <p className="text-xs text-gray-500">
-              Consejo: doble clic sobre el nombre de la sección para renombrar. Clic derecho para eliminar o mover la sección. Usa â€œDup â†’â€ para duplicar un momento en otra sección y â€œMov â†’â€ para moverlo.
+              Consejo: doble clic sobre el nombre de la seccin para renombrar. Clic derecho para eliminar o mover la seccin. Usa “Dup →” para duplicar un momento en otra seccin y “Mov →” para moverlo.
             </p>
 
             <div className="space-y-3">
@@ -940,13 +940,13 @@ const MomentosEspeciales = () => {
                                 title: e.target.value,
                               })
                             }
-                            placeholder="TÃ­tulo del momento"
+                            placeholder="Ttulo del momento"
                           />
 
                           <div className="mt-2 flex flex-wrap gap-2">
                             <div className="flex-1 min-w-[200px]">
                               <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                                <Music size={12} /> Canción
+                                <Music size={12} /> Cancin
                               </div>
                               <input
                                 type="text"
@@ -958,9 +958,9 @@ const MomentosEspeciales = () => {
                                     song: e.target.value,
                                   })
                                 }
-                                placeholder="Nombre de la Canción"
+                                placeholder="Nombre de la Cancin"
                               />
-                              {/* Si pega un enlace de Spotify vÃ¡lido, mástramás el reproductor embebido */}
+                              {/* Si pega un enlace de Spotify vlido, mstrams el reproductor embebido */}
                               {(() => {
                                 const embed = getSpotifyEmbedUrl(moment.song);
                                 if (!embed) return null;
@@ -976,7 +976,7 @@ const MomentosEspeciales = () => {
                                       loading="lazy"
                                     />
                                     <div className="text-[11px] text-gray-500 mt-1">
-                                      Pegaste un enlace de Spotify. Se mástra un reproductor de
+                                      Pegaste un enlace de Spotify. Se mstra un reproductor de
                                       vista previa.
                                     </div>
                                   </div>
@@ -1001,7 +1001,7 @@ const MomentosEspeciales = () => {
                             </div>
 
                             <div className="w-28">
-                              <div className="text-xs text-gray-500 mb-1">Duración</div>
+                              <div className="text-xs text-gray-500 mb-1">Duracin</div>
                               <input
                                 type="text"
                                 className="w-full border rounded px-2 py-1 text-sm"
@@ -1047,9 +1047,9 @@ const MomentosEspeciales = () => {
                               } catch {}
                             }}
                             className="text-gray-400 hover:text-blue-500 p-1"
-                            title="Duplicar en otra sección"
+                            title="Duplicar en otra seccin"
                           >
-                            <span className="text-[11px]">Dup →</span>
+                            <span className="text-[11px]">Dup ?</span>
                           </button>
 
                           <button
@@ -1065,9 +1065,9 @@ const MomentosEspeciales = () => {
                               } catch {}
                             }}
                             className="text-gray-400 hover:text-blue-600 p-1"
-                            title="Mover a otra sección"
+                            title="Mover a otra seccin"
                           >
-                            <span className="text-[11px]">Mov →</span>
+                            <span className="text-[11px]">Mov ?</span>
                           </button>
 
                           {idx > 0 && (
@@ -1095,8 +1095,8 @@ const MomentosEspeciales = () => {
                   ))
               ) : (
                 <div className="text-center py-6 text-gray-500">
-                  <p>No hay momentos en esta sección.</p>
-                  <p className="text-sm mt-1">Haz clic en "Añadir momento" para crear uno nuevo.</p>
+                  <p>No hay momentos en esta seccin.</p>
+                  <p className="text-sm mt-1">Haz clic en "Aadir momento" para crear uno nuevo.</p>
                 </div>
               )}
             </div>
@@ -1108,6 +1108,14 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
+
+
+
+
+
+
+
+
 
 
 

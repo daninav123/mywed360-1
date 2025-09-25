@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to window 'lovenda-guests' events and persists guests in Firestore
+// Listens to window 'mywed360-guests' events and persists guests in Firestore
 export default function GuestEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -77,13 +77,14 @@ export default function GuestEventBridge() {
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[GuestEventBridge] Error al manejar evento lovenda-guests', e);
+        console.error('[GuestEventBridge] Error al manejar evento mywed360-guests', e);
       }
     };
 
-    window.addEventListener('lovenda-guests', handler);
-    return () => window.removeEventListener('lovenda-guests', handler);
+    window.addEventListener('mywed360-guests', handler);
+    return () => window.removeEventListener('mywed360-guests', handler);
   }, [activeWedding]);
 
   return null;
 }
+

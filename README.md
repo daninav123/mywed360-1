@@ -1,6 +1,6 @@
-﻿# MyWed360 â€“ Monorepo (Frontend + Backend + Docs)
+# MyWed360 – Monorepo (Frontend + Backend + Docs)
 
-MyWed360 â€“ Monorepo (Frontend + Backend + Docs)
+MyWed360 – Monorepo (Frontend + Backend + Docs)
 
 Este repositorio contiene el frontend (React + Vite + Tailwind, PWA), el backend (Express) y documentaciÃ³n operativa. Sirve como punto de entrada para desarrollo local, CI/CD y despliegues.
 

@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
 import { X, Search, Users } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
 
 export default function SeatingGuestDrawer({
   open,

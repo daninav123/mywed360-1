@@ -23,10 +23,10 @@ const IS_TEST = (
 
 // Constantes para configuración de caché
 const CACHE_VERSION = '1.0.0';
-const CACHE_PREFIX = 'lovenda_template_cache';
+const CACHE_PREFIX = 'mywed360_template_cache';
 const CACHE_EXPIRY = 12 * 60 * 60 * 1000; // 12 horas en milisegundos
 const CACHE_MAX_SIZE = 100; // Máximo número de plantillas en caché
-const TEMPLATE_USAGE_KEY = 'lovenda_template_usage';
+const TEMPLATE_USAGE_KEY = 'mywed360_template_usage';
 const PRELOAD_THRESHOLD = 3; // Número mínimo de usos para precarga
 
 // Caché en memoria
@@ -674,5 +674,6 @@ const templateCache = {
 
 export { templateCache };
 export default templateCache;
+
 
 

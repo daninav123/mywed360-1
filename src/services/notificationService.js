@@ -68,7 +68,7 @@ export const DEFAULT_NOTIFICATION_PREFS = {
   },
 };
 
-const PREFS_KEY = 'lovenda_notification_prefs_v1';
+const PREFS_KEY = 'mywed360_notification_prefs_v1';
 
 export function getNotificationPrefs() {
   try {
@@ -205,7 +205,7 @@ export async function addNotification(notification) {
 
     if (!res.ok) throw new Error('Error adding notification');
     const notif = await res.json();
-    window.dispatchEvent(new CustomEvent('lovenda-notif', { detail: { id: notif.id } }));
+    window.dispatchEvent(new CustomEvent('mywed360-notif', { detail: { id: notif.id } }));
     return notif;
   } catch (error) {
     console.error('Error adding notification:', error);
@@ -398,7 +398,7 @@ export function generateTrackingNotifications(trackingRecords, providers) {
  */
 export function showNotification({ title, message, type = 'info', duration = 3000, actions = [] }) {
   // Crear evento personalizado para el sistema de notificaciones
-  const event = new CustomEvent('lovenda-toast', {
+  const event = new CustomEvent('mywed360-toast', {
     detail: { title, message, type, duration, actions },
   });
 
@@ -499,7 +499,7 @@ export function generateEmailNotifications(emails) {
 // Funciones helper para almacenamiento local de notificaciones
 function loadLocalNotifications() {
   try {
-    const notifications = JSON.parse(localStorage.getItem('lovenda_notifications') || '[]');
+    const notifications = JSON.parse(localStorage.getItem('mywed360_notifications') || '[]');
     return notifications;
   } catch (e) {
     console.error('Error loading local notifications:', e);
@@ -509,7 +509,7 @@ function loadLocalNotifications() {
 
 function saveLocalNotifications(notifications) {
   try {
-    localStorage.setItem('lovenda_notifications', JSON.stringify(notifications));
+    localStorage.setItem('mywed360_notifications', JSON.stringify(notifications));
     return true;
   } catch (e) {
     console.error('Error saving local notifications:', e);
@@ -528,7 +528,7 @@ function addLocalNotification(notification) {
   saveLocalNotifications(notifications);
 
   window.dispatchEvent(
-    new CustomEvent('lovenda-notif', {
+    new CustomEvent('mywed360-notif', {
       detail: { id: newNotification.id },
     })
   );
@@ -553,3 +553,5 @@ function deleteLocalNotification(id) {
   saveLocalNotifications(updatedNotifications);
   return true;
 }
+
+

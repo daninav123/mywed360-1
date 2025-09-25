@@ -1,5 +1,5 @@
 import { doc, getDoc } from 'firebase/firestore';
-import { Search, RefreshCcw, Star, MapPin } from 'lucide-react';
+import { Search, RefreshCcw, MapPin } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import { db } from '../firebaseConfig';
@@ -48,16 +48,16 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
   const commonServices = useMemo(
     () => [
       'Catering',
-      'Fotógrafo',
-      'Música',
+      'Fotgrafo',
+      'Msica',
       'Flores',
       'Vestidos',
-      'Decoración',
+      'Decoracin',
       'Lugar',
       'Transporte',
       'Invitaciones',
       'Pasteles',
-      'Joyería',
+      'Joyera',
       'Detalles',
     ],
     []
@@ -77,33 +77,33 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         location: provider.location || 'No especificada',
         priceRange: provider.priceRange || provider.price || 'Consultar',
         image: provider.image || '',
-        // Por defecto consideramos válido hasta que se demuestre lo contrario
+        // Por defecto consideramos vlido hasta que se demuestre lo contrario
         verified: true,
       }));
 
-      // Filtrar proveedores con enlaces vacíos o mal formados
+      // Filtrar proveedores con enlaces vacos o mal formados
       const validProviders = normalizedProviders.filter((provider) => {
         const link = provider.link || '';
-        // Verificación básica del formato del enlace
+        // Verificacin bsica del formato del enlace
         return (
           link && (link.startsWith('http://') || link.startsWith('https://')) && link.includes('.')
         );
       });
 
       console.log(
-        `${validProviders.length} de ${normalizedProviders.length} tienen enlaces potencialmente válidos`
+        `${validProviders.length} de ${normalizedProviders.length} tienen enlaces potencialmente vlidos`
       );
 
-      // Si no hay proveedores válidos después del filtro, devolver al menos uno como respaldo
+      // Si no hay proveedores vlidos despus del filtro, devolver al menos uno como respaldo
       if (validProviders.length === 0 && normalizedProviders.length > 0) {
         // Crear un resultado de respaldo para el directorio de bodas.net
         return [
           {
             title: 'Directorio de proveedores para bodas',
             link: `https://www.bodas.net/busqueda/${(serviceFilter || 'proveedores').toLowerCase().replace(/\s+/g, '-')}-espana`,
-            snippet: `Encuentra proveedores de ${serviceFilter || 'boda'} en toda España`,
+            snippet: `Encuentra proveedores de ${serviceFilter || 'boda'} en toda Espaa`,
             service: serviceFilter || 'Proveedor',
-            location: 'España',
+            location: 'Espaa',
             priceRange: 'Varios precios disponibles',
             verified: true,
           },
@@ -125,7 +125,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       try {
         let profile = {};
         if (activeWedding) {
-          // Intentar ruta válida de subdocumento: weddings/{id}/info/weddingInfo
+          // Intentar ruta vlida de subdocumento: weddings/{id}/info/weddingInfo
           try {
             const infoSnap = await getDoc(doc(db, 'weddings', activeWedding, 'info', 'weddingInfo'));
             if (infoSnap.exists()) profile = infoSnap.data();
@@ -139,7 +139,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           }
         }
 
-        // Extraer información de ubicación del perfil
+        // Extraer informacin de ubicacin del perfil
         let locationInfo = '';
 
         if (profile.celebrationPlace) {
@@ -148,7 +148,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
 
         const formattedLocation = locationInfo || 'Valencia';
 
-        // Intentar realizar la búsqueda a través del API proxy (apiClient, con auth opcional)
+        // Intentar realizar la búsqueda a travs del API proxy (apiClient, con auth opcional)
         try {
           if (!ENABLE_BACKEND_AI) {
             await fetchOpenAi();
@@ -171,7 +171,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
             try {
               data = await res.json();
             } catch (_) {
-              /* cuerpo vacío */
+              /* cuerpo vaco */
             }
           }
 
@@ -180,11 +180,11 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
             const verifiedResults = await verifyProviderLinks(data);
             setAiResults(verifiedResults);
             setShowResults(true);
-            saveData('lovendaSuppliers', verifiedResults, {
+            saveData('mywed360Suppliers', verifiedResults, {
               firestore: false,
               showNotification: false,
             });
-            window.dispatchEvent(new Event('lovenda-suppliers'));
+            window.dispatchEvent(new Event('mywed360-suppliers'));
             return;
           }
         } catch (err) {
@@ -203,19 +203,19 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
               const verifiedResults = await verifyProviderLinks(js.results);
               setAiResults(verifiedResults);
               setShowResults(true);
-              saveData('lovendaSuppliers', verifiedResults, { firestore: false, showNotification: false });
-              window.dispatchEvent(new Event('lovenda-suppliers'));
+              saveData('mywed360Suppliers', verifiedResults, { firestore: false, showNotification: false });
+              window.dispatchEvent(new Event('mywed360-suppliers'));
               return;
             }
           }
         } catch (_) {}
 
-        // Si la solicitud API falló o no devolvió resultados, usar OpenAI directamente (si está habilitado)
+        // Si la solicitud API fall o no devolvi resultados, usar OpenAI directamente (si est habilitado)
         await fetchOpenAi();
       } catch (err) {
         console.error('Error general:', err);
         setToast({
-          message: 'Error al buscar proveedores. Inténtalo de nuevo más tarde.',
+          message: 'Error al buscar proveedores. Intntalo de nuevo ms tarde.',
           type: 'error',
         });
       } finally {
@@ -225,12 +225,12 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     [aiQuery, activeWedding, serviceFilter, budgetRange, verifyProviderLinks]
   );
 
-  // Función para buscar proveedores usando OpenAI directamente (solo si está permitido por flag)
+  // Funcin para buscar proveedores usando OpenAI directamente (solo si est permitido por flag)
   const fetchOpenAi = async () => {
     const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
     if (!allowDirect) {
       setToast({
-        message: 'Búsqueda IA vía backend no disponible y fallback directo deshabilitado.',
+        message: 'Bsqueda IA va backend no disponible y fallback directo deshabilitado.',
         type: 'error',
       });
       return;
@@ -263,32 +263,32 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       // Crear el prompt para OpenAI
       const locationPrompt = formattedLocation
         ? `La boda es en ${formattedLocation}.`
-        : 'La ubicación de la boda no está especificada.';
+        : 'La ubicacin de la boda no est especificada.';
 
       const budgetPrompt = budgetRange
         ? `El presupuesto es ${budgetRange}.`
         : 'No hay un presupuesto especificado.';
 
-      const prompt = `Actúa como un asistente de bodas que busca proveedores.
+      const prompt = `Acta como un asistente de bodas que busca proveedores.
         Necesito encontrar proveedores de "${servicioSeleccionado || 'servicios para bodas'}" 
         que ofrezcan: "${aiQuery}".
         ${locationPrompt}
         ${budgetPrompt}
         
-        Devuelve ÚNICAMENTE un array JSON con 5 opciones de proveedores reales, 
+        Devuelve NICAMENTE un array JSON con 5 opciones de proveedores reales, 
         con este formato exacto por cada proveedor:
         {
           "title": "Nombre del proveedor",
           "link": "URL de su web oficial o perfil en plataforma de bodas",
-          "snippet": "Breve descripción del servicio que ofrecen",
+          "snippet": "Breve descripcin del servicio que ofrecen",
           "service": "${servicioSeleccionado || 'Servicios para bodas'}",
-          "location": "Ubicación del proveedor (ciudad o provincia)",
+          "location": "Ubicacin del proveedor (ciudad o provincia)",
           "priceRange": "Rango de precios aproximado"
         }
         
-        Asegúrate de:
+        Asegrate de:
         1. Incluir enlaces reales y operativos, preferiblemente web oficial o perfil en bodas.net
-        2. Priorizar proveedores en ${formattedLocation || 'la ubicación de la boda'}
+        2. Priorizar proveedores en ${formattedLocation || 'la ubicacin de la boda'}
         3. Que los proveedores sean relevantes para la búsqueda "${aiQuery}"
         4. SOLO devolver el array JSON, sin texto adicional ni explicaciones`;
 
@@ -316,22 +316,22 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       const data = await response.json();
 
       if (!data.choices || !data.choices.length) {
-        throw new Error('Respuesta vacía de OpenAI');
+        throw new Error('Respuesta vaca de OpenAI');
       }
 
       if (!data.choices[0].message || !data.choices[0].message.content) {
-        throw new Error('Formato de respuesta inválido');
+        throw new Error('Formato de respuesta invlido');
       }
 
       // Intentar extraer los resultados del texto de respuesta
       const content = data.choices[0].message.content;
 
-      // Detectar si la respuesta contiene un mensaje de error explícito
+      // Detectar si la respuesta contiene un mensaje de error explcito
       if (content.toLowerCase().includes('error') && content.length < 150) {
         throw new Error(`Error reportado por OpenAI: ${content}`);
       }
 
-      // Intentar extraer JSON de la respuesta con estrategias múltiples
+      // Intentar extraer JSON de la respuesta con estrategias mltiples
       let jsonMatches =
         content.match(/```json\s*([\s\S]+?)\s*```/) ||
         content.match(/```\s*([\s\S]+?)\s*```/) ||
@@ -369,7 +369,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
             const arrayText = jsonMatches[1].substring(startIdx, endIdx + 1);
             results = JSON.parse(arrayText);
           } else {
-            throw new Error('No se encontró estructura de array en la respuesta');
+            throw new Error('No se encontr estructura de array en la respuesta');
           }
         } catch (subError) {
           // Crear resultado manual si todo falla
@@ -388,7 +388,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
               link: `https://www.bodas.net/busqueda/${servicioSeleccionado.toLowerCase().replace(/\s+/g, '-')}-${formattedLocation ? formattedLocation.split(',')[0].toLowerCase() : 'espana'}`,
               snippet: line,
               service: servicioSeleccionado,
-              location: formattedLocation || 'España',
+              location: formattedLocation || 'Espaa',
               priceRange: 'Consultar',
             }));
           }
@@ -409,9 +409,9 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
         validResults.push({
           title: 'Directorio de proveedores para bodas',
           link: `https://www.bodas.net/busqueda/${servicioSeleccionado.toLowerCase().replace(/\s+/g, '-')}-${formattedLocation ? formattedLocation.split(',')[0].toLowerCase() : 'espana'}`,
-          snippet: `Encuentra proveedores de ${servicioSeleccionado} en ${formattedLocation || 'toda España'}`,
+          snippet: `Encuentra proveedores de ${servicioSeleccionado} en ${formattedLocation || 'toda Espaa'}`,
           service: servicioSeleccionado,
-          location: formattedLocation || 'España',
+          location: formattedLocation || 'Espaa',
           priceRange: 'Varios precios disponibles',
           verified: true,
         });
@@ -421,19 +421,19 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
       if (validResults.length > 0) {
         setAiResults(validResults);
         setShowResults(true);
-        saveData('lovendaSuppliers', validResults, { firestore: false, showNotification: false });
-        window.dispatchEvent(new Event('lovenda-suppliers'));
+        saveData('mywed360Suppliers', validResults, { firestore: false, showNotification: false });
+        window.dispatchEvent(new Event('mywed360-suppliers'));
       } else {
         setToast({
           message:
-            'No se encontraron proveedores que coincidan con tu búsqueda. Intenta con otros términos.',
+            'No se encontraron proveedores que coincidan con tu búsqueda. Intenta con otros trminos.',
           type: 'info',
         });
       }
     } catch (err) {
       console.error('Error en la búsqueda de proveedores:', err);
       setToast({
-        message: 'Error al buscar proveedores. Inténtalo de nuevo más tarde.',
+        message: 'Error al buscar proveedores. Intntalo de nuevo ms tarde.',
         type: 'error',
       });
     }
@@ -473,7 +473,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                 value={aiQuery}
                 onChange={(e) => setAiQuery(e.target.value)}
                 className="w-full border rounded p-3"
-                placeholder="¿Qué buscas? Ej: Fotógrafo con experiencia en bodas al aire libre"
+                placeholder="Qu buscas? Ej: Fotgrafo con experiencia en bodas al aire libre"
               />
             </div>
             <button
@@ -507,7 +507,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                 className="w-full border rounded p-3"
               >
                 <option value="">Cualquier presupuesto</option>
-                <option value="económico">Económico</option>
+                <option value="econmico">Econmico</option>
                 <option value="medio">Precio medio</option>
                 <option value="premium">Premium</option>
               </select>
@@ -559,7 +559,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
                       </div>
                     </div>
                     <p className="text-sm mt-2 text-gray-700 line-clamp-2">
-                      {item.snippet || 'Sin descripción disponible'}
+                      {item.snippet || 'Sin descripcin disponible'}
                     </p>
                     {item.link && (
                       <a
@@ -588,7 +588,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
           </div>
         )}
 
-        {/* Botones de acción */}
+        {/* Botones de accin */}
         <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">
             Cerrar
@@ -598,4 +598,7 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     </div>
   );
 }
+
+
+
 

@@ -1,4 +1,4 @@
-﻿import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -69,12 +69,12 @@ function Perfil() {
     removeRole,
   } = useRoles(weddingId);
 
-  // Actualiza nÃƒÂºmero de invitados (con muestra local si no hay datos)
+  // Actualiza nmero de invitados (con muestra local si no hay datos)
   useEffect(() => {
     function updateGuestCount() {
       let guests = [];
       try {
-        guests = JSON.parse(localStorage.getItem('lovendaGuests'));
+        guests = JSON.parse(localStorage.getItem('mywed360Guests'));
         if (!Array.isArray(guests)) guests = null;
       } catch {
         guests = null;
@@ -105,8 +105,8 @@ function Perfil() {
       setWeddingInfo((w) => ({ ...w, numGuests: total }));
     }
     updateGuestCount();
-    window.addEventListener('lovenda-guests', updateGuestCount);
-    return () => window.removeEventListener('lovenda-guests', updateGuestCount);
+    window.addEventListener('mywed360-guests', updateGuestCount);
+    return () => window.removeEventListener('mywed360-guests', updateGuestCount);
   }, []);
 
   // Notas importantes (desde eventos externos)
@@ -116,8 +116,8 @@ function Perfil() {
       if (p && typeof p.then === 'function') p.then((val) => setImportantInfo(val ?? ''));
       else setImportantInfo(p ?? '');
     }
-    window.addEventListener('lovenda-important-note', updateNotes);
-    return () => window.removeEventListener('lovenda-important-note', updateNotes);
+    window.addEventListener('mywed360-important-note', updateNotes);
+    return () => window.removeEventListener('mywed360-important-note', updateNotes);
   }, []);
 
   const handleAccountChange = (e) =>
@@ -168,10 +168,10 @@ function Perfil() {
       toast.error('No se pudo determinar tu usuario');
       return;
     }
-    // Validaciones rÃƒÂ¡pidas
+    // Validaciones rÍpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrÃƒÂ³nico invÃƒÂ¡lido');
+        toast.error('Correo electrnico invÍlido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -181,7 +181,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÃƒÂ¡lida');
+          toast.error('Fecha de boda invÍlida');
           return;
         }
       }
@@ -283,7 +283,7 @@ function Perfil() {
           ></div>
           <span>
             {!syncStatus.isOnline
-              ? t('profile.offline', { defaultValue: 'Sin conexiÃ³n (modo offline)' })
+              ? t('profile.offline', { defaultValue: 'Sin conexin (modo offline)' })
               : syncStatus.isSyncing
                 ? t('profile.syncing', { defaultValue: 'Sincronizando...' })
                 : syncStatus.pendingChanges
@@ -292,14 +292,14 @@ function Perfil() {
           </span>
           {lastSavedAt && (
             <span className="text-muted">
-              {'Ã¯Â¿Â½altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}
+              {'ï½altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}
             </span>
           )}
         </div>
       </div>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.subscription.type', { defaultValue: 'Tipo de suscripciÃ³n' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.subscription.type', { defaultValue: 'Tipo de suscripcin' })}</h2>
         <div className="flex gap-4">
           <Button
             variant={subscription === 'free' ? 'primary' : 'outline'}
@@ -541,7 +541,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.billing.title', { defaultValue: 'Datos de facturación' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.billing.title', { defaultValue: 'Datos de facturacin' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Nombre completo"
@@ -585,3 +585,4 @@ function Perfil() {
 }
 
 export default Perfil;
+

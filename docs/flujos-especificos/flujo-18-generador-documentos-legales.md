@@ -24,8 +24,8 @@ Sistema integrado en el menú de Protocolo para generar automáticamente documen
 ### 1. Acceso a Documentos Legales
 
 #### **1.1 Navegación**
-1. Usuario accede a menú "Protocolo"
-2. Selecciona "Documentos Legales"
+1. Usuario accede a menú  – Protocolo – 
+2. Selecciona  – Documentos Legales – 
 3. Ve dashboard con tipos de documentos disponibles
 4. Puede crear nuevo documento o gestionar existentes
 
@@ -33,27 +33,27 @@ Sistema integrado en el menú de Protocolo para generar automáticamente documen
 ```jsx
 const DocumentsDashboard = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className= – grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 – >
       <DocumentTypeCard
-        title="Contratos Proveedores"
-        description="Contratos estándar para catering, fotografía, música, etc."
+        title= – Contratos Proveedores – 
+        description= – Contratos estándar para catering, fotografía, música, etc. – 
         icon={FileText}
         count={contractsCount}
-        status="active"
+        status= – active – 
       />
       <DocumentTypeCard
-        title="Cesión de Imagen"
-        description="Autorización para uso de fotografías y videos"
+        title= – Cesión de Imagen – 
+        description= – Autorización para uso de fotografías y videos – 
         icon={Camera}
         count={imageRightsCount}
-        status="pending"
+        status= – pending – 
       />
       <DocumentTypeCard
-        title="Términos y Condiciones"
-        description="T&C personalizados para eventos y servicios"
+        title= – Términos y Condiciones – 
+        description= – T&C personalizados para eventos y servicios – 
         icon={Shield}
         count={termsCount}
-        status="draft"
+        status= – draft – 
       />
     </div>
   );
@@ -137,24 +137,24 @@ const ContractGenerator = ({ providerType }) => {
   const contractFields = getFieldsByProviderType(providerType);
   
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className= – max-w-4xl mx-auto – >
       {/* Datos básicos */}
-      <Section title="Información General">
-        <FormField label="Nombre del Proveedor" required />
-        <FormField label="Servicio Contratado" required />
-        <FormField label="Fecha del Evento" type="date" required />
-        <FormField label="Importe Total" type="currency" required />
+      <Section title= – Información General – >
+        <FormField label= – Nombre del Proveedor –  required />
+        <FormField label= – Servicio Contratado –  required />
+        <FormField label= – Fecha del Evento –  type= – date –  required />
+        <FormField label= – Importe Total –  type= – currency –  required />
       </Section>
       
       {/* Campos específicos por tipo */}
-      <Section title="Detalles del Servicio">
+      <Section title= – Detalles del Servicio – >
         {contractFields.map(field => (
           <DynamicFormField key={field.id} field={field} />
         ))}
       </Section>
       
       {/* Cláusulas estándar */}
-      <Section title="Cláusulas del Contrato">
+      <Section title= – Cláusulas del Contrato – >
         <ClauseSelector
           availableClauses={getStandardClauses(providerType)}
           selectedClauses={selectedClauses}
@@ -163,7 +163,7 @@ const ContractGenerator = ({ providerType }) => {
       </Section>
       
       {/* Cláusulas personalizadas */}
-      <Section title="Cláusulas Adicionales">
+      <Section title= – Cláusulas Adicionales – >
         <CustomClauseEditor
           clauses={customClauses}
           onChange={setCustomClauses}
@@ -243,31 +243,31 @@ const SignatureTracker = ({ documentId }) => {
   const [signatureStatus, setSignatureStatus] = useState(null);
   
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold mb-4">Estado de Firmas</h3>
+    <div className= – bg-white rounded-lg shadow p-6 – >
+      <h3 className= – text-lg font-semibold mb-4 – >Estado de Firmas</h3>
       
       {signatureStatus?.signers.map(signer => (
-        <div key={signer.id} className="flex items-center justify-between py-3 border-b">
-          <div className="flex items-center space-x-3">
+        <div key={signer.id} className= – flex items-center justify-between py-3 border-b – >
+          <div className= – flex items-center space-x-3 – >
             <Avatar src={signer.avatar} name={signer.name} />
             <div>
-              <p className="font-medium">{signer.name}</p>
-              <p className="text-sm text-gray-500">{signer.email}</p>
+              <p className= – font-medium – >{signer.name}</p>
+              <p className= – text-sm text-gray-500 – >{signer.email}</p>
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className= – flex items-center space-x-2 – >
             {signer.status === 'signed' && (
-              <Badge variant="success">Firmado</Badge>
+              <Badge variant= – success – >Firmado</Badge>
             )}
             {signer.status === 'pending' && (
-              <Badge variant="warning">Pendiente</Badge>
+              <Badge variant= – warning – >Pendiente</Badge>
             )}
             {signer.status === 'declined' && (
-              <Badge variant="error">Rechazado</Badge>
+              <Badge variant= – error – >Rechazado</Badge>
             )}
             
-            <span className="text-sm text-gray-500">
+            <span className= – text-sm text-gray-500 – >
               {signer.signedAt ? formatDate(signer.signedAt) : 'Sin firmar'}
             </span>
           </div>
@@ -291,12 +291,12 @@ const DocumentLibrary = () => {
   });
   
   return (
-    <div className="space-y-6">
+    <div className= – space-y-6 – >
       {/* Filtros */}
       <DocumentFilters filters={filters} onChange={setFilters} />
       
       {/* Lista de documentos */}
-      <div className="grid gap-4">
+      <div className= – grid gap-4 – >
         {documents.map(doc => (
           <DocumentCard
             key={doc.id}
@@ -316,18 +316,18 @@ const DocumentLibrary = () => {
 #### **5.2 Versionado de Documentos**
 ```javascript
 const DocumentVersion = {
-  id: "doc_123_v2",
-  documentId: "doc_123",
+  id:  – doc_123_v2 – ,
+  documentId:  – doc_123 – ,
   version: 2,
-  createdAt: "2024-08-26T10:00:00Z",
-  createdBy: "user_456",
+  createdAt:  – 2024-08-26T10:00:00Z – ,
+  createdBy:  – user_456 – ,
   changes: [
-    "Actualizado importe del catering",
-    "Añadida cláusula de cancelación por COVID",
-    "Corregida fecha de montaje"
+     – Actualizado importe del catering – ,
+     – Añadida cláusula de cancelación por COVID – ,
+     – Corregida fecha de montaje – 
   ],
-  status: "draft", // draft, sent, signed, archived
-  signatureRequestId: "sr_789"
+  status:  – draft – , // draft, sent, signed, archived
+  signatureRequestId:  – sr_789 – 
 };
 ```
 
@@ -340,68 +340,68 @@ const DocumentVersion = {
 #### **Documento Legal**
 ```javascript
 {
-  id: "legal_doc_123",
-  weddingId: "wedding_456",
-  type: "provider_contract", // provider_contract, image_rights, terms_conditions
-  subtype: "catering", // catering, photography, music, etc.
-  title: "Contrato de Catering - Restaurante El Jardín",
+  id:  – legal_doc_123 – ,
+  weddingId:  – wedding_456 – ,
+  type:  – provider_contract – , // provider_contract, image_rights, terms_conditions
+  subtype:  – catering – , // catering, photography, music, etc.
+  title:  – Contrato de Catering - Restaurante El Jardín – ,
   
   // Datos del documento
   data: {
     provider: {
-      name: "Restaurante El Jardín",
-      cif: "B12345678",
-      address: "Calle Mayor 123, Madrid",
-      contact: "info@eljardin.com",
-      phone: "+34 91 123 4567"
+      name:  – Restaurante El Jardín – ,
+      cif:  – B12345678 – ,
+      address:  – Calle Mayor 123, Madrid – ,
+      contact:  – info@eljardin.com – ,
+      phone:  – +34 91 123 4567 – 
     },
     service: {
-      description: "Servicio de catering para boda",
-      date: "2024-12-15",
-      time: "14:00-02:00",
+      description:  – Servicio de catering para boda – ,
+      date:  – 2024-12-15 – ,
+      time:  – 14:00-02:00 – ,
       guests: 120,
-      menu: "Menú Premium",
+      menu:  – Menú Premium – ,
       totalAmount: 8500,
       deposit: 2550,
       finalPayment: 5950
     },
     clauses: [
       {
-        id: "payment_terms",
-        title: "Condiciones de Pago",
-        content: "30% al firmar, 70% 15 días antes del evento",
+        id:  – payment_terms – ,
+        title:  – Condiciones de Pago – ,
+        content:  – 30% al firmar, 70% 15 días antes del evento – ,
         required: true
       },
       {
-        id: "cancellation_policy",
-        title: "Política de Cancelación",
-        content: "Cancelación gratuita hasta 60 días antes",
+        id:  – cancellation_policy – ,
+        title:  – Política de Cancelación – ,
+        content:  – Cancelación gratuita hasta 60 días antes – ,
         required: true
       }
     ]
   },
   
   // Estado del documento
-  status: "draft", // draft, sent, partially_signed, fully_signed, expired
-  createdAt: "2024-08-26T10:00:00Z",
-  updatedAt: "2024-08-26T11:30:00Z",
+  status:  – draft – , // draft, sent, partially_signed, fully_signed, expired
+  createdAt:  – 2024-08-26T10:00:00Z – ,
+  updatedAt:  – 2024-08-26T11:30:00Z – ,
   
   // Firmas digitales
   signatures: {
-    requestId: "sr_789",
+    requestId:  – sr_789 – ,
     signers: [
       {
-        role: "client",
-        email: "pareja@email.com",
-        name: "Juan y María",
-        status: "signed",
-        signedAt: "2024-08-26T12:00:00Z"
+        role:  – client – ,
+        email:  – pareja@email.com – ,
+        name:  – Juan y María – ,
+        status:  – signed – ,
+        signedAt:  – 2024-08-26T12:00:00Z – 
       },
       {
-        role: "provider",
-        email: "info@eljardin.com",
-        name: "Restaurante El Jardín",
-        status: "pending",
+        role:  – provider – ,
+        email:  – info@eljardin.com – ,
+        name:  – Restaurante El Jardín – ,
+        status:  – pending – ,
         signedAt: null
       }
     ]
@@ -409,8 +409,8 @@ const DocumentVersion = {
   
   // Archivos generados
   files: {
-    pdf: "documents/legal_doc_123.pdf",
-    signedPdf: "documents/legal_doc_123_signed.pdf"
+    pdf:  – documents/legal_doc_123.pdf – ,
+    signedPdf:  – documents/legal_doc_123_signed.pdf – 
   }
 }
 ```
@@ -577,22 +577,22 @@ const generateImageRightsForGuests = async (guestList) => {
 const createDocumentTasks = async (documentId) => {
   const tasks = [
     {
-      title: "Revisar contrato generado",
+      title:  – Revisar contrato generado – ,
       dueDate: addDays(new Date(), 2),
-      category: "legal",
-      priority: "high"
+      category:  – legal – ,
+      priority:  – high – 
     },
     {
-      title: "Seguir estado de firmas",
+      title:  – Seguir estado de firmas – ,
       dueDate: addDays(new Date(), 7),
-      category: "legal",
-      priority: "medium"
+      category:  – legal – ,
+      priority:  – medium – 
     },
     {
-      title: "Archivar documento firmado",
+      title:  – Archivar documento firmado – ,
       dueDate: addDays(new Date(), 30),
-      category: "legal",
-      priority: "low"
+      category:  – legal – ,
+      priority:  – low – 
     }
   ];
   

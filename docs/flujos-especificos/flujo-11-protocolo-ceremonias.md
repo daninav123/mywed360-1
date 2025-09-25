@@ -233,106 +233,106 @@
 ```javascript
 // /weddings/{weddingId}/ceremony
 {
-  id: "ceremony_001",
-  type: "religious", // religious, civil, symbolic, multiple
+  id:  – ceremony_001 – ,
+  type:  – religious – , // religious, civil, symbolic, multiple
   
   basicInfo: {
-    date: "2024-06-15T17:00:00Z",
+    date:  – 2024-06-15T17:00:00Z – ,
     duration: 60, // minutos
     location: {
-      name: "Iglesia San Miguel",
-      address: "Plaza Mayor 1, Madrid",
+      name:  – Iglesia San Miguel – ,
+      address:  – Plaza Mayor 1, Madrid – ,
       capacity: 200,
-      contact: "+34 91 123 4567"
+      contact:  – +34 91 123 4567 – 
     },
     officiant: {
-      name: "Padre José García",
-      title: "Párroco",
-      contact: "+34 91 765 4321"
+      name:  – Padre José García – ,
+      title:  – Párroco – ,
+      contact:  – +34 91 765 4321 – 
     }
   },
   
   participants: {
     bride: {
-      name: "Ana García",
-      entryTime: "17:05",
-      position: "altar_right"
+      name:  – Ana García – ,
+      entryTime:  – 17:05 – ,
+      position:  – altar_right – 
     },
     groom: {
-      name: "Carlos López", 
-      entryTime: "17:00",
-      position: "altar_left"
+      name:  – Carlos López – , 
+      entryTime:  – 17:00 – ,
+      position:  – altar_left – 
     },
     bridesmaids: [
       {
-        name: "María García",
-        role: "maid_of_honor",
-        entryTime: "17:03"
+        name:  – María García – ,
+        role:  – maid_of_honor – ,
+        entryTime:  – 17:03 – 
       }
     ],
     groomsmen: [
       {
-        name: "Luis López",
-        role: "best_man", 
-        entryTime: "17:02"
+        name:  – Luis López – ,
+        role:  – best_man – , 
+        entryTime:  – 17:02 – 
       }
     ],
     parents: [
       {
-        name: "José García",
-        role: "father_bride",
-        entryTime: "16:55"
+        name:  – José García – ,
+        role:  – father_bride – ,
+        entryTime:  – 16:55 – 
       }
     ],
     witnesses: [
       {
-        name: "Carmen Ruiz",
-        role: "official_witness",
-        documentId: "12345678A"
+        name:  – Carmen Ruiz – ,
+        role:  – official_witness – ,
+        documentId:  – 12345678A – 
       }
     ]
   },
   
   protocol: {
     entryOrder: [
-      { participant: "parents", time: "16:55" },
-      { participant: "groom", time: "17:00" },
-      { participant: "groomsmen", time: "17:02" },
-      { participant: "bridesmaids", time: "17:03" },
-      { participant: "bride", time: "17:05" }
+      { participant:  – parents – , time:  – 16:55 –  },
+      { participant:  – groom – , time:  – 17:00 –  },
+      { participant:  – groomsmen – , time:  – 17:02 –  },
+      { participant:  – bridesmaids – , time:  – 17:03 –  },
+      { participant:  – bride – , time:  – 17:05 –  }
     ],
     
     ceremony_sequence: [
-      { time: "17:05", event: "Entrada de la novia", duration: 3 },
-      { time: "17:08", event: "Palabras de bienvenida", duration: 5 },
-      { time: "17:13", event: "Primera lectura", duration: 5 },
-      { time: "17:18", event: "Intercambio de votos", duration: 10 },
-      { time: "17:28", event: "Intercambio de anillos", duration: 5 },
-      { time: "17:33", event: "Declaración matrimonial", duration: 5 },
-      { time: "17:38", event: "Firma de acta", duration: 10 },
-      { time: "17:48", event: "Salida de novios", duration: 5 }
+      { time:  – 17:05 – , event:  – Entrada de la novia – , duration: 3 },
+      { time:  – 17:08 – , event:  – Palabras de bienvenida – , duration: 5 },
+      { time:  – 17:13 – , event:  – Primera lectura – , duration: 5 },
+      { time:  – 17:18 – , event:  – Intercambio de votos – , duration: 10 },
+      { time:  – 17:28 – , event:  – Intercambio de anillos – , duration: 5 },
+      { time:  – 17:33 – , event:  – Declaración matrimonial – , duration: 5 },
+      { time:  – 17:38 – , event:  – Firma de acta – , duration: 10 },
+      { time:  – 17:48 – , event:  – Salida de novios – , duration: 5 }
     ]
   },
   
   documentation: {
     required: [
       {
-        type: "birth_certificate",
-        participant: "bride",
-        status: "submitted",
-        expiryDate: "2024-12-31"
+        type:  – birth_certificate – ,
+        participant:  – bride – ,
+        status:  – submitted – ,
+        expiryDate:  – 2024-12-31 – 
       },
       {
-        type: "single_certificate", 
-        participant: "groom",
-        status: "pending",
-        deadline: "2024-05-15"
+        type:  – single_certificate – , 
+        participant:  – groom – ,
+        status:  – pending – ,
+        deadline:  – 2024-05-15 – 
       }
     ],
     
     legalProcess: {
-      expedientDate: "2024-04-01",
-      publicationDate: "2024-04-15",
+      expedientDate:  – 2024-04-01 – ,
+      publicationDate:  – 2024-04-15 – ,
       waitingPeriod: 15,
       approvalDate: null
     }
@@ -342,22 +342,22 @@
     arras: {
       enabled: true,
       coins: 13,
-      bearer: "ring_bearer"
+      bearer:  – ring_bearer – 
     },
     unity_candle: {
       enabled: false
     },
     sand_ceremony: {
       enabled: true,
-      colors: ["blue", "pink"]
+      colors: [ – blue – ,  – pink – ]
     }
   },
   
   contingencies: {
     weather: {
-      indoor_backup: "Salón anexo",
+      indoor_backup:  – Salón anexo – ,
       tent_option: true,
-      decision_time: "16:00"
+      decision_time:  – 16:00 – 
     },
     technical: {
       sound_backup: true,

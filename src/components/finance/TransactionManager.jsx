@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+﻿import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
@@ -28,7 +28,7 @@ export default function TransactionManager({
         {t('finance.transactions.empty', { defaultValue: 'No hay transacciones que mostrar' })}
       </p>
       <Button className="mt-4" onClick={openCreate} leftIcon={<Plus size={16} />}>
-        {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacci�n' })}
+        {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacci€)n' })}
       </Button>
     </div>
   );
@@ -72,7 +72,7 @@ export default function TransactionManager({
       <Modal
         open={showTransactionModal}
         onClose={closeModal}
-        title={t('finance.transactions.new', { defaultValue: 'Nueva transacci�n' })}
+        title={t('finance.transactions.new', { defaultValue: 'Nueva transacci€)n' })}
       >
         <TransactionForm
           isLoading={isLoading}
@@ -90,3 +90,4 @@ export default function TransactionManager({
     </>
   );
 }
+

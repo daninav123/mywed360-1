@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce';
-import { Search, Mail, Calendar, User, X, ChevronRight, Clock } from 'lucide-react';
+import { Search, Mail, Calendar, User, X, Clock } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import * as EmailService from '../services/EmailService';
 import * as ProveedorService from '../services/ProveedorService';
@@ -232,7 +232,7 @@ const GlobalSearch = () => {
       <button
         onClick={handleOpen}
         className="flex items-center text-gray-600 hover:text-gray-900 focus:outline-none"
-        aria-label="Buscar en Lovenda"
+        aria-label="Buscar en MyWed360"
       >
         <Search size={20} />
         <span className="ml-2 hidden md:inline">Buscar</span>
@@ -489,3 +489,5 @@ const GlobalSearch = () => {
 };
 
 export default GlobalSearch;
+
+

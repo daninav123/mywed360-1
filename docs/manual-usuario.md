@@ -2,7 +2,7 @@
 
 ## Introducción
 
-Bienvenido/a al nuevo sistema de email personalizado de MyWed360. Esta guía te ayudará a conocer todas las características disponibles y cómo sacar el máximo provecho de tu cuenta de correo electrónico personalizada con dominio @lovenda.com.
+Bienvenido/a al nuevo sistema de email personalizado de MyWed360. Esta guía te ayudará a conocer todas las características disponibles y cómo sacar el máximo provecho de tu cuenta de correo electrónico personalizada con dominio @mywed360.com.
 
 ## Tu cuenta de correo electrónico personalizada
 
@@ -11,7 +11,7 @@ Bienvenido/a al nuevo sistema de email personalizado de MyWed360. Esta guía te 
 Al registrarte en MyWed360, automáticamente se te asigna una dirección de correo electrónico personalizada con el formato:
 
 ```
-tunombre@lovenda.com
+tunombre@mywed360.com
 ```
 
 Esta dirección te permite:
@@ -23,8 +23,8 @@ Esta dirección te permite:
 ### Acceso a tu bandeja de entrada
 
 Puedes acceder a tu bandeja de entrada de varias formas:
-1. En el menú principal, seleccionando "Buzón de Emails"
-2. Desde tu perfil de usuario, en la opción "Buzón de Emails"
+1. En el menú principal, seleccionando  – Buzón de Emails – 
+2. Desde tu perfil de usuario, en la opción  – Buzón de Emails – 
 3. Directamente a través de la URL: `/buzon`
 
 ## Características principales
@@ -33,16 +33,16 @@ Puedes acceder a tu bandeja de entrada de varias formas:
 
 Tu cuenta permite enviar y recibir emails como cualquier otra cuenta de correo electrónico:
 
-- **Redactar email**: Utiliza el botón "Nuevo Email" en la esquina superior derecha de la bandeja de entrada
-- **Responder**: Abre un email y utiliza los botones "Responder" o "Responder a todos"
-- **Reenviar**: Abre un email y selecciona "Reenviar"
+- **Redactar email**: Utiliza el botón  – Nuevo Email –  en la esquina superior derecha de la bandeja de entrada
+- **Responder**: Abre un email y utiliza los botones  – Responder –  o  – Responder a todos – 
+- **Reenviar**: Abre un email y selecciona  – Reenviar – 
 - **Adjuntar archivos**: Puedes adjuntar documentos, imágenes y otros archivos hasta un máximo de 25MB por email
 
 ### Sistema de plantillas
 
 Para facilitar tu comunicación con proveedores, MyWed360 incluye plantillas predefinidas que puedes personalizar:
 
-1. Al redactar un nuevo email, haz clic en "Usar plantilla"
+1. Al redactar un nuevo email, haz clic en  – Usar plantilla – 
 2. Selecciona la plantilla que mejor se adapte a tu necesidad
 3. Personaliza los campos marcados entre dobles llaves `{{campo}}`
 4. Envía tu email con un aspecto profesional
@@ -51,8 +51,8 @@ Para facilitar tu comunicación con proveedores, MyWed360 incluye plantillas pre
 
 También puedes crear plantillas personalizadas:
 
-1. Ve a "Configuración" > "Plantillas de email"
-2. Haz clic en "Nueva plantilla"
+1. Ve a  – Configuración –  >  – Plantillas de email – 
+2. Haz clic en  – Nueva plantilla – 
 3. Define el nombre, asunto y contenido
 4. Utiliza variables entre dobles llaves, por ejemplo: `{{nombre_proveedor}}`
 5. Guarda tu plantilla para usarla en futuros emails
@@ -61,7 +61,7 @@ También puedes crear plantillas personalizadas:
 
 Una de las características más útiles es la detección automática de eventos en los emails:
 
-1. Cuando recibas un email que contenga fechas, horas o referencias a reuniones, verás un botón "Añadir al calendario"
+1. Cuando recibas un email que contenga fechas, horas o referencias a reuniones, verás un botón  – Añadir al calendario – 
 2. Al hacer clic, se abrirá un formulario precompletado con la información detectada
 3. Puedes ajustar los detalles según sea necesario
 4. Al guardar, el evento se añade a tu calendario de MyWed360
@@ -70,10 +70,10 @@ Una de las características más útiles es la detección automática de eventos
 
 Puedes crear alias para organizar mejor tu comunicación:
 
-1. Ve a "Configuración" > "Alias de email"
+1. Ve a  – Configuración –  >  – Alias de email – 
 2. Crea alias como:
-   - `bodatunombre.flores@lovenda.com`
-   - `bodatunombre.catering@lovenda.com`
+   - `bodatunombre.flores@mywed360.com`
+   - `bodatunombre.catering@mywed360.com`
 3. Cada alias puede redirigir los emails a carpetas específicas
 4. Utiliza estos alias para segmentar la comunicación con diferentes proveedores
 
@@ -96,9 +96,9 @@ El nuevo sistema de búsqueda te permite encontrar rápidamente cualquier inform
 ### Consejos de búsqueda
 
 Para obtener mejores resultados:
-- Usa términos específicos (ej: "presupuesto flores" en lugar de solo "flores")
+- Usa términos específicos (ej:  – presupuesto flores –  en lugar de solo  – flores – )
 - Incluye nombres de proveedores o servicios
-- Busca por fechas específicas (ej: "reunión 15 septiembre")
+- Busca por fechas específicas (ej:  – reunión 15 septiembre – )
 
 ## Centro de notificaciones
 
@@ -169,8 +169,8 @@ Recibirás notificaciones para:
 
 Si necesitas asistencia adicional:
 
-- Visita nuestro centro de ayuda en ayuda.lovenda.com
-- Contacta con nuestro equipo de soporte: soporte@lovenda.com
+- Visita nuestro centro de ayuda en ayuda.mywed360.com
+- Contacta con nuestro equipo de soporte: soporte@mywed360.com
 - Consulta los tutoriales en video disponibles en tu perfil de usuario
 
 ---
@@ -178,3 +178,4 @@ Si necesitas asistencia adicional:
 *Esta guía se actualizará periódicamente con nuevas características y mejoras del sistema.*
 
 *Última actualización: 13 de julio de 2025*
+

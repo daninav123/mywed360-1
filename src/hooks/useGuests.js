@@ -134,9 +134,9 @@ const useGuests = () => {
   // Sincronización con localStorage para compatibilidad
   useEffect(() => {
     try {
-      localStorage.setItem('lovendaGuests', JSON.stringify(guests));
+      localStorage.setItem('mywed360Guests', JSON.stringify(guests));
       window.dispatchEvent(
-        new CustomEvent('lovenda-guests-updated', { detail: { guests, count: guests.length } })
+        new CustomEvent('mywed360-guests-updated', { detail: { guests, count: guests.length } })
       );
     } catch (error) {
       console.error('Error sincronizando invitados:', error);
@@ -555,3 +555,4 @@ const useGuests = () => {
 };
 
 export default useGuests;
+

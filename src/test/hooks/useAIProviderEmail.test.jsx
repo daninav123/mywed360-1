@@ -7,7 +7,7 @@ import EmailTemplateService from '../../services/EmailTemplateService';
 // Mock del hook useProviderEmail
 vi.mock('../../hooks/useProviderEmail', () => ({
   useProviderEmail: () => ({
-    userEmail: 'usuario.test@lovenda.com',
+    userEmail: 'usuario.test@mywed360.com',
     sendEmailToProvider: vi.fn().mockResolvedValue(true),
     generateDefaultSubject: () => 'Asunto predeterminado',
     generateDefaultEmailBody: () => 'Cuerpo predeterminado',
@@ -52,7 +52,7 @@ describe('useAIProviderEmail', () => {
   it('devuelve las funciones y propiedades esperadas', () => {
     const { result } = renderHook(() => useAIProviderEmail());
 
-    expect(result.current.userEmail).toBe('usuario.test@lovenda.com');
+    expect(result.current.userEmail).toBe('usuario.test@mywed360.com');
     expect(typeof result.current.sendEmailFromAIResult).toBe('function');
     expect(typeof result.current.generateAISubject).toBe('function');
     expect(typeof result.current.generateAIEmailBody).toBe('function');
@@ -152,7 +152,7 @@ describe('useAIProviderEmail', () => {
       '../../hooks/useProviderEmail',
       () => ({
         useProviderEmail: () => ({
-          userEmail: 'usuario.test@lovenda.com',
+          userEmail: 'usuario.test@mywed360.com',
           sendEmailToProvider: vi.fn().mockRejectedValue(new Error('Error de prueba')),
           generateDefaultSubject: () => 'Asunto predeterminado',
           generateDefaultEmailBody: () => 'Cuerpo predeterminado',
@@ -195,3 +195,6 @@ describe('useAIProviderEmail', () => {
     expect(result.current.error).not.toBeNull();
   });
 });
+
+
+

@@ -32,11 +32,11 @@ Esquemas sugeridos
 ```
 POST /api/contracts
 {
-  "title": "Contrato DJ",
-  "providerId": "p1",
-  "weddingId": "w1",
-  "amount": 500,
-  "currency": "EUR"
+   – title – :  – Contrato DJ – ,
+   – providerId – :  – p1 – ,
+   – weddingId – :  – w1 – ,
+   – amount – : 500,
+   – currency – :  – EUR – 
 }
 ```
 
@@ -44,25 +44,25 @@ POST /api/contracts
 ```
 POST /api/payments/intent
 {
-  "amount": 500,
-  "currency": "EUR",
-  "contractId": "c1"
+   – amount – : 500,
+   – currency – :  – EUR – ,
+   – contractId – :  – c1 – 
 }
 ```
 
 - Evento Stripe (checkout.session.completed) — payload esperado por webhook:
 ```
 {
-  "type": "checkout.session.completed",
-  "data": {
-    "object": {
-      "id": "cs_test_123",
-      "currency": "eur",
-      "amount_total": 1000,
-      "metadata": {
-        "contractId": "c1",
-        "providerId": "p1",
-        "weddingId": "w1"
+   – type – :  – checkout.session.completed – ,
+   – data – : {
+     – object – : {
+       – id – :  – cs_test_123 – ,
+       – currency – :  – eur – ,
+       – amount_total – : 1000,
+       – metadata – : {
+         – contractId – :  – c1 – ,
+         – providerId – :  – p1 – ,
+         – weddingId – :  – w1 – 
       }
     }
   }
@@ -72,14 +72,14 @@ POST /api/payments/intent
 - Evento Stripe (payment_intent.succeeded):
 ```
 {
-  "type": "payment_intent.succeeded",
-  "data": {
-    "object": {
-      "id": "pi_123",
-      "currency": "eur",
-      "amount": 5000,
-      "metadata": {
-        "contractId": "c1"
+   – type – :  – payment_intent.succeeded – ,
+   – data – : {
+     – object – : {
+       – id – :  – pi_123 – ,
+       – currency – :  – eur – ,
+       – amount – : 5000,
+       – metadata – : {
+         – contractId – :  – c1 – 
       }
     }
   }
@@ -89,16 +89,16 @@ POST /api/payments/intent
 - Evento Stripe (payment_intent.payment_failed):
 ```
 {
-  "type": "payment_intent.payment_failed",
-  "data": {
-    "object": {
-      "id": "pi_123",
-      "currency": "eur",
-      "last_payment_error": {
-        "message": "Card declined"
+   – type – :  – payment_intent.payment_failed – ,
+   – data – : {
+     – object – : {
+       – id – :  – pi_123 – ,
+       – currency – :  – eur – ,
+       – last_payment_error – : {
+         – message – :  – Card declined – 
       },
-      "metadata": {
-        "contractId": "c1"
+       – metadata – : {
+         – contractId – :  – c1 – 
       }
     }
   }

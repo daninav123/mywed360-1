@@ -11,7 +11,7 @@ async function getAuthToken() {
       return await user.getIdToken();
     }
     // Fallback: mock si existe email en localStorage perfil
-    const profile = JSON.parse(localStorage.getItem('lovendaProfile') || '{}');
+    const profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
     if (profile?.email || profile?.account?.email) {
       const uid = profile?.uid || 'local';
       const email = profile?.email || profile?.account?.email;
@@ -54,3 +54,4 @@ export async function getAchievements(weddingId, uid) {
   if (!res.ok) throw new Error('getAchievements failed');
   return res.json();
 }
+

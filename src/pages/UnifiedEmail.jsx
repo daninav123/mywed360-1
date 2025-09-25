@@ -46,11 +46,11 @@ import {
 import sanitizeHtml from '../utils/sanitizeHtml';
 
 /**
- * P�gina principal de Buz�n (correo interno @mywed360.com)
+ * P)gina principal de Buz)n (correo interno @mywed360.com)
  * Incluye: Sidebar de carpetas, lista de correos, visor del correo y modal para redactar.
  * Email backend:
- *  - GET  /getMailgunEvents  -> lista de eventos (funci�n Cloud)
- *  - POST /sendEmail        -> env�a correo (funci�n Cloud)
+ *  - GET  /getMailgunEvents  -> lista de eventos (funci)n Cloud)
+ *  - POST /sendEmail        -> env)a correo (funci)n Cloud)
  */
 const UnifiedEmail = () => {
   const { getCurrentUsername } = useEmailUsername();
@@ -71,7 +71,7 @@ const UnifiedEmail = () => {
 
   const [userId, setUserId] = useState(null);
   const [customFolders, setCustomFolders] = useState([]);
-  // Proveedores de la boda activa para detecci�n de respuestas
+  // Proveedores de la boda activa para detecci)n de respuestas
   const { activeWedding } = useWedding();
   const { data: providers } = useWeddingCollection('suppliers', activeWedding, []);
 
@@ -79,7 +79,7 @@ const UnifiedEmail = () => {
   const [activeTagId, setActiveTagId] = useState(null); // filtro etiqueta
   const [allTags, setAllTags] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
-  // Helper local para marcar como NO le�do en backend
+  // Helper local para marcar como NO le)do en backend
   const markAsUnreadApi = async (id) => {
     try {
       await markAsUnread(id);
@@ -144,7 +144,7 @@ const UnifiedEmail = () => {
       if (!emails || emails.length === 0) return;
       if (!providers || providers.length === 0) return;
 
-      const processedKey = 'lovenda_provider_response_checked';
+      const processedKey = 'mywed360_provider_response_checked';
       const processed = new Set(JSON.parse(localStorage.getItem(processedKey) || '[]'));
       let changed = false;
 
@@ -164,7 +164,7 @@ const UnifiedEmail = () => {
       }
       if (changed) {
         try {
-          window.dispatchEvent(new Event('lovenda-tracking-updated'));
+          window.dispatchEvent(new Event('mywed360-tracking-updated'));
         } catch {}
       }
     } catch (e) {
@@ -236,8 +236,8 @@ const UnifiedEmail = () => {
       setEmails((prev) => prev.map((m) => (m.id === mail.id ? { ...m, read: true } : m)));
       setSelected((prev) => (prev ? { ...prev, read: true } : prev));
     } catch (err) {
-      console.error('Error marcando le�do:', err);
-      alert('No se pudo marcar como le�do');
+      console.error('Error marcando le)do:', err);
+      alert('No se pudo marcar como le)do');
     }
   };
 
@@ -263,7 +263,7 @@ const UnifiedEmail = () => {
         setSelected((prev) => (prev && prev.id === mail.id ? { ...prev, read: false } : prev));
       }
     } catch (e) {
-      console.warn('Error alternando le�do', e);
+      console.warn('Error alternando le)do', e);
     }
   }
 
@@ -284,7 +284,7 @@ const UnifiedEmail = () => {
     }
   };
 
-  // Filtro local por b�squeda y chips
+  // Filtro local por b)squeda y chips
   const filteredEmails = useMemo(() => {
     const q = search.trim().toLowerCase();
     let base = emails
@@ -319,13 +319,13 @@ const UnifiedEmail = () => {
     <div className="flex h-full w-full flex-col">
       {/* Wizard para elegir nombre si es la primera vez */}
       <UsernameWizard />
-      {/* B�squeda y filtros r�pidos */}
+      {/* B)squeda y filtros r)pidos */}
       <div className="flex flex-col gap-2 border-b bg-gray-50/50 p-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <ChipToggle
             active={onlyUnread}
             onClick={() => setOnlyUnread((v) => !v)}
-            label="No le�do"
+            label="No le)do"
           />
           <ChipToggle
             active={onlyWithAttachments}
@@ -376,7 +376,7 @@ const UnifiedEmail = () => {
 
       {/* Barra superior */}
       <header className="flex items-center justify-between border-b p-4">
-        <h1 className="text-lg font-semibold">Buz�n</h1>
+        <h1 className="text-lg font-semibold">Buz)n</h1>
         <Button variant="primary" onClick={() => setShowCompose(true)}>
           Redactar
         </Button>
@@ -467,7 +467,7 @@ const UnifiedEmail = () => {
                         title="Eliminar"
                         onClick={() => {
                           try {
-                            if (!confirm('¿Eliminar carpeta?')) return;
+                            if (!confirm('Eliminar carpeta?')) return;
                             deleteFolder(userId || '', f.id);
                             setCustomFolders(getUserFolders(userId || ''));
                             if (activeCustomFolder === f.id) setActiveCustomFolder(null);
@@ -516,7 +516,7 @@ const UnifiedEmail = () => {
                   setSelectedIds(new Set());
                 }}
               >
-                Marcar le�do
+                Marcar le)do
               </Button>
               <Button
                 variant="ghost"
@@ -592,7 +592,7 @@ const UnifiedEmail = () => {
             />
           ) : (
             <div className="flex h-full items-center justify-center text-gray-500">
-              Selecciona un correo para verlo aqu�
+              Selecciona un correo para verlo aquí)
             </div>
           )}
         </main>
@@ -623,4 +623,6 @@ const formatDateShort = (d) => {
   return dt.toLocaleDateString();
 };
 
-// Avatar y ChipToggle se han extra�do a componentes reutilizables
+// Avatar y ChipToggle se han extra)do a componentes reutilizables
+
+

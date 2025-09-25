@@ -6,15 +6,15 @@
 ### Selección de Prompt y Generación
 **Pasos detallados:**
 - [ ] **Navegación al generador**
-  - Desde dashboard principal → "Diseño Web"
+  - Desde dashboard principal →  – Diseño Web – 
   - Redirección a `/diseno-web`
   - Componente: `WebGenerator.jsx`
 
 - [ ] **Selección de prompt base**
-  - Prompt "Boda Clásica y Elegante"
-  - Prompt "Boda Moderna y Minimalista"
-  - Prompt "Boda Rústica y Natural"
-  - Prompt "Boda Temática Personalizada"
+  - Prompt  – Boda Clásica y Elegante – 
+  - Prompt  – Boda Moderna y Minimalista – 
+  - Prompt  – Boda Rústica y Natural – 
+  - Prompt  – Boda Temática Personalizada – 
 
 - [ ] **Edición del prompt**
   - Editor de texto para personalizar el prompt
@@ -25,7 +25,7 @@
 ### Generación con Un Solo Botón
 **Pasos detallados:**
 - [ ] **Proceso de generación**
-  - Botón "Generar Sitio Web" prominente
+  - Botón  – Generar Sitio Web –  prominente
   - Uso de datos existentes del sistema (nombres, fecha, ubicación, invitados)
   - Generación automática con IA usando OpenAI API
   - Indicador de progreso durante generación
@@ -43,9 +43,9 @@
 ### Biblioteca de Prompts
 **Pasos detallados:**
 - [ ] **Prompts predefinidos**
-  - "Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos."
-  - "Diseña un sitio web moderno y minimalista para {nombres}. Usa tipografías limpias, mucho espacio en blanco y una paleta de colores neutros. Enfócate en la funcionalidad y simplicidad."
-  - "Genera un sitio web rústico y natural para la boda de {nombres} en {ubicacion}. Incorpora elementos naturales, texturas de madera y una sensación acogedora y campestre."
+  -  – Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. – 
+  -  – Diseña un sitio web moderno y minimalista para {nombres}. Usa tipografías limpias, mucho espacio en blanco y una paleta de colores neutros. Enfócate en la funcionalidad y simplicidad. – 
+  -  – Genera un sitio web rústico y natural para la boda de {nombres} en {ubicacion}. Incorpora elementos naturales, texturas de madera y una sensación acogedora y campestre. – 
 
 - [ ] **Editor de prompts**
   - Componente: `PromptEditor.jsx`
@@ -115,7 +115,7 @@
   - Compartir automático con colaboradores
 
 - [ ] **Regeneración cuando sea necesario**
-  - Botón "Regenerar Sitio" disponible
+  - Botón  – Regenerar Sitio –  disponible
   - Mantiene URL existente
   - Actualización automática de datos
   - Historial de versiones generadas
@@ -193,30 +193,30 @@
 ```javascript
 // /weddings/{weddingId}/website
 {
-  id: "website_001",
-  generationMethod: "ai_prompt",
-  domain: "ana-carlos-2024.mywed360.com",
+  id:  – website_001 – ,
+  generationMethod:  – ai_prompt – ,
+  domain:  – ana-carlos-2024.mywed360.com – ,
   published: true,
-  publishedAt: "2024-01-20T10:00:00Z",
+  publishedAt:  – 2024-01-20T10:00:00Z – ,
   
   prompt: {
-    basePrompt: "classic_elegant",
-    customPrompt: "Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa.",
-    processedPrompt: "Crea un sitio web elegante y clásico para la boda de Ana & Carlos el 15 de junio de 2024 en Madrid, España. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa.",
+    basePrompt:  – classic_elegant – ,
+    customPrompt:  – Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa. – ,
+    processedPrompt:  – Crea un sitio web elegante y clásico para la boda de Ana & Carlos el 15 de junio de 2024 en Madrid, España. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa. – ,
     variables: {
-      nombres: "Ana & Carlos",
-      fecha: "15 de junio de 2024",
-      ubicacion: "Madrid, España",
+      nombres:  – Ana & Carlos – ,
+      fecha:  – 15 de junio de 2024 – ,
+      ubicacion:  – Madrid, España – ,
       invitados: 120
     }
   },
   
   generatedContent: {
-    html: "<!DOCTYPE html><html>...",
-    css: "body { font-family: 'Playfair Display'... }",
-    javascript: "// Countdown timer and RSVP form...",
-    generatedAt: "2024-01-20T10:00:00Z",
-    aiModel: "gpt-4",
+    html:  – <!DOCTYPE html><html>... – ,
+    css:  – body { font-family: 'Playfair Display'... } – ,
+    javascript:  – // Countdown timer and RSVP form... – ,
+    generatedAt:  – 2024-01-20T10:00:00Z – ,
+    aiModel:  – gpt-4 – ,
     tokensUsed: 2500
   },
   
@@ -231,14 +231,14 @@
     totalVisits: 245,
     uniqueVisitors: 189,
     rsvpSubmissions: 87,
-    lastUpdated: "2024-01-25T15:30:00Z"
+    lastUpdated:  – 2024-01-25T15:30:00Z – 
   },
   
   versions: [
     {
       version: 1,
-      generatedAt: "2024-01-20T10:00:00Z",
-      prompt: "Prompt original...",
+      generatedAt:  – 2024-01-20T10:00:00Z – ,
+      prompt:  – Prompt original... – ,
       active: true
     }
   ]

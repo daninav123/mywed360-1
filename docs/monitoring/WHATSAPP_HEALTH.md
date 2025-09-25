@@ -11,10 +11,10 @@ Respuesta (ejemplo)
 
 ```json
 {
-  "provider": "twilio",
-  "configured": true,
-  "ok": true,
-  "message": "Webhook verificado y credenciales presentes"
+   – provider – :  – twilio – ,
+   – configured – : true,
+   – ok – : true,
+   – message – :  – Webhook verificado y credenciales presentes – 
 }
 ```
 

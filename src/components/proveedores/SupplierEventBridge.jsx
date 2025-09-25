@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to 'lovenda-suppliers' events and persists suppliers in Firestore
+// Listens to 'mywed360-suppliers' events and persists suppliers in Firestore
 export default function SupplierEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -79,13 +79,15 @@ export default function SupplierEventBridge() {
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[SupplierEventBridge] Error al manejar evento lovenda-suppliers', e);
+        console.error('[SupplierEventBridge] Error al manejar evento mywed360-suppliers', e);
       }
     };
 
-    window.addEventListener('lovenda-suppliers', handler);
-    return () => window.removeEventListener('lovenda-suppliers', handler);
+    window.addEventListener('mywed360-suppliers', handler);
+    return () => window.removeEventListener('mywed360-suppliers', handler);
   }, [activeWedding]);
 
   return null;
 }
+
+

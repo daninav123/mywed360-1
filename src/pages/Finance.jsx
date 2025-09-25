@@ -3,6 +3,7 @@
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
 import FinanceOverview from '../components/finance/FinanceOverview';
+import PaymentSuggestions from '../components/finance/PaymentSuggestions.jsx';
 import TransactionManager from '../components/finance/TransactionManager';
 import PageWrapper from '../components/PageWrapper';
 import PageTabs from '../components/ui/PageTabs';
@@ -10,12 +11,30 @@ import PageTabs from '../components/ui/PageTabs';
 // Lazy load analytics charts to reduce initial bundle
 const FinanceCharts = React.lazy(() => import('../components/finance/FinanceCharts'));
 import useFinance from '../hooks/useFinance';
+import useProveedores from '../hooks/useProveedores';
 import useTranslations from '../hooks/useTranslations';
+import { useLocation } from 'react-router-dom';
 
 function Finance() {
   const { t } = useTranslations();
+  const { providers: supplierProviders = [] } = useProveedores();
+  const location = useLocation();
+  const [prefillTx, setPrefillTx] = useState(null);
+  useEffect(() => {
+    try {
+      const st = (location && location.state) || (window.history && window.history.state && window.history.state.usr) || null;
+      const pre = st && st.prefillTransaction ? st.prefillTransaction : null;
+      if (pre) {
+        setActiveTab('transactions');
+        setPrefillTx(pre);
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, '', window.location.pathname + window.location.search + window.location.hash);
+        }
+      }
+    } catch {}
+  }, [location]);
 
-  // Hook personalizado para GestiÃ³n financiera
+  // Hook personalizado para Gestión financiera
   const {
     // Estados
     syncStatus,
@@ -25,7 +44,7 @@ function Finance() {
     budget,
     transactions,
 
-    // CÃ¡lculos
+    // Cálculos
     stats,
     budgetUsage,
     settings,
@@ -50,22 +69,22 @@ function Finance() {
   const [activeTab, setActiveTab] = useState('overview');
   const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
-  // Detectar URL hash para abrir modal especÃ­fico
+  // Detectar URL hash para abrir modal específico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager GestionarÃ¡ la apertura del modal
+      // El TransactionManager Gestionará la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar nÃºmero de invitados al montar el componente
+  // Cargar número de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores despuÃ©s de 5 segundos
+  // Limpiar errores después de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -78,7 +97,7 @@ function Finance() {
     setTransactionFiltersSignal({ version: Date.now(), filters });
   };
 
-  // Manejar actualizaciÃ³n de presupuesto total
+  // Manejar actualización de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -110,7 +129,7 @@ function Finance() {
           </div>
         )}
 
-        {/* Tabs de pÃ¡gina (estilo Proveedores) */}
+        {/* Tabs de página (estilo Proveedores) */}
         <PageTabs
           value={activeTab}
           onChange={setActiveTab}
@@ -125,7 +144,7 @@ function Finance() {
               id: 'contributions',
               label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }),
             },
-            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'AnÃ¡lisis' }) },
+            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'Análisis' }) },
           ]}
           className="w-full"
         />
@@ -147,6 +166,7 @@ function Finance() {
         {/* Contenido: Transacciones */}
         {activeTab === 'transactions' && (
           <div className="space-y-6">
+            <PaymentSuggestions onCreateTransaction={createTransaction} isLoading={isLoading} providers={supplierProviders} />
             {!hasBankAccount && (
               <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -179,6 +199,8 @@ function Finance() {
               onDeleteTransaction={deleteTransaction}
               onImportBank={importBankTransactions}
               isLoading={isLoading}
+              initialTransaction={prefillTx}
+              onInitialOpened={() => setPrefillTx(null)}
             />
           </div>
         )}
@@ -211,7 +233,7 @@ function Finance() {
           </div>
         )}
 
-        {/* Contenido: AnÃ¡lisis */}
+        {/* Contenido: Análisis */}
         {activeTab === 'analytics' && (
           <div className="space-y-6">
             <React.Suspense fallback={<div className="p-4">{t("finance.charts.loading", { defaultValue: "Cargando análisis…" })}</div>}>

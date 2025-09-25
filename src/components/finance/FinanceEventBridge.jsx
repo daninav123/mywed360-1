@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 
-// Listens to 'lovenda-finance' custom events and creates transactions in Firestore
+// Listens to 'mywed360-finance' custom events and creates transactions in Firestore
 export default function FinanceEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -79,13 +79,14 @@ export default function FinanceEventBridge() {
         }
       } catch (e) {
         // eslint-disable-next-line no-console
-        console.error('[FinanceEventBridge] Error al manejar evento lovenda-finance', e);
+        console.error('[FinanceEventBridge] Error al manejar evento mywed360-finance', e);
       }
     };
 
-    window.addEventListener('lovenda-finance', handler);
-    return () => window.removeEventListener('lovenda-finance', handler);
+    window.addEventListener('mywed360-finance', handler);
+    return () => window.removeEventListener('mywed360-finance', handler);
   }, [activeWedding]);
 
   return null;
 }
+

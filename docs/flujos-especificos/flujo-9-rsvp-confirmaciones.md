@@ -12,7 +12,7 @@
   - Expiración configurable del enlace
 
 - [ ] **Integración con invitaciones**
-  - Botón "Confirmar Asistencia" en invitaciones digitales
+  - Botón  – Confirmar Asistencia –  en invitaciones digitales
   - QR code para acceso rápido desde móvil
   - Enlace directo en emails de invitación
   - Recordatorios automáticos por fecha límite
@@ -200,49 +200,49 @@
 ```javascript
 // /weddings/{weddingId}/rsvp/{rsvpId}
 {
-  id: "rsvp_001",
-  guestId: "guest_123",
-  token: "abc123def456",
-  status: "confirmed", // pending, confirmed, declined, expired
+  id:  – rsvp_001 – ,
+  guestId:  – guest_123 – ,
+  token:  – abc123def456 – ,
+  status:  – confirmed – , // pending, confirmed, declined, expired
   
   response: {
     attending: true,
     attendeeCount: 2,
     attendees: [
       {
-        name: "Ana García",
+        name:  – Ana García – ,
         isMainGuest: true,
-        dietaryRestrictions: ["vegetarian"],
-        allergies: ["nuts"]
+        dietaryRestrictions: [ – vegetarian – ],
+        allergies: [ – nuts – ]
       },
       {
-        name: "Carlos López",
+        name:  – Carlos López – ,
         isMainGuest: false,
         dietaryRestrictions: [],
         allergies: []
       }
     ],
-    comments: "Esperamos con muchas ganas este día especial",
+    comments:  – Esperamos con muchas ganas este día especial – ,
     contactInfo: {
-      email: "ana@email.com",
-      phone: "+34 600 123 456"
+      email:  – ana@email.com – ,
+      phone:  – +34 600 123 456 – 
     }
   },
   
   metadata: {
-    sentAt: "2024-01-15T10:00:00Z",
-    respondedAt: "2024-01-18T14:30:00Z",
-    lastModified: "2024-01-18T14:30:00Z",
+    sentAt:  – 2024-01-15T10:00:00Z – ,
+    respondedAt:  – 2024-01-18T14:30:00Z – ,
+    lastModified:  – 2024-01-18T14:30:00Z – ,
     remindersSent: 0,
-    ipAddress: "192.168.1.1",
-    userAgent: "Mozilla/5.0...",
-    source: "email_link" // email_link, qr_code, direct_url
+    ipAddress:  – 192.168.1.1 – ,
+    userAgent:  – Mozilla/5.0... – ,
+    source:  – email_link –  // email_link, qr_code, direct_url
   },
   
-  invitationType: "standard", // standard, family_group, corporate, collaborator
+  invitationType:  – standard – , // standard, family_group, corporate, collaborator
   permissions: {
     canModify: true,
-    modifyDeadline: "2024-05-01T23:59:59Z"
+    modifyDeadline:  – 2024-05-01T23:59:59Z – 
   }
 }
 
@@ -263,12 +263,12 @@
   },
   
   responsesByDate: {
-    "2024-01-15": 12,
-    "2024-01-16": 8,
-    "2024-01-17": 15
+     – 2024-01-15 – : 12,
+     – 2024-01-16 – : 8,
+     – 2024-01-17 – : 15
   },
   
-  lastUpdated: "2024-01-25T16:45:00Z"
+  lastUpdated:  – 2024-01-25T16:45:00Z – 
 }
 ```
 

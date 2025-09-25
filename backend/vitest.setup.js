@@ -130,7 +130,7 @@ vi.mock('axios', () => ({
 // eslint-disable-next-line no-undef
 globalThis.EmailService = {
   __esModule: true,
-  initEmailService: vi.fn(async () => 'usuario@lovenda.app'),
+  initEmailService: vi.fn(async () => 'usuario@mywed360.com'),
   getMails: vi.fn(async () => []),
   deleteMail: vi.fn(async () => true),
   markAsRead: vi.fn(async () => {}),
@@ -169,10 +169,10 @@ const useAuthMock = vi.fn(() => ({
   isLoading: false,
   userProfile: { email: 'test@mock.com' },
   // Compatibilidad con componentes que esperan estas claves
-  user: { uid: 'user123', email: 'usuario@lovenda.app' },
+  user: { uid: 'user123', email: 'usuario@mywed360.com' },
   profile: {
     id: 'profile123',
-    email: 'usuario@lovenda.app',
+    email: 'usuario@mywed360.com',
     name: 'Usuario Test',
     emailUsername: 'usuario',
     myWed360Email: 'usuario@mywed360.com'

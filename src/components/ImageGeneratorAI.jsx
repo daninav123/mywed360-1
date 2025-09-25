@@ -11,7 +11,7 @@ import { post as apiPost } from '../services/apiClient';
 import { saveData, loadData } from '../services/SyncService';
 
 /**
- * Componente para generar imÒ�� �"Ò�a�¡genes con IA (DALLÒ�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�·E/Proxy)
+ * Componente para generar imÒ€)€) €)"Ò€)a€)¡genes con IA (DALLÒ€)€) €)"Ò¢â€)a¬€)&¡Ò€)â€)€)šÒ€)a€)·E/Proxy)
  * Props:
  *  - category: string (invitaciones, logo, etc.)
  *  - templates: Array<{ name, description, prompt }>
@@ -39,11 +39,11 @@ const ImageGeneratorAI = ({
   const [orientation, setOrientation] = useState('portrait'); // 'portrait' | 'landscape'
   const [bleed, setBleed] = useState(true); // sangrado 3mm
 
-  // Cargar imÒ�� �"Ò�a�¡genes guardadas al iniciar
+  // Cargar imÒ€)€) €)"Ò€)a€)¡genes guardadas al iniciar
   useEffect(() => {
     (async () => {
       try {
-        const savedImages = await loadData(`lovenda_ai_images_${category}`, {
+        const savedImages = await loadData(`mywed360_ai_images_${category}`, {
           defaultValue: [],
           collection: 'userDesigns',
         });
@@ -80,7 +80,7 @@ const ImageGeneratorAI = ({
     setPrompt(template.prompt);
   };
 
-  // Calcular dimensiones en mm segÒ�� �"Ò�a�ºn preset/orientaciÒ³n/sangrado
+  // Calcular dimensiones en mm segÒ€)€) €)"Ò€)a€)ºn preset/orientaciÒ³n/sangrado
   const getSizeMm = () => {
     let w = 0,
       h = 0;
@@ -120,7 +120,7 @@ const ImageGeneratorAI = ({
     setLoading(true);
     setError(null);
     try {
-      // 1) Proxy backend si estÒ�� �"Ò�a�¡ disponible
+      // 1) Proxy backend si estÒ€)€) €)"Ò€)a€)¡ disponible
       try {
         const res = await apiPost('/api/ai-image', { prompt }, { auth: true });
         if (res.ok) {
@@ -134,10 +134,10 @@ const ImageGeneratorAI = ({
         console.warn('Proxy AI-image no disponible, usando OpenAI directo:', err);
       }
 
-      // 2) Fallback directo a OpenAI (si estÒ�� �"Ò�a�¡ habilitado)
+      // 2) Fallback directo a OpenAI (si estÒ€)€) €)"Ò€)a€)¡ habilitado)
       const allowDirect =
         import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÒ�� �"Ò�a�³n');
+      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÒ€)€) €)"Ò€)a€)³n');
 
       const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
@@ -153,7 +153,7 @@ const ImageGeneratorAI = ({
       }
       const data = await response.json();
       const url = data?.data?.[0]?.url;
-      if (!url) throw new Error('No se recibiÒ�� �"Ò�a�³ URL de imagen');
+      if (!url) throw new Error('No se recibiÒ€)€) €)"Ò€)a€)³ URL de imagen');
       handleImageGenerated(url);
     } catch (err) {
       console.error('Error al generar imagen:', err);
@@ -175,7 +175,7 @@ const ImageGeneratorAI = ({
     const updatedImages = [newImage, ...generatedImages];
     setGeneratedImages(updatedImages);
     // persistir
-    saveData(`lovenda_ai_images_${category}`, updatedImages, {
+    saveData(`mywed360_ai_images_${category}`, updatedImages, {
       collection: 'userDesigns',
       showNotification: false,
     });
@@ -183,7 +183,7 @@ const ImageGeneratorAI = ({
     setToast({
       type: 'success',
       message:
-        'Ò�� �"Ò¢â�a¬�&¡Ò�â��šÒ�a�¡Ò�a�¡�¡Imagen generada con Ò©xito! con Ò©xito!Ò�� �"Ò�a�©xito!',
+        'Ò€)€) €)"Ò¢â€)a¬€)&¡Ò€)â€)€)šÒ€)a€)¡Ò€)a€)¡€)¡Imagen generada con Ò©xito! con Ò©xito!Ò€)€) €)"Ò€)a€)©xito!',
     });
   };
 
@@ -194,7 +194,7 @@ const ImageGeneratorAI = ({
       return;
     }
     try {
-      // Descargar a travÒ�� �"Ò�a�©s del proxy para evitar CORS
+      // Descargar a travÒ€)€) €)"Ò€)a€)©s del proxy para evitar CORS
       const resp = await fetch(`/api/image-proxy?u=${encodeURIComponent(imageUrl)}`);
       if (!resp.ok) throw new Error('No se pudo descargar la imagen');
       const blob = await resp.blob();
@@ -239,7 +239,7 @@ const ImageGeneratorAI = ({
       a.href = imageUrl;
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
-      a.download = imageName || `lovenda-${category}-${Date.now()}.png`;
+      a.download = imageName || `mywed360-${category}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -252,7 +252,7 @@ const ImageGeneratorAI = ({
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = imageName || `lovenda-${category}-${Date.now()}.png`;
+      a.download = imageName || `mywed360-${category}-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -281,8 +281,8 @@ const ImageGeneratorAI = ({
       );
       if (!res.ok) throw new Error('Error generando PDF');
       const blob = await res.blob();
-      if (!blob || blob.size === 0) throw new Error('PDF vacÒ�� �"Ò�a�­o');
-      saveAs(blob, fileName || `lovenda-${category}-${Date.now()}.pdf`);
+      if (!blob || blob.size === 0) throw new Error('PDF vacÒ€)€) €)"Ò€)a€)­o');
+      saveAs(blob, fileName || `mywed360-${category}-${Date.now()}.pdf`);
     } catch (err) {
       console.error('Error al descargar PDF:', err);
       setToast({ type: 'error', message: 'No se pudo generar el PDF' });
@@ -343,11 +343,11 @@ const ImageGeneratorAI = ({
               onChange={(e) => setPaperPreset(e.target.value)}
               className="w-full border rounded p-2 text-sm"
             >
-              <option value="5x7in">5x7&quot; (127Ò�178 mm)</option>
-              <option value="A5">A5 (148Ò�210 mm)</option>
-              <option value="A6">A6 (105Ò�148 mm)</option>
-              <option value="DL">DL (99Ò�210 mm)</option>
-              <option value="SQ140">Cuadrado (140Ò�140 mm)</option>
+              <option value="5x7in">5x7&quot; (127Ò€)178 mm)</option>
+              <option value="A5">A5 (148Ò€)210 mm)</option>
+              <option value="A6">A6 (105Ò€)148 mm)</option>
+              <option value="DL">DL (99Ò€)210 mm)</option>
+              <option value="SQ140">Cuadrado (140Ò€)140 mm)</option>
             </select>
           </div>
           <div>
@@ -391,10 +391,10 @@ const ImageGeneratorAI = ({
         </div>
       </div>
 
-      {/* GalerÒ�� �"Ò�a�­a de imÒ�� �"Ò�a�¡genes generadas */}
+      {/* GalerÒ€)€) €)"Ò€)a€)­a de imÒ€)€) €)"Ò€)a€)¡genes generadas */}
       {generatedImages.length > 0 && (
         <div className="mt-8">
-          <h3 className="font-semibold mb-4">ImÒ�� �"Ò�a�¡genes generadas</h3>
+          <h3 className="font-semibold mb-4">ImÒ€)€) €)"Ò€)a€)¡genes generadas</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {generatedImages.map((image) => (
               <div key={image.id} className="border rounded-lg overflow-hidden">
@@ -474,3 +474,5 @@ const ImageGeneratorAI = ({
 };
 
 export default ImageGeneratorAI;
+
+

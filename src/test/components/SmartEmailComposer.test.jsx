@@ -325,3 +325,6 @@ describe('SmartEmailComposer', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 });
+
+
+

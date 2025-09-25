@@ -80,7 +80,7 @@ const AdminLayout = ({ children }) => {
           className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b`}
         >
           <Link to="/admin" className="flex items-center">
-            <img src="/icon-192.png" alt="Lovenda" className="h-10 w-10" />
+            <img src="/icon-192.png" alt="MyWed360" className="h-10 w-10" />
             {!collapsed && <span className="ml-3 text-xl font-medium">Admin</span>}
           </Link>
 

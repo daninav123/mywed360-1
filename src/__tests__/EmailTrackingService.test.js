@@ -10,7 +10,7 @@ import {
 } from '../services/EmailTrackingService';
 
 // Clave usada por el servicio
-const KEY = 'lovenda_email_tracking';
+const KEY = 'mywed360_email_tracking';
 
 describe('EmailTrackingService (mínimo)', () => {
   beforeEach(() => {
@@ -76,3 +76,4 @@ describe('EmailTrackingService (mínimo)', () => {
     expect(stored[0].notes).toBe('Requiere llamada');
   });
 });
+

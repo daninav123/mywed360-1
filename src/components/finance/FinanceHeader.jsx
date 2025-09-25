@@ -1,4 +1,4 @@
-import { Cloud, CloudOff } from 'lucide-react';
+﻿import { Cloud, CloudOff } from 'lucide-react';
 import React from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
@@ -19,7 +19,7 @@ export default function FinanceHeader({ syncStatus }) {
         </p>
         {syncStatus?.lastSyncTime && (
           <p className="text-xs text-[color:var(--color-text)]/50 mt-1">
-            {t('finance.overview.lastSync', { defaultValue: 'Última sincronizaci�n' })}:{' '}
+            {t('finance.overview.lastSync', { defaultValue: 'Última sincronizaci€)n' })}:{' '}
             {new Date(syncStatus.lastSyncTime).toLocaleString()}
           </p>
         )}
@@ -44,3 +44,4 @@ export default function FinanceHeader({ syncStatus }) {
     </div>
   );
 }
+

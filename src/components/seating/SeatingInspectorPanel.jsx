@@ -1,5 +1,5 @@
-import React from 'react';
 import { Settings, Maximize2, RotateCcw, Copy, Trash2, Users } from 'lucide-react';
+import React from 'react';
 
 export default function SeatingInspectorPanel({
   selectedTable,

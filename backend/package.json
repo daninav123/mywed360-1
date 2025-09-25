@@ -1,8 +1,8 @@
 {
-  "name": "lovenda-backend",
+  "name": "mywed360-backend",
   "version": "0.1.0",
   "type": "module",
-  "description": "Express API backend for Lovenda frontend app",
+  "description": "Express API backend for MyWed360 frontend app",
   "main": "index.js",
   "scripts": {
     "dev:emulator": "concurrently -k \"firebase emulators:start --only firestore\" \"nodemon index.js\"",

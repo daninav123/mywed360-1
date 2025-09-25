@@ -1,5 +1,5 @@
-import React from 'react';
 import { PlusSquare, Ruler, Layers, DoorOpen, Hexagon, Minus, Square, Circle, Grid, Eye, EyeOff, Magnet, Rows, Palette, Users } from 'lucide-react';
+import React from 'react';
 
 const Section = ({ title, icon: Icon, children }) => (
   <div className="px-4 py-3 border-b">

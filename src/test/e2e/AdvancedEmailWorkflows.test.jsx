@@ -98,7 +98,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     {
       id: 'email1',
       from: 'remitente@example.com',
-      to: 'maria.garcia@lovenda.com',
+      to: 'maria.garcia@mywed360.com',
       subject: 'Presupuesto fotografía',
       body: '<p>Hola María, te envío el presupuesto para las fotos de la boda.</p>',
       date: '2025-07-12T15:30:00Z',
@@ -108,7 +108,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     },
     {
       id: 'email2',
-      from: 'maria.garcia@lovenda.com',
+      from: 'maria.garcia@mywed360.com',
       to: 'florista@example.com',
       subject: 'Consulta sobre centros de mesa',
       body: '<p>Hola, estoy interesada en vuestros servicios para mi boda.</p>',
@@ -120,7 +120,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     {
       id: 'email3',
       from: 'dj@example.com',
-      to: 'maria.garcia@lovenda.com',
+      to: 'maria.garcia@mywed360.com',
       subject: 'Presupuesto DJ y sonido',
       body: '<p>Buenos días María, adjunto encontrarás nuestro presupuesto.</p>',
       date: '2025-07-10T09:45:00Z',
@@ -132,7 +132,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     },
     {
       id: 'draft1',
-      from: 'maria.garcia@lovenda.com',
+      from: 'maria.garcia@mywed360.com',
       to: 'catering@example.com',
       subject: 'Consulta menús',
       body: '<p>Borrador de consulta para catering</p>',
@@ -184,7 +184,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     localStorage.clear();
 
     // Configurar mocks para los servicios
-    EmailService.initEmailService.mockReturnValue('maria.garcia@lovenda.com');
+    EmailService.initEmailService.mockReturnValue('maria.garcia@mywed360.com');
     EmailService.getMails.mockImplementation(async (folder) => {
       if (folder === 'drafts') {
         return [mockEmails[3]];
@@ -580,3 +580,6 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     });
   });
 });
+
+
+

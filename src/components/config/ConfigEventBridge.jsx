@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useWedding } from '../../context/WeddingContext';
 import { db, auth } from '../../firebaseConfig';
 
-// Listens to 'lovenda-profile' changes and persists wedding/user config to Firestore
+// Listens to 'mywed360-profile' changes and persists wedding/user config to Firestore
 export default function ConfigEventBridge() {
   const { activeWedding } = useWedding();
 
@@ -13,7 +13,7 @@ export default function ConfigEventBridge() {
       try {
         const uid = auth?.currentUser?.uid || null;
         // Leer perfil local
-        const raw = localStorage.getItem('lovendaProfile');
+        const raw = localStorage.getItem('mywed360Profile');
         if (!raw) return;
         const profile = JSON.parse(raw);
         const weddingInfo = profile?.weddingInfo || {};
@@ -47,10 +47,11 @@ export default function ConfigEventBridge() {
       }
     };
 
-    window.addEventListener('lovenda-profile', handler);
-    return () => window.removeEventListener('lovenda-profile', handler);
+    window.addEventListener('mywed360-profile', handler);
+    return () => window.removeEventListener('mywed360-profile', handler);
   }, [activeWedding]);
 
   return null;
 }
+
 

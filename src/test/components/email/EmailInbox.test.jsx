@@ -49,7 +49,7 @@ describe('EmailInbox Component', () => {
       id: 'email-1',
       subject: 'Asunto importante',
       from: 'remitente@ejemplo.com',
-      to: 'usuario@lovenda.app',
+      to: 'usuario@mywed360.com',
       date: '2025-07-10T10:30:00Z',
       read: false,
       folder: 'inbox',
@@ -59,7 +59,7 @@ describe('EmailInbox Component', () => {
       id: 'email-2',
       subject: 'Recordatorio reunión',
       from: 'team@empresa.com',
-      to: 'usuario@lovenda.app',
+      to: 'usuario@mywed360.com',
       date: '2025-07-09T08:15:00Z',
       read: true,
       folder: 'inbox',
@@ -68,7 +68,7 @@ describe('EmailInbox Component', () => {
     {
       id: 'email-3',
       subject: 'Borrador enviado',
-      from: 'usuario@lovenda.app',
+      from: 'usuario@mywed360.com',
       to: 'destinatario@empresa.com',
       date: '2025-07-08T14:45:00Z',
       read: true,
@@ -90,14 +90,14 @@ describe('EmailInbox Component', () => {
       user: { uid: 'user123' },
       profile: {
         id: 'profile123',
-        email: 'usuario@lovenda.app',
+        email: 'usuario@mywed360.com',
         name: 'Usuario Test',
       },
     });
 
     // Configurar el mock de servicio de email
     EmailService.getMails.mockResolvedValue(mockEmails);
-    EmailService.initEmailService.mockReturnValue('usuario@lovenda.app');
+    EmailService.initEmailService.mockReturnValue('usuario@mywed360.com');
   });
 
   // Prueba de carga inicial
@@ -263,3 +263,6 @@ describe('EmailInbox Component', () => {
     expect(errorNode).toBeInTheDocument();
   });
 });
+
+
+
