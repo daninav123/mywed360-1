@@ -10,7 +10,10 @@ import './debug/setupDebug';
 // Registrar comandos de diagnóstico globales antes de montar la aplicación
 import './utils/consoleCommands';
 import './index.css';
-import './pwa/registerServiceWorker';
+// Registrar SW solo si PWA está habilitado
+if (import.meta.env?.VITE_ENABLE_PWA === '1') {
+  import('./pwa/registerServiceWorker');
+}
 import './pwa/setupPwaToasts';
 import './utils/webVitals';
 

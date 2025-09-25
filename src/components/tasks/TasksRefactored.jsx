@@ -156,7 +156,7 @@ export default function Tasks() {
   // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
   // Si no hay boda activa, mostrar aviso claro y no renderizar resto
-  if (!activeWedding) {
+  if (false && !activeWedding) {
     return (
       <div className="max-w-3xl mx-auto p-6">
         <h1 className="page-title">Gestión de Tareas</h1>
@@ -977,31 +977,53 @@ export default function Tasks() {
   // Recalcular y actualizar el rango del padre basado en sus subtareas programadas
   const computeAndUpdateParentRange = useCallback(async (parentId) => {
     try {
-      if (!activeWedding || !db || !parentId) return;
+      if (!parentId) return;
       const MS_DAY = 24 * 60 * 60 * 1000;
       const kids = (Array.isArray(subtaskEvents) ? subtaskEvents : [])
         .filter((st) => String(st.parentId || '') === String(parentId) && (st.start instanceof Date));
       if (!kids.length) {
-        const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
-        const psnap = await getDoc(pref).catch(() => null);
-        if (!psnap || !psnap.exists()) return;
-        const parent = psnap.data() || {};
+        let parent = {};
+        try {
+          if (activeWedding && db) {
+            const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+            const psnap = await getDoc(pref).catch(() => null);
+            if (!psnap || !psnap.exists()) throw new Error('no-parent');
+            parent = psnap.data() || {};
+          }
+        } catch (_) {
+          // Fallback: buscar en tasksState
+          try {
+            const p = (Array.isArray(tasksState) ? tasksState : []).find((t) => String(t?.id||'')===String(parentId));
+            parent = p || {};
+          } catch {}
+        }
         const update = { computedStart: null, computedEnd: null };
         if (String(parent?.rangeMode || 'auto') === 'auto' && String(parent?.autoAdjust || 'expand_only') === 'expand_and_shrink') {
           update.start = parent.manualStart || parent.start || null;
           update.end = parent.manualEnd || parent.end || null;
         }
-        await updateDoc(pref, update).catch(() => {});
+        try { if (activeWedding && db) { const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId)); await updateDoc(pref, update).catch(() => {}); } } catch {}
+        try { await updateTaskFS(String(parentId), update); } catch {}
         return;
       }
       const starts = kids.map((k) => k.start);
       const ends = kids.map((k) => (k.end instanceof Date ? k.end : k.start));
       const envStart = new Date(Math.min.apply(null, starts.map((d) => d.getTime())));
       const envEnd = new Date(Math.max.apply(null, ends.map((d) => d.getTime())));
-      const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
-      const psnap = await getDoc(pref).catch(() => null);
-      if (!psnap || !psnap.exists()) return;
-      const parent = psnap.data() || {};
+      let parent = {};
+      try {
+        if (activeWedding && db) {
+          const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId));
+          const psnap = await getDoc(pref).catch(() => null);
+          if (!psnap || !psnap.exists()) throw new Error('no-parent');
+          parent = psnap.data() || {};
+        }
+      } catch (_) {
+        try {
+          const p = (Array.isArray(tasksState) ? tasksState : []).find((t) => String(t?.id||'')===String(parentId));
+          parent = p || {};
+        } catch {}
+      }
       const bufferDays = Number(parent?.bufferDays ?? 0);
       const computedStart = new Date(envStart.getTime() - Math.max(0, bufferDays) * MS_DAY);
       const computedEnd = new Date(envEnd.getTime() + Math.max(0, bufferDays) * MS_DAY);
@@ -1019,9 +1041,10 @@ export default function Tasks() {
           update.end = (prevEnd && prevEnd >= computedEnd) ? prevEnd : computedEnd;
         }
       }
-      await updateDoc(pref, update).catch(() => {});
+      try { if (activeWedding && db) { const pref = doc(db, 'weddings', activeWedding, 'tasks', String(parentId)); await updateDoc(pref, update).catch(() => {}); } } catch {}
+      try { await updateTaskFS(String(parentId), update); } catch {}
     } catch (_) {}
-  }, [activeWedding, db, subtaskEvents]);
+  }, [activeWedding, db, subtaskEvents, tasksState, updateTaskFS]);
 
   // Padres para el modal: combinar padres reales y los derivados de subtareas
   const modalParents = useMemo(() => {
@@ -1808,6 +1831,20 @@ export default function Tasks() {
       window.mywed.tasks = {
         activeWedding,
         parentsCount: () => parents.length,
+        getParent: (id) => {
+          try {
+            const p = parents.find((x) => String(x.id) === String(id));
+            if (!p) return null;
+            return { id: String(p.id), name: p.name || p.title, start: p.start, end: p.end };
+          } catch { return null; }
+        },
+        getParentByName: (name) => {
+          try {
+            const p = parents.find((x) => (x.name || x.title) === name);
+            if (!p) return null;
+            return { id: String(p.id), name: p.name || p.title, start: p.start, end: p.end };
+          } catch { return null; }
+        },
         nestedCount: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.length : 0),
         subtaskEventsCount: () => (Array.isArray(subtaskEvents) ? subtaskEvents.length : 0),
         listNestedPaths: () => (Array.isArray(nestedSubtasks) ? nestedSubtasks.map(s=>s.__path || s.id) : []),
@@ -1837,7 +1874,22 @@ export default function Tasks() {
       };
       console.log('[Tasks Debug] Usa mywed.tasks.explainMissing() para ver el estado');
     } catch {}
-  }, [activeWedding, uniqueGanttTasks, nestedSubtasks, subtaskEvents]);return (
+  }, [activeWedding, uniqueGanttTasks, nestedSubtasks, subtaskEvents]);
+
+  // Renderizado condicionado tras ejecutar todos los hooks para mantener el orden estable
+  if (!activeWedding) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="page-title">Gestión de Tareas</h1>
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
+          <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
+          <div className="text-sm">No hay boda activa en este momento. Ve a la sección \"Bodas\" para seleccionar una existente o crear una nueva.</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       <TasksHeader
         syncStatus={syncStatus}
@@ -2010,9 +2062,32 @@ export default function Tasks() {
           }}
           onQuickSchedule={async (st, range) => {
             try {
-              if (!activeWedding || !db || !st?.id || !st?.parentId) return;
-              const ref = doc(db, 'weddings', activeWedding, 'tasks', String(st.parentId), 'subtasks', String(st.id));
-              await setDoc(ref, { start: range.start, end: range.end, mode: 'scheduled', updatedAt: serverTimestamp() }, { merge: true });
+              if (!st?.id || !st?.parentId) return;
+              // Persistencia nested (si hay permisos)
+              try {
+                if (activeWedding && db) {
+                  const ref = doc(
+                    db,
+                    'weddings', activeWedding,
+                    'tasks', String(st.parentId),
+                    'subtasks', String(st.id)
+                  );
+                  await setDoc(
+                    ref,
+                    { start: range.start, end: range.end, mode: 'scheduled', updatedAt: serverTimestamp() },
+                    { merge: true }
+                  );
+                }
+              } catch (_) {}
+              // Fallback local: actualizar subtarea plana para refrescar el modal
+              try {
+                await updateTaskFS(String(st.id), {
+                  start: range.start,
+                  end: range.end,
+                  type: 'subtask',
+                });
+              } catch (_) {}
+              // Recalcular rango del padre
               try { await computeAndUpdateParentRange(String(st.parentId)); } catch {}
             } catch (e) { console.warn('quickSchedule error', e); }
           }}
@@ -2034,10 +2109,5 @@ export default function Tasks() {
     </div>
   );
 }
-
-
-
-
-
 
 

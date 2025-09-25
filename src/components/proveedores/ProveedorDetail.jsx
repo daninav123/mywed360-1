@@ -41,6 +41,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
   const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
   const [preview, setPreview] = useState({ open: false, url: '', type: '' });
+  const [assignOpen, setAssignOpen] = useState(false);
 
   const [trackingFilter, setTrackingFilter] = useState('todos');
   const [selectedTracking, setSelectedTracking] = useState(null);
@@ -625,4 +626,3 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
-  const [assignOpen, setAssignOpen] = useState(false);

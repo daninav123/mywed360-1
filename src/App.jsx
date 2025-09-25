@@ -44,9 +44,7 @@ const EmailStatistics = React.lazy(() => import('./pages/user/EmailStatistics'))
 const MailgunTester = React.lazy(() => import('./components/email/MailgunTester'));
 const EmailSetup = React.lazy(() => import('./pages/EmailSetup'));
 //
-const SeatingPlanRefactored = React.lazy(
-  () => import('./components/seating/SeatingPlanRefactored.jsx')
-);
+// Seating plan deshabilitado en build
 // (dedupe) Invitaciones ya importado arriba
 const Contratos = React.lazy(() => import('./pages/Contratos'));
 const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
@@ -70,6 +68,7 @@ const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
 const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
+const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
 // (dedupe) rutas públicas ya importadas arriba
@@ -143,7 +142,6 @@ function App() {
                   <Route path="finance" element={<Finance />} />
                   <Route path="finance/bank-connect" element={<BankConnect />} />
                   <Route path="invitados" element={<Invitados />} />
-                  <Route path="invitados/seating" element={<SeatingPlanRefactored />} />
                   <Route path="invitados/invitaciones" element={<Invitaciones />} />
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
                   <Route path="proveedores" element={<Proveedores />} />
@@ -207,6 +205,18 @@ function App() {
                   />
                   <Route path="email/setup" element={<EmailSetup />} />
                   <Route path="email/test" element={<MailgunTester />} />
+                  {
+                    // Exponer rutas de test solo en Cypress o entornos no productivos
+                    (typeof window !== 'undefined' && window.Cypress) ||
+                    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production')
+                      ? (
+                          <Route
+                            path="test/proveedores-compare"
+                            element={<ProveedoresCompareTest />}
+                          />
+                        )
+                      : null
+                  }
 
                   {/* Admin */}
                   <Route path="admin/*" element={<AdminRoutes />} />

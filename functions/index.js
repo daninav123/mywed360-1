@@ -451,7 +451,9 @@ exports.initWeddingSubcollections = functions.firestore
       'seatingPlan/banquet/tables',
       'designs',
       'suppliers',
+      // Mantener compatibilidad pero estandarizar en 'specialMoments'
       'momentosEspeciales',
+      'specialMoments',
       'timing',
       'checklist',
       'ayudaCeremonia',
@@ -838,5 +840,4 @@ exports.cleanupWebhookDedup = functions.pubsub
     console.log(`cleanupWebhookDedup: removed ${snap.size} expired docs`);
     return null;
   });
-
 

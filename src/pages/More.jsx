@@ -11,11 +11,6 @@ export default function More() {
 
   // Prefetch helpers
   const pfInvitados = () => prefetchModule('Invitados', () => import('./Invitados'));
-  const pfSeating = () =>
-    prefetchModule(
-      'SeatingPlanRefactored',
-      () => import('../components/seating/SeatingPlanRefactored.jsx')
-    );
   const pfProveedores = () => prefetchModule('Proveedores', () => import('./Proveedores'));
   const pfContratos = () => prefetchModule('Contratos', () => import('./Contratos'));
   const pfProtocolo = () =>
@@ -29,7 +24,6 @@ export default function More() {
   // Grouped prefetch on hover/focus/touch
   const pfInvitadosMenu = () => {
     pfInvitados();
-    pfSeating();
   };
   const pfProveedoresMenu = () => {
     pfProveedores();
@@ -75,12 +69,6 @@ export default function More() {
             >
               <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
                 Gestión de invitados
-              </Link>
-              <Link
-                to="/invitados/seating"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
-              >
-                Seating plan
               </Link>
             </div>
           )}

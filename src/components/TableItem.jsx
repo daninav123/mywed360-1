@@ -84,21 +84,41 @@ function TableItem({
     const cy = (table.y ?? 0) * scale + (offset?.y ?? 0);
     const seats = parseInt(table.seats, 10) || 0;
     if (seats <= 0) return null;
+
+    const angleDeg = Number(table.angle || 0);
+    const a = (angleDeg * Math.PI) / 180;
+
     if (table.shape === 'circle') {
-      const ang = Math.atan2(py - cy, px - cx);
+      // Ajustar el ángulo del puntero restando la rotación de la mesa
+      let ang = Math.atan2(py - cy, px - cx) - a;
+      if (ang < 0) ang += Math.PI * 2;
       const step = (Math.PI * 2) / seats;
-      let idx = Math.round((ang < 0 ? ang + Math.PI * 2 : ang) / step) % seats;
+      let idx = Math.round(ang / step) % seats;
       return idx;
     }
-    // rectangular: proyectar a filas superior/inferior
+
+    // Rectangular: transformar el puntero al marco no rotado de la mesa
+    // Vector del puntero relativo al centro
+    const dx = px - cx;
+    const dy = py - cy;
+    // Rotación inversa por -a
+    const xr = dx * Math.cos(a) + dy * Math.sin(a);
+    const yr = -dx * Math.sin(a) + dy * Math.cos(a);
+
     const width = (table.width || 80) * scale;
     const height = (table.height || table.length || 60) * scale;
-    const left = cx - width / 2;
-    const top = cy - height / 2;
+    // Coordenadas en marco no rotado con origen en el centro
+    const halfW = width / 2;
+    const halfH = height / 2;
+
+    // Normalizar a [0,1] en X sobre el ancho
+    const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+    const relX = clamp01((xr + halfW) / width);
+
     const cols = Math.max(1, Math.ceil(seats / 2));
-    const relX = Math.max(0, Math.min(1, (px - left) / width));
     const col = Math.min(cols - 1, Math.max(0, Math.round(relX * (cols - 1))));
-    const topSide = Math.abs(py - top) < Math.abs(py - (top + height));
+    // Fila superior si está por encima del centro en el marco no rotado
+    const topSide = yr < 0 && Math.abs(yr) >= 0; // evitar NaN
     return topSide ? col : cols + col;
   };
 
@@ -333,6 +353,15 @@ function TableItem({
           title="Ocupación de la mesa"
         >
           {guestCount}/{parseInt(table.seats, 10) || globalMaxSeats || '—'}
+        </div>
+      )}
+      {(table.angle || 0) !== 0 && (
+        <div
+          className="absolute bottom-0 right-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-800 text-white"
+          title={`Rotación: ${Math.round(table.angle)}°`}
+          style={{ opacity: 0.85 }}
+        >
+          {Math.round(table.angle)}°
         </div>
       )}
       {disabled && <div className="absolute inset-0 bg-white bg-opacity-50 rounded" />}

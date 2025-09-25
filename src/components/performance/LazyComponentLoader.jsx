@@ -49,9 +49,7 @@ export const LazyFinance = createLazyComponent(() => import('../../pages/Finance
 export const LazyGestionProveedores = createLazyComponent(
   () => import('../../pages/GestionProveedores')
 );
-export const LazySeatingPlan = createLazyComponent(
-  () => import('../../components/seating/SeatingPlanRefactored.jsx')
-);
+export const LazySeatingPlan = () => null;
 export const LazyInvitationDesigner = createLazyComponent(
   () => import('../../pages/InvitationDesigner')
 );

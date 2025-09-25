@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Modal from '../Modal';
 import Button from '../ui/Button';
@@ -6,13 +6,25 @@ import useSupplierGroups from '../../hooks/useSupplierGroups';
 import useProveedores from '../../hooks/useProveedores';
 import { toast } from 'react-toastify';
 
-function toCSV(rows) {
+function toCSV(rows, includeEstPrice = false) {
   const esc = (s) => '"' + String(s ?? '').replace(/"/g, '""') + '"';
-  const headers = [\n    'Nombre',\n    'Servicio',\n    'Estado',\n    'Precio',\n    'Rating',\n    'Ubicación',\n    'Email',\n    'Teléfono',\n    'Puntuación',\n  ];
+  const headers = [
+    'Nombre',
+    'Servicio',
+    'Estado',
+    'Precio',
+    'Rating',
+    'Ubicación',
+    'Email',
+    'Teléfono',
+    ...(includeEstPrice ? ['Precio (num)'] : []),
+    'Puntuación',
+  ];
   const csv = [headers.join(',')]
     .concat(
-      rows.map((r) =>
-        [
+      rows.map((r) => {
+        const score = Number.isFinite(r?.aiMatch) ? r.aiMatch : Number.isFinite(r?.match) ? r.match : '';
+        const base = [
           r.name,
           r.service,
           r.status,
@@ -21,16 +33,18 @@ function toCSV(rows) {
           r.location || r.address || '',
           r.email || '',
           r.phone || '',
-        ]
+        ];
+        const withPrice = includeEstPrice ? [...base, computePriceValue(r), score] : [...base, score];
+        return withPrice
           .map(esc)
-          .join(',')
-      )
+          .join(',');
+      })
     )
     .join('\n');
   return csv;
 }
 
-export default function CompareSelectedModal({ open, onClose, providers = [], onRemoveFromSelection }) {
+export default function CompareSelectedModal({ open, onClose, providers = [], onRemoveFromSelection, createGroupOverride, updateProviderOverride }) {
   const rows = useMemo(() => providers, [providers]);
   const { createGroup } = useSupplierGroups();
   const { updateProvider } = useProveedores();
@@ -39,6 +53,7 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
   const [creating, setCreating] = useState(false);
   const [sortBy, setSortBy] = useState('score'); // 'score' | 'name' | 'price'
   const [sortDir, setSortDir] = useState('desc'); // 'asc' | 'desc'
+  const [showEstPrice, setShowEstPrice] = useState(false);
 
   const computeScore = (p) => {
     const a = Number.isFinite(p?.aiMatch) ? Number(p.aiMatch) : NaN;
@@ -46,6 +61,23 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
     if (!Number.isNaN(a)) return a;
     if (!Number.isNaN(b)) return b;
     return 0;
+  };
+
+  const computePriceValue = (p) => {
+    const txt = String(p?.priceRange || '')
+      .replace(/€/g, '')
+      .replace(/eur/gi, '')
+      .replace(/por\s+persona/gi, '')
+      .trim();
+    if (!txt) return 0;
+    const nums = (txt.match(/[0-9]+[.,]?[0-9]*/g) || []).map((raw) => {
+      const s = raw.replace(/\./g, '').replace(/,/g, '.');
+      const n = parseFloat(s);
+      return Number.isFinite(n) ? n : 0;
+    });
+    if (nums.length === 0) return 0;
+    if (nums.length === 1) return nums[0];
+    return (nums[0] + nums[1]) / 2;
   };
 
   const filteredRows = useMemo(() => {
@@ -62,7 +94,14 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
         const bn = (b.name || '').toLowerCase();
         return sortDir === 'asc' ? an.localeCompare(bn) : bn.localeCompare(an);
       }
-      if (sortBy === 'price') {\n        const ap = computePriceValue(a);\n        const bp = computePriceValue(b);\n        return sortDir === 'asc' ? ap - bp : bp - ap;\n      }\n      // score\n      const as = computeScore(a);\n      const bs = computeScore(b);\n      return sortDir === 'asc' ? as - bs : bs - as;
+      if (sortBy === 'price') {
+        const ap = computePriceValue(a);
+        const bp = computePriceValue(b);
+        return sortDir === 'asc' ? ap - bp : bp - ap;
+      }
+      const as = computeScore(a);
+      const bs = computeScore(b);
+      return sortDir === 'asc' ? as - bs : bs - as;
     });
     return list;
   }, [filteredRows, sortBy, sortDir]);
@@ -74,11 +113,12 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
     try {
       setCreating(true);
       const ids = filteredRows.map((r) => r.id);
-      const res = await createGroup({ name: groupName.trim(), memberIds: ids });
+      const createFn = typeof createGroupOverride === 'function' ? createGroupOverride : createGroup;
+      const res = await createFn({ name: groupName.trim(), memberIds: ids });
       if (res?.success && res?.id) {
-        // Actualizar localmente para reflejar el cambio
+        const upd = typeof updateProviderOverride === 'function' ? updateProviderOverride : updateProvider;
         await Promise.all(
-          filteredRows.map((p) => updateProvider(p.id, { ...p, groupId: res.id, groupName: groupName.trim() }))
+          filteredRows.map((p) => upd(p.id, { ...p, groupId: res.id, groupName: groupName.trim() }).catch(() => {}))
         );
         try { toast.success(`Grupo "${groupName.trim()}" creado con ${ids.length} proveedores`); } catch {}
         onClose?.();
@@ -91,8 +131,9 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
       setCreating(false);
     }
   };
+
   const exportCSV = () => {
-    const csv = toCSV(rows);
+    const csv = toCSV(displayRows, showEstPrice);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -101,6 +142,7 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
     a.click();
     URL.revokeObjectURL(url);
   };
+
   return (
     <Modal open={open} onClose={onClose} title={`Comparar (${rows.length})`}>
       <div className="space-y-4">
@@ -110,13 +152,13 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
               <label className="block text-xs text-gray-500 mb-1">Nombre de grupo</label>
               <input
                 className="w-full border rounded p-2"
-                placeholder="Ej. Finalistas FotografÃ­a"
+                placeholder="Ej. Finalistas Fotografía"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">PuntuaciÃ³n IA mÃ­nima (opcional)</label>
+              <label className="block text-xs text-gray-500 mb-1">Puntuación IA mínima (opcional)</label>
               <input
                 type="number"
                 min="0"
@@ -129,9 +171,9 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
               />
             </div>
             <div className="md:text-right">
-              <div className="text-xs text-gray-500 mb-1">IncluirÃ¡ {filteredRows.length} de {rows.length}</div>
+              <div className="text-xs text-gray-500 mb-1">Incluirá {filteredRows.length} de {rows.length}</div>
               <Button onClick={createGroupFromSelection} disabled={!canCreate}>
-                {creating ? 'Creandoâ€¦' : 'Crear grupo con selecciÃ³n'}
+                {creating ? 'Creando…' : 'Crear grupo con selección'}
               </Button>
             </div>
           </div>
@@ -142,7 +184,7 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
               onClick={() => setSortBy('score')}
               className={`px-2 py-1 border rounded ${sortBy === 'score' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
             >
-              PuntuaciÃ³n IA
+              Puntuación IA
             </button>
             <button
               type="button"
@@ -153,12 +195,23 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
             </button>
             <button
               type="button"
+              onClick={() => setSortBy('price')}
+              className={`px-2 py-1 border rounded ${sortBy === 'price' ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-700'}`}
+            >
+              Precio estimado
+            </button>
+            <button
+              type="button"
               onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
               className="px-2 py-1 border rounded border-gray-300 text-gray-700"
-              title="Cambiar direcciÃ³n"
+              title="Cambiar dirección"
             >
               {sortDir === 'asc' ? 'Asc' : 'Desc'}
             </button>
+            <label className="ml-4 inline-flex items-center gap-2 text-gray-700">
+              <input type="checkbox" checked={showEstPrice} onChange={(e) => setShowEstPrice(e.target.checked)} />
+              Mostrar precio (num)
+            </label>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -173,7 +226,8 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
                 <th className="text-left p-2">Ubicación</th>
                 <th className="text-left p-2">Email</th>
                 <th className="text-left p-2">Teléfono</th>
-                <th className="text-left p-2">PuntuaciÃ³n</th>
+                {showEstPrice && <th className="text-left p-2">Precio (num)</th>}
+                <th className="text-left p-2">Puntuación</th>
                 <th className="text-left p-2">Acciones</th>
               </tr>
             </thead>
@@ -184,12 +238,11 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
                   <td className="p-2">{r.service}</td>
                   <td className="p-2">{r.status}</td>
                   <td className="p-2">{r.priceRange || '-'}</td>
-                  <td className="p-2">
-                    {r.ratingCount > 0 ? (r.rating / r.ratingCount).toFixed(1) : '-'}
-                  </td>
+                  <td className="p-2">{r.ratingCount > 0 ? (r.rating / r.ratingCount).toFixed(1) : '-'}</td>
                   <td className="p-2">{r.location || r.address || '-'}</td>
                   <td className="p-2">{r.email || '-'}</td>
                   <td className="p-2">{r.phone || '-'}</td>
+                  {showEstPrice && <td className="p-2">{computePriceValue(r) || '-'}</td>}
                   <td className="p-2">{computeScore(r) || '-'}</td>
                   <td className="p-2">
                     {typeof onRemoveFromSelection === 'function' && (
@@ -209,19 +262,10 @@ export default function CompareSelectedModal({ open, onClose, providers = [], on
           </table>
         </div>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>
-            Cerrar
-          </Button>
-          <Button variant="outline" onClick={exportCSV}>
-            Exportar CSV
-          </Button>
+          <Button variant="outline" onClick={onClose}>Cerrar</Button>
+          <Button variant="outline" onClick={exportCSV}>Exportar CSV</Button>
         </div>
       </div>
     </Modal>
   );
 }
-
-
-
-
-

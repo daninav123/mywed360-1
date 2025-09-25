@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 import path from 'path';
+const ENABLE_PWA = process.env.VITE_ENABLE_PWA === '1';
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -12,14 +14,19 @@ export default defineConfig({
     },
     dedupe: ['react', 'react-dom']
   },
-  plugins: [react(), VitePWA({
-      strategies: 'injectManifest',
-      srcDir: 'src/pwa',
-      filename: 'serviceWorker.js',
-      registerType: 'autoUpdate',
-      includeAssets: ['logo-app.png', 'icon-192.png', 'icon-512.png', 'badge-72.png'],
-      manifest: false
-    })],
+  plugins: [
+    react(),
+    ...(ENABLE_PWA
+      ? [VitePWA({
+          strategies: 'injectManifest',
+          srcDir: 'src/pwa',
+          filename: 'serviceWorker.js',
+          registerType: 'autoUpdate',
+          includeAssets: ['logo-app.png', 'icon-192.png', 'icon-512.png', 'badge-72.png'],
+          manifest: false
+        })]
+      : [])
+  ],
   server: {
     host: '0.0.0.0', // Escuchar en todas las interfaces de red
     // Puerto de desarrollo

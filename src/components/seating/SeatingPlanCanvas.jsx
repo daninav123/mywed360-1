@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Componente Canvas especializado para el plan de asientos
- * Maneja la visualización y interacción con mesas y sillas
+ * Maneja la visualizaciÃ³n y interacciÃ³n con mesas y sillas
  */
 
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
@@ -47,6 +47,10 @@ const SeatingPlanCanvas = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [minScale, setMinScale] = useState(0.3);
   const [isPanning, setIsPanning] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selStart, setSelStart] = useState(null); // screen coords
+  const [selEnd, setSelEnd] = useState(null); // screen coords
+  const [selWorldStart, setSelWorldStart] = useState(null);
 
   // Fit to content: calcula bounding box en coordenadas "mundo" y ajusta escala/offset
   const fitToContent = useCallback(() => {
@@ -96,7 +100,7 @@ const SeatingPlanCanvas = ({
         extend(s.x || 0, s.y || 0);
       });
 
-      // Hall (ayuda a no dejar bounds vacíos en banquete)
+      // Hall (ayuda a no dejar bounds vacÃ­os en banquete)
       if (hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number') {
         extend(0, 0);
         extend(hallSize.width, hallSize.height);
@@ -235,52 +239,164 @@ const SeatingPlanCanvas = ({
 
   const handlePointerDown = useCallback(
     (e) => {
-      if (drawMode !== 'pan') return;
-      e.preventDefault();
-      setIsPanning(true);
-      const start = { x: e.clientX, y: e.clientY };
-      const startOffset = { ...offset };
-      let rafId = null;
-      let nextDX = 0,
-        nextDY = 0;
+      // In PAN mode: allow rectangle selection if any modifier (Shift/Ctrl/Meta) is pressed on background
+      if (
+        drawMode === 'pan' &&
+        (e.shiftKey || e.ctrlKey || e.metaKey) &&
+        e.currentTarget === canvasRef.current
+      ) {
+        try {
+          const rect = canvasRef.current.getBoundingClientRect();
+          const startScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+          const startWorld = { x: (e.clientX - rect.left - offset.x) / scale, y: (e.clientY - rect.top - offset.y) / scale };
+          setIsSelecting(true);
+          setSelStart(startScreen);
+          setSelEnd(startScreen);
+          setSelWorldStart(startWorld);
+          const append = !!e.shiftKey; // Shift => additive, otherwise replace
+          const move = (ev) => {
+            const r = canvasRef.current.getBoundingClientRect();
+            setSelEnd({ x: ev.clientX - r.left, y: ev.clientY - r.top });
+          };
+          const up = (ev) => {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+            const r = canvasRef.current.getBoundingClientRect();
+            const endWorld = { x: (ev.clientX - r.left - offset.x) / scale, y: (ev.clientY - r.top - offset.y) / scale };
+            const minX = Math.min(selWorldStart.x, endWorld.x);
+            const maxX = Math.max(selWorldStart.x, endWorld.x);
+            const minY = Math.min(selWorldStart.y, endWorld.y);
+            const maxY = Math.max(selWorldStart.y, endWorld.y);
+            const rectBox = { minX, minY, maxX, maxY };
+            const getBox = (t) => {
+              if (t.shape === 'circle') { const r0 = (t.diameter || 60) / 2; return { minX: (t.x || 0) - r0, minY: (t.y || 0) - r0, maxX: (t.x || 0) + r0, maxY: (t.y || 0) + r0 }; }
+              const hw = (t.width || 80) / 2, hh = (t.height || t.length || 60) / 2; return { minX: (t.x || 0) - hw, minY: (t.y || 0) - hh, maxX: (t.x || 0) + hw, maxY: (t.y || 0) + hh };
+            };
+            const overlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+            const ids = (tables || []).filter(Boolean).filter((t) => overlap(getBox(t), rectBox)).map((t) => t.id);
+            try {
+              if (!append) {
+                // Replace selection: clear then add all
+                typeof onSelectTable === 'function' && onSelectTable(null, false);
+                ids.forEach((id) => onSelectTable && onSelectTable(id, true));
+              } else {
+                // Additive selection
+                const current = new Set((selectedIds || []).map(String));
+                ids.filter((id) => !current.has(String(id))).forEach((id) => onSelectTable && onSelectTable(id, true));
+              }
+            } catch {}
+            setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+          return;
+        } catch (_) {}
+      }
 
-      const schedule = () => {
-        if (rafId != null) return;
-        rafId = window.requestAnimationFrame(() => {
-          setOffset({ x: startOffset.x + nextDX, y: startOffset.y + nextDY });
-          rafId = null;
-        });
-      };
+      // Pan
+      if (drawMode === 'pan') {
+        e.preventDefault();
+        setIsPanning(true);
+        const start = { x: e.clientX, y: e.clientY };
+        const startOffset = { ...offset };
+        let rafId = null;
+        let nextDX = 0,
+          nextDY = 0;
 
-      const move = (ev) => {
-        nextDX = ev.clientX - start.x;
-        nextDY = ev.clientY - start.y;
-        schedule();
-      };
-      const up = () => {
-        if (rafId != null) {
-          window.cancelAnimationFrame(rafId);
-          rafId = null;
-        }
-        window.removeEventListener('pointermove', move);
-        window.removeEventListener('pointerup', up);
-        setIsPanning(false);
-      };
-      window.addEventListener('pointermove', move);
-      window.addEventListener('pointerup', up);
+        const schedule = () => {
+          if (rafId != null) return;
+          rafId = window.requestAnimationFrame(() => {
+            setOffset({ x: startOffset.x + nextDX, y: startOffset.y + nextDY });
+            rafId = null;
+          });
+        };
+
+        const move = (ev) => {
+          nextDX = ev.clientX - start.x;
+          nextDY = ev.clientY - start.y;
+          schedule();
+        };
+        const up = () => {
+          if (rafId != null) {
+            window.cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          window.removeEventListener('pointermove', move);
+          window.removeEventListener('pointerup', up);
+          setIsPanning(false);
+        };
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', up);
+        return;
+      }
+
+      // Rectangle selection in move mode on background
+      if (drawMode === 'move' && e.currentTarget === canvasRef.current) {
+        try {
+          const rect = canvasRef.current.getBoundingClientRect();
+          const startScreen = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+          const startWorld = { x: (e.clientX - rect.left - offset.x) / scale, y: (e.clientY - rect.top - offset.y) / scale };
+          setIsSelecting(true);
+          setSelStart(startScreen);
+          setSelEnd(startScreen);
+          setSelWorldStart(startWorld);
+          const shift = !!e.shiftKey;
+          const move = (ev) => {
+            const r = canvasRef.current.getBoundingClientRect();
+            setSelEnd({ x: ev.clientX - r.left, y: ev.clientY - r.top });
+          };
+          const up = (ev) => {
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+            const r = canvasRef.current.getBoundingClientRect();
+            const endWorld = { x: (ev.clientX - r.left - offset.x) / scale, y: (ev.clientY - r.top - offset.y) / scale };
+            const minX = Math.min(selWorldStart.x, endWorld.x);
+            const maxX = Math.max(selWorldStart.x, endWorld.x);
+            const minY = Math.min(selWorldStart.y, endWorld.y);
+            const maxY = Math.max(selWorldStart.y, endWorld.y);
+            const dx = Math.abs((selEnd?.x || 0) - (selStart?.x || 0));
+            const dy = Math.abs((selEnd?.y || 0) - (selStart?.y || 0));
+            if (dx < 4 && dy < 4) {
+              try { typeof onSelectTable === 'function' && onSelectTable(null, false); } catch {}
+              setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+              return;
+            }
+            const rectBox = { minX, minY, maxX, maxY };
+            const getBox = (t) => {
+              if (t.shape === 'circle') { const r0 = (t.diameter || 60) / 2; return { minX: (t.x || 0) - r0, minY: (t.y || 0) - r0, maxX: (t.x || 0) + r0, maxY: (t.y || 0) + r0 }; }
+              const hw = (t.width || 80) / 2, hh = (t.height || t.length || 60) / 2; return { minX: (t.x || 0) - hw, minY: (t.y || 0) - hh, maxX: (t.x || 0) + hw, maxY: (t.y || 0) + hh };
+            };
+            const overlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+            const ids = (tables || []).filter(Boolean).filter((t) => overlap(getBox(t), rectBox)).map((t) => t.id);
+            try {
+              if (!shift) {
+                typeof onSelectTable === 'function' && onSelectTable(null, false);
+                ids.forEach((id) => onSelectTable && onSelectTable(id, true));
+              } else {
+                const current = new Set((selectedIds || []).map(String));
+                ids.filter((id) => !current.has(String(id))).forEach((id) => onSelectTable && onSelectTable(id, true));
+              }
+            } catch {}
+            setIsSelecting(false); setSelStart(null); setSelEnd(null); setSelWorldStart(null);
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+          return;
+        } catch (_) {}
+      }
     },
-    [drawMode, offset]
+    [drawMode, offset, scale, onSelectTable, tables, selStart, selEnd, selWorldStart, selectedIds]
   );
 
-  // No necesitamos manejar move/up aquí porque el drag de pan
+  // No necesitamos manejar move/up aquÃ­ porque el drag de pan
   // se gestiona con listeners globales registrados en pointerdown.
-  // Aun así, dejamos handlers defensivos para prevenir scroll/gestos
+  // Aun asÃ­, dejamos handlers defensivos para prevenir scroll/gestos
   // inesperados cuando el modo no es pan.
   const handlePointerMove = useCallback(
     (e) => {
       if (drawMode !== 'pan') return;
-      // El movimiento real está gestionado por los listeners añadidos en pointerdown.
-      // Evitamos que el navegador haga selección de texto u otros gestos.
+      // El movimiento real estÃ¡ gestionado por los listeners aÃ±adidos en pointerdown.
+      // Evitamos que el navegador haga selecciÃ³n de texto u otros gestos.
       e.preventDefault();
     },
     [drawMode]
@@ -372,12 +488,34 @@ const SeatingPlanCanvas = ({
         } else if (k === '0') {
           e.preventDefault();
           fitToContent();
+        } else if (k === 'a') {
+          // Seleccionar todo (Ctrl/Cmd + A)
+          try {
+            e.preventDefault();
+            if (Array.isArray(tables) && tables.length) {
+              typeof onSelectTable === 'function' && onSelectTable(null, false);
+              tables.filter(Boolean).forEach((t) => onSelectTable && onSelectTable(t.id, true));
+            }
+          } catch {}
         }
       } catch (_) {}
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [zoomAt, fitToContent]);
+  }, [zoomAt, fitToContent, onSelectTable, tables]);
+
+  // Escape: limpiar selección si hay elementos seleccionados
+  useEffect(() => {
+    const onEsc = (e) => {
+      try {
+        if (e.key === 'Escape' && Array.isArray(selectedIds) && selectedIds.length > 0) {
+          typeof onSelectTable === 'function' && onSelectTable(null, false);
+        }
+      } catch {}
+    };
+    window.addEventListener('keydown', onEsc);
+    return () => window.removeEventListener('keydown', onEsc);
+  }, [selectedIds, onSelectTable]);
 
   return (
     <div className={`relative bg-gray-50 border rounded-lg overflow-hidden ${className}`}>
@@ -432,6 +570,50 @@ const SeatingPlanCanvas = ({
           background={background}
           globalMaxSeats={globalMaxSeats}
         />
+
+        {/* RectÃ¡ngulo de selecciÃ³n */}
+        {isSelecting && selStart && selEnd && (
+          <div
+            className="absolute border-2 border-blue-500 bg-blue-200/20 pointer-events-none"
+            style={{
+              left: Math.min(selStart.x, selEnd.x),
+              top: Math.min(selStart.y, selEnd.y),
+              width: Math.abs(selEnd.x - selStart.x),
+              height: Math.abs(selEnd.y - selStart.y),
+            }}
+          />
+        )}
+
+        {Array.isArray(selectedIds) && selectedIds.length > 0 && (
+          <div className="absolute top-2 right-2 bg-white/95 border rounded shadow-sm px-2 py-1 text-xs text-gray-700 flex items-center gap-2">
+            <span>Seleccionadas: {selectedIds.length}</span>
+            <button
+              type="button"
+              className="px-2 py-0.5 rounded border hover:bg-gray-50"
+              title="Limpiar selección (Esc)"
+              onClick={() => {
+                try { typeof onSelectTable === 'function' && onSelectTable(null, false); } catch {}
+              }}
+            >
+              Limpiar
+            </button>
+            <button
+              type="button"
+              className="px-2 py-0.5 rounded border hover:bg-gray-50"
+              title="Seleccionar todas las mesas"
+              onClick={() => {
+                try {
+                  if (Array.isArray(tables) && tables.length) {
+                    typeof onSelectTable === 'function' && onSelectTable(null, false);
+                    tables.filter(Boolean).forEach((t) => onSelectTable && onSelectTable(t.id, true));
+                  }
+                } catch {}
+              }}
+            >
+              Seleccionar todo
+            </button>
+          </div>
+        )}
 
         {/* Reglas superiores e izquierda */}
         {showRulers && (
@@ -502,10 +684,10 @@ const SeatingPlanCanvas = ({
           </>
         )}
 
-        {/* Indicadores de dimensiones del salón y pasillo mínimo */}
+        {/* Indicadores de dimensiones del salÃ³n y pasillo mÃ­nimo */}
         <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs text-gray-600">
           <div>
-            {(hallSize.width / 100).toFixed(1)} × {(hallSize.height / 100).toFixed(1)} m
+            {(hallSize.width / 100).toFixed(1)} Ã— {(hallSize.height / 100).toFixed(1)} m
           </div>
           <div>Pasillo: {hallSize.aisleMin ?? 80} cm</div>
         </div>
@@ -524,14 +706,14 @@ const SeatingPlanCanvas = ({
             className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
             title="Zoom out"
           >
-            −
+            âˆ’
           </button>
           <button
             onClick={fitToContent}
             className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
             title="Ajustar a pantalla"
           >
-            ⌂
+            âŒ‚
           </button>
         </div>
       </div>
@@ -540,3 +722,5 @@ const SeatingPlanCanvas = ({
 };
 
 export default React.memo(SeatingPlanCanvas);
+
+

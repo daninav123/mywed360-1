@@ -409,6 +409,16 @@ const SeatingPlanSidebar = ({
                         <span className="font-semibold">Mesa {c.tableId}:</span> {c.message}
                       </button>
                       <button
+                        className="text-blue-600 hover:underline mr-2"
+                        title={t('seating.sidebar.goTo', { defaultValue: 'Ir a mesa' })}
+                        onClick={() => {
+                          onFocusTable?.(c.tableId);
+                          onSelectTable?.(c.tableId, false);
+                        }}
+                      >
+                        Ir
+                      </button>
+                      <button
                         className="text-red-600 hover:underline"
                         onClick={() => onFixTable?.(c.tableId)}
                       >

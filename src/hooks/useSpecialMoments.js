@@ -1,4 +1,4 @@
-import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, onSnapshot, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
@@ -6,18 +6,18 @@ import { db } from '../firebaseConfig';
 
 /*
   Hook: useSpecialMoments
-  Gestiona los momentos especiales de la boda de forma compartida entre las páginas
-  Momentos Especiales y Timing. La información se almacena en localStorage y se
-  sincroniza entre pestañas mediante el evento 'moments-updated'.
+  Gestiona los momentos especiales de la boda de forma compartida entre las pÃ¡ginas
+  Momentos Especiales y Timing. La informaciÃ³n se almacena en localStorage y se
+  sincroniza entre pestaÃ±as mediante el evento 'moments-updated'.
 */
 const STORAGE_KEY = 'lovendaSpecialMoments';
 
-// Bloques por defecto (alineados con páginas existentes)
+// Bloques por defecto (alineados con pÃ¡ginas existentes)
 const DEFAULT_BLOCKS = [
   { id: 'ceremonia', name: 'Ceremonia' },
-  // Nota: en Momentos Especiales históricamente se usa "coctail" mientras en Timing aparece "coctel".
+  // Nota: en Momentos Especiales histÃ³ricamente se usa "coctail" mientras en Timing aparece "coctel".
   // Conservamos la clave "coctail" por compatibilidad y normalizamos en los componentes cuando sea necesario.
-  { id: 'coctail', name: 'Cóctel' },
+  { id: 'coctail', name: 'CÃ³ctel' },
   { id: 'banquete', name: 'Banquete' },
   { id: 'disco', name: 'Disco' },
 ];
@@ -31,13 +31,13 @@ const defaultData = {
         id: 1,
         order: 1,
         title: 'Entrada Novio',
-        song: 'Canon in D – Pachelbel',
+        song: 'Canon in D â€“ Pachelbel',
         time: '', // Hora (hh:mm)
-        duration: '', // Duración (min) o texto corto
+        duration: '', // DuraciÃ³n (min) o texto corto
         type: 'entrada', // entrada | lectura | votos | anillos | baile | corte_pastel | discurso | otro
         location: '',
         responsables: [], // [{ role, name, contact }]
-        requirements: '', // necesidades especiales (sonido, proyección...)
+        requirements: '', // necesidades especiales (sonido, proyecciÃ³n...)
         suppliers: [], // referencias/proveedores asociados (ids o strings)
         optional: false,
         state: 'pendiente', // pendiente | confirmado | ensayo
@@ -47,7 +47,7 @@ const defaultData = {
         id: 2,
         order: 2,
         title: 'Entrada Novia',
-        song: 'Bridal Chorus – Wagner',
+        song: 'Bridal Chorus â€“ Wagner',
         time: '',
         duration: '',
         type: 'entrada',
@@ -88,7 +88,7 @@ const defaultData = {
     disco: [
       { id: 11, order: 1, title: 'Primer Baile', song: '', time: '', duration: '', type: 'baile', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'primer_baile' },
       { id: 12, order: 2, title: 'Animar pista', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-      { id: 13, order: 3, title: 'Último tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
+      { id: 13, order: 3, title: 'Ãšltimo tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
     ],
   },
 };
@@ -98,7 +98,7 @@ function load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Compatibilidad hacia atrás: si viene plano (con claves de bloques), migrar a { moments, blocks }
+      // Compatibilidad hacia atrÃ¡s: si viene plano (con claves de bloques), migrar a { moments, blocks }
       if (parsed && !parsed.moments) {
         const keys = Object.keys(parsed || {});
         const known = new Set(['ceremonia', 'coctail', 'banquete', 'disco']);
@@ -136,7 +136,7 @@ export default function useSpecialMoments() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ blocks, moments }));
     } catch {}
 
-    // Firestore: evitar loops comparando con último snapshot remoto
+    // Firestore: evitar loops comparando con Ãºltimo snapshot remoto
     const json = (() => {
       try {
         return JSON.stringify({ blocks, moments });
@@ -161,7 +161,7 @@ export default function useSpecialMoments() {
     })();
   }, [blocks, moments, activeWedding]);
 
-  // Escuchar cambios de localStorage desde otras pestañas (evento 'storage' no se dispara en la pestaña emisora)
+  // Escuchar cambios de localStorage desde otras pestaÃ±as (evento 'storage' no se dispara en la pestaÃ±a emisora)
   useEffect(() => {
     const onStorage = (e) => {
       try {
@@ -176,10 +176,36 @@ export default function useSpecialMoments() {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  // Suscribirse a Firestore para sincronización en vivo
+    // Migración puntual desde 'momentosEspeciales' a 'specialMoments'
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!activeWedding) return;
+        const refNew = doc(db, 'weddings', activeWedding, 'specialMoments', 'main');
+        const snapNew = await getDoc(refNew);
+        if (snapNew.exists()) return;
+        const refOld = doc(db, 'weddings', activeWedding, 'momentosEspeciales', 'main');
+        const snapOld = await getDoc(refOld);
+        if (!snapOld.exists()) return;
+        const data = snapOld.data() || {};
+        if (data.moments) {
+          const nextBlocks = Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
+          const nextMoments = data.moments || {};
+          setBlocks(nextBlocks);
+          setMoments((prev) => ({ ...prev, ...nextMoments }));
+          await setDoc(refNew, { blocks: nextBlocks, moments: nextMoments, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
+        } else {
+          const { updatedAt: _updatedAt, ...payload } = data;
+          setBlocks(DEFAULT_BLOCKS);
+          setMoments((prev) => ({ ...prev, ...payload }));
+          await setDoc(refNew, { blocks: DEFAULT_BLOCKS, moments: payload, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
+        }
+      } catch {}
+    })();
+  }, [activeWedding]);// Suscribirse a Firestore para sincronizaciÃ³n en vivo
   useEffect(() => {
     if (!activeWedding) {
-      // Si no hay boda activa, cancelar cualquier suscripción previa
+      // Si no hay boda activa, cancelar cualquier suscripciÃ³n previa
       if (unsubRef.current) {
         try {
           unsubRef.current();
@@ -289,7 +315,7 @@ export default function useSpecialMoments() {
     });
   }, []);
 
-  // Mover un momento a una posición concreta dentro de su mismo bloque
+  // Mover un momento a una posiciÃ³n concreta dentro de su mismo bloque
   const moveMoment = useCallback((blockId, momentId, toIndex) => {
     setMoments((prev) => {
       const list = prev[blockId] || [];
@@ -329,7 +355,7 @@ export default function useSpecialMoments() {
     });
   }, []);
 
-  // --- Gestión de bloques/secciones ---
+  // --- GestiÃ³n de bloques/secciones ---
   const addBlock = useCallback((name) => {
     const slug = String(name)
       .toLowerCase()
@@ -384,3 +410,6 @@ export default function useSpecialMoments() {
     reorderBlocks,
   };
 }
+
+
+
