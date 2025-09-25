@@ -304,15 +304,28 @@ export default function useSpecialMoments() {
     });
   }, []);
 
-  const duplicateMoment = useCallback((fromBlock, momentId, toBlock) => {
-    if (fromBlock === toBlock) return;
+  const duplicateMoment = useCallback((fromBlock, momentId, toBlock = null) => {
     setMoments((prev) => {
       const sourceList = prev[fromBlock] || [];
       const moment = sourceList.find((m) => m.id === momentId);
       if (!moment) return prev;
-      const destList = prev[toBlock] || [];
+
+      const targetBlock = toBlock || fromBlock;
+      const destList = prev[targetBlock] || [];
+
+      // If duplicating within the same block, insert after the original index; else append
+      if (targetBlock === fromBlock) {
+        const idx = sourceList.findIndex((m) => m.id === momentId);
+        if (idx === -1) return prev;
+        const copy = { ...moment, id: Date.now() };
+        const newList = [...sourceList];
+        newList.splice(idx + 1, 0, copy);
+        const reOrdered = newList.map((m, i) => ({ ...m, order: i + 1 }));
+        return { ...prev, [fromBlock]: reOrdered };
+      }
+
       const copy = { ...moment, id: Date.now(), order: destList.length + 1 };
-      return { ...prev, [toBlock]: [...destList, copy] };
+      return { ...prev, [targetBlock]: [...destList, copy] };
     });
   }, []);
 

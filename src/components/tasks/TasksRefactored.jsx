@@ -155,6 +155,19 @@ export default function Tasks() {
   // Exponer helpers en modo debug para correcciÃƒÆ’Ã‚Â³n in-situ
   // (movido mÃƒÆ’Ã‚Â¡s abajo tras declarar projectStart/projectEnd para evitar TDZ)
 
+  // Si no hay boda activa, mostrar aviso claro y no renderizar resto
+  if (!activeWedding) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <h1 className="page-title">Gestión de Tareas</h1>
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 text-yellow-900 rounded p-4">
+          <div className="font-semibold mb-1">Selecciona o crea una boda para ver tareas</div>
+          <div className="text-sm">No hay boda activa en este momento. Ve a la sección "Bodas" para seleccionar una existente o crear una nueva.</div>
+        </div>
+      </div>
+    );
+  }
+
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
     try {
@@ -557,7 +570,7 @@ export default function Tasks() {
         // Replicar subtareas al modelo anidado para el modal y Gantt
         try {
           if (formData.parentTaskId) {
-            const subId = editingId || savedId || taskData.id;
+            const subId = editingId || taskData.id;
             const nestedSubtask = {
               id: String(subId),
               title: taskData.title,
@@ -2021,8 +2034,6 @@ export default function Tasks() {
     </div>
   );
 }
-
-
 
 
 

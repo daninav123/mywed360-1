@@ -242,7 +242,7 @@ const MomentosEspeciales = () => {
       const fullPrompt = prefs.length ? `${prompt}. Preferencias: ${prefs.join(', ')}` : prompt;
       const res = await apiPost(
         '/api/ai-songs/recommend',
-        { prompt: fullPrompt, context: activeTab },
+        { prompt: fullPrompt, context: activeTab, language: aiLanguage },
         { auth: true }
       );
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -957,7 +957,23 @@ const MomentosEspeciales = () => {
                                     time: e.target.value,
                                   })
                                 }
-                                placeholder="00:00"
+                                placeholder="hh:mm"
+                              />
+                            </div>
+
+                            <div className="w-28">
+                              <div className="text-xs text-gray-500 mb-1">Duración</div>
+                              <input
+                                type="text"
+                                className="w-full border rounded px-2 py-1 text-sm"
+                                value={moment.duration || ''}
+                                onChange={(e) =>
+                                  updateMoment(activeTab, moment.id, {
+                                    ...moment,
+                                    duration: e.target.value,
+                                  })
+                                }
+                                placeholder="ej. 10 min"
                               />
                             </div>
                           </div>
@@ -973,7 +989,7 @@ const MomentosEspeciales = () => {
                           </button>
 
                           <button
-                            onClick={() => duplicateMoment(activeTab, moment.id)}
+                            onClick={() => duplicateMoment(activeTab, moment.id, activeTab)}
                             className="text-gray-400 hover:text-blue-500 p-1"
                             title="Duplicar"
                           >

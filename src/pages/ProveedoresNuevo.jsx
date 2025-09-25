@@ -14,6 +14,7 @@ import ReservationModal from '../components/proveedores/ReservationModal';
 import SupplierOnboardingModal from '../components/proveedores/SupplierOnboardingModal';
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 import WantedServicesModal from '../components/proveedores/WantedServicesModal';
+import AssignSelectedToGroupModal from '../components/proveedores/AssignSelectedToGroupModal';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import PageTabs from '../components/ui/PageTabs';
@@ -89,6 +90,7 @@ const Proveedores = () => {
   const [showDupModal, setShowDupModal] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [showGroupSelectedModal, setShowGroupSelectedModal] = useState(false);
   const [sortMode, setSortMode] = useState('match');
   const [originFilter, setOriginFilter] = useState('all');
   const [statusView, setStatusView] = useState('all');
@@ -317,6 +319,10 @@ const Proveedores = () => {
 
   const openDuplicatesModal = () => {
     setShowDupModal(true);
+  };
+  const openGroupSelectedModal = () => {
+    if (!selectedProviderIds.length) return;
+    setShowGroupSelectedModal(true);
   };
 
   const mapAIResultToProvider = useCallback(
@@ -612,6 +618,13 @@ const Proveedores = () => {
                   </button>
                   <button
                     type="button"
+                    onClick={openGroupSelectedModal}
+                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                  >
+                    Agrupar
+                  </button>
+                  <button
+                    type="button"
                     onClick={openDuplicatesModal}
                     className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
                   >
@@ -696,6 +709,7 @@ const Proveedores = () => {
               onOpenCompare={openCompareModal}
               onOpenBulkStatus={openBulkStatusModal}
               onOpenDuplicates={openDuplicatesModal}
+              onOpenGroupSelected={openGroupSelectedModal}
               onClearSelection={clearSelection}
             />
           )}
@@ -762,6 +776,11 @@ const Proveedores = () => {
         open={showCompareModal}
         onClose={() => setShowCompareModal(false)}
         providers={selectedProviders}
+        onRemoveFromSelection={(id) => {
+          try {
+            toggleSelectProvider(id);
+          } catch {}
+        }}
       />
 
       <BulkStatusModal
@@ -820,8 +839,22 @@ const Proveedores = () => {
         value={wantedServices}
         onSave={saveWanted}
       />
+      {showGroupSelectedModal && (
+        <AssignSelectedToGroupModal
+          open={showGroupSelectedModal}
+          onClose={(res) => {
+            setShowGroupSelectedModal(false);
+            if (res?.success) {
+              clearSelection();
+              try { if (typeof window !== 'undefined') toast.success('Proveedores agrupados'); } catch {}
+            }
+          }}
+          providers={selectedProviders}
+        />
+      )}
     </div>
   );
 };
 
 export default Proveedores;
+
