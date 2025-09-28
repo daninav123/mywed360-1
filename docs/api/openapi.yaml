@@ -372,6 +372,37 @@ paths:
         '400': { description: Bad request }
         '401': { description: Unauthorized }
 
+  /api/rsvp/generate-link:
+    post:
+      tags: [rsvp]
+      summary: Genera o recupera un link RSVP por invitado
+      description: Devuelve el token y el link RSVP para un invitado de una boda
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [weddingId, guestId]
+              properties:
+                weddingId: { type: string }
+                guestId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  token: { type: string }
+                  link: { type: string }
+                  weddingId: { type: string }
+                  guestId: { type: string }
+
   /api/whatsapp/webhook/twilio:
     post:
       tags: [whatsapp]
