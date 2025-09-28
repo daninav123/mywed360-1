@@ -38,13 +38,15 @@ async function fetchFromBackend({ page, pageSize, language }) {
     '', // como último recurso: proxy de Vite o mismo origen
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
-  // Prioritize Render backend to avoid slow/failing local attempts first
-  try {
-    const RENDER_BASE = 'https://mywed360-backend.onrender.com';
-    if (candidates.includes(RENDER_BASE)) {
-      candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
-    }
-  } catch {}
+  // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
+  if (import.meta?.env?.PROD) {
+    try {
+      const RENDER_BASE = 'https://mywed360-backend.onrender.com';
+      if (candidates.includes(RENDER_BASE)) {
+        candidates = [RENDER_BASE, ...candidates.filter((b) => b !== RENDER_BASE)];
+      }
+    } catch {}
+  }
 
   let sawError = false;
   // Carga perezosa de axios para reducir bundle inicial

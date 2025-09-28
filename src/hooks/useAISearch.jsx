@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
@@ -62,7 +62,7 @@ const normalizeResult = (item, index, query, source) => {
 const generateDemoResults = (query) => {
   const demoDatabase = [
     { id: '1', name: 'Fotografia Naturaleza Viva', service: 'Fotografia', snippet: 'Estudio especializado en fotografia de bodas con estilo natural y documental. Capturamos los momentos mas emotivos y espontaneos.', image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60', location: 'Madrid', price: '1200 EUR - 2500 EUR', tags: ['natural', 'documental', 'exterior', 'luz natural'], keywords: ['fotografo', 'natural', 'documental', 'boda'] },
-    { id: '2', name: 'Lente Azul Fotografia', service: 'Fotografia', snippet: 'Más de 10 años de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.', image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60', location: 'Barcelona', price: '1500 EUR - 3000 EUR', tags: ['playa', 'exterior', 'naturaleza'], keywords: ['fotografo', 'boda', 'playa', 'experiencia'] },
+    { id: '2', name: 'Lente Azul Fotografia', service: 'Fotografia', snippet: 'MÃ¡s de 10 aÃ±os de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.', image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60', location: 'Barcelona', price: '1500 EUR - 3000 EUR', tags: ['playa', 'exterior', 'naturaleza'], keywords: ['fotografo', 'boda', 'playa', 'experiencia'] },
     { id: '3', name: 'Catering Delicious Moments', service: 'Catering', snippet: 'Catering con opciones vegetarianas, veganas y alergias. Especialistas en eventos de 50 a 200 personas.', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60', location: 'Madrid', price: '70 EUR - 120 EUR por persona', tags: ['vegetariano', 'vegano', 'buffet'], keywords: ['catering', 'buffet', 'evento'] },
     { id: '4', name: 'DJ Sounds & Lights', service: 'Musica', snippet: 'DJ con equipo profesional de sonido e iluminacion. Amplia experiencia en bodas y eventos corporativos.', image: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60', location: 'Valencia', price: '800 EUR - 1500 EUR', tags: ['dj', 'musica', 'iluminacion'], keywords: ['dj', 'musica', 'evento'] },
     { id: '5', name: 'Flores del Jardin', service: 'Flores', snippet: 'Floristeria artesanal especializada en decoracion vintage y boho. Trabajamos con producto local de temporada.', image: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60', location: 'Sevilla', price: '500 EUR - 1500 EUR', tags: ['flores', 'decoracion', 'boho'], keywords: ['flores', 'decoracion', 'boda'] },
@@ -93,16 +93,8 @@ export const useAISearch = () => {
       const budget = profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
       const inferredService = (opts && opts.service) || guessServiceFromQuery(query);
 
-      // Habilitar backend sólo si la variable de entorno lo indica
-      const ENABLE_BACKEND_AI = (() => {
-        try {
-          const env = (typeof import.meta !== 'undefined' && import.meta.env) || (typeof process !== 'undefined' && process.env) || {};
-          const v = env.VITE_ENABLE_AI_SUPPLIERS || env.VITE_AI_SUPPLIERS || '';
-          return /^(1|true)$/i.test(String(v));
-        } catch {
-          return false;
-        }
-      })();
+      // Habilitar backend sÃ³lo si la variable de entorno lo indica
+      const ENABLE_BACKEND_AI = true;
 
       try {
         if (ENABLE_BACKEND_AI) {
@@ -123,7 +115,7 @@ export const useAISearch = () => {
             }
           }
         }
-        // Intentar motor de búsqueda real del backend si está configurado (SerpAPI)
+        // Intentar motor de bÃºsqueda real del backend si estÃ¡ configurado (SerpAPI)
         try {
           const q = [query, inferredService, location].filter(Boolean).join(' ');
           const res2 = await apiGet(`/api/ai/search-suppliers?q=${encodeURIComponent(q)}`, { silent: true });
@@ -174,7 +166,7 @@ export const useAISearch = () => {
 
 export default useAISearch;
 
-// Refinado: servicio estricto y ubicación estricta si hay matches; si no, blando por zona
+// Refinado: servicio estricto y ubicaciÃ³n estricta si hay matches; si no, blando por zona
 function refineResults(list, ctx) {
   const serviceRef = String(ctx?.service || '').toLowerCase();
   const locRef = String(ctx?.location || '').toLowerCase();
@@ -204,7 +196,7 @@ function refineResults(list, ctx) {
     if (locRef) boost += locMatch ? 15 : -10;
     const match = Math.max(0, Math.min(100, Math.round(base + boost)));
     let aiSummary = src.aiSummary || '';
-    if (locRef && locMatch && !/zona|\bubicaci[óo]n|\bdisponible/i.test(aiSummary)) {
+    if (locRef && locMatch && !/zona|\bubicaci[Ã³o]n|\bdisponible/i.test(aiSummary)) {
       const humanLoc = ctx.location || '';
       aiSummary = (aiSummary ? aiSummary + ' ' : '') + `Disponible en la zona de ${humanLoc}.`;
     }
@@ -230,3 +222,4 @@ function includesWord(haystack, needle) {
   const nw = n.split(/[\s,/-]+/);
   return hw.some((w) => nw.includes(w));
 }
+

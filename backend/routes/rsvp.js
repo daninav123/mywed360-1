@@ -168,6 +168,39 @@ router.put('/by-token/:token', async (req, res) => {
   }
 });
 
+// POST /api/rsvp/generate-link  { weddingId, guestId }
+// Genera/garantiza token y devuelve link RSVP para un invitado concreto
+router.post('/generate-link', requirePlanner, async (req, res) => {
+  try {
+    const { weddingId, guestId } = req.body || {};
+    if (!weddingId || !guestId) return res.status(400).json({ error: 'weddingId and guestId required' });
+
+    const guestRef = db.collection('weddings').doc(String(weddingId)).collection('guests').doc(String(guestId));
+    const snap = await guestRef.get();
+    if (!snap.exists) return res.status(404).json({ error: 'guest-not-found' });
+    const data = snap.data() || {};
+
+    let token = (data.token || '').toString();
+    if (!token) {
+      token = uuidv4();
+      await db.collection('rsvpTokens').doc(token).set({
+        weddingId: String(weddingId),
+        guestId: String(guestId),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+      await guestRef.set({ token, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    }
+
+    const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
+    const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
+    return res.json({ ok: true, token, link, weddingId: String(weddingId), guestId: String(guestId) });
+  } catch (err) {
+    logger.error('rsvp-generate-link', err);
+    return res.status(500).json({ error: 'generate-link-failed' });
+  }
+});
+
 // POST /api/rsvp/reminders  { weddingId, limit?, dryRun?, minIntervalMinutes?, force? }
 router.post('/reminders', requirePlanner, async (req, res) => {
   try {

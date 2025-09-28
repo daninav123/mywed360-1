@@ -233,6 +233,42 @@ components:
       properties:
         channel: { type: string, enum: [push, email, sms] }
         enabled: { type: boolean }
+    ProviderStatus:
+      type: object
+      properties:
+        providerId: { type: string }
+        contracts:
+          type: object
+          properties:
+            total: { type: integer }
+            byStatus:
+              type: object
+              properties:
+                draft: { type: integer }
+                sent: { type: integer }
+                signed: { type: integer }
+                cancelled: { type: integer }
+            amountSigned: { type: number }
+            lastUpdate: { type: string, format: date-time, nullable: true }
+        payments:
+          type: object
+          properties:
+            total: { type: integer }
+            byStatus:
+              type: object
+              properties:
+                pending: { type: integer }
+                authorized: { type: integer }
+                paid: { type: integer }
+                failed: { type: integer }
+                refunded: { type: integer }
+            amount:
+              type: object
+              properties:
+                paid: { type: number }
+                pending: { type: number }
+                failed: { type: number }
+            lastUpdate: { type: string, format: date-time, nullable: true }
 
 paths:
   /api/health:
@@ -505,6 +541,25 @@ paths:
           schema: { type: number }
       responses:
         '200': { description: OK }
+
+  /api/providers/{id}/status:
+    get:
+      tags: [providers]
+      summary: Estado agregado de contratos y pagos del proveedor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderStatus'
 
   /api/contracts:
     get:

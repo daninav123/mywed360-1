@@ -170,3 +170,82 @@ router.get('/search', validate(searchQuery, 'query'), async (req, res) => {
 });
 
 export default router;
+// GET /api/providers/:id/status
+// Aggrega estado de contratos y pagos relacionados con el proveedor (sin procesar pagos)
+const statusParams = z.object({ id: z.string().min(1) });
+router.get('/:id/status', validate(statusParams, 'params'), async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Contratos por proveedor
+    let contractsSnap = { empty: true, docs: [] };
+    try {
+      contractsSnap = await admin.firestore().collection('contracts').where('providerId', '==', id).limit(500).get();
+    } catch {}
+    const contracts = contractsSnap.empty ? [] : contractsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const cByStatus = { draft: 0, sent: 0, signed: 0, cancelled: 0 };
+    let cAmountSigned = 0;
+    let lastContractUpdate = null;
+    for (const c of contracts) {
+      const st = String(c.status || 'draft');
+      if (Object.prototype.hasOwnProperty.call(cByStatus, st)) cByStatus[st] += 1;
+      if (st === 'signed' && typeof c.amount === 'number') cAmountSigned += Number(c.amount) || 0;
+      const ts = c.updatedAt?.toDate?.() || c.updatedAt || c.createdAt?.toDate?.() || c.createdAt || null;
+      if (ts && (!lastContractUpdate || ts > lastContractUpdate)) lastContractUpdate = ts;
+    }
+
+    // Pagos por proveedor (vía metadata o providerId en el pago si existe)
+    let paymentsSnap = { empty: true, docs: [] };
+    try {
+      // Intento principal: payments con providerId directo
+      paymentsSnap = await admin.firestore().collection('payments').where('providerId', '==', id).limit(1000).get();
+      if (paymentsSnap.empty) {
+        // Fallback: si no hay providerId directo, recuperar por contratos del proveedor
+        const contractIds = new Set(contracts.map((c) => c.id));
+        if (contractIds.size) {
+          // No hay where IN garantizado en el mock; cargamos y filtramos localmente (limit 1000 para no explotar)
+          const allPay = await admin.firestore().collection('payments').limit(1000).get();
+          const docs = [];
+          allPay.docs.forEach((doc) => {
+            const d = doc.data() || {};
+            if (d.contractId && contractIds.has(d.contractId)) docs.push({ id: doc.id, ...d });
+          });
+          paymentsSnap = { empty: docs.length === 0, docs: docs.map((d) => ({ id: d.id, data: () => ({ ...d }) })) };
+        }
+      }
+    } catch {}
+
+    const payments = paymentsSnap.empty ? [] : paymentsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const pByStatus = { pending: 0, authorized: 0, paid: 0, failed: 0, refunded: 0 };
+    let paid = 0, pending = 0, failed = 0;
+    let lastPaymentUpdate = null;
+    for (const p of payments) {
+      const st = String(p.status || 'pending');
+      if (Object.prototype.hasOwnProperty.call(pByStatus, st)) pByStatus[st] += 1;
+      const amt = Number(p.amount || 0) || 0;
+      if (st === 'paid') paid += amt;
+      else if (st === 'pending' || st === 'authorized') pending += amt;
+      else if (st === 'failed') failed += amt;
+      const ts = p.updatedAt?.toDate?.() || p.updatedAt || p.createdAt?.toDate?.() || p.createdAt || null;
+      if (ts && (!lastPaymentUpdate || ts > lastPaymentUpdate)) lastPaymentUpdate = ts;
+    }
+
+    return res.json({
+      providerId: id,
+      contracts: {
+        total: contracts.length,
+        byStatus: cByStatus,
+        amountSigned: cAmountSigned,
+        lastUpdate: lastContractUpdate ? new Date(lastContractUpdate).toISOString() : null,
+      },
+      payments: {
+        total: payments.length,
+        byStatus: pByStatus,
+        amount: { paid, pending, failed },
+        lastUpdate: lastPaymentUpdate ? new Date(lastPaymentUpdate).toISOString() : null,
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, error: e?.message || 'internal' });
+  }
+});

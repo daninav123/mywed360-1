@@ -324,7 +324,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               className={`py-2 px-4 ${activeTab === 'tracking' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('tracking')}
             >
-              Seguimiento
+              Seguimiento{paySuggestions && paySuggestions.length ? (
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{paySuggestions.length}</span>
+              ) : null}
             </button>
           </div>
 
@@ -732,6 +734,5 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
-
 
 

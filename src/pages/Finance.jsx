@@ -1,4 +1,4 @@
-Ôªøimport React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
@@ -14,6 +14,8 @@ import useFinance from '../hooks/useFinance';
 import useProveedores from '../hooks/useProveedores';
 import useTranslations from '../hooks/useTranslations';
 import { useLocation } from 'react-router-dom';
+import Modal from '../components/Modal';
+import TransactionForm from '../components/finance/TransactionForm';
 
 function Finance() {
   const { t } = useTranslations();
@@ -34,7 +36,7 @@ function Finance() {
     } catch {}
   }, [location]);
 
-  // Hook personalizado para Gesti√≥n financiera
+  // Hook personalizado para GestiÛn financiera
   const {
     // Estados
     syncStatus,
@@ -44,7 +46,7 @@ function Finance() {
     budget,
     transactions,
 
-    // C√°lculos
+    // C·lculos
     stats,
     budgetUsage,
     settings,
@@ -69,22 +71,22 @@ function Finance() {
   const [activeTab, setActiveTab] = useState('overview');
   const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
-  // Detectar URL hash para abrir modal espec√≠fico
+  // Detectar URL hash para abrir modal especÌfico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager Gestionar√° la apertura del modal
+      // El TransactionManager Gestionar· la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar n√∫mero de invitados al montar el componente
+  // Cargar n˙mero de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores despu√©s de 5 segundos
+  // Limpiar errores despuÈs de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -97,7 +99,7 @@ function Finance() {
     setTransactionFiltersSignal({ version: Date.now(), filters });
   };
 
-  // Manejar actualizaci√≥n de presupuesto total
+  // Manejar actualizaciÛn de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -119,7 +121,7 @@ function Finance() {
             <div className="flex">
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
-                  {t("finance.error.title", { defaultValue: "Error en Gesti√≥n financiera" })}
+                  {t("finance.error.title", { defaultValue: "Error en GestiÛn financiera" })}
                 </h3>
                 <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
@@ -129,7 +131,7 @@ function Finance() {
           </div>
         )}
 
-        {/* Tabs de p√°gina (estilo Proveedores) */}
+        {/* Tabs de p·gina (estilo Proveedores) */}
         <PageTabs
           value={activeTab}
           onChange={setActiveTab}
@@ -144,7 +146,7 @@ function Finance() {
               id: 'contributions',
               label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }),
             },
-            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'An√°lisis' }) },
+            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'An·lisis' }) },
           ]}
           className="w-full"
         />
@@ -167,6 +169,27 @@ function Finance() {
         {activeTab === 'transactions' && (
           <div className="space-y-6">
             <PaymentSuggestions onCreateTransaction={createTransaction} isLoading={isLoading} providers={supplierProviders} />
+            {/* Vista r·pida: transacciones registradas desde emails */}
+            <div className="p-3 border rounded bg-white/60">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium">Transacciones registradas desde emails</h3>
+                <span className="text-xs text-gray-600">{(transactions || []).filter(tx => /Desde email:/i.test(tx?.description || '') || (tx?.meta && tx.meta.source === 'email')).length}</span>
+              </div>
+              <div className="max-h-40 overflow-auto text-sm">
+                {(transactions || [])
+                  .filter((tx) => /Desde email:/i.test(tx?.description || '') || (tx?.meta && tx.meta.source === 'email'))
+                  .slice(0, 8)
+                  .map((tx, i) => (
+                    <div key={tx.id || i} className="flex items-center justify-between py-1 border-b last:border-0">
+                      <div className="truncate">
+                        <div className="font-medium truncate" title={tx.concept || ''}>{tx.concept || '(Sin concepto)'}</div>
+                        <div className="text-[color:var(--color-text)]/70">{(tx.date || '').slice(0,10)} ∑ {tx.type === 'income' ? 'Ingreso' : 'Gasto'} ∑ {tx.provider || ''}</div>
+                      </div>
+                      <div className="whitespace-nowrap">{Number(tx.amount || tx.paidAmount || 0).toFixed(2)}</div>
+                    </div>
+                  ))}
+              </div>
+            </div>
             {!hasBankAccount && (
               <div className="p-4 border rounded-md border-[color:var(--color-primary)]/30 bg-[var(--color-primary)]/10">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -233,10 +256,10 @@ function Finance() {
           </div>
         )}
 
-        {/* Contenido: An√°lisis */}
+        {/* Contenido: An·lisis */}
         {activeTab === 'analytics' && (
           <div className="space-y-6">
-            <React.Suspense fallback={<div className="p-4">{t("finance.charts.loading", { defaultValue: "Cargando an√°lisis‚Ä¶" })}</div>}>
+            <React.Suspense fallback={<div className="p-4">{t("finance.charts.loading", { defaultValue: "Cargando an·lisisÖ" })}</div>}>
               <FinanceCharts transactions={transactions} budgetUsage={budgetUsage} stats={stats} />
             </React.Suspense>
           </div>
@@ -247,4 +270,3 @@ function Finance() {
 }
 
 export default Finance;
-

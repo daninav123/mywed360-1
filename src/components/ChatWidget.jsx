@@ -466,14 +466,11 @@ export default function ChatWidget() {
           const query = payload.query || payload.q || payload.keyword || payload.term || '';
           if (query) {
             try {
-              const apiBase =
-                import.meta.env.VITE_BACKEND_URL ||
-                (window.location.hostname === 'localhost'
-                  ? 'http://localhost:4004'
-                  : 'https://mywed360-backend.onrender.com');
-              const resp = await fetch(
-                `${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`
-              );
+              // Resolver base del backend de forma unificada
+              const baseFromEnv = (import.meta?.env?.VITE_BACKEND_BASE_URL || '').toString();
+              const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
+              const apiBase = resolvedBase || 'http://localhost:3001';
+              const resp = await fetch(`${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`);
               const dataS = await resp.json();
               if (dataS.results) {
                 localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
@@ -923,7 +920,6 @@ export default function ChatWidget() {
     </>
   );
 }
-
 
 
 

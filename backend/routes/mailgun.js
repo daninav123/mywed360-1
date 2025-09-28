@@ -5,6 +5,17 @@ import cors from 'cors';
 // Asegura variables de entorno disponibles en Render o local
 dotenv.config();
 
+// Ensure MAILGUN_* env vars exist in development by falling back to VITE_* equivalents
+if (!process.env.MAILGUN_API_KEY && process.env.VITE_MAILGUN_API_KEY) {
+  process.env.MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY;
+}
+if (!process.env.MAILGUN_DOMAIN && process.env.VITE_MAILGUN_DOMAIN) {
+  process.env.MAILGUN_DOMAIN = process.env.VITE_MAILGUN_DOMAIN;
+}
+if (typeof process.env.MAILGUN_EU_REGION === 'undefined' && typeof process.env.VITE_MAILGUN_EU_REGION !== 'undefined') {
+  process.env.MAILGUN_EU_REGION = process.env.VITE_MAILGUN_EU_REGION;
+}
+
 const router = express.Router();
 
 // Habilitar CORS basico para tests desde frontend

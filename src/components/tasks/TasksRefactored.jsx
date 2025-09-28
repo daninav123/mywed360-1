@@ -920,8 +920,8 @@ export default function Tasks() {
   // Subtareas (lista): combinar modelo nuevo (nested) y legacy (flat con type='subtask')
   const subtaskEvents = useMemo(() => {
     try {
-      // a) Subtareas planas visibles (con fechas v)lidas)
-      const flat = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
+      // a) Subtareas planas con fechas válidas (provenientes del normalizador Gantt)
+      const flatScheduled = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [])
         .filter((t) => String(t.type || 'task') === 'subtask')
         .map((t) => ({
           id: String(t.id),
@@ -979,48 +979,59 @@ export default function Tasks() {
         };
       });
 
-      // c) Fallback: si no hay nested, incluir todas las planas (aunque no tengan fecha)
-      let flatAll = [];
-      if (nested.length === 0) {
-        const src = Array.isArray(tasksState) ? tasksState : [];
-        flatAll = src
-          .filter((t) => String(t?.type || '') === 'subtask')
-          .map((t) => {
-            const s = t?.start?.toDate ? t.start.toDate() : (t?.start ? new Date(t.start) : null);
-            const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
-            return {
-              id: String(t.id),
-              title: t.name || t.title || 'Subtarea',
-              desc: t.desc || '',
-              category: t.category || 'OTROS',
-              start: s || null,
-              end: e || null,
-              assignee: t.assignee || '',
-              parentId: t.parentId || '',
-              __kind: 'subtask',
-            };
-          });
-      }
+      // c) Subtareas planas (todas, incluso sin fecha) — siempre incluir para compatibilidad
+      const src = Array.isArray(tasksState) ? tasksState : [];
+      const flatAll = src
+        .filter((t) => String(t?.type || '') === 'subtask')
+        .map((t) => {
+          const s = t?.start?.toDate ? t.start.toDate() : (t?.start ? new Date(t.start) : null);
+          const e = t?.end?.toDate ? t.end.toDate() : (t?.end ? new Date(t.end) : (s || null));
+          return {
+            id: String(t.id),
+            title: t.name || t.title || 'Subtarea',
+            desc: t.desc || '',
+            category: t.category || 'OTROS',
+            start: s || null,
+            end: e || null,
+            assignee: t.assignee || '',
+            parentId: t.parentId || t.parentTaskId || '',
+            __kind: 'subtask',
+          };
+        });
 
-      // Unir por clave )nica evitando colisiones de id entre distintos padres
-      const byKey = new Map();
-      for (const it of flat) {
-        const k = `flat:${it.parentId || ''}:${it.id}`;
-        if (!byKey.has(k)) byKey.set(k, it);
-      }
-      for (const it of nested) {
-        const k = String(it.__path || `nested:${it.parentId || ''}:${it.id}`);
-        byKey.set(k, it);
-      }
-      for (const it of flatAll) {
-        const k = `flatAll:${it.parentId || ''}:${it.id}`;
-        if (!byKey.has(k)) byKey.set(k, it);
-      }
-      return Array.from(byKey.values());
+      // Unificar con prioridad: nested > flatScheduled > flatAll
+      const byStable = new Map(); // key = `${parentId}:${id}`
+      const consider = (item, priority) => {
+        try {
+          const pid = String(item?.parentId || '');
+          const sid = String(item?.id || '');
+          if (!sid) return;
+          const key = `${pid}:${sid}`;
+          if (!byStable.has(key)) {
+            byStable.set(key, { item, priority });
+            return;
+          }
+          const cur = byStable.get(key);
+          // Reemplazar si la nueva fuente tiene mayor prioridad o aporta fecha donde antes no había
+          if (
+            priority < cur.priority ||
+            (!cur.item?.start && item?.start)
+          ) {
+            byStable.set(key, { item, priority });
+          }
+        } catch {}
+      };
+
+      // prioridad: 0 nested, 1 flatScheduled, 2 flatAll
+      for (const it of nested) consider(it, 0);
+      for (const it of flatScheduled) consider(it, 1);
+      for (const it of flatAll) consider(it, 2);
+
+      return Array.from(byStable.values()).map((e) => e.item);
     } catch {
       return [];
     }
-  }, [uniqueGanttTasks, nestedSubtasks, tasksState]);
+  }, [uniqueGanttTasks, nestedSubtasks, nestedSubtasksFallback, tasksState]);
 
   // (se declara ms abajo tras parentNameMap)
 
@@ -2193,7 +2204,6 @@ export default function Tasks() {
     </div>
   );
 }
-
 
 
 
