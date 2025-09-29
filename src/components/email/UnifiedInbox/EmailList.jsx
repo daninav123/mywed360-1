@@ -7,7 +7,8 @@ import {
   Loader,
   Star as StarIcon,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { get as apiGet } from '../../../services/apiClient';
 
 import { safeRender, ensureNotPromise, safeMap } from '../../../utils/promiseSafeRenderer';
 import Button from '../../Button';
@@ -242,6 +243,7 @@ const EmailList = ({
                 </div>
                 <div className="col-span-6 sm:col-span-6 truncate flex items-center">
                   <span className="mr-2 truncate">{safeRender(email.subject, '(Sin asunto)')}</span>
+                  <InsightsBadge id={safeRender(email.id, '')} />
                   {email.attachments && email.attachments.length > 0 && (
                     <span className="text-gray-500 text-xs">📎</span>
                   )}
@@ -263,5 +265,33 @@ const EmailList = ({
     </div>
   );
 };
+
+function InsightsBadge({ id }) {
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        if (!id) return;
+        const res = await apiGet(`/api/email-insights/${encodeURIComponent(id)}`, { auth: true, silent: true });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (ignore) return;
+        const t = (json?.tasks?.length || 0) + (json?.meetings?.length || 0) + (json?.budgets?.length || 0) + (json?.contracts?.length || 0);
+        setTotal(t);
+      } catch {}
+    })();
+    return () => { ignore = true; };
+  }, [id]);
+  if (total <= 0) return null;
+  return (
+    <span
+      title={`Acciones IA: ${total}`}
+      className="ml-2 inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-2 py-px text-[10px] font-semibold"
+    >
+      IA {total}
+    </span>
+  );
+}
 
 export default EmailList;

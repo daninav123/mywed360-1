@@ -1,6 +1,7 @@
 import { Mail, Paperclip } from 'lucide-react';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
+import { get as apiGet } from '../../services/apiClient';
 
 /**
  * Componente que muestra la lista de correos electrónicos en la bandeja
@@ -147,6 +148,26 @@ const EmailList = ({
 
   const Row = ({ index, style }) => {
     const email = emails[index];
+    const [insights, setInsights] = useState(null);
+    useEffect(() => {
+      let ignore = false;
+      (async () => {
+        try {
+          if (!email?.id) return;
+          const res = await apiGet(`/api/email-insights/${encodeURIComponent(email.id)}`, { auth: true, silent: true });
+          if (!res.ok) return;
+          const json = await res.json();
+          if (!ignore) setInsights(json);
+        } catch {}
+      })();
+      return () => { ignore = true; };
+    }, [email?.id]);
+    const totalActions = (() => {
+      try {
+        const t = (insights?.tasks?.length || 0) + (insights?.meetings?.length || 0) + (insights?.budgets?.length || 0) + (insights?.contracts?.length || 0);
+        return t;
+      } catch { return 0; }
+    })();
     return (
       <div
         style={style}
@@ -186,6 +207,14 @@ const EmailList = ({
           >
             {email.subject || '(Sin asunto)'}
           </h4>
+          {totalActions > 0 && (
+            <span
+              title={`Acciones IA: ${totalActions}`}
+              className="ml-2 inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-2 py-px text-[10px] font-semibold"
+            >
+              IA {totalActions}
+            </span>
+          )}
           {email.attachments && email.attachments.length > 0 && (
             <span aria-label="Contiene archivos adjuntos">
               <Paperclip size={14} className="text-gray-600 shrink-0" />

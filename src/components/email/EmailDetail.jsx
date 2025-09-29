@@ -9,6 +9,7 @@ import {
 import sanitizeHtml from '../../utils/sanitizeHtml';
 // Importamos nuestros componentes personalizados en lugar de lucide-react
 import Button from '../Button';
+import EmailInsights from '../EmailInsights';
 import EmailTagsManager from './EmailTagsManager';
 import FolderSelectionModal from './FolderSelectionModal';
 import {
@@ -367,6 +368,9 @@ const EmailDetail = ({
           </div>
         </section>
       )}
+
+      {/* IA: Acciones sugeridas */}
+      <EmailInsights mailId={email.id} email={email} />
 
       {/* Modal de selección de carpetas */}
       <FolderSelectionModal
