@@ -2,7 +2,8 @@
 // Provides a thin client around backend APIs when available,
 // and a minimal in-memory fallback otherwise to keep the UI functional.
 
-import { auth } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
+import { collection, getDocs, query as fbQuery, where as fbWhere, orderBy as fbOrderBy, limit as fbLimit } from 'firebase/firestore';
 import { get as apiGet, post as apiPost, put as apiPut, del as apiDel } from './apiClient';
 import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 
@@ -60,6 +61,47 @@ function normalizeMail(m) {
     const id = String(Date.now());
     return { ...(m || {}), id, apiId: id };
   }
+}
+
+// Fallback: cargar correos directamente desde Firestore del frontend
+async function fetchMailsFromFirestore(folder = 'inbox', userEmail = '') {
+  try {
+    const results = [];
+    const u = auth?.currentUser || null;
+    const emailNorm = String(userEmail || u?.email || '').toLowerCase();
+
+    // 1) Intentar subcolección del usuario autenticado
+    if (u && u.uid) {
+      try {
+        const sub = collection(db, 'users', u.uid, 'mails');
+        let q = fbQuery(sub, fbWhere('folder', '==', folder));
+        try {
+          q = fbQuery(sub, fbWhere('folder', '==', folder), fbOrderBy('date', 'desc'));
+        } catch {}
+        const snap = await getDocs(q);
+        snap.forEach((d) => results.push({ id: d.id, ...(d.data() || {}) }));
+        if (results.length) {
+          try { return results.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).map((m) => normalizeMail(classifyMailClientSide(m))); } catch { return results.map(normalizeMail); }
+        }
+      } catch {}
+    }
+
+    // 2) Colección global filtrando por to/from
+    try {
+      const root = collection(db, 'mails');
+      let q = fbQuery(root, fbWhere('folder', '==', folder));
+      if (emailNorm) {
+        if (folder === 'sent') q = fbQuery(root, fbWhere('folder', '==', folder), fbWhere('from', '==', emailNorm));
+        else q = fbQuery(root, fbWhere('folder', '==', folder), fbWhere('to', '==', emailNorm));
+      }
+      try { q = fbQuery(q, fbOrderBy('date', 'desc')); } catch {}
+      const snap = await getDocs(q);
+      const arr = [];
+      snap.forEach((d) => arr.push({ id: d.id, ...(d.data() || {}) }));
+      try { return arr.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).map((m) => normalizeMail(classifyMailClientSide(m))); } catch { return arr.map(normalizeMail); }
+    } catch {}
+  } catch {}
+  return [];
 }
 
 // Heurísticas básicas de clasificación en cliente (sin IA externa)
@@ -167,13 +209,23 @@ export async function getMails(folder = 'inbox') {
     if (folder) qs.set('folder', folder);
     if (user) qs.set('user', (user || '').toLowerCase());
     const path = `/api/mail${qs.toString() ? `?${qs.toString()}` : ''}`;
-    let res = await apiGet(path, { auth: true });
+    let res;
+    try {
+      res = await apiGet(path, { auth: true, silent: true });
+    } catch (_netErr) {
+      // Backend no disponible: intentar leer directamente de Firestore desde el cliente
+      return fetchMailsFromFirestore(folder, user);
+    }
     // Fallback por 403: reintentar sin user y filtrar en cliente
     if (res.status === 403) {
       const qs2 = new URLSearchParams();
       if (folder) qs2.set('folder', folder);
       const path2 = `/api/mail${qs2.toString() ? `?${qs2.toString()}` : ''}`;
-      res = await apiGet(path2, { auth: true });
+      try {
+        res = await apiGet(path2, { auth: true, silent: true });
+      } catch (_netErr) {
+        return fetchMailsFromFirestore(folder, user);
+      }
       if (res.ok) {
         const all = await res.json();
         const myAddrs = resolveMyAddresses();
@@ -217,7 +269,13 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
   if (cursor) qs.set('cursor', String(cursor));
   const path = `/api/mail/page${qs.toString() ? `?${qs.toString()}` : ''}`;
   try {
-    let res = await apiGet(path, { auth: true });
+    let res;
+    try {
+      res = await apiGet(path, { auth: true, silent: true });
+    } catch (_netErr) {
+      const items = await fetchMailsFromFirestore(folder, user);
+      return { items, nextCursor: null };
+    }
     if (res.ok) {
       const json = await res.json();
       const items = Array.isArray(json?.items) ? json.items : [];
@@ -235,7 +293,12 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
       if (limit) qs2.set('limit', String(limit));
       if (cursor) qs2.set('cursor', String(cursor));
       const path2 = `/api/mail/page${qs2.toString() ? `?${qs2.toString()}` : ''}`;
-      res = await apiGet(path2, { auth: true });
+      try {
+        res = await apiGet(path2, { auth: true, silent: true });
+      } catch (_netErr) {
+        const items = await fetchMailsFromFirestore(folder, user);
+        return { items, nextCursor: null };
+      }
       if (res.ok) {
         const json = await res.json();
         const baseItems = Array.isArray(json?.items) ? json.items : [];
@@ -546,4 +609,3 @@ export function logAIEmailActivity(aiResultId, searchQuery) {
 }
 
 export default api;
-

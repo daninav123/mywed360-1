@@ -103,6 +103,9 @@ input[type='number'] {
   .bg-surface {
     background-color: var(--color-surface);
   }
+  .border-primary {
+    border-color: var(--color-primary);
+  }
   .text-body {
     color: var(--color-text);
   }
@@ -117,6 +120,13 @@ input[type='number'] {
   }
   .bg-primary {
     background-color: var(--color-primary);
+  }
+  /* Fondo sutil basado en el color primario (para estados activos/hover) */
+  .bg-primary-soft {
+    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+  .hover\:bg-primary-soft:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
   }
   .text-primary {
     color: var(--color-primary);

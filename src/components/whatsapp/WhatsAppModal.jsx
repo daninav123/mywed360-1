@@ -103,13 +103,13 @@ export default function WhatsAppModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg border">
-        <div className="flex items-center justify-between px-4 py-3 border-b">
+      <div className="bg-surface w-full max-w-2xl rounded-lg shadow-lg border border-soft">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-soft">
           <div className="flex items-center gap-2">
             <MessageSquare size={18} />
             <h3 className="font-semibold">Enviar por WhatsApp</h3>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+          <button onClick={onClose} className="text-muted hover:text-body">
             ×
           </button>
         </div>
@@ -126,7 +126,7 @@ export default function WhatsAppModal({
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted">
                 Se abrirá WhatsApp en tu dispositivo con el mensaje preparado. Podrás confirmar el
                 envío manualmente.
               </p>
@@ -134,7 +134,7 @@ export default function WhatsAppModal({
               <div>
                 <label className="block text-sm font-medium mb-1">Mensaje</label>
                 <textarea
-                  className="w-full border rounded-md p-2 text-sm min-h-[120px]"
+                  className="w-full border border-soft rounded-md p-2 text-sm min-h-[120px]"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
@@ -173,7 +173,7 @@ export default function WhatsAppModal({
               </div>
               {health && (
                 <div>
-                  <div className="text-xs text-gray-600">
+                  <div className="text-xs text-muted">
                     Health: {health.success ? 'OK' : 'Degradado'}{' '}
                     {health.status?.fallback ? `(fallback: ${health.status.fallback})` : ''}
                   </div>
@@ -194,11 +194,11 @@ export default function WhatsAppModal({
                       Ver métricas
                     </button>
                     {showMetrics && (
-                      <div className="mt-2 border rounded p-2 bg-gray-50">
+                      <div className="mt-2 border rounded p-2 bg-surface">
                         {loadingMetrics ? (
                           <div>Cargando métricas…</div>
                         ) : metrics ? (
-                          <div className="text-[11px] text-gray-700">
+                          <div className="text-[11px] text-body">
                             <div>Total: {metrics.total || 0}</div>
                             <div>
                               Entrega: {Math.round((metrics.rates?.deliveryRate || 0) * 100)}%
@@ -214,7 +214,7 @@ export default function WhatsAppModal({
               <div>
                 <label className="block text-sm font-medium mb-1">Mensaje</label>
                 <textarea
-                  className="w-full border rounded-md p-2 text-sm min-h-[120px]"
+                  className="w-full border border-soft rounded-md p-2 text-sm min-h-[120px]"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
@@ -236,7 +236,7 @@ export default function WhatsAppModal({
                 </Button>
               </div>
               {!provider.configured && (
-                <div className="mt-2 text-xs text-gray-500">
+                <div className="mt-2 text-xs text-muted">
                   Nota: El proveedor API no está listo. Puedes usar la pestaña &quot;Móvil
                   personal&quot; (deeplink) como alternativa.
                 </div>

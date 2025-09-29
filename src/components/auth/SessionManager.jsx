@@ -38,13 +38,13 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+      <div className="bg-surface rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
         <div className="flex items-center mb-4">
           <Shield className="h-6 w-6 text-yellow-500 mr-2" />
           <h2 className="text-lg font-semibold">Reautenticación Requerida</h2>
         </div>
 
-        <p className="text-gray-600 mb-4">
+        <p className="text-muted mb-4">
           Tu sesión ha expirado. Por favor, confirma tu contraseña para continuar.
         </p>
 
@@ -59,7 +59,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-body mb-2">
               Email: {currentUser?.email}
             </label>
             <input
@@ -67,7 +67,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-soft rounded-md focus:outline-none focus:ring-2 ring-primary"
               disabled={isLoading}
               autoFocus
             />
@@ -77,7 +77,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
             <button
               type="submit"
               disabled={!password.trim() || isLoading}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="flex-1 bg-[var(--color-primary)] text-white px-4 py-2 rounded-md hover:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin mr-2" />
@@ -90,7 +90,7 @@ const ReauthModal = ({ isOpen, onClose, onReauth, error }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-4 py-2 border border-soft rounded-md hover:bg-primary-soft"
               disabled={isLoading}
             >
               Cancelar
@@ -123,8 +123,8 @@ const ConnectionStatus = ({ isOnline, lastSync }) => {
       </div>
 
       {showDetails && (
-        <div className="absolute top-12 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-48">
-          <div className="text-xs text-gray-600">
+        <div className="absolute top-12 right-0 bg-surface border border-soft rounded-lg shadow-lg p-3 min-w-48">
+          <div className="text-xs text-muted">
             <div className="flex justify-between mb-1">
               <span>Estado:</span>
               <span className={isOnline ? 'text-green-600' : 'text-red-600'}>

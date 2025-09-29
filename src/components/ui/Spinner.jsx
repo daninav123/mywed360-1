@@ -13,7 +13,7 @@ const Spinner = ({ size = 'md', className = '' }) => {
   };
 
   const spinnerSize = sizeClasses[size] || sizeClasses.md;
-  const classes = `animate-spin rounded-full border-t-2 border-blue-500 border-r-2 border-transparent ${spinnerSize} ${className}`;
+  const classes = `animate-spin rounded-full border-t-2 border-t-[color:var(--color-primary)] border-r-2 border-transparent ${spinnerSize} ${className}`;
 
   return (
     <div role="status" className="inline-block">

@@ -57,14 +57,14 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-[var(--color-bg)]">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
+      <form onSubmit={handleSubmit} className="bg-surface p-6 rounded shadow-md border border-soft">
         <h2 className="text-2xl mb-4">Iniciar sesión</h2>
         <input
           type="text"
           placeholder="Nombre de usuario"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
           data-testid="email-input"
         />
         <input
@@ -72,7 +72,7 @@ export default function Login() {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
           data-testid="password-input"
         />
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}

@@ -68,16 +68,16 @@ const AdminLayout = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-app">
       {/* Menú lateral */}
       <aside
-        className={`bg-white shadow-md transition-all duration-300 flex flex-col ${
+        className={`bg-surface shadow-md transition-all duration-300 flex flex-col ${
           collapsed ? 'w-20' : 'w-64'
         }`}
       >
         {/* Logo y nombre */}
         <div
-          className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b`}
+          className={`p-4 flex items-center ${collapsed ? 'justify-center' : 'justify-between'} border-b border-soft`}
         >
           <Link to="/admin" className="flex items-center">
             <img src="/icon-192.png" alt="MyWed360" className="h-10 w-10" />
@@ -110,8 +110,8 @@ const AdminLayout = ({ children }) => {
                   to={item.path}
                   className={`flex items-center px-4 py-3 ${
                     isActive(item.path)
-                      ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-primary-soft text-primary border-r-4 border-primary'
+                      : 'text-body hover:bg-primary-soft'
                   } ${collapsed ? 'justify-center' : ''}`}
                 >
                   {item.icon}
@@ -123,11 +123,11 @@ const AdminLayout = ({ children }) => {
         </nav>
 
         {/* Perfil y cerrar sesión */}
-        <div className={`mt-auto p-4 border-t ${collapsed ? 'text-center' : ''}`}>
+        <div className={`mt-auto p-4 border-t border-soft ${collapsed ? 'text-center' : ''}`}>
           {!collapsed && (
             <div className="mb-4">
               <p className="text-sm font-medium">{user?.name || 'Administrador'}</p>
-              <p className="text-xs text-gray-500">{user?.email || ''}</p>
+              <p className="text-xs text-muted">{user?.email || ''}</p>
             </div>
           )}
 
@@ -146,9 +146,9 @@ const AdminLayout = ({ children }) => {
       {/* Área de contenido principal */}
       <main className="flex-grow overflow-auto">
         {/* Cabecera */}
-        <header className="bg-white shadow-sm p-4">
+        <header className="bg-surface shadow-sm p-4">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl font-semibold text-gray-800">Panel de administración</h1>
+            <h1 className="text-2xl font-semibold text-body">Panel de administración</h1>
           </div>
         </header>
 

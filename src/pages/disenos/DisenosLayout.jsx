@@ -37,7 +37,7 @@ const DiseñosLayout = React.memo(() => {
 
   return (
     <section className="p-6 flex flex-col gap-6" aria-labelledby="disenos-heading">
-      <h1 id="disenos-heading" className="text-2xl font-bold text-gray-800">
+      <h1 id="disenos-heading" className="text-2xl font-bold text-body">
         Diseños
       </h1>
 
@@ -53,10 +53,10 @@ const DiseñosLayout = React.memo(() => {
             role="tab"
             aria-current={location.pathname === tab.href ? 'page' : undefined}
             className={({ isActive }) =>
-              `px-4 py-2 rounded-t-lg font-medium whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 ${
+              `px-4 py-2 rounded-t-lg font-medium whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-primary ${
                 isActive
-                  ? 'bg-white border-t-2 border-l-2 border-r-2 border-blue-500 text-blue-600 font-semibold'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-surface border-t-2 border-l-2 border-r-2 border-primary text-primary font-semibold'
+                  : 'bg-surface text-muted hover:bg-primary-soft'
               }`
             }
           >
@@ -66,7 +66,7 @@ const DiseñosLayout = React.memo(() => {
       </nav>
 
       <Card
-        className="overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        className="overflow-hidden focus:outline-none focus-visible:ring-2 ring-primary"
         role="region"
         aria-label="Contenido de Diseños"
       >
