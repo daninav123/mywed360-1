@@ -1,5 +1,5 @@
 ﻿import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
@@ -19,6 +19,7 @@ import Modal from '../Modal';
 import Toast from '../Toast';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import { fetchProviderStatus } from '../../services/providerStatusService';
 
 /**
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
@@ -52,6 +53,23 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [paying, setPaying] = useState(false);
   const [paySuggestions, setPaySuggestions] = useState([]);
   const [payLoading, setPayLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [providerStatus, setProviderStatus] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!provider?.id) return;
+        setStatusLoading(true);
+        const data = await fetchProviderStatus(provider.id).catch(() => null);
+        if (!cancelled) setProviderStatus(data);
+      } finally {
+        if (!cancelled) setStatusLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [provider?.id]);
 
   const handlePayDeposit = async () => {
     if (!provider) return;
@@ -510,6 +528,47 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   </div>
                 </Card>
 
+                <Card>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium">Estado del proveedor</h3>
+                    {statusLoading && <span className="text-xs text-gray-500">Cargando…</span>}
+                  </div>
+                  {!providerStatus ? (
+                    <p className="text-sm text-gray-600">Sin datos agregados todavía.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="p-3 rounded bg-gray-50">
+                        <p className="font-semibold mb-1">Contratos</p>
+                        <p>Total: {providerStatus.contracts?.total ?? 0}</p>
+                        <div className="mt-1 text-gray-700">
+                          <p>Firmados: {providerStatus.contracts?.byStatus?.signed ?? 0}</p>
+                          <p>Enviados: {providerStatus.contracts?.byStatus?.sent ?? 0}</p>
+                          <p>Borradores: {providerStatus.contracts?.byStatus?.draft ?? 0}</p>
+                          <p>Cancelados: {providerStatus.contracts?.byStatus?.cancelled ?? 0}</p>
+                        </div>
+                        <p className="mt-1">Importe firmado: {providerStatus.contracts?.amountSigned ?? 0}</p>
+                        {providerStatus.contracts?.lastUpdate && (
+                          <p className="text-xs text-gray-500 mt-1">Última actualización: {new Date(providerStatus.contracts.lastUpdate).toLocaleString()}</p>
+                        )}
+                      </div>
+                      <div className="p-3 rounded bg-gray-50">
+                        <p className="font-semibold mb-1">Pagos</p>
+                        <p>Total: {providerStatus.payments?.total ?? 0}</p>
+                        <div className="mt-1 text-gray-700">
+                          <p>Pagados: {providerStatus.payments?.byStatus?.paid ?? 0}</p>
+                          <p>Pendientes/Autorizados: {(providerStatus.payments?.byStatus?.pending ?? 0) + (providerStatus.payments?.byStatus?.authorized ?? 0)}</p>
+                          <p>Fallidos: {providerStatus.payments?.byStatus?.failed ?? 0}</p>
+                          <p>Reembolsados: {providerStatus.payments?.byStatus?.refunded ?? 0}</p>
+                        </div>
+                        <p className="mt-1">Importes: pagado {providerStatus.payments?.amount?.paid ?? 0}, pendiente {providerStatus.payments?.amount?.pending ?? 0}</p>
+                        {providerStatus.payments?.lastUpdate && (
+                          <p className="text-xs text-gray-500 mt-1">Última actualización: {new Date(providerStatus.payments.lastUpdate).toLocaleString()}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </Card>
+
                 <ProveedorBudgets supplierId={provider.id} />
 
                 <Card>
@@ -734,5 +793,4 @@ export default React.memo(ProveedorDetail, (prevProps, nextProps) => {
     JSON.stringify(prevProps.provider) === JSON.stringify(nextProps.provider)
   );
 });
-
 
