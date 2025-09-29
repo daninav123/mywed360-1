@@ -5,14 +5,19 @@ import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
 import Card from '../components/ui/Card';
 import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import useGuests from '../hooks/useGuests';
 import * as EmailService from '../services/emailService';
 import { generateRsvpLink } from '../services/rsvpService';
 import { post as apiPost } from '../services/apiClient';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { invitationTemplates } from '../data/invitationTemplates';
+import sanitizeHtml from '../utils/sanitizeHtml';
 
 export default function Invitaciones() {
   const { activeWedding } = useWedding();
+  const { info: weddingInfo } = useActiveWeddingInfo();
+  const { guests } = useGuests();
   // Estado de sincronizaciÃ³n
   const [syncStatus, setSyncStatus] = useState(getSyncState());
 
@@ -132,13 +137,11 @@ export default function Invitaciones() {
     })();
   }, []);
 
-  // Ejemplo de plantillas
-  const templates = [
-    { id: 1, name: 'ClÃ¡sico', category: 'clÃ¡sico', color: 'pastel', font: 'Serif' },
-    { id: 2, name: 'Moderno', category: 'moderno', color: 'vibrante', font: 'Sans' },
-    { id: 3, name: 'RÃºstico', category: 'rÃºstico', color: 'tierra', font: 'Handwriting' },
-    { id: 4, name: 'Minimalista', category: 'minimalista', color: 'monocromo', font: 'Sans' },
-  ];
+  // Plantillas
+  const templates = invitationTemplates;
+  const [selectedTemplateId, setSelectedTemplateId] = useState(templates[0]?.id || 'classic');
+  const [previewGuestId, setPreviewGuestId] = useState('');
+  const [previewRsvpLink, setPreviewRsvpLink] = useState('');
   const filtered = templates.filter(
     (t) =>
       (filterCategory ? t.category === filterCategory : true) &&
@@ -306,7 +309,8 @@ export default function Invitaciones() {
             {filtered.map((t) => (
               <div
                 key={t.id}
-                className="border rounded overflow-hidden cursor-pointer hover:shadow-lg"
+                onClick={() => setSelectedTemplateId(t.id)}
+                className={`border rounded overflow-hidden cursor-pointer hover:shadow-lg ${selectedTemplateId === t.id ? 'ring-2 ring-blue-500' : ''}`}
               >
                 <div className="h-32 bg-gray-100 flex items-center justify-center">
                   <span className="text-sm font-medium">{t.name}</span>
@@ -516,12 +520,58 @@ export default function Invitaciones() {
           </div>
         </section>
       )}
-      {showPreview && generatedText && (
+
+      {showPreview && (
         <section className="border rounded p-4 bg-gray-50 mt-4">
-          <h3 className="text-lg font-semibold">Preview de InvitaciÃ³n</h3>
-          <p className="whitespace-pre-wrap">{generatedText}</p>
+          <h3 className="text-lg font-semibold mb-2">Preview de Invitación</h3>
+          <div className="mb-3">
+            <label className="text-sm mr-2">Invitado para preview:</label>
+            <select
+              value={previewGuestId}
+              onChange={async (e) => {
+                const id = e.target.value; setPreviewGuestId(id);
+                try {
+                  if (activeWedding && id) {
+                    const { link } = await generateRsvpLink({ weddingId: activeWedding, guestId: id });
+                    setPreviewRsvpLink(link || "");
+                  } else { setPreviewRsvpLink(""); }
+                } catch { setPreviewRsvpLink(""); }
+              }}
+              className="border rounded px-2 py-1"
+            >
+              <option value="">(Opcional) Selecciona invitado…</option>
+              {(guests || []).slice(0, 100).map((g) => (
+                <option key={g.id} value={g.id}>{g.name || g.email || g.id}</option>
+              ))}
+            </select>
+          </div>
+          <div className="border rounded bg-white overflow-hidden">
+            <div
+              className="max-h-[70vh] overflow-auto"
+              dangerouslySetInnerHTML={{ __html: (() => {
+                const tpl = templates.find((t) => t.id === selectedTemplateId) || templates[0];
+                const couple = (weddingInfo?.weddingInfo?.coupleName || weddingInfo?.weddingInfo?.name || "Nuestra boda");
+                const wedDate = (weddingInfo?.weddingInfo?.weddingDate || weddingInfo?.weddingInfo?.date || "").toString();
+                const venue = (weddingInfo?.weddingInfo?.venue || weddingInfo?.weddingInfo?.place || weddingInfo?.weddingInfo?.location || "Lugar por confirmar");
+                const g = (guests || []).find((x) => String(x.id) === String(previewGuestId));
+                const guestName = g?.name || "Invitado/a";
+                const map = {
+                  coupleName: couple,
+                  weddingDate: wedDate,
+                  venue,
+                  guestName,
+                  rsvpLink: previewRsvpLink || "",
+                  invitationText: generatedText || "Nos hará mucha ilusión contar contigo en este día tan especial.",
+                };
+                const withIf = (tpl?.html || "").replace(/\{\{#if rsvpLink\}\}([\s\S]*?)\{\{\/if\}\}/g, (_, block) => (map.rsvpLink ? block : ""));
+                const out = withIf.replace(/\{\{(\w+)\}\}/g, (_m, k) => (map[k] != null ? String(map[k]) : ""));
+                return sanitizeHtml(typeof out === "string" ? out : String(out || ""));
+              })() }}
+            />
+          </div>
         </section>
       )}
+
       {/* Opciones Avanzadas */}
       {step === 4 && (
         <section className="border rounded p-4">
@@ -547,5 +597,6 @@ export default function Invitaciones() {
     </Card>
   );
 }
+
 
 

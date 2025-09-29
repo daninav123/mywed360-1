@@ -77,7 +77,8 @@ const SeatingPlanToolbar = ({
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showAlignMenu, setShowAlignMenu] = useState(false);
-  const [showSnaps, setShowSnaps] = useState(false);\n  const [showHotkeys, setShowHotkeys] = useState(false);
+  const [showSnaps, setShowSnaps] = useState(false);
+  const [showHotkeys, setShowHotkeys] = useState(false);
   const [snapshotName, setSnapshotName] = useState('');
   const [snapshotError, setSnapshotError] = useState('');
   const exportRef = useRef(null);
@@ -735,7 +736,8 @@ const SeatingPlanToolbar = ({
             </div>
           </div>
         </div>
-      )}\n      {/* Snapshots menu */}
+      )}
+      {/* Snapshots menu */}
       <div className="px-3 pb-3">
         <div ref={snapsRef} className="relative inline-block">
           <button
@@ -833,6 +835,5 @@ const SeatingPlanToolbar = ({
 };
 
 export default React.memo(SeatingPlanToolbar);
-
 
 
