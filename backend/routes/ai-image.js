@@ -72,12 +72,7 @@ router.post('/', async (req, res) => {
 // ---------- PDF vectorizado ----------
 
 
-import { createCanvas, loadImage } from 'canvas';
-import ImageTracer from 'imagetracerjs';
-import PDFDocument from 'pdfkit';
-import SVGtoPDF from 'svg-to-pdfkit';
-import stream from 'stream';
-import potrace from 'potrace';
+// Lazy imports dentro de los handlers para evitar fallos de arranque si faltan binarios nativos (canvas, etc.)
 
 /**
  * POST /api/ai-image/vector-pdf
@@ -86,6 +81,22 @@ import potrace from 'potrace';
  */
 router.post('/vector-pdf', async (req, res) => {
   let { url, widthMm = 210, heightMm = 297, dpi = 300 } = req.body || {};
+  // Cargar dependencias pesadas bajo demanda
+  let createCanvas, loadImage, ImageTracer, PDFDocument, SVGtoPDF;
+  try {
+    const canvasMod = await import('canvas');
+    createCanvas = canvasMod.createCanvas;
+    loadImage = canvasMod.loadImage;
+    const itMod = await import('imagetracerjs').catch(() => null);
+    ImageTracer = itMod?.default || itMod;
+    const pdfMod = await import('pdfkit');
+    PDFDocument = pdfMod.default || pdfMod;
+    const svg2pdfMod = await import('svg-to-pdfkit');
+    SVGtoPDF = svg2pdfMod.default || svg2pdfMod;
+  } catch (e) {
+    logger.error('vector-pdf setup failed', e);
+    return res.status(501).json({ error: 'feature-disabled', details: 'Raster/vector PDF generation not available on this environment' });
+  }
   try {
     const mod = await import('zod').catch(()=>null);
     if (mod) {
@@ -163,6 +174,18 @@ router.post('/vector-pdf', async (req, res) => {
  */
 router.post('/vectorize-svg', async (req, res) => {
   let { url, options } = req.body || {};
+  // Cargar dependencias pesadas bajo demanda
+  let createCanvas, loadImage, ImageTracer;
+  try {
+    const canvasMod = await import('canvas');
+    createCanvas = canvasMod.createCanvas;
+    loadImage = canvasMod.loadImage;
+    const itMod = await import('imagetracerjs').catch(() => null);
+    ImageTracer = itMod?.default || itMod;
+  } catch (e) {
+    logger.error('vectorize-svg setup failed', e);
+    return res.status(501).json({ error: 'feature-disabled', details: 'SVG vectorization not available on this environment' });
+  }
   try {
     const mod = await import('zod').catch(()=>null);
     if (mod){
@@ -210,6 +233,17 @@ router.post('/vectorize-svg', async (req, res) => {
  */
 router.post('/svg-to-pdf', async (req, res) => {
   try {
+    // Cargar dependencias bajo demanda
+    let PDFDocument, SVGtoPDF;
+    try {
+      const pdfMod = await import('pdfkit');
+      PDFDocument = pdfMod.default || pdfMod;
+      const svg2pdfMod = await import('svg-to-pdfkit');
+      SVGtoPDF = svg2pdfMod.default || svg2pdfMod;
+    } catch (e) {
+      logger.error('svg-to-pdf setup failed', e);
+      return res.status(501).json({ error: 'feature-disabled', details: 'SVG to PDF not available on this environment' });
+    }
     let { svg, widthMm = 210, heightMm = 297 } = req.body || {};
     try {
       const mod = await import('zod').catch(()=>null);
@@ -260,6 +294,15 @@ router.post('/vectorize-mono', async (req, res) => {
   const { url, threshold = 128, color = '#000000', background = 'transparent' } = req.body || {};
   if (!url) return res.status(400).json({ error: 'url required' });
   try {
+    // Cargar potrace bajo demanda
+    let potrace;
+    try {
+      const mod = await import('potrace');
+      potrace = mod.default || mod;
+    } catch (e) {
+      logger.error('vectorize-mono setup failed', e);
+      return res.status(501).json({ error: 'feature-disabled', details: 'Monochrome vectorization not available on this environment' });
+    }
     const imgResp = await axios.get(url, { responseType: 'arraybuffer' });
     const buf = Buffer.from(imgResp.data);
 
