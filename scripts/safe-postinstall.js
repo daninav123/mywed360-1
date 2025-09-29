@@ -12,12 +12,13 @@ function run(cmd, opts = {}) {
 
 const inCI = String(process.env.CI || '').toLowerCase() === 'true';
 const skipBackend = String(process.env.SKIP_BACKEND_INSTALL || '').toLowerCase() === '1';
+const onRender = Boolean(process.env.RENDER || process.env.RENDER_SERVICE_ID || process.env.RENDER_INTERNAL_HOSTNAME);
 // Detectar ejecución anidada iniciada desde backend/ para evitar recursión
 const initCwd = String(process.env.INIT_CWD || '');
 const isRunningFromBackendInstall = initCwd.includes(`${path.sep}backend`) || /[\\\/]backend$/.test(initCwd);
 
 try {
-  if (inCI || skipBackend || isRunningFromBackendInstall) {
+  if (inCI || onRender || skipBackend || isRunningFromBackendInstall) {
     console.log('[postinstall] CI/Skip detected => omitiendo instalación de backend');
   } else {
     console.log('[postinstall] Instalando dependencias de backend…');
