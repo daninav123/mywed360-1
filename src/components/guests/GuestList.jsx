@@ -10,7 +10,7 @@ import { Button } from '../ui';
  */
 const statusCycle = (current) => {
   if (current === 'pending' || current === 'Pendiente') return 'confirmed';
-  if (current === 'confirmed' || current === 'Sí') return 'declined';
+  if (current === 'confirmed' || current === 'SÃ­') return 'declined';
   return 'pending';
 };
 
@@ -27,7 +27,7 @@ const GuestList = React.memo(
     onInviteWhatsApp,
     onInviteEmail,
     isLoading = false,
-    // selección múltiple
+    // selecciÃ³n mÃºltiple
     selectedIds = [],
     onToggleSelect,
     onToggleSelectAll,
@@ -71,12 +71,12 @@ const GuestList = React.memo(
       }
     }, [safeGuests, searchTerm, statusFilter, tableFilter, groupFilter]);
 
-    // Estadísticas memoizadas
+    // EstadÃ­sticas memoizadas
     const stats = useMemo(() => {
       try {
         const confirmed = safeGuests.filter((g) => {
           const s = String(g.status || '').toLowerCase();
-          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+          return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
         }).length;
         const pending = safeGuests.filter((g) => {
           const s = String(g.status || '').toLowerCase();
@@ -106,7 +106,7 @@ const GuestList = React.memo(
       }
     }, [safeGuests]);
 
-    // Funciones de acción memoizadas
+    // Funciones de acciÃ³n memoizadas
     const handleEdit = useCallback(
       (guest) => {
         onEdit?.(guest);
@@ -116,7 +116,7 @@ const GuestList = React.memo(
 
     const handleDelete = useCallback(
       (guest) => {
-        if (window.confirm(`¿Estás seguro de que quieres eliminar a ${guest.name}?`)) {
+        if (window.confirm(`Â¿EstÃ¡s seguro de que quieres eliminar a ${guest.name}?`)) {
           onDelete?.(guest);
         }
       },
@@ -139,7 +139,7 @@ const GuestList = React.memo(
       [onInviteEmail]
     );
 
-    // Función para obtener el color del estado
+    // FunciÃ³n para obtener el color del estado
     const handleStatusToggle = useCallback(
       (guest, e) => {
         if (e && e.stopPropagation) e.stopPropagation();
@@ -154,7 +154,7 @@ const GuestList = React.memo(
       switch (s) {
         case 'confirmed':
         case 'accepted':
-        case 'Sí':
+        case 'SÃ­':
           return 'text-green-600 bg-green-100';
         case 'declined':
         case 'rejected':
@@ -165,7 +165,7 @@ const GuestList = React.memo(
       }
     }, []);
 
-    // Cálculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
+    // CÃ¡lculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
     const selectedSet = new Set(safeSelectedIds);
     const allVisibleSelected =
       filteredGuests.length > 0 && filteredGuests.every((g) => selectedSet.has(g.id));
@@ -173,54 +173,54 @@ const GuestList = React.memo(
     if (isLoading) {
       return (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-gray-600">Cargando invitados...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <span className="ml-2 text-muted">Cargando invitados...</span>
         </div>
       );
     }
 
     return (
       <div className="space-y-6">
-        {/* Estadísticas */}
+        {/* EstadÃ­sticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm border">
-            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-            <div className="text-sm text-gray-600">{t('guests.totalGuests')}</div>
+            <div className="text-2xl font-bold text-primary">{stats.total}</div>
+            <div className="text-sm text-muted">{t('guests.totalGuests')}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-green-600">{stats.confirmed}</div>
-            <div className="text-sm text-gray-600">{t('guests.confirmedGuests')}</div>
+            <div className="text-sm text-muted">{t('guests.confirmedGuests')}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-            <div className="text-sm text-gray-600">{t('guests.pendingGuests')}</div>
+            <div className="text-sm text-muted">{t('guests.pendingGuests')}</div>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-purple-600">{stats.totalAttendees}</div>
-            <div className="text-sm text-gray-600">Total asistentes</div>
+            <div className="text-sm text-muted">Total asistentes</div>
           </div>
         </div>
 
         {/* Lista de invitados */}
         {filteredGuests.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <User size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron invitados</h3>
-            <p className="text-gray-600">
+            <User size={48} className="mx-auto text-muted mb-4" />
+            <h3 className="text-lg font-medium text-body mb-2">No se encontraron invitados</h3>
+            <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
-                ? 'Intenta ajustar los filtros de búsqueda'
-                : 'Añade tu primer invitado para comenzar'}
+                ? 'Intenta ajustar los filtros de bÃºsqueda'
+                : 'AÃ±ade tu primer invitado para comenzar'}
             </p>
           </div>
         ) : (
           <>
             {/* Vista de escritorio */}
-            <div className="hidden md:block bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div className="hidden md:block bg-surface rounded-lg shadow-sm border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         <input
                           type="checkbox"
                           aria-label="Seleccionar todos"
@@ -234,22 +234,22 @@ const GuestList = React.memo(
                           onClick={(e) => e.stopPropagation()}
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Invitado
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Contacto
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Estado
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Mesa
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Acompañantes
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
+                        AcompaÃ±antes
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                         Acciones
                       </th>
                     </tr>
@@ -258,7 +258,7 @@ const GuestList = React.memo(
                     {filteredGuests.map((guest) => (
                       <tr
                         key={guest.id}
-                        className="cursor-pointer hover:bg-gray-50"
+                        className="cursor-pointer hover:bg-primary-soft"
                         onClick={() => handleEdit(guest)}
                       >
                         <td
@@ -277,22 +277,22 @@ const GuestList = React.memo(
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
                               <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                <User size={20} className="text-gray-600" />
+                                <User size={20} className="text-muted" />
                               </div>
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{guest.name}</div>
+                              <div className="text-sm font-medium text-body">{guest.name}</div>
                               {guest.dietaryRestrictions && (
                                 <div className="text-xs text-orange-600">
-                                  Restricciones dietéticas
+                                  Restricciones dietÃ©ticas
                                 </div>
                               )}
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{guest.email}</div>
-                          <div className="text-sm text-gray-500">{guest.phone}</div>
+                          <div className="text-sm text-body">{guest.email}</div>
+                          <div className="text-sm text-muted">{guest.phone}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
@@ -303,10 +303,10 @@ const GuestList = React.memo(
                             {wedding?.guestStatus?.(guest.status) || guest.response}
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-body">
                           {guest.table || '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-body">
                           {guest.companion || 0}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -363,7 +363,7 @@ const GuestList = React.memo(
               </div>
             </div>
 
-            {/* Vista móvil */}
+            {/* Vista mÃ³vil */}
             <div className="md:hidden space-y-4">
               {filteredGuests.map((guest) => (
                 <div
@@ -374,10 +374,10 @@ const GuestList = React.memo(
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center">
                       <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-                        <User size={20} className="text-gray-600" />
+                        <User size={20} className="text-muted" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-900">{guest.name}</h3>
+                        <h3 className="text-sm font-medium text-body">{guest.name}</h3>
                         <button
                           type="button"
                           onClick={(e) => handleStatusToggle(guest, e)}
@@ -397,7 +397,7 @@ const GuestList = React.memo(
                     </div>
                   </div>
 
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <div className="space-y-2 text-sm text-muted mb-4">
                     {guest.email && (
                       <div className="flex items-center">
                         <Mail size={14} className="mr-2" />
@@ -412,10 +412,10 @@ const GuestList = React.memo(
                     )}
                     <div className="flex justify-between">
                       <span>Mesa: {guest.table || '-'}</span>
-                      <span>Acompañantes: {guest.companion || 0}</span>
+                      <span>AcompaÃ±antes: {guest.companion || 0}</span>
                     </div>
                     {guest.dietaryRestrictions && (
-                      <div className="text-orange-600 text-xs">Restricciones dietéticas</div>
+                      <div className="text-orange-600 text-xs">Restricciones dietÃ©ticas</div>
                     )}
                   </div>
 

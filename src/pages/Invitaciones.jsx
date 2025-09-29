@@ -1,4 +1,4 @@
-﻿import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Spinner from '../components/Spinner';
@@ -197,7 +197,7 @@ export default function Invitaciones() {
 
   // Indicador de sincronizaciÃ³n
   const SyncIndicator = () => (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-md">
+    <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-surface px-3 py-2 rounded-full shadow-md">
       {syncStatus === 'online' ? (
         <>
           <Cloud size={18} className="text-green-500" />
@@ -210,7 +210,7 @@ export default function Invitaciones() {
         </>
       ) : (
         <>
-          <RefreshCw size={18} className="text-blue-500 animate-spin" />
+          <RefreshCw size={18} className="text-primary animate-spin" />
           <span className="text-sm">Sincronizando...</span>
         </>
       )}
@@ -338,7 +338,7 @@ export default function Invitaciones() {
               Sobre
             </button>
           </div>
-          <div className="border bg-white h-[400px] flex items-center justify-center text-gray-400">
+          <div className="border bg-surface h-[400px] flex items-center justify-center text-gray-400">
             {panel === 'invitation'
               ? 'Canvas de invitaciÃ³n: arrastra componentes aquÃ­'
               : 'Canvas de sobre: frontal / trasero'}
@@ -545,7 +545,7 @@ export default function Invitaciones() {
               ))}
             </select>
           </div>
-          <div className="border rounded bg-white overflow-hidden">
+          <div className="border rounded bg-surface overflow-hidden">
             <div
               className="max-h-[70vh] overflow-auto"
               dangerouslySetInnerHTML={{ __html: (() => {

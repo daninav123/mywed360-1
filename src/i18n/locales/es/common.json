@@ -753,5 +753,28 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "duplicate": "Duplicate"
+  },
+  "guests": {
+    "saveTheDate": {
+      "message": "Hola somos {{p1}}{{p2Suffix}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.",
+      "messageFallback": "¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!"
+    },
+    "rsvp": {
+      "printPdf": "Imprimir / PDF"
+    },
+    "groups": {
+      "title": "Gestión de grupos",
+      "assignTitle": "Asignar a seleccionados",
+      "newGroup": "Nuevo grupo…",
+      "groupName": "Nombre de grupo",
+      "rename": "Renombrar grupo",
+      "origin": "Origen…",
+      "newName": "Nuevo nombre",
+      "merge": "Fusionar grupos",
+      "destination": "Destino…",
+      "existing": "Grupos existentes",
+      "none": "No hay grupos aún."
+    },
+    "selectedCount": "Seleccionados: {{count}}"
   }
 }

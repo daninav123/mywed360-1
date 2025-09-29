@@ -21,6 +21,8 @@ import errorLogger from '../utils/errorLogger';
 
 // Crear contexto de autenticación
 const AuthContext = createContext(null);
+// Evitar spam de consola si un componente usa el hook fuera del provider (HMR, rutas públicas, etc.)
+let __authWarnedOutside = false;
 
 /**
  * Proveedor del contexto de autenticación
@@ -329,8 +331,9 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === null) {
     try {
-      if (import.meta?.env?.DEV) {
-        console.warn('[useAuth] Llamado fuera de AuthProvider. Usando fallback no-auth.');
+      if (import.meta?.env?.DEV && !__authWarnedOutside) {
+        __authWarnedOutside = true;
+        console.debug('[useAuth] Llamado fuera de AuthProvider. Usando fallback no-auth.');
       }
     } catch {}
     // Fallback seguro para evitar crasheos en rutas pblicas o durante HMR
@@ -352,7 +355,6 @@ export const useAuth = () => {
   return context;
 };
 export default useAuth;
-
 
 
 

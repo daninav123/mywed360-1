@@ -166,7 +166,7 @@ const MomentosEspeciales = () => {
     if (ok) setPlayerOpen(true);
   };
 
-  // Bsqueda por nombre (iTunes)
+  // Búsqueda por nombre (iTunes Search API con CORS permitido)
   const handleSearch = async () => {
     const term = search.trim();
     if (!term) {
@@ -176,8 +176,9 @@ const MomentosEspeciales = () => {
     setLoadingSearch(true);
     setErrorSearch(null);
     try {
+      // Importante: usar itunes.apple.com (no music.apple.com) para evitar CORS
       const resp = await fetch(
-        `https://music.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=15`
+        `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&media=music&limit=15`
       );
       const data = await resp.json();
       if (Array.isArray(data.results)) {
@@ -196,7 +197,7 @@ const MomentosEspeciales = () => {
       }
     } catch (err) {
       console.error('Error buscando Canciones', err);
-      setErrorSearch('No se pudo buscar Canciones. Intntalo ms tarde.');
+      setErrorSearch('No se pudo buscar Canciones. Inténtalo más tarde.');
       setResults([]);
     } finally {
       setLoadingSearch(false);
@@ -263,8 +264,9 @@ const MomentosEspeciales = () => {
         try {
           const q = `${song.title} ${song.artist}`.trim();
           if (!q) return song;
+          // Usar itunes.apple.com para evitar CORS en navegador
           const resp = await fetch(
-            `https://music.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=1`
+            `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&media=music&limit=1`
           );
           const json = await resp.json();
           const hit = Array.isArray(json?.results) && json.results[0] ? json.results[0] : null;
@@ -1108,7 +1110,6 @@ const MomentosEspeciales = () => {
 };
 
 export default MomentosEspeciales;
-
 
 
 

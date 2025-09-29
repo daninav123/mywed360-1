@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import Modal from '../Modal';
@@ -38,7 +38,7 @@ export default function GroupManager({
           {/* Asignar grupo a seleccionados */}
           <div className="border rounded p-4">
             <div className="font-medium mb-2">{t("guests.groups.assignTitle", { defaultValue: "Asignar a seleccionados" })}</div>
-            <div className="text-sm text-gray-600 mb-3">{t("guests.selectedCount", { defaultValue: "Seleccionados: {{count}}", count: selectedCount })}</div>
+            <div className="text-sm text-muted mb-3">{t("guests.selectedCount", { defaultValue: "Seleccionados: {{count}}", count: selectedCount })}</div>
             <div className="flex gap-2 items-center">
               <select
                 className="border rounded px-2 py-1"
@@ -141,7 +141,7 @@ export default function GroupManager({
           <div className="border rounded p-4">
             <div className="font-medium mb-2">{t("guests.groups.existing", { defaultValue: "Grupos existentes" })}</div>
             {groupList.length === 0 ? (
-              <div className="text-sm text-gray-600">{t("guests.groups.none", { defaultValue: "No hay grupos aún." })}</div>
+              <div className="text-sm text-muted">{t("guests.groups.none", { defaultValue: "No hay grupos aún." })}</div>
             ) : (
               <ul className="list-disc pl-6 text-sm">
                 {groupList.map((g) => (

@@ -10,7 +10,7 @@ import InviteTemplateModal from '../whatsapp/InviteTemplateModal';
 
 /**
  * Componente de filtros y acciones para la lista de invitados
- * Optimizado con memoización y UX mejorada
+ * Optimizado con memoizaciÃ³n y UX mejorada
  */
 const GuestFilters = React.memo(
   ({
@@ -29,7 +29,7 @@ const GuestFilters = React.memo(
     onOpenSaveTheDate,
     guestCount = 0,
     isLoading = false,
-    // selección múltiple
+    // selecciÃ³n mÃºltiple
     selectedCount = 0,
     onSendSelectedApi,
     onScheduleSelected,
@@ -69,16 +69,16 @@ const GuestFilters = React.memo(
       [onTableFilterChange]
     );
 
-    // Funciones de acción
+    // Funciones de acciÃ³n
     const handleAddGuest = useCallback(() => {
       onAddGuest?.();
     }, [onAddGuest]);
 
     const handleBulkInviteApi = useCallback(() => {
-      wh('UI – BulkInvite click', { guestCount });
+      wh('UI â€“ BulkInvite click', { guestCount });
       if (guestCount === 0) {
         alert('No hay invitados para enviar invitaciones');
-        wh('UI – BulkInvite cancel: sin invitados');
+        wh('UI â€“ BulkInvite cancel: sin invitados');
         return;
       }
       onBulkInvite?.();
@@ -92,7 +92,7 @@ const GuestFilters = React.memo(
 
     const handleEditTemplate = useCallback(() => {
       try {
-        wh('UI – EditTemplate open');
+        wh('UI â€“ EditTemplate open');
       } catch {}
       setShowTemplateModal(true);
     }, []);
@@ -100,33 +100,33 @@ const GuestFilters = React.memo(
     return (
       <>
         <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
-          {/* Título y contador */}
+          {/* TÃ­tulo y contador */}
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">{t('guests.guestList')}</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-xl font-semibold text-body">{t('guests.guestList')}</h2>
+              <p className="text-sm text-muted mt-1">
                 {guestCount} {guestCount === 1 ? 'invitado' : 'invitados'} en total
               </p>
             </div>
 
-            {/* Botón principal de añadir */}
+            {/* BotÃ³n principal de aÃ±adir */}
             <Button onClick={handleAddGuest} disabled={isLoading} className="flex items-center">
               <Plus size={20} className="mr-2" />
               {t('guests.addGuest')}
             </Button>
           </div>
 
-          {/* Filtros de búsqueda */}
+          {/* Filtros de bÃºsqueda */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Búsqueda por texto */}
+            {/* BÃºsqueda por texto */}
             <div className="relative">
               <Search
                 size={20}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted"
               />
               <Input
                 type="text"
-                placeholder="Buscar por nombre, email o teléfono..."
+                placeholder="Buscar por nombre, email o telÃ©fono..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="pl-10"
@@ -138,13 +138,13 @@ const GuestFilters = React.memo(
             <div className="relative">
               <Filter
                 size={20}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted"
               />
               <select
                 value={statusFilter}
                 onChange={handleStatusChange}
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                className="w-full pl-10 pr-4 py-2 border border-soft rounded-md focus:outline-none focus:ring-2 ring-primary appearance-none bg-surface"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -171,7 +171,7 @@ const GuestFilters = React.memo(
                 value={groupFilter || ''}
                 onChange={(e) => onGroupFilterChange?.(e.target.value)}
                 disabled={isLoading}
-                className="w-full pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+                className="w-full pr-4 py-2 border border-soft rounded-md focus:outline-none focus:ring-2 ring-primary appearance-none bg-surface"
               >
                 <option value="">Todos los grupos</option>
                 {groupOptions.map((opt) => (
@@ -190,7 +190,7 @@ const GuestFilters = React.memo(
               onClick={handleBulkInviteApi}
               disabled={isLoading || guestCount === 0}
               className="flex items-center"
-              title="Enviar invitaciones a todos los invitados vía WhatsApp API"
+              title="Enviar invitaciones a todos los invitados vÃ­a WhatsApp API"
             >
               <MessageSquare size={16} className="mr-2" />
               Invitaciones masivas (API)
@@ -213,9 +213,9 @@ const GuestFilters = React.memo(
               Editar mensaje (API)
             </Button>
 
-            {/* Envío/Programación para seleccionados */}
+            {/* EnvÃ­o/ProgramaciÃ³n para seleccionados */}
             <div className="flex items-center gap-2 ml-auto">
-              <span className="text-sm text-gray-600">Seleccionados: {selectedCount}</span>
+              <span className="text-sm text-muted">Seleccionados: {selectedCount}</span>
 
               {showApiButtons && (
                 <Button
@@ -244,9 +244,9 @@ const GuestFilters = React.memo(
                   variant="outline"
                   onClick={() => onSendSelectedBroadcast?.()}
                   disabled={isLoading || selectedCount === 0}
-                  title="Enviar por difusión (requiere extensión)"
+                  title="Enviar por difusiÃ³n (requiere extensiÃ³n)"
                 >
-                  Difusión (extensión)
+                  DifusiÃ³n (extensiÃ³n)
                 </Button>
               )}
 

@@ -5,8 +5,8 @@ import { Button } from '../ui';
 import { Input } from '../ui';
 
 /**
- * Formulario optimizado para añadir/editar invitados
- * Componente reutilizable con validación y UX mejorada
+ * Formulario optimizado para aÃ±adir/editar invitados
+ * Componente reutilizable con validaciÃ³n y UX mejorada
  */
 const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOptions = [] }) => {
   const { t, wedding } = useTranslations();
@@ -17,7 +17,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     email: guest?.email || '',
     phone: guest?.phone || '',
     address: guest?.address || '',
-    // Campos de dirección detallada (opcionales)
+    // Campos de direcciÃ³n detallada (opcionales)
     addressStreet: guest?.addressStreet || '',
     addressStreet2: guest?.addressStreet2 || '',
     addressCity: guest?.addressCity || '',
@@ -35,10 +35,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     notes: guest?.notes || '',
   });
 
-  // Estado de validación
+  // Estado de validaciÃ³n
   const [errors, setErrors] = useState({});
 
-  // Dirección completa (desplegable) y helper para componer
+  // DirecciÃ³n completa (desplegable) y helper para componer
   const [showAddressDetails, setShowAddressDetails] = useState(false);
   const composeAddress = (fd) => {
     const parts = [];
@@ -48,7 +48,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     const stateLine = [fd.addressState, fd.addressCountry].filter(Boolean).join(', ').trim();
     if (cityLine) parts.push(cityLine);
     if (stateLine) parts.push(stateLine);
-    return parts.join(' · ');
+    return parts.join(' Â· ');
   };
 
   // Validar formulario
@@ -70,14 +70,14 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     }
 
     if (formData.companion < 0) {
-      newErrors.companion = 'El número de acompañantes no puede ser negativo';
+      newErrors.companion = 'El nÃºmero de acompaÃ±antes no puede ser negativo';
     }
 
     if (formData.companion > 0 && formData.companionType === 'none') {
-      newErrors.companionType = 'Selecciona el tipo de acompañante';
+      newErrors.companionType = 'Selecciona el tipo de acompaÃ±ante';
     }
     if (formData.companion === 0 && formData.companionType !== 'none') {
-      newErrors.companionType = 'Establece "Sin acompañante" o añade alguno';
+      newErrors.companionType = 'Establece "Sin acompaÃ±ante" o aÃ±ade alguno';
     }
 
     setErrors(newErrors);
@@ -89,7 +89,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     (field, value) => {
       setFormData((prev) => {
         const next = { ...prev, [field]: value };
-        // Si se editan campos de dirección detallada, recomponer 'address'
+        // Si se editan campos de direcciÃ³n detallada, recomponer 'address'
         if (
           field === 'addressStreet' ||
           field === 'addressStreet2' ||
@@ -114,7 +114,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     [errors]
   );
 
-  // Manejar envío del formulario
+  // Manejar envÃ­o del formulario
   const handleSubmit = useCallback(
     (e) => {
       e.preventDefault();
@@ -131,7 +131,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         createdAt: guest?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      // Si hay dirección detallada y el resumen está vacío, componerlo
+      // Si hay direcciÃ³n detallada y el resumen estÃ¡ vacÃ­o, componerlo
       const hasDetailed =
         formData.addressStreet ||
         formData.addressStreet2 ||
@@ -174,10 +174,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Información básica */}
+      {/* InformaciÃ³n bÃ¡sica */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestName')} *
           </label>
           <Input
@@ -192,7 +192,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestEmail')} *
           </label>
           <Input
@@ -210,7 +210,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
       {/* Contacto */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestPhone')}
           </label>
           <Input
@@ -225,13 +225,13 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestStatus')}
           </label>
           <select
             value={formData.status}
             onChange={(e) => handleChange('status', e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary"
             disabled={isLoading}
           >
             {rsvpOptions.map((option) => (
@@ -243,32 +243,32 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         </div>
       </div>
 
-      {/* Dirección */}
+      {/* DirecciÃ³n */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-body mb-1">
           {t('guests.guestAddress')}
         </label>
         <Input
           type="text"
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
-          placeholder="Dirección completa (opcional)"
+          placeholder="DirecciÃ³n completa (opcional)"
           disabled={isLoading}
         />
         <div className="mt-2">
           <button
             type="button"
-            className="text-xs text-blue-600 hover:underline"
+            className="text-xs text-primary hover:underline"
             onClick={() => setShowAddressDetails((v) => !v)}
             disabled={isLoading}
           >
-            {showAddressDetails ? 'Ocultar dirección completa' : 'Añadir dirección completa'}
+            {showAddressDetails ? 'Ocultar direcciÃ³n completa' : 'AÃ±adir direcciÃ³n completa'}
           </button>
           {showAddressDetails && (
             <div className="mt-3 p-3 border rounded-md bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Calle y número</label>
+                  <label className="block text-xs font-medium text-body mb-1">Calle y nÃºmero</label>
                   <Input
                     type="text"
                     value={formData.addressStreet}
@@ -278,17 +278,17 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Piso, puerta, etc.</label>
+                  <label className="block text-xs font-medium text-body mb-1">Piso, puerta, etc.</label>
                   <Input
                     type="text"
                     value={formData.addressStreet2}
                     onChange={(e) => handleChange('addressStreet2', e.target.value)}
-                    placeholder="Ej. 3ºB"
+                    placeholder="Ej. 3ÂºB"
                     disabled={isLoading}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Ciudad</label>
+                  <label className="block text-xs font-medium text-body mb-1">Ciudad</label>
                   <Input
                     type="text"
                     value={formData.addressCity}
@@ -298,7 +298,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Provincia/Estado</label>
+                  <label className="block text-xs font-medium text-body mb-1">Provincia/Estado</label>
                   <Input
                     type="text"
                     value={formData.addressState}
@@ -308,7 +308,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Código Postal</label>
+                  <label className="block text-xs font-medium text-body mb-1">CÃ³digo Postal</label>
                   <Input
                     type="text"
                     value={formData.addressZip}
@@ -318,27 +318,27 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">País</label>
+                  <label className="block text-xs font-medium text-body mb-1">PaÃ­s</label>
                   <Input
                     type="text"
                     value={formData.addressCountry}
                     onChange={(e) => handleChange('addressCountry', e.target.value)}
-                    placeholder="Ej. España"
+                    placeholder="Ej. EspaÃ±a"
                     disabled={isLoading}
                   />
                 </div>
               </div>
-              <p className="text-[11px] text-gray-500 mt-2">
-                El campo "Dirección" se compone automáticamente a partir de estos datos.
+              <p className="text-[11px] text-muted mt-2">
+                El campo "DirecciÃ³n" se compone automÃ¡ticamente a partir de estos datos.
               </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Grupo / Categoría */}
+      {/* Grupo / CategorÃ­a */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Grupo / Categoría</label>
+        <label className="block text-sm font-medium text-body mb-1">Grupo / CategorÃ­a</label>
         <Input
           type="text"
           value={formData.group}
@@ -354,13 +354,13 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
             ))}
           </datalist>
         )}
-        <p className="text-xs text-gray-500 mt-1">Este campo permite filtrar y gestionar grupos.</p>
+        <p className="text-xs text-muted mt-1">Este campo permite filtrar y gestionar grupos.</p>
       </div>
 
-      {/* Acompañantes y mesa */}
+      {/* AcompaÃ±antes y mesa */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.plusOne')}
           </label>
           <Input
@@ -376,10 +376,10 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
           {errors.companion && <p className="text-red-500 text-xs mt-1">{errors.companion}</p>}
         </div>
 
-        {/* Grupo de acompañantes */}
+        {/* Grupo de acompaÃ±antes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Grupo de acompañantes
+          <label className="block text-sm font-medium text-body mb-1">
+            Grupo de acompaÃ±antes
           </label>
           <div className="flex space-x-2">
             <Input
@@ -400,16 +400,16 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tipo de acompañante
+          <label className="block text-sm font-medium text-body mb-1">
+            Tipo de acompaÃ±ante
           </label>
           <select
             value={formData.companionType}
             onChange={(e) => handleChange('companionType', e.target.value)}
-            className={`w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.companionType ? 'border-red-500' : ''}`}
+            className={`w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary ${errors.companionType ? 'border-red-500' : ''}`}
             disabled={isLoading}
           >
-            <option value="none">Sin acompañante</option>
+            <option value="none">Sin acompaÃ±ante</option>
             <option value="partner">Pareja</option>
             <option value="child">Hijo/a(s)</option>
             <option value="plus_one">+1</option>
@@ -420,29 +420,29 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-body mb-1">
             {t('guests.guestTable')}
           </label>
           <Input
             type="text"
             value={formData.table}
             onChange={(e) => handleChange('table', e.target.value)}
-            placeholder="Número o nombre de mesa"
+            placeholder="NÃºmero o nombre de mesa"
             disabled={isLoading}
           />
         </div>
       </div>
 
-      {/* Restricciones dietéticas */}
+      {/* Restricciones dietÃ©ticas */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-body mb-1">
           {t('guests.dietaryRestrictions')}
         </label>
         <textarea
           value={formData.dietaryRestrictions}
           onChange={(e) => handleChange('dietaryRestrictions', e.target.value)}
           placeholder="Alergias, intolerancias o preferencias alimentarias..."
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary resize-none"
           rows="2"
           disabled={isLoading}
         />
@@ -450,18 +450,18 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
 
       {/* Notas adicionales */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Notas adicionales</label>
+        <label className="block text-sm font-medium text-body mb-1">Notas adicionales</label>
         <textarea
           value={formData.notes}
           onChange={(e) => handleChange('notes', e.target.value)}
-          placeholder="Información adicional sobre el invitado..."
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          placeholder="InformaciÃ³n adicional sobre el invitado..."
+          className="w-full border border-soft rounded-md px-3 py-2 focus:outline-none focus:ring-2 ring-primary resize-none"
           rows="2"
           disabled={isLoading}
         />
       </div>
 
-      {/* Botones de acción */}
+      {/* Botones de acciÃ³n */}
       <div className="flex justify-end space-x-3 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
           {t('app.cancel')}

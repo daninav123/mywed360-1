@@ -47,9 +47,19 @@ i18n
     react: { useSuspense: false, bindI18n: 'languageChanged', bindI18nStore: 'added removed' },
   });
 
-// Wrap i18n.t to repair mojibake at read-time
+// Wrap i18n.t to repair mojibake at read-time y soporte de variables derivadas
 const _origT = i18n.t.bind(i18n);
-i18n.t = (key, opts) => fixMojibake(_origT(key, opts));
+i18n.t = (key, opts) => {
+  try {
+    // Inyectar p2Suffix para mensajes que lo necesiten sin usar ICU/formatters
+    if (key === 'guests.saveTheDate.message') {
+      const p2 = opts && typeof opts.p2 === 'string' ? opts.p2 : '';
+      const p2Suffix = p2 ? ` y ${p2}` : '';
+      return fixMojibake(_origT(key, { ...opts, p2Suffix }));
+    }
+  } catch {}
+  return fixMojibake(_origT(key, opts));
+};
 
 export const changeLanguage = (lng) => i18n.changeLanguage(lng);
 export const getCurrentLanguage = () => i18n.language || 'es';

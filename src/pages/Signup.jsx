@@ -28,26 +28,26 @@ export default function Signup() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-[var(--color-bg)]">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
+      <form onSubmit={handleSubmit} className="bg-surface p-6 rounded shadow-md border border-soft">
         <h2 className="text-2xl mb-4">Crear cuenta</h2>
         <input
           type="email"
-          placeholder="Correo electrónico"
+          placeholder="Correo electrÃ³nico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
         />
         <input
           type="password"
-          placeholder="Contraseña"
+          placeholder="ContraseÃ±a"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
         />
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
         >
           <option value="particular">Particular</option>
           <option value="planner">Wedding Planner</option>
@@ -61,9 +61,9 @@ export default function Signup() {
           Registrarse
         </button>
         <p className="mt-4 text-sm">
-          ¿Ya tienes cuenta?{' '}
+          Â¿Ya tienes cuenta?{' '}
           <Link to="/" className="text-[var(--color-primary)] hover:underline">
-            Inicia sesión
+            Inicia sesiÃ³n
           </Link>
         </p>
       </form>

@@ -22,15 +22,15 @@ import { post as apiPost } from '../services/apiClient';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 
 /**
- * Página de gestión de invitados completamente refactorizada
+ * PÃ¡gina de gestiÃ³n de invitados completamente refactorizada
  * Arquitectura modular, optimizada y mantenible
  *
  * OPTIMIZACIONES IMPLEMENTADAS:
- * - Eliminada complejidad anterior (597 líneas → 140 líneas)
+ * - Eliminada complejidad anterior (597 lÃ­neas â†’ 140 lÃ­neas)
  * - Arquitectura modular con componentes especializados
- * - Hook personalizado useGuests para lógica centralizada
- * - Memoización y optimización de re-renders
- * - Integración con sistema i18n
+ * - Hook personalizado useGuests para lÃ³gica centralizada
+ * - MemoizaciÃ³n y optimizaciÃ³n de re-renders
+ * - IntegraciÃ³n con sistema i18n
  * - UX mejorada con indicadores de estado
  */
 function Invitados() {
@@ -138,7 +138,7 @@ function Invitados() {
 
       return t('guests.saveTheDate.message', {
         defaultValue:
-          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
+          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un noticiÃ³n sÃºper importante que compartir contigo. Â¡Nos casamos! ResÃ©rvate el {{date}} porque queremos contar contigo.',
         p1,
         p2: p2 || undefined,
         date: fechaFmt,
@@ -146,12 +146,12 @@ function Invitados() {
     } catch {
       return t('guests.saveTheDate.messageFallback', {
         defaultValue:
-          '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
+          'Â¡Hola! Tenemos un noticiÃ³n sÃºper importante que compartir contigo. Â¡Nos casamos! Â¡ResÃ©rvate la fecha porque queremos contar contigo!',
       });
     }
   }, [weddings, activeWedding, activeWeddingInfo]);
 
-  // Opciones únicas de grupo (group o companionGroupId)
+  // Opciones Ãºnicas de grupo (group o companionGroupId)
   const groupOptions = React.useMemo(() => {
     try {
       const set = new Set();
@@ -203,7 +203,7 @@ function Invitados() {
     }
   };
 
-  // Difusión (lista de difusión vía extensión)
+  // DifusiÃ³n (lista de difusiÃ³n vÃ­a extensiÃ³n)
   const handleSendSelectedBroadcast = async () => {
     try {
       if (import.meta.env.DEV)
@@ -215,38 +215,38 @@ function Invitados() {
         return;
       }
       const custom = window.prompt(
-        'Mensaje de difusión (se enviará una sola vez a una lista de difusión). Ten en cuenta que solo lo recibirán quienes tengan tu número guardado en contactos.',
+        'Mensaje de difusiÃ³n (se enviarÃ¡ una sola vez a una lista de difusiÃ³n). Ten en cuenta que solo lo recibirÃ¡n quienes tengan tu nÃºmero guardado en contactos.',
         ''
       );
       const r = await inviteSelectedWhatsAppBroadcastViaExtension(selectedIds, custom || undefined);
       if (r?.notAvailable) {
         const doFallback = window.confirm(
-          'No se detectó la extensión para difusión. ¿Quieres intentar el envío individual (una sola acción) en su lugar?'
+          'No se detectÃ³ la extensiÃ³n para difusiÃ³n. Â¿Quieres intentar el envÃ­o individual (una sola acciÃ³n) en su lugar?'
         );
         if (doFallback) {
           const rb = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
           if (rb?.success && !rb?.notAvailable) {
-            alert(`Envío iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
+            alert(`EnvÃ­o iniciado para ${rb?.count || selectedIds.length} invitado(s).`);
           } else {
-            alert('No se pudo iniciar el envío (extensión no disponible).');
+            alert('No se pudo iniciar el envÃ­o (extensiÃ³n no disponible).');
           }
         }
         return;
       }
       if (r?.success) {
-        if (r?.mode === 'broadcast') alert(`Difusión enviada a ${r?.count || 0} destinatarios.`);
+        if (r?.mode === 'broadcast') alert(`DifusiÃ³n enviada a ${r?.count || 0} destinatarios.`);
         else if (r?.mode === 'fallback_individual')
-          alert(`Envío individual fallback. Éxitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
+          alert(`EnvÃ­o individual fallback. Ã‰xitos: ${r?.sent || 0}, Fallos: ${r?.failed || 0}`);
         return;
       }
-      alert('No se pudo completar la difusión: ' + (r?.error || 'desconocido'));
+      alert('No se pudo completar la difusiÃ³n: ' + (r?.error || 'desconocido'));
     } catch (e) {
-      console.warn('Error en difusión (Móvil):', e);
-      alert('Error en la difusión');
+      console.warn('Error en difusiÃ³n (MÃ³vil):', e);
+      alert('Error en la difusiÃ³n');
     }
   };
 
-  // Manejar eliminación de invitado
+  // Manejar eliminaciÃ³n de invitado
   const handleDeleteGuest = async (guest) => {
     const result = await removeGuest(guest.id);
     if (!result.success) {
@@ -269,7 +269,7 @@ function Invitados() {
     }
   };
 
-  // Envío masivo API para todos los invitados (usado por GuestFilters)
+  // EnvÃ­o masivo API para todos los invitados (usado por GuestFilters)
   const bulkInviteAllApi = async () => {
     try {
       if (!guests || guests.length === 0) {
@@ -278,12 +278,12 @@ function Invitados() {
       }
       const ids = guests.filter((g) => g.phone).map((g) => g.id);
       if (!ids.length) {
-        alert('Los invitados no tienen teléfonos válidos');
+        alert('Los invitados no tienen telÃ©fonos vÃ¡lidos');
         return;
       }
       const confirm = window.confirm(
         t('guests.whatsapp.confirmBulkApi', {
-          defaultValue: '¿Enviar invitaciones vía WhatsApp API a {{count}} invitados?',
+          defaultValue: 'Â¿Enviar invitaciones vÃ­a WhatsApp API a {{count}} invitados?',
           count: ids.length,
         })
       );
@@ -292,7 +292,7 @@ function Invitados() {
       if (res?.success) {
         alert(
           t('guests.whatsapp.bulkApiDone', {
-            defaultValue: 'Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}',
+            defaultValue: 'EnvÃ­o completado. Ã‰xitos: {{ok}}, Fallos: {{fail}}',
             ok: res.ok || 0,
             fail: res.fail || 0,
           })
@@ -300,24 +300,24 @@ function Invitados() {
       } else {
         alert(
           t('guests.whatsapp.bulkApiError', {
-            defaultValue: 'Error en envío masivo: {{error}}',
+            defaultValue: 'Error en envÃ­o masivo: {{error}}',
             error: res?.error || 'desconocido',
           })
         );
       }
     } catch (e) {
       console.warn('bulkInviteAllApi error:', e);
-      alert(t('guests.whatsapp.bulkApiUnexpected', { defaultValue: 'Error en envío masivo API' }));
+      alert(t('guests.whatsapp.bulkApiUnexpected', { defaultValue: 'Error en envÃ­o masivo API' }));
     }
   };
 
-  // Abrir modal de envío masivo WhatsApp
+  // Abrir modal de envÃ­o masivo WhatsApp
   const openWhatsBatch = () => setShowWhatsBatch(true);
   const closeWhatsBatch = () => setShowWhatsBatch(false);
   const openSaveTheDate = () => setShowSaveTheDate(true);
   const closeSaveTheDate = () => setShowSaveTheDate(false);
 
-  // Selección múltiple
+  // SelecciÃ³n mÃºltiple
   const handleToggleSelect = (id, checked) => {
     setSelectedIds((prev) => {
       const set = new Set(prev);
@@ -349,7 +349,7 @@ function Invitados() {
       const res = await inviteSelectedWhatsAppApi(selectedIds);
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
-        alert('Acción cancelada');
+        alert('AcciÃ³n cancelada');
         return;
       }
       if (res?.error && !res?.success) {
@@ -364,7 +364,7 @@ function Invitados() {
       if (res?.success) {
         alert(
           t('guests.whatsapp.bulkApiDone', {
-            defaultValue: 'Envío completado. Éxitos: {{ok}}, Fallos: {{fail}}',
+            defaultValue: 'EnvÃ­o completado. Ã‰xitos: {{ok}}, Fallos: {{fail}}',
             ok: res?.ok || 0,
             fail: res?.fail || 0,
           })
@@ -373,16 +373,16 @@ function Invitados() {
       }
       alert(
         t('guests.whatsapp.apiStartFailed', {
-          defaultValue: 'No se pudo iniciar el envío por API',
+          defaultValue: 'No se pudo iniciar el envÃ­o por API',
         })
       );
     } catch (e) {
-      console.warn('Error envío seleccionados (API):', e);
+      console.warn('Error envÃ­o seleccionados (API):', e);
       alert(t('guests.whatsapp.selectedUnexpected', { defaultValue: 'Error enviando a seleccionados' }));
     }
   };
 
-  // Enviar por móvil personal (preferir "una sola acción" vía extensión)
+  // Enviar por mÃ³vil personal (preferir "una sola acciÃ³n" vÃ­a extensiÃ³n)
   const handleSendSelectedMobile = async () => {
     try {
       if (import.meta.env.DEV)
@@ -396,28 +396,28 @@ function Invitados() {
       const custom = window.prompt(
         t('guests.whatsapp.customPrompt', {
           defaultValue:
-            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usará un mensaje por defecto con enlace RSVP cuando sea posible:',
+            'Mensaje personalizado (opcional). Si lo dejas en blanco, se usarÃ¡ un mensaje por defecto con enlace RSVP cuando sea posible:',
         }),
         ''
       );
-      // 1) Intentar envío en una sola acción usando extensión (WhatsApp Web automation)
+      // 1) Intentar envÃ­o en una sola acciÃ³n usando extensiÃ³n (WhatsApp Web automation)
       try {
         const r = await inviteSelectedWhatsAppViaExtension(selectedIds, custom || undefined);
         if (r?.success && !r?.notAvailable) {
           alert(
             t('guests.whatsapp.webStarted', {
-              defaultValue: 'Envío iniciado en WhatsApp Web para {{count}} invitado(s).',
+              defaultValue: 'EnvÃ­o iniciado en WhatsApp Web para {{count}} invitado(s).',
               count: r?.count || selectedIds.length,
             })
           );
           return;
         }
         if (r?.notAvailable) {
-          // 2) Fallback opcional: abrir chats en pestañas (no recomendado para >50)
+          // 2) Fallback opcional: abrir chats en pestaÃ±as (no recomendado para >50)
           const doFallback = window.confirm(
             t('guests.whatsapp.extensionMissingConfirm', {
               defaultValue:
-                'No se detectó la extensión para enviar en una sola acción. ¿Quieres abrir los chats en pestañas como alternativa?',
+                'No se detectÃ³ la extensiÃ³n para enviar en una sola acciÃ³n. Â¿Quieres abrir los chats en pestaÃ±as como alternativa?',
             })
           );
           if (doFallback) {
@@ -435,13 +435,13 @@ function Invitados() {
         // Si no es success y tampoco es notAvailable, informar del error
         alert(
           t('guests.whatsapp.oneClickFailed', {
-            defaultValue: 'No se pudo iniciar el envío en una sola acción: {{error}}',
+            defaultValue: 'No se pudo iniciar el envÃ­o en una sola acciÃ³n: {{error}}',
             error: r?.error || 'desconocido',
           })
         );
         return;
       } catch (e) {
-        console.warn('Extensión WhatsApp Web no disponible o falló, usando fallback:', e);
+        console.warn('ExtensiÃ³n WhatsApp Web no disponible o fallÃ³, usando fallback:', e);
         const fr = await inviteSelectedWhatsAppDeeplink(selectedIds, custom || undefined);
         if (fr?.success)
           alert(
@@ -453,10 +453,10 @@ function Invitados() {
         return;
       }
     } catch (e) {
-      console.warn('Error envío seleccionados (Móvil):', e);
+      console.warn('Error envÃ­o seleccionados (MÃ³vil):', e);
       alert(
         t('guests.whatsapp.mobileUnexpected', {
-          defaultValue: 'Error enviando a seleccionados (Móvil)',
+          defaultValue: 'Error enviando a seleccionados (MÃ³vil)',
         })
       );
     }
@@ -494,8 +494,8 @@ function Invitados() {
           }
         } catch {}
         const msg = link
-          ? `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. Confirma tu asistencia aquí: ${link}`
-          : `¡Hola ${g.name || ''}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?`;
+          ? `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Confirma tu asistencia aquÃ­: ${link}`
+          : `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
         const to = toE164(g.phone);
         if (to)
           items.push({
@@ -507,18 +507,18 @@ function Invitados() {
           });
       }
       if (!items.length) {
-        alert('Los seleccionados no tienen teléfonos válidos');
+        alert('Los seleccionados no tienen telÃ©fonos vÃ¡lidos');
         return;
       }
       const result = await scheduleWhats(items, whenIso);
       if (result?.success) {
-        alert(`Programados ${items.length} envíos para ${whenIso}`);
+        alert(`Programados ${items.length} envÃ­os para ${whenIso}`);
       } else {
-        alert('Error programando envíos: ' + (result?.error || 'desconocido'));
+        alert('Error programando envÃ­os: ' + (result?.error || 'desconocido'));
       }
     } catch (e) {
-      console.warn('Error programando envíos:', e);
-      alert('Error programando envíos');
+      console.warn('Error programando envÃ­os:', e);
+      alert('Error programando envÃ­os');
     }
   };
 
@@ -545,7 +545,7 @@ function Invitados() {
   const handleImportedGuests = async (importedGuests) => {
     try {
       if (!importedGuests || importedGuests.length === 0) return;
-      // Deduplicación por email/teléfono
+      // DeduplicaciÃ³n por email/telÃ©fono
       const existingEmails = new Set((guests || []).map((g) => utils.normalize(g?.email || '')));
       const existingPhones = new Set((guests || []).map((g) => utils.phoneClean(g?.phone || '')));
 
@@ -575,7 +575,7 @@ function Invitados() {
       setShowGuestModal(false);
     } catch (error) {
       console.error('Error importando invitados:', error);
-      alert('Ocurrió un error al importar los invitados');
+      alert('OcurriÃ³ un error al importar los invitados');
     }
   };
 
@@ -626,11 +626,11 @@ function Invitados() {
         if (phoneKey) existingPhones.add(phoneKey);
         added++;
       }
-      alert(`${added} invitados añadidos${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
+      alert(`${added} invitados aÃ±adidos${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
       setShowBulkModal(false);
     } catch (err) {
       console.error('Error en alta masiva:', err);
-      alert('Ocurrió un error al procesar la alta masiva');
+      alert('OcurriÃ³ un error al procesar la alta masiva');
     }
   };
 
@@ -646,7 +646,7 @@ function Invitados() {
       const confirmedGuests = (guests || [])
         .filter((g) => {
           const s = String(g.status || '').toLowerCase();
-          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+          return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
         })
         .map((g) => ({ name: g.name || '', table: g.table || '' }));
 
@@ -717,7 +717,7 @@ function Invitados() {
       win.document.open();
       win.document.write(html);
       win.document.close();
-      // Opcional: lanzar print automático tras cargar
+      // Opcional: lanzar print automÃ¡tico tras cargar
       win.onload = () => {
         try {
           win.print();
@@ -725,11 +725,11 @@ function Invitados() {
       };
     } catch (err) {
       console.error('Error generando PDF:', err);
-      alert('No se pudo generar el documento de impresión');
+      alert('No se pudo generar el documento de impresiÃ³n');
     }
   };
 
-  // Manejar cancelación de modal
+  // Manejar cancelaciÃ³n de modal
   const handleCancelModal = () => {
     setShowGuestModal(false);
     setEditingGuest(null);
@@ -738,14 +738,14 @@ function Invitados() {
   return (
     <div className="min-h-screen bg-app p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header con indicador de sincronización */}
+        {/* Header con indicador de sincronizaciÃ³n */}
         <div className="page-header">
           <div>
             <h1 className="page-title">{t('guests.guestList')}</h1>
             <p className="text-muted mt-1">Gestiona tu lista de invitados de forma eficiente</p>
           </div>
 
-          {/* Indicador de sincronización */}
+          {/* Indicador de sincronizaciÃ³n */}
           <div className="flex items-center space-x-2">
             {syncStatus?.isOnline ? (
               <div className="flex items-center text-[var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
@@ -755,7 +755,7 @@ function Invitados() {
             ) : (
               <div className="flex items-center text-[var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
                 <CloudOff size={16} className="mr-2" />
-                <span className="text-sm font-medium">Sin conexión</span>
+                <span className="text-sm font-medium">Sin conexiÃ³n</span>
               </div>
             )}
           </div>
@@ -810,11 +810,11 @@ function Invitados() {
                       'password123'
                     )
                       .then(() => console.log('Login manual exitoso'))
-                      .catch((err) => console.error('Login manual falló:', err));
+                      .catch((err) => console.error('Login manual fallÃ³:', err));
                   });
                 });
               }}
-              className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-xs"
+              className="mt-2 px-3 py-1 bg-primary-soft0 text-white rounded text-xs"
             >
               Login Manual
             </button>
@@ -823,9 +823,9 @@ function Invitados() {
 
         {/* Fallback temporal: sin bodas visibles para el usuario */}
         {!isLoading && Array.isArray(weddings) && weddings.length === 0 && (
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-muted">
             {activeWedding
-              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la página o contacta con soporte.'
+              ? 'No se encontraron bodas asociadas a tu cuenta o no tienes permisos sobre la boda activa. Si el problema persiste, recarga la pÃ¡gina o contacta con soporte.'
               : 'No se encontraron bodas asociadas a tu cuenta. Crea o selecciona una boda para gestionar invitados.'}
           </div>
         )}
@@ -852,7 +852,7 @@ function Invitados() {
         <Modal
           open={showGuestModal}
           onClose={handleCancelModal}
-          title={editingGuest ? 'Editar Invitado' : 'Añadir Invitado'}
+          title={editingGuest ? 'Editar Invitado' : 'AÃ±adir Invitado'}
           size="lg"
         >
           {editingGuest ? (
@@ -884,8 +884,8 @@ function Invitados() {
               </TabsContent>
               <TabsContent value="import" className="pt-2">
                 <ContactsImporter onImported={handleImportedGuests} />
-                <p className="text-xs text-gray-500 mt-3">
-                  Selecciona los contactos de tu agenda y se añadirán como invitados.
+                <p className="text-xs text-muted mt-3">
+                  Selecciona los contactos de tu agenda y se aÃ±adirÃ¡n como invitados.
                 </p>
               </TabsContent>
             </Tabs>
@@ -911,8 +911,8 @@ function Invitados() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-blue-600">{stats?.total || 0}</div>
-                <div className="text-sm text-gray-600">Total invitados</div>
+                <div className="text-2xl font-bold text-primary">{stats?.total || 0}</div>
+                <div className="text-sm text-muted">Total invitados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
                 <div className="text-2xl font-bold text-green-600">
@@ -923,7 +923,7 @@ function Invitados() {
                     }).length
                   }
                 </div>
-                <div className="text-sm text-gray-600">Confirmados</div>
+                <div className="text-sm text-muted">Confirmados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
                 <div className="text-2xl font-bold text-yellow-600">
@@ -934,7 +934,7 @@ function Invitados() {
                     }).length
                   }
                 </div>
-                <div className="text-sm text-gray-600">Pendientes</div>
+                <div className="text-sm text-muted">Pendientes</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
                 <div className="text-2xl font-bold text-red-600">
@@ -945,7 +945,7 @@ function Invitados() {
                     }).length
                   }
                 </div>
-                <div className="text-sm text-gray-600">Rechazados</div>
+                <div className="text-sm text-muted">Rechazados</div>
               </div>
             </div>
 
@@ -963,7 +963,7 @@ function Invitados() {
                     {(guests || [])
                       .filter((g) => {
                         const s = String(g.status || '').toLowerCase();
-                        return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
+                        return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
                       })
                       .sort(
                         (a, b) =>
@@ -992,7 +992,7 @@ function Invitados() {
           </div>
         </Modal>
 
-        {/* Modal envío masivo WhatsApp */}
+        {/* Modal envÃ­o masivo WhatsApp */}
         <WhatsAppSender
           open={showWhatsBatch}
           onClose={closeWhatsBatch}
@@ -1018,7 +1018,7 @@ function Invitados() {
           selectedDefaultIds={selectedIds}
         />
 
-        {/* Modal WhatsApp con dos pestañas (móvil personal / API) */}
+        {/* Modal WhatsApp con dos pestaÃ±as (mÃ³vil personal / API) */}
         <WhatsAppModal
           open={showWhatsModal}
           onClose={handleCloseWhatsModal}
@@ -1027,7 +1027,7 @@ function Invitados() {
             whatsGuest
               ? t('guests.whatsapp.dm', {
                   defaultValue:
-                    '¡Hola {{name}}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?',
+                    'Â¡Hola {{name}}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?',
                   name: whatsGuest?.name || '',
                 })
               : ''
@@ -1062,7 +1062,7 @@ function Invitados() {
               const targets = (guests || []).filter((g) => setIds.has(g.id));
               for (const g of targets) {
                 await updateGuest(g.id, { group: groupName });
-                // Propagar a companions del mismo grupo de acompañantes si aplica
+                // Propagar a companions del mismo grupo de acompaÃ±antes si aplica
                 if (g.companionGroupId) {
                   const companions = (guests || []).filter(
                     (x) => x.companionGroupId === g.companionGroupId && x.id !== g.id
@@ -1084,7 +1084,7 @@ function Invitados() {
               for (const g of targets) {
                 await updateGuest(g.id, { group: to });
               }
-              alert(`Grupo renombrado: ${from} → ${to} (${targets.length} invitados actualizados)`);
+              alert(`Grupo renombrado: ${from} â†’ ${to} (${targets.length} invitados actualizados)`);
             } catch (e) {
               alert('Error renombrando grupo');
             }

@@ -52,7 +52,7 @@ export default function RSVPDashboard() {
     return () => unsub();
   }, [activeWedding]);
 
-  // Evaluación discreta de reglas de automatización para RSVP (sin cambios visuales)
+  // EvaluaciÃ³n discreta de reglas de automatizaciÃ³n para RSVP (sin cambios visuales)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -67,10 +67,10 @@ export default function RSVPDashboard() {
         for (const a of actions) {
           if (cancelled) break;
           if (a.type === 'send_notification' && a.template === 'rsvp_reminder') {
-            // Crear notificación persistente (no altera diseño)
+            // Crear notificaciÃ³n persistente (no altera diseÃ±o)
             await addNotification({
               type: 'info',
-              message: 'Recordatorio RSVP: la fecha límite está próxima',
+              message: 'Recordatorio RSVP: la fecha lÃ­mite estÃ¡ prÃ³xima',
               action: 'viewRSVP',
             });
           }
@@ -92,35 +92,35 @@ export default function RSVPDashboard() {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard de RSVP</h1>
       {!stats ? (
-        <div className="text-gray-600">Sin datos de respuestas todavía.</div>
+        <div className="text-gray-600">Sin datos de respuestas todavÃ­a.</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="border rounded p-4 bg-white">
+            <div className="border rounded p-4 bg-surface">
               <div className="text-sm text-gray-500">Invitaciones</div>
               <div className="text-2xl font-bold">{stats.totalInvitations || 0}</div>
             </div>
-            <div className="border rounded p-4 bg-white">
+            <div className="border rounded p-4 bg-surface">
               <div className="text-sm text-gray-500">Respuestas</div>
               <div className="text-2xl font-bold">{stats.totalResponses || 0}</div>
             </div>
-            <div className="border rounded p-4 bg-white">
+            <div className="border rounded p-4 bg-surface">
               <div className="text-sm text-gray-500">Asistentes Confirmados</div>
               <div className="text-2xl font-bold">{stats.confirmedAttendees || 0}</div>
             </div>
-            <div className="border rounded p-4 bg-white">
+            <div className="border rounded p-4 bg-surface">
               <div className="text-sm text-gray-500">Rechazadas</div>
               <div className="text-2xl font-bold">{stats.declinedInvitations || 0}</div>
             </div>
-            <div className="border rounded p-4 bg-white">
+            <div className="border rounded p-4 bg-surface">
               <div className="text-sm text-gray-500">Pendientes</div>
               <div className="text-2xl font-bold">{stats.pendingResponses || 0}</div>
             </div>
           </div>
 
           {stats.dietaryRestrictions && (
-            <div className="border rounded p-4 bg-white">
-              <h2 className="font-semibold mb-3">Restricciones dietéticas</h2>
+            <div className="border rounded p-4 bg-surface">
+              <h2 className="font-semibold mb-3">Restricciones dietÃ©ticas</h2>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>Vegetarianos: {stats.dietaryRestrictions.vegetarian || 0}</li>
                 <li>Veganos: {stats.dietaryRestrictions.vegan || 0}</li>
@@ -131,7 +131,7 @@ export default function RSVPDashboard() {
           )}
 
           {/* Pendientes y Recordatorios */}
-          <div className="border rounded p-4 bg-white">
+          <div className="border rounded p-4 bg-surface">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold">Pendientes de responder</h2>
               <div className="flex gap-2">
@@ -149,7 +149,7 @@ export default function RSVPDashboard() {
                       );
                       const json = await res.json().catch(() => ({}));
                       alert(
-                        `Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                        `SimulaciÃ³n: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
                       );
                     } catch (e) {
                       alert('Error simulando recordatorios');
@@ -165,7 +165,7 @@ export default function RSVPDashboard() {
                   disabled={!activeWedding || sending}
                   onClick={async () => {
                     if (!activeWedding) return;
-                    const ok = window.confirm('¿Enviar recordatorios por email a pendientes?');
+                    const ok = window.confirm('Â¿Enviar recordatorios por email a pendientes?');
                     if (!ok) return;
                     setSending(true);
                     try {
@@ -176,7 +176,7 @@ export default function RSVPDashboard() {
                       );
                       const json = await res.json().catch(() => ({}));
                       alert(
-                        `Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                        `EnvÃ­o: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
                       );
                     } catch (e) {
                       alert('Error enviando recordatorios');
@@ -190,7 +190,7 @@ export default function RSVPDashboard() {
               </div>
             </div>
             {loadingPending ? (
-              <div className="text-gray-600">Cargando pendientes…</div>
+              <div className="text-gray-600">Cargando pendientesâ€¦</div>
             ) : pendingGuests.length === 0 ? (
               <div className="text-gray-600">Sin pendientes ahora mismo.</div>
             ) : (
@@ -200,7 +200,7 @@ export default function RSVPDashboard() {
                     <tr>
                       <th className="px-3 py-2 text-left">Nombre</th>
                       <th className="px-3 py-2 text-left">Email</th>
-                      <th className="px-3 py-2 text-left">Teléfono</th>
+                      <th className="px-3 py-2 text-left">TelÃ©fono</th>
                       <th className="px-3 py-2 text-left">Acciones</th>
                     </tr>
                   </thead>

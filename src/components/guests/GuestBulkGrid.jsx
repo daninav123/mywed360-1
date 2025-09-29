@@ -4,18 +4,18 @@ import useTranslations from '../../hooks/useTranslations';
 import { Button } from '../ui';
 import { Input } from '../ui';
 
-// Cabeceras estándar que soporta el pegado desde Excel / Sheets
+// Cabeceras estÃ¡ndar que soporta el pegado desde Excel / Sheets
 const DEFAULT_COLUMNS = [
   { key: 'name', label: 'Nombre *', required: true },
   { key: 'email', label: 'Email *', required: true },
-  { key: 'phone', label: 'Teléfono' },
-  { key: 'companions', label: 'Acompañantes', type: 'number', min: 0, max: 10 },
+  { key: 'phone', label: 'TelÃ©fono' },
+  { key: 'companions', label: 'AcompaÃ±antes', type: 'number', min: 0, max: 10 },
   { key: 'table', label: 'Mesa' },
 ];
 
 /**
  * Grid estilo Excel para alta masiva de invitados.
- * Permite pegar desde el portapapeles, edición inline y validación básica.
+ * Permite pegar desde el portapapeles, ediciÃ³n inline y validaciÃ³n bÃ¡sica.
  *
  * Props:
  *  - onCancel(): cierre del grid
@@ -26,7 +26,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
   const [rows, setRows] = useState([{ id: 0 }]);
   const [errors, setErrors] = useState({});
 
-  // Añadir fila vacía
+  // AÃ±adir fila vacÃ­a
   const addRow = () => setRows((r) => [...r, { id: Date.now() }]);
 
   // Eliminar fila
@@ -64,7 +64,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
     [setRows]
   );
 
-  // Validación simple por fila
+  // ValidaciÃ³n simple por fila
   const validate = () => {
     const newErrors = {};
     rows.forEach((row, idx) => {
@@ -99,8 +99,8 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
 
   return (
     <div className="space-y-4" onPaste={handlePaste}>
-      <p className="text-sm text-gray-600">
-        Pega datos desde Excel/Sheets o edítalos manualmente. Columnas esperadas:
+      <p className="text-sm text-muted">
+        Pega datos desde Excel/Sheets o edÃ­talos manualmente. Columnas esperadas:
         {DEFAULT_COLUMNS.map((c) => ` ${c.label}`).join(', ')}.
       </p>
 
@@ -140,7 +140,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
                     type="button"
                     onClick={() => removeRow(rowIdx)}
                     disabled={isLoading}
-                    className="text-gray-400 hover:text-red-600"
+                    className="text-muted hover:text-red-600"
                   >
                     &times;
                   </button>
@@ -153,7 +153,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={addRow} disabled={isLoading}>
-          + Añadir fila
+          + AÃ±adir fila
         </Button>
         <div className="space-x-3">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>

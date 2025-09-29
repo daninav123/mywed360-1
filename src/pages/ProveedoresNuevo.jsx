@@ -1,4 +1,4 @@
-﻿import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -605,11 +605,11 @@ const Proveedores = () => {
                 <Card key={s.id || s.name} className="opacity-60 border-dashed">
                   <div className="flex itemás-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">{s.name || s.id}</h3>
-                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-body">
                       Pendiente
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-sm text-muted mb-3">
                     Aún no hay proveedor confirmado para este servicio.
                   </p>
                   <div className="flex gap-2">
@@ -634,40 +634,40 @@ const Proveedores = () => {
             <div className="space-y-6">
               {/* Barra de acciones para seleccionaños */}
               {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
-                <div className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600">
+                <div className="flex flex-wrap itemás-center gap-2 text-sm text-muted">
                   <span>{selectedProviderIds.length} seleccionaños</span>
                   <button
                     type="button"
                     onClick={openCompareModal}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
                   >
                     Comparar
                   </button>
                   <button
                     type="button"
                     onClick={openBulkStatusModal}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
                   >
                     Cambiar estado
                   </button>
                   <button
                     type="button"
                     onClick={openGroupSelectedModal}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
                   >
                     Agrupar
                   </button>
                   <button
                     type="button"
                     onClick={openDuplicatesModal}
-                    className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
                   >
                     Revisar duplicaños
                   </button>
                   <button
                     type="button"
                     onClick={clearSelection}
-                    className="px-3 py-1 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
+                    className="px-3 py-1 border border-soft rounded-md text-muted hover:bg-primary-soft"
                   >
                     Limpiar
                   </button>
