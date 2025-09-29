@@ -104,12 +104,11 @@ Cypress.Commands.add('closeDiagnostic', () => {
           cy.contains('button', '×').click({ force: true });
         });
     } else {
-      // Fallback: si por alguna razón el modal está visible pero el selector falla, usa el botón flotante
-      cy.get('button[title="Panel de Diagnóstico"]', { timeout: 500 })
-        .then(($btn) => {
-          if ($btn && $btn.is(':visible')) cy.wrap($btn).click({ force: true });
-        })
-        .catch(() => {});
+      // Fallback: busca el botón en el DOM actual sin fallar si no existe
+      const $btn = $body.find('button[title="Panel de Diagnóstico"]');
+      if ($btn && $btn.length) {
+        cy.wrap($btn.first()).click({ force: true });
+      }
     }
   });
 });

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SeatingPlan refactorizado â€“ Componente principal
  */
 import React, { useEffect } from 'react';
@@ -212,6 +212,16 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [setDrawMode]);
 
+  // Handlers usados por atajos globales (definir antes del efecto)
+  const handleOpenSpaceConfig = React.useCallback(
+    () => setSpaceConfigOpen(true),
+    [setSpaceConfigOpen]
+  );
+  const handleOpenTemplates = React.useCallback(
+    () => setTemplateOpen(true),
+    [setTemplateOpen]
+  );
+
   // Atajos extra: rotación, alinear/distribuir, tabs, toggles y paneles
   useEffect(() => {
     const onKey = (e) => {
@@ -322,15 +332,10 @@ const SeatingPlanRefactored = () => {
     () => setBanquetConfigOpen(false),
     [setBanquetConfigOpen]
   );
-  const handleOpenSpaceConfig = React.useCallback(
-    () => setSpaceConfigOpen(true),
-    [setSpaceConfigOpen]
-  );
   const handleCloseSpaceConfig = React.useCallback(
     () => setSpaceConfigOpen(false),
     [setSpaceConfigOpen]
   );
-  const handleOpenTemplates = React.useCallback(() => setTemplateOpen(true), [setTemplateOpen]);
   const handleCloseTemplates = React.useCallback(() => setTemplateOpen(false), [setTemplateOpen]);
 
   const handleConfigureTable = React.useCallback(
@@ -582,7 +587,7 @@ const SeatingPlanRefactored = () => {
   if (!isHallReady) {
     return (
       <DndProvider backend={HTML5Backend}>
-        <div className="h-full flex items-center justify-center text-gray-600">
+        <div className="h-full flex items-center justify-center text-muted">
           Cargando plano...
         </div>
       </DndProvider>
@@ -791,7 +796,7 @@ const SeatingPlanRefactored = () => {
 
         {/* Barra inferior de estado */}
         <div className="flex-shrink-0 px-4 pb-4">
-          <div className="flex items-center gap-4 text-xs text-gray-600 bg-white border rounded-lg px-3 py-2">
+          <div className="flex items-center gap-4 text-xs text-muted bg-white border rounded-lg px-3 py-2">
             <div>Zoom: {Math.round((viewport?.scale || 1) * 100)}%</div>
             <div>Dimensiones: {(safeHallSize.width / 100).toFixed(1)} × {(safeHallSize.height / 100).toFixed(1)} m</div>
             <div>Conflictos: {Array.isArray(conflicts) ? conflicts.length : 0}</div>
