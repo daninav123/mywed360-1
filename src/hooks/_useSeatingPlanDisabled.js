@@ -499,7 +499,7 @@ export const useSeatingPlan = () => {
             (a) => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3
           );
           return b ? b.points : null;
-        } catch { return null; }
+        } catch (e) { return null; }
       })();
       const obstacles = (() => {
         const rects = [];
@@ -582,6 +582,8 @@ export const useSeatingPlan = () => {
           return;
         }
         
+      });
+
       // ---- Ceremonia ----
       try {
         const cerBoundary = (() => {
@@ -614,7 +616,7 @@ export const useSeatingPlan = () => {
             out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obstáculo/puerta' });
           }
         });
-      } catch {}
+      } catch (e) {}
     } catch (e) {
       return [];
     }
@@ -805,7 +807,7 @@ export const useSeatingPlan = () => {
       const raw = localStorage.getItem(indexKey);
       const arr = raw ? JSON.parse(raw) : [];
       return Array.isArray(arr) ? arr : [];
-    } catch { return []; }
+    } catch (e) { return []; }
   };
   const saveSnapshot = (name) => {
     try {
@@ -818,7 +820,7 @@ export const useSeatingPlan = () => {
         localStorage.setItem(indexKey, JSON.stringify([...idx, safe]));
       }
       return true;
-    } catch { return false; }
+    } catch (e) { return false; }
   };
   const loadSnapshot = (name) => {
     try {
@@ -827,7 +829,7 @@ export const useSeatingPlan = () => {
       if (!raw) return false;
       applySnapshot(JSON.parse(raw));
       return true;
-    } catch { return false; }
+    } catch (e) { return false; }
   };
   const deleteSnapshot = (name) => {
     try {
@@ -837,12 +839,12 @@ export const useSeatingPlan = () => {
       const idx = listSnapshots().filter((n) => n !== safe);
       localStorage.setItem(indexKey, JSON.stringify(idx));
       return true;
-    } catch { return false; }
+    } catch (e) { return false; }
   };
 
   // Setter merge para scoringWeights
   const updateScoringWeights = (patch) => {
-    try { setScoringWeights((prev) => ({ ...(prev || {}), ...(patch || {}) })); } catch {}
+    try { setScoringWeights((prev) => ({ ...(prev || {}), ...(patch || {}) })); } catch (e) {}
   };
 
   return {
@@ -958,4 +960,3 @@ export const useSeatingPlan = () => {
     normalizeId,
   };
 };
-
