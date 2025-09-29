@@ -30,6 +30,7 @@ const InboxContainer = () => {
   const [folder, setFolder] = useState('inbox'); // 'inbox' | 'sent'
   const [inboxCounts, setInboxCounts] = useState({ total: 0, unread: 0 });
   const [sentCounts, setSentCounts] = useState({ total: 0, unread: 0 });
+  const [iaCounts, setIaCounts] = useState({ inbox: 0, sent: 0 });
   const [analyzing, setAnalyzing] = useState(false);
 
   // Cargar emails al montar el componente
@@ -70,6 +71,31 @@ const InboxContainer = () => {
       const s = Array.isArray(sentList) ? sentList : [];
       setInboxCounts({ total: i.length, unread: i.filter((m) => !m.read).length });
       setSentCounts({ total: s.length, unread: s.filter((m) => !m.read).length });
+
+      // IA counts (best-effort, limitado a 50 por carpeta)
+      try {
+        const { get: apiGet } = await import('../../../services/apiClient');
+        const sample = (arr) => arr.slice(0, 50).map((m) => m.id).filter(Boolean);
+        const hasInsights = async (id) => {
+          try {
+            const res = await apiGet(`/api/email-insights/${encodeURIComponent(id)}`, { auth: true, silent: true });
+            if (!res?.ok) return 0;
+            const j = await res.json();
+            const t = (j?.tasks?.length || 0) + (j?.meetings?.length || 0) + (j?.budgets?.length || 0) + (j?.contracts?.length || 0);
+            return t > 0 ? 1 : 0;
+          } catch { return 0; }
+        };
+        const countFor = async (ids) => {
+          const promises = ids.map((id) => hasInsights(id));
+          const results = await Promise.all(promises);
+          return results.reduce((a, b) => a + b, 0);
+        };
+        const [ci, cs] = await Promise.all([
+          countFor(sample(i)),
+          countFor(sample(s)),
+        ]);
+        setIaCounts({ inbox: ci, sent: cs });
+      } catch {}
     } catch {}
   }, []);
 
@@ -385,7 +411,11 @@ const InboxContainer = () => {
               }`}
               onClick={() => { setSelectedEmailId(null); setFolder('inbox'); }}
             >
-              <span>Recibidos</span>
+              <span className="flex items-center gap-2">Recibidos {iaCounts.inbox > 0 && (
+                <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.inbox}`}>
+                  IA {iaCounts.inbox}
+                </span>
+              )}</span>
               <span className="text-xs rounded-full px-2 py-0.5 bg-blue-600 text-white">
                 {inboxCounts.unread > 0 ? `${inboxCounts.unread}/${inboxCounts.total}` : inboxCounts.total}
               </span>
@@ -396,7 +426,11 @@ const InboxContainer = () => {
               }`}
               onClick={() => { setSelectedEmailId(null); setFolder('sent'); }}
             >
-              <span>Enviados</span>
+              <span className="flex items-center gap-2">Enviados {iaCounts.sent > 0 && (
+                <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.sent}`}>
+                  IA {iaCounts.sent}
+                </span>
+              )}</span>
               <span className="text-xs rounded-full px-2 py-0.5 bg-gray-700 text-white">
                 {sentCounts.total}
               </span>
@@ -459,6 +493,5 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
-
 
 

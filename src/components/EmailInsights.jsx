@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
 import { get as apiGet, post as apiPost } from '../services/apiClient';
@@ -7,6 +8,7 @@ import { getUserTags, createTag, addTagToEmail } from '../services/tagService';
 
 export default function EmailInsights({ mailId, userId, email }) {
   const { user: authUser } = (typeof useAuth === 'function' ? useAuth() : {}) || {};
+  const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -262,6 +264,18 @@ export default function EmailInsights({ mailId, userId, email }) {
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+          onClick={() => { try { navigate && navigate('/tasks'); } catch {} }}
+        >
+          Ver tareas
+        </button>
+        <button
+          className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+          onClick={() => { try { navigate && navigate('/protocolo/timing'); } catch {} }}
+        >
+          Ver Timing
+        </button>
+        <button
+          className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
           onClick={() => {
             try {
               const defaultTitle =
@@ -345,5 +359,3 @@ export default function EmailInsights({ mailId, userId, email }) {
     </div>
   );
 }
-
-
