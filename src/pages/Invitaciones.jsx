@@ -1,19 +1,22 @@
-import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+﻿import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Spinner from '../components/Spinner';
 import Toast from '../components/Toast';
 import Card from '../components/ui/Card';
 import { useWedding } from '../context/WeddingContext';
+import useGuests from '../hooks/useGuests';
+import * as EmailService from '../services/emailService';
+import { generateRsvpLink } from '../services/rsvpService';
 import { post as apiPost } from '../services/apiClient';
 import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
 
 export default function Invitaciones() {
   const { activeWedding } = useWedding();
-  // Estado de sincronización
+  // Estado de sincronizaciÃ³n
   const [syncStatus, setSyncStatus] = useState(getSyncState());
 
-  // Suscribirse a cambios en el estado de sincronización
+  // Suscribirse a cambios en el estado de sincronizaciÃ³n
   useEffect(() => {
     const unsubscribe = subscribeSyncState(setSyncStatus);
     return () => unsubscribe();
@@ -31,7 +34,7 @@ export default function Invitaciones() {
     try {
       const allowDirect =
         import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
-      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuración');
+      if (!allowDirect) throw new Error('OpenAI directo deshabilitado por configuraciÃ³n');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -53,10 +56,10 @@ export default function Invitaciones() {
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content || '';
       setGeneratedText(text);
-      setToast({ message: 'Invitación generada', type: 'success' });
+      setToast({ message: 'InvitaciÃ³n generada', type: 'success' });
     } catch (err) {
       console.error(err);
-      setToast({ message: 'Error generando invitación', type: 'error' });
+      setToast({ message: 'Error generando invitaciÃ³n', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -76,15 +79,18 @@ export default function Invitaciones() {
       collection: 'userInvitations',
       showNotification: false,
     });
-    setToast({ message: 'Diseño duplicado', type: 'success' });
+    setToast({ message: 'DiseÃ±o duplicado', type: 'success' });
   };
   const [panel, setPanel] = useState('invitation'); // 'invitation' o 'envelope'
   const [filterCategory, setFilterCategory] = useState('');
   const [filterColor, setFilterColor] = useState('');
   const [filterFont, setFilterFont] = useState('');
   const [step, setStep] = useState(1);
+  const [sendingTest, setSendingTest] = useState(false);
+  const [sendingBulk, setSendingBulk] = useState(false);
+  const [subject, setSubject] = useState('Invitación a nuestra boda');
 
-  // Carga inicial asíncrona de borrador/preferencias
+  // Carga inicial asÃ­ncrona de borrador/preferencias
   useEffect(() => {
     (async () => {
       try {
@@ -128,9 +134,9 @@ export default function Invitaciones() {
 
   // Ejemplo de plantillas
   const templates = [
-    { id: 1, name: 'Clásico', category: 'clásico', color: 'pastel', font: 'Serif' },
+    { id: 1, name: 'ClÃ¡sico', category: 'clÃ¡sico', color: 'pastel', font: 'Serif' },
     { id: 2, name: 'Moderno', category: 'moderno', color: 'vibrante', font: 'Sans' },
-    { id: 3, name: 'Rústico', category: 'rústico', color: 'tierra', font: 'Handwriting' },
+    { id: 3, name: 'RÃºstico', category: 'rÃºstico', color: 'tierra', font: 'Handwriting' },
     { id: 4, name: 'Minimalista', category: 'minimalista', color: 'monocromo', font: 'Sans' },
   ];
   const filtered = templates.filter(
@@ -186,7 +192,7 @@ export default function Invitaciones() {
     });
   }, [showPreview]);
 
-  // Indicador de sincronización
+  // Indicador de sincronizaciÃ³n
   const SyncIndicator = () => (
     <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-white px-3 py-2 rounded-full shadow-md">
       {syncStatus === 'online' ? (
@@ -211,7 +217,7 @@ export default function Invitaciones() {
   return (
     <Card className="p-6 space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      <h1 className="text-2xl font-semibold">Diseño de Invitaciones</h1>
+      <h1 className="text-2xl font-semibold">DiseÃ±o de Invitaciones</h1>
       <div className="flex justify-between mb-4">
         {step > 1 && (
           <button onClick={() => setStep(step - 1)} className="bg-gray-200 px-3 py-1 rounded">
@@ -242,7 +248,7 @@ export default function Invitaciones() {
           <h2 className="text-lg font-semibold">Asistente de IA</h2>
           <textarea
             rows={3}
-            placeholder="Describe cómo quieres tu invitación..."
+            placeholder="Describe cÃ³mo quieres tu invitaciÃ³n..."
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
             className="w-full border rounded p-2"
@@ -253,15 +259,15 @@ export default function Invitaciones() {
             className="bg-indigo-600 text-white px-4 py-2 rounded flex items-center"
           >
             {loading ? <Spinner size={16} className="mr-2" /> : <Zap size={16} className="mr-2" />}{' '}
-            {loading ? 'Generando...' : 'Generar invitación'}
+            {loading ? 'Generando...' : 'Generar invitaciÃ³n'}
           </button>
         </section>
       )}
 
-      {/* Selección de Plantilla */}
+      {/* SelecciÃ³n de Plantilla */}
       {step === 2 && (
         <section className="border rounded p-4 space-y-4">
-          <h2 className="text-lg font-semibold">Selección de Plantilla</h2>
+          <h2 className="text-lg font-semibold">SelecciÃ³n de Plantilla</h2>
           <div className="flex gap-4 flex-wrap">
             <select
               value={filterCategory}
@@ -269,9 +275,9 @@ export default function Invitaciones() {
               className="border rounded px-2 py-1"
             >
               <option value="">Todos los estilos</option>
-              <option value="clásico">Clásico</option>
+              <option value="clÃ¡sico">ClÃ¡sico</option>
               <option value="moderno">Moderno</option>
-              <option value="rústico">Rústico</option>
+              <option value="rÃºstico">RÃºstico</option>
               <option value="minimalista">Minimalista</option>
             </select>
             <select
@@ -290,7 +296,7 @@ export default function Invitaciones() {
               onChange={(e) => setFilterFont(e.target.value)}
               className="border rounded px-2 py-1"
             >
-              <option value="">Todas las tipografías</option>
+              <option value="">Todas las tipografÃ­as</option>
               <option value="Serif">Serif</option>
               <option value="Sans">Sans</option>
               <option value="Handwriting">Handwriting</option>
@@ -311,7 +317,7 @@ export default function Invitaciones() {
         </section>
       )}
 
-      {/* Editor Invitación/Sobre */}
+      {/* Editor InvitaciÃ³n/Sobre */}
       {step === 3 && (
         <section className="border rounded p-4 space-y-4">
           <div className="flex gap-4">
@@ -319,7 +325,7 @@ export default function Invitaciones() {
               onClick={() => setPanel('invitation')}
               className={`px-4 py-2 rounded ${panel === 'invitation' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
             >
-              Invitación
+              InvitaciÃ³n
             </button>
             <button
               onClick={() => setPanel('envelope')}
@@ -330,7 +336,7 @@ export default function Invitaciones() {
           </div>
           <div className="border bg-white h-[400px] flex items-center justify-center text-gray-400">
             {panel === 'invitation'
-              ? 'Canvas de invitación: arrastra componentes aquí'
+              ? 'Canvas de invitaciÃ³n: arrastra componentes aquÃ­'
               : 'Canvas de sobre: frontal / trasero'}
           </div>
         </section>
@@ -357,6 +363,104 @@ export default function Invitaciones() {
           <button className="bg-purple-600 text-white px-4 py-2 rounded">Compartir</button>
         </section>
       )}
+
+      {step === 4 && (
+        <section className="border rounded p-4 space-y-3 mt-3">
+          <h2 className="text-lg font-semibold">Envío</h2>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm">
+              Asunto
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="block w-full border rounded px-2 py-1 mt-1"
+                placeholder="Asunto del correo"
+              />
+            </label>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              disabled={sendingTest}
+              onClick={async () => {
+                try {
+                  const to = typeof window !== 'undefined' ? window.prompt('Email de prueba:', '') : '';
+                  if (!to) return;
+                  setSendingTest(true);
+                  const html = `
+                    <div style="font-family:Arial, sans-serif; line-height:1.6">
+                      <h2 style="margin:0 0 12px 0">${subject || 'Invitación a nuestra boda'}</h2>
+                      <p>${(generatedText || '').replace(/\n/g, '<br/>')}</p>
+                    </div>`;
+                  await EmailService.sendMail({ to, subject: subject || 'Invitación a nuestra boda', body: html });
+                  setToast({ message: 'Enviado email de prueba', type: 'success' });
+                } catch (e) {
+                  setToast({ message: 'No se pudo enviar la prueba', type: 'error' });
+                } finally {
+                  setSendingTest(false);
+                }
+              }}
+              className="bg-indigo-600 text-white px-3 py-1 rounded"
+            >
+              {sendingTest ? 'Enviando…' : 'Enviar prueba'}
+            </button>
+            <button
+              disabled={!activeWedding || sendingBulk}
+              onClick={async () => {
+                try {
+                  const localGuests = (guests || []).filter(Boolean);
+                  if (!localGuests.length) {
+                    setToast({ message: 'No hay invitados cargados', type: 'info' });
+                    return;
+                  }
+                  const pending = localGuests.filter((g) => {
+                    const s = String(g.status || '').toLowerCase();
+                    return (
+                      (!s || s === 'pending') &&
+                      !(s === 'confirmed' || s === 'accepted') &&
+                      !(s === 'declined' || s === 'rejected') &&
+                      g.email
+                    );
+                  });
+                  if (!pending.length) {
+                    setToast({ message: 'No hay pendientes con email', type: 'info' });
+                    return;
+                  }
+                  const ok = typeof window !== 'undefined' ? window.confirm(`Enviar invitación a ${pending.length} pendientes con enlace RSVP?`) : true;
+                  if (!ok) return;
+                  setSendingBulk(true);
+                  let sent = 0, failed = 0;
+                  for (const g of pending.slice(0, 100)) { // límite de seguridad
+                    try {
+                      const res = await generateRsvpLink({ weddingId: activeWedding, guestId: g.id });
+                      const link = res?.link || '';
+                      const html = `
+                        <div style="font-family:Arial, sans-serif; line-height:1.6">
+                          <h2 style="margin:0 0 12px 0">${subject || 'Invitación a nuestra boda'}</h2>
+                          <p>${(generatedText || '').replace(/\n/g, '<br/>')}</p>
+                          ${link ? `<p><a href="${link}" target="_blank" style="display:inline-block; background:#2563eb; color:#fff; padding:10px 16px; border-radius:6px; text-decoration:none">Confirmar asistencia (RSVP)</a></p>` : ''}
+                        </div>`;
+                      await EmailService.sendMail({ to: g.email, subject: subject || 'Invitación a nuestra boda', body: html });
+                      sent++;
+                    } catch (e) {
+                      failed++;
+                    }
+                  }
+                  setToast({ message: `Invitaciones enviadas: ${sent}. Fallidas: ${failed}.`, type: failed ? 'error' : 'success' });
+                } catch (e) {
+                  setToast({ message: 'Error en envío masivo', type: 'error' });
+                } finally {
+                  setSendingBulk(false);
+                }
+              }}
+              className="bg-blue-600 text-white px-3 py-1 rounded"
+            >
+              {sendingBulk ? 'Enviando…' : 'Enviar a pendientes'}
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* Envío masivo/Recordatorios RSVP */}
       {step === 4 && (
         <section className="border rounded p-4 space-y-3 mt-3">
@@ -374,7 +478,7 @@ export default function Invitaciones() {
                   );
                   const json = await res.json().catch(() => ({}));
                   setToast({
-                    message: `Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}`,
+                    message: `SimulaciÃ³n: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}`,
                     type: 'info',
                   });
                 } catch {
@@ -414,7 +518,7 @@ export default function Invitaciones() {
       )}
       {showPreview && generatedText && (
         <section className="border rounded p-4 bg-gray-50 mt-4">
-          <h3 className="text-lg font-semibold">Preview de Invitación</h3>
+          <h3 className="text-lg font-semibold">Preview de InvitaciÃ³n</h3>
           <p className="whitespace-pre-wrap">{generatedText}</p>
         </section>
       )}
@@ -435,7 +539,7 @@ export default function Invitaciones() {
               className="bg-gray-200 px-3 py-1 rounded flex items-center"
             >
               <Copy size={16} className="mr-2" />
-              Duplicar Diseño
+              Duplicar DiseÃ±o
             </button>
           </div>
         </section>
@@ -443,3 +547,5 @@ export default function Invitaciones() {
     </Card>
   );
 }
+
+
