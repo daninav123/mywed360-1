@@ -1,4 +1,4 @@
-describe('RSVP - Confirmación por token público', () => {
+﻿describe('RSVP - Confirmación por token público', () => {
   it('crea invitado dev, visita enlace y confirma asistencia', () => {
     // Crear invitado de prueba (solo en desarrollo)
     cy.request('POST', '/api/rsvp/dev/create', {

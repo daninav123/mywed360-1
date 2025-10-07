@@ -1,4 +1,6 @@
 {
     "git.ignoreLimitWarning": true,
-    "chatgpt.openOnStartup": true
+    "chatgpt.openOnStartup": true,
+    "files.encoding": "utf8",
+    "files.autoGuessEncoding": false
 }

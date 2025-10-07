@@ -1,13 +1,13 @@
-﻿openapi: 3.0.3
+openapi: 3.0.3
 info:
   title: MyWed360 Backend API
   version: 0.1.0
   description: |
-    EspecificaciÃ³n OpenAPI 3 del backend de MyWed360.
+    Especificación OpenAPI 3 del backend de MyWed360.
 
     Seguridad principal: Firebase Auth (Bearer token). En desarrollo puede estar activo el bypass de tokens mock (`ALLOW_MOCK_TOKENS`).
 
-    DocumentaciÃ³n relacionada:
+    Documentación relacionada:
     - Arquitectura: ../ARCHITECTURE.md
     - Onboarding: ../ONBOARDING.md
     - Monitoreo: ../monitoring/README.md
@@ -15,7 +15,7 @@ servers:
   - url: http://localhost:3001
     description: Local (desarrollo)
   - url: https://mywed360-backend.onrender.com
-    description: Render (staging/producciÃ³n)
+    description: Render (staging/producción)
 
 tags:
   - name: health
@@ -23,7 +23,7 @@ tags:
   - name: rsvp
     description: Confirmaciones de asistencia por token y recordatorios
   - name: whatsapp
-    description: Webhooks y endpoints de mensajerÃ­a WhatsApp
+    description: Webhooks y endpoints de mensajería WhatsApp
   - name: mailgun
     description: Webhooks de Mailgun
 
@@ -102,7 +102,7 @@ components:
         allergens:
           type: string
           maxLength: 500
-          default:  –  – 
+          default:     
     RSVPRemindersRequest:
       type: object
       required: [weddingId]
@@ -124,7 +124,7 @@ components:
         ok:
           type: boolean
           nullable: true
-          description: Indicador heurÃ­stico opcional si se realiza verificaciÃ³n activa
+          description: Indicador heurístico opcional si se realiza verificación activa
         message:
           type: string
           nullable: true
@@ -286,14 +286,14 @@ paths:
   /api/health/livez:
     get:
       tags: [health]
-      summary: SeÃ±al de liveness
+      summary: Señal de liveness
       security: []
       responses:
         '200': { description: Alive }
   /api/health/readyz:
     get:
       tags: [health]
-      summary: SeÃ±al de readiness (comprueba Firestore superficialmente)
+      summary: Señal de readiness (comprueba Firestore superficialmente)
       security: []
       responses:
         '200': { description: Ready }
@@ -302,7 +302,7 @@ paths:
   /api/rsvp/by-token/{token}:
     get:
       tags: [rsvp]
-      summary: Obtiene el estado de RSVP por token pÃºblico
+      summary: Obtiene el estado de RSVP por token público
       security: []
       parameters:
         - name: token
@@ -311,7 +311,7 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Datos bÃ¡sicos de RSVP
+          description: Datos básicos de RSVP
           content:
             application/json:
               schema:
@@ -319,7 +319,7 @@ paths:
         '404': { description: Not found }
     put:
       tags: [rsvp]
-      summary: Actualiza el estado de RSVP por token pÃºblico
+      summary: Actualiza el estado de RSVP por token público
       security: []
       parameters:
         - name: token
@@ -345,9 +345,9 @@ paths:
   /api/rsvp/reminders:
     post:
       tags: [rsvp]
-      summary: EnvÃ­a recordatorios por email a invitados pendientes (requiere rol planner)
+      summary: Envía recordatorios por email a invitados pendientes (requiere rol planner)
       description: |
-        Requiere autenticaciÃ³n (Firebase) y rol `planner` (verificado en el backend).
+        Requiere autenticación (Firebase) y rol `planner` (verificado en el backend).
       security:
         - bearerAuth: []
       requestBody:
@@ -408,7 +408,7 @@ paths:
       tags: [whatsapp]
       summary: Webhook de estados y mensajes entrantes de Twilio
       description: |
-        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` estÃ¡ configurado. Acepta `application/x-www-form-urlencoded`.
+        Verifica la firma `X-Twilio-Signature` si `TWILIO_AUTH_TOKEN` está configurado. Acepta `application/x-www-form-urlencoded`.
         Procesa actualizaciones de estado y mensajes entrantes para el flujo de RSVP.
       security: []
       requestBody:
@@ -426,8 +426,8 @@ paths:
       tags: [whatsapp]
       summary: Estado del proveedor de WhatsApp (health superficial)
       description: |
-        Expone si el proveedor (p. ej., Twilio) estÃ¡ configurado mediante variables de entorno.
-        Puede incluir seÃ±al `ok` y `message` cuando exista verificaciÃ³n activa.
+        Expone si el proveedor (p. ej., Twilio) está configurado mediante variables de entorno.
+        Puede incluir señal `ok` y `message` cuando exista verificación activa.
       security: []
       responses:
         '200':
@@ -440,7 +440,7 @@ paths:
   /api/mailgun/webhook:
     post:
       tags: [mailgun]
-      summary: Webhook de Mailgun con verificaciÃ³n HMAC-SHA256
+      summary: Webhook de Mailgun con verificación HMAC-SHA256
       description: |
         Verifica la firma usando `MAILGUN_SIGNING_KEY`. Acepta `application/x-www-form-urlencoded`.
       security: []
@@ -556,7 +556,7 @@ paths:
   /api/providers/search:
     get:
       tags: [providers]
-      summary: BÃºsqueda con IA de proveedores
+      summary: Búsqueda con IA de proveedores
       security:
         - bearerAuth: []
       parameters:
@@ -655,7 +655,7 @@ paths:
   /api/contracts/{id}/send:
     post:
       tags: [contracts]
-      summary: EnvÃ­o del contrato para firma
+      summary: Envío del contrato para firma
       security:
         - bearerAuth: []
       responses:
@@ -679,7 +679,7 @@ paths:
   /api/payments/intent:
     post:
       tags: [payments]
-      summary: Crea intenciÃ³n de pago
+      summary: Crea intención de pago
       security:
         - bearerAuth: []
       requestBody:
@@ -722,7 +722,7 @@ paths:
   /api/emails/send:
     post:
       tags: [emails]
-      summary: EnvÃ­o de email
+      summary: Envío de email
       security:
         - bearerAuth: []
       requestBody:
@@ -737,7 +737,7 @@ paths:
   /api/emails/analyze:
     post:
       tags: [emails]
-      summary: AnÃ¡lisis IA de email
+      summary: Análisis IA de email
       security:
         - bearerAuth: []
       requestBody:
@@ -764,7 +764,7 @@ paths:
         '200': { description: OK }
     post:
       tags: [notifications]
-      summary: Crea una notificaciÃ³n
+      summary: Crea una notificación
       security:
         - bearerAuth: []
       requestBody:
@@ -779,7 +779,7 @@ paths:
   /api/notifications/{id}:
     patch:
       tags: [notifications]
-      summary: Actualiza estado o preferencias de una notificaciÃ³n
+      summary: Actualiza estado o preferencias de una notificación
       security:
         - bearerAuth: []
       parameters:
@@ -799,7 +799,7 @@ paths:
   /api/admin/metrics/http:
     get:
       tags: [metrics]
-      summary: Resumen de mÃ©tricas HTTP (admin)
+      summary: Resumen de métricas HTTP (admin)
       security:
         - bearerAuth: []
       responses:

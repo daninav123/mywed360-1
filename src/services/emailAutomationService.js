@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+﻿/* eslint-disable no-undef */
 import { post } from './apiClient';
 
 const CONFIG_KEY = 'mywed360.email.automation.config';

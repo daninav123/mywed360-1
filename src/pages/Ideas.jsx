@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 
 import ExternalImage from '@/components/ExternalImage';
 
@@ -44,12 +44,12 @@ export default function Ideas() {
             fallbackToLocal: true,
           }),
         ]);
-        setNotes(Array.isArray(loadedNotes) ? loadedNotes : []);
+        setNotes(Array.isArray(loadedNotes) ?loadedNotes : []);
         const f =
-          Array.isArray(loadedFolders) && loadedFolders.length ? loadedFolders : ['General'];
+          Array.isArray(loadedFolders) && loadedFolders.length ?loadedFolders : ['General'];
         setFolders(f);
-        setCurrentFolder(f.includes('General') ? 'General' : f[0]);
-        setPhotos(Array.isArray(loadedPhotos) ? loadedPhotos : []);
+        setCurrentFolder(f.includes('General') ?'General' : f[0]);
+        setPhotos(Array.isArray(loadedPhotos) ?loadedPhotos : []);
       } finally {
         setLoading(false);
       }
@@ -103,7 +103,7 @@ export default function Ideas() {
               <button
                 key={folder}
                 onClick={() => setCurrentFolder(folder)}
-                className={`px-2 py-1 rounded-full text-sm ${currentFolder === folder ? 'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
+                className={`px-2 py-1 rounded-full text-sm ${currentFolder === folder ?'border border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
               >
                 {folder}
               </button>
@@ -158,7 +158,7 @@ export default function Ideas() {
             onChange={async (e) => {
               const files = Array.from(e.target.files || []);
               if (!files.length) return;
-              // Reutilizamos el uploader de adjuntos con una ruta separada lldave (userId)
+              // Reutilizamos el uploader de adjuntos con una ruta separada lldave (userId)
               const uploaded = await uploadFilesToStorage(files, uid, 'ideas');
               const mapped = uploaded.map((u) => ({ url: u.url, name: u.filename, size: u.size }));
               const next = [...photos, ...mapped];

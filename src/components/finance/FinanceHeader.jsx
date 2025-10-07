@@ -1,9 +1,8 @@
-﻿import { Cloud, CloudOff } from 'lucide-react';
-import React from 'react';
+﻿import React from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 
-export default function FinanceHeader({ syncStatus }) {
+export default function FinanceHeader() {
   const { t } = useTranslations();
 
   return (
@@ -17,31 +16,7 @@ export default function FinanceHeader({ syncStatus }) {
             defaultValue: 'Control completo del presupuesto y gastos de tu boda',
           })}
         </p>
-        {syncStatus?.lastSyncTime && (
-          <p className="text-xs text-[color:var(--color-text)]/50 mt-1">
-            {t('finance.overview.lastSync', { defaultValue: 'Última sincronizaci€)n' })}:{' '}
-            {new Date(syncStatus.lastSyncTime).toLocaleString()}
-          </p>
-        )}
-      </div>
-      <div className="flex items-center space-x-2">
-        {syncStatus?.isOnline ? (
-          <div className="flex items-center text-[color:var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
-            <Cloud size={16} className="mr-2" />
-            <span className="text-sm font-medium">
-              {t('finance.overview.synced', { defaultValue: 'Sincronizado' })}
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center text-[color:var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
-            <CloudOff size={16} className="mr-2" />
-            <span className="text-sm font-medium">
-              {t('finance.overview.offline', { defaultValue: 'Sin conexión' })}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
 }
-

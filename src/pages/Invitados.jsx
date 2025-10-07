@@ -1,5 +1,4 @@
-import { Cloud, CloudOff } from 'lucide-react';
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GroupManager from '../components/guests/GroupManager';
@@ -58,7 +57,6 @@ function Invitados() {
     guests,
     stats,
     filters,
-    syncStatus,
     isLoading,
     addGuest,
     updateGuest,
@@ -738,26 +736,10 @@ function Invitados() {
   return (
     <div className="min-h-screen bg-app p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header con indicador de sincronizaciÃ³n */}
         <div className="page-header">
           <div>
             <h1 className="page-title">{t('guests.guestList')}</h1>
             <p className="text-muted mt-1">Gestiona tu lista de invitados de forma eficiente</p>
-          </div>
-
-          {/* Indicador de sincronizaciÃ³n */}
-          <div className="flex items-center space-x-2">
-            {syncStatus?.isOnline ? (
-              <div className="flex items-center text-[var(--color-success)] bg-[var(--color-success)]/10 px-3 py-1 rounded-full">
-                <Cloud size={16} className="mr-2" />
-                <span className="text-sm font-medium">Sincronizado</span>
-              </div>
-            ) : (
-              <div className="flex items-center text-[var(--color-warning)] bg-[var(--color-warning)]/10 px-3 py-1 rounded-full">
-                <CloudOff size={16} className="mr-2" />
-                <span className="text-sm font-medium">Sin conexiÃ³n</span>
-              </div>
-            )}
           </div>
         </div>
 

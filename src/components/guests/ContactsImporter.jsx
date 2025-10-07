@@ -6,7 +6,7 @@ import useTranslations from '../../hooks/useTranslations';
 import { Button, Input } from '../ui';
 
 /**
- * VERSION LIMPIA del componente de importaciÃ³n de contactos.
+ * VERSION LIMPIA del componente de importación de contactos.
  * Utiliza la Contact Picker API y permite revisar/editar los contactos antes de importarlos.
  */
 const ContactsImporterFixed = ({ onImported }) => {
@@ -28,7 +28,7 @@ const ContactsImporterFixed = ({ onImported }) => {
     if (!('contacts' in navigator) || !navigator.contacts?.select) {
       alert(
         t('guests.contacts.unsupported', {
-          defaultValue: 'Este dispositivo/navegador no soporta la selecciÃ³n de contactos.',
+          defaultValue: 'Este dispositivo/navegador no soporta la selección de contactos.',
         })
       );
       return;
@@ -71,11 +71,11 @@ const ContactsImporterFixed = ({ onImported }) => {
     }
   };
 
-  // ImportaciÃ³n desde CSV (opcional)
+  // Importación desde CSV (opcional)
   const handleImportCSVClick = () => fileInputRef.current?.click();
 
   const parseCSV = (text) => {
-    // Parser bÃ¡sico para CSV sencillo (campos separados por coma, comillas opcionales)
+    // Parser básico para CSV sencillo (campos separados por coma, comillas opcionales)
     const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(Boolean);
     if (lines.length === 0) return [];
     const rawHeaders = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''));
@@ -98,7 +98,7 @@ const ContactsImporterFixed = ({ onImported }) => {
     const data = [];
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
-      // Split simple por comas (soporta comillas bÃ¡sicas)
+      // Split simple por comas (soporta comillas básicas)
       const cols = [];
       let cur = '';
       let inQuotes = false;
@@ -135,7 +135,7 @@ const ContactsImporterFixed = ({ onImported }) => {
       if (!parsed.length) {
         alert(
           t('guests.contacts.csvEmpty', {
-            defaultValue: 'El CSV no contiene filas vÃ¡lidas',
+            defaultValue: 'El CSV no contiene filas válidas',
           })
         );
         return;
@@ -181,7 +181,7 @@ const ContactsImporterFixed = ({ onImported }) => {
             <tr>
               <th className="border px-2 py-1">{t('guests.fields.name', { defaultValue: 'Nombre' })}</th>
               <th className="border px-2 py-1">{t('guests.fields.email', { defaultValue: 'Email' })}</th>
-              <th className="border px-2 py-1">{t('guests.fields.phone', { defaultValue: 'TelÃ©fono' })}</th>
+              <th className="border px-2 py-1">{t('guests.fields.phone', { defaultValue: 'Teléfono' })}</th>
               <th className="border px-2 py-1">{t('guests.fields.table', { defaultValue: 'Mesa' })}</th>
             </tr>
           </thead>

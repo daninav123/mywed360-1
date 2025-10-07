@@ -149,7 +149,7 @@ function MetricsDashboard() {
         ]);
         if (errsRes?.ok) {
           const data = await errsRes.json();
-          setErrorList(Array.isArray(data.items) ? data.items : []);
+          setErrorList(Array.isArray(data.items) ?data.items : []);
         } else {
           setErrorList([]);
         }
@@ -175,7 +175,7 @@ function MetricsDashboard() {
         const res = await apiGet(`${endpoint}/web-vitals?timeframe=${selectedTimeframe}&limit=200`, { auth: true });
         if (res?.ok) {
           const data = await res.json();
-          setWebVitals(Array.isArray(data.items) ? data.items : []);
+          setWebVitals(Array.isArray(data.items) ?data.items : []);
         } else {
           setWebVitals([]);
         }
@@ -202,13 +202,13 @@ function MetricsDashboard() {
   const displayCounters = useMemo(() => {
     const hasAgg = aggregate && aggregate.counters && Object.keys(aggregate.counters).length > 0;
     if (hasAgg) return aggregate.counters;
-    return (metrics && metrics.counters) ? metrics.counters : {};
+    return (metrics && metrics.counters) ?metrics.counters : {};
   }, [aggregate, metrics]);
 
   const displayTimings = useMemo(() => {
     const hasAgg = aggregate && aggregate.timings && Object.keys(aggregate.timings).length > 0;
     if (hasAgg) return aggregate.timings;
-    return (metrics && metrics.timings) ? metrics.timings : {};
+    return (metrics && metrics.timings) ?metrics.timings : {};
   }, [aggregate, metrics]);
 
   // Punto Ms reciente de la serie temporal (seguro)
@@ -226,7 +226,7 @@ function MetricsDashboard() {
   }, [errorList]);
 
   const filteredErrors = useMemo(() => {
-    const base = errorList.length > 0 ? errorList : (metrics?.errors || []);
+    const base = errorList.length > 0 ?errorList : (metrics?.errors || []);
     return base.filter((e) => {
       if (errorFilterSource !== 'all' && (e.source || 'unknown') !== errorFilterSource) return false;
       if (errorFilterType !== 'all' && (e.type || 'error') !== errorFilterType) return false;
@@ -293,7 +293,7 @@ function MetricsDashboard() {
                 {Object.entries(displayTimings).map(([k, t]) => (
                   <tr key={k} className="border-b">
                     <td className="py-2 px-2">{k}</td>
-                    <td className="py-2 px-2 text-right">{t.count ? Math.round(t.total / t.count) : 0}</td>
+                    <td className="py-2 px-2 text-right">{t.count ?Math.round(t.total / t.count) : 0}</td>
                     <td className="py-2 px-2 text-right">{Math.round((t.p95 || 0))}</td>
                     <td className="py-2 px-2 text-right">{Math.round((t.p99 || 0))}</td>
                     <td className="py-2 px-2 text-right">{Math.round(t.min || 0)}</td>
@@ -418,7 +418,7 @@ function MetricsDashboard() {
             onClick={() => setSelectedTimeframe('day')}
             className={`px-4 py-2 text-sm rounded-md ${
               selectedTimeframe === 'day'
-                ? 'bg-indigo-600 text-white'
+                ?'bg-indigo-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -428,7 +428,7 @@ function MetricsDashboard() {
             onClick={() => setSelectedTimeframe('week')}
             className={`px-4 py-2 text-sm rounded-md ${
               selectedTimeframe === 'week'
-                ? 'bg-indigo-600 text-white'
+                ?'bg-indigo-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -438,7 +438,7 @@ function MetricsDashboard() {
             onClick={() => setSelectedTimeframe('month')}
             className={`px-4 py-2 text-sm rounded-md ${
               selectedTimeframe === 'month'
-                ? 'bg-indigo-600 text-white'
+                ?'bg-indigo-600 text-white'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -501,11 +501,11 @@ function MetricsDashboard() {
                       key={`cell-${index}`}
                       fill={
                         entry.name.includes('Email')
-                          ? colors.email
+                          ?colors.email
                           : entry.name.includes('Search')
-                            ? colors.search
+                            ?colors.search
                             : entry.name.includes('Notification')
-                              ? colors.notification
+                              ?colors.notification
                               : colors.eventDetection
                       }
                     />
@@ -563,11 +563,11 @@ function MetricsDashboard() {
                       key={`cell-${index}`}
                       fill={
                         entry.name.includes('Email enviados')
-                          ? colors.email
+                          ?colors.email
                           : entry.name.includes('Email recibidos')
-                            ? colors.notification
+                            ?colors.notification
                             : entry.name.includes('Búsquedas')
-                              ? colors.search
+                              ?colors.search
                               : colors.eventDetection
                       }
                     />
@@ -589,25 +589,25 @@ function MetricsDashboard() {
             title="Emails enviados hoy"
             value={lastPoint?.emailSent || 0}
             trend={10}
-            icon="x"
+            icon="x"
           />
           <StatCard
             title="Emails recibidos hoy"
             value={lastPoint?.emailReceived || 0}
             trend={15}
-            icon="x"
+            icon="x"
           />
           <StatCard
             title="Búsquedas realizadas"
             value={lastPoint?.searchCount || 0}
             trend={-5}
-            icon="x"
+            icon="x"
           />
           <StatCard
             title="Eventos detectados"
             value={lastPoint?.eventsDetected || 0}
             trend={20}
-            icon="x&"
+            icon="x&"
           />
         </div>
       </div>
@@ -615,7 +615,7 @@ function MetricsDashboard() {
       {/* altima actualizacin */}
       <div className="mt-6 text-right text-sm text-gray-500">
         altima actualizacin:{' '}
-        {metrics?.timestamp ? new Date(metrics.timestamp).toLocaleString() : 'N/A'}
+        {metrics?.timestamp ?new Date(metrics.timestamp).toLocaleString() : 'N/A'}
       </div>
     </div>
   );
@@ -629,8 +629,8 @@ function StatCard({ title, value, trend, icon }) {
     <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
       <div className="flex justify-between items-start">
         <span className="text-2xl">{icon}</span>
-        <span className={`text-sm font-medium ${trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-          {trend >= 0 ? ' ' : ' '} {Math.abs(trend)}%
+        <span className={`text-sm font-medium ${trend >= 0 ?'text-green-500' : 'text-red-500'}`}>
+          {trend >= 0 ?' ' : ' '} {Math.abs(trend)}%
         </span>
       </div>
       <h4 className="mt-2 text-gray-500 text-sm">{title}</h4>
@@ -653,7 +653,7 @@ function HttpRoutesTable() {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_BACKEND_BASE_URL || '';
-        const url = (endpoint ? `${endpoint}` : '') + '/api/admin/metrics/http?limit=50';
+        const url = (endpoint ?`${endpoint}` : '') + '/api/admin/metrics/http?limit=50';
         const res = await apiGet(url, { auth: true, silent: true });
         if (!mounted) return;
         if (res?.ok) {

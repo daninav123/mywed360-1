@@ -1,100 +1,96 @@
-# API — Contratos y Endpoints
+﻿# API — Contratos y Endpoints
 
-Este documento lista endpoints REST usados por el frontend y contratos esperados. Ajustar según backend real.
+Este documento lista los endpoints REST usados por el frontend y los contratos esperados (ajustar según el backend real).
 
-Base URL backend: `VITE_BACKEND_BASE_URL` (Render)
+Base URL backend: `VITE_BACKEND_BASE_URL` (Render).
 
 ## RSVP
 
-GET `/api/rsvp/by-token/:token`
-- Respuesta 200:
-  - `{ id, name, status, companions, allergens, ... }`
-- Errores:
-  - 404 Invitado no encontrado
+**GET** `/api/rsvp/by-token/:token`
+- Respuesta 200: `{ id, name, status, companions, allergens, ... }`
+- Errores: `404` (invitado no encontrado)
 
-PUT `/api/rsvp/by-token/:token`
+**PUT** `/api/rsvp/by-token/:token`
 - Body JSON: `{ status: 'accepted'|'rejected', companions: number, allergens: string }`
-- Respuestas: 200 OK, 400/500 error de validación o servidor
+- Respuestas: `200` OK, `400/500` error de validación o del servidor
 
 ## WhatsApp Provider
 
-GET `/api/whatsapp/provider-status`
-- 200 OK si el proveedor está disponible
-- 404 si ruta no habilitada en entorno (observado en dev)
+**GET** `/api/whatsapp/provider-status`
+- `200` OK si el proveedor está disponible
+- `404` si la ruta no está habilitada en el entorno (observado en dev)
 
 ## Invitaciones de Colaboradores (App)
 
 Función `acceptInvitation(code, uid)` (Firebase/Firestore)
-- Busca código en subcolecciones `weddingInvitations` (collectionGroup)
-- Actualiza acceso del usuario `uid` a la boda correspondiente
+- Busca el código en la collectionGroup `weddingInvitations`
+- Actualiza el acceso del usuario `uid` a la boda correspondiente
 - Redirige a `/bodas/:weddingId`
 
-## Otros (referenciados en flujos)
+## Enlaces RSVP (Invitados)
 
-## Gesti�n de Invitados � RSVP link
-
-POST `/api/guests/:weddingId/id/:guestId/rsvp-link`
-- Genera o regenera un enlace RSVP �nico para el invitado.
+**POST** `/api/guests/:weddingId/id/:guestId/rsvp-link`
+- Genera o regenera un enlace RSVP único para el invitado
 - Respuesta 200: `{ link }`
 
-GET `/api/guests/:weddingId/id/:guestId/rsvp-link` (si existe en backend)
-- Devuelve el enlace existente; fallback a POST en el cliente si no existe.
+**GET** `/api/guests/:weddingId/id/:guestId/rsvp-link`
+- Devuelve el enlace existente (fallback del frontend: lanzar POST si falta)
 
-## Proveedores � Presupuestos
+## Proveedores — Presupuestos
 
-POST `/api/weddings/:weddingId/suppliers/:supplierId/budget`
-- Crea/actualiza presupuesto para proveedor.
-- Body: `{ amount, notes, ... }` (ver implementaci�n backend)
+**POST** `/api/weddings/:weddingId/suppliers/:supplierId/budget`
+- Crea/actualiza presupuesto para proveedor
+- Body: `{ amount, notes, ... }` (ver implementación backend)
 
 ## Email y Bandeja de Entrada
 
 Base: `/api/mail` y `/api/email*` (requiere `Authorization` cuando aplica)
-
-- GET `/api/mail?folder=...&user=...`
-- POST `/api/mail` (enviar)
-- DELETE `/api/mail/:id`
-- GET `/api/mail/:id`
-- POST `/api/mail/:id/read`
-- GET `/api/email-templates`
-- POST `/api/email-templates`
-- PUT `/api/email-templates/:templateId`
-- GET `/api/email/:folder`
-- GET `/api/email/all`
-- POST `/api/email/:emailId/tag`
-- DELETE `/api/email/:emailId/tag/:tagId`
+- `GET /api/mail?folder=...&user=...`
+- `POST /api/mail`
+- `DELETE /api/mail/:id`
+- `GET /api/mail/:id`
+- `POST /api/mail/:id/read`
+- `GET /api/email-templates`
+- `POST /api/email-templates`
+- `PUT /api/email-templates/:templateId`
+- `GET /api/email/:folder`
+- `GET /api/email/all`
+- `POST /api/email/:emailId/tag`
+- `DELETE /api/email/:emailId/tag/:tagId`
 
 ## Notificaciones
 
-- GET `/api/notifications`
-- POST `/api/notifications`
-- PATCH `/api/notifications/:id/read`
-- DELETE `/api/notifications/:id`
+- `GET /api/notifications`
+- `POST /api/notifications`
+- `PATCH /api/notifications/:id/read`
+- `DELETE /api/notifications/:id`
 
-## AI / B�squeda / Recursos
+## IA / Búsqueda / Recursos
 
-- GET `/api/ai/search-suppliers?q=...`
-- POST `/api/ai-suppliers`
-- POST `/api/ai-image`
-- POST `/api/ai-image/vector-pdf`
-- GET `/api/ai/test`
+- `GET /api/ai/search-suppliers?q=...`
+- `POST /api/ai-suppliers`
+- `POST /api/ai-image`
+- `POST /api/ai-image/vector-pdf`
+- `GET /api/ai/test`
 
-## M�tricas
+## Métricas
 
-- POST `/api/metrics/seating` � registra eventos (assign/unassign, errores, etc.)
+- `POST /api/metrics/seating` — registra eventos (assign/unassign, errores, etc.)
 
-## Mailgun � Salud y Webhooks
+## Mailgun — Salud y Webhooks
 
-- POST `/api/mailgun/test`
-- POST `/api/test/mailgun`
-- POST `/api/mailgun/webhook`
+- `POST /api/mailgun/test`
+- `POST /api/test/mailgun`
+- `POST /api/mailgun/webhook`
 
-- Generación de PDF/print: vía servicio externo (no definido aquí)
-- AI Assign (Seating): endpoint opcional `POST /api/ai-assign` (si está implementado)
+## Otros
+
+- Generación de PDF/print: se delega en servicio externo (no definido aquí)
+- AI Assign (Seating): endpoint opcional `POST /api/ai-assign`
 
 ## Códigos de Error (guía)
-- 200: OK
-- 400: Body inválido
-- 401/403: No autorizado / Prohibido
-- 404: No encontrado o feature no disponible
-- 500: Error interno (log + toast en cliente)
-
+- `200`: OK
+- `400`: Body inválido
+- `401 / 403`: No autorizado / prohibido
+- `404`: Recurso no encontrado o feature deshabilitada
+- `500`: Error interno (log + toast en cliente)

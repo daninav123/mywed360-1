@@ -1,4 +1,4 @@
-/**
+﻿/**
  * SeatingPlan refactorizado â€“ Componente principal
  */
 import React, { useEffect } from 'react';
@@ -24,7 +24,6 @@ const SeatingPlanRefactored = () => {
   const {
     tab,
     setTab,
-    syncStatus,
     hallSize,
     areas,
     tables,
@@ -662,7 +661,6 @@ const SeatingPlanRefactored = () => {
             onAutoAssign={handleAutoAssignClick}
             onClearBanquet={clearBanquetLayout}
             onOpenTemplates={handleOpenTemplates}
-            syncStatus={syncStatus}
             snapshots={typeof listSnapshots === 'function' ? listSnapshots() : []}
             onSaveSnapshot={(name) => {
               try {

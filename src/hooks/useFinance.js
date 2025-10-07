@@ -8,7 +8,7 @@ import { useFirestoreCollection } from './useFirestoreCollection';
 import { useWedding } from '../context/WeddingContext';
 import { getTransactions } from '../services/bankService';
 import { uploadEmailAttachments } from '../services/storageUploadService';
-import { saveData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { saveData } from '../services/SyncService';
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
@@ -62,7 +62,6 @@ export default function useFinance() {
   const { activeWedding } = useWedding();
 
   // Estados principales
-  const [syncStatus, setSyncStatus] = useState(getSyncState());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -397,11 +396,6 @@ export default function useFinance() {
   }, [transactions, contributions, totalIncome, totalSpent, weddingTimeline]);
 
   // Suscribirse a cambios en el estado de sincronización
-  useEffect(() => {
-    const unsubscribe = subscribeSyncState(setSyncStatus);
-    return () => unsubscribe();
-  }, []);
-
   // Cargar número de invitados desde el perfil de la boda
   const loadGuestCount = useCallback(async () => {
     if (!activeWedding) return;
@@ -899,7 +893,6 @@ export default function useFinance() {
 
   return {
     // Estados
-    syncStatus,
     isLoading,
     error,
     contributions,
@@ -934,4 +927,3 @@ export default function useFinance() {
     hasBankAccount,
   };
 }
-

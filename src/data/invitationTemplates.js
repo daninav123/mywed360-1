@@ -1,4 +1,4 @@
-// Simple invitation HTML templates with {{placeholders}}.
+﻿// Simple invitation HTML templates with {{placeholders}}.
 
 export const invitationTemplates = [
   {

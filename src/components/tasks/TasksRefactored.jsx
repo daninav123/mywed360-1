@@ -40,7 +40,6 @@ import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services
 
 // Funcin helper para cargar datos de Firestore de forma segura con fallbacks
 
-import { subscribeSyncState, getSyncState } from '../../services/SyncService';
 
 // Componente principal Tasks refactorizado
 export default function Tasks() {
@@ -322,18 +321,9 @@ export default function Tasks() {
     return () => window.removeEventListener('resize', compute);
   }, []);
 
-  const [syncStatus, setSyncStatus] = useState(() => {
-    try {
-      return getSyncState();
-    } catch (error) {
-      console.error('Error al obtener estado de sincronización’Â³n:', error);
-      return { isOnline: navigator.onLine, isSyncing: false };
-    }
-  });
 
   // Suscripcin a cambios del estado de sincronizaciónn (online/syncing/pending)
   useEffect(() => {
-    const unsub = subscribeSyncState(setSyncStatus);
     return () => {
       try {
         unsub && unsub();
@@ -1982,7 +1972,6 @@ export default function Tasks() {
   return (
     <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       <TasksHeader
-        syncStatus={syncStatus}
         onShowAllTasks={() => setShowAllTasks(true)}
         onNewTask={() => {
           resetForm();

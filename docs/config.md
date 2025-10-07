@@ -1,4 +1,4 @@
----
+﻿---
 # Nota de configuración de puertos
 ---
 

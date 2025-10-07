@@ -1,12 +1,21 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import useWeddingCollection from './useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 import { guestSchema, guestUpdateSchema } from '../schemas/guest';
 import { post as apiPost } from '../services/apiClient';
-import { subscribeSyncState, getSyncState } from '../services/SyncService';
 import { ensureExtensionAvailable, sendBatchMessages } from '../services/whatsappBridge';
 import { toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
+import { renderInviteMessage } from '../services/MessageTemplateService';
+
+const resolveMessageForGuest = (guest, baseMessage) => {
+  const name = guest?.name || '';
+  const template = typeof baseMessage === 'string' ? baseMessage.trim() : '';
+  if (template) {
+    return template.replace(/\{guestName\}/g, name);
+  }
+  return renderInviteMessage(name);
+};
 
 // Hook personalizado para gestión optimizada de invitados
 const useGuests = () => {
@@ -74,10 +83,6 @@ const useGuests = () => {
   });
 
   const isLoading = collectionLoading;
-
-  // Sincronización global
-  const [syncStatus, setSyncStatus] = useState(getSyncState());
-  useEffect(() => subscribeSyncState(setSyncStatus), []);
 
   // Filtros
   const [filters, setFilters] = useState({ search: '', status: '', table: '', group: '' });
@@ -414,34 +419,132 @@ const useGuests = () => {
   );
 
   // Variantes API/Email: placeholders seguros para mantener la API del hook
-  const inviteViaWhatsAppApi = useCallback(async (guest, message) => {
-    try {
-      const body = { to: guest?.phone, message: message || '' };
-      const resp = await apiPost(`/api/whatsapp/send`, body, { auth: true });
-      return { success: !!resp?.ok };
-    } catch (e) {
-      return { success: false, error: String(e?.message || e) };
-    }
-  }, []);
-
-  const inviteSelectedWhatsAppApi = useCallback(
-    async (selectedIds = [], message) => {
+  const inviteViaWhatsAppApi = useCallback(
+    async (guest, message) => {
       try {
-        const targets = guests.filter(
-          (g) => selectedIds.includes(g.id) && utils.phoneClean(g.phone)
-        );
-        const body = { items: targets.map((g) => ({ to: g.phone, message })) };
-        const resp = await apiPost(`/api/whatsapp/send-batch`, body, { auth: true });
-        return { success: !!resp?.ok, count: targets.length };
+        if (!guest?.phone) {
+          return { success: false, error: 'no-phone' };
+        }
+
+        const to = utils.phoneClean(guest.phone);
+        if (!to) {
+          return { success: false, error: 'no-phone' };
+        }
+
+        const payload = {
+          to,
+          message: resolveMessageForGuest(guest, message),
+          weddingId: activeWedding || undefined,
+          guestId: guest.id || undefined,
+          metadata: { guestName: guest.name || '' },
+        };
+
+        const resp = await apiPost(`/api/whatsapp/send`, payload, { auth: true });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || json.success === false) {
+          return { success: false, error: json.error || `HTTP ${resp.status}` };
+        }
+        return { success: true, result: json };
       } catch (e) {
         return { success: false, error: String(e?.message || e) };
       }
     },
-    [guests, utils]
+    [activeWedding, utils],
+  );
+
+  const inviteSelectedWhatsAppApi = useCallback(
+    async (selectedIds = [], baseMessage) => {
+      try {
+        if (!Array.isArray(selectedIds) || selectedIds.length === 0) {
+          return { success: false, error: 'no-selection' };
+        }
+
+        const idSet = new Set(selectedIds);
+        const seen = new Set();
+        const items = [];
+
+        (guests || []).forEach((guest) => {
+          if (!idSet.has(guest.id)) return;
+          const cleaned = utils.phoneClean(guest.phone || '');
+          if (!cleaned || seen.has(cleaned)) return;
+          seen.add(cleaned);
+          items.push({
+            to: cleaned,
+            message: resolveMessageForGuest(guest, baseMessage),
+            guestId: guest.id,
+            metadata: { guestName: guest.name || '' },
+          });
+        });
+
+        if (!items.length) {
+          return { success: false, error: 'no-targets' };
+        }
+
+        const payload = {
+          weddingId: activeWedding || undefined,
+          items,
+        };
+
+        const resp = await apiPost(`/api/whatsapp/send-batch`, payload, { auth: true });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || json.success === false) {
+          return { success: false, error: json.error || `HTTP ${resp.status}` };
+        }
+
+        return {
+          success: true,
+          ok: json.ok ?? items.length,
+          fail: json.fail ?? 0,
+          count: json.count ?? items.length,
+          result: json,
+        };
+      } catch (e) {
+        return { success: false, error: String(e?.message || e) };
+      }
+    },
+    [guests, utils, activeWedding]
   );
 
   const bulkInviteWhatsApp = useCallback(async () => ({ success: true, count: 0 }), []);
-  const bulkInviteWhatsAppApi = useCallback(async () => ({ success: true, count: 0 }), []);
+  const bulkInviteWhatsAppApi = useCallback(async () => {
+    try {
+      const seen = new Set();
+      const items = [];
+
+      (guests || []).forEach((guest) => {
+        const cleaned = utils.phoneClean(guest.phone || '');
+        if (!cleaned || seen.has(cleaned)) return;
+        seen.add(cleaned);
+        items.push({
+          to: cleaned,
+          message: resolveMessageForGuest(guest),
+          guestId: guest.id,
+          metadata: { guestName: guest.name || '' },
+        });
+      });
+
+      if (!items.length) {
+        return { success: false, error: 'no-targets' };
+      }
+
+      const payload = { weddingId: activeWedding || undefined, items };
+      const resp = await apiPost(`/api/whatsapp/send-batch`, payload, { auth: true });
+      const json = await resp.json().catch(() => ({}));
+      if (!resp.ok || json.success === false) {
+        return { success: false, error: json.error || `HTTP ${resp.status}` };
+      }
+
+      return {
+        success: true,
+        count: json.count ?? items.length,
+        ok: json.ok ?? items.length,
+        fail: json.fail ?? 0,
+        result: json,
+      };
+    } catch (e) {
+      return { success: false, error: String(e?.message || e) };
+    }
+  }, [guests, utils, activeWedding]);
   const inviteViaEmail = useCallback(async () => ({ success: true }), []);
   const importFromContacts = useCallback(
     async () => ({ success: false, error: 'not-implemented' }),
@@ -519,7 +622,6 @@ const useGuests = () => {
     filteredGuests,
     stats,
     filters,
-    syncStatus,
     isLoading,
     error: collectionError,
     reload,

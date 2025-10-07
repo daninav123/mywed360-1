@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ï»¿import React, { useState, useEffect } from 'react';
 
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
@@ -36,17 +36,16 @@ function Finance() {
     } catch {}
   }, [location]);
 
-  // Hook personalizado para Gestión financiera
+  // Hook personalizado para GestiÃ³n financiera
   const {
     // Estados
-    syncStatus,
     isLoading,
     error,
     contributions,
     budget,
     transactions,
 
-    // Cálculos
+    // CÃ¡lculos
     stats,
     budgetUsage,
     settings,
@@ -71,22 +70,22 @@ function Finance() {
   const [activeTab, setActiveTab] = useState('overview');
   const [transactionFiltersSignal, setTransactionFiltersSignal] = useState(null);
 
-  // Detectar URL hash para abrir modal específico
+  // Detectar URL hash para abrir modal especÃ­fico
   useEffect(() => {
     const hash = window.location.hash;
     if (hash === '#nuevo') {
       setActiveTab('transactions');
-      // El TransactionManager Gestionará la apertura del modal
+      // El TransactionManager GestionarÃ¡ la apertura del modal
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
 
-  // Cargar número de invitados al montar el componente
+  // Cargar nÃºmero de invitados al montar el componente
   useEffect(() => {
     loadGuestCount();
   }, [loadGuestCount]);
 
-  // Limpiar errores después de 5 segundos
+  // Limpiar errores despuÃ©s de 5 segundos
   useEffect(() => {
     if (error) {
       const timer = setTimeout(clearError, 5000);
@@ -99,7 +98,7 @@ function Finance() {
     setTransactionFiltersSignal({ version: Date.now(), filters });
   };
 
-  // Manejar actualización de presupuesto total
+  // Manejar actualizaciÃ³n de presupuesto total
   const handleUpdateTotalBudget = (newTotal) => {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
@@ -121,7 +120,7 @@ function Finance() {
             <div className="flex">
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-[color:var(--color-danger)]">
-                  {t("finance.error.title", { defaultValue: "Error en Gestión financiera" })}
+                  {t("finance.error.title", { defaultValue: "Error en GestiÃ³n financiera" })}
                 </h3>
                 <div className="mt-2 text-sm text-[color:var(--color-danger)]/90">
                   <p>{error}</p>
@@ -131,7 +130,7 @@ function Finance() {
           </div>
         )}
 
-        {/* Tabs de página (estilo Proveedores) */}
+        {/* Tabs de pÃ¡gina (estilo Proveedores) */}
         <PageTabs
           value={activeTab}
           onChange={setActiveTab}
@@ -146,7 +145,7 @@ function Finance() {
               id: 'contributions',
               label: t('finance.tabs.contributions', { defaultValue: 'Aportaciones' }),
             },
-            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'Análisis' }) },
+            { id: 'analytics', label: t('finance.tabs.analytics', { defaultValue: 'AnÃ¡lisis' }) },
           ]}
           className="w-full"
         />
@@ -155,9 +154,7 @@ function Finance() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <FinanceOverview
-              stats={stats}
-              syncStatus={syncStatus}
-              budgetUsage={budgetUsage}
+              stats={stats}              budgetUsage={budgetUsage}
               thresholds={settings?.alertThresholds}
               isLoading={isLoading}
               transactions={transactions}
@@ -169,7 +166,7 @@ function Finance() {
         {activeTab === 'transactions' && (
           <div className="space-y-6">
             <PaymentSuggestions onCreateTransaction={createTransaction} isLoading={isLoading} providers={supplierProviders} />
-            {/* Vista rápida: transacciones registradas desde emails */}
+            {/* Vista rÃ¡pida: transacciones registradas desde emails */}
             <div className="p-3 border rounded bg-white/60">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium">Transacciones registradas desde emails</h3>
@@ -183,7 +180,7 @@ function Finance() {
                     <div key={tx.id || i} className="flex items-center justify-between py-1 border-b last:border-0">
                       <div className="truncate">
                         <div className="font-medium truncate" title={tx.concept || ''}>{tx.concept || '(Sin concepto)'}</div>
-                        <div className="text-[color:var(--color-text)]/70">{(tx.date || '').slice(0,10)} · {tx.type === 'income' ? 'Ingreso' : 'Gasto'} · {tx.provider || ''}</div>
+                        <div className="text-[color:var(--color-text)]/70">{(tx.date || '').slice(0,10)} Â· {tx.type === 'income' ? 'Ingreso' : 'Gasto'} Â· {tx.provider || ''}</div>
                       </div>
                       <div className="whitespace-nowrap">{Number(tx.amount || tx.paidAmount || 0).toFixed(2)}</div>
                     </div>
@@ -256,10 +253,10 @@ function Finance() {
           </div>
         )}
 
-        {/* Contenido: Análisis */}
+        {/* Contenido: AnÃ¡lisis */}
         {activeTab === 'analytics' && (
           <div className="space-y-6">
-            <React.Suspense fallback={<div className="p-4">{t("finance.charts.loading", { defaultValue: "Cargando análisis…" })}</div>}>
+            <React.Suspense fallback={<div className="p-4">{t("finance.charts.loading", { defaultValue: "Cargando anÃ¡lisisÂ…" })}</div>}>
               <FinanceCharts transactions={transactions} budgetUsage={budgetUsage} stats={stats} />
             </React.Suspense>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 
 import { sendBatch } from '../../services/WhatsAppBatchService';
 import Modal from '../Modal';

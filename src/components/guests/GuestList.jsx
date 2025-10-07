@@ -10,7 +10,7 @@ import { Button } from '../ui';
  */
 const statusCycle = (current) => {
   if (current === 'pending' || current === 'Pendiente') return 'confirmed';
-  if (current === 'confirmed' || current === 'SÃ­') return 'declined';
+  if (current === 'confirmed' || current === 'Sí') return 'declined';
   return 'pending';
 };
 
@@ -27,7 +27,7 @@ const GuestList = React.memo(
     onInviteWhatsApp,
     onInviteEmail,
     isLoading = false,
-    // selecciÃ³n mÃºltiple
+    // selección múltiple
     selectedIds = [],
     onToggleSelect,
     onToggleSelectAll,
@@ -36,8 +36,8 @@ const GuestList = React.memo(
     const safeWedding = wedding || { guestStatus: (s) => s };
 
     // Defensivos por si llegan props mal formadas
-    const safeGuests = Array.isArray(guests) ? guests : [];
-    const safeSelectedIds = Array.isArray(selectedIds) ? selectedIds : [];
+    const safeGuests = Array.isArray(guests) ?guests : [];
+    const safeSelectedIds = Array.isArray(selectedIds) ?selectedIds : [];
 
     // Filtrado optimizado con useMemo
     const filteredGuests = useMemo(() => {
@@ -71,12 +71,12 @@ const GuestList = React.memo(
       }
     }, [safeGuests, searchTerm, statusFilter, tableFilter, groupFilter]);
 
-    // EstadÃ­sticas memoizadas
+    // Estadísticas memoizadas
     const stats = useMemo(() => {
       try {
         const confirmed = safeGuests.filter((g) => {
           const s = String(g.status || '').toLowerCase();
-          return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
+          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
         }).length;
         const pending = safeGuests.filter((g) => {
           const s = String(g.status || '').toLowerCase();
@@ -106,7 +106,7 @@ const GuestList = React.memo(
       }
     }, [safeGuests]);
 
-    // Funciones de acciÃ³n memoizadas
+    // Funciones de acción memoizadas
     const handleEdit = useCallback(
       (guest) => {
         onEdit?.(guest);
@@ -116,7 +116,7 @@ const GuestList = React.memo(
 
     const handleDelete = useCallback(
       (guest) => {
-        if (window.confirm(`Â¿EstÃ¡s seguro de que quieres eliminar a ${guest.name}?`)) {
+        if (window.confirm(`¿Estás seguro de que quieres eliminar a ${guest.name}?`)) {
           onDelete?.(guest);
         }
       },
@@ -139,7 +139,7 @@ const GuestList = React.memo(
       [onInviteEmail]
     );
 
-    // FunciÃ³n para obtener el color del estado
+    // Función para obtener el color del estado
     const handleStatusToggle = useCallback(
       (guest, e) => {
         if (e && e.stopPropagation) e.stopPropagation();
@@ -154,7 +154,7 @@ const GuestList = React.memo(
       switch (s) {
         case 'confirmed':
         case 'accepted':
-        case 'SÃ­':
+        case 'Sí':
           return 'text-green-600 bg-green-100';
         case 'declined':
         case 'rejected':
@@ -165,7 +165,7 @@ const GuestList = React.memo(
       }
     }, []);
 
-    // CÃ¡lculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
+    // Cálculos simples (sin hooks) para evitar desajustes de orden de hooks tras HMR
     const selectedSet = new Set(safeSelectedIds);
     const allVisibleSelected =
       filteredGuests.length > 0 && filteredGuests.every((g) => selectedSet.has(g.id));
@@ -181,7 +181,7 @@ const GuestList = React.memo(
 
     return (
       <div className="space-y-6">
-        {/* EstadÃ­sticas */}
+        {/* Estadísticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow-sm border">
             <div className="text-2xl font-bold text-primary">{stats.total}</div>
@@ -202,14 +202,14 @@ const GuestList = React.memo(
         </div>
 
         {/* Lista de invitados */}
-        {filteredGuests.length === 0 ? (
+        {filteredGuests.length === 0 ?(
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <User size={48} className="mx-auto text-muted mb-4" />
             <h3 className="text-lg font-medium text-body mb-2">No se encontraron invitados</h3>
             <p className="text-muted">
               {searchTerm || statusFilter || tableFilter
-                ? 'Intenta ajustar los filtros de bÃºsqueda'
-                : 'AÃ±ade tu primer invitado para comenzar'}
+                ?'Intenta ajustar los filtros de búsqueda'
+                : 'Añade tu primer invitado para comenzar'}
             </p>
           </div>
         ) : (
@@ -247,7 +247,7 @@ const GuestList = React.memo(
                         Mesa
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider">
-                        AcompaÃ±antes
+                        Acompañantes
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-muted uppercase tracking-wider">
                         Acciones
@@ -284,7 +284,7 @@ const GuestList = React.memo(
                               <div className="text-sm font-medium text-body">{guest.name}</div>
                               {guest.dietaryRestrictions && (
                                 <div className="text-xs text-orange-600">
-                                  Restricciones dietÃ©ticas
+                                  Restricciones dietéticas
                                 </div>
                               )}
                             </div>
@@ -363,7 +363,7 @@ const GuestList = React.memo(
               </div>
             </div>
 
-            {/* Vista mÃ³vil */}
+            {/* Vista móvil */}
             <div className="md:hidden space-y-4">
               {filteredGuests.map((guest) => (
                 <div
@@ -412,10 +412,10 @@ const GuestList = React.memo(
                     )}
                     <div className="flex justify-between">
                       <span>Mesa: {guest.table || '-'}</span>
-                      <span>AcompaÃ±antes: {guest.companion || 0}</span>
+                      <span>Acompañantes: {guest.companion || 0}</span>
                     </div>
                     {guest.dietaryRestrictions && (
-                      <div className="text-orange-600 text-xs">Restricciones dietÃ©ticas</div>
+                      <div className="text-orange-600 text-xs">Restricciones dietéticas</div>
                     )}
                   </div>
 

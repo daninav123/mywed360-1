@@ -1,292 +1,76 @@
-# 9. Flujo de RSVP y Confirmaciones (Detallado)
+# 9. RSVP y Confirmaciones (estado 2025-10-07)
 
-## 9.1 Sistema de Confirmación de Asistencia
-**Objetivo:** Gestionar las confirmaciones de asistencia de los invitados de forma automatizada
+> Implementado: `RSVPConfirm.jsx`, `AcceptInvitation.jsx`, `RSVPDashboard.jsx`, hooks `useGuests`, servicios `rsvpService.js` y `emailAutomationService.js`.
+> Pendiente: confirmaciones grupales avanzadas, recordatorios automaticos multi-canal, analytics detallados y integracion directa con catering.
 
-### Envío de Invitaciones con RSVP
-**Pasos detallados:**
-- [ ] **Generación de enlaces únicos**
-  - URL personalizada por invitado: `/rsvp/{token}`
-  - Token único e irrepetible por invitación
-  - Vinculación con datos del invitado en Firestore
-  - Expiración configurable del enlace
+## 1. Objetivo y alcance
+- Gestionar el ciclo completo de confirmacion de asistencia para invitados y colaboradores.
+- Permitir control de acompanantes, restricciones dieteticas y comentarios.
+- Sincronizar el estado RSVP con listas de invitados, seating y comunicaciones.
 
-- [ ] **Integración con invitaciones**
-  - Botón  – Confirmar Asistencia –  en invitaciones digitales
-  - QR code para acceso rápido desde móvil
-  - Enlace directo en emails de invitación
-  - Recordatorios automáticos por fecha límite
+## 2. Trigger y rutas
+- Menú inferior → `Más` → bloque **Invitados** → “Resumen RSVP” (`/invitados/rsvp`, `RSVPDashboard.jsx`).
+- Emails/WhatsApp a invitados contienen el enlace único `/rsvp/{token}` (renderiza `RSVPConfirm.jsx`).
+- Invitaciones de colaboradores llegan por `/accept-invitation/:code` (`AcceptInvitation.jsx`).
 
-- [ ] **Personalización del mensaje**
-  - Saludo personalizado con nombre del invitado
-  - Información específica de la boda
-  - Instrucciones claras para confirmar
-  - Fecha límite de confirmación visible
+## 3. Paso a paso UX
+1. Envio de invitaciones
+   - Generacion de tokens unicos para cada invitado o grupo familiar.
+   - Plantillas de email con CTA "Confirmar asistencia" y codigo QR opcional.
+   - Programacion de recordatorios segun fecha limite establecida.
+2. Formulario de confirmacion (`RSVPConfirm.jsx`)
+   - Carga datos del invitado desde token y muestra estado actual.
+   - Campos: asistencia (si/no), acompanantes, nombres, restricciones dieteticas, comentarios, datos de contacto.
+   - Validaciones: limite de acompanantes, formato email/telefono, token vigente.
+3. Seguimiento interno (`RSVPDashboard.jsx`)
+   - Widgets con totales confirmados, pendientes, declinados y acompanantes.
+   - Tabla con filtros por estado, etiquetas y recordatorios enviados.
+   - Acciones masivas: reenviar recordatorio, marcar manual, exportar CSV.
 
-### Formulario de Confirmación
-**Pasos detallados:**
-- [ ] **Interfaz de confirmación**
-  - Componente: `RSVPConfirm.jsx`
-  - Diseño responsive y accesible
-  - Carga de datos del invitado automática
-  - Validación en tiempo real
+## 4. Persistencia y datos
+- Firestore `weddings/{id}/rsvp/{rsvpId}`: estado, token, respuesta, metadata (timestamps, ip, canal).
+- `weddings/{id}/guests/{guestId}`: sincroniza `status`, `companions`, restricciones, comentarios.
+- `weddings/{id}/rsvpLogs`: historial de recordatorios y acciones manuales.
+- Invitaciones de colaboradores en `weddings/{id}/invitations/{code}` con roles y expiracion.
 
-- [ ] **Campos del formulario**
-  - Confirmación de asistencia (Sí/No)
-  - Número de acompañantes
-  - Nombres de acompañantes
-  - Restricciones dietéticas
-  - Alergias alimentarias
-  - Comentarios adicionales
-  - Información de contacto actualizada
+## 5. Reglas de negocio
+- Cada token solo puede usarse una vez; permite editar hasta la fecha limite configurada.
+- Invitados corporativos o familiares pueden representar a varios asistentes (grupo controlado).
+- Cambios de estado registran usuario y timestamp para auditoria.
+- Colaboradores requieren email verificado antes de aceptar invitacion.
 
-- [ ] **Validaciones**
-  - Límite máximo de acompañantes
-  - Campos obligatorios marcados
-  - Formato de email válido
-  - Longitud máxima de comentarios
-  - Verificación de token válido
+## 6. Estados especiales y errores
+- Token invalido o expirado -> mensaje "Invitacion no valida" con CTA de contacto.
+- Límite de acompanantes superado -> validacion inline.
+- Error de red al enviar confirmacion -> mantener datos en memoria y permitir reintento.
+- Dashboard sin datos -> CTA "Invita a tus primeros invitados".
 
-## 9.2 Gestión de Invitaciones Especiales
-**Objetivo:** Manejar diferentes tipos de invitaciones y confirmaciones
+## 7. Integracion con otros flujos
+- Flujo 3 (Gestion de invitados) consume y actualiza estados RSVP.
+- Flujo 4 (Seating) recibe listas de confirmados y acompanantes.
+- Flujo 6 (Presupuesto) ajusta conteo de menus y estimaciones.
+- Flujo 7/20 usan resultados para segmentar emails/buzon interno.
+- Flujo 11 y 14 actualizan tareas segun progreso de confirmaciones.
 
-### Invitaciones de Colaboradores
-**Pasos detallados:**
-- [ ] **Invitaciones a organizadores**
-  - Componente: `AcceptInvitation.jsx`
-  - Invitación a co-organizadores de la boda
-  - Definición de permisos y roles
-  - Aceptación de términos de colaboración
+## 8. Metricas y monitorizacion
+- Eventos: `rsvp_invitation_sent`, `rsvp_completed`, `rsvp_declined`, `rsvp_reminder_sent`.
+- Indicadores: tasa de respuesta, tiempo medio de confirmacion, recordatorios necesarios por invitado.
+- Logs para detectar tokens no entregados o altas tasas de error por canal.
 
-- [ ] **Flujo de aceptación**
-  - Verificación de identidad del invitado
-  - Selección de nivel de acceso
-  - Configuración de notificaciones
-  - Integración con sistema de permisos
+## 9. Pruebas recomendadas
+- Unitarias: validadores de acompanantes, generacion de token, servicios de recordatorio.
+- Integracion: confirmar invitado -> verificar actualizacion en `guests` y dashboard.
+- E2E: flujo completo desde envio de invitacion, confirmacion web, verificacion en seating.
 
-- [ ] **Roles disponibles**
-  - Co-organizador (acceso completo)
-  - Familiar (acceso limitado a invitados)
-  - Proveedor (acceso a su área específica)
-  - Invitado especial (funciones adicionales)
+## 10. Checklist de despliegue
+- Reglas Firestore para colecciones `rsvp`, `rsvpLogs`, `invitations` con seguridad por rol.
+- Configurar `MAILGUN_*`, `WHATSAPP_PROVIDER` (si aplica) y plantillas de email con enlaces tracking.
+- Revisar copy y traducciones para formulario y estados.
+- Validar expiraciones de token y reintentos en ambientes de staging.
 
-### Confirmaciones Grupales
-**Pasos detallados:**
-- [ ] **Familias y grupos**
-  - Confirmación por cabeza de familia
-  - Lista de miembros del grupo
-  - Gestión de menores de edad
-  - Restricciones dietéticas grupales
-
-- [ ] **Invitaciones corporativas**
-  - Confirmación por empresa/departamento
-  - Límite de asistentes por organización
-  - Información de contacto corporativo
-  - Facturación separada si aplica
-
-## 9.3 Seguimiento y Recordatorios
-**Objetivo:** Maximizar la tasa de respuesta de confirmaciones
-
-### Sistema de Recordatorios Automáticos
-**Pasos detallados:**
-- [ ] **Cronograma de recordatorios**
-  - Primer recordatorio: 2 semanas después del envío
-  - Segundo recordatorio: 1 semana antes del límite
-  - Recordatorio final: 2 días antes del límite
-  - Recordatorio urgente: día del límite
-
-- [ ] **Canales de recordatorio**
-  - Email automático personalizado
-  - SMS si número disponible
-  - Notificación push en la app
-  - Llamada telefónica (manual)
-
-- [ ] **Personalización de mensajes**
-  - Tono amigable y personal
-  - Información actualizada de la boda
-  - Facilidad para confirmar con un clic
-  - Opción de contacto directo
-
-### Dashboard de Seguimiento
-**Pasos detallados:**
-- [ ] **Métricas en tiempo real**
-  - Total de invitaciones enviadas
-  - Confirmaciones recibidas
-  - Pendientes de respuesta
-  - Tasa de respuesta por grupo
-
-- [ ] **Análisis detallado**
-  - Confirmaciones por día
-  - Restricciones dietéticas más comunes
-  - Comentarios y sugerencias
-  - Invitados que no asistirán
-
-- [ ] **Acciones masivas**
-  - Envío de recordatorios selectivos
-  - Actualización de información de la boda
-  - Exportación de listas
-  - Generación de reportes
-
-## 9.4 Gestión de Cambios y Actualizaciones
-**Objetivo:** Manejar modificaciones después de las confirmaciones
-
-### Cambios de Última Hora
-**Pasos detallados:**
-- [ ] **Modificación de confirmaciones**
-  - Permitir cambios hasta fecha límite
-  - Notificación automática de cambios
-  - Historial de modificaciones
-  - Confirmación de cambios por email
-
-- [ ] **Cancelaciones tardías**
-  - Proceso simplificado de cancelación
-  - Motivo de cancelación opcional
-  - Actualización automática de conteos
-  - Notificación a organizadores
-
-- [ ] **Invitados de último momento**
-  - Proceso de invitación urgente
-  - Confirmación inmediata requerida
-  - Verificación de capacidad disponible
-  - Integración con catering y seating
-
-### Comunicación con Invitados
-**Pasos detallados:**
-- [ ] **Actualizaciones importantes**
-  - Cambios de horario o ubicación
-  - Información adicional sobre la boda
-  - Instrucciones especiales
-  - Protocolos de seguridad/salud
-
-- [ ] **Confirmaciones de recepción**
-  - Email automático de confirmación
-  - Resumen de información proporcionada
-  - Próximos pasos y fechas importantes
-  - Información de contacto para dudas
-
-## 9.5 Integración con Otros Sistemas
-**Objetivo:** Conectar RSVP con el resto de funcionalidades
-
-### Integración con Plan de Asientos
-**Pasos detallados:**
-- [ ] **Asignación automática**
-  - Creación de invitados en sistema de asientos
-  - Agrupación por familias/relaciones
-  - Consideración de restricciones dietéticas
-  - Actualización en tiempo real
-
-- [ ] **Gestión de acompañantes**
-  - Creación de registros para acompañantes
-  - Vinculación con invitado principal
-  - Información completa para seating
-  - Validación de límites de mesa
-
-### Integración con Catering
-**Pasos detallados:**
-- [ ] **Conteo de menús**
-  - Cálculo automático por tipo de menú
-  - Consideración de restricciones dietéticas
-  - Actualización en tiempo real
-  - Reportes para proveedores
-
-- [ ] **Alergias y restricciones**
-  - Base de datos de restricciones
-  - Alertas para el catering
-  - Menús alternativos automáticos
-  - Comunicación con cocina
-
-## Estructura de Datos
-
-```javascript
-// /weddings/{weddingId}/rsvp/{rsvpId}
-{
-  id:  – rsvp_001 – ,
-  guestId:  – guest_123 – ,
-  token:  – abc123def456 – ,
-  status:  – confirmed – , // pending, confirmed, declined, expired
-  
-  response: {
-    attending: true,
-    attendeeCount: 2,
-    attendees: [
-      {
-        name:  – Ana García – ,
-        isMainGuest: true,
-        dietaryRestrictions: [ – vegetarian – ],
-        allergies: [ – nuts – ]
-      },
-      {
-        name:  – Carlos López – ,
-        isMainGuest: false,
-        dietaryRestrictions: [],
-        allergies: []
-      }
-    ],
-    comments:  – Esperamos con muchas ganas este día especial – ,
-    contactInfo: {
-      email:  – ana@email.com – ,
-      phone:  – +34 600 123 456 – 
-    }
-  },
-  
-  metadata: {
-    sentAt:  – 2024-01-15T10:00:00Z – ,
-    respondedAt:  – 2024-01-18T14:30:00Z – ,
-    lastModified:  – 2024-01-18T14:30:00Z – ,
-    remindersSent: 0,
-    ipAddress:  – 192.168.1.1 – ,
-    userAgent:  – Mozilla/5.0... – ,
-    source:  – email_link –  // email_link, qr_code, direct_url
-  },
-  
-  invitationType:  – standard – , // standard, family_group, corporate, collaborator
-  permissions: {
-    canModify: true,
-    modifyDeadline:  – 2024-05-01T23:59:59Z – 
-  }
-}
-
-// /weddings/{weddingId}/rsvpStats
-{
-  totalInvitations: 120,
-  totalResponses: 87,
-  confirmedAttendees: 156,
-  declinedInvitations: 12,
-  pendingResponses: 33,
-  
-  dietaryRestrictions: {
-    vegetarian: 23,
-    vegan: 8,
-    glutenFree: 12,
-    lactoseIntolerant: 5,
-    other: 3
-  },
-  
-  responsesByDate: {
-     – 2024-01-15 – : 12,
-     – 2024-01-16 – : 8,
-     – 2024-01-17 – : 15
-  },
-  
-  lastUpdated:  – 2024-01-25T16:45:00Z – 
-}
-```
-
-## Estado de Implementación
-
-### ✅ Completado
-- Formulario básico de RSVP (RSVPConfirm.jsx)
-- Sistema de invitaciones de colaboradores (AcceptInvitation.jsx)
-- Generación de tokens únicos
-- Validaciones básicas del formulario
-
-### 🚧 En Desarrollo
-- Sistema de recordatorios automáticos
-- Dashboard de seguimiento
-- Integración con plan de asientos
-
-### ❌ Pendiente
-- Confirmaciones grupales avanzadas
-- Sistema de analytics de RSVP
-- Integración completa con catering
-- Notificaciones push para recordatorios
+## 11. Roadmap / pendientes
+- Confirmaciones grupales mas flexibles (familias, corporate) con panel dedicado.
+- Recordatorios multi-canal automáticos y programacion inteligente por segmentos.
+- Tablero de analytics con conversion por canal y motivos de declinacion.
+- Integracion directa con proveedores de catering para menus y alergias.
+- Automatizar mensajes de follow-up tras la boda (agradecimientos).

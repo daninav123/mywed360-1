@@ -1,4 +1,4 @@
-// routes/ai.js
+﻿// routes/ai.js
 // Handles AI-powered endpoints: parse-dialog via OpenAI GPT and image generation via Stability SDK
 // Note: requires environment variables OPENAI_API_KEY and STABILITY_API_KEY
 

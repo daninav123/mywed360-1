@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+﻿import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Users, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import useRoles from '../hooks/useRoles';
 import { changeLanguage, getCurrentLanguage } from '../i18n';
-import { loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { loadData } from '../services/SyncService';
 import { invitePlanner, getWeddingIdForOwner } from '../services/WeddingService';
 
 function Perfil() {
@@ -41,9 +41,7 @@ function Perfil() {
     colorScheme: '',
     numGuests: '',
   });
-  const [importantInfo, setImportantInfo] = useState('');
-  const [syncStatus, setSyncStatus] = useState(getSyncState());
-  const [plannerEmail, setPlannerEmail] = useState('');
+  const [importantInfo, setImportantInfo] = useState('');  const [plannerEmail, setPlannerEmail] = useState('');
   const [inviteLink, setInviteLink] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
 
@@ -168,10 +166,10 @@ function Perfil() {
       toast.error('No se pudo determinar tu usuario');
       return;
     }
-    // Validaciones rÍpidas
+    // Validaciones rÃpidas
     try {
       if (account.email && !/^\S+@\S+\.\S+$/.test(account.email)) {
-        toast.error('Correo electrnico invÍlido');
+        toast.error('Correo electrnico invÃlido');
         return;
       }
       if (account.whatsNumber && !/^\+?[0-9]{8,15}$/.test(account.whatsNumber.trim())) {
@@ -181,7 +179,7 @@ function Perfil() {
       if (weddingInfo.weddingDate) {
         const d = new Date(weddingInfo.weddingDate);
         if (isNaN(d.getTime())) {
-          toast.error('Fecha de boda invÍlida');
+          toast.error('Fecha de boda invÃlida');
           return;
         }
       }
@@ -206,9 +204,7 @@ function Perfil() {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = subscribeSyncState(setSyncStatus);
-    const loadProfileData = async () => {
+  useEffect(() => {    const loadProfileData = async () => {
       const uid = fallbackUid;
       if (!uid) return;
       try {
@@ -266,9 +262,7 @@ function Perfil() {
       }
     };
     // Preferencias musicales ahora se gestionan desde Momentos Especiales
-    loadProfileData();
-    return () => unsubscribe();
-  }, [weddingId]);
+    loadProfileData();  }, [weddingId]);
 
   return (
     <div className="p-4 max-w-3xl mx-auto space-y-6">
@@ -277,27 +271,13 @@ function Perfil() {
         <div className="mt-2">
           <LanguageSelector />
         </div>
-        <div className="flex items-center text-sm gap-3">
-          <div
-            className={`w-3 h-3 rounded-full mr-2 ${!syncStatus.isOnline ? 'bg-[var(--color-danger)]' : syncStatus.isSyncing || syncStatus.pendingChanges ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}
-          ></div>
-          <span>
-            {!syncStatus.isOnline
-              ? t('profile.offline', { defaultValue: 'Sin conexin (modo offline)' })
-              : syncStatus.isSyncing
-                ? t('profile.syncing', { defaultValue: 'Sincronizando...' })
-                : syncStatus.pendingChanges
-                  ? t('profile.pending', { defaultValue: 'Cambios pendientes' })
-                  : t('profile.synced', { defaultValue: 'Sincronizado' })}
-          </span>
-          {lastSavedAt && (
-            <span className="text-muted">
-              {'ï½altimo guardado: '} {new Date(lastSavedAt).toLocaleString()}
-            </span>
-          )}
-        </div>
+        {lastSavedAt && (
+          <div className="text-sm text-muted">
+            {t('profile.lastSaved', { defaultValue: 'Último guardado:' })}{' '}
+            {new Date(lastSavedAt).toLocaleString()}
+          </div>
+        )}
       </div>
-
       <Card className="space-y-4">
         <h2 className="text-lg font-medium">{t('profile.subscription.type', { defaultValue: 'Tipo de suscripcin' })}</h2>
         <div className="flex gap-4">
@@ -318,7 +298,7 @@ function Perfil() {
 
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'Información de la cuenta' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.account.title', { defaultValue: 'InformaciÃ³n de la cuenta' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input label="Nombre" name="name" value={account.name} onChange={handleAccountChange} />
           <Input
@@ -367,7 +347,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'Información de la boda' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.title', { defaultValue: 'InformaciÃ³n de la boda' })}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Nombre de la pareja"
@@ -458,7 +438,7 @@ function Perfil() {
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'Información importante de la boda' })}</h2>
+        <h2 className="text-lg font-medium">{t('profile.wedding.important', { defaultValue: 'InformaciÃ³n importante de la boda' })}</h2>
         <textarea
           className="w-full min-h-[150px] border rounded-md p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder={

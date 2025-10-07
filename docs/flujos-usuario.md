@@ -1,4 +1,4 @@
-# Flujos de Usuario - MyWed360 (Detallado)
+﻿# Flujos de Usuario - MyWed360 (Detallado)
 
 > **Nota**: Este documento contiene la especificación técnica general. Para detalles específicos de cada flujo, consultar los documentos en `/flujos-especificos/`
 

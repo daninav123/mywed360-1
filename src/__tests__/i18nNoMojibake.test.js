@@ -1,4 +1,4 @@
-import fs from 'fs';
+﻿import fs from 'fs';
 import path from 'path';
 
 function walk(dir, acc = []) {
@@ -16,7 +16,7 @@ describe('i18n locales are free of mojibake', () => {
   const files = walk(root);
 
   // Fragments that indicate mojibake or broken encoding. Filter empties defensively.
-  const badFragments = ['ǟ', 'ǽ', '�', '??'].filter((s) => !!s);
+  const badFragments = ['ǟ', 'ǽ', '\uFFFD', '??'].filter((s) => !!s);
 
   it('all locale JSON files have no broken fragments', () => {
     for (const f of files) {

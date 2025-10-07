@@ -40,7 +40,7 @@ function runTests() {
     
     console.log(`\n${COLORS.green}✓ Pruebas completadas${COLORS.reset}\n`);
   } catch (error) {
-    console.error(`${COLORS.red}✗ Error al ejecutar las pruebas: ${error.message}${COLORS.reset}`);
+    console.error(`${COLORS.red} Error al ejecutar las pruebas: ${error.message}${COLORS.reset}`);
     process.exit(1);
   }
 }
@@ -142,7 +142,7 @@ function analyzeCoverage() {
       lowCoverageFiles
     };
   } catch (error) {
-    console.error(`${COLORS.red}✗ Error al analizar la cobertura: ${error.message}${COLORS.reset}`);
+    console.error(`${COLORS.red} Error al analizar la cobertura: ${error.message}${COLORS.reset}`);
     process.exit(1);
   }
 }

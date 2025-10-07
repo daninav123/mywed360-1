@@ -18,7 +18,7 @@ export default function RSVPDashboard() {
     if (!activeWedding) return;
     const ref = doc(db, 'weddings', activeWedding, 'rsvp', 'stats');
     const unsub = onSnapshot(ref, (snap) => {
-      setStats(snap.exists() ? snap.data() : null);
+      setStats(snap.exists() ?snap.data() : null);
     });
     return unsub;
   }, [activeWedding]);
@@ -52,7 +52,7 @@ export default function RSVPDashboard() {
     return () => unsub();
   }, [activeWedding]);
 
-  // EvaluaciÃ³n discreta de reglas de automatizaciÃ³n para RSVP (sin cambios visuales)
+  // Evaluación discreta de reglas de automatización para RSVP (sin cambios visuales)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -63,14 +63,14 @@ export default function RSVPDashboard() {
           type: 'rsvp_deadline',
           deadline: stats.deadline,
         });
-        const actions = Array.isArray(resp?.actions) ? resp.actions : [];
+        const actions = Array.isArray(resp?.actions) ?resp.actions : [];
         for (const a of actions) {
           if (cancelled) break;
           if (a.type === 'send_notification' && a.template === 'rsvp_reminder') {
-            // Crear notificaciÃ³n persistente (no altera diseÃ±o)
+            // Crear notificación persistente (no altera diseño)
             await addNotification({
               type: 'info',
-              message: 'Recordatorio RSVP: la fecha lÃ­mite estÃ¡ prÃ³xima',
+              message: 'Recordatorio RSVP: la fecha límite está próxima',
               action: 'viewRSVP',
             });
           }
@@ -91,8 +91,8 @@ export default function RSVPDashboard() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Dashboard de RSVP</h1>
-      {!stats ? (
-        <div className="text-gray-600">Sin datos de respuestas todavÃ­a.</div>
+      {!stats ?(
+        <div className="text-gray-600">Sin datos de respuestas todavía.</div>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -120,7 +120,7 @@ export default function RSVPDashboard() {
 
           {stats.dietaryRestrictions && (
             <div className="border rounded p-4 bg-surface">
-              <h2 className="font-semibold mb-3">Restricciones dietÃ©ticas</h2>
+              <h2 className="font-semibold mb-3">Restricciones dietéticas</h2>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>Vegetarianos: {stats.dietaryRestrictions.vegetarian || 0}</li>
                 <li>Veganos: {stats.dietaryRestrictions.vegan || 0}</li>
@@ -149,7 +149,7 @@ export default function RSVPDashboard() {
                       );
                       const json = await res.json().catch(() => ({}));
                       alert(
-                        `SimulaciÃ³n: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                        `Simulación: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
                       );
                     } catch (e) {
                       alert('Error simulando recordatorios');
@@ -165,7 +165,7 @@ export default function RSVPDashboard() {
                   disabled={!activeWedding || sending}
                   onClick={async () => {
                     if (!activeWedding) return;
-                    const ok = window.confirm('Â¿Enviar recordatorios por email a pendientes?');
+                    const ok = window.confirm('¿Enviar recordatorios por email a pendientes?');
                     if (!ok) return;
                     setSending(true);
                     try {
@@ -176,7 +176,7 @@ export default function RSVPDashboard() {
                       );
                       const json = await res.json().catch(() => ({}));
                       alert(
-                        `EnvÃ­o: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
+                        `Envío: candidatos=${json.attempted || 0}, enviados=${json.sent || 0}, omitidos=${json.skipped || 0}`
                       );
                     } catch (e) {
                       alert('Error enviando recordatorios');
@@ -189,9 +189,9 @@ export default function RSVPDashboard() {
                 </button>
               </div>
             </div>
-            {loadingPending ? (
-              <div className="text-gray-600">Cargando pendientesâ€¦</div>
-            ) : pendingGuests.length === 0 ? (
+            {loadingPending ?(
+              <div className="text-gray-600">Cargando pendientes…</div>
+            ) : pendingGuests.length === 0 ?(
               <div className="text-gray-600">Sin pendientes ahora mismo.</div>
             ) : (
               <div className="overflow-x-auto">
@@ -200,7 +200,7 @@ export default function RSVPDashboard() {
                     <tr>
                       <th className="px-3 py-2 text-left">Nombre</th>
                       <th className="px-3 py-2 text-left">Email</th>
-                      <th className="px-3 py-2 text-left">TelÃ©fono</th>
+                      <th className="px-3 py-2 text-left">Teléfono</th>
                       <th className="px-3 py-2 text-left">Acciones</th>
                     </tr>
                   </thead>

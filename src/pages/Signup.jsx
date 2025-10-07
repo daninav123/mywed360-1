@@ -32,14 +32,14 @@ export default function Signup() {
         <h2 className="text-2xl mb-4">Crear cuenta</h2>
         <input
           type="email"
-          placeholder="Correo electrÃ³nico"
+          placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
         />
         <input
           type="password"
-          placeholder="ContraseÃ±a"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="border border-soft p-2 w-full mb-4 focus:ring-2 ring-primary"
@@ -61,9 +61,9 @@ export default function Signup() {
           Registrarse
         </button>
         <p className="mt-4 text-sm">
-          Â¿Ya tienes cuenta?{' '}
+          ¿Ya tienes cuenta?{' '}
           <Link to="/" className="text-[var(--color-primary)] hover:underline">
-            Inicia sesiÃ³n
+            Inicia sesión
           </Link>
         </p>
       </form>

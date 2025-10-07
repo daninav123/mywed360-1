@@ -657,7 +657,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   )}
                 </Card>
                 <Card>
-                  <div className="flex item�s-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium">Sugerencias de pago (emails)</h3>
                     <Button size="sm" variant="outline" onClick={() => {
                       // Forzar recarga

@@ -27,7 +27,7 @@ export default function Contratos() {
     },
     {
       id: 2,
-      provider: 'Flores y DiseÃƒÂ±o',
+      provider: 'Flores y Diseұo',
       type: 'Flores',
       signedDate: '2025-03-15',
       serviceDate: '2025-06-12',
@@ -48,7 +48,7 @@ export default function Contratos() {
   const [toast, setToast] = useState(null);
   const initialContract = {
     provider: '',
-    type: 'GenÃƒÂ©rico',
+    type: 'Genҩrico',
     signedDate: '',
     serviceDate: '',
     status: '',
@@ -59,11 +59,11 @@ export default function Contratos() {
   const [editContract, setEditContract] = useState(initialContract);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState('');
-  // GeneraciÃƒÂ³n de contratos genÃƒÂ©ricos
+  // Generaciҳn de contratos genҩricos
   const [showGenericModal, setShowGenericModal] = useState(false);
   const [selectedProvidersForGen, setSelectedProvidersForGen] = useState([]);
   const [genericForm, setGenericForm] = useState({
-    type: 'GenÃƒÂ©rico',
+    type: 'Genҩrico',
     signedDate: '',
     serviceDate: '',
     status: 'Vigente',
@@ -87,7 +87,7 @@ export default function Contratos() {
     let out = body;
     Object.entries(replacements).forEach(([k, v]) => {
       const re = new RegExp(`\\{\\{\\s*${k}\\s*\\}}`, 'g');
-      out = out.replace(re, String(v ?? ''));
+      out = out.replace(re, String(v ?''));
     });
     return out.replace(/\{\{\s*[a-zA-Z0-9_]+\s*\}\}/g, '');
   };
@@ -128,7 +128,7 @@ export default function Contratos() {
         if (uploaded && uploaded[0]?.url) docUrl = uploaded[0].url;
       }
     } catch (err) {
-      console.warn('Upload contrato fallÃƒÂ³, usando URL temporal');
+      console.warn('Upload contrato fallҳ, usando URL temporal');
     }
     const { docFile, ...rest } = newContract;
     const contractObj = { id: `ct${Date.now()}`, ...rest, docUrl };
@@ -146,7 +146,7 @@ export default function Contratos() {
   };
 
   const toggleSelect = (id) => {
-    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setSelected((prev) => (prev.includes(id) ?prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const exportSelected = () => {
@@ -174,7 +174,7 @@ export default function Contratos() {
 
   const toggleProviderForGen = (id) => {
     setSelectedProvidersForGen((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ?prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
@@ -220,7 +220,7 @@ export default function Contratos() {
         const contractObj = {
           id: `ct${Date.now()}_${i}`,
           provider: p?.name || 'Proveedor',
-          type: (genericForm.type || '').trim() || p?.service || 'GenÃƒÂ©rico',
+          type: (genericForm.type || '').trim() || p?.service || 'Genҩrico',
           signedDate: genericForm.signedDate || '',
           serviceDate: genericForm.serviceDate || '',
           status: genericForm.status || 'Vigente',
@@ -232,7 +232,7 @@ export default function Contratos() {
       setShowGenericModal(false);
       setSelectedProvidersForGen([]);
       setGenericForm({
-        type: 'GenÃƒÂ©rico',
+        type: 'Genҩrico',
         signedDate: '',
         serviceDate: '',
         status: 'Vigente',
@@ -241,7 +241,7 @@ export default function Contratos() {
       setAttachBaseDoc(true);
       setToast({ message: 'Contratos generados', type: 'success' });
     } catch (err) {
-      console.error('Error generando contratos genÃƒÂ©ricos', err);
+      console.error('Error generando contratos genҩricos', err);
       setToast({ message: 'Error al generar contratos', type: 'error' });
     }
   };
@@ -249,7 +249,7 @@ export default function Contratos() {
   const actionButtons = (
     <>
       <button onClick={() => setShowAddModal(true)} className="flex items-center">
-        <Plus size={16} className="mr-2" /> AÃƒÂ±adir Contrato
+        <Plus size={16} className="mr-2" /> Aұadir Contrato
       </button>
       <button onClick={() => setShowGenericModal(true)} className="flex items-center">
         <FileText size={16} className="mr-2" /> Generar contratos
@@ -278,7 +278,7 @@ export default function Contratos() {
             onClick={() => setShowAddModal(true)}
             className="bg-blue-600 text-white px-4 py-2 rounded flex items-center"
           >
-            <Plus size={16} className="mr-2" /> AÃƒÂ±adir Contrato
+            <Plus size={16} className="mr-2" /> Aұadir Contrato
           </button>
           <button
             onClick={() => setShowGenericModal(true)}
@@ -302,7 +302,7 @@ export default function Contratos() {
                   <input
                     type="checkbox"
                     onChange={(e) =>
-                      setSelected(e.target.checked ? contracts.map((c) => c.id) : [])
+                      setSelected(e.target.checked ?contracts.map((c) => c.id) : [])
                     }
                   />
                 </th>
@@ -319,7 +319,7 @@ export default function Contratos() {
               {contracts.map((c) => (
                 <tr
                   key={c.id}
-                  className={`${isNearExpiry(c.serviceDate) ? 'bg-[var(--color-warning)]/20' : ''} border-b border-[color:var(--color-text)]/10`}
+                  className={`${isNearExpiry(c.serviceDate) ?'bg-[var(--color-warning)]/20' : ''} border-b border-[color:var(--color-text)]/10`}
                 >
                   <td className="p-2">
                     <input
@@ -385,7 +385,7 @@ export default function Contratos() {
           </table>
         </div>
 
-        {/* MÃƒÂ³vil */}
+        {/* Mҳvil */}
         <div className="block md:hidden space-y-4">
           {contracts.map((c) => (
             <ContractItem
@@ -401,7 +401,7 @@ export default function Contratos() {
       {showAddModal && (
         <div className="hidden">
           <div className="bg-surface p-6 rounded shadow w-96">
-            <h2 className="text-xl font-semibold mb-4">AÃƒÂ±adir Contrato</h2>
+            <h2 className="text-xl font-semibold mb-4">Aұadir Contrato</h2>
             <form onSubmit={handleAddContract} className="space-y-3">
               <input
                 type="text"
@@ -452,7 +452,7 @@ export default function Contratos() {
                     setNewContract({
                       ...newContract,
                       docFile: file,
-                      docUrl: file ? URL.createObjectURL(file) : '',
+                      docUrl: file ?URL.createObjectURL(file) : '',
                     });
                   }}
                   className="w-full"
@@ -525,7 +525,7 @@ export default function Contratos() {
               >
                 <option value="Vigente">Vigente</option>
                 <option value="Expirado">Expirado</option>
-                <option value="SeÃƒÂ±al pagada">SeÃƒÂ±al pagada</option>
+                <option value="Seұal pagada">Seұal pagada</option>
               </select>
               <div className="flex justify-end gap-2">
                 <button
@@ -548,7 +548,7 @@ export default function Contratos() {
         <div className="hidden">
           <div className="bg-surface p-6 rounded shadow w-[90vw] max-w-3xl">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <FileText size={18} className="mr-2" /> Generar contratos genÃƒÂ©ricos
+              <FileText size={18} className="mr-2" /> Generar contratos genҩricos
             </h2>
             <form onSubmit={handleGenerateGenericContracts} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -559,7 +559,7 @@ export default function Contratos() {
                     value={genericForm.type}
                     onChange={(e) => setGenericForm({ ...genericForm, type: e.target.value })}
                     className="w-full border rounded px-2 py-1"
-                    placeholder="GenÃƒÂ©rico / Catering / Foto..."
+                    placeholder="Genҩrico / Catering / Foto..."
                   />
                 </div>
                 <div>
@@ -585,7 +585,7 @@ export default function Contratos() {
                   >
                     <option value="Vigente">Vigente</option>
                     <option value="Expirado">Expirado</option>
-                    <option value="SeÃƒÂ±al pagada">SeÃƒÂ±al pagada</option>
+                    <option value="Seұal pagada">Seұal pagada</option>
                   </select>
                 </div>
                 <div>
@@ -620,7 +620,7 @@ export default function Contratos() {
               <div>
                 <h3 className="text-sm font-medium mb-2">Variables de plantilla</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {__customVars.length ? (
+                  {__customVars.length ?(
                     __customVars.map((k) => (
                       <div key={k}>
                         <label className="block mb-1 text-xs text-muted">{k}</label>
@@ -644,7 +644,7 @@ export default function Contratos() {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium">PrevisualizaciÃƒÂ³n</label>
+                  <label className="text-sm font-medium">Previsualizaciҳn</label>
                   <button
                     type="button"
                     className="text-xs px-2 py-1 border rounded"
@@ -665,9 +665,9 @@ export default function Contratos() {
               <div>
                 <label className="block mb-2 text-sm font-medium">Selecciona proveedores</label>
                 <div className="border rounded max-h-64 overflow-auto divide-y">
-                  {providersLoading ? (
+                  {providersLoading ?(
                     <div className="p-3 text-sm text-muted">Cargando proveedores...</div>
-                  ) : providers.length ? (
+                  ) : providers.length ?(
                     providers.map((p) => (
                       <label key={p.id} className="flex items-center gap-3 p-2">
                         <input
@@ -734,7 +734,7 @@ function ContractItem({ contract, isSelected, onToggle }) {
           </p>
         </div>
         <button className="px-2 py-1 rounded bg-transparent" onClick={() => setOpen((v) => !v)}>
-          {open ? <ChevronUp /> : <ChevronDown />}
+          {open ?<ChevronUp /> : <ChevronDown />}
         </button>
       </div>
       {open && (

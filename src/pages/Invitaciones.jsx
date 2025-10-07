@@ -1,4 +1,4 @@
-import { Search, Eye, Download, Save, Copy, Zap, Cloud, CloudOff, RefreshCw } from 'lucide-react';
+﻿import { Search, Eye, Download, Save, Copy, Zap } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import Spinner from '../components/Spinner';
@@ -10,7 +10,7 @@ import useGuests from '../hooks/useGuests';
 import * as EmailService from '../services/emailService';
 import { generateRsvpLink } from '../services/rsvpService';
 import { post as apiPost } from '../services/apiClient';
-import { saveData, loadData, subscribeSyncState, getSyncState } from '../services/SyncService';
+import { saveData, loadData } from '../services/SyncService';
 import { invitationTemplates } from '../data/invitationTemplates';
 import sanitizeHtml from '../utils/sanitizeHtml';
 
@@ -18,14 +18,6 @@ export default function Invitaciones() {
   const { activeWedding } = useWedding();
   const { info: weddingInfo } = useActiveWeddingInfo();
   const { guests } = useGuests();
-  // Estado de sincronizaciÃ³n
-  const [syncStatus, setSyncStatus] = useState(getSyncState());
-
-  // Suscribirse a cambios en el estado de sincronizaciÃ³n
-  useEffect(() => {
-    const unsubscribe = subscribeSyncState(setSyncStatus);
-    return () => unsubscribe();
-  }, []);
 
   const [aiPrompt, setAiPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -195,29 +187,7 @@ export default function Invitaciones() {
     });
   }, [showPreview]);
 
-  // Indicador de sincronizaciÃ³n
-  const SyncIndicator = () => (
-    <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-surface px-3 py-2 rounded-full shadow-md">
-      {syncStatus === 'online' ? (
-        <>
-          <Cloud size={18} className="text-green-500" />
-          <span className="text-sm">Sincronizado</span>
-        </>
-      ) : syncStatus === 'offline' ? (
-        <>
-          <CloudOff size={18} className="text-yellow-500" />
-          <span className="text-sm">Guardado localmente</span>
-        </>
-      ) : (
-        <>
-          <RefreshCw size={18} className="text-primary animate-spin" />
-          <span className="text-sm">Sincronizando...</span>
-        </>
-      )}
-    </div>
-  );
-
-  return (
+  // Indicador de sincronizaciÃ³n  return (
     <Card className="p-6 space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <h1 className="text-2xl font-semibold">DiseÃ±o de Invitaciones</h1>

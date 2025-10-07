@@ -12,8 +12,6 @@ import {
   Palette,
   Eye,
   EyeOff,
-  Cloud,
-  CloudOff,
   Trash,
   Ruler,
   Magnet,
@@ -47,7 +45,6 @@ const SeatingPlanToolbar = ({
   onOpenBackground,
   onAutoAssign,
   onClearBanquet,
-  syncStatus,
   showTables = true,
   onToggleShowTables,
   // Vista avanzada
@@ -170,31 +167,6 @@ const SeatingPlanToolbar = ({
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
-  const getSyncIcon = () => {
-    switch (syncStatus?.status) {
-      case 'syncing':
-        return <Cloud className="h-4 w-4 animate-pulse text-blue-500" />;
-      case 'synced':
-        return <Cloud className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <CloudOff className="h-4 w-4 text-red-500" />;
-      default:
-        return <CloudOff className="h-4 w-4 text-gray-400" />;
-    }
-  };
-  const getSyncText = () => {
-    switch (syncStatus?.status) {
-      case 'syncing':
-        return t('seating.toolbar.syncing', { defaultValue: 'Sincronizando...' });
-      case 'synced':
-        return t('seating.toolbar.synced', { defaultValue: 'Sincronizado' });
-      case 'error':
-        return t('seating.toolbar.syncError', { defaultValue: 'Error de sincronización' });
-      default:
-        return t('seating.toolbar.offline', { defaultValue: 'Sin conexión' });
-    }
-  };
-
   return (
     <div
       className={`bg-white border rounded-lg shadow-sm ${className}`}
@@ -698,7 +670,6 @@ const SeatingPlanToolbar = ({
           )}
         </div>
 
-        {/* Estado de Sincronización */}
         <div className="flex items-center gap-2 ml-auto">
           <div className="flex items-center gap-1 text-xs text-gray-600">
             {getSyncIcon()}
@@ -707,8 +678,6 @@ const SeatingPlanToolbar = ({
         </div>
       </div>
 
-      {/* Barra de progreso de Sincronizacion */}
-      {syncStatus?.status === 'syncing' && (
         <div className="h-1 bg-gray-200">
           <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }} />
         </div>

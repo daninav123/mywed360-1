@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
+﻿/* eslint-disable react/no-unescaped-entities */
 import { saveAs } from 'file-saver';
 import { Wand2, RefreshCcw, Download, FileDown, PenTool, Save } from 'lucide-react';
 import React, { useState, useEffect } from 'react';

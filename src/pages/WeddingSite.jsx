@@ -89,7 +89,7 @@ export default function WeddingSite() {
           {profile.coupleName || 'Nuestra Boda'}
         </h1>
         <p className="text-2xl mb-6 drop-shadow">
-          {profile.date} • {profile.celebrationPlace}
+          {profile.date} " {profile.celebrationPlace}
         </p>
         <div className="flex gap-4 text-xl bg-white/20 backdrop-blur-sm px-6 py-2 rounded">
           <span>{countdown.days}d</span>

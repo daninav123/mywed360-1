@@ -1,265 +1,75 @@
-# 8. Flujo de Diseño Web y Personalización (Detallado)
+# 8. Diseno Web y Personalizacion (estado 2025-10-07)
 
-## 8.1 Generación Automática de Sitio Web
-**Objetivo:** Generar sitios web personalizados automáticamente usando IA y prompts editables
+> Implementado: `src/pages/DisenoWeb.jsx`, `src/components/web/WebGenerator.jsx`, `WebTemplateGallery.jsx`, `WebsitePreview.jsx`, servicios `websiteService.js` y assets compartidos.
+> Pendiente: prompts IA editables, generacion automatica completa (`AIWebGenerator.jsx`), versionado y analytics nativos, dominios personalizados y flujos de colaboracion.
 
-### Selección de Prompt y Generación
-**Pasos detallados:**
-- [ ] **Navegación al generador**
-  - Desde dashboard principal →  – Diseño Web – 
-  - Redirección a `/diseno-web`
-  - Componente: `WebGenerator.jsx`
+## 1. Objetivo y alcance
+- Permitir que owners generen y editen un sitio publico de la boda en minutos.
+- Ofrecer plantillas, prompts y contenido dinamico que se nutre de datos de la boda.
+- Publicar un micrositio responsive con formulario RSVP, mapa, agenda y branding personalizado.
 
-- [ ] **Selección de prompt base**
-  - Prompt  – Boda Clásica y Elegante – 
-  - Prompt  – Boda Moderna y Minimalista – 
-  - Prompt  – Boda Rústica y Natural – 
-  - Prompt  – Boda Temática Personalizada – 
+## 2. Trigger y rutas
+- Menú inferior → `Más` → bloque **Extras** → “Diseño Web” (`/diseno-web`, `DisenoWeb.jsx`).
+- CTA en Home (“Publica tu sitio”) preselecciona el generador (`WebGenerator.jsx`).
+- Acceso directo al preview: `/diseno-web/preview` permite validar cambios antes de publicar.
 
-- [ ] **Edición del prompt**
-  - Editor de texto para personalizar el prompt
-  - Variables automáticas: {nombres}, {fecha}, {ubicacion}
-  - Vista previa del prompt final
-  - Guardado de prompts personalizados
+## 3. Paso a paso UX
+1. Seleccion y edicion de base
+   - Galeria de plantillas (`WebTemplateGallery.jsx`) por estilo (clasica, moderna, rustica, tematizada).
+   - Biblioteca de prompts IA con variables `{nombres}`, `{fecha}`, `{ubicacion}`, editable en modal.
+   - Campos de branding: colores, tipografia, portada hero, copy principal.
+2. Generacion y personalizacion
+   - `WebGenerator.jsx` rellena estructura con datos de la boda (agenda, invitados, historia, FAQs).
+   - Boton "Generar sitio" dispara servicio IA (cuando se habilite) o plantilla estatica actual.
+   - Panel lateral para editar secciones (Historia, Cronograma, Recomendaciones, Preguntas frecuentes).
+3. Publicacion y comparticion
+   - Vista previa responsive (`WebsitePreview.jsx`) con botones publicar/regenerar.
+   - Opcion de activar formulario RSVP y contador regresivo.
+   - URL publica `/w/{slug}` o dominio personalizado (pendiente) + botones compartir/descargar QR.
 
-### Generación con Un Solo Botón
-**Pasos detallados:**
-- [ ] **Proceso de generación**
-  - Botón  – Generar Sitio Web –  prominente
-  - Uso de datos existentes del sistema (nombres, fecha, ubicación, invitados)
-  - Generación automática con IA usando OpenAI API
-  - Indicador de progreso durante generación
+## 4. Persistencia y datos
+- Firestore `weddings/{id}/website`: configuracion (`theme`, `colors`, `sections`), contenido generado, estado `published`.
+- `publicSites/{weddingId}`: cache del HTML publicado, metadatos (subdominio, seo, ultima publicacion).
+- Recursos en Storage: imagenes optimizadas, favicon, archivos descargables.
+- Logs de generacion IA (cuando se active) en `ai/websites/{runId}` con prompt y tokens.
 
-- [ ] **Contenido generado automáticamente**
-  - Estructura HTML completa
-  - Estilos CSS personalizados
-  - Contenido de texto adaptado al estilo
-  - Integración automática de datos de la boda
-  - Formulario RSVP funcional
+## 5. Reglas de negocio
+- Solo owner/planner pueden publicar; assistants pueden editar borradores si tienen permiso.
+- Datos sensibles (direcciones exactas) se muestran solo si el owner los marca como publicos.
+- Si no hay fecha de boda el contador regresivo se oculta automaticamente.
+- Regenerar sitio mantiene misma URL y publica version mas reciente tras confirmacion.
 
-## 8.2 Sistema de Prompts Inteligentes
-**Objetivo:** Proporcionar prompts base editables para diferentes estilos de boda
+## 6. Estados especiales y errores
+- Sin datos minimos (nombres, fecha) -> banner pidiendo completarlos en Perfil.
+- Error de generacion IA -> fallback a plantilla base y mensaje "No pudimos generar contenido, edita manualmente".
+- Publicacion fallida -> rollback al ultimo HTML correcto y log en consola/notificacion.
+- Vista previa offline -> deshabilitar boton publicar y mostrar aviso de sin conexion.
 
-### Biblioteca de Prompts
-**Pasos detallados:**
-- [ ] **Prompts predefinidos**
-  -  – Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. – 
-  -  – Diseña un sitio web moderno y minimalista para {nombres}. Usa tipografías limpias, mucho espacio en blanco y una paleta de colores neutros. Enfócate en la funcionalidad y simplicidad. – 
-  -  – Genera un sitio web rústico y natural para la boda de {nombres} en {ubicacion}. Incorpora elementos naturales, texturas de madera y una sensación acogedora y campestre. – 
+## 7. Integracion con otros flujos
+- Flujo 2 provee datos iniciales (fecha, ubicacion, estilo) y slug de la boda.
+- Flujo 3 y 9 rellenan RSVP y listas de invitados visibles en el sitio.
+- Flujo 5 (proveedores) y 15 (documentos) pueden publicar secciones destacadas en la web.
+- Flujo 21 reutiliza el mismo contenido para landing publica general.
 
-- [ ] **Editor de prompts**
-  - Componente: `PromptEditor.jsx`
-  - Textarea con syntax highlighting
-  - Variables dinámicas resaltadas
-  - Vista previa de prompt procesado
-  - Validación de variables requeridas
+## 8. Metricas y monitorizacion
+- Eventos: `website_generated`, `website_published`, `website_regenerated`, `website_theme_changed`.
+- Metricas planeadas: visitas unicas, RSVPs recibidos desde sitio publico, tiempo entre generacion y publicacion.
+- Dashboard futuro con top secciones vistas y conversiones por canal.
 
-- [ ] **Gestión de prompts personalizados**
-  - Guardar prompts editados
-  - Biblioteca personal de prompts
-  - Compartir prompts entre bodas (wedding planners)
-  - Historial de prompts utilizados
+## 9. Pruebas recomendadas
+- Unitarias: parseo de prompts, normalizacion de secciones, helpers de slug/domino.
+- Integracion: generar sitio -> guardar en Firestore -> previsualizar -> publicar -> confirmar cache publica.
+- E2E: usuario crea sitio, activa RSVP, visita URL publica y envia confirmacion.
 
-### Integración con Datos del Sistema
-**Pasos detallados:**
-- [ ] **Variables automáticas**
-  - {nombres}: Nombres de la pareja desde perfil
-  - {fecha}: Fecha de la boda desde configuración
-  - {ubicacion}: Lugar de ceremonia y celebración
-  - {invitados}: Número total de invitados
-  - {historia}: Historia de la pareja si está disponible
+## 10. Checklist de despliegue
+- `OPENAI_API_KEY` y limites `RATE_LIMIT_AI_MAX` configurados antes de habilitar generacion IA.
+- CDN/hosting para contenido estatico (`publicSites`) con cache invalido tras publicar.
+- Revisar politicas de privacidad y consentimiento antes de exponer datos publicos.
+- Validar compresion de imagenes y peso total < 2 MB para mejorar performance.
 
-- [ ] **Contenido dinámico**
-  - Información de ceremonia y celebración
-  - Lista de eventos del cronograma
-  - Galería de fotos subidas
-  - Información de alojamiento para invitados
-  - Detalles de transporte
-
-- [ ] **Funcionalidades integradas**
-  - Formulario RSVP conectado al sistema
-  - Contador regresivo automático
-  - Mapa de ubicación con direcciones
-  - Enlaces a redes sociales de la pareja
-
-## 8.3 Generación con IA y Publicación
-**Objetivo:** Generar y publicar sitios web automáticamente usando inteligencia artificial
-
-### Proceso de Generación IA
-**Pasos detallados:**
-- [ ] **Llamada a OpenAI API**
-  - Componente: `AIWebGenerator.jsx`
-  - Prompt procesado con variables reales
-  - Generación de HTML, CSS y JavaScript
-  - Estructura responsive automática
-  - Optimización para móviles
-
-- [ ] **Post-procesamiento**
-  - Validación de HTML generado
-  - Inyección de funcionalidades específicas (RSVP, contador)
-  - Optimización de imágenes automática
-  - Minificación de código
-
-- [ ] **Configuración automática**
-  - Subdominio automático: `{nombres-slug}-{año}.mywed360.com`
-  - Certificado SSL automático
-  - CDN para assets estáticos
-  - Analytics básicos integrados
-
-### Publicación Instantánea
-**Pasos detallados:**
-- [ ] **Publicación automática**
-  - Despliegue inmediato tras generación
-  - URL disponible instantáneamente
-  - Notificación con enlace final
-  - Compartir automático con colaboradores
-
-- [ ] **Regeneración cuando sea necesario**
-  - Botón  – Regenerar Sitio –  disponible
-  - Mantiene URL existente
-  - Actualización automática de datos
-  - Historial de versiones generadas
-
-## 8.4 Funcionalidades Automáticas Integradas
-**Objetivo:** Características que se generan automáticamente con la IA
-
-### Elementos Generados Automáticamente
-**Pasos detallados:**
-- [ ] **Formulario RSVP funcional**
-  - Conectado directamente al sistema de confirmaciones
-  - Validación automática de invitados
-  - Gestión de acompañantes
-  - Restricciones dietéticas
-
-- [ ] **Contador regresivo**
-  - Cálculo automático hasta la fecha de boda
-  - Actualización en tiempo real
-  - Múltiples formatos (días, horas, minutos)
-  - Personalización visual según el estilo
-
-- [ ] **Información dinámica**
-  - Detalles de ceremonia y celebración
-  - Información de alojamiento
-  - Instrucciones de transporte
-  - Cronograma del día
-
-### Integraciones del Sistema
-**Pasos detallados:**
-- [ ] **Galería automática**
-  - Fotos subidas al sistema de la boda
-  - Organización automática por fecha
-  - Slideshow responsive
-  - Carga lazy para performance
-
-- [ ] **Mapa de ubicación**
-  - Integración automática con Google Maps
-  - Marcadores para ceremonia y celebración
-  - Direcciones desde ubicaciones comunes
-  - Información de parking disponible
-
-## 8.5 Optimización Automática por IA
-**Objetivo:** La IA genera sitios optimizados automáticamente
-
-### Optimización Integrada
-**Pasos detallados:**
-- [ ] **Performance automática**
-  - Código optimizado generado por IA
-  - Estructura HTML semántica
-  - CSS minificado y eficiente
-  - JavaScript mínimo necesario
-
-- [ ] **Responsive por defecto**
-  - Diseño mobile-first automático
-  - Breakpoints optimizados
-  - Touch-friendly por defecto
-  - Carga adaptativa por dispositivo
-
-- [ ] **SEO automático**
-  - Meta tags generados automáticamente
-  - Estructura semántica correcta
-  - Alt text para imágenes
-  - Schema markup para eventos
-
-### Analytics Básicos
-**Pasos detallados:**
-- [ ] **Métricas simples**
-  - Contador de visitas básico
-  - Confirmaciones RSVP recibidas
-  - Dispositivos más utilizados
-  - Dashboard simple en MyWed360
-
-## Estructura de Datos
-
-```javascript
-// /weddings/{weddingId}/website
-{
-  id:  – website_001 – ,
-  generationMethod:  – ai_prompt – ,
-  domain:  – ana-carlos-2024.mywed360.com – ,
-  published: true,
-  publishedAt:  – 2024-01-20T10:00:00Z – ,
-  
-  prompt: {
-    basePrompt:  – classic_elegant – ,
-    customPrompt:  – Crea un sitio web elegante y clásico para la boda de {nombres} el {fecha} en {ubicacion}. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa. – ,
-    processedPrompt:  – Crea un sitio web elegante y clásico para la boda de Ana & Carlos el 15 de junio de 2024 en Madrid, España. Incluye secciones de historia, ceremonia, celebración y RSVP con un diseño sofisticado en tonos dorados y blancos. Añade información sobre el dress code y detalles especiales de la ceremonia religiosa. – ,
-    variables: {
-      nombres:  – Ana & Carlos – ,
-      fecha:  – 15 de junio de 2024 – ,
-      ubicacion:  – Madrid, España – ,
-      invitados: 120
-    }
-  },
-  
-  generatedContent: {
-    html:  – <!DOCTYPE html><html>... – ,
-    css:  – body { font-family: 'Playfair Display'... } – ,
-    javascript:  – // Countdown timer and RSVP form... – ,
-    generatedAt:  – 2024-01-20T10:00:00Z – ,
-    aiModel:  – gpt-4 – ,
-    tokensUsed: 2500
-  },
-  
-  integrations: {
-    rsvpConnected: true,
-    photosConnected: true,
-    mapIntegrated: true,
-    countdownActive: true
-  },
-  
-  analytics: {
-    totalVisits: 245,
-    uniqueVisitors: 189,
-    rsvpSubmissions: 87,
-    lastUpdated:  – 2024-01-25T15:30:00Z – 
-  },
-  
-  versions: [
-    {
-      version: 1,
-      generatedAt:  – 2024-01-20T10:00:00Z – ,
-      prompt:  – Prompt original... – ,
-      active: true
-    }
-  ]
-}
-```
-
-## Estado de Implementación
-
-### ✅ Completado
-- Página de diseño web actual (DisenoWeb.jsx)
-- Componentes de diseño básicos
-- Sistema de publicación básico
-
-### 🚧 En Desarrollo
-- Integración con OpenAI API
-- Sistema de prompts editables
-- Generación automática con un botón
-
-### ❌ Pendiente
-- Editor de prompts avanzado (PromptEditor.jsx)
-- Generador IA completo (AIWebGenerator.jsx)
-- Sistema de variables dinámicas
-- Historial de versiones generadas
-- Analytics integrados en dashboard
+## 11. Roadmap / pendientes
+- Editor de prompts avanzado con versionado y biblioteca compartida.
+- Historial de versiones y undo/redo de secciones publicadas.
+- Analitica integrada (visitas, fuentes, conversion RSVP) y alertas.
+- Dominio personalizado, SEO (metatags, sitemap) y generacion de OG images.
+- Colaboracion multirol (comentarios, sugerencias, aprobaciones).

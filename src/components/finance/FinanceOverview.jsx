@@ -23,7 +23,6 @@ const handleAccessibleClick = (event, callback) => {
 
 export default function FinanceOverview({
   stats,
-  syncStatus,
   budgetUsage = [],
   thresholds = { warn: 75, danger: 90 },
   onNavigate,
