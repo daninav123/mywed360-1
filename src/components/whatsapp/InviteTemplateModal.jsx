@@ -8,7 +8,7 @@ import {
 import wh from '../../utils/whDebug';
 import Modal from '../Modal';
 
-function InviteTemplateModal({ open, onClose, onSaved }) {
+function InviteTemplateModal({ open, onClose, onSaved, coupleName = 'Ana y Luis' }) {
   const [value, setValue] = useState('');
 
   useEffect(() => {
@@ -21,15 +21,27 @@ function InviteTemplateModal({ open, onClose, onSaved }) {
     }
   }, [open]);
 
-  const preview = useMemo(() => renderInviteMessage('María'), [value]);
+  const preview = useMemo(
+    () => renderInviteMessage('María', { coupleName }),
+    [value, coupleName]
+  );
 
   const handleSave = () => {
-    const ok = setInviteTemplate(value);
+    let next = value;
+    if (next && !next.includes('{coupleName}')) {
+      const confirmed = window.confirm(
+        'El mensaje no incluye {coupleName}. Se añadirá automáticamente para identificar a la pareja.'
+      );
+      if (!confirmed) return;
+      next = `${next.trim()}\n\nSomos {coupleName}`;
+      setValue(next);
+    }
+    const ok = setInviteTemplate(next);
     if (ok) {
       try {
-        wh('TemplateModal – saved', { length: value.length });
+        wh('TemplateModal – saved', { length: next.length });
       } catch {}
-      onSaved?.(value);
+      onSaved?.(next);
     } else {
       alert('No se pudo guardar la plantilla');
     }
@@ -49,8 +61,10 @@ function InviteTemplateModal({ open, onClose, onSaved }) {
             onChange={(e) => setValue(e.target.value)}
             placeholder="¡Hola {guestName}! …"
           />
-          <div className="text-xs text-gray-500 mt-1">
-            Ejemplo de variable: {`{guestName}`} → María
+          <div className="text-xs text-gray-500 mt-1 space-y-1">
+            <div>Variables disponibles:</div>
+            <div>{`{guestName}`} → María</div>
+            <div>{`{coupleName}`} → {coupleName}</div>
           </div>
         </div>
 

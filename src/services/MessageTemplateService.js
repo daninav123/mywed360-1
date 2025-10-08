@@ -3,7 +3,7 @@
 
 const KEY = 'whatsapp_invite_template';
 const DEFAULT_TEMPLATE =
-  '¡Hola {guestName}! Nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.';
+  '¡Hola {guestName}! Somos {coupleName} y nos encantaría contar contigo en nuestra boda. Para confirmar, responde "Sí" o "No" a este mensaje. Después te preguntaremos acompañantes y alergias.';
 
 export function getInviteTemplate() {
   try {
@@ -25,9 +25,15 @@ export function setInviteTemplate(template) {
   }
 }
 
-export function renderInviteMessage(guestName = '') {
+const renderPlaceholders = (template = '', context = {}) => {
+  return template
+    .replaceAll('{guestName}', context.guestName || '')
+    .replaceAll('{coupleName}', context.coupleName || 'nuestra boda');
+};
+
+export function renderInviteMessage(guestName = '', context = {}) {
   const tpl = getInviteTemplate();
-  return tpl.replaceAll('{guestName}', guestName || '');
+  return renderPlaceholders(tpl, { ...context, guestName });
 }
 
 export default { getInviteTemplate, setInviteTemplate, renderInviteMessage };

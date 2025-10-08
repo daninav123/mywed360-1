@@ -55,7 +55,7 @@ const GuestBulkGrid = ({ onCancel, onSave, isLoading = false }) => {
       const newRows = parsed.map((cols, idx) => {
         const obj = { id: Date.now() + idx };
         DEFAULT_COLUMNS.forEach((col, i) => {
-          obj[col.key] = cols[i] ?'';
+          obj[col.key] = cols[i] ? cols[i].trim() : '';
         });
         return obj;
       });

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
-import SyncIndicator from '../../components/SyncIndicator';
 import Card from '../../components/ui/Card';
 import UploadImageCard from '../../components/UploadImageCard';
 import { useWedding } from '../../context/WeddingContext';
@@ -71,7 +70,6 @@ export default function Logo() {
 
   return (
     <div className="space-y-6">
-      <SyncIndicator />
       <UploadImageCard title="Subir Logo" storageKey="logoImage" />
 
       <Card className="p-4 flex flex-col gap-4 items-start">

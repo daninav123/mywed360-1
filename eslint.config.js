@@ -30,6 +30,7 @@ module.exports = [
     },
     plugins: {
       "react-hooks": require("eslint-plugin-react-hooks"),
+      react: require("eslint-plugin-react"),
     },
     linterOptions: {
       reportUnusedDisableDirectives: "off",

@@ -1,7 +1,6 @@
 ﻿import React, { useState } from 'react';
 
 import ContactsImporter from '../components/guests/ContactsImporter';
-import GroupManager from '../components/guests/GroupManager';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
@@ -11,7 +10,7 @@ import { Button } from '../components/ui';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
 import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
-import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
+import FormalInvitationModal from '../components/whatsapp/FormalInvitationModal';
 import { useWedding } from '../context/WeddingContext';
 import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { useAuth } from '../hooks/useAuth';
@@ -30,7 +29,7 @@ import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
  * - Hook personalizado useGuests para lÃ³gica centralizada
  * - MemoizaciÃ³n y optimizaciÃ³n de re-renders
  * - IntegraciÃ³n con sistema i18n
- * - UX mejorada con indicadores de estado
+ * - UX mejorada con atajos y paneles dedicados
  */
 function Invitados() {
   // Estados para modales
@@ -40,11 +39,10 @@ function Invitados() {
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showRsvpModal, setShowRsvpModal] = useState(false);
   const [showWhatsModal, setShowWhatsModal] = useState(false);
-  const [showWhatsBatch, setShowWhatsBatch] = useState(false);
   const [showSaveTheDate, setShowSaveTheDate] = useState(false);
+  const [showFormalInvitation, setShowFormalInvitation] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [showGroupManager, setShowGroupManager] = useState(false);
 
   // Hooks reales
   const { t } = useTranslations();
@@ -69,22 +67,18 @@ function Invitados() {
     inviteSelectedWhatsAppViaExtension,
     inviteSelectedWhatsAppBroadcastViaExtension,
     inviteViaEmail,
-    bulkInviteWhatsApp,
     bulkInviteWhatsAppApi,
     importFromContacts,
-    exportToCSV,
     updateFilters,
     utils,
   } = useGuests();
 
   // Mensaje por defecto para SAVE THE DATE
-  const saveTheDateDefault = React.useMemo(() => {
+  const { saveTheDateMessage, coupleLabel } = React.useMemo(() => {
     try {
-      // Prioriza weddingInfo del doc principal
       const wi = activeWeddingInfo?.weddingInfo || {};
       const wList = (weddings || []).find((x) => x.id === activeWedding) || {};
 
-      // Nombres pareja
       let p1 = '',
         p2 = '';
       const coupleRaw =
@@ -110,7 +104,8 @@ function Invitados() {
         p2 = 'pareja2';
       }
 
-      // Fecha de la boda
+      const coupleName = p1 && p2 ? `${p1} y ${p2}` : p1 || p2 || 'nuestra boda';
+
       const dateRaw =
         wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
       let fechaFmt = '';
@@ -134,31 +129,28 @@ function Invitados() {
         fechaFmt = 'la fecha de la boda';
       }
 
-      return t('guests.saveTheDate.message', {
+      const message = t('guests.saveTheDate.message', {
         defaultValue:
-          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un noticiÃ³n sÃºper importante que compartir contigo. Â¡Nos casamos! ResÃ©rvate el {{date}} porque queremos contar contigo.',
+          'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
         p1,
         p2: p2 || undefined,
         date: fechaFmt,
       });
-    } catch {
-      return t('guests.saveTheDate.messageFallback', {
-        defaultValue:
-          'Â¡Hola! Tenemos un noticiÃ³n sÃºper importante que compartir contigo. Â¡Nos casamos! Â¡ResÃ©rvate la fecha porque queremos contar contigo!',
-      });
-    }
-  }, [weddings, activeWedding, activeWeddingInfo]);
 
-  // Opciones Ãºnicas de grupo (group o companionGroupId)
-  const groupOptions = React.useMemo(() => {
-    try {
-      const set = new Set();
-      (guests || []).forEach((g) => {
-        if (g.group) set.add(String(g.group));
-        if (g.companionGroupId) set.add(String(g.companionGroupId));
-      });
-      return Array.from(set).sort((a, b) => String(a).localeCompare(String(b)));
+      return { saveTheDateMessage: message, coupleLabel: coupleName };
     } catch {
+      return {
+        saveTheDateMessage: t('guests.saveTheDate.messageFallback', {
+          defaultValue:
+            '¡Hola! Tenemos un notición súper importante que compartir contigo. ¡Nos casamos! ¡Resérvate la fecha porque queremos contar contigo!',
+        }),
+        coupleLabel: 'nuestra boda',
+      };
+    }
+  }, [weddings, activeWedding, activeWeddingInfo, t]);
+
+  const saveTheDateDefault = saveTheDateMessage;
+  // Opciones Ãºnicas de grupo (group o companionGroupId)
       return [];
     }
   }, [guests]);
@@ -268,50 +260,7 @@ function Invitados() {
   };
 
   // EnvÃ­o masivo API para todos los invitados (usado por GuestFilters)
-  const bulkInviteAllApi = async () => {
-    try {
-      if (!guests || guests.length === 0) {
-        alert('No hay invitados');
-        return;
-      }
-      const ids = guests.filter((g) => g.phone).map((g) => g.id);
-      if (!ids.length) {
-        alert('Los invitados no tienen telÃ©fonos vÃ¡lidos');
-        return;
-      }
-      const confirm = window.confirm(
-        t('guests.whatsapp.confirmBulkApi', {
-          defaultValue: 'Â¿Enviar invitaciones vÃ­a WhatsApp API a {{count}} invitados?',
-          count: ids.length,
-        })
-      );
-      if (!confirm) return;
-      const res = await inviteSelectedWhatsAppApi(ids);
-      if (res?.success) {
-        alert(
-          t('guests.whatsapp.bulkApiDone', {
-            defaultValue: 'EnvÃ­o completado. Ã‰xitos: {{ok}}, Fallos: {{fail}}',
-            ok: res.ok || 0,
-            fail: res.fail || 0,
-          })
-        );
-      } else {
-        alert(
-          t('guests.whatsapp.bulkApiError', {
-            defaultValue: 'Error en envÃ­o masivo: {{error}}',
-            error: res?.error || 'desconocido',
-          })
-        );
-      }
-    } catch (e) {
-      console.warn('bulkInviteAllApi error:', e);
-      alert(t('guests.whatsapp.bulkApiUnexpected', { defaultValue: 'Error en envÃ­o masivo API' }));
-    }
-  };
-
   // Abrir modal de envÃ­o masivo WhatsApp
-  const openWhatsBatch = () => setShowWhatsBatch(true);
-  const closeWhatsBatch = () => setShowWhatsBatch(false);
   const openSaveTheDate = () => setShowSaveTheDate(true);
   const closeSaveTheDate = () => setShowSaveTheDate(false);
 
@@ -332,6 +281,43 @@ function Invitados() {
       return Array.from(set);
     });
   };
+  const handleBulkTableReassign = async () => {
+    if (!selectedIds.length) {
+      alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
+      return;
+    }
+    const currentTables = Array.from(
+      new Set(
+        (guests || [])
+          .filter((g) => selectedIds.includes(g.id))
+          .map((g) => g.table || '')
+      )
+    );
+    const promptLabel =
+      currentTables.length === 1 && currentTables[0]
+        ? `Asignar nueva mesa (actual: ${currentTables[0] || 'sin mesa'})`
+        : 'Asignar nueva mesa';
+    const value = window.prompt(promptLabel, currentTables[0] || '');
+    if (value === null) return;
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      alert('Debes indicar una mesa válida.');
+      return;
+    }
+    try {
+      setIsSaving(true);
+      const idSet = new Set(selectedIds);
+      const targets = (guests || []).filter((g) => idSet.has(g.id));
+      await Promise.all(targets.map((guest) => updateGuest(guest.id, { table: trimmed })));
+      alert(`Mesa asignada a ${targets.length} invitado(s).`);
+    } catch (error) {
+      console.error('Error reasignando mesa en bloque', error);
+      alert('No se ha podido reasignar la mesa.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  };
 
   // Enviar API a seleccionados
   const handleSendSelectedApi = async () => {
@@ -344,10 +330,18 @@ function Invitados() {
         alert(t('guests.noneSelected', { defaultValue: 'No hay invitados seleccionados' }));
         return;
       }
-      const res = await inviteSelectedWhatsAppApi(selectedIds);
+      const res = await inviteSelectedWhatsAppApi(selectedIds, undefined, {
+        coupleName: coupleLabel,
+      });
       if (import.meta.env.DEV) console.log('[Invitados] handleSendSelectedApi result', res);
       if (res?.cancelled) {
         alert('AcciÃ³n cancelada');
+        return;
+      }
+      if (res?.error === 'missing-couple-signature') {
+        alert(
+          'El mensaje debe incluir el nombre de la pareja. Revisa la plantilla en “Editar mensaje (API)”.'
+        );
         return;
       }
       if (res?.error && !res?.success) {
@@ -748,23 +742,22 @@ function Invitados() {
           searchTerm={filters?.search || ''}
           statusFilter={filters?.status || ''}
           tableFilter={filters?.table || ''}
-          groupFilter={filters?.group || ''}
-          groupOptions={groupOptions}
           onSearchChange={(value) => updateFilters({ search: value })}
           onStatusFilterChange={(value) => updateFilters({ status: value })}
           onTableFilterChange={(value) => updateFilters({ table: value })}
-          onGroupFilterChange={(value) => updateFilters({ group: value })}
           onAddGuest={handleAddGuest}
-          onBulkInvite={bulkInviteWhatsAppApi}
-          onOpenRsvpSummary={handleOpenRsvpSummary}
           onOpenSaveTheDate={openSaveTheDate}
+          onOpenFormalInvitation={() => setShowFormalInvitation(true)}
+          onOpenRsvpSummary={handleOpenRsvpSummary}
+          onBulkTableReassign={handleBulkTableReassign}
           guestCount={guests?.length || 0}
           isLoading={isLoading}
           selectedCount={selectedIds.length}
           onSendSelectedApi={handleSendSelectedApi}
           onScheduleSelected={handleScheduleSelected}
           onSendSelectedBroadcast={handleSendSelectedBroadcast}
-          onOpenGroupManager={openGroupManager}
+          showApiButtons
+          coupleName={coupleLabel}
         />
 
         {/* Debug info para verificar estado */}
@@ -977,7 +970,6 @@ function Invitados() {
         {/* Modal envÃ­o masivo WhatsApp */}
         <WhatsAppSender
           open={showWhatsBatch}
-          onClose={closeWhatsBatch}
           guests={guests || []}
           weddingId={activeWedding}
           onBatchCreated={(res) => {

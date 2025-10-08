@@ -87,7 +87,7 @@ export default function Contratos() {
     let out = body;
     Object.entries(replacements).forEach(([k, v]) => {
       const re = new RegExp(`\\{\\{\\s*${k}\\s*\\}}`, 'g');
-      out = out.replace(re, String(v ?''));
+      out = out.replace(re, String(v ?? ''));
     });
     return out.replace(/\{\{\s*[a-zA-Z0-9_]+\s*\}\}/g, '');
   };

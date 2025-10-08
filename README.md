@@ -45,6 +45,7 @@ Resumen de módulos:
    - Roadmap: `docs/roadmap-2025-v2.md`
    - CI/CD: `docs/DEPLOYMENT_CI.md`
    - Testing (incluye webhook pagos en CI): `docs/TESTING.md`
+   - Diseño / Prototipos Figma: `docs/diseno/README.md`
 
 ## Características
 

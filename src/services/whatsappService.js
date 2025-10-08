@@ -67,6 +67,9 @@ export async function sendText({
   templateId = null,
   scheduleAt = null,
   metadata = {},
+  deliveryChannel = 'whatsapp',
+  assetUrl,
+  instagramPollId,
 }) {
   try {
     const token = await getAuthToken();
@@ -87,7 +90,18 @@ export async function sendText({
     const res = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ to, message, weddingId, guestId, templateId, scheduleAt, metadata }),
+      body: JSON.stringify({
+        to,
+        message,
+        weddingId,
+        guestId,
+        templateId,
+        scheduleAt,
+        metadata,
+        deliveryChannel,
+        assetUrl,
+        instagramPollId,
+      }),
     });
     const json = await res.json().catch(() => ({}));
     if (import.meta.env.DEV)

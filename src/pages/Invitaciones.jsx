@@ -187,7 +187,7 @@ export default function Invitaciones() {
     });
   }, [showPreview]);
 
-  // Indicador de sincronizaciÃ³n  return (
+  return (
     <Card className="p-6 space-y-6">
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <h1 className="text-2xl font-semibold">DiseÃ±o de Invitaciones</h1>

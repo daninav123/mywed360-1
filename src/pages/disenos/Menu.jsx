@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 
 import ImageGeneratorAI from '../../components/ImageGeneratorAI';
-import SyncIndicator from '../../components/SyncIndicator';
 import Card from '../../components/ui/Card';
 import { saveData, loadData } from '../../services/SyncService';
 
@@ -107,7 +106,6 @@ export default function MenuDiseno() {
 
   return (
     <div className="space-y-8">
-      <SyncIndicator />
       <Card className="p-6 space-y-4">
         <h1 className="text-2xl font-semibold">Diseño del Menú</h1>
         <div className="flex flex-col md:flex-row gap-2 md:items-end">

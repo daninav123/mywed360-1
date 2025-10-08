@@ -23,6 +23,8 @@ export default function SaveTheDateModal({
   defaultMessage = '',
   weddingId,
   selectedDefaultIds = [],
+  coupleName = '',
+  onSent,
 }) {
   const guestsWithPhone = useMemo(() => (guests || []).filter((g) => !!g.phone), [guests]);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
@@ -106,10 +108,23 @@ export default function SaveTheDateModal({
       );
       return;
     }
+    const normalizedCouple = (coupleName || '').toLowerCase().trim();
+    if (normalizedCouple) {
+      const missing = Array.from(selectedIds).some((id) => {
+        const msg = (messages[id] || messageGlobal || '').toLowerCase();
+        return !msg.includes(normalizedCouple);
+      });
+      if (missing) {
+        alert('El mensaje debe incluir el nombre de la pareja para cada invitado seleccionado.');
+        return;
+      }
+    }
     setSending(true);
     setStats(null);
-    let ok = 0,
-      fail = 0;
+    let ok = 0;
+    let fail = 0;
+    const okIds = [];
+    const failIds = [];
     try {
       for (const g of guestsWithPhone) {
         if (!selectedIds.has(g.id)) continue;
@@ -118,6 +133,7 @@ export default function SaveTheDateModal({
           const msg = (messages[g.id] || messageGlobal || '').trim();
           if (!to || !msg) {
             fail++;
+            failIds.push(g.id);
             continue;
           }
           const res = await sendText({
@@ -125,32 +141,47 @@ export default function SaveTheDateModal({
             message: msg,
             weddingId,
             guestId: g.id,
-            metadata: { type: 'save_the_date', guestName: g.name || '' },
+            deliveryChannel: 'whatsapp',
+            metadata: {
+              type: 'save_the_date',
+              guestName: g.name || '',
+              deliveryChannel: 'whatsapp',
+            },
           });
-          if (res?.success) ok++;
-          else fail++;
-          // pequeño respiro para respetar rate limits
+          if (res?.success === false) {
+            fail++;
+            failIds.push(g.id);
+          } else {
+            ok++;
+            okIds.push(g.id);
+          }
+          // Respetar rate limit básico
           // eslint-disable-next-line no-await-in-loop
           await new Promise((r) => setTimeout(r, 200));
-        } catch {
+        } catch (error) {
+          console.error('[SaveTheDateModal] error enviando mensaje', error);
           fail++;
+          failIds.push(g.id);
         }
       }
       setStats({ ok, fail });
       alert(`Envío completado. Éxitos: ${ok}, Fallos: ${fail}`);
+      onSent?.({ ok: okIds, fail: failIds });
       onClose?.();
     } finally {
       setSending(false);
     }
   }, [
+    coupleName,
     guestsWithPhone,
-    selectedIds,
-    messages,
     messageGlobal,
-    weddingId,
-    selectedCount,
+    messages,
     onClose,
+    onSent,
     provider,
+    selectedCount,
+    selectedIds,
+    weddingId,
   ]);
 
   if (!open) return null;
@@ -183,6 +214,11 @@ export default function SaveTheDateModal({
             value={messageGlobal}
             onChange={(e) => setMessageGlobal(e.target.value)}
           />
+          {coupleName && (
+            <p className="text-xs text-gray-500 mt-1">
+              Incluye siempre la firma de la pareja (“{coupleName}”) para que el destinatario identifique quién envía el mensaje.
+            </p>
+          )}
           <div className="mt-2 flex justify-end">
             <Button variant="outline" onClick={applyGlobalToAll}>
               Aplicar a todos

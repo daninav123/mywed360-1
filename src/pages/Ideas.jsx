@@ -3,7 +3,6 @@
 import ExternalImage from '@/components/ExternalImage';
 
 import PageWrapper from '../components/PageWrapper';
-import SyncIndicator from '../components/SyncIndicator';
 import PageTabs from '../components/ui/PageTabs';
 import { useAuth } from '../hooks/useAuth';
 import { uploadEmailAttachments as uploadFilesToStorage } from '../services/storageUploadService';
@@ -85,7 +84,6 @@ export default function Ideas() {
 
   return (
     <PageWrapper title="Ideas" className="max-w-5xl mx-auto">
-      <SyncIndicator />
       <PageTabs
         value={view}
         onChange={setView}

@@ -670,20 +670,10 @@ const SeatingPlanToolbar = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2 ml-auto">
-          <div className="flex items-center gap-1 text-xs text-gray-600">
-            {getSyncIcon()}
-            <span className="hidden md:inline">{getSyncText()}</span>
-          </div>
-        </div>
       </div>
 
-        <div className="h-1 bg-gray-200">
-          <div className="h-full bg-blue-500 animate-pulse" style={{ width: '60%' }} />
-        </div>
-      )}
 
-            {showHotkeys && (
+      {showHotkeys && (
         <div className="px-3 pb-3">
           <div className="bg-white border rounded shadow w-[22rem] max-w-[92vw] p-3 text-xs leading-5">
             <div className="font-semibold text-gray-800 mb-1">{t('seating.hotkeys.title', { defaultValue: 'Atajos de teclado' })}</div>

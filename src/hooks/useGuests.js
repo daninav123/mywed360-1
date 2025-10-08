@@ -8,13 +8,22 @@ import { ensureExtensionAvailable, sendBatchMessages } from '../services/whatsap
 import { toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
 import { renderInviteMessage } from '../services/MessageTemplateService';
 
-const resolveMessageForGuest = (guest, baseMessage) => {
+const applyPlaceholders = (template = '', context = {}) => {
+  const guestName = context.guestName || '';
+  const coupleName = context.coupleName || 'nuestra boda';
+  return template
+    .replace(/\{guestName\}/g, guestName)
+    .replace(/\{coupleName\}/g, coupleName);
+};
+
+const resolveMessageForGuest = (guest, baseMessage, context = {}) => {
   const name = guest?.name || '';
   const template = typeof baseMessage === 'string' ? baseMessage.trim() : '';
+  const ctx = { ...context, guestName: name };
   if (template) {
-    return template.replace(/\{guestName\}/g, name);
+    return applyPlaceholders(template, ctx);
   }
-  return renderInviteMessage(name);
+  return renderInviteMessage(name, context);
 };
 
 // Hook personalizado para gestión optimizada de invitados
@@ -85,14 +94,13 @@ const useGuests = () => {
   const isLoading = collectionLoading;
 
   // Filtros
-  const [filters, setFilters] = useState({ search: '', status: '', table: '', group: '' });
+  const [filters, setFilters] = useState({ search: '', status: '', table: '' });
 
   const filteredGuests = useMemo(() => {
     try {
       const term = (filters.search || '').trim().toLowerCase();
       const status = String(filters.status || '').toLowerCase();
       const table = String(filters.table || '').trim();
-      const group = String(filters.group || '').trim();
       const strip = (x = '') =>
         x.normalize ? x.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : x;
       return guests.filter((g) => {
@@ -125,9 +133,6 @@ const useGuests = () => {
         }
         if (table) {
           if (String(g.table || '').trim() !== table) return false;
-        }
-        if (group) {
-          if (String(g.group || g.companionGroupId || '').trim() !== group) return false;
         }
         return true;
       });
@@ -218,6 +223,8 @@ const useGuests = () => {
         const base = {
           companionGroupId: guestData.companionGroupId || '',
           ...guestData,
+          group: guestData.table || guestData.group || '',
+          companionType: guestData.companionType || 'none',
           id: guestData.id || `guest-${Date.now()}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -254,6 +261,15 @@ const useGuests = () => {
       const originalTable = original?.table || '';
       try {
         const patch = { ...updates, id: guestId, updatedAt: new Date().toISOString() };
+        if (Object.prototype.hasOwnProperty.call(patch, 'table')) {
+          patch.group = patch.table || '';
+        }
+        if (
+          Object.prototype.hasOwnProperty.call(patch, 'companionType') &&
+          (patch.companionType === undefined || patch.companionType === null)
+        ) {
+          patch.companionType = 'none';
+        }
         if (patch.phone) patch.phone = utils.phoneClean(patch.phone);
         // Normalizar estado coherente si se cambia status/response
         try {
@@ -279,6 +295,7 @@ const useGuests = () => {
           for (const comp of companions) {
             await updateItem(comp.id, {
               table: updatedGuest.table,
+              group: updatedGuest.table || '',
               updatedAt: new Date().toISOString(),
             });
           }
@@ -420,7 +437,7 @@ const useGuests = () => {
 
   // Variantes API/Email: placeholders seguros para mantener la API del hook
   const inviteViaWhatsAppApi = useCallback(
-    async (guest, message) => {
+    async (guest, message, options = {}) => {
       try {
         if (!guest?.phone) {
           return { success: false, error: 'no-phone' };
@@ -431,12 +448,31 @@ const useGuests = () => {
           return { success: false, error: 'no-phone' };
         }
 
+        const {
+          coupleName = '',
+          assetUrl,
+          deliveryChannel = 'whatsapp',
+          metadata = {},
+          type = 'direct_invite',
+        } = options || {};
+        const rendered = resolveMessageForGuest(guest, message, { coupleName });
+        if (coupleName && !rendered.toLowerCase().includes(coupleName.toLowerCase())) {
+          return { success: false, error: 'missing-couple-signature' };
+        }
+
         const payload = {
           to,
-          message: resolveMessageForGuest(guest, message),
+          message: rendered,
           weddingId: activeWedding || undefined,
           guestId: guest.id || undefined,
-          metadata: { guestName: guest.name || '' },
+          deliveryChannel,
+          assetUrl: assetUrl || undefined,
+          metadata: {
+            guestName: guest.name || '',
+            type,
+            deliveryChannel,
+            ...metadata,
+          },
         };
 
         const resp = await apiPost(`/api/whatsapp/send`, payload, { auth: true });
@@ -453,7 +489,7 @@ const useGuests = () => {
   );
 
   const inviteSelectedWhatsAppApi = useCallback(
-    async (selectedIds = [], baseMessage) => {
+    async (selectedIds = [], baseMessage, options = {}) => {
       try {
         if (!Array.isArray(selectedIds) || selectedIds.length === 0) {
           return { success: false, error: 'no-selection' };
@@ -462,26 +498,49 @@ const useGuests = () => {
         const idSet = new Set(selectedIds);
         const seen = new Set();
         const items = [];
+        const {
+          coupleName = '',
+          assetUrl,
+          deliveryChannel = 'whatsapp',
+          metadata = {},
+          type = 'bulk_invite',
+        } = options || {};
+        let missingSignature = false;
 
         (guests || []).forEach((guest) => {
           if (!idSet.has(guest.id)) return;
           const cleaned = utils.phoneClean(guest.phone || '');
           if (!cleaned || seen.has(cleaned)) return;
           seen.add(cleaned);
+          const message = resolveMessageForGuest(guest, baseMessage, { coupleName });
+          if (coupleName && !message.toLowerCase().includes(coupleName.toLowerCase())) {
+            missingSignature = true;
+          }
           items.push({
             to: cleaned,
-            message: resolveMessageForGuest(guest, baseMessage),
+            message,
             guestId: guest.id,
-            metadata: { guestName: guest.name || '' },
+            assetUrl: assetUrl || guest.whatsappAssetUrl || undefined,
+            deliveryChannel,
+            metadata: {
+              guestName: guest.name || '',
+              type,
+              deliveryChannel,
+              ...metadata,
+            },
           });
         });
 
         if (!items.length) {
           return { success: false, error: 'no-targets' };
         }
+        if (missingSignature) {
+          return { success: false, error: 'missing-couple-signature' };
+        }
 
         const payload = {
           weddingId: activeWedding || undefined,
+          deliveryChannel,
           items,
         };
 
@@ -506,28 +565,58 @@ const useGuests = () => {
   );
 
   const bulkInviteWhatsApp = useCallback(async () => ({ success: true, count: 0 }), []);
-  const bulkInviteWhatsAppApi = useCallback(async () => {
+  const bulkInviteWhatsAppApi = useCallback(async (options = {}) => {
     try {
       const seen = new Set();
       const items = [];
+      const {
+        coupleName = '',
+        baseMessage,
+        assetUrl,
+        deliveryChannel = 'whatsapp',
+        metadata = {},
+        type = 'formal_invite',
+        targetIds,
+      } = options || {};
+      const idSet = targetIds ? new Set(targetIds) : null;
+      let missingSignature = false;
 
       (guests || []).forEach((guest) => {
+        if (idSet && !idSet.has(guest.id)) return;
         const cleaned = utils.phoneClean(guest.phone || '');
         if (!cleaned || seen.has(cleaned)) return;
         seen.add(cleaned);
+        const message = resolveMessageForGuest(guest, baseMessage, { coupleName });
+        if (coupleName && !message.toLowerCase().includes(coupleName.toLowerCase())) {
+          missingSignature = true;
+        }
         items.push({
           to: cleaned,
-          message: resolveMessageForGuest(guest),
+          message,
           guestId: guest.id,
-          metadata: { guestName: guest.name || '' },
+          assetUrl: assetUrl || guest.whatsappAssetUrl || undefined,
+          deliveryChannel,
+          metadata: {
+            guestName: guest.name || '',
+            type,
+            deliveryChannel,
+            ...metadata,
+          },
         });
       });
 
       if (!items.length) {
         return { success: false, error: 'no-targets' };
       }
+      if (missingSignature) {
+        return { success: false, error: 'missing-couple-signature' };
+      }
 
-      const payload = { weddingId: activeWedding || undefined, items };
+      const payload = {
+        weddingId: activeWedding || undefined,
+        deliveryChannel,
+        items,
+      };
       const resp = await apiPost(`/api/whatsapp/send-batch`, payload, { auth: true });
       const json = await resp.json().catch(() => ({}));
       if (!resp.ok || json.success === false) {
@@ -562,59 +651,12 @@ const useGuests = () => {
     [utils]
   );
 
-  // Exportación CSV
-  const exportToCSV = useCallback(() => {
-    if (guests.length === 0) {
-      alert('No hay invitados para exportar');
-      return;
-    }
-    const headers = [
-      'Nombre',
-      'Email',
-      'Teléfono',
-      'Dirección',
-      'Estado',
-      'Mesa',
-      'Acompañantes',
-      'Restricciones Dietéticas',
-      'Notas',
-    ];
-    const csvContent = [
-      headers.join(','),
-      ...guests.map((guest) =>
-        [
-          `"${guest.name || ''}"`,
-          `"${guest.email || ''}"`,
-          `"${guest.phone || ''}"`,
-          `"${guest.address || ''}"`,
-          `"${utils.getStatusLabel(guest)}"`,
-          `"${guest.table || ''}"`,
-          guest.companion || 0,
-          `"${guest.dietaryRestrictions || ''}"`,
-          `"${guest.notes || ''}"`,
-        ].join(',')
-      ),
-    ].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `invitados-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [guests, utils]);
-
   // Filtros helpers
   const updateFilters = useCallback(
     (newFilters) => setFilters((prev) => ({ ...prev, ...newFilters })),
     []
   );
-  const clearFilters = useCallback(
-    () => setFilters({ search: '', status: '', table: '', group: '' }),
-    []
-  );
+  const clearFilters = useCallback(() => setFilters({ search: '', status: '', table: '' }), []);
 
   return {
     // Datos
@@ -643,9 +685,6 @@ const useGuests = () => {
     bulkInviteWhatsApp,
     bulkInviteWhatsAppApi,
     importFromContacts,
-
-    // Exportación
-    exportToCSV,
 
     // Filtros
     updateFilters,

@@ -20,7 +20,6 @@ const GuestList = React.memo(
     searchTerm = '',
     statusFilter = '',
     tableFilter = '',
-    groupFilter = '',
     onUpdateStatus,
     onEdit,
     onDelete,
@@ -56,20 +55,13 @@ const GuestList = React.memo(
             !tableFilter ||
             (guest.table && guest.table.toString().toLowerCase() === tableFilter.toLowerCase());
 
-          const matchesGroup =
-            !groupFilter ||
-            (guest.group &&
-              String(guest.group).toLowerCase() === String(groupFilter).toLowerCase()) ||
-            (guest.companionGroupId &&
-              String(guest.companionGroupId).toLowerCase() === String(groupFilter).toLowerCase());
-
-          return matchesSearch && matchesStatus && matchesTable && matchesGroup;
+          return matchesSearch && matchesStatus && matchesTable;
         });
       } catch (e) {
         if (import.meta.env.DEV) console.error('[GuestList] filter error', e);
         return [];
       }
-    }, [safeGuests, searchTerm, statusFilter, tableFilter, groupFilter]);
+    }, [safeGuests, searchTerm, statusFilter, tableFilter]);
 
     // Estadísticas memoizadas
     const stats = useMemo(() => {

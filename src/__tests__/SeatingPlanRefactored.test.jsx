@@ -12,7 +12,6 @@ vi.mock('../hooks/useSeatingPlan', () => {
   const mockFn = vi.fn(() => ({
     tab: 'ceremony',
     setTab: vi.fn(),
-    syncStatus: { status: 'synced' },
     hallSize: { width: 1800, height: 1200 },
     areas: [],
     tables: [],
