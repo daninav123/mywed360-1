@@ -22,12 +22,14 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     dueDate: '',
     status: 'pending',
     paidAmount: '',
+    paymentMethod: '',
   });
 
   const [errors, setErrors] = useState({});
   const [existingAttachments, setExistingAttachments] = useState([]);
   const [newAttachments, setNewAttachments] = useState([]);
   const fileInputRef = useRef(null);
+  const [extraFields, setExtraFields] = useState({ meta: { source: 'manual' } });
 
   // Categorias predefinidas (valores internos no traducidos para coherencia)
   const categories = {
@@ -68,12 +70,25 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
         dueDate: transaction.dueDate ? transaction.dueDate.slice(0, 10) : '',
         status: transaction.status || defaultStatus,
         paidAmount: transaction.paidAmount != null ? String(transaction.paidAmount) : '',
+        paymentMethod: transaction.paymentMethod || '',
       });
       setExistingAttachments(Array.isArray(transaction.attachments) ? transaction.attachments : []);
       setNewAttachments([]);
+      const metaSource = transaction.meta?.source || transaction.source || 'manual';
+      if (transaction.meta) {
+        setExtraFields({
+          meta: {
+            ...transaction.meta,
+            source: transaction.meta.source || metaSource,
+          },
+        });
+      } else {
+        setExtraFields({ meta: { source: metaSource } });
+      }
     } else {
       setExistingAttachments([]);
       setNewAttachments([]);
+      setExtraFields({ meta: { source: 'manual' } });
     }
   }, [transaction]);
 
@@ -147,6 +162,10 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       dueDate: formData.dueDate || null,
     };
 
+    if (!transactionData.paymentMethod) {
+      delete transactionData.paymentMethod;
+    }
+
     if (transactionData.type === 'expense') {
       if (transactionData.status === 'paid') {
         transactionData.paidAmount = Number.isNaN(amountValue) ? null : amountValue;
@@ -171,7 +190,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
       newFiles: newAttachments,
     };
 
-    await onSave({ ...transactionData, attachments: attachmentsPayload });
+    await onSave({ ...transactionData, ...extraFields, attachments: attachmentsPayload });
   };
 
   const handleAttachmentFiles = (event) => {
@@ -237,6 +256,14 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   // Obtener categorias segn el tipo
   const availableCategories = categories[formData.type] || [];
+  const paymentMethods = [
+    'Transferencia',
+    'Tarjeta',
+    'Efectivo',
+    'Bizum',
+    'PayPal',
+    'Otro',
+  ];
   const statusOptions =
     formData.type === 'income'
       ? [
@@ -348,6 +375,27 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
             defaultValue: 'Identifica con quin se contrata o de dnde proviene el dinero.',
           })}
         </p>
+      </div>
+
+      {/* Método de pago */}
+      <div>
+        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
+          {t('finance.form.paymentMethod', { defaultValue: 'Método de pago' })}
+        </label>
+        <select
+          value={formData.paymentMethod}
+          onChange={(e) => handleChange('paymentMethod', e.target.value)}
+          className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)] border-[color:var(--color-text)]/20"
+        >
+          <option value="">
+            {t('finance.form.paymentMethodPlaceholder', { defaultValue: 'Selecciona un método' })}
+          </option>
+          {paymentMethods.map((method) => (
+            <option key={method} value={method}>
+              {method}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Monto */}
@@ -635,4 +683,3 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
     </form>
   );
 }
-

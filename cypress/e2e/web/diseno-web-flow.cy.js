@@ -23,4 +23,3 @@ describe('Flujo 9 - Diseño web y personalización', () => {
     cy.get('iframe[title="Vista previa"], iframe').should('exist');
   });
 });
-

@@ -122,6 +122,12 @@ export default function More() {
               onTouchStart={pfProtocoloMenu}
             >
               <Link
+                to="/protocolo/resumen"
+                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+              >
+                Resumen ceremonia
+              </Link>
+              <Link
                 to="/protocolo/momentos-especiales"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >

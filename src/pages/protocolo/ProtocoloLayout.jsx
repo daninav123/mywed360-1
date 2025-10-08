@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
 
-import PageTabs from '../../components/ui/PageTabs';
-
 // Definición estática de las pestañas para evitar recreaciones
 // Nota: 'Documentos Legales' se muestra como página independiente en el submenú,
 // por eso NO aparece como pestaña aquí.
-const tabs = [{ path: 'momentos-especiales', label: 'Momentos Especiales' }];
+const tabs = [
+  { path: 'resumen', label: 'Resumen' },
+  { path: 'momentos-especiales', label: 'Momentos Especiales' },
+  { path: 'timing', label: 'Timing' },
+  { path: 'checklist', label: 'Checklist' },
+  { path: 'ayuda-ceremonia', label: 'Ayuda ceremonia' },
+];
 
 // Componente memoizado para evitar renders innecesarios
 const ProtocoloLayout = React.memo(() => {
@@ -16,7 +20,7 @@ const ProtocoloLayout = React.memo(() => {
   /* Redirigir a la primera pestaña si estamos en la raíz de protocolo */
   useEffect(() => {
     if (location.pathname === '/protocolo' || location.pathname === '/protocolo/') {
-      navigate('/protocolo/momentos-especiales', { replace: true });
+      navigate(`/protocolo/${tabs[0].path}`, { replace: true });
     }
   }, [location.pathname, navigate]);
 

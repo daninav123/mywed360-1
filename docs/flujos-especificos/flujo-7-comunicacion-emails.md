@@ -1,6 +1,6 @@
 # 7. Comunicaciones y Email (estado 2025-10-07)
 
-> Implementado: `UnifiedEmail.jsx`, `EmailInbox.jsx`, `EmailView.jsx`, `EmailComposer.jsx`, `SmartEmailComposer.jsx`, `EmailSetup.jsx`, `EmailSettings.jsx`, `EmailTemplates.jsx`, `EmailStats.jsx`, `EmailFilters.jsx`, `CustomFolders.jsx`, `EmailTagsManager.jsx`, `EmailComments.jsx`, `EmailFeedbackCollector.jsx`, `CalendarIntegration.jsx`, `MailgunTester.jsx`, servicios `emailAutomationService.js`, `emailTemplatesService.js`, `EmailRecommendationService`, hooks `useEmailMonitoring`.
+> Implementado: `components/email/UnifiedInbox/InboxContainer.jsx`, `EmailDetail.jsx`, `EmailList.jsx`, `EmailComposer.jsx`, `SmartEmailComposer.jsx`, `EmailSetup.jsx`, `EmailSettings.jsx`, `EmailTemplates.jsx`, `EmailStatistics.jsx`, `EmailComments.jsx`, `EmailFeedbackCollector.jsx`, `CalendarIntegration.jsx`, `MailgunTester.jsx`, servicios `emailAutomationService.js`, `emailTemplatesService.js`, `EmailRecommendationService`, hooks `useEmailMonitoring`.
 > Pendiente: journeys multicanal, respuesta automática inteligente, integración nativa con WhatsApp/Push y consolidación de buzón legacy.
 
 ## 1. Objetivo y alcance
@@ -21,7 +21,7 @@
 2. Operativa diaria
    - `EmailInbox` ofrece carpetas personalizadas, filtros avanzados, búsqueda semántica, badges y lectura rápida.
    - `EmailComposer` y `SmartEmailComposer` redactan correos; este último integra recomendaciones IA y plantillas dinámicas.
-   - `EmailTagsManager`, `CustomFolders`, `EmailComments` organizan y colaboran sobre hilos.
+   - `EmailComments` permite colaborar sobre hilos internos.
 3. Automatizaciones y análisis
    - `CalendarIntegration` programa envíos, `emailAutomationService` dispara workflows.
    - `EmailFeedbackCollector` registra retroalimentación post-envío.
@@ -40,16 +40,16 @@
 - Roles: owner/planner gestiona settings y plantillas; assistants pueden enviar con plantillas aprobadas.
 
 ## 6. Estados especiales y errores
-- Sin setup ? banner con CTA "Configura tu correo".
-- Error de envío ? toast + reintento automático (`temporary_failure`).
-- Buzón legacy activo ? toggle para migración.
-- Sin conexión ? vista lectura + cola local (envío diferido).
+- Sin setup → banner con CTA "Configura tu correo".
+- Error de envío → toast + reintento automático (`temporary_failure`).
+- Buzón legacy activo → toggle para migración.
+- Sin conexión → vista lectura + cola local (envío diferido).
 
 ## 7. Integración con otros flujos
 - Flujo 3/9 usan emails para invitaciones y recordatorios RSVP.
-- Flujo 5 integra comunicaciones con proveedores (tracking).
+- Flujo 5 integra comunicaciones con proveedores (tracking) mediante el [Flujo 24](./flujo-24-orquestador-automatizaciones.md); los botones �Solicitar presupuesto� y �Pedir cita� en las tarjetas de proveedor disparan respuestas autom�ticas con las plantillas de este flujo.
 - Flujo 12 respeta preferencias de notificación al enviar.
-- Flujo 20 reutiliza bandeja/analytics; Flujo 21 enlaza sitio público.
+- Flujo 20 reutiliza bandeja/analytics; Flujo 21 enlaza sitio público; Flujo 24 coordina automatizaciones multicanal.
 - Flujo 17 otorga puntos por hitos de comunicación.
 
 ## 8. Métricas y monitorización
@@ -59,7 +59,7 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: filtros, parser de cabeceras, servicio de recomendaciones, guardado de plantillas.
-- Integración: configurar cuenta ? enviar campaña ? registrar métricas ? visualizar en stats.
+- Integración: configurar cuenta → enviar campaña → registrar métricas → visualizar en stats.
 - E2E: onboarding, envío masivo, respuesta simulada, control de etiquetas y feedback.
 
 ## 10. Checklist de despliegue
@@ -74,3 +74,6 @@
 - Analítica avanzada con cohorts y comparativas.
 - Biblioteca compartida de plantillas y traducciones.
 - Integración directa con CRM o marketing externo.
+
+
+

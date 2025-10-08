@@ -11,6 +11,7 @@ const transactionBaseSchema = z.object({
   description: z.string().max(1000).optional(),
   category: z.string().max(120).optional(),
   provider: z.string().trim().max(120).optional().nullable(),
+  paymentMethod: z.string().max(60).optional(),
   date: z.string().optional(),
   dueDate: z.union([z.string(), z.date()]).optional().nullable(),
   paidAmount: z.coerce.number().nonnegative().nullable().optional(),
@@ -23,8 +24,18 @@ const transactionBaseSchema = z.object({
         size: z.coerce.number().nonnegative().optional(),
         url: z.string().url().optional(),
         uploadedAt: z.string().optional(),
+        storagePath: z.string().optional().nullable(),
       })
     )
+    .optional(),
+  meta: z
+    .object({
+      source: z.string().optional(),
+      mailId: z.string().optional(),
+      bankId: z.string().optional(),
+      providerAccount: z.string().optional(),
+    })
+    .partial()
     .optional(),
 });
 
@@ -48,4 +59,3 @@ const withBusinessRules = (schema) =>
 
 export const transactionSchema = withBusinessRules(transactionBaseSchema);
 export const transactionUpdateSchema = withBusinessRules(transactionBaseSchema.partial());
-

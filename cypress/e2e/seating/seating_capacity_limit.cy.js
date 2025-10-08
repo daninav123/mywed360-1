@@ -1,4 +1,4 @@
-describe('Seating Plan - Límite de capacidad por mesa', () => {
+﻿describe('Seating Plan - Límite de capacidad por mesa', () => {
   const WID = 'test-wedding-capacity';
 
   function setActiveWeddingBeforeVisit() {
@@ -37,7 +37,7 @@ describe('Seating Plan - Límite de capacidad por mesa', () => {
     cy.get('[data-testid^="table-item-"]').first().click();
 
     // Establecer seats = 1 en el editor de mesa
-    cy.contains('label', 'Número de sillas').parent().find('input').clear().type('1');
+    cy.get('#table-auto-capacity').uncheck({ force: true });\n    cy.contains('label', 'Capacidad máxima').parent().find('input').clear().type('1');
 
     // Mostrar lista de invitados disponibles desde acciones rápidas
     cy.contains('button', 'Mostrar Invitados').click();

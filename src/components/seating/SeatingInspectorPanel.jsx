@@ -1,12 +1,14 @@
-import { Settings, Maximize2, RotateCcw, Copy, Trash2, Users } from 'lucide-react';
-import React from 'react';
+import { Settings, Copy, Trash2, Users } from 'lucide-react';
+import React, { useMemo } from 'react';
+
+import TableEditor from './TableEditor';
+import { TABLE_TYPES, computeTableCapacity } from '../../utils/seatingTables';
 
 export default function SeatingInspectorPanel({
   selectedTable,
   tab,
   globalMaxSeats = 0,
   onTableDimensionChange,
-  onToggleTableShape,
   onConfigureTable,
   duplicateTable,
   deleteTable,
@@ -22,6 +24,32 @@ export default function SeatingInspectorPanel({
       </div>
     );
   }
+
+  const selectedTableType = useMemo(() => {
+    if (!selectedTable) return null;
+    const typeId =
+      selectedTable.tableType ||
+      (selectedTable.shape === 'circle' ? 'round' : 'square');
+    return TABLE_TYPES.find((t) => t.id === typeId) || null;
+  }, [selectedTable?.tableType, selectedTable?.shape]);
+
+  const recommendedCapacity = useMemo(() => {
+    if (!selectedTable) return 0;
+    return computeTableCapacity(selectedTable);
+  }, [selectedTable]);
+
+  const assignedGuestsWithCompanions = useMemo(
+    () =>
+      assignedGuests.reduce(
+        (sum, guest) => sum + 1 + (parseInt(guest?.companion, 10) || 0),
+        0
+      ),
+    [assignedGuests]
+  );
+
+  const remainingCapacity = selectedTable
+    ? (selectedTable.seats || 0) - assignedGuestsWithCompanions
+    : 0;
 
   return (
     <div className={`bg-white border rounded-lg overflow-hidden ${className}`}>
@@ -41,64 +69,59 @@ export default function SeatingInspectorPanel({
       </div>
 
       <div className="p-4 space-y-4">
+        {tab === 'banquet' && (
+          <div className="border border-gray-200 rounded-lg p-3 bg-gray-50/60">
+            <TableEditor
+              table={selectedTable}
+              onChange={onTableDimensionChange}
+              onClose={() => {}}
+              globalMaxSeats={globalMaxSeats}
+            />
+          </div>
+        )}
+
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">Tipo:</span>
-            <span className="font-medium capitalize">{tab === 'ceremony' ? 'Ceremonia' : 'Banquete'}</span>
+            <span className="font-medium capitalize">
+              {tab === 'ceremony' ? 'Ceremonia' : 'Banquete'}
+            </span>
           </div>
 
           {tab === 'banquet' && (
             <>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Asientos:</span>
-                <span className="font-medium">{selectedTable.seats || 8}</span>
+                <span className="text-gray-600">Tipo de mesa:</span>
+                <span className="font-medium">
+                  {selectedTableType?.label || 'Personalizada'}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Forma:</span>
-                <button
-                  onClick={onToggleTableShape}
-                  className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
-                  title="Cambiar forma"
-                >
-                  <span className="capitalize">{selectedTable.shape || 'rectangle'}</span>
-                  <RotateCcw className="h-3 w-3" />
-                </button>
+                <span className="text-gray-600">Capacidad:</span>
+                <span className="font-medium">
+                  {selectedTable.seats || 0} invitados
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                Asignados (incluye acompañantes): {assignedGuestsWithCompanions}
+              </div>
+              <div className="text-xs text-gray-500">
+                {selectedTable.autoCapacity !== false
+                  ? `Calculado automáticamente (sugerido ${recommendedCapacity || 0})`
+                  : `Capacidad manual. Recomendado: ${recommendedCapacity || 0}`}
+              </div>
+              <div
+                className={`text-xs ${
+                  remainingCapacity < 0 ? 'text-red-600' : 'text-gray-500'
+                }`}
+              >
+                {remainingCapacity < 0
+                  ? `Capacidad excedida por ${Math.abs(remainingCapacity)} invitado(s)`
+                  : `Quedan ${remainingCapacity} invitado(s) disponibles`}
               </div>
             </>
           )}
         </div>
-
-        {tab === 'banquet' && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1">
-              <Maximize2 className="h-4 w-4" /> Dimensiones
-            </h4>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Ancho (cm)</label>
-                <input
-                  type="number"
-                  min="20"
-                  max="400"
-                  value={selectedTable.width || 80}
-                  onChange={(e) => onTableDimensionChange?.('width', e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-600 mb-1">Largo (cm)</label>
-                <input
-                  type="number"
-                  min="20"
-                  max="400"
-                  value={selectedTable.height || selectedTable.length || 60}
-                  onChange={(e) => onTableDimensionChange?.('height', e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1">

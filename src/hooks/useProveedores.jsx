@@ -1,4 +1,4 @@
-import {
+﻿import {
   collection,
   getDocs,
   doc,
@@ -17,6 +17,11 @@ import { db } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { loadData, saveData } from '../services/SyncService';
+import { recordSupplierInsight } from '../services/supplierInsightsService';
+
+const SERVICE_LINES_COLLECTION = "serviceLines";
+const MEETINGS_COLLECTION = "supplierMeetings";
+
 
 /**
  * @typedef {Object} Provider
@@ -147,7 +152,7 @@ export const useProveedores = () => {
           return '';
         }
       };
-      const loadedProviders = snapshot.docs
+      const baseProviders = snapshot.docs
         .map((d) => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
         .sort((a, b) => {
           const ac = a.created?.seconds || a.createdAt?.seconds || 0;
@@ -155,8 +160,25 @@ export const useProveedores = () => {
           return bc - ac;
         });
 
-      setProviders(loadedProviders);
-      applyFilters(loadedProviders);
+      const providersWithLines = await Promise.all(
+        baseProviders.map(async (prov) => {
+          const lines = [];
+          try {
+            const linesRef = collection(db, primaryPath, prov.id, SERVICE_LINES_COLLECTION);
+            const linesSnap = await getDocs(linesRef);
+            linesSnap.forEach((docSnap) => {
+              lines.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            lines.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+          } catch (err) {
+            console.warn('[useProveedores] no se pudieron cargar líneas de servicio', err);
+          }
+          return { ...prov, serviceLines: lines };
+        })
+      );
+
+      setProviders(providersWithLines);
+      applyFilters(providersWithLines);
       setLoading(false);
     } catch (err) {
       console.error('Error al cargar los proveedores:', err);
@@ -243,6 +265,172 @@ export const useProveedores = () => {
     setRatingMin(0);
     setTab('contratados');
   }, []);
+  const getServiceLinesCollection = useCallback(
+    (providerId) => {
+      const path = getCollectionPath();
+      if (!path || !providerId) return null;
+      return collection(db, path, providerId, SERVICE_LINES_COLLECTION);
+    },
+    [getCollectionPath]
+  );
+
+  const getMeetingsCollection = useCallback(
+    (providerId) => {
+      const path = getCollectionPath();
+      if (!path || !providerId) return null;
+      return collection(db, path, providerId, MEETINGS_COLLECTION);
+    },
+    [getCollectionPath]
+  );
+
+  const syncServiceLinesLocally = useCallback(
+    (providerId, updater) => {
+      setProviders((prev) => {
+        const updated = prev.map((prov) =>
+          prov.id === providerId
+            ? {
+                ...prov,
+                serviceLines: updater(Array.isArray(prov.serviceLines) ? prov.serviceLines : []),
+              }
+            : prov
+        );
+        try {
+          applyFilters(updated);
+        } catch {}
+        return updated;
+      });
+    },
+    [applyFilters]
+  );
+
+  const addServiceLine = useCallback(
+    async (providerId, lineData) => {
+      const ref = getServiceLinesCollection(providerId);
+      if (!ref) return null;
+      try {
+        const payload = {
+          name: lineData?.name || lineData?.service || 'Servicio',
+          status: lineData?.status || 'Pendiente',
+          budget: typeof lineData?.budget === 'number' ? lineData.budget : null,
+          notes: lineData?.notes || '',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        };
+        const docRef = await addDoc(ref, payload);
+        const nextLine = { id: docRef.id, ...payload };
+        syncServiceLinesLocally(providerId, (prev) => [...prev, nextLine]);
+        return docRef.id;
+      } catch (err) {
+        console.warn('[useProveedores] addServiceLine failed', err);
+        throw err;
+      }
+    },
+    [getServiceLinesCollection, syncServiceLinesLocally]
+  );
+
+  const updateServiceLine = useCallback(
+    async (providerId, lineId, changes) => {
+      const ref = getServiceLinesCollection(providerId);
+      if (!ref || !lineId) return false;
+      try {
+        const docRef = doc(ref, lineId);
+        await updateDoc(docRef, { ...changes, updatedAt: serverTimestamp() });
+        syncServiceLinesLocally(providerId, (prev) =>
+          prev.map((line) => (line.id === lineId ? { ...line, ...changes } : line))
+        );
+        return true;
+      } catch (err) {
+        console.warn('[useProveedores] updateServiceLine failed', err);
+        return false;
+      }
+    },
+    [getServiceLinesCollection, syncServiceLinesLocally]
+  );
+
+  const deleteServiceLine = useCallback(
+    async (providerId, lineId) => {
+      const ref = getServiceLinesCollection(providerId);
+      if (!ref || !lineId) return false;
+      try {
+        const docRef = doc(ref, lineId);
+        await deleteDoc(docRef);
+        syncServiceLinesLocally(providerId, (prev) => prev.filter((line) => line.id !== lineId));
+        return true;
+      } catch (err) {
+        console.warn('[useProveedores] deleteServiceLine failed', err);
+        return false;
+      }
+    },
+    [getServiceLinesCollection, syncServiceLinesLocally]
+  );
+
+  const mergeServiceLines = useCallback(
+    async (providerId, primaryLineId, mergeIds, options = {}) => {
+      const ref = getServiceLinesCollection(providerId);
+      if (!ref || !primaryLineId || !Array.isArray(mergeIds) || mergeIds.length === 0) return false;
+      try {
+        const primaryRef = doc(ref, primaryLineId);
+        const payload = { updatedAt: serverTimestamp() };
+        if (options.name) payload.name = options.name;
+        if (options.status) payload.status = options.status;
+        if (typeof options.budget === 'number') payload.budget = options.budget;
+        if (options.notes) payload.notes = options.notes;
+        await updateDoc(primaryRef, payload);
+
+        for (const mergeId of mergeIds.filter((id) => id !== primaryLineId)) {
+          try {
+            const mergeRef = doc(ref, mergeId);
+            await deleteDoc(mergeRef);
+          } catch (err) {
+            console.warn('[useProveedores] merge remove line failed', err);
+          }
+        }
+
+        syncServiceLinesLocally(providerId, (prev) => {
+          const kept = prev.filter((line) => !mergeIds.includes(line.id) || line.id === primaryLineId);
+          return kept.map((line) => (line.id === primaryLineId ? { ...line, ...options } : line));
+        });
+        return true;
+      } catch (err) {
+        console.warn('[useProveedores] mergeServiceLines failed', err);
+        return false;
+      }
+    },
+    [getServiceLinesCollection, syncServiceLinesLocally]
+  );
+
+  const getMeetingsCollectionSafe = useCallback(
+    (providerId) => getMeetingsCollection(providerId),
+    [getMeetingsCollection]
+  );
+
+  const addMeetingEntry = useCallback(
+    async (providerId, meeting) => {
+      const ref = getMeetingsCollectionSafe(providerId);
+      if (!ref) return null;
+      try {
+        const payload = {
+          ...meeting,
+          createdAt: serverTimestamp(),
+        };
+        await addDoc(ref, payload);
+      } catch (err) {
+        console.warn('[useProveedores] addMeetingEntry failed', err);
+      }
+    },
+    [getMeetingsCollectionSafe]
+  );
+
+  const registerManualContact = useCallback(
+    async (providerId, note) => {
+      await addMeetingEntry(providerId, {
+        type: 'manual_contact',
+        note: note || '',
+        source: 'manual',
+      });
+    },
+    [addMeetingEntry]
+  );
 
   /**
    * Crear un nuevo proveedor
@@ -284,7 +472,7 @@ export const useProveedores = () => {
         return null;
       }
     },
-    [user, providers, applyFilters, getCollectionPath]
+    [user, providers, applyFilters, getCollectionPath, addServiceLine]
   );
 
   /**
@@ -298,17 +486,41 @@ export const useProveedores = () => {
         const path = getCollectionPath();
         if (!path) return false;
         const providerRef = doc(db, path, providerId);
+        const existing = providers.find((p) => p.id === providerId) || {};
 
-        // Añadir campo de timestamp de actualización
+        const parseBudgetValue = (raw) => {
+          if (raw == null) return null;
+          if (typeof raw === 'number' && !Number.isNaN(raw)) return raw;
+          const cleaned = String(raw).replace(/[^0-9.,-]/g, '').replace(',', '.');
+          const value = parseFloat(cleaned);
+          return Number.isNaN(value) ? null : value;
+        };
+
+        const contractStatus = (providerData.contractStatus ?? existing.contractStatus ?? '')
+          .toString()
+          .toLowerCase();
+        const budgetStatus = (providerData.budgetStatus ?? existing.budgetStatus ?? '')
+          .toString()
+          .toLowerCase();
+        const contractOk = ['signed', 'firmado', 'accepted', 'confirmado'].some((flag) =>
+          contractStatus.includes(flag)
+        );
+        const budgetOk = ['approved', 'aceptado', 'confirmado'].some((flag) =>
+          budgetStatus.includes(flag)
+        );
+
         const providerWithTimestamp = {
           ...providerData,
           updated: serverTimestamp(),
           date: providerData.date ? Timestamp.fromDate(new Date(providerData.date)) : null,
         };
 
+        if (contractOk && budgetOk && (providerData.status || existing.status) !== 'Confirmado') {
+          providerWithTimestamp.status = 'Confirmado';
+        }
+
         await updateDoc(providerRef, providerWithTimestamp);
 
-        // Actualizar estado local para reflejar cambios inmediatamente
         setProviders((prev) => {
           const updated = prev.map((p) =>
             p.id === providerId
@@ -316,6 +528,7 @@ export const useProveedores = () => {
                   ...p,
                   ...providerData,
                   id: providerId,
+                  status: providerWithTimestamp.status || providerData.status || p.status,
                   date: providerData.date ? providerData.date : p.date || '',
                 }
               : p
@@ -325,19 +538,51 @@ export const useProveedores = () => {
           } catch {}
           return updated;
         });
+
         setSelectedProvider((prev) =>
-          prev && prev.id === providerId ? { ...prev, ...providerData, id: providerId } : prev
+          prev && prev.id === providerId
+            ? {
+                ...prev,
+                ...providerData,
+                status: providerWithTimestamp.status || providerData.status || prev.status,
+                id: providerId,
+              }
+            : prev
         );
 
+        const finalStatus = providerWithTimestamp.status || providerData.status || existing.status;
+        if (finalStatus === 'Confirmado') {
+          try {
+            await recordSupplierInsight({
+              supplierId: providerId,
+              weddingId: activeWedding || null,
+              service: providerData.service || existing.service || '',
+              budget: parseBudgetValue(
+                providerData.budget ?? providerData.priceRange ?? existing.budget ?? existing.priceRange
+              ),
+              responseTimeMinutes: providerData.responseTimeMinutes ?? null,
+              satisfaction:
+                typeof providerData.satisfactionScore === 'number'
+                  ? providerData.satisfactionScore
+                  : null,
+              status: 'Confirmado',
+            });
+          } catch (err) {
+            console.warn('[useProveedores] recordSupplierInsight failed', err);
+          }
+        }
+
         setError(null);
+        return true;
       } catch (err) {
         console.error('Error al actualizar proveedor:', err);
         setError('Error al actualizar el proveedor. Inténtalo de nuevo.');
+        return false;
       } finally {
         setLoading(false);
       }
     },
-    [user, getCollectionPath]
+    [user, getCollectionPath, providers, activeWedding, applyFilters]
   );
 
   /**
@@ -350,14 +595,19 @@ export const useProveedores = () => {
     async (providerId, reservation) => {
       const provider = providers.find((p) => p.id === providerId);
       if (!provider) return false;
+
       const newReservations = Array.isArray(provider.reservations)
         ? [...provider.reservations, reservation]
         : [reservation];
-      // local update
-      const updatedProvider = { ...provider, reservations: newReservations };
-      setProviders((prev) => prev.map((p) => (p.id === providerId ? updatedProvider : p)));
-      applyFilters(providers.map((p) => (p.id === providerId ? updatedProvider : p)));
-      // firestore update
+
+      setProviders((prev) => {
+        const updated = prev.map((p) => (p.id === providerId ? { ...p, reservations: newReservations } : p));
+        try {
+          applyFilters(updated);
+        } catch {}
+        return updated;
+      });
+
       if (user) {
         try {
           const path = getCollectionPath();
@@ -372,9 +622,17 @@ export const useProveedores = () => {
           console.error('Error al guardar reserva', err);
         }
       }
+
+      await addMeetingEntry(providerId, {
+        type: 'reservation',
+        note: reservation?.note || '',
+        date: reservation?.date || new Date().toISOString(),
+        source: 'reservation_modal',
+      });
+
       return true;
     },
-    [providers, user, applyFilters, getCollectionPath]
+    [providers, user, getCollectionPath, applyFilters, addMeetingEntry]
   );
 
   const deleteProvider = useCallback(

@@ -649,13 +649,35 @@ export default function useFinance() {
           );
         }
 
+        const normalizeAttachment = (att) => ({
+          ...att,
+          storagePath: att.storagePath ?? null,
+        });
+
         if (keepAttachments.length > 0 || uploadedAttachments.length > 0) {
           const nowIso = new Date().toISOString();
           const attachments = [
-            ...keepAttachments,
+            ...keepAttachments.map(normalizeAttachment),
             ...uploadedAttachments.map((file) => ({ ...file, uploadedAt: nowIso })),
           ];
           payload.attachments = attachments;
+        }
+
+        const payloadMeta =
+          transactionData.meta && typeof transactionData.meta === 'object'
+            ? { ...transactionData.meta }
+            : {};
+        if (!payloadMeta.source) {
+          payloadMeta.source =
+            transactionData.source ||
+            (transactionData.description && /desde email:/i.test(transactionData.description)
+              ? 'email'
+              : 'manual');
+        }
+        payload.meta = payloadMeta;
+        payload.source = payloadMeta.source;
+        if (!payload.paymentMethod) {
+          delete payload.paymentMethod;
         }
 
         // Validar y normalizar con Zod
@@ -667,8 +689,10 @@ export default function useFinance() {
 
         const saved = await _addTransaction(payload);
 
-        const updatedTransactions = [...transactions, saved];
-        saveData('movements', updatedTransactions, {
+        const baseTransactions = Array.isArray(transactions) ? transactions : [];
+        const updatedTransactions = [...baseTransactions, saved];
+        const trimmedTransactions = updatedTransactions.slice(-200);
+        saveData('movements', trimmedTransactions, {
           docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
           showNotification: false,
         });
@@ -794,10 +818,29 @@ export default function useFinance() {
         if (hasAttachmentsSpec) {
           const nowIso = new Date().toISOString();
           const attachments = [
-            ...keepAttachments,
+            ...keepAttachments.map((att) => ({ ...att, storagePath: att.storagePath ?? null })),
             ...uploadedAttachments.map((file) => ({ ...file, uploadedAt: nowIso })),
           ];
           payload.attachments = attachments;
+        }
+
+        const payloadMeta =
+          changes?.meta && typeof changes.meta === 'object'
+            ? { ...changes.meta }
+            : existing?.meta
+            ? { ...existing.meta }
+            : {};
+        if (!payloadMeta.source) {
+          const inferredSource =
+            changes?.source ||
+            payload?.source ||
+            (existing?.meta?.source ? existing.meta.source : 'manual');
+          payloadMeta.source = inferredSource;
+        }
+        payload.meta = payloadMeta;
+        payload.source = payloadMeta.source;
+        if (payload.paymentMethod === '') {
+          delete payload.paymentMethod;
         }
 
         // Validar update parcial
@@ -808,6 +851,15 @@ export default function useFinance() {
         payload = parsed.data;
 
         await _updateTransaction(id, payload);
+        const baseTransactions = Array.isArray(transactions) ? transactions : [];
+        const updatedList = baseTransactions.map((tx) =>
+          tx.id === id ? { ...tx, ...payload } : tx
+        );
+        const trimmed = updatedList.slice(-200);
+        saveData('movements', trimmed, {
+          docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
+          showNotification: false,
+        });
         return { success: true };
       } catch (err) {
         console.error('Error actualizando transacción:', err);
@@ -821,13 +873,20 @@ export default function useFinance() {
     async (id) => {
       try {
         await _deleteTransaction(id);
+        const baseTransactions = Array.isArray(transactions) ? transactions : [];
+        const updatedList = baseTransactions.filter((tx) => tx.id !== id);
+        const trimmed = updatedList.slice(-200);
+        saveData('movements', trimmed, {
+          docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
+          showNotification: false,
+        });
         return { success: true };
       } catch (err) {
         console.error('Error eliminando transacción:', err);
         return { success: false, error: err.message };
       }
     },
-    [_deleteTransaction]
+    [_deleteTransaction, transactions, activeWedding]
   );
 
   // Importar transacciones bancarias desde backend (opcional)
@@ -862,12 +921,19 @@ export default function useFinance() {
             status: type === 'expense' ? 'paid' : 'received',
             paidAmount: amount,
             source: 'bank',
+            meta: {
+              source: 'bank',
+              bankId: options.bankId || null,
+              providerAccount: transaction.accountId || null,
+            },
           });
         }
 
         return { success: true, imported: bankTransactions.length };
       } catch (err) {
-        console.error('Error importando transacciones bancarias:', err);
+        console.warn('Error importando transacciones bancarias:', err);
+        setHasBankAccount(false);
+        setError(err?.message || 'Error importando transacciones bancarias');
         return { success: false, error: err.message };
       } finally {
         setIsLoading(false);

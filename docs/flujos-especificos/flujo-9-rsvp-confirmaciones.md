@@ -49,8 +49,8 @@
 - Flujo 3 (Gestion de invitados) consume y actualiza estados RSVP.
 - Flujo 4 (Seating) recibe listas de confirmados y acompanantes.
 - Flujo 6 (Presupuesto) ajusta conteo de menus y estimaciones.
-- Flujo 7/20 usan resultados para segmentar emails/buzon interno.
-- Flujo 11 y 14 actualizan tareas segun progreso de confirmaciones.
+- Flujo 7/20 usan resultados para segmentar emails/buzon interno; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) convierte confirmaciones en acciones automáticas.
+- Flujos 11A/11B sincronizan aforo y orden de ceremonia; Flujo 11C ajusta checklist según confirmaciones, además de las tareas del flujo 14.
 
 ## 8. Metricas y monitorizacion
 - Eventos: `rsvp_invitation_sent`, `rsvp_completed`, `rsvp_declined`, `rsvp_reminder_sent`.

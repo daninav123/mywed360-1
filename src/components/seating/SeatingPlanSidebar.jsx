@@ -6,18 +6,12 @@
 import {
   Settings,
   Users,
-  Maximize2,
-  RotateCcw,
   Move,
   Hand,
-  Pencil,
   Minus,
   Square,
-  Zap,
   Search,
   UserPlus,
-  MousePointer,
-  Edit3,
   Eraser,
   DoorOpen,
   Hexagon,
@@ -29,11 +23,11 @@ import React, { useMemo, useState } from 'react';
 import TableEditor from './TableEditor';
 import useTranslations from '../../hooks/useTranslations';
 import GuestItem from '../GuestItem';
+import { TABLE_TYPES, computeTableCapacity } from '../../utils/seatingTables';
 
 const SeatingPlanSidebar = ({
   selectedTable,
   onTableDimensionChange,
-  onToggleTableShape,
   onConfigureTable,
   guests = [],
   tab,
@@ -127,6 +121,30 @@ const SeatingPlanSidebar = ({
   const assignedGuests = useMemo(() => {
     return guests.filter((guest) => guest.tableId === selectedTable?.id);
   }, [guests, selectedTable?.id]);
+
+  const selectedTableType = useMemo(() => {
+    if (!selectedTable) return null;
+    const typeId =
+      selectedTable.tableType ||
+      (selectedTable.shape === 'circle' ? 'round' : 'square');
+    return TABLE_TYPES.find((t) => t.id === typeId) || null;
+  }, [selectedTable?.tableType, selectedTable?.shape]);
+
+  const recommendedCapacity = useMemo(() => {
+    if (!selectedTable) return 0;
+    return computeTableCapacity(selectedTable);
+  }, [selectedTable]);
+
+  const assignedGuestsWithCompanions = useMemo(() => {
+    return assignedGuests.reduce(
+      (sum, guest) => sum + 1 + (parseInt(guest?.companion, 10) || 0),
+      0
+    );
+  }, [assignedGuests]);
+
+  const remainingCapacity = selectedTable
+    ? (selectedTable.seats || 0) - assignedGuestsWithCompanions
+    : 0;
 
   const guidedSuggestions = (() => {
     try {
@@ -575,7 +593,7 @@ const SeatingPlanSidebar = ({
             {/* Información básica */}
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">{t('seating.sidebar.type')}:</span>
+                <span className="text-gray-600">{t('seating.sidebar.scope', { defaultValue: 'Espacio' })}:</span>
                 <span className="font-medium capitalize">
                   {tab === 'ceremony'
                     ? t('seating.toolbar.ceremony')
@@ -586,63 +604,57 @@ const SeatingPlanSidebar = ({
               {tab === 'banquet' && (
                 <>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">{t('seating.sidebar.seats')}:</span>
-                    <span className="font-medium">{selectedTable.seats || 8}</span>
+                    <span className="text-gray-600">
+                      {t('seating.sidebar.tableType', { defaultValue: 'Tipo de mesa' })}:
+                    </span>
+                    <span className="font-medium">
+                      {selectedTableType?.label || t('common.custom', { defaultValue: 'Personalizada' })}
+                    </span>
                   </div>
-
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">{t('seating.sidebar.shape')}:</span>
-                    <button
-                      onClick={onToggleTableShape}
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-700"
-                    >
-                      <span className="capitalize">{selectedTable.shape || 'rectangle'}</span>
-                      <RotateCcw className="h-3 w-3" />
-                    </button>
+                    <span className="text-gray-600">
+                      {t('seating.sidebar.capacity', { defaultValue: 'Capacidad' })}:
+                    </span>
+                    <span className="font-medium">
+                      {(selectedTable.seats || 0)} {t('seating.sidebar.guests', { defaultValue: 'invitados' })}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {t('seating.sidebar.assignedCount', {
+                      defaultValue: 'Asignados (incluye acompañantes): {count}',
+                      count: assignedGuestsWithCompanions,
+                    })}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {selectedTable.autoCapacity !== false
+                      ? t('seating.sidebar.autoCapacity', {
+                          defaultValue: 'Capacidad calculada automáticamente (sugerido {count})',
+                          count: recommendedCapacity || 0,
+                        })
+                      : t('seating.sidebar.manualCapacity', {
+                          defaultValue: 'Capacidad manual: {current}. Recomendado {recommended}',
+                          current: selectedTable.seats || 0,
+                          recommended: recommendedCapacity || 0,
+                        })}
+                  </div>
+                  <div
+                    className={`text-xs ${
+                      remainingCapacity < 0 ? 'text-red-600' : 'text-gray-500'
+                    }`}
+                  >
+                    {remainingCapacity < 0
+                      ? t('seating.sidebar.capacityExceeded', {
+                          defaultValue: 'Capacidad excedida por {count} invitado(s)',
+                          count: Math.abs(remainingCapacity),
+                        })
+                      : t('seating.sidebar.capacityRemaining', {
+                          defaultValue: 'Quedan {count} invitado(s) disponibles',
+                          count: remainingCapacity,
+                        })}
                   </div>
                 </>
               )}
             </div>
-
-            {/* Dimensiones */}
-            {tab === 'banquet' && (
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1">
-                  <Maximize2 className="h-4 w-4" />
-                  {t('seating.sidebar.dimensions')}
-                </h4>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      {t('seating.sidebar.widthCm')}
-                    </label>
-                    <input
-                      type="number"
-                      min="20"
-                      max="400"
-                      value={selectedTable.width || 80}
-                      onChange={(e) => onTableDimensionChange?.('width', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">
-                      {t('seating.sidebar.lengthCm')}
-                    </label>
-                    <input
-                      type="number"
-                      min="20"
-                      max="400"
-                      value={selectedTable.height || selectedTable.length || 60}
-                      onChange={(e) => onTableDimensionChange?.('height', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Invitados asignados a esta mesa */}
             <div className="space-y-3">

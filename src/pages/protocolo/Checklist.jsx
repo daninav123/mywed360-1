@@ -9,6 +9,7 @@ import { Button } from '../../components/ui';
 import { useWedding } from '../../context/WeddingContext';
 import { useProveedores } from '../../hooks/useProveedores';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
+import CeremonyChecklist from '../../components/protocolo/CeremonyChecklist';
 
 export default function Checklist() {
   const { activeWedding } = useWedding();
@@ -120,6 +121,8 @@ export default function Checklist() {
 
   return (
     <PageWrapper title="Checklist de última hora">
+      <CeremonyChecklist />
+
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <p className="text-gray-600">Resumen rápido de lo imprescindible a última hora.</p>
@@ -254,4 +257,3 @@ export default function Checklist() {
     </PageWrapper>
   );
 }
-

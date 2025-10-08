@@ -52,16 +52,29 @@ export default function FinanceStatsHeader({
         <Button
           variant="outline"
           leftIcon={<Upload size={16} />}
-          onClick={onImportCSV}
-          disabled={isLoading || csvLoading}
+          onClick={(e) => {
+            e.preventDefault();
+            onImportCSV?.();
+          }}
+          disabled
+          title={t('finance.transactions.importComingSoon', { defaultValue: 'Importación CSV disponible próximamente' })}
         >
           {t('finance.transactions.importCSV', { defaultValue: 'Importar CSV' })}
         </Button>
-        <Button variant="outline" leftIcon={<Download size={16} />} onClick={onExportCSV}>
+        <Button
+          variant="outline"
+          leftIcon={<Download size={16} />}
+          onClick={(e) => {
+            e.preventDefault();
+            onExportCSV?.();
+          }}
+          disabled
+          title={t('finance.transactions.exportComingSoon', { defaultValue: 'Exportación CSV disponible próximamente' })}
+        >
           {t('finance.transactions.exportCSV', { defaultValue: 'Exportar CSV' })}
         </Button>
         <Button leftIcon={<Plus size={16} />} onClick={onNew}>
-          {t('finance.transactions.new', { defaultValue: 'Nueva transacci€)n' })}
+          {t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}
         </Button>
       </div>
     </div>

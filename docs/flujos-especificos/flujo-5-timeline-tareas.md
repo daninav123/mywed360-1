@@ -39,10 +39,10 @@
 - Feeds iCal requieren sesión válida y se revocan si se desactiva enlace.
 
 ## 6. Estados especiales y errores
-- Checklist vacía ? CTA "Importar plantilla recomendada".
-- Exceso de tareas vencidas ? banner y sugerencia de reasignación.
-- Error al generar feed iCal ? mensaje con reintento y consulta al backend.
-- Modo offline ? cola local con reintento automático.
+- Checklist vacía → CTA "Importar plantilla recomendada".
+- Exceso de tareas vencidas → banner y sugerencia de reasignación.
+- Error al generar feed iCal → mensaje con reintento y consulta al backend.
+- Modo offline → cola local con reintento automático.
 
 ## 7. Integración con otros flujos
 - Flujo 2 crea seeds iniciales (onboarding).
@@ -58,8 +58,8 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: reducers de tareas/checklist, validadores de dependencias, generador iCal.
-- Integración: crear tarea desde proveedor ? verificar en checklist ? feed iCal incluye evento.
-- E2E: aplicar plantilla ? mover en kanban ? editar calendario ? validar notificación.
+- Integración: crear tarea desde proveedor → verificar en checklist → feed iCal incluye evento.
+- E2E: aplicar plantilla → mover en kanban → editar calendario → validar notificación.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore actualizadas (`tasks`, `checklist`, `taskAutomations`).

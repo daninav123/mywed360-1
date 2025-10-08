@@ -34,10 +34,10 @@
 - Favoritos sincronizados se comparten entre dispositivos del mismo usuario.
 
 ## 6. Estados especiales y errores
-- Galería sin resultados ? mensaje y CTA cambiar búsqueda/tag.
-- Error fetch inspiración ? fallback contenido local.
-- Generador legal sin datos ? validaciones de formulario.
-- Modo offline ? banner informando almacenamiento local.
+- Galería sin resultados → mensaje y CTA cambiar búsqueda/tag.
+- Error fetch inspiración → fallback contenido local.
+- Generador legal sin datos → validaciones de formulario.
+- Modo offline → banner informando almacenamiento local.
 
 ## 7. Integración con otros flujos
 - Flujo 8 reutiliza assets para sitio web.
@@ -52,8 +52,8 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: `InspirationGallery` filtros/favoritos, `SyncService` sincronización, generador PDF.
-- Integración: guardar favorito ? sync ? ver en otro dispositivo ? usar en sitio web.
-- E2E: flujo inspiración ? crear nota ? publicar blog ? generar documento legal.
+- Integración: guardar favorito → sync → ver en otro dispositivo → usar en sitio web.
+- E2E: flujo inspiración → crear nota → publicar blog → generar documento legal.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para colecciones de contenido.

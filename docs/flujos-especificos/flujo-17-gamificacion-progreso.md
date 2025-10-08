@@ -47,7 +47,7 @@
 
 ## 7. Integracion con otros flujos
 - Flujo 14/6 actualizan progreso a partir de tareas y presupuesto.
-- Flujo 3/9 suma puntos por confirmar invitados y completar RSVP.
+- Flujo 3/9 suma puntos por confirmar invitados y completar RSVP; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) registra eventos automáticos para aplicar recompensas.
 - Flujo 5/15 otorga logros por contratos firmados y proveedores confirmados.
 - Flujo 16 permite que el asistente IA sugiera metas gamificadas.
 - Flujo 22 muestra resumen en panel general.

@@ -47,7 +47,7 @@
 
 ## 7. Integracion con otros flujos
 - Flujo 5/15 usa contratos generados para proveedores y seguimiento.
-- Flujo 11 incorpora documentos a protocolo de ceremonia.
+- Flujos 11C/11D usan las guías y plantillas generadas para checklist y documentación de ceremonia.
 - Flujo 3/9 genera cesiones de imagen para invitados.
 - Flujo 14 crea tareas de revision y auditoria.
 - Flujo 16 obtiene prompts para IA y respuestas de soporte.

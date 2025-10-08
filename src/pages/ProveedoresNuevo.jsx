@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from 'lucide-react';
+﻿import { Plus, Sparkles } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -11,10 +11,13 @@ import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorM
 import ProveedorCard from '../components/proveedores/ProveedorCard';
 import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ProveedorList from '../components/proveedores/ProveedorList';
+import ProviderSearchDrawer from '../components/proveedores/ProviderSearchDrawer';
 import ReservationModal from '../components/proveedores/ReservationModal';
 import SupplierOnboardingModal from '../components/proveedores/SupplierOnboardingModal';
 import TrackingModal from '../components/proveedores/tracking/TrackingModal';
 import WantedServicesModal from '../components/proveedores/WantedServicesModal';
+import ServicesBoard from '../components/proveedores/ServicesBoard';
+import SupplierKanban from '../components/proveedores/SupplierKanban';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import PageTabs from '../components/ui/PageTabs';
@@ -29,6 +32,7 @@ import { useAuth } from '../hooks/useAuth';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierGroups from '../hooks/useSupplierGroups';
 import { loadData, saveData } from '../services/SyncService';
+import { loadTrackingRecords, TRACKING_STATUS } from '../services/EmailTrackingService';
 
 const Proveedores = () => {
   const {
@@ -100,6 +104,13 @@ const Proveedores = () => {
   // Servicios deseaños
   const [wantedServices, setWantedServices] = useState([]);
   const [showWantedModal, setShowWantedModal] = useState(false);
+  const [newProviderInitial, setNewProviderInitial] = useState(null);
+  const [showBuscadosKanban, setShowBuscadosKanban] = useState(false);
+  const [unreadMap, setUnreadMap] = useState({});
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
+  const [searchDrawerResult, setSearchDrawerResult] = useState(null);
+  const [searchDrawerLoading, setSearchDrawerLoading] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
 
   const normalizedWanted = useMemo(() => {
     return (wantedServices || [])
@@ -223,6 +234,39 @@ const Proveedores = () => {
     if (user) loadProviders();
   }, [user, loadProviders]);
 
+  const computeUnreadMap = useCallback(() => {
+    const records = loadTrackingRecords();
+    const pendingStatuses = [
+      TRACKING_STATUS?.WAITING,
+      TRACKING_STATUS?.FOLLOWUP,
+      TRACKING_STATUS?.URGENT,
+    ].filter(Boolean);
+    const byEmail = {};
+    (providers || []).forEach((prov) => {
+      if (prov.email) byEmail[String(prov.email).toLowerCase()] = prov.id;
+    });
+    const map = {};
+    (Array.isArray(records) ? records : []).forEach((record) => {
+      const status = record?.status;
+      const isPending = pendingStatuses.length
+        ? pendingStatuses.includes(status)
+        : status !== TRACKING_STATUS?.RESPONDED && status !== 'responded';
+      if (!isPending) return;
+      const providerId = record?.providerId || byEmail[String(record?.providerEmail || '').toLowerCase()];
+      if (providerId) map[providerId] = true;
+    });
+    return map;
+  }, [providers]);
+
+  useEffect(() => {
+    try {
+      setUnreadMap(computeUnreadMap());
+    } catch (err) {
+      console.warn('No se pudieron calcular indicadores de seguimiento', err);
+      setUnreadMap({});
+    }
+  }, [computeUnreadMap]);
+
   // Registrar resultado de pago de Stripe desde query paramás
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -288,22 +332,54 @@ const Proveedores = () => {
     };
   }, [activeWedding]);
 
+  const normalizedProviders = useMemo(() => {
+    const mapEstado = (status) => {
+      const value = String(status || '').toLowerCase();
+      if (value.includes('confirm')) return 'Contratado';
+      if (value.includes('seleccion') || value.includes('presup')) return 'Presupuestos';
+      if (value.includes('contact')) return 'Contactado';
+      if (value.includes('rechaz')) return 'Rechazado';
+      return 'Por definir';
+    };
+    return (providers || []).map((prov) => ({
+      ...prov,
+      nombre: prov.name || prov.nombre || prov.contact || 'Proveedor',
+      servicio: prov.service || prov.servicio || 'Servicio',
+      estado: mapEstado(prov.status || prov.estado),
+      favorito: Boolean(prov.favorite || prov.favorito),
+      presupuesto: prov.priceRange || prov.presupuesto || 0,
+      presupuestoAsignado: prov.assignedBudget || prov.presupuestoAsignado || 0,
+      gastado: prov.spent || prov.gastado || 0,
+      proximaAccion: prov.nextAction || prov.proximaAccion || '',
+    }));
+  }, [providers]);
+
   const mássingServices = useMemo(() => {
     const confirmed = new Set(
-      (providers || [])
-        .filter((p) => ['Confirmado', 'Seleccionado'].includes(p.status))
-        .map((p) => p.service)
+      (normalizedProviders || [])
+        .filter((p) => ['contratado', 'presupuestos'].some((flag) => p.estado.toLowerCase().includes(flag)))
+        .map((p) => p.servicio)
         .filter(Boolean)
     );
     return normalizedWanted.filter((s) => !confirmed.has(s.name || s.id));
-  }, [providers, normalizedWanted]);
+  }, [normalizedProviders, normalizedWanted]);
 
   // Handlers
   const handleViewDetail = (provider) => {
+    if (!provider) return;
     setSelectedProvider(provider);
     setActiveTab('info');
+    setUnreadMap((prev) => {
+      if (!prev || !prev[provider.id]) return prev || {};
+      const next = { ...prev };
+      delete next[provider.id];
+      return next;
+    });
   };
-  const handleNewProvider = () => setShowNewProviderForm(true);
+  const handleNewProvider = () => {
+    setNewProviderInitial(null);
+    setShowNewProviderForm(true);
+  };
   const handleEditProvider = () => setShowEditProviderForm(true);
   const handleReserveProvider = (provider) => {
     setSelectedProvider(provider);
@@ -339,6 +415,98 @@ const Proveedores = () => {
       }
     } catch {}
   };
+
+  const handleOpenSearchDrawer = () => {
+    setSearchDrawerResult(null);
+    setSearchDrawerLoading(false);
+    setSearchDrawerOpen(true);
+  };
+
+  const handleCloseSearchDrawer = () => {
+    setSearchDrawerOpen(false);
+    setSearchDrawerResult(null);
+    setSearchDrawerLoading(false);
+  };
+
+  const handleDrawerSearch = useCallback(
+    async (query) => {
+      if (!query) return;
+      setSearchDrawerLoading(true);
+      try {
+        const results = await searchProviders(query);
+        setSearchHistory((prev) => [...prev.slice(-4), query]);
+        if (Array.isArray(results) && results.length) {
+          setSearchDrawerResult(results[0]);
+        } else {
+          setSearchDrawerResult(null);
+        }
+      } catch (err) {
+        console.warn('Búsqueda IA fallback', err);
+        setSearchDrawerResult(null);
+      } finally {
+        setSearchDrawerLoading(false);
+      }
+    },
+    [searchProviders]
+  );
+
+  const handleDrawerSave = useCallback(
+    (result) => {
+      if (!result) return;
+      const normalized = mapAIResultToProvider(result);
+      if (!normalized) return;
+      setNewProviderInitial(normalized);
+      setShowNewProviderForm(true);
+      handleCloseSearchDrawer();
+    },
+    [mapAIResultToProvider, handleCloseSearchDrawer]
+  );
+
+  const handleBoardSearch = useCallback(
+    (service) => {
+      if (service) setServiceFilter(service);
+      handleOpenSearchDrawer();
+    },
+    [handleOpenSearchDrawer, setServiceFilter]
+  );
+
+  const handleBoardOpenAI = useCallback(
+    (service) => {
+      if (service) setServiceFilter(service);
+      handleOpenAISearch();
+    },
+    [handleOpenAISearch, setServiceFilter]
+  );
+
+  const handleBoardAdd = useCallback(
+    (service) => {
+      setNewProviderInitial({
+        name: '',
+        service: service || '',
+        status: 'Pendiente',
+      });
+      setShowNewProviderForm(true);
+    },
+    []
+  );
+
+  const handleKanbanMove = useCallback(
+    async (prov, targetKey) => {
+      if (!prov || !targetKey) return;
+      const statusMap = {
+        vacio: 'Pendiente',
+        proceso: 'Contactado',
+        presupuestos: 'Seleccionado',
+        contratado: 'Confirmado',
+        rechazado: 'Rechazado',
+      };
+      const newStatus = statusMap[targetKey] || 'Pendiente';
+      const current = (providers || []).find((p) => p.id === prov.id);
+      if (!current || current.status === newStatus) return;
+      await updateProvider(current.id, { ...current, status: newStatus });
+    },
+    [providers, updateProvider]
+  );
 
   const openCompareModal = () => {
     if (!selectedProviderIds.length) return;
@@ -437,8 +605,12 @@ const Proveedores = () => {
       await updateProvider(selectedProvider.id, providerData);
       setShowEditProviderForm(false);
     } else {
-      await addProvider(providerData);
+      const created = await addProvider(providerData);
+      if (created?.id) {
+        setUnreadMap((prev) => ({ ...prev, [created.id]: true }));
+      }
       setShowNewProviderForm(false);
+      setNewProviderInitial(null);
     }
   };
 
@@ -602,7 +774,10 @@ const Proveedores = () => {
           {tab === 'contrataños' && mássingServices.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {mássingServices.map((s) => (
-                <Card key={s.id || s.name} className="opacity-60 border-dashed">
+                <Card
+                  key={s.id || s.name}
+                  className="border border-dashed border-gray-300 bg-white/60 backdrop-blur-sm"
+                >
                   <div className="flex itemás-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">{s.name || s.id}</h3>
                     <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-body">
@@ -616,12 +791,12 @@ const Proveedores = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => {
-                        setServiceFilter(s.name || s.id);
-                        setShowAISearchModal(true);
-                      }}
+                      onClick={() => handleBoardSearch(s.name || s.id)}
                     >
                       Buscar con IA
+                    </Button>
+                    <Button size="sm" onClick={() => handleBoardAdd(s.name || s.id)}>
+                      Añadir manualmente
                     </Button>
                   </div>
                 </Card>
@@ -629,88 +804,163 @@ const Proveedores = () => {
             </div>
           )}
 
+          {tab === 'contrataños' && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Card>
+                <div className="text-sm text-muted">Proveedores contratados</div>
+                <div className="text-2xl font-semibold">{contractedProviders.length}</div>
+              </Card>
+              <Card>
+                <div className="text-sm text-muted">En negociación de presupuesto</div>
+                <div className="text-2xl font-semibold">{budgetStageProviders.length}</div>
+              </Card>
+              <Card>
+                <div className="text-sm text-muted">Servicios cubiertos</div>
+                <div className="text-2xl font-semibold">{servicesCovered.size}</div>
+              </Card>
+            </div>
+          )}
+
           {/* Lista de proveedores con filtros */}
           {tab === 'buscaños' ? (
             <div className="space-y-6">
-              {/* Barra de acciones para seleccionaños */}
-              {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
-                <div className="flex flex-wrap itemás-center gap-2 text-sm text-muted">
-                  <span>{selectedProviderIds.length} seleccionaños</span>
-                  <button
-                    type="button"
-                    onClick={openCompareModal}
-                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
-                  >
-                    Comparar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={openBulkStatusModal}
-                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
-                  >
-                    Cambiar estado
-                  </button>
-                  <button
-                    type="button"
-                    onClick={openGroupSelectedModal}
-                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
-                  >
-                    Agrupar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={openDuplicatesModal}
-                    className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
-                  >
-                    Revisar duplicaños
-                  </button>
-                  <button
-                    type="button"
-                    onClick={clearSelection}
-                    className="px-3 py-1 border border-soft rounded-md text-muted hover:bg-primary-soft"
-                  >
-                    Limpiar
-                  </button>
+              <ServicesBoard
+                proveedores={normalizedProviders}
+                onOpenSearch={handleBoardSearch}
+                onOpenAI={handleBoardOpenAI}
+                onOpenNew={handleBoardAdd}
+              />
+              {searchHistory.length > 0 && (
+                <div className="text-xs text-gray-500">
+                  Últimas búsquedas IA: {searchHistory.slice(-3).join(', ')}
                 </div>
               )}
-              {groupedByService.keys.map((svc) => (
-                <div key={svc}>
+
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted">Vista:</span>
                   <button
                     type="button"
-                    onClick={() => {
-                      setExpandedGroups((prev) => ({ ...prev, [svc]: !(prev?.[svc] === false) }));
-                    }}
-                    className="flex itemás-center gap-2 mb-2"
+                    onClick={() => setShowBuscadosKanban(false)}
+                    className={`px-2 py-1 rounded border text-xs ${
+                      !showBuscadosKanban
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
+                        : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'
+                    }`}
                   >
-                    <span className="text-lg font-semibold">{svc}</span>
-                    <span className="text-xs text-muted">
-                      {expandedGroups?.[svc] === false ? '(mástrar)' : '(ocultar)'}
-                    </span>
+                    Lista
                   </button>
-                  {expandedGroups?.[svc] === false ? null : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {groupedByService.groups[svc].map((provider) => (
-                        <ProveedorCard
-                          key={provider.id}
-                          provider={provider}
-                          isSelected={selectedProviderIds?.includes?.(provider.id)}
-                          onToggleSelect={() => toggleSelectProvider(provider.id)}
-                          onViewDetail={() => handleViewDetail(provider)}
-                          onToggleFavorite={toggleFavoriteProvider}
-                          onEdit={() => handleEdit(provider)}
-                          onDelete={() => handleDelete(provider.id)}
-                          onReserve={() => handleReserveProvider(provider)}
-                          onShowTracking={(item) => {
-                            setTrackingItem(item || null);
-                            setShowTrackingModal(!!item);
-                          }}
-                          onOpenGroups={handleOpenGroups}
-                        />
-                      ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowBuscadosKanban(true)}
+                    className={`px-2 py-1 rounded border text-xs ${
+                      showBuscadosKanban
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
+                        : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'
+                    }`}
+                  >
+                    Kanban
+                  </button>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={handleOpenSearchDrawer}>
+                    Búsqueda IA contextual
+                  </Button>
+                </div>
+              </div>
+
+              {showBuscadosKanban ? (
+                <SupplierKanban
+                  proveedores={normalizedProviders}
+                  onMove={handleKanbanMove}
+                  onClick={(prov) => {
+                    const original = providers.find((p) => p.id === prov.id) || prov;
+                    handleViewDetail(original);
+                  }}
+                />
+              ) : (
+                <>
+                  {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
+                    <div className="flex flex-wrap itemás-center gap-2 text-sm text-muted">
+                      <span>{selectedProviderIds.length} seleccionados</span>
+                      <button
+                        type="button"
+                        onClick={openCompareModal}
+                        className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
+                      >
+                        Comparar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={openBulkStatusModal}
+                        className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
+                      >
+                        Cambiar estado
+                      </button>
+                      <button
+                        type="button"
+                        onClick={openGroupSelectedModal}
+                        className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
+                      >
+                        Agrupar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={openDuplicatesModal}
+                        className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft"
+                      >
+                        Revisar duplicaños
+                      </button>
+                      <button
+                        type="button"
+                        onClick={clearSelection}
+                        className="px-3 py-1 border border-soft rounded-md text-muted hover:bg-primary-soft"
+                      >
+                        Limpiar
+                      </button>
                     </div>
                   )}
-                </div>
-              ))}
+                  {groupedByService.keys.map((svc) => (
+                    <div key={svc}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setExpandedGroups((prev) => ({ ...prev, [svc]: !(prev?.[svc] === false) }));
+                        }}
+                        className="flex itemás-center gap-2 mb-2"
+                      >
+                        <span className="text-lg font-semibold">{svc}</span>
+                        <span className="text-xs text-muted">
+                          {expandedGroups?.[svc] === false ? '(mástrar)' : '(ocultar)'}
+                        </span>
+                      </button>
+                      {expandedGroups?.[svc] === false ? null : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {groupedByService.groups[svc].map((provider) => (
+                            <ProveedorCard
+                              key={provider.id}
+                              provider={provider}
+                              isSelected={selectedProviderIds?.includes?.(provider.id)}
+                              onToggleSelect={() => toggleSelectProvider(provider.id)}
+                              onViewDetail={() => handleViewDetail(provider)}
+                              onToggleFavorite={toggleFavoriteProvider}
+                              onEdit={() => handleEdit(provider)}
+                              onDelete={() => handleDelete(provider.id)}
+                              onReserve={() => handleReserveProvider(provider)}
+                              onShowTracking={(item) => {
+                                setTrackingItem(item || null);
+                                setShowTrackingModal(!!item);
+                              }}
+                              onOpenGroups={handleOpenGroups}
+                              hasPending={Boolean(unreadMap[provider.id])}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           ) : (
             <ProveedorList
@@ -745,6 +995,7 @@ const Proveedores = () => {
               onOpenDuplicates={openDuplicatesModal}
               onOpenGroupSelected={openGroupSelectedModal}
               onClearSelection={clearSelection}
+              hasPendingMap={unreadMap}
             />
           )}
         </div>
@@ -754,8 +1005,12 @@ const Proveedores = () => {
       {showNewProviderForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
           <ProveedorForm
+            initialData={newProviderInitial || undefined}
             onSubmit={handleSubmitProvider}
-            onCancel={() => setShowNewProviderForm(false)}
+            onCancel={() => {
+              setShowNewProviderForm(false);
+              setNewProviderInitial(null);
+            }}
           />
         </div>
       )}
@@ -782,6 +1037,15 @@ const Proveedores = () => {
         providers={providers}
         serviceFilter={serviceFilter}
         setServiceFilter={setServiceFilter}
+      />
+
+      <ProviderSearchDrawer
+        open={searchDrawerOpen}
+        onClose={handleCloseSearchDrawer}
+        onBuscar={handleDrawerSearch}
+        onGuardar={handleDrawerSave}
+        resultado={searchDrawerResult}
+        cargando={searchDrawerLoading}
       />
 
       {showAIEmailModal && aiSelectedResult && (
@@ -891,5 +1155,6 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
 
 

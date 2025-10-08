@@ -27,6 +27,7 @@ const ProveedorList = ({
   onOpenCompare,
   onOpenBulkStatus,
   onOpenDuplicates,
+  onOpenGroupSelected,
   onClearSelection,
   // filtros
   searchTerm,
@@ -42,6 +43,7 @@ const ProveedorList = ({
   ratingMin,
   setRatingMin,
   clearFilters,
+  hasPendingMap = {},
 }) => {
   const navigate = useNavigate();
 
@@ -217,6 +219,15 @@ const ProveedorList = ({
             Comparar
           </button>
         )}
+        {typeof onOpenGroupSelected === 'function' && (
+          <button
+            type="button"
+            onClick={onOpenGroupSelected}
+            className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
+          >
+            Agrupar
+          </button>
+        )}
         {typeof onOpenBulkStatus === 'function' && (
           <button
             type="button"
@@ -267,6 +278,8 @@ const ProveedorList = ({
                   onDelete={onDelete ? () => onDelete(provider.id) : undefined}
                   onReserve={onReserve ? () => onReserve(provider) : undefined}
                   onShowTracking={onShowTracking}
+                  onOpenGroups={onOpenGroupSelected}
+                  hasPending={Boolean(hasPendingMap?.[provider.id])}
                 />
               ))
             ) : (
@@ -298,6 +311,8 @@ const ProveedorList = ({
             onDelete={onDelete ? () => onDelete(provider.id) : undefined}
             onReserve={onReserve ? () => onReserve(provider) : undefined}
             onShowTracking={onShowTracking}
+            onOpenGroups={onOpenGroupSelected}
+            hasPending={Boolean(hasPendingMap?.[provider.id])}
           />
         </div>
       );

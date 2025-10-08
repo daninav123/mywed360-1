@@ -158,6 +158,7 @@ function Finance() {
               thresholds={settings?.alertThresholds}
               isLoading={isLoading}
               transactions={transactions}
+              projection={projection}
             />
           </div>
         )}
@@ -165,7 +166,13 @@ function Finance() {
         {/* Contenido: Transacciones */}
         {activeTab === 'transactions' && (
           <div className="space-y-6">
-            <PaymentSuggestions onCreateTransaction={createTransaction} isLoading={isLoading} providers={supplierProviders} />
+            <PaymentSuggestions
+              onCreateTransaction={createTransaction}
+              isLoading={isLoading}
+              providers={supplierProviders}
+              enabled={!hasBankAccount}
+              disabledMessage="Con la cuenta bancaria vinculada importamos los movimientos directamente, por lo que las sugerencias del correo quedan desactivadas."
+            />
             {/* Vista rápida: transacciones registradas desde emails */}
             <div className="p-3 border rounded bg-white/60">
               <div className="flex items-center justify-between mb-2">

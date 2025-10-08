@@ -1,13 +1,16 @@
 import { Eye, Edit2, Trash2, Calendar, Star, MapPin, Users } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
 import ProveedorDetail from './ProveedorDetail';
-import ProviderEmailModal from './ProviderEmailModal';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
+import Alert from '../../components/ui/Alert';
+import useProviderEmail from '../../hooks/useProviderEmail.jsx';
 import useSupplierBudgets from '../../hooks/useSupplierBudgets';
+import { useAuth } from '../../hooks/useAuth';
 import * as EmailService from '../../services/emailService';
+import EmailTemplateService from '../../services/EmailTemplateService';
 import { loadTrackingRecords } from '../../services/EmailTrackingService';
 
 /**
@@ -41,15 +44,26 @@ const ProveedorCard = ({
   onShowTracking,
   onOpenGroups,
   budgetsOverride,
+  hasPending = false,
 }) => {
+  const { userProfile } = useAuth();
+  const {
+    sendEmailToProvider,
+    generateDefaultSubject,
+    generateDefaultEmailBody,
+    loading: sendingEmail,
+    error: providerEmailError,
+  } = useProviderEmail();
   const [showDetail, setShowDetail] = useState(false);
   const [detailTab, setDetailTab] = useState('info');
-  const [showEmail, setShowEmail] = useState(false);
   const [tracking, setTracking] = useState(null);
   const [showAssign, setShowAssign] = useState(false);
   const [emails, setEmails] = useState([]);
   const [emailsOpen, setEmailsOpen] = useState(false);
   const [emailsLoading, setEmailsLoading] = useState(false);
+  const [sendingAction, setSendingAction] = useState(null);
+  const [autoMessage, setAutoMessage] = useState(null);
+  const templateService = useMemo(() => new EmailTemplateService(), []);
   const { budgets = [] } = useSupplierBudgets(provider?.id);
   const budgetsToUse = Array.isArray(budgetsOverride) ? budgetsOverride : budgets;
   const budgetInfo = useMemo(() => {
@@ -65,7 +79,7 @@ const ProveedorCard = ({
     }
   }, [budgetsToUse]);
 
-  const refreshTracking = () => {
+  const refreshTracking = useCallback(() => {
     try {
       const list = loadTrackingRecords();
       const rec = (Array.isArray(list) ? list : []).find(
@@ -76,14 +90,20 @@ const ProveedorCard = ({
       );
       setTracking(rec || null);
     } catch {}
-  };
+  }, [provider?.email]);
 
   useEffect(() => {
     refreshTracking();
   }, [provider?.email]);
 
+  useEffect(() => {
+    if (!autoMessage) return;
+    const timer = setTimeout(() => setAutoMessage(null), 4000);
+    return () => clearTimeout(timer);
+  }, [autoMessage]);
+
   // Cargar correos relacionados con este proveedor (por email o nombre)
-  const fetchProviderEmails = async () => {
+  const fetchProviderEmails = useCallback(async () => {
     if (!provider) return [];
     const term = provider.email || provider.name || '';
     if (!term) return [];
@@ -96,7 +116,7 @@ const ProveedorCard = ({
     } finally {
       setEmailsLoading(false);
     }
-  };
+  }, [provider]);
 
   const lastAgo = useMemo(() => {
     try {
@@ -115,6 +135,206 @@ const ProveedorCard = ({
       return null;
     }
   }, [tracking?.lastEmailDate]);
+
+  const formatWeddingDate = useCallback((value) => {
+    if (!value) return '';
+    try {
+      const date = typeof value?.toDate === 'function' ? value.toDate() : new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch {
+      return '';
+    }
+  }, []);
+
+  const formatTemplateToHtml = useCallback((text) => {
+    if (!text) return '';
+    const lines = String(text)
+      .split('\n')
+      .map((line) => line.trim());
+    const blocks = [];
+    let listItems = [];
+    lines.forEach((line) => {
+      if (!line) {
+        if (listItems.length) {
+          blocks.push(`<ul>${listItems.join('')}</ul>`);
+          listItems = [];
+        }
+        return;
+      }
+      if (line.startsWith('-')) {
+        listItems.push(`<li>${line.replace(/^-+\s*/, '')}</li>`);
+      } else {
+        if (listItems.length) {
+          blocks.push(`<ul>${listItems.join('')}</ul>`);
+          listItems = [];
+        }
+        blocks.push(`<p>${line}</p>`);
+      }
+    });
+    if (listItems.length) {
+      blocks.push(`<ul>${listItems.join('')}</ul>`);
+    }
+    return blocks.join('');
+  }, []);
+
+  const insertBeforeSignature = useCallback((html, extra) => {
+    if (!html) return extra;
+    const marker = '<p style="color:#888; font-size:12px;">';
+    if (html.includes(marker)) {
+      return html.replace(marker, `${extra}${marker}`);
+    }
+    return `${html}${extra}`;
+  }, []);
+
+  const buildAutomatedEmail = useCallback(
+    (action) => {
+      const displayDate = formatWeddingDate(
+        userProfile?.weddingDate ||
+          userProfile?.eventDate ||
+          userProfile?.profileWeddingDate ||
+          ''
+      );
+      const displayGuests =
+        String(
+          userProfile?.guestsTotal ||
+            userProfile?.guestCount ||
+            userProfile?.guests ||
+            ''
+        ) || '100';
+      const displayName =
+        userProfile?.name ||
+        [userProfile?.brideFirstName, userProfile?.brideLastName].filter(Boolean).join(' ') ||
+        userProfile?.displayName ||
+        (userProfile?.email ? userProfile.email.split('@')[0] : 'Usuario');
+
+      const templateData = {
+        providerName: provider?.name || '',
+        date: displayDate,
+        userName: displayName,
+        guests: displayGuests,
+        location:
+          provider?.location ||
+          provider?.city ||
+          userProfile?.weddingLocation ||
+          userProfile?.city ||
+          '',
+        price:
+          provider?.presupuesto != null
+            ? `${provider.presupuesto} €`
+            : provider?.budgetRange || provider?.pricing || provider?.price || '',
+        aiInsight: provider?.aiSummary || provider?.notes || '',
+        searchQuery:
+          action === 'quote'
+            ? 'Solicitud de presupuesto para boda'
+            : 'Agendar reunion con proveedor de boda',
+      };
+
+      const category = provider?.service || 'general';
+      const aiSubject = templateService.generateSubjectFromTemplate(category, templateData);
+      const aiBody = templateService.generateBodyFromTemplate(category, templateData);
+      const baseSubject =
+        (aiSubject && aiSubject.trim()) || generateDefaultSubject(provider) || '';
+      const baseBodyHtml = formatTemplateToHtml(aiBody);
+      const appended =
+        action === 'quote'
+          ? '<p>Nos gustaria recibir un presupuesto detallado con tarifas, condiciones y disponibilidad para nuestra fecha.</p>'
+          : '<p>Podemos coordinar una reunion (presencial o videollamada) para revisar el servicio y confirmar disponibilidad? Indicanos los horarios que mejor te encajen.</p>';
+      const closing = '<p>Quedamos atentos a tu respuesta.</p>';
+
+      let body = '';
+      if (baseBodyHtml) {
+        const signature =
+          userProfile?.preferences?.emailSignature ||
+          'Enviado automaticamente desde MyWed360';
+        body = `${baseBodyHtml}${appended}${closing}<p style="color:#888; font-size:12px;">${signature}</p>`;
+      } else {
+        const fallback = generateDefaultEmailBody(provider) || '';
+        body = insertBeforeSignature(fallback, `${appended}${closing}`);
+      }
+
+      const subject =
+        action === 'quote'
+          ? `Solicitud de presupuesto - ${provider?.name || provider?.service || baseSubject}`
+          : `Solicitud de reunion - ${provider?.name || provider?.service || baseSubject}`;
+
+      return { subject, body };
+    },
+    [
+      formatWeddingDate,
+      userProfile,
+      provider,
+      templateService,
+      generateDefaultSubject,
+      generateDefaultEmailBody,
+      formatTemplateToHtml,
+      insertBeforeSignature,
+    ]
+  );
+
+  const handleAutoEmail = useCallback(
+    async (action) => {
+      if (!provider?.email) {
+        setAutoMessage({
+          type: 'error',
+          text: 'Agrega un email de contacto al proveedor para enviar solicitudes automaticas.',
+        });
+        return;
+      }
+      setSendingAction(action);
+      try {
+        const { subject, body } = buildAutomatedEmail(action);
+        const result = await sendEmailToProvider(provider, subject, body);
+        templateService.logTemplateUsage(
+          provider?.service || 'general',
+          { id: provider?.id, name: provider?.name },
+          false
+        );
+        if (result) {
+          setAutoMessage({
+            type: 'success',
+            text:
+              action === 'quote'
+                ? 'Solicitud de presupuesto enviada automaticamente.'
+                : 'Solicitud de cita enviada automaticamente.',
+          });
+          refreshTracking();
+          if (emailsOpen) {
+            const list = await fetchProviderEmails();
+            setEmails(list);
+          }
+        } else {
+          setAutoMessage({
+            type: 'error',
+            text:
+              providerEmailError ||
+              'No se pudo enviar el correo automatico. Intentalo nuevamente.',
+          });
+        }
+      } catch (err) {
+        setAutoMessage({
+          type: 'error',
+          text: err?.message || 'No se pudo enviar el correo automatico.',
+        });
+      } finally {
+        setSendingAction(null);
+      }
+    },
+    [
+      provider,
+      buildAutomatedEmail,
+      sendEmailToProvider,
+      templateService,
+      providerEmailError,
+      refreshTracking,
+      emailsOpen,
+      fetchProviderEmails,
+    ]
+  );
   // Función para mástrar estrellas de calificación
   const renderRating = (rating, count) => {
     const stars = [];
@@ -158,7 +378,10 @@ const ProveedorCard = ({
     <>
       <Card
         className={`relative transition-all ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
-        onClick={() => setShowDetail(true)}
+        onClick={() => {
+          onViewDetail?.(provider);
+          setShowDetail(true);
+        }}
       >
         {/* Botón favorito */}
         <button
@@ -174,6 +397,13 @@ const ProveedorCard = ({
             className={provider.favorite ? 'fill-yellow-400' : 'fill-none stroke-2'}
           />
         </button>
+
+        {hasPending ? (
+          <span
+            className="absolute top-3 right-10 h-2.5 w-2.5 rounded-full bg-red-500 shadow-inner shadow-red-200"
+            title="Pendiente de revisar"
+          ></span>
+        ) : null}
 
         {/* Checkbox para selección */}
         <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
@@ -297,8 +527,23 @@ const ProveedorCard = ({
             <Eye size={16} className="mr-1" /> Ver
           </Button>
 
-          <Button onClick={() => setShowEmail(true)} variant="outline" size="sm" className="flex-1">
-            Contactar
+          <Button
+            onClick={() => handleAutoEmail('quote')}
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[180px]"
+            disabled={sendingEmail || !!sendingAction}
+          >
+            {sendingEmail && sendingAction === 'quote' ? 'Enviando...' : 'Solicitar presupuesto'}
+          </Button>
+          <Button
+            onClick={() => handleAutoEmail('meeting')}
+            variant="outline"
+            size="sm"
+            className="flex-1 min-w-[170px]"
+            disabled={sendingEmail || !!sendingAction}
+          >
+            {sendingEmail && sendingAction === 'meeting' ? 'Enviando...' : 'Pedir cita'}
           </Button>
 
           {/* Contratos se gestionan en la plataforma del proveedor */}
@@ -361,6 +606,14 @@ const ProveedorCard = ({
             </Button>
           )}
         </div>
+
+        {autoMessage && (
+          <div className="px-3 pb-3 w-full" onClick={(e) => e.stopPropagation()}>
+            <Alert type={autoMessage.type} className="text-sm">
+              {autoMessage.text}
+            </Alert>
+          </div>
+        )}
 
         {tracking && (
           <div className="w-full text-xs text-gray-600 mt-1 flex itemás-center gap-2 flex-wrap">
@@ -467,17 +720,6 @@ const ProveedorCard = ({
           open={showAssign}
           onClose={() => setShowAssign(false)}
           provider={provider}
-        />
-      )}
-      {showEmail && (
-        <ProviderEmailModal
-          open={showEmail}
-          onClose={() => setShowEmail(false)}
-          provider={provider}
-          onSent={() => {
-            refreshTracking();
-            setShowEmail(false);
-          }}
         />
       )}
     </>

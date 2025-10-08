@@ -47,7 +47,7 @@
 
 ## 7. Integracion con otros flujos
 - Flujo 5 (Proveedores) y 6 (Presupuesto) sincronizan importes y pagos.
-- Flujo 11 (Protocolo) usa documentos legales para ceremonias.
+- Flujos 11C/11D consumen documentos legales y enlaces a plantillas de ceremonia.
 - Flujo 14 crea tareas automaticas para seguimiento de contratos.
 - Flujo 16/18 consumen datos para IA y generador de documentos legales.
 - Flujo 20/7 notifican cambios o firmas completadas.

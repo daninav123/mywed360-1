@@ -19,25 +19,31 @@
    - `ServicesBoard` funciona como matriz de necesidades: lista los servicios críticos para la boda, permite marcar cuáles están “por definir” y sugiere combinaciones habituales según tipo de evento.
    - Cada proveedor puede descomponerse en “líneas de servicio” (ej. `Espacio Las Brisas` → servicios `Venue` y `Catering`). Un wizard de fusión/separación (`SupplierMergeWizard`) guía el proceso: selecciona líneas implicadas, decide si se crean proveedores independientes, reubica contratos/pagos asociados y registra un histórico de cambios.
    - `DuplicateDetectorModal` evita crear líneas duplicadas y guía el proceso de fusión.
+   - Cada tarjeta de servicio incluye accesos directos `Buscar`, `IA` y `Añadir` para abrir el drawer, disparar búsqueda inteligente o crear un proveedor nuevo preasignado al servicio seleccionado.
 2. Exploración y shortlist (**Vistos**)
    - `ProviderSearchDrawer`, `AISearchModal` y `ServicesBoard` lanzan búsquedas IA usando ubicación, presupuesto objetivo y estilo de la boda; los resultados se guardan en la pestaña **Vistos** (`ProveedorList.jsx` en modo shortlist).
-   - `ProveedorFiltro` expone pestañas globales (todos/contratados/contactados/favoritos/vistos) y búsqueda rápida que impacta shortlist y pipeline.
+   - `ProveedorFiltro` expone pestañas globales (todos/contratados/contactados/favoritos/vistos) y búsqueda rápida que impacta shortlist y pipeline; los usuarios pueden marcar favoritos desde la propia tarjeta y el filtro se actualiza en tiempo real.
    - Desde **Vistos** se promueven proveedores a evaluación o se descartan con motivo. `ProveedorForm` permite capturar proveedores offline y, si se encuentra coincidencia, la IA enriquece datos públicos.
 3. Evaluación y negociación
    - `CompareSelectedModal` contrasta propuestas y notas por servicio; `AIEmailModal` genera correos iniciales (la operativa detallada vive en la página de mail).
    - `SupplierKanban` gestiona estados “Por definir → Vistos → Contactados → Presupuesto → Contratado → Rechazado” por línea de servicio, con drag & drop y acciones rápidas.
+   - Las tarjetas de proveedor (`ProveedorCardNuevo`) muestran imagen de cabecera, nombre, servicio principal, estado con etiqueta coloreada, próxima cita y presupuesto estimado; incluyen acciones inline para marcar favorito, abrir menú contextual (editar/eliminar) y abrir detalle al hacer clic en el cuerpo.
+   - `EmailTrackingList` registra cada correo enviado y recibido (IA o manual) y `SupplierEventBridge` enlaza invitaciones/calendarios para mantener historial de citas; ambos se muestran dentro de la pestaña de comunicaciones del detalle.
+   - Las tarjetas muestran un punto rojo de alerta cuando existen correos o citas sin revisar; el indicador se limpia al abrir la ficha o marcar la comunicación como leída.
    - `GroupCreateModal`, `GroupAllocationModal` y `GroupSuggestions` ayudan a equilibrar presupuestos y detectar huecos sin cobertura.
 4. Contratación y seguimiento
    - `RFQModal`, `ReservationModal` y `ProviderEmailModal` disparan solicitudes formales; `SupplierEventBridge` alimenta timeline y tareas.
    - Automatizaciones IA monitorean respuestas de correo y estados de contrato/presupuesto: necesitan detectar `budgetStatus = approved` + `contractStatus = signed` (ya sea por lectura del correo, adjunto reconocido o registro manual en Flujo 15). Si solo llega uno de los dos, se crea alerta “Falta validar presupuesto/contrato” antes de mover la línea.
    - Los planificadores pueden marcar “Contacto manual registrado” desde `SupplierKanban` o `ProveedorDetalle` para reflejar comunicaciones fuera del módulo de email; esto evita que el pipeline dependa exclusivamente del rastreo automático.
-   - `GestionProveedores` integra las vistas; `ProveedorDetalle` muestra pestañas de información/comunicaciones, detalla qué servicios cubre cada proveedor y enlaza contratos/pagos.
+   - `GestionProveedores` integra las vistas; `ProveedorDetalle` muestra pestañas de información/comunicaciones, detalla qué servicios cubre cada proveedor, enlaza contratos/pagos y aporta un bloque de métricas comparativas (precio medio, ratio de respuesta, satisfacción) calculadas a partir de `supplierInsights`.
    - Panel lateral “Resumen financiero” expone KPIs agregados (asignado, gastado, presupuestos pendientes, recordatorios, próximo deadline) y aloja filtros globales.
 
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/suppliers/{supplierId}`: datos base, notas, presupuesto objetivo, estado pipeline y banderas globales (favorito, proveedor multi-servicio).
 - Subcolección `serviceLines` (`weddings/{id}/suppliers/{supplierId}/serviceLines/{lineId}`) para cubrir cada servicio asociado: nombre, categoría, presupuesto objetivo, estado, fechas clave.
 - Colecciones auxiliares: `supplierGroups` (agrupaciones, metas), `supplierEmails` (historial de comunicaciones), `supplierRFQ`, `supplierShortlist` (vistos/buscados con fuente y fecha de revisión).
+- Subcolección `supplierMeetings` (citas, recordatorios, enlaces calendario) sincronizada con `ReservationModal` y timeline.
+- Repositorio global `supplierInsights/{supplierId}` agrega métricas históricas entre bodas (ratio de respuesta, precio medio contratado, satisfacción) y enlaces a reseñas; se actualiza al cerrar cada línea de servicio.
 - Logs IA en `weddings/{id}/ai/suppliers/{uuid}` con prompt, respuesta, proveedor, usuario.
 - Integración con `finance` refleja gastos confirmados/estimados por proveedor y por línea de servicio.
 
@@ -48,26 +54,29 @@
 - Shortlist **Vistos** requiere etiqueta de origen (IA, manual, recomendado) y fecha de última revisión; las entradas caducadas disparan recordatorios.
 - Automatizaciones IA solo promueven a “contratado” si detectan presupuesto aprobado (`budgetStatus`) y contrato firmado (`contractStatus`). Señales válidas: campos sincronizados desde Flujo 6/15, etiquetas reconocidas en email, adjuntos firmados (PDF con firma). Ante señales inconsistentes se genera tarea “Revisar respuesta”.
 - El wizard de fusión/separación preserva contratos, pagos e historiales; si hay facturas vinculadas exige seleccionar a qué línea se reasignan antes de confirmar.
+- Todos los correos y citas quedan registrados (colecciones `supplierEmails` y `supplierMeetings`); si falta correspondencia entre agenda y card se genera alerta para revisión manual.
+- Al cerrar una línea de servicio se persiste un snapshot en `supplierInsights` con métricas agregadas y feedback; se valida que cada proveedor comparta ID global para evitar duplicados.
 - Grupos respetan presupuesto objetivo agregado; avisos cuando se excede por servicio o categoría.
 
 ## 6. Estados especiales y errores
-- Falta de IA (sin API) ? modales muestran fallback para entrada manual.
-- Tracking email deshabilitado ? panel indica Sin seguimiento activo.
-- Registro bancario fallido ? se muestra alerta y se reintenta tras reautenticación.
-- Conexión perdida ? tabla y kanban pasan a modo lectura.
+- Falta de IA (sin API) → modales muestran fallback para entrada manual.
+- Tracking email deshabilitado → panel indica Sin seguimiento activo.
+- Registro bancario fallido → se muestra alerta y se reintenta tras reautenticación.
+- Conexión perdida → tabla y kanban pasan a modo lectura.
 
 ## 7. Integración con otros flujos
 - Flujo 3 (Invitados/RSVP) aporta datos de perfil y timing para ajustar plantillas de servicios sugeridos.
 - Flujo 6 sincroniza presupuestos por proveedor y por línea de servicio, además de controlar pagos planificados.
-- Flujo 7 centraliza comunicaciones; las respuestas analizadas por IA actualizan automáticamente el kanban del flujo 5.
+- Flujo 7 centraliza comunicaciones; las respuestas analizadas por IA actualizan automáticamente el kanban del flujo 5 (a través del [Flujo 24](./flujo-24-orquestador-automatizaciones.md)).
 - Flujo 14 crea tareas automáticas tras cambios de estado (ej. “revisar propuesta”, “confirmar contrato detectado por IA”).
 - Flujo 15 genera contratos y documentos desde la ficha del proveedor (con enlaces por servicio).
 - Flujo 17 otorga puntos al confirmar proveedores clave.
+- Flujo 23 consolida métricas globales de proveedores y muestra comparativas históricas en el dashboard de proyecto.
 
 ## 8. Métricas y monitorización
 - Eventos: `supplier_ai_search`, `supplier_service_defined`, `supplier_shortlist_added`, `supplier_stage_changed`, `supplier_email_sent`.
-- KPIs: ratio shortlist→contacto→contrato por servicio, cobertura de servicios definidos vs requeridos, tiempo medio por etapa, ahorro conseguido vs presupuesto objetivo.
-- Tracking de uso IA (peticiones, aciertos, feedback) y efectividad de detección automática de contratos/presupuestos.
+- KPIs: ratio shortlist→contacto→contrato por servicio, cobertura de servicios definidos vs requeridos, tiempo medio por etapa, ahorro conseguido vs presupuesto objetivo, variaciones respecto al promedio global del proveedor (`supplierInsights`).
+- Tracking de uso IA (peticiones, aciertos, feedback), efectividad de detección automática de contratos/presupuestos y tasa de comunicaciones pendientes (indicador rojo activo).
 
 ## 9. Pruebas recomendadas
 - Unitarias: servicio AI (`aiSuppliersService`), detectores de duplicados, reducers de grupos, normalización de líneas de servicio.

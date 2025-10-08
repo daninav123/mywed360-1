@@ -65,6 +65,7 @@ const SeatingPlanToolbar = ({
   onToggleValidations,
   globalMaxSeats = 0,
   onOpenCapacity,
+  onOpenExportWizard,
   // Snapshots
   snapshots = [],
   onSaveSnapshot,
@@ -662,10 +663,22 @@ const SeatingPlanToolbar = ({
                     setShowExportMenu(false);
                   }}
                   className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm"
-                >
-                  Tarjetas
-                </button>
-              )}
+              >
+                Tarjetas
+              </button>
+            )}
+              <div className="border-t my-1" />
+              <button
+                type="button"
+                data-testid="export-advanced"
+                onClick={() => {
+                  setShowExportMenu(false);
+                  onOpenExportWizard?.();
+                }}
+                className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm text-blue-600"
+              >
+                {t('seating.export.advanced', { defaultValue: 'Exportación avanzada…' })}
+              </button>
             </div>
           )}
         </div>

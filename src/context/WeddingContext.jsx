@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo, useCall
 import { db, firebaseReady } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import errorLogger from '../utils/errorLogger';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 /**
  * Contexto para la boda activa que está gestionando el planner.
@@ -264,15 +265,56 @@ export default function WeddingProvider({ children }) {
     listenWeddings();
   }, [currentUser, activeWedding, clearActiveWeddingStorage, storageKeyForUser]);
 
-  const setActiveWedding = useCallback((id) => {
-    setActiveWeddingState(id);
-    try {
-      localStorage.setItem('mywed360_active_wedding', id);
+  const setActiveWedding = useCallback(
+    (id) => {
+      setActiveWeddingState(id);
+      try {
+        localStorage.setItem('mywed360_active_wedding', id || '');
+        if (currentUser?.uid) {
+          localStorage.setItem(storageKeyForUser(currentUser.uid), id || '');
+        }
+      } catch {}
+
       if (currentUser?.uid) {
-        localStorage.setItem(storageKeyForUser(currentUser.uid), id);
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          void setDoc(
+            userRef,
+            {
+              activeWeddingId: id || null,
+              hasActiveWedding: !!id,
+              lastActiveWeddingAt: serverTimestamp(),
+            },
+            { merge: true }
+          ).catch(() => {});
+          if (id) {
+            const userWeddingRef = doc(db, 'users', currentUser.uid, 'weddings', id);
+            void setDoc(
+              userWeddingRef,
+              {
+                active: true,
+                lastAccessedAt: serverTimestamp(),
+              },
+              { merge: true }
+            ).catch(() => {});
+          }
+        } catch (error) {
+          console.warn('[WeddingContext] No se pudo sincronizar activeWeddingId en Firestore', error);
+        }
       }
-    } catch {}
-  }, [currentUser, storageKeyForUser]);
+
+      if ((id || '') !== (activeWedding || '')) {
+        try {
+          performanceMonitor.logEvent('wedding_switched', {
+            fromWeddingId: activeWedding || null,
+            toWeddingId: id || null,
+            userUid: currentUser?.uid || null,
+          });
+        } catch {}
+      }
+    },
+    [currentUser, storageKeyForUser, activeWedding]
+  );
 
   const value = useMemo(
     () => ({ weddings, activeWedding, setActiveWedding }),
@@ -283,4 +325,3 @@ export default function WeddingProvider({ children }) {
 }
 
 export { WeddingProvider };
-

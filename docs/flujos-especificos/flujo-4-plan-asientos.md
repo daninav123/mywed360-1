@@ -133,7 +133,7 @@
 - Flujo 3 (Invitados/RSVP) provee fuente de invitados, tags, restricciones alimentarias y la preasignacion `tableId`. Los cambios realizados en banquet regresan como actualizaciones al listado de invitados.
 - Flujo 6 (Presupuesto) usa la capacidad definida para pedir mobiliario y reflejar costos, considerando mesas auxiliares si aceptan invitados.
 - Flujo 9 (RSVP confirmaciones) alimenta estado de invitados pendientes y acompanantes.
-- Flujo 11 (Ceremonia) reutiliza el layout ceremony para protocolo y orden de entrada.
+- Flujos 11A/11B reutilizan el layout de ceremonia para momentos especiales y orden de entrada.
 - Flujo 14 (Tasks) crea recordatorios cuando faltan asignaciones criticas, cuando `GuestSidebar` marca conflictos de prioridad alta o cuando hay exportaciones pendientes de compartir.
   - Tipos de tarea:
     * `Completar seating ceremonia` (se dispara si filas reservadas < 80% asignadas a 14 días del evento).

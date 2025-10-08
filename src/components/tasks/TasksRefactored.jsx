@@ -235,6 +235,8 @@ export default function Tasks() {
       if (category === 'INVITADOS') return '/invitados';
       if (title.includes('invitad') || title.includes('rsvp') || title.includes('lista de invitados') || title.includes('confirmaciones')) return '/invitados';
 
+      if (category === 'CEREMONIA' || title.includes('ceremonia') || title.includes('protocolo')) return '/protocolo/resumen';
+
       // Website / design
       if (title.includes('pagina web') || title.includes('hacer pagina web') || title.includes('crear web') || title.includes('diseno web') || title.includes('wedding site') || title.includes('web boda') || title.includes('diseno-web')) return '/diseno-web';
       // Public website
@@ -401,6 +403,8 @@ export default function Tasks() {
       texto.includes('bebida')
     ) {
       return 'COMIDA';
+    } else if (texto.includes('ceremon') || texto.includes('protocolo') || texto.includes('ensayo')) {
+      return 'CEREMONIA';
     } else if (texto.includes('decora') || texto.includes('adorno') || texto.includes('flor')) {
       return 'decoración';
     } else if (
@@ -499,6 +503,7 @@ export default function Tasks() {
   LUGAR: ['venue','location','lugar','sitio','espacio','salón','jardín','terraza'],
   INVITADOS: ['guests','invitados','personas','asistentes','confirmaciones','lista','rsvp'],
   COMIDA: ['catering','food','comida','bebida','menu','bocadillos','pastel','torta'],
+  CEREMONIA: ['ceremonia','protocolo','votos','ensayo','celebrante','testigos','expediente'],
   DECORACION: ['decoración','flores','arreglos','centros de mesa','iluminación','ambientación'],
   PAPELERIA: ['invitaciones','papelería','save the date','tarjetas','programa','seating plan'],
   MUSICA: ['música','dj','banda','playlist','sonido','baile','entretenimiento'],

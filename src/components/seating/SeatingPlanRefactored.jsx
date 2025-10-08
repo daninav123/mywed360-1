@@ -13,6 +13,8 @@ import SeatingPlanCanvas from './SeatingPlanCanvas';
 import SeatingPlanModals from './SeatingPlanModals';
 import SeatingPlanTabs from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
+import SeatingExportWizard from './SeatingExportWizard';
+import SeatingMobileOverlay from './SeatingMobileOverlay';
 import { useWedding } from '../../context/WeddingContext';
 // Nota: incluir extensión .js para compatibilidad con resoluciones estrictas en build (Linux)
 import { useSeatingPlan } from '../../hooks/useSeatingPlan.hook.js';
@@ -114,6 +116,7 @@ const SeatingPlanRefactored = () => {
   // Mostrar numeración de asientos
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
+  const [isMobile, setIsMobile] = React.useState(false);
   // handler para fondo rápido (prompt)
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
@@ -130,6 +133,20 @@ const SeatingPlanRefactored = () => {
   // Drawer de invitados pendientes y viewport del canvas
   const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
   const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
+  const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
+  useEffect(() => {
+    const updateIsMobile = () => {
+      try {
+        setIsMobile(window.innerWidth <= 1024);
+      } catch (_e) {
+        setIsMobile(false);
+      }
+    };
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
+  }, []);
 
   // Invitados pendientes sin mesa
   const pendingGuests = React.useMemo(() => {
@@ -149,6 +166,20 @@ const SeatingPlanRefactored = () => {
       return [];
     }
   }, [safeGuests, selectedTable]);
+
+  const availableExportTabs = React.useMemo(() => ['ceremony', 'banquet', 'free-draw'], []);
+
+  const handleGenerateAdvancedExport = React.useCallback(
+    (payload) => {
+      if (!payload || !payload.formats) return;
+      const { formats } = payload;
+      if (formats.includes('pdf')) exportPDF?.();
+      if (formats.includes('svg')) exportSVG?.();
+      if (formats.includes('csv')) exportCSV?.();
+      toast.info('La exportación avanzada se completará con las opciones seleccionadas.');
+    },
+    [exportPDF, exportSVG, exportCSV]
+  );
 
   /* ---- atajos Ctrl/Cmd + Z / Y ---- */
   useEffect(() => {
@@ -577,6 +608,92 @@ const SeatingPlanRefactored = () => {
   // No-op defensivo para habilitar/deshabilitar elementos desde el canvas
   const handleToggleEnabled = React.useCallback(() => {}, []);
 
+  const libraryPanel = (
+    <SeatingLibraryPanel
+      drawMode={drawMode}
+      onDrawModeChange={setDrawMode}
+      onOpenTemplates={handleOpenTemplates}
+      showTables={showTables}
+      onToggleShowTables={toggleShowTables}
+      showRulers={showRulers}
+      onToggleRulers={() => setShowRulers((v) => !v)}
+      snapToGrid={snapToGrid}
+      onToggleSnap={() => setSnapToGrid((v) => !v)}
+      showSeatNumbers={showSeatNumbers}
+      onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
+      gridStep={gridStep}
+      onAddTable={addTable}
+      onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+      pendingCount={pendingGuests.length}
+    />
+  );
+
+  const renderCanvas = (className = 'h-full') => (
+    <SeatingPlanCanvas
+      tab={tab}
+      areas={safeAreas}
+      tables={showTables ? safeTables : []}
+      seats={safeSeats}
+      hallSize={safeHallSize}
+      selectedTable={selectedTable}
+      onSelectTable={handleSelectTable}
+      onTableDimensionChange={handleTableDimensionChange}
+      onToggleEnabled={handleToggleEnabled}
+      onAddArea={addArea}
+      onAddTable={addTable}
+      drawMode={drawMode}
+      onDrawModeChange={setDrawMode}
+      canvasRef={canvasRef}
+      className={className}
+      moveTable={moveTable}
+      onToggleSeat={toggleSeatEnabled}
+      onAssignGuest={handleAssignGuest}
+      onAssignGuestSeat={(tableId, seatIdx, guestId) => {
+        try {
+          moveGuestToSeat(guestId, tableId, seatIdx);
+          toast.success(`Invitado a asiento ${seatIdx + 1}`);
+        } catch (_) {
+          handleAssignGuest(tableId, guestId);
+        }
+      }}
+      onAssignCeremonySeat={async (seatId, guestId) => {
+        try {
+          await assignGuestToCeremonySeat(seatId, guestId);
+          toast.success('Invitado asignado a silla');
+        } catch (_) {}
+      }}
+      guests={safeGuests}
+      onDeleteArea={deleteArea}
+      onUpdateArea={updateArea}
+      showRulers={showRulers}
+      gridStep={gridStep}
+      selectedIds={selectedIds}
+      showSeatNumbers={showSeatNumbers}
+      background={background}
+      globalMaxSeats={globalMaxSeats}
+      validationsEnabled={validationsEnabled}
+      suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
+      focusTableId={focusTableId}
+      onViewportChange={(vp) => setViewport(vp)}
+    />
+  );
+
+  const renderInspector = (className = 'h-full') => (
+    <SeatingInspectorPanel
+      selectedTable={selectedTable}
+      tab={tab}
+      globalMaxSeats={globalMaxSeats}
+      onTableDimensionChange={handleTableDimensionChange}
+      onConfigureTable={handleConfigureTable}
+      duplicateTable={duplicateTable}
+      deleteTable={deleteTable}
+      toggleTableLocked={toggleTableLocked}
+      assignedGuests={assignedToSelected}
+      onUnassignGuest={handleUnassignGuest}
+      className={className}
+    />
+  );
+
   // Auto IA eliminado en la toolbar (feature desactivada en UI)
 
   /* ---- render ---- */
@@ -661,6 +778,7 @@ const SeatingPlanRefactored = () => {
             onAutoAssign={handleAutoAssignClick}
             onClearBanquet={clearBanquetLayout}
             onOpenTemplates={handleOpenTemplates}
+            onOpenExportWizard={() => setExportWizardOpen(true)}
             snapshots={typeof listSnapshots === 'function' ? listSnapshots() : []}
             onSaveSnapshot={(name) => {
               try {
@@ -700,105 +818,52 @@ const SeatingPlanRefactored = () => {
         </div>
 
         {/* Cuerpo principal: Biblioteca (izqda) Â· Canvas (centro) Â· Inspector (dcha) */}
-        <div className="flex-1 grid grid-cols-[18rem_1fr_20rem] gap-3 px-4 pb-3">
-          {/* Biblioteca y capas */}
-          <div className="min-h-0">
-            <SeatingLibraryPanel
-              drawMode={drawMode}
-              onDrawModeChange={setDrawMode}
-              onOpenTemplates={handleOpenTemplates}
-              showTables={showTables}
-              onToggleShowTables={toggleShowTables}
-              showRulers={showRulers}
-              onToggleRulers={() => setShowRulers((v) => !v)}
-              snapToGrid={!!snapToGrid}
-              onToggleSnap={() => setSnapToGrid((v) => !v)}
-              showSeatNumbers={showSeatNumbers}
-              onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
-              gridStep={gridStep}
-              onAddTable={addTable}
-              onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-              pendingCount={pendingGuests.length}
-            />
-          </div>
-
-          {/* Canvas central */}
-          <div className="min-h-0">
-            <SeatingPlanCanvas
-              tab={tab}
-              areas={safeAreas}
-              tables={showTables ? safeTables : []}
-              seats={safeSeats}
+        {isMobile ? (
+          <div className="flex-1 flex flex-col gap-3 px-4 pb-3">
+            <SeatingMobileOverlay
               hallSize={safeHallSize}
+              tables={safeTables}
               selectedTable={selectedTable}
               onSelectTable={handleSelectTable}
-              onTableDimensionChange={handleTableDimensionChange}
-              onToggleEnabled={handleToggleEnabled}
-              onAddArea={addArea}
-              onAddTable={addTable}
-              drawMode={drawMode}
-              onDrawModeChange={setDrawMode}
-              canvasRef={canvasRef}
-              className="h-full"
-              moveTable={moveTable}
-              onToggleSeat={toggleSeatEnabled}
-              onAssignGuest={handleAssignGuest}
-              onAssignGuestSeat={(tableId, seatIdx, guestId) => {
-                try {
-                  moveGuestToSeat(guestId, tableId, seatIdx);
-                  toast.success(`Invitado a asiento ${seatIdx + 1}`);
-                } catch (_) {
-                  handleAssignGuest(tableId, guestId);
-                }
-              }}
-              onAssignCeremonySeat={async (seatId, guestId) => {
-                try {
-                  await assignGuestToCeremonySeat(seatId, guestId);
-                  toast.success('Invitado asignado a silla');
-                } catch (_) {}
-              }}
-              guests={safeGuests}
-              onDeleteArea={deleteArea}
-              onUpdateArea={updateArea}
-              showRulers={showRulers}
-              gridStep={gridStep}
-              selectedIds={selectedIds}
-              showSeatNumbers={showSeatNumbers}
-              background={background}
-              globalMaxSeats={globalMaxSeats}
-              validationsEnabled={validationsEnabled}
-              suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
-              focusTableId={focusTableId}
-              onViewportChange={(vp) => setViewport(vp)}
+              onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+              onOpenTemplates={handleOpenTemplates}
+              onOpenExportWizard={() => setExportWizardOpen(true)}
             />
+            <div className="max-h-60 overflow-y-auto">{libraryPanel}</div>
+            <div className="border border-gray-200 rounded-lg bg-white overflow-hidden min-h-[55vh]">
+              {renderCanvas('h-[55vh]')}
+            </div>
+            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg bg-white">
+              {renderInspector('max-h-60 overflow-y-auto')}
+            </div>
           </div>
-
-          {/* Inspector contextual */}
-          <div className="min-h-0">
-            <SeatingInspectorPanel
-              selectedTable={selectedTable}
-              tab={tab}
-              globalMaxSeats={globalMaxSeats}
-              onTableDimensionChange={handleTableDimensionChange}
-              onToggleTableShape={toggleSelectedTableShape}
-              onConfigureTable={handleConfigureTable}
-              duplicateTable={duplicateTable}
-              deleteTable={deleteTable}
-              toggleTableLocked={toggleTableLocked}
-              assignedGuests={assignedToSelected}
-              onUnassignGuest={handleUnassignGuest}
-              className="h-full"
-            />
+        ) : (
+          <div className="flex-1 grid grid-cols-[18rem_1fr_20rem] gap-3 px-4 pb-3">
+            <div className="min-h-0">{libraryPanel}</div>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              {renderCanvas('h-full')}
+            </div>
+            <div className="min-h-0">{renderInspector('h-full')}</div>
           </div>
-        </div>
+        )}
 
         {/* Barra inferior de estado */}
-        <div className="flex-shrink-0 px-4 pb-4">
-          <div className="flex items-center gap-4 text-xs text-muted bg-white border rounded-lg px-3 py-2">
+        <div className={`flex-shrink-0 px-4 pb-4 ${isMobile ? 'pt-2' : ''}`}>
+          <div
+            className={`flex items-center text-muted bg-white border rounded-lg px-3 py-2 ${
+              isMobile ? 'flex-wrap gap-x-3 gap-y-2 text-[11px]' : 'gap-4 text-xs'
+            }`}
+          >
             <div>Zoom: {Math.round((viewport?.scale || 1) * 100)}%</div>
-            <div>Dimensiones: {(safeHallSize.width / 100).toFixed(1)} × {(safeHallSize.height / 100).toFixed(1)} m</div>
+            <div>
+              Dimensiones: {(safeHallSize.width / 100).toFixed(1)} ×{' '}
+              {(safeHallSize.height / 100).toFixed(1)} m
+            </div>
             <div>Conflictos: {Array.isArray(conflicts) ? conflicts.length : 0}</div>
-            <button className="ml-auto px-2 py-1 border rounded hover:bg-gray-50" onClick={() => setGuestDrawerOpen(true)}>
+            <button
+              className={`${isMobile ? 'basis-full mt-1 text-center' : 'ml-auto'} px-2 py-1 border rounded hover:bg-gray-50`}
+              onClick={() => setGuestDrawerOpen(true)}
+            >
               Pendientes: {pendingGuests.length}
             </button>
           </div>
@@ -860,6 +925,12 @@ const SeatingPlanRefactored = () => {
           tables={safeTables}
           background={background}
           globalMaxSeats={globalMaxSeats}
+        />
+        <SeatingExportWizard
+          open={exportWizardOpen}
+          onClose={() => setExportWizardOpen(false)}
+          onGenerateExport={handleGenerateAdvancedExport}
+          availableTabs={availableExportTabs}
         />
       </div>
     </DndProvider>

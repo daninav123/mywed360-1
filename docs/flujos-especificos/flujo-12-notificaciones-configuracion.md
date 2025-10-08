@@ -36,17 +36,17 @@
 - Digest respeta frecuencia configurada; se almacena timestamp último envío.
 
 ## 6. Estados especiales y errores
-- Sin notificaciones ? mensaje "No tienes notificaciones nuevas".
-- Error al guardar preferencia ? toast y rollback estado toggle.
-- Canal inhabilitado (ej. WhatsApp sin proveedor) ? UI muestra aviso.
-- Watcher sin permisos ? log en consola y modo no intrusivo.
+- Sin notificaciones → mensaje "No tienes notificaciones nuevas".
+- Error al guardar preferencia → toast y rollback estado toggle.
+- Canal inhabilitado (ej. WhatsApp sin proveedor) → UI muestra aviso.
+- Watcher sin permisos → log en consola y modo no intrusivo.
 
 ## 7. Integración con otros flujos
 - Flujo 5/15 generan notificaciones por contratos y proveedores.
 - Flujo 6 envía alertas de presupuesto.
 - Flujo 9/11 informan confirmaciones y ensayos.
 - Flujo 14/17 se integran para recordatorios de tareas/gamificación.
-- Flujo 7 respeta preferencias de canal.
+- Flujo 7 respeta preferencias de canal; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) aplica la configuración al ejecutar automatizaciones.
 
 ## 8. Métricas y monitorización
 - Eventos: `notification_sent`, `notification_read`, `notification_preference_updated`, `digest_generated`.
@@ -55,7 +55,7 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: guardado de preferencias, mapeo de reglas del watcher.
-- Integración: disparar evento (tarea vencida) ? verificar notificación generada y preferencia aplicada.
+- Integración: disparar evento (tarea vencida) → verificar notificación generada y preferencia aplicada.
 - E2E: usuario actualiza preferencias, recibe digest/alertas, revisa centro y marca como leído.
 
 ## 10. Checklist de despliegue

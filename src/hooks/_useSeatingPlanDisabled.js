@@ -11,6 +11,12 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
+import {
+  createTableFromType,
+  sanitizeTable,
+  updateTableWithField,
+  inferTableType,
+} from '../utils/seatingTables';
 
 // Utilidad para normalizar IDs de mesas
 export const normalizeId = (id) => {
@@ -222,7 +228,8 @@ export const useSeatingPlan = () => {
       if (Array.isArray(snap.areasBanquet)) setAreasBanquet(snap.areasBanquet);
       if (Array.isArray(snap.tablesCeremony)) setTablesCeremony(snap.tablesCeremony);
       if (Array.isArray(snap.seatsCeremony)) setSeatsCeremony(snap.seatsCeremony);
-      if (Array.isArray(snap.tablesBanquet)) setTablesBanquet(snap.tablesBanquet);
+      if (Array.isArray(snap.tablesBanquet))
+        setTablesBanquet(snap.tablesBanquet.map((t) => sanitizeTable(t)));
       if (snap.tab) setTab(snap.tab);
     } catch (_) {}
   };
@@ -271,16 +278,23 @@ export const useSeatingPlan = () => {
   };
   const handleTableDimensionChange = (field, value) => {
     if (!selectedTable) return;
-    const updatedTable = { ...selectedTable, [field]: parseInt(value, 10) };
-    setSelectedTable(updatedTable);
-    setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? updatedTable : t)));
+    const updated = updateTableWithField(selectedTable, field, value);
+    const sanitized = sanitizeTable(updated, {
+      forceAuto: updated.autoCapacity === true && ['tableType'].includes(field),
+    });
+    setSelectedTable(sanitized);
+    setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? sanitized : t)));
   };
   const toggleSelectedTableShape = () => {
     if (!selectedTable) return;
-    const newShape = selectedTable.shape === 'rectangle' ? 'circle' : 'rectangle';
-    const updatedTable = { ...selectedTable, shape: newShape };
-    setSelectedTable(updatedTable);
-    setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? updatedTable : t)));
+    const nextType =
+      selectedTable.tableType === 'round' || selectedTable.shape === 'circle'
+        ? 'square'
+        : 'round';
+    const updated = updateTableWithField(selectedTable, 'tableType', nextType);
+    const sanitized = sanitizeTable(updated, { forceAuto: true });
+    setSelectedTable(sanitized);
+    setTables((prev) => prev.map((t) => (t.id === selectedTable.id ? sanitized : t)));
   };
   const moveTable = (tableId, pos, { finalize } = { finalize: true }) => {
     const apply = (prev) => prev.map((t) => (String(t.id) === String(tableId) ? { ...t, x: pos.x, y: pos.y } : t));
@@ -296,40 +310,41 @@ export const useSeatingPlan = () => {
     else setTablesBanquet((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
   };
   const duplicateTable = (tableId) => {
-    const source = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
-    const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
-    const t = source.find((x) => String(x.id) === String(tableId));
-    if (!t) return;
-    const maxId = source.reduce((m, x) => { const n = parseInt(x.id, 10); return Number.isFinite(n) ? Math.max(m, n) : m; }, 0);
-    const copy = { ...t, id: maxId + 1, x: (t.x || 0) + 30, y: (t.y || 0) + 30, name: `Mesa ${maxId + 1}` };
-    setFn((prev) => [...prev, copy]);
-  };
+      const source = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
+      const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
+      const t = source.find((x) => String(x.id) === String(tableId));
+      if (!t) return;
+      const maxId = source.reduce((m, x) => { const n = parseInt(x.id, 10); return Number.isFinite(n) ? Math.max(m, n) : m; }, 0);
+      const copy = sanitizeTable({
+        ...t,
+        id: maxId + 1,
+        x: (t.x || 0) + 30,
+        y: (t.y || 0) + 30,
+        name: `Mesa ${maxId + 1}`,
+      });
+      setFn((prev) => [...prev, copy]);
+    };
   const toggleTableLocked = (tableId) => {
     const setFn = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
     setFn((prev) => prev.map((t) => (String(t.id) === String(tableId) ? { ...t, locked: !t.locked } : t)));
   };
 
   const addTable = (table = {}) => {
-    const base = {
+    const typeHint =
+      table.tableType ||
+      (table.shape === 'circle' ? 'round' : inferTableType(table));
+    const base = createTableFromType(typeHint, {
+      ...table,
       id: Date.now(),
-      x: Number(table.x) || 120,
-      y: Number(table.y) || 120,
-      shape: table.shape === 'circle' ? 'circle' : 'rectangle',
-      width: Number(table.width) || 80,
-      height: Number(table.height || table.length) || 60,
-      diameter: Number(table.diameter) || 80,
-      seats: Number.parseInt(table.seats, 10) || 8,
-      enabled: true,
-      name: table.name || '',
-    };
+      autoCapacity: table.autoCapacity ?? true,
+    });
+    const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
     if (tab === 'ceremony') {
-      setTablesCeremony((prev) => [...prev, base]);
+      setTablesCeremony((prev) => [...prev, sanitized]);
     } else {
-      const toAdd = base.shape === 'circle'
-        ? { id: base.id, x: base.x, y: base.y, shape: 'circle', diameter: base.diameter, seats: base.seats, enabled: true, name: base.name || `Mesa ${base.id}` }
-        : { id: base.id, x: base.x, y: base.y, shape: 'rectangle', width: base.width, height: base.height, seats: base.seats, enabled: true, name: base.name || `Mesa ${base.id}` };
-      setTablesBanquet((prev) => [...prev, toAdd]);
+      setTablesBanquet((prev) => [...prev, sanitized]);
     }
+  };
   };
 
   // Ãreas (perÃ­metro/puertas/obstÃ¡culos/pasillos)
@@ -363,14 +378,32 @@ export const useSeatingPlan = () => {
     setSeatsCeremony(newSeats);
     pushHistory({ type: 'ceremony', seats: newSeats, tables: tablesCeremony, areas: areasCeremony });
   };
-  const generateBanquetLayout = ({ rows = 3, cols = 4, seats = 8, gapX = 140, gapY = 160, startX = 120, startY = 160 } = {}) => {
+  const generateBanquetLayout = ({
+    rows = 3,
+    cols = 4,
+    seats = 8,
+    gapX = 140,
+    gapY = 160,
+    startX = 120,
+    startY = 160,
+    tableType = 'square',
+  } = {}) => {
     const newTables = [];
     let tableId = 1;
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = startX + col * gapX;
         const y = startY + row * gapY;
-        newTables.push({ id: tableId++, x, y, width: 80, height: 60, shape: 'rectangle', seats, enabled: true, name: `Mesa ${tableId - 1}` });
+        const base = createTableFromType(tableType, {
+          id: tableId,
+          x,
+          y,
+          seats,
+          name: `Mesa ${tableId}`,
+        });
+        const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
+        newTables.push({ ...sanitized, id: tableId });
+        tableId += 1;
       }
     }
     setTablesBanquet(newTables);
@@ -381,10 +414,13 @@ export const useSeatingPlan = () => {
       let idCounter = 1;
       const sanitized = (Array.isArray(tablesArray) ? tablesArray : []).map((t) => {
         const id = t.id != null ? t.id : idCounter++;
-        const shape = t.shape === 'circle' ? 'circle' : 'rectangle';
-        const base = { id, x: Number(t.x) || 0, y: Number(t.y) || 0, seats: Number.parseInt(t.seats, 10) || 8, enabled: t.enabled !== false, name: t.name || `Mesa ${id}`, shape };
-        if (shape === 'circle') return { ...base, diameter: Number(t.diameter) || 80 };
-        return { ...base, width: Number(t.width) || 80, height: Number(t.height || t.length) || 60 };
+        const type = t.tableType || inferTableType(t);
+        const base = createTableFromType(type, {
+          ...t,
+          id,
+          autoCapacity: t.autoCapacity ?? true,
+        });
+        return sanitizeTable(base, { forceAuto: base.autoCapacity });
       });
       setTablesBanquet(sanitized);
       pushHistory({ type: 'banquet', tables: sanitized, areas: areasBanquet });

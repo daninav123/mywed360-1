@@ -6,6 +6,7 @@ import { Button } from '../../components/ui';
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
+import CeremonyTimeline from '../../components/protocolo/CeremonyTimeline';
 
 // Bloques por defecto para inicializar el Timing
 const DEFAULT_BLOCKS = [
@@ -146,6 +147,7 @@ const Timing = () => {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
+      <CeremonyTimeline />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-800">Timing de la Boda</h1>
         <Button

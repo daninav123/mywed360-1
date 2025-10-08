@@ -2,6 +2,15 @@ import React, { useRef, useMemo, useCallback } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { ItemTypes } from './GuestItem';
+import { inferTableType } from '../utils/seatingTables';
+
+const TABLE_TYPE_COLORS = {
+  round: '#fef3c7',
+  square: '#e0f2fe',
+  imperial: '#fee2e2',
+  cocktail: '#d6d3ff',
+  auxiliary: '#e5e7eb',
+};
 
 // Basic draggable table (circle or rectangle)
 // Helper para obtener primer nombre (máx 8 caracteres)
@@ -261,12 +270,19 @@ function TableItem({
     // Sin assignedGuests: devolvemos la lista de invitados por mesa (puede estar vacía)
     return list;
   }, [guests, table.id, table.name, table.assignedGuests]);
-  const seatDots = guestsList.length; // mostramos iniciales alrededor
+  const seatDots =
+    tableType === 'cocktail' || tableType === 'auxiliary'
+      ? 0
+      : guestsList.length; // mostramos iniciales alrededor
   // Tamaño base: diámetro para circular o ancho/alto para rectangular
   const sizeX = table.shape === 'circle' ? table.diameter || 60 : table.width || 80;
   const sizeY =
     table.shape === 'circle' ? table.diameter || 60 : table.height || table.length || 60;
   const disabled = table.enabled === false;
+  const tableType = table.tableType || inferTableType(table);
+  const tableColor = disabled
+    ? '#e5e7eb'
+    : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
 
   const style = {
     position: 'absolute',
@@ -274,7 +290,7 @@ function TableItem({
     top: (table.y ?? 0) * scale + offset.y - (sizeY * scale) / 2,
     width: sizeX * scale,
     height: sizeY * scale,
-    backgroundColor: disabled ? '#e5e7eb' : '#fef3c7',
+    backgroundColor: tableColor,
     border: selected
       ? '3px solid #2563eb'
       : danger

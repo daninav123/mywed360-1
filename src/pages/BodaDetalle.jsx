@@ -1,12 +1,15 @@
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
+import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
 import { db } from '../firebaseConfig';
+import { useWedding } from '../context/WeddingContext';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 function formatDateEs(dateVal) {
   if (!dateVal) return '';
@@ -23,7 +26,9 @@ export default function BodaDetalle() {
   const { id } = useParams();
   const [wedding, setWedding] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updatingState, setUpdatingState] = useState(false);
   const navigate = useNavigate();
+  const { activeWedding, setActiveWedding } = useWedding();
 
   const DESIGN_ITEMS = [
     { key: 'web', label: 'Página web' },
@@ -50,6 +55,7 @@ export default function BodaDetalle() {
           suppliers: Array.isArray(data.suppliers) ? data.suppliers : [],
           designs: Array.isArray(data.designs) ? data.designs : [],
           documents: Array.isArray(data.documents) ? data.documents : [],
+          active: data.active !== false,
         });
         setLoading(false);
       },
@@ -62,10 +68,54 @@ export default function BodaDetalle() {
   if (!wedding) return <p>No se encontró la boda.</p>;
 
   const pendingTasks = (wedding.tasks || []).filter((t) => !t.done).length;
+  const isActive = wedding.active !== false;
+
+  const toggleArchive = async () => {
+    const nextActive = !isActive;
+    const confirmMessage = nextActive
+      ? '¿Restaurar esta boda y volver a marcarla como activa?'
+      : '¿Archivar esta boda? Podrás restaurarla más adelante.';
+    if (!window.confirm(confirmMessage)) return;
+    try {
+      setUpdatingState(true);
+      const ref = doc(db, 'weddings', wedding.id);
+      await updateDoc(ref, {
+        active: nextActive,
+        archivedAt: nextActive ? deleteField() : serverTimestamp(),
+      });
+      performanceMonitor.logEvent(nextActive ? 'wedding_restored' : 'wedding_archived', {
+        weddingId: wedding.id,
+        source: 'wedding_detail',
+      });
+      if (!nextActive && activeWedding === wedding.id) {
+        setActiveWedding('');
+      }
+      setWedding((prev) => (prev ? { ...prev, active: nextActive } : prev));
+    } catch (error) {
+      console.error('[BodaDetalle] No se pudo actualizar el estado de la boda', error);
+      alert('No se pudo actualizar el estado. Intenta nuevamente.');
+    } finally {
+      setUpdatingState(false);
+    }
+  };
 
   return (
     <PageWrapper
       title={wedding.name?.trim() ? wedding.name : 'Boda sin nombre'}
+      actions={
+        <div className="flex items-center gap-2">
+          <span
+            className={`text-xs font-semibold px-2 py-1 rounded ${
+              isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+            }`}
+          >
+            {isActive ? 'Activa' : 'Archivada'}
+          </span>
+          <Button variant="outline" size="sm" disabled={updatingState} onClick={toggleArchive}>
+            {isActive ? 'Archivar' : 'Restaurar'}
+          </Button>
+        </div>
+      }
       className="max-w-4xl mx-auto"
     >
       <button

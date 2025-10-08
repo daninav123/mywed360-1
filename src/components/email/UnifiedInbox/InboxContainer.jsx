@@ -6,7 +6,12 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import { post as apiPost } from '../../../services/apiClient';
 import EmailService, { setAuthContext } from '../../../services/emailService';
+import { scheduleEmailSend } from '../../../services/emailAutomationService';
+import CalendarService from '../../../services/CalendarService';
 import EmailComposer from '../EmailComposer';
+import SmartEmailComposer from '../SmartEmailComposer';
+import EmailFeedbackCollector from '../EmailFeedbackCollector';
+import CalendarIntegration from '../CalendarIntegration';
 import ProviderSearchModal from '../../ProviderSearchModal';
 // (duplicated import removed)
 
@@ -24,6 +29,23 @@ const InboxContainer = () => {
     setAuthContext(authContext);
   }, [authContext]);
 
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const templates = await EmailService.getEmailTemplates();
+        if (!ignore) {
+          setEmailTemplates(Array.isArray(templates) ? templates : []);
+        }
+      } catch (templateError) {
+        console.warn('No se pudieron cargar las plantillas de email:', templateError);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   // Estados para datos de emails
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +56,10 @@ const InboxContainer = () => {
   const [iaCounts, setIaCounts] = useState({ inbox: 0, sent: 0 });
   const [analyzing, setAnalyzing] = useState(false);
   const [showProviderSearch, setShowProviderSearch] = useState(false);
+  const [composerMode, setComposerMode] = useState('basic');
+  const [emailTemplates, setEmailTemplates] = useState([]);
+  const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
+  const [calendarEmail, setCalendarEmail] = useState(null);
 
   // Cargar emails al montar el componente
   const refreshEmails = useCallback(async (targetFolder = folder) => {
@@ -173,6 +199,19 @@ const InboxContainer = () => {
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
   const [viewMode, setViewMode] = useState('list'); // list, detail
 
+  const openComposer = useCallback(
+    (mode = 'basic', initial = {}) => {
+      setComposerMode(mode);
+      setComposerInitial(initial);
+      setShowComposer(true);
+    },
+    []
+  );
+
+  const closeComposer = useCallback(() => {
+    setShowComposer(false);
+  }, []);
+
   // Asegurar que emails siempre sea un array
   const safeEmails = Array.isArray(emails) ? emails : [];
 
@@ -232,32 +271,123 @@ const InboxContainer = () => {
     setViewMode('list');
   }, []);
 
-  const handleSendEmail = useCallback(
+    const handleSendEmail = useCallback(
     async (emailData) => {
       try {
-        // âœ… Usar EmailService directamente sin safeRender para evitar Promise rendering
         const result = await EmailService.sendEmail(emailData);
 
         if (result && result.success) {
-          setShowComposer(false);
-          await refreshEmails(); // Refrescar lista tras envío\n          try { await refreshCounts(); } catch {}
-
-          // Track operation si está disponible
-          if (trackOperation) {
-            trackOperation('email_sent', { success: true });
-          }
+          closeComposer();
+          await refreshEmails();
+          try {
+            await refreshCounts();
+          } catch {}
+          trackOperation?.('email_sent', { success: true, mode: 'basic' });
         }
       } catch (error) {
         console.error('Error al enviar email:', error);
-        if (trackOperation) {
-          trackOperation('email_sent', { success: false, error: error.message });
-        }
+        trackOperation?.('email_sent', { success: false, mode: 'basic', error: error.message });
       }
     },
-    [refreshEmails, refreshCounts, trackOperation]
+    [closeComposer, refreshEmails, refreshCounts, trackOperation]
+  );
+  const handleSmartComposerSend = useCallback(
+    async ({ to, subject, message, scheduledTime, provider }) => {
+      const payload = {
+        to: to || provider?.email || '',
+        subject,
+        body: message,
+      };
+
+      if (!payload.to) {
+        trackOperation?.('email_sent', {
+          success: false,
+          mode: 'smart',
+          error: 'missing_recipient',
+        });
+        return;
+      }
+
+      try {
+        if (scheduledTime) {
+          await scheduleEmailSend(payload, scheduledTime);
+        } else {
+          await EmailService.sendEmail(payload);
+        }
+
+        closeComposer();
+        await refreshEmails();
+        try {
+          await refreshCounts();
+        } catch {}
+
+        trackOperation?.('email_sent', { success: true, mode: 'smart' });
+      } catch (error) {
+        console.error('Error al enviar email IA:', error);
+        trackOperation?.('email_sent', { success: false, mode: 'smart', error: error.message });
+      }
+    },
+    [closeComposer, refreshEmails, refreshCounts, trackOperation]
   );
 
-  // Estados de carga y error
+
+  const openCalendarIntegrationForEmail = useCallback((email) => {
+    setCalendarEmail(email || null);
+    setShowCalendarIntegration(Boolean(email));
+  }, []);
+
+  const closeCalendarIntegration = useCallback(() => {
+    setShowCalendarIntegration(false);
+    setCalendarEmail(null);
+  }, []);
+
+  const handleCalendarSave = useCallback(
+    async (eventData) => {
+      try {
+        await apiPost(
+          '/api/email/calendar-event',
+          {
+            ...eventData,
+            emailId: calendarEmail?.id || null,
+          },
+          { auth: true, silent: true }
+        );
+      } catch (error) {
+        try {
+          CalendarService.createEvent({
+            title: eventData.title,
+            description: eventData.description,
+            start: eventData.dateTime,
+            end: eventData.dateTime,
+            location: eventData.location,
+          });
+        } catch (fallbackError) {
+          console.warn('No se pudo crear el evento en calendario:', fallbackError);
+        }
+        console.warn('Fallo al registrar el evento en backend, usando fallback local.', error);
+      }
+    },
+    [calendarEmail]
+  );
+
+  const handleFeedbackSubmit = useCallback(
+    async (feedback) => {
+      try {
+        await apiPost(
+          '/api/email-feedback',
+          {
+            ...feedback,
+            userId: user?.uid || null,
+            userEmail: user?.email || null,
+          },
+          { auth: true, silent: true }
+        );
+      } catch (error) {
+        console.warn('No se pudo registrar el feedback de email:', error);
+      }
+    },
+    [user]
+  );  // Estados de carga y error
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -531,3 +661,6 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
+
+
+

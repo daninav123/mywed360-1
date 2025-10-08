@@ -8,7 +8,7 @@ import { Input } from '../ui';
  * Formulario optimizado para aÃ±adir/editar invitados
  * Componente reutilizable con validaciÃ³n y UX mejorada
  */
-const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOptions = [] }) => {
+const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false }) => {
   const { t, wedding } = useTranslations();
 
   // Estado inicial del formulario
@@ -24,7 +24,7 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
     addressState: guest?.addressState || '',
     addressZip: guest?.addressZip || '',
     addressCountry: guest?.addressCountry || '',
-    group: guest?.group || '',
+    group: guest?.group || guest?.table || '',
     companion: guest?.companion || 0,
     companionType: guest?.companionType || 'none',
     table: guest?.table || '',
@@ -99,6 +99,9 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
           field === 'addressCountry'
         ) {
           next.address = composeAddress(next);
+        }
+        if (field === 'table') {
+          next.group = value;
         }
         return next;
       });
@@ -335,28 +338,6 @@ const GuestForm = ({ guest = null, onSave, onCancel, isLoading = false, groupOpt
           )}
         </div>
       </div>
-
-      {/* Grupo / CategorÃ­a */}
-      <div>
-        <label className="block text-sm font-medium text-body mb-1">Grupo / CategorÃ­a</label>
-        <Input
-          type="text"
-          value={formData.group}
-          onChange={(e) => handleChange('group', e.target.value)}
-          list="guest-group-options"
-          placeholder="Ej. Familia novia, Amigos, Trabajo"
-          disabled={isLoading}
-        />
-        {Array.isArray(groupOptions) && groupOptions.length > 0 && (
-          <datalist id="guest-group-options">
-            {groupOptions.map((opt) => (
-              <option key={String(opt)} value={String(opt)} />
-            ))}
-          </datalist>
-        )}
-        <p className="text-xs text-muted mt-1">Este campo permite filtrar y gestionar grupos.</p>
-      </div>
-
       {/* AcompaÃ±antes y mesa */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>

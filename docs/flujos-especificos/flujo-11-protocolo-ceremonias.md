@@ -1,81 +1,47 @@
-# 11. Protocolo y Ceremonias (estado 2025-10-07)
+# 11. Protocolo y Ceremonias (visión global)
 
-> Implementado: `CeremonyProtocol.jsx`, `CeremonyTimeline.jsx`, `CeremonyConfigModal.jsx`, `CeremonyChecklist.jsx`, plantillas en `docs/protocolo/*` y seeds de tareas relacionadas.
-> Pendiente: automatizacion legal completa, integracion con registros civiles, planes de contingencia inteligentes y generacion de programas para invitados.
-> Nota: cuando `eventType` = `evento` sin ceremonia formal, este flujo se convierte en opcional y el wizard mostrará copy genérico ("Programa del evento").
+> Estado: 2025-10-07  
+> Implementado en producción. Ver subflujos 11A–11E para la especificación detallada.
 
-## 1. Objetivo y alcance
-- Planificar ceremonias civiles, religiosas y simbolicas con detalle minuto a minuto.
-- Definir roles, procesiones, musica, lecturas y requisitos legales asociados.
-- Coordinar documentos obligatorios, tradiciones y planes alternativos.
+El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los momentos especiales del día B. Para facilitar el mantenimiento, el alcance se divide en subflujos especializados:
 
-## 2. Trigger y rutas
-- Menú inferior → `Más` → bloque **Protocolo** → enlaces a Momentos especiales, Timing, Checklist, Ayuda Ceremonia y Documentos (render `CeremonyProtocol.jsx`).
-- Accesos directos desde Home (widget “Checklist ceremonia”), notificaciones legales y recordatorios en Timeline.
-- Modal rapido desde Seating Plan para configurar distribucion de ceremonia.
+- **[11A – Momentos Especiales de la Boda](./flujo-11a-momentos-especiales.md):** orquesta lecturas, música y rituales a lo largo del evento.  
+- **[11B – Timeline Global del Día B](./flujo-11b-timeline-dia-b.md):** construye y monitoriza el cronograma minuto a minuto.  
+- **[11C – Checklist de Última Hora](./flujo-11c-checklist-ultima-hora.md):** confirma, el día previo, que todo está listo antes de abrir puertas.  
+- **[11D – Guía de Documentación Legal](./flujo-11d-guia-documentacion-legal.md):** ayuda a la pareja a reunir cada papel oficial.  
+- **[11E – Ayuda a Lecturas y Votos](./flujo-11e-ayuda-textos-ceremonia.md):** acompaña a familiares y amigos a preparar discursos inolvidables.
 
-## 3. Paso a paso UX
-1. Configuracion inicial
-   - Seleccion de tipo de ceremonia (civil, religiosa, simbolica, multiples).
-   - Captura de fecha, hora, ubicacion, capacidad, celebrante/oficiante.
-   - Requisitos legales y documentacion por tipo.
-2. Definicion de protocolo y roles
-   - Orden de entrada y salida (novios, padrinos, damas, testigos, invitados especiales).
-   - Asignacion de roles y responsabilidades con horarios de llegada y vestimenta.
-   - Tradiciones opcionales (arras, lazo, arena, unity candle) con instrucciones.
-3. Cronograma y ejecucion
-   - `CeremonyTimeline.jsx` divide pre-ceremonia, ceremonia y post-ceremonia.
-   - Integracion con playlist/musica, lecturas, firmas y sesiones de fotos.
-   - Panel de contingencias (clima, fallos tecnicos, retrasos) y contactos de emergencia.
-4. Documentacion y seguimiento
-   - Checklist de documentos civiles/religiosos con fechas limite y recordatorios.
-   - Registro de firmas y certificados almacenados en `documents`.
-   - Generacion de tareas asociadas y sincronizacion con timeline general.
+## Arquitectura compartida
 
-## 4. Persistencia y datos
-- Firestore `weddings/{id}/ceremony`: configuracion general, protocolos, roles, tradiciones, contingencias.
-- `weddings/{id}/ceremonyTimeline`: hitos con timestamp, responsable, notas.
-- Documentacion legal en `weddings/{id}/documents` enlazada mediante `relatedCeremonyId`.
-- Seeds de tareas en `weddings/{id}/tasks` (curso prematrimonial, tramites, ensayos).
+- **Navegación:** `Más → Protocolo`. El layout `src/pages/protocolo/ProtocoloLayout.jsx` expone pestañas para cada subflujo, más accesos independientes como “Documentos”.  
+- **Persistencia (Firestore):**
+  - `weddings/{id}/specialMoments/main`: bloques y momentos (subflujo 11A).  
+  - `weddings/{id}/timing`: timeline maestro (11B).  
+  - `weddings/{id}/ceremonyTimeline/main`: hitos concretos de la ceremonia (11B).  
+  - `weddings/{id}/ceremonyChecklist/main`: pendientes críticos (11C).  
+  - `weddings/{id}/documents` con `relatedCeremonyId`: archivos asociados (11C/11D).  
+  - `weddings/{id}/ceremony/config`: datos generales, roles, tradiciones, contingencias (soporte común).  
+- **Seeds demo:** `scripts/seedTestDataForPlanner.js` crea boda de ejemplo con configuración, timeline, checklist y tareas categoría `CEREMONIA`.
 
-## 5. Reglas de negocio
-- Cada ceremonia requiere al menos un celebrante y dos testigos para marcarse como lista.
-- Documentos con estado `pending` bloquean la generacion de programa final.
-- Roles sensibles (celebrante, testigos) solo editables por owner/planner.
-- Tradiciones marcadas como obligatorias deben asignar responsable antes del evento.
+## Integraciones con otros flujos
 
-## 6. Estados especiales y errores
-- Falta de datos esenciales -> banner "Completa fecha, lugar y celebrante".
-- Documentacion vencida -> alerta roja y tarea automatica de renovacion.
-- Cambios de ultima hora -> versionado con historial y control de conflictos.
-- Modal de contingencia se activa si se pronostica lluvia o el venue reporta incidencias.
+- **Flujo 2 (Datos del evento):** provee fecha y localización inicial.  
+- **Flujos 3 y 4 (Invitados y Seating):** consumen roles especiales y layout de ceremonia.  
+- **Flujo 6 (Presupuesto):** enlaza pagos de celebrante y permisos.  
+- **Flujo 9 (RSVP):** sincroniza confirmaciones con aforo de ceremonia.  
+- **Flujos 14/15 (Checklist avanzada y Documentos):** amplían tareas y gestión documental del planner.  
+- **Flujo 21 (Sitio público):** publica extractos del protocolo y horarios.
 
-## 7. Integracion con otros flujos
-- Flujo 2 aporta fecha y ubicacion para sincronizar timeline.
-- Flujo 3 y 4 asignan asientos especiales y controlan entrada de invitados.
-- Flujo 6 vincula pagos a celebrante y permisos del venue.
-- Flujo 14/15 generan tareas y documentos de protocolo.
-- Flujo 21 usa extractos para sitio publico y comunicacion a invitados.
+## Eventos y métricas transversales
 
-## 8. Metricas y monitorizacion
-- Eventos: `ceremony_configured`, `ceremony_document_added`, `ceremony_protocol_updated`, `ceremony_contingency_triggered`.
-- Indicadores: porcentaje de documentos completos, tiempo restante para fecha clave, cumplimiento de ensayos.
-- Logs de auditoria para cambios de roles y actualizaciones legales.
+- Eventos previstos: `ceremony_configured`, `special_moment_added`, `ceremony_timeline_updated`, `ceremony_checklist_checked`, `ceremony_document_uploaded` (pendientes de instrumentar salvo configuración base).  
+- Indicadores: % de momentos con música asignada, % checklist completada, desviación horaria acumulada, documentación legal completada.
 
-## 9. Pruebas recomendadas
-- Unitarias: validadores de protocolo, manejo de tradiciones, generacion de cronograma.
-- Integracion: actualizar configuracion -> tareas y checklist reflejan cambios.
-- E2E: crear ceremonia completa, adjuntar documentos, simular contingencia y ejecutar plan alternativo.
+## Roadmap compartido
 
-## 10. Checklist de despliegue
-- Reglas Firestore para `ceremony`, `ceremonyTimeline` y documentos relacionados.
-- Plantillas legales actualizadas por region y almacenadas en `docs/protocolo`.
-- Revisar traducciones y roles default antes de publicar.
-- Validar integracion con notificaciones (recordatorios de tramites y ensayos).
+- Integración con registros civiles y APIs públicas para validar documentación automáticamente.  
+- Generador de programas/QR a partir de momentos y timeline.  
+- Alertas inteligentes en tiempo real (retrasos, clima adverso, tareas críticas).  
+- Dashboard operativo para planners el día del evento.
 
-## 11. Roadmap / pendientes
-- Integracion con registros civiles para seguimiento de expediente.
-- Generador de programas PDF para invitados con QR y seating.
-- Automatizacion de line-up con IA segun preferencias culturales.
-- Planes de contingencia inteligentes basados en clima y disponibilidad de proveedores.
-- Dashboard de seguimiento en tiempo real para el dia del evento.
+> Consulta los enlaces 11A–11E para reglas de negocio, UX y pruebas específicas de cada módulo.

@@ -102,13 +102,17 @@ export async function uploadEmailAttachments(
 
       await uploadBytes(r, file, metadata);
       const url = await getDownloadURL(r);
-      results.push({ filename: safeName, size, url });
+      results.push({ filename: safeName, size, url, storagePath: objectPath });
     }
     return results;
   } catch (e) {
     console.error('uploadEmailAttachments error:', e);
     // Si falla Storage, devolvemos sin URLs para que el backend use fallback
-    return Array.from(files).map((f) => ({ filename: f?.name || 'adjunto', size: f?.size || 0 }));
+    return Array.from(files).map((f) => ({
+      filename: f?.name || 'adjunto',
+      size: f?.size || 0,
+      storagePath: null,
+    }));
   }
 }
 

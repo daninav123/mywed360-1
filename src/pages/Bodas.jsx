@@ -5,9 +5,10 @@ import {
   where,
   getDoc,
   doc,
-  addDoc,
   setDoc,
+  updateDoc,
   serverTimestamp,
+  deleteField,
 } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,10 +22,12 @@ import WeddingFormModal from '../components/WeddingFormModal';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
+import { performanceMonitor } from '../services/PerformanceMonitor';
+import { createWedding } from '../services/WeddingService';
 
 export default function Bodas() {
   const { currentUser, userProfile } = useAuth();
-  const { setActiveWedding } = useWedding();
+  const { activeWedding, setActiveWedding } = useWedding();
   const [weddings, setWeddings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -33,27 +36,24 @@ export default function Bodas() {
 
   const crearBoda = async (values) => {
     try {
-      const newDoc = await addDoc(collection(db, 'weddings'), {
+      const weddingId = await createWedding(currentUser.uid, {
         name: values.name,
         weddingDate: values.date || '',
         location: values.location || '',
         banquetPlace: values.banquetPlace || '',
-        createdAt: serverTimestamp(),
         ownerIds: [],
         plannerIds: [currentUser.uid],
-        assistantIds: [],
         progress: 0,
         active: true,
+        createdFrom: 'planner_dashboard',
       });
-      // Inicializar subcolección de finanzas
-      try {
-        const financeRef = doc(db, 'weddings', newDoc.id, 'finance', 'main');
-        await setDoc(financeRef, { movements: [], createdAt: serverTimestamp() }, { merge: true });
-      } catch (e) {
-        console.warn('No se pudo inicializar finance/main para', newDoc.id, e);
-      }
-      setActiveWedding(newDoc.id);
-      navigate(`/bodas/${newDoc.id}`);
+      performanceMonitor.logEvent('wedding_created', {
+        weddingId,
+        role: userProfile?.role || 'planner',
+        source: 'planner_dashboard',
+      });
+      setActiveWedding(weddingId);
+      navigate(`/bodas/${weddingId}`);
     } catch (err) {
       console.error('Error creando nueva boda:', err);
       alert('No se pudo crear la boda. Revise permisos.');
@@ -109,18 +109,47 @@ export default function Bodas() {
     return () => unsub();
   }, [currentUser]);
 
-  const today = new Date();
-  const activeWeddings = weddings.filter((w) => {
-    if (!w.date) return true; // sin fecha = activa
-    const d = new Date(w.date);
-    return isNaN(d) ? true : d >= today;
-  });
-  const pastWeddings = weddings.filter((w) => {
-    if (!w.date) return false;
-    const d = new Date(w.date);
-    return !isNaN(d) && d < today;
-  });
-  const weddingsToShow = tab === 'active' ? activeWeddings : pastWeddings;
+  const handleToggleActive = async (wed) => {
+    const nextActive = !wed.active;
+    const confirmMessage = nextActive
+      ? '¿Restaurar esta boda y volver a marcarla como activa?'
+      : '¿Archivar esta boda? Podrás restaurarla más adelante.';
+    if (!window.confirm(confirmMessage)) return;
+    try {
+      const wedRef = doc(db, 'weddings', wed.id);
+      await updateDoc(wedRef, {
+        active: nextActive,
+        archivedAt: nextActive ? deleteField() : serverTimestamp(),
+      });
+      if (currentUser?.uid) {
+        const subRef = doc(db, 'users', currentUser.uid, 'weddings', wed.id);
+        await setDoc(
+          subRef,
+          {
+            active: nextActive,
+            archivedAt: nextActive ? deleteField() : new Date().toISOString(),
+            lastUpdatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      }
+      performanceMonitor.logEvent(nextActive ? 'wedding_restored' : 'wedding_archived', {
+        weddingId: wed.id,
+        role: userProfile?.role || 'planner',
+        source: 'planner_dashboard',
+      });
+      if (!nextActive && activeWedding === wed.id) {
+        setActiveWedding('');
+      }
+    } catch (err) {
+      console.error('No se pudo actualizar el estado de la boda', err);
+      alert('No se pudo actualizar el estado de la boda. Intenta nuevamente.');
+    }
+  };
+
+  const activeWeddings = weddings.filter((w) => w.active !== false);
+  const archivedWeddings = weddings.filter((w) => w.active === false);
+  const weddingsToShow = tab === 'active' ? activeWeddings : archivedWeddings;
 
   if (loading) {
     return <p>Cargando bodas...</p>;
@@ -144,7 +173,7 @@ export default function Bodas() {
         onChange={setTab}
         options={[
           { id: 'active', label: 'Bodas activas' },
-          { id: 'past', label: 'Bodas pasadas' },
+          { id: 'archived', label: 'Bodas archivadas' },
         ]}
         className="mb-4"
       />
@@ -162,11 +191,37 @@ export default function Bodas() {
                 navigate(`/bodas/${wed.id}`);
               }}
             >
-              <div className="space-y-2">
-                <h2 className="text-lg font-semibold text-[color:var(--color-text)]">{wed.name}</h2>
-                <p className="text-sm text-muted">
-                  {wed.date} · {wed.location}
-                </p>
+              <div className="space-y-2 relative">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
+                      {wed.name}
+                    </h2>
+                    <p className="text-sm text-muted">
+                      {wed.date} · {wed.location}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-xs font-semibold px-2 py-1 rounded ${
+                      wed.active !== false
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {wed.active !== false ? 'Activa' : 'Archivada'}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  className="absolute top-0 right-0 translate-y-10"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleToggleActive(wed);
+                  }}
+                >
+                  {wed.active !== false ? 'Archivar' : 'Restaurar'}
+                </Button>
               </div>
               {/* Barra de progreso */}
               <div className="mt-4">

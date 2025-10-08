@@ -1,5 +1,22 @@
-import { PlusSquare, Ruler, Layers, DoorOpen, Hexagon, Minus, Square, Circle, Grid, Eye, EyeOff, Magnet, Rows, Palette, Users } from 'lucide-react';
+import {
+  PlusSquare,
+  Ruler,
+  Layers,
+  DoorOpen,
+  Hexagon,
+  Minus,
+  Square,
+  Circle,
+  Grid,
+  Eye,
+  EyeOff,
+  Magnet,
+  Rows,
+  Palette,
+  Users,
+} from 'lucide-react';
 import React from 'react';
+import { venueTemplates } from '../../data/venueTemplates';
 
 const Section = ({ title, icon: Icon, children }) => (
   <div className="px-4 py-3 border-b">
@@ -53,13 +70,37 @@ export default function SeatingLibraryPanel({
             </button>
           </div>
 
-          <div className="text-xs text-gray-500 mt-3 mb-1">Mesas estándar</div>
+          <div className="text-xs text-gray-500 mt-3 mb-1">Mesas</div>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => onAddTable?.({ shape: 'rectangle', width: 80, height: 60, seats: 8 })} className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700">
-              <Square className="inline h-3 w-3 mr-1"/> Rectangular
+            <button
+              onClick={() => onAddTable?.({ tableType: 'round' })}
+              className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1"
+            >
+              <Circle className="inline h-3 w-3" /> Redonda
             </button>
-            <button onClick={() => onAddTable?.({ shape: 'circle', diameter: 80, seats: 8 })} className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700">
-              <Circle className="inline h-3 w-3 mr-1"/> Circular
+            <button
+              onClick={() => onAddTable?.({ tableType: 'square' })}
+              className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1"
+            >
+              <Square className="inline h-3 w-3" /> Cuadrada
+            </button>
+            <button
+              onClick={() => onAddTable?.({ tableType: 'imperial' })}
+              className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1 col-span-2"
+            >
+              <Rows className="inline h-3 w-3" /> Imperial
+            </button>
+            <button
+              onClick={() => onAddTable?.({ tableType: 'cocktail' })}
+              className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1"
+            >
+              <Circle className="inline h-3 w-3" /> Cóctel
+            </button>
+            <button
+              onClick={() => onAddTable?.({ tableType: 'auxiliary' })}
+              className="px-2 py-1 rounded text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center gap-1"
+            >
+              <Users className="inline h-3 w-3" /> Auxiliar
             </button>
           </div>
         </div>

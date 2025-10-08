@@ -28,6 +28,7 @@ export default function FinanceOverview({
   onNavigate,
   isLoading = false,
   transactions = [],
+  projection = null,
 }) {
   const { t } = useTranslations();
   const safeBudget = Array.isArray(budgetUsage) ? budgetUsage : [];
@@ -307,7 +308,58 @@ export default function FinanceOverview({
           })}
         </div>
       </Card>
+
+      {projection?.summary && (
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
+          <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-3">
+            {t('finance.overview.projectionTitle', { defaultValue: 'Proyección financiera' })}
+          </h3>
+          <p className="text-sm text-[color:var(--color-text)]/70 mb-4">
+            {t('finance.overview.projectionHint', {
+              defaultValue:
+                'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
+            })}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30 rounded-md p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-success)]/80">
+                {t('finance.overview.projectedAtWedding', { defaultValue: 'Balance el día de la boda' })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-success)]">
+                {formatCurrency(projection.summary.projectedAtWedding ?? 0)}
+              </p>
+            </div>
+            <div className="bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30 rounded-md p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-warning)]/80">
+                {t('finance.overview.minBalance', { defaultValue: 'Punto de balance mínimo' })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-warning)]">
+                {formatCurrency(projection.summary.minProjectedBalance ?? 0)}
+              </p>
+              {projection.summary.minProjectedBalanceDate && (
+                <p className="text-xs text-[color:var(--color-text)]/60">
+                  {t('finance.overview.onDate', { defaultValue: 'en' })}{' '}
+                  {projection.summary.minProjectedBalanceDate}
+                </p>
+              )}
+            </div>
+            <div className="bg-[var(--color-text)]/5 border border-[color:var(--color-text)]/15 rounded-md p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/70">
+                {t('finance.overview.riskDays', { defaultValue: 'Días en riesgo' })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-text)]">
+                {projection.summary.riskDays ?? 0}
+              </p>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.overview.totalProjectedGifts', {
+                  defaultValue: 'Regalos proyectados:',
+                })}{' '}
+                {formatCurrency(projection.summary.totalProjectedGifts ?? 0)}
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
-

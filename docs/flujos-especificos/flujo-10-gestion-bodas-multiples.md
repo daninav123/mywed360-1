@@ -37,10 +37,10 @@
 - Boda activa se guarda en contexto y localStorage para retomar.
 
 ## 6. Estados especiales y errores
-- Sin bodas ? card onboarding con CTA crear primera boda.
-- Error al crear boda ? toast y rollback; se intenta reintentar seeds.
-- Cambiar a boda sin permisos ? fallback a boda anterior + mensaje.
-- Archivos/actividades sin datos ? placeholders en detalle.
+- Sin bodas → card onboarding con CTA crear primera boda.
+- Error al crear boda → toast y rollback; se intenta reintentar seeds.
+- Cambiar a boda sin permisos → fallback a boda anterior + mensaje.
+- Archivos/actividades sin datos → placeholders en detalle.
 
 ## 7. Integración con otros flujos
 - Flujo 2 usa `activeWeddingId` para onboarding.
@@ -54,7 +54,7 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: context `useWedding`, reducers, creación/archivado.
-- Integración: crear boda ? seeds en finanzas/tareas ? switch ? verificar dashboards cargan.
+- Integración: crear boda → seeds en finanzas/tareas → switch → verificar dashboards cargan.
 - E2E: planner crea segunda boda, alterna, archiva y restaura.
 
 ## 10. Checklist de despliegue

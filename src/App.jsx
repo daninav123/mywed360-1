@@ -41,6 +41,8 @@ const UnifiedInbox = React.lazy(() => import('./components/email/UnifiedInbox/In
 const EmailAdminDashboard = React.lazy(() => import('./components/admin/EmailAdminDashboard'));
 const ComposeEmail = React.lazy(() => import('./components/email/ComposeEmail'));
 const EmailStatistics = React.lazy(() => import('./pages/user/EmailStatistics'));
+const EmailTemplatesPage = React.lazy(() => import('./pages/EmailTemplates.jsx'));
+const EmailSettingsPage = React.lazy(() => import('./components/email/EmailSettings.jsx'));
 const MailgunTester = React.lazy(() => import('./components/email/MailgunTester'));
 const EmailSetup = React.lazy(() => import('./pages/EmailSetup'));
 //
@@ -50,6 +52,7 @@ const Contratos = React.lazy(() => import('./pages/Contratos'));
 const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
 // Protocolo
 const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
+const CeremonyProtocol = React.lazy(() => import('./pages/protocolo/CeremonyProtocol'));
 const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
 const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
 const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
@@ -72,11 +75,15 @@ const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
 const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
 const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
+const ProveedoresFlowHarness = React.lazy(() =>
+  import('./pages/test/ProveedoresFlowHarness.jsx')
+);
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
 // (dedupe) rutas públicas ya importadas arriba
 
 import './utils/consoleCommands';
+import UserProvider from './context/UserContext';
 
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -153,7 +160,8 @@ function App() {
 
                   {/* Protocolo */}
                   <Route path="protocolo" element={<ProtocoloLayout />}>
-                    <Route index element={<Navigate to="momentos-especiales" replace />} />
+                    <Route index element={<Navigate to="resumen" replace />} />
+                    <Route path="resumen" element={<CeremonyProtocol />} />
                     <Route path="momentos-especiales" element={<MomentosEspeciales />} />
                     <Route path="timing" element={<ProtocoloTiming />} />
                     <Route path="checklist" element={<ProtocoloChecklist />} />
@@ -200,6 +208,14 @@ function App() {
                   <Route path="email/compose" element={<ComposeEmail />} />
                   <Route path="email/compose/:action/:id" element={<ComposeEmail />} />
                   <Route
+                    path="email/plantillas"
+                    element={
+                      <UserProvider>
+                        <EmailTemplatesPage />
+                      </UserProvider>
+                    }
+                  />
+                  <Route
                     path="email/stats"
                     element={
                       <UserPreferencesProvider>
@@ -207,6 +223,16 @@ function App() {
                       </UserPreferencesProvider>
                     }
                   />
+                  <Route
+                    path="email/estadisticas"
+                    element={
+                      <UserPreferencesProvider>
+                        <EmailStatistics />
+                      </UserPreferencesProvider>
+                    }
+                  />
+                  <Route path="email/settings" element={<EmailSettingsPage />} />
+                  <Route path="email/configuracion" element={<EmailSettingsPage />} />
                   <Route path="email/setup" element={<EmailSetup />} />
                   <Route path="email/test" element={<MailgunTester />} />
                   {
@@ -224,7 +250,10 @@ function App() {
                   {
                     ((typeof window !== 'undefined' && window.Cypress) ||
                       (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production')) && (
-                      <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+                      <>
+                        <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+                        <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
+                      </>
                     )
                   }
 

@@ -72,12 +72,18 @@
   - Con ID pero sin variables `VITE_BANK_API_*`: se mantiene CTA y se avisa en consola (estado “conexión pendiente”).
   - Errores HTTP → `hasBankAccount=false`, toast genérico y `console.warn`, sin bloquear la vista.
 
+## Alertas de presupuesto
+- Umbrales: `settings.alertThresholds.warn` (75 % por defecto) colorea progreso en ámbar y agrega la categoría a la tarjeta de alertas; `danger` (90 % por defecto) cambia a rojo y marca el estado como crítico.
+- Visualización: `FinanceOverview` renderiza la tarjeta “Alertas de Presupuesto” listando cada categoría sobre los umbrales con enlace a Transacciones filtrado por categoría y tipo de gasto. Los chips de estado por categoría usan los mismos colores.
+- `BudgetManager` replica la lógica de colores en las barras de progreso para mantener consistencia visual, pero no muestra mensajes adicionales.
+- `BudgetAlerts.jsx` quedó obsoleto y no se monta en `Finance.jsx`; el comportamiento oficial es el de `FinanceOverview`.
+
 ## 7. Integracion con otros flujos
 - Flujo 2 usa presupuesto para seeds iniciales y recomendaciones de IA.
 - Flujo 3 aporta correos y contactos para el matching automático de proveedores (sugerencias de email).
 - Flujo 5 (proveedores) sincroniza presupuestos ofertados y estado de contratos.
 - Flujo 6 conecta con timeline de pagos y tareas automáticas (Flujo 5b).
-- Flujo 11 consume pagos confirmados para protocolo y permisos.
+- Flujos 11A/11B/11C usan pagos confirmados para protocolo (celebrante, permisos, música).
 - Flujo 17 considera `budgetProgress` para puntos y logros; Flujo 12 envia notificaciones de sobrepresupuesto.
 
 ## 8. Metricas y monitorizacion

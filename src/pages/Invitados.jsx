@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 
+
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
@@ -150,10 +151,22 @@ function Invitados() {
   }, [weddings, activeWedding, activeWeddingInfo, t]);
 
   const saveTheDateDefault = saveTheDateMessage;
-  // Opciones Ãºnicas de grupo (group o companionGroupId)
-      return [];
-    }
-  }, [guests]);
+
+  const defaultInvitationMessage = React.useMemo(
+    () =>
+      '¡Hola {guestName}! Somos {coupleName} y te enviamos la invitación oficial de nuestra boda. Adjuntamos la tarjeta con todos los detalles y esperamos tu respuesta.',
+    [coupleLabel]
+  );
+
+  const defaultInvitationAsset = React.useMemo(() => {
+    const wi = activeWeddingInfo?.weddingInfo || {};
+    return (
+      wi.invitationAssetUrl ||
+      wi.invitationAsset ||
+      activeWeddingInfo?.invitation?.assetUrl ||
+      ''
+    );
+  }, [activeWeddingInfo]);
 
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
@@ -317,6 +330,97 @@ function Invitados() {
       setIsSaving(false);
     }
   };
+
+  const handleSaveTheDateDelivered = async ({ ok = [] }) => {
+    if (!ok || !ok.length) return;
+    try {
+      await Promise.all(
+        ok.map((id) =>
+          updateGuest(id, {
+            deliveryChannel: 'whatsapp',
+            deliveryStatus: 'save_the_date_sent',
+          })
+        )
+      );
+    } catch (error) {
+      console.warn('[Invitados] error actualizando estado Save The Date', error);
+    }
+  };
+
+  const handleSendFormalInvites = async ({ guestIds = [], message, assetUrl, instagramPollId }) => {
+    if (!guestIds.length) {
+      alert('Selecciona al menos un invitado');
+      return { success: false };
+    }
+    try {
+      const normalizedMessage = (message || '').trim() || defaultInvitationMessage;
+      const normalizedAsset = (assetUrl || '').trim() || defaultInvitationAsset;
+      const pollId = instagramPollId?.trim() || '';
+      const res = await bulkInviteWhatsAppApi({
+        targetIds: guestIds,
+        baseMessage: normalizedMessage,
+        assetUrl: normalizedAsset,
+        coupleName: coupleLabel,
+        metadata: pollId ? { instagramPollId: pollId } : {},
+        type: 'formal_invitation',
+        deliveryChannel: 'whatsapp',
+      });
+      if (res?.error === 'missing-couple-signature') {
+        alert('El mensaje debe incluir el nombre de la pareja.');
+        return { success: false };
+      }
+      if (res?.success) {
+        await Promise.all(
+          guestIds.map((id) =>
+            updateGuest(id, {
+              deliveryChannel: 'whatsapp',
+              deliveryStatus: 'invitation_sent',
+              whatsappAssetUrl: normalizedAsset,
+              instagramPollId: pollId,
+            })
+          )
+        );
+        alert(`Invitación enviada a ${res.ok ?? guestIds.length} invitado(s).`);
+        return { success: true };
+      }
+      alert(res?.error || 'No se pudo enviar la invitación');
+      return { success: false };
+    } catch (error) {
+      console.error('Error enviando invitaciones formales', error);
+      alert('Error enviando las invitaciones');
+      return { success: false };
+    }
+  };
+
+  const handleMarkFormalDelivery = async ({ guestIds = [], channel, assetUrl }) => {
+    if (!guestIds.length) {
+      alert('Selecciona al menos un invitado');
+      return { success: false };
+    }
+    try {
+      const normalizedAsset = (assetUrl || '').trim() || defaultInvitationAsset;
+      if (!normalizedAsset) {
+        alert('Añade la URL de la invitación diseñada antes de continuar.');
+        return { success: false };
+      }
+      const batchId = `${channel || 'print'}-${Date.now()}`;
+      await Promise.all(
+        guestIds.map((id) =>
+          updateGuest(id, {
+            deliveryChannel: channel,
+            deliveryStatus: 'pending',
+            whatsappAssetUrl: normalizedAsset,
+            printBatchId: channel?.startsWith('print') ? batchId : '',
+          })
+        )
+      );
+      alert('Entrega registrada correctamente.');
+      return { success: true };
+    } catch (error) {
+      console.error('Error registrando entrega física', error);
+      alert('No se pudo registrar la entrega.');
+      return { success: false };
+    }
   };
 
   // Enviar API a seleccionados
@@ -486,8 +590,8 @@ function Invitados() {
           }
         } catch {}
         const msg = link
-          ? `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Confirma tu asistencia aquÃ­: ${link}`
-          : `Â¡Hola ${g.name || ''}! Nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
+          ? `Â¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantarÃ­a contar contigo en nuestra boda. Confirma tu asistencia aquÃ­: ${link}`
+          : `Â¡Hola ${g.name || ''}! Somos ${coupleLabel} y nos encantarÃ­a contar contigo en nuestra boda. Â¿Puedes confirmar tu asistencia?`;
         const to = toE164(g.phone);
         if (to)
           items.push({
@@ -529,9 +633,6 @@ function Invitados() {
     setWhatsGuest(null);
   };
 
-  // Abrir gestor de grupos
-  const openGroupManager = () => setShowGroupManager(true);
-  const closeGroupManager = () => setShowGroupManager(false);
 
   // Importar contactos seleccionados
   const handleImportedGuests = async (importedGuests) => {
@@ -638,9 +739,9 @@ function Invitados() {
       const confirmedGuests = (guests || [])
         .filter((g) => {
           const s = String(g.status || '').toLowerCase();
-          return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
+          return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
         })
-        .map((g) => ({ name: g.name || '', table: g.table || '' }));
+        .map((g) => ({ name: g.name || '', table: g.table || '', companion: g.companion || 0 }));
 
       // Ordenar por mesa y nombre
       confirmedGuests.sort((a, b) => {
@@ -661,7 +762,12 @@ function Invitados() {
         <tr>
           <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${idx + 1}</td>
           <td style="padding: 6px 8px; border-bottom: 1px solid #eee;">${g.name}</td>
-          <td style="padding: 6px 8px; border-bottom: 1px solid #eee; text-align:center;">${g.table || '-'}</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #eee; text-align:center;">${
+            g.table || '-'
+          }</td>
+          <td style="padding: 6px 8px; border-bottom: 1px solid #eee; text-align:center;">${
+            g.companion || 0
+          }</td>
         </tr>
       `
         )
@@ -697,6 +803,7 @@ function Invitados() {
                   <th>#</th>
                   <th>Nombre completo</th>
                   <th style="text-align:center;">Mesa</th>
+                  <th style="text-align:center;">Acompañantes</th>
                 </tr>
               </thead>
               <tbody>
@@ -709,7 +816,6 @@ function Invitados() {
       win.document.open();
       win.document.write(html);
       win.document.close();
-      // Opcional: lanzar print automÃ¡tico tras cargar
       win.onload = () => {
         try {
           win.print();
@@ -717,7 +823,7 @@ function Invitados() {
       };
     } catch (err) {
       console.error('Error generando PDF:', err);
-      alert('No se pudo generar el documento de impresiÃ³n');
+      alert('No se pudo generar el documento de impresión');
     }
   };
 
@@ -811,7 +917,6 @@ function Invitados() {
           searchTerm={filters?.search || ''}
           statusFilter={filters?.status || ''}
           tableFilter={filters?.table || ''}
-          groupFilter={filters?.group || ''}
           onUpdateStatus={handleUpdateStatus}
           onEdit={handleEditGuest}
           onDelete={handleDeleteGuest}
@@ -836,7 +941,6 @@ function Invitados() {
               onSave={handleSaveGuest}
               onCancel={handleCancelModal}
               isLoading={isSaving}
-              groupOptions={groupOptions}
             />
           ) : (
             <Tabs defaultValue="manual">
@@ -854,7 +958,6 @@ function Invitados() {
                   onSave={handleSaveGuest}
                   onCancel={handleCancelModal}
                   isLoading={isSaving}
-                  groupOptions={groupOptions}
                 />
               </TabsContent>
               <TabsContent value="import" className="pt-2">
@@ -938,7 +1041,7 @@ function Invitados() {
                     {(guests || [])
                       .filter((g) => {
                         const s = String(g.status || '').toLowerCase();
-                        return s === 'confirmed' || s === 'accepted' || g.response === 'SÃ­';
+                        return s === 'confirmed' || s === 'accepted' || g.response === 'Sí';
                       })
                       .sort(
                         (a, b) =>
@@ -967,21 +1070,7 @@ function Invitados() {
           </div>
         </Modal>
 
-        {/* Modal envÃ­o masivo WhatsApp */}
-        <WhatsAppSender
-          open={showWhatsBatch}
-          guests={guests || []}
-          weddingId={activeWedding}
-          onBatchCreated={(res) => {
-            alert(
-              t('guests.whatsapp.batchCreated', {
-                defaultValue: 'Lote creado con {{count}} mensajes',
-                count: res.items?.length || 0,
-              })
-            );
-          }}
-        />
-
+        {/* Modal envio masivo WhatsApp */}
         {/* Modal SAVE THE DATE */}
         <SaveTheDateModal
           open={showSaveTheDate}
@@ -990,6 +1079,20 @@ function Invitados() {
           weddingId={activeWedding}
           defaultMessage={saveTheDateDefault}
           selectedDefaultIds={selectedIds}
+          coupleName={coupleLabel}
+          onSent={handleSaveTheDateDelivered}
+        />
+
+        <FormalInvitationModal
+          open={showFormalInvitation}
+          onClose={() => setShowFormalInvitation(false)}
+          guests={guests || []}
+          coupleName={coupleLabel}
+          defaultMessage={defaultInvitationMessage}
+          defaultAssetUrl={defaultInvitationAsset}
+          selectedDefaultIds={selectedIds}
+          onSendWhatsApp={handleSendFormalInvites}
+          onMarkDelivery={handleMarkFormalDelivery}
         />
 
         {/* Modal WhatsApp con dos pestaÃ±as (mÃ³vil personal / API) */}
@@ -1013,66 +1116,29 @@ function Invitados() {
           }}
           onSendApi={async (g, msg) => {
             try {
-              const r = await inviteViaWhatsAppApi(g, msg);
+              const r = await inviteViaWhatsAppApi(g, msg, { coupleName: coupleLabel });
+              if (r?.error === 'missing-couple-signature') {
+                alert(
+                  'El mensaje debe incluir el nombre de la pareja. Añade la firma antes de enviarlo.'
+                );
+                return;
+              }
               if (r?.success) setShowWhatsModal(false);
             } catch {}
           }}
           onSendApiBulk={async () => {
             try {
-              await bulkInviteWhatsAppApi();
+              const res = await bulkInviteWhatsAppApi({ coupleName: coupleLabel });
+              if (res?.error === 'missing-couple-signature') {
+                alert(
+                  'El mensaje debe incluir el nombre de la pareja. Revisa la plantilla antes de enviar.'
+                );
+                return;
+              }
+              if (res?.success) {
+                alert(`Invitación enviada a ${res.ok ?? res.count ?? 0} invitado(s).`);
+              }
             } catch {}
-          }}
-        />
-
-        {/* Gestor de Grupos */}
-        <GroupManager
-          open={showGroupManager}
-          onClose={closeGroupManager}
-          guests={guests || []}
-          selectedIds={selectedIds}
-          onAssignGroup={async (groupName) => {
-            try {
-              const setIds = new Set(selectedIds);
-              const targets = (guests || []).filter((g) => setIds.has(g.id));
-              for (const g of targets) {
-                await updateGuest(g.id, { group: groupName });
-                // Propagar a companions del mismo grupo de acompaÃ±antes si aplica
-                if (g.companionGroupId) {
-                  const companions = (guests || []).filter(
-                    (x) => x.companionGroupId === g.companionGroupId && x.id !== g.id
-                  );
-                  for (const c of companions) {
-                    await updateGuest(c.id, { group: groupName });
-                  }
-                }
-              }
-              alert(`Asignado grupo "${groupName}" a ${targets.length} invitado(s).`);
-              closeGroupManager();
-            } catch (e) {
-              alert('Error asignando grupo');
-            }
-          }}
-          onRenameGroup={async (from, to) => {
-            try {
-              const targets = (guests || []).filter((g) => String(g.group || '') === String(from));
-              for (const g of targets) {
-                await updateGuest(g.id, { group: to });
-              }
-              alert(`Grupo renombrado: ${from} â†’ ${to} (${targets.length} invitados actualizados)`);
-            } catch (e) {
-              alert('Error renombrando grupo');
-            }
-          }}
-          onMergeGroups={async (from, to) => {
-            try {
-              const targets = (guests || []).filter((g) => String(g.group || '') === String(from));
-              for (const g of targets) {
-                await updateGuest(g.id, { group: to });
-              }
-              alert(`Fusionados ${targets.length} invitado(s) de "${from}" en "${to}".`);
-            } catch (e) {
-              alert('Error fusionando grupos');
-            }
           }}
         />
       </div>

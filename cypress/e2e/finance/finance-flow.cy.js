@@ -1,11 +1,11 @@
 /// <reference types="Cypress" />
 
-// Flujo 7: Presupuesto y Finanzas
+// Flujo 6: Presupuesto y Finanzas
 // - Crear transacción (modo local, sin boda activa)
 // - Filtrar transacciones
 // - Añadir categoría de presupuesto
 
-describe('Flujo 7 - Finanzas (transacciones y presupuesto)', () => {
+describe('Flujo 6 - Finanzas (transacciones y presupuesto)', () => {
   beforeEach(() => {
     cy.window().then((win) => win.localStorage.clear());
     cy.loginToLovenda();
@@ -50,4 +50,3 @@ describe('Flujo 7 - Finanzas (transacciones y presupuesto)', () => {
     cy.contains('h4,div', 'DJ', { timeout: 8000 }).should('exist');
   });
 });
-
