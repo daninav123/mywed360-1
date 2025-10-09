@@ -26,6 +26,7 @@ import TaskForm from './TaskForm.jsx';
 import TaskList from './TaskList.jsx';
 import TasksHeader from './TasksHeader.jsx';
 import DebugTasksPanel from './DebugTasksPanel.jsx';
+import TaskSidePanel from './TaskSidePanel.jsx';
 //
 
 // Importar hooks de Firestore
@@ -37,6 +38,9 @@ import { useWeddingCollection } from '../../hooks/useWeddingCollection';
 import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup';
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
+import masterTimelineTemplate from '../../data/tasks/masterTimelineTemplate.json';
+
+const GANTT_UNASSIGNED = '__gantt_unassigned__';
 
 // Funcin helper para cargar datos de Firestore de forma segura con fallbacks
 
@@ -321,6 +325,26 @@ export default function Tasks() {
     compute();
     window.addEventListener('resize', compute);
     return () => window.removeEventListener('resize', compute);
+  }, []);
+
+  const [showGanttSubtasks, setShowGanttSubtasks] = useState(false);
+  const [ganttCategoryFilter, setGanttCategoryFilter] = useState('ALL');
+  const [ganttAssigneeFilter, setGanttAssigneeFilter] = useState('ALL');
+  const [selectedParentId, setSelectedParentId] = useState(null);
+  const filtersActive = ganttCategoryFilter !== 'ALL' || ganttAssigneeFilter !== 'ALL';
+
+  const normalizeCategory = useCallback((value) => String(value || 'OTROS').toUpperCase(), []);
+  const extractAssignees = useCallback((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const collected = new Set();
+    if (Array.isArray(item.assignees)) {
+      item.assignees.filter(Boolean).forEach((val) => collected.add(String(val)));
+    }
+    const fallbackKeys = ['assignee', 'responsible', 'responsable', 'assignedTo', 'assigned', 'owner'];
+    for (const key of fallbackKeys) {
+      if (item[key]) collected.add(String(item[key]));
+    }
+    return Array.from(collected);
   }, []);
 
 
@@ -864,7 +888,7 @@ export default function Tasks() {
   let parentProgressMap = new Map();
 
   // Inyectar progreso calculado en tareas padre visibles en el Gantt
-  const ganttDisplayTasks = useMemo(() => {
+  const ganttBaseTasks = useMemo(() => {
     try {
       const bounded = Array.isArray(ganttTasksBounded) ? ganttTasksBounded : [];
       const injected = bounded.map((t) => {
@@ -1028,6 +1052,107 @@ export default function Tasks() {
     }
   }, [uniqueGanttTasks, nestedSubtasks, nestedSubtasksFallback, tasksState]);
 
+  const ganttCategoryOptions = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    const categories = new Set();
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      categories.add(normalizeCategory(task.category));
+    }
+    return Array.from(categories).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  }, [ganttDisplayTasks, normalizeCategory]);
+
+  const ganttAssigneeOptions = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    const names = new Set();
+    let includeUnassigned = false;
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      const assignees = extractAssignees(task);
+      if (assignees.length === 0) includeUnassigned = true;
+      assignees.forEach((name) => names.add(name));
+    }
+    const ordered = Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const opts = ordered.map((value) => ({ value, label: value }));
+    if (includeUnassigned) opts.push({ value: GANTT_UNASSIGNED, label: 'Sin responsable' });
+    return opts;
+  }, [ganttDisplayTasks, extractAssignees]);
+
+  const filteredGanttTasks = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    if (!filtersActive) return tasks;
+    return tasks.filter((task) => {
+      if (!task) return false;
+      const type = String(task.type || 'task');
+      if (type !== 'task') return true;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(task.category) !== ganttCategoryFilter) return false;
+      if (ganttAssigneeFilter === 'ALL') return true;
+      const assignees = extractAssignees(task);
+      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
+      return assignees.includes(ganttAssigneeFilter);
+    });
+  }, [ganttDisplayTasks, filtersActive, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+
+  const filteredParentIds = useMemo(() => {
+    const ids = new Set();
+    const tasks = Array.isArray(filteredGanttTasks) ? filteredGanttTasks : [];
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      if (!task.id) continue;
+      ids.add(String(task.id));
+    }
+    return ids;
+  }, [filteredGanttTasks]);
+
+  const filteredSubtaskEvents = useMemo(() => {
+    const base = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+    if (!filtersActive) return base;
+    if (filteredParentIds.size === 0) return [];
+    return base.filter((sub) => {
+      if (!sub) return false;
+      const pid = String(sub.parentId || '');
+      if (pid && !filteredParentIds.has(pid)) return false;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(sub.category) !== ganttCategoryFilter) return false;
+      if (ganttAssigneeFilter === 'ALL') return true;
+      const assignees = extractAssignees(sub);
+      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
+      return assignees.includes(ganttAssigneeFilter);
+    });
+  }, [subtaskEvents, filtersActive, filteredParentIds, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+
+  const totalParentCount = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    return tasks.filter((task) => String(task?.type || 'task') === 'task').length;
+  }, [ganttDisplayTasks]);
+
+  const showEmptyGanttState = filtersActive && totalParentCount > 0 && filteredParentIds.size === 0;
+
+  const ganttSizingTasks = useMemo(() => {
+    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
+    const candidate = (Array.isArray(source) ? source : []).filter((task) => task && task.start && task.end);
+    if (candidate.length > 0) return candidate;
+    const fallback = Array.isArray(ganttDisplayTasks)
+      ? ganttDisplayTasks.filter((task) => task && task.start && task.end)
+      : [];
+    if (fallback.length > 0) return fallback;
+    return Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
+  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks, uniqueGanttTasks]);
+
+  const ganttTasksToRender = useMemo(() => {
+    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
+    return Array.isArray(source) ? source : [];
+  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks]);
+
+  const ganttSubtasksToRender = useMemo(() => {
+    const source = filtersActive ? filteredSubtaskEvents : subtaskEvents;
+    return Array.isArray(source) ? source : [];
+  }, [filtersActive, filteredSubtaskEvents, subtaskEvents]);
+
+  const noTasksScheduled = totalParentCount === 0;
+
   // (se declara ms abajo tras parentNameMap)
 
   const taskListItems = useMemo(() => {
@@ -1058,6 +1183,36 @@ export default function Tasks() {
       return [];
     }
   }, [uniqueGanttTasks]);
+
+  const selectedParent = useMemo(() => {
+    if (!selectedParentId) return null;
+    const pid = String(selectedParentId);
+    const fromGantt = (Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : []).find(
+      (t) => String(t?.id || '') === pid && String(t?.type || 'task') === 'task'
+    );
+    if (fromGantt) return fromGantt;
+    const fromState = (Array.isArray(tasksState) ? tasksState : []).find(
+      (t) => String(t?.id || '') === pid
+    );
+    return fromState || null;
+  }, [selectedParentId, uniqueGanttTasks, tasksState]);
+
+  const selectedParentSubtasks = useMemo(() => {
+    if (!selectedParentId) return [];
+    const pid = String(selectedParentId);
+    return (Array.isArray(subtaskEvents) ? subtaskEvents : []).filter(
+      (sub) => String(sub?.parentId || '') === pid
+    );
+  }, [selectedParentId, subtaskEvents]);
+
+  useEffect(() => {
+    if (!selectedParentId) return;
+    if (!filtersActive) return;
+    const pid = String(selectedParentId);
+    if (filteredParentIds.size === 0 || !filteredParentIds.has(pid)) {
+      setSelectedParentId(null);
+    }
+  }, [selectedParentId, filtersActive, filteredParentIds]);
 
   // Recalcular y actualizar el rango del padre basado en sus subtareas programadas
   const computeAndUpdateParentRange = useCallback(async (parentId) => {
@@ -1215,6 +1370,136 @@ export default function Tasks() {
     }
   }, [subtaskEvents, completedIdSet]);
 
+  const parentRiskMap = useMemo(() => {
+    try {
+      const map = new Map();
+      const parents = (Array.isArray(ganttBaseTasks) ? ganttBaseTasks : []).filter(
+        (task) => task && String(task.type || 'task') === 'task'
+      );
+      if (parents.length === 0) return map;
+
+      const subsByParent = new Map();
+      const subs = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+      const today = new Date();
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+
+      const isCompleted = (sub) => {
+        if (!sub) return false;
+        if (completedIdSet.has(String(sub.id))) return true;
+        if (typeof sub.done === 'boolean') return sub.done;
+        if (typeof sub.completed === 'boolean') return sub.completed;
+        return false;
+      };
+
+      for (const sub of subs) {
+        if (!sub) continue;
+        const pid = String(sub.parentId || '');
+        if (!pid) continue;
+        const start =
+          sub.start instanceof Date
+            ? sub.start
+            : sub.start
+              ? new Date(sub.start)
+              : null;
+        const end =
+          sub.end instanceof Date
+            ? sub.end
+            : sub.end
+              ? new Date(sub.end)
+              : start;
+        if (!subsByParent.has(pid)) subsByParent.set(pid, []);
+        subsByParent.get(pid).push({
+          ...sub,
+          start,
+          end,
+          isDone: isCompleted(sub),
+        });
+      }
+
+      parents.forEach((parent) => {
+        const pid = String(parent.id || '');
+        if (!pid) return;
+        const list = subsByParent.get(pid) || [];
+        const total = list.length;
+        const completed = list.filter((item) => item.isDone).length;
+
+        const completionPct =
+          total > 0 ? Math.round((completed / total) * 100) : Math.round(Number(parent.progress || 0));
+
+        const overdue = list.filter((item) => {
+          if (!item.end || !(item.end instanceof Date)) return false;
+          const due = new Date(
+            item.end.getFullYear(),
+            item.end.getMonth(),
+            item.end.getDate(),
+            0,
+            0,
+            0,
+            0
+          );
+          return due.getTime() < todayStart.getTime() && !item.isDone;
+        }).length;
+
+        const start =
+          parent.start instanceof Date ? parent.start : parent.start ? new Date(parent.start) : null;
+        const end = parent.end instanceof Date ? parent.end : parent.end ? new Date(parent.end) : null;
+        let timeRatio = 0;
+        if (start && end) {
+          const span = end.getTime() - start.getTime();
+          if (span > 0) {
+            timeRatio = (todayStart.getTime() - start.getTime()) / span;
+            timeRatio = Math.max(0, Math.min(1, timeRatio));
+          }
+        }
+        const expectedProgress = Math.round(timeRatio * 100);
+
+        let level = 'ok';
+        let reason = '';
+        if (end && end.getTime() < todayStart.getTime() && completionPct < 90) {
+          level = 'critical';
+          reason = 'Bloque atrasado y sin finalizar';
+        } else if (overdue > 0 && overdue >= Math.max(2, Math.ceil(total * 0.3))) {
+          level = 'critical';
+          reason = `${overdue} subtareas vencidas`;
+        } else if (overdue > 0) {
+          level = 'warning';
+          reason = `${overdue} subtareas vencidas`;
+        } else if (timeRatio > 0.3 && completionPct + 15 < expectedProgress) {
+          level = 'warning';
+          reason = 'Progreso por debajo del ritmo esperado';
+        } else if (completionPct >= 100) {
+          level = 'ok';
+          reason = 'Bloque completado';
+        }
+
+        map.set(pid, {
+          level,
+          overdue,
+          completionPct,
+          expectedProgress,
+          message: reason,
+        });
+      });
+
+      return map;
+    } catch (error) {
+      console.warn('[Tasks] Error calculando mapa de riesgo', error);
+      return new Map();
+    }
+  }, [ganttBaseTasks, subtaskEvents, completedIdSet]);
+
+  const ganttDisplayTasks = useMemo(() => {
+    const base = Array.isArray(ganttBaseTasks) ? ganttBaseTasks : [];
+    if (base.length === 0) return base;
+    return base.map((task) => {
+      if (!task || String(task.type || 'task') !== 'task') return task;
+      const pid = String(task.id || '');
+      const risk = parentRiskMap.get(pid);
+      if (!risk) return task;
+      return { ...task, risk };
+    });
+  }, [ganttBaseTasks, parentRiskMap]);
+
   // Accin manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
     try {
@@ -1235,118 +1520,31 @@ export default function Tasks() {
       const span = Math.max(1, endBase.getTime() - startBase.getTime());
       const at = (p) => new Date(startBase.getTime() + span * p);
 
-      const blocks = [
-        {
-          key: 'A',
-          name: 'Bloque A - Fundamentos',
-          p0: 0.0,
-          p1: 0.2,
-          items: [
-            'Difundir la noticia y organizar la planificacin (perfil, invitar pareja, anillo, presupuesto inicial)',
-            'Crear primera versin de la lista de invitados',
-            'Investigar lugares de celebracin y comenzar visitas',
-            'Decidir cortejo nupcial',
-          ],
-        },
-        {
-          key: 'B',
-          name: 'Bloque B - Proveedores Clave',
-          p0: 0.1,
-          p1: 0.8,
-          items: [
-            'fotografía â†’ contacto inicial pronto, cierre de contrato a mitad del proceso',
-            'Videografa â†’ decisin temprana, reuniones finales hacia el final',
-            'Catering â†’ investigacin inicial, prueba de men, cierre cercano a la boda',
-            'Florista â†’ inspiracin y primeras ideas, confirmacin en la fase final',
-            'música â†’ banda/DJ reservados pronto, reunin final mÍs tarde',
-            'Repostera â†’ búsqueda inicial, prueba de sabores meses despus, pedido final cerca de la boda',
-          ],
-        },
-        {
-          key: 'C',
-          name: 'Bloque C - Vestuario y Moda',
-          p0: 0.15,
-          p1: 0.9,
-          items: [
-            'Novia â†’ visitas iniciales, decisin intermedia, pruebas finales en los Últimos meses',
-            'Novio â†’ compra traje en mitad del proceso, ajustes finales poco antes',
-            'Cortejo â†’ definir vestidos/trajes, confirmar tallas y ajustes finales mÍs tarde',
-          ],
-        },
-        {
-          key: 'D',
-          name: 'Bloque D - Estilo y Detalles',
-          p0: 0.2,
-          p1: 0.95,
-          items: [
-            'Invitaciones digitales y save-the-dates (inicio medio)',
-            'Invitaciones fsicas y papelería (fase intermedia)',
-            'decoración y DIY (se puede trabajar meses antes y ultimar al final)',
-            'Recuerdos y regalos (eleccin temprana, cierre antes del evento)',
-          ],
-        },
-        {
-          key: 'E',
-          name: 'Bloque E - Organizacin y Logstica',
-          p0: 0.3,
-          p1: 1.0,
-          items: [
-            'Transporte (se puede definir pronto, confirmar al final)',
-            'Extras y bÍsicos del da (ir acumulando, revisin final cercana a la boda)',
-            'Confirmaciones con proveedores (Últimas semanas)',
-            'Plan B clima (al final)',
-            'Ensayo general (Última fase)',
-          ],
-        },
-        {
-          key: 'F',
-          name: 'Bloque F - Celebraciones y Emociones',
-          p0: 0.4,
-          p1: 0.95,
-          items: [
-            'Eventos adicionales (preboda, brunchâ€¦)',
-            'Despedidas (planificacin antes, celebracin final)',
-            'Votos y discursos (escribir con calma, repasar justo antes)',
-          ],
-        },
-        {
-          key: 'G',
-          name: 'Bloque G - Belleza y Cuidado',
-          p0: 0.6,
-          p1: 0.95,
-          items: [
-            'Reservas peluquería/maquillaje con antelacin',
-            'Pruebas intermedias',
-            'Rutinas de cuidado personal (Últimos meses)',
-          ],
-        },
-        {
-          key: 'H',
-          name: 'Bloque H - Anillos y Luna de Miel',
-          p0: 0.7,
-          p1: 1.0,
-          items: [
-            'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-            'Planificar luna de miel (eleccin pronto, reservas intermedias, maletas al final)',
-          ],
-        },
-        {
-          key: 'I',
-          name: 'Bloque I - Despus de la Boda',
-          p0: 1.0,
-          p1: 1.05,
-          items: ['Disfrutar inicio del matrimonio', 'Organizar Ílbum y recuerdos'],
-        },
-      ];
+      const templateBlocks = Array.isArray(masterTimelineTemplate?.blocks)
+        ? masterTimelineTemplate.blocks
+        : [];
+      if (templateBlocks.length === 0) {
+        console.warn('[Tasks] Sin bloques de plantilla, se omite el seed manual');
+        setSeedingDefaults(false);
+        return;
+      }
+      const templateVersion = Number(masterTimelineTemplate?.version || 1);
 
       const colRef = collection(db, 'weddings', activeWedding, 'tasks');
-      for (const b of blocks) {
+      for (const b of templateBlocks) {
+        const safeName = String(b?.name || 'Tarea');
+        const safeP0 = typeof b?.p0 === 'number' ? b.p0 : 0;
+        const safeP1Raw = typeof b?.p1 === 'number' ? b.p1 : safeP0 + 0.2;
+        const safeP1 = safeP1Raw <= safeP0 ? safeP0 + 0.2 : safeP1Raw;
+        const ratioSpan = Math.max(0.05, safeP1 - safeP0);
+        const safeItems = Array.isArray(b?.items) ? b.items : [];
+
         const parent = {
-          title: b.name,
-          name: b.name,
+          title: safeName,
+          name: safeName,
           type: 'task',
-          start: at(b.p0),
-          end: at(b.p1),
+          start: at(safeP0),
+          end: at(safeP1),
           progress: 0,
           isDisabled: false,
           createdAt: serverTimestamp(),
@@ -1354,12 +1552,13 @@ export default function Tasks() {
         };
         const pDoc = await addDoc(colRef, parent);
         await setDoc(pDoc, { id: pDoc.id }, { merge: true });
-        for (const item of b.items) {
-          const s = at(b.p0 + Math.random() * (b.p1 - b.p0) * 0.6);
-          const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
+        for (const item of safeItems) {
+          const label = String(item || '').trim() || 'Subtarea';
+          const s = at(safeP0 + Math.random() * ratioSpan * 0.6);
+          const e = at(Math.min(safeP1, safeP0 + 0.4 + Math.random() * ratioSpan * 0.5));
           const sub = {
-            title: item,
-            name: item,
+            title: label,
+            name: label,
             parentId: pDoc.id,
             weddingId: activeWedding,
             start: s,
@@ -1375,7 +1574,11 @@ export default function Tasks() {
         }
       }
 
-      await setDoc(seedRef, { seededAt: serverTimestamp(), version: 1 }, { merge: true });
+      await setDoc(
+        seedRef,
+        { seededAt: serverTimestamp(), version: templateVersion },
+        { merge: true }
+      );
     } catch (_) {
     } finally {
       setSeedingDefaults(false);
@@ -1406,118 +1609,31 @@ export default function Tasks() {
         const span = Math.max(1, endBase.getTime() - startBase.getTime());
         const at = (p) => new Date(startBase.getTime() + span * p);
 
-        const blocks = [
-          {
-            key: 'A',
-            name: 'Fundamentos',
-            p0: 0.0,
-            p1: 0.2,
-            items: [
-              'Difundir la noticia y organizar la planificacin (perfil, invitar pareja, anillo, presupuesto inicial)',
-              'Crear primera versin de la lista de invitados',
-              'Investigar lugares de celebracin y comenzar visitas',
-              'Decidir cortejo nupcial',
-            ],
-          },
-          {
-            key: 'B',
-            name: 'Proveedores Clave',
-            p0: 0.1,
-            p1: 0.8,
-            items: [
-              'fotografía â†’ contacto inicial pronto, cierre de contrato a mitad del proceso',
-              'Videografa â†’ decisin temprana, reuniones finales hacia el final',
-              'Catering â†’ investigacin inicial, prueba de men, cierre cercano a la boda',
-              'Florista â†’ inspiracin y primeras ideas, confirmacin en la fase final',
-              'música â†’ banda/DJ reservados pronto, reunin final mÍs tarde',
-              'Repostera â†’ búsqueda inicial, prueba de sabores meses despus, pedido final cerca de la boda',
-            ],
-          },
-          {
-            key: 'C',
-            name: 'Vestuario y Moda',
-            p0: 0.15,
-            p1: 0.9,
-            items: [
-              'Novia â†’ visitas iniciales, decisin intermedia, pruebas finales en los Últimos meses',
-              'Novio â†’ compra traje en mitad del proceso, ajustes finales poco antes',
-              'Cortejo â†’ definir vestidos/trajes, confirmar tallas y ajustes finales mÍs tarde',
-            ],
-          },
-          {
-            key: 'D',
-            name: 'Estilo y Detalles',
-            p0: 0.2,
-            p1: 0.95,
-            items: [
-              'Invitaciones digitales y save-the-dates (inicio medio)',
-              'Invitaciones fsicas y papelería (fase intermedia)',
-              'decoración y DIY (se puede trabajar meses antes y ultimar al final)',
-              'Recuerdos y regalos (eleccin temprana, cierre antes del evento)',
-            ],
-          },
-          {
-            key: 'E',
-            name: 'Organizacin y Logstica',
-            p0: 0.3,
-            p1: 1.0,
-            items: [
-              'Transporte (se puede definir pronto, confirmar al final)',
-              'Extras y bÍsicos del da (ir acumulando, revisin final cercana a la boda)',
-              'Confirmaciones con proveedores (Últimas semanas)',
-              'Plan B clima (al final)',
-              'Ensayo general (Última fase)',
-            ],
-          },
-          {
-            key: 'F',
-            name: 'Celebraciones y Emociones',
-            p0: 0.4,
-            p1: 0.95,
-            items: [
-              'Eventos adicionales (preboda, brunchâ€¦)',
-              'Despedidas (planificacin antes, celebracin final)',
-              'Votos y discursos (escribir con calma, repasar justo antes)',
-            ],
-          },
-          {
-            key: 'G',
-            name: 'Belleza y Cuidado',
-            p0: 0.6,
-            p1: 0.95,
-            items: [
-              'Reservas peluquería/maquillaje con antelacin',
-              'Pruebas intermedias',
-              'Rutinas de cuidado personal (Últimos meses)',
-            ],
-          },
-          {
-            key: 'H',
-            name: 'Anillos y Luna de Miel',
-            p0: 0.7,
-            p1: 1.0,
-            items: [
-              'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-              'Planificar luna de miel (eleccin pronto, reservas intermedias, maletas al final)',
-            ],
-          },
-          {
-            key: 'I',
-            name: 'Despus de la Boda',
-            p0: 1.0,
-            p1: 1.05,
-            items: ['Disfrutar inicio del matrimonio', 'Organizar Ílbum y recuerdos'],
-          },
-        ];
+        const templateBlocks = Array.isArray(masterTimelineTemplate?.blocks)
+          ? masterTimelineTemplate.blocks
+          : [];
+        if (templateBlocks.length === 0) {
+          console.warn('[Tasks] Sin bloques de plantilla, se omite el seed inicial');
+          setSeedingDefaults(false);
+          return;
+        }
 
+        const templateVersion = Number(masterTimelineTemplate?.version || 1);
         const colRef = collection(db, 'weddings', activeWedding, 'tasks');
-        for (const b of blocks) {
+        for (const b of templateBlocks) {
+          const safeName = String(b?.name || 'Tarea');
+          const safeP0 = typeof b?.p0 === 'number' ? b.p0 : 0;
+          const safeP1Raw = typeof b?.p1 === 'number' ? b.p1 : safeP0 + 0.2;
+          const safeP1 = safeP1Raw <= safeP0 ? safeP0 + 0.2 : safeP1Raw;
+          const ratioSpan = Math.max(0.05, safeP1 - safeP0);
+          const safeItems = Array.isArray(b?.items) ? b.items : [];
+
           const parent = {
-            title: b.name,
-            name: b.name,
+            title: safeName,
+            name: safeName,
             type: 'task',
-            start: at(b.p0),
-            end: at(b.p1),
+            start: at(safeP0),
+            end: at(safeP1),
             progress: 0,
             isDisabled: false,
             createdAt: serverTimestamp(),
@@ -1525,12 +1641,13 @@ export default function Tasks() {
           };
           const pDoc = await addDoc(colRef, parent);
           await setDoc(pDoc, { id: pDoc.id }, { merge: true });
-          for (const item of b.items) {
-            const s = at(b.p0 + Math.random() * (b.p1 - b.p0) * 0.6);
-            const e = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
+          for (const item of safeItems) {
+            const label = String(item || '').trim() || 'Subtarea';
+            const s = at(safeP0 + Math.random() * ratioSpan * 0.6);
+            const e = at(Math.min(safeP1, safeP0 + 0.4 + Math.random() * ratioSpan * 0.5));
             const sub = {
-              title: item,
-              name: item,
+              title: label,
+              name: label,
               parentId: pDoc.id,
               weddingId: activeWedding,
               start: s,
@@ -1546,7 +1663,11 @@ export default function Tasks() {
           }
         }
 
-        await setDoc(seedRef, { seededAt: serverTimestamp(), version: 1 }, { merge: true });
+        await setDoc(
+          seedRef,
+          { seededAt: serverTimestamp(), version: templateVersion },
+          { merge: true }
+        );
       } catch (e) {
         console.warn('[Tasks] Seed de bloques no completado:', e);
       }
@@ -1577,7 +1698,7 @@ export default function Tasks() {
 
   // Ajuste de Gantt (hooks deben estar a nivel superior del componente)
   useGanttSizing({
-    uniqueGanttTasks,
+    uniqueGanttTasks: ganttSizingTasks,
     projectStart,
     projectEnd,
     containerRef: ganttContainerRef,
@@ -1988,45 +2109,115 @@ export default function Tasks() {
 
       {/* Componente para el diagrama Gantt */}
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
-        <h2 className="text-xl font-semibold mb-4">Planificacin a Largo Plazo</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 className="text-xl font-semibold">Planificación a Largo Plazo</h2>
+          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                checked={showGanttSubtasks}
+                onChange={(e) => setShowGanttSubtasks(e.target.checked)}
+              />
+              Mostrar subtareas
+            </label>
+            <select
+              className="border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              value={ganttCategoryFilter}
+              onChange={(e) => setGanttCategoryFilter(e.target.value)}
+            >
+              <option value="ALL">Todas las categorías</option>
+              {ganttCategoryOptions.map((cat) => {
+                const pretty = cat ? cat.charAt(0) + cat.slice(1).toLowerCase() : '';
+                const label = pretty ? pretty.charAt(0).toUpperCase() + pretty.slice(1) : 'Sin categoría';
+                return (
+                  <option key={cat} value={cat}>
+                    {label}
+                  </option>
+                );
+              })}
+            </select>
+            <select
+              className="border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              value={ganttAssigneeFilter}
+              onChange={(e) => setGanttAssigneeFilter(e.target.value)}
+            >
+              <option value="ALL">Todos los responsables</option>
+              {ganttAssigneeOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {filtersActive && (
+              <button
+                type="button"
+                className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                onClick={() => {
+                  setGanttCategoryFilter('ALL');
+                  setGanttAssigneeFilter('ALL');
+                }}
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
+        </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <LongTermTasksGantt
-            tasks={ganttDisplayTasks || []}
-            subtasks={subtaskEvents || []}
-            projectStart={projectStart || new Date()}
-            projectEnd={projectEnd || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)} // Default to 30 days from now
-            containerRef={ganttContainerRef}
-            columnWidth={120}
-            rowHeight={40}
-            onTaskClick={(task) => {
-              if (!task) return;
-              // Intento de Navegacin rpida a otra secci)n si aplica
-              if (handleTaskIntent(task)) return;
-              try {
-                const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
-                const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
-                setEditingId(task.id);
-                setEditingPath(task.__path || null);
-                setFormData((prev) => ({
-                  ...prev,
-                  title: task.title || '',
-                  desc: task.desc || '',
-                  category: task.category || 'OTROS',
-                  startDate: eventStart.toISOString().slice(0, 10),
-                  startTime: eventStart.toTimeString().slice(0, 5),
-                  endDate: eventEnd.toISOString().slice(0, 10),
-                  endTime: eventEnd.toTimeString().slice(0, 5),
-                  long: task.__kind === 'subtask',
-                  parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
-                  assignee: task.assignee || '',
-                  completed: completedIdSet?.has?.(String(task.id)) || false,
-                }));
-                setShowNewTask(true);
-              } catch (error) {
-                console.error('Error al manejar clic en tarea:', error);
-              }
-            }}
-          />
+          {showEmptyGanttState ? (
+            <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-lg px-4 py-6 text-center">
+              No hay tareas que coincidan con los filtros seleccionados.
+            </div>
+          ) : noTasksScheduled ? (
+            <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-lg px-4 py-6 text-center">
+              Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
+            </div>
+          ) : (
+            <LongTermTasksGantt
+              tasks={ganttTasksToRender}
+              subtasks={ganttSubtasksToRender}
+              projectStart={projectStart || new Date()}
+              projectEnd={projectEnd || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
+              containerRef={ganttContainerRef}
+              columnWidth={120}
+              rowHeight={40}
+              showSubtasks={showGanttSubtasks}
+              onParentSelect={(task) => {
+                if (!task || !task.id) {
+                  setSelectedParentId(null);
+                  return;
+                }
+                setSelectedParentId(String(task.id));
+              }}
+              onTaskClick={(task) => {
+                if (!task) return;
+                if (handleTaskIntent(task)) return;
+                try {
+                  const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
+                  const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
+                  setEditingId(task.id);
+                  setEditingPath(task.__path || null);
+                  setFormData((prev) => ({
+                    ...prev,
+                    title: task.title || '',
+                    desc: task.desc || '',
+                    category: task.category || 'OTROS',
+                    startDate: eventStart.toISOString().slice(0, 10),
+                    startTime: eventStart.toTimeString().slice(0, 5),
+                    endDate: eventEnd.toISOString().slice(0, 10),
+                    endTime: eventEnd.toTimeString().slice(0, 5),
+                    long: task.__kind === 'subtask',
+                    parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
+                    assignee: task.assignee || '',
+                    completed: completedIdSet?.has?.(String(task.id)) || false,
+                  }));
+                  setShowNewTask(true);
+                } catch (error) {
+                  console.error('Error al manejar clic en tarea:', error);
+                }
+              }}
+            />
+          )}
         </div>
       </div>
 
@@ -2195,6 +2386,13 @@ export default function Tasks() {
           parentOptions={parentTaskOptions}
         />
       )}
+      <TaskSidePanel
+        isOpen={Boolean(selectedParent)}
+        onClose={() => setSelectedParentId(null)}
+        weddingId={activeWedding}
+        parent={selectedParent}
+        subtasks={selectedParentSubtasks}
+      />
     </div>
   );
 }

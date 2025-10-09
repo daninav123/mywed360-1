@@ -167,8 +167,8 @@ export const AuthProvider = ({ children }) => {
         const userData = userDoc.data();
         
         setUser(firebaseUser);
-        setUserRole(userData?.role || 'owner');
-        setUserPlan(userData?.profile?.plan || 'free');
+        setUserRole(userData→.role || 'owner');
+        setUserPlan(userData→.profile→.plan || 'free');
       } else {
         setUser(null);
         setUserRole(null);
@@ -282,7 +282,7 @@ const WeddingSelector = () => {
   return (
     <div className= – wedding-selector – >
       <select 
-        value={activeWedding?.id || ''} 
+        value={activeWedding→.id || ''} 
         onChange={(e) => {
           const selected = availableWeddings.find(w => w.id === e.target.value);
           setActiveWedding(selected);
@@ -317,7 +317,7 @@ export const usePermissions = () => {
 
   const canDeleteWedding = () => {
     return userRole === 'owner' || 
-           (userRole === 'wedding_planner' && activeWedding?.plannerId === user?.uid);
+           (userRole === 'wedding_planner' && activeWedding→.plannerId === user→.uid);
   };
 
   const canEditBilling = () => {

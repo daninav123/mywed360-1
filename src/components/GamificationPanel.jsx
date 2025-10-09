@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState, useMemo } from 'react';
 import { getSummary } from '../services/gamificationService';
 import { useUserContext } from '../context/UserContext';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 import { Card } from './ui/Card';
 import { Progress } from './ui/Progress';
 

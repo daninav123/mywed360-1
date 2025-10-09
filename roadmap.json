@@ -552,6 +552,258 @@
       "command": "npm run test:unit -- src/__tests__/firestore.rules.collections.test.js",
       "attempts": 19,
       "lastError": "Task process exit code 1"
+    },
+    {
+      "id": "e2e_compose_quick_replies_cy_js",
+      "title": "E2E: E2E – compose quick replies",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/compose_quick_replies.cy.js\""
+    },
+    {
+      "id": "e2e_email_inbox_smoke_cy_js",
+      "title": "E2E: E2E – email inbox smoke",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/email_inbox_smoke.cy.js\""
+    },
+    {
+      "id": "e2e_inspiration_smoke_cy_js",
+      "title": "E2E: E2E – inspiration smoke",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration_smoke.cy.js\""
+    },
+    {
+      "id": "e2e_invitaciones_rsvp_cy_js",
+      "title": "E2E: E2E – invitaciones rsvp",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/invitaciones_rsvp.cy.js\""
+    },
+    {
+      "id": "e2e_proveedores_compare_cy_js",
+      "title": "E2E: E2E – proveedores compare",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/proveedores_compare.cy.js\""
+    },
+    {
+      "id": "e2e_proveedores_flow_cy_js",
+      "title": "E2E: E2E – proveedores flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/proveedores_flow.cy.js\""
+    },
+    {
+      "id": "e2e_proveedores_smoke_cy_js",
+      "title": "E2E: E2E – proveedores smoke",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/proveedores_smoke.cy.js\""
+    },
+    {
+      "id": "e2e_admin_admin_flow_cy_js",
+      "title": "E2E: Administración – admin flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/admin/admin-flow.cy.js\""
+    },
+    {
+      "id": "e2e_auth_auth_flow_cy_js",
+      "title": "E2E: Autenticación – auth flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/auth/auth-flow.cy.js\""
+    },
+    {
+      "id": "e2e_auth_flow1_password_reset_cy_js",
+      "title": "E2E: Autenticación – flow1 password reset",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/auth/flow1-password-reset.cy.js\""
+    },
+    {
+      "id": "e2e_auth_flow1_signup_cy_js",
+      "title": "E2E: Autenticación – flow1 signup",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/auth/flow1-signup.cy.js\""
+    },
+    {
+      "id": "e2e_auth_flow1_social_login_cy_js",
+      "title": "E2E: Autenticación – flow1 social login",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/auth/flow1-social-login.cy.js\""
+    },
+    {
+      "id": "e2e_auth_flow1_verify_email_cy_js",
+      "title": "E2E: Autenticación – flow1 verify email",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/auth/flow1-verify-email.cy.js\""
+    },
+    {
+      "id": "e2e_contracts_contracts_flow_cy_js",
+      "title": "E2E: Contratos – contracts flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/contracts/contracts-flow.cy.js\""
+    },
+    {
+      "id": "e2e_email_smart_composer_cy_js",
+      "title": "E2E: Email – smart composer",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/email/smart-composer.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_analytics_cy_js",
+      "title": "E2E: Finance – finance analytics",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-analytics.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_budget_cy_js",
+      "title": "E2E: Finance – finance budget",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-budget.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_contributions_cy_js",
+      "title": "E2E: Finance – finance contributions",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-contributions.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_flow_full_cy_js",
+      "title": "E2E: Finance – finance flow full",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-flow-full.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_flow_cy_js",
+      "title": "E2E: Finance – finance flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-flow.cy.js\""
+    },
+    {
+      "id": "e2e_finance_finance_transactions_cy_js",
+      "title": "E2E: Finance – finance transactions",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-transactions.cy.js\""
+    },
+    {
+      "id": "e2e_guests_guests_flow_cy_js",
+      "title": "E2E: Invitados – guests flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/guests/guests_flow.cy.js\""
+    },
+    {
+      "id": "e2e_inspiration_inspiration_flow_cy_js",
+      "title": "E2E: Inspiración – inspiration flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration/inspiration-flow.cy.js\""
+    },
+    {
+      "id": "e2e_news_news_flow_cy_js",
+      "title": "E2E: Noticias – news flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/news/news-flow.cy.js\""
+    },
+    {
+      "id": "e2e_notifications_preferences_flow_cy_js",
+      "title": "E2E: Notificaciones – preferences flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/notifications/preferences-flow.cy.js\""
+    },
+    {
+      "id": "e2e_onboarding_create_event_flow_cy_js",
+      "title": "E2E: Onboarding – create event flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/create-event-flow.cy.js\""
+    },
+    {
+      "id": "e2e_protocolo_ceremony_tabs_flow_cy_js",
+      "title": "E2E: Protocolo – ceremony tabs flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/protocolo/ceremony-tabs-flow.cy.js\""
+    },
+    {
+      "id": "e2e_protocolo_protocolo_flows_cy_js",
+      "title": "E2E: Protocolo – protocolo flows",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/protocolo/protocolo-flows.cy.js\""
+    },
+    {
+      "id": "e2e_rsvp_rsvp_confirm_cy_js",
+      "title": "E2E: rsvp – rsvp confirm",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp/rsvp_confirm.cy.js\""
+    },
+    {
+      "id": "e2e_seating_seating_content_flow_cy_js",
+      "title": "E2E: Seating – seating content flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating-content-flow.cy.js\""
+    },
+    {
+      "id": "e2e_seating_seating_area_type_cy_js",
+      "title": "E2E: Seating – seating area type",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_area_type.cy.js\""
+    },
+    {
+      "id": "e2e_seating_seating_ceremony_cy_js",
+      "title": "E2E: Seating – seating ceremony",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_ceremony.cy.js\""
+    },
+    {
+      "id": "e2e_seating_seating_delete_duplicate_cy_js",
+      "title": "E2E: Seating – seating delete duplicate",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_delete_duplicate.cy.js\""
+    },
+    {
+      "id": "e2e_tasks_all_subtasks_modal_cy_js",
+      "title": "E2E: Tareas – all subtasks modal",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/tasks/all_subtasks_modal.cy.js\""
+    },
+    {
+      "id": "e2e_web_diseno_web_flow_cy_js",
+      "title": "E2E: Diseño Web – diseno web flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/web/diseno-web-flow.cy.js\""
+    },
+    {
+      "id": "e2e_weddings_multi_weddings_flow_cy_js",
+      "title": "E2E: Bodas múltiples – multi weddings flow",
+      "status": "pending",
+      "priority": 15,
+      "command": "npm run cypress:run -- --spec \"cypress/e2e/weddings/multi-weddings-flow.cy.js\""
     }
   ]
 }

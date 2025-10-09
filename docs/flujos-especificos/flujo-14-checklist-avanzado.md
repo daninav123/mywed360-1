@@ -9,9 +9,9 @@
 - Coordinar colaboracion multirol, seguimiento de progreso y automatizacion de recordatorios.
 
 ## 2. Trigger y rutas
-- Menu lateral -> `/tareas` (kanban) y `/checklist` (lista) en `Tasks.jsx`/`Checklist.jsx`.
-- CTA desde onboarding "Configura tu checklist" y widgets del dashboard.
-- Acceso contextual desde modulos (Proveedores, RSVP, Presupuesto) para crear tareas relacionadas.
+- Menú inferior → pestaña **Tareas** (`/tareas`) con acceso directo a checklist (`/checklist`).
+- CTA de onboarding “Configura tu checklist” y widgets en Home.
+- Accesos contextuales desde Proveedores/RSVP/Presupuesto para crear tareas relacionadas.
 
 ## 3. Paso a paso UX
 1. Configuracion inicial
@@ -49,8 +49,8 @@
 - Flujo 2 crea seeds iniciales tras onboarding.
 - Flujo 5/15 generan tareas al aprobar contratos o proveedores.
 - Flujo 6 produce tareas de pagos y seguimiento presupuestario.
-- Flujo 9/11 anaden hitos de RSVP y ensayos.
-- Flujo 17 utiliza estadisticas para puntos, logros y objetivos semanales.
+- Flujo 9/11 añaden hitos de RSVP y ensayos.
+- Flujo 17 usa estadísticas para puntos/logros; Flujo 12 respeta horarios silenciados.
 
 ## 8. Metricas y monitorizacion
 - Eventos: `task_created`, `task_completed`, `task_overdue`, `template_applied`, `automation_triggered`.
@@ -61,6 +61,10 @@
 - Unitarias: reducers de tareas/checklist, validacion de dependencias, plantillas.
 - Integracion: crear tarea -> sincroniza con checklist -> dispara automatizacion.
 - E2E: aplicar plantilla, reasignar tareas, completar racha semanal, revisar dashboard.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/tasks/all_subtasks_modal.cy.js`: verifica la gestión de checklist avanzado, subtareas y estados.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para `tasks`, `checklist`, `taskTemplates`, `taskAutomations`, `checklistStats`.

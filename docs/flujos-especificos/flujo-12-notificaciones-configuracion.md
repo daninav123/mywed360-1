@@ -1,72 +1,78 @@
-# 12. Notificaciones y Configuración (estado 2025-10-07)
+﻿# 12. Notificaciones y Configuración (estado 2025-10-07)
 
 > Implementado: `Notificaciones.jsx`, `NotificationPreferences.jsx`, `NotificationWatcher.jsx`, `NotificationCenter.jsx` (scaffold), servicios `notificationService.js`, `notificationPreferencesService.js`, rutas backend `/api/notification-preferences`.
 > Pendiente: automatizaciones avanzadas (AutomationRules UI), notificaciones push/SMS completas y centro de notificaciones final.
 
 ## 1. Objetivo y alcance
-- Centralizar notificaciones del sistema y preferencias por usuario/canal.
-- Configurar qué eventos generan alertas y cómo se entregan.
-- Ofrecer watcher que detecta eventos relevantes y dispara notificaciones.
+- Mostrar el centro de notificaciones in-app e indicar qué acciones requieren revisión.
+- Permitir que cada usuario configure canales (email, push, WhatsApp) y categorías que desea recibir.
+- Ejecutar watchers (`NotificationWatcher`, `TaskNotificationWatcher`) que disparan eventos periódicos.
 
 ## 2. Trigger y rutas
-- Icono de campana (barra superior) abre el centro de notificaciones (`/notificaciones`, `Notificaciones.jsx`).
-- Menú de usuario → “Preferencias de notificación” (`/perfil/notificaciones`, `NotificationPreferences.jsx`).
-- API pública `/api/notification-preferences` expuesta para integraciones y apps móviles.
+- Icono de campana en la barra superior -> `/notificaciones` (`Notificaciones.jsx`) por ahora listado sencillo + `NotificationSettings`.
+- Menú del avatar → “Preferencias de notificación” (`/perfil/notificaciones`, `NotificationPreferences.jsx` con toggles por canal/categoría).
+- API `/api/notification-preferences` para integraciones externas.
 
 ## 3. Paso a paso UX
-1. Centro de notificaciones
-   - `Notificaciones.jsx` muestra lista cronológica, filtros (tipo, leídas), acciones marcar/archivar.
-   - `NotificationCenter.jsx` sirve como scaffold para entornos dev.
-2. Preferencias
-   - `NotificationPreferences.jsx` permite toggles por canal (email, push, WhatsApp) y categorías (tareas, RSVP, finanzas, sistema).
-   - Soporta digest diario/semanal (en backend).
-3. Watcher y automatizaciones
-   - `NotificationWatcher.jsx` escucha eventos (Firestore/automation) y encola notificaciones.
-   - Integrado con hooks de tareas, RSVP, proveedores.
+1. Centro de notificaciones (`Notificaciones.jsx`)
+   - Lista cronológica con filtros “Todas/Sin leer”.
+   - Botones para marcar como leída y eliminar.
+   - Botones de push (activar/desactivar/probar) mediante `PushService`.
+2. Preferencias (vista legacy)
+   - `NotificationSettings` en la misma página: toggles por categoría (email/AI/tareas/proveedores/finanzas), horas de silencio (`quietHours`) y preview del estado.
+3. Preferencias (nueva)
+   - `NotificationPreferences.jsx`: switches por canal y categoría; persiste en `notificationPreferencesService`.
+4. Watchers
+   - `NotificationWatcher` (en `MainLayout`) consulta periódicamente el backend.
+   - `TaskNotificationWatcher` dispara recordatorios de tareas (flujo 14).
 
 ## 4. Persistencia y datos
-- Firestore `weddings/{id}/notifications/{notificationId}`: tipo, payload, estado, metadata.
-- `users/{uid}/notificationPreferences`: canales y digest.
-- Log de envíos en backend (`notification_logs`).
+- Firestore `weddings/{id}/notifications/{notificationId}`: payload básico, estado leído.
+- `users/{uid}/notificationPreferences`: canales y categorías + horario silencioso.
+- LocalStorage (`mywed360-notifications`) usado para evitar duplicidades en modo offline.
+- Logs backend (Mailgun/Twilio) para fallos push/email.
 
 ## 5. Reglas de negocio
-- Notificaciones críticas (pagos, seguridad) siempre envían email aunque se deshabilite canal.
-- Assistants reciben notificaciones solo de bodas donde tienen acceso.
-- Cambiar preferencias requiere autenticación (token) y se audita.
-- Digest respeta frecuencia configurada; se almacena timestamp último envío.
+- Eventos críticos (pagos, seguridad) se fuerzan vía email aunque se deshabilite canal.
+- Assistants sólo ven notificaciones de bodas con acceso.
+- Horario silencioso bloquea notificaciones push (`isQuietHoursActive`).
+- Las preferencias se guardan en local y backend; se audita `updatedAt`.
 
 ## 6. Estados especiales y errores
-- Sin notificaciones → mensaje "No tienes notificaciones nuevas".
-- Error al guardar preferencia → toast y rollback estado toggle.
-- Canal inhabilitado (ej. WhatsApp sin proveedor) → UI muestra aviso.
-- Watcher sin permisos → log en consola y modo no intrusivo.
+- Sin notificaciones → mensaje “No hay notificaciones”.
+- Error guardando → toast + rollback (`saveNotificationPrefs`).
+- Push deshabilitado → banner/alerta indicando configurar en navegador.
+- Watcher sin permisos → log `console.warn`, no rompe UI.
 
 ## 7. Integración con otros flujos
-- Flujo 5/15 generan notificaciones por contratos y proveedores.
-- Flujo 6 envía alertas de presupuesto.
-- Flujo 9/11 informan confirmaciones y ensayos.
-- Flujo 14/17 se integran para recordatorios de tareas/gamificación.
-- Flujo 7 respeta preferencias de canal; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) aplica la configuración al ejecutar automatizaciones.
+- Flujo 5 y 15 (proveedores/contratos): envían alertas de presupuesto/estado.
+- Flujo 6 (finanzas): pagos/pendientes generan avisos.
+- Flujo 9/11 (RSVP/ceremonia): recordatorios.
+- Flujo 14 (tareas): integra con `TaskNotificationWatcher`.
+- Flujo 17 (gamificación) usa preferencias para no saturar con avisos.
+- Flujo 16 (automatizaciones) previsto para respetar configuraciones.
 
 ## 8. Métricas y monitorización
-- Eventos: `notification_sent`, `notification_read`, `notification_preference_updated`, `digest_generated`.
-- Indicadores: ratio de apertura, tiempos de respuesta, top categorías.
-- Logs de fallos por canal (Mailgun/Twilio) y backlog del watcher.
+- Eventos básicos: `notification_sent`, `notification_read`, `notification_preferences_saved`.
+- Indicadores: ratio de lectura, uso de push, categorías más activas.
+- Logs Mailgun/Twilio/FCM para errores.
 
 ## 9. Pruebas recomendadas
-- Unitarias: guardado de preferencias, mapeo de reglas del watcher.
-- Integración: disparar evento (tarea vencida) → verificar notificación generada y preferencia aplicada.
-- E2E: usuario actualiza preferencias, recibe digest/alertas, revisa centro y marca como leído.
+- Unitarias: servicios (`notificationService`, `notificationPreferencesService`).
+- Integración: Notificaciones + PushService (activar/desactivar).
+- E2E: marcar como leída/borrar, cambiar preferencias, verificar persistencia.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/notifications/preferences-flow.cy.js`: prueba la edición de preferencias, canales disponibles y persistencia de configuraciones.
 
 ## 10. Checklist de despliegue
-- Reglas Firestore para `notifications`, `notificationPreferences`.
-- Credenciales `MAILGUN_*`, `TWILIO_*`, `WHATSAPP_PROVIDER` según canales.
-- Cron jobs/digest configurados en backend.
-- Revisar copy/translations.
+- Reglas Firestore `notifications` y `notificationPreferences`.
+- Configurar Mailgun/Twilio/FCM; validar push en navegadores.
+- Revisar traducciones (todas las opciones en `NotificationSettings` y `NotificationPreferences`).
 
 ## 11. Roadmap / pendientes
-- AutomationRules UI (if-this-then-that) para usuarios avanzados.
-- Centro de notificaciones con agrupación y búsqueda.
-- Push notifications (FCM) y SMS avanzados.
-- Insights de efectividad (CTR, canales preferidos).
-- Modo silencio programable por usuario.
+- Centro de notificaciones completo (agrupaciones, búsqueda).
+- Automation rules UI (if-this-then-that).
+- Integración multi-canal (SMS/push con configuración avanzada).
+- Panel de auditoría y métricas ( CTR, canal favorito/efectividad ).

@@ -218,4 +218,6 @@ const firebaseReady = inicializarFirebase().catch((error) => {
   throw error;
 });
 
-export { auth, db, analytics, firebaseReady };
+const getFirebaseAuth = () => auth;
+
+export { auth, db, analytics, firebaseReady, getFirebaseAuth };

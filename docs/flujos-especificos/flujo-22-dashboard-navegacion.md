@@ -61,6 +61,10 @@
 - Integracion: cambio de boda -> dashboard refleja datos correctos.
 - E2E: onboarding -> dashboard -> configurar perfil -> acceder a more menu.
 
+
+## Cobertura E2E implementada
+- No hay pruebas end-to-end específicas implementadas para este flujo.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `dashboardConfig`, `activityFeed` (cuando se publique).
 - Asegurar que herramientas dev esten desactivadas en produccion (`VITE_ENV` check).

@@ -21,6 +21,7 @@ import SupplierKanban from '../components/proveedores/SupplierKanban';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import PageTabs from '../components/ui/PageTabs';
+import Modal from '../components/Modal';
 
 // Componentes
 
@@ -104,6 +105,7 @@ const Proveedores = () => {
   // Servicios deseaños
   const [wantedServices, setWantedServices] = useState([]);
   const [showWantedModal, setShowWantedModal] = useState(false);
+  const [showNeedsModal, setShowNeedsModal] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
   const [showBuscadosKanban, setShowBuscadosKanban] = useState(false);
   const [unreadMap, setUnreadMap] = useState({});
@@ -450,6 +452,42 @@ const Proveedores = () => {
     [searchProviders]
   );
 
+  const mapAIResultToProvider = useCallback(
+    (result, overrides = {}) => {
+      if (!result) return null;
+      const baseName = (result.name || result.title || 'Proveedor sugerido').trim();
+      const serviceName = (result.service || serviceFilter || 'Servicio para bodas').trim();
+      const sanitize = (value) =>
+        value
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '.')
+          .replace(/^[.]+|[.]+$/g, '');
+      const fallbackEmail = result.email || (baseName ? `${sanitize(baseName)}@contacto.pro` : '');
+      const normalized = {
+        name: baseName,
+        service: serviceName,
+        contact: result.contact || '',
+        email: fallbackEmail,
+        phone: result.phone || '',
+        status: 'Pendiente',
+        snippet: result.snippet || result.aiSummary || '',
+        link: result.link || '',
+        image: result.image || '',
+        priceRange: result.priceRange || result.price || '',
+        location: result.location || '',
+        rating: result.rating || 0,
+        ratingCount: result.ratingCount || 0,
+        aiMatch: result.match || 0,
+        aiSummary: result.aiSummary || '',
+        tags: Array.isArray(result.tags) ? result.tags : [],
+        source: 'ai-search',
+        createdFromAI: true,
+      };
+      return { ...normalized, ...overrides };
+    },
+    [serviceFilter]
+  );
+
   const handleDrawerSave = useCallback(
     (result) => {
       if (!result) return;
@@ -525,42 +563,6 @@ const Proveedores = () => {
     if (!selectedProviderIds.length) return;
     setShowGroupSelectedModal(true);
   };
-
-  const mapAIResultToProvider = useCallback(
-    (result, overrides = {}) => {
-      if (!result) return null;
-      const baseName = (result.name || result.title || 'Proveedor sugerido').trim();
-      const serviceName = (result.service || serviceFilter || 'Servicio para bodas').trim();
-      const sanitize = (value) =>
-        value
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '.')
-          .replace(/^[.]+|[.]+$/g, '');
-      const fallbackEmail = result.email || (baseName ? `${sanitize(baseName)}@contacto.pro` : '');
-      const normalized = {
-        name: baseName,
-        service: serviceName,
-        contact: result.contact || '',
-        email: fallbackEmail,
-        phone: result.phone || '',
-        status: 'Pendiente',
-        snippet: result.snippet || result.aiSummary || '',
-        link: result.link || '',
-        image: result.image || '',
-        priceRange: result.priceRange || result.price || '',
-        location: result.location || '',
-        rating: result.rating || 0,
-        ratingCount: result.ratingCount || 0,
-        aiMatch: result.match || 0,
-        aiSummary: result.aiSummary || '',
-        tags: Array.isArray(result.tags) ? result.tags : [],
-        source: 'ai-search',
-        createdFromAI: true,
-      };
-      return { ...normalized, ...overrides };
-    },
-    [serviceFilter]
-  );
 
   const handleAISelect = useCallback(
     async (result, action) => {
@@ -639,7 +641,18 @@ const Proveedores = () => {
           >
             Configurar servicios
           </Button>
-          <Button onClick={handleOpenAISearch} className="flex itemás-center">
+          <Button
+            onClick={() => setShowNeedsModal(true)}
+            className="flex itemás-center"
+            variant="outline"
+          >
+            Matriz de necesidades
+          </Button>
+          <Button
+            onClick={handleOpenAISearch}
+            className="flex itemás-center"
+            data-testid="open-ai-search"
+          >
             <Sparkles size={16} className="mr-1" /> Búsqueda IA
           </Button>
           <Button onClick={handleNewProvider} className="flex itemás-center">
@@ -824,12 +837,19 @@ const Proveedores = () => {
           {/* Lista de proveedores con filtros */}
           {tab === 'buscaños' ? (
             <div className="space-y-6">
-              <ServicesBoard
-                proveedores={normalizedProviders}
-                onOpenSearch={handleBoardSearch}
-                onOpenAI={handleBoardOpenAI}
-                onOpenNew={handleBoardAdd}
-              />
+              <div className="border border-dashed border-soft bg-surface/70 rounded-md p-4 flex flex-wrap items-center gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-body">Organiza tus necesidades</div>
+                  <p className="text-xs text-muted max-w-md">
+                    Utiliza la matriz para marcar servicios cubiertos, detectar huecos y lanzar búsquedas o altas rápidas.
+                  </p>
+                </div>
+                <div className="ml-auto">
+                  <Button size="sm" variant="outline" onClick={() => setShowNeedsModal(true)}>
+                    Abrir matriz de necesidades
+                  </Button>
+                </div>
+              </div>
               {searchHistory.length > 0 && (
                 <div className="text-xs text-gray-500">
                   Últimas búsquedas IA: {searchHistory.slice(-3).join(', ')}
@@ -1130,6 +1150,26 @@ const Proveedores = () => {
           trackingItem={trackingItem}
         />
       )}
+
+      <Modal
+        open={showNeedsModal}
+        onClose={() => setShowNeedsModal(false)}
+        title="Matriz de necesidades"
+        size="full"
+        className="max-w-6xl"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-muted">
+            Marca el estado de cada servicio, detecta duplicados y lanza rutas rápidas de búsqueda o alta manual.
+          </p>
+          <ServicesBoard
+            proveedores={normalizedProviders}
+            onOpenSearch={handleBoardSearch}
+            onOpenAI={handleBoardOpenAI}
+            onOpenNew={handleBoardAdd}
+          />
+        </div>
+      </Modal>
 
       <WantedServicesModal
         open={showWantedModal}

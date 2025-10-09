@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -38,6 +39,37 @@ const fetchVersions = async (uid, weddingId) => {
 
   versionList.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
   return versionList;
+};
+
+const fetchPromptLibrary = async (uid) => {
+  if (!uid) return [];
+  const promptSnap = await getDocs(collection(db, 'users', uid, 'websitePrompts'));
+  const prompts = promptSnap.docs.map((snapshot) => ({
+    id: snapshot.id,
+    ...(snapshot.data() || {}),
+  }));
+
+  prompts.sort((a, b) => {
+    const tsB = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
+    const tsA = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
+    return tsB - tsA;
+  });
+
+  return prompts;
+};
+
+const normalizePromptPayload = ({ name, description, prompt, templateKey }) => {
+  const trimmedPrompt = String(prompt || '').trim();
+  if (!trimmedPrompt) {
+    throw new Error('El prompt no puede estar vacio');
+  }
+
+  return {
+    name: String(name || '').trim() || 'Prompt personalizado',
+    description: String(description || '').trim(),
+    prompt: trimmedPrompt,
+    templateKey: String(templateKey || 'personalizada').trim() || 'personalizada',
+  };
 };
 
 const normalizeProfile = (userDoc = {}, weddingInfo = {}) => {
@@ -92,7 +124,13 @@ const normalizeProfile = (userDoc = {}, weddingInfo = {}) => {
   const contactPhone = userDoc?.account?.whatsNumber || userDoc?.phone || '';
   const weddingStyle = weddingInfo.weddingStyle || userDoc?.weddingStyle || 'Clásico';
   const colorScheme = weddingInfo.colorScheme || userDoc?.colorScheme || 'Blanco y dorado';
-  const additionalInfo = [weddingInfo.importantInfo, weddingInfo.giftAccount].filter(Boolean).join(' | ');
+  const additionalInfo = [
+    weddingInfo.additionalInfo,
+    weddingInfo.importantInfo,
+    weddingInfo.giftAccount,
+  ]
+    .filter(Boolean)
+    .join(' | ');
 
   return {
     brideInfo: { nombre: brideName },
@@ -119,6 +157,8 @@ const normalizeProfile = (userDoc = {}, weddingInfo = {}) => {
     weddingStyle,
     colorScheme,
     additionalInfo,
+    story: weddingInfo.story || userDoc?.story || '',
+    faqs: Array.isArray(weddingInfo.faqs) ? weddingInfo.faqs : [],
   };
 };
 
@@ -147,7 +187,7 @@ const fetchWeddingDoc = async (weddingId) => {
 };
 
 export const loadWebsiteContext = async ({ uid, weddingId }) => {
-  if (!uid) return { profile: null, weddingInfo: {}, versions: [] };
+  if (!uid) return { profile: null, weddingInfo: {}, versions: [], promptLibrary: [] };
 
   try {
     await firebaseReady;
@@ -155,11 +195,15 @@ export const loadWebsiteContext = async ({ uid, weddingId }) => {
     console.warn('websiteService.loadWebsiteContext firebaseReady', err);
   }
 
-  const [userDoc, weddingInfo] = await Promise.all([fetchUserDoc(uid), fetchWeddingDoc(weddingId)]);
+  const [userDoc, weddingInfo, prompts] = await Promise.all([
+    fetchUserDoc(uid),
+    fetchWeddingDoc(weddingId),
+    fetchPromptLibrary(uid),
+  ]);
   const profile = normalizeProfile(userDoc, weddingInfo);
   const versions = await fetchVersions(uid, weddingId);
 
-  return { profile, weddingInfo, versions };
+  return { profile, weddingInfo, versions, promptLibrary: prompts };
 };
 
 export const buildSlugSuggestions = (profile) => {
@@ -315,4 +359,152 @@ export const publishWeddingSite = async ({ weddingId, html, slug }) => {
   }
 };
 
+export const updateWebsiteLogistics = async ({ uid, weddingId, logistics }) => {
+  if (!uid) throw new Error('updateWebsiteLogistics: uid requerido');
+  const payload = {
+    transportation: logistics?.transportation || '',
+    transportationSchedule: logistics?.transportationSchedule || [],
+    lodgingOptions: logistics?.lodgingOptions || [],
+    travelGuide: logistics?.travelGuide || {},
+    story: logistics?.story || '',
+    additionalInfo: logistics?.additionalInfo || '',
+    faqs: logistics?.faqs || [],
+  };
+
+  const updateData = {
+    'weddingInfo.transportation': payload.transportation,
+    'weddingInfo.transportationSchedule': payload.transportationSchedule,
+    'weddingInfo.lodgingOptions': payload.lodgingOptions,
+    'weddingInfo.travelGuide': payload.travelGuide,
+    'weddingInfo.story': payload.story,
+    'weddingInfo.additionalInfo': payload.additionalInfo,
+    'weddingInfo.faqs': payload.faqs,
+  };
+
+  if (weddingId) {
+    await setDoc(doc(db, 'weddings', weddingId), updateData, { merge: true });
+  } else {
+    await setDoc(doc(db, 'users', uid), updateData, { merge: true });
+  }
+
+  return payload;
+};
+
+export const logWebsiteAiRun = async ({ uid, weddingId, prompt, templateKey }) => {
+  try {
+    const ref = await addDoc(collection(db, 'ai', 'websites', 'runs'), {
+      uid,
+      weddingId: weddingId || null,
+      templateKey,
+      prompt,
+      estimatedTokens: Math.max(1, Math.round((prompt || '').split(/\s+/).length * 1.2)),
+      createdAt: serverTimestamp(),
+    });
+    return ref.id;
+  } catch (err) {
+    console.warn('logWebsiteAiRun', err);
+    return null;
+  }
+};
+
+export const recordWebsiteEvent = async ({ uid, weddingId, event, payload }) => {
+  try {
+    await addDoc(collection(db, 'analytics', 'websiteEvents'), {
+      uid,
+      weddingId: weddingId || null,
+      event,
+      payload: payload || {},
+      createdAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('recordWebsiteEvent', err);
+    throw err;
+  }
+};
+
+export const listWebsitePrompts = async ({ uid }) => fetchPromptLibrary(uid);
+
+export const createWebsitePrompt = async ({ uid, name, description, prompt, templateKey }) => {
+  if (!uid) throw new Error('createWebsitePrompt: uid requerido');
+  const payload = normalizePromptPayload({ name, description, prompt, templateKey });
+  await addDoc(collection(db, 'users', uid, 'websitePrompts'), {
+    ...payload,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return fetchPromptLibrary(uid);
+};
+
+export const updateWebsitePrompt = async ({
+  uid,
+  promptId,
+  name,
+  description,
+  prompt,
+  templateKey,
+}) => {
+  if (!uid) throw new Error('updateWebsitePrompt: uid requerido');
+  if (!promptId) throw new Error('updateWebsitePrompt: promptId requerido');
+  const payload = normalizePromptPayload({ name, description, prompt, templateKey });
+  await setDoc(
+    doc(db, 'users', uid, 'websitePrompts', promptId),
+    { ...payload, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
+  return fetchPromptLibrary(uid);
+};
+
+export const deleteWebsitePrompt = async ({ uid, promptId }) => {
+  if (!uid) throw new Error('deleteWebsitePrompt: uid requerido');
+  if (!promptId) throw new Error('deleteWebsitePrompt: promptId requerido');
+  await deleteDoc(doc(db, 'users', uid, 'websitePrompts', promptId));
+  return fetchPromptLibrary(uid);
+};
+
 export const RESERVED_PUBLIC_SLUGS = RESERVED_SLUGS;
+
+export const requestWebsiteAiHtml = async ({
+  systemMessage,
+  userMessage,
+  templateKey,
+  weddingId,
+  temperature,
+  model,
+}) => {
+  const response = await apiPost(
+    '/api/ai-website/generate',
+    {
+      systemMessage,
+      userMessage,
+      templateKey: templateKey || 'personalizada',
+      weddingId: weddingId || null,
+      temperature,
+      model,
+    },
+    { auth: true }
+  );
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch (err) {
+    if (response.ok) {
+      throw new Error('Respuesta inválida al generar el sitio con IA');
+    }
+  }
+
+  if (!response.ok) {
+    const error = new Error(data?.error || 'No se pudo generar la página con IA');
+    error.details = data;
+    error.status = response.status;
+    throw error;
+  }
+
+  if (!data || typeof data.html !== 'string') {
+    const error = new Error('Respuesta inválida al generar el sitio con IA');
+    error.details = data;
+    throw error;
+  }
+
+  return data;
+};

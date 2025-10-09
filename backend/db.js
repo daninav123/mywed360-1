@@ -1,9 +1,25 @@
 import admin from 'firebase-admin';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env' });
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envCandidates = [
+  path.resolve(process.cwd(), '.env.local'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '.env.local'),
+  path.resolve(__dirname, '.env'),
+  path.resolve(__dirname, '..', '.env.local'),
+  path.resolve(__dirname, '..', '.env'),
+];
+for (const candidate of envCandidates) {
+  if (fs.existsSync(candidate)) {
+    dotenv.config({ path: candidate });
+    break;
+  }
+}
 
 // Deshabilitar el uso del emulador salvo que se indique explícitamente
 // Esto evita errores de conexión (ECONNREFUSED) cuando el emulador no está arrancado.
@@ -18,12 +34,22 @@ if (process.env.FIRESTORE_EMULATOR_HOST && process.env.USE_FIRESTORE_EMULATOR !=
 // is set the Admin SDK automatically routes all calls to the emulator.
 
 // Permitir inyectar credencial de servicio vía variable de entorno (JSON directo o base64)
-const RAW_SERVICE_ACCOUNT = process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+const RAW_SERVICE_ACCOUNT =
+  process.env.FIREBASE_SERVICE_ACCOUNT_JSON || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
 let parsedServiceAccount = null;
 if (RAW_SERVICE_ACCOUNT) {
   try {
     // Si la credencial viene en base64, decodificar
-    const jsonStr = RAW_SERVICE_ACCOUNT.trim().startsWith('{') ? RAW_SERVICE_ACCOUNT : Buffer.from(RAW_SERVICE_ACCOUNT, 'base64').toString('utf8');
+    let clean = RAW_SERVICE_ACCOUNT.trim();
+    if (
+      (clean.startsWith("'") && clean.endsWith("'")) ||
+      (clean.startsWith('"') && clean.endsWith('"'))
+    ) {
+      clean = clean.slice(1, -1);
+    }
+    const jsonStr = clean.startsWith('{')
+      ? clean
+      : Buffer.from(clean, 'base64').toString('utf8');
     parsedServiceAccount = JSON.parse(jsonStr);
     console.log('✅ Credencial de servicio cargada desde variable de entorno');
   } catch (e) {

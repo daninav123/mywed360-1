@@ -1,1 +1,1 @@
-export { auth, db, analytics, firebaseReady } from './firebaseConfig.jsx';
+export { auth, db, analytics, firebaseReady, getFirebaseAuth } from './firebaseConfig.jsx';

@@ -1,4 +1,4 @@
-# Análisis de Flujos Faltantes - MyWed360
+﻿# Análisis de Flujos Faltantes - MyWed360
 
 > Actualización (2025-09-11): Este documento consolida el estado actual tras normalizar el índice de flujos y añadir secciones de estado. Usa `docs/FLUJOS-INDICE.md` como fuente de verdad.
 
@@ -18,7 +18,7 @@
 
 ### Flujos específicos detallados (docs/flujos-especificos)
 - flujo-3-gestion-invitados.md — Documentado
-- flujo-4-plan-asientos.md — Documentado
+- flujo-4-invitados-operativa.md — Documentado
 - flujo-5-proveedores-ia.md — Documentado
 - flujo-5-timeline-tareas.md — Documentado
 - flujo-6-presupuesto.md — Documentado
@@ -28,7 +28,7 @@
 - flujo-10-gestion-bodas-multiples.md — Documentado
 - flujo-11-protocolo-ceremonias.md — Documentado
 - flujo-12-notificaciones-configuracion.md — Documentado
-- flujo-13-gestion-contenido.md — Documentado
+- flujo-4-invitados-operativa.md — Documentado
 - flujo-13-seating-plan-e2e.md — Documentado (tests E2E)
 - flujo-14-checklist-avanzado.md — Documentado
 - flujo-15-contratos-documentos.md — Documentado
@@ -41,7 +41,7 @@
 Los siguientes flujos estaban marcados como “no documentados” y ahora cuentan con documentación en `docs/flujos-especificos/`:
 
 - Diseño Web y Personalización — Documentado (ver `flujo-8-diseno-web-personalizacion.md`)
-- Gestión de Contenido y Blog — Documentado (ver `flujo-13-gestion-contenido.md`)
+- Gestión de Contenido y Blog — Documentado (ver `flujo-4-invitados-operativa.md`)
 - Protocolo y Ceremonias — Documentado (ver `flujo-11-protocolo-ceremonias.md`)
 - Checklist y Tareas — Documentado (ver `flujo-5-timeline-tareas.md` y `flujo-14-checklist-avanzado.md`)
 - RSVP y Confirmaciones — Documentado (ver `flujo-9-rsvp-confirmaciones.md`)

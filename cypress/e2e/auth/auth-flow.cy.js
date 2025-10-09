@@ -27,9 +27,15 @@ describe('Flujo 1 - Autenticación (login/logout)', () => {
 
     // El email debe persistirse por remember me
     cy.window().then((win) => {
-      expect(win.localStorage.getItem('lovenda_login_email')).to.eq(email);
+      const rememberedEmail =
+        win.localStorage.getItem('mywed360_login_email') ||
+        win.localStorage.getItem('lovenda_login_email');
+      expect(rememberedEmail).to.eq(email);
       // También debe existir sesión mock del hook unificado
-      expect(win.localStorage.getItem('lovenda_user')).to.exist;
+      const profile =
+        win.localStorage.getItem('MyWed360_user_profile') ||
+        win.localStorage.getItem('lovenda_user');
+      expect(profile).to.exist;
     });
 
     // Abrir menú de usuario y cerrar sesión
@@ -40,4 +46,3 @@ describe('Flujo 1 - Autenticación (login/logout)', () => {
     cy.url({ timeout: 10000 }).should('match', /\/(login)?$/);
   });
 });
-

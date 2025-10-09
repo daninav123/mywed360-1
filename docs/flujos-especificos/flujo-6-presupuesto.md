@@ -39,7 +39,7 @@
 
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/finance/main`: documento único con:
-  - `budget`: `{ total: number, categories: Array<{ name: string, amount: number, muted?: boolean }> }`. El flag `muted` desactiva alertas de una categoría sin eliminarla.
+  - `budget`: `{ total: number, categories: Array<{ name: string, amount: number, muted→: boolean }> }`. El flag `muted` desactiva alertas de una categoría sin eliminarla.
   - `settings.alertThresholds`: `{ warn: number, danger: number }` (por defecto 75/90) usado por barras de progreso y alertas visuales.
   - `contributions`: `{ initA, initB, monthlyA, monthlyB, extras, giftPerGuest, guestCount }`.
   - Fechas clave (`weddingTimeline`) derivadas en runtime desde `weddingInfo`.
@@ -95,6 +95,11 @@
 - Unitarias: `useFinance` (reducers, proyección beta+geométrica, auto-categoría), `BudgetManager` validaciones, `PaymentSuggestions` (parseo correos), `TransactionForm` (transiciones de estado/adjuntos), `bankService` (credenciales faltantes).
 - Integracion: guardar presupuesto → leer en `FinanceOverview`, registrar sugerencia de email, sincronizar transacciones con widgets, importar movimientos bancarios simulados.
 - E2E: configurar presupuesto, registrar gasto con adjunto, verificar alerta de categoría, procesar sugerencia de email, simular error de API bancaria y validar fallback.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/finance/finance-flow.cy.js` y `cypress/e2e/finance/finance-flow-full.cy.js`: validan creación del presupuesto base, contribuciones y navegación entre pestañas financieras.
+- `cypress/e2e/finance/finance-budget.cy.js`, `cypress/e2e/finance/finance-transactions.cy.js`, `cypress/e2e/finance/finance-contributions.cy.js`, `cypress/e2e/finance/finance-analytics.cy.js` y `cypress/e2e/budget_flow.cy.js`: cubren edición de categorías, registro de movimientos y paneles analíticos.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore actualizadas para `finance/main`, subcolección `transactions` y almacenamiento de adjuntos (`finance/` en Storage).

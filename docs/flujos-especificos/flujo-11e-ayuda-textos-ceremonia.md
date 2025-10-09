@@ -1,7 +1,7 @@
 # 11E. Ayuda a Lecturas y Votos
 
 > Componente clave: `src/pages/protocolo/AyudaCeremonia.jsx`
-> Persistencia: actualmente local (state en memoria); pendiente definir almacenamiento en Firestore
+> Persistencia: Firestore (`weddings/{id}/ceremonyTexts/main`) con sincronización en tiempo real y metadatos de usuario
 
 ## 1. Objetivo y alcance
 - Proveer un espacio guiado para que ayudantes, familiares o la pareja redacten y mejoren textos que se leerán durante la ceremonia.  
@@ -13,18 +13,26 @@
 - Desde Momentos Especiales (Flujo 11A) se puede redirigir cuando un momento tipo “lectura” no tiene contenido definido.  
 - Eventos de checklist pueden apuntar aquí cuando falte preparar discursos.
 
-## 3. Experiencia de usuario
-1. **Tabs temáticos** (`lecturas`, `votos`, `sorpresas`, `discursos`), controlados por `activeTab`.  
-2. **Editor ligero**: campos para título, contenido, duración, notas y estado (`draft | review | final`).  
-3. **Vista previa**: modal simple para repasar el texto antes de compartirlo.  
-4. **Plantillas sugeridas**: se muestran recomendaciones de estructura, saludos e ideas según el tipo de lectura.  
-5. **Colaboración básica**: botones para duplicar, marcar como favoritos y exportar (pendiente conectar con almacenamiento).
+## 3. Estado actual vs. pendientes
+
+**Implementado hoy**
+- Dos pestañas operativas: "Lecturas" y "Ramos y Sorpresas".  
+- Editor de lecturas con duración estimada automática, vista previa modal y control de estado (`draft`/`final`).  
+- Persistencia compartida en Firestore con `updatedAt`, `updatedBy` y registro de eventos (`ceremony_text_created`, `ceremony_text_finalized`).  
+- Lista de sorpresas con alta, cambio de estado y eliminación sincronizados en tiempo real.  
+- Permisos de edición basados en rol (planner/owner/assistant) expuestos desde `useCeremonyTexts`.
+
+**Pendiente / roadmap**
+- Tabs adicionales (votos, discursos) y plantillas específicas por tipo.  
+- Campos extra: notas privadas, enlace directo a momentos de 11A y responsables asignados.  
+- Control de versiones, duplicado, favoritos y exportación (PDF/proyección).  
+- Integración IA (reescritura, tono) y publicación automática en flujo 21.  
+- Validación de permisos en backend y auditoría detallada.
 
 ## 4. Datos y modelo
-- El estado actual vive en memoria (arrays `readings`, `surprises`, etc.).  
-- Futuro: sincronizar con Firestore (`weddings/{id}/ceremonyTexts`) para compartir entre usuarios.  
-- Cada lectura incluye `id`, `title`, `content`, `duration`, `status`.  
-- Sorpresas/discursos añaden campos `recipient`, `table`, `notes` para logística.
+- Documento `weddings/{id}/ceremonyTexts/main` con `{ readings, surprises, updatedAt, updatedBy, lastAction }`.  
+- Lecturas: `id`, `title`, `content`, `duration`, `status`, timestamps.  
+- Sorpresas: `id`, `type`, `recipient`, `table`, `description`, `notes`, `status`, timestamps.
 
 ## 5. Reglas de negocio
 - Estados de texto: `draft`, `review`, `final` determinan qué se mostrará al público (cuando se integre con flujo 21).  
@@ -43,15 +51,20 @@
 - **IA Generativa** (backlog): botón “Reescribir con IA” para sugerir mejoras automáticas.
 
 ## 8. Métricas y eventos
-- Eventos (a implementar): `ceremony_text_created`, `ceremony_text_finalized`.  
-- Indicadores: número de textos finales, duración total estimada de lecturas, número de sorpresas confirmadas.
+- Eventos emitidos: `ceremony_text_created`, `ceremony_text_finalized`, `ceremony_surprise_added`.  
+- Indicadores sugeridos: nº textos finalizados, duración total estimada, sorpresas entregadas.
 
 ## 9. Pruebas recomendadas
 - Unitarias: helpers de división de tabs, validación de estados.  
 - Integración: crear lectura → asignar a momento en 11A → marcar final y validar checklist.  
 - E2E: ayudante inicia sesión, redacta votos, marca como final y planner visualiza el resultado.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/email/smart-composer.cy.js y cypress/e2e/email/ai-provider-email.cy.js`: cubren la generación asistida de textos, reutilizada por el asistente de ceremonia.
+- Cobertura adicional pendiente para el flujo específico de textos.
+
 ## 10. Checklist de despliegue
-- Definir persistencia compartida antes de abrir a invitados.  
+- Verificar reglas Firestore para `ceremonyTexts`.  
 - Revisar textos de muestra y traducciones.  
-- Validar permisos según rol en `useAuth`/`WeddingContext`.
+- Validar permisos según rol y auditoría (`updatedBy`).

@@ -24,15 +24,31 @@ import Login from './pages/Login';
 import More from './pages/More';
 import Perfil from './pages/Perfil';
 import Proveedores from './pages/ProveedoresNuevo';
+import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
 import RSVPConfirm from './pages/RSVPConfirm';
 import RSVPDashboard from './pages/RSVPDashboard';
 import Signup from './pages/Signup';
 import SupplierPortal from './pages/SupplierPortal';
 import Tasks from './pages/Tasks';
+import VerifyEmail from './pages/VerifyEmail.jsx';
+import AdminLogin from './pages/admin/AdminLogin.jsx';
+import AdminLayout from './pages/admin/AdminLayout.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import AdminMetrics from './pages/admin/AdminMetrics.jsx';
+import AdminPortfolio from './pages/admin/AdminPortfolio.jsx';
+import AdminUsers from './pages/admin/AdminUsers.jsx';
+import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
+import AdminSettings from './pages/admin/AdminSettings.jsx';
+import AdminAlerts from './pages/admin/AdminAlerts.jsx';
+import AdminBroadcast from './pages/admin/AdminBroadcast.jsx';
+import AdminAudit from './pages/admin/AdminAudit.jsx';
+import AdminReports from './pages/admin/AdminReports.jsx';
+import AdminSupport from './pages/admin/AdminSupport.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
 import AdminRoutes from './routes/AdminRoutes';
+import RequireAdmin from './routes/RequireAdmin.jsx';
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
@@ -77,6 +93,9 @@ const ProveedoresCompareTest = React.lazy(() => import('./pages/test/Proveedores
 const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
 const ProveedoresFlowHarness = React.lazy(() =>
   import('./pages/test/ProveedoresFlowHarness.jsx')
+);
+const BudgetApprovalHarness = React.lazy(() =>
+  import('./pages/test/BudgetApprovalHarness.jsx')
 );
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
@@ -130,6 +149,25 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route element={<RequireAdmin />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="metrics" element={<AdminMetrics />} />
+                  <Route path="portfolio" element={<AdminPortfolio />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="integrations" element={<AdminIntegrations />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route path="alerts" element={<AdminAlerts />} />
+                  <Route path="broadcast" element={<AdminBroadcast />} />
+                  <Route path="audit" element={<AdminAudit />} />
+                  <Route path="reports" element={<AdminReports />} />
+                  <Route path="support" element={<AdminSupport />} />
+                </Route>
+              </Route>
 
               {/* Rutas públicas */}
               <Route path="w/:uid" element={<WeddingSite />} />
@@ -192,6 +230,7 @@ function App() {
                   <Route path="perfil" element={<Perfil />} />
                   <Route path="notificaciones" element={<Notificaciones />} />
                   <Route path="diseno-web" element={<DisenoWeb />} />
+                  <Route path="diseno-web/preview" element={<DisenoWeb mode="preview" />} />
                   <Route path="web" element={<WebEditor />} />
                   <Route path="ideas" element={<Ideas />} />
                   <Route path="inspiracion" element={<Inspiration />} />
@@ -253,6 +292,7 @@ function App() {
                       <>
                         <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
                         <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
+                        <Route path="test/e2eProveedor" element={<BudgetApprovalHarness />} />
                       </>
                     )
                   }

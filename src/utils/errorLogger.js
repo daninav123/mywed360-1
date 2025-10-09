@@ -16,6 +16,7 @@ class ErrorLogger {
       wedding: { status: 'unknown', details: null },
     };
     this.isInitialized = false;
+    this.openAIThrottleUntil = 0;
     this.setupGlobalErrorHandlers();
     this.startDiagnostics();
   }
@@ -168,7 +169,6 @@ class ErrorLogger {
           this.diagnostics.firebase.details = details;
         } else if (
           urlStr.includes('render.com') ||
-          urlStr.includes('localhost:3001') ||
           urlStr.includes('localhost:4004')
         ) {
           this.diagnostics.backend.status = 'error';
@@ -380,23 +380,48 @@ class ErrorLogger {
 
   /**
    * Verifica la conexión con OpenAI
-   */
+  */
   async checkOpenAIConnection() {
     try {
+      if (this.openAIThrottleUntil && Date.now() < this.openAIThrottleUntil) {
+        this.diagnostics.openai = {
+          status: 'warning',
+          details: {
+            reason: 'throttled',
+            nextRetryInMs: this.openAIThrottleUntil - Date.now(),
+            retryAt: new Date(this.openAIThrottleUntil).toISOString(),
+          },
+        };
+        return;
+      }
+
+      const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+      if (!allowDirect) {
+        this.diagnostics.openai = {
+          status: 'warning',
+          details: { reason: 'direct-openai-disabled' },
+        };
+        return;
+      }
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
       if (!apiKey) {
         throw new Error('VITE_OPENAI_API_KEY no está configurada');
       }
 
       // Test simple de la API de OpenAI
-      const response = await fetch('https://api.openai.com/v1/models', {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const projectId = import.meta.env.VITE_OPENAI_PROJECT_ID;
+      const headers = {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      };
+      if (projectId) {
+        headers['OpenAI-Project'] = projectId;
+      }
+
+      const response = await fetch('https://api.openai.com/v1/models', { headers });
 
       if (response.ok) {
+        this.openAIThrottleUntil = 0;
         this.diagnostics.openai = {
           status: 'success',
           details: {
@@ -404,15 +429,39 @@ class ErrorLogger {
             status: response.status,
           },
         };
+        return;
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        this.openAIThrottleUntil = Date.now() + 10 * 60 * 1000;
+        this.diagnostics.openai = {
+          status: 'warning',
+          details: {
+            error: `OpenAI API respondió con status ${response.status}`,
+            status: response.status,
+            retryAt: new Date(this.openAIThrottleUntil).toISOString(),
+          },
+        };
+        return;
       } else {
         throw new Error(`OpenAI API respondió con status ${response.status}`);
       }
     } catch (error) {
+      if (
+        !this.openAIThrottleUntil &&
+        typeof error?.message === 'string' &&
+        /status (401|403)/.test(error.message)
+      ) {
+        this.openAIThrottleUntil = Date.now() + 10 * 60 * 1000;
+      }
       this.diagnostics.openai = {
         status: 'error',
         details: {
           error: error.message,
           hasApiKey: !!import.meta.env.VITE_OPENAI_API_KEY,
+          ...(this.openAIThrottleUntil
+            ? { retryAt: new Date(this.openAIThrottleUntil).toISOString() }
+            : {}),
         },
       };
     }
@@ -581,9 +630,5 @@ const errorLogger = new ErrorLogger();
 window.errorLogger = errorLogger;
 
 export default errorLogger;
-
-
-
-
 
 

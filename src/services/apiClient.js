@@ -105,3 +105,57 @@ export async function del(path, opts = {}) {
   const res = await fetch(u2, { method: 'DELETE', headers: await buildHeaders(opts) });
   return res;
 }
+
+/**
+ * Construye las opciones de cabecera para peticiones autenticadas.
+ * Acepta objetos de usuario (Firebase, contexto propio o mocks de tests) y mergea opciones extra.
+ *
+ * - Si el usuario expone un token sin prefijo, se agrega como `Bearer`.
+ * - Si no hay token explícito, fuerza auth=true para que buildHeaders obtenga el token actual.
+ * - Permite aportar cabeceras adicionales mediante `extra.headers`.
+ *
+ * @param {Object|string|null} user Usuario actual o token directo.
+ * @param {Object} extra Opciones adicionales (por ejemplo { silent: true }).
+ * @returns {Object} Opciones compatibles con apiClient (auth, headers, silent, ...).
+ */
+export function buildAuthHeaders(user, extra = {}) {
+  const opts = { ...(extra || {}) };
+  const headers = { ...(opts.headers || {}) };
+
+  let token = null;
+  if (typeof user === 'string' && user.trim()) {
+    token = user.trim();
+  } else if (user && typeof user === 'object') {
+    token =
+      user.token ||
+      user.accessToken ||
+      user.idToken ||
+      user.authToken ||
+      user.bearerToken ||
+      null;
+    if (!token && typeof user.getIdToken === 'function') {
+      // Guardar referencia para resolución lazy en buildHeaders mediante auth=true
+      opts.auth = opts.auth !== undefined ? opts.auth : true;
+    }
+    if (user.uid) headers['X-User-Uid'] = String(user.uid);
+    if (user.email) headers['X-User-Email'] = String(user.email);
+  }
+
+  if (token) {
+    headers.Authorization = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    // Cuando hay token explícito ya no necesitamos que buildHeaders resuelva auth automáticamente.
+    if (opts.auth === undefined) opts.auth = false;
+  } else if (opts.auth === undefined) {
+    opts.auth = true;
+  }
+
+  if (Object.keys(headers).length) {
+    opts.headers = headers;
+  } else {
+    delete opts.headers;
+  }
+
+  return opts;
+}
+
+export { get as apiGet, post as apiPost, put as apiPut, del as apiDel };

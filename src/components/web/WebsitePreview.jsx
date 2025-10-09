@@ -31,8 +31,32 @@ const WebsitePreview = ({
   showQR,
   onShowQR,
   onHideQR,
+  onEditLogistics,
+  publishDisabled = false,
+  publishDisabledReason = '',
+  isPublishing = false,
 }) => {
-  if (!html) return null;
+  if (!html) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-3">Vista previa de tu página web</h2>
+        <p className="text-sm text-gray-600">
+          Genera la página con el asistente para previsualizar el resultado y poder publicarla.
+        </p>
+        {onEditLogistics && (
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={onEditLogistics}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors"
+            >
+              Editar logística antes de generar
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const shareUrl = useMemo(() => {
     if (publicUrl) return publicUrl;
@@ -112,16 +136,59 @@ const WebsitePreview = ({
         <button
           type="button"
           onClick={onPublish}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
+          disabled={publishDisabled || isPublishing}
+          className={`bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors ${
+            publishDisabled || isPublishing ? 'opacity-60 cursor-not-allowed' : ''
+          }`}
+        >
+          {isPublishing ? (
+            <>
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <span>Publicando...</span>
+            </>
+          ) : (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>Publicar página</span>
+            </>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={onEditLogistics}
+          className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-              clipRule="evenodd"
-            />
+            <path d="M17.414 2.586a2 2 0 010 2.828l-1.121 1.121-2.828-2.828 1.121-1.121a2 2 0 012.828 0z" />
+            <path d="M2 13.5V17h3.5l9.193-9.193-3.5-3.5L2 13.5z" />
           </svg>
-          <span>Publicar página</span>
+          <span>Editar logística</span>
         </button>
 
         <button
@@ -150,6 +217,11 @@ const WebsitePreview = ({
       </div>
 
       <div className="mt-6 flex flex-col gap-4">
+        {publishDisabledReason && (
+          <div className="bg-amber-50 border-l-4 border-amber-500 p-3 text-sm text-amber-700 rounded">
+            {publishDisabledReason}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-sm text-gray-600" htmlFor="publish-slug">
             Slug público

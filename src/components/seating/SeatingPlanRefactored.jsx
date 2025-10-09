@@ -15,6 +15,7 @@ import SeatingPlanTabs from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
 import SeatingExportWizard from './SeatingExportWizard';
 import SeatingMobileOverlay from './SeatingMobileOverlay';
+import SeatingSmartPanel from './SeatingSmartPanel';
 import { useWedding } from '../../context/WeddingContext';
 // Nota: incluir extensión .js para compatibilidad con resoluciones estrictas en build (Linux)
 import { useSeatingPlan } from '../../hooks/useSeatingPlan.hook.js';
@@ -60,6 +61,7 @@ const SeatingPlanRefactored = () => {
     exportSVG,
     exportPlaceCardsPDF,
     exportPosterA2,
+    exportAdvancedReport,
     saveHallDimensions,
     drawMode,
     setDrawMode,
@@ -99,8 +101,11 @@ const SeatingPlanRefactored = () => {
     saveSnapshot,
     loadSnapshot,
     deleteSnapshot,
+    ceremonySettings,
     scoringWeights,
     setScoringWeights,
+    smartRecommendations,
+    smartInsights,
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
@@ -117,6 +122,8 @@ const SeatingPlanRefactored = () => {
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
   const [isMobile, setIsMobile] = React.useState(false);
+  const showSmartPanel = tab === 'banquet';
+  const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
   // handler para fondo rápido (prompt)
   // Valores seguros para evitar crashes por undefined
   const safeAreas = Array.isArray(areas) ? areas : [];
@@ -134,7 +141,6 @@ const SeatingPlanRefactored = () => {
   const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
   const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
   const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
-  const [isMobile, setIsMobile] = React.useState(false);
   useEffect(() => {
     const updateIsMobile = () => {
       try {
@@ -169,16 +175,153 @@ const SeatingPlanRefactored = () => {
 
   const availableExportTabs = React.useMemo(() => ['ceremony', 'banquet', 'free-draw'], []);
 
+  const ceremonyRows = React.useMemo(() => {
+    if (!Array.isArray(safeSeats) || safeSeats.length === 0) return [];
+    const vipRowSet = new Set(
+      Array.isArray(ceremonySettings?.vipRows)
+        ? ceremonySettings.vipRows
+            .map((value) => Number.parseInt(value, 10))
+            .filter((value) => Number.isFinite(value) && value >= 0)
+        : []
+    );
+    const vipLabel = ceremonySettings?.vipLabel || 'VIP';
+    const rowMap = new Map();
+    safeSeats.forEach((seat) => {
+      const key =
+        seat?.rowIndex != null
+          ? `row-${seat.rowIndex}`
+          : `y-${Math.round(typeof seat?.y === 'number' ? seat.y : 0)}`;
+      if (!rowMap.has(key)) {
+        rowMap.set(key, {
+          key,
+          rowIndex: typeof seat?.rowIndex === 'number' ? seat.rowIndex : null,
+          yReference: typeof seat?.y === 'number' ? seat.y : 0,
+          seats: [],
+        });
+      }
+      rowMap.get(key).seats.push(seat);
+    });
+    const sorted = Array.from(rowMap.values()).sort((a, b) => a.yReference - b.yReference);
+    return sorted.map((bucket, index) => {
+      const seats = bucket.seats;
+      const enabledSeats = seats.filter((s) => s?.enabled !== false);
+      const assignedSeats = seats.filter((s) => !!s?.guestId);
+      const referenceIndex = bucket.rowIndex != null ? bucket.rowIndex : index;
+      const isVip = vipRowSet.has(referenceIndex);
+      return {
+        key: bucket.key,
+        index,
+        referenceIndex,
+        label: `Fila ${index + 1}`,
+        seats,
+        enabledCount: enabledSeats.length,
+        assignedCount: assignedSeats.length,
+        disabledCount: seats.length - enabledSeats.length,
+        availableCount: Math.max(0, enabledSeats.length - assignedSeats.length),
+        isVip,
+        reservedLabel: isVip ? vipLabel : null,
+      };
+    });
+  }, [safeSeats, ceremonySettings?.vipRows, ceremonySettings?.vipLabel]);
+
+  React.useEffect(() => {
+    if (!Array.isArray(ceremonyRows) || ceremonyRows.length === 0) {
+      setCeremonyActiveRow(0);
+      return;
+    }
+    setCeremonyActiveRow((prev) => {
+      if (prev >= 0 && prev < ceremonyRows.length) return prev;
+      const vipCandidates = Array.isArray(ceremonySettings?.vipRows)
+        ? ceremonySettings.vipRows
+            .map((value) => Number.parseInt(value, 10))
+            .filter((value) => Number.isFinite(value) && value >= 0 && value < ceremonyRows.length)
+        : [];
+      if (vipCandidates.length > 0) {
+        return vipCandidates[0];
+      }
+      return 0;
+    });
+  }, [ceremonyRows, ceremonySettings?.vipRows]);
+
+  const ceremonyAssignedGuestIds = React.useMemo(() => {
+    const ids = new Set();
+    safeSeats.forEach((seat) => {
+      if (seat?.guestId) ids.add(String(seat.guestId));
+    });
+    return ids;
+  }, [safeSeats]);
+
+  const ceremonySuggestions = React.useMemo(() => {
+    const suggestions = {
+      padrinos: [],
+      familiares: [],
+      otros: [],
+    };
+    if (!Array.isArray(safeGuests) || safeGuests.length === 0) return suggestions;
+    const toText = (value) => (value == null ? '' : String(value).toLowerCase());
+    const matchesAny = (guest, patterns) => {
+      const tags = Array.isArray(guest?.tags) ? guest.tags.map(toText) : [];
+      const group = toText(guest?.group || guest?.groupName);
+      const notes = toText(guest?.notes);
+      return patterns.some(
+        (pattern) =>
+          tags.includes(pattern) || group.includes(pattern) || (notes && notes.includes(pattern))
+      );
+    };
+    const vipPatterns = [
+      'padrino',
+      'padrinos',
+      'madrina',
+      'madrinas',
+      'best man',
+      'bestman',
+      'maid of honor',
+      'oficiante',
+    ];
+    const familyPatterns = [
+      'familia',
+      'familiares',
+      'family',
+      'padre',
+      'madre',
+      'hermano',
+      'hermana',
+      'abuelo',
+      'abuela',
+      'primo',
+      'prima',
+      'tío',
+      'tía',
+      'tio',
+      'tia',
+    ];
+    safeGuests.forEach((guest) => {
+      if (!guest?.id) return;
+      if (ceremonyAssignedGuestIds.has(String(guest.id))) return;
+      const bag = matchesAny(guest, vipPatterns)
+        ? suggestions.padrinos
+        : matchesAny(guest, familyPatterns)
+          ? suggestions.familiares
+          : suggestions.otros;
+      if (bag.length < 8) {
+        bag.push(guest);
+      }
+    });
+    return suggestions;
+  }, [safeGuests, ceremonyAssignedGuestIds]);
+
   const handleGenerateAdvancedExport = React.useCallback(
-    (payload) => {
-      if (!payload || !payload.formats) return;
-      const { formats } = payload;
-      if (formats.includes('pdf')) exportPDF?.();
-      if (formats.includes('svg')) exportSVG?.();
-      if (formats.includes('csv')) exportCSV?.();
-      toast.info('La exportación avanzada se completará con las opciones seleccionadas.');
+    async (payload) => {
+      if (!payload || !Array.isArray(payload.formats)) return;
+      try {
+        await exportAdvancedReport?.(payload);
+        toast.success('Exportación generada correctamente.');
+      } catch (error) {
+        console.error('Error generando exportación avanzada', error);
+        toast.error('No se pudo generar la exportación avanzada.');
+      }
     },
-    [exportPDF, exportSVG, exportCSV]
+    [exportAdvancedReport]
   );
 
   /* ---- atajos Ctrl/Cmd + Z / Y ---- */
@@ -462,6 +605,27 @@ const SeatingPlanRefactored = () => {
     [safeTables, safeGuests, moveGuest, tab]
   );
 
+  const focusTable = React.useCallback(
+    (tableId) => {
+      if (!tableId) return;
+      if (tab !== 'banquet') {
+        setTab('banquet');
+      }
+      setFocusTableId(tableId);
+      handleSelectTable(tableId, false);
+    },
+    [tab, setTab, setFocusTableId, handleSelectTable]
+  );
+
+  const handleSmartAssign = React.useCallback(
+    (guestId, tableId) => {
+      if (!guestId || !tableId) return;
+      focusTable(tableId);
+      handleAssignGuest(tableId, guestId);
+    },
+    [focusTable, handleAssignGuest]
+  );
+
   // Desasignar un invitado concreto
   const handleUnassignGuest = React.useCallback(
     (guestId) => {
@@ -481,14 +645,24 @@ const SeatingPlanRefactored = () => {
   const handleApplyTemplate = React.useCallback(
     (template) => {
       if (template?.ceremony) {
-        generateSeatGrid(
-          template.ceremony.rows,
-          template.ceremony.cols,
-          40,
-          100,
-          80,
-          Math.floor(template.ceremony.cols / 2)
-        );
+        const ceremonyConfig = {
+          rows: template.ceremony.rows,
+          cols: template.ceremony.cols,
+          gap: template.ceremony.gap || 40,
+          startX: 100,
+          startY: 80,
+          aisleAfter:
+            template.ceremony.aisleAfter != null
+              ? template.ceremony.aisleAfter
+              : Math.floor((template.ceremony.cols || 0) / 2),
+          vipRows: template.ceremony.vipRows || [],
+          vipLabel: template.ceremony.vipLabel || 'VIP',
+          lockVipSeats: !!template.ceremony.lockVipSeats,
+          notes: Array.isArray(template?.overlays?.notes)
+            ? template.overlays.notes.join(' · ')
+            : template.ceremony.notes || '',
+        };
+        generateSeatGrid(ceremonyConfig);
       }
       if (Array.isArray(template?.banquetTables)) {
         applyBanquetTables(template.banquetTables);
@@ -578,9 +752,20 @@ const SeatingPlanRefactored = () => {
 
   // Generación desde modal de ceremonia seguida de autoasignación forzada
   const handleGenerateCeremonyWithAssign = React.useCallback(
-    (rows, cols, gap, startX, startY, aisleAfter) => {
+    (...args) => {
+      const config =
+        typeof args[0] === 'object' && args[0] !== null
+          ? { ...args[0] }
+          : {
+              rows: args[0],
+              cols: args[1],
+              gap: args[2],
+              startX: args[3],
+              startY: args[4],
+              aisleAfter: args[5],
+            };
       try {
-        generateSeatGrid(rows, cols, gap, startX, startY, aisleAfter);
+        generateSeatGrid(config);
       } finally {
         setTimeout(async () => {
           try {
@@ -607,6 +792,35 @@ const SeatingPlanRefactored = () => {
 
   // No-op defensivo para habilitar/deshabilitar elementos desde el canvas
   const handleToggleEnabled = React.useCallback(() => {}, []);
+
+  const handleAssignGuestToCeremonyRow = React.useCallback(
+    async (guestId, targetRowIndex) => {
+      if (!guestId) return { ok: false, error: 'guest-required' };
+      const rows = Array.isArray(ceremonyRows) ? ceremonyRows : [];
+      if (!rows.length) return { ok: false, error: 'no-rows' };
+      const index =
+        typeof targetRowIndex === 'number' && targetRowIndex >= 0 ? targetRowIndex : ceremonyActiveRow;
+      const row = rows[index];
+      if (!row) return { ok: false, error: 'row-not-found' };
+      const availableSeats = row.seats.filter((seat) => seat?.enabled !== false && !seat?.guestId);
+      const vipCandidates = availableSeats.filter((seat) => seat?.reservedFor);
+      const candidateSeat = vipCandidates.length > 0 ? vipCandidates[0] : availableSeats[0];
+      if (!candidateSeat) {
+        toast.warning('Esta fila no tiene asientos disponibles');
+        return { ok: false, error: 'row-full' };
+      }
+      try {
+        setCeremonyActiveRow(index);
+        await assignGuestToCeremonySeat(candidateSeat.id, guestId);
+        toast.success('Invitado asignado a la fila seleccionada');
+        return { ok: true };
+      } catch (err) {
+        toast.error('No se pudo asignar el invitado a la fila');
+        return { ok: false, error: 'assign-error', cause: err };
+      }
+    },
+    [assignGuestToCeremonySeat, ceremonyRows, ceremonyActiveRow]
+  );
 
   const libraryPanel = (
     <SeatingLibraryPanel
@@ -683,6 +897,13 @@ const SeatingPlanRefactored = () => {
       selectedTable={selectedTable}
       tab={tab}
       globalMaxSeats={globalMaxSeats}
+      ceremonyRows={ceremonyRows}
+      ceremonyActiveRow={ceremonyActiveRow}
+      onSelectCeremonyRow={setCeremonyActiveRow}
+      onAssignCeremonyGuest={handleAssignGuestToCeremonyRow}
+      ceremonySuggestions={ceremonySuggestions}
+      ceremonySettings={ceremonySettings}
+      guests={safeGuests}
       onTableDimensionChange={handleTableDimensionChange}
       onConfigureTable={handleConfigureTable}
       duplicateTable={duplicateTable}
@@ -833,16 +1054,42 @@ const SeatingPlanRefactored = () => {
             <div className="border border-gray-200 rounded-lg bg-white overflow-hidden min-h-[55vh]">
               {renderCanvas('h-[55vh]')}
             </div>
+            {showSmartPanel && (
+              <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+                <SeatingSmartPanel
+                  recommendations={smartRecommendations}
+                  insights={smartInsights}
+                  onAssign={handleSmartAssign}
+                  onFocusTable={focusTable}
+                />
+              </div>
+            )}
             <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg bg-white">
               {renderInspector('max-h-60 overflow-y-auto')}
             </div>
           </div>
         ) : (
-          <div className="flex-1 grid grid-cols-[18rem_1fr_20rem] gap-3 px-4 pb-3">
+          <div
+            className={`flex-1 grid ${
+              showSmartPanel
+                ? 'grid-cols-[18rem_1fr_18rem_20rem]'
+                : 'grid-cols-[18rem_1fr_20rem]'
+            } gap-3 px-4 pb-3`}
+          >
             <div className="min-h-0">{libraryPanel}</div>
             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
               {renderCanvas('h-full')}
             </div>
+            {showSmartPanel && (
+              <div className="min-h-0">
+                <SeatingSmartPanel
+                  recommendations={smartRecommendations}
+                  insights={smartInsights}
+                  onAssign={handleSmartAssign}
+                  onFocusTable={focusTable}
+                />
+              </div>
+            )}
             <div className="min-h-0">{renderInspector('h-full')}</div>
           </div>
         )}
@@ -925,6 +1172,7 @@ const SeatingPlanRefactored = () => {
           tables={safeTables}
           background={background}
           globalMaxSeats={globalMaxSeats}
+          ceremonySettings={ceremonySettings}
         />
         <SeatingExportWizard
           open={exportWizardOpen}

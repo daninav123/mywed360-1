@@ -57,6 +57,10 @@
 - Integración: crear boda → seeds en finanzas/tareas → switch → verificar dashboards cargan.
 - E2E: planner crea segunda boda, alterna, archiva y restaura.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/weddings/multi-weddings-flow.cy.js`: valida la vista de bodas activas/archivadas usando datos mock, comprueba la persistencia del `activeWedding` y la disponibilidad del CTA para planners.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
 - Seeds y Cloud Functions idempotentes para nuevas bodas.

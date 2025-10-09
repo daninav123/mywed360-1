@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import errorLogger from '../utils/errorLogger';
 
@@ -7,10 +7,28 @@ import errorLogger from '../utils/errorLogger';
  * Muestra el estado de todos los servicios y errores en tiempo real
  */
 const DiagnosticPanel = () => {
+  const diagnosticsDisabled = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      if (window.Cypress) return true;
+      if (window.__DISABLE_DIAGNOSTIC__ === true) return true;
+    }
+    if (
+      typeof import.meta !== 'undefined' &&
+      import.meta?.env &&
+      import.meta.env.VITE_DISABLE_DIAGNOSTIC === 'true'
+    ) {
+      return true;
+    }
+    return false;
+  }, []);
+
+  if (diagnosticsDisabled) {
+    return null;
+  }
+
   const [diagnostics, setDiagnostics] = useState({});
   const [errors, setErrors] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
-  const [autoShown, setAutoShown] = useState(false);
   const [stats, setStats] = useState({});
 
   useEffect(() => {
@@ -40,16 +58,6 @@ const DiagnosticPanel = () => {
 
     return () => clearInterval(interval);
   }, []);
-
-  // Mostrar automáticamente si hay errores críticos (solo una vez)
-  useEffect(() => {
-    const hasErrors = Object.values(diagnostics).some((d) => d.status === 'error');
-    if (hasErrors && !isVisible && !autoShown) {
-      console.warn('🚨 Se detectaron errores críticos. Mostrando panel de diagnóstico...');
-      setIsVisible(true);
-      setAutoShown(true);
-    }
-  }, [diagnostics, isVisible]);
 
   const getStatusIcon = (status) => {
     switch (status) {

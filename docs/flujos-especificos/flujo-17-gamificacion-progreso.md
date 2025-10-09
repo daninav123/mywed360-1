@@ -1,7 +1,7 @@
 # 17. Gamificacion y Progreso (estado 2025-10-07)
 
-> Implementado: widgets iniciales en `Dashboard.jsx`, `ProgressTracker.jsx`, `useGamification` hook (beta), asignacion de puntos basicos por tareas completadas.
-> Pendiente: niveles completos, logros, desafios semanales, recompensas y panel de analytics.
+> Implementado: tarjeta `GamificationPanel.jsx` en Home (`Dashboard.jsx`) y servicio `GamificationService` con endpoints `award`, `stats`, `achievements` (stub).  
+> Pendiente: niveles, logros, retos semanales, recompensas y panel de analytics completo.
 
 ## 1. Objetivo y alcance
 - Motivar a usuarios a completar tareas y usar modulos clave mediante mecanicas de juego.
@@ -9,58 +9,51 @@
 - Incrementar retencion y frecuencia de uso con objetivos claros y recompensas.
 
 ## 2. Trigger y rutas
-- Menú inferior → pestaña **Inicio** (`/home`, `Dashboard.jsx`) con barra de progreso y objetivos.
-- Seccion dedicada `/gamificacion` (pendiente) para ver logros y retos.
-- Notificaciones push/email cuando se desbloquea un logro o hay desafios nuevos.
+- Menú inferior → pestaña **Inicio** (`/home`, `Dashboard.jsx`) donde se renderiza `GamificationPanel`.
+- No existe aún `/gamificacion`; se mantiene como roadmap.
+- No hay notificaciones automáticas (requiere backend futuro).
 
 ## 3. Paso a paso UX
-1. Puntos y niveles
-   - Acciones otorgan puntos (crear tarea, confirmar invitado, actualizar presupuesto, publicar sitio).
-   - Tabla de niveles (Novato -> Maestro Wedding) con beneficios planeados.
-   - Barra de experiencia visible en dashboard y perfil.
-2. Logros y retos
-   - Logros por progreso (primer RSVP, 100 invitados, checklist completa) y velocidad (racha semanal).
-   - Retos temporales (objetivos semanales/mensuales) con recordatorios automáticos.
-   - Notificacion con animacion al desbloquear logro, opcion de compartir (pendiente).
-3. Progreso de boda
-   - `ProgressTracker.jsx` muestra porcentaje global y por categoria (planeacion, invitados, proveedores, presupuesto, sitio web).
-   - Objetivos sugeridos segun estado actual (ej: "Confirma 10 invitados esta semana").
-   - Gamificacion integra datos de tareas, finanzas, RSVP y proveedores.
+1. **Panel de progreso (MVP)**
+   - `GamificationPanel` muestra nivel, puntos y progreso al siguiente nivel usando `getSummary`.
+   - El servicio `GamificationService` devuelve datos mock/stub si no hay backend.
+   - En caso de error se muestra mensaje en rojo y el panel sigue cargando Home.
+2. **Futura experiencia**
+   - Niveles, logros, retos y objetivos semanales están en diseño (no implementados).
+   - `ProgressTracker.jsx` y avisos personalizados se activarán con datos reales.
+   - Notificaciones push/email sólo se describen como roadmap.
 
 ## 4. Persistencia y datos
-- Firestore `weddings/{id}/gamification`: puntos, nivel, progreso por categoria, rachas, ultimos retos.
-- `weddings/{id}/achievements`: logros desbloqueados con metadata (fecha, origen, recompensa).
-- `gamificationEvents` (collection global) para historico anonimo y analitica.
-- Configuracion por usuario en `users/{uid}/gamificationSettings` (opt-in/out, notificaciones).
+- No hay persistencia propia en el cliente; se depende de endpoints `/api/gamification/*` cuando existan.
+- El servicio retorna `{ points, level, progressToNext }` y se guarda sólo en memoria.
+- Colecciones `gamification`, `achievements` y `gamificationEvents` aún no existen en Firestore.
 
 ## 5. Reglas de negocio
-- Evitar duplicidad: puntos otorgados una vez por accion idempotente (usando hashes).
-- Rachas se mantienen si usuario completa objetivo diario/weekly, se reinician al fallar plazo.
-- Logros especiales requieren validaciones (ej. `perfect_budget` solo si presupuesto <= planificado).
-- Gamificacion respeta opt-out; sin consentimiento no se guardan datos de engagement.
+- No hay reglas aplicadas en frontend: se muestra lo que devuelve el servicio.
+- Opt-in/opt-out y deduplicación son parte del backend futuro.
 
 ## 6. Estados especiales y errores
-- Si gamificacion desactivada -> mostrar mensaje y CTA para activarla.
-- Datos faltantes (ej. sin tareas) -> se oculta categoria y se sugiere modulo correspondiente.
-- Error al otorgar puntos -> se guarda en cola de reintentos y se muestra toast informativo.
-- Cuando usuario alcanza nivel maximo -> mostrar mensaje celebratorio y roadmap de mejoras.
+- Sin datos → panel muestra 0 puntos y “Nivel 1”.
+- Error API → mensaje “No se pudo obtener el progreso” (texto rojo) y se mantiene Home usable.
+- No hay CTA para activar/desactivar (se añadirá cuando exista opt-in real).
 
-## 7. Integracion con otros flujos
-- Flujo 14/6 actualizan progreso a partir de tareas y presupuesto.
-- Flujo 3/9 suma puntos por confirmar invitados y completar RSVP; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) registra eventos automáticos para aplicar recompensas.
-- Flujo 5/15 otorga logros por contratos firmados y proveedores confirmados.
-- Flujo 16 permite que el asistente IA sugiera metas gamificadas.
-- Flujo 22 muestra resumen en panel general.
+## 7. Integración con otros flujos (roadmap)
+- Se planea sumar puntos al completar tareas (Flujo 14), confirmar invitados (Flujo 3/9) y cerrar contratos (Flujo 5/15).
+- El [Flujo 16](./flujo-16-asistente-virtual-ia.md) podría sugerir metas en el futuro.
+- Actualmente el panel sólo refleja datos devueltos por `GamificationService`.
 
-## 8. Metricas y monitorizacion
-- Eventos: `gamification_points_awarded`, `achievement_unlocked`, `streak_extended`, `challenge_completed`.
-- Indicadores: usuarios activos con gamificacion, puntos medios por semana, retencion vs control.
-- Dashboard de producto para analizar correlacion entre gamificacion y conversion a planes de pago.
+## 8. Métricas y monitorización
+- No hay eventos instrumentados en frontend.
+- Roadmap: `gamification_points_awarded`, `achievement_unlocked`, `challenge_completed` y dashboards de producto.
 
 ## 9. Pruebas recomendadas
-- Unitarias: calculo de puntos, gestion de rachas, desbloqueo de logros.
-- Integracion: accion (ej. completar tarea) -> actualiza gamificacion y notifica dashboard.
-- E2E: usuario activa gamificacion, completa objetivos, desbloquea logro y recibe notificacion.
+- Unitarias: `GamificationService` (mocks `awardPoints`, `getStats`, `getAchievements`) y el render simple de `GamificationPanel`.
+- Integración: simular `getSummary` devolviendo datos y comprobar render.
+- E2E (pendiente de backend real).
+
+
+## Cobertura E2E implementada
+- No hay pruebas end-to-end específicas implementadas para este flujo.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para `gamification`, `achievements`, `gamificationEvents`.

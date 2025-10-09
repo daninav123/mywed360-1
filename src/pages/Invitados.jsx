@@ -1,6 +1,5 @@
 ﻿import React, { useState } from 'react';
 
-
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
 import GuestFilters from '../components/guests/GuestFilters';
@@ -12,12 +11,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs'
 import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
 import FormalInvitationModal from '../components/whatsapp/FormalInvitationModal';
+import WhatsAppSender from '../components/whatsapp/WhatsAppSender';
 import { useWedding } from '../context/WeddingContext';
 import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { useAuth } from '../hooks/useAuth';
 import useGuests from '../hooks/useGuests';
 import useTranslations from '../hooks/useTranslations';
 import { post as apiPost } from '../services/apiClient';
+import { renderInviteMessage } from '../services/MessageTemplateService';
+import { createInvitationPrintBatch } from '../services/printService';
 import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
 
 /**
@@ -41,6 +43,7 @@ function Invitados() {
   const [showRsvpModal, setShowRsvpModal] = useState(false);
   const [showWhatsModal, setShowWhatsModal] = useState(false);
   const [showSaveTheDate, setShowSaveTheDate] = useState(false);
+  const [showWhatsBatch, setShowWhatsBatch] = useState(false);
   const [showFormalInvitation, setShowFormalInvitation] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -168,6 +171,44 @@ function Invitados() {
     );
   }, [activeWeddingInfo]);
 
+  const ownerAddress = React.useMemo(() => {
+    const info = activeWeddingInfo?.weddingInfo || {};
+    const contact = info.printingContact || {};
+    const addressBlock =
+      info.printingAddress ||
+      info.ownerAddress ||
+      info.postalAddress ||
+      info.addressObject ||
+      {};
+    const line1 =
+      addressBlock.line1 ||
+      addressBlock.addressLine1 ||
+      info.ownerAddressLine1 ||
+      info.addressStreet ||
+      info.address ||
+      '';
+    const line2 =
+      addressBlock.line2 ||
+      addressBlock.addressLine2 ||
+      info.ownerAddressLine2 ||
+      info.addressStreet2 ||
+      '';
+    const city = addressBlock.city || info.addressCity || '';
+    const state = addressBlock.state || info.addressState || '';
+    const postalCode =
+      addressBlock.postalCode || addressBlock.zip || info.addressZip || '';
+    const country = addressBlock.country || info.addressCountry || '';
+    return {
+      name: contact.name || info.printingContactName || info.ownerName || coupleLabel,
+      line1,
+      line2,
+      city,
+      state,
+      postalCode,
+      country,
+    };
+  }, [activeWeddingInfo, coupleLabel]);
+
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
     setEditingGuest(null);
@@ -276,6 +317,8 @@ function Invitados() {
   // Abrir modal de envÃ­o masivo WhatsApp
   const openSaveTheDate = () => setShowSaveTheDate(true);
   const closeSaveTheDate = () => setShowSaveTheDate(false);
+  const openWhatsBatch = () => setShowWhatsBatch(true);
+  const closeWhatsBatch = () => setShowWhatsBatch(false);
 
   // SelecciÃ³n mÃºltiple
   const handleToggleSelect = (id, checked) => {
@@ -403,18 +446,59 @@ function Invitados() {
         alert('Añade la URL de la invitación diseñada antes de continuar.');
         return { success: false };
       }
-      const batchId = `${channel || 'print'}-${Date.now()}`;
+      const guestsToPrint = guestIds
+        .map((id) => (guests || []).find((g) => g.id === id))
+        .filter(Boolean);
+      if (!guestsToPrint.length) {
+        alert('No se pudo encontrar información de los invitados seleccionados.');
+        return { success: false };
+      }
+      const finalChannel = channel || 'print_owner';
+      const batchId = `${finalChannel}-${Date.now()}`;
+      const guestsPayload = guestsToPrint.map((guest) => ({
+        guestId: guest.id,
+        name: guest.name || '',
+        assetUrl: guest.whatsappAssetUrl || normalizedAsset,
+        envelope: {
+          name: guest.name || '',
+          address: {
+            line1: guest.addressStreet || guest.address || '',
+            line2: guest.addressStreet2 || '',
+            city: guest.addressCity || '',
+            state: guest.addressState || '',
+            postalCode: guest.addressZip || '',
+            country: guest.addressCountry || '',
+          },
+        },
+        metadata: {
+          companions: guest.companion || 0,
+          notes: guest.notes || '',
+        },
+        message: renderInviteMessage(guest.name || '', {
+          coupleName: coupleLabel,
+        }),
+      }));
+      const providerResponse = await createInvitationPrintBatch({
+        weddingId: activeWedding,
+        batchId,
+        assetUrl: normalizedAsset,
+        guests: guestsPayload,
+        ownerAddress,
+      });
+      if (!providerResponse?.success) {
+        throw new Error(providerResponse?.error || 'print-batch-failed');
+      }
       await Promise.all(
-        guestIds.map((id) =>
-          updateGuest(id, {
-            deliveryChannel: channel,
-            deliveryStatus: 'pending',
+        guestsToPrint.map((guest) =>
+          updateGuest(guest.id, {
+            deliveryChannel: finalChannel,
+            deliveryStatus: 'printing',
             whatsappAssetUrl: normalizedAsset,
-            printBatchId: channel?.startsWith('print') ? batchId : '',
+            printBatchId: batchId,
           })
         )
       );
-      alert('Entrega registrada correctamente.');
+      alert('Pedido de impresión generado correctamente.');
       return { success: true };
     } catch (error) {
       console.error('Error registrando entrega física', error);
@@ -853,7 +937,8 @@ function Invitados() {
           onTableFilterChange={(value) => updateFilters({ table: value })}
           onAddGuest={handleAddGuest}
           onOpenSaveTheDate={openSaveTheDate}
-          onOpenFormalInvitation={() => setShowFormalInvitation(true)}
+          onBulkInvite={() => setShowFormalInvitation(true)}
+          onOpenManualBatch={openWhatsBatch}
           onOpenRsvpSummary={handleOpenRsvpSummary}
           onBulkTableReassign={handleBulkTableReassign}
           guestCount={guests?.length || 0}
@@ -1095,6 +1180,24 @@ function Invitados() {
           onMarkDelivery={handleMarkFormalDelivery}
         />
 
+
+        <WhatsAppSender
+          open={showWhatsBatch}
+          onClose={closeWhatsBatch}
+          guests={guests || []}
+          weddingId={activeWedding}
+          defaultMessage={defaultInvitationMessage}
+          coupleName={coupleLabel}
+          onBatchCreated={(res) => {
+            alert(
+              t('guests.whatsapp.batchCreated', {
+                defaultValue: 'Lote creado con {{count}} mensajes',
+                count: res.items?.length || 0,
+              })
+            );
+          }}
+        />
+
         {/* Modal WhatsApp con dos pestaÃ±as (mÃ³vil personal / API) */}
         <WhatsAppModal
           open={showWhatsModal}
@@ -1147,3 +1250,5 @@ function Invitados() {
 }
 
 export default Invitados;
+
+

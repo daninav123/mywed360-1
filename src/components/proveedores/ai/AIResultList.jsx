@@ -24,48 +24,51 @@ import Card from '../../../components/ui/Card';
 const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFallback }) => {
   if (isLoading) {
     return (
-      <div className="flex flex-col itemás-center justify-center py-12">
-        <div className="animate-spin mb-4">
-          <Loader2 size={40} className="text-blue-500" />
+      <div data-testid="ai-results-list">
+        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+          <div className="animate-spin mb-4">
+            <Loader2 size={40} className="text-blue-500" />
+          </div>
+          <p className="text-lg font-medium text-gray-700">Buscando proveedores...</p>
+          <p className="text-sm text-gray-500 mt-2">Analizando tu consulta: "{query}"</p>
         </div>
-        <p className="text-lg font-medium text-gray-700">Buscando proveedores...</p>
-        <p className="text-sm text-gray-500 mt-2">Analizando tu consulta: "{query}"</p>
       </div>
     );
   }
-
   if (error) {
     return (
-      <div className="flex flex-col itemás-center justify-center py-12">
-        <div className="p-3 rounded-full bg-red-100 mb-4">
-          <X size={24} className="text-red-500" />
+      <div data-testid="ai-results-list">
+        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+          <div className="p-3 rounded-full bg-red-100 mb-4">
+            <X size={24} className="text-red-500" />
+          </div>
+          <p className="text-lg font-medium text-gray-700">Error al buscar</p>
+          <p className="text-sm text-gray-500 mt-2 text-center max-w-md">{error}</p>
+          <Button className="mt-4" size="sm" variant="outline">
+            Intentar de nuevo
+          </Button>
         </div>
-        <p className="text-lg font-medium text-gray-700">Error al buscar</p>
-        <p className="text-sm text-gray-500 mt-2 text-center max-w-md">{error}</p>
-        <Button className="mt-4" size="sm" variant="outline">
-          Intentar de nuevo
-        </Button>
       </div>
     );
   }
-
   // Mensaje "sin resultaños" se pospone hasta después de definir displayResults
 
   if (!query) {
     return (
-      <div className="flex flex-col itemás-center justify-center py-12">
-        <div className="p-3 rounded-full bg-blue-100 mb-4">
-          <Search size={24} className="text-blue-500" />
+      <div data-testid="ai-results-list">
+        <div className="flex flex-col itemÃ¡s-center justify-center py-12">
+          <div className="p-3 rounded-full bg-blue-100 mb-4">
+            <Search size={24} className="text-blue-500" />
+          </div>
+          <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
+          <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
+            Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más
+            adecuados
+          </p>
         </div>
-        <p className="text-lg font-medium text-gray-700">Busca proveedores con IA</p>
-        <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
-          Describe lo que buscas en lenguaje natural y la IA encontrará los proveedores más
-          adecuaños
-        </p>
       </div>
     );
   }
-
   // Ejemplo de daños para mástrar en modo de demástración
   // DEMO DATA
   const demoResults = [
@@ -117,7 +120,7 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="ai-results-list">
       {usedFallback && query && (
         <div className="w-full flex itemás-start gap-2 p-3 border border-amber-200 bg-amber-50 text-amber-800 rounded">
           <AlertTriangle size={18} className="mt-0.5" />

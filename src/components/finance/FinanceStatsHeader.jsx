@@ -73,7 +73,7 @@ export default function FinanceStatsHeader({
         >
           {t('finance.transactions.exportCSV', { defaultValue: 'Exportar CSV' })}
         </Button>
-        <Button leftIcon={<Plus size={16} />} onClick={onNew}>
+        <Button leftIcon={<Plus size={16} />} onClick={onNew} data-testid="transactions-new">
           {t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}
         </Button>
       </div>

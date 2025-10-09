@@ -142,6 +142,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
   if (!isExpanded) {
     return (
       <button
+        data-testid="feedback-toggle"
         onClick={toggleExpanded}
         className="fixed bottom-4 right-4 bg-indigo-600 text-white rounded-full p-3 shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 z-50"
         aria-label="Dar feedback sobre el sistema de email"
@@ -165,7 +166,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 md:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden">
+    <div className="fixed bottom-4 right-4 w-80 md:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200 overflow-hidden" data-testid="feedback-form">
       <div className="bg-indigo-600 text-white px-4 py-3 flex justify-between items-center">
         <h3 className="font-medium text-lg">Tu opinión importa</h3>
         <button
@@ -190,7 +191,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
 
       <div className="p-4">
         {isSubmitted ? (
-          <div className="text-center py-6">
+          <div className="text-center py-6" data-testid="feedback-thanks">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-12 w-12 mx-auto text-green-500"
@@ -211,7 +212,7 @@ function EmailFeedbackCollector({ onSubmit, isMinimized = false, emailId = null 
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} data-testid="feedback-form-inner">
             {step === 1 && (
               <div>
                 <h4 className="font-medium mb-3">
@@ -430,4 +431,6 @@ EmailFeedbackCollector.propTypes = {
 };
 
 export default EmailFeedbackCollector;
+
+
 

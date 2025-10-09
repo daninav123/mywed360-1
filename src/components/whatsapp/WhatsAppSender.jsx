@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 
 import { sendBatch } from '../../services/WhatsAppBatchService';
 import Modal from '../Modal';
@@ -12,8 +12,9 @@ import { Button } from '../ui';
  *  - onClose: fn()
  *  - guests: array [{ id, name, phone }]
  *  - weddingId: string
- *  - defaultMessage: string (puede contener {guestName})
+ *  - defaultMessage: string (puede contener {guestName} y {coupleName})
  *  - onBatchCreated: fn(batchResult)
+ *  - coupleName: string (se usa como fallback para firmar los mensajes)
  */
 export default function WhatsAppSender({
   open,
@@ -22,13 +23,13 @@ export default function WhatsAppSender({
   weddingId,
   defaultMessage = '',
   onBatchCreated,
+  coupleName = 'nuestra boda',
 }) {
-  const [selectedIds, setSelectedIds] = useState(
-    () => new Set(guests.filter((g) => g.phone).map((g) => g.id))
-  );
+  const guestsWithPhone = useMemo(() => (guests || []).filter((g) => !!g.phone), [guests]);
+  const [selectedIds, setSelectedIds] = useState(() => new Set(guestsWithPhone.map((g) => g.id)));
   const [message, setMessage] = useState(
     defaultMessage ||
-      '¡Hola {guestName}! Nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?'
+      '¡Hola {guestName}! Somos {coupleName} y nos encantaría contar contigo en nuestra boda. ¿Puedes confirmar tu asistencia?'
   );
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
@@ -42,23 +43,43 @@ export default function WhatsAppSender({
     });
   };
 
-  const list = useMemo(() => guests.filter((g) => g.phone), [guests]);
+  const handleToggleAll = (checked) => {
+    if (checked) setSelectedIds(new Set(guestsWithPhone.map((g) => g.id)));
+    else setSelectedIds(new Set());
+  };
 
   const handleSend = async () => {
     if (!selectedIds.size) {
       setError('Selecciona al menos un invitado');
       return;
     }
+    const trimmed = (message || '').trim();
+    if (!trimmed) {
+      setError('El mensaje no puede estar vacío');
+      return;
+    }
+    if (!coupleName) {
+      setError('Define el nombre de la pareja para firmar el mensaje');
+      return;
+    }
+
+    const normalizedCouple = coupleName.trim();
+    const templateWithCouple = trimmed.includes('{coupleName}')
+      ? trimmed.replaceAll('{coupleName}', normalizedCouple)
+      : trimmed.toLowerCase().includes(normalizedCouple.toLowerCase())
+        ? trimmed
+        : `${trimmed}\n\n${normalizedCouple}`;
+
     setSending(true);
     setError('');
     try {
       const res = await sendBatch({
         weddingId,
         guestIds: Array.from(selectedIds),
-        messageTemplate: message,
+        messageTemplate: templateWithCouple,
       });
-      if (onBatchCreated) onBatchCreated(res);
-      onClose();
+      onBatchCreated?.(res);
+      onClose?.();
     } catch (e) {
       console.error(e);
       setError('No se pudo crear el lote');
@@ -66,6 +87,8 @@ export default function WhatsAppSender({
       setSending(false);
     }
   };
+
+  if (!open) return null;
 
   return (
     <Modal open={open} onClose={onClose} title="Enviar invitaciones por WhatsApp" size="lg">
@@ -77,20 +100,18 @@ export default function WhatsAppSender({
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="text-xs text-gray-500">
-          Puedes usar la variable {'{guestName}'} que se reemplazará automáticamente.
+          Puedes usar las variables {'{guestName}'} y {'{coupleName}'} que se reemplazarán automáticamente.
         </div>
 
         <div className="max-h-60 overflow-auto border rounded-md">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
-                <th className="px-2 py-1">
+                <th className="px-2 py-1 text-center">
                   <input
                     type="checkbox"
-                    checked={selectedIds.size === list.length}
-                    onChange={(e) =>
-                      setSelectedIds(e.target.checked ? new Set(list.map((g) => g.id)) : new Set())
-                    }
+                    checked={selectedIds.size === guestsWithPhone.length && guestsWithPhone.length > 0}
+                    onChange={(e) => handleToggleAll(e.target.checked)}
                   />
                 </th>
                 <th className="px-2 py-1 text-left">Nombre</th>
@@ -98,7 +119,7 @@ export default function WhatsAppSender({
               </tr>
             </thead>
             <tbody>
-              {list.map((g) => (
+              {guestsWithPhone.map((g) => (
                 <tr key={g.id} className="border-t">
                   <td className="px-2 py-1 text-center">
                     <input
@@ -107,7 +128,7 @@ export default function WhatsAppSender({
                       onChange={() => toggleId(g.id)}
                     />
                   </td>
-                  <td className="px-2 py-1">{g.name}</td>
+                  <td className="px-2 py-1">{g.name || '-'}</td>
                   <td className="px-2 py-1">{g.phone}</td>
                 </tr>
               ))}

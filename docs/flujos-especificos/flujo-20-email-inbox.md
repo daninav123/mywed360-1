@@ -61,6 +61,13 @@
 - Integracion: enviar email -> registrar evento -> actualizar estadisticas.
 - E2E: configurar cuenta, enviar masivo, recibir respuesta simulada, revisar bandeja.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/email_inbox_smoke.cy.js`: smoke general de bandeja, sincronización y navegación.
+- `cypress/e2e/email/read-email.cy.js y cypress/e2e/email/send-email.cy.js`: cubren lectura, respuestas y reenvío.
+- `cypress/e2e/email/folders-management.cy.js y cypress/e2e/email/tags-filters.cy.js`: validan organización avanzada, carpetas y filtros.
+- `cypress/e2e/compose_quick_replies.cy.js y cypress/e2e/email/smart-composer.cy.js`: prueban asistentes y respuestas rápidas integrados en la bandeja.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `emails`, `emailSettings`, `emailTemplates`.
 - Configurar webhooks en Mailgun/SMTP y credenciales seguras.

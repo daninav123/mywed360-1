@@ -62,19 +62,14 @@ App.jsx → AuthProvider → UserProvider → MainLayout → WeddingProvider
 **Impacto:** WeddingContext no está disponible en rutas públicas
 **Ubicación:** `src/components/MainLayout.jsx` líneas 61, 69, 135
 
-#### 2. Import Incorrecto en WeddingContext
+#### 2. Import en WeddingContext (actualización 2025-10-08)
 
-**Problema:**
 ```javascript
-// ❌ INCORRECTO: Importa useAuthUnified en lugar de useAuth
-import { useAuth } from '../hooks/useAuthUnified';
-```
-
-**Debería ser:**
-```javascript
-// ✅ CORRECTO: Como especifica el flujo
+// ✅ CORRECTO: WeddingContext ya usa el hook unificado
 import { useAuth } from '../hooks/useAuth';
 ```
+
+**Estado:** Anteriormente se importaba `useAuthUnified`; la migración completada el 2025-10-08 alinea la implementación con el flujo documentado.
 
 ### ⚠️ CUMPLIMIENTO PARCIAL
 
@@ -120,13 +115,7 @@ return (
 ```
 
 #### 2. Corregir Import en WeddingContext
-```javascript
-// src/context/WeddingContext.jsx
-// Cambiar:
-import { useAuth } from '../hooks/useAuthUnified';
-// Por:
-import { useAuth } from '../hooks/useAuth';
-```
+- ✅ Completado 2025-10-08: `WeddingContext.jsx` importa `useAuth` correctamente. Mantener verificación en PRs para evitar regresiones.
 
 ### Prioridad Media
 

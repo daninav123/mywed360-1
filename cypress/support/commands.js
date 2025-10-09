@@ -1,4 +1,4 @@
-// ***********************************************
+﻿// ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
 // existing commands.
@@ -11,7 +11,7 @@
 // Import cypress-file-upload plugin for attachFile command
 import 'cypress-file-upload';
 
-// Prefijo automático para llamadas a backend cuando se usa URL relativa '/api/*'
+// Prefijo automÃ¡tico para llamadas a backend cuando se usa URL relativa '/api/*'
 // Lee Cypress.env('BACKEND_BASE_URL') definido en cypress.config.js o variables de entorno
 const __prefixApiUrl = (url) => {
   try {
@@ -64,48 +64,75 @@ Cypress.Commands.overwrite('request', (originalFn, ...args) => {
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-// Comando personalizado para iniciar sesión
+// Comando personalizado para iniciar sesiÃ³n
 Cypress.Commands.add('loginToLovenda', (email, password) => {
-  // Simular autenticación directamente con localStorage (compatible con useAuth.jsx)
+  // Simular autenticaciÃ³n directamente con localStorage (compatible con useAuth.jsx)
   cy.window().then((win) => {
-    win.localStorage.setItem('userEmail', email || 'usuario.test@lovenda.com');
+    const userEmail = email || 'usuario.test@lovenda.com';
+    win.localStorage.setItem('userEmail', userEmail);
     win.localStorage.setItem('isLoggedIn', 'true');
-    // También configurar datos de usuario completos para compatibilidad
+    // TambiÃ©n configurar datos de usuario completos para compatibilidad
     const mockUser = {
       uid: 'cypress-test',
-      email: email || 'usuario.test@lovenda.com',
+      email: userEmail,
       displayName: 'Usuario Test Cypress'
     };
     win.localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('mywed360_user', JSON.stringify(mockUser));
+    win.localStorage.setItem('mywed360_login_email', userEmail);
+    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockUser));
+  });
+});
+
+// Comando específico para preparar una sesión de administrador
+Cypress.Commands.add('loginAsAdmin', () => {
+  cy.window().then((win) => {
+    const adminUser = {
+      uid: 'admin-cypress',
+      email: 'admin@lovenda.com',
+      displayName: 'Administrador Lovenda',
+      role: 'admin',
+      isAdmin: true,
+      preferences: {
+        theme: 'dark',
+        emailNotifications: false
+      }
+    };
+
+    win.localStorage.setItem('lovenda_user', JSON.stringify(adminUser));
+    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(adminUser));
+    win.localStorage.setItem('MyWed360_admin_profile', JSON.stringify(adminUser));
+    win.localStorage.setItem('isLoggedIn', 'true');
+    win.localStorage.setItem('isAdminAuthenticated', 'true');
   });
 });
 
 // Comando personalizado para navegar a la bandeja de entrada de correo
 Cypress.Commands.add('navigateToEmailInbox', () => {
   cy.visit('/email/inbox');
-  // Esperar a que la bandeja de entrada se cargue
-  cy.get('[data-testid="email-list"]', { timeout: 10000 }).should('be.visible');
+  cy.get('[data-testid="email-title"]', { timeout: 20000 }).should('contain', 'Recibidos');
+  cy.closeDiagnostic();
 });
 
-// Comando para crear y enviar un correo electrónico
+// Comando para crear y enviar un correo electrÃ³nico
 
 // ======== Seating helpers =========
-// Cierra el panel de diagnóstico si está visible
+// Cierra el panel de diagnÃ³stico si estÃ¡ visible
 Cypress.Commands.add('closeDiagnostic', () => {
   cy.get('body').then(($body) => {
     const hasModal = $body.find('div.fixed.inset-0').length > 0;
     if (hasModal) {
-      // Intentar cerrar por el botón × del header del panel
-      cy.contains('h2', 'Panel de Diagnóstico MyWed360', { timeout: 1000 })
+      // Intentar cerrar por el botÃ³n Ã— del header del panel
+      cy.contains('h2', 'Panel de DiagnÃ³stico MyWed360', { timeout: 1000 })
         .parents('div')
         .first()
         .parent() // header container
         .within(() => {
-          cy.contains('button', '×').click({ force: true });
+          cy.contains('button', 'Ã—').click({ force: true });
         });
     } else {
-      // Fallback: busca el botón en el DOM actual sin fallar si no existe
-      const $btn = $body.find('button[title="Panel de Diagnóstico"]');
+      // Fallback: busca el botÃ³n en el DOM actual sin fallar si no existe
+      const $btn = $body.find('button[title="Panel de DiagnÃ³stico"]');
       if ($btn && $btn.length) {
         cy.wrap($btn.first()).click({ force: true });
       }
@@ -113,7 +140,7 @@ Cypress.Commands.add('closeDiagnostic', () => {
   });
 });
 
-// Inyecta un contexto mínimo de boda para que SeatingPlanRefactored renderice la toolbar
+// Inyecta un contexto mÃ­nimo de boda para que SeatingPlanRefactored renderice la toolbar
 Cypress.Commands.add('mockWeddingMinimal', () => {
   cy.window().then((win) => {
     win.__MOCK_WEDDING__ = {
@@ -133,19 +160,21 @@ Cypress.Commands.add('resetSeatingLS', () => {
   });
 });
 Cypress.Commands.add('sendEmail', (recipient, subject, body) => {
-  // Navegar al formulario de composición
+  // Navegar al formulario de composiciÃ³n
   cy.get('[data-testid="compose-button"]').click();
   
   // Rellenar el formulario
   cy.get('[data-testid="recipient-input"]').type(recipient);
   cy.get('[data-testid="subject-input"]').type(subject);
   
-  // Usar el editor de contenido (podría ser un editor rico)
+  // Usar el editor de contenido (podrÃ­a ser un editor rico)
   cy.get('[data-testid="body-editor"]').type(body);
   
   // Enviar el correo
   cy.get('[data-testid="send-button"]').click();
   
-  // Esperar confirmación
+  // Esperar confirmaciÃ³n
   cy.get('[data-testid="success-message"]', { timeout: 10000 }).should('be.visible');
 });
+
+

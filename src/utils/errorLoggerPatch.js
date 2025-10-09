@@ -43,7 +43,8 @@ function installPatch() {
 
       // Fallback: prueba directa con VITE_OPENAI_API_KEY si existe
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-      if (apiKey) {
+      const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
+      if (apiKey && allowDirect) {
         try {
           const response = await fetch('https://api.openai.com/v1/models', {
             headers: {
@@ -69,6 +70,11 @@ function installPatch() {
             details: { error: err.message }
           };
         }
+      } else if (apiKey && !allowDirect) {
+        this.diagnostics.openai = {
+          status: 'warning',
+          details: { message: 'OpenAI directo deshabilitado', apiKeyPrefix: apiKey.substring(0, 6) + '...' }
+        };
       } else {
         this.diagnostics.openai = {
           status: 'warning',

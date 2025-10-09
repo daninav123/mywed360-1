@@ -3,7 +3,10 @@
 const loginAndReset = () => {
   cy.window().then((win) => win.localStorage.clear());
   cy.loginToLovenda();
-  cy.window().then((win) => win.localStorage.removeItem('lovenda_active_wedding'));
+  cy.window().then((win) => {
+    win.localStorage.removeItem('mywed360_active_wedding');
+    win.localStorage.removeItem('lovenda_active_wedding');
+  });
 };
 
 const addCategory = (name, amount) => {

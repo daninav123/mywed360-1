@@ -132,7 +132,7 @@ Esquemas sugeridos
 
 Esquema sugerido
 
-- `WhatsAppHealth` { provider: string, configured: boolean, ok: boolean, message?: string }
+- `WhatsAppHealth` { provider: string, configured: boolean, ok: boolean, message→: string }
 
 ## 6) Métricas de dominio
 
@@ -144,7 +144,7 @@ Esquema sugerido
 
 - Seguridad: `bearerAuth` (Firebase); añadir `requireAdmin` donde aplique.
 - Paginación: `limit`, `page`, `sort`, `order`.
-- Errores: objetos `{ code, message, details? }` y `4xx/5xx` coherentes.
+- Errores: objetos `{ code, message, details→ }` y `4xx/5xx` coherentes.
 - Versionado: prefijo `v1` cuando estable.
 
 ## Tareas

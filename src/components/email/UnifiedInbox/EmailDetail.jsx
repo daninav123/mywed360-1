@@ -10,6 +10,7 @@ import {
   Printer,
   Flag,
   ArrowLeftRight,
+  Calendar,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef, memo } from 'react';
 
@@ -54,7 +55,7 @@ const IMAGE_TYPES = {
   bmp: 'image/bmp',
   ico: 'image/x-icon',
 };
-const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll, userId }) => {
+const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll, userId, onSchedule }) => {
   // Si email es null o undefined, mostrar un mensaje
   if (!email) {
     return (
@@ -503,6 +504,17 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, 
             <Reply size={16} className="mr-1" />
             Responder
           </Button>
+          {onSchedule && (
+            <Button
+              onClick={() => onSchedule(email)}
+              variant="outline"
+              size="sm"
+              className="flex items-center"
+            >
+              <Calendar size={16} className="mr-1" />
+              Agendar evento
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -511,3 +523,6 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, 
 
 // Exportación simple sin memo
 export default EmailDetail;
+
+
+

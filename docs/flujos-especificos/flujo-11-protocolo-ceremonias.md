@@ -34,8 +34,12 @@ El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los
 
 ## Eventos y métricas transversales
 
-- Eventos previstos: `ceremony_configured`, `special_moment_added`, `ceremony_timeline_updated`, `ceremony_checklist_checked`, `ceremony_document_uploaded` (pendientes de instrumentar salvo configuración base).  
-- Indicadores: % de momentos con música asignada, % checklist completada, desviación horaria acumulada, documentación legal completada.
+- Eventos activos: `special_moment_added`, `special_moment_removed`, `special_moment_state_changed`, `ceremony_timeline_updated`, `ceremony_checklist_checked`, `ceremony_document_uploaded`, `ceremony_text_created`, `ceremony_text_finalized`, `ceremony_surprise_added`. Pendientes: `ceremony_configured`, `ceremony_document_guide_opened`.  
+- Indicadores: % de momentos con música asignada, % checklist completada, desviación horaria acumulada, documentación legal completada, número de textos finalizados.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/protocolo/ceremony-tabs-flow.cy.js`: verifica la navegación general del módulo de protocolo, conmutando entre los subflujos 11A–11E y confirmando que cada vista se renderiza con una boda simulada.
 
 ## Roadmap compartido
 

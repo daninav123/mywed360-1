@@ -1,12 +1,14 @@
-﻿import { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import useWeddingCollection from './useWeddingCollection';
+import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useWedding } from '../context/WeddingContext';
 import { guestSchema, guestUpdateSchema } from '../schemas/guest';
 import { post as apiPost } from '../services/apiClient';
 import { ensureExtensionAvailable, sendBatchMessages } from '../services/whatsappBridge';
 import { toE164 as toE164Frontend, waDeeplink } from '../services/whatsappService';
-import { renderInviteMessage } from '../services/MessageTemplateService';
+import { renderInviteMessage, getInviteTemplate } from '../services/MessageTemplateService';
+import { sendMail } from '../services/emailService';
 
 const applyPlaceholders = (template = '', context = {}) => {
   const guestName = context.guestName || '';
@@ -30,12 +32,15 @@ const resolveMessageForGuest = (guest, baseMessage, context = {}) => {
 const useGuests = () => {
   // Contexto de boda activa
   let activeWedding;
+  let weddingsList = [];
   try {
     const weddingContext = useWedding();
     activeWedding = weddingContext?.activeWedding;
+    weddingsList = Array.isArray(weddingContext?.weddings) ? weddingContext.weddings : [];
   } catch (error) {
     console.error('Error accediendo al contexto de bodas en useGuests:', error);
     activeWedding = null;
+    weddingsList = [];
   }
 
   // Datos de ejemplo (solo si VITE_ALLOW_SAMPLE_GUESTS === 'true' y no hay boda activa)
@@ -77,6 +82,95 @@ const useGuests = () => {
   }, [allowSamples]);
 
   const fallbackGuests = activeWedding ? [] : sampleGuests;
+  const seatingSyncLockRef = useRef(false);
+
+  const broadcastSeatingSync = useCallback((detail = {}) => {
+    try {
+      window.dispatchEvent(
+        new CustomEvent('mywed360-seating-sync', {
+          detail: {
+            source: 'guests',
+            timestamp: Date.now(),
+            ...detail,
+          },
+        })
+      );
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn('[useGuests] broadcastSeatingSync error', error);
+      }
+    }
+  }, []);
+  const { info: activeWeddingInfo } = useActiveWeddingInfo();
+
+  const coupleName = useMemo(() => {
+    try {
+      const info = activeWeddingInfo?.weddingInfo || {};
+      const weddingRecord = (weddingsList || []).find((w) => w.id === activeWedding) || {};
+      let p1 = '';
+      let p2 = '';
+      const coupleRaw =
+        info.coupleName ||
+        weddingRecord.coupleName ||
+        weddingRecord.name ||
+        info.brideAndGroom ||
+        weddingRecord.brideAndGroom ||
+        info.nombrePareja ||
+        '';
+      if (coupleRaw) {
+        const parts = String(coupleRaw)
+          .trim()
+          .split(/\s*&\s*|\s+y\s+/i);
+        p1 = (parts[0] || '').trim();
+        p2 = (parts[1] || '').trim();
+      } else if (info.bride || info.groom || weddingRecord.bride || weddingRecord.groom) {
+        p1 = String(info.bride || weddingRecord.bride || '').trim();
+        p2 = String(info.groom || weddingRecord.groom || '').trim();
+      }
+      if (p1 && p2) return `${p1} y ${p2}`;
+      return p1 || p2 || 'nuestra boda';
+    } catch {
+      return 'nuestra boda';
+    }
+  }, [activeWedding, activeWeddingInfo, weddingsList]);
+
+  const weddingDateLabel = useMemo(() => {
+    try {
+      const info = activeWeddingInfo?.weddingInfo || {};
+      const weddingRecord = (weddingsList || []).find((w) => w.id === activeWedding) || {};
+      const raw =
+        info.weddingDate ||
+        info.date ||
+        weddingRecord.weddingDate ||
+        weddingRecord.date ||
+        info.ceremonyDate ||
+        weddingRecord.ceremonyDate ||
+        null;
+      if (!raw) return '';
+      const toDate = (value) => {
+        if (!value) return null;
+        if (value instanceof Date) return value;
+        if (typeof value === 'string' || typeof value === 'number') {
+          const d = new Date(value);
+          return Number.isNaN(d.getTime()) ? null : d;
+        }
+        if (value.seconds) {
+          const d = new Date(value.seconds * 1000);
+          return Number.isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+      };
+      const date = toDate(raw);
+      if (!date) return String(raw);
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      });
+    } catch {
+      return '';
+    }
+  }, [activeWedding, activeWeddingInfo, weddingsList]);
 
   // Colección guests de la boda activa
   const {
@@ -116,7 +210,7 @@ const useGuests = () => {
             String(g.response || '')
               .toLowerCase()
               .trim()
-          );
+         );
           if (
             status === 'confirmed' &&
             !(s === 'confirmed' || s === 'accepted' || r === 's' || r === 'si' || r === 'sí')
@@ -147,7 +241,7 @@ const useGuests = () => {
       localStorage.setItem('mywed360Guests', JSON.stringify(guests));
       window.dispatchEvent(
         new CustomEvent('mywed360-guests-updated', { detail: { guests, count: guests.length } })
-      );
+     );
     } catch (error) {
       console.error('Error sincronizando invitados:', error);
     }
@@ -181,7 +275,7 @@ const useGuests = () => {
       },
     }),
     []
-  );
+ );
 
   // Estadísticas
   const stats = useMemo(() => {
@@ -228,6 +322,10 @@ const useGuests = () => {
           id: guestData.id || `guest-${Date.now()}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          checkedIn: !!guestData.checkedIn,
+          checkedInAt: guestData.checkedIn
+            ? guestData.checkedInAt || new Date().toISOString()
+            : null,
         };
         if (base.phone) base.phone = utils.phoneClean(base.phone);
         // Normalizar estado coherente basado en status/response
@@ -246,14 +344,17 @@ const useGuests = () => {
         }
         const newGuest = parsed.data;
         await addItem(newGuest);
+        if (!seatingSyncLockRef.current) {
+          broadcastSeatingSync({ guest: newGuest });
+        }
         return { success: true, guest: newGuest };
       } catch (error) {
         console.error('Error añadiendo invitado:', error);
         return { success: false, error: error.message };
       }
     },
-    [addItem]
-  );
+    [addItem, broadcastSeatingSync]
+ );
 
   const updateGuest = useCallback(
     async (guestId, updates) => {
@@ -288,6 +389,10 @@ const useGuests = () => {
         }
         const updatedGuest = parsed.data;
         await updateItem(guestId, updatedGuest);
+        const mergedGuest = { ...(original || {}), ...updatedGuest };
+        if (!seatingSyncLockRef.current) {
+          broadcastSeatingSync({ guest: mergedGuest });
+        }
         if (updatedGuest.table !== originalTable && updatedGuest.companionGroupId) {
           const companions = guests.filter(
             (g) => g.companionGroupId === updatedGuest.companionGroupId && g.id !== guestId
@@ -298,6 +403,15 @@ const useGuests = () => {
               group: updatedGuest.table || '',
               updatedAt: new Date().toISOString(),
             });
+            if (!seatingSyncLockRef.current) {
+              broadcastSeatingSync({
+                guest: {
+                  ...comp,
+                  table: updatedGuest.table,
+                  group: updatedGuest.table || '',
+                },
+              });
+            }
           }
         }
         return { success: true, guest: updatedGuest };
@@ -306,21 +420,55 @@ const useGuests = () => {
         return { success: false, error: error.message };
       }
     },
-    [guests, updateItem]
-  );
+    [broadcastSeatingSync, guests, updateItem]
+ );
 
   const removeGuest = useCallback(
     async (guestId) => {
       try {
         await deleteItem(guestId);
+        if (!seatingSyncLockRef.current) {
+          broadcastSeatingSync({ removed: true, guestId });
+        }
         return { success: true };
       } catch (error) {
         console.error('Error eliminando invitado:', error);
         return { success: false, error: error.message };
       }
     },
-    [deleteItem]
+    [broadcastSeatingSync, deleteItem]
   );
+
+  useEffect(() => {
+    const handler = (event) => {
+      try {
+        const detail = event?.detail || {};
+        if (detail.source !== 'seating') return;
+        const payloadGuest = detail.guest;
+        if (payloadGuest && payloadGuest.id) {
+          seatingSyncLockRef.current = true;
+          updateGuest(payloadGuest.id, {
+            table: payloadGuest.table || '',
+            companionGroupId: payloadGuest.companionGroupId || '',
+          }).finally(() => {
+            seatingSyncLockRef.current = false;
+          });
+        }
+        if (detail.removed && detail.guestId) {
+          seatingSyncLockRef.current = true;
+          removeGuest(detail.guestId).finally(() => {
+            seatingSyncLockRef.current = false;
+          });
+        }
+      } catch (err) {
+        if (import.meta.env.DEV) {
+          console.warn('[useGuests] seating sync handler error', err);
+        }
+      }
+    };
+    window.addEventListener('mywed360-seating-sync', handler);
+    return () => window.removeEventListener('mywed360-seating-sync', handler);
+  }, [removeGuest, updateGuest]);
 
   // WhatsApp helpers
   const inviteViaWhatsApp = useCallback(
@@ -336,7 +484,7 @@ const useGuests = () => {
           `/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`,
           {},
           { auth: true }
-        );
+       );
         if (resp.ok) {
           const json = await resp.json();
           link = json.link || '';
@@ -349,7 +497,7 @@ const useGuests = () => {
       window.open(deeplink, '_blank');
     },
     [utils, activeWedding]
-  );
+ );
 
   const inviteSelectedWhatsAppDeeplink = useCallback(
     async (selectedIds = [], customMessage) => {
@@ -364,7 +512,7 @@ const useGuests = () => {
               `/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`,
               {},
               { auth: true }
-            );
+           );
             if (resp.ok) {
               const json = await resp.json();
               link = json.link || '';
@@ -386,7 +534,7 @@ const useGuests = () => {
       return { success: true, opened };
     },
     [guests, utils, activeWedding]
-  );
+ );
 
   const inviteSelectedWhatsAppViaExtension = useCallback(
     async (selectedIds = [], customMessage) => {
@@ -404,7 +552,7 @@ const useGuests = () => {
               `/api/guests/${activeWedding}/id/${guest.id}/rsvp-link`,
               {},
               { auth: true }
-            );
+           );
             if (resp.ok) {
               const json = await resp.json();
               link = json.link || '';
@@ -425,7 +573,7 @@ const useGuests = () => {
       return { success: true, ...result, count: items.length };
     },
     [guests, utils, activeWedding]
-  );
+ );
 
   const inviteSelectedWhatsAppBroadcastViaExtension = useCallback(
     async (selectedIds = [], customMessage) => {
@@ -433,7 +581,7 @@ const useGuests = () => {
       return inviteSelectedWhatsAppViaExtension(selectedIds, customMessage);
     },
     [inviteSelectedWhatsAppViaExtension]
-  );
+ );
 
   // Variantes API/Email: placeholders seguros para mantener la API del hook
   const inviteViaWhatsAppApi = useCallback(
@@ -486,7 +634,7 @@ const useGuests = () => {
       }
     },
     [activeWedding, utils],
-  );
+ );
 
   const inviteSelectedWhatsAppApi = useCallback(
     async (selectedIds = [], baseMessage, options = {}) => {
@@ -562,7 +710,7 @@ const useGuests = () => {
       }
     },
     [guests, utils, activeWedding]
-  );
+ );
 
   const bulkInviteWhatsApp = useCallback(async () => ({ success: true, count: 0 }), []);
   const bulkInviteWhatsAppApi = useCallback(async (options = {}) => {
@@ -634,11 +782,71 @@ const useGuests = () => {
       return { success: false, error: String(e?.message || e) };
     }
   }, [guests, utils, activeWedding]);
-  const inviteViaEmail = useCallback(async () => ({ success: true }), []);
+  const inviteViaEmail = useCallback(
+    async (guest, overrides = {}) => {
+      try {
+        const target = guest || overrides.guest;
+        if (!target || !target.email) {
+          return { success: false, error: 'no-email' };
+        }
+        const templateSubject =
+          overrides.subject || 'Invitación a la boda de {coupleName}';
+        const subject = templateSubject.replace('{coupleName}', coupleName);
+        const renderedBody = renderInviteMessage(target.name || '', {
+          coupleName,
+        });
+        const extraParagraphs = [];
+        if (weddingDateLabel) {
+          extraParagraphs.push(`Fecha: ${weddingDateLabel}`);
+        }
+        if (overrides.extraMessage) {
+          extraParagraphs.push(overrides.extraMessage);
+        }
+        const htmlBody =
+          (overrides.body || '')
+            .trim()
+            .replace('{guestName}', target.name || '') ||
+          [
+            `<p>${renderedBody}</p>`,
+            ...extraParagraphs.map((text) => `<p>${text}</p>`),
+          ]
+            .filter(Boolean)
+            .join('\n');
+        const attachments = [];
+        const assetUrl = overrides.assetUrl || target.whatsappAssetUrl;
+        if (assetUrl) {
+          attachments.push({
+            name: overrides.assetName || `Invitacion-${target.name || 'invitado'}.pdf`,
+            url: assetUrl,
+            type: 'application/pdf',
+          });
+        }
+        const result = await sendMail({
+          to: target.email,
+          subject,
+          body: htmlBody || getInviteTemplate(),
+          attachments,
+        });
+        if (result?.success === false) {
+          return { success: false, error: result.error || 'send-email-failed' };
+        }
+        if (target.id) {
+          await updateGuest(target.id, {
+            deliveryChannel: 'email',
+            deliveryStatus: 'email_sent',
+          });
+        }
+        return { success: true, result };
+      } catch (error) {
+        return { success: false, error: error?.message || 'send-email-failed' };
+      }
+    },
+    [coupleName, updateGuest, weddingDateLabel]
+  );
   const importFromContacts = useCallback(
     async () => ({ success: false, error: 'not-implemented' }),
     []
-  );
+ );
   const inviteViaWhatsAppDeeplinkCustom = useCallback(
     async (guest, customMessage) => {
       const phone = utils.phoneClean(guest.phone);
@@ -649,13 +857,13 @@ const useGuests = () => {
       return { success: true };
     },
     [utils]
-  );
+ );
 
   // Filtros helpers
   const updateFilters = useCallback(
     (newFilters) => setFilters((prev) => ({ ...prev, ...newFilters })),
     []
-  );
+ );
   const clearFilters = useCallback(() => setFilters({ search: '', status: '', table: '' }), []);
 
   return {
@@ -696,4 +904,9 @@ const useGuests = () => {
 };
 
 export default useGuests;
+
+
+
+
+
 

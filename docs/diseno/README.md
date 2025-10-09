@@ -30,7 +30,7 @@ Adoptar Figma como herramienta estándar para prototipar el flujo de Plan de Asi
 - Capturas o GIF corto para documentación/soporte.
 
 ## Workflow recomendado
-1. Revisar documentación funcional (`docs/flujos-especificos/flujo-4-plan-asientos.md`).
+1. Revisar documentación funcional (`docs/flujos-especificos/flujo-4-invitados-operativa.md`).
 2. Actualizar prototipos en Figma siguiendo esta guía.
 3. Adjuntar enlaces de Figma y capturas en los tickets.
 4. Tras cada entrega, reflejar cambios en la documentación técnica y backlog.

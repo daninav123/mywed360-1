@@ -12,7 +12,7 @@ info:
     - Onboarding: ../ONBOARDING.md
     - Monitoreo: ../monitoring/README.md
 servers:
-  - url: http://localhost:3001
+  - url: http://localhost:4004
     description: Local (desarrollo)
   - url: https://mywed360-backend.onrender.com
     description: Render (staging/producción)

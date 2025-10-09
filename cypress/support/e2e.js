@@ -16,6 +16,8 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
+const rsvpStubState = {};
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
@@ -34,8 +36,18 @@ beforeEach(() => {
 
   // 2) Crear invitado con token (dev)
   cy.intercept('POST', '**/api/rsvp/dev/create', (req) => {
-    const token = 'stub-token-123';
+    const token = `stub-token-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const weddingId = (req.body && req.body.weddingId) || 'test-wedding-reminders';
+    const guestId = (req.body && req.body.guestId) || `guest-${Math.floor(Math.random() * 1000)}`;
+    const guestName = (req.body && req.body.name) || 'Invitado Cypress';
+    rsvpStubState[token] = {
+      name: guestName,
+      status: 'pending',
+      companions: Number(req.body?.companions) || 0,
+      allergens: req.body?.allergens || '',
+      weddingId,
+      guestId,
+    };
     req.reply({
       statusCode: 200,
       body: {
@@ -43,17 +55,62 @@ beforeEach(() => {
         token,
         link: `${Cypress.config('baseUrl').replace(/\/$/, '')}/rsvp/${token}`,
         weddingId,
-        guestId: 'guest-1'
+        guestId,
       }
     });
   });
 
   // 3) Consulta pública por token
   cy.intercept('GET', /.*\/api\/rsvp\/by-token\/.+/, (req) => {
+    try {
+      const url = new URL(req.url);
+      const parts = url.pathname.split('/');
+      const token = parts[parts.length - 1];
+      const data = rsvpStubState[token] || {
+        name: 'Invitado Recordatorio',
+        status: 'pending',
+        companions: 0,
+        allergens: '',
+      };
+      req.reply({
+        statusCode: 200,
+        body: data,
+      });
+      return;
+    } catch (error) {
+      // fall through to default reply
+    }
     req.reply({
       statusCode: 200,
       body: { name: 'Invitado Recordatorio', status: 'pending', companions: 0, allergens: '' }
     });
+  });
+
+  // 4) Actualizar respuesta pública por token
+  cy.intercept('PUT', /.*\/api\/rsvp\/by-token\/.+/, (req) => {
+    try {
+      const url = new URL(req.url);
+      const parts = url.pathname.split('/');
+      const token = parts[parts.length - 1];
+      const current = rsvpStubState[token] || {
+        name: 'Invitado Cypress',
+        status: 'pending',
+        companions: 0,
+        allergens: '',
+      };
+      const body = req.body || {};
+      const updated = {
+        ...current,
+        status: typeof body.status === 'string' ? body.status : current.status,
+        companions:
+          typeof body.companions === 'number' ? body.companions : Number(body.companions || current.companions),
+        allergens: body.allergens ?? current.allergens,
+      };
+      rsvpStubState[token] = updated;
+      req.reply({ statusCode: 200, body: updated });
+    } catch (error) {
+      req.reply({ statusCode: 200, body: req.body || {} });
+    }
   });
 
   // 4) Ejecutar recordatorios (dryRun)

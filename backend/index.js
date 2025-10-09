@@ -41,6 +41,7 @@ import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
 import aiSongsRouter from './routes/ai-songs.js';
+import aiWebsiteRouter from './routes/ai-website.js';
 import emailInsightsRouter from './routes/email-insights.js';
 import metricsSeatingRouter from './routes/metrics-seating.js';
 import notificationsRouter from './routes/notifications.js';
@@ -174,6 +175,7 @@ if (RATE_LIMIT_AI_MAX > 0) {
   app.use('/api/ai', aiLimiter);
   app.use('/api/ai-image', aiLimiter);
   app.use('/api/ai-suppliers', aiLimiter);
+  app.use('/api/ai-website', aiLimiter);
 }
 
 // Rate limit global opcional (excluye health/metrics/vitals)
@@ -474,6 +476,7 @@ app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
 app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
+app.use('/api/ai-website', requireAuth, aiWebsiteRouter);
 app.use('/api/instagram-wall', optionalAuth, instagramWallRouter); // Puede ser público
 // Alias para compatibilidad con frontend: /api/instagram/wall -> mismo router
 app.use('/api/instagram/wall', optionalAuth, instagramWallRouter);

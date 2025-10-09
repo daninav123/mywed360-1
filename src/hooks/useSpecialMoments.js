@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 /*
   Hook: useSpecialMoments
@@ -277,17 +278,30 @@ export default function useSpecialMoments() {
           ...moment,
         },
       ];
+      try {
+        performanceMonitor.logEvent('special_moment_added', {
+          weddingId: activeWedding,
+          blockId,
+          momentType: moment?.type || 'otro',
+        });
+      } catch {}
       return next;
     });
-  }, []);
+  }, [activeWedding]);
 
   const removeMoment = useCallback((blockId, momentId) => {
     setMoments((prev) => {
       const next = { ...prev };
       next[blockId] = prev[blockId].filter((m) => m.id !== momentId);
+      try {
+        performanceMonitor.logEvent('special_moment_removed', {
+          weddingId: activeWedding,
+          blockId,
+        });
+      } catch {}
       return next;
     });
-  }, []);
+  }, [activeWedding]);
 
   const updateMoment = useCallback((blockId, momentId, changes) => {
     setMoments((prev) => {
@@ -295,9 +309,18 @@ export default function useSpecialMoments() {
       next[blockId] = (prev[blockId] || []).map((m) =>
         m.id === momentId ? { ...m, ...changes } : m
       );
+      if (changes?.state) {
+        try {
+          performanceMonitor.logEvent('special_moment_state_changed', {
+            weddingId: activeWedding,
+            blockId,
+            state: changes.state,
+          });
+        } catch {}
+      }
       return next;
     });
-  }, []);
+  }, [activeWedding]);
 
   // Reordenar (arriba/abajo) un momento dentro de su bloque
   const reorderMoment = useCallback((blockId, momentId, direction = 'up') => {
@@ -410,7 +433,6 @@ export default function useSpecialMoments() {
     reorderBlocks,
   };
 }
-
 
 
 

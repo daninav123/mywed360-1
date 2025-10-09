@@ -4,8 +4,9 @@
 
 ## 📋 Flujos Específicos Disponibles
 
+0. **Flujo 0**: [Administración Global](./flujos-especificos/flujo-0-administracion-global.md)
 1. **Flujo 3**: [Gestión de Invitados](./flujos-especificos/flujo-3-gestion-invitados.md)
-2. **Flujo 4**: [Plan de Asientos](./flujos-especificos/flujo-4-plan-asientos.md)
+2. **Flujo 4**: [Invitados – Plan de Asientos y Contenido](./flujos-especificos/flujo-4-invitados-operativa.md)
 3. **Flujo 5**: [Proveedores con IA](./flujos-especificos/flujo-5-proveedores-ia.md)
 4. **Flujo 5**: [Timeline y Tareas](./flujos-especificos/flujo-5-timeline-tareas.md)
 5. **Flujo 6**: [Presupuesto](./flujos-especificos/flujo-6-presupuesto.md)
@@ -20,14 +21,14 @@
 14. **Flujo 11D**: [Guía de Documentación Legal](./flujos-especificos/flujo-11d-guia-documentacion-legal.md)
 15. **Flujo 11E**: [Ayuda a Lecturas y Votos](./flujos-especificos/flujo-11e-ayuda-textos-ceremonia.md)
 16. **Flujo 12**: [Notificaciones y Configuración](./flujos-especificos/flujo-12-notificaciones-configuracion.md)
-17. **Flujo 13**: [Gestión de Contenido](./flujos-especificos/flujo-13-gestion-contenido.md)
+17. **Flujo 13**: Integrado en [Flujo 4](./flujos-especificos/flujo-4-invitados-operativa.md)
 18. **Flujo 14**: [Checklist Avanzado](./flujos-especificos/flujo-14-checklist-avanzado.md)
 19. **Flujo 15**: [Contratos y Documentos](./flujos-especificos/flujo-15-contratos-documentos.md)
 20. **Flujo 16**: [Asistente Virtual con IA](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
 21. **Flujo 17**: [Gamificación y Progreso](./flujos-especificos/flujo-17-gamificacion-progreso.md)
 22. **Flujo 18**: [Generador de Documentos Legales](./flujos-especificos/flujo-18-generador-documentos-legales.md)
 23. **Flujo 23**: [Métricas del Proyecto](./flujos-especificos/flujo-23-metricas-proyecto.md)
-19. **Flujo 24**: [Orquestador IA de Automatizaciones](./flujos-especificos/flujo-24-orquestador-automatizaciones.md)
+19. **Flujo 16**: [Orquestador IA de Automatizaciones](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
 
 ---
 
@@ -90,7 +91,7 @@
 - [ ] **Formulario de login**
   - Campos: email, contraseña
   - Checkbox  – Recordarme – 
-  - Link  – ¿Olvidaste tu contraseña? – 
+  - Link  – ¿Olvidaste tu contraseña→ – 
   - Botón  – Iniciar sesión – 
   - Opciones sociales: Google, Facebook
 
@@ -120,7 +121,7 @@
 
 **Pasos detallados:**
 - [ ] **Solicitud de reset**
-  - Usuario hace clic en  – ¿Olvidaste tu contraseña? – 
+  - Usuario hace clic en  – ¿Olvidaste tu contraseña→ – 
   - Redirección a `/forgot-password`
   - Formulario con campo email
   - Validación de email existente
@@ -132,7 +133,7 @@
 
 - [ ] **Verificación y cambio**
   - Usuario hace clic en link del email
-  - Redirección a `/reset-password?token=xxx`
+  - Redirección a `/reset-password→token=xxx`
   - Formulario: nueva contraseña, confirmar contraseña
   - Validación de contraseña fuerte
 
@@ -161,17 +162,17 @@
 
 - [ ] **Bienvenida conversacional**
   - Avatar de wedding planner IA
-  - Mensaje:  – ¡Hola! Soy Sofia, tu wedding planner virtual. Te ayudaré a organizar tu boda perfecta. ¿Cómo te llamas? – 
+  - Mensaje:  – ¡Hola! Soy Sofia, tu wedding planner virtual. Te ayudaré a organizar tu boda perfecta. ¿Cómo te llamas→ – 
   - Input de chat conversacional
   - Procesamiento de respuesta con OpenAI
 
 - [ ] **Recopilación de datos básicos (conversacional)**
   - IA pregunta de forma natural:
-    -  – ¿Cuál es el nombre de tu pareja? – 
-    -  – ¿Ya tienen fecha para la boda o aún la están decidiendo? – 
-    -  – ¿Tienen idea de dónde les gustaría celebrarla? – 
-    -  – ¿Cuántos invitados aproximadamente esperan? – 
-    -  – ¿Cuál es su presupuesto estimado? – 
+    -  – ¿Cuál es el nombre de tu pareja→ – 
+    -  – ¿Ya tienen fecha para la boda o aún la están decidiendo→ – 
+    -  – ¿Tienen idea de dónde les gustaría celebrarla→ – 
+    -  – ¿Cuántos invitados aproximadamente esperan→ – 
+    -  – ¿Cuál es su presupuesto estimado→ – 
   - Cada respuesta se procesa y almacena
   - IA adapta siguientes preguntas según respuestas
 
@@ -355,7 +356,7 @@
   - Énfasis en que puede empezar por donde prefiera
 
 - [ ] **Elección de siguiente paso**
-  -  – ¿Por dónde te gustaría empezar? – 
+  -  – ¿Por dónde te gustaría empezar→ – 
   - Opciones: Invitados, Presupuesto, Proveedores, Plan de Asientos, Timeline
   - Redirección a mini-tutorial de la sección elegida
   - Posibilidad de cambiar de sección en cualquier momento
@@ -518,55 +519,41 @@
 
 ---
 
-## Estado de Implementación
+## Estado de implementación (resumen 2025-10-08)
 
-### ✅ Completado
-- Autenticación básica con Firebase
-- Gestión completa de invitados (refactorizado)
-- Plan de asientos completo (refactorizado en 7 componentes)
-- Sistema de finanzas (refactorizado en 9 componentes)
-- Gestión de emails con análisis IA
-- Sistema de roles (Owner, Wedding Planner, Ayudante)
-- Documentación completa (18 flujos específicos)
-- Planes de suscripción definidos
+| Flujo | Estado | Pendiente principal |
+|-------|--------|---------------------|
+| 0. Administración global | No (pendiente) | Cerrar alcance técnico y endurecer seguridad del backoffice admin |
+| 1. Registro / autenticación | Sí (en curso) | Métricas de sign-up/login, refactor de formularios legacy y auditoría de accesibilidad |
+| 2. Creación de boda con IA | Sí (en curso) | Opt-in planner, telemetría completa del funnel, migración a `/eventos` e IA contextual |
+| 3. Gestión de invitados | Sí (en curso) | Dashboard analítico de RSVP, check-in el día del evento y sync automática con Seating Plan |
+| 4. Invitados – operativo | Sí (en curso) | Panel inteligente con IA, automatización documental y revisión de accesibilidad |
+| 5a. Proveedores IA | Sí (en curso) | Scoring IA consolidado, portal proveedor completo, RFQ multi-proveedor y reportes |
+| 5b. Timeline / tareas | Sí (en curso) | Motor IA para plan maestro y matriz de responsabilidades |
+| 6. Finanzas / presupuesto | Sí (en curso) | Importación CSV/Excel, analítica predictiva, aportaciones colaborativas y reportes avanzados |
+| 7. Emails & IA | Sí (en curso) | Búsqueda/ordenación, carpetas personalizadas, clasificador backend y envíos programados |
+| 8. Diseño web | Sí (en curso) | Ejecutar IA desde backend, prompts editables, dominios personalizados y analítica de sitios |
+| 9. RSVP | Sí (en curso) | Confirmaciones grupales, recordatorios multicanal, analítica e integración con catering |
+| 10. Bodas múltiples | Sí (en curso) | Dashboards multi-boda, permisos granulares y vistas cruzadas |
+| 11.x Protocolo y ceremonias | Sí (completado) | — |
+| 12. Notificaciones | Sí (en curso) | AutomationRules UI, push/SMS completos y centro de notificaciones final |
+| 13b. Tests Seating Plan | Sí (en curso) | Extender cobertura a escenarios futuros (ceremonia avanzada, seating híbrido) |
+| 14. Checklist avanzado | Sí (en curso) | Generación IA, dependencias, gamificación y plantillas compartidas |
+| 15. Contratos y documentos | Sí (en curso) | Firma digital integrada, workflows de aprobación y analítica legal |
+| 16. Asistente virtual IA | No (pendiente) | Orquestador multicanal, reglas configurables y workers backend |
+| 17. Gamificación | No (pendiente) | Niveles, logros, retos, recompensas y panel de analytics |
+| 18. Generador documentos legales | Sí (en curso) | Repositorio completo, firma electrónica, almacenamiento backend y automatización IA |
+| 19. Diseño de invitaciones | Sí (en curso) | Tutoriales guiados, colaboración/feedback, integración con impresión y generación IA |
+| 20. Email inbox global | Sí (en curso) | Experiencia unificada, documentación APIs backend, onboarding centralizado y telemetría |
+| 21. Sitio público | Sí (en curso) | Personalización avanzada, dominios propios, SEO/analytics y medición de conversión |
+| 22. Dashboard & navegación | Sí (en curso) | Dashboard en vivo, proteger herramientas internas y actividad reciente |
+| 23. Métricas del proyecto | Sí (en curso) | Dashboard multi-módulo, workers de agregación y rutas `/analytics/*` |
 
-### 🚧 En Desarrollo
-- Diseño web con generación IA por prompts
-- Sistema de proveedores (85% completado)
-- RSVP avanzado con confirmaciones inteligentes
-- Timeline y tareas automáticas
+> Referencia cruzada: ver `docs/FLUJOS-INDICE.md` para el detalle completo y enlaces a cada flujo.
 
-### ❌ Pendiente
-- Invitaciones digitales avanzadas
-- Sistema de contratos y documentos
-- Checklist avanzado con automatización
-- Protocolo de ceremonias completo
-- Check-in del día de la boda
+## Próximos focos sugeridos
 
-### 🔍 Requiere Investigación
-- Integración con sistemas de pago
-- APIs de proveedores externos
-- White-label para Teams Ilimitado
-- Optimización móvil avanzada
-
----
-
-## Prioridades de Desarrollo
-
-1. **Alta Prioridad**
-   - Implementar generador IA de sitios web
-   - Completar análisis automático de emails
-   - Sistema de roles técnico completo
-   - Finalizar sistema de proveedores
-
-2. **Media Prioridad**
-   - Timeline automático con IA
-   - Sistema de contratos y documentos
-   - Checklist avanzado
-   - RSVP inteligente
-
-3. **Baja Prioridad**
-   - Funcionalidades del día de la boda
-   - White-label completo
-   - Análisis post-evento
-   - Integraciones avanzadas
+- **Backoffice y automatizaciones**: cerrar flujo 0 (administración) y 16 (asistente/automatizaciones) para operar IA multicanal con seguridad.
+- **Experiencias IA completadas**: concluir pendientes de los flujos 5a/5b/6/7/8 para que proveedores, tareas, finanzas, emails y sitios web sean 100 % productivos.
+- **Engagement y analítica**: priorizar gamificación (17), métricas unificadas (23) y mejoras de dashboard (22) para medir adopción y mantener usuarios activos.
+- **Documentación legal y contratos**: finalizar los gaps críticos de flujos 15 y 18 para soportar firma electrónica e integraciones de cumplimiento.

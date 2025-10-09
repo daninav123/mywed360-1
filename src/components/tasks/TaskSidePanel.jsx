@@ -1,4 +1,5 @@
 ﻿import React, { useMemo, useState } from 'react';
+import { useEffect, useCallback } from 'react';
 import { db } from '../../firebaseConfig';
 import {
   doc,
@@ -7,8 +8,13 @@ import {
   collection,
   deleteDoc,
   serverTimestamp,
+  onSnapshot,
+  query,
+  orderBy,
 } from 'firebase/firestore';
-import { X, Edit3, CalendarPlus, Trash2, CheckCircle2, Circle } from 'lucide-react';
+import { X, Edit3, CalendarPlus, Trash2, CheckCircle2, Circle, MessageSquare } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import * as notificationService from '../../services/notificationService';
 
 const fmtDateTimeLocal = (d) => {
   try {
@@ -32,9 +38,29 @@ const toDate = (v, fallback) => {
     if (v instanceof Date) return v;
     if (typeof v?.toDate === 'function') return v.toDate();
     const d = new Date(v);
-    return isNaN(d.getTime()) ?(fallback || null) : d;
+    return isNaN(d.getTime()) ? (fallback || null) : d;
   } catch {
     return fallback || null;
+  }
+};
+
+const MENTION_REGEX = /@([^\s@]+)/g;
+
+const formatRelativeComment = (value) => {
+  try {
+    const date = value instanceof Date ? value : new Date(value);
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+    const diffMs = Date.now() - date.getTime();
+    const minutes = Math.round(diffMs / 60000);
+    if (minutes <= 0) return 'hace instantes';
+    if (minutes < 60) return `hace ${minutes} min`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `hace ${hours} h`;
+    const days = Math.round(hours / 24);
+    if (days < 7) return `hace ${days} d`;
+    return date.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+  } catch {
+    return '';
   }
 };
 
@@ -45,6 +71,10 @@ export default function TaskSidePanel({
   parent,
   subtasks = [],
 }) {
+  const { currentUser, userProfile } = useAuth();
+  const userId = currentUser?.uid || userProfile?.id || 'anon';
+  const userName = userProfile?.name || currentUser?.displayName || 'Colaborador';
+
   const [editingParentStart, setEditingParentStart] = useState(false);
   const [parentStartValue, setParentStartValue] = useState(() => fmtDateTimeLocal(toDate(parent?.start)));
   const [editingParentEnd, setEditingParentEnd] = useState(false);
@@ -54,15 +84,79 @@ export default function TaskSidePanel({
   const [newSubStart, setNewSubStart] = useState('');
   const [newSubEnd, setNewSubEnd] = useState('');
 
-  React.useEffect(() => {
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentDraft, setCommentDraft] = useState('');
+  const [sendingComment, setSendingComment] = useState(false);
+  const [commentError, setCommentError] = useState('');
+  const parentLabel = useMemo(() => parent?.title || parent?.name || 'tarea', [parent?.title, parent?.name]);
+
+  useEffect(() => {
     setParentStartValue(fmtDateTimeLocal(toDate(parent?.start)));
     setParentEndValue(fmtDateTimeLocal(toDate(parent?.end)));
     setEditingParentStart(false);
     setEditingParentEnd(false);
   }, [parent?.id]);
 
+  useEffect(() => {
+    if (!isOpen || !weddingId || !parent?.id || !db) {
+      setComments([]);
+      setLoadingComments(false);
+      return undefined;
+    }
+    setLoadingComments(true);
+    setCommentError('');
+    const commentsRef = collection(db, 'weddings', weddingId, 'tasks', parent.id, 'comments');
+    const q = query(commentsRef, orderBy('createdAt', 'asc'));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        try {
+          const next = snapshot.docs.map((docSnap) => {
+            const data = docSnap.data() || {};
+            const createdAt =
+              data.createdAt && typeof data.createdAt.toDate === 'function'
+                ? data.createdAt.toDate()
+                : data.createdAt
+                  ? new Date(data.createdAt)
+                  : null;
+            return {
+              id: docSnap.id,
+              body: data.body || '',
+              mentions: Array.isArray(data.mentions) ? data.mentions : [],
+              authorId: data.authorId || '',
+              authorName: data.authorName || 'Equipo',
+              createdAt,
+            };
+          });
+          setComments(next);
+        } catch (error) {
+          console.error('Error procesando comentarios de tarea:', error);
+          setComments([]);
+          setCommentError('No se pudieron procesar los comentarios.');
+        } finally {
+          setLoadingComments(false);
+        }
+      },
+      (error) => {
+        console.error('Error cargando comentarios de tarea:', error);
+        setComments([]);
+        setLoadingComments(false);
+        setCommentError('No se pudieron cargar los comentarios.');
+      }
+    );
+    return () => unsubscribe();
+  }, [isOpen, weddingId, parent?.id, db]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setCommentDraft('');
+      setCommentError('');
+    }
+  }, [isOpen, parent?.id]);
+
   const sortedSubs = useMemo(() => {
-    const list = Array.isArray(subtasks) ?subtasks.slice() : [];
+    const list = Array.isArray(subtasks) ? subtasks.slice() : [];
     list.sort((a, b) => (toDate(a.start)?.getTime() || 0) - (toDate(b.start)?.getTime() || 0));
     return list;
   }, [subtasks]);
@@ -163,6 +257,110 @@ export default function TaskSidePanel({
       console.error('Error eliminando subtarea:', e);
     }
   };
+
+  const renderCommentBody = useCallback((body) => {
+    if (!body) return null;
+    const nodes = [];
+    const regex = new RegExp(MENTION_REGEX.source, 'g');
+    let lastIndex = 0;
+    let match;
+    while ((match = regex.exec(body)) !== null) {
+      if (match.index > lastIndex) nodes.push(body.slice(lastIndex, match.index));
+      nodes.push({ mention: match[1], text: match[0] });
+      lastIndex = match.index + match[0].length;
+    }
+    if (lastIndex < body.length) nodes.push(body.slice(lastIndex));
+    return nodes.map((node, idx) =>
+      typeof node === 'string' ? (
+        <React.Fragment key={`txt-${idx}`}>{node}</React.Fragment>
+      ) : (
+        <span key={`men-${idx}`} className="text-indigo-600 font-medium">
+          {node.text}
+        </span>
+      )
+    );
+  }, []);
+
+  const handleSubmitComment = useCallback(async () => {
+    const body = commentDraft.trim();
+    if (!body || !weddingId || !parent?.id) return;
+    setSendingComment(true);
+    setCommentError('');
+    try {
+      const regex = new RegExp(MENTION_REGEX.source, 'g');
+      const mentions = [];
+      let match;
+      while ((match = regex.exec(body)) !== null) {
+        const mention = match[1]?.trim();
+        if (mention) mentions.push(mention);
+      }
+      const uniqueMentions = Array.from(new Set(mentions));
+      const commentsRef = collection(db, 'weddings', weddingId, 'tasks', parent.id, 'comments');
+      await addDoc(commentsRef, {
+        body,
+        mentions: uniqueMentions,
+        authorId: userId,
+        authorName: userName,
+        createdAt: serverTimestamp(),
+      });
+      setCommentDraft('');
+      const recipients =
+        uniqueMentions.length > 0
+          ? uniqueMentions
+          : Array.isArray(parent?.assignees)
+            ? parent.assignees.filter(Boolean)
+            : [];
+      try {
+        await notificationService.addNotification({
+          type: uniqueMentions.length ? 'warning' : 'info',
+          message:
+            uniqueMentions.length > 0
+              ? `Nuevo comentario en ${parentLabel} con menciones a ${uniqueMentions.join(', ')}`
+              : `Nuevo comentario en ${parentLabel}`,
+          action: 'viewTask',
+          trackingId: parent?.id || undefined,
+        });
+      } catch (error) {
+        console.warn('No se pudo registrar la notificación remota del comentario', error);
+      }
+      notificationService.showNotification({
+        title: 'Comentario añadido',
+        message:
+          recipients.length > 0
+            ? `Notificaremos a: ${recipients.join(', ')}`
+            : 'El comentario queda registrado para el equipo',
+        type: 'success',
+      });
+    } catch (error) {
+      console.error('Error guardando comentario de tarea:', error);
+      setCommentError('No se pudo guardar tu comentario. Inténtalo de nuevo.');
+    } finally {
+      setSendingComment(false);
+    }
+  }, [commentDraft, weddingId, parent?.id, userId, userName, parent?.assignees, parentLabel]);
+
+  const handleDeleteComment = useCallback(
+    async (commentId) => {
+      if (!commentId || !weddingId || !parent?.id) return;
+      try {
+        await deleteDoc(doc(db, 'weddings', weddingId, 'tasks', parent.id, 'comments', commentId));
+      } catch (error) {
+        console.error('Error eliminando comentario de tarea:', error);
+        setCommentError('No se pudo eliminar el comentario.');
+      }
+    },
+    [weddingId, parent?.id]
+  );
+
+  const handleCommentKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        handleSubmitComment();
+      }
+    },
+    [handleSubmitComment]
+  );
 
   return (
     <div className="fixed inset-0 z-40 flex">
@@ -319,8 +517,83 @@ export default function TaskSidePanel({
             </div>
           </div>
         </div>
+
+        <div className="border-t mt-6 pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MessageSquare size={18} className="text-indigo-500" />
+              <h4 className="font-medium">Comentarios</h4>
+            </div>
+            <span className="text-xs text-gray-500">{comments.length}</span>
+          </div>
+
+          {commentError && (
+            <div className="mb-3 text-xs text-red-600 bg-red-50 border border-red-100 rounded px-3 py-2">
+              {commentError}
+            </div>
+          )}
+
+          {loadingComments ? (
+            <p className="text-sm text-gray-500 mb-3">Cargando comentarios…</p>
+          ) : comments.length === 0 ? (
+            <p className="text-sm text-gray-500 mb-3">
+              Aún no hay comentarios en este bloque. Usa @ para mencionar responsables.
+            </p>
+          ) : (
+            <ul className="space-y-3 mb-4 max-h-56 overflow-y-auto pr-1">
+              {comments.map((comment) => (
+                <li key={comment.id} className="border border-gray-200 rounded-md px-3 py-2 shadow-sm bg-white">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-medium text-gray-800">
+                        {comment.authorName || 'Equipo'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatRelativeComment(comment.createdAt)}
+                      </div>
+                    </div>
+                    {comment.authorId === userId && (
+                      <button
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Eliminar comentario"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-sm text-gray-700 whitespace-pre-wrap mt-2 leading-relaxed">
+                    {renderCommentBody(comment.body)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="space-y-2">
+            <textarea
+              className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              rows={3}
+              placeholder="Escribe un comentario… Usa @ para mencionar a alguien"
+              value={commentDraft}
+              onChange={(e) => setCommentDraft(e.target.value)}
+              onKeyDown={handleCommentKeyDown}
+              disabled={sendingComment}
+            />
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">Ctrl/⌘ + Enter para enviar</span>
+              <button
+                type="button"
+                onClick={handleSubmitComment}
+                disabled={sendingComment || !commentDraft.trim()}
+                className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {sendingComment ? 'Publicando…' : 'Publicar'}
+              </button>
+            </div>
+          </div>
+        </div>
       </aside>
     </div>
   );
 }
-

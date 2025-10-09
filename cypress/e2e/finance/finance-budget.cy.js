@@ -3,7 +3,10 @@
 const loginAndReset = () => {
   cy.window().then((win) => win.localStorage.clear());
   cy.loginToLovenda();
-  cy.window().then((win) => win.localStorage.removeItem('lovenda_active_wedding'));
+  cy.window().then((win) => {
+    win.localStorage.removeItem('mywed360_active_wedding');
+    win.localStorage.removeItem('lovenda_active_wedding');
+  });
 };
 
 const addCategory = (name, amount) => {
@@ -17,8 +20,9 @@ const addCategory = (name, amount) => {
 };
 
 const createExpense = ({ concept, amount, category, dueDate }) => {
-  cy.contains('button', 'Nueva Transacción', { matchCase: false }).click();
-  cy.get('[role="dialog"]').within(() => {
+  cy.get('[data-testid="transactions-new"]').first().click();
+  cy.get('[data-testid="finance-transaction-modal"]', { timeout: 10000 }).should('be.visible');
+  cy.get('[data-testid="finance-transaction-modal"]').within(() => {
     cy.contains('label', 'Concepto', { matchCase: false })
       .parent()
       .find('input')
@@ -31,7 +35,7 @@ const createExpense = ({ concept, amount, category, dueDate }) => {
       .clear()
       .type(String(amount));
 
-    cy.contains('label', 'Categoria', { matchCase: false })
+    cy.get('[data-testid="finance-category-label"]')
       .parent()
       .find('select')
       .select(category);
@@ -54,6 +58,7 @@ describe('Finanzas - Gestión de presupuesto', () => {
   beforeEach(() => {
     loginAndReset();
     cy.visit('/finance');
+    cy.closeDiagnostic();
   });
 
   it('crea categorías, detecta sobrepresupuesto y permite silenciar alertas', () => {

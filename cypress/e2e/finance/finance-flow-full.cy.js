@@ -20,7 +20,10 @@ describe('Flujo 6 - Finanzas completo', () => {
     cy.window().then((win) => win.localStorage.clear());
     cy.loginToLovenda();
     // Eliminar boda activa para forzar modo local/offline
-    cy.window().then((win) => win.localStorage.removeItem('lovenda_active_wedding'));
+    cy.window().then((win) => {
+      win.localStorage.removeItem('mywed360_active_wedding');
+      win.localStorage.removeItem('lovenda_active_wedding');
+    });
 
     // Stub de bandeja de entrada y análisis de pagos desde email
     cy.intercept('GET', '**/api/mail/page**', {

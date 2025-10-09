@@ -16,6 +16,12 @@ const DEFAULT_BLOCKS = [
   { id: 'disco', name: 'Disco' },
 ];
 
+const STATUS_OPTIONS = [
+  { value: 'on-time', label: 'A tiempo' },
+  { value: 'slightly-delayed', label: 'Ligero retraso' },
+  { value: 'delayed', label: 'Retrasado' },
+];
+
 const Timing = () => {
   const { activeWedding } = useWedding();
   const {
@@ -121,6 +127,13 @@ const Timing = () => {
     persistTimeline(next);
   };
 
+  const updateBlockStatus = (blockId, status) => {
+    const next = timeline.map((block) =>
+      block.id === blockId ? { ...block, status } : block,
+    );
+    persistTimeline(next);
+  };
+
   const addMomentToBlock = (blockId) => {
     const next = timeline.map((block) => {
       if (block.id !== blockId) return block;
@@ -205,11 +218,17 @@ const Timing = () => {
               <div className="px-6 py-4 border-b flex justify-between items-center">
                 <h3 className="text-lg font-medium">{block.name}</h3>
                 <div className="flex items-center space-x-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(block.status)}`}
+                  <select
+                    className={`px-3 py-1 rounded-full text-xs font-medium focus:outline-none ${getStatusColor(block.status)}`}
+                    value={block.status || 'on-time'}
+                    onChange={(e) => updateBlockStatus(block.id, e.target.value)}
                   >
-                    {getStatusLabel(block.status)}
-                  </span>
+                    {STATUS_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                   <button
                     className="text-sm text-gray-600 hover:underline"
                     onClick={() => {
@@ -265,7 +284,7 @@ const Timing = () => {
                           <div className="flex-1">
                             <div className="flex items-center space-x-3">
                               <div
-                                className={`w-3 h-3 rounded-full ${getStatusColor('on-time').split(' ')[0]}`}
+                                className={`w-3 h-3 rounded-full ${getStatusColor(block.status || 'on-time').split(' ')[0]}`}
                               ></div>
                               <input
                                 className="font-medium bg-transparent border-b border-dashed focus:outline-none"

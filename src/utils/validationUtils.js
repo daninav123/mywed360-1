@@ -51,6 +51,79 @@ export const isNotEmpty = (value) => {
   return value && typeof value === 'string' && value.trim().length > 0;
 };
 
+const PASSWORD_SCORE_LABELS = ['Muy débil', 'Débil', 'Aceptable', 'Buena', 'Excelente'];
+const PASSWORD_SCORE_COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#15803d'];
+const PASSWORD_PROGRESS_STEPS = [8, 35, 60, 85, 100];
+
+/**
+ * Evalúa la fuerza de una contraseña y ofrece recomendaciones de mejora.
+ * @param {string} password - Contraseña a evaluar
+ * @returns {{score: number, label: string, color: string, progress: number, suggestions: string[]}}
+ */
+export const evaluatePasswordStrength = (password = '') => {
+  const value = password.trim();
+  if (!value) {
+    return {
+      score: 0,
+      label: PASSWORD_SCORE_LABELS[0],
+      color: PASSWORD_SCORE_COLORS[0],
+      progress: PASSWORD_PROGRESS_STEPS[0],
+      suggestions: ['Introduce una contraseña con al menos 8 caracteres.'],
+    };
+  }
+
+  let score = 0;
+  const suggestions = [];
+
+  if (value.length >= 8) {
+    score += 1;
+  } else {
+    suggestions.push('Usa al menos 8 caracteres.');
+  }
+
+  if (value.length >= 12) {
+    score += 1;
+  } else {
+    suggestions.push('Aumenta la longitud a 12 caracteres o más.');
+  }
+
+  if (/[a-z]/.test(value) && /[A-Z]/.test(value)) {
+    score += 1;
+  } else {
+    suggestions.push('Combina mayúsculas y minúsculas.');
+  }
+
+  if (/\d/.test(value)) {
+    score += 1;
+  } else {
+    suggestions.push('Añade números para reforzarla.');
+  }
+
+  if (/[^A-Za-z0-9]/.test(value)) {
+    score += 1;
+  } else {
+    suggestions.push('Incluye símbolos como !, %, # o similares.');
+  }
+
+  if (/(\w)\1{2,}/.test(value)) {
+    suggestions.push('Evita repetir el mismo carácter varias veces seguidas.');
+  }
+
+  if (/password|1234|abcd|qwer|admin/i.test(value)) {
+    suggestions.push('Evita palabras comunes o secuencias previsibles.');
+  }
+
+  score = Math.min(score, 4);
+
+  return {
+    score,
+    label: PASSWORD_SCORE_LABELS[score],
+    color: PASSWORD_SCORE_COLORS[score],
+    progress: PASSWORD_PROGRESS_STEPS[score],
+    suggestions: Array.from(new Set(suggestions)).slice(0, 4),
+  };
+};
+
 /**
  * Valida longitud mínima
  * @param {string} value - Valor a validar

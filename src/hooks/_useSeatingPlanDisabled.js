@@ -38,6 +38,16 @@ export const useSeatingPlan = () => {
   const [background, setBackground] = useState(null);
   const [scoringWeights, setScoringWeights] = useState({ fit: 50, side: 10, wants: 20, avoid: -10 });
   const [selectedIds, setSelectedIds] = useState([]);
+  const [ceremonySettings, setCeremonySettings] = useState({
+    vipRows: [],
+    vipLabel: 'VIP',
+    lockVipSeats: false,
+    notes: '',
+    rows: 0,
+    cols: 0,
+    gap: 40,
+    aisleAfter: 6,
+  });
 
   // Estados por tipo de evento
   const [areasCeremony, setAreasCeremony] = useState([]);
@@ -119,6 +129,41 @@ export const useSeatingPlan = () => {
     loadHallDimensions();
   }, [activeWedding]);
 
+  // Cargar configuración de ceremonia (seats/tables/areas/settings)
+  useEffect(() => {
+    if (!activeWedding) return;
+    let cancelled = false;
+    const loadCeremonyPlan = async () => {
+      try {
+        const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'ceremony');
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return;
+        const data = snap.data() || {};
+        if (cancelled) return;
+        if (Array.isArray(data.seats)) setSeatsCeremony(data.seats);
+        if (Array.isArray(data.tables)) setTablesCeremony(data.tables);
+        if (Array.isArray(data.areas)) setAreasCeremony(data.areas);
+        const loadedSettings =
+          data.settings && typeof data.settings === 'object' ? data.settings.ceremony : undefined;
+        if (loadedSettings && typeof loadedSettings === 'object') {
+          setCeremonySettings((prev) => ({
+            ...prev,
+            ...loadedSettings,
+            vipRows: Array.isArray(loadedSettings.vipRows)
+              ? loadedSettings.vipRows.map((n) => parseInt(n, 10)).filter(Number.isFinite)
+              : prev.vipRows,
+          }));
+        }
+      } catch (err) {
+        console.warn('No se pudieron cargar datos de ceremonia:', err);
+      }
+    };
+    loadCeremonyPlan();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeWedding]);
+
   // Suscribirse a cambios en el estado de sincronizaciÃ³n
   useEffect(() => {  }, []);
 
@@ -150,10 +195,22 @@ export const useSeatingPlan = () => {
       ceremonySaveTimerRef.current = setTimeout(async () => {
         try {
           const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'ceremony');
+          const settingsPayload =
+            ceremonySettings && typeof ceremonySettings === 'object'
+              ? {
+                  ceremony: {
+                    ...ceremonySettings,
+                    vipRows: Array.isArray(ceremonySettings.vipRows)
+                      ? ceremonySettings.vipRows.map((n) => parseInt(n, 10)).filter(Number.isFinite)
+                      : [],
+                  },
+                }
+              : null;
           const payload = {
             seats: Array.isArray(seatsCeremony) ? seatsCeremony : [],
             tables: Array.isArray(tablesCeremony) ? tablesCeremony : [],
             areas: Array.isArray(areasCeremony) ? areasCeremony : [],
+            ...(settingsPayload ? { settings: settingsPayload } : {}),
             updatedAt: serverTimestamp(),
           };
           const isEmpty =
@@ -170,7 +227,7 @@ export const useSeatingPlan = () => {
         try { clearTimeout(ceremonySaveTimerRef.current); } catch (_) {}
       };
     } catch (_) {}
-  }, [activeWedding, seatsCeremony, tablesCeremony, areasCeremony]);
+  }, [activeWedding, seatsCeremony, tablesCeremony, areasCeremony, ceremonySettings]);
 
   // Auto-guardado: Banquete (config/tables/areas)
   useEffect(() => {
@@ -220,6 +277,7 @@ export const useSeatingPlan = () => {
     tablesCeremony: [...tablesCeremony],
     seatsCeremony: [...seatsCeremony],
     tablesBanquet: [...tablesBanquet],
+    ceremonySettings: { ...ceremonySettings },
   });
   const applySnapshot = (snap) => {
     if (!snap || typeof snap !== 'object') return;
@@ -231,10 +289,24 @@ export const useSeatingPlan = () => {
       if (Array.isArray(snap.tablesBanquet))
         setTablesBanquet(snap.tablesBanquet.map((t) => sanitizeTable(t)));
       if (snap.tab) setTab(snap.tab);
+      if (snap.ceremonySettings && typeof snap.ceremonySettings === 'object') {
+        setCeremonySettings((prev) => ({
+          ...prev,
+          ...snap.ceremonySettings,
+          vipRows: Array.isArray(snap.ceremonySettings.vipRows)
+            ? snap.ceremonySettings.vipRows
+                .map((value) => Number.parseInt(value, 10))
+                .filter(Number.isFinite)
+            : prev.vipRows,
+        }));
+      }
     } catch (_) {}
   };
   const pushHistory = (snapshot) => {
     const snap = snapshot && typeof snapshot === 'object' ? snapshot : makeSnapshot();
+    if (!snap.ceremonySettings && ceremonySettings) {
+      snap.ceremonySettings = { ...ceremonySettings };
+    }
     const newHistory = history.slice(0, historyPointer + 1);
     newHistory.push(snap);
     setHistory(newHistory);
@@ -345,7 +417,6 @@ export const useSeatingPlan = () => {
       setTablesBanquet((prev) => [...prev, sanitized]);
     }
   };
-  };
 
   // Ãreas (perÃ­metro/puertas/obstÃ¡culos/pasillos)
   const addArea = (area) => {
@@ -365,18 +436,98 @@ export const useSeatingPlan = () => {
   };
 
   // GeneraciÃ³n de layouts
-  const generateSeatGrid = (rows = 10, cols = 12, gap = 40, startX = 100, startY = 80, aisleAfter = 6) => {
+  const generateSeatGrid = (
+    configOrRows,
+    maybeCols,
+    maybeGap,
+    maybeStartX,
+    maybeStartY,
+    maybeAisleAfter
+  ) => {
+    const baseConfig = {
+      rows: 10,
+      cols: 12,
+      gap: 40,
+      startX: 100,
+      startY: 80,
+      aisleAfter: 6,
+      vipRows: [],
+      vipLabel: 'VIP',
+      lockVipSeats: false,
+      notes: '',
+    };
+    let config;
+    if (typeof configOrRows === 'object' && configOrRows !== null) {
+      config = { ...baseConfig, ...configOrRows };
+    } else {
+      config = {
+        ...baseConfig,
+        rows: Number.parseInt(configOrRows, 10) || baseConfig.rows,
+        cols: Number.parseInt(maybeCols, 10) || baseConfig.cols,
+        gap: Number.parseInt(maybeGap, 10) || baseConfig.gap,
+        startX: Number.isFinite(Number(maybeStartX)) ? Number(maybeStartX) : baseConfig.startX,
+        startY: Number.isFinite(Number(maybeStartY)) ? Number(maybeStartY) : baseConfig.startY,
+        aisleAfter:
+          Number.isFinite(Number(maybeAisleAfter)) && Number(maybeAisleAfter) >= 0
+            ? Number(maybeAisleAfter)
+            : baseConfig.aisleAfter,
+      };
+    }
+    const vipRowSet = new Set(
+      Array.isArray(config.vipRows)
+        ? config.vipRows
+            .map((value) => Number.parseInt(value, 10))
+            .filter((value) => Number.isFinite(value) && value >= 0)
+        : []
+    );
+    const normalizedSettings = {
+      vipRows: Array.from(vipRowSet),
+      vipLabel:
+        typeof config.vipLabel === 'string' && config.vipLabel.trim()
+          ? config.vipLabel.trim()
+          : 'VIP',
+      lockVipSeats: !!config.lockVipSeats,
+      notes: typeof config.notes === 'string' ? config.notes : '',
+      rows: Number.isFinite(config.rows) ? config.rows : baseConfig.rows,
+      cols: Number.isFinite(config.cols) ? config.cols : baseConfig.cols,
+      gap: Number.isFinite(config.gap) ? config.gap : baseConfig.gap,
+      aisleAfter: Number.isFinite(config.aisleAfter) ? config.aisleAfter : baseConfig.aisleAfter,
+    };
+    const startX = Number.isFinite(config.startX) ? config.startX : baseConfig.startX;
+    const startY = Number.isFinite(config.startY) ? config.startY : baseConfig.startY;
+
     const newSeats = [];
     let seatId = 1;
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        const x = startX + col * gap + (col > aisleAfter ? gap : 0);
-        const y = startY + row * gap;
-        newSeats.push({ id: seatId++, x, y, enabled: true, guestId: null, guestName: null });
+    for (let row = 0; row < normalizedSettings.rows; row++) {
+      for (let col = 0; col < normalizedSettings.cols; col++) {
+        const x =
+          startX +
+          col * normalizedSettings.gap +
+          (col > normalizedSettings.aisleAfter ? normalizedSettings.gap : 0);
+        const y = startY + row * normalizedSettings.gap;
+        const isVipRow = vipRowSet.has(row);
+        newSeats.push({
+          id: seatId++,
+          x,
+          y,
+          enabled: !(normalizedSettings.lockVipSeats && isVipRow),
+          guestId: null,
+          guestName: null,
+          rowIndex: row,
+          colIndex: col,
+          reservedFor: isVipRow ? normalizedSettings.vipLabel : null,
+        });
       }
     }
     setSeatsCeremony(newSeats);
-    pushHistory({ type: 'ceremony', seats: newSeats, tables: tablesCeremony, areas: areasCeremony });
+    setCeremonySettings(normalizedSettings);
+    pushHistory({
+      type: 'ceremony',
+      seats: newSeats,
+      tables: tablesCeremony,
+      areas: areasCeremony,
+      ceremonySettings: normalizedSettings,
+    });
   };
   const generateBanquetLayout = ({
     rows = 3,
@@ -518,7 +669,27 @@ export const useSeatingPlan = () => {
     }
   };
 
-  // Conflictos: perÃ­metro, obstÃ¡culos/puertas, pasillos (espaciado) y overbooking
+  const keywordMatch = (text, patterns = []) => {
+    if (!text) return false;
+    const normalized = String(text).toLowerCase();
+    return patterns.some((pattern) => normalized.includes(pattern));
+  };
+
+  const SMART_VIP_KEYWORDS = [
+    'vip',
+    'padrin',
+    'madrin',
+    'best man',
+    'maid of honor',
+    'principal',
+    'oficiante',
+  ];
+
+const SMART_SIDE_KEYWORDS = {
+  novia: ['novia', 'bride'],
+  novio: ['novio', 'groom'],
+};
+
   const conflicts = useMemo(() => {
     if (!validationsEnabled) return [];
     try {
@@ -530,7 +701,9 @@ export const useSeatingPlan = () => {
             (a) => !Array.isArray(a) && a?.type === 'boundary' && Array.isArray(a?.points) && a.points.length >= 3
           );
           return b ? b.points : null;
-        } catch (e) { return null; }
+        } catch (e) {
+          return null;
+        }
       })();
       const obstacles = (() => {
         const rects = [];
@@ -541,7 +714,12 @@ export const useSeatingPlan = () => {
           if (!pts.length) return;
           const xs = pts.map((p) => p.x);
           const ys = pts.map((p) => p.y);
-          rects.push({ minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) });
+          rects.push({
+            minX: Math.min(...xs),
+            minY: Math.min(...ys),
+            maxX: Math.max(...xs),
+            maxY: Math.max(...ys),
+          });
         });
         return rects;
       })();
@@ -555,15 +733,29 @@ export const useSeatingPlan = () => {
         }
         const hw = (t.width || 80) / 2;
         const hh = (t.height || t.length || 60) / 2;
-        return { minX: (t.x || 0) - hw, minY: (t.y || 0) - hh, maxX: (t.x || 0) + hw, maxY: (t.y || 0) + hh };
+        return {
+          minX: (t.x || 0) - hw,
+          minY: (t.y || 0) - hh,
+          maxX: (t.x || 0) + hw,
+          maxY: (t.y || 0) + hh,
+        };
       };
-      const expandBox = (b, m) => ({ minX: b.minX - m, minY: b.minY - m, maxX: b.maxX + m, maxY: b.maxY + m });
-      const rectsOverlap = (a, b) => !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
+      const expandBox = (b, m) => ({
+        minX: b.minX - m,
+        minY: b.minY - m,
+        maxX: b.maxX + m,
+        maxY: b.maxY + m,
+      });
+      const rectsOverlap = (a, b) =>
+        !(a.maxX <= b.minX || a.minX >= b.maxX || a.maxY <= b.minY || a.minY >= b.maxY);
       const pointInPoly = (px, py, pts) => {
         if (!Array.isArray(pts) || pts.length < 3) return true;
         let inside = false;
         for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-          const xi = pts[i].x, yi = pts[i].y; const xj = pts[j].x, yj = pts[j].y;
+          const xi = pts[i].x;
+          const yi = pts[i].y;
+          const xj = pts[j].x;
+          const yj = pts[j].y;
           const intersect = (yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi || 1e-9) + xi;
           if (intersect) inside = !inside;
         }
@@ -572,22 +764,30 @@ export const useSeatingPlan = () => {
       const boxInsidePoly = (b, pts) => {
         if (!pts) return true;
         const corners = [
-          { x: b.minX, y: b.minY }, { x: b.maxX, y: b.minY },
-          { x: b.maxX, y: b.maxY }, { x: b.minX, y: b.maxY },
+          { x: b.minX, y: b.minY },
+          { x: b.maxX, y: b.minY },
+          { x: b.maxX, y: b.maxY },
+          { x: b.minX, y: b.maxY },
         ];
         return corners.every((c) => pointInPoly(c.x, c.y, pts));
       };
 
       // Overbooking map
       const idSet = new Set((tablesBanquet || []).map((t) => String(t?.id)));
-      const nameSet = new Set((tablesBanquet || []).map((t) => String(t?.name || '').trim()).filter(Boolean));
+      const nameSet = new Set(
+        (tablesBanquet || [])
+          .map((t) => String(t?.name || '').trim())
+          .filter(Boolean)
+      );
       const occ = new Map();
       (guests || []).forEach((g) => {
         const tid = g?.tableId != null ? String(g.tableId) : null;
         const tname = g?.table != null ? String(g.table).trim() : '';
         let key = null;
-        if (tid && idSet.has(tid)) key = tid; else if (tname && (idSet.has(tname) || nameSet.has(tname))) key = tname;
-        if (!key) return; const count = 1 + (parseInt(g?.companion, 10) || 0);
+        if (tid && idSet.has(tid)) key = tid;
+        else if (tname && (idSet.has(tname) || nameSet.has(tname))) key = tname;
+        if (!key) return;
+        const count = 1 + (parseInt(g?.companion, 10) || 0);
         occ.set(key, (occ.get(key) || 0) + count);
       });
 
@@ -595,24 +795,23 @@ export const useSeatingPlan = () => {
         const box = getTableBox(t);
         const padded = expandBox(box, aisle / 2);
         const tid = String(t.id);
-        // 1) PerÃ­metro
+        // 1) Perímetro
         if (boundary && !boxInsidePoly(box, boundary)) {
-          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del perÃ­metro' });
-          return; // prioriza perÃ­metro
+          out.push({ type: 'perimeter', tableId: t.id, message: 'Fuera del perímetro' });
+          return; // prioriza perímetro
         }
-        // 2) ObstÃ¡culos/puertas
+        // 2) Obstáculos/puertas
         if (obstacles.some((o) => rectsOverlap(padded, o))) {
-          out.push({ type: 'obstacle', tableId: t.id, message: 'ColisiÃ³n con obstÃ¡culo/puerta' });
+          out.push({ type: 'obstacle', tableId: t.id, message: 'Colisión con obstáculo/puerta' });
           return;
         }
-        // 3) Espaciado mÃ­nimo entre mesas
+        // 3) Espaciado mínimo entre mesas
         const others = (tablesBanquet || []).filter((x) => String(x?.id) !== tid);
         const otherExpanded = others.map(getTableBox).map((b) => expandBox(b, aisle / 2));
         if (otherExpanded.some((o) => rectsOverlap(padded, o))) {
           out.push({ type: 'spacing', tableId: t.id, message: 'Distancia insuficiente entre mesas' });
           return;
         }
-        
       });
 
       // ---- Ceremonia ----
@@ -632,7 +831,12 @@ export const useSeatingPlan = () => {
             if (!pts.length) return;
             const xs = pts.map((p) => p.x);
             const ys = pts.map((p) => p.y);
-            rects.push({ minX: Math.min(...xs), minY: Math.min(...ys), maxX: Math.max(...xs), maxY: Math.max(...ys) });
+            rects.push({
+              minX: Math.min(...xs),
+              minY: Math.min(...ys),
+              maxX: Math.max(...xs),
+              maxY: Math.max(...ys),
+            });
           });
           return rects;
         })();
@@ -640,18 +844,257 @@ export const useSeatingPlan = () => {
           const px = s.x || 0;
           const py = s.y || 0;
           if (cerBoundary && !pointInPoly(px, py, cerBoundary)) {
-            out.push({ type: 'perimeter', tableId: `S${s.id}`, message: 'Silla fuera del perÃ­metro' });
+            out.push({ type: 'perimeter', tableId: `S${s.id}`, message: 'Silla fuera del perímetro' });
             return;
           }
           if (cerObstacles.some((o) => px >= o.minX && px <= o.maxX && py >= o.minY && py <= o.maxY)) {
-            out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obstÃ¡culo/puerta' });
+            out.push({ type: 'obstacle', tableId: `S${s.id}`, message: 'Silla sobre obstáculo/puerta' });
           }
         });
-      } catch (e) {}
+      } catch (e) {
+        /* ignored */
+      }
+      return out;
     } catch (e) {
       return [];
     }
-  }, [tablesBanquet, areasBanquet, seatsCeremony, areasCeremony, guests, validationsEnabled, hallSize, globalMaxSeats]);
+  }, [
+    tablesBanquet,
+    areasBanquet,
+    seatsCeremony,
+    areasCeremony,
+    guests,
+    validationsEnabled,
+    hallSize,
+    globalMaxSeats,
+  ]);
+
+  const smartTableMeta = useMemo(() => {
+    const assignments = new Map();
+    (guests || []).forEach((guest) => {
+      const key =
+        guest?.tableId != null
+          ? `id-${guest.tableId}`
+          : guest?.table != null
+          ? `name-${String(guest.table).trim()}`
+          : null;
+      if (!key) return;
+      if (!assignments.has(key)) assignments.set(key, []);
+      assignments.get(key).push(guest);
+    });
+
+    const conflictMap = new Map();
+    (conflicts || []).forEach((conflict) => {
+      if (!conflict?.tableId) return;
+      const keyId = `id-${String(conflict.tableId).replace(/^S/, '')}`;
+      if (!conflictMap.has(keyId)) conflictMap.set(keyId, []);
+      conflictMap.get(keyId).push(conflict);
+    });
+
+    return (tablesBanquet || []).map((table) => {
+      const idKey = `id-${table.id}`;
+      const nameKey =
+        table?.name && String(table.name).trim()
+          ? `name-${String(table.name).trim()}`
+          : null;
+      const assignedGuests = [
+        ...(assignments.get(idKey) || []),
+        ...(nameKey ? assignments.get(nameKey) || [] : []),
+      ];
+      const companions = assignedGuests.reduce(
+        (sum, guest) => sum + (parseInt(guest?.companion, 10) || 0),
+        0
+      );
+      const capacity = parseInt(table.seats, 10) || globalMaxSeats || 0;
+      const used = assignedGuests.length + companions;
+      const free = capacity > 0 ? Math.max(0, capacity - used) : 0;
+      const conflictReasons = [
+        ...(conflictMap.get(idKey) || []),
+        ...(nameKey ? conflictMap.get(nameKey) || [] : []),
+      ];
+      const sideHints = new Set();
+      Object.entries(SMART_SIDE_KEYWORDS).forEach(([side, patterns]) => {
+        if (keywordMatch(table?.name, patterns)) {
+          sideHints.add(side);
+        }
+      });
+      return {
+        table,
+        tableId: String(table.id),
+        nameKey,
+        assignedGuests,
+        capacity,
+        free,
+        conflictReasons,
+        isVipTable: keywordMatch(table?.name, SMART_VIP_KEYWORDS),
+        sideHints,
+      };
+    });
+  }, [tablesBanquet, guests, conflicts, globalMaxSeats]);
+
+  const smartRecommendations = useMemo(() => {
+    const pendingGuests = (guests || []).filter(
+      (guest) => !guest?.tableId && !guest?.table
+    );
+    if (!pendingGuests.length || !smartTableMeta.length) return [];
+
+    const buildReason = (message, weight) => ({ message, weight });
+
+    const evaluateTable = (guest, meta) => {
+      if (meta.free <= 0) return { score: -Infinity, reasons: [] };
+      const desiredSeats = 1 + (parseInt(guest?.companion, 10) || 0);
+      if (meta.free < desiredSeats) return { score: -Infinity, reasons: [] };
+
+      let score = 0;
+      const reasons = [];
+      const remainingAfter = meta.free - desiredSeats;
+      const capacityScore = Math.max(0, 28 - Math.max(0, remainingAfter) * 5);
+      score += capacityScore;
+      reasons.push(buildReason(`Quedan ${meta.free} asientos libres`, capacityScore));
+
+      const guestSide = String(guest?.side || '').toLowerCase();
+      if (guestSide && meta.sideHints.has(guestSide)) {
+        score += 12;
+        reasons.push(buildReason(`Mesa asociada al lado ${guestSide}`, 12));
+      }
+
+      const group = String(guest?.group || guest?.groupName || '').trim();
+      if (group) {
+        const sameGroupCount = meta.assignedGuests.filter(
+          (assigned) =>
+            String(assigned?.group || assigned?.groupName || '')
+              .trim()
+              .toLowerCase() === group.toLowerCase()
+        ).length;
+        if (sameGroupCount > 0) {
+          const bonus = Math.min(15, sameGroupCount * 5);
+          score += bonus;
+          reasons.push(
+            buildReason(
+              `Mesa con ${sameGroupCount} invitado(s) del grupo "${group}"`,
+              bonus
+            )
+          );
+        }
+      }
+
+      const guestKeywords = [
+        ...(Array.isArray(guest?.tags) ? guest.tags : []),
+        guest?.notes || '',
+        guest?.role || '',
+        group,
+        guest?.name || '',
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      const isVipGuest = keywordMatch(guestKeywords, SMART_VIP_KEYWORDS);
+      if (isVipGuest && meta.isVipTable) {
+        score += 16;
+        reasons.push(buildReason('Mesa VIP adecuada para este invitado', 16));
+      } else if (isVipGuest) {
+        score += 6;
+        reasons.push(buildReason('Invitado VIP: mesa disponible', 6));
+      }
+
+      if (meta.table?.locked) {
+        score -= 8;
+        reasons.push(buildReason('Mesa bloqueada (preferir mesas libres)', -8));
+      }
+
+      if (meta.conflictReasons.length) {
+        score -= 14;
+        reasons.push(
+          buildReason(`Mesa con ${meta.conflictReasons.length} conflicto(s)`, -14)
+        );
+      }
+
+      if (desiredSeats > 1 && remainingAfter === 0) {
+        score += 5;
+        reasons.push(buildReason('Encaja justo incluyendo acompañantes', 5));
+      }
+
+      return { score, reasons };
+    };
+
+    return pendingGuests
+      .map((guest) => {
+        const evaluations = smartTableMeta
+          .map((meta) => {
+            const { score, reasons } = evaluateTable(guest, meta);
+            return {
+              tableId: meta.tableId,
+              tableName: meta.table?.name || `Mesa ${meta.tableId}`,
+              score,
+              reasons,
+              freeSeats: meta.free,
+              conflicts: meta.conflictReasons,
+            };
+          })
+          .filter((entry) => Number.isFinite(entry.score) && entry.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+
+        const guestKeywords = [
+          ...(Array.isArray(guest?.tags) ? guest.tags : []),
+          guest?.notes || '',
+          guest?.group || '',
+          guest?.name || '',
+        ]
+          .join(' ')
+          .toLowerCase();
+        const cluster = keywordMatch(guestKeywords, SMART_VIP_KEYWORDS)
+          ? 'vip'
+          : keywordMatch(guestKeywords, ['familia', 'family', 'herman', 'padre', 'madre'])
+          ? 'familia'
+          : 'otros';
+
+        return {
+          guest,
+          cluster,
+          topRecommendations: evaluations,
+        };
+      })
+      .filter((item) => item.topRecommendations.length > 0)
+      .sort((a, b) => b.topRecommendations[0].score - a.topRecommendations[0].score);
+  }, [guests, smartTableMeta]);
+
+  const smartInsights = useMemo(() => {
+    const pendingGuests = (guests || []).filter(
+      (guest) => !guest?.tableId && !guest?.table
+    );
+    const vipPending = pendingGuests.filter((guest) =>
+      keywordMatch(
+        [guest?.tags, guest?.group, guest?.notes, guest?.name].join(' '),
+        SMART_VIP_KEYWORDS
+      )
+    ).length;
+    const tablesNearlyFull = smartTableMeta.filter(
+      (meta) => meta.free > 0 && meta.free <= 2
+    ).length;
+    const companionSeats = pendingGuests.reduce(
+      (sum, guest) => sum + (parseInt(guest?.companion, 10) || 0),
+      0
+    );
+    return {
+      pendingGuests: pendingGuests.length,
+      vipPending,
+      tablesNearlyFull,
+      conflictCount: conflicts.length,
+      companionSeats,
+    };
+  }, [guests, smartTableMeta, conflicts]);
+
+  // Conflictos: perÃ­metro, obstÃ¡culos/puertas, pasillos (espaciado) y overbooking
+  const guestMap = useMemo(() => {
+    const map = new Map();
+    (guests || []).forEach((guest) => {
+      if (guest && guest.id != null) {
+        map.set(String(guest.id), guest);
+      }
+    });
+    return map;
+  }, [guests]);
 
   // Exportaciones
   const exportPNG = async () => {
@@ -686,14 +1129,36 @@ export const useSeatingPlan = () => {
       pdf.save(`seating-plan-${tab}-${Date.now()}.pdf`);
     } catch (error) { console.error('Error exportando PDF:', error); }
   };
-  const exportCSV = async () => {
+  const exportCSV = async (options = {}) => {
+    const { tabs: selectedTabs } = options;
     try {
-      const rows = [['guestId', 'name', 'tableId', 'companions'].join(','), ...guests.map((g) => [g.id, JSON.stringify(g.name || ''), g.tableId ?? '', parseInt(g.companion, 10) || 0].join(','))];
+      const requestedTabs = Array.isArray(selectedTabs) && selectedTabs.length ? selectedTabs : ['banquet', 'ceremony'];
+      const rows = [
+        ['guestId', 'name', 'tab', 'table', 'companions', 'notes'].join(','),
+        ...guests.map((g) => {
+          const tableName = g.table ?? g.tableId ?? '';
+          const tabForGuest = (() => {
+            if (requestedTabs.includes('banquet') && tableName) return 'banquet';
+            if (requestedTabs.includes('ceremony') && seatsCeremony.some((seat) => String(seat.guestId) === String(g.id))) {
+              return 'ceremony';
+            }
+            return 'general';
+          })();
+          return [
+            g.id,
+            JSON.stringify(g.name || ''),
+            tabForGuest,
+            JSON.stringify(tableName || ''),
+            parseInt(g.companion, 10) || 0,
+            JSON.stringify(g.notes || ''),
+          ].join(',');
+        }),
+      ];
       const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `seating-${tab}-${Date.now()}.csv`;
+      a.download = `seating-${requestedTabs.join('-')}-${Date.now()}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) { console.warn('CSV export failed', e); }
@@ -729,6 +1194,553 @@ export const useSeatingPlan = () => {
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) { console.warn('SVG export failed', e); }
+  };
+
+  const fetchImageAsDataURL = async (url) => {
+    if (!url) return null;
+    try {
+      const response = await fetch(url, { mode: 'cors' });
+      if (!response.ok) return null;
+      const blob = await response.blob();
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('read-error'));
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.warn('No se pudo cargar el logotipo para la exportación', error);
+      return null;
+    }
+  };
+
+  const normalizeTabId = (value) => {
+    if (value === 'ceremony' || value === 'banquet' || value === 'free-draw') return value;
+    if (value === 'freedraw') return 'free-draw';
+    return 'banquet';
+  };
+
+  const collectTabReport = (tabId) => {
+    const guestsIndexByTable = new Map();
+    (guests || []).forEach((guest) => {
+      const key =
+        guest?.tableId != null
+          ? `id-${guest.tableId}`
+          : guest?.table
+          ? `name-${String(guest.table).trim()}`
+          : null;
+      if (!key) return;
+      if (!guestsIndexByTable.has(key)) guestsIndexByTable.set(key, []);
+      guestsIndexByTable.get(key).push(guest);
+    });
+
+    if (tabId === 'ceremony') {
+      const rowsMap = new Map();
+      (seatsCeremony || []).forEach((seat) => {
+        const rowIndex = Number.isFinite(seat?.rowIndex) ? seat.rowIndex : 0;
+        if (!rowsMap.has(rowIndex)) {
+          rowsMap.set(rowIndex, {
+            index: rowIndex,
+            seats: [],
+          });
+        }
+        rowsMap.get(rowIndex).seats.push(seat);
+      });
+      const rows = Array.from(rowsMap.values())
+        .sort((a, b) => a.index - b.index)
+        .map((row) => {
+          const seats = row.seats;
+          const enabledSeats = seats.filter((seat) => seat?.enabled !== false);
+          const assignedSeats = seats.filter((seat) => !!seat?.guestId);
+          const vip =
+            Array.isArray(ceremonySettings?.vipRows) &&
+            ceremonySettings.vipRows.some((vipRow) => Number(vipRow) === row.index);
+          return {
+            label: `Fila ${row.index + 1}`,
+            index: row.index,
+            seats,
+            enabled: enabledSeats.length,
+            assigned: assignedSeats.length,
+            available: Math.max(0, enabledSeats.length - assignedSeats.length),
+            reservedLabel: vip ? ceremonySettings?.vipLabel || 'VIP' : null,
+            guests: seats
+              .map((seat) => {
+                if (!seat?.guestId) return null;
+                const guest = guestMap.get(String(seat.guestId));
+                return guest || null;
+              })
+              .filter(Boolean),
+          };
+        });
+
+      const ceremonyGuests = rows.flatMap((row) => row.guests);
+
+      return {
+        id: 'ceremony',
+        title: 'Ceremonia',
+        rows,
+        totalSeats: seatsCeremony.length,
+        vipLabel: ceremonySettings?.vipLabel || 'VIP',
+        vipRows: Array.isArray(ceremonySettings?.vipRows)
+          ? ceremonySettings.vipRows.map((value) => Number(value)).filter(Number.isFinite)
+          : [],
+        notes: ceremonySettings?.notes || '',
+        guests: ceremonyGuests,
+      };
+    }
+
+    if (tabId === 'banquet') {
+      const tables = Array.isArray(tablesBanquet) ? tablesBanquet : [];
+      const tableSummaries = tables.map((table) => {
+        const byIdKey = `id-${table.id}`;
+        const byNameKey =
+          table?.name && String(table.name).trim() ? `name-${String(table.name).trim()}` : null;
+        const assignedGuests = [
+          ...(guestsIndexByTable.get(byIdKey) || []),
+          ...(byNameKey ? guestsIndexByTable.get(byNameKey) || [] : []),
+        ];
+        const companionCount = assignedGuests.reduce(
+          (sum, guest) => sum + (parseInt(guest?.companion, 10) || 0),
+          0
+        );
+        const totalAssigned = assignedGuests.length + companionCount;
+        const capacity = parseInt(table.seats, 10) || globalMaxSeats || 0;
+        return {
+          id: table.id,
+          name: table.name || `Mesa ${table.id}`,
+          seats: capacity,
+          assignedGuests,
+          assignedCount: totalAssigned,
+          freeCount: capacity > 0 ? Math.max(0, capacity - totalAssigned) : null,
+          shape: table.shape || table.tableType || 'round',
+          locked: table.locked || false,
+        };
+      });
+
+      return {
+        id: 'banquet',
+        title: 'Banquete',
+        tables: tableSummaries,
+        totalTables: tables.length,
+        totalGuestsSeated: tableSummaries.reduce((sum, table) => sum + table.assignedCount, 0),
+      };
+    }
+
+    if (tabId === 'free-draw') {
+      const shapes = Array.isArray(areasBanquet) ? areasBanquet : [];
+      return {
+        id: 'free-draw',
+        title: 'Zona libre',
+        shapes,
+        shapeCount: shapes.length,
+      };
+    }
+
+    return null;
+  };
+
+  const translate = (lang, key, fallback) => {
+    const dictionary = {
+      es: {
+        reportTitle: 'Informe del plan de asientos',
+        summary: 'Resumen general',
+        hallDimensions: 'Dimensiones del salón',
+        aisle: 'Pasillo mínimo',
+        vipNotes: 'Notas de ceremonia',
+        legend: 'Leyenda',
+        guestList: 'Lista de invitados',
+        conflicts: 'Conflictos pendientes',
+        noConflicts: 'No hay conflictos registrados.',
+        providerNotes: 'Notas para proveedores',
+        setupInstructions: 'Instrucciones de montaje',
+        ceremonyRows: 'Filas de ceremonia',
+        banquetTables: 'Mesas del banquete',
+        freeDrawZones: 'Zonas libres',
+        generatedAt: 'Generado el',
+        legendVip: 'Filas VIP reservadas',
+        legendLocked: 'Mesas bloqueadas',
+        legendCapacity: 'Capacidad disponible',
+        legendConflict: 'Conflictos detectados',
+        legendNotes: 'Notas internas',
+        instructionsPasillos: 'Respeta el pasillo mínimo indicado para el montaje.',
+        instructionsRevisar: 'Revisar el plano antes de la llegada de proveedores.',
+        instructionsCapacidad: 'Verificar que la capacidad asignada no exceda el máximo global.',
+        scale: 'Escala',
+      },
+      en: {
+        reportTitle: 'Seating Plan Report',
+        summary: 'Executive Summary',
+        hallDimensions: 'Hall dimensions',
+        aisle: 'Minimum aisle',
+        vipNotes: 'Ceremony notes',
+        legend: 'Legend',
+        guestList: 'Guest list',
+        conflicts: 'Pending conflicts',
+        noConflicts: 'No conflicts registered.',
+        providerNotes: 'Provider notes',
+        setupInstructions: 'Setup instructions',
+        ceremonyRows: 'Ceremony rows',
+        banquetTables: 'Banquet tables',
+        freeDrawZones: 'Free-draw zones',
+        generatedAt: 'Generated on',
+        legendVip: 'Reserved VIP rows',
+        legendLocked: 'Locked tables',
+        legendCapacity: 'Available capacity',
+        legendConflict: 'Detected conflicts',
+        legendNotes: 'Internal notes',
+        instructionsPasillos: 'Keep the minimum aisle clearance during setup.',
+        instructionsRevisar: 'Review the plan before vendors arrive.',
+        instructionsCapacidad: 'Verify assigned capacity does not exceed the global maximum.',
+        scale: 'Scale',
+      },
+    };
+    const langDict = dictionary[lang] || dictionary.es;
+    return langDict[key] || fallback || key;
+  };
+
+  const exportDetailedPDF = async (options) => {
+    const {
+      tabs: requestedTabs = ['ceremony', 'banquet'],
+      contents = [],
+      config: exportConfig = {},
+      logoDataUrl = null,
+    } = options;
+    const language = exportConfig.language || 'es';
+    const orientation =
+      exportConfig.orientation === 'landscape' || exportConfig.orientation === 'portrait'
+        ? exportConfig.orientation
+        : 'portrait';
+    const pdf = new jsPDF(orientation === 'landscape' ? 'landscape' : 'portrait', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const marginX = 14;
+    const marginY = 16;
+    const bodyFont = 11;
+    const smallFont = 9;
+    let cursorY = marginY;
+
+    const ensureSpace = (needed = 6) => {
+      if (cursorY + needed > pageHeight - marginY) {
+        pdf.addPage();
+        cursorY = marginY;
+      }
+    };
+
+    const addHeading = (text, size = 14) => {
+      ensureSpace(size / 2 + 4);
+      pdf.setFontSize(size);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(text, marginX, cursorY);
+      cursorY += size / 2 + 4;
+      pdf.setFontSize(bodyFont);
+      pdf.setFont('helvetica', 'normal');
+    };
+
+    const addParagraph = (text, options = {}) => {
+      const { fontSize = bodyFont, bold = false } = options;
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', bold ? 'bold' : 'normal');
+      const lines = pdf.splitTextToSize(text, pageWidth - marginX * 2);
+      lines.forEach((line) => {
+        ensureSpace(fontSize / 2 + 2);
+        pdf.text(line, marginX, cursorY);
+        cursorY += fontSize / 2 + 2;
+      });
+      pdf.setFontSize(bodyFont);
+      pdf.setFont('helvetica', 'normal');
+    };
+
+    if (logoDataUrl) {
+      try {
+        const logoWidth = 32;
+        const logoHeight = 12;
+        pdf.addImage(logoDataUrl, 'PNG', pageWidth - marginX - logoWidth, marginY - 4, logoWidth, logoHeight);
+      } catch (error) {
+        console.warn('No se pudo incrustar el logotipo en el PDF', error);
+      }
+    }
+
+    addHeading(translate(language, 'reportTitle'), 16);
+    addParagraph(
+      `${translate(language, 'generatedAt')} ${new Date().toLocaleString(language.toLowerCase())}`,
+      { fontSize: smallFont }
+    );
+
+    addHeading(translate(language, 'summary'), 13);
+    if (exportConfig.includeMeasures) {
+      const hallSummary = [
+        `${translate(language, 'hallDimensions')}: ${((hallSize?.width || 0) / 100).toFixed(1)} m × ${(
+          (hallSize?.height || 0) / 100
+        ).toFixed(1)} m`,
+      ];
+      if (hallSize?.aisleMin != null) {
+        hallSummary.push(
+          `${translate(language, 'aisle')}: ${(hallSize.aisleMin / 100).toFixed(2)} m`
+        );
+      }
+      hallSummary.forEach((line) => addParagraph(`• ${line}`));
+    }
+    if (exportConfig.scale) {
+      addParagraph(`• ${translate(language, 'scale', 'Escala')}: ${exportConfig.scale}`);
+    }
+    const legendItems = [
+      translate(language, 'legendVip'),
+      translate(language, 'legendLocked'),
+      translate(language, 'legendCapacity'),
+      translate(language, 'legendConflict'),
+      translate(language, 'legendNotes'),
+    ];
+
+    const tabsData = requestedTabs
+      .map((tab) => collectTabReport(normalizeTabId(tab)))
+      .filter(Boolean);
+
+    if (contents.includes('legend')) {
+      addHeading(translate(language, 'legend'), 13);
+      legendItems.forEach((item) => addParagraph(`• ${item}`, { fontSize: bodyFont }));
+    }
+
+    tabsData.forEach((tabData, index) => {
+      if (index > 0 || contents.includes('legend')) {
+        pdf.addPage();
+        cursorY = marginY;
+      }
+      addHeading(tabData.title, 14);
+
+      if (tabData.id === 'ceremony') {
+        addParagraph(
+          `${translate(language, 'ceremonyRows')}: ${tabData.rows.length} · ${translate(
+            language,
+            'guestList'
+          )}: ${tabData.guests.length}`
+        );
+        tabData.rows.forEach((row) => {
+          addParagraph(
+            `${row.label} — ${row.assigned}/${row.enabled} ${
+              row.reservedLabel ? `(${row.reservedLabel})` : ''
+            }`
+          );
+          if (contents.includes('guestList') && row.guests.length) {
+            const guestNames = row.guests.map((guest) => guest.name || '—').join(', ');
+            addParagraph(`   ${translate(language, 'guestList')}: ${guestNames}`, {
+              fontSize: smallFont,
+            });
+          }
+        });
+        if (contents.includes('providerNotes') && tabData.notes) {
+          addHeading(translate(language, 'vipNotes'), 12);
+          addParagraph(tabData.notes, { fontSize: bodyFont });
+        }
+      } else if (tabData.id === 'banquet') {
+        addParagraph(
+          `${translate(language, 'banquetTables')}: ${tabData.totalTables} · ${translate(
+            language,
+            'guestList'
+          )}: ${tabData.totalGuestsSeated}`
+        );
+        if (contents.includes('guestList')) {
+          tabData.tables.forEach((table) => {
+            addParagraph(
+              `${table.name} — ${table.assignedCount}/${table.seats}${
+                table.locked ? ' · Locked' : ''
+              }`
+            );
+            if (table.assignedGuests.length) {
+              const guestNames = table.assignedGuests
+                .map((guest) => guest.name || '—')
+                .join(', ');
+              addParagraph(`   ${guestNames}`, { fontSize: smallFont });
+            }
+          });
+        }
+      } else if (tabData.id === 'free-draw') {
+        addParagraph(
+          `${translate(language, 'freeDrawZones')}: ${tabData.shapeCount}`
+        );
+      }
+
+      if (contents.includes('conflicts')) {
+        addHeading(translate(language, 'conflicts'), 12);
+        if (!conflicts.length) {
+          addParagraph(translate(language, 'noConflicts'), { fontSize: smallFont });
+        } else {
+          conflicts.forEach((conflict) => {
+            addParagraph(
+              `• ${conflict.tableId != null ? `Ref ${conflict.tableId}: ` : ''}${
+                conflict.message || conflict.type
+              }`,
+              { fontSize: smallFont }
+            );
+          });
+        }
+      }
+
+      if (contents.includes('setupInstructions')) {
+        addHeading(translate(language, 'setupInstructions'), 12);
+        const instructions = [
+          translate(language, 'instructionsPasillos'),
+          translate(language, 'instructionsRevisar'),
+          translate(language, 'instructionsCapacidad'),
+        ];
+        instructions.forEach((instruction) =>
+          addParagraph(`• ${instruction}`, { fontSize: bodyFont })
+        );
+      }
+
+      if (contents.includes('providerNotes') && tabData.id !== 'ceremony') {
+        addHeading(translate(language, 'providerNotes'), 12);
+        const providerTexts = [];
+        if (ceremonySettings?.notes) {
+          providerTexts.push(ceremonySettings.notes);
+        }
+        if (exportConfig.presetName) {
+          providerTexts.push(`Preset: ${exportConfig.presetName}`);
+        }
+        if (!providerTexts.length) {
+          providerTexts.push('Sin notas registradas.');
+        }
+        providerTexts.forEach((text) => addParagraph(`• ${text}`, { fontSize: smallFont }));
+      }
+    });
+
+    pdf.save(`seating-report-${Date.now()}.pdf`);
+  };
+
+  const exportDetailedSVG = (options) => {
+    const {
+      tabs: requestedTabs = ['ceremony', 'banquet'],
+      config: exportConfig = {},
+      logoDataUrl = null,
+    } = options;
+    const width = hallSize?.width || 1800;
+    const height = hallSize?.height || 1200;
+    const padding = 120;
+    const totalHeight = requestedTabs.length * (height + padding) + padding;
+
+    const svgParts = [];
+    svgParts.push(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${width + padding * 2}" height="${totalHeight}" viewBox="0 0 ${
+        width + padding * 2
+      } ${totalHeight}" font-family="Helvetica, Arial, sans-serif">`
+    );
+    svgParts.push(`<rect x="0" y="0" width="${width + padding * 2}" height="${totalHeight}" fill="#ffffff"/>`);
+
+    if (logoDataUrl) {
+      svgParts.push(
+        `<image href="${logoDataUrl}" x="${padding}" y="${padding / 2}" height="60" preserveAspectRatio="xMidYMid meet" />`
+      );
+    }
+
+    requestedTabs.forEach((tab, index) => {
+      const tabId = normalizeTabId(tab);
+      const yOffset = padding + index * (height + padding);
+      svgParts.push(
+        `<g transform="translate(${padding}, ${yOffset})" data-tab="${tabId}">`
+      );
+      svgParts.push(
+        `<text x="${width / 2}" y="-20" font-size="32" fill="#111" text-anchor="middle">${tabId.toUpperCase()}</text>`
+      );
+
+      if (tabId === 'ceremony') {
+        (seatsCeremony || []).forEach((seat) => {
+          const fill = seat?.enabled === false ? '#fde68a' : seat?.guestId ? '#60a5fa' : '#e5e7eb';
+          svgParts.push(
+            `<circle cx="${seat.x}" cy="${seat.y}" r="18" fill="${fill}" stroke="#1f2937" stroke-width="2"/>`
+          );
+          if (seat?.guestName) {
+            svgParts.push(
+              `<text x="${seat.x}" y="${seat.y + 5}" font-size="18" fill="#1f2937" text-anchor="middle">${seat.guestName
+                .split(' ')
+                .map((word) => word[0])
+                .join('')
+                .toUpperCase()}</text>`
+            );
+          }
+        });
+      } else if (tabId === 'banquet') {
+        (areasBanquet || []).forEach((area) => {
+          const pts = Array.isArray(area?.points) ? area.points : Array.isArray(area) ? area : [];
+          if (!pts.length) return;
+          const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+          svgParts.push(`<path d="${d}" fill="none" stroke="#10b981" stroke-width="4" opacity="0.8"/>`);
+        });
+        (tablesBanquet || []).forEach((table) => {
+          if (table.shape === 'circle') {
+            const r = (table.diameter || 60) / 2;
+            svgParts.push(
+              `<circle cx="${table.x}" cy="${table.y}" r="${r}" fill="#f3f4f6" stroke="#111827" stroke-width="3"/>`
+            );
+          } else {
+            const hw = (table.width || 80) / 2;
+            const hh = (table.height || table.length || 60) / 2;
+            svgParts.push(
+              `<rect x="${table.x - hw}" y="${table.y - hh}" width="${hw * 2}" height="${hh * 2}" fill="#f3f4f6" stroke="#111827" stroke-width="3"/>`
+            );
+          }
+          svgParts.push(
+            `<text x="${table.x}" y="${table.y + 6}" font-size="28" fill="#1f2937" text-anchor="middle">${table.name ||
+              `Mesa ${table.id}`}</text>`
+          );
+        });
+      } else if (tabId === 'free-draw') {
+        (areasBanquet || []).forEach((shape) => {
+          const pts = Array.isArray(shape?.points) ? shape.points : Array.isArray(shape) ? shape : [];
+          if (!pts.length) return;
+          const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+          svgParts.push(`<path d="${d}" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" opacity="0.6"/>`);
+        });
+      }
+      svgParts.push(`</g>`);
+    });
+
+    svgParts.push('</svg>');
+    const svgString = svgParts.join('');
+    const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `seating-advanced-${Date.now()}.svg`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAdvancedReport = async (options = {}) => {
+    const {
+      formats = ['pdf'],
+      tabs: requestedTabs = ['ceremony', 'banquet'],
+      contents = [],
+      config: exportConfig = {},
+    } = options;
+    const normalizedTabs = requestedTabs.map((tab) => normalizeTabId(tab));
+    const uniqueFormats = Array.from(new Set(formats));
+    const logoDataUrl = exportConfig.logoUrl ? await fetchImageAsDataURL(exportConfig.logoUrl) : null;
+
+    const tasks = [];
+    if (uniqueFormats.includes('pdf')) {
+      tasks.push(
+        exportDetailedPDF({
+          tabs: normalizedTabs,
+          contents,
+          config: exportConfig,
+          logoDataUrl,
+        })
+      );
+    }
+    if (uniqueFormats.includes('svg')) {
+      tasks.push(
+        Promise.resolve(
+          exportDetailedSVG({
+            tabs: normalizedTabs,
+            config: exportConfig,
+            logoDataUrl,
+          })
+        )
+      );
+    }
+    if (uniqueFormats.includes('csv')) {
+      tasks.push(exportCSV({ tabs: normalizedTabs }));
+    }
+    await Promise.all(tasks);
   };
 
   // Guardado de configuraciÃ³n
@@ -890,6 +1902,8 @@ export const useSeatingPlan = () => {
     configTable,
     preview,
     guests,
+    ceremonySettings,
+    setCeremonySettings,
 
     // Estados de modales
     ceremonyConfigOpen,
@@ -944,12 +1958,15 @@ export const useSeatingPlan = () => {
     exportCSV,
     exportPDF,
     exportSVG,
+    exportAdvancedReport,
 
     // ConfiguraciÃ³n
     saveHallDimensions,
     saveGlobalMaxGuests,
     saveBackground,
     setBackground,
+    ceremonySettings,
+    setCeremonySettings,
 
     // Preferencias/validaciones/lienzo
     drawMode,
@@ -961,6 +1978,8 @@ export const useSeatingPlan = () => {
     gridStep,
     globalMaxSeats,
     background,
+    smartRecommendations,
+    smartInsights,
 
     // Invitados / auto-asignaciÃ³n / sugerencias
     moveGuest,

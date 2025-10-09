@@ -45,7 +45,7 @@ Función `acceptInvitation(code, uid)` (Firebase/Firestore)
 ## Email y Bandeja de Entrada
 
 Base: `/api/mail` y `/api/email*` (requiere `Authorization` cuando aplica)
-- `GET /api/mail?folder=...&user=...`
+- `GET /api/mail→folder=...&user=...`
 - `POST /api/mail`
 - `DELETE /api/mail/:id`
 - `GET /api/mail/:id`
@@ -67,7 +67,7 @@ Base: `/api/mail` y `/api/email*` (requiere `Authorization` cuando aplica)
 
 ## IA / Búsqueda / Recursos
 
-- `GET /api/ai/search-suppliers?q=...`
+- `GET /api/ai/search-suppliers→q=...`
 - `POST /api/ai-suppliers`
 - `POST /api/ai-image`
 - `POST /api/ai-image/vector-pdf`

@@ -290,7 +290,7 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-accent)] rounded-full opacity-20 transform translate-x-1/2 -translate-y-1/2" />
 
         {/* Header */}
-        <header className="relative z-10 p-6 flex justify-between items-center">
+        <header className="relative z-10 p-6 flex justify-between items-center flex-wrap gap-4">
           <div className="space-y-1">
             <h1 className="page-title">
               Bienvenidos, {weddingName}
@@ -301,11 +301,20 @@ export default function HomePage() {
               Cada detalle hace tu boda inolvidable
             </p>
           </div>
-          <img
-            src={`${import.meta.env.BASE_URL}logo-app.png`}
-            alt="Logo de la boda"
-            className="w-32 h-32 object-contain"
-          />
+          <div className="flex items-center gap-4">
+            <Link
+              to="/diseno-web"
+              state={{ focus: 'generator' }}
+              className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-transform hover:-translate-y-0.5"
+            >
+              Publica tu sitio
+            </Link>
+            <img
+              src={`${import.meta.env.BASE_URL}logo-app.png`}
+              alt="Logo de la boda"
+              className="w-32 h-32 object-contain"
+            />
+          </div>
         </header>
 
         {/* Progress Section */}
@@ -621,5 +630,4 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
-
 

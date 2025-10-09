@@ -74,6 +74,7 @@ export default function AISearchModal({
       <div
         className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
+        data-testid="ai-search-modal"
       >
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b">
@@ -97,9 +98,16 @@ export default function AISearchModal({
                 placeholder="Describe lo que buscas..."
                 className="w-full p-3 pl-10 pr-24 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
                 autoFocus
+                data-testid="ai-search-input"
               />
               <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-              <Button type="submit" className="absolute right-2 top-1.5" size="sm" disabled={isLoading || !query.trim()}>
+              <Button
+                type="submit"
+                className="absolute right-2 top-1.5"
+                size="sm"
+                disabled={isLoading || !query.trim()}
+                data-testid="ai-search-button"
+              >
                 {isLoading ? 'Buscando...' : 'Buscar'}
               </Button>
             </div>
@@ -148,7 +156,7 @@ export default function AISearchModal({
           </div>
 
           {/* Resultados */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-4" data-testid="ai-results-container">
             <AIResultList usedFallback={usedFallback} results={results} error={error} isLoading={isLoading} onSelect={onSelect} query={query} />
           </div>
         </div>

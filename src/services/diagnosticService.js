@@ -246,8 +246,7 @@ class DiagnosticService {
    */
   async testOpenAIConfig() {
     try {
-      const allowDirect =
-        import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true' || import.meta.env.DEV;
+      const allowDirect = import.meta.env.VITE_ENABLE_DIRECT_OPENAI === 'true';
       if (!allowDirect) {
         return {
           status: 'warning',

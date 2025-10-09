@@ -1,0 +1,1882 @@
+{
+  "generatedAt": "2025-10-09T16:00:58.351Z",
+  "modules": [
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-10-gestion-bodas-multiples.md",
+      "title": "10. Gestión de Bodas Múltiples (estado 2025-10-07)",
+      "implementedLines": [
+        "`Bodas.jsx`, `BodaDetalle.jsx`, `WeddingSelector.jsx`, `WeddingFormModal.jsx`, `useWedding` context, seeding inicial (finanzas/tareas) al crear boda desde planner."
+      ],
+      "pendingLines": [
+        "dashboards multi-boda avanzados, permisos granulares por módulo y vistas cruzadas consolidadas."
+      ],
+      "roadmapSection": "- Dashboard multi-boda (resúmenes cruzados, comparativas).\n- Permisos granulares por módulo/colección.\n- Filtro de bodas por estado/fecha/owner.\n- Sincronización con planner CRM externo.\n- Activity feed y alertas multi-boda.",
+      "checklistSection": "- Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).\n- Seeds y Cloud Functions idempotentes para nuevas bodas.\n- Validar UI con >10 bodas (scroll, selector).\n- QA de traducciones y copy en wizard.",
+      "e2eSection": "- `cypress/e2e/weddings/multi-weddings-flow.cy.js`: valida la vista de bodas activas/archivadas usando datos mock, comprueba la persistencia del `activeWedding` y la disponibilidad del CTA para planners.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/weddings/multi-weddings-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Bodas.jsx",
+          "basename": "Bodas.jsx",
+          "matches": [
+            "src\\pages\\Bodas.jsx"
+          ]
+        },
+        {
+          "ref": "BodaDetalle.jsx",
+          "basename": "BodaDetalle.jsx",
+          "matches": [
+            "src\\pages\\BodaDetalle.jsx"
+          ]
+        },
+        {
+          "ref": "WeddingSelector.jsx",
+          "basename": "WeddingSelector.jsx",
+          "matches": [
+            "src\\components\\WeddingSelector.jsx"
+          ]
+        },
+        {
+          "ref": "WeddingFormModal.jsx",
+          "basename": "WeddingFormModal.jsx",
+          "matches": [
+            "src\\components\\WeddingFormModal.jsx"
+          ]
+        },
+        {
+          "ref": "useWedding",
+          "basename": "useWedding",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11-protocolo-ceremonias.md",
+      "title": "11. Protocolo y Ceremonias (visión global)",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "",
+      "e2eSection": "- `cypress/e2e/protocolo/ceremony-tabs-flow.cy.js`: verifica la navegación general del módulo de protocolo, conmutando entre los subflujos 11A–11E y confirmando que cada vista se renderiza con una boda simulada.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/protocolo/ceremony-tabs-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11a-momentos-especiales.md",
+      "title": "11A. Momentos Especiales de la Boda",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Verificar reglas Firestore de `specialMoments`.  \n- Asegurar traducciones (labels de bloques y placeholders).  \n- Mantener catálogo `MUSIC_INSPIRATION` actualizado y sin enlaces caídos.",
+      "e2eSection": "- `cypress/e2e/protocolo/protocolo-flows.cy.js`: carga la vista con datos simulados de momentos especiales y valida que los bloques y canciones persistidos se renderizan correctamente.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11b-timeline-dia-b.md",
+      "title": "11B. Timeline Global del Día B",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Asegurar reglas Firestore para `timing` y `ceremonyTimeline`.  \n- Revisar traducciones de estados y mensajes en UI.  \n- Validar que seeds carguen timeline demo (`scripts/seedTestDataForPlanner.js:266`).",
+      "e2eSection": "- `cypress/e2e/protocolo/protocolo-flows.cy.js`: verifica que el timeline se inicializa con los bloques por defecto y que la interfaz permite añadir nuevos momentos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11c-checklist-ultima-hora.md",
+      "title": "11C. Checklist de Última Hora",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Reglas Firestore para `ceremonyChecklist`.  \n- Traducciones y etiquetas de categorías (ES/EN/FR).  \n- Seeds actualizados (`scripts/seedTestDataForPlanner.js:352`) para mostrar ejemplo funcional.",
+      "e2eSection": "- `cypress/e2e/protocolo/protocolo-flows.cy.js`: valida la checklist de última hora mostrando checkpoints manuales simulados y la integración con el resumen de música.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11d-guia-documentacion-legal.md",
+      "title": "11D. Guía de Documentación Legal",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Revisar contenidos por país y mantener enlaces actualizados.  \n- Verificar traducciones y formato de fechas.  \n- Confirmar que las plantillas existen en `docs/protocolo` y se exponen correctamente desde la UI.",
+      "e2eSection": "- `cypress/e2e/protocolo/protocolo-flows.cy.js`: comprueba la carga de la guía de documentos legales y la disponibilidad del generador de PDFs en modo stub.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/protocolo/protocolo-flows.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-11e-ayuda-textos-ceremonia.md",
+      "title": "11E. Ayuda a Lecturas y Votos",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Verificar reglas Firestore para `ceremonyTexts`.  \n- Revisar textos de muestra y traducciones.  \n- Validar permisos según rol y auditoría (`updatedBy`).",
+      "e2eSection": "- `cypress/e2e/email/smart-composer.cy.js y cypress/e2e/email/ai-provider-email.cy.js`: cubren la generación asistida de textos, reutilizada por el asistente de ceremonia.\n- Cobertura adicional pendiente para el flujo específico de textos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/email/smart-composer.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/ai-provider-email.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-14-checklist-avanzado.md",
+      "title": "14. Checklist Avanzado (estado 2025-10-07)",
+      "implementedLines": [
+        "`Checklist.jsx`, `Tasks.jsx`, `TaskSidePanel.jsx`, `SmartChecklist.jsx`, hooks `useWeddingTasksHierarchy`, `useTaskTemplates`, servicios `automationService.js` (basico)."
+      ],
+      "pendingLines": [
+        "generacion inteligente de checklists, dependencias avanzadas, gamificacion completa y plantillas compartidas por comunidad."
+      ],
+      "roadmapSection": "- Motor de recomendaciones IA que genere checklist dinamico segun perfil de boda.\n- Editor de plantillas colaborativas y marketplace de workflows.\n- Dependencias visuales (gantt, grafo) y pronostico de riesgo.\n- Gamificacion completa (streaks, objetivos semanales, recompensas).\n- Sync bidireccional con calendarios externos (Google/Microsoft).",
+      "checklistSection": "- Reglas Firestore para `tasks`, `checklist`, `taskTemplates`, `taskAutomations`, `checklistStats`.\n- Revisar limites de escritura masiva (batch) en seeds y automatizaciones.\n- Configurar notificaciones (`MAILGUN_*`, `PUSH_PROVIDER`) para recordatorios.\n- Actualizar traducciones y onboarding segun nuevas plantillas.",
+      "e2eSection": "- `cypress/e2e/tasks/all_subtasks_modal.cy.js`: verifica la gestión de checklist avanzado, subtareas y estados.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/tasks/all_subtasks_modal.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Checklist.jsx",
+          "basename": "Checklist.jsx",
+          "matches": [
+            "src\\pages\\Checklist.jsx",
+            "src\\pages\\protocolo\\Checklist.jsx"
+          ]
+        },
+        {
+          "ref": "Tasks.jsx",
+          "basename": "Tasks.jsx",
+          "matches": [
+            "src\\pages\\Tasks.jsx"
+          ]
+        },
+        {
+          "ref": "TaskSidePanel.jsx",
+          "basename": "TaskSidePanel.jsx",
+          "matches": [
+            "src\\components\\tasks\\TaskSidePanel.jsx"
+          ]
+        },
+        {
+          "ref": "SmartChecklist.jsx",
+          "basename": "SmartChecklist.jsx",
+          "matches": []
+        },
+        {
+          "ref": "useWeddingTasksHierarchy",
+          "basename": "useWeddingTasksHierarchy",
+          "matches": []
+        },
+        {
+          "ref": "useTaskTemplates",
+          "basename": "useTaskTemplates",
+          "matches": []
+        },
+        {
+          "ref": "automationService.js",
+          "basename": "automationService.js",
+          "matches": [
+            "backend\\services\\automationService.js"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-15-contratos-documentos.md",
+      "title": "15. Contratos y Documentos (estado 2025-10-07)",
+      "implementedLines": [
+        "`ContractTemplates.jsx`, `ContractEditor.jsx`, `DocumentManager.jsx`, `DigitalSignatureModal.jsx`, servicios `documentService.js`, `signatureService.js` (stub), OCR basico en backend."
+      ],
+      "pendingLines": [
+        "firma digital integrada (DocuSign/HelloSign), workflows de aprobacion, analitica legal y compliance automatizado."
+      ],
+      "roadmapSection": "- Integracion completa con proveedores de firma digital y verificacion de identidad.\n- Analitica de clausulas (riesgos, montos, vencimientos) con IA.\n- Workflows dinamicos segun tipo de contrato y jurisdiccion.\n- Portal colaborativo para proveedores con comentarios y adjuntos.\n- Archivado inteligente y retencion automatica segun politicas legales.",
+      "checklistSection": "- Reglas Firestore para `documents`, `documentWorkflows`, `documentTemplates`, `signatureLogs`.\n- Configurar almacenamiento seguro (Cloud Storage) con buckets separados y KMS.\n- Variables de firma (`DOCUSIGN_*`, `HELLOSIGN_*`) y webhooks configuradas antes de activar.\n- Revisar plantillas por region y mantener repositorio de versiones legales.",
+      "e2eSection": "- `cypress/e2e/contracts/contracts-flow.cy.js`: cubre creación, firma simulada y seguimiento de contratos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/contracts/contracts-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "ContractTemplates.jsx",
+          "basename": "ContractTemplates.jsx",
+          "matches": []
+        },
+        {
+          "ref": "ContractEditor.jsx",
+          "basename": "ContractEditor.jsx",
+          "matches": []
+        },
+        {
+          "ref": "DocumentManager.jsx",
+          "basename": "DocumentManager.jsx",
+          "matches": []
+        },
+        {
+          "ref": "DigitalSignatureModal.jsx",
+          "basename": "DigitalSignatureModal.jsx",
+          "matches": []
+        },
+        {
+          "ref": "documentService.js",
+          "basename": "documentService.js",
+          "matches": []
+        },
+        {
+          "ref": "signatureService.js",
+          "basename": "signatureService.js",
+          "matches": [
+            "backend\\services\\signatureService.js"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-17-gamificacion-progreso.md",
+      "title": "17. Gamificacion y Progreso (estado 2025-10-07)",
+      "implementedLines": [
+        "tarjeta `GamificationPanel.jsx` en Home (`Dashboard.jsx`) y servicio `GamificationService` con endpoints `award`, `stats`, `achievements` (stub)."
+      ],
+      "pendingLines": [
+        "niveles, logros, retos semanales, recompensas y panel de analytics completo."
+      ],
+      "roadmapSection": "- Desafios cooperativos (pareja vs planners) y recompensas canjeables.\n- Tienda de recompensas virtuales (plantillas, upgrades) ligada a puntos.\n- Comparativas opcionales (leaderboards privados) con controles de privacidad.\n- Analitica avanzada de engagement y segmentacion.\n- Integracion con programa de referidos y planes premium.",
+      "checklistSection": "- Reglas Firestore para `gamification`, `achievements`, `gamificationEvents`.\n- Configurar limites de escritura y deduplicacion en Cloud Functions.\n- Revisar copy motivacional y traducciones.\n- Preparar comunicacion a usuarios sobre nuevo sistema y opciones de privacidad.",
+      "e2eSection": "- No hay pruebas end-to-end específicas implementadas para este flujo.",
+      "e2eChecks": [],
+      "implChecks": [
+        {
+          "ref": "GamificationPanel.jsx",
+          "basename": "GamificationPanel.jsx",
+          "matches": [
+            "src\\components\\GamificationPanel.jsx"
+          ]
+        },
+        {
+          "ref": "Dashboard.jsx",
+          "basename": "Dashboard.jsx",
+          "matches": [
+            "src\\pages\\Dashboard.jsx",
+            "src\\components\\dashboard\\Dashboard.jsx"
+          ]
+        },
+        {
+          "ref": "GamificationService",
+          "basename": "GamificationService",
+          "matches": []
+        },
+        {
+          "ref": "award",
+          "basename": "award",
+          "matches": []
+        },
+        {
+          "ref": "stats",
+          "basename": "stats",
+          "matches": []
+        },
+        {
+          "ref": "achievements",
+          "basename": "achievements",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-18-generador-documentos-legales.md",
+      "title": "18. Generador de Documentos Legales (estado 2025-10-07)",
+      "implementedLines": [
+        "formulario `DocumentosLegales.jsx` (consentimiento de uso de imagen) que genera un PDF local con jsPDF."
+      ],
+      "pendingLines": [
+        "repositorio completo de plantillas, firma electrónica, almacenamiento backend y automatización IA."
+      ],
+      "roadmapSection": "",
+      "checklistSection": "- Verificar compatibilidad jsPDF en navegadores soportados.\n- Proveer plantillas actualizadas en cuanto haya repositorio legal.\n- Revisar textos y traducciones.",
+      "e2eSection": "- No hay pruebas end-to-end específicas implementadas para este flujo.",
+      "e2eChecks": [],
+      "implChecks": [
+        {
+          "ref": "DocumentosLegales.jsx",
+          "basename": "DocumentosLegales.jsx",
+          "matches": [
+            "src\\pages\\DocumentosLegales.jsx",
+            "src\\pages\\protocolo\\DocumentosLegales.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-19-diseno-invitaciones.md",
+      "title": "19. Diseno de Invitaciones (estado 2025-10-07)",
+      "implementedLines": [
+        "`InvitationDesigner.jsx`, `MisDisenos.jsx`, `VectorEditor.jsx`, `MenuCatering.jsx`, `PapelesNombres.jsx`, utils `pdfExport.js` y biblioteca de plantillas."
+      ],
+      "pendingLines": [
+        "tutoriales guiados, colaboracion/feedback, integracion con proveedores de impresion y generacion IA."
+      ],
+      "roadmapSection": "- Editor colaborativo con comentarios y versionado.\n- Generacion IA de propuestas a partir del perfil de la boda.\n- Integracion con proveedores (impresion/envio) y tracking.\n- Biblioteca de tutoriales y guias de estilo interactivas.\n- Marketplace de plantillas premium.",
+      "checklistSection": "- Reglas Firestore para `designs`, `designActivity`, `designTemplates`, `designErrors`.\n- Configurar limites de upload y validaciones en Cloud Storage.\n- Revisar fuentes licenciadas y paquetes de iconos.\n- Actualizar portada/template default por temporada.",
+      "e2eSection": "- `cypress/e2e/invitaciones_rsvp.cy.js`: recorre la creación y envío de invitaciones digitales vinculadas a RSVP.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/invitaciones_rsvp.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "InvitationDesigner.jsx",
+          "basename": "InvitationDesigner.jsx",
+          "matches": [
+            "src\\pages\\InvitationDesigner.jsx"
+          ]
+        },
+        {
+          "ref": "MisDisenos.jsx",
+          "basename": "MisDisenos.jsx",
+          "matches": [
+            "src\\pages\\disenos\\MisDisenos.jsx"
+          ]
+        },
+        {
+          "ref": "VectorEditor.jsx",
+          "basename": "VectorEditor.jsx",
+          "matches": [
+            "src\\pages\\disenos\\VectorEditor.jsx",
+            "src\\components\\VectorEditor.jsx"
+          ]
+        },
+        {
+          "ref": "MenuCatering.jsx",
+          "basename": "MenuCatering.jsx",
+          "matches": [
+            "src\\pages\\disenos\\MenuCatering.jsx"
+          ]
+        },
+        {
+          "ref": "PapelesNombres.jsx",
+          "basename": "PapelesNombres.jsx",
+          "matches": [
+            "src\\pages\\disenos\\PapelesNombres.jsx"
+          ]
+        },
+        {
+          "ref": "pdfExport.js",
+          "basename": "pdfExport.js",
+          "matches": [
+            "src\\utils\\pdfExport.js"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-2-creacion-boda-ia.md",
+      "title": "2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08",
+      "implementedLines": [
+        "`src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios `createWedding` y `seedDefaultTasksForWedding`, catálogo `src/config/eventStyles.js`."
+      ],
+      "pendingLines": [
+        "habilitar opt-in a planner desde Perfil, telemetría completa del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners."
+      ],
+      "roadmapSection": "- Implementar opt-in a planner/assistant desde Perfil con flujo dedicado.\n- Refactorizar rutas y componentes (`/bodas` → `/eventos`) cuando exista soporte multi-evento en toda la app.\n- Instrumentar telemetría y dashboards de adopción segmentados por `eventType`.\n- Integrar asistencia IA contextual con prompts específicos por tipo de evento y fallback offline.\n- Habilitar CTA «Crear nuevo evento» tras validar multi-evento en producción.\n- ✅ 2025-10-08: Wizard multi-evento, servicios y pantallas asociados actualizados para `eventType/eventProfile`.\n- ✅ 2025-10-08: Catálogo de estilos centralizado y copy adaptable (`Boda`/`Evento`).",
+      "checklistSection": "- Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.\n- Script `scripts/migrate-event-profile.js` para etiquetar eventos legacy con `eventType: 'boda'` y generar `eventProfileSummary` básico antes del switch.\n- Revisión de copy/traducciones (`Crear boda`, `Crear evento`) y estilos centralizados (`config/eventStyles.js`).\n- Telemetría: preparar dashboard funnel + ratio adopción Paso 2.\n- QA: actualizar suites Cypress/E2E con los casos anteriores.",
+      "e2eSection": "- `cypress/e2e/onboarding/create-event-flow.cy.js`: recorre ambos pasos del wizard multi-evento, valida persistencia de datos entre pasos y el copy condicional según tipo de evento.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/onboarding/create-event-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "src/pages/CreateWeddingAI.jsx",
+          "basename": "CreateWeddingAI.jsx",
+          "matches": [
+            "src\\pages\\CreateWeddingAI.jsx"
+          ]
+        },
+        {
+          "ref": "src/pages/AyudaCeremonia.jsx",
+          "basename": "AyudaCeremonia.jsx",
+          "matches": [
+            "src\\pages\\AyudaCeremonia.jsx",
+            "src\\pages\\protocolo\\AyudaCeremonia.jsx"
+          ]
+        },
+        {
+          "ref": "src/pages/BodaDetalle.jsx",
+          "basename": "BodaDetalle.jsx",
+          "matches": [
+            "src\\pages\\BodaDetalle.jsx"
+          ]
+        },
+        {
+          "ref": "src/context/WeddingContext.jsx",
+          "basename": "WeddingContext.jsx",
+          "matches": [
+            "src\\context\\WeddingContext.jsx"
+          ]
+        },
+        {
+          "ref": "createWedding",
+          "basename": "createWedding",
+          "matches": []
+        },
+        {
+          "ref": "seedDefaultTasksForWedding",
+          "basename": "seedDefaultTasksForWedding",
+          "matches": []
+        },
+        {
+          "ref": "src/config/eventStyles.js",
+          "basename": "eventStyles.js",
+          "matches": [
+            "src\\config\\eventStyles.js"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-20-email-inbox.md",
+      "title": "20. Buzon Interno y Estadisticas (estado 2025-10-07)",
+      "implementedLines": [
+        "`Buzon_fixed_complete.jsx` (legacy), `EmailInbox.jsx`, `EmailStatistics.jsx`, componentes `UnifiedInbox/InboxContainer.jsx`, `EmailComposer.jsx`, `EmailSetupForm.jsx`."
+      ],
+      "pendingLines": [
+        "consolidar experiencia unica, documentar APIs backend, onboarding centralizado y telemetry completa."
+      ],
+      "roadmapSection": "- Unificar experiencia (retirar `Buzon_fixed_complete` una vez completado).\n- Automatizaciones (drip campaigns, journeys multicanal) y IA de respuesta.\n- Estadisticas avanzadas con comparativas por segmento.\n- Plantillas compartidas y biblioteca colaborativa.\n- Integracion con WhatsApp/Push para comunicaciones omnicanal.",
+      "checklistSection": "- Reglas Firestore para `emails`, `emailSettings`, `emailTemplates`.\n- Configurar webhooks en Mailgun/SMTP y credenciales seguras.\n- Revisar limites y politicas anti-spam (DKIM, SPF, DMARC).\n- Plan de migracion desde buzón legacy con backups.",
+      "e2eSection": "- `cypress/e2e/email_inbox_smoke.cy.js`: smoke general de bandeja, sincronización y navegación.\n- `cypress/e2e/email/read-email.cy.js y cypress/e2e/email/send-email.cy.js`: cubren lectura, respuestas y reenvío.\n- `cypress/e2e/email/folders-management.cy.js y cypress/e2e/email/tags-filters.cy.js`: validan organización avanzada, carpetas y filtros.\n- `cypress/e2e/compose_quick_replies.cy.js y cypress/e2e/email/smart-composer.cy.js`: prueban asistentes y respuestas rápidas integrados en la bandeja.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/email_inbox_smoke.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/read-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/send-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/folders-management.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/tags-filters.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/compose_quick_replies.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/smart-composer.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Buzon_fixed_complete.jsx",
+          "basename": "Buzon_fixed_complete.jsx",
+          "matches": [
+            "src\\pages\\Buzon_fixed_complete.jsx"
+          ]
+        },
+        {
+          "ref": "EmailInbox.jsx",
+          "basename": "EmailInbox.jsx",
+          "matches": [
+            "src\\pages\\user\\EmailInbox.jsx",
+            "src\\components\\email\\EmailInbox.jsx"
+          ]
+        },
+        {
+          "ref": "EmailStatistics.jsx",
+          "basename": "EmailStatistics.jsx",
+          "matches": [
+            "src\\pages\\user\\EmailStatistics.jsx"
+          ]
+        },
+        {
+          "ref": "UnifiedInbox/InboxContainer.jsx",
+          "basename": "InboxContainer.jsx",
+          "matches": [
+            "src\\components\\email\\UnifiedInbox\\InboxContainer.jsx"
+          ]
+        },
+        {
+          "ref": "EmailComposer.jsx",
+          "basename": "EmailComposer.jsx",
+          "matches": [
+            "src\\components\\email\\EmailComposer.jsx"
+          ]
+        },
+        {
+          "ref": "EmailSetupForm.jsx",
+          "basename": "EmailSetupForm.jsx",
+          "matches": [
+            "src\\components\\email\\EmailSetupForm.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-21-sitio-publico.md",
+      "title": "21. Sitio Publico (estado 2025-10-07)",
+      "implementedLines": [
+        "`WeddingSite.jsx` (ruta `/w/:uid`), `PublicWedding.jsx`, articulos auxiliares (`SeatingPlanPost.jsx`, `MomentosEspeciales.jsx`), integracion con `websiteService` y contenido Firestore."
+      ],
+      "pendingLines": [
+        "personalizacion avanzada desde panel, dominios personalizados, SEO/analytics y medicion de conversion."
+      ],
+      "roadmapSection": "- Editor dedicado en panel con vista previa y control de secciones.\n- Dominios personalizados y configuracion automatica de SSL.\n- Analytics en tiempo real y panel de conversion.\n- Integracion con comentarios/libro de visitas.\n- Experiencia para bodas multiples (selector en header publico).",
+      "checklistSection": "- Reglas Firestore para `publicSites`, `publicSiteAnalytics`.\n- Configurar CDN/hosting estatico y invalidacion tras cada publicacion.\n- Revisar cumplimiento legal (cookies, privacidad) y agregar banner si aplica.\n- Preparar redireccion 404/410 para bodas archivadas.",
+      "e2eSection": "- `cypress/e2e/inspiration/inspiration-flow.cy.js y cypress/e2e/inspiration_smoke.cy.js`: validan la navegación pública de inspiración y bloques reutilizados en el sitio.\n- `cypress/e2e/news/news-flow.cy.js`: cubre la sección de noticias/blog asociada al sitio público.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/inspiration/inspiration-flow.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/inspiration_smoke.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/news/news-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "WeddingSite.jsx",
+          "basename": "WeddingSite.jsx",
+          "matches": [
+            "src\\pages\\WeddingSite.jsx"
+          ]
+        },
+        {
+          "ref": "/w/:uid",
+          "basename": ":uid",
+          "matches": []
+        },
+        {
+          "ref": "PublicWedding.jsx",
+          "basename": "PublicWedding.jsx",
+          "matches": [
+            "src\\pages\\PublicWedding.jsx"
+          ]
+        },
+        {
+          "ref": "SeatingPlanPost.jsx",
+          "basename": "SeatingPlanPost.jsx",
+          "matches": [
+            "src\\pages\\disenos\\SeatingPlanPost.jsx"
+          ]
+        },
+        {
+          "ref": "MomentosEspeciales.jsx",
+          "basename": "MomentosEspeciales.jsx",
+          "matches": [
+            "src\\pages\\protocolo\\MomentosEspeciales.jsx"
+          ]
+        },
+        {
+          "ref": "websiteService",
+          "basename": "websiteService",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-22-dashboard-navegacion.md",
+      "title": "22. Navegacion y Panel General (estado 2025-10-07)",
+      "implementedLines": [
+        "`Home.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`)."
+      ],
+      "pendingLines": [
+        "unificar dashboard con metricas en vivo, proteger herramientas internas y agregar actividad reciente + estado de sincronizacion."
+      ],
+      "roadmapSection": "- Dashboard modular con edicion drag-and-drop y biblioteca de widgets.\n- Activity feed en tiempo real con filtros.\n- Buscador global y comandos rapidos.\n- Integracion con analytics para recomendaciones personalizadas.\n- Panel de salud del sistema (sincronizacion, errores recientes).",
+      "checklistSection": "- Reglas Firestore para `dashboardConfig`, `activityFeed` (cuando se publique).\n- Asegurar que herramientas dev esten desactivadas en produccion (`VITE_ENV` check).\n- Revisar copy, links de soporte y recursos externos.\n- Probar skeleton/loading states con datos grandes.",
+      "e2eSection": "- No hay pruebas end-to-end específicas implementadas para este flujo.",
+      "e2eChecks": [],
+      "implChecks": [
+        {
+          "ref": "Home.jsx",
+          "basename": "Home.jsx",
+          "matches": [
+            "src\\pages\\Home.jsx"
+          ]
+        },
+        {
+          "ref": "Dashboard.jsx",
+          "basename": "Dashboard.jsx",
+          "matches": [
+            "src\\pages\\Dashboard.jsx",
+            "src\\components\\dashboard\\Dashboard.jsx"
+          ]
+        },
+        {
+          "ref": "More.jsx",
+          "basename": "More.jsx",
+          "matches": [
+            "src\\pages\\More.jsx"
+          ]
+        },
+        {
+          "ref": "Perfil.jsx",
+          "basename": "Perfil.jsx",
+          "matches": [
+            "src\\pages\\Perfil.jsx"
+          ]
+        },
+        {
+          "ref": "WidgetContent.jsx",
+          "basename": "WidgetContent.jsx",
+          "matches": [
+            "src\\components\\dashboard\\WidgetContent.jsx"
+          ]
+        },
+        {
+          "ref": "DevEnsureFinance.jsx",
+          "basename": "DevEnsureFinance.jsx",
+          "matches": [
+            "src\\pages\\DevEnsureFinance.jsx"
+          ]
+        },
+        {
+          "ref": "DevSeedGuests.jsx",
+          "basename": "DevSeedGuests.jsx",
+          "matches": [
+            "src\\pages\\DevSeedGuests.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-23-metricas-proyecto.md",
+      "title": "23. Métricas del Sistema (estado 2025-10-07)",
+      "implementedLines": [],
+      "pendingLines": [
+        "dashboard unificado multi-módulo, workers de agregación (`metricAggregatorWorker`/`insightsBackfillTask`) y rutas `/analytics/*`."
+      ],
+      "roadmapSection": "",
+      "checklistSection": "- Definir APIs reales (`/api/email-metrics`, `/api/project-metrics`) antes de exposición en UI.\n- Proteger la ruta futura con permisos (owner/planner/admin).\n- Validar visualizaciones con datos reales y asegurar privacidad.",
+      "e2eSection": "- `cypress/e2e/performance/email-performance.cy.js`: verifica la generación de métricas de comunicación y paneles relacionados.\n- `cypress/e2e/finance/finance-analytics.cy.js`: cubre el tablero analítico compartido que alimenta indicadores de proyecto.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/performance/email-performance.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-analytics.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "pendiente"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-4-invitados-operativa.md",
+      "title": "4. Invitados – Plan de Asientos y Biblioteca de Contenido (estado 2025-10-08)",
+      "implementedLines": [],
+      "pendingLines": [
+        ""
+      ],
+      "roadmapSection": "- Panel lateral inteligente con recomendaciones autónomas de seating (IA) y asistentes de conflictos.\n- Automatización de contenidos (Ideas/Blog) con analítica avanzada y workflows colaborativos.\n- Sincronización documental backend (almacenamiento seguro, versiones, firmas).\n- Integración con proveedores/venues (ingesta automática de planos y configuraciones).",
+      "checklistSection": "- Reglas Firestore: `seating`, `ideas`, `blog` (roles y límites).\n- Seeds y límites (mesas, invitados) validados para rendimiento.\n- Clave API externa para inspiración (si se usa proveedor third-party).\n- Validar compresión de exportaciones y legalidad de documentos.",
+      "e2eSection": "- `cypress/e2e/seating/seating-content-flow.cy.js`: verifica alternancia entre pestañas de ceremonia/banquete y la navegación por inspiración, ideas, blog y documentos legales asociados al flujo.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/seating/seating-content-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "pendiente"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-5-proveedores-ia.md",
+      "title": "5. Proveedores con IA (estado 2025-10-07)",
+      "implementedLines": [
+        "`GestionProveedores.jsx`, `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `SupplierKanban.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, `AI` modals (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`."
+      ],
+      "pendingLines": [
+        "scoring inteligente consolidado, portal proveedor completamente funcional, automatizacin de RFQ multi-proveedor y reportes comparativos."
+      ],
+      "roadmapSection": "- Scoring IA consolidado con mtricas histricas por servicio.\n- Portal proveedor completo con autenticacin, feedback bidireccional y vista del estado por servicio contratado.\n- Automatizacin multi-proveedor (RFQ masivo, recordatorios automticos) extendida a lneas de servicio combinadas.\n- Reportes comparativos y analtica de mercado (incluyendo cobertura de servicios pendientes).\n- Integracin con marketplaces externos y recomendaciones en sitio pblico.",
+      "checklistSection": "- Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.\n- Reglas Firestore para `suppliers`, subcoleccin `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.\n- Validar lmites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.\n- QA del tablero y filtros (performance > 500 proveedores).",
+      "e2eSection": "- `cypress/e2e/proveedores_flow.cy.js`: cubre alta y curacin de proveedores con IA asistida y validaciones de bsqueda.\n- `cypress/e2e/proveedores_compare.cy.js`: valida la comparativa de proveedores y la generacin de shortlist.\n- `cypress/e2e/proveedores_smoke.cy.js`: smoke general del mdulo para garantizar accesos y filtros bsicos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/proveedores_flow.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/proveedores_compare.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/proveedores_smoke.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "GestionProveedores.jsx",
+          "basename": "GestionProveedores.jsx",
+          "matches": [
+            "src\\pages\\GestionProveedores.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorList.jsx",
+          "basename": "ProveedorList.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorList.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorCard.jsx",
+          "basename": "ProveedorCard.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorCard.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorDetail.jsx",
+          "basename": "ProveedorDetail.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorDetail.jsx"
+          ]
+        },
+        {
+          "ref": "SupplierKanban.jsx",
+          "basename": "SupplierKanban.jsx",
+          "matches": [
+            "src\\components\\proveedores\\SupplierKanban.jsx"
+          ]
+        },
+        {
+          "ref": "GroupAllocationModal.jsx",
+          "basename": "GroupAllocationModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupAllocationModal.jsx"
+          ]
+        },
+        {
+          "ref": "GroupCreateModal.jsx",
+          "basename": "GroupCreateModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupCreateModal.jsx"
+          ]
+        },
+        {
+          "ref": "GroupSuggestions.jsx",
+          "basename": "GroupSuggestions.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupSuggestions.jsx"
+          ]
+        },
+        {
+          "ref": "DuplicateDetectorModal.jsx",
+          "basename": "DuplicateDetectorModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\DuplicateDetectorModal.jsx"
+          ]
+        },
+        {
+          "ref": "CompareSelectedModal.jsx",
+          "basename": "CompareSelectedModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\CompareSelectedModal.jsx"
+          ]
+        },
+        {
+          "ref": "ProviderSearchDrawer.jsx",
+          "basename": "ProviderSearchDrawer.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProviderSearchDrawer.jsx"
+          ]
+        },
+        {
+          "ref": "AI",
+          "basename": "AI",
+          "matches": []
+        },
+        {
+          "ref": "AIBusquedaModal.jsx",
+          "basename": "AIBusquedaModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\AIBusquedaModal.jsx"
+          ]
+        },
+        {
+          "ref": "AISearchModal.jsx",
+          "basename": "AISearchModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ai\\AISearchModal.jsx"
+          ]
+        },
+        {
+          "ref": "AIEmailModal.jsx",
+          "basename": "AIEmailModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ai\\AIEmailModal.jsx"
+          ]
+        },
+        {
+          "ref": "aiSuppliersService.js",
+          "basename": "aiSuppliersService.js",
+          "matches": [
+            "src\\services\\aiSuppliersService.js"
+          ]
+        },
+        {
+          "ref": "supplierEventBridge",
+          "basename": "supplierEventBridge",
+          "matches": []
+        },
+        {
+          "ref": "EmailTrackingList.jsx",
+          "basename": "EmailTrackingList.jsx",
+          "matches": [
+            "src\\components\\proveedores\\tracking\\EmailTrackingList.jsx"
+          ]
+        },
+        {
+          "ref": "ProviderEmailModal.jsx",
+          "basename": "ProviderEmailModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProviderEmailModal.jsx"
+          ]
+        },
+        {
+          "ref": "RFQModal.jsx",
+          "basename": "RFQModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\RFQModal.jsx"
+          ]
+        },
+        {
+          "ref": "ReservationModal.jsx",
+          "basename": "ReservationModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ReservationModal.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-5-timeline-tareas.md",
+      "title": "5b. Timeline y Tareas (estado 2025-10-07)",
+      "implementedLines": [
+        "`Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `SmartChecklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, utilidades `taskAutomations`, `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`."
+      ],
+      "pendingLines": [
+        "Motor IA que personaliza un plan de tareas padre/subtareas a partir de una plantilla maestra y matriz de responsabilidades."
+      ],
+      "roadmapSection": "- IA que genere plan de tareas padre/subtareas personalizado: mantener una plantilla maestra (`src/data/tasks/masterTimelineTemplate.json`) con todas las tareas padre y subtareas posibles (curada manualmente y alimentada de forma orgánica cuando otras bodas añaden bloques útiles), ingestar datos de la boda (tipo, tamaño, presupuesto, estilo, lead time) y usar un motor híbrido plantillas versionadas + LLM para descartar/adaptar nodos irrelevantes, proponer dependencias, responsables sugeridos y ventanas temporales; entregar el resultado en modo borrador con explicación por bloque y capturar feedback para mejorar los prompts, pesos y la plantilla base.\n- Matriz RACI y asignaciones múltiples con permisos.\n- Auto-priorización según proximidad y criticidad.\n- Panel de riesgos con predicción de retrasos.",
+      "checklistSection": "- Reglas Firestore actualizadas (`tasks`, `checklist`, `taskAutomations`).\n- Tokens de calendario protegidos (Cloud Functions) y rotación periódica.\n- Configurar servicios de notificación (`MAILGUN_*`, `PUSH_PROVIDER`).\n- Validar performance con >500 tareas y modo Gantt.",
+      "e2eSection": "- `cypress/e2e/tasks/all_subtasks_modal.cy.js`: recorre creación de bloques, subtareas y actualización de estados dentro del timeline.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/tasks/all_subtasks_modal.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Tasks.jsx",
+          "basename": "Tasks.jsx",
+          "matches": [
+            "src\\pages\\Tasks.jsx"
+          ]
+        },
+        {
+          "ref": "TaskSidePanel.jsx",
+          "basename": "TaskSidePanel.jsx",
+          "matches": [
+            "src\\components\\tasks\\TaskSidePanel.jsx"
+          ]
+        },
+        {
+          "ref": "Checklist.jsx",
+          "basename": "Checklist.jsx",
+          "matches": [
+            "src\\pages\\Checklist.jsx",
+            "src\\pages\\protocolo\\Checklist.jsx"
+          ]
+        },
+        {
+          "ref": "SmartChecklist.jsx",
+          "basename": "SmartChecklist.jsx",
+          "matches": []
+        },
+        {
+          "ref": "TaskList.jsx",
+          "basename": "TaskList.jsx",
+          "matches": [
+            "src\\components\\tasks\\TaskList.jsx"
+          ]
+        },
+        {
+          "ref": "EventsCalendar.jsx",
+          "basename": "EventsCalendar.jsx",
+          "matches": [
+            "src\\components\\tasks\\EventsCalendar.jsx"
+          ]
+        },
+        {
+          "ref": "LongTermTasksGantt.jsx",
+          "basename": "LongTermTasksGantt.jsx",
+          "matches": [
+            "src\\components\\tasks\\LongTermTasksGantt.jsx"
+          ]
+        },
+        {
+          "ref": "CalendarSync.jsx",
+          "basename": "CalendarSync.jsx",
+          "matches": [
+            "src\\components\\tasks\\CalendarSync.jsx"
+          ]
+        },
+        {
+          "ref": "TaskEventBridge.jsx",
+          "basename": "TaskEventBridge.jsx",
+          "matches": [
+            "src\\components\\tasks\\TaskEventBridge.jsx"
+          ]
+        },
+        {
+          "ref": "TaskNotificationWatcher.jsx",
+          "basename": "TaskNotificationWatcher.jsx",
+          "matches": [
+            "src\\components\\tasks\\TaskNotificationWatcher.jsx"
+          ]
+        },
+        {
+          "ref": "useWeddingTasksHierarchy.js",
+          "basename": "useWeddingTasksHierarchy.js",
+          "matches": [
+            "src\\hooks\\useWeddingTasksHierarchy.js"
+          ]
+        },
+        {
+          "ref": "taskAutomations",
+          "basename": "taskAutomations",
+          "matches": []
+        },
+        {
+          "ref": "CalendarComponents.jsx",
+          "basename": "CalendarComponents.jsx",
+          "matches": [
+            "src\\components\\tasks\\CalendarComponents.jsx"
+          ]
+        },
+        {
+          "ref": "src/data/tasks/masterTimelineTemplate.json",
+          "basename": "masterTimelineTemplate.json",
+          "matches": [
+            "src\\data\\tasks\\masterTimelineTemplate.json"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-6-presupuesto.md",
+      "title": "6. Gestion de Presupuesto (estado 2025-10-08)",
+      "implementedLines": [
+        "`src/pages/Finance.jsx`, componentes `src/components/finance/BudgetManager.jsx`, `FinanceOverview.jsx`, `FinanceCharts.jsx`, `PaymentSuggestions.jsx`, `TransactionManager.jsx`, hooks `useFinance`, `useSupplierBudgets`, servicios `EmailInsightsService`, `bankService`, `SyncService`."
+      ],
+      "pendingLines": [
+        "importación CSV/Excel con mapeo, analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas."
+      ],
+      "roadmapSection": "- Integracion Open Banking: UI de autenticación, refresco de tokens, categorización inteligente, reconciliación automática.\n- Importación CSV/Excel con preview y mapeo de columnas (validaciones server-side).\n- Reportes descargables (PDF/Excel) listos para proveedores y contabilidad.\n- Gestion completa de aportaciones (recordatorios, agradecimientos, panel compartido).\n- Prediccion de gasto y recomendaciones automaticas basadas en proyección.\n- Automatizacion de pagos programados y conciliacion con contratos.\n- Adjuntos en `TransactionForm` aceptan `image/*, application/pdf, .doc, .docx, .xls, .xlsx`. Otros tipos se bloquean en la carga de archivos.",
+      "checklistSection": "- Reglas Firestore actualizadas para `finance/main`, subcolección `transactions` y almacenamiento de adjuntos (`finance/` en Storage).\n- Revisar limites de seguridad en Cloud Functions de exportacion y notificaciones.\n- Configurar variables `VITE_ENABLE_FINANCE_ALERTS`, `MAILGUN_*`, `VITE_BANK_API_BASE_URL`, `VITE_BANK_API_KEY`, `VITE_EMAIL_INSIGHTS_*`.\n- Asegurar migracion de bodas antiguas para poblar `finance/main` con nuevas llaves (`alertThresholds`, `contributions`) y mover adjuntos a rutas `finance/`.\n- Verificar permisos de storage y tokens para Email Insights / Open Banking, y limpiar colas pendientes en `SyncService` antes de despliegue.",
+      "e2eSection": "- `cypress/e2e/finance/finance-flow.cy.js` y `cypress/e2e/finance/finance-flow-full.cy.js`: validan creación del presupuesto base, contribuciones y navegación entre pestañas financieras.\n- `cypress/e2e/finance/finance-budget.cy.js`, `cypress/e2e/finance/finance-transactions.cy.js`, `cypress/e2e/finance/finance-contributions.cy.js`, `cypress/e2e/finance/finance-analytics.cy.js` y `cypress/e2e/budget_flow.cy.js`: cubren edición de categorías, registro de movimientos y paneles analíticos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/finance/finance-flow.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-flow-full.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-budget.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-transactions.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-contributions.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/finance/finance-analytics.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/budget_flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "src/pages/Finance.jsx",
+          "basename": "Finance.jsx",
+          "matches": [
+            "src\\pages\\Finance.jsx"
+          ]
+        },
+        {
+          "ref": "src/components/finance/BudgetManager.jsx",
+          "basename": "BudgetManager.jsx",
+          "matches": [
+            "src\\components\\finance\\BudgetManager.jsx"
+          ]
+        },
+        {
+          "ref": "FinanceOverview.jsx",
+          "basename": "FinanceOverview.jsx",
+          "matches": [
+            "src\\components\\finance\\FinanceOverview.jsx"
+          ]
+        },
+        {
+          "ref": "FinanceCharts.jsx",
+          "basename": "FinanceCharts.jsx",
+          "matches": [
+            "src\\components\\finance\\FinanceCharts.jsx"
+          ]
+        },
+        {
+          "ref": "PaymentSuggestions.jsx",
+          "basename": "PaymentSuggestions.jsx",
+          "matches": [
+            "src\\components\\finance\\PaymentSuggestions.jsx"
+          ]
+        },
+        {
+          "ref": "TransactionManager.jsx",
+          "basename": "TransactionManager.jsx",
+          "matches": [
+            "src\\components\\finance\\TransactionManager.jsx"
+          ]
+        },
+        {
+          "ref": "useFinance",
+          "basename": "useFinance",
+          "matches": []
+        },
+        {
+          "ref": "useSupplierBudgets",
+          "basename": "useSupplierBudgets",
+          "matches": []
+        },
+        {
+          "ref": "EmailInsightsService",
+          "basename": "EmailInsightsService",
+          "matches": []
+        },
+        {
+          "ref": "bankService",
+          "basename": "bankService",
+          "matches": []
+        },
+        {
+          "ref": "SyncService",
+          "basename": "SyncService",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-7-comunicacion-emails.md",
+      "title": "7. Comunicaciones y Email (estado 2025-10-08)",
+      "implementedLines": [
+        "`components/email/UnifiedInbox/InboxContainer.jsx`, `components/email/UnifiedInbox/EmailDetail.jsx`, `components/email/UnifiedInbox/EmailList.jsx`, `components/email/EmailComposer.jsx`, `components/email/SmartEmailComposer.jsx`, `pages/EmailSetup.jsx`, `components/email/EmailSettings.jsx`, `pages/EmailTemplates.jsx`, `pages/user/EmailStatistics.jsx`, `components/email/EmailComments.jsx`, `components/email/EmailFeedbackCollector.jsx`, `components/email/CalendarIntegration.jsx`, `components/email/MailgunTester.jsx`, servicios `services/emailService.js`, `services/emailAutomationService.js`, `services/EmailRecommendationService.js`, `services/emailTemplatesService.js`, `services/tagService.js`, `services/folderService.js`, hooks `hooks/useEmailMonitoring.js`, `hooks/useEmailUsername.jsx`. El buzón legacy (`pages/Buzon_fixed_complete.jsx`) sigue en el repositorio pero ya no está ruteado."
+      ],
+      "pendingLines": [
+        "cableado de búsqueda/ordenación en `UnifiedInbox/EmailList.jsx`, integración de carpetas/etiquetas personalizadas en la nueva bandeja, implementación real del `callClassificationAPI` y del procesador de envíos programados (`processScheduledEmails`), onboarding con validaciones DKIM/SPF reales, persistencia en backend de la configuración de auto-respuestas, y migración definitiva del buzón legacy + actualización de pruebas E2E/VTU a la nueva UI."
+      ],
+      "roadmapSection": "1. **Automatización y backend**\n   - Implementar `callClassificationAPI` (o sustituirlo) y gestionar gracefully la ausencia del endpoint.\n   - Mover la cola de envíos programados a backend + job recurrente; exponer estado/errores al usuario.\n   - Persistir auto-respuestas y clasificación en Firestore/REST (no sólo localStorage).\n2. **UX / funcionalidad**\n   - Integrar carpetas y etiquetas personalizadas en la nueva bandeja (sidebar, filtros, drag & drop).\n   - Resolver buscador/sort duplicado en `UnifiedInbox/EmailList.jsx` y alinear data-testids con Cypress.\n   - Añadir toggle o ruta para acceder al buzón legacy sólo en modo soporte, o removerlo tras migración.\n   - Completar experiencia de onboarding: validación DKIM/SPF, envío de correo de prueba, integración con `MailgunTester`.\n3. **Analítica y monitoreo**\n   - Registrar eventos de entrega/aperturas reales (Mailgun webhooks) y mostrar alertas en `EmailInsights`/`EmailStats`.\n   - Integrar métricas con dashboards oficiales (Grafana/BigQuery) y alertas para rebotes.\n4. **Integraciones cruzadas**\n   - Sincronizar preferencias con módulo de notificaciones (Flujo 12) y con workflows IA globales (Flujo 16).\n   - Implementar journeys multicanal (email + push + WhatsApp) y timeline conversacional centralizado.\n5. **Testing**\n   - Actualizar suites Cypress/Vitest al nuevo inbox, añadir cobertura para comentarios, calendar, feedback y envíos programados.\n   - Automatizar pruebas de alias / onboarding (`EmailSetup`) y Mailgun fallback.\n\nMantener esta lista viva antes de iniciar nuevas implementaciones en Flujo 7.",
+      "checklistSection": "- **Variables de entorno front/back:**\n  - `VITE_BACKEND_BASE_URL` (si hay API Gateway), `VITE_ENABLE_EMAIL_ANALYZE` (`1` para permitir `/api/email-insights/analyze`), `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_API_KEY`, `VITE_OPENAI_PROJECT_ID` para funciones IA.\n  - `VITE_MAILGUN_DOMAIN` y `VITE_FIREBASE_FUNCTIONS_URL` (`mailgunService` / `MailgunTester`).\n  - `VITE_ENABLE_AI_SUPPLIERS` para búsqueda IA de proveedores.\n- **Firestore/Cloud Functions:**\n  - Colecciones: `emailUsernames`, `users`, `emailMetrics` (+ subcolección `daily`), `users/{uid}/mails` (si se usa fallback), `mails` (global).\n  - Reglas de seguridad que permitan leer/escribir `emailUsernames`, `emailMetrics`, `users/{uid}/mails` y evitar filtraciones cross-user.\n  - Función (cron) o job que invoque `processScheduledEmails(sendMail)` periódicamente en el backend para habilitar programaciones.\n  - Webhooks Mailgun (inbound/outbound) si se habilita backend.\n- **Frontend:** exponer data-testids alineados con Cypress, asegurar que `UnifiedInbox` reemplaza completamente al legacy y limpiar scripts/estilos duplicados antes de release.",
+      "e2eSection": "- `cypress/e2e/email/send-email.cy.js y cypress/e2e/email/read-email.cy.js`: comprueban envío, recepción y lectura de correos desde la bandeja unificada.\n- `cypress/e2e/email/folders-management.cy.js y cypress/e2e/email/tags-filters.cy.js`: verifican organización por carpetas, etiquetas y filtros avanzados.\n- `cypress/e2e/email/smart-composer.cy.js, cypress/e2e/email/ai-provider-email.cy.js y cypress/e2e/compose_quick_replies.cy.js`: prueban generación asistida por IA y respuestas rápidas.\n- `cypress/e2e/email_inbox_smoke.cy.js`: smoke integral de la bandeja y sincronización en tiempo real.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/email/send-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/read-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/folders-management.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/tags-filters.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/smart-composer.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/ai-provider-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/compose_quick_replies.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email_inbox_smoke.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "components/email/UnifiedInbox/InboxContainer.jsx",
+          "basename": "InboxContainer.jsx",
+          "matches": [
+            "src\\components\\email\\UnifiedInbox\\InboxContainer.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/UnifiedInbox/EmailDetail.jsx",
+          "basename": "EmailDetail.jsx",
+          "matches": [
+            "src\\components\\email\\EmailDetail.jsx",
+            "src\\components\\email\\UnifiedInbox\\EmailDetail.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/UnifiedInbox/EmailList.jsx",
+          "basename": "EmailList.jsx",
+          "matches": [
+            "src\\components\\email\\EmailList.jsx",
+            "src\\components\\email\\UnifiedInbox\\EmailList.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/EmailComposer.jsx",
+          "basename": "EmailComposer.jsx",
+          "matches": [
+            "src\\components\\email\\EmailComposer.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/SmartEmailComposer.jsx",
+          "basename": "SmartEmailComposer.jsx",
+          "matches": [
+            "src\\components\\email\\SmartEmailComposer.jsx"
+          ]
+        },
+        {
+          "ref": "pages/EmailSetup.jsx",
+          "basename": "EmailSetup.jsx",
+          "matches": [
+            "src\\pages\\EmailSetup.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/EmailSettings.jsx",
+          "basename": "EmailSettings.jsx",
+          "matches": [
+            "src\\components\\email\\EmailSettings.jsx"
+          ]
+        },
+        {
+          "ref": "pages/EmailTemplates.jsx",
+          "basename": "EmailTemplates.jsx",
+          "matches": [
+            "src\\pages\\EmailTemplates.jsx"
+          ]
+        },
+        {
+          "ref": "pages/user/EmailStatistics.jsx",
+          "basename": "EmailStatistics.jsx",
+          "matches": [
+            "src\\pages\\user\\EmailStatistics.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/EmailComments.jsx",
+          "basename": "EmailComments.jsx",
+          "matches": [
+            "src\\components\\email\\EmailComments.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/EmailFeedbackCollector.jsx",
+          "basename": "EmailFeedbackCollector.jsx",
+          "matches": [
+            "src\\components\\email\\EmailFeedbackCollector.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/CalendarIntegration.jsx",
+          "basename": "CalendarIntegration.jsx",
+          "matches": [
+            "src\\components\\email\\CalendarIntegration.jsx"
+          ]
+        },
+        {
+          "ref": "components/email/MailgunTester.jsx",
+          "basename": "MailgunTester.jsx",
+          "matches": [
+            "src\\components\\email\\MailgunTester.jsx"
+          ]
+        },
+        {
+          "ref": "services/emailService.js",
+          "basename": "emailService.js",
+          "matches": [
+            "src\\services\\emailService.js"
+          ]
+        },
+        {
+          "ref": "services/emailAutomationService.js",
+          "basename": "emailAutomationService.js",
+          "matches": [
+            "src\\services\\emailAutomationService.js"
+          ]
+        },
+        {
+          "ref": "services/EmailRecommendationService.js",
+          "basename": "EmailRecommendationService.js",
+          "matches": [
+            "src\\services\\EmailRecommendationService.js"
+          ]
+        },
+        {
+          "ref": "services/emailTemplatesService.js",
+          "basename": "emailTemplatesService.js",
+          "matches": [
+            "src\\services\\emailTemplatesService.js"
+          ]
+        },
+        {
+          "ref": "services/tagService.js",
+          "basename": "tagService.js",
+          "matches": [
+            "src\\services\\tagService.js"
+          ]
+        },
+        {
+          "ref": "services/folderService.js",
+          "basename": "folderService.js",
+          "matches": [
+            "src\\services\\folderService.js"
+          ]
+        },
+        {
+          "ref": "hooks/useEmailMonitoring.js",
+          "basename": "useEmailMonitoring.js",
+          "matches": [
+            "src\\hooks\\useEmailMonitoring.js"
+          ]
+        },
+        {
+          "ref": "hooks/useEmailUsername.jsx",
+          "basename": "useEmailUsername.jsx",
+          "matches": [
+            "src\\hooks\\useEmailUsername.jsx"
+          ]
+        },
+        {
+          "ref": "pages/Buzon_fixed_complete.jsx",
+          "basename": "Buzon_fixed_complete.jsx",
+          "matches": [
+            "src\\pages\\Buzon_fixed_complete.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-8-diseno-web-personalizacion.md",
+      "title": "8. Diseno Web y Personalizacion (estado 2025-10-08)",
+      "implementedLines": [],
+      "pendingLines": [
+        "mover la llamada a OpenAI al backend (evitar exponer `VITE_OPENAI_API_KEY`), corregir el guard de publicacion (`ProfileSummary`/`publishDisabled`), habilitar biblioteca de prompts editable, exponer configuracion de dominio personalizado y superficie de analitica consumible."
+      ],
+      "roadmapSection": "- Editor de prompts avanzado (CRUD, versionado, biblioteca compartida por rol).  \n- Refactor de generacion IA: mover a backend/`AIWebGenerator` con streaming seguro, quotas y manejo centralizado de errores.  \n- Historial enriquecido: diffs, etiquetas, undo/redo y soporte de borradores previos a publicar.  \n- Analitica integrada (dashboard, alertas) sobre `analytics/websiteEvents` + tracking de visitas publicas.  \n- Dominio personalizado y SEO avanzado (metatags dinamicos, sitemap, OG images, fallback offline).  \n- Colaboracion multirol (comentarios, sugerencias, aprobaciones con permisos granulares).",
+      "checklistSection": "- Definir `OPENAI_API_KEY`, `VITE_ENABLE_DIRECT_OPENAI`, `VITE_OPENAI_PROJECT_ID` y modelo antes de habilitar IA directa.  \n- Configurar hosting/CDN para publicar `weddings/{id}/publicSite/site` y limpiar cache tras cada publish.  \n- Revisar consentimiento de datos publicos y clausulas de privacidad.  \n- Validar peso total del HTML + assets (< 2 MB recomendado).  \n- Preparar rollbacks en caso de fallo del backend `/api/public/weddings/:id/publish`.",
+      "e2eSection": "- `cypress/e2e/web/diseno-web-flow.cy.js`: recorre el generador de sitio, personalización de secciones y publicación.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/web/diseno-web-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "pendiente"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-9-rsvp-confirmaciones.md",
+      "title": "9. RSVP y Confirmaciones (estado 2025-10-07)",
+      "implementedLines": [
+        "`RSVPConfirm.jsx`, `AcceptInvitation.jsx`, `RSVPDashboard.jsx`, hooks `useGuests`, servicios `rsvpService.js` y `emailAutomationService.js`."
+      ],
+      "pendingLines": [
+        "confirmaciones grupales avanzadas, recordatorios automaticos multi-canal, analytics detallados y integracion directa con catering."
+      ],
+      "roadmapSection": "- Confirmaciones grupales mas flexibles (familias, corporate) con panel dedicado.\n- Recordatorios multi-canal automáticos y programacion inteligente por segmentos.\n- Tablero de analytics con conversion por canal y motivos de declinacion.\n- Integracion directa con proveedores de catering para menus y alergias.\n- Automatizar mensajes de follow-up tras la boda (agradecimientos).",
+      "checklistSection": "- Reglas Firestore para colecciones `rsvp`, `rsvpLogs`, `invitations` con seguridad por rol.\n- Configurar `MAILGUN_*`, `WHATSAPP_PROVIDER` (si aplica) y plantillas de email con enlaces tracking.\n- Revisar copy y traducciones para formulario y estados.\n- Validar expiraciones de token y reintentos en ambientes de staging.",
+      "e2eSection": "- `cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js, cypress/e2e/rsvp/rsvp_invalid_token.cy.js y cypress/e2e/rsvp/rsvp_reminders.cy.js`: prueban confirmaciones por enlace, manejo de tokens inválidos y recordatorios automatizados.\n- `cypress/e2e/rsvp/rsvp_confirm.cy.js y cypress/e2e/invitaciones_rsvp.cy.js`: validan la experiencia completa de RSVP y envío de invitaciones digitales.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/rsvp/rsvp_invalid_token.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/rsvp/rsvp_reminders.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/rsvp/rsvp_confirm.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/invitaciones_rsvp.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "RSVPConfirm.jsx",
+          "basename": "RSVPConfirm.jsx",
+          "matches": [
+            "src\\pages\\RSVPConfirm.jsx"
+          ]
+        },
+        {
+          "ref": "AcceptInvitation.jsx",
+          "basename": "AcceptInvitation.jsx",
+          "matches": [
+            "src\\pages\\AcceptInvitation.jsx"
+          ]
+        },
+        {
+          "ref": "RSVPDashboard.jsx",
+          "basename": "RSVPDashboard.jsx",
+          "matches": [
+            "src\\pages\\RSVPDashboard.jsx"
+          ]
+        },
+        {
+          "ref": "useGuests",
+          "basename": "useGuests",
+          "matches": []
+        },
+        {
+          "ref": "rsvpService.js",
+          "basename": "rsvpService.js",
+          "matches": [
+            "src\\services\\rsvpService.js"
+          ]
+        },
+        {
+          "ref": "emailAutomationService.js",
+          "basename": "emailAutomationService.js",
+          "matches": [
+            "src\\services\\emailAutomationService.js"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-13-seating-plan-e2e.md",
+      "title": "Flujo 13: E2E del Seating Plan",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "",
+      "e2eSection": "- `cypress/e2e/seating/seating_smoke.cy.js y cypress/e2e/seating/seating_assign_unassign.cy.js`: validan creación de salones, asignación y desasignación de invitados.\n- `cypress/e2e/seating/seating_capacity_limit.cy.js, cypress/e2e/seating/seating_no_overlap.cy.js y cypress/e2e/seating/seating_obstacles_no_overlap.cy.js`: cubren reglas de capacidad, colisiones y obstáculos.\n- `cypress/e2e/seating/seating_template_circular.cy.js, cypress/e2e/seating/seating_template_u_l_imperial.cy.js y cypress/e2e/seating/seating_ceremony.cy.js`: ejercitan plantillas y configuraciones especiales.\n- `cypress/e2e/seating/seating_fit.cy.js, cypress/e2e/seating/seating_aisle_min.cy.js y cypress/e2e/seating/seating_toasts.cy.js`: prueban distribución automática, pasillos mínimos y flujos de brindis.\n- `cypress/e2e/seating/seating_auto_ai.cy.js`: valida la acción de Auto-IA (stub inicial; acepta éxito o error controlado).\n - `cypress/e2e/seating/seating_area_type.cy.js`: valida creación/edición por tipo de área en el plano.\n - `cypress/e2e/seating/seating_delete_duplicate.cy.js`: valida eliminación de duplicados en entidades del seating.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/seating/seating_smoke.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_assign_unassign.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_capacity_limit.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_no_overlap.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_obstacles_no_overlap.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_template_circular.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_template_u_l_imperial.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_ceremony.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_fit.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_aisle_min.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_toasts.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_auto_ai.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_area_type.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/seating/seating_delete_duplicate.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-0-administracion-global.md",
+      "title": "flujo-0-administracion-global.md",
+      "implementedLines": [
+        "*pendiente de definiciÃ³n tÃ©cnica*."
+      ],
+      "pendingLines": [],
+      "roadmapSection": "- MFA obligatorio (TOTP) para admin.\n- ImpersonaciÃ³n segura (solo lectura) con trail completo.\n- SSO corporativo (SAML/OAuth Enterprise).\n- Alertas push/Slack en tiempo real.\n- Dashboard dedicado Â“Estado integracionesÂ”.\n- Reportes automÃ¡ticos semanales al comitÃ© directivo.\n- KPI NPS automatizado (encuestas periÃ³dicas planners).",
+      "checklistSection": "- Crear usuario admin Ãºnico (`role: admin` en Firestore) y habilitar MFA (si disponible) o restringir IP.\n- Variables entorno: `VITE_ADMIN_ALLOWED_DOMAINS`, `ADMIN_METRICS_REFRESH_MS`, `ADMIN_SUPPORT_EMAIL`, `ADMIN_SUPPORT_PHONE`.\n- Desplegar funciones cron `calculateAdminMetrics` (cada hora) y `syncExternalKPIs` (cada 5 min).\n- Crear Ã­ndices Firestore definidos.\n- Configurar bucket para exportes PDF.\n- Verificar API keys y permisos de integraciones.\n- Actualizar reglas Firestore para colecciones admin.\n- Documentar rotaciÃ³n de claves y plan contingencia.",
+      "e2eSection": "- `cypress/e2e/admin/admin-flow.cy.js`: smoke end-to-end del login administrador, navegaciÃ³n principal del dashboard y validaciÃ³n de accesos restringidos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/admin/admin-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-1-registro-autenticacion.md",
+      "title": "flujo-1-registro-autenticacion.md",
+      "implementedLines": [
+        "`Signup.jsx`, `Login.jsx`, `ResetPassword.jsx`, `VerifyEmail.jsx`, `useAuth.jsx`, `SessionManager.jsx`, `src/context/UserContext.jsx`, componentes `SocialLoginButtons.jsx`, `RegisterForm.jsx`, `PasswordStrengthMeter.jsx`."
+      ],
+      "pendingLines": [
+        "instrumentaci?n de m?tricas (signup/login/reset), refactor de formularios legacy fuera de uso y auditor?a de accesibilidad final."
+      ],
+      "roadmapSection": "- Instrumentar m?tricas (`signup_submit`, `social_signup`, `login_failed`, etc.) y revisar dashboards.\n\n- Completar auditor?a de accesibilidad y focus management en formularios y botones sociales.\n\n- Retirar formularios legacy (`RegisterForm`/`SocialLogin` antiguos) y limpiar dependencias en rutas no utilizadas.\n\n- ? 2025-10-08: `VerifyEmail`, `ResetPassword`, `CreateWeddingAI` y `GamificationPanel` usan el hook unificado (`useAuth`) y este expone `sendPasswordReset`.\n\n- Homogeneizar manejo de errores Firebase ? UI (mapa centralizado en `authErrorMapper`).",
+      "checklistSection": "- Variables Firebase (`VITE_FIREBASE_*`, `FIREBASE_SERVICE_ACCOUNT_KEY`).\n\n- Configurar correo transactional (Mailgun) para reset/verify.\n\n- Alta de credenciales OAuth (Google, Facebook, etc.) en Firebase Console y `.env`.",
+      "e2eSection": "- `cypress/e2e/auth/flow1-signup.cy.js`: cubre altas por correo, validación de duplicados y redirección a verificación.\n- `cypress/e2e/auth/flow1-social-login.cy.js`: valida inicio de sesión con proveedores externos y manejo de errores comunes.\n- `cypress/e2e/auth/flow1-password-reset.cy.js`: ejecuta la solicitud y el completado del restablecimiento de contraseña.\n- `cypress/e2e/auth/flow1-verify-email.cy.js`: asegura reenvío del correo y refresco del estado `emailVerified`.\n- `cypress/e2e/auth/auth-flow.cy.js`: smoke de rutas protegidas, sesión persistente y manipulación de `remember me`.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/auth/flow1-signup.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/auth/flow1-social-login.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/auth/flow1-password-reset.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/auth/flow1-verify-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/auth/auth-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Signup.jsx",
+          "basename": "Signup.jsx",
+          "matches": [
+            "src\\pages\\Signup.jsx"
+          ]
+        },
+        {
+          "ref": "Login.jsx",
+          "basename": "Login.jsx",
+          "matches": [
+            "src\\pages\\Login.jsx"
+          ]
+        },
+        {
+          "ref": "ResetPassword.jsx",
+          "basename": "ResetPassword.jsx",
+          "matches": [
+            "src\\pages\\ResetPassword.jsx"
+          ]
+        },
+        {
+          "ref": "VerifyEmail.jsx",
+          "basename": "VerifyEmail.jsx",
+          "matches": [
+            "src\\pages\\VerifyEmail.jsx"
+          ]
+        },
+        {
+          "ref": "useAuth.jsx",
+          "basename": "useAuth.jsx",
+          "matches": [
+            "src\\hooks\\useAuth.jsx"
+          ]
+        },
+        {
+          "ref": "SessionManager.jsx",
+          "basename": "SessionManager.jsx",
+          "matches": [
+            "src\\components\\auth\\SessionManager.jsx"
+          ]
+        },
+        {
+          "ref": "src/context/UserContext.jsx",
+          "basename": "UserContext.jsx",
+          "matches": [
+            "src\\contexts\\UserContext.jsx",
+            "src\\context\\UserContext.jsx"
+          ]
+        },
+        {
+          "ref": "SocialLoginButtons.jsx",
+          "basename": "SocialLoginButtons.jsx",
+          "matches": [
+            "src\\components\\auth\\SocialLoginButtons.jsx"
+          ]
+        },
+        {
+          "ref": "RegisterForm.jsx",
+          "basename": "RegisterForm.jsx",
+          "matches": [
+            "src\\components\\auth\\RegisterForm.jsx"
+          ]
+        },
+        {
+          "ref": "PasswordStrengthMeter.jsx",
+          "basename": "PasswordStrengthMeter.jsx",
+          "matches": [
+            "src\\components\\auth\\PasswordStrengthMeter.jsx"
+          ]
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-12-notificaciones-configuracion.md",
+      "title": "flujo-12-notificaciones-configuracion.md",
+      "implementedLines": [
+        "`Notificaciones.jsx`, `NotificationPreferences.jsx`, `NotificationWatcher.jsx`, `NotificationCenter.jsx` (scaffold), servicios `notificationService.js`, `notificationPreferencesService.js`, rutas backend `/api/notification-preferences`."
+      ],
+      "pendingLines": [
+        "automatizaciones avanzadas (AutomationRules UI), notificaciones push/SMS completas y centro de notificaciones final."
+      ],
+      "roadmapSection": "- Centro de notificaciones completo (agrupaciones, búsqueda).\n- Automation rules UI (if-this-then-that).\n- Integración multi-canal (SMS/push con configuración avanzada).\n- Panel de auditoría y métricas ( CTR, canal favorito/efectividad ).",
+      "checklistSection": "- Reglas Firestore `notifications` y `notificationPreferences`.\n- Configurar Mailgun/Twilio/FCM; validar push en navegadores.\n- Revisar traducciones (todas las opciones en `NotificationSettings` y `NotificationPreferences`).",
+      "e2eSection": "- `cypress/e2e/notifications/preferences-flow.cy.js`: prueba la edición de preferencias, canales disponibles y persistencia de configuraciones.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/notifications/preferences-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Notificaciones.jsx",
+          "basename": "Notificaciones.jsx",
+          "matches": [
+            "src\\pages\\Notificaciones.jsx"
+          ]
+        },
+        {
+          "ref": "NotificationPreferences.jsx",
+          "basename": "NotificationPreferences.jsx",
+          "matches": [
+            "src\\pages\\NotificationPreferences.jsx"
+          ]
+        },
+        {
+          "ref": "NotificationWatcher.jsx",
+          "basename": "NotificationWatcher.jsx",
+          "matches": [
+            "src\\components\\notifications\\NotificationWatcher.jsx"
+          ]
+        },
+        {
+          "ref": "NotificationCenter.jsx",
+          "basename": "NotificationCenter.jsx",
+          "matches": [
+            "src\\components\\NotificationCenter.jsx",
+            "src\\components\\notifications\\NotificationCenter.jsx"
+          ]
+        },
+        {
+          "ref": "notificationService.js",
+          "basename": "notificationService.js",
+          "matches": [
+            "src\\services\\notificationService.js",
+            "backend\\services\\notificationService.js"
+          ]
+        },
+        {
+          "ref": "notificationPreferencesService.js",
+          "basename": "notificationPreferencesService.js",
+          "matches": [
+            "src\\services\\notificationPreferencesService.js"
+          ]
+        },
+        {
+          "ref": "/api/notification-preferences",
+          "basename": "notification-preferences",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-16-asistente-virtual-ia.md",
+      "title": "flujo-16-asistente-virtual-ia.md",
+      "implementedLines": [],
+      "pendingLines": [],
+      "roadmapSection": "",
+      "checklistSection": "- Clave `OPENAI_API_KEY` solo si el backend `/api/chat-widget` está habilitado.\n- Revisar políticas de almacenamiento local (GDPR) y permitir al usuario limpiar historial.\n- En entornos productivos, habilitar tracking de eventos antes de lanzar automatizaciones reales.",
+      "e2eSection": "- `cypress/e2e/email/ai-provider-email.cy.js y cypress/e2e/email/smart-composer.cy.js`: ejercitan respuestas sugeridas por IA y generación de contenido que reutiliza el asistente virtual.\n- Cobertura e2e dedicada al asistente general pendiente.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/email/ai-provider-email.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/email/smart-composer.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
+      "conclusion": "desconocido"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-3-gestion-invitados.md",
+      "title": "flujo-3-gestion-invitados.md",
+      "implementedLines": [
+        "`Invitados.jsx`, `RSVPDashboard.jsx`, `AcceptInvitation.jsx`, `GuestEventBridge.jsx`, componentes de invitados (`GuestList`, `GuestFilters`, `GuestForm`, `GuestBulkGrid`, `ContactsImporter`, `GroupManager`), modales de WhatsApp (`WhatsAppModal`, `WhatsAppSender`, `SaveTheDateModal`, `InviteTemplateModal`), servicios `useGuests`, `SyncService`, `MessageTemplateService`, `whatsappService`, `WhatsAppBatchService`."
+      ],
+      "pendingLines": [
+        "dashboard analítico de RSVP, check-in en día del evento y sincronización automática con Seating Plan."
+      ],
+      "roadmapSection": "- Dashboard avanzado (métricas, embudos RSVP, historial de comunicaciones).\n- Check-in en el día del evento (lectura QR, actualización en tiempo real).\n- Sincronización automática con Seating Plan y con el asistente IA (respuesta/acciones).",
+      "checklistSection": "- Configurar proveedor WhatsApp y variables (`VITE_BACKEND_BASE_URL`, `VITE_DEFAULT_COUNTRY_CODE`, credenciales).\n- Reglas Firestore actualizadas (CRUD de `guests` y `rsvp`).\n- Endpoints habilitados: `/api/whatsapp/send`, `/send-batch`, `/batch`, `/schedule`, `/api/whatsapp/provider-status`, `/api/rsvp/reminders`, `/api/guests/{id}/rsvp-link`.\n- Revisar traducciones/mensajes de toasts y compatibilidad con modo offline.",
+      "e2eSection": "- `cypress/e2e/guests/guests_flow.cy.js`: cubre alta manual y masiva de invitados, consulta del resumen RSVP y filtros principales de la vista de invitados.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/guests/guests_flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "Invitados.jsx",
+          "basename": "Invitados.jsx",
+          "matches": [
+            "src\\pages\\Invitados.jsx"
+          ]
+        },
+        {
+          "ref": "RSVPDashboard.jsx",
+          "basename": "RSVPDashboard.jsx",
+          "matches": [
+            "src\\pages\\RSVPDashboard.jsx"
+          ]
+        },
+        {
+          "ref": "AcceptInvitation.jsx",
+          "basename": "AcceptInvitation.jsx",
+          "matches": [
+            "src\\pages\\AcceptInvitation.jsx"
+          ]
+        },
+        {
+          "ref": "GuestEventBridge.jsx",
+          "basename": "GuestEventBridge.jsx",
+          "matches": [
+            "src\\components\\guests\\GuestEventBridge.jsx"
+          ]
+        },
+        {
+          "ref": "GuestList",
+          "basename": "GuestList",
+          "matches": []
+        },
+        {
+          "ref": "GuestFilters",
+          "basename": "GuestFilters",
+          "matches": []
+        },
+        {
+          "ref": "GuestForm",
+          "basename": "GuestForm",
+          "matches": []
+        },
+        {
+          "ref": "GuestBulkGrid",
+          "basename": "GuestBulkGrid",
+          "matches": []
+        },
+        {
+          "ref": "ContactsImporter",
+          "basename": "ContactsImporter",
+          "matches": []
+        },
+        {
+          "ref": "GroupManager",
+          "basename": "GroupManager",
+          "matches": []
+        },
+        {
+          "ref": "WhatsAppModal",
+          "basename": "WhatsAppModal",
+          "matches": []
+        },
+        {
+          "ref": "WhatsAppSender",
+          "basename": "WhatsAppSender",
+          "matches": []
+        },
+        {
+          "ref": "SaveTheDateModal",
+          "basename": "SaveTheDateModal",
+          "matches": []
+        },
+        {
+          "ref": "InviteTemplateModal",
+          "basename": "InviteTemplateModal",
+          "matches": []
+        },
+        {
+          "ref": "useGuests",
+          "basename": "useGuests",
+          "matches": []
+        },
+        {
+          "ref": "SyncService",
+          "basename": "SyncService",
+          "matches": []
+        },
+        {
+          "ref": "MessageTemplateService",
+          "basename": "MessageTemplateService",
+          "matches": []
+        },
+        {
+          "ref": "whatsappService",
+          "basename": "whatsappService",
+          "matches": []
+        },
+        {
+          "ref": "WhatsAppBatchService",
+          "basename": "WhatsAppBatchService",
+          "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    }
+  ]
+}

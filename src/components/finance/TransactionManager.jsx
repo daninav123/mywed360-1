@@ -42,8 +42,13 @@ export default function TransactionManager({
       <p className="text-[color:var(--color-text)]/60">
         {t('finance.transactions.empty', { defaultValue: 'No hay transacciones que mostrar' })}
       </p>
-      <Button className="mt-4" onClick={openCreate} leftIcon={<Plus size={16} />}>
-        {t('finance.transactions.createFirst', { defaultValue: 'Crear primera transacción' })}
+      <Button
+        className="mt-4"
+        onClick={openCreate}
+        leftIcon={<Plus size={16} />}
+        data-testid="transactions-new"
+      >
+        {t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}
       </Button>
     </div>
   );
@@ -86,6 +91,7 @@ export default function TransactionManager({
         open={showTransactionModal}
         onClose={closeModal}
         title={t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}
+        data-testid="finance-transaction-modal"
       >
         <TransactionForm
           transaction={prefillTransaction || undefined}
@@ -104,4 +110,3 @@ export default function TransactionManager({
     </>
   );
 }
-

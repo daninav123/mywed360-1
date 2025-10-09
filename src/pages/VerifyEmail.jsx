@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { sendEmailVerification } from 'firebase/auth';
 import { getFirebaseAuth } from '../firebaseConfig';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 export default function VerifyEmail() {
   const { isAuthenticated } = useAuth();

@@ -9,7 +9,7 @@
 - Sincronizar el estado RSVP con listas de invitados, seating y comunicaciones.
 
 ## 2. Trigger y rutas
-- Menú inferior → `Más` → bloque **Invitados** → “Resumen RSVP” (`/invitados/rsvp`, `RSVPDashboard.jsx`).
+- Menú inferior → `Más` → bloque **Invitados** → "Gestión de invitados" (`/invitados`, render `Invitados.jsx`), desde donde se abre el modal "Resumen RSVP" (`RSVPDashboard.jsx`).
 - Emails/WhatsApp a invitados contienen el enlace único `/rsvp/{token}` (renderiza `RSVPConfirm.jsx`).
 - Invitaciones de colaboradores llegan por `/accept-invitation/:code` (`AcceptInvitation.jsx`).
 
@@ -36,7 +36,7 @@
 ## 5. Reglas de negocio
 - Cada token solo puede usarse una vez; permite editar hasta la fecha limite configurada.
 - Invitados corporativos o familiares pueden representar a varios asistentes (grupo controlado).
-- Cambios de estado registran usuario y timestamp para auditoria.
+- Owners, planners y assistants pueden ajustar manualmente el estado RSVP desde la gestión interna; cada cambio queda auditado con usuario y timestamp.
 - Colaboradores requieren email verificado antes de aceptar invitacion.
 
 ## 6. Estados especiales y errores
@@ -47,9 +47,9 @@
 
 ## 7. Integracion con otros flujos
 - Flujo 3 (Gestion de invitados) consume y actualiza estados RSVP.
-- Flujo 4 (Seating) recibe listas de confirmados y acompanantes.
+- Flujo 4 (Seating) recibe listas de confirmados y acompanantes; cuando un invitado pasa a "declined"/"rejected", se libera automáticamente cualquier asiento asignado en los planos de banquete o ceremonia.
 - Flujo 6 (Presupuesto) ajusta conteo de menus y estimaciones.
-- Flujo 7/20 usan resultados para segmentar emails/buzon interno; el [Flujo 24](./flujo-24-orquestador-automatizaciones.md) convierte confirmaciones en acciones automáticas.
+- Flujo 7/20 usan resultados para segmentar emails/buzon interno; el [Flujo 16](./flujo-16-asistente-virtual-ia.md) convierte confirmaciones en acciones automáticas.
 - Flujos 11A/11B sincronizan aforo y orden de ceremonia; Flujo 11C ajusta checklist según confirmaciones, además de las tareas del flujo 14.
 
 ## 8. Metricas y monitorizacion
@@ -61,6 +61,11 @@
 - Unitarias: validadores de acompanantes, generacion de token, servicios de recordatorio.
 - Integracion: confirmar invitado -> verificar actualizacion en `guests` y dashboard.
 - E2E: flujo completo desde envio de invitacion, confirmacion web, verificacion en seating.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js, cypress/e2e/rsvp/rsvp_invalid_token.cy.js y cypress/e2e/rsvp/rsvp_reminders.cy.js`: prueban confirmaciones por enlace, manejo de tokens inválidos y recordatorios automatizados.
+- `cypress/e2e/rsvp/rsvp_confirm.cy.js y cypress/e2e/invitaciones_rsvp.cy.js`: validan la experiencia completa de RSVP y envío de invitaciones digitales.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para colecciones `rsvp`, `rsvpLogs`, `invitations` con seguridad por rol.

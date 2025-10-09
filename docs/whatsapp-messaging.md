@@ -12,12 +12,12 @@ Este módulo permite enviar invitaciones y recordatorios por WhatsApp desde Gest
 ## UI / Flujo
 
 - En `Gestión de Invitados`, acción “Invitar por WhatsApp” en cada fila abre un modal con dos pestañas.
-- Pestaña “Móvil personal”: genera deeplink `https://wa.me/<E164>?text=...` (opción de abrir en WhatsApp Business).
+- Pestaña “Móvil personal”: genera deeplink `https://wa.me/<E164>→text=...` (opción de abrir en WhatsApp Business).
 - Pestaña “Número de la app”: envía vía backend (`POST /api/whatsapp/send`). Incluye botón masivo a pendientes.
 
 ## Endpoints Backend
 
-- `POST /api/whatsapp/send` (autenticado): body `{ to, message, weddingId, guestId, templateId?, scheduleAt?, metadata? }`
+- `POST /api/whatsapp/send` (autenticado): body `{ to, message, weddingId, guestId, templateId→, scheduleAt→, metadata→ }`
 - `POST /api/whatsapp/webhook/twilio` (público): webhook para estados de Twilio (statusCallback) y también para mensajes entrantes ( – A message comes in – ).
 - `GET /api/whatsapp/provider-status` (público): devuelve `{ success, configured, provider }`
 

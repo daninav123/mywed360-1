@@ -1,7 +1,7 @@
 ﻿# TODO Plan de Asientos
 
 ## Referencias Generales
-- Documentación funcional: `docs/flujos-especificos/flujo-4-plan-asientos.md`
+- Documentación funcional: `docs/flujos-especificos/flujo-4-invitados-operativa.md`
 - Especificación de prototipos Figma: `docs/diseno/export-wizard-mobile.md`
 - Guía de trabajo con Figma: `docs/diseno/README.md`
 - Backlog técnico detallado: `docs/tareas/plan-asientos-export-mobile.md`
@@ -25,9 +25,9 @@
 - [ ] Implementar gestos (pinch, double tap, swipe) y botones alternativos.
 
 ### Overlays y plantillas base
-- [ ] Añadir biblioteca de plantillas de venue (`VenueTemplates`).
-- [ ] Implementar overlays de distancias mínimas y heatmap de accesibilidad.
-- [ ] Añadir puntos de interés (altar, pista, DJ, salidas, etc.) con notas exportables.
+- [x] Añadir biblioteca de plantillas de venue (`VenueTemplates`) (versión inicial).
+- [x] Implementar overlays de distancias mínimas y heatmap de accesibilidad (placeholders).
+- [x] Añadir puntos de interés (altar, pista, DJ, salidas, etc.) con notas exportables (placeholders).
 
 ### Mesas y capacidades
 - [ ] Permitir tipos `redonda`, `cuadrada`, `imperial`, `coctel`, `auxiliar/staff`.

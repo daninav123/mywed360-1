@@ -15,7 +15,7 @@
 
 #### **Flujos Específicos Detallados**
 - [`flujos-especificos/flujo-3-gestion-invitados.md`](./flujos-especificos/flujo-3-gestion-invitados.md)
-- [`flujos-especificos/flujo-4-plan-asientos.md`](./flujos-especificos/flujo-4-plan-asientos.md)
+- [`flujos-especificos/flujo-4-invitados-operativa.md`](./flujos-especificos/flujo-4-invitados-operativa.md)
 - [`flujos-especificos/flujo-5-proveedores-ia.md`](./flujos-especificos/flujo-5-proveedores-ia.md)
 - [`flujos-especificos/flujo-5-timeline-tareas.md`](./flujos-especificos/flujo-5-timeline-tareas.md)
 - [`flujos-especificos/flujo-6-presupuesto.md`](./flujos-especificos/flujo-6-presupuesto.md)
@@ -25,7 +25,7 @@
 - [`flujos-especificos/flujo-10-gestion-bodas-multiples.md`](./flujos-especificos/flujo-10-gestion-bodas-multiples.md)
 - [`flujos-especificos/flujo-11-protocolo-ceremonias.md`](./flujos-especificos/flujo-11-protocolo-ceremonias.md)
 - [`flujos-especificos/flujo-12-notificaciones-configuracion.md`](./flujos-especificos/flujo-12-notificaciones-configuracion.md)
-- [`flujos-especificos/flujo-13-gestion-contenido.md`](./flujos-especificos/flujo-13-gestion-contenido.md)
+- *(Integrado en flujo 4)* [`flujos-especificos/flujo-4-invitados-operativa.md`](./flujos-especificos/flujo-4-invitados-operativa.md)
 - [`flujos-especificos/flujo-14-checklist-avanzado.md`](./flujos-especificos/flujo-14-checklist-avanzado.md)
 - [`flujos-especificos/flujo-15-contratos-documentos.md`](./flujos-especificos/flujo-15-contratos-documentos.md)
 - [`flujos-especificos/flujo-16-asistente-virtual-ia.md`](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
@@ -90,7 +90,7 @@ docs/
 ├── planes-suscripcion.md              # Planes comerciales y precios
 ├── flujos-especificos/                # Flujos detallados por módulo (18 flujos)
 │   ├── flujo-3-gestion-invitados.md
-│   ├── flujo-4-plan-asientos.md
+│   ├── flujo-4-invitados-operativa.md
 │   ├── flujo-5-proveedores-ia.md
 │   ├── flujo-5-timeline-tareas.md
 │   ├── flujo-6-presupuesto.md
@@ -100,7 +100,6 @@ docs/
 │   ├── flujo-10-gestion-bodas-multiples.md
 │   ├── flujo-11-protocolo-ceremonias.md
 │   ├── flujo-12-notificaciones-configuracion.md
-│   ├── flujo-13-gestion-contenido.md
 │   ├── flujo-14-checklist-avanzado.md
 │   ├── flujo-15-contratos-documentos.md
 │   ├── flujo-16-asistente-virtual-ia.md

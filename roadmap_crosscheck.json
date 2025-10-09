@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2025-10-09T16:03:27.612Z",
+  "counts": {
+    "modules": 30,
+    "tasks": 86,
+    "docSpecs": 57,
+    "taskSpecs": 57,
+    "actualSpecs": 58
+  },
+  "dupSpecTasks": [],
+  "aggregatedMissingSpecs": [],
+  "modulesWithNoTaskForSpecs": [],
+  "tasksSpecNotInDocs": [],
+  "tasksWithMissingSpecOnDisk": [],
+  "orphanSpecs": [
+    "cypress/e2e/rsvp_confirm.cy.js"
+  ]
+}

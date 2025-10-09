@@ -1,6 +1,13 @@
 ﻿/* eslint-disable no-undef */
 import { post } from './apiClient';
 
+const CLASSIFICATION_ENDPOINT = '/api/email-insights/classify';
+const SCHEDULER_INTERVAL_MS = 60 * 1000;
+const SCHEDULER_KICKOFF_DELAY_MS = 2 * 1000;
+let schedulerHandle = null;
+let schedulerKickoffTimeout = null;
+let queueProcessing = false;
+
 const CONFIG_KEY = 'mywed360.email.automation.config';
 const STATE_KEY = 'mywed360.email.automation.state';
 const CLASSIFICATION_CACHE_KEY = 'mywed360.email.automation.classification';
@@ -188,6 +195,71 @@ function saveClassificationCache(cache) {
   writeJSON(CLASSIFICATION_CACHE_KEY, cache || {});
 }
 
+async function getSendMailFn() {
+  try {
+    const module = await import('./emailService.js');
+    const candidate =
+      module?.sendMail || module?.sendEmail || (module?.default && module.default.sendMail);
+    return typeof candidate === 'function' ? candidate : null;
+  } catch (error) {
+    console.warn('[emailAutomation] unable to load sendMail function', error);
+    return null;
+  }
+}
+
+function shouldAutoProcessQueue() {
+  try {
+    if (typeof window === 'undefined') return false;
+    if (window.__LOVENDA_DISABLE_EMAIL_SCHEDULER__) return false;
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function runScheduledQueueOnce() {
+  if (queueProcessing) return;
+  queueProcessing = true;
+  try {
+    const sendMailFn = await getSendMailFn();
+    if (typeof sendMailFn === 'function') {
+      await processScheduledEmails(sendMailFn);
+    }
+  } catch (error) {
+    console.warn('[emailAutomation] scheduled queue processing failed', error);
+  } finally {
+    queueProcessing = false;
+  }
+}
+
+function ensureSchedulerRunning() {
+  if (!shouldAutoProcessQueue()) return;
+  if (schedulerHandle) return;
+  schedulerHandle = setInterval(() => {
+    runScheduledQueueOnce();
+  }, SCHEDULER_INTERVAL_MS);
+  if (schedulerHandle && typeof schedulerHandle.unref === 'function') {
+    schedulerHandle.unref();
+  }
+}
+
+function scheduleQueueProcessing(delay = SCHEDULER_KICKOFF_DELAY_MS) {
+  if (!shouldAutoProcessQueue()) return;
+  if (schedulerKickoffTimeout) {
+    clearTimeout(schedulerKickoffTimeout);
+  }
+  schedulerKickoffTimeout = setTimeout(() => {
+    schedulerKickoffTimeout = null;
+    runScheduledQueueOnce();
+  }, Math.max(0, delay));
+  if (schedulerKickoffTimeout && typeof schedulerKickoffTimeout.unref === 'function') {
+    schedulerKickoffTimeout.unref();
+  }
+}
+
 function hashString(str) {
   let hash = 0;
   if (!str) return hash;
@@ -275,6 +347,79 @@ function fallbackClassification(mail) {
   }
 }
 
+async function callClassificationAPI(mail) {
+  if (!mail) return null;
+  try {
+    const payload = {
+      id:
+        mail.id ||
+        mail.messageId ||
+        mail.mailId ||
+        mail.apiId ||
+        (mail.date ? `${mail.from || ''}::${mail.date}` : null),
+      subject: mail.subject || '',
+      body: mail.body || '',
+      from: mail.from || '',
+      to: mail.to || '',
+      cc: mail.cc || null,
+      bcc: mail.bcc || null,
+      headers: mail.headers || null,
+      date: mail.date || mail.receivedAt || null,
+    };
+    const response = await post(CLASSIFICATION_ENDPOINT, payload, {
+      auth: true,
+      silent: true,
+    });
+    if (!response || !response.ok) {
+      return null;
+    }
+    let data = null;
+    try {
+      data = await response.json();
+    } catch {
+      data = null;
+    }
+    if (!data || typeof data !== 'object') {
+      return null;
+    }
+    const tags = Array.from(
+      new Set(
+        (Array.isArray(data.tags) ? data.tags : [])
+          .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
+          .filter(Boolean)
+      )
+    );
+    const folder =
+      typeof data.folder === 'string' && data.folder.trim() ? data.folder.trim() : null;
+    if (!tags.length && !folder) {
+      return null;
+    }
+    const result = {
+      tags,
+      folder,
+      source: 'ai',
+      createdAt: Date.now(),
+    };
+    if (typeof data.confidence === 'number') {
+      result.confidence = data.confidence;
+    }
+    if (typeof data.reason === 'string' && data.reason.trim()) {
+      result.reason = data.reason.trim();
+    }
+    if (data.extra && typeof data.extra === 'object') {
+      result.extra = data.extra;
+    }
+    return result;
+  } catch (error) {
+    const isTestEnv =
+      typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
+    if (!isTestEnv) {
+      console.warn('[emailAutomation] classification API request failed', error);
+    }
+    return null;
+  }
+}
+
 function classifyEmail(mail, config) {
   if (!mail || config?.classification?.enabled === false) {
     return null;
@@ -289,8 +434,34 @@ function classifyEmail(mail, config) {
     return classificationPromises.get(cacheKey);
   }
   const promise = (async () => {
+    const heuristic = fallbackClassification(mail);
+    let result = heuristic;
     const aiResult = await callClassificationAPI(mail);
-    const result = aiResult || fallbackClassification(mail);
+    if (aiResult) {
+      const mergedTags = new Set();
+      (Array.isArray(aiResult.tags) ? aiResult.tags : []).forEach((tag) => {
+        if (typeof tag === 'string' && tag.trim()) mergedTags.add(tag.trim());
+      });
+      (heuristic?.tags || []).forEach((tag) => {
+        if (typeof tag === 'string' && tag.trim()) mergedTags.add(tag.trim());
+      });
+      result = {
+        ...aiResult,
+        tags: Array.from(mergedTags),
+        folder: aiResult.folder || heuristic?.folder || null,
+        createdAt: Date.now(),
+        source: 'ai',
+      };
+      if (!result.tags.length && heuristic?.tags?.length) {
+        result.tags = heuristic.tags;
+      }
+      if (heuristic && heuristic.source && !result.fallbackSource) {
+        result.fallbackSource = heuristic.source;
+      }
+      if (heuristic && heuristic.folder && !result.folder) {
+        result.folder = heuristic.folder;
+      }
+    }
     cache[cacheKey] = result;
     saveClassificationCache(cache);
     classificationPromises.delete(cacheKey);
@@ -492,6 +663,12 @@ export function scheduleEmailSend(payload, scheduledAt) {
     status: 'scheduled',
   });
   saveScheduleData({ queue, history: data.history || [] });
+  ensureSchedulerRunning();
+  const diff = date.getTime() - Date.now();
+  const kickoffDelay = Number.isFinite(diff)
+    ? Math.max(0, Math.min(SCHEDULER_KICKOFF_DELAY_MS, diff))
+    : SCHEDULER_KICKOFF_DELAY_MS;
+  scheduleQueueProcessing(kickoffDelay);
   return id;
 }
 
@@ -546,6 +723,22 @@ export async function processScheduledEmails(sendMail) {
   }
   const trimmedHistory = history.slice(-100);
   saveScheduleData({ queue: remaining, history: trimmedHistory });
+  if (remaining.length > 0) {
+    ensureSchedulerRunning();
+    scheduleQueueProcessing(SCHEDULER_KICKOFF_DELAY_MS);
+  }
+}
+
+export function startEmailScheduler(options = {}) {
+  ensureSchedulerRunning();
+  if (options && options.immediate) {
+    scheduleQueueProcessing(0);
+  }
+}
+
+if (shouldAutoProcessQueue()) {
+  ensureSchedulerRunning();
+  scheduleQueueProcessing(SCHEDULER_KICKOFF_DELAY_MS);
 }
 
 

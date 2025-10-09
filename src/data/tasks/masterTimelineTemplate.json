@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "blocks": [
+    {
+      "key": "A",
+      "name": "Fundamentos",
+      "p0": 0.0,
+      "p1": 0.2,
+      "items": [
+        "Difundir la noticia y organizar la planificacion (perfil, invitar pareja, anillo, presupuesto inicial)",
+        "Crear primera version de la lista de invitados",
+        "Investigar lugares de celebracion y comenzar visitas",
+        "Decidir cortejo nupcial"
+      ]
+    },
+    {
+      "key": "B",
+      "name": "Proveedores Clave",
+      "p0": 0.1,
+      "p1": 0.8,
+      "items": [
+        "Fotografia -> contacto inicial pronto, cierre de contrato a mitad del proceso",
+        "Videografia -> decision temprana, reuniones finales hacia el final",
+        "Catering -> investigacion inicial, prueba de menu, cierre cercano a la boda",
+        "Florista -> inspiracion y primeras ideas, confirmacion en la fase final",
+        "Musica -> banda o DJ reservados pronto, reunion final mas tarde",
+        "Reposteria -> busqueda inicial, prueba de sabores meses despues, pedido final cerca de la boda"
+      ]
+    },
+    {
+      "key": "C",
+      "name": "Vestuario y Moda",
+      "p0": 0.15,
+      "p1": 0.9,
+      "items": [
+        "Novia -> visitas iniciales, decision intermedia, pruebas finales en los ultimos meses",
+        "Novio -> compra traje en mitad del proceso, ajustes finales poco antes",
+        "Cortejo -> definir vestidos o trajes, confirmar tallas y ajustes finales mas tarde"
+      ]
+    },
+    {
+      "key": "D",
+      "name": "Estilo y Detalles",
+      "p0": 0.2,
+      "p1": 0.95,
+      "items": [
+        "Invitaciones digitales y save-the-dates (inicio medio)",
+        "Invitaciones fisicas y papeleria (fase intermedia)",
+        "Decoracion y DIY (se puede trabajar meses antes y ultimar al final)",
+        "Recuerdos y regalos (eleccion temprana, cierre antes del evento)"
+      ]
+    },
+    {
+      "key": "E",
+      "name": "Organizacion y Logistica",
+      "p0": 0.3,
+      "p1": 1.0,
+      "items": [
+        "Transporte (se puede definir pronto, confirmar al final)",
+        "Extras y basicos del dia (ir acumulando, revision final cercana a la boda)",
+        "Confirmaciones con proveedores (ultimas semanas)",
+        "Plan B clima (al final)",
+        "Ensayo general (ultima fase)"
+      ]
+    },
+    {
+      "key": "F",
+      "name": "Celebraciones y Emociones",
+      "p0": 0.4,
+      "p1": 0.95,
+      "items": [
+        "Eventos adicionales (preboda, brunch, etc)",
+        "Despedidas (planificacion antes, celebracion final)",
+        "Votos y discursos (escribir con calma, repasar justo antes)"
+      ]
+    },
+    {
+      "key": "G",
+      "name": "Belleza y Cuidado",
+      "p0": 0.6,
+      "p1": 0.95,
+      "items": [
+        "Reservas peluqueria y maquillaje con antelacion",
+        "Pruebas intermedias",
+        "Rutinas de cuidado personal (ultimos meses)"
+      ]
+    },
+    {
+      "key": "H",
+      "name": "Anillos y Luna de Miel",
+      "p0": 0.7,
+      "p1": 1.0,
+      "items": [
+        "Comprar anillos (se puede hacer pronto, recoger justo antes)",
+        "Planificar luna de miel (eleccion pronto, reservas intermedias, maletas al final)"
+      ]
+    },
+    {
+      "key": "I",
+      "name": "Despues de la Boda",
+      "p0": 1.0,
+      "p1": 1.05,
+      "items": [
+        "Disfrutar inicio del matrimonio",
+        "Organizar album y recuerdos"
+      ]
+    }
+  ]
+}

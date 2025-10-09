@@ -20,12 +20,12 @@
 - Vista completa con categorías, cambios de estado, fechas y notas (`CeremonyChecklist.jsx`).  
 - Recupera documentos existentes en Firestore para mostrarlos junto al ítem (`useCeremonyChecklist.js:63-101`).  
 - Permite crear ítems personalizados con IDs generados (`crypto.randomUUID`).  
+- Los requisitos subidos desde la Guía Legal se registran en `weddings/{id}/documents` con `relatedCeremonyId`, apareciendo automáticamente en la checklist.
+- Validación in-app: máximo 50 ítems personalizados y aviso cuando faltan documentos vinculados a un requisito legal.
 
 **Pendiente / roadmap**
-- Asociar automáticamente archivos subidos desde la checklist a `weddings/{id}/documents`.  
-- Límite real de 50 ítems personalizados (hoy no hay restricción).  
-- Alertas visuales/sonoras cuando faltan archivos obligatorios.  
-- Instrumentación (`ceremony_checklist_checked`) y sincronización con centro de notificaciones.
+- Alertas sonoras/notificaciones push para requisitos críticos.  
+- Sincronización con centro de notificaciones.
 
 ## 4. Datos y modelo
 - Documento base (`DEFAULT_ITEMS` en `useCeremonyChecklist.js`). Campos: `id`, `label`, `category`, `status`, `dueDate`, `notes`, `relatedDocType`.  
@@ -50,13 +50,17 @@
 - **Centro de notificaciones**: futura integración para enviar recordatorios según dueDate.
 
 ## 8. Métricas y eventos
-- No se emiten eventos; `ceremony_checklist_checked` sigue pendiente.  
+- Evento `ceremony_checklist_checked` al guardar cambios, con resumen de estados.  
 - Indicadores propuestos: % completado, recuento por categoría, días restantes.
 
 ## 9. Pruebas recomendadas
 - Unitarias: merge de defaults, normalización de documentos en `useCeremonyChecklist`.  
 - Integración: subir documento legal → comprobar asociación automática en checklist.  
 - E2E: planner marca todos los ítems como completados, recarga y verifica persistencia.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/protocolo/protocolo-flows.cy.js`: valida la checklist de última hora mostrando checkpoints manuales simulados y la integración con el resumen de música.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore para `ceremonyChecklist`.  

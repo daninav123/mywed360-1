@@ -22,11 +22,18 @@ export default function CeremonyChecklist({ compact = false }) {
   const [draft, setDraft] = useState(items);
   const [dirty, setDirty] = useState(false);
   const [newItem, setNewItem] = useState({ label: '', category: 'General' });
+  const [limitWarning, setLimitWarning] = useState('');
 
   useEffect(() => {
     setDraft(items);
     setDirty(false);
+    setLimitWarning('');
   }, [items]);
+
+  const defaultIds = useMemo(
+    () => new Set((defaults || []).map((item) => item.id)),
+    [defaults],
+  );
 
   const grouped = useMemo(() => {
     return (draft || []).reduce((acc, item) => {
@@ -54,6 +61,11 @@ export default function CeremonyChecklist({ compact = false }) {
   const handleAdd = () => {
     const label = (newItem.label || '').trim();
     if (!label) return;
+    const customCount = (draft || []).filter((item) => !defaultIds.has(item.id)).length;
+    if (customCount >= 50) {
+      setLimitWarning('Has alcanzado el máximo de 50 ítems personalizados.');
+      return;
+    }
     setDraft((prev) => [
       ...prev,
       {
@@ -67,6 +79,7 @@ export default function CeremonyChecklist({ compact = false }) {
     ]);
     setNewItem({ label: '', category: 'General' });
     setDirty(true);
+    setLimitWarning('');
   };
 
   const handleSave = async () => {
@@ -95,6 +108,9 @@ export default function CeremonyChecklist({ compact = false }) {
           <p className="text-sm text-gray-600">
             Controla documentos, ensayos y entregables críticos para el flujo 11.
           </p>
+          {!compact && limitWarning && (
+            <p className="mt-1 text-sm text-amber-600">{limitWarning}</p>
+          )}
         </div>
         {!compact && (
           <div className="flex items-center gap-2">
@@ -202,11 +218,11 @@ export default function CeremonyChecklist({ compact = false }) {
                     <div className="flex flex-col">
                       <label className="text-gray-500 mb-1">Estado</label>
                       <select
-                        className="border rounded px-2 py-1"
-                        value={item.status}
-                        onChange={(e) => handleStatus(item.id, e.target.value)}
-                        disabled={compact}
-                      >
+                    className="border rounded px-2 py-1"
+                    value={item.status}
+                    onChange={(e) => handleStatus(item.id, e.target.value)}
+                    disabled={compact}
+                  >
                         {Object.entries(STATUS_LABELS).map(([value, label]) => (
                           <option key={value} value={value}>
                             {label}
@@ -241,6 +257,16 @@ export default function CeremonyChecklist({ compact = false }) {
                         ))}
                       </ul>
                     </div>
+                  )}
+
+                  {item.relatedDocType &&
+                    (!documentsIndex || !documentsIndex[item.relatedDocType]?.length) && (
+                      <div className="border-t border-dashed pt-2 text-sm text-amber-600 flex items-center gap-2">
+                        <FileText size={16} />
+                        <span>
+                          No hay documentos vinculados a este requisito. Súbelos desde la guía legal.
+                        </span>
+                      </div>
                   )}
                 </div>
               ))}

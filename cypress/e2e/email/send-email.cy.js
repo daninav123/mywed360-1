@@ -64,7 +64,7 @@ describe('Flujo de envío de correo electrónico', () => {
     cy.navigateToEmailInbox();
     
     // Comprobar que la página de correo se carga correctamente
-    cy.get('[data-testid="email-title"]').should('contain', 'Bandeja de entrada');
+    cy.get('[data-testid="email-title"]').should('contain', 'Recibidos');
     
     // Hacer clic en el botón de redactar correo
     cy.get('[data-testid="compose-button"]').click();

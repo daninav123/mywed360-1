@@ -1,7 +1,7 @@
 # 11B. Timeline Global del Día B
 
 > Componentes clave: `src/pages/protocolo/Timing.jsx`, `src/components/protocolo/CeremonyTimeline.jsx`, `src/hooks/useCeremonyTimeline.js`
-> Persistencia: `weddings/{id}/timing`, `weddings/{id}/ceremonyTimeline/main`
+> Persistencia actual: campo `timing` dentro de `weddings/{id}` y subcolección `weddings/{id}/ceremonyTimeline/main` (migración a doc dedicado pendiente)
 
 ## 1. Objetivo y alcance
 - Definir el cronograma completo del evento (preparativos, ceremonia, cóctel, banquete, fiesta).  
@@ -20,12 +20,13 @@
 - Inicializa bloques por defecto cuando no existe información (`Timing.jsx:47-64`).  
 - Permite editar nombre, horas, añadir/eliminar momentos y reordenarlos con botones.  
 - `CeremonyTimeline` gestiona secciones pre/ceremonia/post, con alta/baja de hitos y cambios de responsable/estado (`src/components/protocolo/CeremonyTimeline.jsx`).  
+- Selector de estado por bloque (`on-time | slightly-delayed | delayed`) directamente desde la cabecera del bloque.
 
 **Pendiente / roadmap**
 - Mover la persistencia de `timing` a una subcolección separada (`weddings/{id}/timing`).  
 - Editar el estado del bloque (on-time/slightly-delayed/delayed) desde la UI.  
 - Reordenamiento drag&drop, límites de 30 hitos y validaciones de coherencia horaria.  
-- Instrumentación (`ceremony_timeline_updated`) y alertas automáticas según retraso.
+- Alertas automáticas según retraso.
 
 ## 4. Datos y modelo
 - Documento `weddings/{id}/timing`: array de bloques con `id`, `name`, `startTime`, `endTime`, `status`, `moments`.  
@@ -50,14 +51,18 @@
 - **Seating Plan**: el botón “Configurar ceremonia” puede abrir el modal de layout con tiempos asociados al acceso de invitados.
 
 ## 8. Métricas y eventos
-- No se envían eventos automáticos; `ceremony_timeline_updated` es una mejora pendiente.  
+- Evento `ceremony_timeline_updated` al guardar el timeline de ceremonia (incluye nº secciones/hitos).  
 - Indicadores propuestos: desviación media, nº hitos completados, horas bloqueadas vs libres.  
-- Logging de auditoría está en backlog.
+- Logging de auditoría detallado continúa en backlog.
 
 ## 9. Pruebas recomendadas
 - Unitarias: `useCeremonyTimeline` (merge de secciones, ids), helpers de `Timing`.  
 - Integración: mover momento desde Momentos Especiales → verificar reflejo en timeline y persistencia.  
 - E2E: planner marca bloque como retrasado, ajusta hora y observa actualización en checklist/tareas.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/protocolo/protocolo-flows.cy.js`: verifica que el timeline se inicializa con los bloques por defecto y que la interfaz permite añadir nuevos momentos.
 
 ## 10. Checklist de despliegue
 - Asegurar reglas Firestore para `timing` y `ceremonyTimeline`.  

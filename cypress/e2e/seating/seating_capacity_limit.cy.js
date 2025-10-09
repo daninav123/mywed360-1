@@ -5,6 +5,7 @@
     cy.visit('/invitados/seating', {
       onBeforeLoad(win) {
         win.localStorage.setItem('lovenda_active_wedding', WID);
+        win.localStorage.setItem('mywed360_active_wedding', WID);
       },
     });
   }

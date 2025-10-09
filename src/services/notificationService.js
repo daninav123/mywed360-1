@@ -12,7 +12,7 @@ export const setAuthContext = (context) => {
   authContext = context;
 };
 
-const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:3001';
+const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:4004';
 
 // Obtiene el token de autenticación del usuario actual (prioriza sistema unificado)
 async function getAuthToken() {
@@ -163,6 +163,11 @@ function mapSubtypeKey(type, subtype) {
 export async function getNotifications() {
   try {
     const headers = await authHeader();
+    if (!headers || !headers.Authorization) {
+      const local = loadLocalNotifications();
+      const unreadCount = local.filter((n) => !n.read).length;
+      return { notifications: local, unreadCount };
+    }
     const res = await apiGet('/api/notifications', { headers });
     if (!res.ok) throw new Error('Error fetching notifications');
     const arr = await res.json();
@@ -553,5 +558,4 @@ function deleteLocalNotification(id) {
   saveLocalNotifications(updatedNotifications);
   return true;
 }
-
 

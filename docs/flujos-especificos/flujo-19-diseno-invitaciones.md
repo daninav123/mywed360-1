@@ -60,6 +60,10 @@
 - Integracion: editar -> guardar -> exportar -> verificar archivo en storage.
 - E2E: crear invitacion desde plantilla, insertar QR RSVP, descargar PDF.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/invitaciones_rsvp.cy.js`: recorre la creación y envío de invitaciones digitales vinculadas a RSVP.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `designs`, `designActivity`, `designTemplates`, `designErrors`.
 - Configurar limites de upload y validaciones en Cloud Storage.

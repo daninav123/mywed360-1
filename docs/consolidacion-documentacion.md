@@ -1,4 +1,4 @@
-# Plan de Consolidación de Documentación - MyWed360
+﻿# Plan de Consolidación de Documentación - MyWed360
 
 ## 🎯 Objetivo
 Eliminar duplicación y crear estructura documental clara y mantenible.
@@ -19,7 +19,7 @@ Eliminar duplicación y crear estructura documental clara y mantenible.
 
 #### **Flujos Específicos Detallados:**
 - ✅ `flujo-3-gestion-invitados.md`
-- ✅ `flujo-4-plan-asientos.md` 
+- ✅ `flujo-4-invitados-operativa.md`
 - ✅ `flujo-5-proveedores-ia.md`
 - ✅ `flujo-5-timeline-tareas.md`
 - ✅ `flujo-6-presupuesto.md`
@@ -57,7 +57,7 @@ docs/
 ├── flujos-usuario.md                  # Especificación técnica general
 ├── flujos-especificos/                # Flujos detallados
 │   ├── flujo-3-gestion-invitados.md
-│   ├── flujo-4-plan-asientos.md
+│   ├── flujo-4-invitados-operativa.md
 │   ├── flujo-5-proveedores-ia.md
 │   ├── flujo-5-timeline-tareas.md
 │   ├── flujo-6-presupuesto.md
@@ -99,6 +99,5 @@ La diferencia clave es:
 - **`flujos-usuario.md`** = Especificación técnica para desarrolladores
 
 Ambos son necesarios pero sirven audiencias diferentes.
-
 
 

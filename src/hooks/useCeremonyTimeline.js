@@ -3,6 +3,7 @@ import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 const DEFAULT_SECTIONS = [
   {
@@ -166,6 +167,14 @@ export default function useCeremonyTimeline() {
           },
           { merge: true },
         );
+        performanceMonitor.logEvent('ceremony_timeline_updated', {
+          weddingId: activeWedding,
+          sections: sanitized.length,
+          totalItems: sanitized.reduce(
+            (acc, section) => acc + (Array.isArray(section.items) ? section.items.length : 0),
+            0,
+          ),
+        });
       } catch (err) {
         console.warn('[useCeremonyTimeline] saveSections error', err);
         setError(err);

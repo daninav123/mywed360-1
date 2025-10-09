@@ -26,18 +26,30 @@ describe('Flujo de envío de correos desde búsqueda AI de proveedores (CP-EP-07
     cy.window().then((win) => {
       win.localStorage.setItem('userEmail', 'usuario.test@lovenda.com');
       win.localStorage.setItem('isLoggedIn', 'true');
-      // Configurar contexto de boda para que Proveedores se renderice correctamente
-      win.localStorage.setItem('activeWedding', 'test-wedding-123');
-      const mockWedding = {
-        id: 'test-wedding-123',
-        brideFirstName: 'María',
-        brideLastName: 'García',
-        groomFirstName: 'Juan',
-        groomLastName: 'Pérez',
-        weddingDate: '2025-10-15'
-      };
-      win.localStorage.setItem('lovenda_wedding_test-wedding-123', JSON.stringify(mockWedding));
-    });
+    // Configurar contexto de boda para que Proveedores se renderice correctamente
+    win.localStorage.setItem('activeWedding', 'test-wedding-123');
+    win.localStorage.setItem('lovenda_active_wedding', 'test-wedding-123');
+    win.localStorage.setItem('mywed360_active_wedding', 'test-wedding-123');
+    const mockWedding = {
+      id: 'test-wedding-123',
+      brideFirstName: 'María',
+      brideLastName: 'García',
+      groomFirstName: 'Juan',
+      groomLastName: 'Pérez',
+      weddingDate: '2025-10-15'
+    };
+    win.localStorage.setItem('lovenda_wedding_test-wedding-123', JSON.stringify(mockWedding));
+    win.localStorage.setItem('mywed360_wedding_test-wedding-123', JSON.stringify(mockWedding));
+    const mockProfile = {
+      uid: 'cypress-ai-user',
+      email: 'usuario.test@lovenda.com',
+      displayName: 'Usuario Test',
+    };
+    win.localStorage.setItem('lovenda_user', JSON.stringify(mockProfile));
+    win.localStorage.setItem('mywed360_user', JSON.stringify(mockProfile));
+    win.localStorage.setItem('mywed360_login_email', 'usuario.test@lovenda.com');
+    win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockProfile));
+  });
     
     // Refrescar para aplicar cambios de autenticación
     cy.reload();

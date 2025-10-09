@@ -9,7 +9,10 @@ describe('Flujo 16 - Contratos y Documentos', () => {
     cy.window().then((win) => win.localStorage.clear());
     cy.loginToLovenda();
     // Forzar modo local (sin boda activa)
-    cy.window().then((win) => win.localStorage.removeItem('lovenda_active_wedding'));
+    cy.window().then((win) => {
+      win.localStorage.removeItem('mywed360_active_wedding');
+      win.localStorage.removeItem('lovenda_active_wedding');
+    });
   });
 
   it('crea un contrato y lo muestra en la lista', () => {
@@ -34,4 +37,3 @@ describe('Flujo 16 - Contratos y Documentos', () => {
       .parents('tr').find('input[type="checkbox"]').check({ force: true });
   });
 });
-

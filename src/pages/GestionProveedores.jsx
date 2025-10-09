@@ -30,6 +30,7 @@ import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import { useAuth } from '../hooks/useAuth';
 import { db } from '../lib/firebase';
 import { post as apiPost } from '../services/apiClient';
+import Modal from '../components/Modal';
 
 /**
  * Página de gestión de proveedores
@@ -57,6 +58,7 @@ const GestionProveedores = () => {
   const [modalFormularioVisible, setModalFormularioVisible] = useState(false);
   const [modalAIVisible, setModalAIVisible] = useState(false);
   const [proveedorEditar, setProveedorEditar] = useState(null);
+  const [needsModalOpen, setNeedsModalOpen] = useState(false);
 
   // Estaños para búsqueda IA
   const [resultadoBusquedaIA, setResultadoBusquedaIA] = useState(null);
@@ -522,17 +524,22 @@ const GestionProveedores = () => {
     contenidoPrincipal = (
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-6">
         <div className="space-y-6">
-          {/* Tablero de servicios */}
-          <ServicesBoard
-            proveedores={proveedores}
-            onOpenSearch={(serv) => {
-              setDrawerBusquedaOpen(true);
-            }}
-            onOpenNew={(serv) => abrirNuevoProveedorConServicio(serv)}
-            onOpenAI={(serv) => {
-              setDrawerBusquedaOpen(true);
-            }}
-          />
+          <div className="rounded-lg border border-dashed border-gray-300 bg-white/70 p-4 flex flex-wrap items-center gap-3">
+            <div>
+              <div className="text-sm font-semibold text-gray-800">Organiza necesidades y servicios</div>
+              <p className="text-xs text-gray-600 max-w-md">
+                Usa la matriz para mapear qué servicios están cubiertos, detectar pendientes y lanzar búsquedas inteligentes.
+              </p>
+            </div>
+            <div className="ml-auto">
+              <button
+                onClick={() => setNeedsModalOpen(true)}
+                className="inline-flex itemás-center px-3 py-2 border border-blue-600 text-blue-600 text-xs font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Abrir matriz de necesidades
+              </button>
+            </div>
+          </div>
 
           {/* Kanban por estado */}
           <SupplierKanban
@@ -595,6 +602,13 @@ const GestionProveedores = () => {
         {!proveedorSeleccionado && (
           <div className="mt-4 sm:mt-0 sm:ml-16 flex space-x-3">
             <button
+              onClick={() => setNeedsModalOpen(true)}
+              className="inline-flex itemás-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Settings className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Matriz de necesidades
+            </button>
+            <button
               onClick={() => setDrawerBusquedaOpen(true)}
               className="inline-flex itemás-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             >
@@ -636,10 +650,39 @@ const GestionProveedores = () => {
           setResultadoBusquedaIA(null);
         }}
         onBuscar={buscarConIAReal}
-        onGuardar={guardarProveedorIA}
-        resultado={resultadoBusquedaIA}
-        cargando={cargandoBusquedaIA}
-      />
+      onGuardar={guardarProveedorIA}
+      resultado={resultadoBusquedaIA}
+      cargando={cargandoBusquedaIA}
+    />
+
+      <Modal
+        open={needsModalOpen}
+        onClose={() => setNeedsModalOpen(false)}
+        title="Matriz de necesidades"
+        size="full"
+        className="max-w-5xl"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Revisa los servicios planificados, asigna responsables y lanza búsquedas instantáneas.
+          </p>
+          <ServicesBoard
+            proveedores={proveedores}
+            onOpenSearch={(serv) => {
+              setNeedsModalOpen(false);
+              setDrawerBusquedaOpen(true);
+            }}
+            onOpenNew={(serv) => {
+              setNeedsModalOpen(false);
+              abrirNuevoProveedorConServicio(serv);
+            }}
+            onOpenAI={(serv) => {
+              setNeedsModalOpen(false);
+              setDrawerBusquedaOpen(true);
+            }}
+          />
+        </div>
+      </Modal>
 
       {/* Drawer IA contextual */}
       <ProviderSearchDrawer
@@ -655,4 +698,3 @@ const GestionProveedores = () => {
 };
 
 export default GestionProveedores;
-

@@ -1,123 +1,101 @@
-# 3. Gesti�n de Invitados (estado 2025-10-07)
+﻿# 3. Gestión de Invitados (estado 2025-10-07)
 
-> Implementado: `Invitados.jsx`, `RSVPDashboard.jsx`, `AcceptInvitation.jsx`, `GuestEventBridge.jsx`, componentes en `src/components/guests/` (GuestList, GuestFilters, GuestForm, GuestBulkGrid, ContactsImporter, GuestEventBridge), modales de WhatsApp (`WhatsAppModal`, `WhatsAppSender`, `SaveTheDateModal`, `InviteTemplateModal`), servicios (`useGuests`, `MessageTemplateService`, `whatsappService`, `WhatsAppBatchService`, `SyncService`), esquemas `guestSchema/guestUpdateSchema` y helpers de contexto (`useWedding`, `useActiveWeddingInfo`).
-> Pendiente: cerrar el canal email (`inviteViaEmail`), dashboards avanzados y check-in d�a del evento, sincronizaci�n bidireccional autom�tica con Seating Plan.
-> Dependencias clave: Firestore (colecciones `weddings/{id}/guests`, `weddings/{id}/rsvp`, `weddings/{id}/rsvpLogs`), SyncService (estado online/offline), whatsappService (API REST), extensi�n de automatizaci�n WhatsApp, localStorage (`mywed360Guests`).
+> Implementado: `Invitados.jsx`, `RSVPDashboard.jsx`, `AcceptInvitation.jsx`, `GuestEventBridge.jsx`, componentes de invitados (`GuestList`, `GuestFilters`, `GuestForm`, `GuestBulkGrid`, `ContactsImporter`, `GroupManager`), modales de WhatsApp (`WhatsAppModal`, `WhatsAppSender`, `SaveTheDateModal`, `InviteTemplateModal`), servicios `useGuests`, `SyncService`, `MessageTemplateService`, `whatsappService`, `WhatsAppBatchService`.  
+> Pendiente: dashboard analítico de RSVP, check-in en día del evento y sincronización automática con Seating Plan.
 
 ## 1. Objetivo y alcance
-- Centralizar la captura, segmentacion y seguimiento de invitados de una boda, incluyendo RSVP, acompanantes, asignacion de mesas (como agrupador principal) y comunicaciones.
-- Usuarios previstos: Owner, Planner y Assistants con permisos sobre la boda activa.
-- El flujo cubre tanto la operaci�n diaria (altas/ediciones, filtros, comunicaciones) como utilidades complementarias (resumen RSVP, impresi�n r�pida, exportaciones y plantillas de mensaje).
+- Centralizar el alta, edición y seguimiento de invitados (datos personales, RSVP, acompañantes, asignación de mesa).
+- Gestionar importaciones masivas, plantillas de mensajería y recordatorios.
+- Ofrecer herramientas de diagnóstico y sincronización (online/offline).
 
 ## 2. Trigger y rutas
-- Men� inferior ? `M�s` ? bloque **Invitados** ? enlace �Gesti�n de invitados� (`/invitados`, render `Invitados.jsx`).
-- Resumen RSVP desde `M�s` ? **Invitados** ? �Resumen RSVP� (abre `/invitados/rsvp`, render `RSVPDashboard.jsx`).
-- Invitaciones de colaboradores: enlaces recibidos apuntan a `/accept-invitation/:code` (`AcceptInvitation.jsx`).
-- Eventos externos (`window.dispatchEvent('mywed360-guests', ...)`) se capturan mediante `GuestEventBridge` (inyectado en `MainLayout`).
+- Menú inferior → `Más` → bloque **Invitados** → “Gestión de invitados” (`/invitados`, render `Invitados.jsx`).
+- Resumen RSVP disponible como modal dentro de la propia pantalla de invitados (render `RSVPDashboard.jsx`).
+- Invitaciones de colaboradores: enlaces enviados apuntan a `/accept-invitation/:code` (`AcceptInvitation.jsx`).
+- Eventos externos (`window.dispatchEvent('mywed360-guests', ...)`) se capturan con `GuestEventBridge` en `MainLayout`.
 
 ## 3. Paso a paso UX
-1. **Invitados.jsx**
-   - **Cabecera y contexto**: muestra el t�tulo y una descripci�n breve; en modo desarrollo se incluyen utilidades de depuraci�n (IDs, conteos, login manual) para verificar el estado de los datos.
-   - **Fallback y depuraci�n**: si `weddings` est� vac�o aparece un mensaje guiando al usuario a crear/seleccionar boda. En modo `import.meta.env.DEV` se renderiza un bloque debug con m�tricas internas (IDs, conteos, estado de auth) y un bot�n de login manual para Firebase (�til en local).
-   - **Filtros y metricas rapidas**: `GuestFilters`
-     - Busca por nombre/email/telefono/notas, filtra por estado (`pending/confirmed/declined`) y mesa (la mesa actua como agrupador unico; los antiguos grupos quedan ocultos).
-     - Muestra contador total y habilita selecci�n m�ltiple (`selectedIds`).
-     - Acciones principales:
-       * Alta manual (abre `GuestForm`).
-       * Alta masiva (`GuestBulkGrid`) con deduplicaci�n.
-       * Importaci�n desde contactos (`ContactsImporter`).
-       * **Invitaciones masivas (API)**: acceso directo a los modulos de Save The Date e Invitacion formal segun la necesidad.
-       * �Enviar SAVE THE DATE� ? `SaveTheDateModal` con mensaje precargado.
-       * �Resumen RSVP� ? abre modal de m�tricas.
-       * �Editar mensaje (API)� ? `InviteTemplateModal`, edita la plantilla base guardada en localStorage.
-       * Selecci�n m�ltiple (lado derecho):
-         ? �Enviar seleccionados (API)� ? `inviteSelectedWhatsAppApi`, usa `/api/whatsapp/send-batch` con dedupe por tel�fono y respuesta de resultado.
-         ? �Programar seleccionados� ? `handleScheduleSelected`, genera enlaces RSVP y llama a `whatsappService.schedule` con metadatos.
-         ? �Difusi�n (extensi�n)� ? `inviteSelectedWhatsAppBroadcastViaExtension`; ofrece fallback individual.
-         ? Acceso avanzado �Reasignar mesa� para mover en bloque a los invitados seleccionados y sincronizar acompanantes.
-   - **Lista de invitados (`GuestList`)**:
-     * Tarjetas de m�tricas: total, confirmados, pendientes, asistentes estimados (`stats.totalAttendees`).
-     * Tabla desktop con selecci�n por fila, avatar placeholder, email, tel�fono, mesa, acompa�antes y badge de restricciones.
-     * Toggle de estado RSVP: ciclo `pending ? confirmed ? declined`, persiste con `updateGuest`.
-     * Acciones por fila: WhatsApp (`WhatsAppModal`), Email (`inviteViaEmail`, pendiente), editar (`GuestForm`), eliminar (`removeGuest`).
-     * Vista m�vil con tarjetas, checkbox lateral y toggle idem.
-   - **Modal de formulario (`GuestForm`)**: campos completos (datos basicos, direccion detallada, acompanantes, mesa, notas, restricciones). Valida coherencia, guarda con `addGuest`/`updateGuest` y autosave cada 30 s; el campo `group` queda oculto y sincroniza su valor con la mesa para mantener retrocompatibilidad.
-   - **Alta masiva (`GuestBulkGrid`)**: grid editable con pegado desde Excel/Sheets, validaci�n por celda y deduplicaci�n.
-   - **Importaci?n de contactos (`ContactsImporter`)**: soporta Contact Picker API y CSV; permite importar todo el lote directamente o seleccionar contactos puntuales para asignarlos a una mesa espec?fica antes de confirmar. El asistente mapea columnas, marca el origen y deduplica frente a la lista actual antes de llamar a `addGuest`.
-   - **Mensajer�a WhatsApp y recordatorios**:
-     * `WhatsAppModal`: pesta�as m?vil personal / n�mero de la app; esta �ltima env�a con `inviteViaWhatsAppApi` y permite trigger masivo a pendientes.
-     * `handleSendSelectedMobile`: env�o one-click v?a extensi�n (`inviteSelectedWhatsAppViaExtension`) con fallback a deeplinks (`inviteSelectedWhatsAppDeeplink`).
-     * `handleSendSelectedBroadcast`: intenta difusi�n por extensi�n, ofrece fallback individual.
-     * `handleScheduleSelected`: genera mensajes personalizados (enlace RSVP por invitado si aplica) y programa lotes (`whatsappService.schedule`).
-     * `WhatsAppSender`: modal para crear lotes manuales (`WhatsAppBatchService.sendBatch`, POST `/api/whatsapp/batch`).
-     * `SaveTheDateModal`: selecciona invitados con tel?fono, permite mensaje global o por invitado, comprueba proveedor y env?a v?a `whatsappService.sendText` (`type: save_the_date`).
-     * `InviteTemplateModal`: edita la plantilla base para env?os API, soporta `{guestName}` y guarda en localStorage.
-   - **Resumen RSVP**: modal con totales (total/confirmados/pendientes/rechazados) y tabla de confirmados con boton de impresion / PDF.
-   - **Reasignacion de mesas**: accion avanzada desde la lista que permite mover en bloque a invitados seleccionados a otra mesa, propagando la mesa a acompanantes y actualizando sincronizaciones externas.
-   - **Compatibilidad y eventos**: sincroniza `localStorage.mywed360Guests`, emite `mywed360-guests-updated`, escucha eventos externos mediante `GuestEventBridge` y permite `sampleGuests` cuando `VITE_ALLOW_SAMPLE_GUESTS === 'true'`.
+1. **Invitados (`Invitados.jsx`)**
+   - Cabecera con título, descripción y herramientas de depuración en modo DEV (IDs, conteos, login manual).
+   - Banner cuando no hay boda seleccionada (guía para crear/seleccionar boda o cargar datos de prueba).
+   - `GuestFilters`: búsqueda por nombre/email/teléfono/notas, filtros por estado RSVP, mesa y grupo; contador y selección múltiple.
+   - Acciones masivas:
+     * Alta manual (`GuestForm`), alta masiva (`GuestBulkGrid`), importación (`ContactsImporter`).
+     * Save the Date (`SaveTheDateModal`), resumen RSVP, edición de plantillas API (`InviteTemplateModal`).
+     * Envío/Programación vía WhatsApp (`inviteSelectedWhatsAppApi`, `handleScheduleSelected`), difusión por extensión, reasignación de mesa para seleccionados.
+   - Lista (`GuestList`): tabla escritorio y tarjetas móviles, toggles RSVP `pending → confirmed → declined`, acciones por fila (WhatsApp, email -pendiente-, editar, eliminar), indicadores de restricciones y acompañantes.
+   - Formulario modal (`GuestForm`): datos personales, dirección, mesa, acompañantes, notas; validaciones y autosave cada 30s.
+   - Alta masiva (`GuestBulkGrid`): pegado desde Excel/Sheets, validaciones por celda, deduplicación.
+   - Importador (`ContactsImporter`): Contact Picker API + CSV, asignación previa de mesa, dedupe antes de crear.
+   - Mensajería WhatsApp:
+     * `WhatsAppModal`: pestañas móvil personal/empresa, envío puntual o masivo vía `/api/whatsapp/send` y `/send-batch`.
+     * `WhatsAppSender`: creación de lotes manuales (`WhatsAppBatchService.sendBatch`).
+     * `handleScheduleSelected`: programa envíos (`whatsappService.schedule`) con enlaces RSVP por invitado.
+     * `SaveTheDateModal`: mensajes tipo “save_the_date” (reutiliza `whatsappService.sendText`).
+     * `InviteTemplateModal`: edita plantillas `{guestName}` y persiste en localStorage.
+   - Impresión física: desde la misma pantalla se generan pedidos (`/api/print/invitations`) reutilizando una invitación única (`assetUrl`) y personalizando el sobre por invitado (nombre y dirección) con un identificador de lote (`printBatchId`).
+   - Correo electrónico: la acción “Email” por invitado usa `sendMail` (plantillas `{guestName}`, `{coupleName}`), adjunta la invitación digital y registra el canal `email`.
+  - Resumen RSVP: modal con totales (confirmados/pendientes/rechazados), tabla y acción de impresión/exportación.
+   - Compatibilidad/offline: sincroniza `localStorage.mywed360Guests`, emite `mywed360-guests-updated`, muestra indicador de conexión y permite cargar muestras (`sampleGuests`).
 
-2. **RSVPDashboard.jsx**
-   - Escucha `weddings/{id}/rsvp/stats` y `weddings/{id}/guests` (pendientes).
-   - Acciones `/api/rsvp/reminders` (`dryRun` o env?o real), copia enlaces RSVP y dispara `evaluateTrigger` para notificaciones.
+2. **Dashboard RSVP (`RSVPDashboard.jsx`)**
+   - Escucha `weddings/{id}/rsvp/stats` y `weddings/{id}/guests`.
+   - Acciones: copiar enlaces RSVP, enviar recordatorios (`/api/rsvp/reminders`, `dryRun`), evaluar reglas (`evaluateTrigger`) para notificaciones.
 
-3. **AcceptInvitation.jsx**
-   - Ruta p?blica con `:code`, requiere usuario autenticado. Llama `acceptInvitation` y redirige a `/bodas/{id}` en ?xito.
+3. **Invitaciones a colaboradores (`AcceptInvitation.jsx`)**
+   - Ruta pública con `:code`; tras autenticarse el invitado, llama `acceptInvitation`, actualiza roles y redirige a `/bodas/{id}`.
 
 ## 4. Persistencia y datos
-- Firestore `weddings/{id}/guests/{guestId}`: `{ id, name, email, phone, address*, addressStreet*, addressCity*, status, response, companion, companionType, companions (legacy), companionGroupId, table, group, tags[], dietaryRestrictions, notes, rsvpToken, clientId, createdAt, updatedAt }`.
-- `weddings/{id}/rsvp/stats`, `weddings/{id}/rsvpLogs` (historial recordatorios).
+- Firestore `weddings/{id}/guests/{guestId}`: campos completos (`name`, `email`, `phone`, `status`, `companions`, `table`, `group`, `dietaryRestrictions`, `rsvpToken`, timestamps, etc.).
+- `weddings/{id}/rsvp/stats`, `weddings/{id}/rsvpLogs` (histórico de recordatorios).
 - LocalStorage: `mywed360Guests`, `mywed360_active_wedding`, `whatsapp_invite_template`.
-- SyncService: `syncState`, guardado h?brido y cola `pendingSyncQueue`.
-- Normalizaci?n: limpieza de tel?fonos, dedupe en importaciones, normalizaci?n de status v?a `guestSchema`/`guestUpdateSchema`.
+- `SyncService`: estado `syncState`, cola `pendingSyncQueue`, timestamps de última sincronización.
 
-## 5. Reglas de negocio y validaciones
-- Email �nico por boda (dedupe email/tel?fono).
-- Tel�fonos normalizados a E.164 (`toE164` con `VITE_DEFAULT_COUNTRY_CODE`).
-- Estados RSVP en `confirmed/declined/pending`.
-- Acompa?antes 0-20 y coherencia con `companionType`.
-- Grupos propagan cambios a `companionGroupId`.
-- Mesas replicadas en companions al editar.
-- Envios API deduplican tel?fonos.
-- Importaciones marcan origen y resaltan errores.
+## 5. Reglas de negocio
+- Email/teléfono únicos por boda (deduplicación en alta masiva/importador).
+- Teléfonos normalizados a E.164 (`VITE_DEFAULT_COUNTRY_CODE`).
+- Estados RSVP válidos: `pending`, `confirmed`, `declined`.
+- Acompañantes: validación 0-20 y sincronización con tipo/grupo.
+- Cuando se reasigna mesa, se actualiza acompañantes y `companionGroupId`.
+- Envíos API eliminan duplicados de teléfono y registran errores por invitado.
 
 ## 6. Estados especiales y errores
-- Indicador offline, alertas en fallos de red.
-- Sin bodas ? mensaje orientativo o `sampleGuests`.
-- `GuestEventBridge` ignora eventos sin coincidencia.
-- Importaciones y alta masiva informan a?adidos/omitidos.
-- Mensajer?a: fallback sin extensi?n, bloqueo si proveedor no configurado, alertas en programaci?n.
-- Recordatorios RSVP alertan si `/api/rsvp/reminders` falla.
-- AcceptInvitation muestra error si el c?digo no es v?lido.
+- Indicadores de modo offline, toasts en fallos de guardado o sincronización.
+- `GuestEventBridge` ignora eventos sin coincidencia y refresca lista al recibir actualizaciones externas.
+- Importaciones/alta masiva reportan filas válidas/erróneas; permiten revisar antes de confirmar.
+- Mensajería: fallback sin extensión, bloqueo si proveedor no está configurado, alerts en programaciones fallidas.
+- Recordatorios RSVP informan resultado (`dryRun` o envío real).
+- `AcceptInvitation` muestra mensajes claros cuando el código es inválido o ya usado.
 
-## 7. Integraciones con otros flujos
-- Plan de asientos, Timeline/Tareas, Presupuesto, Comunicaciones, Perfil/Dashboard y Automations (vía [Flujo 24](./flujo-24-orquestador-automatizaciones.md)) consumen datos/eventos de invitados.
+## 7. Integración con otros flujos
+- Flujo 4 (plan de asientos/gestión de contenido) consume invitados confirmados.
+- Flujo 5 y 15 generan tareas/contratos asociados a invitados.
+- Flujo 6 (finanzas) se apoya en recuentos para estimaciones.
+- Flujo 9 (RSVP) sintetiza métricas y recordatorios.
+- Flujo 14 (checklist) crea tareas automáticas tras importaciones o eventos RSVP.
+- Flujo 16 (asistente) puede sugerir acciones basadas en este módulo.
 
-## 8. Comunicaci?n y mensajer?a
-- Endpoints: `/api/whatsapp/send`, `/api/whatsapp/send-batch`, `/api/whatsapp/batch`, `/api/whatsapp/schedule`, `/api/whatsapp/provider-status`, `/api/whatsapp/metrics`, `/api/whatsapp/health`.
-- `/api/whatsapp/send-batch` procesa items `{to,message,guestId,metadata}`, devuelve `ok/fail` y registra errores.
-- Extensi�n y deeplinks cubren fallback; `WhatsAppBatchService` genera lotes manuales.
-- Plantillas (`MessageTemplateService`) sustituyen `{guestName}` y persisten.
+## 8. Métricas y monitorización
+- `RSVPDashboard` muestra totales y evolución (confirmados, pendientes, rechazados, restricciones).
+- `WhatsAppModal` consulta métricas de entrega (`deliveryRate`, `readRate`) cuando el backend las expone.
+- `SyncService` registra `lastSyncTime` y dispara toasts en sincronizaciones forzadas.
+- Roadmap: dashboard consolidado de métricas (hoy sólo parcial).
 
-## 9. M�tricas y monitorizaci�n
-- `RSVPDashboard` muestra m?tricas y restricciones.
-- `WhatsAppModal` consulta m?tricas (`deliveryRate`, `readRate`).
-- `/send-batch` responde con agregados para UI.
-- SyncService expone `lastSyncTime` y puede disparar toasts.
+## 9. Pruebas recomendadas
+- Unitarias: `useGuests`, esquemas `guestSchema`/`guestUpdateSchema`, `MessageTemplateService`, `WhatsAppBatchService`, `SyncService`.
+- Integración: alta/edición/eliminación, cambio RSVP, importación CSV/contactos, envío/programación WhatsApp, resumen RSVP, eventos `GuestEventBridge`.
+- E2E: alta masiva + seating, Save the Date, recordatorios RSVP, aceptación de invitación.
 
-## 10. Pruebas recomendadas
-- Unitarias: `useGuests`, esquemas, servicios de plantilla y sync, GroupManager, BulkGrid, ContactsImporter.
-- Integraci�n: alta/edici?n/eliminaci?n con acompa?antes, cambio RSVP, importaci?n CSV, programaci?n, edici?n plantilla, eventos `GuestEventBridge`.
-- E2E: alta masiva + seating, SaveTheDate, recordatorios RSVP, aceptaci?n de invitaci?n.
+## Cobertura E2E implementada
+- `cypress/e2e/guests/guests_flow.cy.js`: cubre alta manual y masiva de invitados, consulta del resumen RSVP y filtros principales de la vista de invitados.
 
-## 11. Checklist de despliegue
-- Configurar proveedor WhatsApp y variables (`VITE_BACKEND_BASE_URL`, `VITE_DEFAULT_COUNTRY_CODE`).
-- Reglas Firestore para CRUD de invitados (campos extendidos).
-- Endpoints habilitados (`/api/whatsapp/send`, `/send-batch`, `/batch`, `/schedule`, `/api/rsvp/reminders`, `/api/guests/{id}/rsvp-link`).
-- Revisar permisos SyncService y avisos de extensi?n.
+## 10. Checklist de despliegue
+- Configurar proveedor WhatsApp y variables (`VITE_BACKEND_BASE_URL`, `VITE_DEFAULT_COUNTRY_CODE`, credenciales).
+- Reglas Firestore actualizadas (CRUD de `guests` y `rsvp`).
+- Endpoints habilitados: `/api/whatsapp/send`, `/send-batch`, `/batch`, `/schedule`, `/api/whatsapp/provider-status`, `/api/rsvp/reminders`, `/api/guests/{id}/rsvp-link`.
+- Revisar traducciones/mensajes de toasts y compatibilidad con modo offline.
 
-## 12. Roadmap / pendientes
-- Implementar canal email (`inviteViaEmail`) y decidir estrategia para `bulkInviteWhatsApp` (modo extensi?n).
-- Dashboard avanzado de RSVP / m?tricas de env?o.
-- Check-in en evento en tiempo real.
-- Sincronizaci?n autom?tica Seating Plan.
-- Alertas proactivas (vencimientos RSVP, etc.) en UI.
+## 11. Roadmap / pendientes
+- Dashboard avanzado (métricas, embudos RSVP, historial de comunicaciones).
+- Check-in en el día del evento (lectura QR, actualización en tiempo real).
+- Sincronización automática con Seating Plan y con el asistente IA (respuesta/acciones). 

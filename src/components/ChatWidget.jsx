@@ -467,17 +467,18 @@ export default function ChatWidget() {
           if (query) {
             try {
               // Resolver base del backend de forma unificada
-              const baseFromEnv = (import.meta?.env?.VITE_BACKEND_BASE_URL || '').toString();
-              const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
-              const apiBase = resolvedBase || 'http://localhost:3001';
-              const resp = await fetch(`${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`);
-              const dataS = await resp.json();
-              if (dataS.results) {
+      const baseFromEnv = (import.meta?.env?.VITE_BACKEND_BASE_URL || '').toString();
+      const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
+      const apiBase = resolvedBase || 'http://localhost:4004';
+      const resp = await fetch(`${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`);
+      const dataS = await resp.json();
+      if (dataS.results) {
                 localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
                 window.dispatchEvent(new Event('mywed360-suppliers'));
                 toast.success(`Encontrados ${dataS.results.length} proveedores`);
               } else {
                 toast.info('No se encontraron proveedores');
+{{ ... }}
               }
             } catch (err) {
               toast.error('Error buscando proveedores');

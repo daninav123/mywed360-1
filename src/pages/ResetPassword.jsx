@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuthUnified';
+import { useAuth } from '../hooks/useAuth';
 
 export default function ResetPassword() {
   const { sendPasswordReset } = useAuth();

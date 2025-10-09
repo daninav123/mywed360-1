@@ -472,6 +472,49 @@ const buildFallbackSections = (weddingInfo, template) => ({
     </section>
     `;
   },
+  map: () => {
+    const addresses = [weddingInfo?.ceremonyAddress, weddingInfo?.receptionAddress]
+      .filter(Boolean)
+      .join(' / ');
+    if (!addresses) return '';
+    return `
+    <section data-enhanced="mapa" id="mapa">
+      <div class="lovenda-section-heading"><span>Mapa de la celebración</span></div>
+      <div class="lovenda-card">
+        <iframe
+          title="Ubicación de la boda"
+          src="https://maps.google.com/maps?q=${encodeURIComponent(addresses)}&output=embed"
+          width="100%"
+          height="320"
+          style="border:0"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </section>
+    `;
+  },
+  faq: () => {
+    const faqs = Array.isArray(weddingInfo?.faqs) ? weddingInfo.faqs : [];
+    if (!faqs.length) return '';
+    const items = faqs
+      .map(
+        (faq) => `
+        <div class="lovenda-faq__item">
+          <div class="font-semibold text-gray-800 mb-1">${faq.question || ''}</div>
+          <p class="text-sm text-gray-600">${faq.answer || ''}</p>
+        </div>`
+      )
+      .join('');
+    return `
+    <section data-enhanced="faq" id="faq">
+      <div class="lovenda-section-heading"><span>Preguntas frecuentes</span></div>
+      <div class="lovenda-card lovenda-faq">
+        ${items}
+      </div>
+    </section>
+    `;
+  },
   contact: () => {
     const contact = [weddingInfo?.contactEmail, weddingInfo?.contactPhone].filter(Boolean).join(' · ');
     if (!contact) return '';
@@ -588,6 +631,8 @@ export const enhanceWeddingHtml = (html, { templateKey = 'personalizada', weddin
   output = ensureSection(output, 'data-enhanced="gallery"', fallbackSections.gallery);
   output = ensureSection(output, 'data-enhanced="lodging"', fallbackSections.lodging);
   output = ensureSection(output, 'data-enhanced="travel-guide"', fallbackSections.travel);
+  output = ensureSection(output, 'data-enhanced="mapa"', fallbackSections.map);
+  output = ensureSection(output, 'data-enhanced="faq"', fallbackSections.faq);
   output = ensureSection(output, 'data-enhanced="timeline"', fallbackSections.timeline);
   output = ensureSection(output, 'data-enhanced="contacto"', fallbackSections.contact);
 

@@ -3,6 +3,7 @@ import { collection, getDocs, doc, onSnapshot, serverTimestamp, setDoc } from 'f
 
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 const DEFAULT_ITEMS = [
   {
@@ -119,6 +120,21 @@ export default function useCeremonyChecklist() {
           },
           { merge: true },
         );
+        const summary = sanitized.reduce(
+          (acc, item) => {
+            const status = String(item.status || 'pending').toLowerCase();
+            if (status === 'done') acc.done += 1;
+            else if (status === 'in-progress') acc.inProgress += 1;
+            else acc.pending += 1;
+            return acc;
+          },
+          { done: 0, inProgress: 0, pending: 0 },
+        );
+        performanceMonitor.logEvent('ceremony_checklist_checked', {
+          weddingId: activeWedding,
+          ...summary,
+          total: sanitized.length,
+        });
       } catch (err) {
         console.warn('[useCeremonyChecklist] saveItems error', err);
         setError(err);

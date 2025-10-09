@@ -8,12 +8,12 @@ describe('Flujo 1 - Registro (signup)', () => {
     cy.visit('/signup');
 
     // Completar formulario con data-testid
-    cy.get('[data-testid="signup-email"]').type('nuevo.usuario+e2e@lovenda.test');
-    cy.get('[data-testid="signup-password"]').type('Password123!');
-    cy.get('[data-testid="signup-role"]').select('planner');
+    cy.get('#signup-email').type('nuevo.usuario+e2e@lovenda.test');
+    cy.get('#signup-password').type('Password123!');
+    cy.get('#signup-role').select('planner');
 
     // Enviar formulario
-    cy.get('[data-testid="signup-submit"]').click({ force: true });
+    cy.get('button[type="submit"]').contains(/registrarse/i).click({ force: true });
 
     // Según entorno, podría navegar a /home o mostrar error.
     // Validamos que la UI sigue operativa tras el submit.

@@ -50,6 +50,7 @@ function Finance() {
     budgetUsage,
     settings,
     hasBankAccount,
+    projection,
 
     // Acciones
     updateContributions,

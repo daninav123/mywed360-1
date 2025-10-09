@@ -1,6 +1,14 @@
 import { Download } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc as firestoreDoc,
+  serverTimestamp,
+  setDoc,
+} from 'firebase/firestore';
 
 import PageWrapper from '../../components/PageWrapper';
 import Card from '../../components/ui/Card';
@@ -8,6 +16,9 @@ import { useWedding } from '../../context/WeddingContext';
 import useActiveWeddingInfo from '../../hooks/useActiveWeddingInfo';
 import useTranslations from '../../hooks/useTranslations';
 import { uploadEmailAttachments } from '../../services/storageUploadService';
+import { db } from '../../firebaseConfig';
+import { useAuth } from '../../hooks/useAuth';
+import { performanceMonitor } from '../../services/PerformanceMonitor';
 
 // Persistencia local de progreso de requisitos por boda
 const LEGAL_LS_KEY = (weddingId) => `legalRequirements_${weddingId}`;
@@ -126,6 +137,18 @@ const DOWNLOAD_TEMPLATES = {
     ],
   },
 };
+
+const DEFAULT_RELATED_ID = 'legal';
+
+function guessRelatedCeremonyId(label = '') {
+  const lower = String(label).toLowerCase();
+  if (lower.includes('curso')) return 'curso';
+  if (lower.includes('ensayo')) return 'rehearsal';
+  if (lower.includes('proveedor') || lower.includes('música') || lower.includes('sonido')) {
+    return 'suppliers';
+  }
+  return DEFAULT_RELATED_ID;
+}
 
 // Plantillas HTML para .doc / PDF con prefill básico
 function generateTemplateHTML(id, region = 'ES', data = {}) {
@@ -274,6 +297,7 @@ export default function DocumentosLegales() {
   const { activeWedding } = useWedding();
   const { info: weddingInfo } = useActiveWeddingInfo();
   const { t } = useTranslations();
+  const { currentUser } = useAuth();
   const tr = (key, def) => {
     try {
       const v = t(key);
@@ -385,6 +409,7 @@ export default function DocumentosLegales() {
                             const f = e.target.files && e.target.files[0];
                             if (!f) return;
                             const upKey = key;
+                            const relatedId = guessRelatedCeremonyId(item);
                             setUploadingReq((u) => ({ ...u, [upKey]: true }));
                             try {
                               const uploaded = await uploadEmailAttachments(
@@ -396,12 +421,70 @@ export default function DocumentosLegales() {
                                 Array.isArray(uploaded) && uploaded[0]
                                   ? uploaded[0]
                                   : { filename: f.name, size: f.size };
+                              meta.relatedCeremonyId = relatedId;
                               const next = { ...(legalProgress || {}) };
                               const prev = next[upKey];
+
+                              let documentId =
+                                typeof prev === 'object' && prev.file ? prev.file.documentId : undefined;
+
+                              if (activeWedding) {
+                                const documentsCol = collection(
+                                  db,
+                                  'weddings',
+                                  activeWedding,
+                                  'documents'
+                                );
+                                const documentBase = {
+                                  name: meta.filename || f.name || 'Documento legal',
+                                  url: meta.url || '',
+                                  storagePath: meta.storagePath || '',
+                                  size: meta.size ?? f.size ?? 0,
+                                  category: 'legal',
+                                  relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
+                                  status: 'uploaded',
+                                  requirementKey: upKey,
+                                  legalType,
+                                  source: 'documents-legal',
+                                };
+                                if (currentUser?.uid) documentBase.uploadedBy = currentUser.uid;
+                                if (currentUser?.email) documentBase.uploadedByEmail = currentUser.email;
+
+                                if (documentId) {
+                                  const documentRef = firestoreDoc(
+                                    db,
+                                    'weddings',
+                                    activeWedding,
+                                    'documents',
+                                    documentId
+                                  );
+                                  await setDoc(
+                                    documentRef,
+                                    { ...documentBase, updatedAt: serverTimestamp() },
+                                    { merge: true }
+                                  );
+                                } else {
+                                  const docRef = await addDoc(documentsCol, {
+                                    ...documentBase,
+                                    createdAt: serverTimestamp(),
+                                    updatedAt: serverTimestamp(),
+                                  });
+                                  documentId = docRef.id;
+                                }
+                                meta.documentId = documentId;
+                                try {
+                                  performanceMonitor.logEvent('ceremony_document_uploaded', {
+                                    weddingId: activeWedding,
+                                    requirementKey: upKey,
+                                    relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
+                                  });
+                                } catch {}
+                              }
+
                               next[upKey] =
                                 typeof prev === 'object'
-                                  ? { ...prev, done: true, file: meta }
-                                  : { done: true, file: meta };
+                                  ? { ...prev, done: true, file: { ...meta } }
+                                  : { done: true, file: { ...meta } };
                               setLegalProgress(next);
                               saveLegalProgress(activeWedding, next);
                               try {
@@ -449,6 +532,7 @@ export default function DocumentosLegales() {
                               onClick={async () => {
                                 // Intentar borrar del Storage si tenemos URL
                                 let storageDeletedOk = true;
+                                let firestoreDeletedOk = true;
                                 if (fileMeta.url) {
                                   try {
                                     const {
@@ -475,22 +559,41 @@ export default function DocumentosLegales() {
                                     console.warn('No se pudo borrar del Storage:', e);
                                   }
                                 }
+                                if (fileMeta.documentId && activeWedding) {
+                                  try {
+                                    await deleteDoc(
+                                      firestoreDoc(
+                                        db,
+                                        'weddings',
+                                        activeWedding,
+                                        'documents',
+                                        fileMeta.documentId
+                                      )
+                                    );
+                                  } catch (err) {
+                                    firestoreDeletedOk = false;
+                                    console.warn('No se pudo borrar el documento de Firestore:', err);
+                                  }
+                                }
                                 const next = { ...(legalProgress || {}) };
                                 const prev = next[key];
                                 if (typeof prev === 'object') {
-                                  delete prev.file;
-                                  next[key] = { ...prev };
+                                  const cleanPrev = { ...prev, done: false };
+                                  delete cleanPrev.file;
+                                  next[key] = cleanPrev;
+                                } else if (prev) {
+                                  delete next[key];
                                 }
                                 setLegalProgress(next);
                                 saveLegalProgress(activeWedding, next);
                                 try {
-                                  if (storageDeletedOk)
+                                  if (storageDeletedOk && firestoreDeletedOk)
                                     toast.success(tr('documents.fileDeleted', 'Archivo eliminado'));
                                   else
                                     toast.warn(
                                       tr(
                                         'documents.fileRefRemoved',
-                                        'Referencia eliminada. No se pudo borrar del almacenamiento.'
+                                        'Referencia eliminada. No se pudo borrar del almacenamiento o del registro.'
                                       )
                                     );
                                 } catch {}

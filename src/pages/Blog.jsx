@@ -1,391 +1,306 @@
-﻿import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import ExternalImage from '@/components/ExternalImage';
-import { getBackendBase } from '@/utils/backendBase.js';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import DOMPurify from 'dompurify';
+import { toast } from 'react-toastify';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
-import { fetchWeddingNews } from '../services/blogService';
+import { useAuth } from '../hooks/useAuth';
+import { useWedding } from '../context/WeddingContext';
+import { saveData, loadData } from '../services/SyncService';
+
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `post-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const normalizePosts = (items = []) =>
+  items
+    .filter((item) => item && typeof item === 'object')
+    .map((item) => ({
+      id: item.id || generateId(),
+      title: item.title || 'Entrada sin título',
+      content: item.content || '',
+      createdAt: item.createdAt || new Date().toISOString(),
+      updatedAt: item.updatedAt || item.createdAt || new Date().toISOString(),
+      authorId: item.authorId || 'anon',
+      authorName: item.authorName || 'Equipo',
+    }));
+
+const simpleMarkdownToHtml = (markdown = '') => {
+  let html = markdown
+    .replace(/\r\n/g, '\n')
+    .replace(/^### (.*)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)$/gm, '<h1>$1</h1>')
+    .replace(/^\s*[-*] (.*)$/gm, '<li>$1</li>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Agrupar <li> consecutivos en listas
+  html = html.replace(/(<li>.*?<\/li>)/gs, (match) => match);
+  html = html.replace(/(<li>.*<\/li>)(\n?<li>.*<\/li>)+/gs, (match) => {
+    const cleaned = match.replace(/\n?/g, '');
+    return `<ul>${cleaned}</ul>`;
+  });
+
+  // Convertir saltos dobles en párrafos
+  const paragraphs = html
+    .split(/\n{2,}/)
+    .map((section) => {
+      const trimmed = section.trim();
+      if (!trimmed) return '';
+      if (/^<h[1-3]>/.test(trimmed) || /^<ul>/.test(trimmed)) return trimmed;
+      return `<p>${trimmed.replace(/\n/g, '<br/>')}</p>`;
+    })
+    .filter(Boolean)
+    .join('');
+
+  return DOMPurify.sanitize(paragraphs);
+};
 
 export default function Blog() {
-  const { i18n } = useTranslation();
-  const normalizeLang = (l) =>
-    String(l || 'es')
-      .toLowerCase()
-      .match(/^[a-z]{2}/)?.[0] || 'es';
-  const lang = normalizeLang(i18n.language);
-  // Debug activable: ?debugNews=1, localStorage.blogDebug='1' o VITE_BLOG_DEBUG='1'
-  const debugNews = React.useMemo(() => {
-    try {
-      const usp = new URLSearchParams(window.location.search);
-      if (usp.has('debugNews')) return usp.get('debugNews') !== '0';
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('blogDebug') === '1')
-        return true;
-      if (import.meta?.env?.VITE_BLOG_DEBUG === '1') return true;
-    } catch {}
-    return false;
-  }, []);
-  const dbg = (...args) => {
-    if (debugNews) {
-      try {
-        console.log('[BlogDebug]', ...args);
-      } catch {}
-    }
-  };
+  const { currentUser } = useAuth();
+  const { activeWedding } = useWedding();
 
-  // Visual mode: ?visual=1, localStorage.newsVisual='1' o VITE_NEWS_VISUAL='1'
-  const visualMode = React.useMemo(() => {
-    try {
-      const usp = new URLSearchParams(window.location.search);
-      if (usp.has('visual')) return usp.get('visual') !== '0';
-      if (typeof localStorage !== 'undefined' && localStorage.getItem('newsVisual') === '1')
-        return true;
-      if (import.meta?.env?.VITE_NEWS_VISUAL === '1') return true;
-    } catch {}
-    return false;
-  }, []);
-
-  const isLikelyCover = (url, feedSource) => {
-    try {
-      const u = new URL(url);
-      const host = u.hostname.replace(/^www\./, '').toLowerCase();
-      const path = (u.pathname || '').toLowerCase();
-      if (/\.svg(\?|$)/i.test(url)) return false;
-      const blockHosts = new Set(['gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']);
-      if (host === 'news.google.com' || blockHosts.has(host)) return false;
-      const patterns = ['logo', 'favicon', 'sprite', 'placeholder', 'default', 'brand', 'apple-touch-icon', 'android-chrome'];
-      if (patterns.some((p) => path.includes(p))) return false;
-      return true;
-    } catch {
-      return true;
-    }
-  };
+  const useFirestore = Boolean(activeWedding);
+  const docPath = useFirestore ? `weddings/${activeWedding}` : undefined;
 
   const [posts, setPosts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [attempts, setAttempts] = useState(0);
-  const observer = useRef();
-  // Limites para evitar bucles de llamadas cuando el backend devuelve []
-  const MAX_LOOKAHEAD = 10; // antes 60
-  const MAX_EMPTY_BATCHES = 2; // corta pronto si no hay mas datos
-  const MAX_FETCHES_PER_LOAD = 12;
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [draft, setDraft] = useState({ title: '', content: '' });
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const isLoadedRef = useRef(false);
 
-  const lastRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) setPage((p) => p + 1);
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loading]
+  const selectedPost = useMemo(
+    () => posts.find((post) => post.id === selectedPostId) || null,
+    [posts, selectedPostId]
   );
 
-  // Log de entorno y configuracion al iniciar (solo si debug activo)
   useEffect(() => {
-    if (!debugNews) return;
-    try {
-      dbg('init', {
-        i18n: i18n.language,
-        lang,
-        DEV: !!import.meta?.env?.DEV,
-        BASE_URL: import.meta?.env?.BASE_URL,
-        BACKEND_BASE_ENV:
-          import.meta?.env?.VITE_BACKEND_BASE_URL || import.meta?.env?.VITE_BACKEND_BASE || null,
-        HAS_NEWSAPI: !!import.meta?.env?.VITE_NEWSAPI_KEY,
-        HAS_TRANSLATE: !!import.meta?.env?.VITE_TRANSLATE_KEY,
-      });
-    } catch {}
-  }, [debugNews, lang]);
-
-  // Probar directamente el agregador backend para diagnosticar conectividad
-  useEffect(() => {
-    if (!debugNews) return;
     (async () => {
       try {
-        const base = getBackendBase();
-        const mkUrl = (lg) => {
-          const u = base ? `${base}/api/wedding-news` : '/api/wedding-news';
-          const qs = new URLSearchParams({ page: '1', pageSize: '10', lang: lg });
-          return `${u}?${qs}`;
-        };
-        for (const lg of [lang, 'en']) {
-          const url = mkUrl(lg);
-          const t0 = performance.now();
-          let status = 'n/a';
-          let len = -1;
-          let sample = null;
-          try {
-            const r = await fetch(url, { method: 'GET' });
-            status = r.status;
-            const data = await r.json();
-            len = Array.isArray(data) ? data.length : -1;
-            sample = Array.isArray(data) && data.length ? data[0] : null;
-          } catch (e) {
-            dbg('probe error', lg, e?.message || String(e));
-          }
-          const t1 = performance.now();
-          dbg('probe aggregator', { url, status, timeMs: Math.round(t1 - t0), len, sample });
+        const storedPosts = await loadData('blogPosts', {
+          firestore: useFirestore,
+          docPath,
+          fallbackToLocal: true,
+        });
+        const normalized = normalizePosts(storedPosts);
+        setPosts(normalized);
+        if (normalized.length) {
+          setSelectedPostId(normalized[0].id);
+          setDraft({ title: normalized[0].title, content: normalized[0].content });
         }
-      } catch (e) {
-        dbg('probe setup error', e?.message || String(e));
+      } catch (error) {
+        console.warn('[Blog] Error cargando posts', error);
+      } finally {
+        setLoading(false);
+        isLoadedRef.current = true;
       }
     })();
-  }, [debugNews, lang]);
+  }, [docPath, useFirestore]);
 
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-      if (import.meta?.env?.DEV)
-        console.info('[Blog] load start', { page, lang, existing: posts.length });
-      dbg('load start', { page, lang, existing: posts.length });
-      let newPosts = [...posts];
-      const targetLength = Math.ceil((newPosts.length + 1) / 10) * 10; // siguiente multiplo de 10
-      const domainCounts = {};
-      const windowStart = Math.floor(newPosts.length / 10) * 10;
-      for (let i = windowStart; i < newPosts.length; i++) {
-        const d = (() => {
-          try {
-            return new URL(newPosts[i].url).hostname.replace(/^www\./, '');
-          } catch {
-            return 'unk';
-          }
-        })();
-        domainCounts[d] = (domainCounts[d] || 0) + 1;
-      }
-      dbg('pre-loop window', { targetLength, windowStart, domainCounts: { ...domainCounts } });
+    if (!isLoadedRef.current) return;
+    setIsSaving(true);
+    saveData('blogPosts', posts, {
+      firestore: useFirestore,
+      docPath,
+      mergeWithExisting: true,
+      showNotification: false,
+    })
+      .catch((error) => console.warn('[Blog] Error guardando posts', error))
+      .finally(() => setIsSaving(false));
+  }, [posts, docPath, useFirestore]);
 
-      // Acumular candidatos para un relleno posterior si faltan dominios unicos
-      const candidates = [];
+  const resetDraft = () => setDraft({ title: '', content: '' });
 
-      let fetchPage = page;
-      let consecutiveErrors = 0;
-      let emptyBatches = 0;
-      let fetches = 0;
-      while (
-        newPosts.length < targetLength &&
-        fetchPage < page + MAX_LOOKAHEAD &&
-        fetches < MAX_FETCHES_PER_LOAD &&
-        emptyBatches <= MAX_EMPTY_BATCHES
-      ) {
-        let batch = [];
-        try {
-          dbg('fetch attempt', { phase: 'lang', fetchPage, pageSize: 10, lang });
-          batch = await fetchWeddingNews(fetchPage, 10, lang);
-          consecutiveErrors = 0;
-        } catch (err) {
-          console.error(err);
-          dbg('fetch error', { phase: 'lang', fetchPage, err: err?.message || String(err) });
-          consecutiveErrors++;
-          if (consecutiveErrors >= 3) break;
-        }
-        fetchPage++;
-        fetches++;
-        dbg('fetch result', { phase: 'lang', length: Array.isArray(batch) ? batch.length : -1 });
-        if (!Array.isArray(batch) || batch.length === 0) {
-          emptyBatches++;
-          continue;
-        } else {
-          emptyBatches = 0;
-        }
-        for (const p of batch) {
-          if (!p?.url) continue;
-          const dom = (() => {
-            try {
-              return new URL(p.url).hostname.replace(/^www\./, '');
-            } catch {
-              return 'unk';
-            }
-          })();
-          // Solo aceptar noticias con imagen http(s)
-          if (!(typeof p.image === 'string' && /^https?:\/\//i.test(p.image))) continue;
-          // En modo visual: evitar logos/miniaturas genéricas
-          if (visualMode && !isLikelyCover(p.image, p.feedSource)) continue;
-          // Guardar como candidato global para posibles rellenos (sin duplicados)
-          if (!candidates.some((x) => x.url === p.url || x.id === p.id)) {
-            candidates.push(p);
-          }
-          // Estricto: 1 por dominio por bloque
-          if ((domainCounts[dom] || 0) >= 1) continue;
-          if (newPosts.some((x) => x.url === p.url || x.id === p.id)) continue;
-          domainCounts[dom] = (domainCounts[dom] || 0) + 1;
-          newPosts.push(p);
-          if (newPosts.length >= targetLength) break;
-        }
-        dbg('loop progress', {
-          phase: 'lang',
-          newPosts: newPosts.length,
-          candidates: candidates.length,
-          domainCounts: { ...domainCounts },
-          fetches,
-          emptyBatches,
-        });
-      }
+  const handleSelectPost = (postId) => {
+    const post = posts.find((item) => item.id === postId);
+    if (!post) return;
+    setSelectedPostId(postId);
+    setDraft({ title: post.title, content: post.content });
+  };
 
-            // Sin fallback a EN: respetar idioma del usuario\r\n      }
-
-      // Relleno final: si no hay suficientes dominios unicos, permitir hasta 2 por dominio
-      if (newPosts.length < targetLength && candidates.length) {
-        dbg('final fill from candidates', {
-          have: newPosts.length,
-          targetLength,
-          candidates: candidates.length,
-        });
-        const exists = (p) => newPosts.some((x) => x.url === p.url || x.id === p.id);
-        const notUsed = candidates.filter((c) => !exists(c));
-        if (notUsed.length) {
-          const dom2 = { ...domainCounts };
-          for (const p of notUsed) {
-            if (newPosts.length >= targetLength) break;
-            const d = (() => {
-              try {
-                return new URL(p.url).hostname.replace(/^www\./, '');
-              } catch {
-                return 'unk';
-              }
-            })();
-            if ((dom2[d] || 0) >= 2) continue;
-            dom2[d] = (dom2[d] || 0) + 1;
-            newPosts.push(p);
-          }
-        }
-        // Si aun asi no se llena, ignorar limite por dominio
-        if (newPosts.length < targetLength) {
-          for (const p of candidates) {
-            if (newPosts.length >= targetLength) break;
-            if (newPosts.some((x) => x.url === p.url || x.id === p.id)) continue;
-            newPosts.push(p);
-          }
-        }
-      }
-
-      // Fallback directo: si tras todo seguimos con 0, consultar al agregador con fetch
-      if (newPosts.length === 0) {
-        try {
-          const base = getBackendBase();
-          const mk = (lg) => {
-            const u = base ? `${base}/api/wedding-news` : '/api/wedding-news';
-            return `${u}?page=1&pageSize=10&lang=${lg}`;
-          };
-          const getList = async (lg) => {
-            const r = await fetch(mk(lg));
-            if (!r.ok) return [];
-            const arr = await r.json();
-            return (Array.isArray(arr) ? arr : []).filter(
-              (p) => typeof p.image === 'string' && /^https?:\/\//i.test(p.image) && (!visualMode || isLikelyCover(p.image, p.feedSource))
-            );
-          };
-          let fb = await getList(lang);
-          if (!fb.length) fb = await getList('en');
-          if (fb.length) {
-            newPosts = fb.slice(0, 10);
-            dbg('fallback-direct-aggregator', { count: newPosts.length });
-          } else {
-            dbg('fallback-direct-aggregator-empty');
-          }
-        } catch (e) {
-          dbg('fallback-direct-error', e?.message || String(e));
-        }
-      }
-
-      setPosts(newPosts);
-      setLoading(false);
-      setAttempts((a) => a + 1);
-      if (import.meta?.env?.DEV)
-        console.info('[Blog] load end', {
-          added: newPosts.length - posts.length,
-          total: newPosts.length,
-        });
-      dbg('load end', {
-        added: newPosts.length - posts.length,
-        total: newPosts.length,
-        candidates: candidates.length,
-      });
+  const handleCreatePost = () => {
+    const title = draft.title.trim();
+    const content = draft.content.trim();
+    if (!title || !content) {
+      toast.info('Completa el título y el contenido antes de guardar.');
+      return;
     }
-    load();
-  }, [page]);
+    const now = new Date().toISOString();
+    const newPost = {
+      id: generateId(),
+      title,
+      content,
+      createdAt: now,
+      updatedAt: now,
+      authorId: currentUser?.uid || 'anon',
+      authorName: currentUser?.displayName || currentUser?.email || 'Equipo',
+    };
+    setPosts((prev) => [newPost, ...prev]);
+    setSelectedPostId(newPost.id);
+    toast.success('Entrada creada.');
+  };
 
-  return (
-    <PageWrapper title="Blog" className="max-w-5xl mx-auto">
-      {!loading && attempts > 0 && posts.length === 0 && (
-        <div className="py-20 text-center text-muted">
-          <p className="mb-4">No hay noticias disponibles ahora mismo.</p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => {
-              setPage((p) => p + 1);
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
-      {posts.map((p, idx) => (
-        <ArticleCard
-          key={p.url || p.id || idx}
-          post={p}
-          visual={visualMode}
-          ref={idx === posts.length - 1 ? lastRef : null}
-        />
-      ))}
-      {loading && (
-        <div className="flex justify-center my-6">
+  const handleUpdatePost = () => {
+    if (!selectedPostId) {
+      handleCreatePost();
+      return;
+    }
+    const title = draft.title.trim();
+    const content = draft.content.trim();
+    if (!title || !content) {
+      toast.info('Completa el título y el contenido antes de guardar.');
+      return;
+    }
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === selectedPostId
+          ? {
+              ...post,
+              title,
+              content,
+              updatedAt: new Date().toISOString(),
+              authorId: currentUser?.uid || post.authorId,
+              authorName: currentUser?.displayName || currentUser?.email || post.authorName,
+            }
+          : post
+      )
+    );
+    toast.success('Entrada actualizada.');
+  };
+
+  const handleDeletePost = (postId) => {
+    setPosts((prev) => prev.filter((post) => post.id !== postId));
+    if (selectedPostId === postId) {
+      setSelectedPostId(null);
+      resetDraft();
+    }
+    toast.info('Entrada eliminada.');
+  };
+
+  const previewHtml = useMemo(() => simpleMarkdownToHtml(draft.content), [draft.content]);
+
+  if (loading) {
+    return (
+      <PageWrapper title="Blog" className="max-w-6xl mx-auto">
+        <div className="flex justify-center items-center py-12">
           <Spinner />
         </div>
+      </PageWrapper>
+    );
+  }
+
+  return (
+    <PageWrapper title="Blog" className="max-w-6xl mx-auto">
+      {!useFirestore && (
+        <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          Selecciona una boda activa para sincronizar las entradas del blog con tu equipo. Mientras
+          tanto se guardarán sólo en este navegador.
+        </div>
       )}
+
+      <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
+        <aside className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-base font-semibold text-gray-800">Entradas</h2>
+            <button
+              onClick={() => {
+                setSelectedPostId(null);
+                resetDraft();
+              }}
+              className="px-3 py-1 text-sm bg-[var(--color-primary)] text-white rounded"
+            >
+              Nueva entrada
+            </button>
+          </div>
+          {posts.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Aún no hay entradas. Crea la primera con el editor de la derecha.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {posts.map((post) => (
+                <li
+                  key={post.id}
+                  className={`border rounded-md p-3 text-sm cursor-pointer transition ${
+                    post.id === selectedPostId
+                      ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] text-[var(--color-primary)]'
+                      : 'bg-white hover:bg-gray-50'
+                  }`}
+                  onClick={() => handleSelectPost(post.id)}
+                >
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium truncate">{post.title}</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(post.updatedAt || post.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
+
+        <section className="space-y-4">
+          <div className="flex flex-col gap-3 border rounded-lg p-4 bg-white shadow-sm">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Título</label>
+              <input
+                type="text"
+                value={draft.title}
+                onChange={(e) => setDraft((prev) => ({ ...prev, title: e.target.value }))}
+                placeholder="Ej. Cómo organizar la ceremonia civil perfecta"
+                className="border rounded px-3 py-2 text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Contenido</label>
+              <textarea
+                value={draft.content}
+                onChange={(e) => setDraft((prev) => ({ ...prev, content: e.target.value }))}
+                rows={12}
+                className="border rounded px-3 py-2 text-sm font-mono"
+                placeholder="Escribe en formato Markdown ligero. Usa ## títulos, **negritas**, listas con - ..."
+              />
+            </div>
+            <div className="flex justify-between items-center gap-3 flex-wrap">
+              <span className="text-xs text-gray-500">
+                {isSaving ? 'Guardando…' : 'Cambios guardados automáticamente'}
+              </span>
+              <div className="flex gap-2">
+                {selectedPostId && (
+                  <button
+                    onClick={() => handleDeletePost(selectedPostId)}
+                    className="px-3 py-2 text-sm border border-red-300 text-red-600 rounded"
+                  >
+                    Eliminar
+                  </button>
+                )}
+                <button
+                  onClick={handleUpdatePost}
+                  className="px-3 py-2 text-sm bg-[var(--color-primary)] text-white rounded"
+                >
+                  {selectedPostId ? 'Guardar cambios' : 'Publicar'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 className="text-sm font-semibold text-gray-800 mb-2">Vista previa</h3>
+            <div
+              className="prose prose-sm max-w-none text-sm text-gray-700"
+              dangerouslySetInnerHTML={{ __html: previewHtml || '<p>Aquí verás la vista previa…</p>' }}
+            />
+          </div>
+        </section>
+      </div>
     </PageWrapper>
   );
 }
-
-const ArticleCard = React.forwardRef(({ post, visual = false }, ref) => {
-  const base = getBackendBase();
-  // Resolver URL de imagen relativa respecto al enlace de la noticia
-  let resolvedImage = post.image || null;
-  try {
-    if (post.image && post.url) {
-      resolvedImage = new URL(post.image, post.url).toString();
-    }
-  } catch {}
-  const blockHosts = post.feedSource === 'google-news'
-    ? ['news.google.com', 'gstatic.com', 'ssl.gstatic.com', 'googleusercontent.com']
-    : [];
-  return (
-    <div
-      ref={ref}
-      className="border border-soft bg-[var(--color-surface)] rounded-lg overflow-hidden shadow hover:shadow-md transition"
-    >
-      {resolvedImage && (
-        <ExternalImage
-          src={resolvedImage}
-          alt={post.title}
-          className="w-full h-48 object-cover"
-          requireCover={true}
-          minWidth={visual ? 900 : 600}
-          minHeight={visual ? 500 : 300}
-          extraBlockHosts={blockHosts}
-        />
-      )}
-      <div className="p-4 space-y-2">
-        <h2 className="text-lg font-semibold">{post.title}</h2>
-        <p className="text-sm text-body line-clamp-3">{post.description}</p>
-        <div className="text-xs text-muted flex justify-between">
-          <span>{post.source}</span>
-          <span>{new Date(post.published).toLocaleDateString()}</span>
-        </div>
-        <a
-          href={post.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary text-sm"
-        >
-          Leer mas
-        </a>
-      </div>
-    </div>
-  );
-});
-

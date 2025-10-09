@@ -8,6 +8,7 @@ const WebGenerator = ({
   selectedTemplate,
   templates,
   error,
+  onOpenPromptLibrary,
 }) => (
   <div className="bg-white rounded-lg shadow p-6 mb-8">
     <h2 className="text-xl font-semibold mb-4">Personaliza tu web</h2>
@@ -21,9 +22,20 @@ const WebGenerator = ({
       )}
     </p>
 
+    <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-blue-700">
+      <button
+        type="button"
+        onClick={onOpenPromptLibrary}
+        className="inline-flex items-center gap-2 px-3 py-2 border border-blue-200 rounded-full hover:bg-blue-50 transition-colors"
+      >
+        Explorar biblioteca de prompts
+      </button>
+      <span className="text-gray-400">Usa variables como {'{nombres}'}, {'{fecha}'}, {'{ubicacion}'}</span>
+    </div>
+
     <textarea
       className="w-full h-40 border rounded-lg p-4"
-      placeholder="Ej: Quiero una web con estilo romántico, muchas fotos y una sección para que los invitados confirmen asistencia..."
+      placeholder="Ej: Quiero una web con estilo romántico, muchas fotos y un bloque claro con transporte, hospedaje y recomendaciones locales..."
       value={prompt}
       onChange={(event) => onPromptChange?.(event.target.value)}
     />

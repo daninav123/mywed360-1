@@ -62,6 +62,10 @@
 - Integracion: crear contrato -> aprobar -> enviar a firma -> actualizar estado -> registrar pago.
 - E2E: owner crea contrato, planner revisa, proveedor firma, documento se archiva y actualiza tareas.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/contracts/contracts-flow.cy.js`: cubre creación, firma simulada y seguimiento de contratos.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `documents`, `documentWorkflows`, `documentTemplates`, `signatureLogs`.
 - Configurar almacenamiento seguro (Cloud Storage) con buckets separados y KMS.

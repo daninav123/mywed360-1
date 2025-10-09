@@ -256,6 +256,7 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
   // Obtener categorias segn el tipo
   const availableCategories = categories[formData.type] || [];
+  const categoryLabel = t('finance.form.category', { defaultValue: 'Categoría' });
   const paymentMethods = [
     'Transferencia',
     'Tarjeta',
@@ -449,8 +450,8 @@ export default function TransactionForm({ transaction, onSave, onCancel, isLoadi
 
       {/* Categoria */}
       <div>
-        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-          {t('finance.form.category', { defaultValue: 'Categoria' })} *
+        <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1" data-testid="finance-category-label">
+          {categoryLabel} *
         </label>
         <select
           value={formData.category}

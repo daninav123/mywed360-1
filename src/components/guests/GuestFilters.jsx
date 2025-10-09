@@ -21,7 +21,8 @@ const GuestFilters = React.memo(
     onTableFilterChange,
     onAddGuest,
     onOpenSaveTheDate,
-    onOpenFormalInvitation,
+    onBulkInvite,
+    onOpenManualBatch,
     onOpenRsvpSummary,
     onBulkTableReassign,
     guestCount = 0,
@@ -70,14 +71,23 @@ const GuestFilters = React.memo(
       onAddGuest?.();
     }, [onAddGuest]);
 
-    const handleOpenFormal = useCallback(() => {
-      wh('UI – FormalInvite click', { guestCount });
+    const handleBulkInviteApi = useCallback(() => {
+      wh('UI – BulkInvite click', { guestCount });
       if (guestCount === 0) {
         alert('No hay invitados para enviar invitaciones');
         return;
       }
-      onOpenFormalInvitation?.();
-    }, [guestCount, onOpenFormalInvitation]);
+      onBulkInvite?.();
+    }, [guestCount, onBulkInvite]);
+
+    const handleOpenManualBatch = useCallback(() => {
+      wh('UI – ManualBatch open', { guestCount });
+      if (guestCount === 0) {
+        alert('No hay invitados para enviar invitaciones');
+        return;
+      }
+      onOpenManualBatch?.();
+    }, [guestCount, onOpenManualBatch]);
 
     const [showTemplateModal, setShowTemplateModal] = useState(false);
 
@@ -182,13 +192,13 @@ const GuestFilters = React.memo(
 
             <Button
               variant="outline"
-              onClick={handleOpenFormal}
+              onClick={handleBulkInviteApi}
               disabled={isLoading || guestCount === 0}
               className="flex items-center"
-              title="Gestionar la invitación formal con WhatsApp y entrega física"
+              title="Enviar la invitación formal por WhatsApp API"
             >
               <MessageSquare size={16} className="mr-2" />
-              Invitación formal
+              Invitaciones masivas (API)
             </Button>
 
             <Button variant="outline" onClick={handleOpenRsvp} disabled={isLoading}>
@@ -197,6 +207,15 @@ const GuestFilters = React.memo(
 
             <Button variant="outline" onClick={handleEditTemplate} disabled={isLoading}>
               Editar mensaje (API)
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleOpenManualBatch}
+              disabled={isLoading || guestCount === 0}
+              title="Crear un lote manual con la plantilla actual"
+            >
+              Lote manual (API)
             </Button>
 
             {/* Envío/Programación para seleccionados */}

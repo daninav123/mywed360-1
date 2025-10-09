@@ -13,6 +13,7 @@ const BASE =
 // Polls backend notifications and emits toast events for meeting/budget suggestions
 export default function NotificationWatcher({ intervalMs = 20000 }) {
   const seenRef = useRef(new Set());
+  const unauthorizedRef = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -27,14 +28,27 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
       }
     } catch {}
 
-    const load = async () => {
+    const load = async (forceRefresh = false) => {
       try {
         const u = auth?.currentUser;
         if (!u || !u.getIdToken) return;
-        const token = await u.getIdToken();
+        const token = await u.getIdToken(forceRefresh);
         const res = await fetch(`${BASE}/api/notifications`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401 || res.status === 403) {
+          if (!forceRefresh) {
+            return load(true);
+          }
+          unauthorizedRef.current += 1;
+          if (unauthorizedRef.current >= 3) {
+            console.warn('[NotificationWatcher] Deshabilitado tras respuestas 401 consecutivas');
+            if (intervalId) clearInterval(intervalId);
+            active = false;
+          }
+          return;
+        }
+        unauthorizedRef.current = 0;
         if (!res.ok) return;
         const list = await res.json();
         if (!Array.isArray(list)) return;
@@ -184,5 +198,3 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
 
   return null;
 }
-
-

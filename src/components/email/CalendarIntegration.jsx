@@ -281,7 +281,10 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4"
+      data-testid="calendar-integration"
+    >
       <Card className="w-full max-w-3xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-gray-200 p-4">
           <h2 className="text-xl font-bold flex items-center">
@@ -463,7 +466,12 @@ const CalendarIntegration = ({ email, onClose, onSave }) => {
             <Button variant="outline" onClick={onClose} disabled={loading}>
               Cancelar
             </Button>
-            <Button onClick={handleSubmit} disabled={loading} className="flex items-center">
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex items-center"
+                data-testid="calendar-save"
+              >
               <Check size={18} className="mr-1" />
               Guardar evento
             </Button>

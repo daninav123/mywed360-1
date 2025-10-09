@@ -1,5 +1,5 @@
 import { ChevronRight, ChevronDown } from 'lucide-react';
-import React, { useMemo, useRef, useEffect, useState } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 
 import { addMonths, normalizeAnyDate } from './utils/dateUtils.js';
 import { auth } from '../../firebaseConfig';
@@ -24,6 +24,27 @@ function dayFraction(d) {
 // Gap de días para agrupar subtareas en segmentos
 const SEGMENT_GAP_DAYS = 10;
 
+const RISK_STYLES = {
+  ok: {
+    label: 'En curso',
+    fill: 'rgba(16,185,129,0.12)',
+    border: 'rgba(16,185,129,0.45)',
+    accent: '#10b981',
+  },
+  warning: {
+    label: 'Atención',
+    fill: 'rgba(245,158,11,0.18)',
+    border: 'rgba(245,158,11,0.6)',
+    accent: '#f59e0b',
+  },
+  critical: {
+    label: 'Riesgo',
+    fill: 'rgba(220,38,38,0.18)',
+    border: 'rgba(220,38,38,0.65)',
+    accent: '#dc2626',
+  },
+};
+
 export default function LongTermTasksGantt({
   containerRef,
   tasks,
@@ -38,6 +59,8 @@ export default function LongTermTasksGantt({
   extendMonthsAfterEnd = 0,
   leftColumnWidth = 220,
   subtasks = [],
+  showSubtasks = false,
+  onParentSelect,
 }) {
   const colW = Math.max(60, Number(columnWidth) || 90);
 
@@ -201,40 +224,78 @@ export default function LongTermTasksGantt({
     return out;
   }, [parentTasks, subtasksByParent]);
 
+  useEffect(() => {
+    if (!showSubtasks) {
+      setExpandedParents((prev) => (prev.size === 0 ? prev : new Set()));
+      setExpandedSegments((prev) => (prev.size === 0 ? prev : new Set()));
+      return;
+    }
+
+    const targetParents = new Set(parentTasks.map((p) => String(p.id)));
+    const targetSegments = new Set();
+    segmentsByParent.forEach((segs) => {
+      segs.forEach((seg) => targetSegments.add(seg.id));
+    });
+
+    setExpandedParents((prev) => {
+      if (prev.size === targetParents.size) {
+        let same = true;
+        for (const id of targetParents) {
+          if (!prev.has(id)) { same = false; break; }
+        }
+        if (same) return prev;
+      }
+      return targetParents;
+    });
+
+    setExpandedSegments((prev) => {
+      if (prev.size === targetSegments.size) {
+        let same = true;
+        for (const id of targetSegments) {
+          if (!prev.has(id)) { same = false; break; }
+        }
+        if (same) return prev;
+      }
+      return targetSegments;
+    });
+  }, [showSubtasks, parentTasks, segmentsByParent]);
+
   // 8) Filas: padre -> segmentos -> (opcional) subtareas
-  const [expandedParents, setExpandedParents] = useState(() => {
-    try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed_gantt_expanded_parents') : null;
-      const arr = raw ? JSON.parse(raw) : [];
-      return new Set(Array.isArray(arr) ? arr : []);
-    } catch { return new Set(); }
-  });
-  const [expandedSegments, setExpandedSegments] = useState(() => {
-    try {
-      const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('mywed_gantt_expanded_segments') : null;
-      const arr = raw ? JSON.parse(raw) : [];
-      return new Set(Array.isArray(arr) ? arr : []);
-    } catch { return new Set(); }
-  });
+  const [expandedParents, setExpandedParents] = useState(() => new Set());
+  const [expandedSegments, setExpandedSegments] = useState(() => new Set());
 
-  const toggleParent = (id) => setExpandedParents((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
-  const toggleSegment = (id) => setExpandedSegments((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  const emitParentSelect = useCallback(
+    (parentTask) => {
+      if (typeof onParentSelect === 'function' && parentTask) {
+        onParentSelect(parentTask);
+      }
+    },
+    [onParentSelect]
+  );
 
-  // Persistir estado de expansión
-  useEffect(() => {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('mywed_gantt_expanded_parents', JSON.stringify(Array.from(expandedParents)));
-      }
-    } catch {}
-  }, [expandedParents]);
-  useEffect(() => {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('mywed_gantt_expanded_segments', JSON.stringify(Array.from(expandedSegments)));
-      }
-    } catch {}
-  }, [expandedSegments]);
+  const toggleParent = useCallback(
+    (id) => {
+      if (!showSubtasks) return;
+      setExpandedParents((prev) => {
+        const next = new Set(prev);
+        next.has(id) ? next.delete(id) : next.add(id);
+        return next;
+      });
+    },
+    [showSubtasks]
+  );
+
+  const toggleSegment = useCallback(
+    (id) => {
+      if (!showSubtasks) return;
+      setExpandedSegments((prev) => {
+        const next = new Set(prev);
+        next.has(id) ? next.delete(id) : next.add(id);
+        return next;
+      });
+    },
+    [showSubtasks]
+  );
 
   const rows = useMemo(() => {
     const out = [];
@@ -260,30 +321,45 @@ export default function LongTermTasksGantt({
     const out = [];
     rows.forEach((row, rowIndex) => {
       if (row.kind === 'parent') {
-        // Span global del padre (inicio-fin) como rectángulo transparente
         const p = row.task;
         const ps = normalizeAnyDate(p?.start);
         const pe = normalizeAnyDate(p?.end);
-        if (ps && pe && pe >= ps) {
-          const sM0 = diffMonths(monthStart, ps);
-          const eM0 = diffMonths(monthStart, pe);
-          const left0 = Math.max(0, (sM0 + dayFraction(ps)) * colW);
-          const right0 = Math.max(0, (eM0 + dayFraction(pe)) * colW);
-          const width0 = Math.max(2, right0 - left0 + Math.max(2, Math.floor(colW * 0.1)));
-          out.push({ key: `${row.id}-parent-span`, left: left0, width: width0, rowIndex, type: 'parent-span', task: row.task });
+        if (!ps || !pe || pe < ps) return;
+        const sM0 = diffMonths(monthStart, ps);
+        const eM0 = diffMonths(monthStart, pe);
+        const left0 = Math.max(0, (sM0 + dayFraction(ps)) * colW);
+        const right0 = Math.max(0, (eM0 + dayFraction(pe)) * colW);
+        const width0 = Math.max(2, right0 - left0 + Math.max(2, Math.floor(colW * 0.1)));
+
+        const riskLevel = String((p?.risk && p.risk.level) || 'ok');
+        if (showSubtasks) {
+          // Span global del padre (inicio-fin) como rectángulo transparente
+          out.push({ key: `${row.id}-parent-span`, left: left0, width: width0, rowIndex, type: 'parent-span', task: row.task, riskLevel });
+          const segs = segmentsByParent.get(String(row.id)) || [];
+          segs.forEach((seg, j) => {
+            const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
+            const ce = new Date(Math.min(seg.end.getTime(), timelineEnd.getTime()));
+            if (ce.getTime() < cs.getTime()) return;
+            const sM = diffMonths(monthStart, cs);
+            const eM = diffMonths(monthStart, ce);
+            const left = Math.max(0, (sM + dayFraction(cs)) * colW);
+            const right = Math.max(0, (eM + dayFraction(ce)) * colW);
+            const width = Math.max(2, right - left + Math.max(2, Math.floor(colW * 0.1)));
+            out.push({ key: `${row.id}-segbar-${j}`, left, width, rowIndex, type: 'segment-parent', task: row.task, riskLevel });
+          });
+        } else {
+          const progress = Math.max(0, Math.min(100, Number(p?.progress ?? 0)));
+          out.push({
+            key: `${row.id}-parent-condensed`,
+            left: left0,
+            width: width0,
+            rowIndex,
+            type: 'parent-condensed',
+            task: row.task,
+            progress,
+            riskLevel,
+          });
         }
-        const segs = segmentsByParent.get(String(row.id)) || [];
-        segs.forEach((seg, j) => {
-          const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
-          const ce = new Date(Math.min(seg.end.getTime(), timelineEnd.getTime()));
-          if (ce.getTime() < cs.getTime()) return;
-          const sM = diffMonths(monthStart, cs);
-          const eM = diffMonths(monthStart, ce);
-          const left = Math.max(0, (sM + dayFraction(cs)) * colW);
-          const right = Math.max(0, (eM + dayFraction(ce)) * colW);
-          const width = Math.max(2, right - left + Math.max(2, Math.floor(colW * 0.1)));
-          out.push({ key: `${row.id}-segbar-${j}`, left, width, rowIndex, type: 'segment-parent', task: row.task });
-        });
       } else if (row.kind === 'segment') {
         const seg = row.segment;
         const cs = new Date(Math.max(seg.start.getTime(), timelineStart.getTime()));
@@ -309,7 +385,7 @@ export default function LongTermTasksGantt({
       }
     });
     return out;
-  }, [rows, segmentsByParent, monthStart, colW, timelineStart, timelineEnd]);
+  }, [rows, segmentsByParent, monthStart, colW, timelineStart, timelineEnd, showSubtasks]);
 
   const monthLabels = useMemo(() => {
     const labels = [];
@@ -340,7 +416,20 @@ export default function LongTermTasksGantt({
     return labels;
   }, [totalMonths, monthStart, colW]);
 
-  const handleClick = (bar) => { if (typeof onTaskClick === 'function') onTaskClick(bar.task || bar); };
+  const handleBarClick = useCallback(
+    (bar) => {
+      if (!bar) return;
+      if (bar.type === 'parent-span') return;
+      if (bar.type === 'parent-condensed') {
+        emitParentSelect(bar.task);
+        return;
+      }
+      if (typeof onTaskClick === 'function') {
+        onTaskClick(bar.task || bar);
+      }
+    },
+    [onTaskClick, emitParentSelect]
+  );
   const contentHeight = rows.length * rowHeight + 60;
 
   return (
@@ -363,18 +452,23 @@ export default function LongTermTasksGantt({
               const isSegment = row.kind === 'segment';
               const t = row.task || {};
               const leftPad = isParent ? 0 : isSegment ? 12 : 24;
-              const parentExpanded = expandedParents.has(row.id);
-              const segmentExpanded = expandedSegments.has(row.id);
+              const parentExpanded = showSubtasks && expandedParents.has(row.id);
+              const segmentExpanded = showSubtasks && expandedSegments.has(row.id);
               const onClick = () => {
-                if (isParent) toggleParent(row.id);
-                else if (isSegment) toggleSegment(row.id);
-                else handleClick({ task: t });
+                if (isParent) {
+                  if (showSubtasks) toggleParent(row.id);
+                  else emitParentSelect(row.task);
+                } else if (isSegment) {
+                  if (showSubtasks) toggleSegment(row.id);
+                } else {
+                  handleBarClick({ type: 'subtask', task: t });
+                }
               };
               const progressPct = Math.max(0, Math.min(100, Number(t?.progress ?? 0)));
-              // Color de fondo semáforo muy tenue para padres
-              const parentBg = isParent
-                ? `linear-gradient(90deg, rgba(16,185,129,${0.06 * (progressPct / 100)}), rgba(16,185,129,0))`
-                : 'transparent';
+              const riskLevel = isParent ? String(t?.risk?.level || 'ok') : 'ok';
+              const riskMeta = RISK_STYLES[riskLevel] || RISK_STYLES.ok;
+              const riskTitle = t?.risk?.message || riskMeta.label;
+              const parentBg = isParent ? riskMeta.fill : 'transparent';
               return (
                 <div
                   key={`left-${row.kind}-${row.id}-${i}`}
@@ -399,28 +493,83 @@ export default function LongTermTasksGantt({
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     background: parentBg,
+                    borderLeft: isParent ? `3px solid ${riskMeta.accent}` : undefined,
                   }}
                 >
-                  {(isParent || isSegment) ? (
-                    <button
-                      type="button"
-                      aria-label={isParent ? (parentExpanded ? 'ocultar subtareas' : 'ver subtareas') : (segmentExpanded ? 'ocultar tareas del segmento' : 'ver tareas del segmento')}
-                      aria-expanded={isParent ? parentExpanded : segmentExpanded}
-                      onClick={(e) => { e.stopPropagation(); isParent ? toggleParent(row.id) : toggleSegment(row.id); }}
-                      style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
-                    >
-                      {isParent ? (parentExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />) : (segmentExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />)}
-                    </button>
+                  {isParent ? (
+                    showSubtasks ? (
+                      <button
+                        type="button"
+                        aria-label={parentExpanded ? 'Ocultar subtareas' : 'Ver subtareas'}
+                        aria-expanded={parentExpanded}
+                        onClick={(e) => { e.stopPropagation(); toggleParent(row.id); }}
+                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
+                      >
+                        {parentExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        aria-label="Ver detalles de la tarea padre"
+                        onClick={(e) => { e.stopPropagation(); emitParentSelect(row.task); }}
+                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#1d4ed8', background: 'transparent', border: 'none' }}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    )
+                  ) : isSegment ? (
+                    showSubtasks ? (
+                      <button
+                        type="button"
+                        aria-label={segmentExpanded ? 'Ocultar tareas del segmento' : 'Ver tareas del segmento'}
+                        aria-expanded={segmentExpanded}
+                        onClick={(e) => { e.stopPropagation(); toggleSegment(row.id); }}
+                        style={{ width: 20, height: 20, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#374151', background: 'transparent', border: 'none' }}
+                      >
+                        {segmentExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </button>
+                    ) : (
+                      <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>•</span>
+                    )
                   ) : (
                     <span style={{ width: 16, display: 'inline-block', opacity: 0.7 }}>•</span>
                   )}
                   {/* Guía vertical/árbol según nivel */}
-                  {!isParent && (
+                  {!isParent && showSubtasks && (
                     <span style={{ position: 'absolute', left: 28 + (isSegment ? 0 : 12), top: 0, bottom: 0, width: 1, background: '#e5e7eb' }} />
                   )}
                   <span style={{ marginLeft: leftPad }}>{t?.name || t?.title || (isSegment ? 'Segmento' : 'Tarea')}</span>
                   {isParent && (
-                    <span style={{ marginLeft: 8, fontSize: 11, padding: '2px 6px', borderRadius: 10, background: '#eef2ff', color: '#3730a3' }}>{progressPct}%</span>
+                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {riskLevel !== 'ok' && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            padding: '2px 8px',
+                            borderRadius: 999,
+                            background: riskMeta.fill,
+                            color: riskMeta.accent,
+                            border: `1px solid ${riskMeta.border}`,
+                          }}
+                          title={riskTitle}
+                        >
+                          {riskMeta.label}
+                        </span>
+                      )}
+                      <span
+                        style={{
+                          fontSize: 11,
+                          padding: '2px 6px',
+                          borderRadius: 10,
+                          background: '#eef2ff',
+                          color: '#3730a3',
+                          minWidth: 38,
+                          textAlign: 'center',
+                        }}
+                      >
+                        {progressPct}%
+                      </span>
+                    </div>
                   )}
                 </div>
               );
@@ -449,10 +598,13 @@ export default function LongTermTasksGantt({
               <div key={`grid-${m.key}`} style={{ position: 'absolute', left: m.left, top: 0, bottom: 0, width: 1, background: '#ececec' }} />
             ))}
 
-            {bars.map((bar) => (
+            {bars.map((bar) => {
+              const riskLevel = String(bar.riskLevel || bar.task?.risk?.level || 'ok');
+              const riskMeta = RISK_STYLES[riskLevel] || RISK_STYLES.ok;
+              return (
               <div
                 key={bar.key}
-                onClick={() => handleClick(bar)}
+                onClick={() => handleBarClick(bar)}
                 style={{
                   position: 'absolute',
                   left: bar.left,
@@ -462,6 +614,8 @@ export default function LongTermTasksGantt({
                       ? Math.max(12, rowHeight * 0.35)
                       : bar.type === 'segment'
                       ? Math.max(14, rowHeight * 0.45)
+                      : bar.type === 'parent-condensed'
+                      ? Math.max(18, rowHeight * 0.55)
                       : Math.max(16, rowHeight * 0.5),
                   width: bar.width,
                   background:
@@ -471,10 +625,17 @@ export default function LongTermTasksGantt({
                       ? '#93c5fd'
                       : bar.type === 'parent-span'
                       ? 'transparent'
+                      : bar.type === 'parent-condensed'
+                      ? riskMeta.fill
                       : '#a5b4fc',
                   borderRadius: 6,
                   cursor: bar.type === 'parent-span' ? 'default' : 'pointer',
-                  boxShadow: bar.type === 'parent-span' ? 'none' : '0 2px 6px rgba(0,0,0,0.12)',
+                  boxShadow:
+                    bar.type === 'parent-span'
+                      ? 'none'
+                      : bar.type === 'parent-condensed'
+                      ? `0 3px 10px ${riskMeta.border}`
+                      : '0 2px 6px rgba(0,0,0,0.12)',
                   overflow: 'hidden',
                   border:
                     bar.type === 'subtask'
@@ -482,7 +643,9 @@ export default function LongTermTasksGantt({
                       : bar.type === 'segment'
                       ? '1px solid #60a5fa'
                       : bar.type === 'parent-span'
-                      ? '1px solid rgba(99,102,241,0.35)'
+                      ? `1px solid ${riskMeta.border}`
+                      : bar.type === 'parent-condensed'
+                      ? `1px solid ${riskMeta.border}`
                       : 'none',
                   pointerEvents: bar.type === 'parent-span' ? 'none' : 'auto',
                 }}
@@ -494,11 +657,11 @@ export default function LongTermTasksGantt({
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: `${Math.max(0, Math.min(100, Number(bar.task?.progress ?? 0)))}%`,
+                      width: `${Math.max(0, Math.min(100, Number(bar.task?.progress ?? bar.progress ?? 0)))}%`,
                       background:
                         bar.type === 'subtask'
                           ? 'linear-gradient(90deg, #93c5fd, #60a5fa)'
-                          : 'linear-gradient(90deg, #818cf8, #6366f1)',
+                          : `linear-gradient(90deg, ${riskMeta.accent}, ${riskMeta.accent})`,
                     }}
                   />
                 )}
@@ -521,13 +684,11 @@ export default function LongTermTasksGantt({
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-
-

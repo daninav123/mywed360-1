@@ -1,6 +1,6 @@
 import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { ArrowLeft, CheckCircle, Circle } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import PageWrapper from '../components/PageWrapper';
@@ -10,6 +10,26 @@ import { Progress } from '../components/ui/Progress';
 import { db } from '../firebaseConfig';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
+import {
+  EVENT_TYPE_LABELS,
+  EVENT_STYLE_OPTIONS,
+  GUEST_COUNT_OPTIONS,
+  FORMALITY_OPTIONS,
+  CEREMONY_TYPE_OPTIONS,
+  RELATED_EVENT_OPTIONS,
+} from '../config/eventStyles';
+
+const toLabelMap = (options) =>
+  options.reduce((map, option) => {
+    map[option.value] = option.label;
+    return map;
+  }, {});
+
+const STYLE_LABELS = toLabelMap(EVENT_STYLE_OPTIONS);
+const GUEST_COUNT_LABELS = toLabelMap(GUEST_COUNT_OPTIONS);
+const FORMALITY_LABELS = toLabelMap(FORMALITY_OPTIONS);
+const CEREMONY_LABELS = toLabelMap(CEREMONY_TYPE_OPTIONS);
+const RELATED_EVENT_LABELS = toLabelMap(RELATED_EVENT_OPTIONS);
 
 function formatDateEs(dateVal) {
   if (!dateVal) return '';
@@ -44,9 +64,15 @@ export default function BodaDetalle() {
       doc(db, 'weddings', id),
       (snap) => {
         const data = snap.exists() ? snap.data() : {};
+        const resolvedName =
+          typeof data.name === 'string' && data.name.trim().length
+            ? data.name.trim()
+            : typeof data.coupleName === 'string' && data.coupleName.trim().length
+            ? data.coupleName.trim()
+            : '';
         setWedding({
           id: snap.id,
-          name: data.name || data.coupleName || 'Boda sin nombre',
+          name: resolvedName,
           date: data.weddingDate || data.date || '',
           location: data.location || data.venue || '',
           progress: Number.isFinite(data.progress) ? data.progress : 0,
@@ -56,6 +82,10 @@ export default function BodaDetalle() {
           designs: Array.isArray(data.designs) ? data.designs : [],
           documents: Array.isArray(data.documents) ? data.documents : [],
           active: data.active !== false,
+          eventType: data.eventType || 'boda',
+          eventProfile: data.eventProfile || null,
+          eventProfileSummary: data.eventProfileSummary || null,
+          preferences: data.preferences || {},
         });
         setLoading(false);
       },
@@ -69,12 +99,52 @@ export default function BodaDetalle() {
 
   const pendingTasks = (wedding.tasks || []).filter((t) => !t.done).length;
   const isActive = wedding.active !== false;
+  const eventTypeValue = typeof wedding.eventType === 'string' ? wedding.eventType.toLowerCase() : 'boda';
+  const eventLabel = EVENT_TYPE_LABELS[eventTypeValue] || 'Evento';
+  const isBoda = eventTypeValue === 'boda';
+  const fallbackTitle = isBoda ? 'Boda sin nombre' : 'Evento sin nombre';
+  const singularLabel = isBoda ? 'boda' : 'evento';
+
+  const eventProfile = useMemo(() => {
+    if (wedding.eventProfile && typeof wedding.eventProfile === 'object') return wedding.eventProfile;
+    if (wedding.eventProfileSummary && typeof wedding.eventProfileSummary === 'object') {
+      return wedding.eventProfileSummary;
+    }
+    return {};
+  }, [wedding.eventProfile, wedding.eventProfileSummary]);
+
+  const guestLabel = eventProfile?.guestCountRange
+    ? GUEST_COUNT_LABELS[eventProfile.guestCountRange] || eventProfile.guestCountRange
+    : null;
+  const formalityLabel = eventProfile?.formalityLevel
+    ? FORMALITY_LABELS[eventProfile.formalityLevel] || eventProfile.formalityLevel
+    : null;
+  const ceremonyLabel =
+    isBoda && eventProfile?.ceremonyType
+      ? CEREMONY_LABELS[eventProfile.ceremonyType] || eventProfile.ceremonyType
+      : null;
+  const relatedLabels = Array.isArray(eventProfile?.relatedEvents)
+    ? eventProfile.relatedEvents
+        .map((value) => RELATED_EVENT_LABELS[value] || value)
+        .filter(Boolean)
+    : [];
+  const notes =
+    typeof eventProfile?.notes === 'string' && eventProfile.notes.trim().length
+      ? eventProfile.notes.trim()
+      : '';
+  const styleLabel =
+    typeof wedding.preferences?.style === 'string'
+      ? STYLE_LABELS[wedding.preferences.style] || wedding.preferences.style
+      : null;
+
+  const hasProfileData =
+    guestLabel || formalityLabel || ceremonyLabel || relatedLabels.length > 0 || notes || styleLabel;
 
   const toggleArchive = async () => {
     const nextActive = !isActive;
     const confirmMessage = nextActive
-      ? '¿Restaurar esta boda y volver a marcarla como activa?'
-      : '¿Archivar esta boda? Podrás restaurarla más adelante.';
+      ? `¿Restaurar esta ${singularLabel} y volver a marcarla como activa?`
+      : `¿Archivar esta ${singularLabel}? Podrás restaurarla más adelante.`;
     if (!window.confirm(confirmMessage)) return;
     try {
       setUpdatingState(true);
@@ -101,9 +171,12 @@ export default function BodaDetalle() {
 
   return (
     <PageWrapper
-      title={wedding.name?.trim() ? wedding.name : 'Boda sin nombre'}
+      title={wedding.name?.trim() ? wedding.name : fallbackTitle}
       actions={
         <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold px-2 py-1 rounded bg-blue-100 text-blue-700">
+            {eventLabel}
+          </span>
           <span
             className={`text-xs font-semibold px-2 py-1 rounded ${
               isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
@@ -128,7 +201,54 @@ export default function BodaDetalle() {
       <p className="text-muted mt-1">
         {formatDateEs(wedding.date)}
         {wedding.location ? ` • ${wedding.location}` : ''}
+        {styleLabel ? ` • ${styleLabel}` : ''}
       </p>
+
+      {hasProfileData && (
+        <Card className="mt-4 bg-[var(--color-surface)]">
+          <h2 className="text-lg font-semibold text-[color:var(--color-text)] mb-3">
+            Perfil del {singularLabel}
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-[color:var(--color-text)]">
+            {styleLabel && (
+              <div>
+                <dt className="font-medium text-gray-500">Estilo</dt>
+                <dd>{styleLabel}</dd>
+              </div>
+            )}
+            {guestLabel && (
+              <div>
+                <dt className="font-medium text-gray-500">Tamaño estimado</dt>
+                <dd>{guestLabel}</dd>
+              </div>
+            )}
+            {formalityLabel && (
+              <div>
+                <dt className="font-medium text-gray-500">Formalidad</dt>
+                <dd>{formalityLabel}</dd>
+              </div>
+            )}
+            {ceremonyLabel && (
+              <div>
+                <dt className="font-medium text-gray-500">Tipo de ceremonia</dt>
+                <dd>{ceremonyLabel}</dd>
+              </div>
+            )}
+            {relatedLabels.length > 0 && (
+              <div className="sm:col-span-2">
+                <dt className="font-medium text-gray-500">Eventos relacionados</dt>
+                <dd>{relatedLabels.join(', ')}</dd>
+              </div>
+            )}
+            {notes && (
+              <div className="sm:col-span-2">
+                <dt className="font-medium text-gray-500">Notas</dt>
+                <dd>{notes}</dd>
+              </div>
+            )}
+          </dl>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
         <Card className="text-center cursor-pointer" onClick={() => navigate('/invitados')}>

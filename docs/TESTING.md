@@ -71,7 +71,7 @@ curl -X POST \
          – type – : – checkout.session.completed – ,
          – data – : { – object – : { – id – :  – cs_test_123 – ,  – currency – : – eur – ,  – amount_total – :1000,  – metadata – : { – contractId – : – c1 – }}}
       }' \
-  http://localhost:3001/api/payments/webhook
+  http://localhost:4004/api/payments/webhook
 ```
 
 Efectos esperados (bypass activado):

@@ -38,6 +38,7 @@ Ubicación de los specs:
 - `cypress/e2e/seating/seating_fit.cy.js`
 - `cypress/e2e/seating/seating_area_type.cy.js`
 - `cypress/e2e/seating/seating_assign_unassign.cy.js`
+- `cypress/e2e/seating/seating_auto_ai.cy.js`
 
 ### 1) seating_smoke.cy.js (Smoke general)
 Valida que:
@@ -137,4 +138,13 @@ Notas:
 - Próximos pasos recomendados:
   - Añadir un test para asignación/ desasignación de invitados con drag & drop y botón ×.
   - Validar guardado/recuperación de dimensiones al recargar página (requiere mocks o backend real y datos de usuario).
+
+## Cobertura E2E implementada
+- `cypress/e2e/seating/seating_smoke.cy.js y cypress/e2e/seating/seating_assign_unassign.cy.js`: validan creación de salones, asignación y desasignación de invitados.
+- `cypress/e2e/seating/seating_capacity_limit.cy.js, cypress/e2e/seating/seating_no_overlap.cy.js y cypress/e2e/seating/seating_obstacles_no_overlap.cy.js`: cubren reglas de capacidad, colisiones y obstáculos.
+- `cypress/e2e/seating/seating_template_circular.cy.js, cypress/e2e/seating/seating_template_u_l_imperial.cy.js y cypress/e2e/seating/seating_ceremony.cy.js`: ejercitan plantillas y configuraciones especiales.
+- `cypress/e2e/seating/seating_fit.cy.js, cypress/e2e/seating/seating_aisle_min.cy.js y cypress/e2e/seating/seating_toasts.cy.js`: prueban distribución automática, pasillos mínimos y flujos de brindis.
+- `cypress/e2e/seating/seating_auto_ai.cy.js`: valida la acción de Auto-IA (stub inicial; acepta éxito o error controlado).
+ - `cypress/e2e/seating/seating_area_type.cy.js`: valida creación/edición por tipo de área en el plano.
+ - `cypress/e2e/seating/seating_delete_duplicate.cy.js`: valida eliminación de duplicados en entidades del seating.
 

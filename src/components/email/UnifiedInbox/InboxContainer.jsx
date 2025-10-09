@@ -17,14 +17,14 @@ import ProviderSearchModal from '../../ProviderSearchModal';
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
- * Versión completa con todas las correcciones aplicadas para evitar errores de Promise
+ * VersiÃ³n completa con todas las correcciones aplicadas para evitar errores de Promise
  */
 const InboxContainer = () => {
   const authContext = useAuth();
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
 
-  // Establecer el contexto de autenticación en EmailService
+  // Establecer el contexto de autenticaciÃ³n en EmailService
   useEffect(() => {
     setAuthContext(authContext);
   }, [authContext]);
@@ -71,14 +71,14 @@ const InboxContainer = () => {
         setEmails(res);
         setError(null);
       } else if (res && typeof res === 'object') {
-        // El servicio devolvió un objeto con error o estructura inesperada
-        console.warn('EmailService devolvió estructura no esperada:', res);
+        // El servicio devolviÃ³ un objeto con error o estructura inesperada
+        console.warn('EmailService devolviÃ³ estructura no esperada:', res);
         setEmails([]);
         setError(res.error || 'No se pudieron cargar los emails');
       } else {
         // Valor totalmente inesperado
         setEmails([]);
-        setError('Respuesta de EmailService no válida');
+        setError('Respuesta de EmailService no vÃ¡lida');
       }
     } catch (err) {
       console.error('Error cargando emails:', err);
@@ -160,7 +160,7 @@ const InboxContainer = () => {
     };
   }, [user, folder, refreshEmails, refreshCounts]);
 
-  // Marcar email como leído
+  // Marcar email como leÃ­do
   const markAsRead = useCallback(async (emailId) => {
     try {
       await EmailService.markAsRead(emailId);
@@ -168,13 +168,13 @@ const InboxContainer = () => {
       try { await refreshCounts(); } catch {}
     } catch (err) {
       // En algunos entornos el backend puede devolver 404 si el mail solo
-      // existe en la subcolección del usuario. Marcamos localmente y no
+      // existe en la subcolecciÃ³n del usuario. Marcamos localmente y no
       // llenamos la consola de errores para este caso.
       const msg = String(err?.message || '');
       if (/404/.test(msg)) {
         setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
       } else {
-        console.error('Error marcando como leído:', err);
+        console.error('Error marcando como leÃ­do:', err);
       }
     }
   }, [refreshCounts]);
@@ -197,6 +197,8 @@ const InboxContainer = () => {
   const [composerInitial, setComposerInitial] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
+  const [sortField, setSortField] = useState('date');
+  const [sortDirection, setSortDirection] = useState('desc');
   const [viewMode, setViewMode] = useState('list'); // list, detail
 
   const openComposer = useCallback(
@@ -220,7 +222,7 @@ const InboxContainer = () => {
     ? safeEmails.find((email) => email.id === selectedEmailId)
     : null;
 
-  // Filtrar emails según búsqueda y estado
+  // Filtrar emails segÃºn bÃºsqueda y estado
   const filteredEmails = safeEmails.filter((email) => {
     const matchesSearch =
       !searchTerm ||
@@ -236,13 +238,41 @@ const InboxContainer = () => {
     return matchesSearch && matchesFilter;
   });
 
+  const sortedEmails = filteredEmails.slice().sort((a, b) => {
+    const direction = sortDirection === 'asc' ? 1 : -1;
+    const safeValue = (value) => (value === null || value === undefined ? '' : value);
+
+    if (sortField === 'date') {
+      const aDate = new Date(a?.date || a?.sentAt || 0).getTime();
+      const bDate = new Date(b?.date || b?.sentAt || 0).getTime();
+      if (aDate === bDate) return 0;
+      return aDate > bDate ? direction : -direction;
+    }
+
+    if (sortField === 'subject') {
+      const aSubject = safeValue(a?.subject).toString().toLowerCase();
+      const bSubject = safeValue(b?.subject).toString().toLowerCase();
+      if (aSubject === bSubject) return 0;
+      return aSubject > bSubject ? direction : -direction;
+    }
+
+    if (sortField === 'from') {
+      const aFrom = safeValue(a?.from || a?.to).toString().toLowerCase();
+      const bFrom = safeValue(b?.from || b?.to).toString().toLowerCase();
+      if (aFrom === bFrom) return 0;
+      return aFrom > bFrom ? direction : -direction;
+    }
+
+    return 0;
+  });
+
   // Handlers
   const handleEmailSelect = useCallback(
     (emailId) => {
       setSelectedEmailId(emailId);
       setViewMode('detail');
 
-      // Marcar como leído si no lo está
+      // Marcar como leÃ­do si no lo estÃ¡
       const email = emails.find((e) => e.id === emailId);
       if (email && !email.read) {
         markAsRead(emailId);
@@ -264,6 +294,20 @@ const InboxContainer = () => {
       }
     },
     [deleteEmail, selectedEmailId, safeEmails]
+  );
+
+  const handleSortChange = useCallback(
+    (field) => {
+      setSortField((prevField) => {
+        if (prevField === field) {
+          setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
+          return prevField;
+        }
+        setSortDirection(field === 'date' ? 'desc' : 'asc');
+        return field;
+      });
+    },
+    []
   );
 
   const handleBackToList = useCallback(() => {
@@ -365,9 +409,11 @@ const InboxContainer = () => {
           console.warn('No se pudo crear el evento en calendario:', fallbackError);
         }
         console.warn('Fallo al registrar el evento en backend, usando fallback local.', error);
+      } finally {
+        closeCalendarIntegration();
       }
     },
-    [calendarEmail]
+    [calendarEmail, closeCalendarIntegration]
   );
 
   const handleFeedbackSubmit = useCallback(
@@ -387,7 +433,9 @@ const InboxContainer = () => {
       }
     },
     [user]
-  );  // Estados de carga y error
+  );
+
+  // Estados de carga y error
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -421,25 +469,33 @@ const InboxContainer = () => {
       <div className="bg-surface p-4 border-b shadow-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-semibold text-body">{folder === 'inbox' ? 'Recibidos' : 'Enviados'}</h1>
+            <h1 data-testid="email-title" className="text-2xl font-semibold text-body">{folder === 'inbox' ? 'Recibidos' : 'Enviados'}</h1>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => setShowComposer(true)}
+                data-testid="compose-button"
+                onClick={() => openComposer('basic')}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                âœ‰ï¸ Nuevo Email
+                Nuevo Email
+              </button>
+              <button
+                data-testid="compose-button-ai"
+                onClick={() => openComposer('smart')}
+                className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+              >
+                Redactar con IA
               </button>
               <button
                 onClick={refreshEmails}
                 className="px-3 py-2 text-muted hover:text-body transition-colors"
                 title="Actualizar"
               >
-                ðŸ”„
+                ?
               </button>
             </div>
           </div>
 
-          {/* Barra de búsqueda y filtros */}
+          {/* Barra de bÃºsqueda y filtros */}
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <input
@@ -456,8 +512,8 @@ const InboxContainer = () => {
               className="px-3 py-2 border border-soft rounded-lg focus:ring-2 ring-primary"
             >
               <option value="all">Todos</option>
-              <option value="unread">No leídos</option>
-              <option value="read">Leídos</option>
+              <option value="unread">No leÃ­dos</option>
+              <option value="read">LeÃ­dos</option>
             </select>
           </div>
 
@@ -524,7 +580,7 @@ const InboxContainer = () => {
                       }
                       console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
                     } else {
-                      console.log(`[IA] Análisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
+                      console.log(`[IA] AnÃ¡lisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
                     }
                   } catch (e) {
                     console.error('Error analizando correos', e);
@@ -533,10 +589,10 @@ const InboxContainer = () => {
                   }
                 }}
                 className={`mt-2 px-3 py-2 text-xs border rounded ${analyzing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-soft'}`}
-                title="Analizar correos (IA) - sólo en desarrollo"
+                title="Analizar correos (IA) - sÃ³lo en desarrollo"
                 disabled={analyzing}
               >
-                {analyzing ? 'Analizando…' : 'Analizar IA (carpeta actual)'}
+                {analyzing ? 'Analizandoâ¦' : 'Analizar IA (carpeta actual)'}
               </button>
             </div>
           )}
@@ -585,12 +641,17 @@ const InboxContainer = () => {
         <div className="flex-1 grid grid-cols-2 gap-0">
           <div className="border-r overflow-hidden">
             <EmailList
-              emails={filteredEmails}
+              emails={sortedEmails}
               onSelectEmail={handleEmailSelect}
               onDeleteEmail={handleEmailDelete}
               selectedEmailId={selectedEmailId}
               loading={loading}
               currentFolder={folder}
+              searchTerm={searchTerm}
+              onSearch={setSearchTerm}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSortChange={handleSortChange}
             />
           </div>
           <div className="overflow-auto">
@@ -604,15 +665,14 @@ const InboxContainer = () => {
                   const subj = selectedEmail?.subject ? `Re: ${selectedEmail.subject}` : 'Re:';
                   const to = selectedEmail?.from || '';
                   const quoted = `\n\n---- Mensaje original ----\nDe: ${selectedEmail?.from || ''}\nFecha: ${selectedEmail?.date || ''}\nAsunto: ${selectedEmail?.subject || ''}\n\n${selectedEmail?.body || ''}`;
-                  setComposerInitial({ to, subject: subj, body: quoted });
-                  setShowComposer(true);
+                  openComposer('basic', { to, subject: subj, body: quoted });
                 }}
                 onForward={() => {
                   const subj = selectedEmail?.subject ? `Fwd: ${selectedEmail.subject}` : 'Fwd:';
                   const quoted = `\n\n---- Mensaje reenviado ----\nDe: ${selectedEmail?.from || ''}\nFecha: ${selectedEmail?.date || ''}\nAsunto: ${selectedEmail?.subject || ''}\n\n${selectedEmail?.body || ''}`;
-                  setComposerInitial({ to: '', subject: subj, body: quoted });
-                  setShowComposer(true);
+                  openComposer('basic', { to: '', subject: subj, body: quoted });
                 }}
+                onSchedule={() => openCalendarIntegrationForEmail(selectedEmail)}
               />
             ) : (
               <div className="h-full flex items-center justify-center text-muted">
@@ -624,43 +684,89 @@ const InboxContainer = () => {
       </div>
 
       {/* Composer modal */}
-  {showComposer && (
-    <EmailComposer
-      onSend={handleSendEmail}
-      onClose={() => setShowComposer(false)}
-      initialValues={composerInitial}
-    />
-  )}
+      {showComposer &&
+        (composerMode === 'smart' ? (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl overflow-hidden">
+              <SmartEmailComposer
+                provider={composerInitial?.provider || null}
+                searchQuery={composerInitial?.searchQuery || ''}
+                templates={emailTemplates}
+                initialValues={composerInitial}
+                onCancel={closeComposer}
+                onSend={handleSmartComposerSend}
+              />
+            </div>
+          </div>
+        ) : (
+          <EmailComposer
+            isOpen={showComposer}
+            onSend={handleSendEmail}
+            onClose={closeComposer}
+            initialValues={composerInitial}
+          />
+        ))}
 
-  {/* Botón flotante para búsqueda de proveedores con IA (para tests/E2E) */}
-  <button
-    data-testid="open-ai-search"
-    onClick={() => setShowProviderSearch(true)}
-    className="fixed bottom-4 right-4 z-10 px-3 py-2 text-sm rounded border bg-white shadow hover:bg-gray-50"
-    title="Buscar proveedores con IA"
-  >
-    IA Proveedores
-  </button>
+      {/* Botón flotante para búsqueda de proveedores con IA (para tests/E2E) */}
+      <button
+        data-testid="open-ai-search"
+        onClick={() => {
+          setShowProviderSearch(true);
+        }}
+        className="fixed bottom-4 right-4 z-10 px-3 py-2 text-sm rounded border bg-white shadow hover:bg-gray-50"
+        title="Buscar proveedores con IA"
+      >
+        IA Proveedores
+      </button>
 
-  {/* Modal de búsqueda IA de proveedores */}
-  {showProviderSearch && (
-    <ProviderSearchModal
-      onClose={() => setShowProviderSearch(false)}
-      onSelectProvider={(provider) => {
-        try {
-          const to = provider?.email || '';
-          setComposerInitial({ to, subject: '', body: '' });
-          setShowComposer(true);
-        } catch {}
-        setShowProviderSearch(false);
-      }}
-    />
-  )}
+      {/* Modal de búsqueda IA de proveedores */}
+      {showProviderSearch && (
+        <ProviderSearchModal
+          onClose={() => setShowProviderSearch(false)}
+          onSelectProvider={(provider) => {
+            try {
+              const to = provider?.email || '';
+              openComposer('smart', {
+                to,
+                provider,
+                searchQuery: provider?.service || '',
+              });
+            } catch {}
+            setShowProviderSearch(false);
+          }}
+        />
+      )}
+
+      {showCalendarIntegration && calendarEmail && (
+        <CalendarIntegration
+          email={calendarEmail}
+          onClose={closeCalendarIntegration}
+          onSave={handleCalendarSave}
+        />
+      )}
+
+      <div className="fixed bottom-6 left-6 z-30">
+        <EmailFeedbackCollector
+          isMinimized
+          emailId={selectedEmail?.id || null}
+          onSubmit={handleFeedbackSubmit}
+        />
+      </div>
     </div>
   );
 };
 
 export default InboxContainer;
+
+
+
+
+
+
+
+
+
+
 
 
 

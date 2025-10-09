@@ -62,6 +62,11 @@
 - Integracion: actualizar contenido -> publicar -> verificar en URL publica.
 - E2E: crear sitio, compartir enlace, confirmar RSVP desde visitante anonimo.
 
+
+## Cobertura E2E implementada
+- `cypress/e2e/inspiration/inspiration-flow.cy.js y cypress/e2e/inspiration_smoke.cy.js`: validan la navegación pública de inspiración y bloques reutilizados en el sitio.
+- `cypress/e2e/news/news-flow.cy.js`: cubre la sección de noticias/blog asociada al sitio público.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para `publicSites`, `publicSiteAnalytics`.
 - Configurar CDN/hosting estatico y invalidacion tras cada publicacion.

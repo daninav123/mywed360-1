@@ -1,11 +1,11 @@
-﻿---
+---
 # Nota de configuración de puertos
 ---
 
 ## Puertos de la aplicación
 
 - Frontend (Vite): 5173
-- Backend (Express): 3001
+- Backend (Express): 4004
 - Especial testing contenedor: 30001 reservado (no usar en local)
 
 ## Reglas

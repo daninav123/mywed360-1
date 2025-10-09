@@ -52,11 +52,11 @@ export default function ProveedoresCompareTest() {
       <CompareSelectedModal
         open
         onClose={() => {}}
-        providers={providers}onRemoveFromSelection={(id) => setProviders((prev) => prev.filter((p) => p.id !== id))}
-        createGroupOverride={async ({ name, memberIds }) => ({ success: true, id: "g-test" })}
+        providers={providers}
+        onRemoveFromSelection={(id) => setProviders((prev) => prev.filter((p) => p.id !== id))}
+        createGroupOverride={async () => ({ success: true, id: 'g-test' })}
         updateProviderOverride={async () => ({})}
       />
     </div>
   );
 }
-

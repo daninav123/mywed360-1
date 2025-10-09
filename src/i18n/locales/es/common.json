@@ -730,12 +730,12 @@
     "published": "Published"
   },
   "inspiration": {
-    "alt": "inspiration",
-    "altWithTags": "inspiration: {{tags}}",
-    "aria": "Inspiration image",
-    "ariaWithTags": "Inspiration image: {{tags}}",
-    "addFav": "Add to favorites",
-    "removeFav": "Remove from favorites"
+    "alt": "inspiración",
+    "altWithTags": "inspiración: {{tags}}",
+    "aria": "Imagen de inspiración",
+    "ariaWithTags": "Imagen de inspiración: {{tags}}",
+    "addFav": "Añadir a favoritos",
+    "removeFav": "Quitar de favoritos"
   },
   "compose": {
     "toField": "Recipient field",

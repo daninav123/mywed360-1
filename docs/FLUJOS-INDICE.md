@@ -1,33 +1,47 @@
 ---
-Descripción: Índice maestro de flujos funcionales MyWed360
+title: Índice de flujos funcionales
+description: Índice maestro de flujos funcionales MyWed360
 ---
 
 # Índice de flujos funcionales
 
 Este documento centraliza la numeración, nombre y estado de implementación de cada flujo descrito en `docs/flujos-especificos/`. Evita duplicidades y mantiene la trazabilidad. Al añadir o modificar un flujo, actualiza esta tabla.
 
-| # | Identificador del archivo | Título del flujo | Estado (Sí completado / Sí en curso / No pendiente) |
-|---|---------------------------|------------------|----------------------------------------------------|
-| 1 | flujo-1-... | (pendiente de definir) | No (pendiente) |
-| 2 | flujo-2-... | (pendiente de definir) | No (pendiente) |
-| 3 | flujo-3-gestion-invitados.md | Gestión de Invitados | Sí (en curso) |
-| 4 | flujo-4-plan-asientos.md | Plan de Asientos | Sí (en curso) |
-| 5a | flujo-5-proveedores-ia.md | Proveedores con IA | Sí (en curso) |
-| 5b | flujo-5-timeline-tareas.md | Timeline y Tareas | Sí (en curso) |
-| 6 | flujo-6-presupuesto.md | Presupuesto | Sí (en curso) |
-| 7 | flujo-7-comunicacion-emails.md | Comunicación y Emails | Sí (en curso) |
-| 8 | flujo-8-diseno-web-personalizacion.md | Diseño Web y Personalización | Sí (en curso) |
-| 9 | flujo-9-rsvp-confirmaciones.md | RSVP y Confirmaciones | Sí (en curso) |
-| 10 | flujo-10-gestion-bodas-multiples.md | Gestión de Bodas Múltiples | Sí (en curso) |
-| 11 | flujo-11-protocolo-ceremonias.md | Protocolo y Ceremonias | Sí (en curso) |
-| 12 | flujo-12-notificaciones-configuracion.md | Notificaciones y Configuración | Sí (en curso) |
-| 13a | flujo-13-gestion-contenido.md | Gestión de Contenido | Sí (en curso) |
-| 13b | flujo-13-seating-plan-e2e.md | E2E Seating Plan (Tests) | Sí (en curso) |
-| 14 | flujo-14-checklist-avanzado.md | Checklist Avanzado | Sí (en curso) |
-| 15 | flujo-15-contratos-documentos.md | Contratos y Documentos | Sí (en curso) |
-| 16 | flujo-16-asistente-virtual-ia.md | Asistente Virtual con IA | No (pendiente) |
-| 17 | flujo-17-gamificacion-progreso.md | Gamificación y Progreso | No (pendiente) |
-| 18 | flujo-18-generador-documentos-legales.md | Generador de Documentos Legales | Sí (en curso) |
+> Consulta el roadmap unificado: `docs/ROADMAP.md`
+
+| # | Archivo | Título del flujo | Estado | Pendiente principal |
+|---|---------------------------|------------------------------|----------------|----------------------------|
+| 0 | flujo-0-administracion-global.md | Administración Global | No (pendiente) | Definir alcance técnico, proteger backoffice y cerrar autorización admin |
+| 1 | flujo-1-registro-autenticacion.md | Registro y Autenticación | Sí (en curso) | Instrumentar métricas, refactor formularios legacy y auditoría de accesibilidad |
+| 2 | flujo-2-creacion-boda-ia.md | Creación de Evento con IA | Sí (en curso) | Opt-in planner, telemetría del funnel, migrar rutas a `/eventos` e integrar IA contextual |
+| 3 | flujo-3-gestion-invitados.md | Gestión de Invitados | Sí (en curso) | Dashboard RSVP, check-in del día B y sincronización automática con Seating Plan |
+| 4 | flujo-4-invitados-operativa.md | Invitados (Plan + Contenido) | Sí (en curso) | Panel inteligente con IA, automatización de contenidos y revisión de accesibilidad |
+| 5a | flujo-5-proveedores-ia.md | Proveedores con IA | Sí (en curso) | Scoring IA consolidado, portal proveedor completo y RFQ multi-proveedor automatizada |
+| 5b | flujo-5-timeline-tareas.md | Timeline y Tareas | Sí (en curso) | Motor IA para plantillas padre/subtareas y matriz de responsabilidades |
+| 6 | flujo-6-presupuesto.md | Presupuesto | Sí (en curso) | Importación CSV/Excel, analítica predictiva, aportaciones colaborativas y reportes Avanzados |
+| 7 | flujo-7-comunicacion-emails.md | Comunicación y Emails | Sí (en curso) | Búsqueda/ordenación en inbox, carpetas personalizadas, clasificador backend y envíos programados |
+| 8 | flujo-8-diseno-web-personalizacion.md | diseño Web y Personalización | Sí (en curso) | Mover OpenAI al backend, prompts editables, dominios personalizados y analítica de lugares |
+| 9 | flujo-9-rsvp-confirmaciones.md | RSVP y Confirmaciones | Sí (en curso) | Confirmaciones grupales, recordatorios multicanal, analítica detallada e integración con catering |
+| 10 | flujo-10-gestion-bodas-multiples.md | Gestión de Bodas Múltiples | Sí (en curso) | Dashboards multi-boda, permisos granulares por módulo y vistas cruzadas consolidadas |
+| 11 | flujo-11-protocolo-ceremonias.md | Protocolo y Ceremonias | Sí (completado) | — |
+| 11A | flujo-11a-momentos-especiales.md | Momentos Especiales | Sí (completado) | — |
+| 11B | flujo-11b-timeline-dia-b.md | Timeline Día B | Sí (completado) | — |
+| 11C | flujo-11c-checklist-ultima-hora.md | Checklist Última Hora | Sí (completado) | — |
+| 11D | flujo-11d-guia-documentacion-legal.md | Guía Documentación Legal | Sí (completado) | — |
+| 11E | flujo-11e-ayuda-textos-ceremonia.md | Ayuda Textos Ceremonia | Sí (completado) | — |
+| 12 | flujo-12-notificaciones-configuracion.md | Notificaciones y Configuración | Sí (en curso) | AutomationRules UI, notificaciones push/SMS y centro unificado de notificaciones |
+| 13a | *(Integrado en flujo 4)* | Gestión de Contenido | — | — |
+| 13b | flujo-13-seating-plan-e2e.md | E2E Seating Plan (Tests) | Sí (en curso) | Extender cobertura cuando se publiquen nuevos escenarios de Seating |
+| 14 | flujo-14-checklist-avanzado.md | Checklist Avanzado | Sí (en curso) | Generación IA de checklists, dependencias avanzadas, gamificación y plantillas colaborativas |
+| 15 | flujo-15-contratos-documentos.md | Contratos y Documentos | Sí (en curso) | Firma digital integrada, workflows de aprobación y analítica/legal automation |
+| 16 | flujo-16-asistente-virtual-ia.md | Asistente Virtual con IA | No (pendiente) | Orquestador multicanal, reglas configurables y workers backend |
+| 17 | flujo-17-gamificacion-progreso.md | Gamificación y Progreso | No (pendiente) | Niveles, logros, retos, recompensas y panel de analytics |
+| 18 | flujo-18-generador-documentos-legales.md | Generador de Documentos Legales | Sí (en curso) | Repositorio completo de plantillas, firma electrónica, almacenamiento backend y automatización IA |
+| 19 | flujo-19-diseno-invitaciones.md | Diseño de Invitaciones | Sí (en curso) | Tutoriales guiados, colaboración/feedback, integración impresión y generación IA |
+| 20 | flujo-20-email-inbox.md | Email Inbox Global | Sí (en curso) | Unificar experiencia, documentar APIs backend, onboarding centralizado y telemetría completa |
+| 21 | flujo-21-sitio-publico.md | Sitio Público | Sí (en curso) | Personalización avanzada, dominios personalizados, SEO/analytics y métricas de conversión |
+| 22 | flujo-22-dashboard-navegacion.md | Dashboard y Navegación | Sí (en curso) | Dashboard con métricas en vivo, proteger herramientas internas y mostrar actividad reciente |
+| 23 | flujo-23-metricas-proyecto.md | Métricas del Proyecto | Sí (en curso) | Dashboard multi-módulo, workers de agregación y rutas `/analytics/*` |
 
 ## Convenciones de numeración
 
@@ -44,4 +58,4 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 
 ---
 
-> Última actualización: 2025-09-11
+> Última actualización: 2025-10-08

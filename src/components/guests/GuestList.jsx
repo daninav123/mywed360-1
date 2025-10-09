@@ -124,9 +124,23 @@ const GuestList = React.memo(
     );
 
     const handleEmail = useCallback(
-      (guest, e) => {
+      async (guest, e) => {
         if (e && e.stopPropagation) e.stopPropagation();
-        onInviteEmail?.(guest);
+        if (!onInviteEmail) return;
+        try {
+          const result = await onInviteEmail(guest);
+          if (result?.success) {
+            if (guest?.email) {
+              alert(`Email enviado a ${guest.email}`);
+            } else {
+              alert('Email enviado correctamente.');
+            }
+          } else if (result?.error) {
+            alert(`Error enviando email: ${result.error}`);
+          }
+        } catch (error) {
+          alert('No se pudo enviar el email.');
+        }
       },
       [onInviteEmail]
     );

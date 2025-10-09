@@ -36,7 +36,7 @@ Nota: si trabajas en un entorno compartido evita levantar servidores en puertos 
 
 - Backend (Express):
   - `npm start` (ejecuta `node backend/index.js`)
-  - Comprobar salud: `GET http://localhost:3001/health` (o puerto definido por `PORT`)
+  - Comprobar salud: `GET http://localhost:4004/health` (o puerto definido por `PORT`)
 
 - Frontend (Vite):
   - `npm run dev` (levanta en `http://localhost:5173` con `--strictPort`)

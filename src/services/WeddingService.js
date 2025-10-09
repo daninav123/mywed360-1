@@ -28,6 +28,51 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '../firebaseConfig';
 
+const DEFAULT_EVENT_TYPE = 'boda';
+
+const normalizeEventType = (raw) => {
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim().toLowerCase();
+    return trimmed || DEFAULT_EVENT_TYPE;
+  }
+  return DEFAULT_EVENT_TYPE;
+};
+
+const sanitizeRelatedEvents = (raw) => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => (typeof item === 'string' ? item.trim() : ''))
+    .filter((item) => item.length > 0);
+};
+
+const sanitizeEventProfile = (rawProfile, eventType) => {
+  const profile = rawProfile && typeof rawProfile === 'object' ? { ...rawProfile } : {};
+  return {
+    guestCountRange: profile.guestCountRange || null,
+    formalityLevel: profile.formalityLevel || null,
+    ceremonyType: eventType === 'boda' ? profile.ceremonyType || null : null,
+    relatedEvents: sanitizeRelatedEvents(profile.relatedEvents),
+    notes: typeof profile.notes === 'string' ? profile.notes.trim() : '',
+  };
+};
+
+const sanitizePreferences = (rawPreferences) => {
+  if (!rawPreferences || typeof rawPreferences !== 'object') return {};
+  const { style, ...rest } = rawPreferences;
+  return {
+    ...rest,
+    style: typeof style === 'string' ? style.trim() : style || null,
+  };
+};
+
+const buildEventProfileSummary = (eventType, eventProfile, preferences) => ({
+  eventType,
+  guestCountRange: eventProfile?.guestCountRange || null,
+  formalityLevel: eventProfile?.formalityLevel || null,
+  ceremonyType: eventType === 'boda' ? eventProfile?.ceremonyType || null : null,
+  style: preferences?.style || null,
+});
+
 /**
  * Crea una nueva boda y asigna al usuario como propietario principal.
  * @param {string} uid - UID del usuario creador.
@@ -38,12 +83,18 @@ export async function createWedding(uid, extraData = {}) {
   if (!uid) throw new Error('uid requerido');
   const weddingId = uuidv4();
   const ref = doc(db, 'weddings', weddingId);
+  const eventType = normalizeEventType(extraData?.eventType);
+  const eventProfile = sanitizeEventProfile(extraData?.eventProfile, eventType);
+  const preferences = sanitizePreferences(extraData?.preferences);
   const base = {
     ownerIds: [uid],
     plannerIds: [],
     subscription: { tier: 'free', renewedAt: Timestamp.now() },
     createdAt: Timestamp.now(),
     ...extraData,
+    eventType,
+    eventProfile,
+    preferences,
   };
   await setDoc(ref, base);
   // Inicializar subcolección de finanzas
@@ -54,11 +105,21 @@ export async function createWedding(uid, extraData = {}) {
     console.warn('No se pudo inicializar finance/main para', weddingId, e);
   }
   // Guardar enlace rápido en el perfil del usuario (crea si no existe)
-  await setDoc(doc(db, 'users', uid), { weddingId }, { merge: true });
+  await setDoc(
+    doc(db, 'users', uid),
+    {
+      weddingId,
+      activeWeddingId: weddingId,
+      hasActiveWedding: true,
+      lastWeddingCreatedAt: Timestamp.now(),
+    },
+    { merge: true }
+  );
 
   // Registrar la boda en la subcolección users/{uid}/weddings para que WeddingContext la cargue
   try {
     const subRef = doc(db, 'users', uid, 'weddings', weddingId);
+    const eventProfileSummary = buildEventProfileSummary(eventType, eventProfile, preferences);
     await setDoc(
       subRef,
       {
@@ -69,6 +130,8 @@ export async function createWedding(uid, extraData = {}) {
         progress: base.progress ?? 0,
         active: base.active ?? true,
         createdAt: Timestamp.now(),
+        eventType,
+        eventProfileSummary,
       },
       { merge: true }
     );
@@ -241,7 +304,17 @@ async function seedDefaultTasksForWedding(weddingId, weddingData) {
       await setDoc(sDoc, { id: sDoc.id }, { merge: true });
     }
   }
-  await setDoc(seedRef, { seededAt: Timestamp.now(), version: 1 }, { merge: true });
+  await setDoc(
+    seedRef,
+    {
+      seededAt: Timestamp.now(),
+      version: 1,
+      eventType: weddingData?.eventType || DEFAULT_EVENT_TYPE,
+      guestCountRange: weddingData?.eventProfile?.guestCountRange || null,
+      formalityLevel: weddingData?.eventProfile?.formalityLevel || null,
+    },
+    { merge: true }
+  );
 }
 
 /**

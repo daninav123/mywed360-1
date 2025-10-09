@@ -39,7 +39,7 @@
 - Variables Mailgun presentes: `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_SENDING_DOMAIN`, `MAILGUN_EU_REGION`.
 
 ## Pruebas rápidas
-- Eventos Mailgun: `GET https://<backend>/api/mailgun/events?recipient=tu@correo.com&event=delivered&limit=10`.
+- Eventos Mailgun: `GET https://<backend>/api/mailgun/events→recipient=tu@correo.com&event=delivered&limit=10`.
 - Envío de prueba: `POST https://<backend>/api/mail/test-personal-email` con JSON:
   {
      – from – :  – usuario@mywed360.com – ,

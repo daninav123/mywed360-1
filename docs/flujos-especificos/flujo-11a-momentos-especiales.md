@@ -25,8 +25,7 @@
 **Pendiente / roadmap**
 - Campos adicionales (responsables, requisitos técnicos, suppliers, estado) descritos originalmente.  
 - Reordenamiento drag&drop y límite de 200 momentos.  
-- Instrumentación (`special_moment_added`) y alertas por campos faltantes.  
-- UI guiada para duplicar/mover bloques sin prompts.
+- Alertas por campos faltantes y duplicado/movimiento con UI guiada.
 
 ## 4. Datos y modelo
 - **Estructura base** (`DEFAULT_BLOCKS` y `defaultData` en `useSpecialMoments.js`).  
@@ -51,14 +50,18 @@
 - **Flujo 21**: se pueden publicar fragmentos (momentos destacados) en la web pública.
 
 ## 8. Métricas y eventos
-- Aún no se emiten eventos automáticos; `special_moment_added` está pendiente.  
-- Indicadores sugeridos (por implementar): nº momentos por bloque, % con canción, bloques personalizados.  
+- Eventos emitidos: `special_moment_added`, `special_moment_removed`, `special_moment_state_changed`.  
+- Indicadores sugeridos: nº momentos por bloque, % con canción, bloques personalizados.  
 - Logging IA se limita a console.log para depuración.
 
 ## 9. Pruebas recomendadas
 - Unitarias: `useSpecialMoments` (creación, migración, sincronización).  
 - Integración: añadir/duplicar momentos → reflejo inmediato en Timeline.  
 - E2E: planner crea bloques personalizados, asigna canciones via búsqueda y verifica persistencia tras recarga.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/protocolo/protocolo-flows.cy.js`: carga la vista con datos simulados de momentos especiales y valida que los bloques y canciones persistidos se renderizan correctamente.
 
 ## 10. Checklist de despliegue
 - Verificar reglas Firestore de `specialMoments`.  

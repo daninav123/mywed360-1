@@ -263,7 +263,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
       });
 
       if (result && (result.success || result.id)) {
-        setSuccess('Email enviado correctamente');
+        setSuccess('Correo enviado correctamente');
 
         if (onSend) {
           onSend(result);

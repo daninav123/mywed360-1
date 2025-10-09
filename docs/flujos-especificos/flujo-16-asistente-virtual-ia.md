@@ -1,75 +1,77 @@
-# 16. Asistente Virtual IA (estado 2025-10-07)
+﻿# 16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)
 
-> Implementado: `VirtualAssistant.jsx` (chat flotante), `useVirtualAssistant` hook, integracion inicial con OpenAI (stubs), mensajes contextuales basados en `WeddingContext`.
-> Pendiente: orquestador conversacional real, acciones automatizadas, telemetria completa, controles de permisos y fallback humano.
+> Implementado hoy: `ChatWidget.jsx`, utilidades locales (memoria, notas importantes) y llamadas opcionales a `/api/chat-widget`.  
+> En desarrollo: orquestador multicanal (email/chat/WhatsApp), reglas configurables y workers backend.
 
 ## 1. Objetivo y alcance
-- Proporcionar soporte conversacional contextual dentro de la plataforma.
-- Sugerir tareas, proveedores y respuestas a dudas frecuentes usando datos de la boda.
-- Reducir carga de soporte y acelerar adopcion de funcionalidades clave.
+- Ofrecer un asistente flotante que resuelva dudas y proponga acciones rápidas desde cualquier pantalla.
+- Guardar contexto local (historial corto, notas marcadas como importantes) para consultas posteriores.
+- Sentar las bases para automatizaciones IA futuras (respuesta automática y orquestación de acciones).
 
 ## 2. Trigger y rutas
-- Icono de chat flotante visible en todas las pantallas (`VirtualAssistant.jsx`).
-- Shorcut teclado `Ctrl+Shift+K` (configurable) para abrir chat.
-- Entradas proactivas desde notificaciones cuando se detectan bloqueos (pendiente).
+- Botón flotante (esquina inferior derecha) con icono de chat → abre el `ChatWidget`.
+- Atajo de teclado `Ctrl + Shift + K` (configurable) para abrir/cerrar.
+- No existe hoy un panel dedicado; el trabajo futuro se documentará en `/automation` cuando haya UI.
 
-## 3. Paso a paso UX
-1. Apertura y contexto
-   - Chat muestra mensaje de bienvenida basado en pagina actual.
-   - Sugiere acciones rapidas (crear checklist, revisar presupuesto, invitar colaboradores).
-   - Permite elegir tono (formal, amigable) y idioma (cuando se habilite multi-idioma).
-2. Interaccion
-   - Usuario escribe pregunta libre o selecciona sugerencia.
-   - Backend compone contexto (pagina, rol, progreso, datos claves) antes de llamar a OpenAI.
-   - Respuesta incluye enlaces a pantallas, acciones directas (crear tarea, importar invitados) y resumen textual.
-3. Acciones automatizadas
-   - Acciones confirmables: crear tareas, enviar recordatorios, generar prompts, buscar proveedores (con confirmacion).
-   - Escenarios especiales: planificador rapido (timeline), optimizacion presupuesto, seguimiento RSVP.
-   - Fallback: si no puede ayudar, ofrece abrir base de conocimiento o contactar soporte.
+## 3. Paso a paso UX (estado actual)
+1. **Apertura**
+   - El widget muestra bienvenida contextual (página actual, boda activa).
+   - Permite elegir tono (formal/amistoso) y conserva el estado abierto en `localStorage`.
+2. **Interacción**
+   - Mensajes se guardan en `chatMessages`; se limita a 50 mensajes recientes (MVP sin backend).
+   - Parser local reconoce comandos básicos (crear tarea, asignar categoría sugerida) aunque muchas acciones solo generan recomendaciones.
+3. **Notas importantes**
+   - Cada mensaje puede marcarse “⭐ importante”; se guarda en `importantNotes` y dispara evento `mywed360-important-note`.
+4. **Persistencia**
+   - `chatSummary` almacena conversaciones compactadas.
+   - Si se dispone de token (OAuth vigente) se intenta llamar a `/api/chat-widget`; si falla, se usa fallback local con mensajes predefinidos.
 
 ## 4. Persistencia y datos
-- Conversaciones en `weddings/{id}/assistantSessions/{sessionId}` con mensajes, contexto, rating.
-- `assistantMetrics` para agregados (uso, temas, satisfaccion) y mejoras.
-- Cache temporal en sessionStorage para ultimo estado del chat.
-- Configuracion por usuario en `users/{uid}/assistantPreferences` (tono, idioma, sugerencias proactivas).
+- `localStorage`: `chatOpen`, `chatMessages`, `chatSummary`, `importantNotes`.
+- API opcional: `POST /api/chat-widget` (cuando existe backend para IA conversacional).
+- No hay almacenamiento en Firestore todavía (las conversaciones no se sincronizan entre dispositivos).
 
 ## 5. Reglas de negocio
-- No ejecuta acciones criticas sin confirmacion explicita del usuario.
-- Rol determina alcance: assistants reciben sugerencias focalizadas; planners pueden ver datos de multiples bodas.
-- Conversaciones se anonimizan antes de enviar a modelos externos.
-- Respeta preferencias de privacidad (opt-out desactiva almacenamiento de historial).
+- El asistente **no ejecuta** acciones críticas (pagos, cambios permanentes) sin confirmación manual.
+- Para usuarios sin sesión activa se muestra modo “recordatorio” (no se permiten acciones).
+- En modo offline se muestra aviso y el chat entra en solo lectura.
 
 ## 6. Estados especiales y errores
-- Sin conexion -> chat en modo solo lectura con mensaje "Intento reconectar".
-- Error de OpenAI -> respuesta fallback con guia paso a paso manual.
-- Solicitudes largas -> indicador typing + opcion "Notificar cuando este listo".
-- Deteccion de frustracion (feedback negativo repetido) -> ofrece contacto humano.
+- `loading`: spinner mientras se espera respuesta (tanto local como remota).
+- Error API → toast “No se pudo conectar, prueba de nuevo” y se mantiene el mensaje en la lista.
+- Si el usuario borra `localStorage`, se reinicia la conversación (no existe recuperación).
 
-## 7. Integracion con otros flujos
-- Flujo 2/6/9 para sugerir proximos pasos tras onboarding, presupuesto o RSVP.
-- Flujo 5 (Proveedores) y 8 (Sitio web) con prompts dinamicos y recomendaciones.
-- Flujo 14/17 para actualizar tareas y gamificacion segun progreso sugerido.
-- Flujo 20/22 para mostrar actividad reciente y recursos en dashboard.
+## 7. Integración con otros flujos (hoy)
+- Flujos 2/6/9: el widget sugiere pasos siguientes (crear checklist, revisar presupuesto, revisar RSVP).
+- Flujo 5 (Proveedores) y 8 (Diseño web) utilizan prompts generados manualmente para guiar al usuario.
+- Flujo 12 (Notificaciones) genera evento cuando se marca mensaje como importante.
+- Flujo 17 (Gamificación) podría sumar puntos en futuro (aún no implementado).
 
-## 8. Metricas y monitorizacion
-- Eventos: `assistant_opened`, `assistant_action_executed`, `assistant_feedback_given`, `assistant_error`.
-- KPIs: tasa de adopcion, sesiones por usuario, ratio de acciones confirmadas, feedback positivo.
-- Logs en Cloud Functions para auditar mensajes sensibles y latencias.
+## 8. Métricas y monitorización (MVP)
+- Eventos básicos: `chat_opened`, `chat_message_sent`, `chat_mark_important` (registrados localmente).
+- No hay agregadores centralizados; se prevé usar `assistantMetrics` en la fase de orquestador.
+- Logs locales mediante `window.mywed360Debug` para diagnóstico.
 
 ## 9. Pruebas recomendadas
-- Unitarias: composicion de contexto, sanitizacion de prompts, administracion de sesion.
-- Integracion: disparar accion (crear tarea) y validar efectos colaterales.
-- E2E: flujo ayuda presupuesto, seguimiento RSVP, fallback por error de API.
+- Unitarias: utilidades del widget (parser de comandos, compactación, marcado importante).
+- Integración: apertura → envío mensaje → marcado importante → comprobar `localStorage`.
+- E2E: flujo ayuda presupuesto (respuestas de fallback) y recuperación tras refrescar pestaña.
+
+
+## Cobertura E2E implementada
+- `cypress/e2e/email/ai-provider-email.cy.js y cypress/e2e/email/smart-composer.cy.js`: ejercitan respuestas sugeridas por IA y generación de contenido que reutiliza el asistente virtual.
+- Cobertura e2e dedicada al asistente general pendiente.
 
 ## 10. Checklist de despliegue
-- Configurar `OPENAI_API_KEY`, limites de tokens y politicas de seguridad.
-- Revisar trazabilidad y almacenamiento cifrado de conversaciones.
-- Ajustar cuota diaria por usuario y reglas de coste.
-- Preparar fallback de soporte manual (email/chat humano) antes de lanzar.
+- Clave `OPENAI_API_KEY` solo si el backend `/api/chat-widget` está habilitado.
+- Revisar políticas de almacenamiento local (GDPR) y permitir al usuario limpiar historial.
+- En entornos productivos, habilitar tracking de eventos antes de lanzar automatizaciones reales.
 
-## 11. Roadmap / pendientes
-- Motor de intenciones propio con memoria a largo plazo.
-- Acciones automatizadas encadenadas (playbooks) con confirmaciones.
-- Panel de entrenamiento con feedback humano y quick replies.
-- Multidioma con traduccion en tiempo real.
-- Reportes de adopcion y insights para product/operations.
+## 11. Roadmap / Automatizaciones IA (futuro)
+- **Orquestador multicanal** (`AutomationOrchestrator`): ingerir emails, chats, WhatsApp y decidir acciones.
+- **Reglas configurables**: panel para if/then (ej. “si proveedor responde con presupuesto > X → crear tarea”).
+- **Workers**: procesar colas (`automationLogs`, `automationRules`) sin depender del cliente.
+- **Auditoría**: panel `/automation` con historiales, posibilidad de revertir acciones y métricas (ratio automatización, reversión, latencias).
+- **Integración con flujos**: generación automática de tareas (flujo 14), actualizaciones de proveedores (flujo 5), avisos en notificaciones (flujo 12).
+
+Cuando estas piezas estén listas, se documentarán de nuevo (ver antiguo flujo 24 como referencia de visión).

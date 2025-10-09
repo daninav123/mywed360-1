@@ -12,7 +12,11 @@ module.exports = defineConfig({
     video: false,
     screenshotOnRunFailure: true,
     env: {
-      BACKEND_BASE_URL: process.env.BACKEND_BASE_URL || process.env.VITE_BACKEND_BASE_URL || 'https://mywed360-backend.onrender.com',
+      BACKEND_BASE_URL:
+        process.env.BACKEND_BASE_URL ||
+        process.env.VITE_BACKEND_BASE_URL ||
+        'https://mywed360-backend.onrender.com',
+      STUB_RSVP: true,
     },
   },
 });

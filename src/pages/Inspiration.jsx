@@ -85,6 +85,7 @@ export default function Inspiration() {
       })) || [];
     const exists = Array.isArray(current) && current.some((p) => p.id === item.id);
     let next;
+    const isAdding = !exists;
     if (exists) {
       // Unfavorite: eliminar del array
       next = current.filter((p) => p.id !== item.id);
@@ -109,6 +110,13 @@ export default function Inspiration() {
     }
     // Tracking de interacción (mañado estrella)
     trackInteraction(userId, item, 0, true);
+    if (isAdding) {
+      try {
+        window.dispatchEvent(new Event('mywed360-important-note'));
+      } catch (_) {
+        // no-op si el entorno bloquea eventos personalizados
+      }
+    }
   };
 
   const handleView = (item, dwellStart) => {

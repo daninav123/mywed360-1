@@ -1,4 +1,4 @@
-import AccessTime from '@mui/icons-material/AccessTime';
+﻿import AccessTime from '@mui/icons-material/AccessTime';
 import InsertDriveFile from '@mui/icons-material/InsertDriveFile';
 import Lightbulb from '@mui/icons-material/Lightbulb';
 import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
@@ -37,17 +37,25 @@ import { safeRender, ensureNotPromise, safeMap } from '../../utils/promiseSafeRe
  * @param {Function} props.onCancel - Función llamada al cancelar
  * @param {Array} props.templates - Lista de plantillas disponibles (opcional)
  */
-const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates = [] }) => {
+const SmartEmailComposer = ({
+  provider,
+  searchQuery,
+  onSend,
+  onCancel,
+  templates = [],
+  initialValues = {},
+}) => {
   // Estado del formulario
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-  const [scheduledTime, setScheduledTime] = useState('');
+  const [recipient, setRecipient] = useState(initialValues.to || provider?.email || '');
+  const [subject, setSubject] = useState(initialValues.subject || '');
+  const [message, setMessage] = useState(initialValues.body || initialValues.message || '');
+  const [selectedTemplate, setSelectedTemplate] = useState(initialValues.templateId || '');
+  const [scheduledTime, setScheduledTime] = useState(initialValues.scheduledTime || '');
 
   // Estado de las recomendaciones
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [feedback, setFeedback] = useState(null);
-  const [category, setCategory] = useState(provider?.service || null);
+  const [category, setCategory] = useState(initialValues.category || provider?.service || null);
 
   // Para seguimiento de recomendaciones aplicadas
   const [appliedRecommendations, setAppliedRecommendations] = useState([]);
@@ -55,6 +63,23 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
   // Servicio de recomendaciones
   const recommendationService = new EmailRecommendationService();
 
+  useEffect(() => {
+    setRecipient(initialValues.to || provider?.email || '');
+    setSubject(initialValues.subject || '');
+    setMessage(initialValues.body || initialValues.message || '');
+    setSelectedTemplate(initialValues.templateId || '');
+    setScheduledTime(initialValues.scheduledTime || '');
+    setCategory(initialValues.category || provider?.service || null);
+  }, [initialValues, provider]);
+
+  useEffect(() => {
+    setRecipient(initialValues.to || provider?.email || '');
+    setSubject(initialValues.subject || '');
+    setMessage(initialValues.body || initialValues.message || '');
+    setSelectedTemplate(initialValues.templateId || '');
+    setScheduledTime(initialValues.scheduledTime || '');
+    setCategory(initialValues.category || provider?.service || null);
+  }, [initialValues, provider]);
   // Cargar plantilla inicial si hay proveedor y categoría
   useEffect(() => {
     if (provider && category && templates.length > 0) {
@@ -80,17 +105,17 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
 
   // Manejar envío del correo
   const handleSend = () => {
-    if (!subject || !message) {
+    if (!recipient || !subject || !message) {
       setFeedback({
         type: 'error',
-        message: 'Por favor, completa el asunto y el mensaje antes de enviar.',
+        message: 'Completa destinatario, asunto y mensaje antes de enviar.',
       });
       return;
     }
 
     // Preparar datos del correo
     const emailData = {
-      to: provider?.email || '',
+      to: recipient,
       subject,
       message,
       scheduledTime: scheduledTime || null,
@@ -199,7 +224,7 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
   };
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2 }} data-testid="smart-composer-modal">
       <Typography variant="h5" gutterBottom>
         Redactar Correo
         {provider && (
@@ -224,6 +249,19 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
             </Box>
 
             <Grid container spacing={2}>
+              {/* Destinatario */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Para"
+                  value={recipient}
+                  onChange={(e) => setRecipient(e.target.value)}
+                  variant="outlined"
+                  placeholder="correo@dominio.com"
+                  inputProps={{ 'data-testid': 'smart-recipient' }}
+                />
+              </Grid>
+
               {/* Asunto */}
               <Grid item xs={12}>
                 <TextField
@@ -233,6 +271,7 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
                   onChange={(e) => setSubject(e.target.value)}
                   variant="outlined"
                   placeholder="Escribe un asunto efectivo..."
+                  inputProps={{ 'data-testid': 'smart-subject' }}
                 />
               </Grid>
 
@@ -271,6 +310,7 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
                   onChange={(e) => setMessage(e.target.value)}
                   variant="outlined"
                   placeholder="Escribe tu mensaje aquí..."
+                  inputProps={{ 'data-testid': 'smart-body' }}
                 />
               </Grid>
 
@@ -283,6 +323,7 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
                   </Typography>
                   <TextField
                     type="datetime-local"
+                    inputProps={{ 'data-testid': 'smart-schedule' }}
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
                     InputLabelProps={{
@@ -352,3 +393,12 @@ const SmartEmailComposer = ({ provider, searchQuery, onSend, onCancel, templates
 };
 
 export default SmartEmailComposer;
+
+
+
+
+
+
+
+
+
