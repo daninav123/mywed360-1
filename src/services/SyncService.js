@@ -24,6 +24,7 @@ export const saveData = async (key, data, userOptions = {}) => {
     mergeWithExisting: true, // Combinar con datos existentes o reemplazar
     showNotification: true, // Mostrar notificación de éxito/error
     docPath: undefined, // Ruta completa opcional (prioridad sobre collection/uid)
+    field: undefined, // Nombre del campo en Firestore (por defecto usa key)
     ...userOptions,
   };
 
@@ -77,12 +78,14 @@ export const saveData = async (key, data, userOptions = {}) => {
           // Comprobar si el documento ya existe
           const docSnap = await getDoc(docRef);
 
+          const targetField = options.field || key;
+
           if (docSnap.exists() && options.mergeWithExisting) {
             // Actualizar el campo específico en el documento existente
-            await updateDoc(docRef, { [key]: data });
+            await updateDoc(docRef, { [targetField]: data });
           } else {
             // Crear nuevo documento con el campo
-            await setDoc(docRef, { [key]: data }, { merge: options.mergeWithExisting });
+            await setDoc(docRef, { [targetField]: data }, { merge: options.mergeWithExisting });
           }
 
           syncState.pendingChanges = false;
@@ -138,6 +141,7 @@ export const loadData = async (key, userOptions = {}) => {
     collection: 'users', // Colección en Firestore (doc users/{uid})
     fallbackToLocal: true, // Si no se encuentra en Firestore, intentar localStorage
     docPath: undefined, // Permite especificar una ruta de documento arbitraria
+    field: undefined, // Nombre del campo en Firestore
     ...userOptions,
   };
 
@@ -182,15 +186,16 @@ export const loadData = async (key, userOptions = {}) => {
           }
           const docSnap = await getDoc(docRef);
 
-          if (docSnap.exists() && docSnap.data()[key] !== undefined) {
+          const targetField = options.field || key;
+          if (docSnap.exists() && docSnap.data()[targetField] !== undefined) {
             // Guardar también en localStorage para acceso offline futuro
-            localStorage.setItem(key, JSON.stringify(docSnap.data()[key]));
+            localStorage.setItem(key, JSON.stringify(docSnap.data()[targetField]));
 
             syncState.isSyncing = false;
             syncState.lastSyncTime = new Date().toISOString();
             notifySyncStateChange();
 
-            return docSnap.data()[key];
+            return docSnap.data()[targetField];
           }
         } catch (error) {
           console.warn('Error al cargar de Firestore, intentando localStorage:', error);
@@ -320,4 +325,3 @@ export const getSyncState = () => ({ ...syncState });
 
 // Inicializa el servicio
 setupSyncListeners();
-

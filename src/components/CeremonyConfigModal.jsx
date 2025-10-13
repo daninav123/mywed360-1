@@ -65,7 +65,7 @@ export default function CeremonyConfigModal({ open, onApply, onClose, initialCon
   };
 
   return (
-    <Modal open={open} title="Configurar ceremonia" onClose={onClose}>
+    <Modal open={open} title="Configurar Ceremonia" onClose={onClose}>
       <div className="flex flex-col space-y-3 w-full max-w-sm">
         <div className="grid grid-cols-1 gap-2">
           <label className="flex justify-between items-center">

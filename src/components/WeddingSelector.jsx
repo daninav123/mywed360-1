@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useWedding } from '../context/WeddingContext';
 
-// Selector de boda activa para planners
+// Selector de evento activo para cuentas multi-evento
 export default function WeddingSelector() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -14,7 +14,7 @@ export default function WeddingSelector() {
   return (
     <div className="mb-4 flex items-center space-x-2">
       <label className="text-sm font-medium" htmlFor="wedding-select">
-        Boda:
+        Evento:
       </label>
       <select
         id="wedding-select"
@@ -32,12 +32,12 @@ export default function WeddingSelector() {
         {weddings && weddings.length > 0 ? (
           weddings.map((w) => (
             <option key={w.id} value={w.id}>
-              {w.name?.trim() ? w.name : 'Boda sin nombre'}
+              {w.name?.trim() ? w.name : 'Evento sin nombre'}
             </option>
           ))
         ) : (
           <option value="" disabled>
-            Sin bodas
+            Sin eventos
           </option>
         )}
       </select>

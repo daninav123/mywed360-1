@@ -6,7 +6,7 @@ import GuestFilters from '../components/guests/GuestFilters';
 import GuestForm from '../components/guests/GuestForm';
 import GuestList from '../components/guests/GuestList';
 import Modal from '../components/Modal';
-import { Button } from '../components/ui';
+import { Button, Input } from '../components/ui';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/Tabs';
 import SaveTheDateModal from '../components/whatsapp/SaveTheDateModal';
 import WhatsAppModal from '../components/whatsapp/WhatsAppModal';
@@ -39,6 +39,7 @@ function Invitados() {
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [editingGuest, setEditingGuest] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingSamples, setIsLoadingSamples] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showRsvpModal, setShowRsvpModal] = useState(false);
   const [showWhatsModal, setShowWhatsModal] = useState(false);
@@ -47,6 +48,14 @@ function Invitados() {
   const [showFormalInvitation, setShowFormalInvitation] = useState(false);
   const [whatsGuest, setWhatsGuest] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [checkInInput, setCheckInInput] = useState('');
+  const [checkInGuest, setCheckInGuest] = useState(null);
+  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanError, setScanError] = useState('');
+  const videoRef = React.useRef(null);
+  const scanIntervalRef = React.useRef(null);
 
   // Hooks reales
   const { t } = useTranslations();
@@ -74,8 +83,34 @@ function Invitados() {
     bulkInviteWhatsAppApi,
     importFromContacts,
     updateFilters,
+    markGuestCheckIn,
+    markGuestCheckOut,
+    loadSampleGuests,
     utils,
+    findGuestByCheckInCode,
   } = useGuests();
+
+  const notify = React.useCallback((message, type = 'info') => {
+    if (!message || typeof window === 'undefined') return;
+    try {
+      const toast = window.toast;
+      if (toast && typeof toast[type] === 'function') {
+        toast[type](message);
+        return;
+      }
+      if (typeof toast === 'function') {
+        toast(message, type);
+        return;
+      }
+      if (typeof window.alert === 'function') {
+        window.alert(message);
+      }
+    } catch {
+      if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+        window.alert(message);
+      }
+    }
+  }, []);
 
   // Mensaje por defecto para SAVE THE DATE
   const { saveTheDateMessage, coupleLabel } = React.useMemo(() => {
@@ -171,6 +206,24 @@ function Invitados() {
     );
   }, [activeWeddingInfo]);
 
+  const checkInStats = React.useMemo(() => {
+    const list = Array.isArray(guests) ? guests : [];
+    const checkedIn = list.filter((g) => g.checkedIn).length;
+    return {
+      total: list.length,
+      checkedIn,
+      pending: Math.max(list.length - checkedIn, 0),
+    };
+  }, [guests]);
+  const totalGuestsCount = React.useMemo(() => {
+    if (stats && typeof stats.total === 'number') {
+      return stats.total;
+    }
+    return Array.isArray(guests) ? guests.length : 0;
+  }, [guests, stats]);
+  const viewLoading = isLoading || isLoadingSamples;
+  const listLoading = viewLoading || isSaving;
+
   const ownerAddress = React.useMemo(() => {
     const info = activeWeddingInfo?.weddingInfo || {};
     const contact = info.printingContact || {};
@@ -208,6 +261,15 @@ function Invitados() {
       country,
     };
   }, [activeWeddingInfo, coupleLabel]);
+
+  React.useEffect(() => {
+    if (!checkInInput) {
+      setCheckInGuest(null);
+      return;
+    }
+    const match = findGuestByCheckInCode(checkInInput);
+    setCheckInGuest(match || null);
+  }, [checkInInput, findGuestByCheckInCode, guests]);
 
   // Manejar apertura de modal para nuevo invitado
   const handleAddGuest = () => {
@@ -373,6 +435,188 @@ function Invitados() {
       setIsSaving(false);
     }
   };
+
+  const handleLoadSamples = React.useCallback(async () => {
+    if (isLoadingSamples) return;
+    setIsLoadingSamples(true);
+    try {
+      const result = await loadSampleGuests({ fixture: 'guests-demo.json', replace: true });
+        if (!result?.success) {
+          const reason = result?.error ? ` (${result.error})` : '';
+          notify(`No se pudieron cargar los invitados de ejemplo${reason}`, 'warning');
+        } else {
+          notify(`Se cargaron ${result.count || 0} invitado(s) de ejemplo.`, 'success');
+        }
+      } catch (error) {
+        console.error('[Invitados] loadSampleGuests error', error);
+        notify('Error cargando los invitados de ejemplo', 'error');
+      } finally {
+        setIsLoadingSamples(false);
+      }
+  }, [isLoadingSamples, loadSampleGuests, notify]);
+
+  const stopScanning = React.useCallback(() => {
+    setIsScanning(false);
+    if (scanIntervalRef.current) {
+      window.clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    const videoElement = videoRef.current;
+    const stream = videoElement && videoElement.srcObject;
+    if (stream && typeof stream.getTracks === 'function') {
+      stream.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch {}
+      });
+    }
+    if (videoElement) {
+      videoElement.srcObject = null;
+    }
+  }, []);
+
+  const handleStartScan = React.useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setScanError('La cámara no está disponible en este dispositivo.');
+      return;
+    }
+    if (!('BarcodeDetector' in window)) {
+      setScanError('Este navegador no soporta lectura de códigos QR.');
+      return;
+    }
+    try {
+      const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+      const videoElement = videoRef.current;
+      if (!videoElement) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      videoElement.srcObject = stream;
+      await videoElement.play().catch(() => {});
+      setIsScanning(true);
+      setScanError('');
+      if (scanIntervalRef.current) {
+        window.clearInterval(scanIntervalRef.current);
+      }
+      scanIntervalRef.current = window.setInterval(async () => {
+        if (!videoRef.current) return;
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (Array.isArray(codes) && codes.length > 0) {
+            const raw = codes[0].rawValue || codes[0].rawData;
+            if (raw) {
+              stopScanning();
+              const normalized = String(raw).trim();
+              setCheckInInput((prev) => (prev === normalized ? prev : normalized));
+            }
+          }
+        } catch (error) {
+          setScanError('No se pudo leer el código QR.');
+        }
+      }, 600);
+    } catch (error) {
+      console.error('[Invitados] handleStartScan error', error);
+      setScanError('No se pudo acceder a la cámara.');
+      stopScanning();
+    }
+  }, [stopScanning]);
+
+  const handleOpenCheckInModal = React.useCallback(() => {
+    setShowCheckInModal(true);
+    setCheckInInput('');
+    setScanError('');
+    setCheckInGuest(null);
+  }, []);
+
+  const handleCloseCheckInModal = React.useCallback(() => {
+    setShowCheckInModal(false);
+    stopScanning();
+  }, [stopScanning]);
+
+  const handleCheckInInputChange = React.useCallback((value) => {
+    setCheckInInput(value.toUpperCase());
+  }, []);
+
+  const handleConfirmCheckIn = React.useCallback(async () => {
+    if (!checkInGuest) {
+      notify('No se encontró invitado para registrar el check-in.', 'warning');
+      return;
+    }
+    const code = checkInInput || checkInGuest.checkInCode || checkInGuest.id;
+    setCheckInLoading(true);
+    try {
+      const res = await markGuestCheckIn(checkInGuest.id, {
+        method: isScanning ? 'qr' : 'manual',
+        code,
+        by: currentUser?.email || currentUser?.uid || 'staff',
+      });
+      if (!res?.success) {
+        notify('No se pudo registrar el check-in de este invitado.', 'error');
+        return;
+      }
+      notify(`${checkInGuest.name || 'Invitado'} marcado como presente.`, 'success');
+      setTimeout(() => {
+        const updated = findGuestByCheckInCode(code);
+        setCheckInGuest(updated || null);
+      }, 150);
+    } catch (error) {
+      console.error('[Invitados] handleConfirmCheckIn error', error);
+      notify('Error registrando el check-in.', 'error');
+    } finally {
+      setCheckInLoading(false);
+    }
+  }, [
+    checkInGuest,
+    checkInInput,
+    currentUser,
+    findGuestByCheckInCode,
+    isScanning,
+    markGuestCheckIn,
+    notify,
+  ]);
+
+  const handleConfirmCheckOut = React.useCallback(async () => {
+    if (!checkInGuest) {
+      notify('Selecciona un invitado para revertir el check-in.', 'warning');
+      return;
+    }
+    setCheckInLoading(true);
+    try {
+      const res = await markGuestCheckOut(checkInGuest.id, {
+        by: currentUser?.email || currentUser?.uid || 'staff',
+      });
+      if (!res?.success) {
+        notify('No se pudo revertir el check-in.', 'error');
+        return;
+      }
+      notify(`${checkInGuest.name || 'Invitado'} marcado como pendiente.`, 'info');
+      setTimeout(() => {
+        const updated = checkInGuest.checkInCode
+          ? findGuestByCheckInCode(checkInGuest.checkInCode)
+          : null;
+        setCheckInGuest(updated || null);
+      }, 150);
+    } catch (error) {
+      console.error('[Invitados] handleConfirmCheckOut error', error);
+      notify('Error revirtiendo el check-in.', 'error');
+    } finally {
+      setCheckInLoading(false);
+    }
+  }, [checkInGuest, currentUser, findGuestByCheckInCode, markGuestCheckOut, notify]);
+
+  React.useEffect(() => () => stopScanning(), [stopScanning]);
+
+  React.useEffect(() => {
+    if (!showCheckInModal) {
+      stopScanning();
+      setCheckInInput('');
+      setScanError('');
+    }
+  }, [showCheckInModal, stopScanning]);
 
   const handleSaveTheDateDelivered = async ({ ok = [] }) => {
     if (!ok || !ok.length) return;
@@ -803,11 +1047,16 @@ function Invitados() {
         if (phoneKey) existingPhones.add(phoneKey);
         added++;
       }
-      alert(`${added} invitados aÃ±adidos${skipped ? `, ${skipped} duplicados omitidos` : ''}`);
+      notify(
+        `${added} invitado${added === 1 ? '' : 's'} añadid${added === 1 ? 'o' : 'os'}${
+          skipped ? `, ${skipped} duplicados omitidos` : ''
+        }`,
+        'success'
+      );
       setShowBulkModal(false);
     } catch (err) {
       console.error('Error en alta masiva:', err);
-      alert('OcurriÃ³ un error al procesar la alta masiva');
+      notify('Ocurrió un error al procesar la alta masiva', 'error');
     }
   };
 
@@ -937,55 +1186,22 @@ function Invitados() {
           onTableFilterChange={(value) => updateFilters({ table: value })}
           onAddGuest={handleAddGuest}
           onOpenSaveTheDate={openSaveTheDate}
+          onOpenBulkAdd={handleOpenBulkAdd}
           onBulkInvite={() => setShowFormalInvitation(true)}
           onOpenManualBatch={openWhatsBatch}
           onOpenRsvpSummary={handleOpenRsvpSummary}
           onBulkTableReassign={handleBulkTableReassign}
           guestCount={guests?.length || 0}
-          isLoading={isLoading}
+          isLoading={viewLoading}
           selectedCount={selectedIds.length}
           onSendSelectedApi={handleSendSelectedApi}
           onScheduleSelected={handleScheduleSelected}
           onSendSelectedBroadcast={handleSendSelectedBroadcast}
           showApiButtons
           coupleName={coupleLabel}
+          onLoadSamples={handleLoadSamples}
+          onOpenCheckIn={handleOpenCheckInModal}
         />
-
-        {/* Debug info para verificar estado */}
-        {import.meta.env.DEV && (
-          <div className="p-4 rounded-lg text-sm bg-[var(--color-primary)]/10">
-            <strong>Debug Info:</strong>
-            <br />- activeWedding: {activeWedding || 'null'}
-            <br />- weddings count: {weddings?.length || 0}
-            <br />- guests count: {guests?.length || 0}
-            <br />- isLoading: {isLoading ? 'true' : 'false'}
-            <br />- Firebase Auth: {window.auth?.currentUser?.email || 'No autenticado'}
-            <br />- Usuario Context:{' '}
-            {currentUser
-              ? JSON.stringify({ uid: currentUser.uid, email: currentUser.email })
-              : 'null'}
-            <br />- Ruta Firestore: weddings/{activeWedding || 'null'}/guests
-            <br />
-            <button
-              onClick={() => {
-                import('../firebaseConfig').then(({ auth }) => {
-                  import('firebase/auth').then(({ signInWithEmailAndPassword }) => {
-                    signInWithEmailAndPassword(
-                      auth,
-                      'danielnavarrocampos@icloud.com',
-                      'password123'
-                    )
-                      .then(() => console.log('Login manual exitoso'))
-                      .catch((err) => console.error('Login manual fallÃ³:', err));
-                  });
-                });
-              }}
-              className="mt-2 px-3 py-1 bg-primary-soft0 text-white rounded text-xs"
-            >
-              Login Manual
-            </button>
-          </div>
-        )}
 
         {/* Fallback temporal: sin bodas visibles para el usuario */}
         {!isLoading && Array.isArray(weddings) && weddings.length === 0 && (
@@ -1007,7 +1223,7 @@ function Invitados() {
           onDelete={handleDeleteGuest}
           onInviteWhatsApp={openWhatsModalForGuest}
           onInviteEmail={inviteViaEmail}
-          isLoading={isLoading}
+          isLoading={listLoading}
           selectedIds={selectedIds}
           onToggleSelect={handleToggleSelect}
           onToggleSelectAll={handleToggleSelectAll}
@@ -1074,7 +1290,7 @@ function Invitados() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg border">
-                <div className="text-2xl font-bold text-primary">{stats?.total || 0}</div>
+                <div className="text-2xl font-bold text-primary">{totalGuestsCount}</div>
                 <div className="text-sm text-muted">Total invitados</div>
               </div>
               <div className="bg-white p-4 rounded-lg border">
@@ -1152,6 +1368,143 @@ function Invitados() {
                 {t('guests.rsvp.printPdf', { defaultValue: 'Imprimir / PDF' })}
               </Button>
             </div>
+          </div>
+        </Modal>
+
+        <Modal
+          open={showCheckInModal}
+          onClose={handleCloseCheckInModal}
+          title="Check-in de invitados"
+          size="lg"
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-xs uppercase text-muted">Registrados</div>
+                <div className="text-2xl font-semibold text-green-600">
+                  {checkInStats.checkedIn}
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-xs uppercase text-muted">Pendientes</div>
+                <div className="text-2xl font-semibold text-yellow-600">
+                  {checkInStats.pending}
+                </div>
+              </div>
+              <div className="bg-white p-4 rounded-lg border">
+                <div className="text-xs uppercase text-muted">Total</div>
+                <div className="text-2xl font-semibold">{checkInStats.total}</div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Input
+                value={checkInInput}
+                onChange={(e) => handleCheckInInputChange(e.target.value)}
+                placeholder="Escanea o escribe el código de check-in"
+                disabled={checkInLoading}
+                data-testid="guest-checkin-input"
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" onClick={handleStartScan} disabled={isScanning}>
+                  {isScanning ? 'Escaneando…' : 'Escanear QR'}
+                </Button>
+                {isScanning && (
+                  <Button variant="ghost" onClick={stopScanning}>
+                    Detener
+                  </Button>
+                )}
+              </div>
+              {scanError && <p className="text-sm text-red-600">{scanError}</p>}
+            </div>
+
+            {isScanning && (
+              <div className="border rounded-lg overflow-hidden">
+                <video ref={videoRef} className="w-full aspect-video" />
+              </div>
+            )}
+
+            {!checkInGuest ? (
+              <div className="text-sm text-muted">
+                Introduce o escanea un código válido para mostrar la información del invitado.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="bg-white border rounded-lg p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">{checkInGuest.name || 'Invitado sin nombre'}</h3>
+                    <p className="text-sm text-muted">
+                      {checkInGuest.email || 'Sin email'} · {checkInGuest.phone || 'Sin teléfono'}
+                    </p>
+                    <p className="text-sm">
+                      Mesa:{' '}
+                      <span className="font-medium">{checkInGuest.table || 'Pendiente'}</span>
+                    </p>
+                    <p className="text-sm">
+                      Estado:{' '}
+                      <span className={checkInGuest.checkedIn ? 'text-green-600 font-medium' : 'text-muted'}>
+                        {checkInGuest.checkedIn ? 'Presente' : 'Pendiente'}
+                      </span>
+                    </p>
+                    <p className="text-xs text-muted">
+                      Código: {checkInGuest.checkInCode || 'No asignado'}
+                    </p>
+                    {checkInGuest.checkedInAt && (
+                      <p className="text-xs text-muted">
+                        Registrado el{' '}
+                        {new Date(checkInGuest.checkedInAt).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={handleConfirmCheckIn}
+                      disabled={checkInLoading || checkInGuest.checkedIn}
+                      variant="secondary"
+                    >
+                      {checkInGuest.checkedIn ? 'Ya registrado' : 'Marcar presente'}
+                    </Button>
+                    <Button
+                      onClick={handleConfirmCheckOut}
+                      disabled={checkInLoading || !checkInGuest.checkedIn}
+                      variant="outline"
+                    >
+                      Revertir check-in
+                    </Button>
+                  </div>
+                </div>
+
+                {Array.isArray(checkInGuest.checkInHistory) && checkInGuest.checkInHistory.length > 0 && (
+                  <div className="bg-white border rounded-lg p-4">
+                    <h4 className="font-semibold text-sm mb-2">Historial reciente</h4>
+                    <ul className="space-y-1 max-h-40 overflow-auto text-sm">
+                      {checkInGuest.checkInHistory
+                        .slice()
+                        .reverse()
+                        .slice(0, 8)
+                        .map((entry, idx) => {
+                          let formatted = entry.at || '';
+                          if (entry?.at) {
+                            try {
+                              formatted = new Date(entry.at).toLocaleString();
+                            } catch {
+                              formatted = entry.at;
+                            }
+                          }
+                          return (
+                            <li key={`${entry.at || idx}`} className="flex justify-between gap-2">
+                              <span>
+                                {formatted || 'Sin registro'} · {entry.method || 'manual'}
+                              </span>
+                              <span className="text-muted text-xs">{entry.by || 'sistema'}</span>
+                            </li>
+                          );
+                        })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </Modal>
 

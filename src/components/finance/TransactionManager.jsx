@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import useTranslations from '../../hooks/useTranslations';
 import Modal from '../Modal';
 import { Card, Button } from '../ui';
 import FinanceStatsHeader from './FinanceStatsHeader';
 import TransactionForm from './TransactionForm';
+import TransactionImportModal from './TransactionImportModal';
+import { downloadBlob } from '../../utils/downloadUtils';
 
 export default function TransactionManager({
   transactions = [],
@@ -13,11 +16,18 @@ export default function TransactionManager({
   onUpdateTransaction,
   onDeleteTransaction,
   onImportBank,
+  onImportTransactions,
+  onExportReport,
   isLoading,
+  initialTransaction,
+  onInitialOpened,
 }) {
   const { t } = useTranslations();
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [prefillTransaction, setPrefillTransaction] = useState(null);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Abrir modal automáticamente si hay pre-relleno en history.state
   useEffect(() => {
@@ -34,8 +44,18 @@ export default function TransactionManager({
     } catch {}
   }, []);
 
+  useEffect(() => {
+    if (initialTransaction) {
+      setPrefillTransaction(initialTransaction);
+      setShowTransactionModal(true);
+      onInitialOpened?.();
+    }
+  }, [initialTransaction, onInitialOpened]);
+
   const openCreate = () => setShowTransactionModal(true);
   const closeModal = () => setShowTransactionModal(false);
+  const openImport = () => setShowImportModal(true);
+  const closeImport = () => setShowImportModal(false);
 
   const emptyState = (
     <div className="p-8 text-center">
@@ -77,10 +97,39 @@ export default function TransactionManager({
               t={t}
               stats={stats}
               isLoading={isLoading}
-              csvLoading={false}
+              importLoading={importing}
+              exportLoading={exporting}
               onConnectBank={() => onImportBank?.()}
-              onImportCSV={() => {}}
-              onExportCSV={() => {}}
+              onImportCSV={openImport}
+              onExportCSV={async () => {
+                if (!onExportReport) return;
+                try {
+                  setExporting(true);
+                  const result = await onExportReport();
+                  if (result?.success && result.blob) {
+                    const fileName =
+                      result.fileName ||
+                      `finanzas-${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    downloadBlob(result.blob, fileName);
+                    toast.success(
+                      t('finance.transactions.exportSuccess', {
+                        defaultValue: 'Reporte financiero generado correctamente',
+                      })
+                    );
+                  } else {
+                    throw new Error(result?.error || 'Exportación fallida');
+                  }
+                } catch (err) {
+                  toast.error(
+                    err?.message ||
+                      t('finance.transactions.exportError', {
+                        defaultValue: 'No se pudo generar el reporte',
+                      })
+                  );
+                } finally {
+                  setExporting(false);
+                }
+              }}
               onNew={openCreate}
             />
           </div>
@@ -107,6 +156,58 @@ export default function TransactionManager({
           }}
         />
       </Modal>
+
+      <TransactionImportModal
+        open={showImportModal}
+        onClose={closeImport}
+        isLoading={importing || isLoading}
+        onImport={async (parsedRows) => {
+          if (!onImportTransactions) {
+            toast.error(
+              t('finance.transactions.importUnsupported', {
+                defaultValue: 'Importación no disponible',
+              })
+            );
+            return { success: false, error: 'Import unsupported' };
+          }
+          try {
+            setImporting(true);
+            const result = await onImportTransactions(parsedRows);
+            if (result?.success) {
+              toast.success(
+                t('finance.transactions.importSuccess', {
+                  defaultValue: 'Importación completada',
+                }) +
+                  (result?.imported
+                    ? ` (${result.imported} ${
+                        result.imported === 1
+                          ? t('finance.transactions.item', { defaultValue: 'transacción' })
+                          : t('finance.transactions.items', { defaultValue: 'transacciones' })
+                      })`
+                    : '')
+              );
+            } else if (result?.errors?.length) {
+              toast.warning(
+                `${t('finance.transactions.importPartial', {
+                  defaultValue: 'Importación parcial',
+                })}: ${result.errors.length} ${t('finance.transactions.rowsFailed', {
+                  defaultValue: 'filas con errores',
+                })}`
+              );
+            } else {
+              toast.error(
+                result?.error ||
+                  t('finance.transactions.importError', {
+                    defaultValue: 'No se pudo importar el archivo',
+                  })
+              );
+            }
+            return result;
+          } finally {
+            setImporting(false);
+          }
+        }}
+      />
     </>
   );
 }

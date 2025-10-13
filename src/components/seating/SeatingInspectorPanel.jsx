@@ -20,10 +20,12 @@ export default function SeatingInspectorPanel({
   ceremonyActiveRow = 0,
   onSelectCeremonyRow,
   ceremonySuggestions = {},
+  ceremonySettings = {},
   onAssignCeremonyGuest,
   className = '',
 }) {
   if (tab === 'ceremony') {
+    const vipLabel = ceremonySettings?.vipLabel || 'VIP';
     const rows = Array.isArray(ceremonyRows) ? ceremonyRows : [];
     const safeIndex =
       rows.length === 0

@@ -2,6 +2,7 @@
 
 > Componentes clave: `src/components/protocolo/CeremonyChecklist.jsx`, `src/hooks/useCeremonyChecklist.js`, `src/pages/protocolo/Checklist.jsx`
 > Persistencia: `weddings/{id}/ceremonyChecklist/main` y `weddings/{id}/documents` (vía `relatedCeremonyId`)
+> Pendiente: alertas sonoras/push para requisitos criticos y sincronizacion con el centro de notificaciones.
 
 ## 1. Objetivo y alcance
 - Permitir al planner validar, el día antes del evento, que todos los elementos críticos están listos.  
@@ -13,9 +14,9 @@
 - Acceso desde widget en Home “Checklist ceremonia” (cuando se defina).  
 - Tareas categorizadas como `CEREMONIA` pueden enlazar directamente (`TasksRefactored.jsx:238`).
 
-## 3. Estado actual vs. pendientes
+## 3. Estado actual
 
-**Implementado hoy**
+### Implementado hoy
 - Widget compacto dentro de `CeremonyProtocol.jsx`.  
 - Vista completa con categorías, cambios de estado, fechas y notas (`CeremonyChecklist.jsx`).  
 - Recupera documentos existentes en Firestore para mostrarlos junto al ítem (`useCeremonyChecklist.js:63-101`).  
@@ -23,7 +24,7 @@
 - Los requisitos subidos desde la Guía Legal se registran en `weddings/{id}/documents` con `relatedCeremonyId`, apareciendo automáticamente en la checklist.
 - Validación in-app: máximo 50 ítems personalizados y aviso cuando faltan documentos vinculados a un requisito legal.
 
-**Pendiente / roadmap**
+## Roadmap / pendientes
 - Alertas sonoras/notificaciones push para requisitos críticos.  
 - Sincronización con centro de notificaciones.
 

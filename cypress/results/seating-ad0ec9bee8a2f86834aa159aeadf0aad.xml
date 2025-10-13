@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="16.824" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-10-12T21:03:13" tests="0" file="cypress\e2e\seating\seating_assign_unassign.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Seating Plan - Asignar y Desasignar" timestamp="2025-10-12T21:03:13" tests="1" time="16.811" failures="1">
+    <testcase name="Seating Plan - Asignar y Desasignar asigna por click desde Pendientes y desasigna con botón de mesa" time="0.000" classname="asigna por click desde Pendientes y desasigna con botón de mesa">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `div[aria-label^=&quot;Invitado&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `div[aria-label^="Invitado"]`, but never found it.
+    at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_assign_unassign.cy.js:30:7)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

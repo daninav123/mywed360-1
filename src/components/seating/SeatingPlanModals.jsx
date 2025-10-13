@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import BanquetConfigModal from '../BanquetConfigModal';
 import CeremonyConfigModal from '../CeremonyConfigModal';
@@ -302,47 +303,53 @@ const HallDimensionsModal = ({
       const nextAisle = clampNumber(aisle, 80, { min: 0 });
       await onSave(nextWidth, nextHeight, nextAisle);
     }
+    try { toast.success('Dimensiones guardadas'); } catch (_) {}
     onClose?.();
   };
 
   return (
-    <Modal open={open} title="Dimensiones del salón" onClose={onClose} size="sm">
+    <Modal open={open} title="Configurar Espacio" onClose={onClose} size="sm">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <p className="text-sm text-gray-600">
           Introduce el tamaño real del salón en centímetros y el pasillo mínimo que quieres asegurar
           entre mesas.
         </p>
         <div className="space-y-3">
-          <label className="flex flex-col text-sm text-gray-700">
-            Ancho (cm)
+          <div className="flex flex-col text-sm text-gray-700">
+            <label htmlFor="hall-width">Ancho (m)</label>
             <input
+              id="hall-width"
               type="number"
               min={100}
+              step={0.1}
               value={width}
               onChange={(e) => setWidth(e.target.value)}
               className="mt-1 border rounded px-2 py-1"
             />
-          </label>
-          <label className="flex flex-col text-sm text-gray-700">
-            Largo (cm)
+          </div>
+          <div className="flex flex-col text-sm text-gray-700">
+            <label htmlFor="hall-height">Largo (m)</label>
             <input
+              id="hall-height"
               type="number"
               min={100}
+              step={0.1}
               value={height}
               onChange={(e) => setHeight(e.target.value)}
               className="mt-1 border rounded px-2 py-1"
             />
-          </label>
-          <label className="flex flex-col text-sm text-gray-700">
-            Pasillo mínimo (cm)
+          </div>
+          <div className="flex flex-col text-sm text-gray-700">
+            <label htmlFor="hall-aisle">Pasillo mínimo (cm)</label>
             <input
+              id="hall-aisle"
               type="number"
               min={0}
               value={aisle}
               onChange={(e) => setAisle(e.target.value)}
               className="mt-1 border rounded px-2 py-1"
             />
-          </label>
+          </div>
         </div>
         <div className="flex justify-end gap-2">
           <button
@@ -407,8 +414,86 @@ const TemplateModal = ({
     onClose?.();
   };
 
+  // Constructores de mesas para plantillas E2E
+  const buildCircularTables = () => {
+    const w = hallSize?.width || 1800;
+    const h = hallSize?.height || 1200;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = Math.min(w, h) * 0.35;
+    const n = 10;
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      out.push({
+        tableType: 'round',
+        x: Math.round(cx + r * Math.cos(a)),
+        y: Math.round(cy + r * Math.sin(a)),
+        seats: 8,
+        name: `Mesa ${i + 1}`,
+      });
+    }
+    return out;
+  };
+
+  const buildUEdgeTables = () => {
+    const w = hallSize?.width || 1800;
+    const h = hallSize?.height || 1200;
+    const m = 140; // margen a bordes
+    const gapX = 160;
+    const gapY = 160;
+    const out = [];
+    // Fila inferior
+    for (let x = m; x <= w - m; x += gapX) {
+      out.push({ tableType: 'square', x, y: h - m, seats: 8 });
+    }
+    // Columna izquierda
+    for (let y = m + gapY; y <= h - m - gapY; y += gapY) {
+      out.push({ tableType: 'square', x: m, y, seats: 8 });
+    }
+    // Columna derecha
+    for (let y = m + gapY; y <= h - m - gapY; y += gapY) {
+      out.push({ tableType: 'square', x: w - m, y, seats: 8 });
+    }
+    return out;
+  };
+
+  const buildLEdgeTables = () => {
+    const w = hallSize?.width || 1800;
+    const h = hallSize?.height || 1200;
+    const m = 140;
+    const gapX = 160;
+    const gapY = 160;
+    const out = [];
+    // Fila inferior
+    for (let x = m; x <= w - m; x += gapX) {
+      out.push({ tableType: 'square', x, y: h - m, seats: 8 });
+    }
+    // Columna izquierda
+    for (let y = m + gapY; y <= h - m - gapY; y += gapY) {
+      out.push({ tableType: 'square', x: m, y, seats: 8 });
+    }
+    return out;
+  };
+
+  const buildImperialSingle = () => {
+    const w = hallSize?.width || 1800;
+    const h = hallSize?.height || 1200;
+    return [
+      {
+        tableType: 'imperial',
+        x: Math.round(w / 2),
+        y: Math.round(h / 2),
+        width: 800,
+        height: 120,
+        seats: 16,
+        name: 'Mesa Imperial',
+      },
+    ];
+  };
+
   return (
-    <Modal open={open} title="Plantillas de venue" onClose={onClose} size="lg">
+    <Modal open={open} title="Plantillas" onClose={onClose} size="lg">
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-700">
           <div className="p-3 border rounded bg-gray-50">
@@ -427,6 +512,51 @@ const TemplateModal = ({
             <p className="font-semibold">Perímetro dibujado</p>
             <p>{hasBoundary ? 'Sí, se reutilizará si coincide con la plantilla.' : 'No se ha definido perímetro.'}</p>
           </div>
+        </div>
+        {/* Acciones rápidas esperadas por E2E */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquet: { rows: 3, cols: 4, seats: 8 } })}
+          >
+            Sugerido por datos
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquet: { rows: 4, cols: 5, seats: 8 } })}
+          >
+            Boda Mediana
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquetTables: buildCircularTables() })}
+          >
+            Distribución circular
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquetTables: buildUEdgeTables() })}
+          >
+            Forma U
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquetTables: buildLEdgeTables() })}
+          >
+            Forma L
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm rounded border hover:bg-gray-50"
+            onClick={() => handleApply({ banquetTables: buildImperialSingle() })}
+          >
+            Mesa Imperial única
+          </button>
         </div>
 
         <VenueTemplateSelector onApply={handleApply} selectedTemplateId={null} />

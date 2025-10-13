@@ -1,15 +1,39 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { auditLogs } from '../../data/adminMock';
+import { getAuditLogs } from '../../services/adminDataService';
 
 const AdminAudit = () => {
-  const [logs] = useState(auditLogs);
+  const [logs, setLogs] = useState([]);
   const [actionFilter, setActionFilter] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLogs = async () => {
+      setLoading(true);
+      const data = await getAuditLogs();
+      if (!mounted) return;
+      setLogs(Array.isArray(data) ? data : []);
+      setLoading(false);
+    };
+    loadLogs();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     if (!actionFilter) return logs;
     return logs.filter((log) => log.action === actionFilter);
   }, [logs, actionFilter]);
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        Cargando auditoría...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -64,6 +88,13 @@ const AdminAudit = () => {
                 <td className="px-4 py-3 text-xs text-[var(--color-text-soft,#6b7280)]">{log.payload}</td>
               </tr>
             ))}
+            {filtered.length === 0 && (
+              <tr>
+                <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={5}>
+                  No se encontraron registros.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

@@ -16,7 +16,13 @@ export default function PageTabs({ value, onChange, options = [], className = ''
           key={opt.id}
           type="button"
           onClick={() => onChange?.(opt.id)}
-          className={`tab-trigger ${value === opt.id ? 'tab-trigger-active' : ''}`}
+          className={
+            `tab-trigger inline-flex items-center px-3 py-1.5 rounded-md text-sm ` +
+            (value === opt.id
+              ? 'tab-trigger-active bg-blue-50 text-blue-700 border border-blue-200'
+              : 'hover:bg-gray-50 border border-transparent text-gray-700')
+          }
+          aria-current={value === opt.id ? 'page' : undefined}
         >
           {opt.label}
         </button>

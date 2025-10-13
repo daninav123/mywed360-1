@@ -1,6 +1,6 @@
 import express from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { awardPoints, getStats, getAchievements } from '../services/gamificationService.js';
+import { awardPoints, getStats, getAchievements, getEvents } from '../services/gamificationService.js';
 
 const router = express.Router();
 
@@ -18,8 +18,17 @@ router.post('/award', requireAuth, async (req, res) => {
 // Obtener estadísticas del usuario
 router.get('/stats', requireAuth, async (req, res) => {
   try {
-    const { weddingId, uid } = req.query;
-    const stats = await getStats(weddingId, uid || req.user?.uid);
+    const { weddingId, uid, historyLimit } = req.query;
+    const parsedHistoryLimit =
+      historyLimit === undefined ? undefined : Number(historyLimit);
+    const historyLimitValue =
+      Number.isFinite(parsedHistoryLimit) && parsedHistoryLimit >= 0
+        ? parsedHistoryLimit
+        : 10;
+    const historyLimitClamped = Math.min(historyLimitValue, 50);
+    const stats = await getStats(weddingId, uid || req.user?.uid, {
+      historyLimit: historyLimitClamped,
+    });
     res.json({ success: true, stats });
   } catch (e) {
     res.status(400).json({ success: false, error: e?.message || 'stats error' });
@@ -34,6 +43,16 @@ router.get('/achievements', requireAuth, async (req, res) => {
     res.json({ success: true, achievements });
   } catch (e) {
     res.status(400).json({ success: false, error: e?.message || 'achievements error' });
+  }
+});
+
+router.get('/events', requireAuth, async (req, res) => {
+  try {
+    const { weddingId, uid, limit } = req.query;
+    const events = await getEvents(weddingId, uid || req.user?.uid, Number(limit) || 20);
+    res.json({ success: true, events });
+  } catch (e) {
+    res.status(400).json({ success: false, error: e?.message || 'events error' });
   }
 });
 

@@ -315,14 +315,14 @@ export const removeTagFromEmail = (userId, emailId, tagId) => {
 
     // Si el correo no tiene etiquetas, no hay nada que hacer
     if (!mapping[emailId]) {
-      return false;
+      return true;
     }
 
     const originalLength = mapping[emailId].length;
     // Filtrar la etiqueta a quitar
     mapping[emailId] = mapping[emailId].filter((id) => id !== tagId);
     if (mapping[emailId].length === originalLength) {
-      return false; // No había la etiqueta
+      return true; // No había la etiqueta; consideramos operación exitosa
     }
     // Guardar mapeo actualizado
     saveEmailTagsMapping(userId, mapping);
@@ -420,4 +420,3 @@ export const getEmailsByTag = (userId, tagId) => {
     return [];
   }
 };
-

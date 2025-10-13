@@ -1,4 +1,4 @@
-﻿/// <reference types=\"cypress\" />
+/// <reference types="cypress" />
 
 describe('Proveedores smoke', () => {
   it('Carga la página principal sin romper y muestra botones clave', () => {
@@ -46,8 +46,6 @@ describe('Proveedores smoke', () => {
     cy.contains('button', 'Crear grupo con selección').click();
     cy.contains('Grupo "').should('exist');
   });
-});
-
   it("Cambiar estado abre y cierra modal", () => {
     cy.visit('/test/proveedores-smoke');
     cy.get('input[type="checkbox"]').first().check({ force: true });

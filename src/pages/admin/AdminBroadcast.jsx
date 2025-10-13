@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getBroadcastData } from '../../services/adminDataService';
+import { getBroadcastData, createBroadcast } from '../../services/adminDataService';
 
 const AdminBroadcast = () => {
   const [tab, setTab] = useState('email');
@@ -123,6 +123,29 @@ const AdminBroadcast = () => {
             <button
               type="button"
               data-testid="broadcast-confirm"
+              onClick={async () => {
+                try {
+                  const scheduledAt = scheduled && scheduleDate && scheduleTime
+                    ? new Date(`${scheduleDate}T${scheduleTime}:00`).toISOString()
+                    : undefined;
+                  const item = await createBroadcast({
+                    type: tab,
+                    subject,
+                    content,
+                    segment,
+                    scheduledAt,
+                  });
+                  if (item) setHistory((prev) => [item, ...prev]);
+                  setSubject('');
+                  setContent('');
+                  setSegment('Todos');
+                  setScheduled(false);
+                  setScheduleDate('');
+                  setScheduleTime('');
+                } catch (e) {
+                  console.warn('[AdminBroadcast] create broadcast failed:', e);
+                }
+              }}
               className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
             >
               Confirmar envío

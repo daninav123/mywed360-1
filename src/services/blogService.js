@@ -4,6 +4,9 @@ import { getBackendBase } from '@/utils/backendBase.js';
 
 import { translateText } from './translationService.js';
 
+const FORCE_MOCK_DEFAULT =
+  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
+
 // Evita spam de peticiones al backend si está caído/no iniciado (reservado para uso futuro)
 let _BACKEND_BACKOFF_UNTIL = 0;
 const _backendAvailable = () => Date.now() > _BACKEND_BACKOFF_UNTIL;
@@ -38,6 +41,10 @@ async function fetchFromBackend({ page, pageSize, language }) {
     '', // como último recurso: proxy de Vite o mismo origen
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
+  if (FORCE_MOCK_DEFAULT) {
+    const renderBase = 'https://mywed360-backend.onrender.com';
+    candidates = [renderBase, ...candidates.filter((b) => b && b !== renderBase)];
+  }
   // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
   if (import.meta?.env?.PROD) {
     try {

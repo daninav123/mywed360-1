@@ -43,6 +43,9 @@ function Finance() {
     error,
     contributions,
     budget,
+    advisor,
+    advisorLoading,
+    advisorError,
     transactions,
 
     // Cálculos
@@ -51,6 +54,7 @@ function Finance() {
     settings,
     hasBankAccount,
     projection,
+    predictiveInsights,
 
     // Acciones
     updateContributions,
@@ -58,12 +62,17 @@ function Finance() {
     addBudgetCategory,
     updateBudgetCategory,
     removeBudgetCategory,
+    requestBudgetAdvisor,
+    applyAdvisorScenario,
+    refreshBudgetAdvisor,
     updateTotalBudget,
     updateBudgetSettings,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     importBankTransactions,
+    importTransactionsBulk,
+    exportFinanceReport,
     clearError,
   } = useFinance();
 
@@ -155,11 +164,13 @@ function Finance() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <FinanceOverview
-              stats={stats}              budgetUsage={budgetUsage}
+              stats={stats}
+              budgetUsage={budgetUsage}
               thresholds={settings?.alertThresholds}
               isLoading={isLoading}
               transactions={transactions}
               projection={projection}
+              predictiveInsights={predictiveInsights}
             />
           </div>
         )}
@@ -226,6 +237,8 @@ function Finance() {
               onUpdateTransaction={updateTransaction}
               onDeleteTransaction={deleteTransaction}
               onImportBank={importBankTransactions}
+              onImportTransactions={importTransactionsBulk}
+              onExportReport={exportFinanceReport}
               isLoading={isLoading}
               initialTransaction={prefillTx}
               onInitialOpened={() => setPrefillTx(null)}
@@ -245,6 +258,12 @@ function Finance() {
               onRemoveCategory={removeBudgetCategory}
               alertThresholds={settings?.alertThresholds}
               onUpdateSettings={(s) => updateBudgetSettings({ alertThresholds: s })}
+              advisor={advisor}
+              advisorLoading={advisorLoading}
+              advisorError={advisorError}
+              onRequestAdvisor={requestBudgetAdvisor}
+              onApplyAdvisorScenario={applyAdvisorScenario}
+              onRefreshAdvisor={refreshBudgetAdvisor}
             />
           </div>
         )}

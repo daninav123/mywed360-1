@@ -2,13 +2,71 @@
 import { auth } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
 
-const BASE = import.meta.env.VITE_BACKEND_BASE_URL || '';
+function backendBase() {
+  try {
+    if (typeof window !== 'undefined' && window.Cypress && window.Cypress.env) {
+      const v = window.Cypress.env('BACKEND_BASE_URL');
+      if (v && typeof v === 'string' && v.trim()) return v.trim();
+    }
+  } catch {}
+  return import.meta.env.VITE_BACKEND_BASE_URL || '';
+}
+
+const TOKEN_STORAGE_KEY = 'mw360_auth_token';
+const FORCE_MOCK_DEFAULT =
+  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
+
+function rememberToken(token) {
+  if (!token || typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } catch {}
+}
+
+function readStoredToken() {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage.getItem(TOKEN_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+function buildMockToken(user) {
+  if (!user) return null;
+  const email = user.email || 'user@local.dev';
+  return `mock-${user.uid || 'anon'}-${email}`;
+}
 
 async function getAuthToken() {
   try {
-    const user = auth?.currentUser;
-    if (user?.getIdToken) return await user.getIdToken();
+    const stored = readStoredToken();
+    if (stored) return stored;
   } catch {}
+
+  try {
+    const user = auth?.currentUser;
+    if (!user) return null;
+
+    const forceMock =
+      (import.meta.env.VITE_AUTH_FORCE_MOCK ?? import.meta.env.VITE_AUTH_USE_MOCK) !== undefined
+        ? (import.meta.env.VITE_AUTH_FORCE_MOCK ?? import.meta.env.VITE_AUTH_USE_MOCK) === 'true'
+        : FORCE_MOCK_DEFAULT;
+
+    if (forceMock) {
+      const mockToken = buildMockToken(user);
+      rememberToken(mockToken);
+      return mockToken;
+    }
+
+    if (user.getIdToken) {
+      const token = await user.getIdToken();
+      if (token) rememberToken(token);
+      return token;
+    }
+  } catch (err) {
+    console.warn('[apiClient] No se pudo obtener token de autenticación:', err);
+  }
   return null;
 }
 
@@ -24,6 +82,7 @@ async function buildHeaders(opts = {}) {
 function url(path) {
   if (!path) throw new Error('Empty path');
   if (path.startsWith('http')) return path;
+  const BASE = backendBase();
   // Si hay BASE configurado (Render u otro), usarlo SIEMPRE para rutas relativas
   if (BASE) {
     if (path.startsWith('/')) return `${BASE}${path}`;

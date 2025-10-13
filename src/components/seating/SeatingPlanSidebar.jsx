@@ -222,8 +222,8 @@ const SeatingPlanSidebar = ({
             >
               <UserPlus className="h-4 w-4" />
               {showAvailableGuests
-                ? t('seating.sidebar.hideGuests', { defaultValue: 'Ocultar invitados' })
-                : t('seating.sidebar.showGuests', { defaultValue: 'Mostrar invitados' })}
+                ? t('seating.sidebar.hideGuests', { defaultValue: 'Ocultar Invitados' })
+                : t('seating.sidebar.showGuests', { defaultValue: 'Mostrar Invitados' })}
             </button>
           </div>
 

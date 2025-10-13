@@ -1,296 +1,335 @@
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from 'firebase/firestore';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { db, firebaseReady } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
-import errorLogger from '../utils/errorLogger';
 import { performanceMonitor } from '../services/PerformanceMonitor';
+import errorLogger from '../utils/errorLogger';
+import { ensureWeddingAccessMetadata } from '../utils/weddingPermissions';
 
-/**
- * Contexto para la boda activa que está gestionando el planner.
- * Almacena:
- *  - weddings: listado de bodas disponibles para el planner
- *  - activeWedding: boda activa seleccionada
- *  - setActiveWedding: función para cambiar la boda activa
- *
- * Persistimos la selección en localStorage para mantenerla entre recargas.
- */
-const WeddingContext = createContext({
+const defaultContextValue = {
   weddings: [],
   activeWedding: '',
   setActiveWedding: () => {},
-});
+  weddingsReady: false,
+  activeWeddingData: null,
+  activeWeddingRole: 'guest',
+  activeWeddingPermissions: [],
+  canAccess: () => false,
+};
+
+const WeddingContext = createContext(defaultContextValue);
 
 export const useWedding = () => useContext(WeddingContext);
 
 async function ensureFinance(weddingId) {
   try {
-    const fRef = doc(db, 'weddings', weddingId, 'finance', 'main');
-    const fSnap = await getDoc(fRef);
-    if (!fSnap.exists()) {
-      await setDoc(fRef, { movements: [], createdAt: serverTimestamp() }, { merge: true });
-      console.log('🆕 finance/main creado para', weddingId);
+    const financeRef = doc(db, 'weddings', weddingId, 'finance', 'main');
+    const financeSnap = await getDoc(financeRef);
+    if (!financeSnap.exists()) {
+      await setDoc(
+        financeRef,
+        {
+          movements: [],
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      if (import.meta.env.DEV) {
+        console.debug('[WeddingContext] finance/main creado para', weddingId);
+      }
     }
-  } catch (e) {
-    console.warn('No se pudo asegurar finance para', weddingId, e);
+  } catch (error) {
+    console.warn('[WeddingContext] No se pudo asegurar finance/main', weddingId, error);
   }
 }
 
-export default function WeddingProvider({ children }) {
-  const isCypress = typeof window !== 'undefined' && !!window.Cypress;
-  const mock = (typeof window !== 'undefined' && window.__MOCK_WEDDING__) || null;
-  const [weddings, setWeddings] = useState(() =>
-    isCypress && Array.isArray(mock?.weddings) ? mock.weddings : []
-  );
-  const { currentUser } = useAuth();
-  // Helper: compute storage key for active wedding per user
+const readSafeJson = (key) => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+export function WeddingProvider({ children }) {
+  const { currentUser, userProfile } = useAuth();
+
+  // Estado inicial limpio (sin mocks/stubs)
+  const [weddings, setWeddings] = useState([]);
+  const [weddingsReady, setWeddingsReady] = useState(false);
+  const [activeWedding, setActiveWeddingState] = useState('');
+
+  const getLocalProfileUid = useCallback(() => {
+    try {
+      const raw = window.localStorage.getItem('MyWed360_user_profile');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.id || parsed?.uid || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
   const storageKeyForUser = useCallback(
     (uid) => (uid ? `mywed360_active_wedding_user_${uid}` : 'mywed360_active_wedding'),
     []
   );
 
-  // Helper: read active wedding from storage for a user (with legacy fallback)
-  const readActiveWeddingFromStorage = useCallback(
+  const resolveActiveWeddingFromStorage = useCallback(
     (uid) => {
+      if (typeof window === 'undefined') return '';
+      const key = storageKeyForUser(uid);
       try {
-        const userKey = storageKeyForUser(uid);
-        const byUser = localStorage.getItem(userKey);
-        if (byUser) return byUser;
-        // If we know the user, do not inherit legacy global key from a previous session
-        if (uid) return '';
-        const legacy = localStorage.getItem('mywed360_active_wedding');
-        return legacy || '';
-      } catch {
-        return '';
-      }
-    },
-    [storageKeyForUser]
-  );
-
-  // Helper: clear active wedding keys for a given user and legacy
-  const clearActiveWeddingStorage = useCallback(
-    (uid) => {
-      try {
-        const userKey = storageKeyForUser(uid);
-        localStorage.removeItem(userKey);
-        localStorage.removeItem('mywed360_active_wedding');
-        localStorage.removeItem('mywed360_active_wedding_name');
+        const stored = window.localStorage.getItem(key);
+        if (typeof stored === 'string' && stored) return stored;
       } catch {}
+      return '';
     },
     [storageKeyForUser]
   );
 
-  const [activeWedding, setActiveWeddingState] = useState(() => {
-    if (isCypress && mock?.activeWedding?.id) return mock.activeWedding.id;
-    return '';
-  });
-
-  // When auth user changes, load active wedding from user-scoped storage (with fallback)
+  // Inicializar activeWedding cuando cambie el usuario
   useEffect(() => {
-    if (isCypress && mock?.activeWedding?.id) return; // already set from mock
-    const uid = currentUser?.uid;
-    const stored = readActiveWeddingFromStorage(uid);
-    setActiveWeddingState(stored || '');
-  }, [currentUser, isCypress, mock, readActiveWeddingFromStorage]);
+    const uid = currentUser?.uid || getLocalProfileUid();
+    if (!uid) {
+      setActiveWeddingState('');
+      return;
+    }
+    const stored = resolveActiveWeddingFromStorage(uid);
+    if (stored) {
+      setActiveWeddingState(stored);
+    }
+  }, [currentUser, getLocalProfileUid, resolveActiveWeddingFromStorage]);
 
-  // Actualizar diagnóstico cuando cambian bodas o la boda activa
+  // Suscribirse a Firestore para planner/owner
   useEffect(() => {
-    if (currentUser) {
+    let unsub = null;
+    let cancelled = false;
+
+    const listen = async () => {
+      const uid = currentUser?.uid || getLocalProfileUid();
+      if (!uid) {
+        setWeddings([]);
+        setWeddingsReady(true);
+        return;
+      }
+
+      try {
+        await firebaseReady;
+      } catch (error) {
+        console.warn('[WeddingContext] firebaseReady rejected', error);
+      }
+
+      if (!db) {
+        console.warn('[WeddingContext] Firestore no disponible');
+        setWeddings([]);
+        setWeddingsReady(true);
+        return;
+      }
+
+      try {
+        const plannerQuery = query(
+          collection(db, 'weddings'),
+          where('plannerIds', 'array-contains', uid)
+        );
+        const ownerQuery = query(
+          collection(db, 'weddings'),
+          where('ownerIds', 'array-contains', uid)
+        );
+
+        let plannerDocs = [];
+        let ownerDocs = [];
+
+        const mergeResults = () => {
+          if (cancelled) return;
+          const map = new Map();
+          for (const docSnap of plannerDocs) {
+            const raw = { id: docSnap.id, ...docSnap.data() };
+            const entry = ensureWeddingAccessMetadata(raw, 'planner');
+            map.set(docSnap.id, entry);
+          }
+          for (const docSnap of ownerDocs) {
+            const raw = { id: docSnap.id, ...docSnap.data() };
+            const entry = ensureWeddingAccessMetadata(raw, 'owner');
+            map.set(docSnap.id, entry);
+          }
+          const list = Array.from(map.values());
+          setWeddings(list);
+          setWeddingsReady(true);
+          list.forEach((w) => ensureFinance(w.id));
+          if (!activeWedding && list.length) {
+            setActiveWeddingState(list[0].id);
+          }
+        };
+
+        const unsubPlanner = onSnapshot(
+          plannerQuery,
+          (snap) => {
+            plannerDocs = snap.docs;
+            mergeResults();
+          },
+          (error) => {
+            console.warn('[WeddingContext] planner snapshot error', error);
+          }
+        );
+        const unsubOwner = onSnapshot(
+          ownerQuery,
+          (snap) => {
+            ownerDocs = snap.docs;
+            mergeResults();
+          },
+          (error) => {
+            console.warn('[WeddingContext] owner snapshot error', error);
+          }
+        );
+        unsub = () => {
+          unsubPlanner();
+          unsubOwner();
+        };
+      } catch (error) {
+        console.warn('[WeddingContext] listen weddings failed', error);
+        setWeddingsReady(true);
+      }
+    };
+
+    listen();
+
+    return () => {
+      cancelled = true;
+      if (typeof unsub === 'function') unsub();
+    };
+  }, [currentUser, getLocalProfileUid, activeWedding]);
+
+  // Asegurar activeWedding válido cuando cambia la lista
+  useEffect(() => {
+    if (!weddingsReady) return;
+    if (!weddings.length) {
+      setActiveWeddingState('');
+      return;
+    }
+    if (!activeWedding) {
+      setActiveWeddingState(weddings[0].id);
+      return;
+    }
+    const exists = weddings.some((w) => w.id === activeWedding);
+    if (!exists) {
+      setActiveWeddingState(weddings[0].id);
+    }
+  }, [weddings, weddingsReady, activeWedding]);
+
+  // Actualizar diagnóstico y helpers globales
+  useEffect(() => {
+    try {
+      window.weddingContext = {
+        weddings,
+        activeWedding,
+        weddingsReady,
+      };
+    } catch {}
+  }, [weddings, activeWedding, weddingsReady]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      errorLogger.setWeddingInfo(null);
+      return;
+    }
+    try {
       errorLogger.setWeddingInfo({
         count: weddings.length,
         list: weddings.map((w) => ({ id: w.id, name: w.name || w.slug || 'Boda' })),
         activeWedding,
       });
-    } else {
-      errorLogger.setWeddingInfo(null);
-    }
+    } catch {}
   }, [weddings, activeWedding, currentUser]);
 
-  // Sincronizar activeWedding entre pestañas (localStorage)
-  useEffect(() => {
-    const onStorage = (e) => {
+  const activeWeddingData = useMemo(
+    () => weddings.find((w) => w.id === activeWedding) || null,
+    [weddings, activeWedding]
+  );
+
+  const activeWeddingPermissions = useMemo(() => {
+    const perms = activeWeddingData?.permissions;
+    if (Array.isArray(perms)) return perms;
+    if (Array.isArray(activeWeddingData?.allowedActions)) return activeWeddingData.allowedActions;
+    return [];
+  }, [activeWeddingData]);
+
+  const activeWeddingRole = useMemo(() => {
+    if (activeWeddingData?.role) return activeWeddingData.role;
+    if (userProfile?.role) return userProfile.role;
+    return 'guest';
+  }, [activeWeddingData, userProfile]);
+
+  const canAccess = useCallback(
+    (permission) => {
+      if (!permission) return true;
+      const set = new Set(activeWeddingPermissions);
+      if (set.has('*')) return true;
+      return set.has(permission);
+    },
+    [activeWeddingPermissions]
+  );
+
+  const persistActiveWedding = useCallback(
+    (uid, nextId) => {
+      if (typeof window === 'undefined') return;
+      const key = storageKeyForUser(uid);
       try {
-        const uid = currentUser?.uid;
-        const keysToWatch = [
-          'mywed360_active_wedding',
-          storageKeyForUser(uid),
-        ];
-        if (!keysToWatch.includes(e.key)) return;
-        const id = readActiveWeddingFromStorage(uid);
-        setActiveWeddingState(id || '');
+        window.localStorage.setItem(key, nextId || '');
       } catch {}
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, [currentUser, readActiveWeddingFromStorage, storageKeyForUser]);
-
-  // Cargar lista de bodas del planner desde Firestore (omitido en Cypress con mock)
-  useEffect(() => {
-    async function listenWeddings() {
-      // Bypass completo en entorno Cypress si se inyectó mock
-      if (isCypress && mock) {
-        try {
-          if (Array.isArray(mock.weddings)) setWeddings(mock.weddings);
-          if (mock.activeWedding?.id) {
-            setActiveWeddingState(mock.activeWedding.id);
-            localStorage.setItem('mywed360_active_wedding', mock.activeWedding.id);
-          }
-        } catch (_) {}
-        return;
-      }
-      if (!currentUser) {
-        console.log('[WeddingContext] Sin usuario autenticado, limpiando bodas y activeWedding');
-        setWeddings([]);
-        setActiveWeddingState('');
-        clearActiveWeddingStorage(undefined);
-        return;
-      }
-
-      try {
-        // Aseguramos que Firebase esté totalmente inicializado antes de usar Firestore
-        await firebaseReady;
-        const { collection, getDocs } = await import('firebase/firestore');
-
-        // Cargar bodas desde la subcolección del usuario
-        const userWeddingsCol = collection(db, 'users', currentUser.uid, 'weddings');
-
-        console.log(
-          '[WeddingContext] Cargando bodas desde users/{uid}/weddings para:',
-          currentUser.uid
-        );
-
-        let list = [];
-        const snap = await getDocs(userWeddingsCol);
-        list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        console.log('[WeddingContext] getDocs subcolección ->', list.length);
-        setWeddings(list);
-
-        // Fallback: si no hay bodas en subcolección, intentar recuperar la boda activa desde la subcolección
-        if (list.length === 0 && activeWedding) {
-          try {
-            const { doc: subDoc, getDoc: subGetDoc } = await import('firebase/firestore');
-            const wedRefSub = subDoc(db, 'users', currentUser.uid, 'weddings', activeWedding);
-            const wedSnapSub = await subGetDoc(wedRefSub);
-            if (wedSnapSub.exists()) {
-              list = [{ id: wedSnapSub.id, ...wedSnapSub.data() }];
-              console.log(
-                '[WeddingContext] Boda recuperada manualmente desde subcolección por activeWedding'
-              );
-            }
-          } catch (err) {
-            console.warn(
-              '[WeddingContext] No se pudo recuperar boda por activeWedding en subcolección:',
-              err
-            );
-          }
-        }
-
-        // Fallback adicional controlado por flag: buscar en colección principal por roles (legacy)
-        const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS === 'true';
-        if (list.length === 0 && ENABLE_LEGACY_FALLBACKS) {
-          // Intento adicional: si tenemos activeWedding en localStorage, recuperar manualmente ese doc
-          if (activeWedding) {
-            try {
-              const { doc: fDoc, getDoc: fGetDoc } = await import('firebase/firestore');
-              const wedRef = fDoc(db, 'weddings', activeWedding);
-              const wedSnap = await fGetDoc(wedRef);
-              if (wedSnap.exists()) {
-                list = [{ id: wedSnap.id, ...wedSnap.data() }];
-                console.log('[WeddingContext] Boda recuperada manualmente por activeWedding');
-              }
-            } catch (err) {
-              console.warn('[WeddingContext] No se pudo recuperar boda manualmente:', err);
-            }
-          }
-          const { where, query: fQuery } = await import('firebase/firestore');
-          const globalCol = collection(db, 'weddings');
-          const qLegacy = fQuery(globalCol, where('ownerIds', 'array-contains', currentUser.uid));
-          const qLegacy2 = fQuery(
-            globalCol,
-            where('plannerIds', 'array-contains', currentUser.uid)
-          );
-          const [snap1, snap2] = await Promise.all([getDocs(qLegacy), getDocs(qLegacy2)]);
-          const legacyList = [...snap1.docs, ...snap2.docs].map((d) => ({ id: d.id, ...d.data() }));
-          list = legacyList;
-          if (legacyList.length) {
-            console.log(
-              '[WeddingContext] Bodas encontradas en colección global (legacy):',
-              legacyList.length
-            );
-          }
-        }
-
-        // Ejecutar la carga inicial
-        if (import.meta.env.DEV)
-          console.debug(
-            '[WeddingContext] bodas cargadas',
-            list.map((l) => l.id)
-          );
-        setWeddings(list);
-        list.forEach((w) => ensureFinance(w.id));
-
-        // Si la activeWedding no existe o no pertenece al usuario, seleccionamos la primera válida
-        const existsInList = list.some((w) => w.id === activeWedding);
-        console.log('[WeddingContext] activeWedding actual:', activeWedding);
-        console.log('[WeddingContext] existsInList:', existsInList);
-        console.log('[WeddingContext] list.length:', list.length);
-        console.log(
-          '[WeddingContext] list IDs:',
-          list.map((w) => w.id)
-        );
-
-        if (list.length > 0) {
-          if (!activeWedding || !existsInList) {
-            console.log('[WeddingContext] Estableciendo nueva activeWedding:', list[0].id);
-            // Persistimos también en localStorage para que quede sincronizado
-            setActiveWeddingState(list[0].id);
-            try {
-              localStorage.setItem('mywed360_active_wedding', list[0].id);
-              localStorage.setItem(storageKeyForUser(currentUser.uid), list[0].id);
-            } catch {}
-          } else {
-            console.log('[WeddingContext] activeWedding ya existe y es válida:', activeWedding);
-          }
-        } else {
-          console.log('[WeddingContext] No hay bodas disponibles; limpiando activeWedding');
-          setActiveWeddingState('');
-          clearActiveWeddingStorage(currentUser.uid);
-        }
-      } catch (error) {
-        console.error('[WeddingContext] Error cargando bodas:', error);
-        setWeddings([]);
-      }
-    }
-
-    listenWeddings();
-  }, [currentUser, activeWedding, clearActiveWeddingStorage, storageKeyForUser]);
+    },
+    [storageKeyForUser]
+  );
 
   const setActiveWedding = useCallback(
     (id) => {
-      setActiveWeddingState(id);
-      try {
-        localStorage.setItem('mywed360_active_wedding', id || '');
-        if (currentUser?.uid) {
-          localStorage.setItem(storageKeyForUser(currentUser.uid), id || '');
-        }
-      } catch {}
+      const nextId = id || '';
+      const uid = currentUser?.uid || getLocalProfileUid();
 
-      if (currentUser?.uid) {
+      setActiveWeddingState(nextId);
+      if (uid) persistActiveWedding(uid, nextId);
+
+      if (nextId) {
+        ensureFinance(nextId);
+      }
+
+      if (uid) {
         try {
-          const userRef = doc(db, 'users', currentUser.uid);
+          const userRef = doc(db, 'users', uid);
           void setDoc(
             userRef,
             {
-              activeWeddingId: id || null,
-              hasActiveWedding: !!id,
+              activeWeddingId: nextId || null,
+              hasActiveWedding: Boolean(nextId),
               lastActiveWeddingAt: serverTimestamp(),
             },
             { merge: true }
           ).catch(() => {});
-          if (id) {
-            const userWeddingRef = doc(db, 'users', currentUser.uid, 'weddings', id);
+          if (nextId) {
+            const subRef = doc(db, 'users', uid, 'weddings', nextId);
             void setDoc(
-              userWeddingRef,
+              subRef,
               {
                 active: true,
                 lastAccessedAt: serverTimestamp(),
@@ -299,29 +338,49 @@ export default function WeddingProvider({ children }) {
             ).catch(() => {});
           }
         } catch (error) {
-          console.warn('[WeddingContext] No se pudo sincronizar activeWeddingId en Firestore', error);
+          console.warn('[WeddingContext] No se pudo sincronizar activeWeddingId', error);
         }
       }
 
-      if ((id || '') !== (activeWedding || '')) {
+      if ((nextId || '') !== (activeWedding || '')) {
         try {
           performanceMonitor.logEvent('wedding_switched', {
             fromWeddingId: activeWedding || null,
-            toWeddingId: id || null,
-            userUid: currentUser?.uid || null,
+            toWeddingId: nextId || null,
+            userUid: uid || null,
           });
         } catch {}
       }
     },
-    [currentUser, storageKeyForUser, activeWedding]
+    [activeWedding, currentUser, getLocalProfileUid, persistActiveWedding]
   );
 
-  const value = useMemo(
-    () => ({ weddings, activeWedding, setActiveWedding }),
-    [weddings, activeWedding, setActiveWedding]
+  // Sin exponer info de stub
+
+  const contextValue = useMemo(
+    () => ({
+      weddings,
+      activeWedding,
+      setActiveWedding,
+      weddingsReady,
+      activeWeddingData,
+      activeWeddingRole,
+      activeWeddingPermissions,
+      canAccess,
+    }),
+    [
+      weddings,
+      activeWedding,
+      setActiveWedding,
+      weddingsReady,
+      activeWeddingData,
+      activeWeddingRole,
+      activeWeddingPermissions,
+      canAccess,
+    ]
   );
 
-  return <WeddingContext.Provider value={value}>{children}</WeddingContext.Provider>;
+  return <WeddingContext.Provider value={contextValue}>{children}</WeddingContext.Provider>;
 }
 
-export { WeddingProvider };
+export default WeddingProvider;

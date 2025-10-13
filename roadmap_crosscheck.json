@@ -1,18 +1,27 @@
 {
-  "generatedAt": "2025-10-09T16:03:27.612Z",
+  "generatedAt": "2025-10-11T20:15:34.941Z",
   "counts": {
     "modules": 30,
-    "tasks": 86,
+    "tasks": 87,
     "docSpecs": 57,
-    "taskSpecs": 57,
+    "taskSpecs": 58,
     "actualSpecs": 58
   },
   "dupSpecTasks": [],
   "aggregatedMissingSpecs": [],
   "modulesWithNoTaskForSpecs": [],
-  "tasksSpecNotInDocs": [],
+  "tasksSpecNotInDocs": [
+    {
+      "spec": "cypress/e2e/rsvp_confirm.cy.js",
+      "tasks": [
+        {
+          "id": "e2e_rsvp_confirm_cy_js",
+          "status": "pending",
+          "title": "E2E: E2E – rsvp confirm"
+        }
+      ]
+    }
+  ],
   "tasksWithMissingSpecOnDisk": [],
-  "orphanSpecs": [
-    "cypress/e2e/rsvp_confirm.cy.js"
-  ]
+  "orphanSpecs": []
 }

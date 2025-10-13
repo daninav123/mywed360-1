@@ -67,6 +67,21 @@ if (!admin.apps.length) {
     initOptions.credential = admin.credential.cert(parsedServiceAccount);
   } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS && fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
     initOptions.credential = admin.credential.applicationDefault();
+  } else {
+    try {
+      const candidates = [
+        path.resolve(process.cwd(), 'serviceAccount.json'),
+        path.resolve(__dirname, '..', 'serviceAccount.json'),
+      ];
+      const svcPath = candidates.find((p) => fs.existsSync(p));
+      if (svcPath) {
+        const json = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
+        initOptions.credential = admin.credential.cert(json);
+        console.log(`✅ Credencial de servicio cargada desde ${svcPath}`);
+      }
+    } catch (e) {
+      console.warn('⚠️  No se pudo cargar serviceAccount.json de fallback:', e?.message);
+    }
   }
 
   admin.initializeApp(initOptions);

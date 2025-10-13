@@ -11,13 +11,14 @@ import {
   Sparkles,
   Pause,
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import PageWrapper from '../../components/PageWrapper';
 import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
 import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
+import useGuests from '../../hooks/useGuests';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
 
@@ -36,9 +37,29 @@ const MomentosEspeciales = () => {
     renameBlock,
     removeBlock,
     reorderBlocks,
-  } = useSpecialMoments();
 
-  // Estado bsico
+} = useSpecialMoments();
+
+const { guests } = useGuests();
+const [recipientPanelsOpen, setRecipientPanelsOpen] = useState({});
+const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
+  const list = Array.isArray(guests) ? guests : [];
+  const options = list
+    .map((guest) => {
+      const baseId = guest?.id != null ? String(guest.id) : '';
+      const fallback = guest?.email || guest?.phone || '';
+      const value = baseId || fallback;
+      if (!value) return null;
+      const label = guest?.name || guest?.email || guest?.phone || value;
+      return { value, label, raw: guest };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.label.localeCompare(b.label));
+  const map = new Map(options.map((option) => [option.value, option.raw]));
+  return { options, map };
+}, [guests]);
+
+// Estado bsico
   const [activeTab, setActiveTab] = useState('ceremonia');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
@@ -1019,6 +1040,106 @@ const MomentosEspeciales = () => {
                             </div>
                           </div>
                         </div>
+                        {(() => {
+                          const recipientMode = moment.recipientId ? 'guest' : moment.recipientName ? 'custom' : 'none';
+                          const selectedValue = recipientMode === 'guest' ? String(moment.recipientId) : recipientMode === 'custom' ? '__custom' : '';
+                          const selectedGuest = selectedValue && selectedValue !== '__custom' ? guestOptionMap.get(selectedValue) : null;
+                          const buttonLabel = selectedGuest?.name || moment.recipientName || 'Destinatario';
+                          return (
+                            <div className="mt-3">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setRecipientPanelsOpen((prev) => ({
+                                    ...prev,
+                                    [moment.id]: !prev[moment.id],
+                                  }))
+                                }
+                                className="text-xs text-blue-600 hover:underline"
+                              >
+                                {recipientPanelsOpen[moment.id]
+                                  ? 'Ocultar destinatario'
+                                  : `Destinatario: ${buttonLabel}`}
+                              </button>
+                              {recipientPanelsOpen[moment.id] && (
+                                <div className="mt-2 space-y-2 rounded border border-gray-200 bg-gray-50 p-3">
+                                  <div className="text-xs text-gray-500">Selecciona a quién va dirigido este momento (opcional)</div>
+                                  <select
+                                    className="w-full border rounded px-2 py-1 text-sm"
+                                    value={selectedValue}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      if (!value || value === '') {
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientId: '',
+                                          recipientName: '',
+                                        });
+                                      } else if (value === '__custom') {
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientId: '',
+                                          recipientName: moment.recipientName || '',
+                                        });
+                                      } else {
+                                        const guest = guestOptionMap.get(value);
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientId: value,
+                                          recipientName: guest?.name || guest?.email || '',
+                                        });
+                                      }
+                                    }}
+                                  >
+                                    <option value="">Sin destinatario</option>
+                                    <option value="__custom">Especificar manualmente</option>
+                                    {recipientOptions.map((option) => (
+                                      <option key={option.value} value={option.value}>
+                                        {option.label} {option.raw?.table ? `· Mesa ${option.raw.table}` : ''}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  {selectedValue === '__custom' && (
+                                    <input
+                                      type="text"
+                                      className="w-full border rounded px-2 py-1 text-sm"
+                                      placeholder="Nombre o rol del destinatario"
+                                      value={moment.recipientName || ''}
+                                      onChange={(e) =>
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientId: '',
+                                          recipientName: e.target.value,
+                                        })
+                                      }
+                                    />
+                                  )}
+                                  {selectedGuest && (
+                                    <div className="text-xs text-gray-500">
+                                      Mesa: {selectedGuest.table || selectedGuest.tableId || '—'} · Dieta: {selectedGuest.dietaryRestrictions || '—'}
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      type="button"
+                                      className="text-xs text-gray-500 hover:text-red-600"
+                                      onClick={() =>
+                                        updateMoment(activeTab, moment.id, {
+                                          ...moment,
+                                          recipientId: '',
+                                          recipientName: '',
+                                        })
+                                      }
+                                    >
+                                      Limpiar
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+
 
                         <div className="flex flex-col gap-1">
                           <button

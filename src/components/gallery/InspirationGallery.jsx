@@ -2,18 +2,45 @@ import { Star, StarOff, X } from 'lucide-react';
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// Tags base; en producción pueden venir de API/CMS
+const normalizeTag = (value = '') =>
+  value
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+const humanize = (value = '') =>
+  value
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+
+const TAG_LABELS = {
+  favs: 'Favoritos',
+  ceremonia: 'Ceremonia',
+  decoracion: 'Decoración',
+  coctel: 'Cóctel',
+  banquete: 'Banquete',
+  disco: 'Disco',
+  flores: 'Flores',
+  vestido: 'Vestidos',
+  pastel: 'Pasteles',
+  fotografia: 'Fotografía',
+  inspiration: 'Inspiración',
+};
+
+// Tags base (slug) se sincronizan con servicios y filtros
 const BASE_TAGS = [
   'favs',
   'ceremonia',
-  'decoración',
-  'cóctel',
+  'decoracion',
+  'coctel',
   'banquete',
   'disco',
   'flores',
   'vestido',
   'pastel',
-  'fotografía',
+  'fotografia',
   'inspiration',
 ];
 
@@ -26,6 +53,7 @@ export default function InspirationGallery({
   lastItemRef = null,
   onTagClick = () => {},
   activeTag = 'all',
+  storageKey = 'inspirationFavorites',
 }) {
   const { t } = useTranslation('common');
   const [filter, setFilter] = useState(activeTag);
@@ -41,7 +69,7 @@ export default function InspirationGallery({
   useEffect(() => {
     const loadFavIds = () => {
       try {
-        const stored = JSON.parse(localStorage.getItem('ideasPhotos') || '[]');
+        const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
         return stored.map((p) => p.id);
       } catch {
         return [];
@@ -49,20 +77,31 @@ export default function InspirationGallery({
     };
     setFavorites(loadFavIds());
     const handler = (e) => {
-      if (e.key === 'ideasPhotos') {
+      if (!e.key || e.key === storageKey) {
         setFavorites(loadFavIds());
       }
     };
     window.addEventListener('storage', handler);
     return () => window.removeEventListener('storage', handler);
-  }, []);
+  }, [storageKey]);
 
   const DATA = images.length ? images : DEFAULT_IMAGES;
 
   const allTags = useMemo(() => {
-    const tags = new Set(BASE_TAGS);
-    DATA.forEach((img) => (img.tags || []).forEach((t) => tags.add(t)));
-    return Array.from(tags);
+    const tags = new Map();
+    BASE_TAGS.forEach((slug) => {
+      tags.set(slug, TAG_LABELS[slug] || humanize(slug));
+    });
+    DATA.forEach((img) =>
+      (img.tags || []).forEach((rawTag) => {
+        const slug = normalizeTag(rawTag);
+        if (!slug) return;
+        if (!tags.has(slug)) {
+          tags.set(slug, TAG_LABELS[slug] || humanize(rawTag));
+        }
+      })
+    );
+    return Array.from(tags.entries());
   }, [DATA]);
 
   const filtered = useMemo(() => {
@@ -73,7 +112,10 @@ export default function InspirationGallery({
       if (activeTag === 'favs') return DATA;
       return DATA.filter((img) => favorites.includes(img.id));
     }
-    return DATA.filter((img) => (img.tags || []).includes(eff));
+    const normalizedEff = normalizeTag(eff);
+    return DATA.filter((img) =>
+      (img.tags || []).some((tag) => normalizeTag(tag) === normalizedEff)
+    );
   }, [filter, activeTag, DATA, favorites]);
 
   const toggleFav = (id) => {
@@ -88,24 +130,26 @@ export default function InspirationGallery({
             setFilter('all');
             onTagClick('all');
           }}
+          data-testid="inspiration-tag-all"
           className={`px-3 py-1 rounded text-xs border ${
             (activeTag || filter) === 'all' ? 'bg-blue-600 text-white' : 'bg-white'
           }`}
         >
           {t('common.all', 'Todos')}
         </button>
-        {allTags.map((tag) => (
+        {allTags.map(([tag, label]) => (
           <button
             key={tag}
             onClick={() => {
               setFilter(tag);
               onTagClick(tag);
             }}
-            className={`px-3 py-1 rounded text-xs border capitalize ${
+            data-testid={`inspiration-tag-${tag}`}
+            className={`px-3 py-1 rounded text-xs border ${
               (activeTag || filter) === tag ? 'bg-blue-600 text-white' : 'bg-white'
             }`}
           >
-            {tag}
+            {label}
           </button>
         ))}
       </div>

@@ -1,6 +1,7 @@
 # Flujo 13: E2E del Seating Plan
 
 Este documento describe cómo ejecutar y qué validan los tests E2E del Seating Plan. Cubre generación de layouts, dibujo de áreas, undo/redo, asignación automática (Auto-IA), toasts y flujo de ceremonia.
+> Pendiente: integrar la suite en CI, ampliar escenarios edge y automatizar reportes de ejecucion.
 
 ## Prerrequisitos
 
@@ -68,7 +69,7 @@ Valida que:
 ### En Desarrollo
 - Ampliación de cobertura de casos y escenarios edge
 
-### Pendiente
+## Roadmap / pendientes
 - Integración en pipeline de CI y reporte automático
 
 ### 3) seating_toasts.cy.js (Toasts)

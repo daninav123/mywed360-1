@@ -27,8 +27,20 @@ import { query, where, getDocs, limit } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '../firebaseConfig';
+import { performanceMonitor } from './PerformanceMonitor';
 
 const DEFAULT_EVENT_TYPE = 'boda';
+
+// Determina el límite de bodas permitidas por tier de planner
+function plannerLimitForTier(tier) {
+  const t = String(tier || '').toLowerCase();
+  if (!t) return 5;
+  if (t.includes('unlimit') || t.includes('ilimit')) return Number.POSITIVE_INFINITY;
+  if (t.includes('teams')) return 40; // Teams Wedding Planner
+  if (t.includes('2')) return 10; // Wedding Planner 2
+  if (t.includes('1') || t.includes('planner')) return 5; // Wedding Planner 1 (por defecto)
+  return 5;
+}
 
 const normalizeEventType = (raw) => {
   if (typeof raw === 'string') {
@@ -81,6 +93,25 @@ const buildEventProfileSummary = (eventType, eventProfile, preferences) => ({
  */
 export async function createWedding(uid, extraData = {}) {
   if (!uid) throw new Error('uid requerido');
+  // Validación de límites si el creador es planner
+  try {
+    const userSnap = await getDoc(doc(db, 'users', uid));
+    if (userSnap.exists()) {
+      const u = userSnap.data() || {};
+      const role = String(u.role || '').toLowerCase();
+      if (role === 'planner') {
+        const tier = u?.subscription?.tier || 'wedding_planner_1';
+        const limit = plannerLimitForTier(tier);
+        const current = Array.isArray(u?.plannerWeddingIds) ? u.plannerWeddingIds.length : 0;
+        if (current >= limit) {
+          throw new Error('planner_limit_exceeded');
+        }
+      }
+    }
+  } catch (e) {
+    if (String(e?.message || '') === 'planner_limit_exceeded') throw e;
+    // Si falla la validación, continuamos (no bloquear creación para owners)
+  }
   const weddingId = uuidv4();
   const ref = doc(db, 'weddings', weddingId);
   const eventType = normalizeEventType(extraData?.eventType);
@@ -91,6 +122,7 @@ export async function createWedding(uid, extraData = {}) {
     plannerIds: [],
     subscription: { tier: 'free', renewedAt: Timestamp.now() },
     createdAt: Timestamp.now(),
+    creatorRole: (typeof extraData?.creatorRole === 'string' ? extraData.creatorRole : 'owner'),
     ...extraData,
     eventType,
     eventProfile,
@@ -148,6 +180,13 @@ export async function createWedding(uid, extraData = {}) {
     } catch (_) {}
   } catch (e) {
     console.warn('No se pudieron crear las tareas predeterminadas para', weddingId, e);
+    try {
+      performanceMonitor?.logEvent?.('event_creation_seed_failed', {
+        weddingId,
+        eventType,
+        error: String(e?.message || e) || 'unknown',
+      });
+    } catch {}
   }
   return weddingId;
 }
@@ -417,7 +456,32 @@ export async function acceptInvitation(code, uid) {
   if (role === 'partner') {
     await updateDoc(wedRef, { ownerIds: arrayUnion(uid) });
   } else if (role === 'planner') {
+    // Validación de límites por tier del planner antes de añadirlo
+    try {
+      const userSnap = await getDoc(doc(db, 'users', uid));
+      const u = userSnap.exists() ? (userSnap.data() || {}) : {};
+      const tier = u?.subscription?.tier || 'wedding_planner_1';
+      const limit = plannerLimitForTier(tier);
+      let current = Array.isArray(u?.plannerWeddingIds) ? u.plannerWeddingIds.length : 0;
+      try {
+        const q2 = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', uid));
+        const snap2 = await getDocs(q2);
+        current = snap2.size;
+      } catch {}
+      if (current >= limit) {
+        const err = new Error('planner_limit_exceeded');
+        err.code = 'planner_limit_exceeded';
+        throw err;
+      }
+    } catch (e) {
+      if ((e && (e.code === 'planner_limit_exceeded' || String(e.message) === 'planner_limit_exceeded'))) throw e;
+    }
+
     await updateDoc(wedRef, { plannerIds: arrayUnion(uid) });
+    // Registrar referencia en el perfil del planner
+    try {
+      await updateDoc(doc(db, 'users', uid), { plannerWeddingIds: arrayUnion(weddingId) });
+    } catch {}
   }
   // Guardar weddingId en perfil de usuario si es partner
   if (role === 'partner') {
@@ -481,9 +545,30 @@ export async function getWeddingsForPlanner(plannerUid) {
 export async function addPlannerToWedding(weddingId, plannerUid) {
   if (!weddingId || !plannerUid) throw new Error('parámetros requeridos');
   const wedRef = doc(db, 'weddings', weddingId);
+  // Validación de límites por tier del planner
+  try {
+    const userSnap = await getDoc(doc(db, 'users', plannerUid));
+    const u = userSnap.exists() ? (userSnap.data() || {}) : {};
+    const tier = u?.subscription?.tier || 'wedding_planner_1';
+    const limit = plannerLimitForTier(tier);
+    let current = Array.isArray(u?.plannerWeddingIds) ? u.plannerWeddingIds.length : 0;
+    try {
+      const q = query(collection(db, 'weddings'), where('plannerIds', 'array-contains', plannerUid));
+      const snap = await getDocs(q);
+      current = snap.size;
+    } catch {}
+    if (current >= limit) {
+      const err = new Error('planner_limit_exceeded');
+      err.code = 'planner_limit_exceeded';
+      throw err;
+    }
+  } catch (e) {
+    if ((e && (e.code === 'planner_limit_exceeded' || String(e.message) === 'planner_limit_exceeded'))) throw e;
+  }
+
   await updateDoc(wedRef, { plannerIds: arrayUnion(plannerUid) });
-  // Opcional: guardar referencia de bodas que gestiona el planner
-  await updateDoc(doc(db, 'users', plannerUid), { plannerWeddingIds: arrayUnion(weddingId) });
+  // Guardar referencia de bodas que gestiona el planner
+  try { await updateDoc(doc(db, 'users', plannerUid), { plannerWeddingIds: arrayUnion(weddingId) }); } catch {}
   return true;
 }
 
@@ -597,3 +682,4 @@ export async function fixParentBlockDates(weddingId, ganttStart = null, ganttEnd
   }
   return { updated };
 }
+

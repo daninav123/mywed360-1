@@ -1,14 +1,19 @@
-/**
- * Middleware de autenticación para el backend de MyWed360
+﻿/**
+ * Middleware de autenticaciÃ³n para el backend de MyWed360
  * Verifica tokens de Firebase Auth y gestiona permisos
  */
 
 import admin from 'firebase-admin';
 
-// Inicializar Firebase Admin si no está inicializado
+import {
+  getAdminSession,
+  touchAdminSession,
+} from '../services/adminSessions.js';
+
+// Inicializar Firebase Admin si no estÃ¡ inicializado
 if (!admin.apps.length) {
   try {
-    // En producción, usar las credenciales del entorno
+    // En producciÃ³n, usar las credenciales del entorno
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       let rawKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
       let serviceAccountObj;
@@ -51,7 +56,7 @@ if (!admin.apps.length) {
         }
       }
     } else {
-      // Buscar archivo serviceAccount.json en raíz del proyecto como fallback
+      // Buscar archivo serviceAccount.json en raÃ­z del proyecto como fallback
       try {
         const fs = await import('fs');
         const path = await import('path');
@@ -68,7 +73,7 @@ if (!admin.apps.length) {
           });
           console.log(`[AuthMiddleware] Firebase Admin inicializado con serviceAccount.json (${svcPath})`);
         } else {
-          // Último recurso: inicialización sin credenciales explícitas (usará ADC si existe)
+          // Ãšltimo recurso: inicializaciÃ³n sin credenciales explÃ­citas (usarÃ¡ ADC si existe)
           if (!admin.apps.length) admin.initializeApp({
             projectId: process.env.FIREBASE_PROJECT_ID || 'mywed360'
           });
@@ -89,7 +94,7 @@ if (!admin.apps.length) {
 /**
  * Extrae el token del header Authorization
  * @param {Object} req - Request object
- * @returns {string|null} - Token extraído o null
+ * @returns {string|null} - Token extraÃ­do o null
  */
 const extractToken = (req) => {
   const authHeader = req.headers.authorization;
@@ -107,15 +112,31 @@ const extractToken = (req) => {
   return parts[1];
 };
 
+const ADMIN_SESSION_HEADER_KEYS = ['x-admin-session', 'x-admin-session-token', 'x-admin-token'];
+
+const extractAdminSessionToken = (req) => {
+  for (const headerKey of ADMIN_SESSION_HEADER_KEYS) {
+    const value = req.headers?.[headerKey];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+  const authHeader = req.headers?.authorization || '';
+  if (authHeader.startsWith('Admin ')) {
+    return authHeader.slice('Admin '.length).trim();
+  }
+  return null;
+};
+
 /**
  * Verifica y decodifica el token de Firebase
  * @param {string} token - Token a verificar
  * @returns {Promise<Object>} - Datos del token decodificado
  */
 const verifyFirebaseToken = async (token) => {
-  // BYPASS TEMPORAL PARA DESARROLLO: Aceptar tokens mock del sistema de autenticación actual
-  // Permitir bypass con tokens mock si ALLOW_MOCK_TOKENS está habilitado (por defecto true en desarrollo)
-  // Por seguridad: por defecto desactivar en producción. Se puede forzar con ALLOW_MOCK_TOKENS=true
+  // BYPASS TEMPORAL PARA DESARROLLO: Aceptar tokens mock del sistema de autenticaciÃ³n actual
+  // Permitir bypass con tokens mock si ALLOW_MOCK_TOKENS estÃ¡ habilitado (por defecto true en desarrollo)
+  // Por seguridad: por defecto desactivar en producciÃ³n. Se puede forzar con ALLOW_MOCK_TOKENS=true
   const allowMock = (process.env.ALLOW_MOCK_TOKENS
     ? process.env.ALLOW_MOCK_TOKENS !== 'false'
     : (process.env.NODE_ENV !== 'production'));
@@ -156,7 +177,7 @@ const verifyFirebaseToken = async (token) => {
     console.error('[AuthMiddleware] Error verificando token:', error);
     
     let errorCode = 'invalid-token';
-    let errorMessage = 'Token inválido';
+    let errorMessage = 'Token invÃ¡lido';
     
     switch (error.code) {
       case 'auth/id-token-expired':
@@ -169,7 +190,7 @@ const verifyFirebaseToken = async (token) => {
         break;
       case 'auth/invalid-id-token':
         errorCode = 'invalid-token';
-        errorMessage = 'Token inválido';
+        errorMessage = 'Token invÃ¡lido';
         break;
       case 'auth/user-not-found':
         errorCode = 'user-not-found';
@@ -222,9 +243,9 @@ const getUserProfile = async (uid, emailHint = '') => {
 };
 
 /**
- * Middleware principal de autenticación
+ * Middleware principal de autenticaciÃ³n
  * @param {Object} options - Opciones del middleware
- * @returns {Function} - Función middleware
+ * @returns {Function} - FunciÃ³n middleware
  */
 const authMiddleware = (options = {}) => {
   const {
@@ -236,128 +257,186 @@ const authMiddleware = (options = {}) => {
 
   return async (req, res, next) => {
     try {
-      // Extraer token
-      const token = extractToken(req);
-      
-      // Si no hay token y la autenticación es requerida
-      if (!token && required) {
+      const adminSessionToken = extractAdminSessionToken(req);
+      const token = adminSessionToken ? null : extractToken(req);
+
+      if (!adminSessionToken && !token && required) {
         return res.status(401).json({
           success: false,
           error: {
             code: 'no-token',
-            message: 'Token de autenticación requerido'
+            message: 'Token de autenticaciÃ³n requerido'
           }
         });
       }
       
-      // Si no hay token pero se permite acceso anónimo
-      if (!token && allowAnonymous) {
+      if (!adminSessionToken && !token && allowAnonymous) {
         req.user = null;
         req.userProfile = null;
         return next();
       }
-      
-      // Si hay token, verificarlo
-      if (token) {
+
+      let resolvedUser = null;
+      let resolvedProfile = null;
+      let resolvedSource = null;
+      let firebaseTokenResult = null;
+
+      if (adminSessionToken) {
+        const session = getAdminSession(adminSessionToken);
+        if (!session) {
+          if (required) {
+            return res.status(401).json({
+              success: false,
+              error: {
+                code: 'invalid-admin-session',
+                message: 'SesiÃ³n administrativa no vÃ¡lida o expirada',
+              },
+            });
+          }
+        } else {
+          resolvedSource = 'admin-session';
+          const email = session.email || session.profile?.email || 'admin@lovenda.com';
+          resolvedUser = {
+            uid: session.profile?.id || 'admin-local',
+            email,
+            role: 'admin',
+            isAdminSession: true,
+            sessionId: session.sessionId,
+            adminSessionToken,
+          };
+          resolvedProfile = {
+            ...session.profile,
+            role: 'admin',
+            email,
+          };
+          try {
+            await touchAdminSession(adminSessionToken);
+          } catch {}
+        }
+      }
+
+      // Si no habÃ­a sesiÃ³n admin vÃ¡lida, intentar con token estÃ¡ndar
+      if (!resolvedUser && token) {
         const tokenResult = await verifyFirebaseToken(token);
-        
+
         if (!tokenResult.success) {
           return res.status(401).json({
             success: false,
             error: tokenResult.error
           });
         }
-        
-        // Obtener perfil completo del usuario
+
+        firebaseTokenResult = tokenResult;
         const userProfile = await getUserProfile(tokenResult.user.uid, tokenResult.user.email || '');
-        
-        // Añadir información del usuario al request
-        req.user = tokenResult.user;
-        req.userProfile = userProfile;
-        
-        // Verificar roles si se especifican
-        if (roles.length > 0) {
-          const userRole = userProfile.role?.toLowerCase() || 'particular';
-          const hasRequiredRole = roles.some(role => {
-            const targetRole = role.toLowerCase();
-            
-            // Jerarquía de roles
-            const roleHierarchy = {
-              'admin': ['admin', 'planner', 'particular'],
-              'planner': ['planner', 'particular'],
-              'particular': ['particular']
-            };
-            
-            return roleHierarchy[userRole]?.includes(targetRole) || false;
-          });
-          
-          if (!hasRequiredRole) {
-            return res.status(403).json({
-              success: false,
-              error: {
-                code: 'insufficient-role',
-                message: 'Rol insuficiente para acceder a este recurso',
-                requiredRoles: roles,
-                userRole: userRole
-              }
-            });
-          }
+
+        resolvedSource = 'firebase';
+        resolvedUser = {
+          ...tokenResult.user,
+          isAdminSession: false,
+        };
+        resolvedProfile = userProfile;
+      }
+
+      if (!resolvedUser) {
+        if (allowAnonymous) {
+          req.user = null;
+          req.userProfile = null;
+          return next();
         }
-        
-        // Verificar permisos si se especifican
-        if (permissions.length > 0) {
-          const userRole = userProfile.role?.toLowerCase() || 'particular';
-          
-          // Definir permisos por rol
-          const rolePermissions = {
-            'admin': ['*'], // Todos los permisos
-            'planner': [
-              'manage_weddings',
-              'view_analytics',
-              'manage_tasks',
-              'manage_guests',
-              'manage_vendors',
-              'access_mail_api'
-            ],
-            'particular': [
-              'manage_own_wedding',
-              'manage_own_tasks',
-              'manage_own_guests',
-              'view_own_analytics',
-              'access_mail_api'
-            ]
+        return res.status(401).json({
+          success: false,
+          error: {
+            code: 'authentication-required',
+            message: 'AutenticaciÃ³n requerida'
+          }
+        });
+      }
+
+      // Verificar roles si se especifican
+      if (roles.length > 0) {
+        const userRole = resolvedProfile.role?.toLowerCase() || 'particular';
+        const hasRequiredRole = roles.some(role => {
+          const targetRole = role.toLowerCase();
+
+          const roleHierarchy = {
+            'admin': ['admin', 'planner', 'particular'],
+            'planner': ['planner', 'particular'],
+            'particular': ['particular']
           };
-          
-          // Si el rol no está definido en rolePermissions, usar los permisos de 'particular' por defecto
-          const userPermissions = rolePermissions[userRole] || rolePermissions['particular'];
-          const hasAllPermissions = permissions.every(permission => 
-            userPermissions.includes('*') || userPermissions.includes(permission)
-          );
-          
-          if (!hasAllPermissions) {
-            return res.status(403).json({
-              success: false,
-              error: {
-                code: 'insufficient-permissions',
-                message: 'Permisos insuficientes para acceder a este recurso',
-                requiredPermissions: permissions,
-                userPermissions: userPermissions.filter(p => p !== '*')
-              }
-            });
-          }
+
+          return roleHierarchy[userRole]?.includes(targetRole) || false;
+        });
+
+        if (!hasRequiredRole) {
+          return res.status(403).json({
+            success: false,
+            error: {
+              code: 'insufficient-role',
+              message: 'Rol insuficiente para acceder a este recurso',
+              requiredRoles: roles,
+              userRole: userRole
+            }
+          });
         }
-        
-        // Actualizar última actividad
-        try {
-          await admin.firestore()
-            .collection('users')
-            .doc(tokenResult.user.uid)
-            .update({
-              lastActivity: admin.firestore.FieldValue.serverTimestamp()
-            });
-        } catch (error) {
-          // No es crítico si falla la actualización de actividad
-          console.warn('[AuthMiddleware] Error actualizando actividad:', error);
+      }
+
+      // Verificar permisos si se especifican
+      if (permissions.length > 0) {
+        const userRole = resolvedProfile.role?.toLowerCase() || 'particular';
+
+        const rolePermissions = {
+          'admin': ['*'],
+          'planner': [
+            'manage_weddings',
+            'view_analytics',
+            'manage_tasks',
+            'manage_guests',
+            'manage_vendors',
+            'access_mail_api'
+          ],
+          'particular': [
+            'manage_own_wedding',
+            'manage_own_tasks',
+            'manage_own_guests',
+            'view_own_analytics',
+            'access_mail_api'
+          ]
+        };
+
+        const userPermissions = rolePermissions[userRole] || rolePermissions['particular'];
+        const hasAllPermissions = permissions.every(permission =>
+          userPermissions.includes('*') || userPermissions.includes(permission)
+        );
+
+        if (!hasAllPermissions) {
+          return res.status(403).json({
+            success: false,
+            error: {
+              code: 'insufficient-permissions',
+              message: 'Permisos insuficientes para acceder a este recurso',
+              requiredPermissions: permissions,
+              userPermissions: userPermissions.filter(p => p !== '*')
+            }
+          });
+        }
+      }
+
+      req.user = resolvedUser;
+      req.userProfile = resolvedProfile;
+      req.authSource = resolvedSource;
+
+      if (token) {
+        if (firebaseTokenResult?.success && !resolvedUser.isAdminSession) {
+          try {
+            await admin.firestore()
+              .collection('users')
+              .doc(firebaseTokenResult.user.uid)
+              .update({
+                lastActivity: admin.firestore.FieldValue.serverTimestamp()
+              });
+          } catch (error) {
+            console.warn('[AuthMiddleware] Error actualizando actividad:', error);
+          }
         }
       }
       
@@ -376,12 +455,12 @@ const authMiddleware = (options = {}) => {
 };
 
 /**
- * Middleware específico para rutas que requieren autenticación
+ * Middleware especÃ­fico para rutas que requieren autenticaciÃ³n
  */
 const requireAuth = authMiddleware({ required: true });
 
 /**
- * Middleware específico para rutas de administrador
+ * Middleware especÃ­fico para rutas de administrador
  */
 const requireAdmin = authMiddleware({ 
   required: true, 
@@ -389,7 +468,7 @@ const requireAdmin = authMiddleware({
 });
 
 /**
- * Middleware específico para rutas de planner
+ * Middleware especÃ­fico para rutas de planner
  */
 const requirePlanner = authMiddleware({ 
   required: true, 
@@ -397,7 +476,7 @@ const requirePlanner = authMiddleware({
 });
 
 /**
- * Middleware para rutas de email que requieren permisos específicos
+ * Middleware para rutas de email que requieren permisos especÃ­ficos
  */
 const requireMailAccess = authMiddleware({
   required: true,
@@ -405,7 +484,7 @@ const requireMailAccess = authMiddleware({
 });
 
 /**
- * Middleware opcional (permite acceso anónimo)
+ * Middleware opcional (permite acceso anÃ³nimo)
  */
 const optionalAuth = authMiddleware({ 
   required: false, 
@@ -423,7 +502,7 @@ const requireOwnership = (resourceIdParam = 'id', userIdField = 'userId') => {
         success: false,
         error: {
           code: 'authentication-required',
-          message: 'Autenticación requerida'
+          message: 'AutenticaciÃ³n requerida'
         }
       });
     }
@@ -483,3 +562,4 @@ export {
 };
 
 export default authMiddleware;
+

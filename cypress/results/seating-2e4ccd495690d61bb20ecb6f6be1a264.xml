@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="10.735" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-10-12T21:05:21" tests="0" file="cypress\e2e\seating\seating_smoke.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Seating Plan - Smoke E2E" timestamp="2025-10-12T21:05:21" tests="1" time="10.716" failures="1">
+    <testcase name="Seating Plan - Smoke E2E renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper" time="0.000" classname="renderiza, genera layout vía Plantillas, dibuja área y undo/redo sin romper">
+      <failure message="`cy.click()` can only be called on a single element. Your subject contained 46 elements. Pass `{ multiple: true }` if you want to serially click each element.
+
+https://on.cypress.io/click" type="CypressError"><![CDATA[CypressError: `cy.click()` can only be called on a single element. Your subject contained 46 elements. Pass `{ multiple: true }` if you want to serially click each element.
+
+https://on.cypress.io/click
+    at mouseAction (http://localhost:5173/__cypress/runner/cypress_runner.js:112508:68)
+    at Context.click (http://localhost:5173/__cypress/runner/cypress_runner.js:112675:14)
+    at wrapped (http://localhost:5173/__cypress/runner/cypress_runner.js:138092:19)
+From Your Spec Code:
+    at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_smoke.cy.js:30:18)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

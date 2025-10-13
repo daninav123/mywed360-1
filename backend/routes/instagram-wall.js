@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import LRU from 'lru-cache';
+import { fetchPinterestPins, fetchInstagramMedia } from '../services/socialFeeds.js';
 // Carga dinámica para evitar crash si la librería no es compatible o falta
 let pinterestSearchPins = null;
 async function loadPinterestScraper() {
@@ -244,14 +245,32 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Descubrimiento (placeholder)
-    const discoverPinterestPromise = discoverPinterest(page, searchQuery);
-    const [unsplash, pexels, pinterest] = await Promise.all([
-      discoverUnsplash(page, searchQuery),
-      discoverPexels(page, searchQuery),
-      discoverPinterestPromise,
+    const [officialPinterest, officialInstagram] = await Promise.all([
+      fetchPinterestPins({ query: searchQuery, limit: 18 }),
+      fetchInstagramMedia({ query: searchQuery, limit: 18 }),
     ]);
-    let posts = [...unsplash, ...pexels, ...pinterest]; // resultados agregados
+
+    let posts = [...officialPinterest, ...officialInstagram];
+
+    if (posts.length < 12) {
+      const [unsplash, pexels, fallbackPinterest] = await Promise.all([
+        discoverUnsplash(page, searchQuery),
+        discoverPexels(page, searchQuery),
+        discoverPinterest(page, searchQuery),
+      ]);
+      posts = posts.concat(unsplash, pexels, fallbackPinterest);
+    }
+
+    // Deduplicar por ID o URL
+    const seen = new Set();
+    posts = posts.filter((item) => {
+      if (!item) return false;
+      const key = item.id || item.permalink || item.media_url;
+      if (!key) return false;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
     // Si no alcanza un mínimo razonable, rellenar con placeholders para evitar que el frontend quede vacío
     if (posts.length < 8) {
       const extras = picsumPlaceholders(page, query, 12 - posts.length);

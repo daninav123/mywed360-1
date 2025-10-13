@@ -29,6 +29,23 @@ const guestBaseSchema = z.object({
   printBatchId: z.string().max(120).optional().or(z.literal('')).optional(),
   instagramPollId: z.string().max(120).optional().or(z.literal('')).optional(),
   instagramPollResponse: z.string().max(500).optional().or(z.literal('')).optional(),
+  checkInCode: z.string().max(160).optional().or(z.literal('')).optional(),
+  checkedIn: z.boolean().optional(),
+  checkedInAt: z.string().optional(),
+  checkInBy: z.string().max(160).optional().or(z.literal('')).optional(),
+  checkInMethod: z.string().max(80).optional().or(z.literal('')).optional(),
+  checkInNotes: z.string().max(500).optional().or(z.literal('')).optional(),
+  checkInHistory: z
+    .array(
+      z.object({
+        at: z.string(),
+        by: z.string().optional(),
+        method: z.string().optional(),
+        code: z.string().optional(),
+        notes: z.string().optional(),
+      })
+    )
+    .optional(),
   tags: z.array(z.string().max(60)).optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
@@ -56,6 +73,12 @@ const withNormalization = (schema, { fillDefaults }) =>
       if (out.printBatchId === undefined) out.printBatchId = '';
       if (out.instagramPollId === undefined) out.instagramPollId = '';
       if (out.instagramPollResponse === undefined) out.instagramPollResponse = '';
+      if (out.checkInCode === undefined) out.checkInCode = '';
+      if (out.checkedIn === undefined) out.checkedIn = false;
+      if (out.checkInBy === undefined) out.checkInBy = '';
+      if (out.checkInMethod === undefined) out.checkInMethod = '';
+      if (out.checkInNotes === undefined) out.checkInNotes = '';
+      if (out.checkInHistory === undefined) out.checkInHistory = [];
       if (out.tags === undefined) out.tags = [];
     }
     if (Object.prototype.hasOwnProperty.call(out, 'table')) {
@@ -66,3 +89,4 @@ const withNormalization = (schema, { fillDefaults }) =>
 
 export const guestSchema = withNormalization(guestBaseSchema, { fillDefaults: true });
 export const guestUpdateSchema = withNormalization(guestBaseSchema.partial(), { fillDefaults: false });
+

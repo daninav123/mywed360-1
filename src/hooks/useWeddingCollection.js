@@ -56,6 +56,8 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
   const reload = useCallback(() => setReloadTick((t) => t + 1), []);
 
+  const firebaseUid = auth?.currentUser?.uid || null;
+
   useEffect(() => {
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
     const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS === 'true';
@@ -319,12 +321,17 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       return;
     }
 
-    // Verificar autenticación Firebase - si no hay usuario, intentar de todas formas
-    // ya que las reglas pueden permitir acceso público o el usuario puede autenticarse después
-    if (!auth?.currentUser) {
-      console.warn(
-        `[useWeddingCollection] Sin usuario Firebase autenticado, intentando acceso a Firestore de todas formas para ${subName}`
-      );
+    if (!firebaseUid) {
+      if (import.meta.env.DEV) {
+        console.info(
+          `[useWeddingCollection] Sin auth Firebase; usando solo caché local para ${subName}`
+        );
+      }
+      const cached = lsGet(weddingId, subName, fallback);
+      setData(Array.isArray(cached) ? cached : fallback);
+      setLoading(false);
+      setError((prev) => prev || new Error('auth-required'));
+      return;
     }
 
     // Esperamos a que Firebase esté listo antes de iniciar el listener
@@ -337,7 +344,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
         setError(err);
       });
     return () => unsub && unsub();
-  }, [subName, weddingId, reloadTick]);
+  }, [subName, weddingId, reloadTick, firebaseUid]);
 
   // Sincronización intra‑pestaña (evento custom) y entre pestañas (evento storage)
   useEffect(() => {
@@ -475,4 +482,3 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 };
 
 export default useWeddingCollection;
-

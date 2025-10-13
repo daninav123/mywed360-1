@@ -26,7 +26,7 @@ describe('Flujo 2 - Wizard creación de evento', () => {
   });
 
   it('recorre los dos pasos del wizard y conserva los datos', () => {
-    cy.visit('/create-wedding-ai');
+    cy.visit('/crear-evento');
     cy.closeDiagnostic();
 
     cy.contains('Crear evento con IA', { timeout: 15000 }).should('be.visible');
@@ -41,18 +41,20 @@ describe('Flujo 2 - Wizard creación de evento', () => {
     cy.contains('button', 'Siguiente').click();
 
     cy.contains('Paso 2 de 2', { timeout: 10000 }).should('be.visible');
-    cy.contains('Perfil del evento').should('exist');
+    cy.get('select[name="guestCountRange"]').should('be.visible');
     cy.get('select[name="guestCountRange"]').select('200-plus');
     cy.get('select[name="formalityLevel"]').select('formal');
     cy.get('select[name="ceremonyType"]').should('not.exist');
 
+    cy.contains('button', 'Volver').click();
+    cy.get('input[name="coupleName"]').should('have.value', 'Laura & Diego');
     cy.get('select[name="eventType"]').select('boda');
+    cy.contains('button', 'Siguiente').click();
+
+    cy.contains('Paso 2 de 2', { timeout: 10000 }).should('be.visible');
     cy.get('select[name="ceremonyType"]').should('be.visible').select('religiosa');
     cy.get('textarea[name="notes"]').type('Notas creadas desde test e2e.');
 
-    cy.contains('button', 'Volver').click();
-    cy.get('input[name="coupleName"]').should('have.value', 'Laura & Diego');
-    cy.contains('button', 'Siguiente').click();
     cy.contains('button', 'Crear boda').should('be.visible');
   });
 });

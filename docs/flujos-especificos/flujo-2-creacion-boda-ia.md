@@ -1,7 +1,7 @@
-# 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08
+﻿# 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08
 
 > Implementado: `src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios `createWedding` y `seedDefaultTasksForWedding`, catálogo `src/config/eventStyles.js`.
-> Pendiente: habilitar opt-in a planner desde Perfil, telemetría completa del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
+> Pendiente: habilitar opt-in a planner desde Perfil, paneles/alertas para la telemetría del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
 
 ## 1. Objetivo y alcance
 - Guiar a owners sin evento activo desde el onboarding hasta su primer hub operacional.
@@ -12,7 +12,7 @@
 ## 2. Trigger y rutas
 - Redirección automática tras registro/verificación cuando `activeWeddingId` es falsy.
 - Acceso manual a `/create-wedding-ai` para owners (roles `owner`/`pareja`). Planners y asistentes reciben bloqueo con CTA a inicio.
-- CTA «Crear nuevo evento» pendiente para cuentas con múltiples eventos (no habilitado todavía).
+- CTA «Crear nuevo evento» disponible en la cabecera para owners con eventos existentes (multi-evento).
 
 ## 3. Paso a paso UX (wizard multi-evento)
 1. **Paso 1 · Datos base**
@@ -63,11 +63,10 @@
 - Seeds, checklist, timeline y proveedores deberán leer `eventProfile` a medio plazo (ver flujos 3, 5, 6, 10, 11, 17).
 
 ## 8. Métricas y monitorización
-- Eventos pendientes de instrumentar:
-  - `event_creation_view`, `event_creation_step1_completed`, `event_creation_step2_completed`, `event_creation_submit`, `event_creation_succeeded`, `event_creation_failed`, `event_seed_failed`.
-- Propiedades recomendadas: `uid`, `has_wedding_before`, `eventType`, `guestCountRange`, `formalityLevel`, `style`, `has_date`.
+- Telemetría client-side implementada (`event_creation_view`, `event_creation_step1_completed`, `event_creation_step2_completed`, `event_creation_submit`, `event_creation_succeeded`, `event_creation_failed`) con payload enriquecido (`uid`, `has_wedding_before`, `eventType`, `guestCountRange`, `formalityLevel`, `style`, `has_date`, `has_notes`, `has_related`, `error_code`).
+- Servicio `createWedding` reporta `event_creation_seed_failed` cuando los seeds automáticos fallan.
 - Métrica clave: tiempo desde `signup_completed` (flujo 1) hasta `event_creation_succeeded`.
-- Observabilidad seeds: alertar weddings con `_seed_meta` faltante o errores; revisar `console.warn` hasta persistir en colección dedicada.
+- Pendiente: dashboards/funnel y alertas backend que consuman los eventos, más monitorización `_seed_meta` desde colector dedicado (hasta entonces revisar `console.warn`).
 
 ## 9. Pruebas recomendadas
 - **E2E (multi-evento)**
@@ -89,10 +88,14 @@
 
 ## Cobertura E2E implementada
 - `cypress/e2e/onboarding/create-event-flow.cy.js`: recorre ambos pasos del wizard multi-evento, valida persistencia de datos entre pasos y el copy condicional según tipo de evento.
+- `cypress/e2e/onboarding/create-event-cta.cy.js`: valida el CTA «Crear nuevo evento» para owners con eventos activos y la navegación directa al asistente.
 
 ## 10. Checklist de despliegue
 - Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.
 - Script `scripts/migrate-event-profile.js` para etiquetar eventos legacy con `eventType: 'boda'` y generar `eventProfileSummary` básico antes del switch.
+  1. Obtener credenciales (`serviceAccount.json`) y ejecutar: `node scripts/migrate-event-profile.js --credentials path/to/serviceAccount.json`.
+  2. Verificar en staging que `weddings/{id}` contiene `eventType/eventProfile` normalizados y que cada `users/{uid}/weddings/{id}` refleja `eventProfileSummary`.
+  3. Revisar logs de consola (totales migrados) y auditar uno o dos documentos en la consola de Firestore antes de seguir a producción.
 - Revisión de copy/traducciones (`Crear boda`, `Crear evento`) y estilos centralizados (`config/eventStyles.js`).
 - Telemetría: preparar dashboard funnel + ratio adopción Paso 2.
 - QA: actualizar suites Cypress/E2E con los casos anteriores.
@@ -100,15 +103,15 @@
 ## 11. Roadmap / pendientes
 - Implementar opt-in a planner/assistant desde Perfil con flujo dedicado.
 - Refactorizar rutas y componentes (`/bodas` → `/eventos`) cuando exista soporte multi-evento en toda la app.
-- Instrumentar telemetría y dashboards de adopción segmentados por `eventType`.
-- Integrar asistencia IA contextual con prompts específicos por tipo de evento y fallback offline.
-- Habilitar CTA «Crear nuevo evento» tras validar multi-evento en producción.
+- Conectar telemetría con dashboards de adopción segmentados por `eventType` y alertas de funnel.
+- ✅ 2025-10-13: Asistencia IA contextual con prompts por tipo de evento y fallback offline en ChatWidget.
 - ✅ 2025-10-08: Wizard multi-evento, servicios y pantallas asociados actualizados para `eventType/eventProfile`.
 - ✅ 2025-10-08: Catálogo de estilos centralizado y copy adaptable (`Boda`/`Evento`).
+- ✅ 2025-10-13: CTA «Crear nuevo evento» en header y selector multi-evento habilitado para owners.
 
 ## 12. Resumen de implementación · 2025-10-08
 - Wizard dividido en dos pasos con guardas de rol, selector `eventType` y perfil ampliado (`eventProfile`).
 - `createWedding` normaliza payload, actualiza `eventProfileSummary`, marca `activeWeddingId` y extiende `_seed_meta`.
 - `BodaDetalle` muestra badge de tipo y Card de perfil; `AyudaCeremonia` adapta copy según `eventType`.
 - Catálogo `config/eventStyles.js` agrupa estilos, tamaños, formalidad, ceremonias y eventos relacionados.
-- Pendientes siguientes iteraciones: telemetría, opt-in planners, refactor rutas y despliegue multi-evento.
+- Implementación reciente: telemetría del funnel, CTA multi-evento, selector extendido y asistencia IA contextual con fallback offline.

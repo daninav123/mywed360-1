@@ -12,12 +12,18 @@ export default function RegisterForm({
   onSubmit,
   isSubmitting,
   error,
+  emailInputRef,
+  passwordInputRef,
+  roleSelectRef,
+  errorId = 'register-form-error',
 }) {
+  const hasError = Boolean(error);
+
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <div className="space-y-2">
         <label htmlFor="signup-email" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
-          Correo electrónico
+          Correo electronico
         </label>
         <input
           id="signup-email"
@@ -27,13 +33,16 @@ export default function RegisterForm({
           placeholder="tu@email.com"
           value={email}
           onChange={(event) => onEmailChange?.(event.target.value)}
+          ref={emailInputRef}
+          aria-invalid={hasError ? 'true' : 'false'}
+          aria-describedby={hasError ? errorId : undefined}
           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
         />
       </div>
 
       <div className="space-y-2">
         <label htmlFor="signup-password" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
-          Contraseña
+          Contrasena
         </label>
         <input
           id="signup-password"
@@ -41,9 +50,12 @@ export default function RegisterForm({
           required
           minLength={8}
           autoComplete="new-password"
-          placeholder="Mínimo 8 caracteres"
+          placeholder="Minimo 8 caracteres"
           value={password}
           onChange={(event) => onPasswordChange?.(event.target.value)}
+          ref={passwordInputRef}
+          aria-invalid={hasError ? 'true' : 'false'}
+          aria-describedby={hasError ? errorId : undefined}
           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
         />
         <PasswordStrengthMeter password={password} />
@@ -57,6 +69,7 @@ export default function RegisterForm({
           id="signup-role"
           value={role}
           onChange={(event) => onRoleChange?.(event.target.value)}
+          ref={roleSelectRef}
           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
         >
           <option value="particular">Particular</option>
@@ -65,14 +78,18 @@ export default function RegisterForm({
         </select>
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? (
+        <p id={errorId} role="alert" aria-live="assertive" className="text-sm text-red-600">
+          {error}
+        </p>
+      ) : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
         className="w-full rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] transition-colors hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {isSubmitting ? 'Creando cuenta…' : 'Registrarse'}
+        {isSubmitting ? 'Creando cuenta...' : 'Registrarse'}
       </button>
     </form>
   );

@@ -1,6 +1,10 @@
-import '@testing-library/jest-dom/vitest';
+import { beforeAll, afterEach, expect, vi } from 'vitest';
+import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
-import { beforeAll, afterEach, vi } from 'vitest';
+
+if (matchers && typeof expect?.extend === 'function') {
+  expect.extend(matchers);
+}
 
 // Alias global "jest" apuntando a la API de "vi" para compatibilidad con pruebas que usan Jest
 if (!globalThis.jest) {
@@ -111,6 +115,4 @@ beforeAll(() => {
     })),
   });
 });
-
-
 

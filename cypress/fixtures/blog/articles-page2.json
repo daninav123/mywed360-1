@@ -1,0 +1,29 @@
+[
+  {
+    "id": "blog-101",
+    "title": "Guía rápida para bodas destino en la playa",
+    "description": "Permisos, logística y consejos para casarse frente al mar.",
+    "url": "https://destinosiwedding.com/guia-boda-playa",
+    "image": "https://assets.example.com/blog/boda-playa.jpg",
+    "source": "destinosiwedding.com",
+    "published": "2025-08-30T11:10:00.000Z"
+  },
+  {
+    "id": "blog-102",
+    "title": "Tres maneras de personalizar tu ceremonia civil",
+    "description": "Rituales simbólicos que aportan significado y emoción.",
+    "url": "https://prensa-nupcial.com/articulo/ceremonia-civil-personalizada",
+    "image": null,
+    "source": "prensa-nupcial.com",
+    "published": "2025-08-22T10:05:00.000Z"
+  },
+  {
+    "id": "blog-103",
+    "title": "Playlists imprescindibles para cada momento de la boda",
+    "description": "Selección musical creada por DJs especializados en eventos nupciales.",
+    "url": "https://ritmo-nupcial.es/playlist-imprescindible",
+    "image": "https://assets.example.com/blog/playlist.jpg",
+    "source": "ritmo-nupcial.es",
+    "published": "2025-08-15T19:30:00.000Z"
+  }
+]

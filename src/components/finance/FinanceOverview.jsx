@@ -29,6 +29,7 @@ export default function FinanceOverview({
   isLoading = false,
   transactions = [],
   projection = null,
+  predictiveInsights = null,
 }) {
   const { t } = useTranslations();
   const safeBudget = Array.isArray(budgetUsage) ? budgetUsage : [];
@@ -217,6 +218,146 @@ export default function FinanceOverview({
           sparklineData={monthly.income}
         />
       </div>
+
+      {predictiveInsights && (
+        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-[color:var(--color-text)]">
+                {t('finance.overview.predictiveTitle', { defaultValue: 'Analítica predictiva' })}
+              </h3>
+              <p className="text-sm text-[color:var(--color-text)]/60">
+                {t('finance.overview.predictiveSubtitle', {
+                  defaultValue: 'Basado en la media móvil de los últimos seis meses.',
+                })}
+              </p>
+            </div>
+            {predictiveInsights.netTrend && (
+              <span
+                className={`text-xs px-2 py-1 rounded-full font-medium ${
+                  predictiveInsights.netTrend.direction === 'up'
+                    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
+                    : predictiveInsights.netTrend.direction === 'down'
+                      ? 'bg-[var(--color-danger)]/15 text-[var(--color-danger)]'
+                      : 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'
+                }`}
+              >
+                {predictiveInsights.netTrend.direction === 'up'
+                  ? t('finance.overview.trendUp', { defaultValue: 'Tendencia positiva' })
+                  : predictiveInsights.netTrend.direction === 'down'
+                    ? t('finance.overview.trendDown', { defaultValue: 'Tendencia negativa' })
+                    : t('finance.overview.trendFlat', { defaultValue: 'Tendencia estable' })}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
+              <p className="text-xs text-[color:var(--color-danger)]/80 uppercase tracking-wide">
+                {t('finance.overview.burnRate', { defaultValue: 'Burn rate mensual' })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-danger)]">
+                {formatCurrency(predictiveInsights.burnRate || 0)}
+              </p>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.overview.avgExpense', {
+                  defaultValue: 'Ingreso neto promedio mensual',
+                })}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30">
+              <p className="text-xs text-[color:var(--color-warning)]/80 uppercase tracking-wide">
+                {t('finance.overview.monthsToZero', {
+                  defaultValue: 'Meses hasta agotar presupuesto',
+                })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-warning)]">
+                {formatMonths(predictiveInsights.monthsToZero)}
+              </p>
+              {predictiveInsights.projectedZeroDate && (
+                <p className="text-xs text-[color:var(--color-text)]/60">
+                  {t('finance.overview.estimatedDate', { defaultValue: 'Estimado:' })}{' '}
+                  {predictiveInsights.projectedZeroDate}
+                </p>
+              )}
+            </div>
+            <div className="p-4 rounded-lg bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
+              <p className="text-xs text-[color:var(--color-success)]/80 uppercase tracking-wide">
+                {t('finance.overview.forecastSurplus', {
+                  defaultValue: 'Saldo proyectado día de la boda',
+                })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-success)]">
+                {formatCurrency(predictiveInsights.forecastSurplus || 0)}
+              </p>
+            </div>
+            <div className="p-4 rounded-lg bg-[color:var(--color-primary)]/10 border border-[color:var(--color-primary)]/30">
+              <p className="text-xs text-[color:var(--color-primary)]/80 uppercase tracking-wide">
+                {t('finance.overview.recommendedSaving', {
+                  defaultValue: 'Ahorro mensual recomendado',
+                })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-primary)]">
+                {formatCurrency(predictiveInsights.recommendedMonthlySaving || 0)}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {predictiveInsights.categoriesAtRisk?.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
+                  {t('finance.overview.categoriesAtRisk', {
+                    defaultValue: 'Categorías en riesgo',
+                  })}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {predictiveInsights.categoriesAtRisk.map((cat) => (
+                    <span
+                      key={cat.name}
+                      className="px-3 py-1 text-xs rounded-full bg-[var(--color-danger)]/10 text-[color:var(--color-danger)] border border-[color:var(--color-danger)]/30"
+                    >
+                      {cat.name} · {cat.percentage?.toFixed(1)}% ·{' '}
+                      {formatCurrency(cat.remaining || 0)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {predictiveInsights.upcomingPayments?.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
+                  {t('finance.overview.upcomingPayments', {
+                    defaultValue: 'Pagos próximos',
+                  })}
+                </h4>
+                <ul className="space-y-2 text-xs text-[color:var(--color-text)]/80">
+                  {predictiveInsights.upcomingPayments.map((payment, idx) => (
+                    <li
+                      key={`${payment.concept}-${idx}`}
+                      className="flex items-center justify-between gap-2 border-b border-[color:var(--color-text)]/10 pb-1"
+                    >
+                      <div className="truncate">
+                        <p className="font-medium truncate">{payment.concept}</p>
+                        <p className="text-[color:var(--color-text)]/60">
+                          {payment.dueDate} ·{' '}
+                          {payment.provider ||
+                            t('finance.overview.noProvider', {
+                              defaultValue: 'Proveedor sin asignar',
+                            })}
+                        </p>
+                      </div>
+                      <span className="whitespace-nowrap font-semibold">
+                        {formatCurrency(payment.outstanding)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       {alertCategories.length > 0 && (
         <Card className="p-4 border-[color:var(--color-warning)]/30 bg-[var(--color-warning)]/10">

@@ -22,69 +22,91 @@ export default function ProveedorBudgets({ supplierId }) {
     await updateBudgetStatus(budgetId, action);
   };
 
+  const statusLabelMap = {
+    pending: 'Pendiente',
+    accepted: 'Aceptado',
+    rejected: 'Rechazado',
+    submitted: 'Enviado',
+  };
+
   return (
     <Card className="mt-4">
       <h3 className="text-lg font-medium mb-3">Presupuestos</h3>
       <ul className="space-y-2">
-        {budgets.map((b) => (
-          <li key={b.id} className="p-3 border rounded-md flex justify-between items-center">
-            <div>
-              <p className="font-medium">{b.description || 'Presupuesto'}</p>
-              <p className="text-sm text-gray-600">
-                {b.amount} {b.currency || '€'} — <span className="capitalize">{b.status}</span>
-              </p>
-            </div>
-            <div className="flex space-x-2">
-              {b.status === 'pending' && (
-                <>
-                  <Button size="sm" onClick={() => handleAction(b.id, 'accept')}>Aceptar</Button>
-                  <Button variant="outline" size="sm" onClick={() => handleAction(b.id, 'reject')}>Rechazar</Button>
-                </>
-              )}
-              {b.status === 'accepted' && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    try {
-                      const prov = (providers || []).find((p) => String(p.id) === String(supplierId));
-                      const normalizeAmount = (val) => {
-                        try {
-                          const s = String(val ?? '').replace(/[^0-9.,]/g, '').trim();
-                          if (!s) return '';
-                          const lastComma = s.lastIndexOf(',');
-                          const lastDot = s.lastIndexOf('.');
-                          let normalized = s;
-                          if (lastComma > lastDot) normalized = s.replace(/\./g, '').replace(',', '.');
-                          else if (lastDot > lastComma) normalized = s.replace(/,/g, '');
-                          return String(parseFloat(normalized) || '');
-                        } catch { return ''; }
-                      };
-                      const amt = normalizeAmount(b.amount);
-                      const prefill = {
-                        concept: `Presupuesto aceptado - ${(b.description || prov?.name || 'Proveedor')}`.slice(0, 80),
-                        amount: amt,
-                        date: (b.createdAt && String(b.createdAt).slice(0,10)) || new Date().toISOString().slice(0,10),
-                        type: 'expense',
-                        category: '',
-                        description: `Desde presupuesto: ${b.description || ''}`,
-                        provider: prov?.name || '',
-                        status: 'expected',
-                        paidAmount: '',
-                      };
-                      if (typeof window !== 'undefined') {
-                        try { window.history.pushState({ prefillTransaction: prefill }, '', '/finance#nuevo'); } catch {}
-                        window.location.assign('/finance#nuevo');
-                      }
-                    } catch {}
-                  }}
-                >
-                  Registrar en Finanzas
-                </Button>
-              )}
-            </div>
-          </li>
-        ))}
+        {budgets.map((b) => {
+          const isPortal = String(b.source || '').toLowerCase() === 'portal';
+          const statusLabel = statusLabelMap[b.status] || b.status || 'desconocido';
+          return (
+            <li key={b.id} className="p-3 border rounded-md flex justify-between items-center">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{b.description || 'Presupuesto'}</p>
+                  {isPortal && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                      Portal
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600">
+                  {b.amount} {b.currency || '€'} —{' '}
+                  <span className={`capitalize ${isPortal ? 'text-indigo-600' : ''}`}>{statusLabel}</span>
+                </p>
+                {isPortal && b.status === 'submitted' && (
+                  <p className="text-xs text-indigo-600 mt-1">Pendiente de revisión interna.</p>
+                )}
+              </div>
+              <div className="flex space-x-2">
+                {b.status === 'pending' && (
+                  <>
+                    <Button size="sm" onClick={() => handleAction(b.id, 'accept')}>Aceptar</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleAction(b.id, 'reject')}>Rechazar</Button>
+                  </>
+                )}
+                {b.status === 'accepted' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      try {
+                        const prov = (providers || []).find((p) => String(p.id) === String(supplierId));
+                        const normalizeAmount = (val) => {
+                          try {
+                            const s = String(val ?? '').replace(/[^0-9.,]/g, '').trim();
+                            if (!s) return '';
+                            const lastComma = s.lastIndexOf(',');
+                            const lastDot = s.lastIndexOf('.');
+                            let normalized = s;
+                            if (lastComma > lastDot) normalized = s.replace(/\./g, '').replace(',', '.');
+                            else if (lastDot > lastComma) normalized = s.replace(/,/g, '');
+                            return String(parseFloat(normalized) || '');
+                          } catch { return ''; }
+                        };
+                        const amt = normalizeAmount(b.amount);
+                        const prefill = {
+                          concept: `Presupuesto aceptado - ${(b.description || prov?.name || 'Proveedor')}`.slice(0, 80),
+                          amount: amt,
+                          date: (b.createdAt && String(b.createdAt).slice(0,10)) || new Date().toISOString().slice(0,10),
+                          type: 'expense',
+                          category: '',
+                          description: `Desde presupuesto: ${b.description || ''}`,
+                          provider: prov?.name || '',
+                          status: 'expected',
+                          paidAmount: '',
+                        };
+                        if (typeof window !== 'undefined') {
+                          try { window.history.pushState({ prefillTransaction: prefill }, '', '/finance#nuevo'); } catch {}
+                          window.location.assign('/finance#nuevo');
+                        }
+                      } catch {}
+                    }}
+                  >
+                    Registrar en Finanzas
+                  </Button>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </Card>
   );

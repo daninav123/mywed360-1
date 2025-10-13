@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Componente Toolbar modernizado para el plan de asientos
  * Interfaz mejorada con iconos claros y mejor UX
  */
@@ -43,11 +43,12 @@ const SeatingPlanToolbar = ({
   onOpenSpaceConfig,
   onOpenTemplates,
   onOpenBackground,
+  onFitToContent,
   onAutoAssign,
   onClearBanquet,
   showTables = true,
   onToggleShowTables,
-  // Vista avanzada
+  // Vista Avanzada
   showRulers = false,
   onToggleRulers,
   snapEnabled = false,
@@ -206,30 +207,48 @@ const SeatingPlanToolbar = ({
 
         {/* Grupo: Visibilidad */}
         <div className="flex items-center gap-1 border-r pr-3">
+          {tab === 'banquet' && (
+            <>
+              <button
+                type="button"
+                onClick={handleToggleTables}
+                className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
+                title={
+                  showTablesLocal
+                    ? t('seating.toolbar.hideTables', { defaultValue: 'Ocultar mesas' })
+                    : t('seating.toolbar.showTables', { defaultValue: 'Mostrar mesas' })
+                }
+                aria-pressed={showTablesLocal}
+                aria-label={
+                  showTablesLocal
+                    ? t('seating.toolbar.hideTables', { defaultValue: 'Ocultar mesas' })
+                    : t('seating.toolbar.showTables', { defaultValue: 'Mostrar mesas' })
+                }
+              >
+                {showTablesLocal ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                <span className="hidden sm:inline">
+                  {showTablesLocal
+                    ? t('seating.toolbar.hideTables', { defaultValue: 'Mesas' })
+                    : t('seating.toolbar.showTables', { defaultValue: 'Mesas' })}
+                </span>
+              </button>
+            </>
+          )}
+
+          {/* Ajustar a pantalla */}
           <button
             type="button"
-            onClick={handleToggleTables}
+            onClick={onFitToContent}
             className="flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100"
-            title={
-              showTablesLocal
-                ? t('seating.toolbar.hideTables', { defaultValue: 'Ocultar mesas' })
-                : t('seating.toolbar.showTables', { defaultValue: 'Mostrar mesas' })
-            }
-            aria-pressed={showTablesLocal}
-            aria-label={
-              showTablesLocal
-                ? t('seating.toolbar.hideTables', { defaultValue: 'Ocultar mesas' })
-                : t('seating.toolbar.showTables', { defaultValue: 'Mostrar mesas' })
-            }
+            title="Ajustar a pantalla"
+            aria-label="Ajustar a pantalla"
           >
-            {showTablesLocal ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            <span className="hidden sm:inline">
-              {showTablesLocal
-                ? t('seating.toolbar.hideTables', { defaultValue: 'Mesas' })
-                : t('seating.toolbar.showTables', { defaultValue: 'Mesas' })}
-            </span>
+            <Maximize className="h-4 w-4" />
+            <span className="hidden sm:inline">Ajustar</span>
           </button>
+
           {/* Regla */}
+
           <button
             type="button"
             onClick={onToggleRulers}

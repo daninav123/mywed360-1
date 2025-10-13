@@ -8,7 +8,8 @@ export default function FinanceStatsHeader({
   t,
   stats,
   isLoading,
-  csvLoading,
+  importLoading = false,
+  exportLoading = false,
   onConnectBank,
   onImportCSV,
   onExportCSV,
@@ -56,10 +57,12 @@ export default function FinanceStatsHeader({
             e.preventDefault();
             onImportCSV?.();
           }}
-          disabled
-          title={t('finance.transactions.importComingSoon', { defaultValue: 'Importación CSV disponible próximamente' })}
+          disabled={importLoading || isLoading}
+          aria-busy={importLoading}
         >
-          {t('finance.transactions.importCSV', { defaultValue: 'Importar CSV' })}
+          {importLoading
+            ? t('finance.transactions.importing', { defaultValue: 'Importando…' })
+            : t('finance.transactions.importCSV', { defaultValue: 'Importar CSV/Excel' })}
         </Button>
         <Button
           variant="outline"
@@ -68,10 +71,12 @@ export default function FinanceStatsHeader({
             e.preventDefault();
             onExportCSV?.();
           }}
-          disabled
-          title={t('finance.transactions.exportComingSoon', { defaultValue: 'Exportación CSV disponible próximamente' })}
+          disabled={exportLoading || isLoading}
+          aria-busy={exportLoading}
         >
-          {t('finance.transactions.exportCSV', { defaultValue: 'Exportar CSV' })}
+          {exportLoading
+            ? t('finance.transactions.exporting', { defaultValue: 'Generando reporte…' })
+            : t('finance.transactions.exportCSV', { defaultValue: 'Exportar reporte' })}
         </Button>
         <Button leftIcon={<Plus size={16} />} onClick={onNew} data-testid="transactions-new">
           {t('finance.transactions.new', { defaultValue: 'Nueva transacción' })}

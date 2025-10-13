@@ -24,10 +24,10 @@
 ## 5. Reglas de negocio (MVP)
 - El usuario es responsable de revisar y guardar el PDF generado.
 - No se realiza firma digital ni validación legal; sólo se entrega un borrador editable.
-- El formulario valida campos obligatorios antes de generar el documento.
+- Nota 2025-10-12: el formulario **no** tiene validaciones visibles (`required`, mensajes) aunque deberían existir para impedir generar PDFs vacíos.
 
 ## 6. Estados especiales y errores
-- Campos faltantes → se muestra validación en el formulario.
+- Campos faltantes → hoy se permite generar igualmente; falta implementar validaciones y mensajes.
 - Error jsPDF → se captura y se muestra un toast “No se pudo generar el documento”.
 
 ## 7. Integración con otros flujos (futuro)
@@ -56,3 +56,25 @@
 - Firma digital (integración con DocuSign/HelloSign) y seguimiento de estado.
 - Automatización IA para rellenar cláusulas y generar contratos personalizados.
 - Dashboard de cumplimiento y alertas.
+
+## 12. Plan de QA incremental (2025-10-12)
+### Estado actual verificado
+- `DocumentosLegales.jsx` genera un PDF con jsPDF pero carece de validaciones y manejo de versiones.
+- Sólo existe una plantilla (`consentimiento_imagen`); selector de tipo no cambia contenido.
+- No se expone historial ni confirmación visual tras la descarga; `toast` solo en caso de error.
+
+### Experiencia mínima a construir
+- Añadir validaciones obligatorias (`required`, mensajes bajo cada campo) y deshabilitar el botón hasta completar datos.
+- Mostrar confirmación de éxito (`alert`/`toast`) con nombre del archivo generado.
+- Registrar versiones en memoria (array local) con lista lateral o modal para “Historial”.
+- Exponer `data-testid` en formulario (`legal-docs-form`), botón (`legal-docs-submit`) y lista de historial.
+
+### Criterios de prueba E2E propuestos
+1. `legal-docs-generator`: completar formulario, interceptar `jsPDF` (`cy.stub(window, 'jsPDF')`) y verificar `doc.save` con nombre esperado. Confirmar mensaje de éxito.
+2. `legal-docs-validation`: intentar enviar vacío y esperar mensajes “Campo obligatorio” en nombre, fecha y lugar; el botón permanece deshabilitado.
+3. `legal-docs-versioning`: generar documento, modificar valores y generar nuevamente; historial muestra dos entradas con timestamps distintos.
+
+### Dependencias técnicas
+- Wrapper sobre jsPDF que permita inyectar stub en Cypress (ej. exportar `createLegalDoc` y mockear).
+- Fuente de fecha actual consistente para historial (usar `Date.now()` pero exponer `Date.now = cy.stub`).
+- Fixtures de datos (`cypress/fixtures/legal-docs.json`) para reutilizar nombres y validar copy.

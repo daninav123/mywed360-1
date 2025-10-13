@@ -2,7 +2,7 @@ import { Mail } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 import { getMails, initEmailService } from '../../services/emailService';
 
 /**
@@ -50,7 +50,7 @@ const EmailNotificationBadge = () => {
 
   // Ir a la bandeja de entrada
   const handleClick = () => {
-    navigate('/email');
+    navigate('/user/email');
   };
 
   return (

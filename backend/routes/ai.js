@@ -50,31 +50,61 @@ try {
   db = admin.apps.length ? admin.firestore() : null;
 } catch {}
 
+function describeEvent(context) {
+  if (!context || typeof context !== 'object') return 'tu boda';
+  const rawType = String(context.eventType || '').toLowerCase();
+  const kind = rawType && !rawType.includes('boda') ? 'tu evento' : 'tu boda';
+  const style = context.styleLabel || context.style;
+  const location = context.location;
+  const pieces = [];
+  if (style) pieces.push(`de estilo ${style}`);
+  if (location) pieces.push(`en ${location}`);
+  return pieces.length ? `${kind} ${pieces.join(' ')}` : kind;
+}
+
+function buildContextSummary(context) {
+  if (!context || typeof context !== 'object') return '';
+  const parts = [];
+  if (context.eventType) parts.push(`tipo ${context.eventType}`);
+  const style = context.styleLabel || context.style;
+  if (style) parts.push(`estilo ${style}`);
+  const guest = context.guestCountLabel || context.guestCountRange;
+  if (guest) parts.push(`invitados ${guest}`);
+  const formality = context.formalityLabel || context.formalityLevel;
+  if (formality) parts.push(`formalidad ${formality}`);
+  const ceremony = context.ceremonyLabel || context.ceremonyType;
+  if (ceremony) parts.push(`ceremonia ${ceremony}`);
+  if (context.location) parts.push(`ubicación ${context.location}`);
+  if (context.weddingDate) parts.push(`fecha ${context.weddingDate}`);
+  return parts.join(', ');
+}
+
 // Función de fallback local para cuando OpenAI no está disponible
-function generateLocalResponse(text, history = []) {
+function generateLocalResponse(text, history = [], context = null) {
   const lowerText = text.toLowerCase();
   let reply = '';
   let extracted = {};
+  const subject = describeEvent(context);
   
   // Respuestas contextuales basadas en palabras clave
   if (lowerText.includes('hola') || lowerText.includes('hi') || lowerText.includes('hello')) {
-    reply = '¡Hola! Soy tu asistente de bodas. Aunque tengo algunos problemas técnicos temporales, puedo ayudarte con información básica sobre tu boda. ¿En qué puedo asistirte?';
+    reply = `¡Hola! Soy tu asistente de bodas. Aunque tengo algunos problemas técnicos temporales, puedo ayudarte con información básica sobre ${subject}. ¿En qué puedo asistirte?`;
   } else if (lowerText.includes('invitado') || lowerText.includes('guest')) {
-    reply = 'Te puedo ayudar con la gestión de invitados. Puedes añadir invitados manualmente desde la sección de Invitados en el menú principal. ¿Necesitas ayuda con algo específico sobre los invitados?';
+    reply = `Te puedo ayudar con la gestión de invitados de ${subject}. Puedes añadir invitados manualmente desde la sección de Invitados en el menú principal. ¿Necesitas ayuda con algo específico sobre los invitados?`;
   } else if (lowerText.includes('presupuesto') || lowerText.includes('dinero') || lowerText.includes('coste') || lowerText.includes('precio')) {
-    reply = 'Para gestionar tu presupuesto de boda, ve a la sección de Finanzas donde puedes añadir gastos e ingresos. ¿Quieres que te explique cómo funciona el control de presupuesto?';
+    reply = `Para gestionar el presupuesto de ${subject}, ve a la sección de Finanzas donde puedes añadir gastos e ingresos. ¿Quieres que te explique cómo funciona el control de presupuesto?`;
   } else if (lowerText.includes('fecha') || lowerText.includes('cuando') || lowerText.includes('día')) {
-    reply = 'Puedes gestionar las fechas importantes de tu boda en el calendario. ¿Necesitas ayuda para planificar alguna fecha específica?';
+    reply = `Puedes gestionar las fechas importantes de ${subject} en el calendario. ¿Necesitas ayuda para planificar alguna fecha específica?`;
   } else if (lowerText.includes('proveedor') || lowerText.includes('vendor') || lowerText.includes('fotógrafo') || lowerText.includes('catering')) {
-    reply = 'En la sección de Proveedores puedes buscar y gestionar todos los servicios para tu boda. ¿Buscas algún tipo de proveedor en particular?';
+    reply = `En la sección de Proveedores puedes buscar y gestionar todos los servicios para ${subject}. ¿Buscas algún tipo de proveedor en particular?`;
   } else if (lowerText.includes('mesa') || lowerText.includes('seating') || lowerText.includes('asiento')) {
-    reply = 'El plan de mesas te permite organizar dónde se sentarán tus invitados. Puedes acceder desde el menú principal. ¿Necesitas ayuda con la distribución de mesas?';
+    reply = `El plan de mesas te permite organizar dónde se sentarán los invitados de ${subject}. Puedes acceder desde el menú principal. ¿Necesitas ayuda con la distribución de mesas?`;
   } else if (lowerText.includes('ayuda') || lowerText.includes('help') || lowerText.includes('cómo')) {
-    reply = 'Estoy aquí para ayudarte con tu boda. Aunque tengo limitaciones técnicas temporales, puedo orientarte sobre:\n\n• Gestión de invitados\n• Control de presupuesto\n• Planificación de fechas\n• Búsqueda de proveedores\n• Organización de mesas\n\n¿En qué área necesitas más ayuda?';
+    reply = `Estoy aquí para ayudarte con ${subject}. Aunque tengo limitaciones técnicas temporales, puedo orientarte sobre:\n\n• Gestión de invitados\n• Control de presupuesto\n• Planificación de fechas\n• Búsqueda de proveedores\n• Organización de mesas\n\n¿En qué área necesitas más ayuda?`;
   } else if (lowerText.includes('problema') || lowerText.includes('error') || lowerText.includes('no funciona')) {
-    reply = 'Entiendo que hay algunos problemas técnicos. Estamos trabajando para solucionarlos. Mientras tanto, puedes usar todas las funciones de la aplicación manualmente desde el menú. ¿Hay algo específico que no funcione?';
+    reply = `Entiendo que hay algunos problemas técnicos. Estamos trabajando para solucionarlos. Mientras tanto, puedes usar todas las funciones de la aplicación manualmente desde el menú para avanzar con ${subject}. ¿Hay algo específico que no funcione?`;
   } else {
-    reply = 'Disculpa, tengo algunas limitaciones técnicas temporales y no puedo procesar completamente tu consulta. Sin embargo, puedes:\n\n• Usar el menú principal para navegar\n• Gestionar invitados, presupuesto y fechas manualmente\n• Buscar proveedores en la sección correspondiente\n\n¿Puedes ser más específico sobre lo que necesitas?';
+    reply = `Disculpa, tengo algunas limitaciones técnicas temporales y no puedo procesar completamente tu consulta. Sin embargo, puedes:\n\n• Usar el menú principal para navegar\n• Gestionar invitados, presupuesto y fechas manualmente\n• Buscar proveedores en la sección correspondiente\n\n¿Puedes ser más específico sobre lo que necesitas respecto a ${subject}?`;
   }
   
   // Heurística simple: intentar extraer invitados/reuniones en modo local
@@ -190,7 +220,7 @@ router.get('/debug-env', (req, res) => {
 // Body: { text: "free form conversation" }
 // Returns: { extracted: {...} }
 router.post('/parse-dialog', async (req, res) => {
-  let { text, history = [] } = req.body || {};
+  let { text, history = [], context = null } = req.body || {};
   // Validación opcional con Zod si está disponible; fallback básico
   try {
     const mod = await import('zod').catch(() => null);
@@ -199,24 +229,58 @@ router.post('/parse-dialog', async (req, res) => {
       const schema = z.object({
         text: z.string().min(1).max(5000),
         history: z.array(z.object({ role: z.string().optional(), content: z.string() })).optional().default([]),
+        context: z
+          .object({
+            eventType: z.string().max(64).optional(),
+            style: z.string().max(128).optional().nullable(),
+            styleLabel: z.string().max(128).optional().nullable(),
+            guestCountRange: z.string().max(64).optional().nullable(),
+            guestCountLabel: z.string().max(128).optional().nullable(),
+            formalityLevel: z.string().max(64).optional().nullable(),
+            formalityLabel: z.string().max(128).optional().nullable(),
+            ceremonyType: z.string().max(64).optional().nullable(),
+            ceremonyLabel: z.string().max(128).optional().nullable(),
+            relatedEvents: z.array(z.string()).max(20).optional(),
+            location: z.string().max(160).optional().nullable(),
+            weddingDate: z.string().max(64).optional().nullable(),
+            weddingId: z.string().max(64).optional().nullable(),
+            name: z.string().max(160).optional().nullable(),
+          })
+          .partial()
+          .optional()
+          .nullable(),
       });
-      const parsed = schema.safeParse({ text, history });
+      const parsed = schema.safeParse({ text, history, context });
       if (!parsed.success) {
         return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i => i.message).join('; ') });
       }
-      ({ text, history } = parsed.data);
+      ({ text, history, context } = parsed.data);
     } else {
       if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
       if (!Array.isArray(history)) history = [];
+      if (!context || typeof context !== 'object') context = null;
     }
   } catch {}
   logger.info('↪️  parse-dialog recibido', { textLen: text.length, historyLen: history.length });
   if (!text) return res.status(400).json({ error: 'text required' });
 
+  const historyMessages = Array.isArray(history)
+    ? history
+        .filter((msg) => msg && typeof msg.content === 'string' && msg.content.trim().length)
+        .map((msg) => ({
+          role: ['assistant', 'user', 'system'].includes(msg.role) ? msg.role : 'user',
+          content: msg.content,
+        }))
+    : [];
+  const conversationMessages = historyMessages.length
+    ? historyMessages
+    : [{ role: 'user', content: text }];
+  const contextSummary = buildContextSummary(context);
+
   // Early fallback: si no hay OPENAI_API_KEY, usar heurística local
   if (!OPENAI_API_KEY) {
     logger.warn('OPENAI_API_KEY ausente, usando heurística local (early)');
-    const local = generateLocalResponse(text, history);
+    const local = generateLocalResponse(text, history, context);
     return res.json(local);
   }
 
@@ -321,10 +385,11 @@ router.post('/parse-dialog', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content:
-              'Eres un asistente que extrae información estructurada para una aplicación de bodas. Devuelve solo datos válidos en la función.',
+            content: contextSummary
+              ? `Eres un asistente que extrae información estructurada para una aplicación de bodas. Contexto del evento: ${contextSummary}. Devuelve solo datos válidos en la función.`
+              : 'Eres un asistente que extrae información estructurada para una aplicación de bodas. Devuelve solo datos válidos en la función.',
           },
-          { role: 'user', content: text },
+          ...conversationMessages,
         ],
         functions,
         function_call: { name: 'extractWeddingData' },
@@ -353,11 +418,15 @@ router.post('/parse-dialog', async (req, res) => {
           model,
           temperature: 0.7,
           messages: [
-          { role: 'system', content: 'Eres un asistente wedding planner que responde de forma breve y amistosa a la pareja, resumiendo las acciones o dudas detectadas.' },
-          { role: 'user', content: text },
-          { role: 'assistant', content: `He extraído estos datos: ${JSON.stringify(extracted)}` },
-          { role: 'user', content: 'Por favor, responde de forma cercana en español.' }
-            
+            {
+              role: 'system',
+              content: contextSummary
+                ? `Eres un asistente wedding planner que responde de forma breve y amistosa a la pareja, resumiendo las acciones o dudas detectadas. Evento actual: ${contextSummary}.`
+                : 'Eres un asistente wedding planner que responde de forma breve y amistosa a la pareja, resumiendo las acciones o dudas detectadas.',
+            },
+            ...conversationMessages,
+            { role: 'assistant', content: `He extraído estos datos: ${JSON.stringify(extracted)}` },
+            { role: 'user', content: 'Por favor, responde de forma cercana en español.' },
           ]
         }),
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai-summary')), 10000))
@@ -381,7 +450,7 @@ router.post('/parse-dialog', async (req, res) => {
     logger.error('❌ parse-dialog error', err);
     
     // Fallback inteligente local cuando OpenAI no está disponible
-    const localResponse = generateLocalResponse(text, history);
+    const localResponse = generateLocalResponse(text, history, context);
     
     // Devuelve 200 para que el frontend no lo trate como fallo de red
     res.json({

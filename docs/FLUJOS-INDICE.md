@@ -11,11 +11,12 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 
 | # | Archivo | Título del flujo | Estado | Pendiente principal |
 |---|---------------------------|------------------------------|----------------|----------------------------|
-| 0 | flujo-0-administracion-global.md | Administración Global | No (pendiente) | Definir alcance técnico, proteger backoffice y cerrar autorización admin |
+| 0 | flujo-0-administracion-global.md | Administración Global | No (pendiente, doc actualizada 2025-10-12) | Definir alcance técnico, proteger backoffice y cerrar autorización admin |
 | 1 | flujo-1-registro-autenticacion.md | Registro y Autenticación | Sí (en curso) | Instrumentar métricas, refactor formularios legacy y auditoría de accesibilidad |
-| 2 | flujo-2-creacion-boda-ia.md | Creación de Evento con IA | Sí (en curso) | Opt-in planner, telemetría del funnel, migrar rutas a `/eventos` e integrar IA contextual |
+| 2 | flujo-2-creacion-boda-ia.md | Creación de Evento con IA (wizard) | Sí (en curso) | Opt-in planner, telemetría del funnel, migrar rutas a `/eventos` e integrar IA contextual |
+| 2B | flujo-2b-creacion-boda-asistente.md | Asistente Conversacional para Crear Evento | Sí (en curso) | Telemetría dedicada, pulir prompts y decidir convivencia con el wizard |
 | 3 | flujo-3-gestion-invitados.md | Gestión de Invitados | Sí (en curso) | Dashboard RSVP, check-in del día B y sincronización automática con Seating Plan |
-| 4 | flujo-4-invitados-operativa.md | Invitados (Plan + Contenido) | Sí (en curso) | Panel inteligente con IA, automatización de contenidos y revisión de accesibilidad |
+| 4 | flujo-4-invitados-operativa.md | Invitados (Plan de Asientos) | Sí (en curso) | Panel inteligente con IA, colaboración en tiempo real y workflows de exportación |
 | 5a | flujo-5-proveedores-ia.md | Proveedores con IA | Sí (en curso) | Scoring IA consolidado, portal proveedor completo y RFQ multi-proveedor automatizada |
 | 5b | flujo-5-timeline-tareas.md | Timeline y Tareas | Sí (en curso) | Motor IA para plantillas padre/subtareas y matriz de responsabilidades |
 | 6 | flujo-6-presupuesto.md | Presupuesto | Sí (en curso) | Importación CSV/Excel, analítica predictiva, aportaciones colaborativas y reportes Avanzados |
@@ -42,6 +43,14 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 | 21 | flujo-21-sitio-publico.md | Sitio Público | Sí (en curso) | Personalización avanzada, dominios personalizados, SEO/analytics y métricas de conversión |
 | 22 | flujo-22-dashboard-navegacion.md | Dashboard y Navegación | Sí (en curso) | Dashboard con métricas en vivo, proteger herramientas internas y mostrar actividad reciente |
 | 23 | flujo-23-metricas-proyecto.md | Métricas del Proyecto | Sí (en curso) | Dashboard multi-módulo, workers de agregación y rutas `/analytics/*` |
+| 24 | flujo-24-galeria-inspiracion.md | Galería de Inspiración | Sí (en curso) | Lightbox accesible, métricas completas y colecciones automáticas |
+| 25 | flujo-25-inspiracion.md | Inspiración Personalizada | Sí (en curso) | Motor IA de recomendaciones, caché offline y gestión de errores visible |
+| 26 | flujo-26-blog.md | Blog Interno de Boda | Sí (en curso) | Editor enriquecido, control de versiones y permisos granulares |
+| 27 | flujo-27-momentos.md | Momentos (Álbum Compartido) | No (pendiente, doc 2025-10-13) | Implementar álbum colaborativo, moderación y slideshow QR |
+| 28 | flujo-28-dashboard-planner.md | Dashboard Wedding Planner | Sí (en curso) | Conectar métricas reales, empty states y contenido curado |
+| 29 | flujo-29-upgrade-roles.md | Upgrade de Rol (Owner→Assistant→Planner) | No (definir proceso de pago) | Integrar checkout, límites de bodas y degradación automática |
+| 30 | flujo-30-pagina-inicio.md | Pagina de inicio | No (pendiente, doc 2025-10-13) | Integrar datos reales, fusion con Dashboard y telemetria |
+| 31 | flujo-31-estilo-global.md | Estilo Global | Sí (en curso) | Reutilizar paleta branding en generadores y exponer edición centralizada |
 
 ## Convenciones de numeración
 
@@ -58,4 +67,4 @@ Este documento centraliza la numeración, nombre y estado de implementación de 
 
 ---
 
-> Última actualización: 2025-10-08
+> Última actualización: 2025-10-13

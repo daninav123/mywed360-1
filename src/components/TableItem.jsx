@@ -270,16 +270,14 @@ function TableItem({
     // Sin assignedGuests: devolvemos la lista de invitados por mesa (puede estar vacía)
     return list;
   }, [guests, table.id, table.name, table.assignedGuests]);
+  const tableType = table.tableType || inferTableType(table);
   const seatDots =
-    tableType === 'cocktail' || tableType === 'auxiliary'
-      ? 0
-      : guestsList.length; // mostramos iniciales alrededor
+    tableType === 'cocktail' || tableType === 'auxiliary' ? 0 : guestsList.length; // mostramos iniciales alrededor
   // Tamaño base: diámetro para circular o ancho/alto para rectangular
   const sizeX = table.shape === 'circle' ? table.diameter || 60 : table.width || 80;
   const sizeY =
     table.shape === 'circle' ? table.diameter || 60 : table.height || table.length || 60;
   const disabled = table.enabled === false;
-  const tableType = table.tableType || inferTableType(table);
   const tableColor = disabled
     ? '#e5e7eb'
     : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;

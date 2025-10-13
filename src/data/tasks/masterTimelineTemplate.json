@@ -87,16 +87,26 @@
     },
     {
       "key": "H",
-      "name": "Anillos y Luna de Miel",
+      "name": "Anillos y Joyas",
       "p0": 0.7,
-      "p1": 1.0,
+      "p1": 0.95,
       "items": [
-        "Comprar anillos (se puede hacer pronto, recoger justo antes)",
-        "Planificar luna de miel (eleccion pronto, reservas intermedias, maletas al final)"
+        "Comprar anillos (diseño, tallas y recogida)",
+        "Revisar seguros y mantenimiento de joyas"
       ]
     },
     {
       "key": "I",
+      "name": "Luna de Miel",
+      "p0": 0.75,
+      "p1": 1.05,
+      "items": [
+        "Planificar luna de miel (eleccion del destino, reservas y documentacion)",
+        "Preparar itinerario, maletas y checklist de viaje"
+      ]
+    },
+    {
+      "key": "J",
       "name": "Despues de la Boda",
       "p0": 1.0,
       "p1": 1.05,

@@ -12,6 +12,7 @@ import './utils/consoleCommands';
 // Compat: migración de claves/eventos lovenda_* -> mywed360_*
 import './utils/compatMigration';
 import './index.css';
+import './debug/devServiceWorkerCleanup';
 // Registrar SW solo si PWA está habilitado
 if (import.meta.env?.VITE_ENABLE_PWA === '1') {
   import('./pwa/registerServiceWorker');

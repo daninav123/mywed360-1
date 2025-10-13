@@ -5,7 +5,7 @@
 > Backlog: colaboracion multirol, SEO avanzado (OG/sitemap), dashboard de metricas, historial con diff/undo y biblioteca de prompts compartida.
 
 ## 1. Objetivo y alcance
-- Permitir que owners generen y editen un micrositio publico de la boda en minutos.
+- Permitir que owners, planners y assitants generen y editen un micrositio publico de la boda en minutos.
 - Ofrecer plantillas, prompts y contenido dinamico alimentado por la ficha de la boda.
 - Publicar un sitio responsive con mapa, agenda, transporte, hospedaje y branding personalizado.
 

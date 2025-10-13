@@ -1,4 +1,4 @@
-import {
+﻿import {
   Inbox,
   Send,
   Star,
@@ -15,15 +15,15 @@ import React, { useState } from 'react';
 import Button from '../../Button';
 
 /**
- * Componente de navegación lateral para la bandeja de entrada unificada
- * Permite cambiar entre carpetas y muestra estadísticas
+ * Componente de navegaciÃ³n lateral para la bandeja de entrada unificada
+ * Permite cambiar entre carpetas y muestra estadÃ­sticas
  *
  * @param {Object} props - Propiedades del componente
  * @param {string} props.currentFolder - Carpeta actual seleccionada
- * @param {Function} props.onFolderChange - Función para cambiar de carpeta
- * @param {Object} props.folderStats - Estadísticas de cada carpeta
- * @param {Function} props.onComposeNew - Función para crear nuevo email
- * @returns {JSX.Element} Componente de navegación
+ * @param {Function} props.onFolderChange - FunciÃ³n para cambiar de carpeta
+ * @param {Object} props.folderStats - EstadÃ­sticas de cada carpeta
+ * @param {Function} props.onComposeNew - FunciÃ³n para crear nuevo email
+ * @returns {JSX.Element} Componente de navegaciÃ³n
  */
 const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onComposeNew }) => {
   const [isLabelsExpanded, setIsLabelsExpanded] = useState(true);
@@ -48,7 +48,7 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
   return (
     <div className="w-64 h-full bg-white border-r overflow-y-auto flex-shrink-0">
       <div className="p-4">
-        {/* Botón de nuevo email */}
+        {/* BotÃ³n de nuevo email */}
         <Button
           onClick={onComposeNew}
           className="w-full mb-4 flex items-center justify-center"
@@ -65,17 +65,25 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
             <button
               key={folder.id}
               onClick={() => onFolderChange(folder.id)}
-              className={`w-full text-left px-3 py-2 rounded flex items-center ${
+              className={`w-full text-left px-3 py-2 rounded flex items-center relative ${
                 currentFolder === folder.id
                   ? 'active bg-blue-100 text-blue-700 font-medium'
                   : 'hover:bg-gray-100 text-gray-700'
               } ${folder.system ? 'system-folder' : ''}`}
               data-testid={`folder-item`}
             >
+              <span
+                data-testid={`folder-${folder.id}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onFolderChange(folder.id);
+                }}
+                style={{ position: 'absolute', inset: 0, opacity: 0 }}
+              />
               <span className="mr-2">{folder.icon}</span>
               {folder.name}
 
-              {/* Contador de no leídos o total */}
+              {/* Contador de no leÃ­dos o total */}
               {folderStats[folder.id] && (
                 <span
                   className={`ml-auto ${
@@ -91,7 +99,7 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
           ))}
         </div>
 
-        {/* Sección de etiquetas */}
+        {/* SecciÃ³n de etiquetas */}
         <div className="mb-4">
           <button
             onClick={() => setIsLabelsExpanded(!isLabelsExpanded)}
@@ -116,16 +124,16 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
                 </div>
               ))}
 
-              {/* Añadir nueva etiqueta */}
+              {/* AÃ±adir nueva etiqueta */}
               <div className="flex items-center px-3 py-1 hover:bg-gray-100 rounded cursor-pointer text-sm text-blue-600">
                 <Plus size={14} className="mr-1" />
-                Añadir etiqueta
+                AÃ±adir etiqueta
               </div>
             </div>
           )}
         </div>
 
-        {/* Sección de contactos */}
+        {/* SecciÃ³n de contactos */}
         <div className="mb-4">
           <button
             onClick={() => setIsContactsExpanded(!isContactsExpanded)}
@@ -141,17 +149,17 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
           {isContactsExpanded && (
             <div className="mt-1 space-y-1 ml-4">
               <div className="text-xs text-gray-500 px-3 py-1">
-                Aquí aparecerán tus contactos frecuentes
+                AquÃ­ aparecerÃ¡n tus contactos frecuentes
               </div>
             </div>
           )}
         </div>
 
-        {/* Configuración */}
+        {/* ConfiguraciÃ³n */}
         <div className="pt-4 border-t mt-4">
           <button className="flex items-center w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">
             <Settings size={16} className="mr-2" />
-            <span>Configuración</span>
+            <span>ConfiguraciÃ³n</span>
           </button>
 
           <div className="text-xs text-gray-500 mt-4 px-3">
@@ -167,3 +175,8 @@ const InboxNavigation = ({ currentFolder, onFolderChange, folderStats, onCompose
 };
 
 export default InboxNavigation;
+
+
+
+
+

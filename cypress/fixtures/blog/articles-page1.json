@@ -1,0 +1,38 @@
+[
+  {
+    "id": "blog-001",
+    "title": "Cómo planificar una boda íntima perfecta",
+    "description": "Ideas prácticas para parejas que prefieren celebraciones pequeñas con estilo.",
+    "url": "https://prensa-nupcial.com/articulo/planificar-boda-intima",
+    "image": "https://assets.example.com/blog/intima.jpg",
+    "source": "prensa-nupcial.com",
+    "published": "2025-10-01T09:15:00.000Z"
+  },
+  {
+    "id": "blog-002",
+    "title": "Tendencias florales para 2026",
+    "description": "Arreglos botánicos que dominarán las bodas el próximo año.",
+    "url": "https://floresybodas.es/tendencias-florales-2026",
+    "image": "https://assets.example.com/blog/flores-2026.jpg",
+    "source": "floresybodas.es",
+    "published": "2025-09-28T13:00:00.000Z"
+  },
+  {
+    "id": "blog-003",
+    "title": "Checklist exprés para la semana de la boda",
+    "description": "Todo lo que debes revisar los últimos siete días antes del gran día.",
+    "url": "https://agenda-nupcial.com/checklist-semana-boda",
+    "image": null,
+    "source": "agenda-nupcial.com",
+    "published": "2025-09-20T08:00:00.000Z"
+  },
+  {
+    "id": "blog-004",
+    "title": "Cómo integrar un cóctel de bienvenida inolvidable",
+    "description": "Consejos de mixología para sorprender a tus invitados desde el primer minuto.",
+    "url": "https://prensa-nupcial.com/articulo/coctel-bienvenida",
+    "image": null,
+    "source": "prensa-nupcial.com",
+    "published": "2025-09-18T17:45:00.000Z"
+  }
+]

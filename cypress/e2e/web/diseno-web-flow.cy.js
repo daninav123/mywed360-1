@@ -12,8 +12,10 @@ describe('Flujo 9 - Diseño web y personalización', () => {
   it('genera una vista previa de la web con una plantilla', () => {
     cy.visit('/diseno-web');
 
-    // Seleccionar plantilla "Moderna"
-    cy.contains('.grid div', 'Moderna').click();
+    // Seleccionar plantilla "Moderna" (o equivalente) de forma robusta
+    cy.contains('button', /Moderna/i, { timeout: 10000 })
+      .should('be.visible')
+      .click();
 
     // Escribir prompt y generar
     cy.get('textarea[placeholder*="Describe" i]').type('Página moderna minimalista para una boda en Madrid.');

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+﻿import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { MessageSquare } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -6,6 +6,13 @@ import { toast } from 'react-toastify';
 
 import Spinner from './Spinner';
 import { useAuth } from '../hooks/useAuth';
+import { useWedding } from '../context/WeddingContext';
+import {
+  EVENT_STYLE_OPTIONS,
+  GUEST_COUNT_OPTIONS,
+  FORMALITY_OPTIONS,
+  CEREMONY_TYPE_OPTIONS,
+} from '../config/eventStyles';
 import { post as apiPost } from '../services/apiClient';
 import { getBackendBase } from '../utils/backendBase';
 
@@ -42,6 +49,7 @@ const guessCategory = (title = '') => {
 
 export default function ChatWidget() {
   const { user: _user, getIdToken } = useAuth();
+  const { activeWeddingData } = useWedding();
   const [open, setOpen] = useState(() => {
     const saved = localStorage.getItem('chatOpen');
     return saved ? JSON.parse(saved) : false;
@@ -62,6 +70,33 @@ export default function ChatWidget() {
   });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const eventContext = React.useMemo(() => {
+    if (!activeWeddingData) return null;
+    const profile = activeWeddingData.eventProfile || activeWeddingData.eventProfileSummary || {};
+    const preferences = activeWeddingData.preferences || {};
+    const findLabel = (options, value) => {
+      if (!value) return null;
+      const match = options.find((opt) => opt.value === value);
+      return match ? match.label : value;
+    };
+    const styleValue = preferences.style || profile.style || null;
+    return {
+      weddingId: activeWeddingData.id || null,
+      name: activeWeddingData.name || '',
+      eventType: activeWeddingData.eventType || profile.eventType || 'boda',
+      weddingDate: activeWeddingData.weddingDate || '',
+      location: activeWeddingData.location || '',
+      guestCountRange: profile.guestCountRange || null,
+      guestCountLabel: findLabel(GUEST_COUNT_OPTIONS, profile.guestCountRange || null),
+      formalityLevel: profile.formalityLevel || null,
+      formalityLabel: findLabel(FORMALITY_OPTIONS, profile.formalityLevel || null),
+      ceremonyType: profile.ceremonyType || null,
+      ceremonyLabel: findLabel(CEREMONY_TYPE_OPTIONS, profile.ceremonyType || null),
+      relatedEvents: Array.isArray(profile.relatedEvents) ? profile.relatedEvents : [],
+      style: styleValue || null,
+      styleLabel: findLabel(EVENT_STYLE_OPTIONS, styleValue || null),
+    };
+  }, [activeWeddingData]);
 
   const toggleImportant = (idx) => {
     setMessages((prev) => {
@@ -171,6 +206,58 @@ export default function ChatWidget() {
     }
   };
   /* eslint-enable no-useless-escape */
+
+  const buildLocalFallbackResponse = (text = '', context = null) => {
+    const lower = String(text || '').toLowerCase();
+    const fallback = { extracted: {}, reply: '' };
+    const baseKind =
+      context?.eventType && context.eventType !== 'boda' ? 'evento' : 'boda';
+    const styleLabel = context?.styleLabel || context?.style || '';
+    const descriptorParts = [];
+    if (styleLabel) descriptorParts.push(`de estilo ${styleLabel}`);
+    if (context?.location) descriptorParts.push(`en ${context.location}`);
+    const descriptor = descriptorParts.length ? ` ${descriptorParts.join(' ')}` : '';
+    const subject = `tu ${baseKind}${descriptor}`.trim();
+    const subjectDisplay = subject || 'tu planificación';
+
+    if (!lower.trim()) {
+      fallback.reply = `Puedo orientarte con tareas, invitados, presupuesto o proveedores para ${subjectDisplay}. Cuéntame qué necesitas.`;
+      return fallback;
+    }
+
+    if (/\b(hola|buen[oa]s|saludos)\b/i.test(lower)) {
+      fallback.reply = `¡Hola! Estoy en modo offline temporal, pero puedo guiarte por las secciones de la app para que sigas avanzando con ${subjectDisplay}.`;
+      return fallback;
+    }
+
+    if (lower.includes('proveedor') || lower.includes('fotogra') || lower.includes('catering')) {
+      fallback.reply = `Gestiona proveedores para ${subjectDisplay} desde la sección Proveedores: añade fichas, marca favoritos y compara presupuestos. ¿Quieres que te indique los pasos?`;
+      return fallback;
+    }
+
+    if (lower.includes('presupuesto') || lower.includes('gasto') || lower.includes('dinero')) {
+      fallback.reply = `El panel de Finanzas te permite registrar gastos e ingresos y ver alertas si superas tu presupuesto de ${subjectDisplay}. Abre Finanzas y pulsa "Añadir movimiento".`;
+      return fallback;
+    }
+
+    if (lower.includes('invitad') || lower.includes('rsvp')) {
+      fallback.reply = `Desde Invitados puedes importar listas, registrar confirmaciones y organizar acompañantes para ${subjectDisplay}. También puedes enviar recordatorios por email.`;
+      return fallback;
+    }
+
+    if (lower.includes('mesa') || lower.includes('seating')) {
+      fallback.reply = `Organiza las mesas de ${subjectDisplay} desde Seating Plan: arrastra invitados, detecta huecos y exporta el plano en PDF para tus proveedores.`;
+      return fallback;
+    }
+
+    if (lower.includes('tarea') || lower.includes('pendiente')) {
+      fallback.reply = `El panel de Tareas te permite marcar pendientes, crear recordatorios y coordinarlos con el timeline de ${subjectDisplay}. Revisa la pestaña de tareas para mantener todo al día.`;
+      return fallback;
+    }
+
+    fallback.reply = `El asistente remoto no responde, pero sigo disponible en modo guía. Pregúntame por tareas, invitados, presupuesto o proveedores y te indicaré dónde gestionarlo para ${subjectDisplay}.`;
+    return fallback;
+  };
 
   // Utilidad para aplicar comandos de la IA
   const applyCommands = async (commands = []) => {
@@ -471,18 +558,20 @@ export default function ChatWidget() {
       const resolvedBase = (baseFromEnv || getBackendBase() || '').replace(/\/$/, '');
       const apiBase = resolvedBase || 'http://localhost:4004';
       const resp = await fetch(`${apiBase}/api/ai/search-suppliers?q=${encodeURIComponent(query)}`);
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
       const dataS = await resp.json();
-      if (dataS.results) {
-                localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
-                window.dispatchEvent(new Event('mywed360-suppliers'));
-                toast.success(`Encontrados ${dataS.results.length} proveedores`);
-              } else {
-                toast.info('No se encontraron proveedores');
-{{ ... }}
-              }
-            } catch (err) {
-              toast.error('Error buscando proveedores');
-            }
+      if (Array.isArray(dataS.results) && dataS.results.length) {
+        localStorage.setItem('mywed360Suppliers', JSON.stringify(dataS.results));
+        window.dispatchEvent(new Event('mywed360-suppliers'));
+        toast.success(`Encontrados ${dataS.results.length} proveedores`);
+      } else {
+        toast.info('No se encontraron proveedores');
+      }
+    } catch (err) {
+      toast.error('Error buscando proveedores');
+    }
           }
         } else if (action === 'add') {
           const newId = payload.id || `sup-${Date.now()}`;
@@ -658,18 +747,36 @@ export default function ChatWidget() {
 
       const response = await apiPost(
         '/api/ai/parse-dialog',
-        { text: input, history },
+        { text: input, history, context: eventContext },
         { auth: true }
       );
 
       clearTimeout(timeoutId);
       chatDebug('Duración petición IA:', (performance.now() - fetchStart).toFixed(0), 'ms');
 
-      if (!response.ok) {
-        throw new Error(`Error de API: ${response.status} ${response.statusText}`);
+      let data;
+      if (response.ok) {
+        data = await response.json();
+      } else {
+        let backendFallback = null;
+        try {
+          backendFallback = await response.clone().json();
+        } catch (_) {}
+        const localFallback = buildLocalFallbackResponse(input, eventContext);
+        data = {
+          extracted: backendFallback?.extracted || localFallback.extracted,
+          reply: backendFallback?.reply || localFallback.reply,
+          error: backendFallback?.error || `http_${response.status}`,
+          details: backendFallback?.details || backendFallback?.message || null,
+        };
+        console.warn(
+          '[ChatWidget] Backend IA respondió',
+          response.status,
+          response.statusText,
+          data.error || '(sin detalle)'
+        );
+        toast.warn('El asistente IA usa modo offline temporal.', { autoClose: 2500 });
       }
-
-      const data = await response.json();
 
       // Flag para registrar si se aplicó al menos una acción
       let _anyAction = false;
@@ -847,6 +954,12 @@ export default function ChatWidget() {
         toast.error('Error en la comunicación', { autoClose: 3000 });
       }
 
+      const fallback = buildLocalFallbackResponse(input, eventContext);
+      if (fallback.reply) {
+        const baseText = errMsg?.text ? `${errMsg.text}\n\n${fallback.reply}` : fallback.reply;
+        errMsg = { from: errMsg?.from || 'assistant', text: baseText };
+      }
+
       setMessages((prev) => [...prev, errMsg]);
     } finally {
       clearTimeout(timeoutId);
@@ -921,7 +1034,3 @@ export default function ChatWidget() {
     </>
   );
 }
-
-
-
-

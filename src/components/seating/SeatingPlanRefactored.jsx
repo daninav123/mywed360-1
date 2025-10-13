@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SeatingPlan refactorizado â€“ Componente principal
  */
 import React, { useEffect } from 'react';
@@ -10,20 +10,77 @@ import SeatingGuestDrawer from './SeatingGuestDrawer';
 import SeatingInspectorPanel from './SeatingInspectorPanel';
 import SeatingLibraryPanel from './SeatingLibraryPanel';
 import SeatingPlanCanvas from './SeatingPlanCanvas';
-import SeatingPlanModals from './SeatingPlanModals';
 import SeatingPlanTabs from './SeatingPlanTabs';
 import SeatingPlanToolbar from './SeatingPlanToolbar';
 import SeatingExportWizard from './SeatingExportWizard';
 import SeatingMobileOverlay from './SeatingMobileOverlay';
 import SeatingSmartPanel from './SeatingSmartPanel';
+import SeatingPlanModals from './SeatingPlanModals';
 import { useWedding } from '../../context/WeddingContext';
-// Nota: incluir extensión .js para compatibilidad con resoluciones estrictas en build (Linux)
-import { useSeatingPlan } from '../../hooks/useSeatingPlan.hook.js';
+// Importar vía alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
+import { useSeatingPlan } from '../../hooks/useSeatingPlan';
+
 import { post as apiPost } from '../../services/apiClient';
+
+const AREA_TYPE_META = {
+  boundary: { label: 'Perímetro', color: '#2563eb', order: 1 },
+  aisle: { label: 'Pasillos', color: '#0ea5e9', order: 2 },
+  door: { label: 'Puertas', color: '#16a34a', order: 3 },
+  obstacle: { label: 'Obstáculos', color: '#f97316', order: 4 },
+  stage: { label: 'Escenario', color: '#9333ea', order: 5 },
+  vendor: { label: 'Zona proveedor', color: '#6366f1', order: 6 },
+  kids: { label: 'Área infantil', color: '#f59e0b', order: 7 },
+  free: { label: 'Área libre', color: '#4b5563', order: 8 },
+  default: { label: 'Área', color: '#6b7280', order: 99 },
+};
+
+const AREA_ALIAS = {
+  rectangle: 'obstacle',
+  rect: 'obstacle',
+  square: 'obstacle',
+  line: 'aisle',
+  walkway: 'aisle',
+  path: 'aisle',
+  boundary: 'boundary',
+  perimeter: 'boundary',
+  door: 'door',
+  doorway: 'door',
+  obstacle: 'obstacle',
+  aisle: 'aisle',
+  free: 'free',
+  curve: 'free',
+  stage: 'stage',
+  vendor: 'vendor',
+  suppliers: 'vendor',
+  kids: 'kids',
+  kidsarea: 'kids',
+  play: 'kids',
+};
+
+const resolveAreaType = (area) => {
+  const rawType =
+    typeof area?.type === 'string'
+      ? area.type
+      : typeof area?.semantic === 'string'
+        ? area.semantic
+        : typeof area?.kind === 'string'
+          ? area.kind
+          : typeof area?.label === 'string'
+            ? area.label
+            : null;
+  let normalized = typeof rawType === 'string' ? rawType.trim().toLowerCase() : null;
+  if (!normalized && area && typeof area.drawMode === 'string') {
+    normalized = area.drawMode.trim().toLowerCase();
+  }
+  if (!normalized && Array.isArray(area)) normalized = 'free';
+  if (!normalized) normalized = 'free';
+  normalized = AREA_ALIAS[normalized] || normalized;
+  if (!AREA_TYPE_META[normalized]) return 'free';
+  return normalized;
+};
 
 const SeatingPlanRefactored = () => {
   const { activeWedding } = useWedding();
-  /* ---- estado / funciones principales ---- */
   const {
     tab,
     setTab,
@@ -105,7 +162,11 @@ const SeatingPlanRefactored = () => {
     scoringWeights,
     setScoringWeights,
     smartRecommendations,
+    smartConflictSuggestions,
     smartInsights,
+    executeSmartAction,
+    collaborators,
+    collaborationStatus,
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
@@ -135,12 +196,73 @@ const SeatingPlanRefactored = () => {
       ? hallSize
       : { width: 1800, height: 1200 };
 
+  const uiPrefsKey = React.useMemo(
+    () => `seatingPlan:${activeWedding || 'default'}:ui-prefs`,
+    [activeWedding]
+  );
+
+  const persistUiPrefs = React.useCallback(
+    (patch) => {
+      if (typeof window === 'undefined' || !patch || typeof patch !== 'object') return;
+      try {
+        const currentRaw = window.localStorage.getItem(uiPrefsKey);
+        let base = {};
+        if (currentRaw) {
+          try {
+            const parsed = JSON.parse(currentRaw);
+            if (parsed && typeof parsed === 'object') {
+              base = parsed;
+            }
+          } catch (_) {
+            base = {};
+          }
+        }
+        window.localStorage.setItem(uiPrefsKey, JSON.stringify({ ...base, ...patch }));
+      } catch (_) {}
+    },
+    [uiPrefsKey]
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(uiPrefsKey);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object') return;
+      if (Object.prototype.hasOwnProperty.call(data, 'showRulers')) {
+        setShowRulers(!!data.showRulers);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'showSeatNumbers')) {
+        setShowSeatNumbers(!!data.showSeatNumbers);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'showTables')) {
+        setShowTables(!!data.showTables);
+      }
+    } catch (_) {}
+  }, [uiPrefsKey]);
+
+  useEffect(() => {
+    persistUiPrefs({
+      showRulers,
+      showSeatNumbers,
+      showTables,
+    });
+  }, [showRulers, showSeatNumbers, showTables, persistUiPrefs]);
+
   const isHallReady = Number.isFinite(safeHallSize?.width) && Number.isFinite(safeHallSize?.height);
 
   // Drawer de invitados pendientes y viewport del canvas
   const [guestDrawerOpen, setGuestDrawerOpen] = React.useState(false);
   const [viewport, setViewport] = React.useState({ scale: 1, offset: { x: 0, y: 0 } });
   const [exportWizardOpen, setExportWizardOpen] = React.useState(false);
+  const otherCollaborators = React.useMemo(
+    () =>
+      Array.isArray(collaborators)
+        ? collaborators.filter((member) => !member?.isCurrent)
+        : [],
+    [collaborators]
+  );
   useEffect(() => {
     const updateIsMobile = () => {
       try {
@@ -162,6 +284,31 @@ const SeatingPlanRefactored = () => {
       return [];
     }
   }, [safeGuests]);
+
+  const areaSummary = React.useMemo(() => {
+    if (!Array.isArray(safeAreas) || safeAreas.length === 0) return [];
+    const counts = new Map();
+    safeAreas.forEach((area) => {
+      if (!area) return;
+      const type = resolveAreaType(area);
+      counts.set(type, (counts.get(type) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([type, count]) => {
+        const meta = AREA_TYPE_META[type] || AREA_TYPE_META.default;
+        return {
+          type,
+          count,
+          label: meta.label,
+          color: meta.color,
+          order: meta.order ?? 99,
+        };
+      })
+      .sort((a, b) => {
+        if (a.order !== b.order) return a.order - b.order;
+        return a.label.localeCompare(b.label, 'es');
+      });
+  }, [safeAreas]);
 
   // Invitados asignados a la mesa seleccionada
   const assignedToSelected = React.useMemo(() => {
@@ -626,6 +773,33 @@ const SeatingPlanRefactored = () => {
     [focusTable, handleAssignGuest]
   );
 
+  const handleSmartAction = React.useCallback(
+    (action) => {
+      if (!action) return;
+      if (action.type === 'focus-table') {
+        focusTable(action.tableId);
+        return;
+      }
+      const result = executeSmartAction?.(action);
+      if (result?.ok) {
+        if (action.type === 'reassign') {
+          toast.success(
+            `Invitado reubicado${action.guestName ? `: ${action.guestName}` : ''}`
+          );
+          if (action.toTableId) {
+            focusTable(action.toTableId);
+          }
+        } else if (action.type === 'fix-position') {
+          toast.info('Mesa ajustada dentro del plano');
+          if (action.tableId) focusTable(action.tableId);
+        }
+      } else {
+        toast.error('No se pudo aplicar la acción sugerida');
+      }
+    },
+    [executeSmartAction, focusTable]
+  );
+
   // Desasignar un invitado concreto
   const handleUnassignGuest = React.useCallback(
     (guestId) => {
@@ -824,6 +998,7 @@ const SeatingPlanRefactored = () => {
 
   const libraryPanel = (
     <SeatingLibraryPanel
+      tab={tab}
       drawMode={drawMode}
       onDrawModeChange={setDrawMode}
       onOpenTemplates={handleOpenTemplates}
@@ -839,6 +1014,7 @@ const SeatingPlanRefactored = () => {
       onAddTable={addTable}
       onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
       pendingCount={pendingGuests.length}
+      areaSummary={areaSummary}
     />
   );
 
@@ -995,12 +1171,12 @@ const SeatingPlanRefactored = () => {
             onOpenCeremonyConfig={handleOpenCeremonyConfig}
             onOpenBanquetConfig={handleOpenBanquetConfig}
             onOpenSpaceConfig={handleOpenSpaceConfig}
+            onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
             onOpenBackground={() => setBackgroundOpen(true)}
             onAutoAssign={handleAutoAssignClick}
             onClearBanquet={clearBanquetLayout}
             onOpenTemplates={handleOpenTemplates}
             onOpenExportWizard={() => setExportWizardOpen(true)}
-            snapshots={typeof listSnapshots === 'function' ? listSnapshots() : []}
             onSaveSnapshot={(name) => {
               try {
                 saveSnapshot?.(name);
@@ -1058,9 +1234,11 @@ const SeatingPlanRefactored = () => {
               <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
                 <SeatingSmartPanel
                   recommendations={smartRecommendations}
+                  conflictSuggestions={smartConflictSuggestions}
                   insights={smartInsights}
                   onAssign={handleSmartAssign}
                   onFocusTable={focusTable}
+                  onExecuteAction={handleSmartAction}
                 />
               </div>
             )}
@@ -1076,21 +1254,27 @@ const SeatingPlanRefactored = () => {
                 : 'grid-cols-[18rem_1fr_20rem]'
             } gap-3 px-4 pb-3`}
           >
-            <div className="min-h-0">{libraryPanel}</div>
-            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+            {/* Canvas primero en el DOM para que cy.get('svg') seleccione el lienzo */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white order-2">
               {renderCanvas('h-full')}
             </div>
+            {/* Biblioteca a la izquierda (order-1) */}
+            <div className="min-h-0 order-1">{libraryPanel}</div>
+            {/* Panel inteligente opcional mantiene su posición relativa */}
             {showSmartPanel && (
-              <div className="min-h-0">
+              <div className="min-h-0 order-3">
                 <SeatingSmartPanel
                   recommendations={smartRecommendations}
+                  conflictSuggestions={smartConflictSuggestions}
                   insights={smartInsights}
                   onAssign={handleSmartAssign}
                   onFocusTable={focusTable}
+                  onExecuteAction={handleSmartAction}
                 />
               </div>
             )}
-            <div className="min-h-0">{renderInspector('h-full')}</div>
+            {/* Inspector a la derecha */}
+            <div className={`min-h-0 ${showSmartPanel ? 'order-4' : 'order-3'}`}>{renderInspector('h-full')}</div>
           </div>
         )}
 
@@ -1107,6 +1291,34 @@ const SeatingPlanRefactored = () => {
               {(safeHallSize.height / 100).toFixed(1)} m
             </div>
             <div>Conflictos: {Array.isArray(conflicts) ? conflicts.length : 0}</div>
+            <div className="flex items-center gap-2">
+              <span>Colaboradores:</span>
+              {otherCollaborators.length === 0 ? (
+                <span className="text-gray-500">
+                  {collaborationStatus === 'connecting'
+                    ? 'Conectando…'
+                    : collaborationStatus === 'online'
+                      ? 'Solo tú'
+                      : 'Offline'}
+                </span>
+              ) : (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {otherCollaborators.map((member) => (
+                    <span
+                      key={member.id}
+                      className="px-1.5 py-0.5 rounded-full text-[10px] font-medium text-white shadow-sm"
+                      style={{ backgroundColor: member.color || '#6366f1' }}
+                      title={member.displayName || member.userId || 'Colaborador'}
+                    >
+                      {(member.displayName || member.userId || '?')
+                        .split(' ')
+                        .slice(0, 2)
+                        .join(' ')}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               className={`${isMobile ? 'basis-full mt-1 text-center' : 'ml-auto'} px-2 py-1 border rounded hover:bg-gray-50`}
               onClick={() => setGuestDrawerOpen(true)}
@@ -1123,6 +1335,8 @@ const SeatingPlanRefactored = () => {
           guests={safeGuests}
           selectedTableId={selectedTable?.id}
           onAssignGuest={handleAssignGuest}
+          guidedGuestId={guidedGuestId}
+          onGuideGuest={setGuidedGuestId}
         />
 
         {/* Modales */}

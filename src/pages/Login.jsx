@@ -1,15 +1,31 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
 import { useAuth } from '../hooks/useAuth';
+import { performanceMonitor } from '../services/PerformanceMonitor';
+
+const FORM_ERROR_ID = 'login-form-error';
+const SOCIAL_ERROR_ID = 'login-social-error';
+const INFO_MESSAGE_ID = 'login-info-message';
+
+const VALIDATION_MESSAGES = {
+  missing_email: 'Introduce tu correo electronico.',
+  missing_password: 'Introduce tu contrasena.',
+};
 
 export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login: emailLogin, loginWithProvider, isAuthenticated, isLoading, availableSocialProviders, getProviderLabel } =
-    useAuth();
+  const {
+    login: emailLogin,
+    loginWithProvider,
+    isAuthenticated,
+    isLoading,
+    availableSocialProviders,
+    getProviderLabel,
+  } = useAuth();
 
   const savedEmail =
     typeof window !== 'undefined' ? window.localStorage.getItem('mywed360_login_email') || '' : '';
@@ -17,11 +33,44 @@ export default function Login() {
   const [username, setUsername] = useState(savedEmail);
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(!!savedEmail);
+  const rememberInitial = useRef(!!savedEmail);
   const [formError, setFormError] = useState('');
   const [socialError, setSocialError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [busyProvider, setBusyProvider] = useState(null);
+
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+
+  const loginSource = location?.state?.loginSource || 'direct';
+  const fromPath = location?.state?.from?.pathname || '/home';
+  const safeRedirect = fromPath === '/login' || fromPath === '/' ? '/home' : fromPath;
+
+  useEffect(() => {
+    performanceMonitor?.logEvent?.('login_view', {
+      source: loginSource,
+      remember_pref: rememberInitial.current,
+    });
+  }, [loginSource]);
+
+  const shouldSkipCypressRedirect = () =>
+    typeof window !== 'undefined' &&
+    !!window.Cypress &&
+    window.__MYWED360_DISABLE_LOGIN_REDIRECT__ === true;
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) return;
+    if (shouldSkipCypressRedirect()) return;
+
+    try {
+      const target = safeRedirect;
+      navigate(target, { replace: true });
+    } catch (error) {
+      navigate('/home', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate, safeRedirect]);
 
   const providers = useMemo(() => {
     if (availableSocialProviders && availableSocialProviders.length > 0) {
@@ -30,78 +79,137 @@ export default function Login() {
     return ['google', 'facebook', 'apple'];
   }, [availableSocialProviders]);
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) return;
-
-    try {
-      const fromPath =
-        (location?.state && location.state.from && location.state.from.pathname) || '/home';
-      const safePath = fromPath === '/login' || fromPath === '/' ? '/home' : fromPath;
-      navigate(safePath, { replace: true });
-    } catch (error) {
-      navigate('/home', { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate, location]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const resetFeedback = () => {
     setFormError('');
     setSocialError('');
     setInfoMessage('');
+  };
 
-    if (!username || !password) {
-      setFormError('Introduce tu email y contraseña.');
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    resetFeedback();
+
+    const context = { provider: 'password', remember_me: remember, source: loginSource };
+
+    const issues = [];
+    const trimmedEmail = username.trim();
+    if (!trimmedEmail) issues.push('missing_email');
+    if (!password) issues.push('missing_password');
+
+    performanceMonitor?.logEvent?.('login_submit', {
+      ...context,
+      has_error: issues.length > 0,
+      redirect_to: safeRedirect,
+    });
+
+    if (issues.length > 0) {
+      const firstIssue = issues[0];
+      const message = VALIDATION_MESSAGES[firstIssue] || VALIDATION_MESSAGES.missing_email;
+      setFormError(message);
+      if (firstIssue === 'missing_email') {
+        emailInputRef.current?.focus();
+      } else {
+        passwordInputRef.current?.focus();
+      }
+      performanceMonitor?.logEvent?.('login_failed', {
+        ...context,
+        error_code: firstIssue,
+      });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const result = await emailLogin(username, password, remember);
+      const result = await emailLogin(trimmedEmail, password, remember);
       if (result?.success) {
         if (remember) {
-          window.localStorage.setItem('mywed360_login_email', username);
+          window.localStorage.setItem('mywed360_login_email', trimmedEmail);
         } else {
           window.localStorage.removeItem('mywed360_login_email');
         }
-        navigate('/home');
+
+        performanceMonitor?.logEvent?.('login_success', {
+          ...context,
+          redirect_to: safeRedirect,
+        });
+
+        if (shouldSkipCypressRedirect()) {
+          navigate('/home', { replace: true });
+        } else {
+          navigate(safeRedirect, { replace: true });
+        }
         return;
       }
 
-      setFormError(result?.error || 'Usuario o contraseña inválidos.');
+      const errorCode = result?.code || 'unknown';
+      const message = result?.error || 'Usuario o contrasena invalidos.';
+      setFormError(message);
+      passwordInputRef.current?.focus();
+      performanceMonitor?.logEvent?.('login_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } catch (error) {
-      setFormError(error.message || 'Usuario o contraseña inválidos.');
+      const errorCode = error?.code || 'exception';
+      const message = error?.message || 'Usuario o contrasena invalidos.';
+      setFormError(message);
+      performanceMonitor?.logEvent?.('login_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleSocialLogin = async (providerKey) => {
-    setFormError('');
-    setSocialError('');
-    setInfoMessage('');
+    resetFeedback();
     setBusyProvider(providerKey);
+
+    const providerName = getProviderLabel?.(providerKey) || providerKey;
+    const context = { provider: providerKey, remember_me: remember, source: loginSource };
+
+    performanceMonitor?.logEvent?.('social_login_submit', context);
 
     try {
       const result = await loginWithProvider(providerKey, {});
       if (result?.success) {
+        if (remember && result.user?.email) {
+          window.localStorage.setItem('mywed360_login_email', result.user.email);
+        }
+
         if (result.pendingRedirect) {
-          const providerName = getProviderLabel?.(providerKey) || providerKey;
-          setInfoMessage(`Continúa el inicio de sesión en la ventana de ${providerName}.`);
+          performanceMonitor?.logEvent?.('social_login_redirect', context);
+          setInfoMessage(`Continua el inicio de sesion en la ventana de ${providerName}.`);
         } else {
-          if (remember && result.user?.email) {
-            window.localStorage.setItem('mywed360_login_email', result.user.email);
+          performanceMonitor?.logEvent?.('social_login_completed', {
+            ...context,
+            redirect_to: safeRedirect,
+          });
+          if (shouldSkipCypressRedirect()) {
+            navigate('/home', { replace: true });
+          } else {
+            navigate(safeRedirect, { replace: true });
           }
-          navigate('/home');
         }
         return;
       }
 
-      const providerName = getProviderLabel?.(providerKey) || providerKey;
-      setSocialError(result?.error || `No se pudo iniciar sesión con ${providerName}.`);
+      const errorCode = result?.code || 'unknown';
+      const message = result?.error || `No se pudo iniciar sesion con ${providerName}.`;
+      setSocialError(message);
+      performanceMonitor?.logEvent?.('social_login_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } catch (error) {
-      const providerName = getProviderLabel?.(providerKey) || providerKey;
-      setSocialError(error.message || `No se pudo iniciar sesión con ${providerName}.`);
+      const errorCode = error?.code || 'exception';
+      const message = error?.message || `No se pudo iniciar sesion con ${providerName}.`;
+      setSocialError(message);
+      performanceMonitor?.logEvent?.('social_login_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } finally {
       setBusyProvider(null);
     }
@@ -114,32 +222,31 @@ export default function Login() {
           <div className="hidden bg-[color:var(--color-primary,#6366f1)]/10 p-10 md:flex md:flex-col md:justify-between">
             <div>
               <h2 className="text-3xl font-bold text-[color:var(--color-primary,#6366f1)]">
-                Gestiona todo desde un único panel
+                Gestiona todo desde un unico panel
               </h2>
               <p className="mt-4 text-base text-[color:var(--color-primary-dark,#4338ca)]/80">
-                Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el
-                progreso del evento y coordina a todo tu equipo.
+                Accede a tus invitados, tareas, presupuestos y documentos en segundos. Sigue el progreso del evento y coordina a todo tu equipo.
               </p>
             </div>
             <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark,#4338ca)]/80">
-              <li>• Sincroniza proveedores y contratos.</li>
-              <li>• Automatiza correos y recordatorios personalizados.</li>
-              <li>• Recibe alertas cuando algo requiera tu atención.</li>
+              <li>- Sincroniza proveedores y contratos.</li>
+              <li>- Automatiza correos y recordatorios personalizados.</li>
+              <li>- Recibe alertas cuando algo requiera tu atencion.</li>
             </ul>
           </div>
 
           <div className="p-8 sm:p-10">
             <h1 className="text-2xl font-semibold text-[color:var(--color-text,#111827)]">
-              Inicia sesión
+              Inicia sesion
             </h1>
             <p className="mt-2 text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              Usa tu email y contraseña o accede con un proveedor social.
+              Usa tu correo y contrasena o accede con un proveedor social.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
               <div className="space-y-2">
                 <label htmlFor="login-email" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
-                  Correo electrónico
+                  Correo electronico
                 </label>
                 <input
                   id="login-email"
@@ -149,22 +256,28 @@ export default function Login() {
                   placeholder="tu@email.com"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
+                  ref={emailInputRef}
+                  aria-invalid={formError ? 'true' : 'false'}
+                  aria-describedby={formError ? FORM_ERROR_ID : undefined}
                   className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
                 />
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="login-password" className="text-sm font-medium text-[color:var(--color-text,#111827)]">
-                  Contraseña
+                  Contrasena
                 </label>
                 <input
                   id="login-password"
                   type="password"
                   data-testid="password-input"
                   autoComplete="current-password"
-                  placeholder="Tu contraseña"
+                  placeholder="Tu contrasena"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
+                  ref={passwordInputRef}
+                  aria-invalid={formError ? 'true' : 'false'}
+                  aria-describedby={formError ? FORM_ERROR_ID : undefined}
                   className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary,#6366f1)]"
                 />
               </div>
@@ -176,24 +289,26 @@ export default function Login() {
                     id="remember"
                     checked={remember}
                     onChange={(event) => {
-                      setRemember(event.target.checked);
-                      if (!event.target.checked) {
+                      const isChecked = event.target.checked;
+                      setRemember(isChecked);
+                      if (!isChecked) {
                         window.localStorage.removeItem('mywed360_login_email');
                       }
                     }}
                     className="rounded border-soft text-[color:var(--color-primary,#6366f1)] focus:ring-[color:var(--color-primary,#6366f1)]"
                   />
-                  Recuérdame
+                  Recuerdame
                 </label>
-                <Link
-                  to="/reset-password"
-                  className="text-[color:var(--color-primary,#6366f1)] hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
+                <Link to="/reset-password" className="text-[color:var(--color-primary,#6366f1)] hover:underline">
+                  Olvidaste tu contrasena?
                 </Link>
               </div>
 
-              {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
+              {formError ? (
+                <p id={FORM_ERROR_ID} role="alert" aria-live="assertive" className="text-sm text-red-600">
+                  {formError}
+                </p>
+              ) : null}
 
               <button
                 type="submit"
@@ -201,11 +316,11 @@ export default function Login() {
                 disabled={isSubmitting}
                 className="w-full rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] transition-colors hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isSubmitting ? 'Entrando…' : 'Entrar'}
+                {isSubmitting ? 'Entrando...' : 'Entrar'}
               </button>
             </form>
 
-            <AuthDivider label="o continúa con" />
+            <AuthDivider label="o continua con" />
 
             <SocialLoginButtons
               providers={providers}
@@ -215,21 +330,33 @@ export default function Login() {
             />
 
             {socialError ? (
-              <p className="mt-3 text-center text-sm text-red-600">{socialError}</p>
+              <p
+                id={SOCIAL_ERROR_ID}
+                role="alert"
+                aria-live="assertive"
+                className="mt-3 text-center text-sm text-red-600"
+              >
+                {socialError}
+              </p>
             ) : null}
             {infoMessage ? (
-              <p className="mt-3 text-center text-sm text-[color:var(--color-primary,#6366f1)]">
+              <p
+                id={INFO_MESSAGE_ID}
+                role="status"
+                aria-live="polite"
+                className="mt-3 text-center text-sm text-[color:var(--color-primary,#6366f1)]"
+              >
                 {infoMessage}
               </p>
             ) : null}
 
             <p className="mt-6 text-center text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              ¿No tienes cuenta?{' '}
+              No tienes cuenta?{' '}
               <Link
                 to="/signup"
                 className="font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
               >
-                Regístrate
+                Registrate
               </Link>
             </p>
           </div>

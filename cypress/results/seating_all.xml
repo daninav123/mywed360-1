@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="12.475" tests="1" failures="0">
+  <testsuite name="Root Suite" timestamp="2025-10-12T20:58:25" tests="0" file="cypress\e2e\seating\seating_toasts.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Seating Plan - Toasts E2E" timestamp="2025-10-12T20:58:25" tests="1" time="12.462" failures="0">
+    <testcase name="Seating Plan - Toasts E2E muestra toast al guardar dimensiones del espacio" time="11.694" classname="muestra toast al guardar dimensiones del espacio">
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,32 +1,68 @@
-// Notifications service – interacts with backend API (Express + Firestore)
+﻿// Notifications service â€“ interacts with backend API (Express + Firestore)
 // Notification: { id, type, message, date, read, providerId?, trackingId?, dueDate?, action? }
 
 import { auth } from '../firebaseConfig';
 import { get as apiGet, post as apiPost, del as apiDel } from './apiClient';
 
-// Sistema de autenticación unificado (inyectado desde useAuth)
+// Sistema de autenticaciÃ³n unificado (inyectado desde useAuth)
 let authContext = null;
 
-// Permite registrar el contexto de autenticación desde el proveedor
+// Permite registrar el contexto de autenticaciÃ³n desde el proveedor
 export const setAuthContext = (context) => {
   authContext = context;
 };
 
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:4004';
+const TOKEN_STORAGE_KEY = 'mw360_auth_token';
+const FORCE_MOCK_DEFAULT =
+  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
 
-// Obtiene el token de autenticación del usuario actual (prioriza sistema unificado)
+const getStoredToken = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.localStorage.getItem(TOKEN_STORAGE_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+
+const rememberToken = (token) => {
+  if (!token || typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } catch {}
+};
+
+const buildMockToken = (user) => {
+  if (!user) return null;
+  const email = user.email || 'user@local.dev';
+  return `mock-${user.uid || 'anon'}-${email}`;
+};
+
+// Obtiene el token de autenticaciÃ³n del usuario actual (prioriza sistema unificado)
 async function getAuthToken() {
   try {
-    // 1) Priorizar el sistema de autenticación unificado
-    if (authContext && authContext.getIdToken) {
+    // 1) Priorizar el sistema de autenticaciÃ³n unificado
+    if (authContext && authContext.getIdToken && !FORCE_MOCK_DEFAULT) {
       const token = await authContext.getIdToken();
       if (token) return token;
     }
 
-    // 2) Fallback: Firebase si está disponible
+    // 2) Fallback: Firebase si estÃ¡ disponible
     const user = auth.currentUser;
-    if (user && user.getIdToken) {
+    if (user && user.getIdToken && !FORCE_MOCK_DEFAULT) {
       return await user.getIdToken();
+    }
+
+    if ((authContext && authContext.currentUser) || user) {
+      const ctxUser = authContext?.currentUser || user;
+      if (ctxUser) {
+        const email = ctxUser.email || 'user@local.dev';
+        const uid = ctxUser.uid || 'anon';
+        const mockToken = `mock-${uid}-${email}`;
+        rememberToken(mockToken);
+        return mockToken;
+      }
     }
 
     // 3) Fallback: token mock si tenemos usuario en el contexto
@@ -35,7 +71,7 @@ async function getAuthToken() {
     }
     return null;
   } catch (error) {
-    console.warn('Error obteniendo token de autenticación:', error);
+    console.warn('Error obteniendo token de autenticaciÃ³n:', error);
     return null;
   }
 }
@@ -122,7 +158,7 @@ export function isQuietHoursActive(date = new Date(), quiet = getNotificationPre
 }
 
 /**
- * Determina si se debe notificar según preferencias y prioridad
+ * Determina si se debe notificar segÃºn preferencias y prioridad
  * @param {Object} evt { type, subtype, priority='normal', channel='toast', when=Date }
  * @param {Object} prefs preferencias opcionales (si no, se cargan)
  */
@@ -137,9 +173,9 @@ export function shouldNotify(evt, prefs = null) {
     if (!(priority === 'critical' && p.quietHours?.allowCritical)) return false;
   }
 
-  // categorías
+  // categorÃ­as
   const cat = (p.categories && p.categories[type]) || null;
-  if (!cat) return true; // si no existe categoría, permitir
+  if (!cat) return true; // si no existe categorÃ­a, permitir
   if (subtype && Object.prototype.hasOwnProperty.call(cat, mapSubtypeKey(type, subtype))) {
     return !!cat[mapSubtypeKey(type, subtype)];
   }
@@ -161,6 +197,12 @@ function mapSubtypeKey(type, subtype) {
 }
 
 export async function getNotifications() {
+  if (FORCE_MOCK_DEFAULT) {
+    const local = loadLocalNotifications();
+    const unreadCount = local.filter((n) => !n.read).length;
+    return { notifications: local, unreadCount };
+  }
+
   try {
     const headers = await authHeader();
     if (!headers || !headers.Authorization) {
@@ -168,17 +210,18 @@ export async function getNotifications() {
       const unreadCount = local.filter((n) => !n.read).length;
       return { notifications: local, unreadCount };
     }
-    const res = await apiGet('/api/notifications', { headers });
+    const res = await apiGet('/api/notifications', { headers, silent: true });
     if (!res.ok) throw new Error('Error fetching notifications');
     const arr = await res.json();
     const notifications = (Array.isArray(arr) ? arr : []).map((n) => ({
       ...n,
+      payload: n && typeof n.payload === 'object' && n.payload !== null ? n.payload : {},
       timestamp: n.date || n.createdAt || n.time || new Date().toISOString(),
     }));
     const unreadCount = notifications.filter((n) => !n.read).length;
     return { notifications, unreadCount };
   } catch (error) {
-    // Silenciar 401/primer arranque sin token; devolver vacío/local
+    // Silenciar 401/primer arranque sin token; devolver vacÃ­o/local
     try {
       const local = loadLocalNotifications();
       const unreadCount = local.filter((n) => !n.read).length;
@@ -190,41 +233,68 @@ export async function getNotifications() {
 }
 
 export async function addNotification(notification) {
-  const { type = 'info', message, providerId, trackingId, dueDate, action } = notification;
+  if (!notification || !notification.message) {
+    throw new Error('notification message required');
+  }
+  const {
+    type = 'info',
+    message,
+    providerId,
+    trackingId,
+    dueDate,
+    action,
+    payload: inputPayload,
+    weddingId,
+    severity,
+    category,
+    source,
+    ...rest
+  } = notification;
+
+  const payload = {
+    ...(inputPayload || {}),
+  };
+
+  const assignIf = (key, value) => {
+    if (value !== undefined && value !== null && !(key in payload)) {
+      payload[key] = value;
+    }
+  };
+
+  assignIf('providerId', providerId);
+  assignIf('trackingId', trackingId);
+  assignIf('dueDate', dueDate);
+  assignIf('action', action);
+  assignIf('weddingId', weddingId || rest.wid || rest.eventId);
+  assignIf('severity', severity);
+  assignIf('category', category);
+  assignIf('source', source);
+
+  // Preserve any extra primitive fields for backwards compatibility
+  for (const [key, value] of Object.entries(rest)) {
+    if (payload[key] === undefined && typeof value !== 'function') {
+      payload[key] = value;
+    }
+  }
+
+  const body = {
+    type,
+    message,
+    payload,
+    date: new Date().toISOString(),
+    read: false,
+  };
 
   try {
-    const res = await apiPost(
-      '/api/notifications',
-      {
-        type,
-        message,
-        providerId,
-        trackingId,
-        dueDate,
-        action,
-        date: new Date().toISOString(),
-        read: false,
-      },
-      { headers: await authHeader({}) }
-    );
-
+    const res = await apiPost('/api/notifications', body, { headers: await authHeader({}) });
     if (!res.ok) throw new Error('Error adding notification');
     const notif = await res.json();
-    window.dispatchEvent(new CustomEvent('mywed360-notif', { detail: { id: notif.id } }));
-    return notif;
+    const enriched = { ...notif, payload };
+    window.dispatchEvent(new CustomEvent('mywed360-notif', { detail: { id: enriched.id } }));
+    return enriched;
   } catch (error) {
     console.error('Error adding notification:', error);
-    // Modo fallback: guardar notificación en localStorage
-    return addLocalNotification({
-      type,
-      message,
-      providerId,
-      trackingId,
-      dueDate,
-      action,
-      date: new Date().toISOString(),
-      read: false,
-    });
+    return addLocalNotification(body);
   }
 }
 
@@ -236,7 +306,7 @@ export async function markNotificationRead(id) {
     return res.json();
   } catch (error) {
     console.error('Error marking notification as read:', error);
-    // Modo fallback: marcar como leída en localStorage
+    // Modo fallback: marcar como leÃ­da en localStorage
     return markLocalNotificationRead(id);
   }
 }
@@ -246,7 +316,7 @@ export async function deleteNotification(id) {
     const headers = await authHeader();
     const res = await apiDel(`/api/notifications/${id}`, { headers });
     if (!res.ok) throw new Error('Error deleting notification');
-    // Eliminar también de localStorage por si acaso
+    // Eliminar tambiÃ©n de localStorage por si acaso
     deleteLocalNotification(id);
     return true;
   } catch (error) {
@@ -306,14 +376,24 @@ export async function createUrgentTrackingAlert(provider, tracking, reason) {
     providerId: provider.id,
     trackingId: tracking.id,
     action: 'viewTracking',
+    weddingId: provider?.weddingId || tracking?.weddingId || tracking?.weddingID || null,
+    category: 'providers',
+    severity: 'high',
+    source: 'provider_tracking',
+    payload: {
+      weddingId: provider?.weddingId || tracking?.weddingId || null,
+      providerId: provider?.id,
+      trackingId: tracking?.id,
+      reason,
+    },
   });
 }
 
 /**
- * Crea un recordatorio automático para un proveedor según fecha
+ * Crea un recordatorio automÃ¡tico para un proveedor segÃºn fecha
  * @param {Object} provider - El proveedor para el cual crear el recordatorio
- * @param {Date} dueDate - Fecha límite del recordatorio
- * @param {string} title - Título del recordatorio
+ * @param {Date} dueDate - Fecha lÃ­mite del recordatorio
+ * @param {string} title - TÃ­tulo del recordatorio
  */
 export async function createProviderReminder(provider, dueDate, title) {
   return addNotification({
@@ -322,21 +402,31 @@ export async function createProviderReminder(provider, dueDate, title) {
     providerId: provider.id,
     dueDate: dueDate.toISOString(),
     action: 'viewProvider',
+    weddingId: provider?.weddingId || null,
+    category: 'providers',
+    severity: 'medium',
+    source: 'provider_reminder',
+    payload: {
+      weddingId: provider?.weddingId || null,
+      providerId: provider?.id,
+      dueDate: dueDate.toISOString(),
+      title,
+    },
   });
 }
 
 /**
- * Verifica y genera notificaciones automáticas basadas en registros de seguimiento
+ * Verifica y genera notificaciones automÃ¡ticas basadas en registros de seguimiento
  * @param {Array} trackingRecords - Lista de registros de seguimiento
  * @param {Array} providers - Lista de proveedores
  */
 export function generateTrackingNotifications(trackingRecords, providers) {
-  // Comprobar seguimientos urgentes (sin respuesta tras 7 días)
+  // Comprobar seguimientos urgentes (sin respuesta tras 7 dÃ­as)
   const now = new Date();
   const sevenDaysAgo = new Date(now);
   sevenDaysAgo.setDate(now.getDate() - 7);
 
-  // Filtrar seguimientos pendientes sin actualización por más de 7 días
+  // Filtrar seguimientos pendientes sin actualizaciÃ³n por mÃ¡s de 7 dÃ­as
   const urgentTrackings = trackingRecords.filter((track) => {
     if (track.status !== 'Pendiente' && track.status !== 'Esperando respuesta') {
       return false;
@@ -351,15 +441,15 @@ export function generateTrackingNotifications(trackingRecords, providers) {
     // Buscar el proveedor correspondiente
     const provider = providers.find((p) => p.id === tracking.providerId);
     if (provider) {
-      createUrgentTrackingAlert(provider, tracking, 'Sin respuesta por más de 7 días');
+      createUrgentTrackingAlert(provider, tracking, 'Sin respuesta por mÃ¡s de 7 dÃ­as');
     }
   });
 
-  // Comprobar seguimientos próximos a vencer (recordatorios a 3 días)
+  // Comprobar seguimientos prÃ³ximos a vencer (recordatorios a 3 dÃ­as)
   const threeDaysFromNow = new Date(now);
   threeDaysFromNow.setDate(now.getDate() + 3);
 
-  // Filtrar seguimientos con fecha límite próxima
+  // Filtrar seguimientos con fecha lÃ­mite prÃ³xima
   const upcomingTrackings = trackingRecords.filter((track) => {
     if (!track.dueDate) return false;
 
@@ -370,7 +460,7 @@ export function generateTrackingNotifications(trackingRecords, providers) {
     return isToday || isInThreeDays;
   });
 
-  // Generar recordatorios para seguimientos próximos
+  // Generar recordatorios para seguimientos prÃ³ximos
   upcomingTrackings.forEach((tracking) => {
     const provider = providers.find((p) => p.id === tracking.providerId);
     if (provider) {
@@ -380,7 +470,7 @@ export function generateTrackingNotifications(trackingRecords, providers) {
       createProviderReminder(
         provider,
         dueDate,
-        isToday ? 'Seguimiento vence HOY' : 'Seguimiento próximo a vencer'
+        isToday ? 'Seguimiento vence HOY' : 'Seguimiento prÃ³ximo a vencer'
       );
     }
   });
@@ -394,12 +484,12 @@ export function generateTrackingNotifications(trackingRecords, providers) {
 // =============== EMAIL NOTIFICATIONS ===============
 
 /**
- * Muestra una notificación en la interfaz de usuario
- * @param {Object} notification - Configuración de la notificación
- * @param {string} notification.title - Título de la notificación
- * @param {string} notification.message - Mensaje de la notificación
- * @param {string} notification.type - Tipo de notificación (success, error, info, warning)
- * @param {number} notification.duration - Duración en ms (opcional, por defecto 3000ms)
+ * Muestra una notificaciÃ³n en la interfaz de usuario
+ * @param {Object} notification - ConfiguraciÃ³n de la notificaciÃ³n
+ * @param {string} notification.title - TÃ­tulo de la notificaciÃ³n
+ * @param {string} notification.message - Mensaje de la notificaciÃ³n
+ * @param {string} notification.type - Tipo de notificaciÃ³n (success, error, info, warning)
+ * @param {number} notification.duration - DuraciÃ³n en ms (opcional, por defecto 3000ms)
  */
 export function showNotification({ title, message, type = 'info', duration = 3000, actions = [] }) {
   // Crear evento personalizado para el sistema de notificaciones
@@ -410,11 +500,11 @@ export function showNotification({ title, message, type = 'info', duration = 300
   // Disparar evento para que lo capture el componente de notificaciones
   window.dispatchEvent(event);
 
-  // También registrar en consola para desarrollo
+  // TambiÃ©n registrar en consola para desarrollo
   console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
 }
 
-// Marcar todas como leídas (best-effort)
+// Marcar todas como leÃ­das (best-effort)
 export async function markAllAsRead() {
   try {
     const { notifications } = await getNotifications();
@@ -433,16 +523,25 @@ export async function markAllAsRead() {
 }
 
 /**
- * Crea una notificación relacionada con un nuevo email recibido
+ * Crea una notificaciÃ³n relacionada con un nuevo email recibido
  * @param {Object} email - Datos del email recibido
  */
 export async function createNewEmailNotification(email) {
-  // Añadir al sistema de notificaciones
+  // AÃ±adir al sistema de notificaciones
   await addNotification({
     type: 'info',
     message: `Nuevo email de ${email.from}: ${email.subject || '(Sin asunto)'}`,
     action: 'viewEmail',
     emailId: email.id,
+    weddingId: email?.weddingId || email?.weddingID || null,
+    category: 'email',
+    severity: 'low',
+    source: 'email_inbox',
+    payload: {
+      weddingId: email?.weddingId || null,
+      emailId: email?.id,
+      folder: email?.folder,
+    },
   });
 
   // Mostrar toast inmediato
@@ -455,16 +554,16 @@ export async function createNewEmailNotification(email) {
 }
 
 /**
- * Genera notificaciones para emails importantes o que requieren acción
+ * Genera notificaciones para emails importantes o que requieren acciÃ³n
  * @param {Array} emails - Lista de emails para analizar
  */
 export function generateEmailNotifications(emails) {
   if (!emails || !emails.length) return { count: 0 };
 
-  // Filtrar emails no leídos
+  // Filtrar emails no leÃ­dos
   const unreadEmails = emails.filter((email) => !email.read);
 
-  // Notificar sobre emails no leídos (respetar preferencias)
+  // Notificar sobre emails no leÃ­dos (respetar preferencias)
   try {
     if (
       unreadEmails.length > 0 &&
@@ -478,7 +577,7 @@ export function generateEmailNotifications(emails) {
     }
   } catch {}
 
-  // Filtrar emails importantes y no leídos para notificaciones persistentes
+  // Filtrar emails importantes y no leÃ­dos para notificaciones persistentes
   const importantUnread = unreadEmails.filter(
     (email) => email.folder === 'important' || email.subject?.toLowerCase().includes('urgente')
   );
@@ -490,6 +589,15 @@ export function generateEmailNotifications(emails) {
       message: `Email importante: ${email.subject || '(Sin asunto)'}`,
       action: 'viewEmail',
       emailId: email.id,
+      weddingId: email?.weddingId || null,
+      category: 'email',
+      severity: 'high',
+      source: 'email_inbox',
+      payload: {
+        weddingId: email?.weddingId || null,
+        emailId: email?.id,
+        folder: email?.folder,
+      },
     });
   });
 
@@ -505,7 +613,11 @@ export function generateEmailNotifications(emails) {
 function loadLocalNotifications() {
   try {
     const notifications = JSON.parse(localStorage.getItem('mywed360_notifications') || '[]');
-    return notifications;
+    if (!Array.isArray(notifications)) return [];
+    return notifications.map((n) => ({
+      ...n,
+      payload: n && typeof n.payload === 'object' && n.payload !== null ? n.payload : {},
+    }));
   } catch (e) {
     console.error('Error loading local notifications:', e);
     return [];
@@ -526,6 +638,10 @@ function addLocalNotification(notification) {
   const notifications = loadLocalNotifications();
   const newNotification = {
     ...notification,
+    payload:
+      notification && typeof notification.payload === 'object' && notification.payload !== null
+        ? notification.payload
+        : {},
     id: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
   };
 
@@ -558,4 +674,3 @@ function deleteLocalNotification(id) {
   saveLocalNotifications(updatedNotifications);
   return true;
 }
-

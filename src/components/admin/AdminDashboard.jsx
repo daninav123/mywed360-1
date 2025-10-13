@@ -13,6 +13,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import { get as apiGet } from '../../services/apiClient';
+import { getAdminHeaders, getAdminSessionToken } from '../../services/adminSession';
 
 /**
  * Panel de administración principal
@@ -57,7 +58,12 @@ const AdminDashboard = () => {
     const loadSummary = async () => {
       try {
         const metricsEndpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(`${metricsEndpoint}/dashboard`, { auth: true, silent: true });
+        const adminToken = getAdminSessionToken();
+        const res = await apiGet(`${metricsEndpoint}/dashboard`, {
+          auth: adminToken ? false : true,
+          silent: true,
+          headers: getAdminHeaders(),
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (!cancelled) setMetricsSummary({ ...data, error: null });
@@ -281,4 +287,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

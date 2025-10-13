@@ -42,7 +42,7 @@ export default function Modal({
         {...rest}
       >
         <div className="flex justify-between items-center px-4 pt-4 pb-3 border-b border-soft">
-          <h2 className="text-lg font-semibold leading-none">{title}</h2>
+          <h3 className="text-lg font-semibold leading-none">{title}</h3>
           <button
             onClick={onClose}
             aria-label="Cerrar"

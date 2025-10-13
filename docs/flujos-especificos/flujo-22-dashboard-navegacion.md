@@ -21,7 +21,7 @@
 2. Navegacion secundaria
    - Menu lateral/encabezado con accesos a todos los flujos.
    - `More.jsx` agrupa enlaces secundarios: soporte, tutoriales, FAQ, comunidad.
-   - Buscador global (pendiente) para saltar a vistas especificas.
+   - Buscador global (pendiente). Nota 2025-10-12: el componente `GlobalSearch` solo aparece en desktop (header) y se abre con botón, sin atajos (Ctrl/Cmd+K).
 3. Perfil y configuraciones
    - Actualizar datos personales, idioma, zona horaria y opciones de privacidad.
    - Gestion de sesiones activas y cierre de sesion forzado.
@@ -77,3 +77,26 @@
 - Buscador global y comandos rapidos.
 - Integracion con analytics para recomendaciones personalizadas.
 - Panel de salud del sistema (sincronizacion, errores recientes).
+
+## 12. Plan de QA incremental (2025-10-12)
+### Estado actual verificado
+- `HomePage.jsx` muestra el progreso de checklist y la información de `GamificationPanel` dentro de la misma tarjeta, ocultando el panel cuando no hay datos de gamificación disponibles; aún carece de widgets configurables o métricas en vivo.
+- `Dashboard.jsx` funciona con widgets drag-and-drop pero la aplicación no navega a este layout por defecto (landing usa `HomePage`).
+- `GlobalSearch` requiere click manual; no hay shortcuts ni resultados mockeados para tests.
+- Herramientas de diagnóstico (`DevEnsureFinance`, `DevSeedGuests`) están ocultas en builds por defecto; no hay panel único ni métricas UI visibles.
+
+### Experiencia mínima a construir
+- Definir vista principal (Home vs Dashboard) y asegurar ruta con contenido testable (widgets con `data-testid`).
+- Exponer menú o botón para abrir herramientas de diagnóstico con métricas básicas (ej. totales finance/guests) visibles en DOM.
+- Añadir shortcut accesible (`Ctrl/Cmd+K`) para `GlobalSearch` y resultados deterministas en modo E2E.
+- Identificar breadcrumbs o breadcrumbs virtuales (`data-testid="breadcrumb"`) en cada navegación crítica (Home, Tasks, Finance, More).
+
+### Criterios de prueba E2E propuestos
+1. `main-navigation`: tocar botones Home → Tasks → Finance → More comprobando highlight activo y breadcrumb actualizado.
+2. `global-search-shortcuts`: enviar `cy.realPress(['ctrl','k'])`, escribir término mock y navegar al primer resultado asegurando ruta correcta.
+3. `diagnostic-panel`: abrir panel dev, validar presencia de métricas (`data-testid="diag-total-guests"` etc.) y cerrarlo.
+
+### Dependencias técnicas
+- Helper Cypress (`cy.openGlobalSearch()`) que simule atajo; requiere listeners en `GlobalSearch`.
+- Fixtures o MSW para popular `GlobalSearch` y widgets sin depender de Firestore real.
+- Flag `VITE_ENABLE_DEV_TOOLS` expuesto en entorno de prueba para mostrar panel de diagnóstico.

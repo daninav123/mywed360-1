@@ -1,9 +1,6 @@
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
-import { db, auth } from '../firebaseConfig';
 import { useAuth } from './useAuth';
 
 /**
@@ -16,7 +13,7 @@ import { useAuth } from './useAuth';
  */
 export const useOnboarding = () => {
   const { currentUser } = useAuth();
-  const { weddings, activeWedding } = useWedding();
+  const { weddings, activeWedding, weddingsReady } = useWedding();
   // Si existe flag en localStorage, mostramos onboarding sí o sí
   const forceFlag =
     typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
@@ -26,53 +23,52 @@ export const useOnboarding = () => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // DESHABILITAR TEMPORALMENTE Firebase onboarding checks
+  // Decidir si mostrar onboarding en función del estado del usuario y sus bodas
   useEffect(() => {
-    // MODO OFFLINE TEMPORAL: Solo usar localStorage hasta que se solucionen los permisos
-    const checkOnboardingStatus = (user) => {
-      // Si hay flag forzado, mostrar onboarding
-      if (forceFlag) {
-        setShowOnboarding(true);
-        setLoading(false);
-        return;
-      }
-
-      // Si no hay usuario, no mostrar onboarding
-      if (!user || !user.uid) {
-        setShowOnboarding(false);
-        setLoading(false);
-        return;
-      }
-
-      // Solo usar localStorage - NO Firebase por ahora
-      const localOnboardingKey = `onboarding_completed_${user.uid}`;
-      const localCompleted = localStorage.getItem(localOnboardingKey);
-
-      if (localCompleted === 'true') {
-        setOnboardingCompleted(true);
-        setShowOnboarding(false);
-      } else {
-        // Primera vez o no completado
-        setOnboardingCompleted(false);
-        setShowOnboarding(true);
-      }
-
+    if (forceFlag) {
+      setShowOnboarding(true);
+      setOnboardingCompleted(false);
       setLoading(false);
-    };
+      return;
+    }
 
-    // Usar onAuthStateChanged pero sin consultas a Firebase
-    const unsubscribe = onAuthStateChanged(auth, checkOnboardingStatus);
+    if (!currentUser?.uid) {
+      setShowOnboarding(false);
+      setOnboardingCompleted(false);
+      setLoading(false);
+      return;
+    }
 
-    return () => unsubscribe();
-  }, [forceFlag]);
+    if (!weddingsReady) {
+      // Esperar a que el listado de bodas esté resuelto
+      setLoading(true);
+      return;
+    }
 
-  // Si ya hay una boda cargada, consideramos el onboarding completado
-  useEffect(() => {
-    if (!forceFlag && (weddings.length > 0 || activeWedding)) {
+    const hasWedding =
+      (Array.isArray(weddings) && weddings.length > 0) || Boolean(activeWedding);
+
+    if (hasWedding) {
       setShowOnboarding(false);
       setOnboardingCompleted(true);
+      setLoading(false);
+      return;
     }
-  }, [forceFlag, weddings, activeWedding]);
+
+    const localOnboardingKey = `onboarding_completed_${currentUser.uid}`;
+    const localCompleted =
+      typeof window !== 'undefined' ? localStorage.getItem(localOnboardingKey) : null;
+
+    if (localCompleted === 'true') {
+      setShowOnboarding(false);
+      setOnboardingCompleted(true);
+    } else {
+      setShowOnboarding(true);
+      setOnboardingCompleted(false);
+    }
+
+    setLoading(false);
+  }, [forceFlag, currentUser, weddingsReady, weddings, activeWedding]);
 
   // Función para marcar el onboarding como completado
   const completeOnboarding = () => {
@@ -81,8 +77,8 @@ export const useOnboarding = () => {
     localStorage.removeItem('forceOnboarding');
 
     // Guardar en localStorage como backup
-    if (auth.currentUser && auth.currentUser.uid) {
-      const localOnboardingKey = `onboarding_completed_${auth.currentUser.uid}`;
+    if (currentUser?.uid) {
+      const localOnboardingKey = `onboarding_completed_${currentUser.uid}`;
       localStorage.setItem(localOnboardingKey, 'true');
     }
   };

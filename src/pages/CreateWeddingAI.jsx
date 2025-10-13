@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { createWedding } from '../services/WeddingService';
+import { useWedding } from '../context/WeddingContext';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 import {
   EVENT_STYLE_OPTIONS,
   GUEST_COUNT_OPTIONS,
@@ -21,6 +23,7 @@ import {
 export default function CreateWeddingAI() {
   const { currentUser, userProfile, hasRole, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { weddings, weddingsReady } = useWedding();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     coupleName: '',
@@ -37,6 +40,20 @@ export default function CreateWeddingAI() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+
+  // Telemetría: vista del asistente
+  React.useEffect(() => {
+    try {
+      performanceMonitor.logEvent('event_creation_view', {
+        uid: currentUser?.uid || null,
+        has_wedding_before: Array.isArray(weddings) ? weddings.length > 0 : false,
+        weddings_ready: !!weddingsReady,
+        eventType_default: form.eventType,
+        style_default: form.style,
+      });
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isOwnerLike = hasRole('owner', 'pareja', 'admin');
   const forbiddenRole =
@@ -83,7 +100,19 @@ export default function CreateWeddingAI() {
   };
 
   const goToStepTwo = () => {
-    if (validateStepOne()) setStep(2);
+    if (validateStepOne()) {
+      try {
+        performanceMonitor.logEvent('event_creation_step1_completed', {
+          uid: currentUser?.uid || null,
+          eventType: form.eventType,
+          has_date: !!form.weddingDate,
+          has_location: !!(form.location && form.location.trim()),
+          has_couple_name: !!(form.coupleName && form.coupleName.trim()),
+          style: form.style,
+        });
+      } catch {}
+      setStep(2);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -95,9 +124,32 @@ export default function CreateWeddingAI() {
     setLoading(true);
     setError('');
     try {
+      const hasRelatedEvents = Array.isArray(form.relatedEvents) && form.relatedEvents.length > 0;
+      const trimmedNotes = form.notes.trim();
+      const hasNotes = trimmedNotes.length > 0;
+      try {
+        performanceMonitor.logEvent('event_creation_step2_completed', {
+          uid: currentUser?.uid || null,
+          eventType: form.eventType,
+          guestCountRange: form.guestCountRange,
+          formalityLevel: form.formalityLevel,
+          ceremonyType: form.ceremonyType,
+          has_related: hasRelatedEvents,
+          has_notes: hasNotes,
+          style: form.style,
+        });
+        performanceMonitor.logEvent('event_creation_submit', {
+          uid: currentUser?.uid || null,
+          eventType: form.eventType,
+          guestCountRange: form.guestCountRange,
+          formalityLevel: form.formalityLevel,
+          has_related: hasRelatedEvents,
+          has_notes: hasNotes,
+          style: form.style,
+        });
+      } catch {}
       if (!currentUser?.uid) throw new Error('No autenticado');
       const fallbackName = form.eventType === 'boda' ? 'Mi Boda' : 'Mi Evento';
-      const trimmedNotes = form.notes.trim();
       const weddingId = await createWedding(currentUser.uid, {
         name: form.coupleName || fallbackName,
         weddingDate: form.weddingDate || '',
@@ -112,9 +164,34 @@ export default function CreateWeddingAI() {
         },
         preferences: { style: form.style },
       });
+      try {
+        performanceMonitor.logEvent('event_creation_succeeded', {
+          uid: currentUser?.uid || null,
+          weddingId,
+          eventType: form.eventType,
+          guestCountRange: form.guestCountRange,
+          formalityLevel: form.formalityLevel,
+          has_related: hasRelatedEvents,
+          has_notes: hasNotes,
+          style: form.style,
+        });
+      } catch {}
       navigate(`/bodas/${weddingId}`);
     } catch (err) {
       setError(err?.message || 'Error creando la boda');
+      try {
+        performanceMonitor.logEvent('event_creation_failed', {
+          uid: currentUser?.uid || null,
+          eventType: form.eventType,
+          error: String(err?.message || err) || 'unknown',
+          error_code: err?.code || err?.status || 'exception',
+          guestCountRange: form.guestCountRange,
+          formalityLevel: form.formalityLevel,
+          has_related: Array.isArray(form.relatedEvents) && form.relatedEvents.length > 0,
+          has_notes: !!form.notes && form.notes.trim().length > 0,
+          style: form.style,
+        });
+      } catch {}
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,20 @@ import {
 } from 'recharts';
 
 import { get as apiGet } from '../../services/apiClient';
+import { getAdminHeaders, getAdminSessionToken } from '../../services/adminSession';
+
+const buildAdminApiOptions = (extra = {}) => {
+  const token = getAdminSessionToken();
+  const options = { ...(extra || {}) };
+  options.headers = getAdminHeaders(options.headers || {});
+  if (!Object.prototype.hasOwnProperty.call(options, 'auth')) {
+    options.auth = !token;
+  }
+  if (!Object.prototype.hasOwnProperty.call(options, 'silent')) {
+    options.silent = true;
+  }
+  return options;
+};
 
 function UsersWithErrorsTable({ timeframe = 'day' }) {
   const [items, setItems] = useState([]);
@@ -16,7 +30,10 @@ function UsersWithErrorsTable({ timeframe = 'day' }) {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(`${endpoint}/errors/by-user?timeframe=${timeframe}`, { auth: true, silent: true });
+        const res = await apiGet(
+          `${endpoint}/errors/by-user?timeframe=${timeframe}`,
+          buildAdminApiOptions({ silent: true })
+        );
         if (!mounted) return;
         if (res?.ok) {
           const json = await res.json();
@@ -76,7 +93,10 @@ function ErrorRateChart({ timeframe = 'day' }) {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(`${endpoint}/errors?timeframe=${timeframe}&limit=2000`, { auth: true, silent: true });
+        const res = await apiGet(
+          `${endpoint}/errors?timeframe=${timeframe}&limit=2000`,
+          buildAdminApiOptions({ silent: true })
+        );
         if (!mounted) return;
         if (res?.ok) {
           const json = await res.json();
@@ -145,4 +165,3 @@ export default function AdminHealth() {
     </div>
   );
 }
-

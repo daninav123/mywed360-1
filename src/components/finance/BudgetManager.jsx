@@ -1,4 +1,15 @@
-﻿import { Plus, Edit3, Trash2, AlertTriangle, Target } from 'lucide-react';
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  AlertTriangle,
+  Target,
+  Sparkles,
+  Loader2,
+  RefreshCw,
+  Info,
+  CheckCircle,
+} from 'lucide-react';
 import React, { useState } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
@@ -15,12 +26,42 @@ export default function BudgetManager({
   onRemoveCategory,
   alertThresholds = { warn: 75, danger: 90 },
   onUpdateSettings,
+  advisor = null,
+  onRequestAdvisor,
+  advisorLoading = false,
+  advisorError = null,
+  onApplyAdvisorScenario,
+  onRefreshAdvisor,
 }) {
   const { t } = useTranslations();
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCategoryIndex, setEditingCategoryIndex] = useState(-1);
   const [newCategory, setNewCategory] = useState({ name: '', amount: '' });
+  const [showAdvisorModal, setShowAdvisorModal] = useState(false);
+  const [localAdvisorLoading, setLocalAdvisorLoading] = useState(false);
+  const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
+  const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
+    ? effectiveAdvisor.scenarios
+    : [];
+  const selectedScenario =
+    advisorScenarios.find((scenario) => scenario.id === effectiveAdvisor?.selectedScenarioId) ||
+    advisorScenarios[0] ||
+    null;
+  const advisorTips = Array.isArray(effectiveAdvisor?.globalTips)
+    ? effectiveAdvisor.globalTips
+    : [];
+
+  const formatTimestamp = (value) => {
+    if (!value) return null;
+    try {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return null;
+      return date.toLocaleString();
+    } catch {
+      return null;
+    }
+  };
 
   const handleAddCategory = () => {
     setEditingCategory(null);
@@ -67,12 +108,64 @@ export default function BudgetManager({
     }
   };
 
+  const ensureAdvisorData = async () => {
+    if (!onRequestAdvisor) return;
+    setLocalAdvisorLoading(true);
+    try {
+      await onRequestAdvisor();
+    } catch (err) {
+      console.error('[BudgetManager] advisor request failed', err);
+      alert(err?.message || 'No se pudo obtener la recomendación del consejero.');
+    } finally {
+      setLocalAdvisorLoading(false);
+    }
+  };
+
+  const handleOpenAdvisor = async () => {
+    setShowAdvisorModal(true);
+    if (!effectiveAdvisor?.scenarios?.length && onRequestAdvisor) {
+      await ensureAdvisorData();
+    }
+  };
+
+  const handleRefreshAdvisor = async () => {
+    if (onRefreshAdvisor) {
+      try {
+        setLocalAdvisorLoading(true);
+        await onRefreshAdvisor();
+      } catch (err) {
+        console.error('[BudgetManager] advisor refresh failed', err);
+        alert(err?.message || 'No se pudo actualizar la recomendación.');
+      } finally {
+        setLocalAdvisorLoading(false);
+      }
+      return;
+    }
+    await ensureAdvisorData();
+  };
+
+  const handleApplyScenario = async (scenarioId) => {
+    if (!onApplyAdvisorScenario) return;
+    try {
+      const result = await Promise.resolve(onApplyAdvisorScenario(scenarioId));
+      if (result && result.ok === false) {
+        const message = result.reason ? ` (${result.reason})` : '';
+        alert(`No se pudo aplicar el escenario${message}.`);
+      } else {
+        setShowAdvisorModal(false);
+      }
+    } catch (err) {
+      console.error('[BudgetManager] apply advisor scenario failed', err);
+      alert(err?.message || 'No se pudo aplicar el escenario recomendado.');
+    }
+  };
+
   const totalBudgeted = budget.categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
   const totalSpent = budgetUsage.reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
             {t('finance.budget.title', { defaultValue: 'Gestión de presupuesto' })}
@@ -83,9 +176,25 @@ export default function BudgetManager({
             })}
           </p>
         </div>
-        <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-          {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            leftIcon={
+              advisorLoading || localAdvisorLoading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )
+            }
+            onClick={handleOpenAdvisor}
+            disabled={advisorLoading || localAdvisorLoading}
+          >
+            Abrir consejero
+          </Button>
+          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
+            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
+          </Button>
+        </div>
       </div>
 
       <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
@@ -183,6 +292,62 @@ export default function BudgetManager({
             {t('finance.budget.categoriesTitle', { defaultValue: 'categorías de presupuesto' })}
           </h3>
         </div>
+        {advisorScenarios.length > 0 && (
+          <div className="px-6 py-4 bg-[var(--color-primary)]/5 border-b border-[var(--color-primary)]/20 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center gap-2 text-[var(--color-primary)]">
+                <Sparkles size={18} />
+                <span className="text-sm font-semibold">
+                  {selectedScenario?.label || 'Consejero IA listo'}
+                </span>
+                {effectiveAdvisor?.requestedAt && (
+                  <span className="text-xs text-[color:var(--color-text)]/60">
+                    Actualizado {formatTimestamp(effectiveAdvisor.requestedAt)}
+                  </span>
+                )}
+              </div>
+              {selectedScenario?.summary && (
+                <p className="text-sm text-[color:var(--color-text)]/80">{selectedScenario.summary}</p>
+              )}
+              {advisorTips.length > 0 && (
+                <ul className="text-xs text-[color:var(--color-text)]/70 list-disc pl-5 space-y-1">
+                  {advisorTips.slice(0, 3).map((tip, idx) => (
+                    <li key={idx}>{tip}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 min-w-[200px]">
+              <Button
+                variant="ghost"
+                className="justify-start"
+                leftIcon={<Info size={16} />}
+                onClick={handleOpenAdvisor}
+                disabled={advisorLoading || localAdvisorLoading}
+              >
+                Ver escenarios
+              </Button>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 disabled:opacity-60 disabled:cursor-not-allowed"
+                onClick={handleRefreshAdvisor}
+                disabled={advisorLoading || localAdvisorLoading}
+              >
+                {(advisorLoading || localAdvisorLoading) ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={14} />
+                )}
+                Actualizar consejero
+              </button>
+            </div>
+          </div>
+        )}
+        {advisorError && (
+          <div className="px-6 py-3 text-sm text-[color:var(--color-danger)] bg-[var(--color-danger)]/10 border-b border-[var(--color-danger)]/30">
+            {advisorError}
+          </div>
+        )}
         {budgetUsage.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-[color:var(--color-text)]/70 mb-4">
@@ -194,90 +359,285 @@ export default function BudgetManager({
           </div>
         ) : (
           <div className="divide-y divide-[color:var(--color-text)]/10">
-            {budgetUsage.map((category, index) => (
-              <div key={index} className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h4 className="text-lg font-semibold text-[color:var(--color-text)]">
-                      {category.name}
-                    </h4>
-                    {category.percentage >= 100 && (
-                      <div className="flex items-center text-[color:var(--color-danger)] bg-[var(--color-danger)]/10 px-2 py-1 rounded-full">
-                        <AlertTriangle size={14} className="mr-1" />
-                        <span className="text-xs font-medium">Excedido</span>
+            {budgetUsage.map((category, index) => {
+              const usagePercent = Math.min(Math.max(Number(category.percentage) || 0, 0), 999);
+              const barWidth = Math.min(usagePercent, 100);
+              const barColor =
+                usagePercent >= (alertThresholds.danger || 90)
+                  ? 'bg-[var(--color-danger)]'
+                  : usagePercent >= (alertThresholds.warn || 75)
+                    ? 'bg-[var(--color-warning)]'
+                    : 'bg-[var(--color-success)]';
+              const remaining = Number(category.remaining) || 0;
+              const sourceTag =
+                typeof category.source === 'string' && category.source.toLowerCase() === 'advisor';
+
+              return (
+                <div key={index} className="p-6">
+                  <div className="flex items-start justify-between mb-4 gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-lg font-semibold text-[color:var(--color-text)]">
+                          {category.name}
+                        </h4>
+                        {sourceTag && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                            <Sparkles size={12} />
+                            Consejero
+                          </span>
+                        )}
+                        {usagePercent >= 100 && (
+                          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                            <AlertTriangle size={12} />
+                            Excedido
+                          </span>
+                        )}
                       </div>
-                    )}
+                      {category.description && (
+                        <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                          {category.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
+                        onClick={handleOpenAdvisor}
+                        disabled={advisorLoading || localAdvisorLoading}
+                      >
+                        {(advisorLoading || localAdvisorLoading) ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Sparkles size={14} />
+                        )}
+                        Consejero
+                      </button>
+                      <label className="flex items-center gap-1 text-xs text-[color:var(--color-text)]/70">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(category.muted)}
+                          onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
+                        />
+                        Silenciar alertas
+                      </label>
+                      <button
+                        aria-label="Editar categoría"
+                        onClick={() => handleEditCategory(category, index)}
+                        className="text-[var(--color-primary)] hover:brightness-110 p-1"
+                      >
+                        <Edit3 size={16} />
+                      </button>
+                      <button
+                        aria-label="Eliminar categoría"
+                        onClick={() => handleDeleteCategory(index, category.name)}
+                        className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <label className="flex items-center gap-1 text-xs text-[color:var(--color-text)]/70">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(category.muted)}
-                        onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <p className="text-sm text-[color:var(--color-text)]/70">
+                        {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
+                      </p>
+                      <p className="text-lg font-semibold text-[color:var(--color-text)]">
+                        {formatCurrency(category.amount)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-[color:var(--color-text)]/70">
+                        {t('finance.budget.spent', { defaultValue: 'Gastado' })}
+                      </p>
+                      <p className="text-lg font-semibold text-[color:var(--color-danger)]">
+                        {formatCurrency(category.spent)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-[color:var(--color-text)]/70">
+                        {t('finance.budget.remaining', { defaultValue: 'Restante' })}
+                      </p>
+                      <p className="text-lg font-semibold">
+                        {formatCurrency(remaining)}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
+                      <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
+                      <span>{usagePercent}%</span>
+                    </div>
+                    <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
+                      <div
+                        className={`${barColor} h-3 rounded-full transition-all duration-300`}
+                        style={{ width: `${barWidth}%` }}
                       />
-                      Silenciar alertas
-                    </label>
-                    <button
-                      aria-label="Editar categoría"
-                      onClick={() => handleEditCategory(category, index)}
-                      className="text-[var(--color-primary)] hover:brightness-110 p-1"
-                    >
-                      <Edit3 size={16} />
-                    </button>
-                    <button
-                      aria-label="Eliminar categoría"
-                      onClick={() => handleDeleteCategory(index, category.name)}
-                      className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-[color:var(--color-text)]/70">
-                      {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
-                    </p>
-                    <p className="text-lg font-semibold text-[color:var(--color-text)]">
-                      {formatCurrency(category.amount)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[color:var(--color-text)]/70">
-                      {t('finance.budget.spent', { defaultValue: 'Gastado' })}
-                    </p>
-                    <p className="text-lg font-semibold text-[color:var(--color-danger)]">
-                      {formatCurrency(category.spent)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[color:var(--color-text)]/70">
-                      {t('finance.budget.remaining', { defaultValue: 'Restante' })}
-                    </p>
-                    <p
-                      className={`text-lg font-semibold ${category.remaining >= 0 ? 'text-[color:var(--color-success)]' : 'text-[color:var(--color-danger)]'}`}
-                    >
-                      {formatCurrency(category.remaining)}
-                    </p>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
-                    <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
-                    <span>{category.percentage.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${category.percentage >= 100 ? 'bg-[var(--color-danger)]' : category.percentage >= (alertThresholds.warn || 75) ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}
-                      style={{ width: `${Math.min(category.percentage, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Card>
+
+      <Modal
+        open={showAdvisorModal}
+        onClose={() => {
+          if (!localAdvisorLoading && !advisorLoading) {
+            setShowAdvisorModal(false);
+          }
+        }}
+        title="Consejero IA de presupuesto"
+      >
+        <div className="space-y-4">
+          {(advisorLoading || localAdvisorLoading) && (
+            <div className="flex items-center justify-center py-6 text-[color:var(--color-text)]/70">
+              <Loader2 className="animate-spin mr-2" size={18} />
+              Calculando recomendaciones...
+            </div>
+          )}
+
+          {!advisorLoading && !localAdvisorLoading && advisorError && (
+            <div className="rounded-md border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 p-4 text-sm text-[color:var(--color-danger)]">
+              {advisorError}
+            </div>
+          )}
+
+          {!advisorLoading &&
+            !localAdvisorLoading &&
+            !advisorError &&
+            advisorScenarios.length === 0 && (
+              <div className="rounded-lg border border-dashed border-[color:var(--color-text)]/20 p-6 text-center text-sm text-[color:var(--color-text)]/70 space-y-3">
+                <p>No hay escenarios disponibles todavía.</p>
+                <Button
+                  leftIcon={<Sparkles size={16} />}
+                  onClick={ensureAdvisorData}
+                  disabled={advisorLoading || localAdvisorLoading}
+                >
+                  Solicitar recomendación
+                </Button>
+              </div>
+            )}
+
+          {!advisorLoading && !localAdvisorLoading && advisorScenarios.length > 0 && (
+            <div className="space-y-4">
+              {advisorScenarios.map((scenario, idx) => {
+                const allocation = Array.isArray(scenario.allocation)
+                  ? scenario.allocation
+                  : [];
+                const isApplied =
+                  scenario.id &&
+                  scenario.id === effectiveAdvisor?.selectedScenarioId &&
+                  effectiveAdvisor?.appliedAt;
+
+                return (
+                  <div
+                    key={scenario.id || idx}
+                    className="rounded-lg border border-[color:var(--color-text)]/15 bg-white/70 shadow-sm"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 px-4 py-3 border-b border-[color:var(--color-text)]/10">
+                      <div>
+                        <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--color-text)]">
+                          <Sparkles className="text-[var(--color-primary)]" size={16} />
+                          {scenario.label || `Escenario ${idx + 1}`}
+                          {isApplied && (
+                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-success)]/10 text-[var(--color-success)]">
+                              <CheckCircle size={12} />
+                              Aplicado
+                            </span>
+                          )}
+                        </div>
+                        {scenario.summary && (
+                          <p className="text-sm text-[color:var(--color-text)]/70 mt-1">
+                            {scenario.summary}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 disabled:opacity-60 disabled:cursor-not-allowed"
+                          onClick={() => handleApplyScenario(scenario.id)}
+                          disabled={advisorLoading || localAdvisorLoading}
+                        >
+                          {(advisorLoading || localAdvisorLoading) ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Target size={14} />
+                          )}
+                          Aplicar escenario
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-3 space-y-3">
+                      {allocation.length > 0 && (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full text-sm">
+                            <thead>
+                              <tr className="text-left text-[color:var(--color-text)]/60 uppercase tracking-wide text-xs">
+                                <th className="py-2 pr-4">Categoría</th>
+                                <th className="py-2 pr-4">Distribución</th>
+                                <th className="py-2 pr-4">Notas</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {allocation.map((entry, entryIdx) => {
+                                const pct =
+                                  entry.percentage != null
+                                    ? `${Number(entry.percentage).toFixed(1)}%`
+                                    : null;
+                                const amount =
+                                  entry.amount != null
+                                    ? formatCurrency(Number(entry.amount))
+                                    : null;
+                                const distribution = [pct, amount]
+                                  .filter(Boolean)
+                                  .join(' · ');
+
+                                return (
+                                  <tr
+                                    key={`${scenario.id || idx}-allocation-${entryIdx}`}
+                                    className="border-t border-[color:var(--color-text)]/10"
+                                  >
+                                    <td className="py-2 pr-4 font-medium text-[color:var(--color-text)]">
+                                      {entry.category || 'Categoria'}
+                                    </td>
+                                    <td className="py-2 pr-4 text-[color:var(--color-text)]/80">
+                                      {distribution || '—'}
+                                    </td>
+                                    <td className="py-2 pr-4 text-[color:var(--color-text)]/60">
+                                      {entry.notes || 'Sin observaciones'}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+
+                      {Array.isArray(scenario.alerts) && scenario.alerts.length > 0 && (
+                        <div className="rounded-md border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 p-3 space-y-2 text-xs text-[color:var(--color-text)]/80">
+                          {scenario.alerts.map((alert, alertIdx) => (
+                            <div key={alertIdx} className="flex items-start gap-2">
+                              <AlertTriangle size={12} className="mt-0.5 text-[var(--color-warning)]" />
+                              <span>{alert}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </Modal>
 
       <Modal
         open={showCategoryModal}

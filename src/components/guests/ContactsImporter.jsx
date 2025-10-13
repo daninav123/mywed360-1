@@ -263,6 +263,7 @@ const ContactsImporterFixed = ({ onImported }) => {
           variant="outline"
           onClick={handleImportCSVClick}
           className="flex items-center space-x-2"
+          data-testid="guest-import-csv"
         >
           <UploadCloud size={16} />
           <span>{t('guests.contacts.importCsv', { defaultValue: 'Importar CSV' })}</span>

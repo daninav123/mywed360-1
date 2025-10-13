@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="12.640" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-10-12T17:09:50" tests="0" file="cypress\e2e\rsvp\rsvp_confirm_by_token.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="RSVP - Confirmación por token público" timestamp="2025-10-12T17:09:50" tests="1" time="12.618" failures="1">
+    <testcase name="RSVP - Confirmación por token público crea invitado dev, visita enlace y confirma asistencia" time="0.000" classname="crea invitado dev, visita enlace y confirma asistencia">
+      <failure message="expected 500 to equal 200" type="AssertionError"><![CDATA[AssertionError: expected 500 to equal 200
+    at Context.eval (webpack://mywed360/./cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js:51:32)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

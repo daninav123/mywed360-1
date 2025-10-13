@@ -1,11 +1,12 @@
 import { Download } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   addDoc,
   collection,
   deleteDoc,
   doc as firestoreDoc,
+  getDoc,
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
@@ -19,6 +20,7 @@ import { uploadEmailAttachments } from '../../services/storageUploadService';
 import { db } from '../../firebaseConfig';
 import { useAuth } from '../../hooks/useAuth';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
+import legalCatalog from '../../data/legalRequirementsCatalog.json';
 
 // Persistencia local de progreso de requisitos por boda
 const LEGAL_LS_KEY = (weddingId) => `legalRequirements_${weddingId}`;
@@ -35,36 +37,29 @@ function saveLegalProgress(weddingId, data) {
   } catch {}
 }
 
-// Requisitos legales informativos para registrar la boda
-const LEGAL_REQUIREMENTS = {
-  ES: {
-    civil: [
-      'DNI o Pasaporte vigente de ambos',
-      'Certificado literal de nacimiento de ambos',
-      'Certificado de empadronamiento (últimos 2 años)',
-      'Declaración jurada de estado civil (soltería/divorcio/viudedad)',
-      'Sentencia de divorcio o certificado de defunción (si aplica)',
-      'Formulario de solicitud/expediente matrimonial del Registro Civil',
-      'Testigos con DNI (según registro, el día de la cita)',
-    ],
-    iglesia: [
-      'Certificado de bautismo reciente (expedido en los últimos 6 meses)',
-      'Certificado de confirmación (si aplica o dispensa)',
-      'Curso prematrimonial (certificado de asistencia)',
-      'Fe de soltería eclesiástica (o dispensa correspondiente)',
-      'Expediente matrimonial canónico',
-      'Dispensa por disparidad de culto o mixta (si aplica)',
-    ],
-  },
-  FR: {
-    civil: ['Pièces d’identité', 'Actes de naissance récents'],
-    iglesia: ['Certificat de baptême', 'Certificat de confirmation'],
-  },
-  US: {
-    civil: ['ID válidos', 'Solicitud de Marriage License'],
-    iglesia: ['Baptismal certificate', 'Pre-Cana course'],
-  },
-};
+const COUNTRY_CATALOG = legalCatalog?.countries || {};
+const DEFAULT_COUNTRY = COUNTRY_CATALOG.ES
+  ? 'ES'
+  : Object.keys(COUNTRY_CATALOG)[0] || 'ES';
+const LEGAL_TYPE_OPTIONS = [
+  { key: 'civil', label: 'Civil / Juzgado' },
+  { key: 'religious_catholic', label: 'Iglesia (efectos civiles)' },
+];
+const COUNTRY_OPTIONS = Object.entries(COUNTRY_CATALOG)
+  .map(([code, info]) => ({ code, name: info?.name || code }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const legacyTypeKey = (type) => (type === 'religious_catholic' ? 'iglesia' : type);
+
+const sanitizeKeyFragment = (value = '') =>
+  value
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase() || 'item';
 
 // Descargables por región y tipo
 const DOWNLOAD_TEMPLATES = {
@@ -307,19 +302,242 @@ export default function DocumentosLegales() {
     }
   };
 
-  const [form, setForm] = useState({ region: 'ES' });
-  const [legalType, setLegalType] = useState('civil'); // 'civil' | 'iglesia'
+  const [form, setForm] = useState({ region: DEFAULT_COUNTRY });
+  const [legalType, setLegalType] = useState('civil');
   const [legalProgress, setLegalProgress] = useState({});
   const [uploadingReq, setUploadingReq] = useState({}); // { key: boolean }
 
+  const progressSyncRef = useRef({
+    localLoaded: false,
+    remoteLoaded: false,
+    skipNextWrite: false,
+  });
+  const progressWriteTimerRef = useRef(null);
+
+  useEffect(() => {
+    progressSyncRef.current.localLoaded = false;
+    progressSyncRef.current.remoteLoaded = false;
+    progressSyncRef.current.skipNextWrite = false;
+    if (progressWriteTimerRef.current) {
+      clearTimeout(progressWriteTimerRef.current);
+      progressWriteTimerRef.current = null;
+    }
+  }, [activeWedding]);
+
   useEffect(() => {
     if (!activeWedding) return;
-    setLegalProgress(loadLegalProgress(activeWedding));
+    const stored = loadLegalProgress(activeWedding);
+    progressSyncRef.current.skipNextWrite = true;
+    progressSyncRef.current.localLoaded = true;
+    setLegalProgress(stored || {});
   }, [activeWedding]);
+
+  useEffect(() => {
+    if (!activeWedding) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const docRef = firestoreDoc(db, 'weddings', activeWedding, 'legalRequirements', 'progress');
+        const snap = await getDoc(docRef);
+        if (cancelled) return;
+        if (snap.exists()) {
+          const data = snap.data() || {};
+          const entries = data.entries && typeof data.entries === 'object' ? data.entries : {};
+          if (entries && Object.keys(entries).length > 0) {
+            progressSyncRef.current.skipNextWrite = true;
+            setLegalProgress((prev) => {
+              const merged = { ...(prev || {}) };
+              Object.entries(entries).forEach(([key, value]) => {
+                merged[key] = value;
+              });
+              if (activeWedding) {
+                saveLegalProgress(activeWedding, merged);
+              }
+              return merged;
+            });
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.warn('[DocumentosLegales] No se pudo cargar progreso legal remoto', error);
+        }
+      } finally {
+        if (!cancelled) {
+          progressSyncRef.current.remoteLoaded = true;
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeWedding]);
+
+  const activeCountry = COUNTRY_CATALOG[form.region] || COUNTRY_CATALOG[DEFAULT_COUNTRY];
+
+  useEffect(() => {
+    if (!weddingInfo) return;
+    const profileCountry =
+      weddingInfo?.ceremony?.legal?.countryOrigin ||
+      weddingInfo?.profile?.location?.country ||
+      weddingInfo?.profile?.country ||
+      weddingInfo?.event?.country ||
+      weddingInfo?.location?.country ||
+      weddingInfo?.country;
+    if (!profileCountry) return;
+    const normalized = String(profileCountry).toUpperCase();
+    if (!COUNTRY_CATALOG[normalized]) return;
+    setForm((prev) => (prev.region === normalized ? prev : { ...prev, region: normalized }));
+  }, [weddingInfo]);
+
+  const availableLegalTypes = useMemo(() => {
+    if (!activeCountry) return LEGAL_TYPE_OPTIONS;
+    return LEGAL_TYPE_OPTIONS.filter((option) => {
+      const typeData = activeCountry.ceremonyTypes?.[option.key];
+      if (!typeData || !Array.isArray(typeData.requirements)) return false;
+      return typeData.requirements.some(
+        (req) => Array.isArray(req.documentation) && req.documentation.length > 0
+      );
+    });
+  }, [activeCountry]);
+
+  useEffect(() => {
+    if (!activeCountry) return;
+    if (!availableLegalTypes.some((option) => option.key === legalType)) {
+      const fallbackType = availableLegalTypes[0]?.key || 'civil';
+      if (fallbackType !== legalType) setLegalType(fallbackType);
+    }
+  }, [activeCountry, availableLegalTypes, legalType]);
+
+  const updateProgress = useCallback(
+    (updater) => {
+      setLegalProgress((prev) => {
+        const snapshot = { ...(prev || {}) };
+        const next = updater(snapshot);
+        const finalState = next || snapshot;
+        if (activeWedding) {
+          saveLegalProgress(activeWedding, finalState);
+        }
+        return finalState;
+      });
+    },
+    [activeWedding]
+  );
+
+  const requirementsList = useMemo(() => {
+    if (!activeCountry) return [];
+    const typeCollection = activeCountry.ceremonyTypes?.[legalType];
+    if (!typeCollection || !Array.isArray(typeCollection.requirements)) return [];
+    const list = [];
+    typeCollection.requirements.forEach((req, reqIndex) => {
+      (req.documentation || []).forEach((docLabel, docIndex) => {
+        const normalizedLabel = (docLabel || '').trim();
+        if (!normalizedLabel) return;
+        const fragment =
+          sanitizeKeyFragment(normalizedLabel) || `${req.id || `req-${reqIndex}`}-${docIndex}`;
+        const key = `${form.region}.${legalType}.${req.id || `req-${reqIndex}`}.${fragment}`;
+        const legacyKey = `${form.region}.${legacyTypeKey(legalType)}.${normalizedLabel}`;
+        list.push({
+          key,
+          legacyKey,
+          label: normalizedLabel,
+          requirement: req,
+        });
+      });
+    });
+    return list;
+  }, [activeCountry, form.region, legalType]);
+
+  const requirementSummary = useMemo(() => {
+    if (!activeCountry) {
+      return { authorities: [], links: [], leadTimeDays: null };
+    }
+    const typeCollection = activeCountry.ceremonyTypes?.[legalType];
+    if (!typeCollection || !Array.isArray(typeCollection.requirements)) {
+      return { authorities: [], links: [], leadTimeDays: null };
+    }
+    const authorities = new Set();
+    const linksMap = new Map();
+    let leadTime = null;
+    typeCollection.requirements.forEach((req) => {
+      if (req.authority) authorities.add(req.authority);
+      if (typeof req.leadTimeDays === 'number' && !Number.isNaN(req.leadTimeDays)) {
+        leadTime = leadTime === null ? req.leadTimeDays : Math.max(leadTime, req.leadTimeDays);
+      }
+      (req.links || []).forEach((link) => {
+        if (link?.url && !linksMap.has(link.url)) {
+          linksMap.set(link.url, link);
+        }
+      });
+    });
+    return {
+      authorities: Array.from(authorities),
+      links: Array.from(linksMap.values()),
+      leadTimeDays: leadTime,
+    };
+  }, [activeCountry, legalType]);
+
+  useEffect(() => {
+    if (!activeWedding) return;
+    const syncState = progressSyncRef.current;
+    if (!syncState.localLoaded || !syncState.remoteLoaded) return;
+    if (syncState.skipNextWrite) {
+      syncState.skipNextWrite = false;
+      return;
+    }
+    if (progressWriteTimerRef.current) {
+      clearTimeout(progressWriteTimerRef.current);
+      progressWriteTimerRef.current = null;
+    }
+    const safeProgress = legalProgress && typeof legalProgress === 'object' ? legalProgress : {};
+    progressWriteTimerRef.current = setTimeout(async () => {
+      try {
+        const docRef = firestoreDoc(db, 'weddings', activeWedding, 'legalRequirements', 'progress');
+        await setDoc(
+          docRef,
+          {
+            entries: safeProgress,
+            updatedAt: serverTimestamp(),
+            updatedBy: currentUser?.uid || null,
+          },
+          { merge: true }
+        );
+        saveLegalProgress(activeWedding, safeProgress);
+      } catch (error) {
+        console.warn('[DocumentosLegales] No se pudo sincronizar progreso legal', error);
+      } finally {
+        progressWriteTimerRef.current = null;
+      }
+    }, 800);
+    return () => {
+      if (progressWriteTimerRef.current) {
+        clearTimeout(progressWriteTimerRef.current);
+        progressWriteTimerRef.current = null;
+      }
+    };
+  }, [legalProgress, activeWedding, currentUser]);
+
+  const countryNotes = activeCountry?.metadata?.notes || [];
+  const sourceLinks =
+    requirementSummary.links.length > 0
+      ? requirementSummary.links
+      : activeCountry?.metadata?.sourceUrl
+        ? [
+            {
+              type: 'reference',
+              label: activeCountry?.metadata?.sourceLabel || 'Fuente oficial',
+              url: activeCountry.metadata.sourceUrl,
+            },
+          ]
+        : [];
+  const formattedLeadTime =
+    requirementSummary.leadTimeDays && requirementSummary.leadTimeDays > 0
+      ? `≈ ${requirementSummary.leadTimeDays} días`
+      : null;
 
   const templatesForSelection = useMemo(() => {
     const byRegion = DOWNLOAD_TEMPLATES[form.region] || DOWNLOAD_TEMPLATES.ES;
-    return byRegion[legalType] || [];
+    const templateKey = legacyTypeKey(legalType);
+    return byRegion[templateKey] || [];
   }, [form.region, legalType]);
 
   return (
@@ -339,18 +557,17 @@ export default function DocumentosLegales() {
               <div className="flex flex-wrap items-center gap-2">
                 <label className="text-sm text-gray-600">Tipo:</label>
                 <div className="inline-flex rounded overflow-hidden border">
-                  <button
-                    className={`${legalType === 'civil' ? 'bg-blue-600 text-white' : 'bg-white'} px-3 py-1 text-sm`}
-                    onClick={() => setLegalType('civil')}
-                  >
-                    Civil / Juzgado
-                  </button>
-                  <button
-                    className={`${legalType === 'iglesia' ? 'bg-blue-600 text-white' : 'bg-white'} px-3 py-1 text-sm`}
-                    onClick={() => setLegalType('iglesia')}
-                  >
-                    Iglesia
-                  </button>
+                  {availableLegalTypes.map((option) => (
+                    <button
+                      key={option.key}
+                      className={`${
+                        legalType === option.key ? 'bg-blue-600 text-white' : 'bg-white'
+                      } px-3 py-1 text-sm transition-colors`}
+                      onClick={() => setLegalType(option.key)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
                 <label className="text-sm text-gray-600 ml-2">País:</label>
                 <select
@@ -358,9 +575,11 @@ export default function DocumentosLegales() {
                   value={form.region}
                   onChange={(e) => setForm((f) => ({ ...f, region: e.target.value }))}
                 >
-                  <option value="ES">España</option>
-                  <option value="FR">Francia</option>
-                  <option value="US">Estados Unidos</option>
+                  {COUNTRY_OPTIONS.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -369,246 +588,313 @@ export default function DocumentosLegales() {
               Confirma siempre con tu oficina/parroquia.
             </p>
             <div className="space-y-2">
-              {(LEGAL_REQUIREMENTS[form.region] || LEGAL_REQUIREMENTS.ES)[legalType].map(
-                (item, idx) => {
-                  const key = `${form.region}.${legalType}.${item}`;
-                  const entry = legalProgress[key];
-                  const checked = typeof entry === 'object' ? !!entry.done : !!entry;
-                  const fileMeta = typeof entry === 'object' ? entry.file : null;
-                  return (
-                    <div key={idx} className="flex flex-col gap-1">
-                      <label className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={(e) => {
-                            const next = { ...(legalProgress || {}) };
-                            const prev = next[key];
+              {requirementsList.length === 0 && (
+                <p className="text-sm text-gray-600">
+                  No hay requisitos configurados para este tipo en{' '}
+                  {activeCountry?.name || form.region}.
+                </p>
+              )}
+              {requirementsList.map(({ key: progressKey, legacyKey, label }, idx) => {
+                const entry =
+                  legalProgress[progressKey] ??
+                  (legacyKey ? legalProgress[legacyKey] : undefined);
+                const checked = typeof entry === 'object' ? !!entry.done : !!entry;
+                const fileMeta = typeof entry === 'object' ? entry.file : null;
+                const inputId = `file-${idx}-${progressKey.replace(/[^a-z0-9]/gi, '-')}`;
+                return (
+                  <div key={progressKey} className="flex flex-col gap-1">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) =>
+                          updateProgress((current) => {
+                            const next = { ...current };
+                            const previous =
+                              next[progressKey] ??
+                              (legacyKey ? next[legacyKey] : undefined);
                             if (e.target.checked) {
-                              next[key] = typeof prev === 'object' ? { ...prev, done: true } : true;
+                              next[progressKey] =
+                                typeof previous === 'object'
+                                  ? { ...previous, done: true }
+                                  : true;
                             } else {
-                              if (typeof prev === 'object' && prev.file) {
-                                next[key] = { ...prev, done: false };
+                              if (typeof previous === 'object' && previous.file) {
+                                next[progressKey] = { ...previous, done: false };
                               } else {
-                                delete next[key];
+                                delete next[progressKey];
                               }
                             }
-                            setLegalProgress(next);
-                            saveLegalProgress(activeWedding, next);
-                          }}
-                        />
-                        <span>{item}</span>
-                      </label>
-                      <div className="pl-6 flex items-center gap-2 text-xs text-gray-600">
-                        <input
-                          id={`file-${idx}`}
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                          onChange={async (e) => {
-                            const f = e.target.files && e.target.files[0];
-                            if (!f) return;
-                            const upKey = key;
-                            const relatedId = guessRelatedCeremonyId(item);
-                            setUploadingReq((u) => ({ ...u, [upKey]: true }));
-                            try {
-                              const uploaded = await uploadEmailAttachments(
-                                [f],
-                                activeWedding || 'anon',
-                                'legal-requirements'
+                            if (legacyKey && legacyKey in next) delete next[legacyKey];
+                            return next;
+                          })
+                        }
+                      />
+                      <span>{label}</span>
+                    </label>
+                    <div className="pl-6 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                      <input
+                        id={inputId}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={async (e) => {
+                          const f = e.target.files && e.target.files[0];
+                          if (!f) return;
+                          const upKey = progressKey;
+                          const relatedId = guessRelatedCeremonyId(label);
+                          setUploadingReq((u) => ({ ...u, [upKey]: true }));
+                          try {
+                            const uploaded = await uploadEmailAttachments(
+                              [f],
+                              activeWedding || 'anon',
+                              'legal-requirements'
+                            );
+                            const meta =
+                              Array.isArray(uploaded) && uploaded[0]
+                                ? uploaded[0]
+                                : { filename: f.name, size: f.size };
+                            meta.relatedCeremonyId = relatedId;
+                            let documentId =
+                              typeof entry === 'object' && entry?.file
+                                ? entry.file.documentId
+                                : undefined;
+
+                            if (activeWedding) {
+                              const documentsCol = collection(
+                                db,
+                                'weddings',
+                                activeWedding,
+                                'documents'
                               );
-                              const meta =
-                                Array.isArray(uploaded) && uploaded[0]
-                                  ? uploaded[0]
-                                  : { filename: f.name, size: f.size };
-                              meta.relatedCeremonyId = relatedId;
-                              const next = { ...(legalProgress || {}) };
-                              const prev = next[upKey];
+                              const documentBase = {
+                                name: meta.filename || f.name || 'Documento legal',
+                                url: meta.url || '',
+                                storagePath: meta.storagePath || '',
+                                size: meta.size ?? f.size ?? 0,
+                                category: 'legal',
+                                relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
+                                status: 'uploaded',
+                                requirementKey: upKey,
+                                legalType,
+                                source: 'documents-legal',
+                              };
+                              if (currentUser?.uid) documentBase.uploadedBy = currentUser.uid;
+                              if (currentUser?.email) documentBase.uploadedByEmail = currentUser.email;
 
-                              let documentId =
-                                typeof prev === 'object' && prev.file ? prev.file.documentId : undefined;
-
-                              if (activeWedding) {
-                                const documentsCol = collection(
+                              if (documentId) {
+                                const documentRef = firestoreDoc(
                                   db,
                                   'weddings',
                                   activeWedding,
-                                  'documents'
+                                  'documents',
+                                  documentId
                                 );
-                                const documentBase = {
-                                  name: meta.filename || f.name || 'Documento legal',
-                                  url: meta.url || '',
-                                  storagePath: meta.storagePath || '',
-                                  size: meta.size ?? f.size ?? 0,
-                                  category: 'legal',
-                                  relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
-                                  status: 'uploaded',
-                                  requirementKey: upKey,
-                                  legalType,
-                                  source: 'documents-legal',
-                                };
-                                if (currentUser?.uid) documentBase.uploadedBy = currentUser.uid;
-                                if (currentUser?.email) documentBase.uploadedByEmail = currentUser.email;
-
-                                if (documentId) {
-                                  const documentRef = firestoreDoc(
-                                    db,
-                                    'weddings',
-                                    activeWedding,
-                                    'documents',
-                                    documentId
-                                  );
-                                  await setDoc(
-                                    documentRef,
-                                    { ...documentBase, updatedAt: serverTimestamp() },
-                                    { merge: true }
-                                  );
-                                } else {
-                                  const docRef = await addDoc(documentsCol, {
-                                    ...documentBase,
-                                    createdAt: serverTimestamp(),
-                                    updatedAt: serverTimestamp(),
-                                  });
-                                  documentId = docRef.id;
-                                }
-                                meta.documentId = documentId;
-                                try {
-                                  performanceMonitor.logEvent('ceremony_document_uploaded', {
-                                    weddingId: activeWedding,
-                                    requirementKey: upKey,
-                                    relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
-                                  });
-                                } catch {}
+                                await setDoc(
+                                  documentRef,
+                                  { ...documentBase, updatedAt: serverTimestamp() },
+                                  { merge: true }
+                                );
+                              } else {
+                                const docRef = await addDoc(documentsCol, {
+                                  ...documentBase,
+                                  createdAt: serverTimestamp(),
+                                  updatedAt: serverTimestamp(),
+                                });
+                                documentId = docRef.id;
                               }
-
-                              next[upKey] =
-                                typeof prev === 'object'
-                                  ? { ...prev, done: true, file: { ...meta } }
-                                  : { done: true, file: { ...meta } };
-                              setLegalProgress(next);
-                              saveLegalProgress(activeWedding, next);
+                              meta.documentId = documentId;
                               try {
-                                toast.success(tr('documents.uploaded', 'Archivo subido'));
+                                performanceMonitor.logEvent('ceremony_document_uploaded', {
+                                  weddingId: activeWedding,
+                                  requirementKey: upKey,
+                                  relatedCeremonyId: relatedId || DEFAULT_RELATED_ID,
+                                });
                               } catch {}
-                            } catch (err) {
-                              console.warn('Upload requirement failed', err);
-                              try {
-                                toast.error(
-                                  tr('documents.uploadFailed', 'No se pudo subir el archivo')
-                                );
-                              } catch {}
-                            } finally {
-                              setUploadingReq((u) => ({ ...u, [upKey]: false }));
-                              e.target.value = '';
                             }
-                          }}
-                        />
-                        <label
-                          htmlFor={`file-${idx}`}
-                          className="px-2 py-1 border rounded cursor-pointer hover:bg-gray-50"
-                        >
-                          {uploadingReq[key]
-                            ? 'Subiendo...'
-                            : fileMeta
-                              ? 'Reemplazar archivo'
-                              : 'Subir archivo'}
-                        </label>
-                        {fileMeta && (
-                          <>
-                            {fileMeta.url ? (
-                              <a
-                                href={fileMeta.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="underline"
-                              >
-                                Ver
-                              </a>
-                            ) : (
-                              <span>{fileMeta.filename || 'Archivo'}</span>
-                            )}
-                            <button
-                              className="text-red-600"
-                              onClick={async () => {
-                                // Intentar borrar del Storage si tenemos URL
-                                let storageDeletedOk = true;
-                                let firestoreDeletedOk = true;
-                                if (fileMeta.url) {
-                                  try {
-                                    const {
-                                      getStorage,
-                                      ref: sRef,
-                                      deleteObject,
-                                      refFromURL,
-                                    } = await import('firebase/storage');
-                                    const storage = getStorage();
-                                    let fileRef;
-                                    try {
-                                      fileRef = refFromURL(fileMeta.url);
-                                    } catch (_) {
-                                      try {
-                                        fileRef = sRef(storage, fileMeta.url);
-                                      } catch {}
-                                    }
-                                    if (fileRef)
-                                      await deleteObject(fileRef).catch(() => {
-                                        storageDeletedOk = false;
-                                      });
-                                  } catch (e) {
-                                    storageDeletedOk = false;
-                                    console.warn('No se pudo borrar del Storage:', e);
-                                  }
-                                }
-                                if (fileMeta.documentId && activeWedding) {
-                                  try {
-                                    await deleteDoc(
-                                      firestoreDoc(
-                                        db,
-                                        'weddings',
-                                        activeWedding,
-                                        'documents',
-                                        fileMeta.documentId
-                                      )
-                                    );
-                                  } catch (err) {
-                                    firestoreDeletedOk = false;
-                                    console.warn('No se pudo borrar el documento de Firestore:', err);
-                                  }
-                                }
-                                const next = { ...(legalProgress || {}) };
-                                const prev = next[key];
-                                if (typeof prev === 'object') {
-                                  const cleanPrev = { ...prev, done: false };
-                                  delete cleanPrev.file;
-                                  next[key] = cleanPrev;
-                                } else if (prev) {
-                                  delete next[key];
-                                }
-                                setLegalProgress(next);
-                                saveLegalProgress(activeWedding, next);
-                                try {
-                                  if (storageDeletedOk && firestoreDeletedOk)
-                                    toast.success(tr('documents.fileDeleted', 'Archivo eliminado'));
-                                  else
-                                    toast.warn(
-                                      tr(
-                                        'documents.fileRefRemoved',
-                                        'Referencia eliminada. No se pudo borrar del almacenamiento o del registro.'
-                                      )
-                                    );
-                                } catch {}
-                              }}
+
+                            updateProgress((current) => {
+                              const next = { ...current };
+                              const previous =
+                                next[upKey] ?? (legacyKey ? next[legacyKey] : undefined);
+                              const base = typeof previous === 'object' ? previous : {};
+                              next[upKey] = { ...base, done: true, file: { ...meta } };
+                              if (legacyKey && legacyKey in next) delete next[legacyKey];
+                              return next;
+                            });
+                            try {
+                              toast.success(tr('documents.uploaded', 'Archivo subido'));
+                            } catch {}
+                          } catch (err) {
+                            console.warn('Upload requirement failed', err);
+                            try {
+                              toast.error(
+                                tr('documents.uploadFailed', 'No se pudo subir el archivo')
+                              );
+                            } catch {}
+                          } finally {
+                            setUploadingReq((u) => ({ ...u, [upKey]: false }));
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={inputId}
+                        className="px-2 py-1 border rounded cursor-pointer hover:bg-gray-50"
+                      >
+                        {uploadingReq[progressKey]
+                          ? 'Subiendo...'
+                          : fileMeta
+                            ? 'Reemplazar archivo'
+                            : 'Subir archivo'}
+                      </label>
+                      {fileMeta && (
+                        <>
+                          {fileMeta.url ? (
+                            <a
+                              href={fileMeta.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline"
                             >
-                              Quitar
-                            </button>
-                          </>
-                        )}
-                      </div>
+                              Ver
+                            </a>
+                          ) : (
+                            <span>{fileMeta.filename || 'Archivo'}</span>
+                          )}
+                          <button
+                            className="text-red-600"
+                            onClick={async () => {
+                              let storageDeletedOk = true;
+                              let firestoreDeletedOk = true;
+                              if (fileMeta.url) {
+                                try {
+                                  const {
+                                    getStorage,
+                                    ref: sRef,
+                                    deleteObject,
+                                    refFromURL,
+                                  } = await import('firebase/storage');
+                                  const storage = getStorage();
+                                  let fileRef;
+                                  try {
+                                    fileRef = refFromURL(fileMeta.url);
+                                  } catch (_) {
+                                    try {
+                                      fileRef = sRef(storage, fileMeta.url);
+                                    } catch {}
+                                  }
+                                  if (fileRef)
+                                    await deleteObject(fileRef).catch(() => {
+                                      storageDeletedOk = false;
+                                    });
+                                } catch (e) {
+                                  storageDeletedOk = false;
+                                  console.warn('No se pudo borrar del Storage:', e);
+                                }
+                              }
+                              if (fileMeta.documentId && activeWedding) {
+                                try {
+                                  await deleteDoc(
+                                    firestoreDoc(
+                                      db,
+                                      'weddings',
+                                      activeWedding,
+                                      'documents',
+                                      fileMeta.documentId
+                                    )
+                                  );
+                                } catch (err) {
+                                  firestoreDeletedOk = false;
+                                  console.warn('No se pudo borrar el documento de Firestore:', err);
+                                }
+                              }
+                              updateProgress((current) => {
+                                const next = { ...current };
+                                const previous =
+                                  next[progressKey] ??
+                                  (legacyKey ? next[legacyKey] : undefined);
+                                if (typeof previous === 'object') {
+                                  const cleaned = { ...previous, done: false };
+                                  delete cleaned.file;
+                                  if (Object.keys(cleaned).length <= 1 && cleaned.done === false) {
+                                    delete next[progressKey];
+                                  } else {
+                                    next[progressKey] = cleaned;
+                                  }
+                                } else if (previous) {
+                                  delete next[progressKey];
+                                }
+                                if (legacyKey && legacyKey in next) delete next[legacyKey];
+                                return next;
+                              });
+                              try {
+                                if (storageDeletedOk && firestoreDeletedOk)
+                                  toast.success(tr('documents.fileDeleted', 'Archivo eliminado'));
+                                else
+                                  toast.warn(
+                                    tr(
+                                      'documents.fileRefRemoved',
+                                      'Referencia eliminada. No se pudo borrar del almacenamiento o del registro.'
+                                    )
+                                  );
+                              } catch {}
+                            }}
+                          >
+                            Quitar
+                          </button>
+                        </>
+                      )}
                     </div>
-                  );
-                }
-              )}
+                  </div>
+                );
+              })}
             </div>
+            {(requirementSummary.authorities.length > 0 ||
+              formattedLeadTime ||
+              countryNotes.length > 0 ||
+              sourceLinks.length > 0) && (
+              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 space-y-2 text-sm text-slate-700">
+                {requirementSummary.authorities.length > 0 && (
+                  <div>
+                    <span className="font-semibold">Autoridades clave:</span>{' '}
+                    {requirementSummary.authorities.join(', ')}
+                  </div>
+                )}
+                {formattedLeadTime && (
+                  <div>
+                    <span className="font-semibold">Plazo estimado:</span> {formattedLeadTime}
+                  </div>
+                )}
+                {countryNotes.length > 0 && (
+                  <div>
+                    <span className="font-semibold">Notas destacadas:</span>
+                    <ul className="list-disc ml-5 mt-1 space-y-1">
+                      {countryNotes.map((note, index) => (
+                        <li key={`${form.region}-note-${index}`}>{note}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {sourceLinks.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold">Fuentes:</span>
+                    {sourceLinks.map((link) => (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-blue-600 hover:underline"
+                      >
+                        {link.label || link.url}
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
 
           {/* Descargables */}

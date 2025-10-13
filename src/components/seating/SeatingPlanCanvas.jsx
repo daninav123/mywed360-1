@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Componente Canvas especializado para el plan de asientos
  * Maneja la visualización y interacción con mesas y sillas
  */
@@ -135,6 +135,15 @@ const SeatingPlanCanvas = ({
       setOffset({ x: 0, y: 0 });
     }
   }, [areas, tables, seats, hallSize, canvasRef, onViewportChange]);
+
+  // Permitir que la Toolbar dispare "Ajustar a pantalla" vía evento global
+  useEffect(() => {
+    const handler = () => {
+      try { fitToContent(); } catch {}
+    };
+    window.addEventListener('seating-fit', handler);
+    return () => window.removeEventListener('seating-fit', handler);
+  }, [fitToContent]);
 
   // Recalcular minScale (fit) cuando cambie el contenido, sin alterar el zoom actual
   useEffect(() => {
@@ -711,7 +720,8 @@ const SeatingPlanCanvas = ({
           <button
             onClick={fitToContent}
             className="w-8 h-8 bg-white shadow-md rounded flex items-center justify-center hover:bg-gray-50"
-            title="Ajustar a pantalla"
+            title="Ajustar lienzo"
+            aria-label="Ajustar lienzo"
           >
             âŒ‚
           </button>

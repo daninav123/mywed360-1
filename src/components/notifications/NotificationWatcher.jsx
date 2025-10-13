@@ -2,18 +2,16 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { useEffect, useRef } from 'react';
 
 import { auth } from '../../firebaseConfig';
-import { showNotification, shouldNotify } from '../../services/notificationService';
-
-const BASE =
-  (typeof import.meta !== 'undefined' &&
-    import.meta.env &&
-    import.meta.env.VITE_BACKEND_BASE_URL) ||
-  '';
+import {
+  showNotification,
+  shouldNotify,
+  getNotifications as fetchNotifications,
+} from '../../services/notificationService';
 
 // Polls backend notifications and emits toast events for meeting/budget suggestions
 export default function NotificationWatcher({ intervalMs = 20000 }) {
   const seenRef = useRef(new Set());
-  const unauthorizedRef = useRef(0);
+  const uid = auth?.currentUser?.uid || null;
 
   useEffect(() => {
     let active = true;
@@ -30,27 +28,8 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
 
     const load = async (forceRefresh = false) => {
       try {
-        const u = auth?.currentUser;
-        if (!u || !u.getIdToken) return;
-        const token = await u.getIdToken(forceRefresh);
-        const res = await fetch(`${BASE}/api/notifications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.status === 401 || res.status === 403) {
-          if (!forceRefresh) {
-            return load(true);
-          }
-          unauthorizedRef.current += 1;
-          if (unauthorizedRef.current >= 3) {
-            console.warn('[NotificationWatcher] Deshabilitado tras respuestas 401 consecutivas');
-            if (intervalId) clearInterval(intervalId);
-            active = false;
-          }
-          return;
-        }
-        unauthorizedRef.current = 0;
-        if (!res.ok) return;
-        const list = await res.json();
+        const { notifications = [] } = await fetchNotifications({ forceRefresh });
+        const list = Array.isArray(notifications) ? notifications : [];
         if (!Array.isArray(list)) return;
         for (const n of list) {
           if (!n || !n.id) continue;
@@ -160,7 +139,11 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
         try {
           localStorage.setItem('mywed360_notif_seen', JSON.stringify(Array.from(seenRef.current)));
         } catch {}
-      } catch {}
+      } catch (error) {
+        if (import.meta.env?.DEV) {
+          console.debug('[NotificationWatcher] load error, usando cache local', error?.message);
+        }
+      }
     };
 
     const startPolling = async () => {
@@ -179,7 +162,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
       );
     };
 
-    if (auth?.currentUser) {
+    if (auth?.currentUser?.uid) {
       startPolling();
     } else {
       const unsub = onAuthStateChanged(auth, (u) => {
@@ -194,7 +177,7 @@ export default function NotificationWatcher({ intervalMs = 20000 }) {
       active = false;
       if (intervalId) clearInterval(intervalId);
     };
-  }, [intervalMs]);
+  }, [intervalMs, uid]);
 
   return null;
 }

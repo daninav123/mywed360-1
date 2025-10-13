@@ -1,6 +1,6 @@
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
 import { db } from '../../firebaseConfig';
@@ -10,23 +10,27 @@ import { post as apiPost } from '../../services/apiClient';
 import Modal from '../Modal';
 import Button from '../ui/Button';
 
+const DEFAULT_RFP_BODY =
+  'Hola,\n\nNos gustaría recibir un presupuesto detallado para nuestro evento. Por favor, incluye condiciones, logística y extras.\n\nGracias.';
+const REMINDER_OPTIONS = [3, 7, 14];
+
 export default function RFQModal({
   open,
   onClose,
   providers = [],
   defaultSubject = 'Solicitud de presupuesto',
   defaultBody = '',
+  onSent = () => {},
 }) {
   const { activeWedding } = useWedding();
   const [subject, setSubject] = useState(defaultSubject);
-  const [body, setBody] = useState(
-    defaultBody ||
-      'Hola,\n\nNos gustaría recibir un presupuesto detallado para nuestro evento. Por favor, incluye condiciones, logística y extras.\n\nGracias.'
-  );
+  const [body, setBody] = useState(defaultBody || DEFAULT_RFP_BODY);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState(null);
+  const [autoReminderDays, setAutoReminderDays] = useState([3]);
 
   const targets = useMemo(() => providers.filter((p) => !!p?.email), [providers]);
+  const previewTarget = targets[0] || providers[0] || null;
   const inferredService = providers.find((p) => p?.service)?.service || '';
 
   // Templates
@@ -41,6 +45,31 @@ export default function RFQModal({
   const [activeField, setActiveField] = useState('body');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setResult(null);
+    setSubject(defaultSubject);
+    setBody(defaultBody || DEFAULT_RFP_BODY);
+    setAutoReminderDays([3]);
+    setAttachments([]);
+    setTplId('');
+    setTplName('');
+    setTplService(inferredService || '');
+    setActiveField('body');
+  }, [open, defaultSubject, defaultBody, inferredService]);
+
+  const toggleReminder = (day) => {
+    setAutoReminderDays((prev) => {
+      if (prev.includes(day)) {
+        return prev.filter((d) => d !== day);
+      }
+      return [...prev, day].sort((a, b) => a - b);
+    });
+  };
+
+  const remindersActive = autoReminderDays.length > 0;
+  const missingEmails = Math.max(0, (providers?.length || 0) - (targets?.length || 0));
 
   const variables = useMemo(() => {
     const wi = weddingInfo || {};
@@ -89,6 +118,7 @@ export default function RFQModal({
     setResult(null);
     try {
       const errors = [];
+      let followupsCreated = 0;
       for (const p of targets) {
         try {
           const compiledSubject = interpolate(subject, p);
@@ -103,11 +133,13 @@ export default function RFQModal({
             },
             { auth: true }
           );
+          let success = res.ok;
           if (!res.ok) {
             const json = await res.json().catch(() => ({}));
             errors.push({ id: p.id, email: p.email, err: json?.message || res.statusText });
+            success = false;
           }
-          // Log RFQ in Firestore (best-effort)
+          // Log RFQ en Firestore (best-effort) y programar recordatorios
           try {
             if (activeWedding && p.id && !String(p.id).startsWith('web-')) {
               const col = collection(
@@ -124,17 +156,55 @@ export default function RFQModal({
                 email: p.email,
                 attachments: attachments,
                 sentAt: serverTimestamp(),
+                status: success ? 'sent' : 'failed',
+                reminders: remindersActive ? autoReminderDays : [],
               });
-              // update supplier lastRFQAt
-              const sref = doc(db, 'weddings', activeWedding, 'suppliers', p.id);
-              await updateDoc(sref, { lastRFQAt: serverTimestamp() });
+              if (success) {
+                const sref = doc(db, 'weddings', activeWedding, 'suppliers', p.id);
+                await updateDoc(sref, { lastRFQAt: serverTimestamp() });
+                if (remindersActive) {
+                  for (const day of autoReminderDays) {
+                    const scheduleDate = Timestamp.fromDate(
+                      new Date(Date.now() + day * 24 * 60 * 60 * 1000)
+                    );
+                    const followupsCol = collection(
+                      db,
+                      'weddings',
+                      activeWedding,
+                      'suppliers',
+                      p.id,
+                      'rfqFollowups'
+                    );
+                    await addDoc(followupsCol, {
+                      subject: compiledSubject,
+                      email: p.email,
+                      scheduledFor: scheduleDate,
+                      status: 'scheduled',
+                      createdAt: serverTimestamp(),
+                      dayOffset: day,
+                      auto: true,
+                    });
+                    followupsCreated += 1;
+                  }
+                }
+              }
             }
           } catch {}
         } catch (e) {
           errors.push({ id: p.id, email: p.email, err: e?.message || String(e) });
         }
       }
-      setResult({ ok: errors.length === 0, errors });
+      const outcome = {
+        ok: errors.length === 0,
+        errors,
+        sentCount: targets.length - errors.length,
+        reminders: remindersActive ? autoReminderDays.slice() : [],
+        remindersCreated: followupsCreated,
+      };
+      setResult(outcome);
+      try {
+        onSent?.(outcome);
+      } catch {}
     } finally {
       setSending(false);
     }
@@ -165,6 +235,11 @@ export default function RFQModal({
   return (
     <Modal open={open} onClose={onClose} title={`Solicitar presupuesto (${targets.length})`}>
       <div className="space-y-4">
+        {missingEmails > 0 && (
+          <div className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            {missingEmails} proveedor(es) no tienen email asignado y se omitirán del envío.
+          </div>
+        )}
         {/* Templates */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           <div>
@@ -295,6 +370,46 @@ export default function RFQModal({
                 </span>
               ))}
             </div>
+            <div className="mt-3 border border-indigo-100 bg-indigo-50/50 rounded-md p-3">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-indigo-700">Recordatorios automáticos</p>
+                {remindersActive ? (
+                  <button
+                    type="button"
+                    className="text-[11px] text-indigo-600 hover:underline"
+                    onClick={() => setAutoReminderDays([])}
+                  >
+                    Limpiar
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-indigo-500">Sin recordatorios</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {REMINDER_OPTIONS.map((day) => {
+                  const active = autoReminderDays.includes(day);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => toggleReminder(day)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                        active
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
+                          : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-100'
+                      }`}
+                    >
+                      +{day} días
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-indigo-600 mt-2">
+                {remindersActive
+                  ? `Programaremos seguimiento en ${autoReminderDays.join(', ')} día(s).`
+                  : 'Activa los recordatorios para automatizar el follow-up.'}
+              </p>
+            </div>
           </div>
           <div>
             <p className="text-xs text-gray-500 mb-1">Adjuntos (URL)</p>
@@ -381,15 +496,26 @@ export default function RFQModal({
         {/* Vista previa */}
         <div className="border rounded p-3 bg-gray-50">
           <p className="text-xs text-gray-500 mb-1">Vista previa</p>
-          <p className="font-medium">Asunto: {interpolate(subject, targets[0])}</p>
-          <div className="whitespace-pre-wrap text-sm mt-1">{interpolate(body, targets[0])}</div>
+          <p className="font-medium">
+            Asunto: {previewTarget ? interpolate(subject, previewTarget) : subject}
+          </p>
+          <div className="whitespace-pre-wrap text-sm mt-1">
+            {previewTarget ? interpolate(body, previewTarget) : body}
+          </div>
         </div>
         {result && (
           <div
             className={`text-sm ${result.ok ? 'text-green-700 bg-green-50 border-green-200' : 'text-red-700 bg-red-50 border-red-200'} border p-2 rounded`}
           >
             {result.ok ? (
-              'Enviado correctamente.'
+              <>
+                Enviado correctamente a {result.sentCount} proveedor(es).
+                {result.remindersCreated > 0 && result.reminders?.length ? (
+                  <span className="block text-xs mt-1 text-green-700">
+                    Recordatorios programados: +{result.reminders.join(', ')} día(s).
+                  </span>
+                ) : null}
+              </>
             ) : (
               <>
                 Fallos: {result.errors.length}
@@ -400,6 +526,11 @@ export default function RFQModal({
                     </li>
                   ))}
                 </ul>
+                {result.sentCount > 0 && (
+                  <p className="mt-2 text-xs text-red-700">
+                    Se enviaron {result.sentCount} solicitudes con {result.remindersCreated} recordatorios programados.
+                  </p>
+                )}
               </>
             )}
           </div>

@@ -77,3 +77,79 @@ router.post('/:weddingId/permissions/autofix', requireAuth, async (req, res) => 
 });
 
 export default router;
+
+// Rutas de soporte para E2E/Desarrollo (no producción salvo flag explícita)
+// POST /api/weddings/dev/seed
+// Crea/actualiza bodas para el usuario autenticado como planner y las vincula en users/{uid}/weddings
+router.post('/dev/seed', requireAuth, async (req, res) => {
+  try {
+    const allowProd = String(process.env.ENABLE_DEV_SEED || 'false').toLowerCase() === 'true';
+    const isProd = String(process.env.NODE_ENV || 'production').toLowerCase() === 'production';
+    if (isProd && !allowProd) {
+      return res.status(403).json({ ok: false, error: { code: 'forbidden', message: 'dev/seed deshabilitado en producción' } });
+    }
+
+    const uid = req?.user?.uid;
+    if (!uid) return res.status(401).json({ ok: false, error: { code: 'unauthenticated' } });
+
+    const payload = req.body || {};
+    const items = Array.isArray(payload.weddings) ? payload.weddings : [];
+    const activeIdReq = typeof payload.activeId === 'string' ? payload.activeId.trim() : '';
+
+    const db = admin.firestore();
+    const created = [];
+    const batch = db.batch();
+
+    for (const it of items) {
+      try {
+        const id = (typeof it?.id === 'string' && it.id.trim()) || db.collection('weddings').doc().id;
+        const wedRef = db.collection('weddings').doc(id);
+        const base = {
+          name: it?.name || 'Boda',
+          weddingDate: it?.weddingDate || it?.date || '',
+          location: it?.location || '',
+          progress: Number.isFinite(Number(it?.progress)) ? Number(it.progress) : 0,
+          active: it?.active !== false,
+          ownerIds: Array.isArray(it?.ownerIds) ? it.ownerIds : [],
+          plannerIds: admin.firestore.FieldValue.arrayUnion(uid),
+          assistantIds: Array.isArray(it?.assistantIds) ? it.assistantIds : [],
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        batch.set(wedRef, base, { merge: true });
+
+        const subRef = db.collection('users').doc(uid).collection('weddings').doc(id);
+        batch.set(subRef, {
+          id,
+          name: base.name,
+          weddingDate: base.weddingDate,
+          location: base.location,
+          progress: base.progress,
+          active: base.active,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, { merge: true });
+
+        created.push(id);
+      } catch (e) {
+        logger.warn('[dev/seed] item error:', e);
+      }
+    }
+
+    await batch.commit();
+
+    const activeId = activeIdReq && created.includes(activeIdReq) ? activeIdReq : (created[0] || null);
+    if (activeId) {
+      try {
+        await db.collection('users').doc(uid).set({ activeWeddingId: activeId, hasActiveWedding: true, lastActiveWeddingAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        await db.collection('users').doc(uid).collection('weddings').doc(activeId).set({ active: true, lastAccessedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      } catch (e) {
+        logger.warn('[dev/seed] could not set active wedding for user', e);
+      }
+    }
+
+    return res.json({ ok: true, created, activeId });
+  } catch (e) {
+    logger.error('[dev/seed] exception:', e);
+    return res.status(500).json({ ok: false, error: { code: 'internal_error', message: 'Error interno' } });
+  }
+});

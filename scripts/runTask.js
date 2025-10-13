@@ -88,13 +88,23 @@ function runCmd(cmd, opts = {}) {
   });
 }
 
-function enhanceCypressCommand(cmd) {
-  const isCypress = String(cmd).includes('cypress:run');
-  const hasBrowser = /--browser\s+\S+/i.test(String(cmd));
-  if (isCypress && !hasBrowser) {
-    return `${cmd} --browser edge --headless`;
+function enhanceCypressCommand(cmd, taskId) {
+  const str = String(cmd);
+  const isCypress = str.includes('cypress:run');
+  if (!isCypress) return cmd;
+  const parts = [str];
+  if (!/--browser\s+\S+/i.test(str)) {
+    parts.push('--browser edge --headless');
   }
-  return cmd;
+  // Añadir reporter JSON por tarea
+  const reportOut = taskId ? `cypress/reports/${taskId}.json` : `cypress/reports/run.json`;
+  if (!/--reporter\s+\S+/i.test(str)) {
+    parts.push('--reporter json');
+  }
+  if (!/--reporter-options\s+[^\s]+/i.test(str)) {
+    parts.push(`--reporter-options output=${reportOut}`);
+  }
+  return parts.join(' ');
 }
 
 async function healthCheckWithRetries(taskId = 'generic') {
@@ -194,7 +204,13 @@ async function main() {
   try {
     // Ejecutar acción
     if (task.command) {
-      const cmd = enhanceCypressCommand(task.command);
+      // Si es Cypress, asegurar carpeta de reportes
+      try {
+        if (String(task.command).includes('cypress:run')) {
+          ensureDir(path.join(repoRoot, 'cypress', 'reports'));
+        }
+      } catch {}
+      const cmd = enhanceCypressCommand(task.command, String(task.id));
       runExit = await runCmd(cmd, { logPath: path.join(OUTPUT_DIR, `${String(task.id)}.run.log`) });
     } else if (task.script) {
       const cmd = `node ${task.script}`;

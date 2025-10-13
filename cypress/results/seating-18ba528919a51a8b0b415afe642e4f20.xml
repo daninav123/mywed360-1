@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="19.037" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-10-12T21:05:35" tests="0" file="cypress\e2e\seating\seating_template_circular.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Seating Plan - Plantilla: Distribución circular" timestamp="2025-10-12T21:05:35" tests="1" time="19.028" failures="1">
+    <testcase name="Seating Plan - Plantilla: Distribución circular coloca las mesas aproximadamente en un anillo" time="0.000" classname="coloca las mesas aproximadamente en un anillo">
+      <failure message="Timed out retrying after 10000ms: Expected to find content: &apos;Distribución circular&apos; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 10000ms: Expected to find content: 'Distribución circular' but never did.
+    at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_template_circular.cy.js:21:7)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

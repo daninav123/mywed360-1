@@ -1,4 +1,4 @@
-import { getAnalytics, isSupported } from 'firebase/analytics';
+﻿import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, onValue } from 'firebase/database';
@@ -13,38 +13,75 @@ import {
 } from 'firebase/firestore';
 
 // Configuración de Firebase desde variables de entorno (sin secretos hard-coded)
-const firebaseConfig = {
-  apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || '',
-  authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: import.meta?.env?.VITE_FIREBASE_APP_ID || '',
+const rawFirebaseConfig = {
+  apiKey: import.meta?.env?.VITE_FIREBASE_API_KEY || "",
+  authDomain: import.meta?.env?.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: import.meta?.env?.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: import.meta?.env?.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: import.meta?.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: import.meta?.env?.VITE_FIREBASE_APP_ID || "",
   measurementId: import.meta?.env?.VITE_FIREBASE_MEASUREMENT_ID || undefined,
 };
+const inferredAuthDomain =
+  rawFirebaseConfig.authDomain ||
+  (rawFirebaseConfig.projectId ? `${rawFirebaseConfig.projectId}.firebaseapp.com` : '');
+const inferredStorageBucket =
+  rawFirebaseConfig.storageBucket ||
+  (rawFirebaseConfig.projectId ? `${rawFirebaseConfig.projectId}.appspot.com` : '');
+
+if (!rawFirebaseConfig.authDomain && inferredAuthDomain && typeof console !== 'undefined') {
+  console.warn(
+    '[firebaseConfig] VITE_FIREBASE_AUTH_DOMAIN ausente; usando dominio inferido:',
+    inferredAuthDomain
+  );
+}
+
+if (!rawFirebaseConfig.storageBucket && inferredStorageBucket && typeof console !== 'undefined') {
+  console.warn(
+    '[firebaseConfig] VITE_FIREBASE_STORAGE_BUCKET ausente; usando bucket inferido:',
+    inferredStorageBucket
+  );
+}
+
+const firebaseConfig = {
+  ...rawFirebaseConfig,
+  authDomain: inferredAuthDomain,
+  storageBucket: inferredStorageBucket,
+};
+
+const FIREBASE_CONFIGURED =
+  Boolean(firebaseConfig.apiKey) && Boolean(firebaseConfig.projectId) && Boolean(firebaseConfig.authDomain);
 
 if (typeof window !== 'undefined') {
   const missing = Object.entries(firebaseConfig)
     .filter(([_, v]) => !v)
     .map(([k]) => k);
   if (missing.length) {
-    // Aviso en consola para facilitar configuración local
+    // Aviso en consola para facilitar configuraciÃ³n local
     // No expone valores; solo lista claves faltantes
     console.warn('[firebaseConfig] Variables VITE_* faltantes:', missing.join(', '));
   }
 }
 
 // Variables globales de Firebase
-let app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-let db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  cacheSizeBytes: 50 * 1024 * 1024,
-  ignoreUndefinedProperties: true,
-});
+let app =
+  FIREBASE_CONFIGURED && getApps().length
+    ? getApp()
+    : FIREBASE_CONFIGURED
+    ? initializeApp(firebaseConfig)
+    : null;
+let db =
+  FIREBASE_CONFIGURED && app
+    ? initializeFirestore(app, {
+        experimentalForceLongPolling: true,
+        cacheSizeBytes: 50 * 1024 * 1024,
+        ignoreUndefinedProperties: true,
+      })
+    : null;
 let auth;
 let analytics;
 
-// Prueba la conexión con Firestore con reintentos
+// Prueba la conexiÃ³n con Firestore con reintentos
 const probarConexionFirestore = async (maxReintentos = 2) => {
   for (let intento = 0; intento <= maxReintentos; intento++) {
     try {
@@ -63,7 +100,7 @@ const probarConexionFirestore = async (maxReintentos = 2) => {
   return false;
 };
 
-// Listener de estado de conexión (opcional)
+// Listener de estado de conexiÃ³n (opcional)
 const configurarListenerConexion = () => {
   if (typeof window === 'undefined') return;
   if (import.meta.env.VITE_ENABLE_REALTIME_DB !== 'true') return;
@@ -80,12 +117,15 @@ const configurarListenerConexion = () => {
       }
     });
   } catch (error) {
-    console.warn('No se pudo configurar el listener de conexión:', error);
+    console.warn('No se pudo configurar el listener de conexiÃ³n:', error);
   }
 };
 
 // Inicializa los servicios de Firebase
 const inicializarFirebase = async () => {
+  if (!FIREBASE_CONFIGURED) {
+    return null;
+  }
   try {
     // App
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
@@ -115,9 +155,9 @@ const inicializarFirebase = async () => {
       } catch (firestoreError) {
         if (firestoreError?.message?.includes('has already been called')) {
           db = getFirestore(app);
-          console.warn('ℹ️ Firestore ya estaba inicializado, usando instancia existente');
+          console.warn('â„¹ï¸ Firestore ya estaba inicializado, usando instancia existente');
         } else {
-          console.error('❌ Error al inicializar Firestore:', firestoreError);
+          console.error('âŒ Error al inicializar Firestore:', firestoreError);
           throw new Error(`Error al inicializar Firestore: ${firestoreError.message}`);
         }
       }
@@ -133,7 +173,7 @@ const inicializarFirebase = async () => {
     } catch (err) {
       if (err.code === 'failed-precondition') {
         console.warn(
-          'No se pudo habilitar multi‑tab (otra pestaña es dueña). Intentando modo single‑tab...'
+          'No se pudo habilitar multiâ€‘tab (otra pestaÃ±a es dueÃ±a). Intentando modo singleâ€‘tab...'
         );
         try {
           await enableIndexedDbPersistence(db);
@@ -154,7 +194,7 @@ const inicializarFirebase = async () => {
       console.warn('No se pudo configurar el emulador:', emulatorError);
     }
 
-    // Probar conexión y prueba de escritura
+    // Probar conexiÃ³n y prueba de escritura
     try {
       await probarConexionFirestore();
       try {
@@ -165,7 +205,7 @@ const inicializarFirebase = async () => {
         if (writeError.code === 'permission-denied') {
           errorMsg = 'Error de permisos: No tienes acceso a la base de datos.';
         } else if (writeError.code === 'unavailable') {
-          errorMsg = 'Servidor de Firebase no disponible. Verifica tu conexión a internet.';
+          errorMsg = 'Servidor de Firebase no disponible. Verifica tu conexiÃ³n a internet.';
         } else {
           errorMsg = `Error al acceder a Firestore: ${writeError.message}`;
         }
@@ -175,9 +215,9 @@ const inicializarFirebase = async () => {
       }
     } catch (error) {
       let errorMsg =
-        'Modo sin conexión - Los cambios se sincronizarán cuando se recupere la conexión';
+        'Modo sin conexiÃ³n - Los cambios se sincronizarÃ¡n cuando se recupere la conexiÃ³n';
       if (error.code === 'unavailable') {
-        errorMsg = 'Firebase no disponible. Verifica tu conexión a internet.';
+        errorMsg = 'Firebase no disponible. Verifica tu conexiÃ³n a internet.';
       } else if (error.message && error.message.includes('network')) {
         errorMsg = 'Problemas de red al conectar con Firebase.';
       }
@@ -186,7 +226,7 @@ const inicializarFirebase = async () => {
       }
     }
 
-    // Analytics en producción
+    // Analytics en producciÃ³n
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
       try {
         const soporteAnalytics = await isSupported();
@@ -198,13 +238,13 @@ const inicializarFirebase = async () => {
       }
     }
 
-    // Listener de conexión
+    // Listener de conexiÃ³n
     configurarListenerConexion();
   } catch (error) {
     console.error('Error al inicializar Firebase:', error);
     if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
       window.mostrarErrorUsuario(
-        'Error al conectar con el servidor. La aplicación funcionará en modo fuera de línea.',
+        'Error al conectar con el servidor. La aplicaciÃ³n funcionarÃ¡ en modo fuera de lÃ­nea.',
         0
       );
     }
@@ -212,12 +252,15 @@ const inicializarFirebase = async () => {
   }
 };
 
-// Al importar este módulo iniciamos Firebase y exportamos la promesa
-const firebaseReady = inicializarFirebase().catch((error) => {
-  console.error('Error crítico al inicializar Firebase:', error);
-  throw error;
-});
+// Al importar este mÃ³dulo iniciamos Firebase y exportamos la promesa
+const firebaseReady = FIREBASE_CONFIGURED
+  ? inicializarFirebase().catch((error) => {
+      console.error('Error crÃ­tico al inicializar Firebase:', error);
+      throw error;
+    })
+  : Promise.resolve();
 
 const getFirebaseAuth = () => auth;
 
 export { auth, db, analytics, firebaseReady, getFirebaseAuth };
+

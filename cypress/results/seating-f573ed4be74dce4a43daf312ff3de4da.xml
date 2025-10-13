@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="18.956" tests="1" failures="1">
+  <testsuite name="Root Suite" timestamp="2025-10-12T21:03:38" tests="0" file="cypress\e2e\seating\seating_capacity_limit.cy.js" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Seating Plan - Límite de capacidad por mesa" timestamp="2025-10-12T21:03:38" tests="1" time="18.947" failures="1">
+    <testcase name="Seating Plan - Límite de capacidad por mesa bloquea la asignación cuando seats está completo y muestra toast de error" time="0.000" classname="bloquea la asignación cuando seats está completo y muestra toast de error">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[aria-label^=&quot;Invitado &quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[aria-label^="Invitado "]`, but never found it.
+    at Context.eval (webpack://mywed360/./cypress/e2e/seating/seating_capacity_limit.cy.js:52:7)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

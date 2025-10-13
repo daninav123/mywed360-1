@@ -1,8 +1,13 @@
-# 7. Comunicaciones y Email (estado 2025-10-08)
+# 7. Comunicaciones y Email (estado 2025-10-13)
 
-> Implementado: `components/email/UnifiedInbox/InboxContainer.jsx`, `components/email/UnifiedInbox/EmailDetail.jsx`, `components/email/UnifiedInbox/EmailList.jsx`, `components/email/EmailComposer.jsx`, `components/email/SmartEmailComposer.jsx`, `pages/EmailSetup.jsx`, `components/email/EmailSettings.jsx`, `pages/EmailTemplates.jsx`, `pages/user/EmailStatistics.jsx`, `components/email/EmailComments.jsx`, `components/email/EmailFeedbackCollector.jsx`, `components/email/CalendarIntegration.jsx`, `components/email/MailgunTester.jsx`, servicios `services/emailService.js`, `services/emailAutomationService.js`, `services/EmailRecommendationService.js`, `services/emailTemplatesService.js`, `services/tagService.js`, `services/folderService.js`, hooks `hooks/useEmailMonitoring.js`, `hooks/useEmailUsername.jsx`. El buzón legacy (`pages/Buzon_fixed_complete.jsx`) sigue en el repositorio pero ya no está ruteado.
+> Implementado:
+> - **Bandeja unificada:** `components/email/UnifiedInbox/InboxContainer.jsx`, `components/email/UnifiedInbox/EmailDetail.jsx`, `components/email/UnifiedInbox/EmailList.jsx`, `components/email/EmailComposer.jsx`, `components/email/SmartEmailComposer.jsx`, `components/email/EmailComments.jsx`, `components/email/EmailFeedbackCollector.jsx`, `components/email/CalendarIntegration.jsx`, `components/ProviderSearchModal.jsx`, `components/email/CustomFolders.jsx`, `components/email/ManageFoldersModal.jsx`.
+> - **Configuración y plantillas:** `pages/EmailSetup.jsx`, `components/email/EmailSettings.jsx`, `pages/EmailTemplates.jsx`, `pages/user/EmailStatistics.jsx`, `components/email/MailgunTester.jsx`, `components/email/EmptyTrashModal.jsx`, `components/email/UnifiedInbox/InboxNavigation.jsx`.
+> - **Servicios y utilidades:** `services/emailService.js`, `services/emailAutomationService.js`, `services/EmailRecommendationService.js`, `services/emailTemplatesService.js`, `services/tagService.js`, `services/folderService.js`, `utils/EmailCache.js`.
+> - **Hooks:** `hooks/useEmailMonitoring.js`, `hooks/useEmailUsername.jsx`.
+> El buzón legacy (`pages/Buzon_fixed_complete.jsx`) sigue en el repositorio pero ya no está ruteado.
 >
-> Pendiente/alertas principales: cableado de búsqueda/ordenación en `UnifiedInbox/EmailList.jsx`, integración de carpetas/etiquetas personalizadas en la nueva bandeja, implementación real del `callClassificationAPI` y del procesador de envíos programados (`processScheduledEmails`), onboarding con validaciones DKIM/SPF reales, persistencia en backend de la configuración de auto-respuestas, y migración definitiva del buzón legacy + actualización de pruebas E2E/VTU a la nueva UI.
+> Pendiente/alertas principales: cableado de búsqueda/ordenación secundario en `UnifiedInbox/EmailList.jsx`, sincronización de contadores/unread de carpetas personalizadas con backend, implementación real del `callClassificationAPI` y del procesador de envíos programados (`processScheduledEmails`), onboarding con validaciones DKIM/SPF, persistencia server-side de auto-respuestas y migración definitiva del buzón legacy + actualización de pruebas E2E/VTU a la nueva UI.
 
 ## 1. Objetivo y alcance
 - Centralizar recepción y envío de emails vinculados a la boda, con soporte para alias `@mywed360`, plantillas e IA de apoyo.
@@ -27,18 +32,22 @@
 
 ### 3.2 Operativa diaria
 - `UnifiedInbox/InboxContainer.jsx` (UI actual por defecto):
-  - Carpeta activa: sólo `inbox` y `sent`. No hay UI para carpetas personalizadas ni papelera (las APIs existen en `services/folderService.js` pero aún no se integran).
-  - Controles: buscar (`searchTerm` en cabecera), filtrar por leído/no leído, abrir compositor básico o IA, refrescar, lanzar análisis IA (dev only) y abrir búsqueda de proveedores.
-  - `UnifiedInbox/EmailList.jsx` soporta selección múltiple, eliminación y badges IA por correo. **Pendiente:** se renderiza un buscador secundario que invoca `onSearch`/`onSortChange` sin estar cableados desde `InboxContainer`, provocando errores si se usa; decidir si se elimina o se conecta al estado del padre.
-  - `UnifiedInbox/EmailDetail.jsx` muestra contenido, adjuntos (descarga pendiente), botones de responder/reenviar/reenviar calendario y alimenta:
-    - `components/EmailInsights.jsx` (extrae tareas, reuniones, presupuestos, contratos via `/api/email-insights` o heurística local).
-    - `components/email/EmailComments.jsx` (comentarios internos por correo, persistidos en `localStorage` por usuario).
-    - `components/email/EmailTagsManager.jsx` (etiquetado best-effort con API/`tagService`).
-    - `components/email/CalendarIntegration.jsx` (detección heurística de fechas/ubicaciones y creación de eventos vía `/api/email/calendar-event` o fallback `CalendarService.createEvent`).
-    - `components/email/EmailFeedbackCollector.jsx` (encuesta rápida; guarda en `performanceMonitor` y POST opcional a `/api/email-feedback`).
+  - Navegación lateral: botones `Bandeja de entrada`, `Enviados` y `Papelera` con contadores (`inboxCounts`, `sentCounts`, `trashCounts`). `CustomFolders.jsx` consume `folderService` para carpetas personalizadas (crear/renombrar/eliminar) y expone accesos a `ManageFoldersModal.jsx`. Cuando la carpeta activa es `trash`, se habilita el botón “Vaciar papelera” que abre `EmptyTrashModal.jsx`.
+  - `refreshEmails` soporta carpetas del sistema (`inbox`, `sent`, `trash`) y personalizadas (`custom:{id}`) combinando `EmailService.getMails` con `folderService.getEmailsInFolder`. `refreshCounts` actualiza métricas (incluidas IA) y sincroniza la lista de carpetas personalizadas.
+  - Encabezado de página: búsqueda global (`searchTerm`), filtros leído/no leído (`filterStatus`), accesos directos a “Nuevo email”/“Redactar con IA”, refresco manual y gatillo de análisis IA (solo desarrollo).
+  - Eliminación: en carpetas activas se usa `EmailService.moveMail(id, 'trash')`; en `trash` se invoca `EmailService.deleteMail`. Las operaciones limpian asignaciones locales de carpetas personalizadas (`removeEmailFromFolder`) y refrescan conteos globales.
+  - `EmptyTrashModal.jsx` delega en el nuevo `EmailService.emptyTrash`, vaciando la carpeta y actualizando la UI tras confirmar.
+- `UnifiedInbox/EmailList.jsx`:
+  - Gestiona selección múltiple y “Eliminar” respetando la carpeta actual (mueve a papelera o elimina permanentemente en `trash`). Añade `data-testid` (`email-list-item`, `empty-folder-message`) para soportar Cypress.
+  - El buscador y orden secundario siguen sin cablearse al contenedor; queda pendiente decidir si se eliminan o se sincronizan con el estado global.
+- `UnifiedInbox/EmailDetail.jsx`:
+  - Integra acciones contextuales: fuera de `trash` el botón “Eliminar” mueve el correo; dentro de `trash` aparecen “Restaurar” (retorna a `inbox`) y “Eliminar permanentemente” (`EmailService.deleteMail`).
+  - Mantiene integraciones con `EmailInsights`, comentarios internos, etiquetas (`EmailTagsManager`), calendario y feedback.
+- `components/email/EmptyTrashModal.jsx` ya existe con `data-testid` consumibles por Cypress, pero la UI aún no lo utiliza.
 - Composición:
-  - `components/email/EmailComposer.jsx` (clásico): valida destinatarios/asunto/cuerpo, limita adjuntos a 10 MB y permite programar envíos (ver limitaciones en automatización).
+  - `components/email/EmailComposer.jsx` (clásico): valida destinatarios/asunto/cuerpo, limita adjuntos a 10 MB y permite programar envíos (ver limitaciones en automatización). Cuando programa, delega en `emailAutomationService.scheduleEmailSend`.
   - `components/email/SmartEmailComposer.jsx`: se alimenta de plantillas (`EmailService.getEmailTemplates` → API o `services/emailTemplates.js`) y recomendaciones de `EmailRecommendationService`. Soporta programación y rastrea recomendaciones aplicadas; integra con `ProviderSearchModal`.
+  - Tanto el modo clásico como el IA refrescan la bandeja y contadores tras enviar; los envíos programados permanecen en cola hasta que exista un job que ejecute `processScheduledEmails` (3.3).
 
 ### 3.3 Automatizaciones y análisis
 - `services/emailAutomationService.js` gestiona:
@@ -48,14 +57,26 @@
 - `services/EmailRecommendationService.js` + `AIEmailTrackingService` llevan métricas locales para sugerencias IA dentro del Smart Composer.
 - `components/email/EmailStats.jsx` + `pages/user/EmailStatistics.jsx` muestran métricas (Chart.js) usando `services/emailMetricsService.js` (Firestore `emailMetrics/{userId}`) con fallback a cálculos locales via `services/statsService.js`.
 
+### 3.4 Gestión de carpetas y papelera
+- **Estado actual:**
+  - La barra lateral expone `inbox`, `sent` y `trash` con contadores, integra `CustomFolders.jsx` para carpetas personalizadas (creación, renombrado, eliminación) y habilita `ManageFoldersModal.jsx` / `EmptyTrashModal.jsx` desde el propio contenedor.
+  - `EmailService.moveMail` (alias de `setFolder`) se usa para mover correos; `EmailService.deleteMail` queda reservado para `trash` y vaciados masivos. `removeEmailFromFolder` limpia mapeos locales cuando se desplaza un correo fuera de una carpeta personalizada.
+  - Restaurar desde la papelera devuelve el correo a `inbox` por defecto; todavía no se conserva la carpeta original ni se rehidratan etiquetas personalizadas.
+  - Los contadores de carpetas personalizadas dependen de `folderService` en localStorage; no existe sincronización de `unread` ni métricas agregadas en backend.
+- **Pendientes:**
+  - Persistir carpeta de origen y contadores `unread` en backend para soportar restauraciones completas y métricas consistentes.
+  - Añadir UI para mover correos entre carpetas personalizadas desde lista/detalle (drag & drop o `FolderSelectionModal`).
+  - Definir política de retención automática (cron/backend) y registrar métricas de papelera/acciones de limpieza.
+
 ## 4. Persistencia y datos
-- Correos: `services/emailService.js` prioriza backend (`/api/mail/*`). Sin backend, cae a Firestore (`users/{uid}/mails` y colección global `mails`) o memoria/localStorage (`memoryStore.mails`). No existe colección `weddings/{id}/emails`.
+- Correos: `services/emailService.js` prioriza backend (`/api/mail/*`). Sin backend, cae a Firestore (`users/{uid}/mails` y colección global `mails`) o memoria/localStorage (`memoryStore.mails`). El campo `folder` se actualiza con `EmailService.setFolder` (cuando se integre) y se usa para determinar `inbox`/`sent`/`trash`/personalizadas. No existe colección `weddings/{id}/emails`.
 - Alias: `hooks/useEmailUsername.jsx` escribe en `emailUsernames/{alias}` y `users/{uid}` (`emailUsername`, `myWed360Email`).
 - Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`mywed360.email.automation.*`, `mywed360.email.automation.schedule`…).
-- Etiquetas y carpetas personalizadas: `tagService.js` y `folderService.js` almacenan en `localStorage` (mirroring opcional a Firestore); la UI principal todavía no las consume.
+- Etiquetas y carpetas personalizadas: `tagService.js` (`mywed360_email_tags_*`) y `folderService.js` (`mywed360_email_folders_{uid}` + `mywed360_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
 - Plantillas: API `/api/email-templates` (via `services/emailTemplatesService.js`); fallback a catálogo estático `services/emailTemplates.js`. No existe sincronización automática con Firestore.
 - Métricas agregadas: Firestore `emailMetrics/{userId}` (+ subcolección `daily`). El cálculo local guarda copia en `localStorage` (`mywed360_email_stats_{userId}`).
 - Tracking de proveedores/campañas AI: `services/EmailTrackingService.js` y `AIEmailTrackingService.js` usan `localStorage` (claves `mywed360_email_tracking`, `aiEmailActivities`, etc.). No hay persistencia servidor.
+- Caché local: `utils/EmailCache.js` guarda correos por carpeta (`folder_inbox`, `folder_sent`, `folder_trash`, etc.) con límites configurables y debe invalidarse al mover o eliminar correos.
 
 ## 5. Reglas de negocio vigentes y pendientes
 - **Implementadas:** 
@@ -69,6 +90,8 @@
   - Validaciones DKIM/SPF/DMARC durante el onboarding (mencionadas en documentación anterior).
   - Gestión de permisos por rol más allá del alias (hoy se confía en UI).
   - Integración con WhatsApp/push o journeys multicanal.
+  - Restaurar a la carpeta de origen y conservar historial al mover correos a `trash`.
+  - Automatizar retención y métricas de papelera (jobs backend/cron).
 
 ## 6. Estados especiales y manejo de errores
 - Onboarding: si no hay sesión → redirección a `/login` con `returnUrl`; errores muestran banners en `EmailSetup.jsx`.
@@ -76,6 +99,7 @@
 - Composición: muestra toasts (éxito/error) y bloquea botón durante envío; validaciones evitan duplicados. Los envíos programados se guardan pero no se ejecutan.
 - IA insights: si backend falla, heurística local produce un mínimo de acciones; se loguea en consola.
 - Notificaciones: `EmailNotification.jsx` y `EmailNotificationBadge.jsx` degradan silenciosamente si `getMails` falla; la notificación overlay actual intercepta el click y lanza un `alert` placeholder (debe ajustarse).
+- Papelera: accesible desde la barra lateral; el vaciado exige confirmación (`EmptyTrashModal`) y la restauración vuelve a `inbox`. Falta conservar carpeta original y definir política de retención automática.
 
 ## 7. Integración con otros flujos
 - **Flujo 3/9 (Invitaciones & RSVP):** `pages/Invitaciones.jsx` usa `EmailService` para mandar invitaciones generadas; `rsvpService` genera links. La auto-respuesta “RSVP” de `EmailSettings` sirve de comunicación cruzada.
@@ -96,7 +120,7 @@
   - `src/test/components/email/*` cubren `EmailInbox`, `EmailDetail`, `FolderSelectionModal`, etc.
   - `src/test/accessibility/EmailInbox.a11y.test.jsx` verifica accesibilidad de la bandeja legacy.
 - **Cypress:** `cypress/e2e/email/*.cy.js` validan envío, lectura, gestión y notificaciones, pero confían en data-testids de la UI previa (`folder-sent`, etc.). La nueva bandeja debe exponer atributos equivalentes o actualizar las pruebas.
-- **Gaps:** no hay pruebas específicas para `UnifiedInbox/InboxContainer`, `EmailFeedbackCollector`, `CalendarIntegration` ni para la cola de envíos programados/auto-respuestas. Se requiere crear nuevos escenarios E2E (programar envío, aplicar etiquetas, comentarios, flujo IA).
+- **Gaps:** no hay pruebas específicas para `UnifiedInbox/InboxContainer`, `EmailFeedbackCollector`, `CalendarIntegration` ni para la cola de envíos programados/auto-respuestas. Se requiere crear nuevos escenarios E2E (programar envío, aplicar etiquetas, comentarios, flujo IA) e incorporar cobertura para papelera (mover, restaurar, vaciar).
 
 
 ## Cobertura E2E implementada
@@ -123,7 +147,8 @@
    - Mover la cola de envíos programados a backend + job recurrente; exponer estado/errores al usuario.
    - Persistir auto-respuestas y clasificación en Firestore/REST (no sólo localStorage).
 2. **UX / funcionalidad**
-   - Integrar carpetas y etiquetas personalizadas en la nueva bandeja (sidebar, filtros, drag & drop).
+   - Completar integración de carpetas personalizadas (drag & drop, recuentos unread persistentes) y alinear etiquetas con la nueva UI.
+   - Refinar papelera (`trash`): restaurar a la carpeta de origen, exponer métricas/retención y consolidar vaciado backend.
    - Resolver buscador/sort duplicado en `UnifiedInbox/EmailList.jsx` y alinear data-testids con Cypress.
    - Añadir toggle o ruta para acceder al buzón legacy sólo en modo soporte, o removerlo tras migración.
    - Completar experiencia de onboarding: validación DKIM/SPF, envío de correo de prueba, integración con `MailgunTester`.

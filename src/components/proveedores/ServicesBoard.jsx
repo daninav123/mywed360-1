@@ -22,8 +22,8 @@ const statusMeta = (estado = '') => {
 
 export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNew, onOpenAI }) {
   // Agrupar por servicio
-  const byService = proveedores.reduce((m, p) => {
-    const key = p.servicio || 'Otros';
+  const byService = (proveedores || []).reduce((m, p) => {
+    const key = p.service || p.servicio || 'Otros';
     if (!m.has(key)) m.set(key, []);
     m.get(key).push(p);
     return m;
@@ -39,15 +39,19 @@ export default function ServicesBoard({ proveedores = [], onOpenSearch, onOpenNe
       if (e.includes('rechaz')) return 0;
       return 1; // vacío / nuevo
     };
-    const best = list.reduce((acc, p) => (rank(p.estado) > rank(acc.estado) ? p : acc), list[0] || {});
-    const meta = statusMeta(best?.estado);
+    const best = list.reduce((acc, p) => (rank(p.estado || p.status) > rank(acc?.estado || acc?.status) ? p : acc), list[0] || {});
+    const meta = statusMeta(best?.estado || best?.status);
 
     // Totales financieros (si existen campos)
-    const asignado = list.reduce((s, p) => s + (parseFloat(p.presupuestoAsignado) || 0), 0);
-    const gastado = list.reduce((s, p) => s + (parseFloat(p.gastado) || 0), 0);
+    const asignado = list.reduce(
+      (s, p) => s + (parseFloat(p.assignedBudget ?? p.presupuestoAsignado) || 0),
+      0
+    );
+    const gastado = list.reduce((s, p) => s + (parseFloat(p.spent ?? p.gastado) || 0), 0);
 
     const Icon = serviceIcon(serv);
-    return { serv, meta, asignado, gastado, list, Icon, next: best?.proximaAccion || '' };
+    const nextAction = best?.nextAction || best?.proximaAccion || '';
+    return { serv, meta, asignado, gastado, list, Icon, next: nextAction };
   });
 
   // Servicios "vacíos" (si se desea mostrar placeholders): omitido por simplicidad

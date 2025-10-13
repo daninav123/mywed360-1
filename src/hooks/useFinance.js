@@ -3,12 +3,13 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { transactionSchema, transactionUpdateSchema } from '@/schemas/transaction.js';
 
-import { db } from '../firebaseConfig';
+import { auth, db } from '../firebaseConfig';
 import { useFirestoreCollection } from './useFirestoreCollection';
 import { useWedding } from '../context/WeddingContext';
 import { getTransactions } from '../services/bankService';
 import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData } from '../services/SyncService';
+import { requestBudgetAdvisor as fetchBudgetAdvisor } from '../services/budgetAdvisorService';
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
@@ -47,6 +48,113 @@ const AUTO_CATEGORY_RULES = [
   },
 ];
 
+const LEGACY_DEFAULT_CATEGORY_KEYS = new Set([
+  'venue',
+  'lugar',
+  'espacio',
+  'catering',
+  'fotografia',
+  'fotos',
+  'flores',
+  'musica',
+  'vestido',
+  'vestidos',
+  'transporte',
+  'otros',
+]);
+
+const normalizeCategoryName = (value) => {
+  if (!value) return '';
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/gi, ' ')
+    .trim()
+    .toLowerCase();
+};
+
+const dedupeServiceList = (list = []) => {
+  const seen = new Set();
+  const result = [];
+  for (const entry of Array.isArray(list) ? list : []) {
+    if (!entry) continue;
+    const name = String(entry).trim();
+    if (!name) continue;
+    const key = normalizeCategoryName(name);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    result.push(name);
+  }
+  return result;
+};
+
+const arraysShallowEqual = (a = [], b = []) => {
+  if (a === b) return true;
+  if (!Array.isArray(a) || !Array.isArray(b)) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+};
+
+const normalizeAdvisorTimestamp = (value) => {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value.toDate === 'function') {
+    try {
+      const date = value.toDate();
+      if (date instanceof Date && !Number.isNaN(date.getTime())) {
+        return date.toISOString();
+      }
+    } catch {}
+  }
+  return null;
+};
+
+const normalizeAdvisorData = (rawAdvisor) => {
+  if (!rawAdvisor || typeof rawAdvisor !== 'object') return null;
+  const toNumberOrNull = (value) => {
+    if (value === null || value === undefined || value === '') return null;
+    const num = Number(value);
+    return Number.isNaN(num) ? null : num;
+  };
+  const scenarios = Array.isArray(rawAdvisor.scenarios)
+    ? rawAdvisor.scenarios.map((scenario, idx) => {
+        const allocation = Array.isArray(scenario?.allocation)
+          ? scenario.allocation.map((entry) => ({
+              category: String(entry?.category || ''),
+              percentage: toNumberOrNull(entry?.percentage),
+              amount: toNumberOrNull(entry?.amount),
+              notes: entry?.notes ? String(entry.notes) : '',
+            }))
+          : [];
+        return {
+          id: scenario?.id || `scenario-${idx}`,
+          label: scenario?.label || scenario?.title || `Escenario ${idx + 1}`,
+          summary: scenario?.summary ? String(scenario.summary) : '',
+          allocation,
+          alerts: Array.isArray(scenario?.alerts)
+            ? scenario.alerts.filter(Boolean).map((alert) => String(alert))
+            : [],
+          traceId: scenario?.traceId || null,
+        };
+      })
+    : [];
+  return {
+    scenarios,
+    globalTips: Array.isArray(rawAdvisor.globalTips)
+      ? rawAdvisor.globalTips.filter(Boolean).map((tip) => String(tip))
+      : [],
+    requestedAt: normalizeAdvisorTimestamp(rawAdvisor.requestedAt),
+    appliedAt: normalizeAdvisorTimestamp(rawAdvisor.appliedAt),
+    selectedScenarioId: rawAdvisor.selectedScenarioId || null,
+    traceId: rawAdvisor.traceId || null,
+    feedback: rawAdvisor.feedback || null,
+  };
+};
+
 const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type = 'expense') => {
   const text = `${concept} ${provider}`.toLowerCase();
   if (type !== 'expense') return '';
@@ -56,10 +164,21 @@ const autoCategorizeTransaction = (concept = '', provider = '', amount = 0, type
   return '';
 };
 
+const loadXLSXModule = async () => {
+  const mod = await import('xlsx/xlsx.mjs');
+  const cpexcel = await import('xlsx/dist/cpexcel.full.mjs');
+  const XLSX = mod.default || mod;
+  if (typeof XLSX.set_cptable === 'function') {
+    XLSX.set_cptable(cpexcel.default || cpexcel);
+  }
+  return XLSX;
+};
+
 // Hook centralizado para gestión de finanzas
 // Maneja transacciones, presupuestos, aportaciones y sincronización
 export default function useFinance() {
-  const { activeWedding } = useWedding();
+  const { activeWedding, activeWeddingData } = useWedding();
+  const firebaseUid = auth?.currentUser?.uid || null;
 
   // Estados principales
   const [isLoading, setIsLoading] = useState(false);
@@ -82,10 +201,17 @@ export default function useFinance() {
     categories: [],
   });
 
+  const [advisor, setAdvisor] = useState(null);
+  const [advisorLoading, setAdvisorLoading] = useState(false);
+  const [advisorError, setAdvisorError] = useState(null);
+
   // Ajustes de finanzas (umbrales de alertas, etc.)
   const [settings, setSettings] = useState({
     alertThresholds: { warn: 75, danger: 90 },
   });
+
+  // Servicios deseados desde proveedores (para plantillas por defecto)
+  const [providerTemplates, setProviderTemplates] = useState([]);
 
   // Indica si hay cuenta bancaria vinculada
   const [hasBankAccount, setHasBankAccount] = useState(false);
@@ -105,7 +231,7 @@ export default function useFinance() {
   // Helper: persistir cambios en weddings/{id}/finance/main
   const persistFinanceDoc = useCallback(
     async (patch) => {
-      if (!activeWedding) return;
+      if (!activeWedding || !firebaseUid) return;
       try {
         const ref = doc(db, 'weddings', activeWedding, 'finance', 'main');
         await setDoc(ref, patch, { merge: true });
@@ -113,8 +239,55 @@ export default function useFinance() {
         console.warn('[useFinance] No se pudo persistir finance/main:', e);
       }
     },
-    [activeWedding]
+    [activeWedding, firebaseUid]
   );
+
+  useEffect(() => {
+    if (!activeWedding) {
+      setProviderTemplates((prev) => (prev.length ? [] : prev));
+      return undefined;
+    }
+    const weddingRef = doc(db, 'weddings', activeWedding);
+    const unsubscribe = onSnapshot(
+      weddingRef,
+      (snap) => {
+        if (!snap.exists()) {
+          setProviderTemplates((prev) => (prev.length ? [] : prev));
+          return;
+        }
+        try {
+          const data = snap.data() || {};
+          const rawList =
+            Array.isArray(data?.wantedServices) && data.wantedServices.length
+              ? data.wantedServices
+              : Array.isArray(data?.neededServices) && data.neededServices.length
+                ? data.neededServices
+                : Array.isArray(data?.requiredServices) && data.requiredServices.length
+                  ? data.requiredServices
+                  : [];
+          const normalized = (Array.isArray(rawList) ? rawList : [])
+            .map((entry) => {
+              if (typeof entry === 'string') return entry;
+              if (entry && typeof entry === 'object') {
+                return entry.name || entry.label || entry.id || '';
+              }
+              return '';
+            })
+            .map((value) => (typeof value === 'string' ? value.trim() : ''))
+            .filter(Boolean);
+          const deduped = dedupeServiceList(normalized);
+          setProviderTemplates((prev) => (arraysShallowEqual(prev, deduped) ? prev : deduped));
+        } catch (err) {
+          console.warn('[useFinance] Error procesando wantedServices:', err);
+        }
+      },
+      (err) => {
+        console.warn('[useFinance] Error escuchando wantedServices:', err);
+        setProviderTemplates((prev) => (prev.length ? [] : prev));
+      }
+    );
+    return () => unsubscribe();
+  }, [activeWedding]);
 
   // Cálculos memoizados
   const normalizePaidAmount = useCallback((transaction) => {
@@ -157,6 +330,38 @@ export default function useFinance() {
       .filter((t) => t.type === 'expense')
       .reduce((sum, t) => sum + normalizePaidAmount(t), 0);
   }, [transactions, normalizePaidAmount]);
+
+  const monthlySeries = useMemo(() => {
+    const arr = Array.isArray(transactions) ? transactions : [];
+    const now = new Date();
+    const months = [];
+    const incomeMap = new Map();
+    const expenseMap = new Map();
+    for (let i = 11; i >= 0; i--) {
+      const point = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${point.getFullYear()}-${String(point.getMonth() + 1).padStart(2, '0')}`;
+      months.push(key);
+      incomeMap.set(key, 0);
+      expenseMap.set(key, 0);
+    }
+    for (const tx of arr) {
+      if (!tx?.date) continue;
+      const parsed = new Date(tx.date);
+      if (Number.isNaN(parsed.getTime())) continue;
+      const key = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}`;
+      if (!incomeMap.has(key)) continue;
+      const amount = Number(tx.amount) || 0;
+      if (tx.type === 'income') {
+        incomeMap.set(key, (incomeMap.get(key) || 0) + Math.max(0, amount));
+      } else if (tx.type === 'expense') {
+        expenseMap.set(key, (expenseMap.get(key) || 0) + Math.max(0, amount));
+      }
+    }
+    const income = months.map((key) => incomeMap.get(key) || 0);
+    const expense = months.map((key) => expenseMap.get(key) || 0);
+    const net = income.map((value, idx) => value - expense[idx]);
+    return { months, income, expense, net };
+  }, [transactions]);
 
   const totalIncome = useMemo(() => {
     if (!Array.isArray(transactions)) return 0;
@@ -395,6 +600,106 @@ export default function useFinance() {
     }
   }, [transactions, contributions, totalIncome, totalSpent, weddingTimeline]);
 
+  const predictiveInsights = useMemo(() => {
+    if (!Array.isArray(transactions) || transactions.length === 0) return null;
+    const sliceCount = Math.min(monthlySeries.net.length, 6);
+    const recentNet = monthlySeries.net.slice(monthlySeries.net.length - sliceCount);
+    const recentIncome = monthlySeries.income.slice(monthlySeries.income.length - sliceCount);
+    const recentExpense = monthlySeries.expense.slice(monthlySeries.expense.length - sliceCount);
+    const avg = (arr) => (arr.length ? arr.reduce((sum, value) => sum + value, 0) / arr.length : 0);
+    const avgNet = avg(recentNet);
+    const avgIncome = avg(recentIncome);
+    const avgExpense = avg(recentExpense);
+    const burnRate = avgNet < 0 ? Math.abs(avgNet) : 0;
+    const budgetRemaining = Math.max(0, (stats?.totalBudget || 0) - (stats?.totalSpent || 0));
+    let monthsToZero = null;
+    let projectedZeroDate = null;
+    if (burnRate > 0) {
+      monthsToZero = budgetRemaining / burnRate;
+      if (Number.isFinite(monthsToZero)) {
+        const zeroDate = new Date();
+        const wholeMonths = Math.floor(monthsToZero);
+        const extraDays = Math.round((monthsToZero - wholeMonths) * 30);
+        zeroDate.setMonth(zeroDate.getMonth() + wholeMonths);
+        zeroDate.setDate(zeroDate.getDate() + extraDays);
+        projectedZeroDate = zeroDate.toISOString().slice(0, 10);
+      }
+    }
+    const warnThreshold = settings?.alertThresholds?.warn ?? 75;
+    const categoriesAtRisk = (budgetUsage || [])
+      .filter((cat) => !cat.muted && (cat.percentage || 0) >= warnThreshold)
+      .sort((a, b) => (b.percentage || 0) - (a.percentage || 0))
+      .slice(0, 5)
+      .map((cat) => ({
+        name: cat.name,
+        percentage: cat.percentage,
+        remaining: cat.remaining,
+      }));
+    const now = new Date();
+    const upcomingPayments = (Array.isArray(transactions) ? transactions : [])
+      .filter(
+        (tx) =>
+          tx &&
+          tx.type === 'expense' &&
+          tx.dueDate &&
+          (tx.status || '') !== 'paid' &&
+          new Date(tx.dueDate) >= now
+      )
+      .map((tx) => ({
+        concept: tx.concept || tx.description || '(Sin concepto)',
+        dueDate: new Date(tx.dueDate).toISOString().slice(0, 10),
+        outstanding: Math.max(0, (Number(tx.amount) || 0) - normalizePaidAmount(tx)),
+        provider: tx.provider || '',
+      }))
+      .filter((item) => item.outstanding > 0)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+      .slice(0, 5);
+    const forecastSurplus =
+      projection?.summary?.projectedAtWedding ?? stats?.currentBalance ?? 0;
+    let monthsToWedding = null;
+    if (
+      weddingTimeline.weddingDate instanceof Date &&
+      !Number.isNaN(weddingTimeline.weddingDate.getTime())
+    ) {
+      const diff =
+        (weddingTimeline.weddingDate.getFullYear() - now.getFullYear()) * 12 +
+        (weddingTimeline.weddingDate.getMonth() - now.getMonth()) +
+        (weddingTimeline.weddingDate.getDate() - now.getDate()) / 30;
+      monthsToWedding = diff > 0 ? diff : 0;
+    }
+    const recommendedMonthlySaving =
+      monthsToWedding && monthsToWedding > 0
+        ? Math.max(0, budgetRemaining / monthsToWedding)
+        : 0;
+    const netTrendDiff =
+      monthlySeries.net.length >= 2
+        ? monthlySeries.net[monthlySeries.net.length - 1] - monthlySeries.net[0]
+        : 0;
+    const trend =
+      netTrendDiff > 0 ? 'up' : netTrendDiff < 0 ? 'down' : 'flat';
+    return {
+      avgNet,
+      avgIncome,
+      avgExpense,
+      burnRate,
+      monthsToZero,
+      projectedZeroDate,
+      categoriesAtRisk,
+      upcomingPayments,
+      forecastSurplus,
+      recommendedMonthlySaving,
+      netTrend: { change: netTrendDiff, direction: trend },
+    };
+  }, [
+    transactions,
+    monthlySeries,
+    stats,
+    budgetUsage,
+    settings,
+    projection,
+    weddingTimeline,
+    normalizePaidAmount,
+  ]);
   // Suscribirse a cambios en el estado de sincronización
   // Cargar número de invitados desde el perfil de la boda
   const loadGuestCount = useCallback(async () => {
@@ -451,6 +756,7 @@ export default function useFinance() {
                   name: String(c.name || ''),
                   amount: Number(c.amount) || 0,
                   muted: Boolean(c.muted || false),
+                  source: c.source ? String(c.source) : undefined,
                 }))
               : [],
           });
@@ -478,6 +784,13 @@ export default function useFinance() {
             guestCount: Number(c.guestCount) || 0,
           });
         }
+        if (data.aiAdvisor && typeof data.aiAdvisor === 'object') {
+          const normalized = normalizeAdvisorData(data.aiAdvisor);
+          setAdvisor(normalized);
+          setAdvisorError(null);
+        } else {
+          setAdvisor(null);
+        }
       },
       (err) => {
         console.warn('[useFinance] Error leyendo finance/main:', err);
@@ -485,6 +798,67 @@ export default function useFinance() {
     );
     return () => unsub();
   }, [activeWedding]);
+
+  useEffect(() => {
+    if (!activeWedding) return;
+    if (!Array.isArray(providerTemplates) || providerTemplates.length === 0) return;
+
+    const normalizedDesired = [];
+    const seen = new Set();
+    for (const name of providerTemplates) {
+      const key = normalizeCategoryName(name);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      normalizedDesired.push({ name, key });
+    }
+
+    if (!normalizedDesired.length) return;
+
+    const currentCategories = Array.isArray(budget.categories) ? budget.categories : [];
+    const hasCategories = currentCategories.length > 0;
+
+    const isLegacyTemplate =
+      hasCategories &&
+      currentCategories.length <= LEGACY_DEFAULT_CATEGORY_KEYS.size &&
+      currentCategories.every((cat) => {
+        const key = normalizeCategoryName(cat?.name);
+        const amount = Number(cat?.amount) || 0;
+        return LEGACY_DEFAULT_CATEGORY_KEYS.has(key) && amount === 0;
+      });
+
+    if (hasCategories && !isLegacyTemplate) return;
+
+    const nextCategories = normalizedDesired.map(({ name, key }) => {
+      const existing = currentCategories.find(
+        (cat) => normalizeCategoryName(cat?.name) === key
+      );
+      return {
+        ...existing,
+        name,
+        amount: existing ? Number(existing.amount) || 0 : 0,
+        muted: existing ? Boolean(existing.muted) : false,
+      };
+    });
+
+    const shouldUpdate =
+      currentCategories.length !== nextCategories.length ||
+      currentCategories.some((cat, index) => {
+        const next = nextCategories[index];
+        if (!next) return true;
+        if (normalizeCategoryName(cat?.name) !== normalizeCategoryName(next?.name)) return true;
+        if ((Number(cat?.amount) || 0) !== (Number(next?.amount) || 0)) return true;
+        if (Boolean(cat?.muted) !== Boolean(next?.muted)) return true;
+        return false;
+      });
+
+    if (!shouldUpdate) return;
+
+    setBudget((prev) => {
+      const nextState = { ...prev, categories: nextCategories };
+      persistFinanceDoc({ budget: { total: nextState.total, categories: nextCategories } });
+      return nextState;
+    });
+  }, [activeWedding, providerTemplates, budget.categories, persistFinanceDoc]);
 
   // Actualizar configuración de aportaciones y persistir
   const updateContributions = useCallback(
@@ -538,7 +912,203 @@ export default function useFinance() {
     [budget.categories, budget.total, persistFinanceDoc]
   );
 
-  // Actualizar presupuesto total
+  const requestBudgetAdvisor = useCallback(async () => {
+    if (!activeWedding) {
+      throw new Error('No hay una boda activa seleccionada.');
+    }
+    const categories = Array.isArray(budget.categories) ? budget.categories : [];
+    if (!categories.length) {
+      throw new Error('Configura al menos una categoría antes de usar el consejero.');
+    }
+
+    const currency =
+      activeWeddingData?.currency ||
+      budget?.currency ||
+      settings?.currency ||
+      contributions?.currency ||
+      'EUR';
+
+    const guestCount =
+      contributions?.guestCount ||
+      activeWeddingData?.guestCount ||
+      null;
+
+    const styleNotes = [
+      activeWeddingData?.style,
+      activeWeddingData?.theme,
+      activeWeddingData?.notes,
+    ]
+      .filter(Boolean)
+      .join('. ');
+
+    const baseTotal =
+      Number(budget.total) ||
+      categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
+
+    const payload = {
+      weddingId: activeWedding,
+      context: {
+        eventType: activeWeddingData?.eventType || activeWeddingData?.type || 'boda',
+        guestCount,
+        city:
+          activeWeddingData?.city ||
+          activeWeddingData?.location ||
+          activeWeddingData?.province ||
+          '',
+        date: (() => {
+          const raw =
+            activeWeddingData?.weddingDate ||
+            activeWeddingData?.date ||
+            null;
+          if (!raw) return null;
+          const parsed = new Date(raw);
+          return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+        })(),
+        currency,
+        styleNotes,
+      },
+      budget: {
+        total: Number(budget.total) || baseTotal,
+        categories: categories.map((cat) => ({
+          name: cat.name,
+          amount: Number(cat.amount) || 0,
+        })),
+      },
+      constraints: {
+        mustHave: providerTemplates,
+        priorities: Array.isArray(activeWeddingData?.priorities)
+          ? activeWeddingData.priorities.filter(Boolean)
+          : [],
+      },
+      financeStatus: {
+        incomeConfirmed: stats.totalIncome,
+        incomeExpected: expectedIncome,
+        expensesCommitted: totalSpent,
+        pendingExpenses: paymentHealth.pendingExpenses,
+      },
+    };
+
+    setAdvisorLoading(true);
+    setAdvisorError(null);
+    try {
+      const response = await fetchBudgetAdvisor(payload);
+      const normalized = normalizeAdvisorData({
+        scenarios: Array.isArray(response?.scenarios) ? response.scenarios : [],
+        globalTips: response?.globalTips,
+        requestedAt: response?.requestedAt || new Date().toISOString(),
+        traceId: response?.traceId || null,
+        feedback: response?.feedback || null,
+        selectedScenarioId: null,
+        appliedAt: null,
+      });
+      setAdvisor(normalized);
+      persistFinanceDoc({ aiAdvisor: normalized });
+      return normalized;
+    } catch (err) {
+      console.error('[useFinance] advisor request failed', err);
+      const message =
+        err?.message || 'No se pudo obtener la recomendación del consejero.';
+      setAdvisorError(message);
+      throw err;
+    } finally {
+      setAdvisorLoading(false);
+    }
+  }, [
+    activeWedding,
+    activeWeddingData,
+    budget.categories,
+    budget.total,
+    contributions,
+    expectedIncome,
+    paymentHealth.pendingExpenses,
+    providerTemplates,
+    stats.totalIncome,
+    totalSpent,
+    persistFinanceDoc,
+    settings,
+  ]);
+
+  const applyAdvisorScenario = useCallback(
+    (scenarioId) => {
+      if (!advisor || !Array.isArray(advisor.scenarios)) {
+        return { ok: false, reason: 'advisor_unavailable' };
+      }
+      const scenario =
+        advisor.scenarios.find((entry) => entry.id === scenarioId) || null;
+      if (!scenario) {
+        return { ok: false, reason: 'scenario_not_found' };
+      }
+      const allocation = Array.isArray(scenario.allocation) ? scenario.allocation : [];
+      if (!allocation.length) {
+        return { ok: false, reason: 'allocation_empty' };
+      }
+
+      const baseTotal =
+        Number(budget.total) ||
+        budget.categories.reduce(
+          (sum, cat) => sum + (Number(cat.amount) || 0),
+          0
+        );
+
+      const categoryMap = new Map();
+      budget.categories.forEach((cat, idx) => {
+        categoryMap.set(normalizeCategoryName(cat.name), { cat, idx });
+      });
+
+      const updatedCategories = budget.categories.map((cat) => ({ ...cat }));
+      const handled = new Set();
+
+      allocation.forEach((entry) => {
+        const key = normalizeCategoryName(entry?.category);
+        if (!key) return;
+        handled.add(key);
+        const parsedAmount =
+          entry?.amount != null
+            ? Number(entry.amount)
+            : entry?.percentage != null && baseTotal > 0
+              ? (Number(entry.percentage) / 100) * baseTotal
+              : null;
+        const amount = parsedAmount != null && Number.isFinite(parsedAmount)
+          ? Math.max(0, Math.round(parsedAmount * 100) / 100)
+          : 0;
+        if (categoryMap.has(key)) {
+          const { idx } = categoryMap.get(key);
+          updatedCategories[idx] = {
+            ...updatedCategories[idx],
+            amount,
+            source: 'advisor',
+          };
+        } else {
+          updatedCategories.push({
+            name: entry?.category || `Categoría ${updatedCategories.length + 1}`,
+            amount,
+            muted: false,
+            source: 'advisor',
+          });
+        }
+      });
+
+      const nextAdvisorState = {
+        ...(advisor || {}),
+        selectedScenarioId: scenarioId,
+        appliedAt: new Date().toISOString(),
+      };
+
+      setBudget((prev) => ({ ...prev, categories: updatedCategories }));
+      setAdvisor(nextAdvisorState);
+      persistFinanceDoc({
+        budget: { total: budget.total, categories: updatedCategories },
+        aiAdvisor: nextAdvisorState,
+      });
+      return { ok: true };
+    },
+    [advisor, budget.categories, budget.total, persistFinanceDoc]
+  );
+
+  const refreshBudgetAdvisor = useCallback(async () => {
+    return requestBudgetAdvisor();
+  }, [requestBudgetAdvisor]);
+
   const updateTotalBudget = useCallback(
     (newTotal) => {
       const total = Number(newTotal) || 0;
@@ -895,7 +1465,7 @@ export default function useFinance() {
       try {
         setIsLoading(true);
         let options = { ...opts };
-        if (!options.bankId && activeWedding) {
+        if (!options.bankId && activeWedding && firebaseUid) {
           try {
             const accSnap = await getDoc(doc(db, 'weddings', activeWedding, 'finance', 'accounts'));
             const acc = accSnap.exists() ? accSnap.data() : null;
@@ -939,12 +1509,215 @@ export default function useFinance() {
         setIsLoading(false);
       }
     },
-    [createTransaction, activeWedding]
+    [createTransaction, activeWedding, firebaseUid]
   );
+
+  const importTransactionsBulk = useCallback(
+    async (items = []) => {
+      if (!Array.isArray(items) || !items.length) {
+        return { success: false, error: 'No hay filas para importar' };
+      }
+      const successes = [];
+      const errors = [];
+      for (let index = 0; index < items.length; index++) {
+        const entry = items[index] || {};
+        try {
+          const rawType = String(entry.type || '').toLowerCase();
+          const type = rawType === 'income' || rawType.startsWith('ing') ? 'income' : 'expense';
+          const amount = Math.abs(Number(entry.amount) || 0);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error('Import: importe inválido');
+          }
+          let status = String(entry.status || '').toLowerCase();
+          if (type === 'expense') {
+            if (!['pending', 'partial', 'paid', 'overdue', 'canceled'].includes(status)) {
+              status = 'pending';
+            }
+          } else {
+            if (!['expected', 'received'].includes(status)) status = 'expected';
+          }
+          let paidAmount = entry.paidAmount !== undefined ? Number(entry.paidAmount) : null;
+          if (Number.isFinite(paidAmount) && paidAmount !== null) {
+            paidAmount = Math.min(Math.max(Math.abs(paidAmount), 0), amount);
+          } else {
+            paidAmount = null;
+          }
+          if (type === 'expense' && status === 'paid' && paidAmount === null) {
+            paidAmount = amount;
+          }
+          if (type === 'income' && status === 'received' && paidAmount === null) {
+            paidAmount = amount;
+          }
+          const normalizeDate = (value) => {
+            if (!value) return undefined;
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return undefined;
+            return date.toISOString().slice(0, 10);
+          };
+          const concept = (entry.concept || entry.description || `Importado ${index + 1}`).toString().trim();
+          const payload = {
+            concept,
+            description: entry.description ? String(entry.description).trim() : undefined,
+            amount,
+            type,
+            status,
+            category: entry.category ? String(entry.category).trim() || undefined : undefined,
+            provider: entry.provider ? String(entry.provider).trim() || undefined : undefined,
+            paymentMethod: entry.paymentMethod ? String(entry.paymentMethod).trim() || undefined : undefined,
+            dueDate: normalizeDate(entry.dueDate) || null,
+            date: normalizeDate(entry.date) || new Date().toISOString().slice(0, 10),
+            paidAmount: paidAmount === null ? undefined : paidAmount,
+            source: entry.source || 'import-csv',
+            createdAt: new Date().toISOString(),
+            meta: {
+              ...(entry.meta || {}),
+              source: entry.meta?.source || entry.source || 'import-csv',
+            },
+          };
+          if (!payload.category || payload.category === 'OTROS' || payload.category === 'Otros') {
+            const inferredCategory = autoCategorizeTransaction(
+              payload.concept || payload.description || '',
+              payload.provider || '',
+              payload.amount,
+              payload.type
+            );
+            if (inferredCategory) payload.category = inferredCategory;
+          }
+          const validation = transactionSchema.safeParse(payload);
+          if (!validation.success) {
+            throw new Error(validation.error?.errors?.[0]?.message || 'Fila inválida');
+          }
+          const saved = await _addTransaction(validation.data);
+          successes.push(saved);
+        } catch (err) {
+          errors.push({ index, error: err?.message || 'Error desconocido' });
+        }
+      }
+      if (successes.length) {
+        const baseTransactions = Array.isArray(transactions) ? transactions : [];
+        const updated = [...baseTransactions, ...successes].slice(-200);
+        saveData('movements', updated, {
+          docPath: activeWedding ? `weddings/${activeWedding}/finance/main` : undefined,
+          showNotification: false,
+        });
+        window.dispatchEvent(new Event('mywed360-movements'));
+      }
+      return { success: errors.length === 0, imported: successes.length, errors };
+    },
+    [_addTransaction, transactions, activeWedding]
+  );
+
+  const exportFinanceReport = useCallback(async () => {
+    try {
+      const XLSX = await loadXLSXModule();
+      const workbook = XLSX.utils.book_new();
+
+      const summarySheet = XLSX.utils.aoa_to_sheet([
+        ['Total presupuesto', stats.totalBudget || 0],
+        ['Gasto total', stats.totalSpent || 0],
+        ['Ingresos totales', stats.totalIncome || 0],
+        ['Balance actual', stats.currentBalance || 0],
+        ['Ingresos esperados', stats.expectedIncome || 0],
+        ['Ahorro de emergencia', stats.emergencyAmount || 0],
+        ['Burn rate mensual', predictiveInsights?.burnRate || 0],
+        ['Meses hasta agotar presupuesto', predictiveInsights?.monthsToZero ?? 'N/A'],
+      ]);
+      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+
+      const transactionRows = (transactions || []).map((tx) => ({
+        Fecha: tx.date || '',
+        Tipo: tx.type,
+        Estado: tx.status,
+        Concepto: tx.concept || '',
+        Descripción: tx.description || '',
+        Categoría: tx.category || '',
+        Proveedor: tx.provider || '',
+        Importe: Number(tx.amount) || 0,
+        Pagado: tx.paidAmount != null ? Number(tx.paidAmount) : '',
+        'Fecha venc.': tx.dueDate || '',
+        'Método de pago': tx.paymentMethod || '',
+        Fuente: tx.source || tx.meta?.source || '',
+      }));
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(transactionRows.length ? transactionRows : [{}], { skipHeader: transactionRows.length === 0 }),
+        'Transacciones'
+      );
+
+      const categoryRows = (budgetUsage || []).map((cat) => ({
+        Categoría: cat.name,
+        Presupuesto: cat.amount,
+        Gastado: cat.spent,
+        Restante: cat.remaining,
+        '% uso': Number(cat.percentage || 0),
+      }));
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(categoryRows.length ? categoryRows : [{}], { skipHeader: categoryRows.length === 0 }),
+        'Categorías'
+      );
+
+      const monthlyRows = monthlySeries.months.map((month, idx) => ({
+        Mes: month,
+        Ingresos: monthlySeries.income[idx],
+        Gastos: monthlySeries.expense[idx],
+        Neto: monthlySeries.net[idx],
+      }));
+      XLSX.utils.book_append_sheet(
+        workbook,
+        XLSX.utils.json_to_sheet(monthlyRows.length ? monthlyRows : [{}], { skipHeader: monthlyRows.length === 0 }),
+        'Mensual'
+      );
+
+      if (predictiveInsights) {
+        const insightsRows = [
+          ['Promedio neto mensual', predictiveInsights.avgNet],
+          ['Promedio ingresos mensual', predictiveInsights.avgIncome],
+          ['Promedio egresos mensual', predictiveInsights.avgExpense],
+          ['Burn rate (mes)', predictiveInsights.burnRate],
+          ['Meses hasta agotar presupuesto', predictiveInsights.monthsToZero ?? 'N/A'],
+          ['Fecha estimada de agotamiento', predictiveInsights.projectedZeroDate || 'N/A'],
+          ['Saldo proyectado día de la boda', predictiveInsights.forecastSurplus || 0],
+          ['Ahorro mensual recomendado', predictiveInsights.recommendedMonthlySaving || 0],
+          ['Tendencia neta', predictiveInsights.netTrend?.direction || 'flat'],
+          ['Cambio neto acumulado', predictiveInsights.netTrend?.change || 0],
+        ];
+        if (predictiveInsights.categoriesAtRisk?.length) {
+          insightsRows.push([], ['Categorías en riesgo']);
+          insightsRows.push(['Nombre', '% uso', 'Restante']);
+          predictiveInsights.categoriesAtRisk.forEach((cat) => {
+            insightsRows.push([cat.name, cat.percentage, cat.remaining]);
+          });
+        }
+        if (predictiveInsights.upcomingPayments?.length) {
+          insightsRows.push([], ['Pagos próximos']);
+          insightsRows.push(['Concepto', 'Fecha', 'Importe', 'Proveedor']);
+          predictiveInsights.upcomingPayments.forEach((pay) => {
+            insightsRows.push([pay.concept, pay.dueDate, pay.outstanding, pay.provider]);
+          });
+        }
+        const insightsSheet = XLSX.utils.aoa_to_sheet(insightsRows);
+        XLSX.utils.book_append_sheet(workbook, insightsSheet, 'Analítica');
+      }
+
+      const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const fileName = `finanzas-${activeWedding || 'evento'}.xlsx`;
+      return { success: true, blob, fileName };
+    } catch (error) {
+      console.error('[useFinance] exportFinanceReport error:', error);
+      return { success: false, error: error?.message || 'No se pudo generar el reporte' };
+    }
+  }, [transactions, stats, budgetUsage, monthlySeries, predictiveInsights, activeWedding]);
 
   // Suscribirse a cuentas bancarias vinculadas (para CTA conectar banco)
   useEffect(() => {
-    if (!activeWedding) return;
+    if (!activeWedding || !firebaseUid) {
+      setHasBankAccount(false);
+      return;
+    }
     const ref = doc(db, 'weddings', activeWedding, 'finance', 'accounts');
     const unsub = onSnapshot(
       ref,
@@ -955,7 +1728,7 @@ export default function useFinance() {
       () => setHasBankAccount(false)
     );
     return () => unsub();
-  }, [activeWedding]);
+  }, [activeWedding, firebaseUid]);
 
   return {
     // Estados
@@ -963,6 +1736,9 @@ export default function useFinance() {
     error,
     contributions,
     budget,
+    advisor,
+    advisorLoading,
+    advisorError,
     transactions,
 
     // Cálculos
@@ -974,6 +1750,8 @@ export default function useFinance() {
     emergencyAmount,
     currentBalance,
     projection,
+    monthlySeries,
+    predictiveInsights,
 
     // Acciones
     updateContributions,
@@ -981,15 +1759,25 @@ export default function useFinance() {
     addBudgetCategory,
     updateBudgetCategory,
     removeBudgetCategory,
+    requestBudgetAdvisor,
+    applyAdvisorScenario,
+    refreshBudgetAdvisor,
     updateTotalBudget,
     updateBudgetSettings,
     createTransaction,
     updateTransaction,
     deleteTransaction,
     importBankTransactions,
+    importTransactionsBulk,
+    exportFinanceReport,
 
     // Utilidades
     clearError: () => setError(null),
     hasBankAccount,
   };
 }
+
+
+
+
+

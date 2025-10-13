@@ -1,7 +1,7 @@
-﻿import { User, Mail, Moon, LogOut } from 'lucide-react';
+import { User, Mail, Moon, LogOut, Plus } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 
 import ConfigEventBridge from '@/components/config/ConfigEventBridge.jsx';
 import FinanceEventBridge from '@/components/finance/FinanceEventBridge.jsx';
@@ -18,11 +18,15 @@ import Nav from './Nav';
 import NotificationCenter from './NotificationCenter';
 import WeddingSelector from './WeddingSelector';
 import { useAuth } from '../hooks/useAuth';
+import { useWedding } from '../context/WeddingContext';
 import { prefetchModule } from '../utils/prefetch';
 import NotificationWatcher from './notifications/NotificationWatcher';
+import OnboardingModeSelector from './Onboarding/OnboardingModeSelector.jsx';
 import OnboardingTutorial from './Onboarding/OnboardingTutorial';
 import RoleBadge from './RoleBadge';
 import { useOnboarding } from '../hooks/useOnboarding';
+import Button from './ui/Button';
+import { performanceMonitor } from '../services/PerformanceMonitor';
 
 export default function MainLayout() {
   const { t } = useTranslation();
@@ -33,18 +37,44 @@ export default function MainLayout() {
   }, []);
 
   // Autenticación y rol
-  const { hasRole, userProfile, isLoading, logout: logoutUnified } = useAuth();
+  const { hasRole, userProfile, isLoading, logout: logoutUnified, currentUser } = useAuth();
   const _role = userProfile?.role || 'particular';
 
   const [openMenu, setOpenMenu] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const hideSelectorRoutes = ['/home', '/tasks'];
   const hideSelector =
     hideSelectorRoutes.some((r) => location.pathname.startsWith(r)) ||
     location.pathname === '/bodas';
   const isPlanner = userProfile && hasRole ? hasRole('planner') : false;
-  const showWeddingSelector = isPlanner && !hideSelector;
+  const ownerLike = hasRole ? hasRole('owner', 'pareja', 'admin') : false;
+  const showWeddingSelector = !hideSelector && (isPlanner || ownerLike);
   const { showOnboarding, completeOnboarding } = useOnboarding();
+  const [onboardingMode, setOnboardingMode] = useState(null);
+  const { weddingsReady, activeWedding, weddings } = useWedding();
+  const isCreateEventRoute =
+    location.pathname.startsWith('/crear-evento') ||
+    location.pathname.startsWith('/create-wedding-ai') ||
+    location.pathname.startsWith('/crear-evento-asistente');
+  const canShowCreateEventCta =
+    ownerLike &&
+    weddingsReady &&
+    Array.isArray(weddings) &&
+    weddings.length > 0 &&
+    !isCreateEventRoute;
+
+  const handleCreateEventClick = React.useCallback(() => {
+    try {
+      performanceMonitor.logEvent('event_creation_cta_click', {
+        uid: currentUser?.uid || null,
+        activeWeddingId: activeWedding || null,
+        weddings_count: Array.isArray(weddings) ? weddings.length : 0,
+        route: location.pathname,
+      });
+    } catch {}
+    navigate('/crear-evento', { state: { source: 'multi_event_cta' } });
+  }, [activeWedding, currentUser?.uid, location.pathname, navigate, weddings]);
 
   // Prefetch helpers for lazy routes (email)
   const prefetchEmail = React.useCallback(() => {
@@ -60,7 +90,33 @@ export default function MainLayout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [openMenu]);
 
+  useEffect(() => {
+    if (!showOnboarding) setOnboardingMode(null);
+  }, [showOnboarding]);
+
   const isCypress = typeof window !== 'undefined' && !!window.Cypress;
+  const enableOnboardingTests =
+    typeof window !== 'undefined' && window.__ENABLE_ONBOARDING_TEST__ === true;
+  const onboardingBypassRoutes = ['/crear-evento', '/crear-evento-asistente'];
+  const isOnboardingRoute = onboardingBypassRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
+  const shouldShowOnboardingModal =
+    showOnboarding && (!isCypress || enableOnboardingTests) && !isOnboardingRoute;
+
+  // Redirección automática para owners/parejas/admin sin eventos activos al asistente IA
+  useEffect(() => {
+    try {
+      if (!ownerLike || isCreateEventRoute) return;
+      if (!weddingsReady) return;
+      const noEvents = !Array.isArray(weddings) || weddings.length === 0;
+      const noActive = !activeWedding;
+      if (noEvents && noActive) {
+        navigate('/crear-evento', { replace: true });
+      }
+    } catch {}
+  }, [ownerLike, isCreateEventRoute, weddingsReady, weddings, activeWedding, navigate]);
+
   // Mostrar loading mientras se inicializa la autenticación (excepto en Cypress)
   if (isLoading && !isCypress) {
     return (
@@ -76,17 +132,35 @@ export default function MainLayout() {
   }
 
   // Onboarding (ocultar en E2E)
-  if (showOnboarding && !isCypress) {
+  if (shouldShowOnboardingModal) {
+    if (onboardingMode === 'classic') {
+      return (
+        <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
+          <OnboardingTutorial onComplete={completeOnboarding} />
+        </div>
+      );
+    }
     return (
-      <div className="min-h-screen flex flex-col bg-[var(--color-bg)]">
-        <OnboardingTutorial onComplete={completeOnboarding} />
-      </div>
+      <OnboardingModeSelector
+        onChooseClassic={() => setOnboardingMode('classic')}
+        onChooseAI={() => navigate('/crear-evento')}
+      />
     );
   }
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[var(--color-bg)] text-[color:var(--color-text)] font-sans">
       <div className="absolute top-4 right-4 z-50 flex items-center space-x-4">
+        {canShowCreateEventCta && (
+          <Button
+            size="sm"
+            onClick={handleCreateEventClick}
+            startIcon={<Plus className="w-4 h-4" />}
+            className="hidden sm:inline-flex"
+          >
+            Crear nuevo evento
+          </Button>
+        )}
         {/* Centro de notificaciones y watcher */}
         <NotificationWatcher intervalMs={3000} />
         <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
@@ -120,6 +194,19 @@ export default function MainLayout() {
                 <User className="w-4 h-4 mr-2" />{' '}
                 {t('navigation.profile', { defaultValue: 'Perfil' })}
               </Link>
+
+              {canShowCreateEventCta && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenMenu(false);
+                    handleCreateEventClick();
+                  }}
+                  className="flex w-full items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
+                >
+                  <Plus className="w-4 h-4 mr-2" /> Crear nuevo evento
+                </button>
+              )}
 
               {false && (
                 <Link
@@ -186,4 +273,3 @@ export default function MainLayout() {
     </div>
   );
 }
-

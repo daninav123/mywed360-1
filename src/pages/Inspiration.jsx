@@ -1,15 +1,31 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 
 import InspirationGallery from '../components/gallery/InspirationGallery';
 import SearchBar from '../components/SearchBar';
 import Spinner from '../components/Spinner';
 import { useAuth } from '../hooks/useAuth';
+import { useWedding } from '../context/WeddingContext';
 import { trackInteraction } from '../services/inspirationService';
 import { saveData, loadData } from '../services/SyncService';
 import { fetchWall } from '../services/wallService';
 
+const normalizeTag = (value = '') =>
+  value
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+const normalizeFilterValue = (value) => {
+  if (!value) return 'all';
+  if (value === 'all' || value === 'favs') return value;
+  return normalizeTag(value);
+};
+
 export default function Inspiration() {
   const { currentUser } = useAuth();
+  const { activeWedding } = useWedding();
   const userId = currentUser?.uid || 'anon';
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,6 +34,32 @@ export default function Inspiration() {
   const [selectedTag, setSelectedTag] = useState('all');
   const [prefTags, setPrefTags] = useState([]); // top tags del usuario
   const observer = useRef();
+  const storageKey = useMemo(
+    () => (activeWedding ? `inspirationFavorites_${activeWedding}` : 'inspirationFavorites'),
+    [activeWedding]
+  );
+  const syncOptions = useMemo(() => {
+    if (activeWedding && currentUser) {
+      return {
+        firestore: true,
+        docPath: `weddings/${activeWedding}/inspiration/favorites`,
+        field: 'items',
+        fallbackToLocal: true,
+        mergeWithExisting: true,
+      };
+    }
+    return {
+      firestore: false,
+      fallbackToLocal: true,
+    };
+  }, [activeWedding, currentUser]);
+
+  useEffect(() => {
+    setItems([]);
+    setPage(1);
+    setQuery('wedding');
+    setSelectedTag('all');
+  }, [activeWedding]);
   const lastItemRef = useCallback(
     (node) => {
       if (loading) return;
@@ -32,32 +74,89 @@ export default function Inspiration() {
     [loading]
   );
 
-  // Obtener tags preferidos basados en favoritos guañados
-  useEffect(() => {
-    (async () => {
-      const favs = await loadData('ideasPhotos', {
-        firestore: !!currentUser,
-        collection: 'userIdeas',
-        fallbackToLocal: true,
-      });
-      if (Array.isArray(favs)) {
-        const counts = {};
-        favs.forEach((p) =>
-          (p.tags || []).forEach((t) => {
-            counts[t] = (counts[t] || 0) + 1;
-          })
-        );
-        const sorted = Object.entries(counts)
-          .sort((a, b) => b[1] - a[1])
-          .map(([t]) => t);
-        setPrefTags(sorted.slice(0, 5));
-        // Notificar a componentes que escuchan cambios de localStorage en otras pestañas
+  const loadFavorites = useCallback(async () => {
+    const loadLegacy = async () => {
+      if (currentUser) {
         try {
-          window.dispatchEvent(new StorageEvent('storage', { key: 'ideasPhotos' }));
-        } catch {}
+          const legacyRemote = await loadData('ideasPhotos', {
+            firestore: true,
+            collection: 'userIdeas',
+            fallbackToLocal: true,
+          });
+          if (Array.isArray(legacyRemote) && legacyRemote.length) {
+            return legacyRemote;
+          }
+        } catch (error) {
+          console.warn('[Inspiration] No se pudo leer favoritos legacy remotos:', error);
+        }
       }
-    })();
-  }, [currentUser]);
+      try {
+        const legacyLocal =
+          JSON.parse(localStorage.getItem('ideasPhotos') || 'null') ||
+          JSON.parse(localStorage.getItem('inspirationFavorites') || 'null');
+        return Array.isArray(legacyLocal) && legacyLocal.length ? legacyLocal : null;
+      } catch {
+        return null;
+      }
+    };
+
+    let favs = await loadData(storageKey, syncOptions);
+    let migrated = false;
+
+    if (!Array.isArray(favs) || favs.length === 0) {
+      const legacy = await loadLegacy();
+      if (Array.isArray(legacy) && legacy.length) {
+        favs = legacy;
+        migrated = true;
+        await saveData(storageKey, legacy, { ...syncOptions, showNotification: false });
+      } else {
+        favs = Array.isArray(favs) ? favs : [];
+      }
+    }
+
+    if (migrated) {
+      try {
+        localStorage.removeItem('ideasPhotos');
+        localStorage.removeItem('inspirationFavorites');
+      } catch {
+        /* noop */
+      }
+    }
+
+    if (Array.isArray(favs) && favs.length) {
+      const counts = {};
+      favs.forEach((p) =>
+        (p.tags || []).forEach((t) => {
+          const slug = normalizeTag(t);
+          if (!slug) return;
+          counts[slug] = (counts[slug] || 0) + 1;
+        })
+      );
+      const sorted = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([slug]) => slug);
+      setPrefTags(sorted.slice(0, 5));
+    } else {
+      setPrefTags([]);
+    }
+
+    if (selectedTag === 'favs') {
+      setItems(favs);
+    }
+
+    try {
+      window.dispatchEvent(new StorageEvent('storage', { key: storageKey }));
+    } catch {
+      /* noop */
+    }
+
+    return favs;
+  }, [storageKey, syncOptions, selectedTag, currentUser]);
+
+  // Obtener tags preferidos basados en favoritos guardados
+  useEffect(() => {
+    loadFavorites();
+  }, [loadFavorites]);
 
   useEffect(() => {
     if (selectedTag === 'favs') return; // No cargar muro cuando estamos en pestaña favoritos
@@ -67,7 +166,8 @@ export default function Inspiration() {
       setItems((prev) => {
         const merged = [...prev, ...newItems.filter((it) => !prev.some((p) => p.id === it.id))];
         // Personalización: boost posts que incluyan tags preferidos
-        const score = (item) => ((item.tags || []).some((t) => prefTags.includes(t)) ? 1 : 0);
+        const score = (item) =>
+          (item.tags || []).some((t) => prefTags.includes(normalizeTag(t))) ? 1 : 0;
         return merged.sort((a, b) => score(b) - score(a));
       });
       setLoading(false);
@@ -77,12 +177,7 @@ export default function Inspiration() {
 
   const handleSave = async (item) => {
     // Cargar estado actual de favoritos (Firestore si autenticado)
-    const current =
-      (await loadData('ideasPhotos', {
-        firestore: !!currentUser,
-        collection: 'userIdeas',
-        fallbackToLocal: true,
-      })) || [];
+    const current = (await loadData(storageKey, syncOptions)) || [];
     const exists = Array.isArray(current) && current.some((p) => p.id === item.id);
     let next;
     const isAdding = !exists;
@@ -93,15 +188,19 @@ export default function Inspiration() {
       // Favorite: añadir al array
       next = [...current, item];
       // actualizar prefTags en memoria SOLO al añadir
-      const newTags = (item.tags || []).filter((t) => !prefTags.includes(t));
+      const newTags = (item.tags || [])
+        .map((t) => normalizeTag(t))
+        .filter((slug) => slug && !prefTags.includes(slug));
       if (newTags.length) {
-        setPrefTags([...prefTags, ...newTags].slice(0, 5));
+        setPrefTags((prev) => {
+          const merged = Array.from(new Set([...prev, ...newTags]));
+          return merged.slice(0, 5);
+        });
       }
     }
     // Guardar array resultante (Firestore si autenticado; siempre actualiza localStorage)
-    await saveData('ideasPhotos', next, {
-      collection: 'userIdeas',
-      firestore: !!currentUser,
+    await saveData(storageKey, next, {
+      ...syncOptions,
       showNotification: false,
     });
     // Si estamos en la pestaña de favoritos, refrescar inmediatamente el listado
@@ -131,14 +230,11 @@ export default function Inspiration() {
     setSelectedTag('all');
   };
 
-  const handleTag = async (tag) => {
+  const handleTag = async (rawTag) => {
+    const tag = normalizeFilterValue(rawTag);
     setSelectedTag(tag);
     if (tag === 'favs') {
-      const favs = await loadData('ideasPhotos', {
-        firestore: !!currentUser,
-        collection: 'userIdeas',
-        fallbackToLocal: true,
-      });
+      const favs = await loadData(storageKey, syncOptions);
       setItems(Array.isArray(favs) ? favs : []);
       setPage(1);
       return;
@@ -159,6 +255,7 @@ export default function Inspiration() {
         lastItemRef={lastItemRef}
         onTagClick={handleTag}
         activeTag={selectedTag}
+        storageKey={storageKey}
       />
 
       {loading && (

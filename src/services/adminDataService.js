@@ -1,151 +1,236 @@
-﻿import {
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-} from 'firebase/firestore';
+import errorLogger from '../utils/errorLogger';
+import { apiGet, apiPost, apiPut } from './apiClient';
+import { getAdminHeaders, getAdminSessionToken } from './adminSession';
 
-import {
-  adminKpis,
-  serviceHealth,
-  adminAlerts,
-  adminTasks,
-  adminPortfolio,
-  adminUsersList,
-  adminIncidents,
-  featureFlags,
-  secretList,
-  emailTemplates,
-  broadcastHistory,
-  auditLogs,
-  reportsScheduled,
-  supportSummary,
-  supportTickets,
-} from '../data/adminMock';
-import { db } from '../firebaseConfig.jsx';
+const ADMIN_BASE_PATH = '/api/admin/dashboard';
 
-const safeGetDocs = async (colName, opts = {}) => {
-  if (!db) return null;
-  try {
-    const col = collection(db, colName);
-    const q = opts.orderBy
-      ? query(col, orderBy(opts.orderBy, opts.direction || 'desc'), limit(opts.limit || 20))
-      : query(col, limit(opts.limit || 20));
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return [];
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  } catch (error) {
-    console.warn(`[adminDataService] No se pudo leer ${colName}:`, error);
-    return null;
-  }
+const toArray = (value) => (Array.isArray(value) ? value : []);
+const toObject = (value) => (value && typeof value === 'object' ? value : null);
+
+const DEFAULT_OVERVIEW = {
+  kpis: [],
+  services: [],
+  alerts: [],
+  tasks: [],
 };
 
+const DEFAULT_METRICS = {
+  series: [],
+  funnel: null,
+  iaCosts: [],
+  communications: [],
+  supportMetrics: null,
+};
+
+const DEFAULT_INTEGRATIONS = {
+  services: [],
+  incidents: [],
+};
+
+const DEFAULT_SETTINGS = {
+  featureFlags: [],
+  secrets: [],
+  templates: [],
+};
+
+const DEFAULT_SUPPORT = {
+  summary: null,
+  tickets: [],
+};
+
+async function fetchAdminEndpoint(path) {
+  const adminToken = getAdminSessionToken();
+  const headers = adminToken ? getAdminHeaders() : undefined;
+
+  try {
+    const response = await apiGet(path, {
+      auth: !adminToken,
+      silent: true,
+      headers,
+    });
+
+    let data = null;
+    if (response.status !== 204) {
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+    }
+
+    if (!response.ok) {
+      const message =
+        data?.message ||
+        data?.error?.message ||
+        data?.error ||
+        `${response.status} ${response.statusText}`;
+      throw new Error(message);
+    }
+
+    return data ?? null;
+  } catch (error) {
+    errorLogger?.logError?.('AdminDataServiceError', {
+      path,
+      message: error.message,
+    });
+    return null;
+  }
+}
+
 export const getDashboardData = async () => {
-  const metricsDocs = await safeGetDocs('adminMetrics', { limit: 1, orderBy: 'date' });
-  const latestMetrics = metricsDocs && metricsDocs.length ? metricsDocs[0] : {};
-
-  const alertsDocs = await safeGetDocs('adminAlerts', { orderBy: 'createdAt', limit: 20 });
-  const tasksDocs = await safeGetDocs('adminTasks', { orderBy: 'createdAt', limit: 20 });
-  const servicesDocs = await safeGetDocs('adminServiceStatus', { limit: 50, orderBy: 'service' });
-
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/overview`);
+  if (!data) return DEFAULT_OVERVIEW;
   return {
-    kpis: latestMetrics.kpis || adminKpis,
-    services: servicesDocs || latestMetrics.servicesHealth || serviceHealth,
-    alerts: alertsDocs || adminAlerts,
-    tasks: tasksDocs || adminTasks,
+    kpis: toArray(data.kpis),
+    services: toArray(data.services),
+    alerts: toArray(data.alerts),
+    tasks: toArray(data.tasks),
   };
 };
 
 export const getMetricsData = async () => {
-  const metricsDocs = await safeGetDocs('adminMetrics', { limit: 1, orderBy: 'date' });
-  const latest = metricsDocs && metricsDocs.length ? metricsDocs[0] : {};
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/metrics`);
+  if (!data) return DEFAULT_METRICS;
   return {
-    series: latest.series || [],
-    funnel: latest.funnel || null,
-    iaCosts: latest.aiCosts || [],
+    series: toArray(data.series),
+    funnel: data.funnel ?? null,
+    iaCosts: toArray(data.iaCosts),
+    communications: toArray(data.communications),
+    supportMetrics: data.supportMetrics ?? null,
   };
 };
 
-export const getPortfolioData = async () => {
-  const weddingsDocs = await safeGetDocs('weddings', { limit: 100, orderBy: 'eventDate' });
-  if (weddingsDocs && weddingsDocs.length) {
-    return weddingsDocs.map((wedding) => ({
-      id: wedding.id,
-      couple: wedding.coupleName || wedding.name || 'Pareja sin nombre',
-      owner: wedding.ownerEmail || 'sin-owner@lovenda.com',
-      eventDate: wedding.eventDate || '-',
-      status: wedding.status || 'draft',
-      confirmedGuests: wedding.confirmedGuests || 0,
-      signedContracts: wedding.signedContracts || 0,
-      lastUpdate: wedding.updatedAt || wedding.createdAt || '-',
-    }));
-  }
-  return adminPortfolio;
+export const getPortfolioData = async (opts = {}) => {
+  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
+  const data = await fetchAdminEndpoint(
+    `${ADMIN_BASE_PATH}/portfolio?limit=${encodeURIComponent(limit)}`,
+  );
+  return Array.isArray(data?.items) ? data.items : [];
 };
 
-export const getUsersData = async () => {
-  const usersDocs = await safeGetDocs('users', { limit: 100, orderBy: 'createdAt' });
-  if (usersDocs && usersDocs.length) {
-    return usersDocs.map((user) => ({
-      id: user.id,
-      email: user.email,
-      role: user.role || 'owner',
-      status: user.status || 'active',
-      lastAccess: user.lastAccess || '-',
-      weddings: user.weddingsCount || 0,
-      createdAt: user.createdAt || '-',
-    }));
-  }
-  return adminUsersList;
+export const getUsersData = async (opts = {}) => {
+  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
+  const data = await fetchAdminEndpoint(
+    `${ADMIN_BASE_PATH}/users?limit=${encodeURIComponent(limit)}`,
+  );
+  return Array.isArray(data?.items) ? data.items : [];
 };
 
 export const getIntegrationsData = async () => {
-  const incidents = await safeGetDocs('adminIncidents', { orderBy: 'startedAt', limit: 50 });
-  const servicesDocs = await safeGetDocs('adminServiceStatus', { limit: 50, orderBy: 'service' });
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/integrations`);
+  if (!data) return DEFAULT_INTEGRATIONS;
   return {
-    services: servicesDocs || serviceHealth,
-    incidents: incidents || adminIncidents,
+    services: toArray(data.services),
+    incidents: toArray(data.incidents),
   };
 };
 
 export const getSettingsData = async () => {
-  const flagsDocs = await safeGetDocs('featureFlags', { limit: 50, orderBy: 'lastModifiedAt' });
-  const secretsDocs = await safeGetDocs('adminSecrets', { limit: 50, orderBy: 'lastRotatedAt' });
-  const templatesDocs = await safeGetDocs('adminTemplates', { limit: 50, orderBy: 'updatedAt' });
-
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/settings`);
+  if (!data) return DEFAULT_SETTINGS;
   return {
-    featureFlags: flagsDocs || featureFlags,
-    secrets: secretsDocs || secretList,
-    templates: templatesDocs || emailTemplates,
+    featureFlags: toArray(data.featureFlags),
+    secrets: toArray(data.secrets),
+    templates: toArray(data.templates),
   };
 };
 
-export const getAlertsData = async () => {
-  const alertsDocs = await safeGetDocs('adminAlerts', { orderBy: 'createdAt', limit: 50 });
-  return alertsDocs || adminAlerts;
-};
+export const getAlertsData = async () =>
+  toArray(await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/alerts`));
 
-export const getBroadcastData = async () => {
-  const historyDocs = await safeGetDocs('adminBroadcasts', { orderBy: 'scheduledAt', limit: 50 });
-  return historyDocs || broadcastHistory;
-};
+export const getBroadcastData = async () =>
+  toArray(await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/broadcasts`));
 
-export const getAuditLogs = async () => {
-  const logsDocs = await safeGetDocs('adminAuditLogs', { orderBy: 'createdAt', limit: 100 });
-  return logsDocs || auditLogs;
-};
+export const getAuditLogs = async () =>
+  toArray(await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/audit`));
 
-export const getReportsData = async () => {
-  const reportsDocs = await safeGetDocs('adminReports', { orderBy: 'name', limit: 50 });
-  return reportsDocs || reportsScheduled;
-};
+export const getReportsData = async () =>
+  toArray(await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/reports`));
 
 export const getSupportData = async () => {
-  const ticketsDocs = await safeGetDocs('adminTickets', { orderBy: 'updatedAt', limit: 50 });
-  const summaryDocs = await safeGetDocs('adminSupportSummary', { limit: 1, orderBy: 'generatedAt' });
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/support`);
+  if (!data) return DEFAULT_SUPPORT;
   return {
-    summary: summaryDocs && summaryDocs.length ? summaryDocs[0] : supportSummary,
-    tickets: ticketsDocs || supportTickets,
+    summary: toObject(data.summary),
+    tickets: toArray(data.tickets),
   };
 };
+
+// --- Mutations ---
+
+async function postJson(path, body) {
+  const adminToken = getAdminSessionToken();
+  const headers = adminToken ? getAdminHeaders() : undefined;
+  const res = await apiPost(path, body, { auth: !adminToken, headers });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {}
+  if (!res.ok) {
+    const err = new Error(data?.message || `${res.status} ${res.statusText}`);
+    err.code = data?.code || 'admin_mutation_failed';
+    throw err;
+  }
+  return data;
+}
+
+async function putJson(path, body) {
+  const adminToken = getAdminSessionToken();
+  const headers = adminToken ? getAdminHeaders() : undefined;
+  const res = await apiPut(path, body, { auth: !adminToken, headers });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {}
+  if (!res.ok) {
+    const err = new Error(data?.message || `${res.status} ${res.statusText}`);
+    err.code = data?.code || 'admin_mutation_failed';
+    throw err;
+  }
+  return data;
+}
+
+export async function createAdminTask({ title, priority, dueDate }) {
+  const payload = { title, priority, dueDate };
+  const data = await postJson(`${ADMIN_BASE_PATH}/tasks`, payload);
+  return data?.task || null;
+}
+
+export async function updateAdminTask(id, patch) {
+  if (!id) throw new Error('task_id_required');
+  return await putJson(`${ADMIN_BASE_PATH}/tasks/${encodeURIComponent(id)}`, patch);
+}
+
+export async function resolveAdminAlert(id, notes = '') {
+  if (!id) throw new Error('alert_id_required');
+  return await postJson(`${ADMIN_BASE_PATH}/alerts/${encodeURIComponent(id)}/resolve`, { notes });
+}
+
+export async function updateFeatureFlag(id, enabled) {
+  if (!id) throw new Error('flag_id_required');
+  const data = await putJson(`${ADMIN_BASE_PATH}/settings/flags/${encodeURIComponent(id)}`, { enabled: !!enabled });
+  return data?.flag || null;
+}
+
+export async function rotateSecret(id) {
+  if (!id) throw new Error('secret_id_required');
+  return await postJson(`${ADMIN_BASE_PATH}/settings/secrets/${encodeURIComponent(id)}/rotate`, {});
+}
+
+export async function saveTemplate(id, content) {
+  if (!id) throw new Error('template_id_required');
+  return await putJson(`${ADMIN_BASE_PATH}/settings/templates/${encodeURIComponent(id)}`, { content });
+}
+
+export async function createBroadcast({ type = 'email', subject, content, segment = 'Todos', scheduledAt }) {
+  const payload = { type, subject, content, segment };
+  if (scheduledAt) payload.scheduledAt = scheduledAt;
+  const data = await postJson(`${ADMIN_BASE_PATH}/broadcasts`, payload);
+  return data?.item || null;
+}
+
+export async function retryIntegration(serviceId) {
+  if (!serviceId) throw new Error('integration_id_required');
+  const data = await postJson(`${ADMIN_BASE_PATH}/integrations/${encodeURIComponent(serviceId)}/retry`, {});
+  return data?.service || null;
+}

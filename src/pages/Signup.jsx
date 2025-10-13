@@ -1,13 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import RegisterForm from '../components/auth/RegisterForm';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
 import { useAuth } from '../hooks/useAuth';
+import { performanceMonitor } from '../services/PerformanceMonitor';
+
+const FORM_ERROR_ID = 'signup-form-error';
+const SOCIAL_ERROR_ID = 'signup-social-error';
+const INFO_MESSAGE_ID = 'signup-info-message';
+
+const VALIDATION_MESSAGES = {
+  missing_email: 'Introduce tu correo electronico.',
+  missing_password: 'Introduce una contrasena valida.',
+  password_too_short: 'La contrasena debe tener al menos 8 caracteres.',
+};
 
 export default function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     register: registerWithEmail,
     registerWithProvider,
@@ -24,6 +36,16 @@ export default function Signup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [busyProvider, setBusyProvider] = useState(null);
 
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
+  const roleSelectRef = useRef(null);
+
+  const signupSource = location?.state?.signupSource || 'direct';
+
+  useEffect(() => {
+    performanceMonitor?.logEvent?.('signup_view', { source: signupSource });
+  }, [signupSource]);
+
   const providers = useMemo(() => {
     if (availableSocialProviders && availableSocialProviders.length > 0) {
       return availableSocialProviders;
@@ -31,63 +53,119 @@ export default function Signup() {
     return ['google', 'facebook', 'apple'];
   }, [availableSocialProviders]);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const resetFeedback = () => {
     setFormError('');
     setSocialError('');
     setInfoMessage('');
+  };
 
-    if (!email || !password) {
-      setFormError('Introduce tu email y una contraseña válida.');
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    resetFeedback();
 
-    if (password.length < 8) {
-      setFormError('La contraseña debe tener al menos 8 caracteres.');
+    const context = { role, provider: 'password', source: signupSource };
+    const trimmedEmail = email.trim();
+
+    const issues = [];
+    if (!trimmedEmail) issues.push('missing_email');
+    if (!password) issues.push('missing_password');
+    if (password && password.length < 8) issues.push('password_too_short');
+
+    performanceMonitor?.logEvent?.('signup_submit', {
+      ...context,
+      has_error: issues.length > 0,
+    });
+
+    if (issues.length > 0) {
+      const firstIssue = issues[0];
+      const message = VALIDATION_MESSAGES[firstIssue] || VALIDATION_MESSAGES.missing_email;
+      setFormError(message);
+      if (firstIssue === 'missing_email') {
+        emailInputRef.current?.focus();
+      } else {
+        passwordInputRef.current?.focus();
+      }
+      performanceMonitor?.logEvent?.('signup_failed', {
+        ...context,
+        error_code: firstIssue,
+      });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const result = await registerWithEmail(email, password, role);
+      const result = await registerWithEmail(trimmedEmail, password, role);
       if (result?.success) {
-        navigate('/home');
+        performanceMonitor?.logEvent?.('signup_completed', {
+          ...context,
+          user_id: result?.user?.uid || null,
+        });
+        navigate('/home', { replace: true });
         return;
       }
+
+      const errorCode = result?.code || 'unknown';
       const message =
-        result?.error ||
-        'No pudimos crear tu cuenta. Revisa los datos e inténtalo de nuevo.';
+        result?.error || 'No pudimos crear tu cuenta. Revisa los datos e intentalo de nuevo.';
       setFormError(message);
+      passwordInputRef.current?.focus();
+      performanceMonitor?.logEvent?.('signup_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } catch (error) {
-      setFormError(error.message || 'No pudimos crear tu cuenta. Inténtalo nuevamente.');
+      const errorCode = error?.code || 'exception';
+      const message = error?.message || 'No pudimos crear tu cuenta. Intentalo nuevamente.';
+      setFormError(message);
+      performanceMonitor?.logEvent?.('signup_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleSocialLogin = async (providerKey) => {
-    setFormError('');
-    setSocialError('');
-    setInfoMessage('');
+    resetFeedback();
     setBusyProvider(providerKey);
+
+    const providerName = getProviderLabel?.(providerKey) || providerKey;
+    const context = { provider: providerKey, role, source: signupSource };
+
+    performanceMonitor?.logEvent?.('social_signup_submit', context);
 
     try {
       const result = await registerWithProvider(providerKey, { role, forceRole: true });
       if (result?.success) {
         if (result.pendingRedirect) {
-          const providerName = getProviderLabel?.(providerKey) || providerKey;
-          setInfoMessage(`Continúa el registro en la ventana de ${providerName}.`);
+          performanceMonitor?.logEvent?.('social_signup_redirect', context);
+          setInfoMessage(`Continua el registro en la ventana de ${providerName}.`);
         } else {
-          navigate('/home');
+          performanceMonitor?.logEvent?.('social_signup_completed', {
+            ...context,
+            is_new_user: Boolean(result?.isNewUser),
+          });
+          navigate('/home', { replace: true });
         }
         return;
       }
 
-      const providerName = getProviderLabel?.(providerKey) || providerKey;
-      setSocialError(result?.error || `No se pudo completar el registro con ${providerName}.`);
+      const errorCode = result?.code || 'unknown';
+      const message = result?.error || `No se pudo completar el registro con ${providerName}.`;
+      setSocialError(message);
+      performanceMonitor?.logEvent?.('social_signup_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } catch (error) {
-      const providerName = getProviderLabel?.(providerKey) || providerKey;
-      setSocialError(error.message || `No se pudo completar el registro con ${providerName}.`);
+      const errorCode = error?.code || 'exception';
+      const message = error?.message || `No se pudo completar el registro con ${providerName}.`;
+      setSocialError(message);
+      performanceMonitor?.logEvent?.('social_signup_failed', {
+        ...context,
+        error_code: errorCode,
+      });
     } finally {
       setBusyProvider(null);
     }
@@ -103,14 +181,13 @@ export default function Signup() {
                 Bienvenida a Lovenda
               </h2>
               <p className="mt-4 text-base text-[color:var(--color-primary-dark,#4338ca)]/80">
-                Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra IA te guiará en
-                cada paso para que tu boda sea perfecta.
+                Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra IA te guiara en cada paso para que tu boda sea perfecta.
               </p>
             </div>
             <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark,#4338ca)]/80">
-              <li>• Timeline inteligente para no olvidar nada.</li>
-              <li>• Automatizaciones de correo y recordatorios para invitados.</li>
-              <li>• Catálogo de proveedores con recomendaciones personalizadas.</li>
+              <li>- Timeline inteligente para no olvidar nada.</li>
+              <li>- Automatizaciones de correo y recordatorios para invitados.</li>
+              <li>- Catalogo de proveedores con recomendaciones personalizadas.</li>
             </ul>
           </div>
 
@@ -119,7 +196,7 @@ export default function Signup() {
               Crea tu cuenta
             </h1>
             <p className="mt-2 text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              Puedes registrarte con tu email o usando tu cuenta social favorita.
+              Puedes registrarte con tu correo o usando tu cuenta social favorita.
             </p>
 
             <div className="mt-6">
@@ -133,10 +210,14 @@ export default function Signup() {
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
                 error={formError}
+                emailInputRef={emailInputRef}
+                passwordInputRef={passwordInputRef}
+                roleSelectRef={roleSelectRef}
+                errorId={FORM_ERROR_ID}
               />
             </div>
 
-            <AuthDivider label="o continúa con" />
+            <AuthDivider label="o continua con" />
 
             <SocialLoginButtons
               providers={providers}
@@ -146,21 +227,33 @@ export default function Signup() {
             />
 
             {socialError ? (
-              <p className="mt-3 text-center text-sm text-red-600">{socialError}</p>
+              <p
+                id={SOCIAL_ERROR_ID}
+                role="alert"
+                aria-live="assertive"
+                className="mt-3 text-center text-sm text-red-600"
+              >
+                {socialError}
+              </p>
             ) : null}
             {infoMessage ? (
-              <p className="mt-3 text-center text-sm text-[color:var(--color-primary,#6366f1)]">
+              <p
+                id={INFO_MESSAGE_ID}
+                role="status"
+                aria-live="polite"
+                className="mt-3 text-center text-sm text-[color:var(--color-primary,#6366f1)]"
+              >
                 {infoMessage}
               </p>
             ) : null}
 
             <p className="mt-6 text-center text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              ¿Ya tienes cuenta?{' '}
+              Ya tienes cuenta?{' '}
               <Link
                 to="/login"
                 className="font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
               >
-                Inicia sesión
+                Inicia sesion
               </Link>
             </p>
           </div>

@@ -2,6 +2,7 @@
 
 > Componentes clave: `src/pages/protocolo/Timing.jsx`, `src/components/protocolo/CeremonyTimeline.jsx`, `src/hooks/useCeremonyTimeline.js`
 > Persistencia actual: campo `timing` dentro de `weddings/{id}` y subcolección `weddings/{id}/ceremonyTimeline/main` (migración a doc dedicado pendiente)
+> Pendiente: migrar la persistencia a subcoleccion propia, exponer estado editable, habilitar drag&drop y alertas automaticas.
 
 ## 1. Objetivo y alcance
 - Definir el cronograma completo del evento (preparativos, ceremonia, cóctel, banquete, fiesta).  
@@ -13,16 +14,16 @@
 - Accesos rápidos desde tareas con palabras clave “timing”, “cronograma”, “ensayo” (`src/components/tasks/TasksRefactored.jsx:238`).  
 - Notificaciones internas pueden abrir la vista cuando un bloque entra en estado “retrasado”.
 
-## 3. Estado actual vs. pendientes
+## 3. Estado actual
 
-**Implementado hoy**
+### Implementado hoy
 - `Timing.jsx` escucha el documento principal `weddings/{id}` y lee el campo `timing` (`src/pages/protocolo/Timing.jsx:35-44`).  
 - Inicializa bloques por defecto cuando no existe información (`Timing.jsx:47-64`).  
 - Permite editar nombre, horas, añadir/eliminar momentos y reordenarlos con botones.  
 - `CeremonyTimeline` gestiona secciones pre/ceremonia/post, con alta/baja de hitos y cambios de responsable/estado (`src/components/protocolo/CeremonyTimeline.jsx`).  
 - Selector de estado por bloque (`on-time | slightly-delayed | delayed`) directamente desde la cabecera del bloque.
 
-**Pendiente / roadmap**
+## Roadmap / pendientes
 - Mover la persistencia de `timing` a una subcolección separada (`weddings/{id}/timing`).  
 - Editar el estado del bloque (on-time/slightly-delayed/delayed) desde la UI.  
 - Reordenamiento drag&drop, límites de 30 hitos y validaciones de coherencia horaria.  

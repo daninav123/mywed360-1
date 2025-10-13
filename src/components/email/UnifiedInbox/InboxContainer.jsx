@@ -5,7 +5,7 @@ import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
 import { post as apiPost } from '../../../services/apiClient';
-import EmailService, { setAuthContext } from '../../../services/emailService';
+import EmailService from '../../../services/emailService';
 import { scheduleEmailSend } from '../../../services/emailAutomationService';
 import CalendarService from '../../../services/CalendarService';
 import EmailComposer from '../EmailComposer';
@@ -13,7 +13,18 @@ import SmartEmailComposer from '../SmartEmailComposer';
 import EmailFeedbackCollector from '../EmailFeedbackCollector';
 import CalendarIntegration from '../CalendarIntegration';
 import ProviderSearchModal from '../../ProviderSearchModal';
-// (duplicated import removed)
+import CustomFolders from '../CustomFolders';
+import ManageFoldersModal from '../ManageFoldersModal';
+import EmptyTrashModal from '../EmptyTrashModal';
+import {
+  getUserFolders,
+  createFolder as createCustomFolder,
+  renameFolder as renameCustomFolder,
+  deleteFolder as deleteCustomFolder,
+  assignEmailToFolder,
+  removeEmailFromFolder,
+  getEmailsInFolder,
+} from '../../../services/folderService';
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
@@ -26,7 +37,7 @@ const InboxContainer = () => {
 
   // Establecer el contexto de autenticaciÃ³n en EmailService
   useEffect(() => {
-    setAuthContext(authContext);
+    EmailService?.setAuthContext?.(authContext);
   }, [authContext]);
 
   useEffect(() => {
@@ -50,9 +61,11 @@ const InboxContainer = () => {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [folder, setFolder] = useState('inbox'); // 'inbox' | 'sent'
+  const [folder, setFolder] = useState('inbox'); // admite carpetas personalizadas con formato custom:{id}
   const [inboxCounts, setInboxCounts] = useState({ total: 0, unread: 0 });
   const [sentCounts, setSentCounts] = useState({ total: 0, unread: 0 });
+  const [trashCounts, setTrashCounts] = useState({ total: 0, unread: 0 });
+  const [importantCounts, setImportantCounts] = useState({ total: 0, unread: 0 });
   const [iaCounts, setIaCounts] = useState({ inbox: 0, sent: 0 });
   const [analyzing, setAnalyzing] = useState(false);
   const [showProviderSearch, setShowProviderSearch] = useState(false);
@@ -60,45 +73,92 @@ const InboxContainer = () => {
   const [emailTemplates, setEmailTemplates] = useState([]);
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
   const [calendarEmail, setCalendarEmail] = useState(null);
+  const [customFolders, setCustomFolders] = useState([]);
+  const [showManageFolders, setShowManageFolders] = useState(false);
+  const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
+  const currentCustomFolderId = folder.startsWith('custom:') ? folder.slice(7) : null;
+  const isTrash = folder === 'trash';
+  const manageFoldersList = [
+    { id: 'inbox', name: 'Bandeja de entrada', system: true },
+    { id: 'sent', name: 'Enviados', system: true },
+    { id: 'trash', name: 'Papelera', system: true },
+    ...customFolders.map((folderItem) => ({
+      ...folderItem,
+      system: false,
+    })),
+  ];
 
   // Cargar emails al montar el componente
-  const refreshEmails = useCallback(async (targetFolder = folder) => {
-    try {
-      setLoading(true);
-      const res = await EmailService.getMails(targetFolder);
-
-      if (Array.isArray(res)) {
-        setEmails(res);
-        setError(null);
-      } else if (res && typeof res === 'object') {
-        // El servicio devolviÃ³ un objeto con error o estructura inesperada
-        console.warn('EmailService devolviÃ³ estructura no esperada:', res);
-        setEmails([]);
-        setError(res.error || 'No se pudieron cargar los emails');
-      } else {
-        // Valor totalmente inesperado
-        setEmails([]);
-        setError('Respuesta de EmailService no vÃ¡lida');
-      }
-    } catch (err) {
-      console.error('Error cargando emails:', err);
-      setError('No se pudieron cargar los emails');
-    } finally {
-      setLoading(false);
+  const loadCustomFolders = useCallback(() => {
+    if (!user?.uid) {
+      setCustomFolders([]);
+      return;
     }
-  }, [folder]);
+    try {
+      const folders = getUserFolders(user.uid);
+      setCustomFolders(Array.isArray(folders) ? folders : []);
+    } catch (folderError) {
+      console.error('Error cargando carpetas personalizadas:', folderError);
+      setCustomFolders([]);
+    }
+  }, [user?.uid]);
+
+  const refreshEmails = useCallback(
+    async (targetFolder = folder) => {
+      try {
+        setLoading(true);
+        let list = [];
+        if (targetFolder.startsWith('custom:')) {
+          const folderId = targetFolder.slice(7);
+          const allMails = await EmailService.getMails('all');
+          const ids =
+            user?.uid && folderId
+              ? new Set(getEmailsInFolder(user.uid, folderId))
+              : new Set();
+          list = (Array.isArray(allMails) ? allMails : []).filter((mail) => {
+            if (!mail) return false;
+            if (mail.folder === `custom:${folderId}`) return true;
+            if (ids.size) return ids.has(mail.id);
+            return false;
+          });
+        } else {
+          const res = await EmailService.getMails(targetFolder);
+          list = Array.isArray(res) ? res : [];
+        }
+
+        setEmails(Array.isArray(list) ? list : []);
+        setError(null);
+      } catch (err) {
+        console.error('Error cargando emails:', err);
+        setError('No se pudieron cargar los emails');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [folder, user?.uid]
+  );
 
   // Contadores por carpeta
   const refreshCounts = useCallback(async () => {
     try {
-      const [inboxList, sentList] = await Promise.all([
+      const [inboxList, sentList, trashList] = await Promise.all([
         EmailService.getMails('inbox').catch(() => []),
         EmailService.getMails('sent').catch(() => []),
+        EmailService.getMails('trash').catch(() => []),
       ]);
       const i = Array.isArray(inboxList) ? inboxList : [];
       const s = Array.isArray(sentList) ? sentList : [];
+      const t = Array.isArray(trashList) ? trashList : [];
       setInboxCounts({ total: i.length, unread: i.filter((m) => !m.read).length });
       setSentCounts({ total: s.length, unread: s.filter((m) => !m.read).length });
+      setTrashCounts({ total: t.length, unread: t.filter((m) => !m.read).length });
+      const importantList = [...i, ...s].filter((mail) => mail?.important);
+      setImportantCounts({
+        total: importantList.length,
+        unread: importantList.filter((mail) => !mail?.read).length,
+      });
+
+      loadCustomFolders();
 
       // IA counts (best-effort, limitado a 50 por carpeta)
       try {
@@ -125,7 +185,19 @@ const InboxContainer = () => {
         setIaCounts({ inbox: ci, sent: cs });
       } catch {}
     } catch {}
-  }, []);
+  }, [loadCustomFolders]);
+
+  useEffect(() => {
+    loadCustomFolders();
+  }, [loadCustomFolders]);
+
+  const refreshAllData = useCallback(async (targetFolder = folder) => {
+    try {
+      await Promise.all([refreshEmails(targetFolder), refreshCounts()]);
+    } catch (refreshError) {
+      console.warn('Error refrescando datos de email:', refreshError);
+    }
+  }, [folder, refreshEmails, refreshCounts]);
 
   // Inicializar EmailService y refrescar lista (con fallback para Cypress/dev sin usuario Firebase)
   useEffect(() => {
@@ -179,17 +251,148 @@ const InboxContainer = () => {
     }
   }, [refreshCounts]);
 
-  // Eliminar email
-  const deleteEmail = useCallback(async (emailId) => {
+  const moveEmailToFolder = useCallback(
+    async (emailId, targetFolder) => {
+      if (!emailId || !targetFolder) return;
+      try {
+        if (typeof EmailService.moveMail === 'function') {
+          await EmailService.moveMail(emailId, targetFolder);
+        } else {
+          await EmailService.setFolder(emailId, targetFolder);
+        }
+        if (user?.uid) {
+          if (targetFolder.startsWith('custom:')) {
+            assignEmailToFolder(user.uid, emailId, targetFolder.slice(7));
+          } else {
+            removeEmailFromFolder(user.uid, emailId);
+          }
+        }
+        await refreshAllData();
+      } catch (err) {
+        console.error('Error moviendo email:', err);
+        throw err;
+      }
+    },
+    [user?.uid, refreshAllData]
+  );
+
+  const deleteEmailForever = useCallback(
+    async (emailId) => {
+      if (!emailId) return;
+      try {
+        await EmailService.deleteMail(emailId);
+        if (user?.uid) {
+          try {
+            removeEmailFromFolder(user.uid, emailId);
+          } catch {}
+        }
+        await refreshAllData();
+      } catch (err) {
+        console.error('Error eliminando email definitivamente:', err);
+        throw err;
+      }
+    },
+    [user?.uid, refreshAllData]
+  );
+
+  const handleDeleteEmail = useCallback(
+    async (emailId, { permanent = false } = {}) => {
+      if (!emailId) return;
+      try {
+        if (permanent || isTrash) {
+          await deleteEmailForever(emailId);
+        } else {
+          await moveEmailToFolder(emailId, 'trash');
+        }
+        if (selectedEmailId === emailId) {
+          setSelectedEmailId(null);
+          setViewMode('list');
+        }
+      } catch (err) {
+        console.error('Error procesando eliminación de email:', err);
+      }
+    },
+    [deleteEmailForever, moveEmailToFolder, isTrash, selectedEmailId]
+  );
+
+  const handleRestoreEmail = useCallback(
+    async (emailId) => {
+      if (!emailId) return;
+      try {
+        await moveEmailToFolder(emailId, 'inbox');
+        if (selectedEmailId === emailId) {
+          setSelectedEmailId(null);
+          setViewMode('list');
+        }
+      } catch (err) {
+        console.error('Error restaurando email:', err);
+      }
+    },
+    [moveEmailToFolder, selectedEmailId]
+  );
+
+  const handleEmptyTrash = useCallback(async () => {
     try {
-      await EmailService.deleteMail(emailId);
-      setEmails((prev) => prev.filter((e) => e.id !== emailId));
-      try { await refreshCounts(); } catch {}
+      await EmailService.emptyTrash();
+      await refreshAllData();
     } catch (err) {
-      console.error('Error eliminando email:', err);
-      throw err;
+      console.error('Error vaciando papelera:', err);
+    } finally {
+      setShowEmptyTrashModal(false);
     }
-  }, [refreshCounts]);
+  }, [refreshAllData]);
+
+  const handleCreateFolder = useCallback(
+    (name) => {
+      if (!user?.uid || !name) return null;
+      try {
+        const created = createCustomFolder(user.uid, name);
+        loadCustomFolders();
+        return created;
+      } catch (err) {
+        console.error('Error creando carpeta personalizada:', err);
+        throw err;
+      }
+    },
+    [user?.uid, loadCustomFolders]
+  );
+
+  const handleRenameFolder = useCallback(
+    (folderId, newName) => {
+      if (!user?.uid || !folderId || !newName) return null;
+      try {
+        const updated = renameCustomFolder(user.uid, folderId, newName);
+        loadCustomFolders();
+        return updated;
+      } catch (err) {
+        console.error('Error renombrando carpeta personalizada:', err);
+        throw err;
+      }
+    },
+    [user?.uid, loadCustomFolders]
+  );
+
+  const handleDeleteFolder = useCallback(
+    (folderId) => {
+      if (!user?.uid || !folderId) return false;
+      try {
+        const result = deleteCustomFolder(user.uid, folderId);
+        loadCustomFolders();
+        if (folder === `custom:${folderId}`) {
+          setFolder('inbox');
+          setSelectedEmailId(null);
+          refreshAllData('inbox');
+        } else {
+          refreshAllData(folder);
+        }
+        return result;
+      } catch (err) {
+        console.error('Error eliminando carpeta personalizada:', err);
+        throw err;
+      }
+    },
+    [user?.uid, loadCustomFolders, folder, refreshAllData]
+  );
 
   // Estados locales
   const [selectedEmailId, setSelectedEmailId] = useState(null);
@@ -279,21 +482,6 @@ const InboxContainer = () => {
       }
     },
     [safeEmails, markAsRead]
-  );
-
-  const handleEmailDelete = useCallback(
-    async (emailId) => {
-      try {
-        await deleteEmail(emailId);
-        if (selectedEmailId === emailId) {
-          setSelectedEmailId(null);
-          setViewMode('list');
-        }
-      } catch (error) {
-        console.error('Error al eliminar email:', error);
-      }
-    },
-    [deleteEmail, selectedEmailId, safeEmails]
   );
 
   const handleSortChange = useCallback(
@@ -602,15 +790,20 @@ const InboxContainer = () => {
       {/* Contenido principal */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar de carpetas */}
-        <aside className="w-60 border-r bg-surface p-4">
+        <aside className="w-72 border-r bg-surface p-4 flex flex-col" data-testid="email-sidebar">
           <nav className="space-y-2">
             <button
               className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
                 folder === 'inbox' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
-              }`}
-              onClick={() => { setSelectedEmailId(null); setFolder('inbox'); }}
+              } system-folder`}
+              onClick={() => {
+                setSelectedEmailId(null);
+                setFolder('inbox');
+              }}
+              data-testid="folder-item"
+              title="Bandeja de entrada"
             >
-              <span className="flex items-center gap-2">Recibidos {iaCounts.inbox > 0 && (
+              <span className="flex items-center gap-2">Bandeja de entrada {iaCounts.inbox > 0 && (
                 <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.inbox}`}>
                   IA {iaCounts.inbox}
                 </span>
@@ -622,8 +815,13 @@ const InboxContainer = () => {
             <button
               className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
                 folder === 'sent' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
-              }`}
-              onClick={() => { setSelectedEmailId(null); setFolder('sent'); }}
+              } system-folder`}
+              onClick={() => {
+                setSelectedEmailId(null);
+                setFolder('sent');
+              }}
+              data-testid="folder-item"
+              title="Enviados"
             >
               <span className="flex items-center gap-2">Enviados {iaCounts.sent > 0 && (
                 <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.sent}`}>
@@ -634,7 +832,58 @@ const InboxContainer = () => {
                 {sentCounts.total}
               </span>
             </button>
+            <button
+              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
+                folder === 'trash' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
+              } system-folder`}
+              onClick={() => {
+                setSelectedEmailId(null);
+                setFolder('trash');
+              }}
+              data-testid="folder-item"
+              title="Papelera"
+            >
+              <span className="flex items-center gap-2">Papelera</span>
+              <span className="text-xs rounded-full px-2 py-0.5 bg-gray-300 text-gray-800">
+                {trashCounts.total}
+              </span>
+            </button>
           </nav>
+
+          <div className="mt-6">
+            <CustomFolders
+              folders={customFolders}
+              activeFolder={currentCustomFolderId}
+              onSelectFolder={(folderId) => {
+                setSelectedEmailId(null);
+                setFolder(`custom:${folderId}`);
+              }}
+              onCreateFolder={handleCreateFolder}
+              onRenameFolder={handleRenameFolder}
+              onDeleteFolder={handleDeleteFolder}
+            />
+          </div>
+
+          <div className="mt-auto pt-4 border-t space-y-2">
+            <button
+              type="button"
+              className="w-full px-3 py-2 text-sm text-body border rounded hover:bg-primary-soft"
+              onClick={() => setShowManageFolders(true)}
+              data-testid="manage-folders-button"
+            >
+              Gestionar carpetas
+            </button>
+            {folder === 'trash' && (
+              <button
+                type="button"
+                className="w-full px-3 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700"
+                onClick={() => setShowEmptyTrashModal(true)}
+                data-testid="empty-trash-button"
+              >
+                Vaciar papelera
+              </button>
+            )}
+          </div>
         </aside>
 
         {/* Lista y detalle lado a lado */}
@@ -643,7 +892,7 @@ const InboxContainer = () => {
             <EmailList
               emails={sortedEmails}
               onSelectEmail={handleEmailSelect}
-              onDeleteEmail={handleEmailDelete}
+              onDeleteEmail={handleDeleteEmail}
               selectedEmailId={selectedEmailId}
               loading={loading}
               currentFolder={folder}
@@ -659,8 +908,11 @@ const InboxContainer = () => {
               <EmailDetail
                 email={selectedEmail}
                 userId={user?.uid}
+                currentFolder={folder}
                 onBack={handleBackToList}
-                onDelete={() => handleEmailDelete(selectedEmail.id)}
+                onDelete={() => handleDeleteEmail(selectedEmail.id)}
+                onDeleteForever={() => handleDeleteEmail(selectedEmail.id, { permanent: true })}
+                onRestore={() => handleRestoreEmail(selectedEmail.id)}
                 onReply={() => {
                   const subj = selectedEmail?.subject ? `Re: ${selectedEmail.subject}` : 'Re:';
                   const to = selectedEmail?.from || '';
@@ -752,6 +1004,19 @@ const InboxContainer = () => {
           onSubmit={handleFeedbackSubmit}
         />
       </div>
+
+      <ManageFoldersModal
+        isOpen={showManageFolders}
+        onClose={() => setShowManageFolders(false)}
+        folders={manageFoldersList}
+        onDeleteFolder={handleDeleteFolder}
+      />
+
+      <EmptyTrashModal
+        isOpen={showEmptyTrashModal}
+        onConfirm={handleEmptyTrash}
+        onClose={() => setShowEmptyTrashModal(false)}
+      />
     </div>
   );
 };

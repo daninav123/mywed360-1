@@ -19,3 +19,4 @@ Notas:
 - El backend ya soporta `/etc/secrets/app.env` para inyectar variables en despliegue.
 - Los archivos `serviceAccount*.json` estÃ¡n ignorados en `.gitignore`; no deben versionarse.
 
+- Multi-boda: vista portfolio con filtros y permisos por boda (Bodas.jsx, MultiWeddingSummary.jsx, WeddingPortfolioTable.jsx, actualización WeddingContext).

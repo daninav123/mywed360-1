@@ -8,7 +8,7 @@
 
 export function getBackendBase() {
   // 1. Variables de entorno definidas en tiempo de build
-  const envBase = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_BACKEND_BASE_URL;
+  const envBase = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_BASE;
   if (envBase) {
     return envBase.replace(/\/$/, ''); // quitar barra final
   }

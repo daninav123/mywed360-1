@@ -27,21 +27,34 @@
 - flujo-9-rsvp-confirmaciones.md — Documentado
 - flujo-10-gestion-bodas-multiples.md — Documentado
 - flujo-11-protocolo-ceremonias.md — Documentado
+- flujo-11a-momentos-especiales.md — Documentado
+- flujo-11b-timeline-dia-b.md — Documentado
+- flujo-11c-checklist-ultima-hora.md — Documentado
+- flujo-11d-guia-documentacion-legal.md — Documentado
+- flujo-11e-ayuda-textos-ceremonia.md — Documentado
 - flujo-12-notificaciones-configuracion.md — Documentado
-- flujo-4-invitados-operativa.md — Documentado
 - flujo-13-seating-plan-e2e.md — Documentado (tests E2E)
 - flujo-14-checklist-avanzado.md — Documentado
 - flujo-15-contratos-documentos.md — Documentado
 - flujo-16-asistente-virtual-ia.md — Documentado (concepto) — Implementación pendiente
 - flujo-17-gamificacion-progreso.md — Documentado (concepto) — Implementación pendiente
 - flujo-18-generador-documentos-legales.md — Documentado (concepto) — Implementación pendiente
+- flujo-19-diseno-invitaciones.md — Documentado
+- flujo-20-email-inbox.md — Documentado
+- flujo-21-sitio-publico.md — Documentado
+- flujo-22-dashboard-navegacion.md — Documentado
+- flujo-23-metricas-proyecto.md — Documentado
+- flujo-24-galeria-inspiracion.md — Documentado
+- flujo-25-inspiracion.md — Documentado
+- flujo-26-blog.md — Documentado
 
 ## Implementados sin documentar (histórico)
 
 Los siguientes flujos estaban marcados como “no documentados” y ahora cuentan con documentación en `docs/flujos-especificos/`:
 
 - Diseño Web y Personalización — Documentado (ver `flujo-8-diseno-web-personalizacion.md`)
-- Gestión de Contenido y Blog — Documentado (ver `flujo-4-invitados-operativa.md`)
+- Gestión de Inspiración/Galería — Documentado (ver `flujo-24-galeria-inspiracion.md` y `flujo-25-inspiracion.md`)
+- Blog interno — Documentado (ver `flujo-26-blog.md`)
 - Protocolo y Ceremonias — Documentado (ver `flujo-11-protocolo-ceremonias.md`)
 - Checklist y Tareas — Documentado (ver `flujo-5-timeline-tareas.md` y `flujo-14-checklist-avanzado.md`)
 - RSVP y Confirmaciones — Documentado (ver `flujo-9-rsvp-confirmaciones.md`)

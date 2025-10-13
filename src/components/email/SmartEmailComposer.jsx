@@ -1,9 +1,4 @@
-﻿import AccessTime from '@mui/icons-material/AccessTime';
-import InsertDriveFile from '@mui/icons-material/InsertDriveFile';
-import Lightbulb from '@mui/icons-material/Lightbulb';
-import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
-import Schedule from '@mui/icons-material/Schedule';
-import Send from '@mui/icons-material/Send';
+﻿import { CalendarClock, Clock, FileText, Lightbulb, Send } from 'lucide-react';
 import {
   Box,
   Grid,
@@ -393,6 +388,7 @@ const SmartEmailComposer = ({
 };
 
 export default SmartEmailComposer;
+
 
 
 

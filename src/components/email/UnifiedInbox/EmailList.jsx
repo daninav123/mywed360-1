@@ -69,7 +69,13 @@ const EmailList = ({
 
   // Manejador para eliminar emails seleccionados
   const handleDeleteSelected = () => {
-    selectedEmailIds.forEach((id) => onDeleteEmail(id));
+    if (typeof onDeleteEmail !== 'function') {
+      setSelectedEmailIds([]);
+      return;
+    }
+    selectedEmailIds.forEach((id) =>
+      onDeleteEmail(id, { permanent: currentFolder === 'trash' })
+    );
     setSelectedEmailIds([]);
   };
 
@@ -110,8 +116,11 @@ const EmailList = ({
   };
 
   // Componente para renderizar mensaje de estado
-  const StatusMessage = ({ icon, message, className }) => (
-    <div className={`flex flex-col items-center justify-center py-16 ${className}`}>
+  const StatusMessage = ({ icon, message, className, dataTestId }) => (
+    <div
+      className={`flex flex-col items-center justify-center py-16 ${className}`}
+      data-testid={dataTestId}
+    >
       {icon}
       <p className="mt-4 text-sm">{message}</p>
     </div>
@@ -216,6 +225,7 @@ const EmailList = ({
             icon={<AlertCircle size={32} className="text-gray-400" />}
             message="No hay emails en esta carpeta"
             className="text-gray-500"
+            dataTestId="empty-folder-message"
           />
         ) : (
           <div className="divide-y divide-gray-100" data-testid="email-list">
@@ -226,6 +236,7 @@ const EmailList = ({
                 className={`grid grid-cols-12 gap-2 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors ${
                   selectedEmailId === safeRender(email.id, '') ? 'bg-blue-50' : ''
                 } ${!safeRender(email.read, false) ? 'font-medium' : ''}`}
+                data-testid="email-list-item"
               >
                 <div
                   className="col-span-1 flex items-center justify-center"

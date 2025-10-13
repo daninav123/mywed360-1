@@ -1,8 +1,9 @@
-﻿import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
+import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
+import SupplierMergeWizard from './SupplierMergeWizard';
 import ProveedorBudgets from './ProveedorBudgets.jsx';
 import RFQModal from './RFQModal';
 import EmailTrackingList from './tracking/EmailTrackingList';
@@ -29,7 +30,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const [ratingDirty, setRatingDirty] = useState(false);
   const [savingRating, setSavingRating] = useState(false);
-  const { updateProvider } = useProveedores();
+  const { updateProvider, registerManualContact } = useProveedores();
 
   const { activeWedding } = useWedding();
   const [generating, setGenerating] = useState(false);
@@ -45,6 +46,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const { itemás: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
   const [preview, setPreview] = useState({ open: false, url: '', type: '' });
   const [assignOpen, setAssignOpen] = useState(false);
+  const [mergeOpen, setMergeOpen] = useState(false);
 
   const [trackingFilter, setTrackingFilter] = useState('todos');
   const [selectedTracking, setSelectedTracking] = useState(null);
@@ -71,6 +73,45 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     return () => { cancelled = true; };
   }, [provider?.id]);
 
+  const portalAvailabilityLabel = useMemo(() => {
+    const raw = String(provider?.portalAvailability || '').toLowerCase();
+    if (!raw) return 'Sin respuesta';
+    if (raw === 'available') return 'Disponible';
+    if (raw === 'unavailable') return 'No disponible';
+    if (raw === 'unknown' || raw === 'pending') return 'Por confirmar';
+    return provider.portalAvailability;
+  }, [provider?.portalAvailability]);
+
+  const portalLastSubmit = useMemo(() => {
+    const ts = provider?.portalLastSubmitAt;
+    if (!ts) return null;
+    try {
+      if (typeof ts.toDate === 'function') return ts.toDate();
+      const date = new Date(ts);
+      return Number.isNaN(date.getTime()) ? null : date;
+    } catch {
+      return null;
+    }
+  }, [provider?.portalLastSubmitAt]);
+
+  const portalStatus = useMemo(() => {
+    if (portalLastSubmit) return 'responded';
+    if (provider?.portalToken) return 'pending';
+    return 'none';
+  }, [portalLastSubmit, provider?.portalToken]);
+
+  const portalStatusColor = useMemo(() => {
+    if (portalStatus === 'responded') return 'bg-emerald-100 text-emerald-700';
+    if (portalStatus === 'pending') return 'bg-amber-100 text-amber-700';
+    return 'bg-gray-100 text-gray-600';
+  }, [portalStatus]);
+
+  const portalLastSubmitText = portalLastSubmit
+    ? portalLastSubmit.toLocaleString()
+    : null;
+
+  const portalLastMessage = provider?.portalLastMessage || '';
+
   const handlePayDeposit = async () => {
     if (!provider) return;
     let amount = 100;
@@ -93,6 +134,49 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setToast({ type: 'error', mássage: 'No se pudo iniciar el pago' });
     } finally {
       setPaying(false);
+    }
+  };
+  const handleManualContact = async () => {
+    if (!provider?.id) return;
+    let note = '';
+    if (typeof window !== 'undefined') {
+      try {
+        const input = window.prompt('Nota para el contacto manual (opcional)', '');
+        if (input === null) {
+          return;
+        }
+        note = input;
+      } catch {
+        /* noop */
+      }
+    }
+    try {
+      await registerManualContact(provider.id, note);
+      setToast({ type: 'success', mássage: 'Contacto manual registrado.' });
+    } catch (e) {
+      setToast({ type: 'error', mássage: 'No se pudo registrar el contacto.' });
+    }
+  };
+
+  const handleCopyPortalLink = async () => {
+    if (!activeWedding || !provider?.id) return;
+    try {
+      const res = await apiPost(
+        `/api/supplier-portal/weddings/${activeWedding}/suppliers/${provider.id}/portal-token`,
+        {},
+        { auth: true }
+      );
+      const json = await res.json();
+      if (json?.url) {
+        try {
+          await navigator.clipboard?.writeText?.(json.url);
+        } catch {}
+        setToast({ type: 'success', mássage: 'Enlace del portal copiado' });
+      } else {
+        setToast({ type: 'info', mássage: 'Token generado' });
+      }
+    } catch (e) {
+      setToast({ type: 'error', mássage: 'No se pudo generar el enlace del portal' });
     }
   };
 
@@ -248,9 +332,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       setLoadingEvents(true);
       const res = await apiGet(`/api/mailgun/events?recipient=${encodeURIComponent(provider.email)}&limit=50`, { auth: true, silent: true });
       const json = await res.json();
-      const itemás = Array.isArray(json?.itemás) ? json.itemás : [];
-      const mapped = itemás.map((ev, idx) => {
-        const tsSec = ev?.timástamp || ev?.event_timástamp || Date.now() / 1000;
+      const items = Array.isArray(json?.items) ? json.items : [];
+      const mapped = items.map((ev, idx) => {
+        const tsSec = ev?.timestamp || ev?.event_timestamp || Date.now() / 1000;
         const dateIso = new Date(tsSec * 1000).toISOString();
         const evType = String(ev?.event || '').toLowerCase();
         let status = 'enviado';
@@ -514,6 +598,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
                   </div>
 
+                  <div className="mt-4">
+                    <Button size="sm" variant="outline" onClick={handleManualContact}>
+                      Registrar contacto manual
+                    </Button>
+                  </div>
+
                   <div className="mt-6">
                     <p className="font-medium mb-1">Calificacion</p>
                     <div className="flex itemás-center space-x-4">
@@ -525,6 +615,54 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                         {savingRating ? 'Guardando...' : 'Guardar valoracion'}
                       </Button>
                     </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-medium">Líneas de servicio</h3>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setMergeOpen(true)}
+                          disabled={!Array.isArray(provider.serviceLines) || provider.serviceLines.length === 0}
+                        >
+                          Gestionar líneas
+                        </Button>
+                      </div>
+                    </div>
+                    {Array.isArray(provider.serviceLines) && provider.serviceLines.length > 0 ? (
+                      <div className="overflow-hidden rounded-lg border border-gray-200">
+                        <table className="min-w-full text-sm bg-white">
+                          <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+                            <tr>
+                              <th className="px-3 py-2 text-left font-medium">Servicio</th>
+                              <th className="px-3 py-2 text-left font-medium">Estado</th>
+                              <th className="px-3 py-2 text-left font-medium">Presupuesto</th>
+                              <th className="px-3 py-2 text-left font-medium">Notas</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {provider.serviceLines.map((line) => (
+                              <tr key={line.id} className="border-t border-gray-100">
+                                <td className="px-3 py-2 font-medium text-gray-800">
+                                  {line.name || 'Sin nombre'}
+                                </td>
+                                <td className="px-3 py-2">{line.status || '—'}</td>
+                                <td className="px-3 py-2">
+                                  {line.budget != null ? `€ ${line.budget}` : '—'}
+                                </td>
+                                <td className="px-3 py-2 text-gray-500">{line.notes || '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        Aún no se han definido líneas de servicio para este proveedor.
+                      </p>
+                    )}
                   </div>
                 </Card>
 
@@ -569,6 +707,65 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   )}
                 </Card>
 
+                <Card>
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-medium">Portal proveedor</h3>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${portalStatusColor}`}>
+                          {portalStatus === 'responded'
+                            ? 'Respondido'
+                            : portalStatus === 'pending'
+                              ? 'Pendiente'
+                              : 'Sin enlace'}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">Disponibilidad:</span>
+                          <span className="text-gray-800">{portalAvailabilityLabel}</span>
+                        </div>
+                        {portalLastSubmitText && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold">Última respuesta:</span>
+                            <span>{portalLastSubmitText}</span>
+                          </div>
+                        )}
+                        {portalLastMessage && (
+                          <div>
+                            <span className="font-semibold">Último mensaje:</span>
+                            <p className="mt-1 p-2 border border-gray-200 bg-white rounded text-sm text-gray-700 line-clamp-3">
+                              {portalLastMessage}
+                            </p>
+                          </div>
+                        )}
+                        {portalStatus === 'pending' && (
+                          <p className="text-xs text-amber-600">
+                            Invitación enviada: a la espera de respuesta del proveedor.
+                          </p>
+                        )}
+                        {portalStatus === 'none' && (
+                          <p className="text-xs text-gray-500">
+                            Genera un enlace para que el proveedor pueda responder desde su portal privado.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start gap-2 md:items-end">
+                      <Button
+                        variant="outline"
+                        onClick={handleCopyPortalLink}
+                        disabled={!activeWedding || !provider?.id}
+                      >
+                        Copiar enlace del portal
+                      </Button>
+                      {portalLastSubmitText && (
+                        <span className="text-xs text-emerald-600">Respuesta registrada.</span>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+
                 <ProveedorBudgets supplierId={provider.id} />
 
                 <Card>
@@ -592,30 +789,6 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   <div className="flex itemás-center justify-between mb-2">
                     <h3 className="text-lg font-medium">RFQ enviaños</h3>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={async () => {
-                          if (!activeWedding || !provider?.id) return;
-                          try {
-                            const res = await apiPost(
-                              `/api/supplier-portal/weddings/${activeWedding}/suppliers/${provider.id}/portal-token`,
-                              {},
-                              { auth: true }
-                            );
-                            const json = await res.json();
-                            if (json?.url) {
-                              try { await navigator.clipboard?.writeText?.(json.url); } catch {}
-                              setToast({ type: 'success', mássage: 'Enlace del portal copiado' });
-                            } else {
-                              setToast({ type: 'info', mássage: 'Token generado' });
-                            }
-                          } catch (e) {
-                            setToast({ type: 'error', mássage: 'No se pudo generar el enlace del portal' });
-                          }
-                        }}
-                      >
-                        Portal proveedor
-                      </Button>
                       <Button
                         variant="outline"
                         onClick={() => {
@@ -728,7 +901,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     </Button>
                   </div>
                   <EmailTrackingList
-                    trackingItemás={trackingItemás}
+                    trackingItems={trackingItemás}
                     currentFilter={trackingFilter}
                     onFilter={setTrackingFilter}
                     onViewDetails={(item) => setSelectedTracking(item)}
@@ -782,6 +955,20 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
           provider={provider}
         />
       )}
+      <SupplierMergeWizard
+        open={mergeOpen}
+        onClose={() => setMergeOpen(false)}
+        provider={provider}
+        onCompleted={(result) => {
+          setMergeOpen(false);
+          if (!result) return;
+          if (result.type === 'merge') {
+            setToast({ type: 'success', mássage: 'Líneas combinadas correctamente.' });
+          } else if (result.type === 'split') {
+            setToast({ type: 'success', mássage: 'Se creó un proveedor nuevo con las líneas seleccionadas.' });
+          }
+        }}
+      />
     </>
   );
 };

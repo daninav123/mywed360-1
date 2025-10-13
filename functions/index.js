@@ -1,6 +1,9 @@
 const functions = require('firebase-functions');
 const createCors = require('cors');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const { authenticator } = require('otplib');
+const { z } = require('zod');
 // Usar fetch nativo de Node 18+ (Cloud Functions Node 20)
 const fetch = globalThis.fetch;
 let FormDataLib = null;
@@ -33,6 +36,353 @@ const corsHandler = createCors({
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
+
+// ----- Configuración y utilidades de autenticación admin -----
+const ADMIN_EMAIL = String(
+  process.env.ADMIN_EMAIL ||
+    process.env.VITE_ADMIN_EMAIL ||
+    process.env.ADMIN_USER_EMAIL ||
+    'admin@lovenda.com'
+)
+  .trim()
+  .toLowerCase();
+const ADMIN_NAME =
+  process.env.ADMIN_NAME ||
+  process.env.VITE_ADMIN_NAME ||
+  'Administrador Lovenda';
+const ADMIN_PASSWORD_HASH =
+  process.env.ADMIN_PASSWORD_HASH || process.env.VITE_ADMIN_PASSWORD_HASH || '';
+const ADMIN_PASSWORD_FALLBACK =
+  process.env.ADMIN_PASSWORD ||
+  process.env.VITE_ADMIN_PASSWORD ||
+  '';
+const ADMIN_REQUIRE_MFA = String(
+  process.env.ADMIN_REQUIRE_MFA ||
+    process.env.VITE_ADMIN_REQUIRE_MFA ||
+    'true'
+)
+  .toLowerCase()
+  .trim() !== 'false';
+const ADMIN_MFA_SECRET =
+  process.env.ADMIN_MFA_SECRET || process.env.VITE_ADMIN_MFA_SECRET || '';
+const ADMIN_MFA_WINDOW_SECONDS = Number(
+  process.env.ADMIN_MFA_WINDOW_SECONDS ||
+    process.env.VITE_ADMIN_MFA_WINDOW_SECONDS ||
+    90
+);
+const ADMIN_LOGIN_MAX_ATTEMPTS = Number(
+  process.env.ADMIN_LOGIN_MAX_ATTEMPTS ||
+    process.env.VITE_ADMIN_LOGIN_MAX_ATTEMPTS ||
+    5
+);
+const ADMIN_LOGIN_WINDOW_MINUTES = Number(
+  process.env.ADMIN_LOGIN_WINDOW_MINUTES ||
+    process.env.VITE_ADMIN_LOGIN_WINDOW_MINUTES ||
+    60
+);
+const ADMIN_LOGIN_LOCK_MINUTES = Number(
+  process.env.ADMIN_LOGIN_LOCK_MINUTES ||
+    process.env.VITE_ADMIN_LOGIN_LOCK_MINUTES ||
+    15
+);
+const ADMIN_SESSION_TTL_MINUTES = Number(
+  process.env.ADMIN_SESSION_TTL_MINUTES ||
+    process.env.VITE_ADMIN_SESSION_TTL_MINUTES ||
+    720
+);
+
+authenticator.options = {
+  window: Number(
+    process.env.ADMIN_MFA_WINDOW_DRIFT ||
+      process.env.VITE_ADMIN_MFA_WINDOW_DRIFT ||
+      1
+  ),
+};
+
+const LOGIN_ATTEMPTS_COLLECTION = 'adminLoginAttempts';
+const LOGIN_CHALLENGES_COLLECTION = 'adminLoginChallenges';
+const ADMIN_SESSIONS_COLLECTION = 'adminSessions';
+
+const ADMIN_PROFILE = {
+  id: 'admin-local',
+  name: ADMIN_NAME,
+  email: ADMIN_EMAIL,
+  role: 'admin',
+  isAdmin: true,
+  permissions: ['*'],
+  preferences: {
+    theme: 'dark',
+    emailNotifications: false,
+  },
+};
+
+const ADMIN_USER = {
+  uid: 'admin-local',
+  email: ADMIN_EMAIL,
+  displayName: ADMIN_NAME,
+};
+
+function getAdminProfile() {
+  return {
+    ...ADMIN_PROFILE,
+    email: ADMIN_EMAIL,
+  };
+}
+
+function getAdminUser() {
+  return {
+    ...ADMIN_USER,
+    email: ADMIN_EMAIL,
+    displayName: ADMIN_NAME,
+  };
+}
+
+function toIsoDate(value) {
+  try {
+    if (value && typeof value.toISOString === 'function') {
+      return value.toISOString();
+    }
+  } catch {}
+  return null;
+}
+
+const loginSchema = z.object({
+  email: z.string().trim().min(3, 'Email requerido'),
+  password: z.string().min(1, 'Contraseña requerida'),
+});
+
+const mfaSchema = z.object({
+  challengeId: z.string().min(10, 'Challenge inválido'),
+  code: z
+    .string()
+    .regex(/^\d{6}$/, 'Código MFA inválido')
+    .transform((value) => value.trim()),
+  resumeToken: z.string().min(10, 'Token inválido'),
+});
+
+const logoutSchema = z.object({
+  sessionToken: z.string().min(20, 'Token de sesión requerido'),
+});
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded) {
+    const parts = forwarded.split(',').map((part) => part.trim());
+    if (parts.length && parts[0]) return parts[0];
+  }
+  return req.ip || req.connection?.remoteAddress || 'unknown';
+}
+
+function getUserAgent(req) {
+  return (
+    req.headers['user-agent'] ||
+    req.headers['User-Agent'] ||
+    'unknown'
+  );
+}
+
+async function recordAdminAudit(action, payload = {}) {
+  try {
+    const entry = {
+      action,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      ...payload,
+    };
+    await db.collection('adminAuditLogs').add(entry);
+  } catch (error) {
+    console.error('[adminAudit] No se pudo registrar el evento', error);
+  }
+}
+
+async function getLoginAttemptDoc(email, ip) {
+  const key = hashToken(`${email}|${ip || 'unknown'}`);
+  return db.collection(LOGIN_ATTEMPTS_COLLECTION).doc(key);
+}
+
+async function getLoginAttemptState(email, ip) {
+  const ref = await getLoginAttemptDoc(email, ip);
+  const snapshot = await ref.get();
+  if (!snapshot.exists) return { ref, locked: false, data: null };
+  const data = snapshot.data() || {};
+  const now = Date.now();
+  const lockedUntil = data.lockedUntil?.toMillis
+    ? data.lockedUntil.toMillis()
+    : null;
+  if (lockedUntil && lockedUntil > now) {
+    return {
+      ref,
+      locked: true,
+      lockedUntil: new Date(lockedUntil),
+      data,
+    };
+  }
+  const firstAttemptAt = data.firstAttemptAt?.toMillis
+    ? data.firstAttemptAt.toMillis()
+    : null;
+  if (
+    firstAttemptAt &&
+    now - firstAttemptAt > ADMIN_LOGIN_WINDOW_MINUTES * 60 * 1000
+  ) {
+    await ref.delete().catch(() => {});
+    return { ref, locked: false, data: null };
+  }
+  return { ref, locked: false, data };
+}
+
+async function incrementLoginFailure(email, ip) {
+  const { ref, data } = await getLoginAttemptState(email, ip);
+  const now = Date.now();
+  const base = data || {};
+  const firstAttemptAt =
+    base.firstAttemptAt?.toMillis?.() || now;
+  const count = Number(base.count || 0) + 1;
+  const update = {
+    email,
+    ip,
+    count,
+    firstAttemptAt: admin.firestore.Timestamp.fromMillis(firstAttemptAt),
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  if (count >= ADMIN_LOGIN_MAX_ATTEMPTS) {
+    const lockedUntilDate = new Date(
+      now + ADMIN_LOGIN_LOCK_MINUTES * 60 * 1000
+    );
+    update.count = 0;
+    update.lockedUntil =
+      admin.firestore.Timestamp.fromDate(lockedUntilDate);
+    await ref.set(update, { merge: true });
+    return {
+      locked: true,
+      lockedUntil: lockedUntilDate,
+    };
+  }
+
+  await ref.set(update, { merge: true });
+  return { locked: false };
+}
+
+async function resetLoginAttempts(email, ip) {
+  try {
+    const ref = await getLoginAttemptDoc(email, ip);
+    await ref.delete();
+  } catch (error) {
+    console.warn('[adminLogin] No se pudo limpiar attempts', error);
+  }
+}
+
+async function verifyAdminPassword(password) {
+  if (ADMIN_PASSWORD_HASH) {
+    try {
+      return await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+    } catch (error) {
+      console.error('[adminLogin] Error verificando hash', error);
+      return false;
+    }
+  }
+  if (ADMIN_PASSWORD_FALLBACK) {
+    return password === ADMIN_PASSWORD_FALLBACK;
+  }
+  console.error('[adminLogin] No hay contraseña configurada');
+  return false;
+}
+
+async function createMfaChallenge(email, ip, userAgent) {
+  const challengeId = crypto.randomUUID();
+  const resumeToken = crypto.randomBytes(24).toString('base64url');
+  const expiresAt = new Date(Date.now() + ADMIN_MFA_WINDOW_SECONDS * 1000);
+
+  await db
+    .collection(LOGIN_CHALLENGES_COLLECTION)
+    .doc(challengeId)
+    .set({
+      email,
+      ip,
+      userAgent,
+      resumeTokenHash: hashToken(resumeToken),
+      status: 'pending',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+      attempts: 0,
+    });
+
+  return { challengeId, resumeToken, expiresAt };
+}
+
+async function consumeMfaChallenge(challengeId) {
+  try {
+    await db
+      .collection(LOGIN_CHALLENGES_COLLECTION)
+      .doc(challengeId)
+      .set(
+        {
+          status: 'consumed',
+          consumedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+  } catch (error) {
+    console.warn('[adminLogin] No se pudo marcar challenge como consumido', error);
+  }
+}
+
+async function createAdminSession(email, metadata = {}) {
+  const sessionId = crypto.randomUUID();
+  const sessionToken = crypto.randomBytes(48).toString('base64url');
+  const expiresAt = new Date(
+    Date.now() + ADMIN_SESSION_TTL_MINUTES * 60 * 1000
+  );
+  const tokenHash = hashToken(sessionToken);
+
+  await db.collection(ADMIN_SESSIONS_COLLECTION).doc(sessionId).set({
+    sessionId,
+    email,
+    tokenHash,
+    status: 'active',
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+    metadata: {
+      ip: metadata.ip || null,
+      userAgent: metadata.userAgent || null,
+      reason: metadata.reason || 'login',
+    },
+  });
+
+  return {
+    sessionId,
+    sessionToken,
+    expiresAt,
+  };
+}
+
+async function endAdminSession(sessionToken, reason = 'logout') {
+  if (!sessionToken) return;
+  const tokenHash = hashToken(sessionToken);
+  const snapshot = await db
+    .collection(ADMIN_SESSIONS_COLLECTION)
+    .where('tokenHash', '==', tokenHash)
+    .limit(1)
+    .get();
+  if (snapshot.empty) return null;
+  const doc = snapshot.docs[0];
+  const data = doc.data() || {};
+  await doc.ref.set(
+    {
+      status: 'terminated',
+      terminatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      terminationReason: reason,
+    },
+    { merge: true }
+  );
+  return {
+    email: data.email || ADMIN_EMAIL,
+    sessionId: data.sessionId,
+  };
+}
 
 // ----- Helpers de autenticación (Firebase ID token) -----
 const allowMockTokens = (() => {
@@ -288,6 +638,410 @@ exports.sendEmail = functions.https.onRequest((request, response) => {
       console.error('Error sending email:', error);
       return response.status(500).json({ error: error.message });
     }
+  });
+});
+
+// ----- Autenticación administrativa -----
+exports.adminLogin = functions.https.onRequest((request, response) => {
+  corsHandler(request, response, async () => {
+    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    if (request.method === 'OPTIONS') {
+      return response.status(204).send('');
+    }
+    if (request.method !== 'POST') {
+      return response
+        .status(405)
+        .json({ success: false, code: 'method_not_allowed' });
+    }
+
+    let payload = request.body;
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch {
+        return response
+          .status(400)
+          .json({ success: false, code: 'invalid_json', message: 'JSON inválido' });
+      }
+    }
+    payload = payload || {};
+
+    const parsed = loginSchema.safeParse(payload);
+    if (!parsed.success) {
+      return response.status(400).json({
+        success: false,
+        code: 'invalid_payload',
+        message: 'Email y contraseña son obligatorios',
+      });
+    }
+
+    const { email, password } = parsed.data;
+    const normalizedEmail = email.trim().toLowerCase();
+    const attemptEmail = ADMIN_EMAIL;
+    const ip = getClientIp(request);
+    const userAgent = getUserAgent(request);
+
+    const lockStatus = await getLoginAttemptState(attemptEmail, ip);
+    if (lockStatus.locked) {
+      await recordAdminAudit('ADMIN_ACCESS_BLOCKED', {
+        actor: normalizedEmail,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          lockedUntil: toIsoDate(lockStatus.lockedUntil),
+        },
+      });
+      return response.status(429).json({
+        success: false,
+        code: 'locked',
+        message:
+          'Acceso bloqueado temporalmente. Inténtalo de nuevo en unos minutos.',
+        lockedUntil: toIsoDate(lockStatus.lockedUntil),
+      });
+    }
+
+    if (normalizedEmail !== ADMIN_EMAIL) {
+      const failure = await incrementLoginFailure(attemptEmail, ip);
+      await recordAdminAudit('ADMIN_ACCESS_DENIED', {
+        actor: normalizedEmail,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'invalid_email',
+        },
+      });
+      return response.status(failure.locked ? 429 : 401).json({
+        success: false,
+        code: failure.locked ? 'locked' : 'invalid_credentials',
+        message: 'Email o contraseña no válidos',
+        lockedUntil: failure.locked ? toIsoDate(failure.lockedUntil) : null,
+      });
+    }
+
+    const passwordOk = await verifyAdminPassword(password);
+    if (!passwordOk) {
+      const failure = await incrementLoginFailure(attemptEmail, ip);
+      await recordAdminAudit('ADMIN_ACCESS_DENIED', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'invalid_password',
+        },
+      });
+      return response.status(failure.locked ? 429 : 401).json({
+        success: false,
+        code: failure.locked ? 'locked' : 'invalid_credentials',
+        message: 'Email o contraseña no válidos',
+        lockedUntil: failure.locked ? toIsoDate(failure.lockedUntil) : null,
+      });
+    }
+
+    await resetLoginAttempts(attemptEmail, ip);
+
+    if (ADMIN_REQUIRE_MFA) {
+      if (!ADMIN_MFA_SECRET) {
+        console.error(
+          '[adminLogin] MFA requerido pero ADMIN_MFA_SECRET no está configurado'
+        );
+        return response.status(500).json({
+          success: false,
+          code: 'mfa_not_configured',
+          message: 'No se pudo completar el login (MFA no disponible).',
+        });
+      }
+      const challenge = await createMfaChallenge(ADMIN_EMAIL, ip, userAgent);
+      await recordAdminAudit('ADMIN_MFA_CHALLENGE', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'challenge',
+        metadata: {
+          ip,
+          challengeId: challenge.challengeId,
+        },
+      });
+      return response.json({
+        success: true,
+        requiresMfa: true,
+        challengeId: challenge.challengeId,
+        resumeToken: challenge.resumeToken,
+        expiresAt: challenge.expiresAt.toISOString(),
+      });
+    }
+
+    const session = await createAdminSession(ADMIN_EMAIL, {
+      ip,
+      userAgent,
+      reason: 'password-only',
+    });
+    const profile = getAdminProfile();
+    const adminUser = getAdminUser();
+
+    await recordAdminAudit('ADMIN_LOGIN_SUCCESS', {
+      actor: ADMIN_EMAIL,
+      resourceType: 'auth',
+      outcome: 'granted',
+      metadata: {
+        ip,
+        userAgent,
+        sessionId: session.sessionId,
+      },
+    });
+
+    return response.json({
+      success: true,
+      requiresMfa: false,
+      sessionToken: session.sessionToken,
+      sessionExpiresAt: session.expiresAt.toISOString(),
+      sessionId: session.sessionId,
+      adminUser,
+      profile,
+    });
+  });
+});
+
+exports.adminLoginMfa = functions.https.onRequest((request, response) => {
+  corsHandler(request, response, async () => {
+    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    if (request.method === 'OPTIONS') {
+      return response.status(204).send('');
+    }
+    if (request.method !== 'POST') {
+      return response
+        .status(405)
+        .json({ success: false, code: 'method_not_allowed' });
+    }
+
+    let payload = request.body;
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch {
+        return response
+          .status(400)
+          .json({ success: false, code: 'invalid_json', message: 'JSON inválido' });
+      }
+    }
+    payload = payload || {};
+
+    const parsed = mfaSchema.safeParse(payload);
+    if (!parsed.success) {
+      return response.status(400).json({
+        success: false,
+        code: 'invalid_payload',
+        message: 'Código MFA inválido',
+      });
+    }
+
+    const { challengeId, code, resumeToken } = parsed.data;
+    const ip = getClientIp(request);
+    const userAgent = getUserAgent(request);
+    const attemptEmail = ADMIN_EMAIL;
+
+    const challengeRef = db.collection(LOGIN_CHALLENGES_COLLECTION).doc(challengeId);
+    const snapshot = await challengeRef.get();
+    if (!snapshot.exists) {
+      await recordAdminAudit('ADMIN_MFA_FAILED', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'challenge_not_found',
+        },
+      });
+      return response.status(404).json({
+        success: false,
+        code: 'challenge_not_found',
+        message: 'El desafío MFA no existe o ya fue consumido.',
+      });
+    }
+
+    const challenge = snapshot.data() || {};
+    if (challenge.status === 'consumed') {
+      return response.status(409).json({
+        success: false,
+        code: 'challenge_consumed',
+        message: 'El desafío ya fue completado.',
+      });
+    }
+
+    const expectedHash = challenge.resumeTokenHash;
+    if (!expectedHash || hashToken(resumeToken) !== expectedHash) {
+      const failure = await incrementLoginFailure(attemptEmail, ip);
+      await recordAdminAudit('ADMIN_MFA_FAILED', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'resume_token_mismatch',
+        },
+      });
+      return response.status(failure.locked ? 429 : 401).json({
+        success: false,
+        code: failure.locked ? 'locked' : 'invalid_mfa',
+        message: 'Código MFA inválido.',
+        lockedUntil: failure.locked ? toIsoDate(failure.lockedUntil) : null,
+      });
+    }
+
+    const expiresAtMillis = challenge.expiresAt?.toMillis?.() || 0;
+    if (expiresAtMillis && expiresAtMillis < Date.now()) {
+      await challengeRef.set(
+        {
+          status: 'expired',
+          expiredAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      const failure = await incrementLoginFailure(attemptEmail, ip);
+      await recordAdminAudit('ADMIN_MFA_FAILED', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'challenge_expired',
+        },
+      });
+      return response.status(failure.locked ? 429 : 410).json({
+        success: false,
+        code: failure.locked ? 'locked' : 'challenge_expired',
+        message: 'El desafío ha expirado. Inicia sesión de nuevo.',
+        lockedUntil: failure.locked ? toIsoDate(failure.lockedUntil) : null,
+      });
+    }
+
+    const validMfa =
+      !ADMIN_REQUIRE_MFA || authenticator.check(code, ADMIN_MFA_SECRET);
+
+    if (!validMfa) {
+      await challengeRef.set(
+        {
+          attempts: (challenge.attempts || 0) + 1,
+          lastAttemptAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+      const failure = await incrementLoginFailure(attemptEmail, ip);
+      await recordAdminAudit('ADMIN_MFA_FAILED', {
+        actor: ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'denied',
+        metadata: {
+          ip,
+          reason: 'invalid_code',
+        },
+      });
+      return response.status(failure.locked ? 429 : 401).json({
+        success: false,
+        code: failure.locked ? 'locked' : 'invalid_mfa',
+        message: 'Código MFA inválido.',
+        lockedUntil: failure.locked ? toIsoDate(failure.lockedUntil) : null,
+      });
+    }
+
+    await consumeMfaChallenge(challengeId);
+    await resetLoginAttempts(attemptEmail, ip);
+
+    const session = await createAdminSession(ADMIN_EMAIL, {
+      ip,
+      userAgent,
+      reason: 'password+mfa',
+    });
+    const profile = getAdminProfile();
+    const adminUser = getAdminUser();
+
+    await recordAdminAudit('ADMIN_MFA_SUCCESS', {
+      actor: ADMIN_EMAIL,
+      resourceType: 'auth',
+      outcome: 'granted',
+      metadata: {
+        ip,
+        userAgent,
+        challengeId,
+      },
+    });
+
+    await recordAdminAudit('ADMIN_LOGIN_SUCCESS', {
+      actor: ADMIN_EMAIL,
+      resourceType: 'auth',
+      outcome: 'granted',
+      metadata: {
+        ip,
+        userAgent,
+        sessionId: session.sessionId,
+        strategy: 'password+mfa',
+      },
+    });
+
+    return response.json({
+      success: true,
+      sessionToken: session.sessionToken,
+      sessionExpiresAt: session.expiresAt.toISOString(),
+      sessionId: session.sessionId,
+      adminUser,
+      profile,
+    });
+  });
+});
+
+exports.adminLogout = functions.https.onRequest((request, response) => {
+  corsHandler(request, response, async () => {
+    response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    if (request.method === 'OPTIONS') {
+      return response.status(204).send('');
+    }
+    if (request.method !== 'POST') {
+      return response
+        .status(405)
+        .json({ success: false, code: 'method_not_allowed' });
+    }
+
+    let payload = request.body;
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch {
+        return response
+          .status(400)
+          .json({ success: false, code: 'invalid_json', message: 'JSON inválido' });
+      }
+    }
+    payload = payload || {};
+
+    const parsed = logoutSchema.safeParse(payload);
+    if (!parsed.success) {
+      return response.status(400).json({
+        success: false,
+        code: 'invalid_payload',
+        message: 'Token de sesión requerido',
+      });
+    }
+
+    const { sessionToken } = parsed.data;
+    const ip = getClientIp(request);
+    const userAgent = getUserAgent(request);
+
+    const session = await endAdminSession(sessionToken, 'logout');
+    if (session) {
+      await recordAdminAudit('ADMIN_LOGOUT', {
+        actor: session.email || ADMIN_EMAIL,
+        resourceType: 'auth',
+        outcome: 'logout',
+        metadata: {
+          ip,
+          userAgent,
+          sessionId: session.sessionId,
+        },
+      });
+    }
+
+    return response.json({ success: true });
   });
 });
 
@@ -840,4 +1594,3 @@ exports.cleanupWebhookDedup = functions.pubsub
     console.log(`cleanupWebhookDedup: removed ${snap.size} expired docs`);
     return null;
   });
-

@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getDashboardData } from '../../services/adminDataService';
+import { getDashboardData, createAdminTask, updateAdminTask, resolveAdminAlert } from '../../services/adminDataService';
 
 const severityColors = {
   critical: 'border-red-200 bg-red-50 text-red-700',
@@ -43,30 +43,48 @@ const AdminDashboard = () => {
   const openResolveModal = (alert) => setSelectedAlert(alert);
   const closeResolveModal = () => setSelectedAlert(null);
 
-  const handleResolveAlert = () => {
+  const handleResolveAlert = async () => {
     if (!selectedAlert) return;
-    setAlerts((prev) =>
-      prev.map((alert) =>
-        alert.id === selectedAlert.id ? { ...alert, resolved: true } : alert
-      )
-    );
-    closeResolveModal();
+    try {
+      await resolveAdminAlert(selectedAlert.id);
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === selectedAlert.id ? { ...alert, resolved: true } : alert
+        )
+      );
+    } catch (e) {
+      console.warn('[AdminDashboard] resolve alert failed:', e);
+    } finally {
+      closeResolveModal();
+    }
   };
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTaskTitle.trim()) return;
-    setTasks((prev) => [
-      ...prev,
-      { id: 'task-' + Date.now(), title: newTaskTitle.trim(), completed: false },
-    ]);
-    setNewTaskTitle('');
-    setShowTaskModal(false);
+    try {
+      const task = await createAdminTask({ title: newTaskTitle.trim() });
+      if (task) {
+        setTasks((prev) => [...prev, task]);
+      }
+    } catch (e) {
+      console.warn('[AdminDashboard] create task failed:', e);
+    } finally {
+      setNewTaskTitle('');
+      setShowTaskModal(false);
+    }
   };
 
-  const toggleTask = (taskId) => {
-    setTasks((prev) =>
-      prev.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task))
-    );
+  const toggleTask = async (taskId) => {
+    const t = tasks.find((x) => x.id === taskId);
+    const nextCompleted = !t?.completed;
+    try {
+      await updateAdminTask(taskId, { completed: nextCompleted });
+      setTasks((prev) =>
+        prev.map((task) => (task.id === taskId ? { ...task, completed: nextCompleted } : task))
+      );
+    } catch (e) {
+      console.warn('[AdminDashboard] update task failed:', e);
+    }
   };
 
   if (loading) {

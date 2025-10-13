@@ -5,16 +5,26 @@
 //   Health check at /
 
 import dotenv from 'dotenv';
-// Cargar variables de entorno lo antes posible desde secret file (Render) o .env local
+// Cargar variables de entorno con precedencia clara (secret -> .env -> .env.local)
 import fs from 'fs';
 import path from 'path';
 
 const secretEnvPath = '/etc/secrets/app.env';
+const rootDir = process.cwd();
+const envPath = path.resolve(rootDir, '.env');
+const envLocalPath = path.resolve(rootDir, '.env.local');
+
 if (fs.existsSync(secretEnvPath)) {
-  dotenv.config({ path: secretEnvPath });
+  dotenv.config({ path: secretEnvPath, override: false });
   console.log('[env] Variables de entorno cargadas desde secret file', secretEnvPath);
-} else {
-  dotenv.config(); // fallback a .env local
+}
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, override: false });
+  console.log('[env] .env loaded from', envPath);
+}
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath, override: true });
+  console.log('[env] .env.local loaded from', envLocalPath);
 }
 import express from 'express';
 import cors from 'cors';
@@ -40,6 +50,7 @@ import aiRouter from './routes/ai.js';
 import aiAssignRouter from './routes/ai-assign.js';
 import aiImageRouter from './routes/ai-image.js';
 import aiSuppliersRouter from './routes/ai-suppliers.js';
+import aiBudgetRouter from './routes/ai-budget.js';
 import aiSongsRouter from './routes/ai-songs.js';
 import aiWebsiteRouter from './routes/ai-website.js';
 import emailInsightsRouter from './routes/email-insights.js';
@@ -84,24 +95,15 @@ import emailActionsRouter from './routes/email-actions.js';
 import emailsRouter from './routes/emails.js';
 import providersRouter from './routes/providers.js';
 import weddingsRouter from './routes/weddings.js';
-import { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } from './config.js';
+import usersRouter from './routes/users.js';
+ 
 import ipAllowlist from './middleware/ipAllowlist.js';
+import adminAuthRouter from './routes/admin-auth.js';
+import adminSuppliersRouter from './routes/admin-suppliers.js';
+import adminAuditRouter from './routes/admin-audit.js';
 
 
-// Load environment variables (root .env)
-const envPath = path.resolve(process.cwd(), '.env');
-let result = dotenv.config({ path: envPath });
-
-// Si no se encuentra en la ruta actual, intentar buscar en el directorio padre
-if (result.error) {
-  const parentEnvPath = path.resolve(process.cwd(), '../.env');
-  result = dotenv.config({ path: parentEnvPath });
-}
-if (result.error) {
-  console.warn('[env] .env file not found at', envPath);
-} else {
-  console.log('[env] .env loaded from', envPath);
-}
+const { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } = await import('./config.js');
 if (!process.env.OPENAI_API_KEY) {
   console.warn('[env] OPENAI_API_KEY not set. Chat AI endpoints will return 500.');
 }
@@ -136,7 +138,16 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Admin-Session',
+    'x-admin-session',
+    'X-Admin-Session-Token',
+    'x-admin-session-token',
+    'X-Admin-Token',
+    'x-admin-token',
+  ],
   exposedHeaders: CORS_EXPOSE_HEADERS,
   optionsSuccessStatus: 204
 }));
@@ -149,7 +160,16 @@ app.options('*', cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Admin-Session',
+    'x-admin-session',
+    'X-Admin-Session-Token',
+    'x-admin-session-token',
+    'X-Admin-Token',
+    'x-admin-token',
+  ],
   optionsSuccessStatus: 204,
   maxAge: 600
 }));
@@ -175,6 +195,7 @@ if (RATE_LIMIT_AI_MAX > 0) {
   app.use('/api/ai', aiLimiter);
   app.use('/api/ai-image', aiLimiter);
   app.use('/api/ai-suppliers', aiLimiter);
+  app.use('/api/ai/budget-estimate', aiLimiter);
   app.use('/api/ai-website', aiLimiter);
 }
 
@@ -473,6 +494,7 @@ app.use('/api/events', requireAuth, eventsRouter);
 app.use('/api/roles', requireAuth, rolesRouter);
 app.use('/api/ai-image', requireAuth, aiImageRouter);
 app.use('/api/ai-suppliers', requireAuth, aiSuppliersRouter);
+app.use('/api/ai/budget-estimate', requireAuth, aiBudgetRouter);
 app.use('/api/ai', requireAuth, aiRouter);
 app.use('/api/ai-assign', requireAuth, aiAssignRouter);
 app.use('/api/ai-songs', requireAuth, aiSongsRouter);
@@ -511,6 +533,7 @@ app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
 app.use('/api/providers', requireAuth, providersRouter);
+app.use('/api/users', requireAuth, usersRouter);
 if (WHATSAPP_WEBHOOK_IP_ALLOWLIST.length) {
   app.use('/api/whatsapp/webhook/twilio', ipAllowlist(WHATSAPP_WEBHOOK_IP_ALLOWLIST));
 }
@@ -539,11 +562,20 @@ app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
 app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
 app.use('/api/weddings', (await import('./routes/wedding-metrics.js')).default);
+// Rutas de autenticación de administración (login/MFA/logout)
+app.use('/api/admin', adminAuthRouter);
+app.use('/api/admin/suppliers', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminSuppliersRouter);
+app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
 try {
   const { requireAdmin } = await import('./middleware/authMiddleware.js');
   const metricsAdminRouter = (await import('./routes/metrics-admin.js')).default;
   app.use('/api/admin/metrics', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, metricsAdminRouter);
+} catch {}
+try {
+  const { requireAdmin } = await import('./middleware/authMiddleware.js');
+  const adminDashboardRouter = (await import('./routes/admin-dashboard.js')).default;
+  app.use('/api/admin/dashboard', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminDashboardRouter);
 } catch {}
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);

@@ -1,10 +1,35 @@
-﻿import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { reportsScheduled } from '../../data/adminMock';
+import { getReportsData } from '../../services/adminDataService';
 
 const AdminReports = () => {
+  const [reports, setReports] = useState([]);
   const [template, setTemplate] = useState('global');
   const [recipients, setRecipients] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadReports = async () => {
+      setLoading(true);
+      const data = await getReportsData();
+      if (!mounted) return;
+      setReports(Array.isArray(data) ? data : []);
+      setLoading(false);
+    };
+    loadReports();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        Cargando reportes...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -31,17 +56,24 @@ const AdminReports = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-soft">
-            {reportsScheduled.map((report) => (
+            {reports.map((report) => (
               <tr key={report.id}>
                 <td className="py-3">{report.name}</td>
                 <td className="py-3">{report.cadence}</td>
                 <td className="py-3 text-xs text-[var(--color-text-soft,#6b7280)]">
-                  {report.recipients.join(', ')}
+                  {Array.isArray(report.recipients) ? report.recipients.join(', ') : ''}
                 </td>
                 <td className="py-3">{report.format}</td>
                 <td className="py-3">{report.status}</td>
               </tr>
             ))}
+            {reports.length === 0 && (
+              <tr>
+                <td className="py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={5}>
+                  No hay reportes configurados.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

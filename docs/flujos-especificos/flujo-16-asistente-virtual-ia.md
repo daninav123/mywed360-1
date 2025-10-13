@@ -1,7 +1,8 @@
 ﻿# 16. Asistente Virtual y Automatizaciones IA (estado 2025-10-07)
 
-> Implementado hoy: `ChatWidget.jsx`, utilidades locales (memoria, notas importantes) y llamadas opcionales a `/api/chat-widget`.  
+> Implementado hoy: `ChatWidget.jsx`, utilidades locales (memoria, notas importantes) y llamadas opcionales a `/api/ai/parse-dialog` (con fallback local contextual).  
 > En desarrollo: orquestador multicanal (email/chat/WhatsApp), reglas configurables y workers backend.
+> Pendiente: habilitar backend multicanal, reglas configurables, workers dedicados y cobertura E2E especifica.
 
 ## 1. Objetivo y alcance
 - Ofrecer un asistente flotante que resuelva dudas y proponga acciones rápidas desde cualquier pantalla.
@@ -20,15 +21,17 @@
 2. **Interacción**
    - Mensajes se guardan en `chatMessages`; se limita a 50 mensajes recientes (MVP sin backend).
    - Parser local reconoce comandos básicos (crear tarea, asignar categoría sugerida) aunque muchas acciones solo generan recomendaciones.
+   - Contexto IA: envía `eventType`, estilo, rango invitados y ubicación al backend para ajustar prompts y respuestas.
+   - Fallback offline personalizado menciona el tipo de evento y guía rutas manuales.
 3. **Notas importantes**
    - Cada mensaje puede marcarse “⭐ importante”; se guarda en `importantNotes` y dispara evento `mywed360-important-note`.
 4. **Persistencia**
    - `chatSummary` almacena conversaciones compactadas.
-   - Si se dispone de token (OAuth vigente) se intenta llamar a `/api/chat-widget`; si falla, se usa fallback local con mensajes predefinidos.
+   - Si se dispone de token (OAuth vigente) se intenta llamar a `/api/ai/parse-dialog` (con fallback local contextual); si falla, se usa fallback local con mensajes predefinidos.
 
 ## 4. Persistencia y datos
 - `localStorage`: `chatOpen`, `chatMessages`, `chatSummary`, `importantNotes`.
-- API opcional: `POST /api/chat-widget` (cuando existe backend para IA conversacional).
+- API preferente: `POST /api/ai/parse-dialog` (OpenAI) con fallback heurístico local cuando no hay clave o hay timeout.
 - No hay almacenamiento en Firestore todavía (las conversaciones no se sincronizan entre dispositivos).
 
 ## 5. Reglas de negocio
@@ -39,10 +42,11 @@
 ## 6. Estados especiales y errores
 - `loading`: spinner mientras se espera respuesta (tanto local como remota).
 - Error API → toast “No se pudo conectar, prueba de nuevo” y se mantiene el mensaje en la lista.
+- Respuesta offline contextual: menciona el tipo de evento vigente y sugiere rutas manuales cuando la IA no responde.
 - Si el usuario borra `localStorage`, se reinicia la conversación (no existe recuperación).
 
 ## 7. Integración con otros flujos (hoy)
-- Flujos 2/6/9: el widget sugiere pasos siguientes (crear checklist, revisar presupuesto, revisar RSVP).
+- Flujos 2/6/9: el widget usa el `eventType` y estilo actuales para sugerir próximos pasos (checklist, presupuesto, RSVP) y ajustar prompts.
 - Flujo 5 (Proveedores) y 8 (Diseño web) utilizan prompts generados manualmente para guiar al usuario.
 - Flujo 12 (Notificaciones) genera evento cuando se marca mensaje como importante.
 - Flujo 17 (Gamificación) podría sumar puntos en futuro (aún no implementado).
@@ -60,14 +64,15 @@
 
 ## Cobertura E2E implementada
 - `cypress/e2e/email/ai-provider-email.cy.js y cypress/e2e/email/smart-composer.cy.js`: ejercitan respuestas sugeridas por IA y generación de contenido que reutiliza el asistente virtual.
+- `cypress/e2e/assistant/chat-fallback-context.cy.js`: fuerza fallback offline y verifica que el copy incluya datos del evento activo (tipo, estilo, ubicación).
 - Cobertura e2e dedicada al asistente general pendiente.
 
 ## 10. Checklist de despliegue
-- Clave `OPENAI_API_KEY` solo si el backend `/api/chat-widget` está habilitado.
+- Clave `OPENAI_API_KEY` solo si el backend `/api/ai/parse-dialog` (con fallback local contextual) está habilitado.
 - Revisar políticas de almacenamiento local (GDPR) y permitir al usuario limpiar historial.
 - En entornos productivos, habilitar tracking de eventos antes de lanzar automatizaciones reales.
 
-## 11. Roadmap / Automatizaciones IA (futuro)
+## 11. Roadmap / pendientes
 - **Orquestador multicanal** (`AutomationOrchestrator`): ingerir emails, chats, WhatsApp y decidir acciones.
 - **Reglas configurables**: panel para if/then (ej. “si proveedor responde con presupuesto > X → crear tarea”).
 - **Workers**: procesar colas (`automationLogs`, `automationRules`) sin depender del cliente.

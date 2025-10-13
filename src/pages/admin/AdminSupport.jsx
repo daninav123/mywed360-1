@@ -1,9 +1,53 @@
-﻿import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { supportSummary, supportTickets } from '../../data/adminMock';
+import { getSupportData } from '../../services/adminDataService';
+
+const initialSummary = {
+  open: 0,
+  pending: 0,
+  resolved: 0,
+  slaAverage: '—',
+  nps: null,
+};
 
 const AdminSupport = () => {
+  const [summary, setSummary] = useState(initialSummary);
+  const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadSupport = async () => {
+      setLoading(true);
+      const data = await getSupportData();
+      if (!mounted) return;
+      const currentSummary = data?.summary || initialSummary;
+      const currentTickets = Array.isArray(data?.tickets) ? data.tickets : [];
+      setSummary({
+        open: currentSummary.open ?? initialSummary.open,
+        pending: currentSummary.pending ?? initialSummary.pending,
+        resolved: currentSummary.resolved ?? initialSummary.resolved,
+        slaAverage: currentSummary.slaAverage || initialSummary.slaAverage,
+        nps: currentSummary.nps ?? initialSummary.nps,
+      });
+      setTickets(currentTickets);
+      setSelectedTicket(currentTickets.length ? currentTickets[0] : null);
+      setLoading(false);
+    };
+    loadSupport();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+        Cargando soporte...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -15,19 +59,19 @@ const AdminSupport = () => {
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm" data-testid="support-kpi-tickets-open">
           <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Tickets abiertos</p>
-          <p className="mt-3 text-2xl font-semibold">{supportSummary.open}</p>
+          <p className="mt-3 text-2xl font-semibold">{summary.open}</p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
           <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Tickets pendientes</p>
-          <p className="mt-3 text-2xl font-semibold">{supportSummary.pending}</p>
+          <p className="mt-3 text-2xl font-semibold">{summary.pending}</p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
           <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Resueltos</p>
-          <p className="mt-3 text-2xl font-semibold">{supportSummary.resolved}</p>
+          <p className="mt-3 text-2xl font-semibold">{summary.resolved}</p>
         </article>
         <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
           <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">SLA medio</p>
-          <p className="mt-3 text-2xl font-semibold">{supportSummary.slaAverage}</p>
+          <p className="mt-3 text-2xl font-semibold">{summary.slaAverage}</p>
         </article>
       </section>
 
@@ -37,7 +81,7 @@ const AdminSupport = () => {
           className="mt-4 flex h-36 items-center justify-center rounded-lg border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]"
           data-testid="support-nps-chart"
         >
-          NPS actual: {supportSummary.nps} (placeholder)
+          NPS actual: {summary.nps ?? '—'} (placeholder)
         </div>
       </section>
 
@@ -47,18 +91,29 @@ const AdminSupport = () => {
         </header>
         <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
           <div className="divide-y divide-soft">
-            {supportTickets.map((ticket) => (
+            {tickets.map((ticket) => (
               <button
                 type="button"
                 key={ticket.id}
                 data-testid="support-ticket-row"
                 onClick={() => setSelectedTicket(ticket)}
-                className={selectedTicket?.id === ticket.id ? 'w-full px-4 py-3 text-left text-sm bg-[var(--color-bg-soft,#f3f4f6)]' : 'w-full px-4 py-3 text-left text-sm'}
+                className={
+                  selectedTicket?.id === ticket.id
+                    ? 'w-full px-4 py-3 text-left text-sm bg-[var(--color-bg-soft,#f3f4f6)]'
+                    : 'w-full px-4 py-3 text-left text-sm'
+                }
               >
                 <p className="font-medium">{ticket.subject}</p>
-                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{ticket.status} · {ticket.updatedAt}</p>
+                <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                  {ticket.status} · {ticket.updatedAt}
+                </p>
               </button>
             ))}
+            {tickets.length === 0 && (
+              <div className="px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+                No hay tickets registrados.
+              </div>
+            )}
           </div>
           <div className="px-4 py-4" data-testid="support-ticket-detail">
             {selectedTicket ? (

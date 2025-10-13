@@ -11,7 +11,7 @@ describe('Admin - Login', () => {
     cy.clearLocalStorage();
   });
 
-  it.skip('permite iniciar sesión con credenciales válidas y MFA opcional', () => {
+  it('permite iniciar sesión con credenciales válidas y MFA opcional', () => {
     cy.visit('/admin/login');
     cy.get('[data-testid="admin-login-email"]').type('admin@lovenda.com');
     cy.get('[data-testid="admin-login-password"]').type('AdminPass123!');
@@ -22,7 +22,7 @@ describe('Admin - Login', () => {
     cy.get('[data-testid="admin-dashboard"]').should('exist');
   });
 
-  it.skip('muestra error cuando las credenciales son incorrectas', () => {
+  it('muestra error cuando las credenciales son incorrectas', () => {
     cy.visit('/admin/login');
     cy.get('[data-testid="admin-login-email"]').type('admin@lovenda.com');
     cy.get('[data-testid="admin-login-password"]').type('bad-password');
@@ -30,7 +30,7 @@ describe('Admin - Login', () => {
     cy.get('[data-testid="admin-login-error"]').should('contain', 'Email o contraseña no válidos');
   });
 
-  it.skip('bloquea el acceso a usuarios sin rol admin', () => {
+  it('bloquea el acceso a usuarios sin rol admin', () => {
     cy.visit('/admin/login');
     cy.get('[data-testid="admin-login-email"]').type('owner@lovenda.com');
     cy.get('[data-testid="admin-login-password"]').type('OwnerPass123!');
@@ -38,7 +38,7 @@ describe('Admin - Login', () => {
     cy.get('[data-testid="admin-login-error"]').should('contain', 'Tu cuenta no dispone de acceso administrador');
   });
 
-  it.skip('limita los intentos de login y muestra el mensaje de bloqueo', () => {
+  it('limita los intentos de login y muestra el mensaje de bloqueo', () => {
     cy.visit('/admin/login');
     for (let i = 0; i < 5; i += 1) {
       cy.get('[data-testid="admin-login-email"]').clear().type('admin@lovenda.com');
@@ -55,21 +55,21 @@ describe('Admin - Dashboard', () => {
     cy.visit('/admin/dashboard');
   });
 
-  it.skip('muestra los KPIs principales con sus variaciones', () => {
+  it('muestra los KPIs principales con sus variaciones', () => {
     cy.get('[data-testid="admin-kpi-active-users"]').should('exist');
     cy.get('[data-testid="admin-kpi-new-weddings"]').should('exist');
     cy.get('[data-testid="admin-kpi-conversion"]').should('exist');
     cy.get('[data-testid="admin-kpi-estimated-revenue"]').should('exist');
   });
 
-  it.skip('presenta el estado de los servicios externos', () => {
+  it('presenta el estado de los servicios externos', () => {
     cy.get('[data-testid="service-health-firebase"]').should('exist');
     cy.get('[data-testid="service-health-mailgun"]').should('exist');
     cy.get('[data-testid="service-health-whatsapp"]').should('exist');
     cy.get('[data-testid="service-health-openai"]').should('exist');
   });
 
-  it.skip('permite marcar alertas como resueltas', () => {
+  it('permite marcar alertas como resueltas', () => {
     cy.get('[data-testid="admin-alert-item"]').first().as('alert');
     cy.get('@alert').find('[data-testid="admin-alert-resolve"]').click();
     cy.get('[data-testid="admin-alert-resolve-modal"]').should('be.visible');
@@ -78,7 +78,7 @@ describe('Admin - Dashboard', () => {
     cy.get('@alert').should('have.attr', 'data-status', 'resolved');
   });
 
-  it.skip('gestiona la lista de tareas administrativas', () => {
+  it('gestiona la lista de tareas administrativas', () => {
     cy.get('[data-testid="admin-task-add"]').click();
     cy.get('[data-testid="admin-task-modal"]').should('be.visible');
     cy.get('[data-testid="admin-task-title"]').type('Revisar reportes semanales');
@@ -93,13 +93,13 @@ describe('Admin - Métricas y reportes', () => {
     cy.visit('/admin/metrics');
   });
 
-  it.skip('permite seleccionar rangos de fechas y exportar datos', () => {
+  it('permite seleccionar rangos de fechas y exportar datos', () => {
     cy.get('[data-testid="metrics-range-selector"]').select('30');
     cy.get('[data-testid="metrics-export-csv"]').click();
     cy.get('[data-testid="metrics-export-json"]').click();
   });
 
-  it.skip('muestra el funnel de conversión con valores absolutos y porcentajes', () => {
+  it('muestra el funnel de conversión con valores absolutos y porcentajes', () => {
     cy.get('[data-testid="metrics-funnel"]').within(() => {
       cy.contains('Visitantes').should('exist');
       cy.contains('Registrados').should('exist');
@@ -107,7 +107,7 @@ describe('Admin - Métricas y reportes', () => {
     });
   });
 
-  it.skip('genera reportes bajo demanda', () => {
+  it('genera reportes bajo demanda', () => {
     cy.visit('/admin/reports');
     cy.get('[data-testid="admin-report-generate"]').click();
     cy.get('[data-testid="admin-report-template"]').select('Métricas globales');
@@ -121,7 +121,7 @@ describe('Admin - Portfolio y usuarios', () => {
     cy.loginAsAdmin();
   });
 
-  it.skip('filtra el portfolio por estado y fecha', () => {
+  it('filtra el portfolio por estado y fecha', () => {
     cy.visit('/admin/portfolio');
     cy.get('[data-testid="portfolio-filter-status"]').select('active');
     cy.get('[data-testid="portfolio-filter-date-from"]').type('2025-01-01');
@@ -130,7 +130,7 @@ describe('Admin - Portfolio y usuarios', () => {
     cy.get('[data-testid="portfolio-table"]').should('contain', 'active');
   });
 
-  it.skip('abre el detalle de una boda y permite generar reporte PDF', () => {
+  it('abre el detalle de una boda y permite generar reporte PDF', () => {
     cy.visit('/admin/portfolio');
     cy.get('[data-testid="portfolio-row"]').first().within(() => {
       cy.get('[data-testid="portfolio-view-detail"]').click();
@@ -139,7 +139,7 @@ describe('Admin - Portfolio y usuarios', () => {
     cy.get('[data-testid="portfolio-export-pdf"]').click();
   });
 
-  it.skip('gestion de usuarios: suspender y reactivar', () => {
+  it('gestion de usuarios: suspender y reactivar', () => {
     cy.visit('/admin/users');
     cy.get('[data-testid="admin-user-row"]').first().within(() => {
       cy.get('[data-testid="admin-user-suspend"]').click();
@@ -156,7 +156,7 @@ describe('Admin - Integraciones y configuración', () => {
     cy.loginAsAdmin();
   });
 
-  it.skip('muestra incidentes de integraciones y permite reintentar conexión', () => {
+  it('muestra incidentes de integraciones y permite reintentar conexión', () => {
     cy.visit('/admin/integrations');
     cy.get('[data-testid="integration-card-mailgun"]').should('exist');
     cy.get('[data-testid="integration-incidents-table"]').should('exist');
@@ -164,7 +164,7 @@ describe('Admin - Integraciones y configuración', () => {
     cy.get('[data-testid="integration-retry-confirm"]').click();
   });
 
-  it.skip('gestiona feature flags y rotación de secretos', () => {
+  it('gestiona feature flags y rotación de secretos', () => {
     cy.visit('/admin/settings');
     cy.get('[data-testid="feature-flag-toggle"]').first().click();
     cy.get('[data-testid="feature-flag-confirm"]').click();
@@ -176,7 +176,7 @@ describe('Admin - Integraciones y configuración', () => {
     });
   });
 
-  it.skip('permite editar plantillas globales de email', () => {
+  it('permite editar plantillas globales de email', () => {
     cy.visit('/admin/settings');
     cy.get('[data-testid="template-editor-select"]').select('email-welcome');
     cy.get('[data-testid="template-editor-content"]').clear().type('Bienvenida Lovenda {nombre}');
@@ -190,7 +190,7 @@ describe('Admin - Alertas, broadcast y auditoría', () => {
     cy.loginAsAdmin();
   });
 
-  it.skip('gestiona alertas críticas desde la sección específica', () => {
+  it('gestiona alertas críticas desde la sección específica', () => {
     cy.visit('/admin/alerts');
     cy.get('[data-testid="admin-alert-item"]').first().click();
     cy.get('[data-testid="admin-alert-detail"]').should('be.visible');
@@ -199,7 +199,7 @@ describe('Admin - Alertas, broadcast y auditoría', () => {
     cy.get('[data-testid="admin-alert-resolve-confirm"]').click();
   });
 
-  it.skip('crea y programa un broadcast', () => {
+  it('crea y programa un broadcast', () => {
     cy.visit('/admin/broadcast');
     cy.get('[data-testid="broadcast-tab-email"]').click();
     cy.get('[data-testid="broadcast-subject"]').type('Mantenimiento programado');
@@ -211,7 +211,7 @@ describe('Admin - Alertas, broadcast y auditoría', () => {
     cy.get('[data-testid="broadcast-confirm"]').click();
   });
 
-  it.skip('filtra y exporta el histórico de auditoría', () => {
+  it('filtra y exporta el histórico de auditoría', () => {
     cy.visit('/admin/audit');
     cy.get('[data-testid="audit-filter-action"]').select('FLAG_UPDATE');
     cy.get('[data-testid="audit-filter-apply"]').click();
@@ -226,7 +226,7 @@ describe('Admin - Support y sesión', () => {
     cy.loginAsAdmin();
   });
 
-  it.skip('visualiza métricas de tickets y NPS', () => {
+  it('visualiza métricas de tickets y NPS', () => {
     cy.visit('/admin/support');
     cy.get('[data-testid="support-kpi-tickets-open"]').should('exist');
     cy.get('[data-testid="support-nps-chart"]').should('exist');
@@ -234,7 +234,7 @@ describe('Admin - Support y sesión', () => {
     cy.get('[data-testid="support-ticket-detail"]').should('be.visible');
   });
 
-  it.skip('finaliza la sesión correctamente', () => {
+  it('finaliza la sesión correctamente', () => {
     cy.visit('/admin/dashboard');
     cy.get('[data-testid="admin-logout-button"]').click();
     cy.url().should('include', '/admin/login');

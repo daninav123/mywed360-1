@@ -275,6 +275,12 @@ export default function Tasks() {
     } catch { return null; }
   }, []);
   const handleTaskIntent = useCallback((task, fallback) => {
+    const kind = String(task?.__kind || '').toLowerCase();
+    const taskType = String(task?.type || (kind === 'subtask' ? 'subtask' : 'task')).toLowerCase();
+    if (taskType !== 'subtask') {
+      if (typeof fallback === 'function') fallback();
+      return false;
+    }
     const route = getQuickRouteForTask(task);
     if (route) {
       try { navigate(route); } catch {}
@@ -330,8 +336,10 @@ export default function Tasks() {
   const [showGanttSubtasks, setShowGanttSubtasks] = useState(false);
   const [ganttCategoryFilter, setGanttCategoryFilter] = useState('ALL');
   const [ganttAssigneeFilter, setGanttAssigneeFilter] = useState('ALL');
+  const [ganttRiskFilter, setGanttRiskFilter] = useState('ALL');
   const [selectedParentId, setSelectedParentId] = useState(null);
-  const filtersActive = ganttCategoryFilter !== 'ALL' || ganttAssigneeFilter !== 'ALL';
+  const filtersActive =
+    ganttCategoryFilter !== 'ALL' || ganttAssigneeFilter !== 'ALL' || ganttRiskFilter !== 'ALL';
 
   const normalizeCategory = useCallback((value) => String(value || 'OTROS').toUpperCase(), []);
   const extractAssignees = useCallback((item) => {
@@ -1052,107 +1060,6 @@ export default function Tasks() {
     }
   }, [uniqueGanttTasks, nestedSubtasks, nestedSubtasksFallback, tasksState]);
 
-  const ganttCategoryOptions = useMemo(() => {
-    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
-    const categories = new Set();
-    for (const task of tasks) {
-      if (!task) continue;
-      if (String(task.type || 'task') !== 'task') continue;
-      categories.add(normalizeCategory(task.category));
-    }
-    return Array.from(categories).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-  }, [ganttDisplayTasks, normalizeCategory]);
-
-  const ganttAssigneeOptions = useMemo(() => {
-    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
-    const names = new Set();
-    let includeUnassigned = false;
-    for (const task of tasks) {
-      if (!task) continue;
-      if (String(task.type || 'task') !== 'task') continue;
-      const assignees = extractAssignees(task);
-      if (assignees.length === 0) includeUnassigned = true;
-      assignees.forEach((name) => names.add(name));
-    }
-    const ordered = Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-    const opts = ordered.map((value) => ({ value, label: value }));
-    if (includeUnassigned) opts.push({ value: GANTT_UNASSIGNED, label: 'Sin responsable' });
-    return opts;
-  }, [ganttDisplayTasks, extractAssignees]);
-
-  const filteredGanttTasks = useMemo(() => {
-    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
-    if (!filtersActive) return tasks;
-    return tasks.filter((task) => {
-      if (!task) return false;
-      const type = String(task.type || 'task');
-      if (type !== 'task') return true;
-      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(task.category) !== ganttCategoryFilter) return false;
-      if (ganttAssigneeFilter === 'ALL') return true;
-      const assignees = extractAssignees(task);
-      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
-      return assignees.includes(ganttAssigneeFilter);
-    });
-  }, [ganttDisplayTasks, filtersActive, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
-
-  const filteredParentIds = useMemo(() => {
-    const ids = new Set();
-    const tasks = Array.isArray(filteredGanttTasks) ? filteredGanttTasks : [];
-    for (const task of tasks) {
-      if (!task) continue;
-      if (String(task.type || 'task') !== 'task') continue;
-      if (!task.id) continue;
-      ids.add(String(task.id));
-    }
-    return ids;
-  }, [filteredGanttTasks]);
-
-  const filteredSubtaskEvents = useMemo(() => {
-    const base = Array.isArray(subtaskEvents) ? subtaskEvents : [];
-    if (!filtersActive) return base;
-    if (filteredParentIds.size === 0) return [];
-    return base.filter((sub) => {
-      if (!sub) return false;
-      const pid = String(sub.parentId || '');
-      if (pid && !filteredParentIds.has(pid)) return false;
-      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(sub.category) !== ganttCategoryFilter) return false;
-      if (ganttAssigneeFilter === 'ALL') return true;
-      const assignees = extractAssignees(sub);
-      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
-      return assignees.includes(ganttAssigneeFilter);
-    });
-  }, [subtaskEvents, filtersActive, filteredParentIds, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
-
-  const totalParentCount = useMemo(() => {
-    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
-    return tasks.filter((task) => String(task?.type || 'task') === 'task').length;
-  }, [ganttDisplayTasks]);
-
-  const showEmptyGanttState = filtersActive && totalParentCount > 0 && filteredParentIds.size === 0;
-
-  const ganttSizingTasks = useMemo(() => {
-    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
-    const candidate = (Array.isArray(source) ? source : []).filter((task) => task && task.start && task.end);
-    if (candidate.length > 0) return candidate;
-    const fallback = Array.isArray(ganttDisplayTasks)
-      ? ganttDisplayTasks.filter((task) => task && task.start && task.end)
-      : [];
-    if (fallback.length > 0) return fallback;
-    return Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
-  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks, uniqueGanttTasks]);
-
-  const ganttTasksToRender = useMemo(() => {
-    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
-    return Array.isArray(source) ? source : [];
-  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks]);
-
-  const ganttSubtasksToRender = useMemo(() => {
-    const source = filtersActive ? filteredSubtaskEvents : subtaskEvents;
-    return Array.isArray(source) ? source : [];
-  }, [filtersActive, filteredSubtaskEvents, subtaskEvents]);
-
-  const noTasksScheduled = totalParentCount === 0;
-
   // (se declara ms abajo tras parentNameMap)
 
   const taskListItems = useMemo(() => {
@@ -1204,15 +1111,6 @@ export default function Tasks() {
       (sub) => String(sub?.parentId || '') === pid
     );
   }, [selectedParentId, subtaskEvents]);
-
-  useEffect(() => {
-    if (!selectedParentId) return;
-    if (!filtersActive) return;
-    const pid = String(selectedParentId);
-    if (filteredParentIds.size === 0 || !filteredParentIds.has(pid)) {
-      setSelectedParentId(null);
-    }
-  }, [selectedParentId, filtersActive, filteredParentIds]);
 
   // Recalcular y actualizar el rango del padre basado en sus subtareas programadas
   const computeAndUpdateParentRange = useCallback(async (parentId) => {
@@ -1499,6 +1397,120 @@ export default function Tasks() {
       return { ...task, risk };
     });
   }, [ganttBaseTasks, parentRiskMap]);
+
+  const ganttCategoryOptions = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    const categories = new Set();
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      categories.add(normalizeCategory(task.category));
+    }
+    return Array.from(categories).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  }, [ganttDisplayTasks, normalizeCategory]);
+
+  const ganttAssigneeOptions = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    const names = new Set();
+    let includeUnassigned = false;
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      const assignees = extractAssignees(task);
+      if (assignees.length === 0) includeUnassigned = true;
+      assignees.forEach((name) => names.add(name));
+    }
+    const ordered = Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    const opts = ordered.map((value) => ({ value, label: value }));
+    if (includeUnassigned) opts.push({ value: GANTT_UNASSIGNED, label: 'Sin responsable' });
+    return opts;
+  }, [ganttDisplayTasks, extractAssignees]);
+
+  const filteredGanttTasks = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    if (!filtersActive) return tasks;
+    return tasks.filter((task) => {
+      if (!task) return false;
+      const type = String(task.type || 'task');
+      if (type !== 'task') return true;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(task.category) !== ganttCategoryFilter) return false;
+      if (ganttRiskFilter !== 'ALL') {
+        const riskLevel = String(task?.risk?.level || 'ok');
+        if (riskLevel !== ganttRiskFilter) return false;
+      }
+      if (ganttAssigneeFilter === 'ALL') return true;
+      const assignees = extractAssignees(task);
+      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
+      return assignees.includes(ganttAssigneeFilter);
+    });
+  }, [ganttDisplayTasks, filtersActive, ganttCategoryFilter, ganttRiskFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+
+  const filteredParentIds = useMemo(() => {
+    const ids = new Set();
+    const tasks = Array.isArray(filteredGanttTasks) ? filteredGanttTasks : [];
+    for (const task of tasks) {
+      if (!task) continue;
+      if (String(task.type || 'task') !== 'task') continue;
+      if (!task.id) continue;
+      ids.add(String(task.id));
+    }
+    return ids;
+  }, [filteredGanttTasks]);
+
+  const filteredSubtaskEvents = useMemo(() => {
+    const base = Array.isArray(subtaskEvents) ? subtaskEvents : [];
+    if (!filtersActive) return base;
+    if (filteredParentIds.size === 0) return [];
+    return base.filter((sub) => {
+      if (!sub) return false;
+      const pid = String(sub.parentId || '');
+      if (pid && !filteredParentIds.has(pid)) return false;
+      if (ganttCategoryFilter !== 'ALL' && normalizeCategory(sub.category) !== ganttCategoryFilter) return false;
+      if (ganttAssigneeFilter === 'ALL') return true;
+      const assignees = extractAssignees(sub);
+      if (ganttAssigneeFilter === GANTT_UNASSIGNED) return assignees.length === 0;
+      return assignees.includes(ganttAssigneeFilter);
+    });
+  }, [subtaskEvents, filtersActive, filteredParentIds, ganttCategoryFilter, ganttAssigneeFilter, normalizeCategory, extractAssignees]);
+
+  const totalParentCount = useMemo(() => {
+    const tasks = Array.isArray(ganttDisplayTasks) ? ganttDisplayTasks : [];
+    return tasks.filter((task) => String(task?.type || 'task') === 'task').length;
+  }, [ganttDisplayTasks]);
+
+  const showEmptyGanttState = filtersActive && totalParentCount > 0 && filteredParentIds.size === 0;
+
+  useEffect(() => {
+    if (!selectedParentId) return;
+    if (!filtersActive) return;
+    const pid = String(selectedParentId);
+    if (filteredParentIds.size === 0 || !filteredParentIds.has(pid)) {
+      setSelectedParentId(null);
+    }
+  }, [selectedParentId, filtersActive, filteredParentIds]);
+
+  const ganttSizingTasks = useMemo(() => {
+    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
+    const candidate = (Array.isArray(source) ? source : []).filter((task) => task && task.start && task.end);
+    if (candidate.length > 0) return candidate;
+    const fallback = Array.isArray(ganttDisplayTasks)
+      ? ganttDisplayTasks.filter((task) => task && task.start && task.end)
+      : [];
+    if (fallback.length > 0) return fallback;
+    return Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
+  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks, uniqueGanttTasks]);
+
+  const ganttTasksToRender = useMemo(() => {
+    const source = filtersActive ? filteredGanttTasks : ganttDisplayTasks;
+    return Array.isArray(source) ? source : [];
+  }, [filtersActive, filteredGanttTasks, ganttDisplayTasks]);
+
+  const ganttSubtasksToRender = useMemo(() => {
+    const source = filtersActive ? filteredSubtaskEvents : subtaskEvents;
+    return Array.isArray(source) ? source : [];
+  }, [filtersActive, filteredSubtaskEvents, subtaskEvents]);
+
+  const noTasksScheduled = totalParentCount === 0;
 
   // Accin manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
@@ -2149,6 +2161,16 @@ export default function Tasks() {
                 </option>
               ))}
             </select>
+            <select
+              className="border border-gray-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              value={ganttRiskFilter}
+              onChange={(e) => setGanttRiskFilter(e.target.value)}
+            >
+              <option value="ALL">Todos los estados</option>
+              <option value="critical">Solo riesgo</option>
+              <option value="warning">Solo atención</option>
+              <option value="ok">Solo en curso</option>
+            </select>
             {filtersActive && (
               <button
                 type="button"
@@ -2156,6 +2178,7 @@ export default function Tasks() {
                 onClick={() => {
                   setGanttCategoryFilter('ALL');
                   setGanttAssigneeFilter('ALL');
+                  setGanttRiskFilter('ALL');
                 }}
               >
                 Limpiar filtros
@@ -2193,8 +2216,35 @@ export default function Tasks() {
                 if (!task) return;
                 if (handleTaskIntent(task)) return;
                 try {
-                  const eventStart = task.start instanceof Date ? task.start : new Date(task.start);
-                  const eventEnd = task.end instanceof Date ? task.end : new Date(task.end);
+                  const normalizeDate = (value) => {
+                    if (!value) return null;
+                    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+                    if (typeof value?.toDate === 'function') {
+                      const d = value.toDate();
+                      return Number.isNaN(d.getTime()) ? null : d;
+                    }
+                    try {
+                      const d = new Date(value);
+                      return Number.isNaN(d.getTime()) ? null : d;
+                    } catch {
+                      return null;
+                    }
+                  };
+                  const eventStart =
+                    normalizeDate(task.start) ||
+                    normalizeDate(task.startDate) ||
+                    normalizeDate(task.when);
+                  const eventEnd =
+                    normalizeDate(task.end) ||
+                    normalizeDate(task.endDate) ||
+                    normalizeDate(task.until) ||
+                    normalizeDate(task.finish) ||
+                    normalizeDate(task.to) ||
+                    eventStart;
+                  if (!eventStart || !eventEnd) {
+                    console.warn('[Tasks] Gantt task sin fechas válidas al abrir detalle', task);
+                    return;
+                  }
                   setEditingId(task.id);
                   setEditingPath(task.__path || null);
                   setFormData((prev) => ({

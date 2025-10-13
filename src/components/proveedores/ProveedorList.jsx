@@ -9,7 +9,7 @@ import ProveedorCard from './ProveedorCard';
  */
 
 /**
- * Lista de proveedores con pestanas (Contrataños, Buscaños, Favoritos).
+ * Lista de proveedores con pestanas (Contratados, Buscados, Favoritos).
  * Activa virtualizacion cuando la lista es muy grande para mejorar rendimiento.
  */
 const ProveedorList = ({
@@ -25,6 +25,7 @@ const ProveedorList = ({
   onReserve,
   onShowTracking,
   onOpenCompare,
+  onOpenRfq,
   onOpenBulkStatus,
   onOpenDuplicates,
   onOpenGroupSelected,
@@ -85,14 +86,14 @@ const ProveedorList = ({
 
   const selectedCount = Array.isArray(selected) ? selected.length : 0;
   const tabOptions = [
-    { id: 'contrataños', label: 'Contrataños' },
-    { id: 'buscaños', label: 'Buscaños' },
+    { id: 'contratados', label: 'Contratados' },
+    { id: 'buscados', label: 'Buscados' },
     { id: 'favoritos', label: 'Favoritos' },
   ];
 
   const renderTabs = () => {
     if (typeof setTab !== 'function') return null;
-    const activeTab = tab || 'contrataños';
+    const activeTab = tab || 'contratados';
     return (
       <div className="flex flex-wrap itemás-center gap-3">
         <nav className="flex gap-2 border-b border-gray-200" aria-label="Filtros de proveedores">
@@ -209,7 +210,7 @@ const ProveedorList = ({
     if (!selectedCount) return null;
     return (
       <div className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600">
-        <span>{selectedCount} seleccionaños</span>
+        <span>{selectedCount} seleccionados</span>
         {typeof onOpenCompare === 'function' && (
           <button
             type="button"
@@ -217,6 +218,15 @@ const ProveedorList = ({
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
             Comparar
+          </button>
+        )}
+        {typeof onOpenRfq === 'function' && (
+          <button
+            type="button"
+            onClick={onOpenRfq}
+            className="px-3 py-1 border border-indigo-200 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+          >
+            Enviar RFQ
           </button>
         )}
         {typeof onOpenGroupSelected === 'function' && (
@@ -243,7 +253,7 @@ const ProveedorList = ({
             onClick={onOpenDuplicates}
             className="px-3 py-1 border border-gray-300 rounded-md bg-white hover:bg-gray-50"
           >
-            Revisar duplicaños
+            Revisar duplicados
           </button>
         )}
         {typeof onClearSelection === 'function' && (
@@ -271,7 +281,7 @@ const ProveedorList = ({
                   provider={provider}
                   isSelected={selected?.includes?.(provider.id)}
                   onToggleSelect={() => toggleSelect(provider.id)}
-                  onViewDetail={() => handleViewDetail(provider)}
+                  onViewDetail={typeof handleViewDetail === 'function' ? () => handleViewDetail(provider) : undefined}
                   onToggleFavorite={toggleFavorite}
                   onCreateContract={handleCreateContract}
                   onEdit={onEdit ? () => onEdit(provider) : undefined}
@@ -304,7 +314,7 @@ const ProveedorList = ({
             provider={provider}
             isSelected={selected?.includes?.(provider.id)}
             onToggleSelect={() => toggleSelect(provider.id)}
-            onViewDetail={() => handleViewDetail(provider)}
+            onViewDetail={typeof handleViewDetail === 'function' ? () => handleViewDetail(provider) : undefined}
             onToggleFavorite={toggleFavorite}
             onCreateContract={handleCreateContract}
             onEdit={onEdit ? () => onEdit(provider) : undefined}

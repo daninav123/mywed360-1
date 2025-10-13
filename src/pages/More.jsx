@@ -11,6 +11,7 @@ export default function More() {
 
   // Prefetch helpers
   const pfInvitados = () => prefetchModule('Invitados', () => import('./Invitados'));
+  const pfSeating = () => prefetchModule('SeatingPlan', () => import('./SeatingPlan'));
   const pfProveedores = () => prefetchModule('Proveedores', () => import('./Proveedores'));
   const pfContratos = () => prefetchModule('Contratos', () => import('./Contratos'));
   const pfProtocolo = () =>
@@ -20,10 +21,12 @@ export default function More() {
   const pfIdeas = () => prefetchModule('Ideas', () => import('./Ideas'));
   const pfInspiration = () => prefetchModule('Inspiration', () => import('./Inspiration'));
   const pfBlog = () => prefetchModule('Blog', () => import('./Blog'));
+  const pfMomentos = () => prefetchModule('Momentos', () => import('./Momentos'));
 
   // Grouped prefetch on hover/focus/touch
   const pfInvitadosMenu = () => {
     pfInvitados();
+    pfSeating();
   };
   const pfProveedoresMenu = () => {
     pfProveedores();
@@ -38,6 +41,7 @@ export default function More() {
     pfIdeas();
     pfInspiration();
     pfBlog();
+    pfMomentos();
   };
 
   // Push handlers removed
@@ -69,6 +73,12 @@ export default function More() {
             >
               <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
                 Gestión de invitados
+              </Link>
+              <Link
+                to="/invitados/seating"
+                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
+              >
+                Plan de asientos
               </Link>
             </div>
           )}
@@ -168,7 +178,7 @@ export default function More() {
           >
             <Layers size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">Extras</h2>
-            <p className="text-sm text-muted">Diseño web e ideas</p>
+            <p className="text-sm text-muted">Diseño web, ideas y Momentos colaborativos</p>
           </button>
           {openMenu === 'extras' && (
             <div
@@ -191,6 +201,9 @@ export default function More() {
               </Link>
               <Link to="/blog" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
                 Blog
+              </Link>
+              <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
+                Momentos
               </Link>
             </div>
           )}

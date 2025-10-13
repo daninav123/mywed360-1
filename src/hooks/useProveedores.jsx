@@ -18,10 +18,10 @@ import { useAuth } from './useAuth';
 import { useWedding } from '../context/WeddingContext';
 import { loadData, saveData } from '../services/SyncService';
 import { recordSupplierInsight } from '../services/supplierInsightsService';
+import computeSupplierScore from '../utils/supplierScore';
 
 const SERVICE_LINES_COLLECTION = "serviceLines";
 const MEETINGS_COLLECTION = "supplierMeetings";
-
 
 /**
  * @typedef {Object} Provider
@@ -92,105 +92,15 @@ export const useProveedores = () => {
   const [tab, setTab] = useState('contratados'); // 'contratados', 'buscados', 'favoritos'
 
   const { user } = useAuth();
+  const userUid = user?.uid || null;
   const { activeWedding } = useWedding();
   const persistTimer = useRef(null);
 
   const getCollectionPath = useCallback(() => {
     if (activeWedding) return `weddings/${activeWedding}/suppliers`;
-    if (user?.uid) return `users/${user.uid}/suppliers`;
+    if (userUid) return `users/${userUid}/suppliers`;
     return null;
-  }, [activeWedding, user]);
-
-  /**
-   * Cargar proveedores desde Firestore
-   */
-  const loadProviders = useCallback(async () => {
-    if (!user) return;
-
-    setLoading(true);
-
-    try {
-      const primaryPath = getCollectionPath();
-      if (!primaryPath) {
-        setLoading(false);
-        return;
-      }
-      const tryLoad = async (path) => {
-        const proveedoresRef = collection(db, path);
-        return await getDocs(proveedoresRef);
-      };
-
-      let snapshot;
-      try {
-        snapshot = await tryLoad(primaryPath);
-      } catch (e) {
-        // Intentar rutas alternativas si hay error de permisos u otros
-        const fallbacks = [];
-        if (activeWedding) fallbacks.push(`weddings_public/${activeWedding}/suppliers`);
-        if (user?.uid) {
-          fallbacks.push(`users/${user.uid}/suppliers`);
-          fallbacks.push(`usuarios/${user.uid}/proveedores`); // legacy
-        }
-        for (const p of fallbacks) {
-          try {
-            const snap = await tryLoad(p);
-            snapshot = snap;
-            if (snap && !snap.empty) break;
-          } catch {}
-        }
-      }
-      if (!snapshot) {
-        snapshot = { docs: [], empty: true };
-      }
-      const toIso = (d) => {
-        try {
-          if (!d) return '';
-          if (typeof d?.toDate === 'function')
-            return new Date(d.toDate()).toISOString().split('T')[0];
-          return new Date(d).toISOString().split('T')[0];
-        } catch {
-          return '';
-        }
-      };
-      const baseProviders = snapshot.docs
-        .map((d) => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
-        .sort((a, b) => {
-          const ac = a.created?.seconds || a.createdAt?.seconds || 0;
-          const bc = b.created?.seconds || b.createdAt?.seconds || 0;
-          return bc - ac;
-        });
-
-      const providersWithLines = await Promise.all(
-        baseProviders.map(async (prov) => {
-          const lines = [];
-          try {
-            const linesRef = collection(db, primaryPath, prov.id, SERVICE_LINES_COLLECTION);
-            const linesSnap = await getDocs(linesRef);
-            linesSnap.forEach((docSnap) => {
-              lines.push({ id: docSnap.id, ...docSnap.data() });
-            });
-            lines.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-          } catch (err) {
-            console.warn('[useProveedores] no se pudieron cargar líneas de servicio', err);
-          }
-          return { ...prov, serviceLines: lines };
-        })
-      );
-
-      setProviders(providersWithLines);
-      applyFilters(providersWithLines);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error al cargar los proveedores:', err);
-      try { setProviders([]); applyFilters([]); } catch {}
-      if (String(err?.message || '').toLowerCase().includes('permission')) {
-        setError('No tienes permisos para ver los proveedores de esta boda.');
-      } else {
-        setError('No se pudieron cargar los proveedores.');
-      }
-      setLoading(false);
-    }
-  }, [user, getCollectionPath]);
+  }, [activeWedding, userUid]);
 
   /**
    * Aplicar filtros a los proveedores
@@ -252,6 +162,146 @@ export const useProveedores = () => {
     },
     [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]
   );
+
+  /**
+   * Cargar proveedores desde Firestore
+   */
+  const loadProviders = useCallback(async () => {
+    if (!userUid) return;
+
+    setLoading(true);
+
+    try {
+      const primaryPath = getCollectionPath();
+      if (!primaryPath) {
+        setLoading(false);
+        return;
+      }
+      const tryLoad = async (path) => {
+        const proveedoresRef = collection(db, path);
+        return await getDocs(proveedoresRef);
+      };
+
+      let snapshot;
+      try {
+        snapshot = await tryLoad(primaryPath);
+      } catch (e) {
+        // Intentar rutas alternativas si hay error de permisos u otros
+        const fallbacks = [];
+        if (activeWedding) fallbacks.push(`weddings_public/${activeWedding}/suppliers`);
+        if (userUid) {
+          fallbacks.push(`users/${userUid}/suppliers`);
+          fallbacks.push(`usuarios/${userUid}/proveedores`); // legacy
+        }
+        for (const p of fallbacks) {
+          try {
+            const snap = await tryLoad(p);
+            snapshot = snap;
+            if (snap && !snap.empty) break;
+          } catch {}
+        }
+      }
+      if (!snapshot) {
+        snapshot = { docs: [], empty: true };
+      }
+      const toIso = (d) => {
+        try {
+          if (!d) return '';
+          if (typeof d?.toDate === 'function')
+            return new Date(d.toDate()).toISOString().split('T')[0];
+          return new Date(d).toISOString().split('T')[0];
+        } catch {
+          return '';
+        }
+      };
+      const baseProviders = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data(), date: toIso(d.data().date) }))
+        .sort((a, b) => {
+          const ac = a.created?.seconds || a.createdAt?.seconds || 0;
+          const bc = b.created?.seconds || b.createdAt?.seconds || 0;
+          return bc - ac;
+        });
+
+      const providersWithLines = await Promise.all(
+        baseProviders.map(async (prov) => {
+          const lines = [];
+          try {
+            const linesRef = collection(db, primaryPath, prov.id, SERVICE_LINES_COLLECTION);
+            const linesSnap = await getDocs(linesRef);
+            linesSnap.forEach((docSnap) => {
+              lines.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            lines.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+          } catch (err) {
+            console.warn('[useProveedores] no se pudieron cargar líneas de servicio', err);
+          }
+          return { ...prov, serviceLines: lines };
+        })
+      );
+
+      const serviceLineMap = new Map(
+        providersWithLines.map((prov) => [prov.id, prov.serviceLines || []])
+      );
+      const now = Date.now();
+      const enrichedProviders = providersWithLines.map((prov) => {
+        const lines = serviceLineMap.get(prov.id) || [];
+        const coveredLines = lines.filter((line) => {
+          const status = String(line?.status || '').toLowerCase();
+          if (status.includes('confirm') || status.includes('contrat') || status.includes('assign')) {
+            return true;
+          }
+          if (line?.assignedProviderId || line?.providerId) return true;
+          return false;
+        }).length;
+        const coverageRatio = lines.length ? coveredLines / lines.length : 0;
+        const lastInteraction =
+          prov.lastInteractionAt ||
+          prov.lastContactAt ||
+          prov.lastEmailAt ||
+          prov.lastFollowupAt ||
+          prov.updatedAt ||
+          prov.updated ||
+          prov.date;
+        let recentInteractionDays = null;
+        if (lastInteraction) {
+          try {
+            const value =
+              typeof lastInteraction?.toDate === 'function'
+                ? lastInteraction.toDate()
+                : new Date(lastInteraction);
+            const diffMs = now - value.getTime();
+            if (Number.isFinite(diffMs)) {
+              recentInteractionDays = diffMs / (1000 * 60 * 60 * 24);
+            }
+          } catch {}
+        }
+        const intelligentScore = computeSupplierScore(prov, null, {
+          serviceCoverageRatio: coverageRatio,
+          recentInteractionDays,
+        });
+        return {
+          ...prov,
+          intelligentScore,
+        };
+      });
+
+      setProviders(enrichedProviders);
+      applyFilters(enrichedProviders);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error al cargar los proveedores:', err);
+      try {
+        setProviders([]);
+        applyFilters([]);
+      } catch {}
+      if (String(err?.message || '').toLowerCase().includes('permission')) {
+        setError('No tienes permisos para ver los proveedores de esta boda.');
+      } else {
+        setError('No se pudieron cargar los proveedores.');
+      }
+      setLoading(false);
+    }
+  }, [userUid, getCollectionPath, applyFilters, activeWedding]);
 
   /**
    * Limpiar todos los filtros
@@ -464,6 +514,7 @@ export const useProveedores = () => {
 
         setProviders((prev) => [newProvider, ...prev]);
         applyFilters([newProvider, ...providers]);
+        loadProviders();
 
         return newProvider;
       } catch (err) {
@@ -472,7 +523,7 @@ export const useProveedores = () => {
         return null;
       }
     },
-    [user, providers, applyFilters, getCollectionPath, addServiceLine]
+    [user, providers, applyFilters, getCollectionPath, addServiceLine, loadProviders]
   );
 
   /**
@@ -573,6 +624,7 @@ export const useProveedores = () => {
         }
 
         setError(null);
+        loadProviders();
         return true;
       } catch (err) {
         console.error('Error al actualizar proveedor:', err);
@@ -582,7 +634,7 @@ export const useProveedores = () => {
         setLoading(false);
       }
     },
-    [user, getCollectionPath, providers, activeWedding, applyFilters]
+    [user, getCollectionPath, providers, activeWedding, applyFilters, loadProviders]
   );
 
   /**
@@ -657,7 +709,7 @@ export const useProveedores = () => {
 
         // Eliminar de la lista de seleccionados si estaba allí
         setSelectedProviderIds((prev) => prev.filter((id) => id !== providerId));
-
+        loadProviders();
         return true;
       } catch (err) {
         console.error('Error al eliminar proveedor:', err);
@@ -665,7 +717,7 @@ export const useProveedores = () => {
         return false;
       }
     },
-    [user, providers, selectedProvider, applyFilters, getCollectionPath]
+    [user, providers, selectedProvider, applyFilters, getCollectionPath, loadProviders]
   );
 
   /**
@@ -714,12 +766,26 @@ export const useProveedores = () => {
     setSelectedProviderIds([]);
   }, []);
 
-  // Cargar proveedores al iniciar
+  const loadProvidersRef = useRef(loadProviders);
   useEffect(() => {
-    if (user) {
-      loadProviders();
+    loadProvidersRef.current = loadProviders;
+  }, [loadProviders]);
+
+  const lastLoadKeyRef = useRef(null);
+
+  useEffect(() => {
+    if (!userUid) {
+      lastLoadKeyRef.current = null;
+      setProviders([]);
+      setFilteredProviders([]);
+      setLoading(false);
+      return;
     }
-  }, [user, loadProviders]);
+    const key = `${userUid}::${activeWedding || ''}`;
+    if (lastLoadKeyRef.current === key) return;
+    lastLoadKeyRef.current = key;
+    loadProvidersRef.current();
+  }, [userUid, activeWedding]);
 
   // Hidratar filtros guardados por boda
   useEffect(() => {
@@ -800,6 +866,11 @@ export const useProveedores = () => {
     updateProvider,
     deleteProvider,
     addReservation,
+    addServiceLine,
+    updateServiceLine,
+    deleteServiceLine,
+    mergeServiceLines,
+    registerManualContact,
     toggleSelectProvider,
     toggleFavoriteProvider,
     clearSelection,

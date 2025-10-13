@@ -24,21 +24,28 @@ const DEFAULT_BLOCKS = [
 ];
 
 // Estructura inicial por defecto
+const withRecipientDefaults = (list = []) =>
+  (Array.isArray(list) ? list : []).map((item) => ({
+    recipientId: '',
+    recipientName: '',
+    ...item,
+  }));
+
 const defaultData = {
   blocks: DEFAULT_BLOCKS,
   moments: {
-    ceremonia: [
+    ceremonia: withRecipientDefaults([
       {
         id: 1,
         order: 1,
         title: 'Entrada Novio',
-        song: 'Canon in D – Pachelbel',
+        song: 'Canon in D � Pachelbel',
         time: '', // Hora (hh:mm)
-        duration: '', // Duracin (min) o texto corto
+        duration: '', // Duración (min) o texto corto
         type: 'entrada', // entrada | lectura | votos | anillos | baile | corte_pastel | discurso | otro
         location: '',
         responsables: [], // [{ role, name, contact }]
-        requirements: '', // necesidades especiales (sonido, proyeccin...)
+        requirements: '', // necesidades especiales (sonido, proyección...)
         suppliers: [], // referencias/proveedores asociados (ids o strings)
         optional: false,
         state: 'pendiente', // pendiente | confirmado | ensayo
@@ -48,7 +55,7 @@ const defaultData = {
         id: 2,
         order: 2,
         title: 'Entrada Novia',
-        song: 'Bridal Chorus – Wagner',
+        song: 'Bridal Chorus � Wagner',
         time: '',
         duration: '',
         type: 'entrada',
@@ -79,19 +86,27 @@ const defaultData = {
       { id: 4, order: 4, title: 'Lectura 2', song: '', time: '', duration: '', type: 'lectura', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
       { id: 5, order: 5, title: 'Intercambio de Anillos', song: '', time: '', duration: '', type: 'anillos', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
       { id: 6, order: 6, title: 'Salida', song: '', time: '', duration: '', type: 'salida', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-    ],
-    coctail: [{ id: 7, order: 1, title: 'Entrada', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' }],
-    banquete: [
+    ]),
+    coctail: withRecipientDefaults([{ id: 7, order: 1, title: 'Entrada', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' }]),
+    banquete: withRecipientDefaults([
       { id: 8, order: 1, title: 'Entrada Novios', song: '', time: '', duration: '', type: 'entrada', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
       { id: 9, order: 2, title: 'Corte Pastel', song: '', time: '', duration: '', type: 'corte_pastel', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'corte_tarta' },
       { id: 10, order: 3, title: 'Discursos', song: '', time: '', duration: '', type: 'discurso', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-    ],
-    disco: [
+    ]),
+    disco: withRecipientDefaults([
       { id: 11, order: 1, title: 'Primer Baile', song: '', time: '', duration: '', type: 'baile', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: 'primer_baile' },
       { id: 12, order: 2, title: 'Animar pista', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
       { id: 13, order: 3, title: 'Último tema', song: '', time: '', duration: '', type: 'otro', location: '', responsables: [], requirements: '', suppliers: [], optional: false, state: 'pendiente', key: '' },
-    ],
+    ]),
   },
+};
+
+const normalizeMomentsStructure = (momentsObj = {}) => {
+  const normalized = {};
+  Object.entries(momentsObj || {}).forEach(([blockId, list]) => {
+    normalized[blockId] = withRecipientDefaults(Array.isArray(list) ? list : []);
+  });
+  return normalized;
 };
 
 function load() {
@@ -125,8 +140,12 @@ function load() {
 export default function useSpecialMoments() {
   const { activeWedding } = useWedding();
   const initial = load();
-  const [blocks, setBlocks] = useState(initial.blocks || DEFAULT_BLOCKS);
-  const [moments, setMoments] = useState(initial.moments || defaultData.moments);
+  const initialBlocks =
+    Array.isArray(initial.blocks) && initial.blocks.length ? initial.blocks : DEFAULT_BLOCKS;
+  const initialMoments =
+    initial.moments ? normalizeMomentsStructure(initial.moments) : defaultData.moments;
+  const [blocks, setBlocks] = useState(initialBlocks);
+  const [moments, setMoments] = useState(initialMoments);
   const lastRemoteRef = useRef(null);
   const unsubRef = useRef(null);
 
@@ -169,7 +188,7 @@ export default function useSpecialMoments() {
         if (e && e.key === STORAGE_KEY && typeof e.newValue === 'string') {
           const parsed = JSON.parse(e.newValue);
           setBlocks(parsed.blocks || DEFAULT_BLOCKS);
-          setMoments(parsed.moments || defaultData.moments);
+          setMoments(parsed.moments ? normalizeMomentsStructure(parsed.moments) : defaultData.moments);
         }
       } catch {}
     };
@@ -191,14 +210,15 @@ export default function useSpecialMoments() {
         const data = snapOld.data() || {};
         if (data.moments) {
           const nextBlocks = Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
-          const nextMoments = data.moments || {};
+          const nextMoments = normalizeMomentsStructure(data.moments || {});
           setBlocks(nextBlocks);
           setMoments((prev) => ({ ...prev, ...nextMoments }));
           await setDoc(refNew, { blocks: nextBlocks, moments: nextMoments, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
         } else {
           const { updatedAt: _updatedAt, ...payload } = data;
           setBlocks(DEFAULT_BLOCKS);
-          setMoments((prev) => ({ ...prev, ...payload }));
+          const normalizedPayload = normalizeMomentsStructure(payload);
+          setMoments((prev) => ({ ...prev, ...normalizedPayload }));
           await setDoc(refNew, { blocks: DEFAULT_BLOCKS, moments: payload, migratedFrom: 'momentosEspeciales', updatedAt: serverTimestamp() }, { merge: true });
         }
       } catch {}
@@ -222,22 +242,27 @@ export default function useSpecialMoments() {
       const data = snap.data() || {};
       // Compatibilidad: aceptar tanto forma nueva { moments, blocks } como la antigua plana
       if (data.moments) {
-        const next = {
-          blocks: Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS,
-          moments: data.moments || {},
-        };
-        setBlocks(next.blocks);
+        const nextBlocks = Array.isArray(data.blocks) && data.blocks.length ? data.blocks : DEFAULT_BLOCKS;
+        const nextMoments = normalizeMomentsStructure(data.moments || {});
+        setBlocks(nextBlocks);
         setMoments((prev) => {
-          const merged = { ...prev, ...next.moments };
-          try { lastRemoteRef.current = JSON.stringify({ blocks: next.blocks, moments: merged }); } catch { lastRemoteRef.current = null; }
+          const merged = { ...prev };
+          Object.entries(nextMoments).forEach(([blockId, list]) => {
+            merged[blockId] = list;
+          });
+          try { lastRemoteRef.current = JSON.stringify({ blocks: nextBlocks, moments: merged }); } catch { lastRemoteRef.current = null; }
           return merged;
         });
       } else {
         // Antigua: data contiene directamente las claves de cada bloque
         const { updatedAt: _updatedAt, ...payload } = data;
         setBlocks(DEFAULT_BLOCKS);
+        const normalizedPayload = normalizeMomentsStructure(payload);
         setMoments((prev) => {
-          const merged = { ...prev, ...payload };
+          const merged = { ...prev };
+          Object.entries(normalizedPayload).forEach(([blockId, list]) => {
+            merged[blockId] = list;
+          });
           try { lastRemoteRef.current = JSON.stringify({ blocks: DEFAULT_BLOCKS, moments: merged }); } catch { lastRemoteRef.current = null; }
           return merged;
         });
@@ -275,6 +300,8 @@ export default function useSpecialMoments() {
           optional: false,
           state: 'pendiente',
           key: '',
+          recipientId: '',
+          recipientName: '',
           ...moment,
         },
       ];
@@ -433,6 +460,3 @@ export default function useSpecialMoments() {
     reorderBlocks,
   };
 }
-
-
-

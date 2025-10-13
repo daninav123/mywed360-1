@@ -38,7 +38,12 @@
     cy.get('[data-testid^="table-item-"]').first().click();
 
     // Establecer seats = 1 en el editor de mesa
-    cy.get('#table-auto-capacity').uncheck({ force: true });\n    cy.contains('label', 'Capacidad máxima').parent().find('input').clear().type('1');
+    cy.get('#table-auto-capacity').uncheck({ force: true });
+    cy.contains('label', 'Capacidad máxima')
+      .parent()
+      .find('input')
+      .clear()
+      .type('1');
 
     // Mostrar lista de invitados disponibles desde acciones rápidas
     cy.contains('button', 'Mostrar Invitados').click();

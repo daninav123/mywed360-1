@@ -9,7 +9,7 @@
 - Sincronizar el estado RSVP con listas de invitados, seating y comunicaciones.
 
 ## 2. Trigger y rutas
-- Menú inferior → `Más` → bloque **Invitados** → "Gestión de invitados" (`/invitados`, render `Invitados.jsx`), desde donde se abre el modal "Resumen RSVP" (`RSVPDashboard.jsx`).
+- Menú inferior → `Más` → bloque **Invitados** → "Gestión de invitados" (`/invitados`, render `Invitados.jsx`), desde donde se abre el modal "Resumen RSVP" (`RSVPDashboard.jsx`) compartido con el Flujo 3.
 - Emails/WhatsApp a invitados contienen el enlace único `/rsvp/{token}` (renderiza `RSVPConfirm.jsx`).
 - Invitaciones de colaboradores llegan por `/accept-invitation/:code` (`AcceptInvitation.jsx`).
 
@@ -24,8 +24,8 @@
    - Validaciones: limite de acompanantes, formato email/telefono, token vigente.
 3. Seguimiento interno (`RSVPDashboard.jsx`)
    - Widgets con totales confirmados, pendientes, declinados y acompanantes.
-   - Tabla con filtros por estado, etiquetas y recordatorios enviados.
-   - Acciones masivas: reenviar recordatorio, marcar manual, exportar CSV.
+   - Tabla con filtros por estado, etiquetas y recordatorios enviados; los cambios manuales de estado se realizan desde `GuestList` (ver Flujo 3).
+   - Acciones masivas propias del dashboard: reenviar recordatorios (simulación o envío real) y exportar CSV para análisis fuera de línea.
 
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/rsvp/{rsvpId}`: estado, token, respuesta, metadata (timestamps, ip, canal).
@@ -35,6 +35,7 @@
 
 ## 5. Reglas de negocio
 - Cada token solo puede usarse una vez; permite editar hasta la fecha limite configurada.
+- Estados RSVP persistidos: `pending`, `accepted`, `rejected`; la interfaz de gestión de invitados los representa como `pending`, `confirmed`, `declined` para claridad del usuario.
 - Invitados corporativos o familiares pueden representar a varios asistentes (grupo controlado).
 - Owners, planners y assistants pueden ajustar manualmente el estado RSVP desde la gestión interna; cada cambio queda auditado con usuario y timestamp.
 - Colaboradores requieren email verificado antes de aceptar invitacion.
@@ -47,7 +48,8 @@
 
 ## 7. Integracion con otros flujos
 - Flujo 3 (Gestion de invitados) consume y actualiza estados RSVP.
-- Flujo 4 (Seating) recibe listas de confirmados y acompanantes; cuando un invitado pasa a "declined"/"rejected", se libera automáticamente cualquier asiento asignado en los planos de banquete o ceremonia.
+- Flujo 4 (Seating) recibe listas de confirmados y acompanantes; cuando un invitado pasa a estado rechazado (`declined` en UI, almacenado como `rejected`), se libera automáticamente cualquier asiento asignado en los planos de banquete o ceremonia.
+- Flujo 3 (Gestión de invitados) es la vía autorizada para crear/editar registros y cambiar estados individuales; este flujo consume esos datos para las métricas y automatizaciones de RSVP.
 - Flujo 6 (Presupuesto) ajusta conteo de menus y estimaciones.
 - Flujo 7/20 usan resultados para segmentar emails/buzon interno; el [Flujo 16](./flujo-16-asistente-virtual-ia.md) convierte confirmaciones en acciones automáticas.
 - Flujos 11A/11B sincronizan aforo y orden de ceremonia; Flujo 11C ajusta checklist según confirmaciones, además de las tareas del flujo 14.

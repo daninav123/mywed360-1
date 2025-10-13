@@ -8,7 +8,7 @@ import { useWedding } from '../context/WeddingContext';
 import { post as apiPost } from '../services/apiClient';
 import { saveData } from '../services/SyncService';
 
-export default function ProviderSearchModal({ onClose, onSelectProvider }) {
+export default function ProviderSearchModal({ onClose, onSelectProvider, onNavigate }) {
   const { activeWedding } = useWedding();
   const [aiQuery, setAiQuery] = useState('');
   const [serviceFilter, setServiceFilter] = useState('');
@@ -590,6 +590,14 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
 
         {/* Botones de accin */}
         <div className="mt-4 pt-4 border-t flex justify-end space-x-2">
+          {typeof onNavigate === 'function' && (
+            <button
+              onClick={() => onNavigate()}
+              className="px-4 py-2 text-blue-700 bg-blue-100 rounded hover:bg-blue-200 transition"
+            >
+              Ir a proveedores
+            </button>
+          )}
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded">
             Cerrar
           </button>
@@ -598,7 +606,6 @@ export default function ProviderSearchModal({ onClose, onSelectProvider }) {
     </div>
   );
 }
-
 
 
 

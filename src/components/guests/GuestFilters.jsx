@@ -22,6 +22,7 @@ const GuestFilters = React.memo(
     onAddGuest,
     onOpenSaveTheDate,
     onBulkInvite,
+    onOpenBulkAdd,
     onOpenManualBatch,
     onOpenRsvpSummary,
     onBulkTableReassign,
@@ -33,6 +34,8 @@ const GuestFilters = React.memo(
     onSendSelectedBroadcast,
     showApiButtons = true,
     coupleName = '',
+    onLoadSamples,
+    onOpenCheckIn,
   }) => {
     const { t, wedding } = useTranslations();
 
@@ -123,7 +126,12 @@ const GuestFilters = React.memo(
             </div>
 
             {/* Botón principal de añadir */}
-            <Button onClick={handleAddGuest} disabled={isLoading} className="flex items-center">
+            <Button
+              onClick={handleAddGuest}
+              disabled={isLoading}
+              className="flex items-center"
+              data-testid="guest-add-manual"
+            >
               <Plus size={20} className="mr-2" />
               {t('guests.addGuest')}
             </Button>
@@ -158,6 +166,7 @@ const GuestFilters = React.memo(
                 onChange={handleStatusChange}
                 disabled={isLoading}
                 className="w-full pl-10 pr-4 py-2 border border-soft rounded-md focus:outline-none focus:ring-2 ring-primary appearance-none bg-surface"
+                data-testid="guest-filter-rsvp"
               >
                 {statusOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -188,6 +197,33 @@ const GuestFilters = React.memo(
               title="Enviar SAVE THE DATE por WhatsApp"
             >
               Enviar SAVE THE DATE
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => onLoadSamples?.()}
+              disabled={isLoading}
+              data-testid="guest-load-samples"
+            >
+              Cargar ejemplos
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => onOpenBulkAdd?.()}
+              disabled={isLoading}
+              data-testid="guest-open-bulk"
+            >
+              Alta masiva
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => onOpenCheckIn?.()}
+              disabled={isLoading}
+              data-testid="guest-open-checkin"
+            >
+              Check-in día B
             </Button>
 
             <Button
@@ -260,6 +296,7 @@ const GuestFilters = React.memo(
                 onClick={handleReassignTables}
                 disabled={isLoading || selectedCount === 0}
                 title="Mover invitados seleccionados a otra mesa"
+                data-testid="guest-bulk-update"
               >
                 Reasignar mesa
               </Button>

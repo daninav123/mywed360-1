@@ -4,7 +4,7 @@ const normalizeLang = (l) =>
     .toLowerCase()
     .match(/^[a-z]{2}/)?.[0] || 'es';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 // import anterior eliminado: useUserContext
@@ -34,6 +34,17 @@ import useFinance from '../hooks/useFinance';
 import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
 
+const INSPIRATION_CATEGORIES = [
+  { slug: 'decoracion', label: 'Decoración' },
+  { slug: 'coctel', label: 'Cóctel' },
+  { slug: 'banquete', label: 'Banquete' },
+  { slug: 'ceremonia', label: 'Ceremonia' },
+  { slug: 'flores', label: 'Flores' },
+  { slug: 'vestido', label: 'Vestidos' },
+  { slug: 'pastel', label: 'Pasteles' },
+  { slug: 'fotografia', label: 'Fotografía' },
+];
+
 export default function HomePage() {
   // Todo se maneja con modales locales
   const [noteText, setNoteText] = useState('');
@@ -47,6 +58,7 @@ export default function HomePage() {
   const [activeModal, setActiveModal] = useState(null);
   // Hook de autenticacin unificado
   const { hasRole, userProfile, currentUser } = useAuth();
+  const navigate = useNavigate();
 
   // Derivados equivalentes al antiguo UserContext
   const role = userProfile?.role || 'particular';
@@ -62,17 +74,14 @@ export default function HomePage() {
 
   // Datos derivados ya calculados ms arriba
   const email = currentUser?.email || '';
-
-  // Si el usuario es Wedding Planner mostramos dashboard especfico
-  if (role === 'planner') {
-    return <PlannerDashboard />;
-  }
+  const isPlanner = role === 'planner';
   const galleryRef = useRef(null);
   const [newsPosts, setNewsPosts] = useState([]);
   const [categoryImages, setCategoryImages] = useState([]);
   const { i18n } = useTranslation();
   const lang = normalizeLang(i18n.language);
   const backendBase = getBackendBase();
+
   // Visual mode toggle similar a Blog
   const visualMode = useMemo(() => {
     try {
@@ -84,21 +93,27 @@ export default function HomePage() {
     return false;
   }, []);
 
-  // Cargar primera imagen de cada categora
+  // Cargar primera imagen de cada categoría destacada
   useEffect(() => {
-    const categories = ['decoracin', 'cctel', 'banquete', 'ceremonia'];
-    Promise.all(categories.map((cat) => fetchWall(1, cat)))
+    Promise.all(INSPIRATION_CATEGORIES.map(({ slug }) => fetchWall(1, slug)))
       .then((results) => {
         const imgs = results
-          .map((arr, i) => {
-            const first = arr[0];
-            if (first) return { src: first.url, alt: categories[i] };
-            return null;
+          .map((arr, index) => {
+            const first = arr?.[0];
+            if (!first) return null;
+            const { slug, label } = INSPIRATION_CATEGORIES[index];
+            return {
+              src: first.url || first.thumb,
+              alt: label,
+              slug,
+            };
           })
           .filter(Boolean);
         setCategoryImages(imgs);
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error('[HomePage] No se pudo precargar la galería de inspiración:', error);
+      });
   }, []);
 
   // Cargar ltimas noticias (mx 3 por dominio y 4 con imagen)
@@ -178,6 +193,14 @@ export default function HomePage() {
     }
   }, []);
   const scrollAmount = 300;
+
+  const handleNavigateFromModal = useCallback(
+    (path) => {
+      setActiveModal(null);
+      navigate(path);
+    },
+    [navigate]
+  );
 
   const scrollPrev = useCallback(() => {
     galleryRef.current?.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
@@ -274,6 +297,10 @@ export default function HomePage() {
     [role, statsNovios, statsPlanner]
   );
 
+  if (isPlanner) {
+    return <PlannerDashboard />;
+  }
+
   return (
     <React.Fragment>
       {/* Botn solo visible en desarrollo */}
@@ -319,17 +346,25 @@ export default function HomePage() {
 
         {/* Progress Section */}
         <section className="z-10 w-full p-6">
-          <Card className="bg-[var(--color-surface)]/70 backdrop-blur-md p-4 w-full">
-            <p className="text-sm text-[color:var(--color-text)]/70 mb-2">Progreso de tareas</p>
-            <Progress
-              className="h-4 rounded-full w-full"
-              value={progress}
-              max={100}
-              variant={progress >= 100 ? 'success' : progress >= 80 ? 'primary' : 'destructive'}
-            />
-            <p className="mt-2 text-sm font-medium text-[color:var(--color-text)]">
-              {progress}% completado
-            </p>
+          <Card className="bg-[var(--color-surface)]/70 backdrop-blur-md p-4 w-full flex flex-col gap-4">
+            <div>
+              <p className="text-sm text-[color:var(--color-text)]/70 mb-2">Progreso de tareas</p>
+              <Progress
+                className="h-4 rounded-full w-full"
+                value={progress}
+                max={100}
+                variant={
+                  progress >= 100 ? 'success' : progress >= 80 ? 'primary' : 'destructive'
+                }
+                data-testid="home-progress-bar"
+              />
+              <p
+                className="mt-2 text-sm font-medium text-[color:var(--color-text)]"
+                data-testid="home-progress-label"
+              >
+                {progress}% completado
+              </p>
+            </div>
           </Card>
         </section>
 
@@ -385,7 +420,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-4">
             <Link to="/inspiracion">
               <button className="text-xl font-bold text-[var(--color-text)] hover:text-[var(--color-primary)]">
-                Inspiracin para tu boda
+                Inspiración para tu boda
               </button>
             </Link>
             <div className="flex space-x-2">
@@ -408,19 +443,20 @@ export default function HomePage() {
             className="flex space-x-4 overflow-x-auto pb-4 snap-x scrollbar-hide"
           >
             {categoryImages.map((img, idx) => (
-              <div
-                key={idx}
-                className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden"
+              <Link
+                key={`${img.slug}-${idx}`}
+                to={`/inspiracion?tag=${encodeURIComponent(img.slug)}`}
+                className="snap-start flex-shrink-0 w-64 h-64 relative rounded-lg overflow-hidden group"
               >
                 <ExternalImage
                   src={img.src}
                   alt={img.alt}
-                  className="w-full h-full object-cover transition transform hover:scale-110"
+                  className="w-full h-full object-cover transition transform group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
                   <p className="text-white font-medium">{img.alt}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -476,7 +512,12 @@ export default function HomePage() {
       </div>
 
       {/* Modales */}
-      {activeModal === 'proveedor' && <ProviderSearchModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'proveedor' && (
+        <ProviderSearchModal
+          onClose={() => setActiveModal(null)}
+          onNavigate={() => handleNavigateFromModal('/proveedores')}
+        />
+      )}
 
       {activeModal === 'invitado' && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -514,6 +555,12 @@ export default function HomePage() {
                 className="px-4 py-2 text-[var(--color-text)] border border-[var(--color-text)]/20 rounded"
               >
                 Cancelar
+              </button>
+              <button
+                onClick={() => handleNavigateFromModal('/invitados')}
+                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+              >
+                Ir a invitados
               </button>
               <button
                 onClick={() => {
@@ -576,6 +623,12 @@ export default function HomePage() {
                 Cancelar
               </button>
               <button
+                onClick={() => handleNavigateFromModal('/finance')}
+                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+              >
+                Ir a finanzas
+              </button>
+              <button
                 onClick={() => {
                   const movs = JSON.parse(localStorage.getItem('quickMovements') || '[]');
                   movs.push({ ...newMovement, id: Date.now() });
@@ -612,6 +665,12 @@ export default function HomePage() {
                 Cancelar
               </button>
               <button
+                onClick={() => handleNavigateFromModal('/ideas')}
+                className="px-4 py-2 text-[var(--color-primary)] border border-[var(--color-primary)]/40 rounded bg-[var(--color-primary)]/10"
+              >
+                Ir a ideas
+              </button>
+              <button
                 onClick={() => {
                   const notes = JSON.parse(localStorage.getItem('lovendaNotes') || '[]');
                   notes.push({ text: noteText, id: Date.now() });
@@ -630,4 +689,3 @@ export default function HomePage() {
     </React.Fragment>
   );
 }
-

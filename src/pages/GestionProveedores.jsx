@@ -109,7 +109,7 @@ const GestionProveedores = () => {
 
     // Aplicar filtro por categoría
     switch (filtro) {
-      case 'contrataños':
+      case 'contratados':
         resultado = resultado.filter((p) => p.estado === 'Contratado');
         break;
       case 'contactaños':

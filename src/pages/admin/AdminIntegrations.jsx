@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getIntegrationsData } from '../../services/adminDataService';
+import { getIntegrationsData, retryIntegration } from '../../services/adminDataService';
 
 const statusInfo = {
   operational: { label: 'Operativo', className: 'text-green-600' },
@@ -11,7 +11,7 @@ const statusInfo = {
 const AdminIntegrations = () => {
   const [data, setData] = useState({ services: [], incidents: [] });
   const [loading, setLoading] = useState(true);
-  const [showRetry, setShowRetry] = useState(false);
+  const [showRetry, setShowRetry] = useState(''); // guarda id del servicio a reintentar
 
   useEffect(() => {
     const loadIntegrations = async () => {
@@ -66,7 +66,7 @@ const AdminIntegrations = () => {
               <button
                 type="button"
                 data-testid="integration-retry-button"
-                onClick={() => setShowRetry(true)}
+                onClick={() => setShowRetry(service.id || service.name)}
                 className="mt-4 text-xs font-medium text-[color:var(--color-primary,#6366f1)]"
               >
                 Reintentar conexión
@@ -122,13 +122,29 @@ const AdminIntegrations = () => {
               ¿Deseas reintentar la conexión del servicio seleccionado?
             </p>
             <div className="flex justify-end gap-3 text-sm">
-              <button type="button" onClick={() => setShowRetry(false)} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">
+              <button type="button" onClick={() => setShowRetry('')} className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]">
                 Cancelar
               </button>
               <button
                 type="button"
                 data-testid="integration-retry-confirm"
-                onClick={() => setShowRetry(false)}
+                onClick={async () => {
+                  try {
+                    const updated = await retryIntegration(showRetry);
+                    if (updated) {
+                      setData((prev) => ({
+                        ...prev,
+                        services: prev.services.map((s) =>
+                          (s.id === updated.id || s.name === updated.name) ? { ...s, ...updated } : s
+                        ),
+                      }));
+                    }
+                  } catch (e) {
+                    console.warn('[AdminIntegrations] retry failed:', e);
+                  } finally {
+                    setShowRetry('');
+                  }
+                }}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
               >
                 Reintentar

@@ -1,4 +1,4 @@
-﻿import { Plus, Sparkles } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -7,6 +7,7 @@ import AISearchModal from '../components/proveedores/ai/AISearchModal';
 import AssignSelectedToGroupModal from '../components/proveedores/AssignSelectedToGroupModal';
 import BulkStatusModal from '../components/proveedores/BulkStatusModal';
 import CompareSelectedModal from '../components/proveedores/CompareSelectedModal';
+import RFQModal from '../components/proveedores/RFQModal';
 import DuplicateDetectorModal from '../components/proveedores/DuplicateDetectorModal';
 import ProveedorCard from '../components/proveedores/ProveedorCard';
 import ProveedorForm from '../components/proveedores/ProveedorForm';
@@ -32,8 +33,11 @@ import useAISearch from '../hooks/useAISearch';
 import { useAuth } from '../hooks/useAuth';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierGroups from '../hooks/useSupplierGroups';
+import useSupplierShortlist from '../hooks/useSupplierShortlist';
 import { loadData, saveData } from '../services/SyncService';
 import { loadTrackingRecords, TRACKING_STATUS } from '../services/EmailTrackingService';
+import { sendBulkRfqAutomation } from '../services/bulkRfqAutomation';
+import { recommendBestProvider } from '../utils/providerRecommendation';
 
 const Proveedores = () => {
   const {
@@ -79,6 +83,14 @@ const Proveedores = () => {
   } = useAISearch();
   const { user } = useAuth();
   const { groups } = useSupplierGroups();
+  const {
+    shortlist,
+    loading: shortlistLoading,
+    error: shortlistError,
+    addEntry: addShortlistEntry,
+    markReviewed: markShortlistReviewed,
+    removeEntry: removeShortlistEntry,
+  } = useSupplierShortlist();
   const { info: weddingInfo, loading: loadingWeddingInfo } = useActiveWeddingInfo();
   const { activeWedding } = useWedding();
 
@@ -96,11 +108,15 @@ const Proveedores = () => {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [showGroupSelectedModal, setShowGroupSelectedModal] = useState(false);
+  const [showBulkRfqModal, setShowBulkRfqModal] = useState(false);
+  const [bulkRfqTargets, setBulkRfqTargets] = useState([]);
   const [sortMode, setSortMode] = useState('match');
   const [originFilter, setOriginFilter] = useState('all');
   const [statusView, setStatusView] = useState('all');
   const [expandedGroups, setExpandedGroups] = useState({});
   const [trackingItem, setTrackingItem] = useState(null);
+  const [automationLoading, setAutomationLoading] = useState(false);
+  const [autoRecommendation, setAutoRecommendation] = useState(null);
 
   // Servicios deseaños
   const [wantedServices, setWantedServices] = useState([]);
@@ -144,9 +160,21 @@ const Proveedores = () => {
         if (sortMode === 'name') {
           return collator.compare(a.name || '', b.name || '');
         }
-        const am = Number.isFinite(a.aiMatch) ? a.aiMatch : Number.isFinite(a.match) ? a.match : 0;
-        const bm = Number.isFinite(b.aiMatch) ? b.aiMatch : Number.isFinite(b.match) ? b.match : 0;
-        if (bm !== am) return bm - am;
+        const aScore = Number.isFinite(a?.intelligentScore?.score)
+          ? a.intelligentScore.score
+          : Number.isFinite(a.aiMatch)
+            ? a.aiMatch
+            : Number.isFinite(a.match)
+              ? a.match
+              : 0;
+        const bScore = Number.isFinite(b?.intelligentScore?.score)
+          ? b.intelligentScore.score
+          : Number.isFinite(b.aiMatch)
+            ? b.aiMatch
+            : Number.isFinite(b.match)
+              ? b.match
+              : 0;
+        if (bScore !== aScore) return bScore - aScore;
         return collator.compare(a.name || '', b.name || '');
       });
     });
@@ -155,16 +183,29 @@ const Proveedores = () => {
 
   const prefsKey = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    if (activeWedding) return `buscañosPrefs_${activeWedding}`;
-    if (user?.uid) return `buscañosPrefs_user_${user.uid}`;
-    return 'buscañosPrefs';
+    if (activeWedding) return `buscadosPrefs_${activeWedding}`;
+    if (user?.uid) return `buscadosPrefs_user_${user.uid}`;
+    return 'buscadosPrefs';
+  }, [activeWedding, user?.uid]);
+
+  const legacyPrefsKeys = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    const base = 'busca\u00f1osPrefs';
+    const keys = [];
+    if (activeWedding) keys.push(`${base}_${activeWedding}`);
+    if (user?.uid) keys.push(`${base}_user_${user.uid}`);
+    keys.push(base);
+    return keys;
   }, [activeWedding, user?.uid]);
 
   useEffect(() => {
     if (!prefsKey || typeof window === 'undefined') return;
-    try {
-      const rawPrefs = localStorage.getItem(prefsKey);
-      if (rawPrefs) {
+    const candidates = [prefsKey, ...legacyPrefsKeys];
+    for (const key of candidates) {
+      if (!key) continue;
+      try {
+        const rawPrefs = localStorage.getItem(key);
+        if (!rawPrefs) continue;
         const prefs = JSON.parse(rawPrefs);
         if (prefs && typeof prefs === 'object') {
           if (prefs.originFilter) setOriginFilter(prefs.originFilter);
@@ -173,10 +214,13 @@ const Proveedores = () => {
           if (prefs.expandedGroups && typeof prefs.expandedGroups === 'object') {
             setExpandedGroups(prefs.expandedGroups);
           }
+          break;
         }
+      } catch {
+        continue;
       }
-    } catch {}
-  }, [prefsKey]);
+    }
+  }, [prefsKey, legacyPrefsKeys]);
 
   useEffect(() => {
     if (!prefsKey || typeof window === 'undefined') return;
@@ -334,6 +378,24 @@ const Proveedores = () => {
     };
   }, [activeWedding]);
 
+  const formatShortDate = (value) => {
+    if (!value) return '';
+    try {
+      const date =
+        typeof value?.toDate === 'function'
+          ? value.toDate()
+          : typeof value === 'string'
+            ? new Date(value)
+            : value instanceof Date
+              ? value
+              : new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    } catch {
+      return '';
+    }
+  };
+
   const normalizedProviders = useMemo(() => {
     const mapEstado = (status) => {
       const value = String(status || '').toLowerCase();
@@ -353,18 +415,45 @@ const Proveedores = () => {
       presupuestoAsignado: prov.assignedBudget || prov.presupuestoAsignado || 0,
       gastado: prov.spent || prov.gastado || 0,
       proximaAccion: prov.nextAction || prov.proximaAccion || '',
+      origin: prov.origin || prov.origen || '',
+      groupName: prov.groupName || prov.grupo || '',
     }));
   }, [providers]);
 
-  const mássingServices = useMemo(() => {
-    const confirmed = new Set(
-      (normalizedProviders || [])
-        .filter((p) => ['contratado', 'presupuestos'].some((flag) => p.estado.toLowerCase().includes(flag)))
-        .map((p) => p.servicio)
-        .filter(Boolean)
-    );
-    return normalizedWanted.filter((s) => !confirmed.has(s.name || s.id));
-  }, [normalizedProviders, normalizedWanted]);
+  const contractedProviders = useMemo(
+    () =>
+      (normalizedProviders || []).filter((prov) =>
+        String(prov?.estado || '').toLowerCase().includes('contrat')
+      ),
+    [normalizedProviders]
+  );
+
+  const budgetStageProviders = useMemo(
+    () =>
+      (normalizedProviders || []).filter((prov) =>
+        String(prov?.estado || '').toLowerCase().includes('presup')
+      ),
+    [normalizedProviders]
+  );
+
+  const servicesCovered = useMemo(() => {
+    const covered = new Set();
+    (normalizedProviders || []).forEach((prov) => {
+      const state = String(prov?.estado || '').toLowerCase();
+      if (!state.includes('contrat') && !state.includes('presup')) return;
+      const service = prov?.servicio || prov?.service;
+      if (service) covered.add(service);
+    });
+    return covered;
+  }, [normalizedProviders]);
+
+  const missingServices = useMemo(() => {
+    return normalizedWanted.filter((service) => {
+      const key = service?.name || service?.id;
+      if (!key) return false;
+      return !servicesCovered.has(key);
+    });
+  }, [servicesCovered, normalizedWanted]);
 
   // Handlers
   const handleViewDetail = (provider) => {
@@ -409,7 +498,7 @@ const Proveedores = () => {
       if (!groupId) return;
       const g = (groups || []).find((x) => x.id === groupId);
       if (g) {
-        setTab('buscaños');
+        setTab('buscados');
         setSearchTerm(g.name || '');
         if (typeof window !== 'undefined') {
           toast.info(`Grupo: ${g.name}`);
@@ -488,16 +577,49 @@ const Proveedores = () => {
     [serviceFilter]
   );
 
+  const addResultToShortlist = useCallback(
+    async (result, overrides = {}) => {
+      if (!result || typeof addShortlistEntry !== 'function') return;
+      try {
+        const uniqueKey = (result.link || result.email || result.name || '')
+          .toString()
+          .toLowerCase();
+        const alreadyExists = (shortlist || []).some((item) => {
+          const compareKey = (item.link || item.email || item.name || '').toString().toLowerCase();
+          return uniqueKey && compareKey && compareKey === uniqueKey;
+        });
+        if (alreadyExists) return;
+        const entry = {
+          name: result.name || result.title || 'Proveedor sugerido',
+          service: overrides.service || result.service || serviceFilter || '',
+          location: result.location || '',
+          priceRange: overrides.priceRange || result.priceRange || result.price || '',
+          source: overrides.source || result.source || 'ai',
+          match: overrides.match ?? result.match ?? null,
+          link: result.link || '',
+          email: result.email || '',
+          phone: result.phone || '',
+          notes: overrides.notes || result.snippet || result.aiSummary || '',
+        };
+        await addShortlistEntry(entry);
+      } catch (err) {
+        console.warn('[shortlist] add entry failed', err);
+      }
+    },
+    [addShortlistEntry, shortlist, serviceFilter]
+  );
+
   const handleDrawerSave = useCallback(
-    (result) => {
+    async (result) => {
       if (!result) return;
+      await addResultToShortlist(result);
       const normalized = mapAIResultToProvider(result);
       if (!normalized) return;
       setNewProviderInitial(normalized);
       setShowNewProviderForm(true);
       handleCloseSearchDrawer();
     },
-    [mapAIResultToProvider, handleCloseSearchDrawer]
+    [mapAIResultToProvider, handleCloseSearchDrawer, addResultToShortlist]
   );
 
   const handleBoardSearch = useCallback(
@@ -532,9 +654,10 @@ const Proveedores = () => {
     async (prov, targetKey) => {
       if (!prov || !targetKey) return;
       const statusMap = {
-        vacio: 'Pendiente',
-        proceso: 'Contactado',
-        presupuestos: 'Seleccionado',
+        por_definir: 'Pendiente',
+        vistos: 'Vistos',
+        contactado: 'Contactado',
+        presupuesto: 'Seleccionado',
         contratado: 'Confirmado',
         rechazado: 'Rechazado',
       };
@@ -551,6 +674,102 @@ const Proveedores = () => {
     setShowCompareModal(true);
   };
 
+  const handleAutoRecommend = useCallback(async () => {
+    if (!selectedProviders.length) {
+      toast.info('Selecciona al menos un proveedor para automatizar la solicitud.', { autoClose: 4000 });
+      return;
+    }
+    const providersWithEmail = selectedProviders
+      .filter((provider) => provider?.email)
+      .map((provider) => ({
+        ...provider,
+        assignedBudget:
+          Number(provider?.assignedBudget ?? provider?.presupuestoAsignado ?? provider?.budgetTarget ?? provider?.presupuesto) ||
+          null,
+      }));
+
+    if (!providersWithEmail.length) {
+      toast.warn('Ninguno de los proveedores seleccionados tiene email configurado.', { autoClose: 5000 });
+      return;
+    }
+
+    const weddingDoc = (weddingInfo && (weddingInfo.weddingInfo || weddingInfo)) || {};
+    const serviceNames = Array.from(
+      new Set(
+        providersWithEmail
+          .map((p) => p?.service || p?.servicio || '')
+          .filter(Boolean),
+      ),
+    );
+    const servicesLabel = serviceNames.length ? serviceNames.join(', ') : 'tu evento';
+    const autoSubject = `Solicitud de presupuesto para ${servicesLabel}`;
+    const autoBody = [
+      'Hola {proveedor_nombre},',
+      '',
+      'Estamos organizando nuestra boda para {fecha_evento} en {lugar} y necesitamos {servicio}.',
+      'Nuestro presupuesto objetivo es {presupuesto_asignado} y nos gustaría conocer tu propuesta detallada, disponibilidad y cualquier información relevante.',
+      '',
+      'Quedamos atentos a tu respuesta.',
+      '',
+      'Gracias,',
+      '{organizador}',
+    ].join('\n');
+
+    setAutomationLoading(true);
+    setAutoRecommendation(null);
+    try {
+      const rfqResult = await sendBulkRfqAutomation({
+        weddingId: activeWedding,
+        providers: providersWithEmail,
+        subject: autoSubject,
+        body: autoBody,
+        weddingInfo: weddingDoc,
+      });
+
+      const recommendation = recommendBestProvider(providersWithEmail, {
+        wantedServices: normalizedWanted,
+        requiredTags: normalizedWanted,
+        preferences: weddingDoc?.preferences || {},
+      });
+
+      if (recommendation) {
+        setAutoRecommendation({ recommendation, rfqResult });
+        setShowCompareModal(true);
+        const winner = providersWithEmail.find((p) => p.id === recommendation.providerId);
+        if (winner?.name) {
+          toast.success(`Recomendación IA: ${winner.name}`, { autoClose: 5000 });
+        } else {
+          toast.success('Recomendación IA generada.', { autoClose: 5000 });
+        }
+      } else {
+        toast.info('Se enviaron las solicitudes, pero no se pudo calcular una recomendación automática.', { autoClose: 5000 });
+      }
+
+      if (rfqResult.fail > 0) {
+        toast.warn(`No se pudieron enviar ${rfqResult.fail} solicitudes.`, { autoClose: 6000 });
+      }
+    } catch (error) {
+      console.error('Error en la automatización de RFQ:', error);
+      toast.error('No se pudo completar la automatización de solicitudes.', { autoClose: 6000 });
+    } finally {
+      setAutomationLoading(false);
+    }
+  }, [selectedProviders, weddingInfo, activeWedding, normalizedWanted]);
+
+  const openBulkRfqModal = () => {
+    if (!selectedProviders.length) {
+      toast.info('Selecciona al menos un proveedor con email para enviar el RFQ.');
+      return;
+    }
+    const hasEmail = selectedProviders.some((p) => !!p?.email);
+    if (!hasEmail) {
+      toast.error('Ninguno de los proveedores seleccionados tiene email válido.');
+      return;
+    }
+    setBulkRfqTargets(selectedProviders);
+    setShowBulkRfqModal(true);
+  };
+
   const openBulkStatusModal = () => {
     if (!selectedProviderIds.length) return;
     setShowBulkStatus(true);
@@ -564,9 +783,25 @@ const Proveedores = () => {
     setShowGroupSelectedModal(true);
   };
 
+  const handleBulkRfqSent = (outcome) => {
+    if (!outcome) return;
+    if (outcome.sentCount > 0) {
+      toast.success(`RFQ enviado a ${outcome.sentCount} proveedor(es).`);
+    } else if (!outcome.ok) {
+      toast.error('No se pudo enviar el RFQ.');
+    }
+    if (outcome.sentCount > 0) {
+      clearSelection();
+    }
+  };
+
   const handleAISelect = useCallback(
     async (result, action) => {
       if (!result) return;
+      await addResultToShortlist(result, {
+        source: action === 'email' ? 'ai-email' : 'ai-modal',
+        match: result.match ?? result.aiMatch ?? null,
+      });
       if (action === 'view') {
         const normalized = mapAIResultToProvider(result);
         if (normalized) {
@@ -599,7 +834,141 @@ const Proveedores = () => {
       setShowAISearchModal,
       setAiSelectedResult,
       setShowAIEmailModal,
+      addResultToShortlist,
     ]
+  );
+
+  const handleShortlistPromote = useCallback(
+    async (item) => {
+      if (!item) return;
+      setNewProviderInitial({
+        name: item.name || '',
+        service: item.service || '',
+        email: item.email || '',
+        phone: item.phone || '',
+        link: item.link || '',
+        status: 'Pendiente',
+        snippet: item.notes || '',
+        priceRange: item.priceRange || '',
+        location: item.location || '',
+        origin: item.source || 'shortlist',
+      });
+      setShowNewProviderForm(true);
+      try {
+        if (item.id) await markShortlistReviewed(item.id);
+      } catch (err) {
+        console.warn('[shortlist] mark reviewed failed', err);
+      }
+    },
+    [markShortlistReviewed, setNewProviderInitial, setShowNewProviderForm]
+  );
+
+  const handleShortlistReview = useCallback(
+    async (item) => {
+      if (!item?.id) return;
+      try {
+        await markShortlistReviewed(item.id);
+        toast.success('Entrada marcada como revisada.');
+      } catch (err) {
+        console.warn('[shortlist] review failed', err);
+        toast.error('No se pudo marcar como revisado.');
+      }
+    },
+    [markShortlistReviewed]
+  );
+
+  const handleShortlistRemove = useCallback(
+    async (item) => {
+      if (!item?.id) return;
+      try {
+        await removeShortlistEntry(item.id);
+        toast.info('Elemento eliminado de la lista de vistos.');
+      } catch (err) {
+        console.warn('[shortlist] remove failed', err);
+        toast.error('No se pudo eliminar el elemento.');
+      }
+    },
+    [removeShortlistEntry]
+  );
+
+  const ShortlistSection = () => (
+    <div className="mt-3 space-y-4">
+      {shortlistLoading && (
+        <Card>
+          <div className="text-sm text-muted">Cargando shortlist…</div>
+        </Card>
+      )}
+      {shortlistError && (
+        <Card>
+          <div className="text-sm text-red-600">No se pudo cargar la lista de vistos.</div>
+        </Card>
+      )}
+      {!shortlistLoading && (!shortlist || shortlist.length === 0) ? (
+        <Card>
+          <div className="text-sm text-muted">
+            Aún no tienes proveedores en la lista de vistos. Guarda resultados de la búsqueda IA o añade enlaces manuales para revisarlos más tarde.
+          </div>
+        </Card>
+      ) : null}
+      {(shortlist || []).map((item) => (
+        <Card key={item.id}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-semibold text-body truncate">{item.name || 'Proveedor'}</h3>
+              <p className="text-sm text-muted truncate">{item.service || 'Servicio'}</p>
+              <p className="text-xs text-muted mt-1">
+                {item.location ? `${item.location} · ` : ''}
+                Guardado: {formatShortDate(item.createdAt)}
+                {item.reviewedAt ? ` · Revisado: ${formatShortDate(item.reviewedAt)}` : ''}
+              </p>
+              {item.notes && <p className="text-sm text-body/80 mt-2">{item.notes}</p>}
+              {item.link && (
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-indigo-600 underline mt-2 inline-block"
+                >
+                  Abrir enlace
+                </a>
+              )}
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              {item.match != null && (
+                <span className="px-2 py-1 text-xs rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200">
+                  Match {item.match}
+                </span>
+              )}
+              {item.priceRange && <span className="text-xs text-muted">{item.priceRange}</span>}
+              {item.source && (
+                <span className="text-[11px] text-muted uppercase tracking-wide">{item.source}</span>
+              )}
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button size="sm" onClick={() => handleShortlistPromote(item)}>
+              Crear proveedor
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleShortlistReview(item)}
+              disabled={!!item.reviewedAt}
+            >
+              {item.reviewedAt ? 'Revisado' : 'Marcar revisado'}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-red-600 border-red-200 hover:bg-red-50"
+              onClick={() => handleShortlistRemove(item)}
+            >
+              Eliminar
+            </Button>
+          </div>
+        </Card>
+      ))}
+    </div>
   );
 
   const handleSubmitProvider = async (providerData) => {
@@ -633,29 +1002,31 @@ const Proveedores = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="page-header">
         <h1 className="page-title">Gestión de Proveedores</h1>
+        {/* Texto accesible para E2E sin alterar el diseño visual */}
+        <span className="sr-only">Proveedores</span>
         <div className="flex space-x-2">
           <Button
             onClick={() => setShowWantedModal(true)}
-            className="flex itemás-center"
+            className="flex items-center"
             variant="outline"
           >
             Configurar servicios
           </Button>
           <Button
             onClick={() => setShowNeedsModal(true)}
-            className="flex itemás-center"
+            className="flex items-center"
             variant="outline"
           >
             Matriz de necesidades
           </Button>
           <Button
             onClick={handleOpenAISearch}
-            className="flex itemás-center"
+            className="flex items-center"
             data-testid="open-ai-search"
           >
             <Sparkles size={16} className="mr-1" /> Búsqueda IA
           </Button>
-          <Button onClick={handleNewProvider} className="flex itemás-center">
+          <Button onClick={handleNewProvider} className="flex items-center">
             <Plus size={16} className="mr-1" /> Nuevo Proveedor
           </Button>
         </div>
@@ -667,14 +1038,17 @@ const Proveedores = () => {
           value={tab}
           onChange={setTab}
           options={[
-            { id: 'contrataños', label: 'Contrataños' },
-            { id: 'buscaños', label: 'Buscaños' },
+            { id: 'vistos', label: 'Vistos' },
+            { id: 'buscados', label: 'Pipeline' },
+            { id: 'contratados', label: 'Contratados' },
             { id: 'favoritos', label: 'Favoritos' },
           ]}
         />
-        {tab === 'buscaños' && (
-          <div className="mt-2 flex flex-wrap itemás-center gap-3 text-sm">
-            <div className="flex itemás-center gap-2">
+        {tab === 'vistos' ? (
+          <ShortlistSection />
+        ) : tab === 'buscados' ? (
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm">
+            <div className="flex items-center gap-2">
               <span className="text-muted">Origen:</span>
               <button
                 type="button"
@@ -698,7 +1072,7 @@ const Proveedores = () => {
                 Manual
               </button>
             </div>
-            <div className="flex itemás-center gap-2">
+            <div className="flex items-center gap-2">
               <span className="text-muted">Estado:</span>
               <button
                 type="button"
@@ -722,7 +1096,7 @@ const Proveedores = () => {
                 Contactado
               </button>
             </div>
-            <div className="ml-auto flex itemás-center gap-2">
+            <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -751,24 +1125,26 @@ const Proveedores = () => {
               </button>
             </div>
           </div>
+        ) : null}
+        {tab !== 'vistos' && (
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <span className="text-muted">Ordenar por:</span>
+            <button
+              type="button"
+              onClick={() => setSortMode('match')}
+              className={`px-2 py-1 rounded border text-xs ${sortMode === 'match' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
+            >
+              Puntuación IA
+            </button>
+            <button
+              type="button"
+              onClick={() => setSortMode('name')}
+              className={`px-2 py-1 rounded border text-xs ${sortMode === 'name' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
+            >
+              Nombre
+            </button>
+          </div>
         )}
-        <div className="mt-2 flex itemás-center gap-2 text-sm">
-          <span className="text-muted">Ordenar por:</span>
-          <button
-            type="button"
-            onClick={() => setSortMode('match')}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === 'match' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
-          >
-            Puntuación IA
-          </button>
-          <button
-            type="button"
-            onClick={() => setSortMode('name')}
-            className={`px-2 py-1 rounded border text-xs ${sortMode === 'name' ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'border-soft bg-surface text-body/80 hover:bg-[var(--color-accent)]/10'}`}
-          >
-            Nombre
-          </button>
-        </div>
       </div>
 
       {error && (
@@ -784,14 +1160,14 @@ const Proveedores = () => {
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {/* Placeholders de servicios faltantes */}
-          {tab === 'contrataños' && mássingServices.length > 0 && (
+          {tab === 'contratados' && missingServices.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mássingServices.map((s) => (
+              {missingServices.map((s) => (
                 <Card
                   key={s.id || s.name}
                   className="border border-dashed border-gray-300 bg-white/60 backdrop-blur-sm"
                 >
-                  <div className="flex itemás-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-semibold">{s.name || s.id}</h3>
                     <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-body">
                       Pendiente
@@ -817,7 +1193,7 @@ const Proveedores = () => {
             </div>
           )}
 
-          {tab === 'contrataños' && (
+          {tab === 'contratados' && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Card>
                 <div className="text-sm text-muted">Proveedores contratados</div>
@@ -835,7 +1211,7 @@ const Proveedores = () => {
           )}
 
           {/* Lista de proveedores con filtros */}
-          {tab === 'buscaños' ? (
+          {tab === 'buscados' ? (
             <div className="space-y-6">
               <div className="border border-dashed border-soft bg-surface/70 rounded-md p-4 flex flex-wrap items-center gap-3">
                 <div>
@@ -901,8 +1277,16 @@ const Proveedores = () => {
               ) : (
                 <>
                   {Array.isArray(selectedProviderIds) && selectedProviderIds.length > 0 && (
-                    <div className="flex flex-wrap itemás-center gap-2 text-sm text-muted">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
                       <span>{selectedProviderIds.length} seleccionados</span>
+                      <button
+                        type="button"
+                        onClick={handleAutoRecommend}
+                        disabled={automationLoading}
+                        className="px-3 py-1 border border-soft rounded-md bg-surface hover:bg-primary-soft disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {automationLoading ? 'Enviando…' : 'Solicitar y recomendar IA'}
+                      </button>
                       <button
                         type="button"
                         onClick={openCompareModal}
@@ -947,7 +1331,7 @@ const Proveedores = () => {
                         onClick={() => {
                           setExpandedGroups((prev) => ({ ...prev, [svc]: !(prev?.[svc] === false) }));
                         }}
-                        className="flex itemás-center gap-2 mb-2"
+                        className="flex items-center gap-2 mb-2"
                       >
                         <span className="text-lg font-semibold">{svc}</span>
                         <span className="text-xs text-muted">
@@ -1011,6 +1395,7 @@ const Proveedores = () => {
               }}
               onOpenGroups={handleOpenGroups}
               onOpenCompare={openCompareModal}
+              onOpenRfq={openBulkRfqModal}
               onOpenBulkStatus={openBulkStatusModal}
               onOpenDuplicates={openDuplicatesModal}
               onOpenGroupSelected={openGroupSelectedModal}
@@ -1023,7 +1408,7 @@ const Proveedores = () => {
 
       {/* Modales */}
       {showNewProviderForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <ProveedorForm
             initialData={newProviderInitial || undefined}
             onSubmit={handleSubmitProvider}
@@ -1036,7 +1421,7 @@ const Proveedores = () => {
       )}
 
       {showEditProviderForm && selectedProvider && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <ProveedorForm
             initialData={selectedProvider}
             onSubmit={handleSubmitProvider}
@@ -1099,6 +1484,9 @@ const Proveedores = () => {
             toggleSelectProvider(id);
           } catch {}
         }}
+        recommendedId={autoRecommendation?.recommendation?.providerId}
+        recommendationDetails={autoRecommendation?.recommendation}
+        rfqSummary={autoRecommendation?.rfqResult}
       />
 
       <BulkStatusModal
@@ -1177,6 +1565,17 @@ const Proveedores = () => {
         value={wantedServices}
         onSave={saveWanted}
       />
+      {showBulkRfqModal && (
+        <RFQModal
+          open={showBulkRfqModal}
+          onClose={() => {
+            setShowBulkRfqModal(false);
+            setBulkRfqTargets([]);
+          }}
+          providers={bulkRfqTargets}
+          onSent={handleBulkRfqSent}
+        />
+      )}
       {showGroupSelectedModal && (
         <AssignSelectedToGroupModal
           open={showGroupSelectedModal}

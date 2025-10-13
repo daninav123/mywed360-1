@@ -1,4 +1,4 @@
-import { Eye, Edit2, Trash2, Calendar, Star, MapPin, Users } from 'lucide-react';
+import { Eye, Edit2, Trash2, Calendar, Star, MapPin, Users, Globe } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
@@ -78,6 +78,56 @@ const ProveedorCard = ({
       return null;
     }
   }, [budgetsToUse]);
+
+  const scoreValue = useMemo(() => {
+    try {
+      const raw = provider?.intelligentScore?.score;
+      if (Number.isFinite(raw)) return Math.round(raw);
+      if (Number.isFinite(provider?.aiMatch)) return Math.round(provider.aiMatch);
+      if (Number.isFinite(provider?.match)) return Math.round(provider.match);
+    } catch {}
+    return null;
+  }, [provider?.intelligentScore?.score, provider?.aiMatch, provider?.match]);
+
+  const breakdown = provider?.intelligentScore?.breakdown || {};
+  const matchValue = useMemo(() => {
+    try {
+      if (Number.isFinite(breakdown.match)) return Math.round(breakdown.match);
+      if (Number.isFinite(provider?.aiMatch)) return Math.round(provider.aiMatch);
+      if (Number.isFinite(provider?.match)) return Math.round(provider.match);
+    } catch {}
+    return null;
+  }, [breakdown.match, provider?.aiMatch, provider?.match]);
+
+  const experiencePercent = useMemo(() => {
+    try {
+      if (!Number.isFinite(breakdown.experienceScore)) return null;
+      return Math.min(100, Math.round((breakdown.experienceScore / 20) * 100));
+    } catch {
+      return null;
+    }
+  }, [breakdown.experienceScore]);
+
+  const responsePercent = useMemo(() => {
+    try {
+      if (!Number.isFinite(breakdown.responseScore)) return null;
+      return Math.min(100, Math.round((breakdown.responseScore / 20) * 100));
+    } catch {
+      return null;
+    }
+  }, [breakdown.responseScore]);
+
+  const portalStatus = useMemo(() => {
+    if (provider?.portalLastSubmitAt) return 'responded';
+    if (provider?.portalToken) return 'pending';
+    return 'none';
+  }, [provider?.portalLastSubmitAt, provider?.portalToken]);
+
+  const portalStatusLabel = useMemo(() => {
+    if (portalStatus === 'responded') return 'Portal respondido';
+    if (portalStatus === 'pending') return 'Portal pendiente';
+    return null;
+  }, [portalStatus]);
 
   const refreshTracking = useCallback(() => {
     try {
@@ -424,7 +474,56 @@ const ProveedorCard = ({
 
         {/* Información principal */}
         <div className="p-4">
-          <h3 className="text-lg font-semibold line-clamp-1">{provider.name}</h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-lg font-semibold line-clamp-1">{provider.name}</h3>
+            {Number.isFinite(scoreValue) && (
+              <span
+                className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold whitespace-nowrap"
+                title="Puntuación IA consolidada"
+              >
+                Score {scoreValue}
+              </span>
+            )}
+          </div>
+
+          {(matchValue != null || experiencePercent != null || responsePercent != null) && (
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600">
+              {matchValue != null && (
+                <span>
+                  Match IA:{' '}
+                  <span className="font-semibold text-gray-800">{matchValue}%</span>
+                </span>
+              )}
+              {experiencePercent != null && (
+                <span>
+                  Experiencia:{' '}
+                  <span className="font-semibold text-gray-800">{experiencePercent}%</span>
+                </span>
+              )}
+              {responsePercent != null && (
+                <span>
+                  Agilidad:{' '}
+                  <span className="font-semibold text-gray-800">{responsePercent}%</span>
+                </span>
+              )}
+            </div>
+          )}
+
+          {portalStatus !== 'none' && portalStatusLabel && (
+            <div className="mt-2 flex items-center gap-2 text-xs">
+              <Globe
+                size={12}
+                className={portalStatus === 'responded' ? 'text-emerald-600' : 'text-indigo-500'}
+              />
+              <span
+                className={
+                  portalStatus === 'responded' ? 'text-emerald-700 font-medium' : 'text-indigo-600'
+                }
+              >
+                {portalStatusLabel}
+              </span>
+            </div>
+          )}
 
           <div className="mt-1 mb-3 flex itemás-center space-x-2">
             <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(provider.status)}`}>

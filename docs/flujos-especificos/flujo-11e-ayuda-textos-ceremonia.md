@@ -2,6 +2,7 @@
 
 > Componente clave: `src/pages/protocolo/AyudaCeremonia.jsx`
 > Persistencia: Firestore (`weddings/{id}/ceremonyTexts/main`) con sincronización en tiempo real y metadatos de usuario
+> Pendiente: ampliar tabs dedicadas, control de versiones, integracion IA y cobertura E2E para usuarios ayudantes.
 
 ## 1. Objetivo y alcance
 - Proveer un espacio guiado para que ayudantes, familiares o la pareja redacten y mejoren textos que se leerán durante la ceremonia.  
@@ -13,21 +14,25 @@
 - Desde Momentos Especiales (Flujo 11A) se puede redirigir cuando un momento tipo “lectura” no tiene contenido definido.  
 - Eventos de checklist pueden apuntar aquí cuando falte preparar discursos.
 
-## 3. Estado actual vs. pendientes
+## 3. Estado actual
 
-**Implementado hoy**
+### Implementado hoy
 - Dos pestañas operativas: "Lecturas" y "Ramos y Sorpresas".  
 - Editor de lecturas con duración estimada automática, vista previa modal y control de estado (`draft`/`final`).  
 - Persistencia compartida en Firestore con `updatedAt`, `updatedBy` y registro de eventos (`ceremony_text_created`, `ceremony_text_finalized`).  
 - Lista de sorpresas con alta, cambio de estado y eliminación sincronizados en tiempo real.  
 - Permisos de edición basados en rol (planner/owner/assistant) expuestos desde `useCeremonyTexts`.
 
-**Pendiente / roadmap**
+## Roadmap / pendientes
 - Tabs adicionales (votos, discursos) y plantillas específicas por tipo.  
-- Campos extra: notas privadas, enlace directo a momentos de 11A y responsables asignados.  
-- Control de versiones, duplicado, favoritos y exportación (PDF/proyección).  
+- Tabs deben soportar experiencias segmentadas para cada miembro de la pareja (votos ella/él/elle) y para ayudantes.  
+- Campos extra: notas privadas, enlace directo a momentos de 11A, responsables asignados y tags de inspiración.  
+- Control de versiones con historial consultable, duplicado, favoritos y exportación (PDF/proyección).  
+- Validaciones en cliente (título requerido, evitar duplicados, longitud mínima) con surfaced feedback y recuperación ante errores de red.  
 - Integración IA (reescritura, tono) y publicación automática en flujo 21.  
-- Validación de permisos en backend y auditoría detallada.
+- Validación de permisos en backend y auditoría detallada, incluyendo trazabilidad de quién vio o editó cada texto.  
+- Métricas operativas en UI (duración total de ceremonia, ratio de textos finalizados) y eventos adicionales para checklist 11C.  
+- Pruebas E2E dedicadas para usuarios ayudantes y miembros de la pareja cubriendo visibilidad, estados y vistas previas.
 
 ## 4. Datos y modelo
 - Documento `weddings/{id}/ceremonyTexts/main` con `{ readings, surprises, updatedAt, updatedBy, lastAction }`.  
@@ -35,9 +40,10 @@
 - Sorpresas: `id`, `type`, `recipient`, `table`, `description`, `notes`, `status`, timestamps.
 
 ## 5. Reglas de negocio
-- Estados de texto: `draft`, `review`, `final` determinan qué se mostrará al público (cuando se integre con flujo 21).  
+- Estados de texto: `draft`, `review`, `final` determinan qué se mostrará al público (cuando se integre con flujo 21); la interfaz debe permitir transiciones explicitas y registro de quién mueve cada estado.  
 - Duplicar un texto genera un nuevo id timestamp.  
 - Los ayudantes sólo pueden editar si tienen rol `assistant` o `planner`; `guest` lo verá en modo lectura (validación pendiente en hook de auth).
+- Visibilidad segmentada: cada miembro de la pareja únicamente accede a sus votos hasta que ambos estén en `final`; los votos de la otra persona se ocultan salvo para el planner. Las lecturas creadas por ayudantes permanecen invisibles para los novios hasta que se marquen `final` o el planner las comparta explícitamente.
 
 ## 6. Estados especiales
 - **Sin lecturas**: se muestra CTA para crear la primera y sugerencias predeterminadas.  
@@ -51,11 +57,11 @@
 - **IA Generativa** (backlog): botón “Reescribir con IA” para sugerir mejoras automáticas.
 
 ## 8. Métricas y eventos
-- Eventos emitidos: `ceremony_text_created`, `ceremony_text_finalized`, `ceremony_surprise_added`.  
-- Indicadores sugeridos: nº textos finalizados, duración total estimada, sorpresas entregadas.
+- Eventos emitidos: `ceremony_text_created`, `ceremony_text_finalized`, `ceremony_surprise_added`; añadir `ceremony_text_state_changed` y `ceremony_text_viewed` para auditoría.  
+- Indicadores sugeridos: nº textos finalizados, duración total estimada, sorpresas entregadas, ratio de textos en `review` y distribuciones de visibilidad por rol.
 
 ## 9. Pruebas recomendadas
-- Unitarias: helpers de división de tabs, validación de estados.  
+- Unitarias: helpers de división de tabs, validación de estados y reglas de visibilidad segmentada.  
 - Integración: crear lectura → asignar a momento en 11A → marcar final y validar checklist.  
 - E2E: ayudante inicia sesión, redacta votos, marca como final y planner visualiza el resultado.
 

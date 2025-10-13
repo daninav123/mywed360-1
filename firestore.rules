@@ -21,6 +21,56 @@ service cloud.firestore {
              (request.resource.data.start <= request.resource.data.end);
     }
 
+    function _stringMax(value, maxLen) {
+      return value is string && value.size() <= maxLen;
+    }
+
+    function _stringOrNull(value, maxLen) {
+      return value == null || _stringMax(value, maxLen);
+    }
+
+    function _listOfStrings(value, maxItems, maxLen) {
+      return value == null ||
+             (value is list &&
+             value.size() <= maxItems &&
+             value.where(item => item is string && item.size() <= maxLen).size() == value.size());
+    }
+
+    function _hasField(obj, field) {
+      return obj.keys().hasAny([field]);
+    }
+
+    function weddingEventFieldsValid(newData) {
+      return
+        (!_hasField(newData, 'eventType') || _stringMax(newData.eventType, 40)) &&
+        (!_hasField(newData, 'eventProfile') ||
+          (
+            newData.eventProfile is map &&
+            (!_hasField(newData.eventProfile, 'guestCountRange') || _stringOrNull(newData.eventProfile.guestCountRange, 40)) &&
+            (!_hasField(newData.eventProfile, 'formalityLevel') || _stringOrNull(newData.eventProfile.formalityLevel, 40)) &&
+            (!_hasField(newData.eventProfile, 'ceremonyType') || _stringOrNull(newData.eventProfile.ceremonyType, 60)) &&
+            (!_hasField(newData.eventProfile, 'relatedEvents') || _listOfStrings(newData.eventProfile.relatedEvents, 12, 60)) &&
+            (!_hasField(newData.eventProfile, 'notes') || _stringOrNull(newData.eventProfile.notes, 2000))
+          )
+        ) &&
+        (!_hasField(newData, 'preferences') ||
+          (
+            newData.preferences is map &&
+            (!_hasField(newData.preferences, 'style') || _stringOrNull(newData.preferences.style, 60))
+          )
+        ) &&
+        (!_hasField(newData, 'eventProfileSummary') ||
+          (
+            newData.eventProfileSummary is map &&
+            (!_hasField(newData.eventProfileSummary, 'eventType') || _stringOrNull(newData.eventProfileSummary.eventType, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'guestCountRange') || _stringOrNull(newData.eventProfileSummary.guestCountRange, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'formalityLevel') || _stringOrNull(newData.eventProfileSummary.formalityLevel, 40)) &&
+            (!_hasField(newData.eventProfileSummary, 'ceremonyType') || _stringOrNull(newData.eventProfileSummary.ceremonyType, 60)) &&
+            (!_hasField(newData.eventProfileSummary, 'style') || _stringOrNull(newData.eventProfileSummary.style, 60))
+          )
+        );
+    }
+
     // Weddings collection
     match /weddings/{weddingId} {
       // Read: owners, planners and assistants
@@ -31,13 +81,14 @@ service cloud.firestore {
       );
 
       // Write: owners and planners. Allow self-adding as planner exactly once.
-      allow update: if isOwnerOrPlanner(weddingId) || isAddingSelfAsPlanner();
+      allow update: if (isOwnerOrPlanner(weddingId) || isAddingSelfAsPlanner()) &&
+        weddingEventFieldsValid(request.resource.data);
 
       // Create: authenticated user must include themselves as owner or planner
       allow create: if request.auth != null && (
         (request.resource.data.ownerIds != null && request.auth.uid in request.resource.data.ownerIds) ||
         (request.resource.data.plannerIds != null && request.auth.uid in request.resource.data.plannerIds)
-      );
+      ) && weddingEventFieldsValid(request.resource.data);
 
       allow delete: if isOwnerOrPlanner(weddingId);
 
@@ -226,6 +277,55 @@ service cloud.firestore {
       return (path.matches('^seatingPlan/banquet$') && isValidBanquetData(data)) ||
              (path.matches('^seatingPlan/ceremony$') && isValidCeremonyData(data));
     }
+
+    // --- Administración Global (colecciones internas, SOLO backend) ---
+    // Estas colecciones contienen datos operativos y de control. El acceso
+    // desde apps cliente queda denegado explícitamente. El backend usa
+    // Admin SDK y no está sujeto a estas reglas.
+    match /adminSessions/{docId} {
+      allow read, write: if false;
+    }
+    match /adminAuditLogs/{docId} {
+      allow read, write: if false;
+    }
+    match /auditLogs/{docId} {
+      allow read, write: if false;
+    }
+    match /metrics/{docId} {
+      allow read, write: if false;
+    }
+    match /serviceStatus/{docId} {
+      allow read, write: if false;
+    }
+    match /alerts/{docId} {
+      allow read, write: if false;
+    }
+    match /tasks/{docId} {
+      allow read, write: if false;
+    }
+    match /incidents/{docId} {
+      allow read, write: if false;
+    }
+    match /featureFlags/{docId} {
+      allow read, write: if false;
+    }
+    match /secrets/{docId} {
+      allow read, write: if false;
+    }
+    match /templates/{docId} {
+      allow read, write: if false;
+    }
+    match /broadcasts/{docId} {
+      allow read, write: if false;
+    }
+    match /reports/{docId} {
+      allow read, write: if false;
+    }
+    match /supportSummary/{docId} {
+      allow read, write: if false;
+    }
+    match /supportTickets/{docId} {
+      allow read, write: if false;
+    }
   }
 }
-

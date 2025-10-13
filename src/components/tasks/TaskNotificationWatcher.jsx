@@ -2,18 +2,19 @@ import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore
 import { useEffect } from 'react';
 
 import { useWedding } from '../../context/WeddingContext';
-import { db } from '../../firebaseConfig';
+import { auth, db } from '../../firebaseConfig';
 import { addNotification, showNotification, shouldNotify } from '../../services/notificationService';
 
 // Observa tareas de la boda activa (consulta puntual + polling simple) y emite notificaciones
 // de vencidas (últimas 24h) o próximas a 24h. Desduplica con localStorage.
 export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) {
   const { activeWedding } = useWedding();
+  const firebaseUid = auth?.currentUser?.uid || null;
 
   useEffect(() => {
     let timer = null;
     let running = false;
-    if (!db || !activeWedding) return;
+    if (!db || !activeWedding || !firebaseUid) return;
 
     const seenKey = 'mywed360_tasks_notif_seen';
     const loadSeen = () => {
@@ -69,7 +70,21 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
           }
 
           // Registrar en bandeja (persistente)
-          addNotification({ type: isOverdue ? 'warning' : 'info', message, dueDate: end.toISOString() }).catch(() => {});
+          addNotification({
+            type: isOverdue ? 'warning' : 'info',
+            message,
+            weddingId: activeWedding,
+            category: 'tasks',
+            severity: isOverdue ? 'high' : 'medium',
+            source: 'task_watcher',
+            payload: {
+              kind,
+              taskId: doc.id,
+              weddingId: activeWedding,
+              dueDate: end.toISOString(),
+              status: isOverdue ? 'overdue' : 'due_soon',
+            },
+          }).catch(() => {});
 
           seen[key] = true;
           emitted++;
@@ -84,9 +99,7 @@ export default function TaskNotificationWatcher({ intervalMs = 5 * 60 * 1000 }) 
     scan();
     timer = setInterval(scan, Math.max(60_000, intervalMs));
     return () => { if (timer) clearInterval(timer); };
-  }, [db, activeWedding, intervalMs]);
+  }, [db, activeWedding, intervalMs, firebaseUid]);
 
   return null;
 }
-
-

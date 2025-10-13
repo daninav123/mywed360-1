@@ -2,6 +2,7 @@
 
 > Estado: 2025-10-07  
 > Implementado en producción. Ver subflujos 11A–11E para la especificación detallada.
+> Pendiente: integracion con registros civiles, generador de programas/QR, alertas en tiempo real y dashboard operativo para el dia B.
 
 El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los momentos especiales del día B. Para facilitar el mantenimiento, el alcance se divide en subflujos especializados:
 
@@ -41,7 +42,7 @@ El flujo 11 funciona como paraguas de todo lo relacionado con la ceremonia y los
 ## Cobertura E2E implementada
 - `cypress/e2e/protocolo/ceremony-tabs-flow.cy.js`: verifica la navegación general del módulo de protocolo, conmutando entre los subflujos 11A–11E y confirmando que cada vista se renderiza con una boda simulada.
 
-## Roadmap compartido
+## Roadmap / pendientes
 
 - Integración con registros civiles y APIs públicas para validar documentación automáticamente.  
 - Generador de programas/QR a partir de momentos y timeline.  

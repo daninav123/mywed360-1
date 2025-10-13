@@ -4,7 +4,7 @@
 
 > Implementado: `Signup.jsx`, `Login.jsx`, `ResetPassword.jsx`, `VerifyEmail.jsx`, `useAuth.jsx`, `SessionManager.jsx`, `src/context/UserContext.jsx`, componentes `SocialLoginButtons.jsx`, `RegisterForm.jsx`, `PasswordStrengthMeter.jsx`.
 
-> Pendiente: instrumentaci?n de m?tricas (signup/login/reset), refactor de formularios legacy fuera de uso y auditor?a de accesibilidad final.
+> Pendiente: refactor de formularios legacy fuera de uso y auditoría de accesibilidad manual sobre flows secundarios.
 
 
 
@@ -51,7 +51,7 @@
 
    - Roles: el valor seleccionado se persiste en el perfil generado por `useAuth` (`userProfile.role`), lo que habilita flujos diferenciados (planner vs owner) tras el login.
 
-   - Telemetr?a prevista: evento `signup_submit` con propiedades (`role`, `has_error`, `source: landing/dashboard`). A?n no instrumentado.
+   - Telemetr?a activa: `signup_view`, `signup_submit`, `signup_completed`, `signup_failed` con propiedades (`role`, `source`, `error_code`) registradas en `PerformanceMonitor`.
 
 2. **Login.jsx**
 
@@ -62,6 +62,7 @@
    - Checkbox `remember` controla la persistencia del correo; al desactivarlo elimina la clave en `localStorage`.
 
    - `handleSubmit` invoca `useAuth().login(username, password, remember)` y gestiona estados de error locales.
+   - Telemetr?a activa: `login_view`, `login_submit`, `login_success`, `login_failed` con props `remember_me` y `redirect_to`.
 
    - Redirecci?n post-login: utiliza `location.state.from` y evita bucles (`/login` o `/`) redirigiendo a `/home`.
 

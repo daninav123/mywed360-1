@@ -319,7 +319,7 @@ export default function ProveedoresFlowHarness() {
         id: `comm-${Date.now()}`,
         tipo: 'Nota',
         fecha: new Date().toISOString(),
-        mensaje: 'Registro añadido manualmente durante la prueba.',
+        mensaje: 'Comunicación registrada durante la prueba',
       };
       return { ...prev, [selectedProviderId]: [entry, ...current] };
     });

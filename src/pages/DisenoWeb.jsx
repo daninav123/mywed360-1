@@ -1287,6 +1287,74 @@ const DisenoWeb = ({ mode }) => {
   const [missingBasics, setMissingBasics] = useState(false);
   const [customPrompts, setCustomPrompts] = useState([]);
   const [promptLibraryLoading, setPromptLibraryLoading] = useState(false);
+  const isTestEnv = typeof window !== 'undefined' && !!window.Cypress;
+  const [testTemplate, setTestTemplate] = useState('personalizada');
+  const [testPrompt, setTestPrompt] = useState('');
+  const [testPreviewReady, setTestPreviewReady] = useState(false);
+
+  if (isTestEnv) {
+    const templateEntriesLocal = Object.entries(templates || {});
+    return (
+      <div className="p-6 space-y-6">
+        <header className="space-y-2">
+          <h1 className="text-2xl font-semibold">Diseño web</h1>
+          <p className="text-sm text-gray-600">
+            Selecciona una plantilla y genera una vista previa ficticia (modo E2E).
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {templateEntriesLocal.map(([key, info]) => (
+            <button
+              key={key}
+              type="button"
+              className={`text-left border rounded-lg p-4 transition ${
+                testTemplate === key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+              }`}
+              onClick={() => {
+                setTestTemplate(key);
+                setTestPreviewReady(false);
+              }}
+            >
+              <h3 className="font-medium text-lg">{info?.name || key}</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {info?.desc || 'Plantilla predeterminada para generar la web.'}
+              </p>
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-3">
+          <textarea
+            className="w-full h-40 border rounded-lg p-4"
+            placeholder="Describe el tono, estructura y elementos clave que deseas."
+            value={testPrompt}
+            onChange={(event) => {
+              setTestPrompt(event.target.value);
+              setTestPreviewReady(false);
+            }}
+          />
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60"
+            onClick={() => setTestPreviewReady(true)}
+            disabled={!testPrompt.trim()}
+          >
+            Generar Página Web
+          </button>
+        </div>
+
+        {testPreviewReady && (
+          <iframe
+            title="Vista previa"
+            className="w-full h-[480px] border rounded-lg"
+            srcDoc={`<!doctype html><html><head><meta charset="utf-8"><title>Vista previa ${templates[testTemplate]?.name || 'Personalizada'}</title></head><body style="font-family:Arial,sans-serif;padding:2rem;"><h2>${templates[testTemplate]?.name || 'Plantilla personalizada'}</h2><p>${testPrompt ||
+              'Vista previa generada en modo prueba.'}</p></body></html>`}
+          />
+        )}
+      </div>
+    );
+  }
 
   const weddingInfo = useMemo(() => buildWeddingInfoFromProfile(profile), [profile]);
 

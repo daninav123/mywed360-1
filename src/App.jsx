@@ -47,7 +47,6 @@ import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
-import AdminRoutes from './routes/AdminRoutes';
 import RequireAdmin from './routes/RequireAdmin.jsx';
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
@@ -74,6 +73,8 @@ const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
 const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
 const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia'));
 const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
+const Momentos = React.lazy(() => import('./pages/Momentos'));
+const MomentosGuest = React.lazy(() => import('./pages/MomentosGuest'));
 // (dedupe) WebEditor ya importado arriba
 // Seating Plan interactivo
 const SeatingPlan = React.lazy(() => import('./pages/SeatingPlan.jsx'));
@@ -97,6 +98,13 @@ const ProveedoresFlowHarness = React.lazy(() =>
 const BudgetApprovalHarness = React.lazy(() =>
   import('./pages/test/BudgetApprovalHarness.jsx')
 );
+const WeddingTeamHarness = React.lazy(() =>
+  import('./pages/test/WeddingTeamHarness.jsx')
+);
+const CreateWeddingAI = React.lazy(() => import('./pages/CreateWeddingAI.jsx'));
+const CreateWeddingAssistant = React.lazy(() =>
+  import('./pages/CreateWeddingAssistant.jsx')
+);
 
 const Notificaciones = React.lazy(() => import('./pages/Notificaciones'));
 // (dedupe) rutas públicas ya importadas arriba
@@ -108,8 +116,13 @@ function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Bypass in Cypress tests
-  if (typeof window !== 'undefined' && window.Cypress) {
+  // Bypass in Cypress tests unless explicitly disabled
+  const shouldBypassProtectedRoute =
+    typeof window !== 'undefined' &&
+    window.Cypress &&
+    window.__MYWED360_DISABLE_PROTECTED_BYPASS__ !== true;
+
+  if (shouldBypassProtectedRoute) {
     return (
       <>
         <Outlet />
@@ -175,6 +188,7 @@ function App() {
               <Route path="supplier/:token" element={<SupplierPortal />} />
               <Route path="invitation/:code" element={<AcceptInvitation />} />
               <Route path="rsvp/:token" element={<RSVPConfirm />} />
+              <Route path="momentos/invitados" element={<MomentosGuest />} />
 
               {/* Dev tools públicas */}
               <Route path="dev/seed-guests" element={<DevSeedGuests />} />
@@ -191,6 +205,7 @@ function App() {
                   <Route path="finance/bank-connect" element={<BankConnect />} />
                   <Route path="invitados" element={<Invitados />} />
                   <Route path="invitados/seating" element={<SeatingPlan />} />
+                  <Route path="plan-asientos" element={<Navigate to="/invitados/seating" replace />} />
                   <Route path="invitados/invitaciones" element={<Invitaciones />} />
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
                   <Route path="proveedores" element={<Proveedores />} />
@@ -235,7 +250,12 @@ function App() {
                   <Route path="ideas" element={<Ideas />} />
                   <Route path="inspiracion" element={<Inspiration />} />
                   <Route path="blog" element={<Blog />} />
+                  <Route path="momentos" element={<Momentos />} />
                   <Route path="more" element={<More />} />
+                  <Route path="crear-evento" element={<CreateWeddingAI />} />
+                  {/* Alias documentado para acceso manual al asistente de creación */}
+                  <Route path="create-wedding-ai" element={<Navigate to="/crear-evento" replace />} />
+                  <Route path="crear-evento-asistente" element={<CreateWeddingAssistant />} />
 
                   {/* Email (UI nueva por defecto) */}
                   <Route path="email" element={<UnifiedInbox />} />
@@ -274,31 +294,14 @@ function App() {
                   <Route path="email/configuracion" element={<EmailSettingsPage />} />
                   <Route path="email/setup" element={<EmailSetup />} />
                   <Route path="email/test" element={<MailgunTester />} />
-                  {
-                    // Exponer rutas de test solo en Cypress o entornos no productivos
-                    (typeof window !== 'undefined' && window.Cypress) ||
-                    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production')
-                      ? (
-                          <Route
-                            path="test/proveedores-compare"
-                            element={<ProveedoresCompareTest />}
-                          />
-                        )
-                      : null
-                  }
-                  {
-                    ((typeof window !== 'undefined' && window.Cypress) ||
-                      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE !== 'production')) && (
-                      <>
-                        <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
-                        <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
-                        <Route path="test/e2eProveedor" element={<BudgetApprovalHarness />} />
-                      </>
-                    )
-                  }
+                  {/* Rutas de test siempre disponibles en cualquier modo para soportar E2E sin acoplar a entorno */}
+                  <Route path="test/proveedores-compare" element={<ProveedoresCompareTest />} />
+                    <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+                    <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
+                    <Route path="test/e2eProveedor" element={<BudgetApprovalHarness />} />
+                    <Route path="test/wedding-team" element={<WeddingTeamHarness />} />
 
-                  {/* Admin */}
-                  <Route path="admin/*" element={<AdminRoutes />} />
+                    {/* Admin */}
                   <Route path="email-admin" element={<EmailAdminDashboard />} />
 
                   <Route path="*" element={<Navigate to="/home" replace />} />

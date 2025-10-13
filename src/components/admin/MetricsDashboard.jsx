@@ -17,6 +17,11 @@ import {
 
 import { get as apiGet } from '../../services/apiClient';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
+import {
+  getAdminFetchOptions,
+  getAdminHeaders,
+  getAdminSessionToken,
+} from '../../services/adminSession';
 
 /**
  * Dashboard para visualizar mtricas de rendimiento del sistema
@@ -49,6 +54,19 @@ function MetricsDashboard() {
     error: '#ff0000',
   };
 
+  const buildAdminApiOptions = (extra = {}) => {
+    const token = getAdminSessionToken();
+    const options = { ...(extra || {}) };
+    options.headers = getAdminHeaders(options.headers || {});
+    if (!Object.prototype.hasOwnProperty.call(options, 'auth')) {
+      options.auth = !token;
+    }
+    if (!Object.prototype.hasOwnProperty.call(options, 'silent')) {
+      options.silent = true;
+    }
+    return options;
+  };
+
   // Cargar datos de mtricas al montar el componente
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -73,7 +91,8 @@ function MetricsDashboard() {
 
         if (metricsEndpoint) {
           const response = await fetch(
-            `${metricsEndpoint}/dashboard?timeframe=${selectedTimeframe}`
+            `${metricsEndpoint}/dashboard?timeframe=${selectedTimeframe}`,
+            getAdminFetchOptions()
           );
           if (response.ok) {
             remoteMetrics = await response.json();
@@ -99,7 +118,7 @@ function MetricsDashboard() {
           if (metricsEndpoint) {
             const resp = await apiGet(
               `${metricsEndpoint}/dashboard?timeframe=${selectedTimeframe}`,
-              { auth: true }
+              buildAdminApiOptions()
             );
             if (resp?.ok) {
               const remoteMetrics = await resp.json();
@@ -144,8 +163,14 @@ function MetricsDashboard() {
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
         const [errsRes, aggRes] = await Promise.all([
-          apiGet(`${endpoint}/errors?timeframe=${selectedTimeframe}&limit=1000`, { auth: true }),
-          apiGet(`${endpoint}/aggregate?timeframe=${selectedTimeframe}`, { auth: true }),
+          apiGet(
+            `${endpoint}/errors?timeframe=${selectedTimeframe}&limit=1000`,
+            buildAdminApiOptions()
+          ),
+          apiGet(
+            `${endpoint}/aggregate?timeframe=${selectedTimeframe}`,
+            buildAdminApiOptions()
+          ),
         ]);
         if (errsRes?.ok) {
           const data = await errsRes.json();
@@ -172,7 +197,10 @@ function MetricsDashboard() {
     const loadWebVitals = async () => {
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(`${endpoint}/web-vitals?timeframe=${selectedTimeframe}&limit=200`, { auth: true });
+        const res = await apiGet(
+          `${endpoint}/web-vitals?timeframe=${selectedTimeframe}&limit=200`,
+          buildAdminApiOptions()
+        );
         if (res?.ok) {
           const data = await res.json();
           setWebVitals(Array.isArray(data.items) ?data.items : []);
@@ -654,7 +682,7 @@ function HttpRoutesTable() {
       try {
         const endpoint = import.meta.env.VITE_BACKEND_BASE_URL || '';
         const url = (endpoint ?`${endpoint}` : '') + '/api/admin/metrics/http?limit=50';
-        const res = await apiGet(url, { auth: true, silent: true });
+        const res = await apiGet(url, buildAdminApiOptions({ silent: true }));
         if (!mounted) return;
         if (res?.ok) {
           const json = await res.json();
@@ -722,7 +750,10 @@ function UsersWithErrors() {
       setLoading(true);
       try {
         const endpoint = import.meta.env.VITE_METRICS_ENDPOINT || '/api/admin/metrics';
-        const res = await apiGet(`${endpoint}/errors/by-user?timeframe=day`, { auth: true, silent: true });
+        const res = await apiGet(
+          `${endpoint}/errors/by-user?timeframe=day`,
+          buildAdminApiOptions({ silent: true })
+        );
         if (!mounted) return;
         if (res?.ok) {
           const json = await res.json();
@@ -772,7 +803,3 @@ function UsersWithErrors() {
     </div>
   );
 }
-
-
-
-

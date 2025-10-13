@@ -1,15 +1,21 @@
-﻿// Hook de GestiÃ³n del plan de asientos
+// Hook de GestiÃ³n del plan de asientos
 import {
+  collection,
+  deleteDoc,
   doc as fsDoc,
-  setDoc,
   getDoc,
+  onSnapshot,
   serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
 } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useState, useRef, useEffect, useMemo } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
+import { useUserContext } from '../context/UserContext';
 import { db } from '../firebaseConfig';
 import {
   createTableFromType,
@@ -26,6 +32,229 @@ export const normalizeId = (id) => {
 
 export const useSeatingPlan = () => {
   const { activeWedding } = useWedding();
+  // Detectar entorno de test (Cypress o Vitest) para evitar persistencia en Firestore
+  const isVitest = (
+    (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.MODE === 'test' || import.meta.env.VITEST)) ||
+    (typeof globalThis !== 'undefined' && !!globalThis.vi)
+  );
+  const isTestEnv = (typeof window !== 'undefined' && !!window.Cypress) || isVitest;
+  const canPersist = !!db && !isTestEnv;
+  const { user: authUser } = useUserContext() || {};
+  const currentUser = authUser || {};
+  const currentUserId = currentUser.uid || 'anonymous';
+  const currentUserName = currentUser.displayName || currentUser.email || 'Colaborador';
+  const collabClientIdRef = useRef(null);
+  if (!collabClientIdRef.current) {
+    try {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        collabClientIdRef.current = crypto.randomUUID();
+      } else {
+        collabClientIdRef.current = `client-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      }
+    } catch {
+      collabClientIdRef.current = `client-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    }
+  }
+  const collaboratorPalette = [
+    '#2563eb',
+    '#fb7185',
+    '#10b981',
+    '#f97316',
+    '#9333ea',
+    '#0ea5e9',
+    '#facc15',
+    '#ec4899',
+  ];
+  const computeColorIndex = (seed) => {
+    if (!seed) return 0;
+    let hash = 0;
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash << 5) - hash + seed.charCodeAt(i);
+      hash |= 0; // eslint-disable-line no-bitwise
+    }
+    return Math.abs(hash) % collaboratorPalette.length;
+  };
+  const collaboratorColorRef = useRef(null);
+  if (!collaboratorColorRef.current) {
+    const seed = currentUserId || collabClientIdRef.current;
+    collaboratorColorRef.current = collaboratorPalette[computeColorIndex(seed)];
+  }
+  const getLocalStorage = () => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage;
+      }
+    } catch (_) {}
+    return null;
+  };
+  const localStorageRef = getLocalStorage();
+  const makeStorageKey = (suffix) =>
+    `seatingPlan:${activeWedding || 'default'}:${suffix}`;
+  const pendingWritesRef = useRef({ ceremony: false, banquet: false });
+  const [collaborators, setCollaborators] = useState([]);
+  const [collaborationStatus, setCollaborationStatus] = useState(
+    canPersist ? 'connecting' : 'offline'
+  );
+  const [specialMomentsData, setSpecialMomentsData] = useState(null);
+  const specialMomentsUnsubRef = useRef(null);
+  const buildBlocksFromMoments = (moments = {}) => {
+  return Object.keys(moments || {})
+    .filter((key) => key !== 'blocks' && key !== 'migratedFrom' && key !== 'updatedAt')
+    .map((key) => ({
+      id: key,
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+    }));
+};
+
+const normalizeSpecialMoments = (moments = {}) => {
+    const normalized = {};
+    Object.entries(moments || {}).forEach(([blockId, list]) => {
+      if (blockId === 'blocks') return;
+      const safeList = Array.isArray(list) ? list : [];
+      normalized[blockId] = safeList.map((moment) => {
+        const recipientId =
+          moment && moment.recipientId != null && moment.recipientId !== ''
+            ? String(moment.recipientId)
+            : '';
+        const recipientName =
+          moment && moment.recipientName != null
+            ? String(moment.recipientName)
+            : '';
+        return {
+          ...moment,
+          recipientId,
+          recipientName,
+        };
+      });
+    });
+    return normalized;
+  };
+
+  const readLocalState = (suffix) => {
+    if (!localStorageRef) return null;
+    try {
+      const raw = localStorageRef.getItem(makeStorageKey(suffix));
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (_) {
+      return null;
+    }
+  };
+  const writeLocalState = (suffix, value) => {
+    if (!localStorageRef) return;
+    try {
+      if (value === null) {
+        localStorageRef.removeItem(makeStorageKey(suffix));
+        return;
+      }
+      localStorageRef.setItem(makeStorageKey(suffix), JSON.stringify(value));
+    } catch (_) {}
+  };
+
+  const markPendingWrite = (key) => {
+    pendingWritesRef.current[key] = true;
+  };
+
+  const shouldSkipSnapshot = (key, meta = {}) => {
+    const lastEditor = meta?.lastEditor;
+    const fromSelf = lastEditor && lastEditor === collabClientIdRef.current;
+    const hadPending = pendingWritesRef.current[key];
+    pendingWritesRef.current[key] = false;
+    return fromSelf && hadPending;
+  };
+
+  const mergeUiPrefs = (patch) => {
+    if (!patch || typeof patch !== 'object') return;
+    try {
+      const current = readLocalState('ui-prefs');
+      const base = current && typeof current === 'object' ? current : {};
+      writeLocalState('ui-prefs', { ...base, ...patch });
+    } catch (_) {}
+  };
+
+  useEffect(() => {
+    if (!activeWedding || !canPersist) {
+      setCollaborators([]);
+      setCollaborationStatus(canPersist ? 'idle' : 'offline');
+      return () => {};
+    }
+    let cancelled = false;
+    setCollaborationStatus('connecting');
+    const clientId = collabClientIdRef.current;
+    const presenceDoc = fsDoc(db, 'weddings', activeWedding, 'seatingPresence', clientId);
+    const basePayload = {
+      clientId,
+      userId: currentUserId,
+      displayName: currentUserName,
+      color: collaboratorColorRef.current,
+      tab,
+      status: 'editing',
+      lastActive: serverTimestamp(),
+    };
+    const ensurePresence = async () => {
+      try {
+        await setDoc(presenceDoc, basePayload, { merge: true });
+        if (!cancelled) setCollaborationStatus('online');
+      } catch (error) {
+        console.warn('[useSeatingPlan] presence set error:', error);
+        if (!cancelled) setCollaborationStatus('error');
+      }
+    };
+    ensurePresence();
+    const heartbeat = setInterval(() => {
+      updateDoc(presenceDoc, {
+        lastActive: serverTimestamp(),
+        tab,
+        status: 'editing',
+      }).catch((error) => {
+        console.warn('[useSeatingPlan] presence heartbeat error:', error);
+      });
+    }, 20000);
+    const presenceCollection = collection(db, 'weddings', activeWedding, 'seatingPresence');
+    const unsubscribe = onSnapshot(
+      presenceCollection,
+      (snapshot) => {
+        const now = Date.now();
+        const list = snapshot.docs
+          .map((docSnap) => {
+            const data = docSnap.data() || {};
+            const rawTs = data.lastActive;
+            let lastActiveMs = 0;
+            if (rawTs instanceof Timestamp) {
+              lastActiveMs = rawTs.toDate().getTime();
+            } else if (typeof rawTs === 'number') {
+              lastActiveMs = rawTs;
+            }
+            const isStale = lastActiveMs && now - lastActiveMs > 60000;
+            if (isStale) return null;
+            return {
+              id: docSnap.id,
+              ...data,
+              isCurrent: docSnap.id === clientId,
+              lastActiveMs,
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => {
+            const nameA = a.displayName || '';
+            const nameB = b.displayName || '';
+            return nameA.localeCompare(nameB, 'es');
+          });
+        setCollaborators(list);
+      },
+      (error) => {
+        console.warn('[useSeatingPlan] presence snapshot error:', error);
+      }
+    );
+    return () => {
+      cancelled = true;
+      clearInterval(heartbeat);
+      unsubscribe?.();
+      deleteDoc(presenceDoc).catch(() => {});
+      setCollaborators([]);
+      setCollaborationStatus('offline');
+    };
+  }, [activeWedding, canPersist, currentUserId, currentUserName, tab]);
 
   // Estados principales
   const [tab, setTab] = useState('ceremony');
@@ -86,9 +315,45 @@ export const useSeatingPlan = () => {
   const seats = tab === 'ceremony' ? seatsCeremony : [];
   const setTables = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
 
-  // Cargar dimensiones del salÃ³n (y compatibilidad con estructura nueva/legacy)
+  useEffect(() => {
+    try {
+      const stored = readLocalState('ui-prefs');
+      if (stored && typeof stored === 'object') {
+        if (Object.prototype.hasOwnProperty.call(stored, 'snapToGrid')) {
+          setSnapToGrid(!!stored.snapToGrid);
+        }
+        if (Object.prototype.hasOwnProperty.call(stored, 'validationsEnabled')) {
+          setValidationsEnabled(!!stored.validationsEnabled);
+        }
+      }
+    } catch (_) {}
+  }, [activeWedding]);
+
+  useEffect(() => {
+    mergeUiPrefs({
+      snapToGrid,
+      validationsEnabled,
+    });
+  }, [snapToGrid, validationsEnabled, activeWedding]);
+
+  // Cargar dimensiones del salón (y compatibilidad con estructura nueva/legacy)
   useEffect(() => {
     if (!activeWedding) return;
+    if (!canPersist) {
+      const stored = readLocalState('banquet');
+      if (stored && typeof stored === 'object') {
+        if (stored.hallSize && typeof stored.hallSize.width === 'number' && typeof stored.hallSize.height === 'number') {
+          setHallSize(stored.hallSize);
+        }
+        if (Number.isFinite(stored.globalMaxSeats)) {
+          setGlobalMaxSeats(stored.globalMaxSeats);
+        }
+        if (stored.background !== undefined) {
+          setBackground(stored.background);
+        }
+      }
+      return;
+    }
     const loadHallDimensions = async () => {
       try {
         const mainRef = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
@@ -123,46 +388,123 @@ export const useSeatingPlan = () => {
           }
         }
       } catch (err) {
-        console.warn('No se pudieron cargar dimensiones del salÃ³n:', err);
+        console.warn('No se pudieron cargar dimensiones del salón:', err);
       }
     };
     loadHallDimensions();
-  }, [activeWedding]);
+  }, [activeWedding, canPersist]);
+
+  useEffect(() => {
+    if (!activeWedding || !canPersist) return () => {};
+    const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
+    const unsubscribe = onSnapshot(
+      ref,
+      (snap) => {
+        try {
+          if (!snap.exists()) {
+            setTablesBanquet([]);
+            setAreasBanquet([]);
+            return;
+          }
+          const data = snap.data() || {};
+          if (shouldSkipSnapshot('banquet', data.meta)) return;
+          if (Array.isArray(data.tables)) setTablesBanquet(data.tables);
+          if (Array.isArray(data.areas)) setAreasBanquet(data.areas);
+          const cfg = data.config || {};
+          if (cfg && typeof cfg === 'object') {
+            setHallSize((prev) => {
+              const next = {
+                ...(prev || {}),
+                ...('width' in cfg ? { width: cfg.width } : {}),
+                ...('height' in cfg ? { height: cfg.height } : {}),
+              };
+              if (Number.isFinite(cfg.aisleMin)) next.aisleMin = cfg.aisleMin;
+              return next;
+            });
+            if (Number.isFinite(cfg.maxSeats)) {
+              setGlobalMaxSeats(cfg.maxSeats);
+            }
+          }
+          if (Object.prototype.hasOwnProperty.call(data, 'background')) {
+            setBackground(data.background || null);
+          }
+        } catch (err) {
+          console.warn('[useSeatingPlan] banquet snapshot error:', err);
+        }
+      },
+      (error) => {
+        console.warn('[useSeatingPlan] banquet snapshot error:', error);
+      }
+    );
+    return () => {
+      unsubscribe?.();
+    };
+  }, [activeWedding, canPersist]);
 
   // Cargar configuración de ceremonia (seats/tables/areas/settings)
   useEffect(() => {
     if (!activeWedding) return;
-    let cancelled = false;
-    const loadCeremonyPlan = async () => {
-      try {
-        const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'ceremony');
-        const snap = await getDoc(ref);
-        if (!snap.exists()) return;
-        const data = snap.data() || {};
-        if (cancelled) return;
-        if (Array.isArray(data.seats)) setSeatsCeremony(data.seats);
-        if (Array.isArray(data.tables)) setTablesCeremony(data.tables);
-        if (Array.isArray(data.areas)) setAreasCeremony(data.areas);
-        const loadedSettings =
-          data.settings && typeof data.settings === 'object' ? data.settings.ceremony : undefined;
-        if (loadedSettings && typeof loadedSettings === 'object') {
+    if (!canPersist) {
+      const stored = readLocalState('ceremony');
+      if (stored && typeof stored === 'object') {
+        if (Array.isArray(stored.seats)) setSeatsCeremony(stored.seats);
+        if (Array.isArray(stored.tables)) setTablesCeremony(stored.tables);
+        if (Array.isArray(stored.areas)) setAreasCeremony(stored.areas);
+        if (stored.settings && typeof stored.settings === 'object') {
           setCeremonySettings((prev) => ({
             ...prev,
-            ...loadedSettings,
-            vipRows: Array.isArray(loadedSettings.vipRows)
-              ? loadedSettings.vipRows.map((n) => parseInt(n, 10)).filter(Number.isFinite)
+            ...stored.settings,
+            vipRows: Array.isArray(stored.settings.vipRows)
+              ? stored.settings.vipRows
+                  .map((value) => Number.parseInt(value, 10))
+                  .filter(Number.isFinite)
               : prev.vipRows,
           }));
         }
-      } catch (err) {
-        console.warn('No se pudieron cargar datos de ceremonia:', err);
       }
-    };
-    loadCeremonyPlan();
+      return () => {};
+    }
+    const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'ceremony');
+    const unsubscribe = onSnapshot(
+      ref,
+      (snap) => {
+        try {
+          if (!snap.exists()) {
+            setSeatsCeremony([]);
+            setTablesCeremony([]);
+            setAreasCeremony([]);
+            return;
+          }
+          const data = snap.data() || {};
+          if (shouldSkipSnapshot('ceremony', data.meta)) return;
+          if (Array.isArray(data.seats)) setSeatsCeremony(data.seats);
+          if (Array.isArray(data.tables)) setTablesCeremony(data.tables);
+          if (Array.isArray(data.areas)) setAreasCeremony(data.areas);
+          const loadedSettings =
+            data.settings && typeof data.settings === 'object'
+              ? data.settings.ceremony || data.settings
+              : undefined;
+          if (loadedSettings && typeof loadedSettings === 'object') {
+            setCeremonySettings((prev) => ({
+              ...prev,
+              ...loadedSettings,
+              vipRows: Array.isArray(loadedSettings.vipRows)
+                ? loadedSettings.vipRows.map((n) => parseInt(n, 10)).filter(Number.isFinite)
+                : prev.vipRows,
+            }));
+          }
+        } catch (err) {
+          console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+        }
+      },
+      (err) => {
+        console.warn('[useSeatingPlan] ceremony snapshot error:', err);
+      }
+    );
     return () => {
-      cancelled = true;
+      unsubscribe?.();
     };
-  }, [activeWedding]);
+  }, [activeWedding, canPersist]);
 
   // Suscribirse a cambios en el estado de sincronizaciÃ³n
   useEffect(() => {  }, []);
@@ -188,7 +530,7 @@ export const useSeatingPlan = () => {
   // Auto-guardado: Ceremonia (seats/tables/areas)
   useEffect(() => {
     try {
-      if (!activeWedding) return;
+      if (!activeWedding || !canPersist) return;
       if (ceremonySaveTimerRef.current) {
         clearTimeout(ceremonySaveTimerRef.current);
       }
@@ -206,18 +548,27 @@ export const useSeatingPlan = () => {
                   },
                 }
               : null;
+          const timestamp = serverTimestamp();
           const payload = {
             seats: Array.isArray(seatsCeremony) ? seatsCeremony : [],
             tables: Array.isArray(tablesCeremony) ? tablesCeremony : [],
             areas: Array.isArray(areasCeremony) ? areasCeremony : [],
             ...(settingsPayload ? { settings: settingsPayload } : {}),
-            updatedAt: serverTimestamp(),
+            updatedAt: timestamp,
+            meta: {
+              lastEditor: collabClientIdRef.current,
+              clientId: collabClientIdRef.current,
+              updatedBy: currentUserName,
+              color: collaboratorColorRef.current,
+              updatedAt: timestamp,
+            },
           };
           const isEmpty =
             (!payload.seats || payload.seats.length === 0) &&
             (!payload.tables || payload.tables.length === 0) &&
             (!payload.areas || payload.areas.length === 0);
           if (isEmpty) return; // Evitar crear doc vacÃ­o
+          markPendingWrite('ceremony');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
           console.warn('[useSeatingPlan] Autosave ceremony error:', e);
@@ -246,18 +597,27 @@ export const useSeatingPlan = () => {
             if (Number.isFinite(hallSize.aisleMin)) cfg.aisleMin = hallSize.aisleMin;
             if (Number.isFinite(globalMaxSeats)) cfg.maxSeats = globalMaxSeats;
           }
+          const timestamp = serverTimestamp();
           const payload = {
             ...(Object.keys(cfg).length ? { config: cfg } : {}),
             ...(background ? { background } : {}),
             tables: Array.isArray(tablesBanquet) ? tablesBanquet : [],
             areas: Array.isArray(areasBanquet) ? areasBanquet : [],
-            updatedAt: serverTimestamp(),
+            updatedAt: timestamp,
+            meta: {
+              lastEditor: collabClientIdRef.current,
+              clientId: collabClientIdRef.current,
+              updatedBy: currentUserName,
+              color: collaboratorColorRef.current,
+              updatedAt: timestamp,
+            },
           };
           const hasTables = Array.isArray(payload.tables) && payload.tables.length > 0;
           const hasAreas = Array.isArray(payload.areas) && payload.areas.length > 0;
           const hasConfig = !!(cfg.width && cfg.height);
           const isEmpty = !hasTables && !hasAreas && !hasConfig;
           if (isEmpty) return; // Evitar crear doc vacÃ­o
+          markPendingWrite('banquet');
           await setDoc(ref, payload, { merge: true });
         } catch (e) {
           console.warn('[useSeatingPlan] Autosave banquet error:', e);
@@ -268,6 +628,68 @@ export const useSeatingPlan = () => {
       };
     } catch (_) {}
   }, [activeWedding, tablesBanquet, areasBanquet, hallSize?.width, hallSize?.height, hallSize?.aisleMin, globalMaxSeats, background]);
+
+  useEffect(() => {
+    if (!activeWedding || canPersist) return;
+    const normalizedSettings =
+      ceremonySettings && typeof ceremonySettings === 'object'
+        ? {
+            ...ceremonySettings,
+            vipRows: Array.isArray(ceremonySettings.vipRows)
+              ? ceremonySettings.vipRows.map((n) => parseInt(n, 10)).filter(Number.isFinite)
+              : [],
+          }
+        : {};
+    const payload = {
+      seats: Array.isArray(seatsCeremony) ? seatsCeremony : [],
+      tables: Array.isArray(tablesCeremony) ? tablesCeremony : [],
+      areas: Array.isArray(areasCeremony) ? areasCeremony : [],
+      settings: normalizedSettings,
+    };
+    const isEmpty =
+      payload.seats.length === 0 &&
+      payload.tables.length === 0 &&
+      payload.areas.length === 0;
+    writeLocalState('ceremony', isEmpty ? null : payload);
+  }, [
+    activeWedding,
+    seatsCeremony,
+    tablesCeremony,
+    areasCeremony,
+    ceremonySettings,
+    canPersist,
+  ]);
+
+  useEffect(() => {
+    if (!activeWedding || canPersist) return;
+    const cfg = {};
+    if (hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number') {
+      cfg.width = hallSize.width;
+      cfg.height = hallSize.height;
+      if (Number.isFinite(hallSize.aisleMin)) cfg.aisleMin = hallSize.aisleMin;
+    }
+    const payload = {
+      hallSize: cfg.width && cfg.height ? cfg : hallSize,
+      globalMaxSeats,
+      background: background || null,
+      tables: Array.isArray(tablesBanquet) ? tablesBanquet : [],
+      areas: Array.isArray(areasBanquet) ? areasBanquet : [],
+    };
+    const hasData =
+      (payload.hallSize && typeof payload.hallSize.width === 'number') ||
+      (Array.isArray(payload.tables) && payload.tables.length > 0) ||
+      (Array.isArray(payload.areas) && payload.areas.length > 0) ||
+      payload.background;
+    writeLocalState('banquet', hasData ? payload : null);
+  }, [
+    activeWedding,
+    tablesBanquet,
+    areasBanquet,
+    hallSize,
+    globalMaxSeats,
+    background,
+    canPersist,
+  ]);
 
   // Historial
   const makeSnapshot = () => ({
@@ -302,7 +724,82 @@ export const useSeatingPlan = () => {
       }
     } catch (_) {}
   };
-  const pushHistory = (snapshot) => {
+  
+useEffect(() => {
+  if (specialMomentsUnsubRef.current) {
+    try {
+      specialMomentsUnsubRef.current();
+    } catch {}
+    specialMomentsUnsubRef.current = null;
+  }
+
+  if (!activeWedding) {
+    try {
+      const localValue =
+        localStorageRef && typeof localStorageRef.getItem === 'function'
+          ? localStorageRef.getItem('mywed360SpecialMoments')
+          : null;
+      if (localValue) {
+        const parsed = JSON.parse(localValue);
+        const rawBlocks = Array.isArray(parsed?.blocks) ? parsed.blocks : [];
+        const payload =
+          parsed?.moments && typeof parsed.moments === 'object'
+            ? parsed.moments
+            : parsed || {};
+        const resolvedBlocks = rawBlocks.length
+          ? rawBlocks
+          : buildBlocksFromMoments(payload);
+        setSpecialMomentsData({
+          blocks: resolvedBlocks,
+          moments: normalizeSpecialMoments(payload),
+        });
+      } else {
+        setSpecialMomentsData(null);
+      }
+    } catch {
+      setSpecialMomentsData(null);
+    }
+    return;
+  }
+
+  const ref = fsDoc(db, 'weddings', activeWedding, 'specialMoments', 'main');
+  const unsubscribe = onSnapshot(ref, (snap) => {
+    if (!snap.exists()) {
+      setSpecialMomentsData(null);
+      return;
+    }
+    const data = snap.data() || {};
+    const rawBlocks = Array.isArray(data?.blocks) ? data.blocks : [];
+    const payload =
+      data?.moments && typeof data.moments === 'object'
+        ? data.moments
+        : Object.fromEntries(
+            Object.entries(data).filter(
+              ([key]) => !['updatedAt', 'blocks', 'migratedFrom'].includes(key)
+            )
+          );
+    const resolvedBlocks = rawBlocks.length
+      ? rawBlocks
+      : buildBlocksFromMoments(payload);
+    setSpecialMomentsData({
+      blocks: resolvedBlocks,
+      moments: normalizeSpecialMoments(payload),
+    });
+  });
+
+  specialMomentsUnsubRef.current = unsubscribe;
+  return () => {
+    try {
+      if (specialMomentsUnsubRef.current) {
+        specialMomentsUnsubRef.current();
+      }
+    } catch {}
+    specialMomentsUnsubRef.current = null;
+  };
+}, [activeWedding, localStorageRef]);
+
+
+const pushHistory = (snapshot) => {
     const snap = snapshot && typeof snapshot === 'object' ? snapshot : makeSnapshot();
     if (!snap.ceremonySettings && ceremonySettings) {
       snap.ceremonySettings = { ...ceremonySettings };
@@ -685,10 +1182,152 @@ export const useSeatingPlan = () => {
     'oficiante',
   ];
 
-const SMART_SIDE_KEYWORDS = {
-  novia: ['novia', 'bride'],
-  novio: ['novio', 'groom'],
-};
+  const SMART_SIDE_KEYWORDS = {
+    novia: ['novia', 'bride'],
+    novio: ['novio', 'groom'],
+  };
+
+  const buildReason = (message, weight) => ({ message, weight });
+
+  const evaluateTableFit = (guest, meta) => {
+    if (!meta) return { score: -Infinity, reasons: [] };
+    const desiredSeats = 1 + (parseInt(guest?.companion, 10) || 0);
+    const hasCapacityLimit = Number.isFinite(meta.capacity) && meta.capacity > 0;
+    const freeSeats = hasCapacityLimit ? Math.max(0, meta.free ?? 0) : 999;
+    if (hasCapacityLimit && freeSeats < desiredSeats) return { score: -Infinity, reasons: [] };
+
+    let score = 0;
+    const reasons = [];
+
+    if (hasCapacityLimit) {
+      const remainingAfter = freeSeats - desiredSeats;
+      const capacityScore = Math.max(0, 28 - Math.max(0, remainingAfter) * 5);
+      score += capacityScore;
+      reasons.push(
+        buildReason(
+          `Quedan ${meta.free} asientos libres`,
+          capacityScore
+        )
+      );
+    } else {
+      score += 8;
+      reasons.push(buildReason('Mesa sin límite de asientos configurado', 8));
+    }
+
+    const guestSide = String(guest?.side || '').toLowerCase();
+    if (guestSide && meta.sideHints.has(guestSide)) {
+      score += 12;
+      reasons.push(buildReason(`Mesa asociada al lado ${guestSide}`, 12));
+    }
+
+    const group = String(guest?.group || guest?.groupName || '').trim();
+    if (group) {
+      const sameGroupCount = meta.assignedGuests.filter(
+        (assigned) =>
+          String(assigned?.group || assigned?.groupName || '')
+            .trim()
+            .toLowerCase() === group.toLowerCase()
+      ).length;
+      if (sameGroupCount > 0) {
+        const bonus = Math.min(15, sameGroupCount * 5);
+        score += bonus;
+        reasons.push(
+          buildReason(
+            `Mesa con ${sameGroupCount} invitado(s) del grupo "${group}"`,
+            bonus
+          )
+        );
+      }
+    }
+
+    const companionGroup = String(guest?.companionGroupId || '').trim();
+    if (companionGroup) {
+      const sameCompanionGroup = meta.assignedGuests.filter(
+        (assigned) =>
+          String(assigned?.companionGroupId || '')
+            .trim()
+            .toLowerCase() === companionGroup.toLowerCase()
+      ).length;
+      if (sameCompanionGroup > 0) {
+        const bonus = Math.min(12, 4 + sameCompanionGroup * 4);
+        score += bonus;
+        reasons.push(
+          buildReason(
+            `Mesa con acompañantes del grupo ${companionGroup}`,
+            bonus
+          )
+        );
+      }
+    }
+
+    const guestDiet = String(guest?.dietaryRestrictions || '').trim().toLowerCase();
+    if (guestDiet) {
+      const dietMatches = meta.assignedGuests.filter((assigned) =>
+        String(assigned?.dietaryRestrictions || '')
+          .trim()
+          .toLowerCase()
+          .includes(guestDiet)
+      ).length;
+      if (dietMatches > 0) {
+        const bonus = Math.min(10, 4 + dietMatches * 2);
+        score += bonus;
+        reasons.push(
+          buildReason(`Mesa con ${dietMatches} invitado(s) con dieta similar`, bonus)
+        );
+      } else {
+        score -= 6;
+        reasons.push(buildReason('La mesa no tiene invitados con la misma dieta', -6));
+      }
+    }
+
+    const guestKeywords = [
+      ...(Array.isArray(guest?.tags) ? guest.tags : []),
+      guest?.notes || '',
+      guest?.role || '',
+      group,
+      guest?.name || '',
+    ]
+      .join(' ')
+      .toLowerCase();
+    const isVipGuest = keywordMatch(guestKeywords, SMART_VIP_KEYWORDS);
+    if (isVipGuest && meta.isVipTable) {
+      score += 16;
+      reasons.push(buildReason('Mesa VIP adecuada para este invitado', 16));
+    } else if (isVipGuest) {
+      score += 6;
+      reasons.push(buildReason('Invitado VIP: mesa disponible', 6));
+    }
+
+    if (meta.table?.locked) {
+      score -= 8;
+      reasons.push(buildReason('Mesa bloqueada (preferir mesas libres)', -8));
+    }
+
+    if (meta.conflictReasons.length) {
+      score -= 14;
+      reasons.push(
+        buildReason(`Mesa con ${meta.conflictReasons.length} conflicto(s)`, -14)
+      );
+    }
+
+    if (Number.isFinite(meta.overCapacity) && meta.overCapacity > 0) {
+      const penalty = meta.overCapacity * 18;
+      score -= penalty;
+      reasons.push(
+        buildReason(
+          `Mesa sobre capacidad por ${meta.overCapacity} asiento(s)`,
+          -penalty
+        )
+      );
+    }
+
+    if (desiredSeats > 1 && hasCapacityLimit && freeSeats - desiredSeats === 0) {
+      score += 5;
+      reasons.push(buildReason('Encaja justo incluyendo acompañantes', 5));
+    }
+
+    return { score, reasons };
+  };
 
   const conflicts = useMemo(() => {
     if (!validationsEnabled) return [];
@@ -814,6 +1453,27 @@ const SMART_SIDE_KEYWORDS = {
         }
       });
 
+      (tablesBanquet || []).forEach((t) => {
+        const tid = String(t.id);
+        const cap = parseInt(t.seats, 10) || globalMaxSeats || 0;
+        if (!Number.isFinite(cap) || cap <= 0) return;
+        const nameKey = String(t?.name || '').trim();
+        const used =
+          occ.get(tid) ||
+          (nameKey ? occ.get(nameKey) : 0) ||
+          0;
+        const overflow = used > cap ? used - cap : 0;
+        if (overflow > 0) {
+          out.push({
+            type: 'overbooking',
+            tableId: t.id,
+            message: `Mesa ${t?.name || tid} excede la capacidad por ${overflow} asiento(s)`,
+            overflow,
+            tableName: t?.name || `Mesa ${tid}`,
+          });
+        }
+      });
+
       // ---- Ceremonia ----
       try {
         const cerBoundary = (() => {
@@ -905,9 +1565,12 @@ const SMART_SIDE_KEYWORDS = {
         (sum, guest) => sum + (parseInt(guest?.companion, 10) || 0),
         0
       );
-      const capacity = parseInt(table.seats, 10) || globalMaxSeats || 0;
+      const rawSeats = parseInt(table.seats, 10) || 0;
+      const capacity = rawSeats || globalMaxSeats || 0;
+      const hasCapacityLimit = Number.isFinite(capacity) && capacity > 0;
       const used = assignedGuests.length + companions;
-      const free = capacity > 0 ? Math.max(0, capacity - used) : 0;
+      const free = hasCapacityLimit ? Math.max(0, capacity - used) : Math.max(0, rawSeats - used);
+      const overCapacity = hasCapacityLimit ? Math.max(0, used - capacity) : 0;
       const conflictReasons = [
         ...(conflictMap.get(idKey) || []),
         ...(nameKey ? conflictMap.get(nameKey) || [] : []),
@@ -925,9 +1588,13 @@ const SMART_SIDE_KEYWORDS = {
         assignedGuests,
         capacity,
         free,
+        used,
+        overCapacity,
         conflictReasons,
         isVipTable: keywordMatch(table?.name, SMART_VIP_KEYWORDS),
         sideHints,
+        tableName:
+          (typeof table?.name === 'string' && table.name.trim()) || `Mesa ${table.id}`,
       };
     });
   }, [tablesBanquet, guests, conflicts, globalMaxSeats]);
@@ -938,93 +1605,14 @@ const SMART_SIDE_KEYWORDS = {
     );
     if (!pendingGuests.length || !smartTableMeta.length) return [];
 
-    const buildReason = (message, weight) => ({ message, weight });
-
-    const evaluateTable = (guest, meta) => {
-      if (meta.free <= 0) return { score: -Infinity, reasons: [] };
-      const desiredSeats = 1 + (parseInt(guest?.companion, 10) || 0);
-      if (meta.free < desiredSeats) return { score: -Infinity, reasons: [] };
-
-      let score = 0;
-      const reasons = [];
-      const remainingAfter = meta.free - desiredSeats;
-      const capacityScore = Math.max(0, 28 - Math.max(0, remainingAfter) * 5);
-      score += capacityScore;
-      reasons.push(buildReason(`Quedan ${meta.free} asientos libres`, capacityScore));
-
-      const guestSide = String(guest?.side || '').toLowerCase();
-      if (guestSide && meta.sideHints.has(guestSide)) {
-        score += 12;
-        reasons.push(buildReason(`Mesa asociada al lado ${guestSide}`, 12));
-      }
-
-      const group = String(guest?.group || guest?.groupName || '').trim();
-      if (group) {
-        const sameGroupCount = meta.assignedGuests.filter(
-          (assigned) =>
-            String(assigned?.group || assigned?.groupName || '')
-              .trim()
-              .toLowerCase() === group.toLowerCase()
-        ).length;
-        if (sameGroupCount > 0) {
-          const bonus = Math.min(15, sameGroupCount * 5);
-          score += bonus;
-          reasons.push(
-            buildReason(
-              `Mesa con ${sameGroupCount} invitado(s) del grupo "${group}"`,
-              bonus
-            )
-          );
-        }
-      }
-
-      const guestKeywords = [
-        ...(Array.isArray(guest?.tags) ? guest.tags : []),
-        guest?.notes || '',
-        guest?.role || '',
-        group,
-        guest?.name || '',
-      ]
-        .join(' ')
-        .toLowerCase();
-
-      const isVipGuest = keywordMatch(guestKeywords, SMART_VIP_KEYWORDS);
-      if (isVipGuest && meta.isVipTable) {
-        score += 16;
-        reasons.push(buildReason('Mesa VIP adecuada para este invitado', 16));
-      } else if (isVipGuest) {
-        score += 6;
-        reasons.push(buildReason('Invitado VIP: mesa disponible', 6));
-      }
-
-      if (meta.table?.locked) {
-        score -= 8;
-        reasons.push(buildReason('Mesa bloqueada (preferir mesas libres)', -8));
-      }
-
-      if (meta.conflictReasons.length) {
-        score -= 14;
-        reasons.push(
-          buildReason(`Mesa con ${meta.conflictReasons.length} conflicto(s)`, -14)
-        );
-      }
-
-      if (desiredSeats > 1 && remainingAfter === 0) {
-        score += 5;
-        reasons.push(buildReason('Encaja justo incluyendo acompañantes', 5));
-      }
-
-      return { score, reasons };
-    };
-
     return pendingGuests
       .map((guest) => {
         const evaluations = smartTableMeta
           .map((meta) => {
-            const { score, reasons } = evaluateTable(guest, meta);
+            const { score, reasons } = evaluateTableFit(guest, meta);
             return {
               tableId: meta.tableId,
-              tableName: meta.table?.name || `Mesa ${meta.tableId}`,
+              tableName: meta.tableName,
               score,
               reasons,
               freeSeats: meta.free,
@@ -1059,16 +1647,169 @@ const SMART_SIDE_KEYWORDS = {
       .sort((a, b) => b.topRecommendations[0].score - a.topRecommendations[0].score);
   }, [guests, smartTableMeta]);
 
+  
+const vipRecipients = useMemo(() => {
+  if (!specialMomentsData || !specialMomentsData.moments) return [];
+  const blockNameMap = new Map(
+    (specialMomentsData.blocks || []).map((block) => {
+      const blockId = String(block?.id ?? block?.key ?? '');
+      const label = block?.name || block?.title || blockId || 'Bloque';
+      return [blockId, label];
+    })
+  );
+
+  const entries = [];
+  Object.entries(specialMomentsData.moments || {}).forEach(([blockId, list]) => {
+    if (!Array.isArray(list)) return;
+    list.forEach((moment) => {
+      const recipientId = moment?.recipientId ? String(moment.recipientId) : '';
+      const recipientName = moment?.recipientName ? String(moment.recipientName) : '';
+      if (!recipientId && !recipientName) return;
+      entries.push({
+        key: `${blockId || 'block'}-${moment?.id || ''}-${recipientId || recipientName}`,
+        blockId,
+        blockName: blockNameMap.get(String(blockId)) || String(blockId),
+        momentId: moment?.id || '',
+        momentTitle: moment?.title || '',
+        time: moment?.time || '',
+        recipientId,
+        recipientName,
+      });
+    });
+  });
+  return entries;
+}, [specialMomentsData]);
+
+const smartConflictSuggestions = useMemo(() => {
+    if (!Array.isArray(conflicts) || conflicts.length === 0) return [];
+    const tableMetaIndex = new Map(
+      smartTableMeta.map((meta) => [String(meta.tableId), meta])
+    );
+    const availableTargets = smartTableMeta.filter(
+      (meta) =>
+        String(meta.tableId) &&
+        meta.conflictReasons.length === 0 &&
+        (meta.free > 0 ||
+          !Number.isFinite(meta.capacity) ||
+          meta.capacity <= 0)
+    );
+    const suggestions = [];
+
+    (conflicts || []).forEach((conflict, index) => {
+      const rawTableId = conflict?.tableId;
+      if (!rawTableId) return;
+      const tableId = String(rawTableId).replace(/^S/, '');
+      const meta = tableMetaIndex.get(tableId);
+      const severity =
+        conflict.type === 'overbooking' || conflict.type === 'obstacle' ? 'high' : 'medium';
+      const baseSuggestion = {
+        id: `conflict-${conflict.type}-${rawTableId}-${index}`,
+        conflict,
+        tableId,
+        tableName: meta?.tableName || conflict?.tableName || `Mesa ${tableId}`,
+        severity,
+        actions: [],
+      };
+
+      if (conflict.type === 'overbooking' && meta) {
+        const overflow = conflict?.overflow ?? meta.overCapacity ?? 1;
+        if (overflow > 0 && availableTargets.length > 0) {
+          const candidateGuests = [...meta.assignedGuests];
+          candidateGuests.sort((a, b) => {
+            const aVip = keywordMatch(
+              [a?.name, a?.group, a?.notes, a?.role].join(' '),
+              SMART_VIP_KEYWORDS
+            );
+            const bVip = keywordMatch(
+              [b?.name, b?.group, b?.notes, b?.role].join(' '),
+              SMART_VIP_KEYWORDS
+            );
+            if (aVip === bVip) return 0;
+            return aVip ? 1 : -1; // prioriza mover no VIP
+          });
+
+          const actions = [];
+          for (const guest of candidateGuests) {
+            if (actions.length >= overflow) break;
+            const alternatives = availableTargets
+              .filter((target) => target.tableId !== meta.tableId)
+              .map((target) => ({
+                meta: target,
+                evaluation: evaluateTableFit(guest, target),
+              }))
+              .filter(
+                (entry) => Number.isFinite(entry.evaluation.score) && entry.evaluation.score > 0
+              )
+              .sort((a, b) => b.evaluation.score - a.evaluation.score);
+            if (!alternatives.length) continue;
+            const best = alternatives[0];
+            actions.push({
+              type: 'reassign',
+              guestId: guest.id,
+              guestName: guest?.name || `Invitado ${guest?.id}`,
+              toTableId: best.meta.tableId,
+              toTableName: best.meta.tableName,
+              reasons: best.evaluation.reasons.slice(0, 2),
+              score: best.evaluation.score,
+            });
+          }
+          if (actions.length) {
+            suggestions.push({ ...baseSuggestion, actions });
+            return;
+          }
+        }
+        suggestions.push(baseSuggestion);
+        return;
+      }
+
+      if (meta && (conflict.type === 'perimeter' || conflict.type === 'spacing')) {
+        suggestions.push({
+          ...baseSuggestion,
+          actions: [{ type: 'fix-position', tableId: meta.tableId }],
+        });
+        return;
+      }
+
+      if (meta && conflict.type === 'obstacle') {
+        suggestions.push({
+          ...baseSuggestion,
+          actions: [
+            { type: 'fix-position', tableId: meta.tableId },
+            { type: 'focus-table', tableId: meta.tableId },
+          ],
+        });
+        return;
+      }
+
+      suggestions.push(baseSuggestion);
+    });
+
+    return suggestions;
+  }, [conflicts, smartTableMeta]);
+
   const smartInsights = useMemo(() => {
     const pendingGuests = (guests || []).filter(
       (guest) => !guest?.tableId && !guest?.table
     );
-    const vipPending = pendingGuests.filter((guest) =>
-      keywordMatch(
-        [guest?.tags, guest?.group, guest?.notes, guest?.name].join(' '),
-        SMART_VIP_KEYWORDS
-      )
-    ).length;
+    const vipRecipientIds = new Set(
+      (vipRecipients || [])
+        .map((entry) => entry.recipientId)
+        .filter((id) => id)
+        .map((id) => String(id))
+    );
+    let vipPending = 0;
+    if (vipRecipientIds.size) {
+      vipPending = pendingGuests.filter((guest) =>
+        vipRecipientIds.has(String(guest?.id))
+      ).length;
+    } else {
+      vipPending = pendingGuests.filter((guest) =>
+        keywordMatch(
+          [guest?.tags, guest?.group, guest?.notes, guest?.name].join(' '),
+          SMART_VIP_KEYWORDS
+        )
+      ).length;
+    }
     const tablesNearlyFull = smartTableMeta.filter(
       (meta) => meta.free > 0 && meta.free <= 2
     ).length;
@@ -1079,11 +1820,17 @@ const SMART_SIDE_KEYWORDS = {
     return {
       pendingGuests: pendingGuests.length,
       vipPending,
+      vipRecipients: vipRecipients.length,
       tablesNearlyFull,
       conflictCount: conflicts.length,
       companionSeats,
+      highSeverityConflicts: smartConflictSuggestions.filter(
+        (item) => item.severity === 'high'
+      ).length,
+      overbookedTables: smartTableMeta.filter((meta) => meta.overCapacity > 0).length,
     };
-  }, [guests, smartTableMeta, conflicts]);
+  }, [guests, smartTableMeta, conflicts, smartConflictSuggestions]);
+
 
   // Conflictos: perÃ­metro, obstÃ¡culos/puertas, pasillos (espaciado) y overbooking
   const guestMap = useMemo(() => {
@@ -1398,215 +2145,631 @@ const SMART_SIDE_KEYWORDS = {
     return langDict[key] || fallback || key;
   };
 
-  const exportDetailedPDF = async (options) => {
+  
+const exportDetailedPDF = async (options = {}) => {
     const {
-      tabs: requestedTabs = ['ceremony', 'banquet'],
-      contents = [],
       config: exportConfig = {},
       logoDataUrl = null,
-    } = options;
-    const language = exportConfig.language || 'es';
-    const orientation =
-      exportConfig.orientation === 'landscape' || exportConfig.orientation === 'portrait'
-        ? exportConfig.orientation
-        : 'portrait';
-    const pdf = new jsPDF(orientation === 'landscape' ? 'landscape' : 'portrait', 'mm', 'a4');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const marginX = 14;
-    const marginY = 16;
-    const bodyFont = 11;
-    const smallFont = 9;
-    let cursorY = marginY;
+    } = options || {};
 
-    const ensureSpace = (needed = 6) => {
-      if (cursorY + needed > pageHeight - marginY) {
-        pdf.addPage();
-        cursorY = marginY;
-      }
-    };
+    const pdf = new jsPDF('landscape', 'mm', 'a4');
+    const margin = 16;
 
-    const addHeading = (text, size = 14) => {
-      ensureSpace(size / 2 + 4);
-      pdf.setFontSize(size);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(text, marginX, cursorY);
-      cursorY += size / 2 + 4;
-      pdf.setFontSize(bodyFont);
-      pdf.setFont('helvetica', 'normal');
-    };
-
-    const addParagraph = (text, options = {}) => {
-      const { fontSize = bodyFont, bold = false } = options;
-      pdf.setFontSize(fontSize);
-      pdf.setFont('helvetica', bold ? 'bold' : 'normal');
-      const lines = pdf.splitTextToSize(text, pageWidth - marginX * 2);
-      lines.forEach((line) => {
-        ensureSpace(fontSize / 2 + 2);
-        pdf.text(line, marginX, cursorY);
-        cursorY += fontSize / 2 + 2;
-      });
-      pdf.setFontSize(bodyFont);
-      pdf.setFont('helvetica', 'normal');
-    };
-
-    if (logoDataUrl) {
+    const drawLogo = () => {
+      if (!logoDataUrl) return;
       try {
-        const logoWidth = 32;
-        const logoHeight = 12;
-        pdf.addImage(logoDataUrl, 'PNG', pageWidth - marginX - logoWidth, marginY - 4, logoWidth, logoHeight);
-      } catch (error) {
-        console.warn('No se pudo incrustar el logotipo en el PDF', error);
-      }
-    }
+        const width = pdf.internal.pageSize.getWidth();
+        pdf.addImage(logoDataUrl, 'PNG', width - margin - 30, margin - 8, 28, 12);
+      } catch {}
+    };
 
-    addHeading(translate(language, 'reportTitle'), 16);
-    addParagraph(
-      `${translate(language, 'generatedAt')} ${new Date().toLocaleString(language.toLowerCase())}`,
-      { fontSize: smallFont }
+    const getPageMetrics = () => ({
+      width: pdf.internal.pageSize.getWidth(),
+      height: pdf.internal.pageSize.getHeight(),
+    });
+
+    const allGuests = Array.isArray(guests) ? [...guests] : [];
+    const guestMapById = new Map(
+      allGuests
+        .filter((guest) => guest && guest.id != null)
+        .map((guest) => [String(guest.id), guest])
+    );
+    const tablesList = Array.isArray(tablesBanquet) ? tablesBanquet : [];
+    const tableNameById = new Map(
+      tablesList.map((table) => [
+        String(table.id),
+        table?.name || `Mesa ${table?.id ?? ''}`,
+      ])
     );
 
-    addHeading(translate(language, 'summary'), 13);
-    if (exportConfig.includeMeasures) {
-      const hallSummary = [
-        `${translate(language, 'hallDimensions')}: ${((hallSize?.width || 0) / 100).toFixed(1)} m × ${(
-          (hallSize?.height || 0) / 100
-        ).toFixed(1)} m`,
-      ];
-      if (hallSize?.aisleMin != null) {
-        hallSummary.push(
-          `${translate(language, 'aisle')}: ${(hallSize.aisleMin / 100).toFixed(2)} m`
-        );
-      }
-      hallSummary.forEach((line) => addParagraph(`• ${line}`));
-    }
-    if (exportConfig.scale) {
-      addParagraph(`• ${translate(language, 'scale', 'Escala')}: ${exportConfig.scale}`);
-    }
-    const legendItems = [
-      translate(language, 'legendVip'),
-      translate(language, 'legendLocked'),
-      translate(language, 'legendCapacity'),
-      translate(language, 'legendConflict'),
-      translate(language, 'legendNotes'),
-    ];
+    const renderLegend = (items = []) => {
+      if (!items.length) return;
+      const { width, height } = getPageMetrics();
+      const legendWidth = 48;
+      const legendHeight = items.length * 6 + 4;
+      const originX = width - margin - legendWidth;
+      const originY = height - margin - legendHeight;
+      pdf.setDrawColor(148, 163, 184);
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(originX - 2, originY - 3, legendWidth + 4, legendHeight + 6, 'FD');
+      items.forEach((item, index) => {
+        const y = originY + index * 6;
+        const [r, g, b] = item.color;
+        pdf.setFillColor(r, g, b);
+        pdf.rect(originX, y, 4, 4, 'F');
+        pdf.setTextColor(55, 65, 81);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.text(item.label, originX + 6, y + 3);
+      });
+      pdf.setTextColor(33, 37, 41);
+    };
 
-    const tabsData = requestedTabs
-      .map((tab) => collectTabReport(normalizeTabId(tab)))
-      .filter(Boolean);
+    const renderCeremonyMap = () => {
+      const seats = Array.isArray(seatsCeremony) ? seatsCeremony : [];
+      const areas = Array.isArray(areasCeremony) ? areasCeremony : [];
+      const boundaryArea = areas.find(
+        (area) => area && area.type === 'boundary' && Array.isArray(area.points)
+      );
+      const boundaryPoints = boundaryArea ? boundaryArea.points : null;
 
-    if (contents.includes('legend')) {
-      addHeading(translate(language, 'legend'), 13);
-      legendItems.forEach((item) => addParagraph(`• ${item}`, { fontSize: bodyFont }));
-    }
+      const { width: pageWidth, height: pageHeight } = getPageMetrics();
+      const usableWidth = pageWidth - margin * 2;
+      const usableHeight = pageHeight - margin * 2;
 
-    tabsData.forEach((tabData, index) => {
-      if (index > 0 || contents.includes('legend')) {
-        pdf.addPage();
-        cursorY = marginY;
-      }
-      addHeading(tabData.title, 14);
-
-      if (tabData.id === 'ceremony') {
-        addParagraph(
-          `${translate(language, 'ceremonyRows')}: ${tabData.rows.length} · ${translate(
-            language,
-            'guestList'
-          )}: ${tabData.guests.length}`
-        );
-        tabData.rows.forEach((row) => {
-          addParagraph(
-            `${row.label} — ${row.assigned}/${row.enabled} ${
-              row.reservedLabel ? `(${row.reservedLabel})` : ''
-            }`
-          );
-          if (contents.includes('guestList') && row.guests.length) {
-            const guestNames = row.guests.map((guest) => guest.name || '—').join(', ');
-            addParagraph(`   ${translate(language, 'guestList')}: ${guestNames}`, {
-              fontSize: smallFont,
-            });
+      const allPoints = [];
+      seats.forEach((seat) => {
+        if (typeof seat?.x === 'number' && typeof seat?.y === 'number') {
+          allPoints.push({ x: seat.x, y: seat.y });
+        }
+      });
+      if (boundaryPoints) {
+        boundaryPoints.forEach((point) => {
+          if (typeof point?.x === 'number' && typeof point?.y === 'number') {
+            allPoints.push({ x: point.x, y: point.y });
           }
         });
-        if (contents.includes('providerNotes') && tabData.notes) {
-          addHeading(translate(language, 'vipNotes'), 12);
-          addParagraph(tabData.notes, { fontSize: bodyFont });
-        }
-      } else if (tabData.id === 'banquet') {
-        addParagraph(
-          `${translate(language, 'banquetTables')}: ${tabData.totalTables} · ${translate(
-            language,
-            'guestList'
-          )}: ${tabData.totalGuestsSeated}`
-        );
-        if (contents.includes('guestList')) {
-          tabData.tables.forEach((table) => {
-            addParagraph(
-              `${table.name} — ${table.assignedCount}/${table.seats}${
-                table.locked ? ' · Locked' : ''
-              }`
-            );
-            if (table.assignedGuests.length) {
-              const guestNames = table.assignedGuests
-                .map((guest) => guest.name || '—')
-                .join(', ');
-              addParagraph(`   ${guestNames}`, { fontSize: smallFont });
-            }
-          });
-        }
-      } else if (tabData.id === 'free-draw') {
-        addParagraph(
-          `${translate(language, 'freeDrawZones')}: ${tabData.shapeCount}`
-        );
       }
 
-      if (contents.includes('conflicts')) {
-        addHeading(translate(language, 'conflicts'), 12);
-        if (!conflicts.length) {
-          addParagraph(translate(language, 'noConflicts'), { fontSize: smallFont });
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(18);
+      pdf.text('Plano de ceremonia', margin, margin);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      drawLogo();
+
+      if (!allPoints.length) {
+        pdf.text('No hay datos de asientos de ceremonia.', margin, margin + 10);
+        renderLegend([
+          { color: [253, 224, 71], label: 'VIP reservado' },
+          { color: [96, 165, 250], label: 'Asignado' },
+          { color: [226, 232, 240], label: 'Disponible' },
+        ]);
+        return;
+      }
+
+      let minX = Infinity;
+      let maxX = -Infinity;
+      let minY = Infinity;
+      let maxY = -Infinity;
+      allPoints.forEach((point) => {
+        if (point.x < minX) minX = point.x;
+        if (point.x > maxX) maxX = point.x;
+        if (point.y < minY) minY = point.y;
+        if (point.y > maxY) maxY = point.y;
+      });
+      const rangeX = maxX - minX || 1;
+      const rangeY = maxY - minY || 1;
+      const scale = Math.min(usableWidth / rangeX, usableHeight / rangeY) * 0.9;
+      const offsetX = (pageWidth - rangeX * scale) / 2;
+      const offsetY = (pageHeight - rangeY * scale) / 2;
+
+      const mapX = (value) => offsetX + (value - minX) * scale;
+      const mapY = (value) => offsetY + (value - minY) * scale;
+
+      if (boundaryPoints) {
+        pdf.setDrawColor(148, 163, 184);
+        pdf.setLineWidth(0.4);
+        for (let i = 0; i < boundaryPoints.length; i += 1) {
+          const current = boundaryPoints[i];
+          const next = boundaryPoints[(i + 1) % boundaryPoints.length];
+          pdf.line(mapX(current.x), mapY(current.y), mapX(next.x), mapY(next.y));
+        }
+      }
+
+      seats.forEach((seat) => {
+        if (typeof seat?.x !== 'number' || typeof seat?.y !== 'number') return;
+        const x = mapX(seat.x);
+        const y = mapY(seat.y);
+        const radius = Math.max(1.6, Math.min(4, scale * 4 / 100));
+        if (seat?.reservedFor) {
+          pdf.setFillColor(253, 224, 71);
+        } else if (seat?.guestId || seat?.guestName) {
+          pdf.setFillColor(96, 165, 250);
+        } else if (seat?.enabled === false) {
+          pdf.setFillColor(226, 232, 240);
         } else {
-          conflicts.forEach((conflict) => {
-            addParagraph(
-              `• ${conflict.tableId != null ? `Ref ${conflict.tableId}: ` : ''}${
-                conflict.message || conflict.type
-              }`,
-              { fontSize: smallFont }
-            );
-          });
+          pdf.setFillColor(241, 245, 249);
+        }
+        pdf.setDrawColor(30, 41, 59);
+        pdf.circle(x, y, radius, 'FD');
+        if (seat?.guestName) {
+          const initials = seat.guestName
+            .split(' ')
+            .map((word) => word[0] || '')
+            .join('')
+            .slice(0, 2)
+            .toUpperCase();
+          if (initials) {
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(Math.min(6, radius * 2.4));
+            pdf.text(initials, x, y + 0.6, { align: 'center', baseline: 'middle' });
+          }
+        }
+      });
+
+      renderLegend([
+        { color: [253, 224, 71], label: 'VIP reservado' },
+        { color: [96, 165, 250], label: 'Asignado' },
+        { color: [226, 232, 240], label: 'Disponible' },
+      ]);
+    };
+
+    const renderBanquetMap = () => {
+      const tables = Array.isArray(tablesBanquet) ? tablesBanquet : [];
+      const areas = Array.isArray(areasBanquet) ? areasBanquet : [];
+      const boundaryArea = areas.find(
+        (area) => area && area.type === 'boundary' && Array.isArray(area.points)
+      );
+      const obstacleAreas = areas.filter(
+        (area) => area && (area.type === 'obstacle' || area.type === 'door') && Array.isArray(area.points)
+      );
+
+      const { width: pageWidth, height: pageHeight } = getPageMetrics();
+      const usableWidth = pageWidth - margin * 2;
+      const usableHeight = pageHeight - margin * 2;
+
+      const allPoints = [];
+      tables.forEach((table) => {
+        if (typeof table?.x === 'number' && typeof table?.y === 'number') {
+          allPoints.push({ x: table.x, y: table.y });
+          if (table?.shape === 'circle') {
+            const r = (table?.diameter || 60) / 2;
+            allPoints.push({ x: table.x + r, y: table.y + r });
+            allPoints.push({ x: table.x - r, y: table.y - r });
+          } else {
+            const hw = (table?.width || 80) / 2;
+            const hh = (table?.height || table?.length || 60) / 2;
+            allPoints.push({ x: table.x + hw, y: table.y + hh });
+            allPoints.push({ x: table.x - hw, y: table.y - hh });
+          }
+        }
+      });
+      if (boundaryArea) {
+        boundaryArea.points.forEach((point) => {
+          if (typeof point?.x === 'number' && typeof point?.y === 'number') {
+            allPoints.push({ x: point.x, y: point.y });
+          }
+        });
+      }
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(18);
+      pdf.text('Plano de banquete', margin, margin);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      drawLogo();
+
+      if (!allPoints.length) {
+        pdf.text('No hay datos de mesas de banquete.', margin, margin + 10);
+        renderLegend([
+          { color: [148, 163, 184], label: 'Perímetro' },
+          { color: [203, 213, 225], label: 'Mesa' },
+          { color: [248, 113, 113], label: 'Obstáculo/Puerta' },
+        ]);
+        return;
+      }
+
+      let minX = Infinity;
+      let maxX = -Infinity;
+      let minY = Infinity;
+      let maxY = -Infinity;
+      allPoints.forEach((point) => {
+        if (point.x < minX) minX = point.x;
+        if (point.x > maxX) maxX = point.x;
+        if (point.y < minY) minY = point.y;
+        if (point.y > maxY) maxY = point.y;
+      });
+      const rangeX = maxX - minX || 1;
+      const rangeY = maxY - minY || 1;
+      const scale = Math.min(usableWidth / rangeX, usableHeight / rangeY) * 0.9;
+      const offsetX = (pageWidth - rangeX * scale) / 2;
+      const offsetY = (pageHeight - rangeY * scale) / 2;
+
+      const mapX = (value) => offsetX + (value - minX) * scale;
+      const mapY = (value) => offsetY + (value - minY) * scale;
+
+      if (boundaryArea) {
+        pdf.setDrawColor(148, 163, 184);
+        pdf.setLineWidth(0.5);
+        for (let i = 0; i < boundaryArea.points.length; i += 1) {
+          const current = boundaryArea.points[i];
+          const next = boundaryArea.points[(i + 1) % boundaryArea.points.length];
+          pdf.line(mapX(current.x), mapY(current.y), mapX(next.x), mapY(next.y));
         }
       }
 
-      if (contents.includes('setupInstructions')) {
-        addHeading(translate(language, 'setupInstructions'), 12);
-        const instructions = [
-          translate(language, 'instructionsPasillos'),
-          translate(language, 'instructionsRevisar'),
-          translate(language, 'instructionsCapacidad'),
-        ];
-        instructions.forEach((instruction) =>
-          addParagraph(`• ${instruction}`, { fontSize: bodyFont })
-        );
+      obstacleAreas.forEach((area) => {
+        const xs = area.points.map((p) => p.x);
+        const ys = area.points.map((p) => p.y);
+        const minOx = Math.min(...xs);
+        const maxOx = Math.max(...xs);
+        const minOy = Math.min(...ys);
+        const maxOy = Math.max(...ys);
+        pdf.setFillColor(248, 113, 113);
+        pdf.rect(mapX(minOx), mapY(minOy), (maxOx - minOx) * scale, (maxOy - minOy) * scale, 'F');
+      });
+
+      tables.forEach((table) => {
+        if (typeof table?.x !== 'number' || typeof table?.y !== 'number') return;
+        const cx = mapX(table.x);
+        const cy = mapY(table.y);
+        pdf.setFillColor(203, 213, 225);
+        pdf.setDrawColor(30, 41, 59);
+        pdf.setLineWidth(0.4);
+        if (table?.shape === 'circle') {
+          const r = ((table?.diameter || 60) / 2) * scale;
+          pdf.circle(cx, cy, Math.max(5, r), 'FD');
+        } else {
+          const hw = ((table?.width || 80) / 2) * scale;
+          const hh = ((table?.height || table?.length || 60) / 2) * scale;
+          pdf.rect(cx - hw, cy - hh, hw * 2, hh * 2, 'FD');
+        }
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.text(table?.name || `Mesa ${table?.id ?? ''}`, cx, cy + 3, {
+          align: 'center',
+        });
+      });
+
+      renderLegend([
+        { color: [148, 163, 184], label: 'Perímetro' },
+        { color: [203, 213, 225], label: 'Mesa' },
+        { color: [248, 113, 113], label: 'Obstáculo/Puerta' },
+      ]);
+    };
+
+    const writeGuestList = () => {
+      pdf.addPage('portrait', 'a4');
+      const marginX = 16;
+      const marginY = 18;
+      let { width: pageWidth, height: pageHeight } = getPageMetrics();
+      let cursorY = marginY;
+
+      const renderHeader = () => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text('Lista de invitados', marginX, cursorY);
+        cursorY += 8;
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.text('Nombre  •  Estado  •  Mesa  •  Acompañantes  •  Dieta', marginX, cursorY);
+        cursorY += 6;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+      };
+
+      renderHeader();
+      drawLogo();
+
+      const ensureSpace = (needed = 6) => {
+        if (cursorY + needed > pageHeight - marginY) {
+          pdf.addPage('portrait', 'a4');
+          const metrics = getPageMetrics();
+          pageWidth = metrics.width;
+          pageHeight = metrics.height;
+          cursorY = marginY;
+          renderHeader();
+          drawLogo();
+        }
+      };
+
+      const sortedGuests = [...allGuests].sort((a, b) => {
+        const nameA = (a?.name || '').toLowerCase();
+        const nameB = (b?.name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      if (!sortedGuests.length) {
+        ensureSpace(6);
+        pdf.text('No hay invitados registrados.', marginX, cursorY);
+        cursorY += 6;
+        return;
       }
 
-      if (contents.includes('providerNotes') && tabData.id !== 'ceremony') {
-        addHeading(translate(language, 'providerNotes'), 12);
-        const providerTexts = [];
-        if (ceremonySettings?.notes) {
-          providerTexts.push(ceremonySettings.notes);
+      sortedGuests.forEach((guest) => {
+        const tableLabel = guest?.table
+          ? String(guest.table)
+          : guest?.tableId != null
+          ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
+          : '—';
+        const line = [
+          guest?.name || '—',
+          guest?.response || guest?.status || '—',
+          tableLabel,
+          String(guest?.companion || 0),
+          guest?.dietaryRestrictions ? guest.dietaryRestrictions : '—',
+        ].join('  •  ');
+        ensureSpace(6);
+        pdf.text(line, marginX, cursorY);
+        cursorY += 6;
+      });
+    };
+
+    const writeGuestsByTable = () => {
+      pdf.addPage('portrait', 'a4');
+      const marginX = 16;
+      const marginY = 18;
+      let { width: pageWidth, height: pageHeight } = getPageMetrics();
+      let cursorY = marginY;
+
+      const renderHeader = () => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text('Invitados por mesa', marginX, cursorY);
+        cursorY += 8;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+      };
+
+      renderHeader();
+      drawLogo();
+
+      const ensureSpace = (needed = 6) => {
+        if (cursorY + needed > pageHeight - marginY) {
+          pdf.addPage('portrait', 'a4');
+          const metrics = getPageMetrics();
+          pageWidth = metrics.width;
+          pageHeight = metrics.height;
+          cursorY = marginY;
+          renderHeader();
+          drawLogo();
         }
-        if (exportConfig.presetName) {
-          providerTexts.push(`Preset: ${exportConfig.presetName}`);
+      };
+
+      const tableSections = [];
+      const assignmentMap = new Map();
+      allGuests.forEach((guest) => {
+        const idKey = guest?.tableId != null ? String(guest.tableId) : '';
+        const nameKey = guest?.table ? String(guest.table).trim() : '';
+        const key = idKey || nameKey;
+        if (!key) return;
+        if (!assignmentMap.has(key)) assignmentMap.set(key, []);
+        assignmentMap.get(key).push(guest);
+      });
+
+      tablesList.forEach((table) => {
+        const keyById = table?.id != null ? String(table.id) : '';
+        const keyByName = table?.name ? String(table.name).trim() : '';
+        const assigned = [];
+        if (keyById && assignmentMap.has(keyById)) {
+          assigned.push(...assignmentMap.get(keyById));
+          assignmentMap.delete(keyById);
         }
-        if (!providerTexts.length) {
-          providerTexts.push('Sin notas registradas.');
+        if (keyByName && assignmentMap.has(keyByName)) {
+          assigned.push(...assignmentMap.get(keyByName));
+          assignmentMap.delete(keyByName);
         }
-        providerTexts.forEach((text) => addParagraph(`• ${text}`, { fontSize: smallFont }));
+        tableSections.push({
+          name: table?.name || `Mesa ${table?.id ?? ''}`,
+          guests: assigned,
+        });
+      });
+
+      assignmentMap.forEach((value, key) => {
+        tableSections.push({ name: `Mesa ${key}`, guests: value });
+      });
+
+      const unassigned = allGuests.filter(
+        (guest) => !guest?.table && guest?.tableId == null
+      );
+      if (unassigned.length) {
+        tableSections.push({ name: 'Sin mesa asignada', guests: unassigned });
       }
-    });
+
+      tableSections.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (!tableSections.length) {
+        ensureSpace(6);
+        pdf.text('No hay mesas registradas.', marginX, cursorY);
+        cursorY += 6;
+        return;
+      }
+
+      tableSections.forEach((section) => {
+        ensureSpace(8);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.text(section.name, marginX, cursorY);
+        cursorY += 6;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        if (!section.guests.length) {
+          ensureSpace(6);
+          pdf.text('—', marginX + 4, cursorY);
+          cursorY += 6;
+        } else {
+          section.guests
+            .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
+            .forEach((guest) => {
+              ensureSpace(6);
+              pdf.text(`• ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
+              cursorY += 6;
+            });
+        }
+      });
+    };
+
+    const writeDietaryRestrictions = () => {
+      pdf.addPage('portrait', 'a4');
+      const marginX = 16;
+      const marginY = 18;
+      let { width: pageWidth, height: pageHeight } = getPageMetrics();
+      let cursorY = marginY;
+
+      const renderHeader = () => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text('Invitados con dietas especiales', marginX, cursorY);
+        cursorY += 8;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+      };
+
+      renderHeader();
+      drawLogo();
+
+      const ensureSpace = (needed = 6) => {
+        if (cursorY + needed > pageHeight - marginY) {
+          pdf.addPage('portrait', 'a4');
+          const metrics = getPageMetrics();
+          pageWidth = metrics.width;
+          pageHeight = metrics.height;
+          cursorY = marginY;
+          renderHeader();
+          drawLogo();
+        }
+      };
+
+      const dietGroups = new Map();
+      allGuests.forEach((guest) => {
+        const diet = String(guest?.dietaryRestrictions || '').trim();
+        if (!diet) return;
+        const key = diet.toLowerCase();
+        if (!dietGroups.has(key)) {
+          dietGroups.set(key, { label: diet, guests: [] });
+        }
+        dietGroups.get(key).guests.push(guest);
+      });
+
+      if (!dietGroups.size) {
+        ensureSpace(6);
+        pdf.text('No hay restricciones dietéticas registradas.', marginX, cursorY);
+        cursorY += 6;
+        return;
+      }
+
+      Array.from(dietGroups.values())
+        .sort((a, b) => a.label.localeCompare(b.label))
+        .forEach((group) => {
+          ensureSpace(8);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(12);
+          pdf.text(group.label, marginX, cursorY);
+          cursorY += 6;
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          group.guests
+            .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''))
+            .forEach((guest) => {
+              ensureSpace(6);
+              pdf.text(`• ${guest?.name || 'Invitado sin nombre'}`, marginX + 4, cursorY);
+              cursorY += 6;
+            });
+        });
+    };
+
+    const vipEntries = Array.isArray(vipRecipients) ? vipRecipients : [];
+
+    const writeVipList = () => {
+      pdf.addPage('portrait', 'a4');
+      const marginX = 16;
+      const marginY = 18;
+      let { width: pageWidth, height: pageHeight } = getPageMetrics();
+      let cursorY = marginY;
+
+      const renderHeader = () => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text('Momentos con destinatarios especiales', marginX, cursorY);
+        cursorY += 8;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+      };
+
+      renderHeader();
+      drawLogo();
+
+      const ensureSpace = (needed = 6) => {
+        if (cursorY + needed > pageHeight - marginY) {
+          pdf.addPage('portrait', 'a4');
+          const metrics = getPageMetrics();
+          pageWidth = metrics.width;
+          pageHeight = metrics.height;
+          cursorY = marginY;
+          renderHeader();
+          drawLogo();
+        }
+      };
+
+      if (!vipEntries.length) {
+        ensureSpace(6);
+        pdf.text('No hay destinatarios registrados en Momentos especiales.', marginX, cursorY);
+        cursorY += 6;
+        return;
+      }
+
+      const expanded = vipEntries.map((entry) => {
+        const guest = entry.recipientId ? guestMapById.get(String(entry.recipientId)) : null;
+        const tableLabel = guest?.table
+          ? String(guest.table)
+          : guest?.tableId != null
+          ? tableNameById.get(String(guest.tableId)) || String(guest.tableId)
+          : '';
+        return {
+          ...entry,
+          guest,
+          tableLabel,
+          displayName: guest?.name || entry.recipientName || '—',
+        };
+      });
+
+      expanded.forEach((item) => {
+        ensureSpace(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(12);
+        pdf.text(item.displayName, marginX, cursorY);
+        cursorY += 5;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        const details = [
+          item.blockName || 'Bloque',
+          item.momentTitle ? `Momento: ${item.momentTitle}` : null,
+          item.time ? `Hora: ${item.time}` : null,
+          item.tableLabel ? `Mesa: ${item.tableLabel}` : null,
+          item.guest?.dietaryRestrictions ? `Dieta: ${item.guest.dietaryRestrictions}` : null,
+        ]
+          .filter(Boolean)
+          .join('  •  ');
+        if (details) {
+          ensureSpace(6);
+          pdf.text(details, marginX + 4, cursorY);
+          cursorY += 6;
+        }
+      });
+    };
+
+    renderCeremonyMap();
+    pdf.addPage('landscape', 'a4');
+    renderBanquetMap();
+    writeGuestList();
+    writeGuestsByTable();
+    writeDietaryRestrictions();
+    writeVipList();
 
     pdf.save(`seating-report-${Date.now()}.pdf`);
   };
-
-  const exportDetailedSVG = (options) => {
+const exportDetailedSVG = (options) => {
     const {
       tabs: requestedTabs = ['ceremony', 'banquet'],
       config: exportConfig = {},
@@ -1748,31 +2911,121 @@ const SMART_SIDE_KEYWORDS = {
     const nextHall = { width, height };
     if (Number.isFinite(aisleMin)) nextHall.aisleMin = aisleMin;
     setHallSize(nextHall);
+    if (!canPersist || !activeWedding) {
+      const current = readLocalState('banquet') || {};
+      writeLocalState('banquet', {
+        ...current,
+        hallSize: nextHall,
+        globalMaxSeats,
+        background: current.background ?? background ?? null,
+        tables: Array.isArray(tablesBanquet) ? tablesBanquet : current.tables || [],
+        areas: Array.isArray(areasBanquet) ? areasBanquet : current.areas || [],
+      });
+      return;
+    }
     if (activeWedding) {
       try {
         const cfgRef = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet', 'config');
         const toSave = { width, height };
         if (Number.isFinite(aisleMin)) toSave.aisleMin = aisleMin;
         await setDoc(cfgRef, toSave, { merge: true });
+        const timestamp = serverTimestamp();
+        const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
+        markPendingWrite('banquet');
+        await setDoc(
+          ref,
+          {
+            config: { ...(Number.isFinite(aisleMin) ? { aisleMin } : {}), width, height },
+            updatedAt: timestamp,
+            meta: {
+              lastEditor: collabClientIdRef.current,
+              clientId: collabClientIdRef.current,
+              updatedBy: currentUserName,
+              color: collaboratorColorRef.current,
+              updatedAt: timestamp,
+            },
+          },
+          { merge: true }
+        );
       } catch (err) { console.error('Error guardando dimensiones del salÃ³n:', err); }
     }
   };
   const saveGlobalMaxGuests = async (n) => {
     const val = Number.parseInt(n, 10) || 0;
     setGlobalMaxSeats(val);
+    if (!canPersist || !activeWedding) {
+      const current = readLocalState('banquet') || {};
+      writeLocalState('banquet', {
+        ...current,
+        hallSize: current.hallSize || hallSize,
+        globalMaxSeats: val,
+        background: current.background ?? background ?? null,
+        tables: Array.isArray(tablesBanquet) ? tablesBanquet : current.tables || [],
+        areas: Array.isArray(areasBanquet) ? areasBanquet : current.areas || [],
+      });
+      return;
+    }
     if (activeWedding) {
       try {
         const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
-        await setDoc(ref, { config: { ...(hallSize || {}), ...(Number.isFinite(hallSize?.aisleMin) ? { aisleMin: hallSize.aisleMin } : {}), maxSeats: val } }, { merge: true });
+        const timestamp = serverTimestamp();
+        markPendingWrite('banquet');
+        await setDoc(
+          ref,
+          {
+            config: {
+              ...(hallSize || {}),
+              ...(Number.isFinite(hallSize?.aisleMin) ? { aisleMin: hallSize.aisleMin } : {}),
+              maxSeats: val,
+            },
+            updatedAt: timestamp,
+            meta: {
+              lastEditor: collabClientIdRef.current,
+              clientId: collabClientIdRef.current,
+              updatedBy: currentUserName,
+              color: collaboratorColorRef.current,
+              updatedAt: timestamp,
+            },
+          },
+          { merge: true }
+        );
       } catch (e) { console.warn('saveGlobalMaxGuests failed', e); }
     }
   };
   const saveBackground = async (bg) => {
     setBackground(bg || null);
+    if (!canPersist || !activeWedding) {
+      const current = readLocalState('banquet') || {};
+      writeLocalState('banquet', {
+        ...current,
+        hallSize: current.hallSize || hallSize,
+        globalMaxSeats,
+        background: bg || null,
+        tables: Array.isArray(tablesBanquet) ? tablesBanquet : current.tables || [],
+        areas: Array.isArray(areasBanquet) ? areasBanquet : current.areas || [],
+      });
+      return;
+    }
     if (activeWedding) {
       try {
         const ref = fsDoc(db, 'weddings', activeWedding, 'seatingPlan', 'banquet');
-        await setDoc(ref, { background: bg || null }, { merge: true });
+        const timestamp = serverTimestamp();
+        markPendingWrite('banquet');
+        await setDoc(
+          ref,
+          {
+            background: bg || null,
+            updatedAt: timestamp,
+            meta: {
+              lastEditor: collabClientIdRef.current,
+              clientId: collabClientIdRef.current,
+              updatedBy: currentUserName,
+              color: collaboratorColorRef.current,
+              updatedAt: timestamp,
+            },
+          },
+          { merge: true }
+        );
       } catch (e) { console.warn('saveBackground failed', e); }
     }
   };
@@ -1840,6 +3093,32 @@ const SMART_SIDE_KEYWORDS = {
         })
       );
     } catch (_) {}
+  };
+
+  const executeSmartAction = (action) => {
+    try {
+      if (!action || typeof action !== 'object') return { ok: false, error: 'invalid-action' };
+      switch (action.type) {
+        case 'reassign': {
+          if (!action.guestId) return { ok: false, error: 'missing-guest' };
+          moveGuest(action.guestId, action.toTableId ?? null);
+          return { ok: true, type: action.type };
+        }
+        case 'fix-position': {
+          if (!action.tableId) return { ok: false, error: 'missing-table' };
+          fixTablePosition(action.tableId);
+          return { ok: true, type: action.type };
+        }
+        case 'focus-table': {
+          // Handler externo enfoca mesa; no mutamos estado aquí
+          return { ok: true, type: action.type };
+        }
+        default:
+          return { ok: false, error: 'unsupported-action' };
+      }
+    } catch (error) {
+      return { ok: false, error: error?.message || 'smart-action-failed' };
+    }
   };
 
   // Snapshots (localStorage)
@@ -1979,7 +3258,9 @@ const SMART_SIDE_KEYWORDS = {
     globalMaxSeats,
     background,
     smartRecommendations,
+    smartConflictSuggestions,
     smartInsights,
+    vipRecipients,
 
     // Invitados / auto-asignaciÃ³n / sugerencias
     moveGuest,
@@ -1990,6 +3271,7 @@ const SMART_SIDE_KEYWORDS = {
     suggestTablesForGuest,
     scoringWeights,
     setScoringWeights: updateScoringWeights,
+    executeSmartAction,
     conflicts,
 
     // No-ops
@@ -2005,6 +3287,9 @@ const SMART_SIDE_KEYWORDS = {
     deleteSnapshot,
 
     // Utilidades
+    collaborators,
+    collaborationStatus,
+    collabClientId: collabClientIdRef.current,
     normalizeId,
   };
 };

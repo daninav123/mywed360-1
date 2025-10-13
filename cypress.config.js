@@ -1,4 +1,17 @@
 const { defineConfig } = require('cypress');
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Cargar variables locales para que Cypress use siempre el backend local en dev/test
+[
+  path.resolve(__dirname, '.env.local'),
+  path.resolve(__dirname, '.env'),
+].forEach((envPath) => {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: false });
+  }
+});
 
 module.exports = defineConfig({
   e2e: {
@@ -15,8 +28,8 @@ module.exports = defineConfig({
       BACKEND_BASE_URL:
         process.env.BACKEND_BASE_URL ||
         process.env.VITE_BACKEND_BASE_URL ||
-        'https://mywed360-backend.onrender.com',
-      STUB_RSVP: true,
+        'http://localhost:4004',
+      STUB_RSVP: false,
     },
   },
 });

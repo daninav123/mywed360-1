@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getSettingsData } from '../../services/adminDataService';
+import { getSettingsData, updateFeatureFlag, rotateSecret, saveTemplate } from '../../services/adminDataService';
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ const AdminSettings = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [templateContent, setTemplateContent] = useState('');
   const [showFlagConfirm, setShowFlagConfirm] = useState(null);
-  const [showSecretModal, setShowSecretModal] = useState(false);
+  const [showSecretModal, setShowSecretModal] = useState(''); // almacena id del secreto
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -38,22 +38,33 @@ const AdminSettings = () => {
     setShowFlagConfirm(flag);
   };
 
-  const confirmToggleFlag = () => {
+  const confirmToggleFlag = async () => {
     if (!showFlagConfirm) return;
-    setFlags((prev) =>
-      prev.map((flag) =>
-        flag.id === showFlagConfirm.id ? { ...flag, enabled: !flag.enabled } : flag
-      )
-    );
-    setShowFlagConfirm(null);
+    try {
+      const updated = await updateFeatureFlag(showFlagConfirm.id, !showFlagConfirm.enabled);
+      if (updated) {
+        setFlags((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+      } else {
+        setFlags((prev) => prev.map((f) => (f.id === showFlagConfirm.id ? { ...f, enabled: !f.enabled } : f)));
+      }
+    } catch (e) {
+      console.warn('[AdminSettings] toggle flag failed:', e);
+    } finally {
+      setShowFlagConfirm(null);
+    }
   };
 
-  const handleSaveTemplate = () => {
-    setTemplates((prev) =>
-      prev.map((template) =>
-        template.id === selectedTemplate ? { ...template, content: templateContent } : template
-      )
-    );
+  const handleSaveTemplate = async () => {
+    try {
+      await saveTemplate(selectedTemplate, templateContent);
+      setTemplates((prev) =>
+        prev.map((template) =>
+          template.id === selectedTemplate ? { ...template, content: templateContent } : template
+        )
+      );
+    } catch (e) {
+      console.warn('[AdminSettings] save template failed:', e);
+    }
   };
 
   if (loading) {
@@ -113,7 +124,7 @@ const AdminSettings = () => {
               <button
                 type="button"
                 data-testid="secret-rotate-button"
-                onClick={() => setShowSecretModal(true)}
+                onClick={() => setShowSecretModal(secret.id)}
                 className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
               >
                 Rotar
@@ -204,7 +215,15 @@ const AdminSettings = () => {
               <button
                 type="button"
                 data-testid="secret-rotate-confirm"
-                onClick={() => setShowSecretModal(false)}
+                onClick={async () => {
+                  try {
+                    await rotateSecret(showSecretModal);
+                  } catch (e) {
+                    console.warn('[AdminSettings] rotate secret failed:', e);
+                  } finally {
+                    setShowSecretModal('');
+                  }
+                }}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"
               >
                 Confirmar rotación

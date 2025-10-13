@@ -36,9 +36,12 @@ import EmailComments from '../EmailComments';
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.email - Email a mostrar
  * @param {Function} props.onReply - Función para responder al email
- * @param {Function} props.onDelete - Función para eliminar el email
+ * @param {Function} props.onDelete - Función para eliminar o mover el email
+ * @param {Function} props.onDeleteForever - Función para eliminar definitivamente (papelera)
  * @param {Function} props.onBack - Función para volver a la lista
  * @param {Function} props.onMarkRead - Función para marcar como leído
+ * @param {Function} props.onRestore - Función para restaurar desde papelera
+ * @param {string} props.currentFolder - Carpeta actual para condicionar acciones
  * @returns {JSX.Element} Componente de detalle de email
  */
 
@@ -55,7 +58,20 @@ const IMAGE_TYPES = {
   bmp: 'image/bmp',
   ico: 'image/x-icon',
 };
-const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, onReplyAll, userId, onSchedule }) => {
+const EmailDetail = ({
+  email,
+  onReply,
+  onDelete,
+  onDeleteForever,
+  onBack,
+  onMarkRead,
+  onForward,
+  onReplyAll,
+  userId,
+  onSchedule,
+  onRestore,
+  currentFolder = 'inbox',
+}) => {
   // Si email es null o undefined, mostrar un mensaje
   if (!email) {
     return (
@@ -225,6 +241,7 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, 
   };
 
   const emailCategories = detectCategories(email);
+  const isInTrash = currentFolder === 'trash';
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -246,10 +263,43 @@ const EmailDetail = ({ email, onReply, onDelete, onBack, onMarkRead, onForward, 
             <span className="hidden sm:inline">Responder</span>
           </Button>
 
-          <Button onClick={onDelete} variant="outline" size="sm" className="flex items-center mr-2">
-            <Trash size={16} className="mr-1" />
-            <span className="hidden sm:inline">Eliminar</span>
-          </Button>
+          {isInTrash ? (
+            <>
+              <Button
+                onClick={() => onRestore?.()}
+                variant="outline"
+                size="sm"
+                className="flex items-center mr-2"
+                data-testid="restore-email-button"
+                aria-label="Restaurar"
+              >
+                <ArrowLeft size={16} className="mr-1" />
+                <span className="hidden sm:inline">Restaurar</span>
+              </Button>
+              <Button
+                onClick={() => (onDeleteForever || onDelete)?.()}
+                variant="danger"
+                size="sm"
+                className="flex items-center mr-2"
+                data-testid="delete-forever-button"
+                aria-label="Eliminar permanentemente"
+              >
+                <Trash size={16} className="mr-1" />
+                <span className="hidden sm:inline">Eliminar permanentemente</span>
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={onDelete}
+              variant="outline"
+              size="sm"
+              className="flex items-center mr-2"
+              aria-label="Eliminar"
+            >
+              <Trash size={16} className="mr-1" />
+              <span className="hidden sm:inline">Eliminar</span>
+            </Button>
+          )}
 
           <button
             onClick={handleToggleStar}
