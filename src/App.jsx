@@ -19,16 +19,15 @@ import DevEnsureFinance from './pages/DevEnsureFinance';
 import DevSeedGuests from './pages/DevSeedGuests';
 import Finance from './pages/Finance';
 import Home from './pages/Home';
+import HomeUser from './pages/HomeUser.jsx';
 import Invitaciones from './pages/Invitaciones';
-import Login from './pages/Login';
 import More from './pages/More';
 import Perfil from './pages/Perfil';
-import Proveedores from './pages/ProveedoresNuevo';
+import GestionProveedores from './pages/GestionProveedores.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import PublicWedding from './pages/PublicWedding';
 import RSVPConfirm from './pages/RSVPConfirm';
 import RSVPDashboard from './pages/RSVPDashboard';
-import Signup from './pages/Signup';
 import SupplierPortal from './pages/SupplierPortal';
 import Tasks from './pages/Tasks';
 import VerifyEmail from './pages/VerifyEmail.jsx';
@@ -42,12 +41,15 @@ import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
 import AdminSettings from './pages/admin/AdminSettings.jsx';
 import AdminAlerts from './pages/admin/AdminAlerts.jsx';
 import AdminBroadcast from './pages/admin/AdminBroadcast.jsx';
-import AdminAudit from './pages/admin/AdminAudit.jsx';
+import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
 import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
 import RequireAdmin from './routes/RequireAdmin.jsx';
+import MarketingAppOverview from './pages/marketing/AppOverview.jsx';
+import MarketingPricing from './pages/marketing/Pricing.jsx';
+import MarketingAccess from './pages/marketing/Access.jsx';
 // Nota: especificamos la extensi€)n .jsx para asegurar la resoluci€)n en entornos Linux/CI
 const Invitados = React.lazy(() => import('./pages/Invitados'));
 // Lazy load de páginas pesadas para reducir bundle inicial
@@ -90,16 +92,17 @@ const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));
 const Ideas = React.lazy(() => import('./pages/Ideas'));
 const Inspiration = React.lazy(() => import('./pages/Inspiration'));
 const Blog = React.lazy(() => import('./pages/Blog'));
-const ProveedoresCompareTest = React.lazy(() => import('./pages/test/ProveedoresCompareTest.jsx'));
-const ProveedoresSmoke = React.lazy(() => import('./pages/test/ProveedoresSmoke.jsx'));
-const ProveedoresFlowHarness = React.lazy(() =>
-  import('./pages/test/ProveedoresFlowHarness.jsx')
-);
+import ProveedoresCompareTest from './pages/test/ProveedoresCompareTest.jsx';
+import ProveedoresSmoke from './pages/test/ProveedoresSmoke.jsx';
+import ProveedoresFlowHarness from './pages/test/ProveedoresFlowHarness.jsx';
 const BudgetApprovalHarness = React.lazy(() =>
   import('./pages/test/BudgetApprovalHarness.jsx')
 );
 const WeddingTeamHarness = React.lazy(() =>
   import('./pages/test/WeddingTeamHarness.jsx')
+);
+const RoleUpgradeHarness = React.lazy(() =>
+  import('./pages/test/RoleUpgradeHarness.jsx')
 );
 const CreateWeddingAI = React.lazy(() => import('./pages/CreateWeddingAI.jsx'));
 const CreateWeddingAssistant = React.lazy(() =>
@@ -144,11 +147,51 @@ function ProtectedRoute() {
   );
 }
 
+function RootLandingRoute() {
+  const location = useLocation();
+  const [shouldRedirectToLogin, setShouldRedirectToLogin] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const searchParams = new URLSearchParams(location.search || window.location.search || '');
+    const normalize = (value) => String(value || '').trim().toLowerCase();
+    const checkTruthy = (value) =>
+      ['1', 'true', 'app', 'mobile', 'yes'].includes(normalize(value));
+
+    const forcedWeb = checkTruthy(searchParams.get('web')) || checkTruthy(searchParams.get('site'));
+    const forcedApp =
+      checkTruthy(searchParams.get('app')) ||
+      checkTruthy(searchParams.get('mode')) ||
+      checkTruthy(searchParams.get('context'));
+
+    const matchStandalone =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(display-mode: standalone)').matches;
+    const isIOSStandalone = Boolean(window.navigator?.standalone);
+    const userAgent = (window.navigator?.userAgent || '').toLowerCase();
+    const isInAppUA =
+      userAgent.includes('lovendaapp') ||
+      userAgent.includes('mywed360app') ||
+      (userAgent.includes('wv') && userAgent.includes('android'));
+
+    const shouldRedirect = !forcedWeb && (forcedApp || matchStandalone || isIOSStandalone || isInAppUA);
+    setShouldRedirectToLogin(shouldRedirect);
+  }, [location]);
+
+  if (shouldRedirectToLogin) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  return <Home />;
+}
+
 function App() {
   return (
     <AuthProvider>
-      <WeddingProvider>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <UserProvider>
+        <WeddingProvider>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ToastContainer position="top-right" autoClose={4000} hideProgressBar newestOnTop />
           <React.Suspense
             fallback={
@@ -159,9 +202,16 @@ function App() {
             }
           >
             <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/" element={<RootLandingRoute />} />
+              <Route path="/app" element={<MarketingAppOverview />} />
+              <Route path="/producto" element={<Navigate to="/app" replace />} />
+              <Route path="/precios" element={<MarketingPricing />} />
+              <Route path="/pricing" element={<Navigate to="/precios" replace />} />
+              <Route path="/acceso" element={<MarketingAccess />} />
+              <Route path="/login" element={<MarketingAccess />} />
+              <Route path="/ingresar" element={<Navigate to="/login" replace />} />
+              <Route path="/signup" element={<MarketingAccess defaultMode="signup" />} />
+              <Route path="/registro" element={<Navigate to="/signup" replace />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin/login" element={<AdminLogin />} />
@@ -176,7 +226,7 @@ function App() {
                   <Route path="settings" element={<AdminSettings />} />
                   <Route path="alerts" element={<AdminAlerts />} />
                   <Route path="broadcast" element={<AdminBroadcast />} />
-                  <Route path="audit" element={<AdminAudit />} />
+                  <Route path="commerce" element={<AdminDiscounts />} />
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="support" element={<AdminSupport />} />
                 </Route>
@@ -189,6 +239,10 @@ function App() {
               <Route path="invitation/:code" element={<AcceptInvitation />} />
               <Route path="rsvp/:token" element={<RSVPConfirm />} />
               <Route path="momentos/invitados" element={<MomentosGuest />} />
+              {/* Rutas de test públicas para E2E (duplicadas también en layout protegido) */}
+              <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
+              <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+              <Route path="test/proveedores-compare" element={<ProveedoresCompareTest />} />
 
               {/* Dev tools públicas */}
               <Route path="dev/seed-guests" element={<DevSeedGuests />} />
@@ -197,7 +251,7 @@ function App() {
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<MainLayout />}>
-                  <Route path="home" element={<Home />} />
+                  <Route path="home" element={<HomeUser />} />
                   <Route path="tasks" element={<Tasks />} />
                   <Route path="bodas" element={<Bodas />} />
                   <Route path="bodas/:id" element={<BodaDetalle />} />
@@ -208,7 +262,7 @@ function App() {
                   <Route path="plan-asientos" element={<Navigate to="/invitados/seating" replace />} />
                   <Route path="invitados/invitaciones" element={<Invitaciones />} />
                   <Route path="rsvp/dashboard" element={<RSVPDashboard />} />
-                  <Route path="proveedores" element={<Proveedores />} />
+                  <Route path="proveedores" element={<GestionProveedores />} />
                   <Route path="proveedores/contratos" element={<Contratos />} />
 
                   {/* Protocolo */}
@@ -296,10 +350,11 @@ function App() {
                   <Route path="email/test" element={<MailgunTester />} />
                   {/* Rutas de test siempre disponibles en cualquier modo para soportar E2E sin acoplar a entorno */}
                   <Route path="test/proveedores-compare" element={<ProveedoresCompareTest />} />
-                    <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
-                    <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
-                    <Route path="test/e2eProveedor" element={<BudgetApprovalHarness />} />
-                    <Route path="test/wedding-team" element={<WeddingTeamHarness />} />
+                  <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
+                  <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
+                  <Route path="test/e2eProveedor" element={<BudgetApprovalHarness />} />
+                  <Route path="test/wedding-team" element={<WeddingTeamHarness />} />
+                  <Route path="test/role-upgrade" element={<RoleUpgradeHarness />} />
 
                     {/* Admin */}
                   <Route path="email-admin" element={<EmailAdminDashboard />} />
@@ -313,8 +368,10 @@ function App() {
           <DiagnosticPanel />
         </BrowserRouter>
       </WeddingProvider>
-    </AuthProvider>
+    </UserProvider>
+  </AuthProvider>
   );
 }
 
 export default App;
+

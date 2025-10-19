@@ -9,6 +9,7 @@ import {
   getAdminSession,
   touchAdminSession,
 } from '../services/adminSessions.js';
+import { getCookie } from '../utils/cookies.js';
 
 // Inicializar Firebase Admin si no estÃ¡ inicializado
 if (!admin.apps.length) {
@@ -113,6 +114,7 @@ const extractToken = (req) => {
 };
 
 const ADMIN_SESSION_HEADER_KEYS = ['x-admin-session', 'x-admin-session-token', 'x-admin-token'];
+const ADMIN_SESSION_COOKIE = 'admin_session';
 
 const extractAdminSessionToken = (req) => {
   for (const headerKey of ADMIN_SESSION_HEADER_KEYS) {
@@ -125,6 +127,10 @@ const extractAdminSessionToken = (req) => {
   if (authHeader.startsWith('Admin ')) {
     return authHeader.slice('Admin '.length).trim();
   }
+  const cookieToken = getCookie(req, ADMIN_SESSION_COOKIE);
+  if (cookieToken && cookieToken.trim()) {
+    return cookieToken.trim();
+  }
   return null;
 };
 
@@ -134,37 +140,17 @@ const extractAdminSessionToken = (req) => {
  * @returns {Promise<Object>} - Datos del token decodificado
  */
 const verifyFirebaseToken = async (token) => {
-  // BYPASS TEMPORAL PARA DESARROLLO: Aceptar tokens mock del sistema de autenticaciÃ³n actual
-  // Permitir bypass con tokens mock si ALLOW_MOCK_TOKENS estÃ¡ habilitado (por defecto true en desarrollo)
-  // Por seguridad: por defecto desactivar en producciÃ³n. Se puede forzar con ALLOW_MOCK_TOKENS=true
-  const allowMock = (process.env.ALLOW_MOCK_TOKENS
-    ? process.env.ALLOW_MOCK_TOKENS !== 'false'
-    : (process.env.NODE_ENV !== 'production'));
-  if (allowMock && token && token.startsWith('mock-')) {
-    console.log('[AuthMiddleware] Usando bypass de desarrollo para token mock');
-    // Extraer datos del token mock (formato: mock-{uid}-{email})
-    const parts = token.split('-');
-    if (parts.length >= 3) {
-      const uid = parts[1];
-      const email = parts.slice(2).join('-'); // En caso de que el email contenga guiones
-      return {
-        success: true,
-        user: {
-          uid: uid,
-          email: email,
-          email_verified: true,
-          auth_time: Math.floor(Date.now() / 1000),
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 3600, // 1 hora
-          firebase: {
-            identities: {
-              email: [email]
-            },
-            sign_in_provider: 'password'
-          }
-        }
-      };
-    }
+  // A partir de ahora sólo se permiten tokens reales de Firebase.
+  // El bypass con tokens mock queda deshabilitado salvo que se active de forma explícita (env)
+  if (token && token.startsWith('mock-')) {
+    console.warn('[AuthMiddleware] Token mock detectado; se requiere un token real de Firebase.');
+    return {
+      success: false,
+      error: {
+        code: 'mock-token-disabled',
+        message: 'Los tokens mock están deshabilitados. Usa credenciales reales.',
+      },
+    };
   }
 
   try {

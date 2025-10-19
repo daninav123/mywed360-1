@@ -1,6 +1,6 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { getMetricsData } from '../../services/adminDataService';
+import { getMetricsData, getHttpMetricsSummary } from '../../services/adminDataService';
 
 const ranges = [
   { label: 'Últimos 7 días', value: '7' },
@@ -14,6 +14,7 @@ const AdminMetrics = () => {
   const [series, setSeries] = useState([]);
   const [funnel, setFunnel] = useState(null);
   const [iaCosts, setIaCosts] = useState([]);
+  const [httpSummary, setHttpSummary] = useState(null);
 
   useEffect(() => {
     const loadMetrics = async () => {
@@ -22,6 +23,10 @@ const AdminMetrics = () => {
       setSeries(data.series || []);
       setFunnel(data.funnel);
       setIaCosts(data.iaCosts || []);
+      try {
+        const http = await getHttpMetricsSummary();
+        setHttpSummary(http);
+      } catch {}
       setLoading(false);
     };
     loadMetrics();
@@ -61,6 +66,21 @@ const AdminMetrics = () => {
           >
             Exportar JSON
           </button>
+          {httpSummary?.totals && (
+            <div
+              className="text-xs text-[var(--color-text-soft,#6b7280)]"
+              data-testid="metrics-http-summary"
+            >
+              {`Req ${httpSummary.totals.totalRequests} | Err ${httpSummary.totals.totalErrors} | Rate ${
+                typeof httpSummary.totals.errorRate === 'number'
+                  ? ((httpSummary.totals.errorRate <= 1
+                      ? httpSummary.totals.errorRate * 100
+                      : httpSummary.totals.errorRate
+                    ).toFixed(1) + '%')
+                  : httpSummary.totals.errorRate
+              }`}
+            </div>
+          )}
         </div>
       </header>
 
@@ -74,10 +94,10 @@ const AdminMetrics = () => {
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
               <h2 className="text-sm font-semibold">Usuarios activos</h2>
               <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
-                Distribución diaria (placeholder).
+                Distribución diaria.
               </p>
-              <div className="mt-4 h-48 rounded-md border border-dashed border-soft flex items-center justify-center text-xs text-[var(--color-text-soft,#6b7280)]">
-                {series.length ? 'Gráfico con datos' : 'Gráfico de línea (mock)'}
+              <div className="mt-4 flex h-48 items-center justify-center rounded-md border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]">
+                {series.length ? 'Visualización disponible con datos reales' : 'Sin datos suficientes para generar la visualización'}
               </div>
             </article>
             <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
@@ -85,8 +105,8 @@ const AdminMetrics = () => {
               <p className="mt-2 text-xs text-[var(--color-text-soft,#6b7280)]">
                 Comparativa con el periodo anterior.
               </p>
-              <div className="mt-4 h-48 rounded-md border border-dashed border-soft flex items-center justify-center text-xs text-[var(--color-text-soft,#6b7280)]">
-                {iaCosts.length ? 'Gráfico de barras con datos' : 'Gráfico de barras (mock)'}
+              <div className="mt-4 flex h-48 items-center justify-center rounded-md border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]">
+                {iaCosts.length ? 'Visualización disponible con datos reales' : 'Sin datos suficientes para generar la visualización'}
               </div>
             </article>
           </section>
@@ -94,16 +114,15 @@ const AdminMetrics = () => {
           <section className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm" data-testid="metrics-funnel">
             <h2 className="text-sm font-semibold">Funnel conversión</h2>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              {(funnel || [])
-                .map((step, index) => ({ ...step, key: step.label || index }))
-                .map((step) => (
-                  <div key={step.key} className="rounded-lg border border-soft px-3 py-4 text-sm">
+              {Array.isArray(funnel) && funnel.length > 0 ? (
+                funnel.map((step, index) => (
+                  <div key={step.label || index} className="rounded-lg border border-soft px-3 py-4 text-sm">
                     <p className="font-medium">{step.label}</p>
                     <p className="text-2xl font-semibold">{step.value}</p>
                     <p className="text-xs text-[var(--color-text-soft,#6b7280)]">{step.percentage}</p>
                   </div>
-                ))}
-              {!funnel && (
+                ))
+              ) : (
                 <>
                   <div className="rounded-lg border border-soft px-3 py-4 text-sm">
                     <p className="font-medium">Visitantes</p>

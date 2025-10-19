@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import PageWrapper from '../components/PageWrapper';
+import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { useAuth } from '../hooks/useAuth';
 import { createWedding } from '../services/WeddingService';
@@ -420,158 +422,157 @@ export default function CreateWeddingAssistant() {
     }
   };
 
+  const renderLayout = (content) => (
+    <PageWrapper
+      title="Asistente conversacional"
+      className="layout-container max-w-3xl space-y-6 pb-12"
+    >
+      {content}
+    </PageWrapper>
+  );
+
   if (isLoading) {
-    return (
-      <div className="p-6 max-w-3xl mx-auto">
-        <Card className="p-6 text-center text-sm text-gray-600">Cargando…</Card>
-      </div>
+    return renderLayout(
+      <Card className="p-6 text-center text-sm text-[color:var(--color-muted)]">Cargando...</Card>
     );
   }
 
   if (forbiddenRole) {
-    return (
-      <div className="p-6 max-w-3xl mx-auto">
-        <Card className="p-6 space-y-3 text-sm">
-          <h1 className="text-xl font-semibold text-gray-900">Acceso restringido</h1>
-          <p>
-            Este asistente está reservado para propietarios del evento. Solicita acceso al owner o
-            al administrador si necesitas crear un nuevo evento.
-          </p>
-          <button
-            type="button"
-            onClick={() => navigate('/home')}
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            Volver al panel
-          </button>
-        </Card>
-      </div>
+    return renderLayout(
+      <Card className="space-y-3 text-sm">
+        <h2 className="text-xl font-semibold text-[color:var(--color-text)]">Acceso restringido</h2>
+        <p className="text-[color:var(--color-muted)]">
+          Este asistente está reservado para propietarios del evento. Solicita acceso al owner o al
+          administrador si necesitas crear un nuevo evento.
+        </p>
+        <Button type="button" onClick={() => navigate('/home')}>
+          Volver al panel
+        </Button>
+      </Card>
     );
   }
 
-  return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto">
-      <Card className="p-6 flex flex-col gap-4 h-[70vh] md:h-[75vh]">
-        <header>
-          <h1 className="text-2xl font-bold text-gray-900">Asistente Conversacional</h1>
-          <p className="text-sm text-gray-600">
-            Charlemos unos minutos y dejaré lista la base del evento con las respuestas que me
-            compartas.
-          </p>
-        </header>
+  return renderLayout(
+    <Card className="flex h-[70vh] flex-col gap-4 p-6 md:h-[75vh]">
+      <header className="space-y-2">
+        <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
+          Configuración rápida con IA
+        </h2>
+        <p className="text-sm text-[color:var(--color-muted)]">
+          Charlemos unos minutos y dejaré lista la base del evento con las respuestas que me
+          compartas.
+        </p>
+      </header>
 
-        <div
-          ref={messagesRef}
-          className="flex-1 overflow-y-auto rounded border border-slate-200 bg-slate-50 p-4 space-y-3"
-        >
-          {messages.map((message) => (
+      <div
+        ref={messagesRef}
+        className="flex-1 space-y-3 overflow-y-auto rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/60 p-4"
+      >
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${message.role === roles.user ? 'justify-end' : 'justify-start'}`}
+          >
             <div
-              key={message.id}
-              className={`flex ${message.role === roles.user ? 'justify-end' : 'justify-start'}`}
+              className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
+                message.role === roles.user
+                  ? 'bg-[var(--color-primary)] text-[color:var(--color-surface)]'
+                  : 'border border-[color:var(--color-border)] bg-[color:var(--color-surface)] text-[color:var(--color-text)]'
+              }`}
             >
-              <div
-                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                  message.role === roles.user
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border border-slate-200 text-slate-800'
-                }`}
-              >
-                {message.content}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {!summaryVisible && activeStep ? (
-          <form onSubmit={handleSend} className="space-y-3">
-            {activeStep.type === 'options' && (
-              <div className="flex flex-wrap gap-2">
-                {(OPTION_SETS[activeStep.optionsKey] || []).map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => handleOptionClick(option.value)}
-                    className="px-3 py-1.5 rounded-full border border-blue-200 bg-white text-sm text-blue-700 hover:bg-blue-600 hover:text-white transition"
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                disabled={creating}
-                placeholder="Escribe tu respuesta y pulsa Enter…"
-                className="flex-1 border rounded px-3 py-2 text-sm"
-              />
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || creating}
-                className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
-              >
-                Enviar
-              </button>
-            </div>
-            {activeStep.optional && (
-              <button
-                type="button"
-                onClick={() => submitAnswer('')}
-                className="text-xs text-blue-600 hover:underline"
-                disabled={creating}
-              >
-                Saltar este detalle
-              </button>
-            )}
-          </form>
-        ) : (
-          <div className="space-y-4">
-            <div className="rounded border border-slate-200 bg-white p-4 text-sm">
-              <h2 className="text-base font-semibold text-slate-800 mb-2">Resumen del evento</h2>
-              <ul className="space-y-1">
-                {summaryData.map((item) => (
-                  <li key={item.label} className="flex flex-col md:flex-row md:items-center md:gap-3">
-                    <span className="font-medium text-slate-600 md:w-48">{item.label}</span>
-                    <span className="text-slate-800">{item.value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {requestError && (
-              <div className="text-sm text-red-600">{requestError}</div>
-            )}
-
-            <div className="flex flex-col md:flex-row gap-2 md:justify-between">
-              <div className="text-xs text-slate-500">
-                {lastCreatedId
-                  ? `ID creado: ${lastCreatedId}`
-                  : 'Podrás ajustar cualquier dato del evento más adelante desde su configuración.'}
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={restartConversation}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded"
-                  disabled={creating}
-                >
-                  Cambiar respuestas
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCreateWedding}
-                  className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-60"
-                  disabled={creating}
-                >
-                  {creating ? 'Creando…' : 'Crear evento'}
-                </button>
-              </div>
+              {message.content}
             </div>
           </div>
-        )}
-      </Card>
-    </div>
+        ))}
+      </div>
+
+      {!summaryVisible && activeStep ? (
+        <form onSubmit={handleSend} className="space-y-3">
+          {activeStep.type === 'options' && (
+            <div className="flex flex-wrap gap-2">
+              {(OPTION_SETS[activeStep.optionsKey] || []).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleOptionClick(option.value)}
+                  className="rounded-full border border-[color:var(--color-primary)]/40 bg-[color:var(--color-surface)] px-3 py-1.5 text-sm text-[color:var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-[color:var(--color-surface)]"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              disabled={creating}
+              placeholder="Escribe tu respuesta y pulsa Enter..."
+              className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+            />
+            <Button type="submit" disabled={!inputValue.trim() || creating}>
+              Enviar
+            </Button>
+          </div>
+          {activeStep.optional && (
+            <button
+              type="button"
+              onClick={() => submitAnswer('')}
+              className="text-xs text-[color:var(--color-primary)] hover:underline"
+              disabled={creating}
+            >
+              Saltar este detalle
+            </button>
+          )}
+        </form>
+      ) : (
+        <div className="space-y-4">
+          <div className="rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-4 text-sm">
+            <h3 className="mb-2 text-base font-semibold text-[color:var(--color-text)]">
+              Resumen del evento
+            </h3>
+            <ul className="space-y-1">
+              {summaryData.map((item) => (
+                <li
+                  key={item.label}
+                  className="flex flex-col md:flex-row md:items-center md:gap-3"
+                >
+                  <span className="font-medium text-[color:var(--color-muted)] md:w-48">
+                    {item.label}
+                  </span>
+                  <span className="text-[color:var(--color-text)]">{item.value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {requestError && (
+            <div className="text-sm text-[color:var(--color-danger)]">{requestError}</div>
+          )}
+
+          <div className="flex flex-col gap-2 md:flex-row md:justify-between">
+            <div className="text-xs text-[color:var(--color-muted)]">
+              {lastCreatedId
+                ? `ID creado: ${lastCreatedId}`
+                : 'Podrás ajustar cualquier dato del evento más adelante desde su configuración.'}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={restartConversation}
+                disabled={creating}
+              >
+                Cambiar respuestas
+              </Button>
+              <Button type="button" onClick={handleCreateWedding} disabled={creating}>
+                {creating ? 'Creando...' : 'Crear evento'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }

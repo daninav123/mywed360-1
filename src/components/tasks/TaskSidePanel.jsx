@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useEffect, useCallback } from 'react';
 import { db } from '../../firebaseConfig';
 import {
@@ -19,7 +19,7 @@ import * as notificationService from '../../services/notificationService';
 
 const fmtDateTimeLocal = (d) => {
   try {
-    const dt = d instanceof Date ?d : new Date(d);
+    const dt = d instanceof Date ? d : new Date(d);
     if (isNaN(dt.getTime())) return '';
     const pad = (n) => String(n).padStart(2, '0');
     const yyyy = dt.getFullYear();
@@ -82,9 +82,6 @@ export default function TaskSidePanel({
   const [parentEndValue, setParentEndValue] = useState(() => fmtDateTimeLocal(toDate(parent?.end)));
 
   const [newSubTitle, setNewSubTitle] = useState('');
-  const [newSubStart, setNewSubStart] = useState('');
-  const [newSubEnd, setNewSubEnd] = useState('');
-  const [newSubSchedulingEnabled, setNewSubSchedulingEnabled] = useState(false);
 
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -94,7 +91,6 @@ export default function TaskSidePanel({
   const parentLabel = useMemo(() => parent?.title || parent?.name || 'tarea', [parent?.title, parent?.name]);
   const parentStartDate = useMemo(() => toDate(parent?.start), [parent?.start]);
   const parentEndDate = useMemo(() => toDate(parent?.end), [parent?.end]);
-  const [scheduleEditor, setScheduleEditor] = useState({ id: null, start: '', end: '' });
 
   const formatDisplayDate = useCallback((value) => {
     try {
@@ -119,10 +115,6 @@ export default function TaskSidePanel({
     setParentEndValue(fmtDateTimeLocal(toDate(parent?.end)));
     setEditingParentStart(false);
     setEditingParentEnd(false);
-    setScheduleEditor({ id: null, start: '', end: '' });
-    setNewSubSchedulingEnabled(false);
-    setNewSubStart('');
-    setNewSubEnd('');
   }, [parent?.id]);
 
   useEffect(() => {
@@ -179,16 +171,19 @@ export default function TaskSidePanel({
     if (!isOpen) {
       setCommentDraft('');
       setCommentError('');
-      setScheduleEditor({ id: null, start: '', end: '' });
-      setNewSubSchedulingEnabled(false);
-      setNewSubStart('');
-      setNewSubEnd('');
     }
   }, [isOpen, parent?.id]);
 
   const sortedSubs = useMemo(() => {
     const list = Array.isArray(subtasks) ? subtasks.slice() : [];
-    list.sort((a, b) => (toDate(a.start)?.getTime() || 0) - (toDate(b.start)?.getTime() || 0));
+    list.sort((a, b) => {
+      const aDone = a?.done ? 1 : 0;
+      const bDone = b?.done ? 1 : 0;
+      if (aDone !== bDone) return aDone - bDone;
+      const aTitle = String(a?.title || a?.name || '').toLowerCase();
+      const bTitle = String(b?.title || b?.name || '').toLowerCase();
+      return aTitle.localeCompare(bTitle);
+    });
     return list;
   }, [subtasks]);
 
@@ -234,42 +229,9 @@ export default function TaskSidePanel({
     }
   };
 
-  const updateSubStart = async (sub, newVal) => {
-    try {
-      const ref = doc(db, 'weddings', weddingId, 'tasks', parent.id, 'subtasks', sub.id);
-      if (!newVal) {
-        await updateDoc(ref, { start: deleteField(), updatedAt: serverTimestamp() });
-        return;
-      }
-      const dt = new Date(newVal);
-      if (isNaN(dt.getTime())) return;
-      await updateDoc(ref, { start: dt, updatedAt: serverTimestamp() });
-    } catch (e) {
-      console.error('Error actualizando inicio de subtarea:', e);
-    }
-  };
-
-  const updateSubEnd = async (sub, newVal) => {
-    try {
-      const ref = doc(db, 'weddings', weddingId, 'tasks', parent.id, 'subtasks', sub.id);
-      if (!newVal) {
-        await updateDoc(ref, { end: deleteField(), updatedAt: serverTimestamp() });
-        return;
-      }
-      const dt = new Date(newVal);
-      if (isNaN(dt.getTime())) return;
-      await updateDoc(ref, { end: dt, updatedAt: serverTimestamp() });
-    } catch (e) {
-      console.error('Error actualizando fin de subtarea:', e);
-    }
-  };
-
   const addSubtask = async () => {
     try {
       if (!newSubTitle.trim()) return;
-      const start = newSubStart ? new Date(newSubStart) : null;
-      const end = newSubEnd ? new Date(newSubEnd) : null;
-      if ((start && isNaN(start.getTime())) || (end && isNaN(end.getTime()))) return;
       const payload = {
         title: newSubTitle.trim(),
         name: newSubTitle.trim(),
@@ -277,12 +239,8 @@ export default function TaskSidePanel({
         done: false,
         createdAt: serverTimestamp(),
       };
-      if (start) payload.start = start;
-      if (end) payload.end = end;
       await addDoc(collection(db, 'weddings', weddingId, 'tasks', parent.id, 'subtasks'), payload);
       setNewSubTitle('');
-      setNewSubStart('');
-      setNewSubEnd('');
     } catch (e) {
       console.error('Error creando subtarea:', e);
     }
@@ -369,10 +327,11 @@ export default function TaskSidePanel({
           },
         });
       } catch (error) {
-        console.warn('No se pudo registrar la notificación remota del comentario', error);
+        console.warn('No se pudo registrar la notificacion remota del comentario', error);
       }
+
       notificationService.showNotification({
-        title: 'Comentario añadido',
+        title: 'Comentario agregado',
         message:
           recipients.length > 0
             ? `Notificaremos a: ${recipients.join(', ')}`
@@ -380,8 +339,7 @@ export default function TaskSidePanel({
         type: 'success',
       });
     } catch (error) {
-      console.error('Error guardando comentario de tarea:', error);
-      setCommentError('No se pudo guardar tu comentario. Inténtalo de nuevo.');
+      setCommentError('No se pudo guardar tu comentario. Intentalo de nuevo.');
     } finally {
       setSendingComment(false);
     }
@@ -495,7 +453,7 @@ export default function TaskSidePanel({
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-medium">Subtareas</h4>
-            <div className="text-xs text-gray-500">{sortedSubs.length} ?tems</div>
+            <div className="text-xs text-gray-500">{sortedSubs.length} items</div>
           </div>
           <ul className="space-y-2">
             {sortedSubs.map((s) => (
@@ -511,15 +469,12 @@ export default function TaskSidePanel({
                     </button>
                     <div>
                       <div className="text-sm font-medium">{s.title || s.name || 'Subtarea'}</div>
-                      <SubtaskScheduleSection
-                        subtask={s}
-                        scheduleEditor={scheduleEditor}
-                        setScheduleEditor={setScheduleEditor}
-                        formatDisplayDate={formatDisplayDate}
-                        renderNoDateBadge={renderNoDateBadge}
-                        updateSubStart={updateSubStart}
-                        updateSubEnd={updateSubEnd}
-                      />
+                      {s.desc && (
+                        <div className="mt-1 text-xs text-gray-600">{s.desc}</div>
+                      )}
+                      {s.assignee && (
+                        <div className="mt-1 text-xs text-gray-500">Responsable: {s.assignee}</div>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-1 opacity-70">
@@ -539,77 +494,34 @@ export default function TaskSidePanel({
         <div className="border-t pt-3">
           <div className="flex items-center gap-2 mb-2">
             <CalendarPlus size={18} />
-            <span className="text-sm font-medium">A?adir subtarea</span>
+            <span className="text-sm font-medium">Agregar subtarea</span>
           </div>
           <div className="space-y-2">
             <input
-              placeholder="T?tulo de la subtarea"
+              placeholder="Titulo de la subtarea"
               className="w-full border rounded px-2 py-1 text-sm"
               value={newSubTitle}
               onChange={(e) => setNewSubTitle(e.target.value)}
             />
-            {newSubSchedulingEnabled ? (
-              <div className="space-y-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Inicio</label>
-                    <input
-                      type="datetime-local"
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={newSubStart}
-                      onChange={(e) => setNewSubStart(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Fin</label>
-                    <input
-                      type="datetime-local"
-                      className="w-full border rounded px-2 py-1 text-sm"
-                      value={newSubEnd}
-                      onChange={(e) => setNewSubEnd(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="text-xs text-amber-600 hover:underline"
-                    onClick={() => {
-                      setNewSubSchedulingEnabled(false);
-                      setNewSubStart('');
-                      setNewSubEnd('');
-                    }}
-                  >
-                    Quitar programación
-                  </button>
-                </div>
-              </div>
-            ) : (
+            <div className="flex justify-end gap-2">
               <button
                 type="button"
-                className="text-xs text-indigo-600 hover:underline"
-                onClick={() => setNewSubSchedulingEnabled(true)}
+                className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={addSubtask}
+                disabled={!newSubTitle.trim()}
               >
-                Anadir fecha puntual (opcional)
+                Agregar
               </button>
-            )}
-            <div className="flex gap-2">
-              <button className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded" onClick={addSubtask}>Anadir</button>
               <button
+                type="button"
                 className="px-3 py-1.5 bg-gray-100 text-sm rounded"
-                onClick={() => {
-                  setNewSubTitle('');
-                  setNewSubStart('');
-                  setNewSubEnd('');
-                  setNewSubSchedulingEnabled(false);
-                }}
+                onClick={() => setNewSubTitle('')}
               >
                 Limpiar
               </button>
             </div>
           </div>
         </div>
-
         <div className="border-t mt-6 pt-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -626,10 +538,10 @@ export default function TaskSidePanel({
           )}
 
           {loadingComments ? (
-            <p className="text-sm text-gray-500 mb-3">Cargando comentarios…</p>
+            <p className="text-sm text-gray-500 mb-3">Cargando comentarios...</p>
           ) : comments.length === 0 ? (
             <p className="text-sm text-gray-500 mb-3">
-              Aún no hay comentarios en este bloque. Usa @ para mencionar responsables.
+              Aun no hay comentarios en este bloque. Usa @ para mencionar responsables.
             </p>
           ) : (
             <ul className="space-y-3 mb-4 max-h-56 overflow-y-auto pr-1">
@@ -666,122 +578,26 @@ export default function TaskSidePanel({
             <textarea
               className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
               rows={3}
-              placeholder="Escribe un comentario… Usa @ para mencionar a alguien"
+              placeholder="Escribe un comentario... Usa @ para mencionar a alguien"
               value={commentDraft}
               onChange={(e) => setCommentDraft(e.target.value)}
               onKeyDown={handleCommentKeyDown}
               disabled={sendingComment}
             />
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">Ctrl/⌘ + Enter para enviar</span>
+              <span className="text-xs text-gray-400">Ctrl/Cmd + Enter para enviar</span>
               <button
                 type="button"
                 onClick={handleSubmitComment}
                 disabled={sendingComment || !commentDraft.trim()}
                 className="px-3 py-1.5 bg-indigo-600 text-white text-sm rounded disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {sendingComment ? 'Publicando…' : 'Publicar'}
+                {sendingComment ? 'Publicando...' : 'Publicar'}
               </button>
             </div>
           </div>
         </div>
       </aside>
-    </div>
-  );
-}
-
-function SubtaskScheduleSection({ subtask, scheduleEditor, setScheduleEditor, formatDisplayDate, renderNoDateBadge, updateSubStart, updateSubEnd }) {
-  const startDate = toDate(subtask?.start);
-  const endDate = toDate(subtask?.end);
-  const editorActive = scheduleEditor.id === String(subtask.id || '');
-  const scheduleExists = Boolean(startDate || endDate);
-
-  const openEditor = () => {
-    setScheduleEditor({
-      id: String(subtask.id || ''),
-      start: startDate ? fmtDateTimeLocal(startDate) : '',
-      end: endDate ? fmtDateTimeLocal(endDate) : '',
-    });
-  };
-
-  const handleSave = async () => {
-    const startValue = scheduleEditor.start || '';
-    const endValue = scheduleEditor.end || '';
-    await updateSubStart(subtask, startValue);
-    await updateSubEnd(subtask, endValue);
-    setScheduleEditor({ id: null, start: '', end: '' });
-  };
-
-  const handleClear = async () => {
-    await updateSubStart(subtask, '');
-    await updateSubEnd(subtask, '');
-    setScheduleEditor({ id: null, start: '', end: '' });
-  };
-
-  const handleCancel = () => setScheduleEditor({ id: null, start: '', end: '' });
-
-  const displayRange = (value) => {
-    const dt = toDate(value);
-    if (!dt) return renderNoDateBadge('Sin fecha');
-    return <span>{formatDisplayDate(dt)}</span>;
-  };
-
-  if (editorActive) {
-    return (
-      <div className="mt-2 space-y-2 text-xs text-gray-600">
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Inicio</label>
-          <input
-            type="datetime-local"
-            className="border rounded px-2 py-1 text-sm w-full"
-            value={scheduleEditor.start}
-            onChange={(e) => setScheduleEditor((prev) => ({ ...prev, start: e.target.value }))}
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-500 mb-1">Fin</label>
-          <input
-            type="datetime-local"
-            className="border rounded px-2 py-1 text-sm w-full"
-            value={scheduleEditor.end}
-            onChange={(e) => setScheduleEditor((prev) => ({ ...prev, end: e.target.value }))}
-          />
-        </div>
-        <div className="flex gap-2">
-          <button type="button" className="px-2 py-1 text-xs bg-blue-600 text-white rounded" onClick={handleSave}>
-            Guardar
-          </button>
-          <button type="button" className="px-2 py-1 text-xs bg-gray-100 rounded" onClick={handleCancel}>
-            Cancelar
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-2 space-y-2 text-xs text-gray-600">
-      <div className="flex items-center gap-2">
-        <span>Inicio:</span>
-        {displayRange(subtask.start)}
-      </div>
-      <div className="flex items-center gap-2">
-        <span>Fin:</span>
-        {displayRange(subtask.end)}
-      </div>
-      <div className="flex items-center gap-2 text-xs">
-        <button type="button" className="text-indigo-600 hover:underline" onClick={openEditor}>
-          {scheduleExists ? 'Editar programacion' : 'Programar'}
-        </button>
-        {scheduleExists ? (
-          <React.Fragment>
-            <span className="text-gray-300">|</span>
-            <button type="button" className="text-amber-600 hover:underline" onClick={handleClear}>
-              Quitar fechas
-            </button>
-          </React.Fragment>
-        ) : null}
-      </div>
     </div>
   );
 }

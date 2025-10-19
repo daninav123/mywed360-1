@@ -59,6 +59,12 @@
 - Evento `wedding_switched` registra cambios de contexto (desde `WeddingContext.setActiveWedding`).
 - `PerformanceMonitor` previsto para instrumentar navegación; falta telemetría específica del dashboard planner (p.ej. clicks en tarjetas, scroll en inspiración).
 
+## Cobertura E2E implementada
+- `cypress/e2e/dashboard/diagnostic-panel.cy.js`: valida el panel de diagnóstico y sus enlaces auxiliares.
+- `cypress/e2e/dashboard/global-search-shortcuts.cy.js`: recorre accesos rápidos y atajos de búsqueda global.
+- `cypress/e2e/dashboard/main-navigation.cy.js`: comprueba navegación principal para planners con múltiples bodas.
+- `cypress/e2e/dashboard/planner-dashboard.cy.js`: smoke completo del dashboard (widgets, métricas y persistencia de selección).
+
 ## 9. Pruebas recomendadas
 - Unitarias: validar recuentos en `PlannerDashboard` usando mocks de `useWedding` y `useFirestoreCollection`.
 - Integración: asegurar que `WeddingContext` selecciona correctamente boda activa y sincroniza permisos.

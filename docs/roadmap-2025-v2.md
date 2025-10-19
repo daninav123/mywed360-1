@@ -1,5 +1,8 @@
 ﻿# Roadmap Estratégico MyWed360 - 2025 v2
 
+> ⚠️ **Documento congelado (snapshot 2025-10-09).** Usa [`docs/ROADMAP.md`](./ROADMAP.md) para el estado y los planes vigentes.
+
+
 ## Estado Actual del Proyecto
 
 ✅ **Completado Recientemente:**
@@ -202,6 +205,7 @@ Entregables:
 - Contratos CRUD y templates operativos.
 - Eventos de gamificación en Tasks/Timeline.
 - Chat IA mínimo funcional.
+
 
 
 

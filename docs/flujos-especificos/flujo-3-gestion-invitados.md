@@ -92,6 +92,9 @@
 
 ## Cobertura E2E implementada
 - `cypress/e2e/guests/guests_flow.cy.js`: cubre alta manual y masiva de invitados, consulta del resumen RSVP y filtros principales de la vista de invitados.
+- `cypress/e2e/guests/guests_crud.cy.js`: valida CRUD completo, filtros avanzados y acciones masivas en la grilla.
+- `cypress/e2e/guests/guests_import_rsvp.cy.js`: ejerce la importación CSV/RSPV, deduplicación y métricas posteriores.
+- `cypress/e2e/guests/guests_messaging.cy.js`: recorre mensajería (WhatsApp/email), plantillas y registro de envíos.
 
 ## 10. Checklist de despliegue
 - Configurar proveedor WhatsApp y variables (`VITE_BACKEND_BASE_URL`, `VITE_DEFAULT_COUNTRY_CODE`, credenciales).

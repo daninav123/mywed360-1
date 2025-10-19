@@ -2,19 +2,41 @@
 
 /**
  * Flujo 18 – Generador de documentos legales.
- * Objetivo: validar requeridos (nombre, fecha, localidad) y retroalimentación.
- *
- * TODO: implementar cuando el formulario exponga validaciones visibles.
- *       Actualmente el componente no marca `required` ni muestra mensajes.
+ * Verifica que el progreso marcado en los requisitos se conserva entre recargas.
  */
-describe('Documentos legales · validaciones de datos', () => {
+describe('Documentos legales · progreso de requisitos', () => {
+  const LEGAL_STORAGE_KEY = 'legalRequirements_cypress-wedding';
+  const REQUIREMENT_LABEL = 'Solicitud de expediente matrimonial';
+
   beforeEach(() => {
-    cy.loginToLovenda();
+    Cypress.env('STUB_FIRESTORE', true);
     cy.visit('/protocolo/documentos');
+    cy.loginToLovenda();
+    cy.window().then((win) => {
+      win.localStorage.removeItem(LEGAL_STORAGE_KEY);
+    });
+    cy.reload();
+    cy.closeDiagnostic();
+    cy.contains('h2', 'Requisitos para registrar la boda', { timeout: 20000 }).should('be.visible');
   });
 
-  it.skip('bloquea la generación si faltan campos obligatorios', () => {
-    // TODO: esperar mensajes de error / estados inválidos.
+  it('mantiene el requisito marcado tras recargar la página', () => {
+    cy.contains('label', REQUIREMENT_LABEL)
+      .find('input[type="checkbox"]')
+      .should('not.be.checked');
+
+    cy.contains('label', REQUIREMENT_LABEL).click();
+
+    cy.contains('label', REQUIREMENT_LABEL)
+      .find('input[type="checkbox"]')
+      .should('be.checked');
+
+    cy.reload();
+    cy.closeDiagnostic();
+    cy.contains('h2', 'Requisitos para registrar la boda', { timeout: 20000 }).should('be.visible');
+
+    cy.contains('label', REQUIREMENT_LABEL)
+      .find('input[type="checkbox"]')
+      .should('be.checked');
   });
 });
-

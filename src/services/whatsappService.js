@@ -10,30 +10,50 @@ const BASE = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKE
 const DEFAULT_CC = (import.meta.env.VITE_DEFAULT_COUNTRY_CODE || '').replace('+', '');
 
 async function getAuthToken() {
-  try {
-    if (authContext && authContext.getIdToken) {
+  const resolvers = [];
+
+  if (authContext?.getIdToken) {
+    resolvers.push(async () => {
       try {
-        const t = await authContext.getIdToken(true);
-        if (t) return t;
-      } catch {}
-      return await authContext.getIdToken();
-    }
-    // Fallback Firebase directo si el contexto no está disponible
+        const refreshed = await authContext.getIdToken(true);
+        if (refreshed) return refreshed;
+      } catch (err) {
+        console.warn('[whatsappService] No se pudo refrescar token desde authContext:', err);
+      }
+      return authContext.getIdToken();
+    });
+  }
+
+  resolvers.push(async () => {
     try {
       const mod = await import('../firebaseConfig');
       const { auth } = mod;
-      const u = auth?.currentUser;
-      if (u?.getIdToken) {
+      const user = auth?.currentUser;
+      if (user?.getIdToken) {
         try {
-          const t = await u.getIdToken(true);
-          if (t) return t;
-        } catch {}
-        return await u.getIdToken();
+          const refreshed = await user.getIdToken(true);
+          if (refreshed) return refreshed;
+        } catch (err) {
+          console.warn('[whatsappService] No se pudo refrescar token Firebase:', err);
+        }
+        return user.getIdToken();
       }
-      if (u?.uid && u?.email) return `mock-${u.uid}-${u.email}`; // compat con backend en dev
-    } catch {}
-  } catch {}
-  return null;
+    } catch (error) {
+      console.warn('[whatsappService] Error importando firebaseConfig:', error);
+    }
+    return null;
+  });
+
+  for (const resolver of resolvers) {
+    try {
+      const token = await resolver();
+      if (token) return token;
+    } catch (error) {
+      console.warn('[whatsappService] Error obteniendo token de autenticación:', error);
+    }
+  }
+
+  throw new Error('WhatsAppService: autenticación requerida');
 }
 
 export function toE164(phone) {

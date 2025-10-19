@@ -1,17 +1,34 @@
 /**
+};
+  return !!mapping[emailId];
+const saveEmailFolderMapping = (userId, mapping) => {
+  const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
+  _getStorage().setItem(storageKey, JSON.stringify(mapping));
+  if (USE_BACKEND) {
+    fireAndForget(mirrorFolderMappingToCloud(userId, mapping));
+  }
+};
+};
+/**
  * Servicio para gestionar carpetas personalizadas de correo
  * Permite crear, editar, eliminar y mover correos entre carpetas
  */
 
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
-import { db } from '../firebaseConfig';
+import { get as apiGet, put as apiPut } from './apiClient';
+import { USE_BACKEND } from './emailService';
 import { _getStorage } from '../utils/storage.js';
 
 // Clave para almacenamiento local
 const FOLDERS_STORAGE_KEY = 'mywed360_email_folders';
 const EMAIL_FOLDER_MAPPING_KEY = 'mywed360_email_folder_mapping';
+
+function fireAndForget(promise) {
+  if (promise && typeof promise.then === 'function' && typeof promise.catch === 'function') {
+    promise.catch(() => {});
+  }
+}
 
 /**
  * Obtener todas las carpetas del usuario actual
@@ -21,9 +38,7 @@ const EMAIL_FOLDER_MAPPING_KEY = 'mywed360_email_folder_mapping';
 export const getUserFolders = (userId) => {
   try {
     // Best‑effort: refrescar desde Firestore sin bloquear
-    try {
-      refreshFoldersFromCloud(userId);
-    } catch {}
+    fireAndForget(refreshFoldersFromCloud(userId));
     // Formato de clave: mywed360_email_folders_[userId]
     const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
     const foldersJson = _getStorage().getItem(storageKey);
@@ -156,10 +171,9 @@ export const deleteFolder = (userId, folderId) => {
 const saveUserFolders = (userId, folders) => {
   const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(folders));
-  // Espejo en Firestore (best‑effort)
-  try {
-    mirrorFoldersToCloud(userId, folders);
-  } catch {}
+  if (USE_BACKEND) {
+    fireAndForget(mirrorFoldersToCloud(userId, folders));
+  }
 };
 
 /**
@@ -171,9 +185,7 @@ const saveUserFolders = (userId, folders) => {
 const getEmailFolderMapping = (userId) => {
   try {
     // Best‑effort: refrescar desde Firestore sin bloquear
-    try {
-      refreshFolderMappingFromCloud(userId);
-    } catch {}
+    fireAndForget(refreshFolderMappingFromCloud(userId));
     const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
     const mappingJson = _getStorage().getItem(storageKey);
 
@@ -197,55 +209,70 @@ const getEmailFolderMapping = (userId) => {
 const saveEmailFolderMapping = (userId, mapping) => {
   const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
   _getStorage().setItem(storageKey, JSON.stringify(mapping));
-  // Espejo en Firestore (best‑effort)
-  try {
-    mirrorFolderMappingToCloud(userId, mapping);
-  } catch {}
+  if (USE_BACKEND) {
+    fireAndForget(mirrorFolderMappingToCloud(userId, mapping));
+  }
 };
 
 async function mirrorFoldersToCloud(userId, folders) {
   try {
-    if (!userId || !db) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailFolders');
-    await setDoc(ref, { folders, updatedAt: new Date().toISOString() }, { merge: true });
-  } catch {}
+    if (!USE_BACKEND || !userId) return;
+    await apiPut(
+      '/api/email/folders',
+      { folders: Array.isArray(folders) ? folders : [] },
+      { auth: true, silent: true }
+    );
+  } catch (error) {
+    console.warn('[folderService] sync folders failed', error?.message || error);
+  }
 }
 
 async function mirrorFolderMappingToCloud(userId, mapping) {
   try {
-    if (!userId || !db) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailFolderMapping');
-    await setDoc(ref, { mapping, updatedAt: new Date().toISOString() }, { merge: true });
-  } catch {}
+    if (!USE_BACKEND || !userId) return;
+    await apiPut(
+      '/api/email/folders/mapping',
+      { mapping: mapping && typeof mapping === 'object' ? mapping : {} },
+      { auth: true, silent: true }
+    );
+  } catch (error) {
+    console.warn('[folderService] sync folder mapping failed', error?.message || error);
+  }
 }
 
 // Refrescos desde nube (no bloqueantes)
 async function refreshFoldersFromCloud(userId) {
   try {
-    if (!db || !userId) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailFolders');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() || {};
-    if (Array.isArray(data.folders)) {
+    if (!USE_BACKEND || !userId) return;
+    const res = await apiGet('/api/email/folders', { auth: true, silent: true });
+    if (!res || !res.ok) return;
+    const payload = await res.json();
+    if (payload && Array.isArray(payload.folders)) {
       const storageKey = `${FOLDERS_STORAGE_KEY}_${userId}`;
-      _getStorage().setItem(storageKey, JSON.stringify(data.folders));
+      _getStorage().setItem(storageKey, JSON.stringify(payload.folders));
     }
-  } catch {}
+    if (payload && payload.mapping && typeof payload.mapping === 'object') {
+      const mappingKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
+      _getStorage().setItem(mappingKey, JSON.stringify(payload.mapping));
+    }
+  } catch (error) {
+    console.warn('[folderService] refresh folders failed', error?.message || error);
+  }
 }
 
 async function refreshFolderMappingFromCloud(userId) {
   try {
-    if (!db || !userId) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailFolderMapping');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() || {};
-    if (data.mapping && typeof data.mapping === 'object') {
+    if (!USE_BACKEND || !userId) return;
+    const res = await apiGet('/api/email/folders/mapping', { auth: true, silent: true });
+    if (!res || !res.ok) return;
+    const payload = await res.json();
+    if (payload && payload.mapping && typeof payload.mapping === 'object') {
       const storageKey = `${EMAIL_FOLDER_MAPPING_KEY}_${userId}`;
-      _getStorage().setItem(storageKey, JSON.stringify(data.mapping));
+      _getStorage().setItem(storageKey, JSON.stringify(payload.mapping));
     }
-  } catch {}
+  } catch (error) {
+    console.warn('[folderService] refresh folder mapping failed', error?.message || error);
+  }
 }
 
 /**
@@ -412,4 +439,3 @@ export const isEmailInCustomFolder = (userId, emailId) => {
   const mapping = getEmailFolderMapping(userId);
   return !!mapping[emailId];
 };
-

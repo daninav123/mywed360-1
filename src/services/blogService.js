@@ -1,11 +1,8 @@
 ﻿// blogService.js - noticias de bodas
 
 import { getBackendBase } from '@/utils/backendBase.js';
-
+import { BLOG_FALLBACK_POSTS } from '@/data/blogFallback.js';
 import { translateText } from './translationService.js';
-
-const FORCE_MOCK_DEFAULT =
-  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
 
 // Evita spam de peticiones al backend si está caído/no iniciado (reservado para uso futuro)
 let _BACKEND_BACKOFF_UNTIL = 0;
@@ -17,6 +14,21 @@ const _backoffBackend = (ms = 60_000) => {
 // Preferimos el agregador backend (RSS) para variedad y fiabilidad.
 // Si se quiere forzar NewsAPI, definir VITE_NEWSAPI_KEY en build.
 const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || '';
+
+function parseStaticFallbackFlag(value) {
+  if (value === undefined || value === null) return undefined;
+  const normalized = String(value).trim().toLowerCase();
+  if (!normalized) return undefined;
+  if (['0', 'false', 'off', 'no'].includes(normalized)) return false;
+  if (['1', 'true', 'on', 'yes'].includes(normalized)) return true;
+  return undefined;
+}
+
+const ENV = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
+const STATIC_FALLBACK_ENABLED =
+  parseStaticFallbackFlag(ENV.VITE_BLOG_ENABLE_STATIC_FALLBACK) ?? false;
+const DISABLE_RENDER_IN_DEV =
+  parseStaticFallbackFlag(ENV.VITE_BLOG_DISABLE_RENDER_DEV) ?? false;
 
 function normalizeLang(lang) {
   if (!lang) return 'es';
@@ -34,16 +46,19 @@ async function fetchFromBackend({ page, pageSize, language }) {
   const derivedBase = getBackendBase();
   // Importante: no usar filter(Boolean) porque elimina '' y perdemos el fallback
   // a la ruta relativa '/api/wedding-news' gestionada por el proxy de Vite.
+  const normalizedEnvBase = envBase ? envBase.replace(/\/$/, '') : undefined;
+  const normalizedDerivedBase = derivedBase ? derivedBase.replace(/\/$/, '') : undefined;
   const rawCandidates = [
-    envBase ? envBase.replace(/\/$/, '') : undefined,
-    derivedBase ? derivedBase.replace(/\/$/, '') : undefined,
+    normalizedEnvBase,
+    normalizedDerivedBase,
+    'http://localhost:4004',
+    '', // Proxy de Vite o mismo origen como penúltimo recurso
     'https://mywed360-backend.onrender.com',
-    '', // como último recurso: proxy de Vite o mismo origen
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
-  if (FORCE_MOCK_DEFAULT) {
-    const renderBase = 'https://mywed360-backend.onrender.com';
-    candidates = [renderBase, ...candidates.filter((b) => b && b !== renderBase)];
+  // En desarrollo podemos desactivar Render con flag explícito, pero por defecto lo dejamos como último recurso real.
+  if (import.meta?.env?.DEV && DISABLE_RENDER_IN_DEV) {
+    candidates = candidates.filter((b) => !/^https:\/\/mywed360-backend\.onrender\.com$/i.test(b || ''));
   }
   // En producción priorizamos Render por fiabilidad; en desarrollo mantenemos prioridad local/env
   if (import.meta?.env?.PROD) {
@@ -66,11 +81,17 @@ async function fetchFromBackend({ page, pageSize, language }) {
         const s = String(b || '');
         return s === '' || /localhost|127\.0\.0\.1|:4004/.test(s);
       };
-      const timeoutMs = isProbablyLocal(base) ? 5000 : 10000;
+      const timeoutMs = isProbablyLocal(base) ? 20000 : 30000;
       const resp = await axios.get(url, {
-        params: { page, pageSize, lang: language, bust: 1 },
+        params: { page, pageSize, lang: language },
         timeout: timeoutMs,
         validateStatus: () => true,
+      });
+      console.info('[blogService] candidato wedding-news', {
+        base,
+        status: resp.status,
+        isArray: Array.isArray(resp.data),
+        length: Array.isArray(resp.data) ? resp.data.length : undefined,
       });
       if (resp.status < 400 && Array.isArray(resp.data)) {
         if (resp.data.length > 0) return resp.data;
@@ -79,7 +100,8 @@ async function fetchFromBackend({ page, pageSize, language }) {
       }
       // Estado no exitoso: marcar como error para posible backoff
       sawError = true;
-    } catch {
+    } catch (error) {
+      console.warn('[blogService] error al consultar wedding-news', { base, message: error?.message });
       sawError = true;
     }
   }
@@ -199,6 +221,163 @@ async function fetchFromNewsApi(page, pageSize, lang) {
 const stripDiacritics = (text = '') => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 const normalizeForMatch = (text = '') => stripDiacritics(text).toLowerCase();
+
+const cleanPlainText = (value = '') => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  const stringValue = String(value);
+  const withoutTags = stringValue.replace(/<[^>]+>/g, ' ');
+  return withoutTags.replace(/\s+/g, ' ').trim();
+};
+
+const ensureAbsoluteUrl = (value, baseUrl) => {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return '';
+  }
+  try {
+    return new URL(trimmed).toString();
+  } catch {}
+  if (baseUrl) {
+    try {
+      return new URL(trimmed, baseUrl).toString();
+    } catch {}
+  }
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+  return '';
+};
+
+function normalizeBlogPost(raw) {
+  const fallback = {
+    id: `post_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    title: 'Untitled',
+    description: '',
+    url: '',
+    image: null,
+    source: '',
+    published: new Date().toISOString(),
+  };
+
+  if (!raw || typeof raw !== 'object') {
+    return fallback;
+  }
+
+  const entry = { ...raw };
+  if (entry.article && typeof entry.article === 'object') {
+    for (const [key, value] of Object.entries(entry.article)) {
+      if (entry[key] === undefined || entry[key] === null) {
+        entry[key] = value;
+      }
+    }
+  }
+
+  const url = (() => {
+    const candidates = [entry.url, entry.link, entry.guid];
+    for (const candidate of candidates) {
+      const resolved = ensureAbsoluteUrl(candidate);
+      if (resolved) return resolved;
+    }
+    return '';
+  })();
+
+  const image = (() => {
+    const candidates = [
+      entry.image,
+      entry.imageUrl,
+      entry.imageURL,
+      entry.thumbnail,
+      entry.media?.thumbnail?.url,
+      entry.media?.content?.url,
+      entry.enclosure?.url,
+      entry.urlToImage,
+    ];
+    for (const candidate of candidates) {
+      const resolved = ensureAbsoluteUrl(candidate, url);
+      if (resolved) return resolved;
+    }
+    return null;
+  })();
+
+  const published = (() => {
+    const dateCandidates = [
+      entry.published,
+      entry.publishedAt,
+      entry.isoDate,
+      entry.pubDate,
+      entry.date,
+      entry.updated,
+      entry.created_at,
+    ];
+    for (const candidate of dateCandidates) {
+      if (!candidate) continue;
+      const date = new Date(candidate);
+      if (!Number.isNaN(date.getTime())) {
+        return date.toISOString();
+      }
+    }
+    return fallback.published;
+  })();
+
+  const title = cleanPlainText(entry.title || entry.name || entry.headline || fallback.title) || fallback.title;
+  const description = cleanPlainText(
+    entry.description ||
+      entry.summary ||
+      entry.summaryText ||
+      entry.contentSnippet ||
+      entry.excerpt ||
+      entry.content ||
+      ''
+  );
+
+  const source = (() => {
+    const rawSource =
+      (typeof entry.source === 'object' && entry.source
+        ? entry.source.name || entry.source.title
+        : entry.source) ||
+      entry.feedSource ||
+      entry.sourceName ||
+      entry.domain ||
+      entry.site ||
+      '';
+    const cleaned = cleanPlainText(rawSource);
+    if (cleaned) return cleaned;
+    if (url) {
+      try {
+        return new URL(url).hostname.replace(/^www\./, '');
+      } catch {}
+    }
+    return '';
+  })();
+
+  let id =
+    entry.id ||
+    entry.guid ||
+    entry.url ||
+    entry.link ||
+    (source ? `${source}_${published}` : '') ||
+    '';
+  if (!id) {
+    id = fallback.id;
+  } else {
+    id = String(id);
+  }
+
+  return {
+    id,
+    title,
+    description,
+    url,
+    image,
+    source,
+    published,
+  };
+}
 
 const buildWordPattern = (keyword) => {
   const normalized = normalizeForMatch(keyword);
@@ -384,145 +563,137 @@ const scoreMatches = (text, patterns) =>
  */
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
   const lang = normalizeLang(language);
-  // Ruta principal: backend RSS aggregator
   const rssData = await fetchFromBackend({ page, pageSize, language: lang });
-  // Si hubo errores de red/servidor, probar NewsAPI si hay clave
+
   if (rssData === null) {
-    if (API_KEY) {
-      try {
-        const posts = await fetchFromNewsApi(page, pageSize, lang);
-        return posts;
-      } catch (e) {
-        console.warn('NewsAPI fallback failed:', e?.message || e);
-      }
+    console.warn('[blogService] Backend wedding-news unavailable');
+    if (_backendAvailable()) {
+      _backoffBackend(2 * 60_000);
     }
-    return [];
-  }
-  // Si el backend respondió OK pero sin datos, intentar NewsAPI si hay clave
-  if (!Array.isArray(rssData) || !rssData.length) {
-    if (API_KEY) {
-      try {
-        const posts = await fetchFromNewsApi(page, pageSize, lang);
-        return posts;
-      } catch {}
+    const fallbackFromBackend = await useStaticFallbackIfAvailable('backend error', page, pageSize, lang);
+    if (fallbackFromBackend) {
+      return fallbackFromBackend;
     }
-    return [];
-  }
-
-  let posts = rssData;
-  if (lang && lang !== 'en') {
-    for (const p of posts) {
-      p.title = await translateText(p.title, lang, '');
-      p.description = await translateText(p.description, lang, '');
-    }
-  }
-  return posts;
-  // NewsAPI (opcional) â€” no usado por defecto
-  // Mantener el codigo para compatibilidad si en el futuro se habilita con API key.
-  /*
-  if (page > 1) {
-    if (!backendAvailable()) return [];
-    const arr = await fetchFromBackend({ page, pageSize, language: lang });
-    if (!Array.isArray(arr) || !arr.length) { backoffBackend(); return []; }
-    return arr;
-  }
-  const endpointOpts = {
-    params: {
-      q: 'wedding OR boda',
-      language: lang,
-      sortBy: 'publishedAt',
-      pageSize,
-      page,
-    },
-    headers: { 'X-Api-Key': API_KEY },
-    timeout: 8000,
-  };
-
-  let data;
-  try {
-    const resp = await axios.get('https://newsapi.org/v2/everything', endpointOpts);
-    data = resp.data;
-  } catch (err) {
-    if (err.response && err.response.status === 426) {
-      console.warn('NewsAPI 426 Upgrade Required -> plan gratuito limitado a primera pagina.');
+    if (!API_KEY) {
       return [];
     }
-    throw err;
   }
 
-  const articles = Array.isArray(data?.articles) ? data.articles : [];
-
-  const entries = articles.map((article, idx) => {
-    const rawText = [article.title || '', article.description || '', article.content || ''].join(' ');
-    const normalizedText = normalizeForMatch(rawText);
-    const hasWeddingContext = hasAny(normalizedText, WEDDING_PATTERNS);
-    const designHits = scoreMatches(normalizedText, DESIGN_PATTERNS);
-    const planningHits = scoreMatches(normalizedText, PLANNING_PATTERNS);
-    const valueScore = designHits * 3 + planningHits;
-    const isHardNegative = hasAny(normalizedText, HARD_NEGATIVE_PATTERNS);
-    const isGossip = hasAny(normalizedText, GOSSIP_PATTERNS);
-
-    return {
-      article,
-      idx,
-      designHits,
-      planningHits,
-      valueScore,
-      hasWeddingContext,
-      isHardNegative,
-      isGossip,
-      passesStrict:
-        hasWeddingContext && (designHits > 0 || planningHits > 0) && !isHardNegative && !(isGossip && designHits === 0),
-      passesLoose:
-        hasWeddingContext && !isHardNegative && (!isGossip || designHits > 0 || planningHits > 0),
-      passesMinimal: hasWeddingContext && !isHardNegative && !isGossip,
-    };
-  });
-
-  const toPost = ({ article, idx }) => ({
-    id: [String(page), String(idx), article.url].join('_'),
-    title: article.title,
-    description: article.description,
-    url: article.url,
-    image: article.urlToImage,
-    source: article.source?.name,
-    published: article.publishedAt,
-  });
-
-  const pickPosts = (filterFn, scoreFn) =>
-    entries
-      .filter(filterFn)
-      .sort((a, b) => scoreFn(b) - scoreFn(a) || a.idx - b.idx)
-      .map(toPost);
-
-  let posts = pickPosts((entry) => entry.passesStrict, (entry) => entry.valueScore);
-
-  if (!posts.length) {
-    posts = pickPosts(
-      (entry) => entry.passesLoose,
-      (entry) => entry.valueScore || entry.designHits + entry.planningHits,
-    );
+  if (Array.isArray(rssData) && rssData.length > 0) {
+    return maybeTranslatePosts(rssData.map((post) => normalizeBlogPost(post, lang)), lang);
   }
 
-  if (!posts.length) {
-    posts = pickPosts((entry) => entry.passesMinimal, (entry) => entry.designHits + entry.planningHits);
-  }
-
-  if (!posts.length) {
-    posts = entries
-      .filter((entry) => entry.hasWeddingContext && !entry.isHardNegative && !entry.isGossip)
-      .slice(0, pageSize)
-      .map(toPost);
-  }
-
-  if (lang && lang !== 'en') {
-    for (const p of posts) {
-      p.title = await translateText(p.title, lang, '');
-      p.description = await translateText(p.description, lang, '');
+  if (!API_KEY) {
+    const fallbackNoApiKey = await useStaticFallbackIfAvailable('no API key', page, pageSize, lang);
+    if (fallbackNoApiKey) {
+      return fallbackNoApiKey;
     }
+    return [];
   }
 
-  return posts;
-  */
+  try {
+    const news = await fetchFromNewsApi(page, pageSize, lang);
+    if (!news.length) {
+      const fallbackEmptyNewsApi = await useStaticFallbackIfAvailable(
+        'empty NewsAPI response',
+        page,
+        pageSize,
+        lang
+      );
+      if (fallbackEmptyNewsApi) {
+        return fallbackEmptyNewsApi;
+      }
+      return [];
+    }
+    return maybeTranslatePosts(news.map((entry) => normalizeBlogPost(entry, lang)), lang);
+  } catch (error) {
+    console.warn('[blogService] NewsAPI fallback failed', error);
+    const fallbackNewsApiError = await useStaticFallbackIfAvailable('NewsAPI error', page, pageSize, lang);
+    if (fallbackNewsApiError) {
+      return fallbackNewsApiError;
+    }
+    return [];
+  }
 }
+
+async function maybeTranslatePosts(posts, lang) {
+  if (!lang || lang === 'en') {
+    return posts;
+  }
+
+  const translated = [];
+  for (const post of posts) {
+    const copy = { ...post };
+    try {
+      copy.title = await translateText(copy.title, lang, '');
+      copy.description = await translateText(copy.description, lang, '');
+    } catch (error) {
+      console.warn('[blogService] translateText failed', error);
+    }
+    translated.push(copy);
+  }
+  return translated;
+}
+
+function appendFallbackMarker(url, cycle, index) {
+  if (!url) return url;
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set('ref', `mw360-fallback-${cycle}-${index}`);
+    return parsed.toString();
+  } catch {
+    const suffix = url.includes('?') ? '&' : '?';
+    return `${url}${suffix}ref=mw360-fallback-${cycle}-${index}`;
+  }
+}
+
+async function buildStaticFallback(page, pageSize, lang) {
+  const normalized = BLOG_FALLBACK_POSTS.map((entry) => normalizeBlogPost(entry));
+  const total = normalized.length;
+  if (!total) {
+    return [];
+  }
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const safeSize =
+    Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) || total : total;
+  const itemsPerPage = safeSize || total;
+  const offset = (safePage - 1) * itemsPerPage;
+  const expanded = [];
+  for (let i = 0; i < itemsPerPage; i += 1) {
+    const globalIndex = offset + i;
+    const base = normalized[globalIndex % total];
+    const cycle = Math.floor(globalIndex / total);
+    const clone = {
+      ...base,
+      id: `${base.id || 'fallback'}::${cycle}::${i}`,
+      source: base.source || `Fallback ${cycle + 1}`,
+      __fallback: true,
+      fallbackCycle: cycle,
+      fallbackIndex: i,
+    };
+    if (clone.url) {
+      clone.url = appendFallbackMarker(clone.url, cycle, i);
+    }
+    expanded.push(clone);
+  }
+  if (lang && lang !== 'es') {
+    return await maybeTranslatePosts(expanded, lang);
+  }
+  return expanded;
+}
+
+async function useStaticFallbackIfAvailable(reason, page, pageSize, lang) {
+  if (!STATIC_FALLBACK_ENABLED) {
+    return null;
+  }
+  const fallbackPosts = await buildStaticFallback(page, pageSize, lang);
+  if (!fallbackPosts.length) {
+    return null;
+  }
+  console.info(`[blogService] Using local blog fallback (${reason})`, fallbackPosts.length);
+  return fallbackPosts;
+}
+
 // Fin de archivo
+
+

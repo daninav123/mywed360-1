@@ -1,0 +1,219 @@
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { getDiscountLinks } from '../../services/adminDataService';
+
+const DEFAULT_SUMMARY = {
+  totalLinks: 0,
+  totalUses: 0,
+  totalRevenue: 0,
+  currency: 'EUR',
+};
+
+const formatCurrency = (value = 0, currency = 'EUR') =>
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency }).format(Number(value) || 0);
+
+const STATUS_LABELS = {
+  activo: 'Activo',
+  agotado: 'Agotado',
+  caducado: 'Caducado',
+};
+
+const TYPE_LABELS = {
+  planner: 'Planner',
+  influencer: 'Influencer',
+  partner: 'Partner',
+  campaign: 'Campaña',
+};
+
+const AdminDiscounts = () => {
+  const [links, setLinks] = useState([]);
+  const [summary, setSummary] = useState(DEFAULT_SUMMARY);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await getDiscountLinks();
+        if (!cancelled) {
+          setLinks(Array.isArray(data.items) ? data.items : []);
+          setSummary(data.summary || DEFAULT_SUMMARY);
+          setError('');
+        }
+      } catch (err) {
+        console.error('[AdminDiscounts] load failed:', err);
+        if (!cancelled) {
+          setError('No se pudieron obtener los enlaces de descuento.');
+          setLinks([]);
+          setSummary(DEFAULT_SUMMARY);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = useMemo(() => {
+    return links.filter((link) => {
+      const matchesStatus = statusFilter === 'all' || (link.status || '').toLowerCase() === statusFilter;
+      const matchesQuery = query
+        ? [link.code, link.url, link.assignedTo?.name]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(query.toLowerCase()))
+        : true;
+      return matchesStatus && matchesQuery;
+    });
+  }, [links, statusFilter, query]);
+
+  const handleCopy = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (copyError) {
+      console.warn('[AdminDiscounts] clipboard copy failed:', copyError);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Descuentos y enlaces comerciales</h1>
+          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+            Seguimiento de enlaces de descuento, asignaciones y facturación asociada.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Buscar por código, URL o responsable"
+            className="rounded-md border border-soft px-3 py-2 text-sm"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            className="rounded-md border border-soft px-3 py-2 text-sm"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="activo">Activos</option>
+            <option value="agotado">Agotados</option>
+            <option value="caducado">Caducados</option>
+          </select>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
+          Cargando enlaces comerciales...
+        </div>
+      ) : error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-600">{error}</div>
+      ) : (
+        <>
+          <section className="grid gap-4 sm:grid-cols-3">
+            <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
+              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Enlaces totales</p>
+              <p className="mt-2 text-2xl font-semibold">{summary.totalLinks}</p>
+            </article>
+            <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
+              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Usos acumulados</p>
+              <p className="mt-2 text-2xl font-semibold">{summary.totalUses}</p>
+            </article>
+            <article className="rounded-xl border border-soft bg-surface px-4 py-5 shadow-sm">
+              <p className="text-xs uppercase text-[var(--color-text-soft,#6b7280)]">Facturación asociada</p>
+              <p className="mt-2 text-2xl font-semibold">
+                {formatCurrency(summary.totalRevenue, summary.currency)}
+              </p>
+            </article>
+          </section>
+
+          <section className="rounded-xl border border-soft bg-surface shadow-sm">
+            <header className="border-b border-soft px-4 py-3">
+              <h2 className="text-sm font-semibold">Enlaces de descuento</h2>
+            </header>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-soft text-sm" data-testid="admin-discounts-table">
+                <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
+                  <tr>
+                    <th className="px-4 py-3 text-left">Código</th>
+                    <th className="px-4 py-3 text-left">URL</th>
+                    <th className="px-4 py-3 text-left">Asignado a</th>
+                    <th className="px-4 py-3 text-left">Estado</th>
+                    <th className="px-4 py-3 text-right">Usos</th>
+                    <th className="px-4 py-3 text-right">Facturación</th>
+                    <th className="px-4 py-3 text-left">Creado</th>
+                    <th className="px-4 py-3 text-left">Último uso</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-soft">
+                  {filtered.map((link) => (
+                    <tr key={link.id}>
+                      <td className="px-4 py-3 font-medium">{link.code}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate text-[color:var(--color-primary,#6366f1)] hover:underline"
+                          >
+                            {link.url || '—'}
+                          </a>
+                          {link.url ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCopy(link.url)}
+                              className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-[var(--color-primary,#6366f1)]"
+                            >
+                              Copiar
+                            </button>
+                          ) : null}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-col leading-tight">
+                          <span>{link.assignedTo?.name || '—'}</span>
+                          <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
+                            {TYPE_LABELS[link.assignedTo?.type] || link.assignedTo?.type || 'N/A'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 capitalize">{STATUS_LABELS[link.status] || link.status || '—'}</td>
+                      <td className="px-4 py-3 text-right">{link.usageCount ?? 0}</td>
+                      <td className="px-4 py-3 text-right">
+                        {formatCurrency(link.totalRevenue, link.currency || summary.currency)}
+                      </td>
+                      <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.createdAt || '—'}</td>
+                      <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.lastUsedAt || '—'}</td>
+                    </tr>
+                  ))}
+                  {!filtered.length && (
+                    <tr>
+                      <td
+                        className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]"
+                        colSpan={8}
+                      >
+                        No se encontraron enlaces con los filtros aplicados.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default AdminDiscounts;

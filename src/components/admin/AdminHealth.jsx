@@ -4,20 +4,10 @@ import {
 } from 'recharts';
 
 import { get as apiGet } from '../../services/apiClient';
-import { getAdminHeaders, getAdminSessionToken } from '../../services/adminSession';
+import { getAdminFetchOptions } from '../../services/adminSession';
 
-const buildAdminApiOptions = (extra = {}) => {
-  const token = getAdminSessionToken();
-  const options = { ...(extra || {}) };
-  options.headers = getAdminHeaders(options.headers || {});
-  if (!Object.prototype.hasOwnProperty.call(options, 'auth')) {
-    options.auth = !token;
-  }
-  if (!Object.prototype.hasOwnProperty.call(options, 'silent')) {
-    options.silent = true;
-  }
-  return options;
-};
+const buildAdminApiOptions = (extra = {}) =>
+  getAdminFetchOptions({ auth: false, silent: true, ...extra });
 
 function UsersWithErrorsTable({ timeframe = 'day' }) {
   const [items, setItems] = useState([]);

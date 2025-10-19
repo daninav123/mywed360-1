@@ -121,7 +121,7 @@ describe('Flujos completos del sistema de correo (E2E)', () => {
       return { success: true, id: 'new-email-id' };
     });
     EmailService.markAsRead.mockImplementation(async (id) => true);
-    EmailService.moveMail.mockImplementation(async (id, folder) => true);
+    EmailService.moveMail.mockResolvedValue(true);
     EmailService.deleteMail.mockImplementation(async (id) => true);
 
     TagService.getUserTags.mockReturnValue(mockTags);
@@ -475,6 +475,5 @@ describe('Flujos completos del sistema de correo (E2E)', () => {
     });
   });
 });
-
 
 

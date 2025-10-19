@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 import useTranslations from '../hooks/useTranslations';
 
@@ -468,6 +468,7 @@ function FreeDrawCanvasComp({
         ref={svgRef}
         className={`w-full h-full ${className}`}
         style={style}
+        data-seating-canvas
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}

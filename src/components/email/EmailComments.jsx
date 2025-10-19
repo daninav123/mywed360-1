@@ -1,5 +1,5 @@
 import { Trash } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '../../hooks/useAuth';
 import * as CommentService from '../../services/commentService';
@@ -15,32 +15,53 @@ const EmailComments = ({ emailId }) => {
 
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const loadComments = () => {
-    const list = CommentService.getComments(userId, emailId);
-    setComments(list);
-  };
+  const loadComments = useCallback(async () => {
+    if (!emailId || !userId) return;
+    setLoading(true);
+    try {
+      const list = await CommentService.getComments(userId, emailId);
+      setComments(Array.isArray(list) ? list : []);
+    } catch (error) {
+      console.error('No se pudieron cargar los comentarios', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [emailId, userId]);
 
   useEffect(() => {
-    if (emailId) loadComments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [emailId]);
+    void loadComments();
+  }, [loadComments]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const body = newComment.trim();
-    if (!body) return;
-    CommentService.addComment(userId, emailId, {
-      authorId: userId,
-      authorName: userProfile?.name || 'Yo',
-      body,
-    });
-    setNewComment('');
-    loadComments();
+    if (!body || !emailId) return;
+    setSaving(true);
+    try {
+      await CommentService.addComment(userId, emailId, {
+        authorId: userId,
+        authorName: userProfile?.name || 'Yo',
+        body,
+      });
+      setNewComment('');
+      await loadComments();
+    } catch (error) {
+      console.error('No se pudo guardar el comentario', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDelete = (commentId) => {
-    CommentService.deleteComment(userId, emailId, commentId);
-    loadComments();
+  const handleDelete = async (commentId) => {
+    try {
+      await CommentService.deleteComment(userId, emailId, commentId);
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+    } catch (error) {
+      console.error('No se pudo eliminar el comentario', error);
+      await loadComments();
+    }
   };
 
   if (!emailId) return null;
@@ -49,7 +70,11 @@ const EmailComments = ({ emailId }) => {
     <div className="mt-6 border-t pt-4">
       <h3 className="font-semibold mb-2">Comentarios internos</h3>
 
-      {comments.length === 0 && (
+      {loading && comments.length === 0 ? (
+        <p className="text-sm text-gray-500 mb-4">Cargando comentarios…</p>
+      ) : null}
+
+      {!loading && comments.length === 0 && (
         <p className="text-sm text-gray-500 mb-4">Aún no hay comentarios.</p>
       )}
 
@@ -88,9 +113,9 @@ const EmailComments = ({ emailId }) => {
         <button
           onClick={handleAdd}
           className="bg-blue-600 text-white rounded-md px-3 py-2 text-sm disabled:opacity-40"
-          disabled={!newComment.trim()}
+          disabled={saving || !newComment.trim()}
         >
-          Añadir
+          {saving ? 'Guardando…' : 'Añadir'}
         </button>
       </div>
     </div>

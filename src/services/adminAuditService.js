@@ -1,63 +1,83 @@
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-
-import { db } from '../firebaseConfig.jsx';
-import errorLogger from '../utils/errorLogger';
 import { apiPost } from './apiClient';
-import { getAdminHeaders, getAdminSessionToken } from './adminSession';
+import { hasAdminSession, getAdminSessionToken, getAdminFetchOptions } from './adminSession';
 
-const AUDIT_COLLECTION = 'adminAuditLogs';
+const ADMIN_AUDIT_ENDPOINT = '/api/admin/audit';
+const ENABLE_ADMIN_AUDIT = (import.meta && import.meta.env && import.meta.env.VITE_ENABLE_ADMIN_AUDIT === 'true') || false;
 
-const withTimestamp = (payload = {}) => ({
-  ...payload,
-  createdAt: payload.createdAt || serverTimestamp(),
-});
-
-const safeCollection = () => {
-  if (!db) {
-    return null;
-  }
-  try {
-    return collection(db, AUDIT_COLLECTION);
-  } catch (error) {
-    errorLogger?.logError?.('AdminAuditCollectionError', { message: error.message });
-    return null;
-  }
+const sanitize = (value, max = 256) => {
+  if (typeof value !== 'string') return '';
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed;
 };
 
-export const recordAdminAudit = async (action, payload = {}) => {
-  if (!action) {
-    return false;
+const buildPayload = (event = {}) => {
+  const action = sanitize(event.action) || 'UNKNOWN_ADMIN_EVENT';
+  const actor = sanitize(event.actor || event.email || '');
+  const outcome = sanitize(event.outcome || '');
+  const resourceType = sanitize(event.resourceType || '');
+  const resourceId = sanitize(event.resourceId || '');
+  const reason = sanitize(event.reason || '');
+  const path = sanitize(event.path || event.route || '');
+
+  const payload = {
+    action,
+    outcome: outcome || undefined,
+    actor: actor || undefined,
+    resourceType: resourceType || undefined,
+    resourceId: resourceId || undefined,
+  };
+
+  const metadata = { ...(event.metadata && typeof event.metadata === 'object' ? event.metadata : {}) };
+  if (reason) metadata.reason = reason;
+  if (path) metadata.path = path;
+  if (event.context && typeof event.context === 'object') {
+    metadata.context = { ...(metadata.context || {}), ...event.context };
   }
-  // 1) Intentar vía backend protegido si hay sesión admin
+
+  if (Object.keys(metadata).length > 0) {
+    payload.metadata = metadata;
+  }
+
+  if (event.payload && typeof event.payload === 'object') {
+    payload.payload = event.payload;
+  } else if (typeof event.payload === 'string') {
+    payload.payload = sanitize(event.payload, 512);
+  } else if (reason || path) {
+    payload.payload = { reason, path };
+  }
+
+  return payload;
+};
+
+export async function recordAdminSecurityEvent(event) {
   try {
-    const token = getAdminSessionToken();
-    if (token) {
-      const res = await apiPost('/api/admin/audit', { action, ...payload }, { auth: false, headers: getAdminHeaders() });
-      if (res && res.status === 204) return true;
+    if (!ENABLE_ADMIN_AUDIT) {
+      return false;
     }
-  } catch (error) {
-    errorLogger?.logError?.('AdminAuditHttpError', { action, message: error?.message });
-  }
+    const hasSession = hasAdminSession();
+    if (!hasSession) {
+      return false;
+    }
 
-  // 2) Fallback: escribir directamente en Firestore (puede fallar según reglas)
-  const col = safeCollection();
-  if (!col) return false;
-  try {
-    await addDoc(col, withTimestamp({ action, ...payload }));
-    return true;
+    const token = getAdminSessionToken();
+    const opts = getAdminFetchOptions({ auth: false, silent: true });
+    if (token) {
+      opts.headers = { ...(opts.headers || {}), 'X-Admin-Session': token };
+    }
+    // Refuerzo para evitar logging de error en consola del interceptador
+    opts.headers = { ...(opts.headers || {}), 'X-Suppress-Error-Logging': '1' };
+
+    const res = await apiPost(ADMIN_AUDIT_ENDPOINT, buildPayload(event), opts);
+
+    if (!res?.ok && import.meta && import.meta.env && import.meta.env.DEV) {
+      console.warn('[adminAuditService] No se pudo registrar el evento', res?.status);
+    }
+    return !!res?.ok;
   } catch (error) {
-    errorLogger?.logError?.('AdminAuditWriteError', { action, message: error.message });
+    if (import.meta && import.meta.env && import.meta.env.DEV) {
+      console.warn('[adminAuditService] Error enviando evento de auditoria', error);
+    }
     return false;
   }
-};
-
-export const recordAdminSecurityEvent = async ({ action, email, outcome, reason }) => {
-  return recordAdminAudit(action, {
-    actor: email || 'unknown',
-    resourceType: 'auth',
-    outcome,
-    details: reason,
-  });
-};
-
-export default recordAdminAudit;
+}

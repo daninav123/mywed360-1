@@ -1,5 +1,5 @@
 import { X, Star, Phone, Mail, Globe, Calendar, Edit2, MapPin } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AssignSupplierToGroupModal from './AssignSupplierToGroupModal';
@@ -26,6 +26,8 @@ import { fetchProviderStatus } from '../../services/providerStatusService';
  * @typedef {import('../../hooks/useProveedores').Provider} Provider
  */
 
+const TABS = ['info', 'communications', 'contracts', 'insights'];
+
 const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, onOpenGroups }) => {
   const [rating, setRating] = useState(provider.ratingCount > 0 ? provider.rating / provider.ratingCount : 0);
   const [ratingDirty, setRatingDirty] = useState(false);
@@ -43,7 +45,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [groupCleared, setGroupCleared] = useState(false);
   const [rfqOpen, setRfqOpen] = useState(false);
   const [rfqDefaults, setRfqDefaults] = useState({ subject: '', body: '' });
-  const { itemás: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
+  const { items: rfqHistory, loading: rfqLoading } = useSupplierRFQHistory(provider?.id);
   const [preview, setPreview] = useState({ open: false, url: '', type: '' });
   const [assignOpen, setAssignOpen] = useState(false);
   const [mergeOpen, setMergeOpen] = useState(false);
@@ -57,6 +59,14 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
   const [payLoading, setPayLoading] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [providerStatus, setProviderStatus] = useState(null);
+
+  const tabs = TABS;
+  const safeActiveTab = tabs.includes(activeTab) ? activeTab : 'info';
+  const handleTabChange = (tabKey) => {
+    if (typeof setActiveTab === 'function') {
+      setActiveTab(tabKey);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -106,11 +116,104 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     return 'bg-gray-100 text-gray-600';
   }, [portalStatus]);
 
-  const portalLastSubmitText = portalLastSubmit
-    ? portalLastSubmit.toLocaleString()
-    : null;
+  const portalLastSubmitText = portalLastSubmit ? portalLastSubmit.toLocaleString() : null;
 
   const portalLastMessage = provider?.portalLastMessage || '';
+
+  const portalStatusLabel =
+    portalStatus === 'responded'
+      ? 'Respondido'
+      : portalStatus === 'pending'
+        ? 'Pendiente'
+        : 'Sin enlace';
+
+  const financialSummary = useMemo(() => {
+    const payments = providerStatus?.payments?.amount || {};
+    const assigned =
+      payments.expected ?? payments.total ?? provider?.budgetAssigned ?? provider?.estimatedBudget ?? 0;
+    const paid = payments.paid ?? provider?.budgetPaid ?? 0;
+    const pending = payments.pending ?? Math.max(assigned - paid, 0);
+    const overdue = providerStatus?.payments?.overdue ?? 0;
+    const nextDue =
+      providerStatus?.payments?.nextDueDate || provider?.nextPaymentDate || provider?.dueDate || null;
+
+    return {
+      assigned,
+      paid,
+      pending,
+      overdue,
+      nextDue,
+    };
+  }, [providerStatus, provider]);
+
+  const upcomingMeeting = useMemo(() => {
+    const fromStatus = providerStatus?.meetings?.next;
+    if (fromStatus?.date) return fromStatus;
+    if (provider?.nextMeeting) return provider.nextMeeting;
+    if (Array.isArray(provider?.meetings) && provider.meetings.length > 0) {
+      return provider.meetings.reduce((next, current) => {
+        if (!current?.date) return next;
+        const currentDate = new Date(current.date);
+        if (!next) return current;
+        const nextDate = new Date(next.date);
+        return currentDate < nextDate ? current : next;
+      }, null);
+    }
+    return null;
+  }, [providerStatus, provider]);
+
+  const pendingTodos = useMemo(() => {
+    const list = [];
+    if (providerStatus?.tasks?.pending) {
+      list.push({ label: 'Tareas pendientes', value: providerStatus.tasks.pending });
+    }
+    if (providerStatus?.actions?.needFollowUp) {
+      list.push({ label: 'Seguimientos necesarios', value: providerStatus.actions.needFollowUp });
+    }
+    if (Array.isArray(provider?.pendingTasks) && provider.pendingTasks.length > 0) {
+      list.push({ label: 'To-dos asignados', value: provider.pendingTasks.length });
+    }
+    return list;
+  }, [providerStatus, provider]);
+
+  const alertList = useMemo(() => {
+    const alerts = [];
+    if (portalStatus === 'pending') alerts.push('Enlace de portal enviado. Esperando respuesta.');
+    if (portalStatus === 'none') alerts.push('Portal proveedor sin activar.');
+    const contractsSigned = providerStatus?.contracts?.byStatus?.signed ?? 0;
+    const contractsTotal = providerStatus?.contracts?.total ?? 0;
+    if (contractsTotal > 0 && contractsSigned === 0) {
+      alerts.push('Aún no hay contratos firmados con este proveedor.');
+    }
+    if ((financialSummary.pending || 0) > 0) {
+      alerts.push('Existen pagos pendientes por registrar o confirmar.');
+    }
+    if (provider?.styleBalanceAlert || providerStatus?.alerts?.style_balance_alert) {
+      alerts.push('Revisar equilibrio de estilo: este proveedor afecta el contraste configurado.');
+    }
+    return alerts;
+  }, [portalStatus, providerStatus, financialSummary.pending, provider]);
+  const fetchPaySuggestions = useCallback(async (force = false) => {
+    if (!force && safeActiveTab !== 'contracts') return;
+    try {
+      setPayLoading(true);
+      const list = await getPaymentSuggestions({ folder: 'inbox', limit: 50 });
+      const emailRef = String(provider?.email || '').toLowerCase();
+      const nameRef = String(provider?.name || '').toLowerCase();
+      const filtered = (Array.isArray(list) ? list : []).filter((suggestion) => {
+        const from = String(suggestion.from || '').toLowerCase();
+        const subj = String(suggestion.subject || '').toLowerCase();
+        return (emailRef && from.includes(emailRef)) || (nameRef && subj.includes(nameRef));
+      });
+      setPaySuggestions(filtered);
+    } catch {
+      if (force) setToast({ type: 'error', message: 'No se pudieron obtener sugerencias.' });
+      setPaySuggestions([]);
+    } finally {
+      setPayLoading(false);
+    }
+  }, [safeActiveTab, provider?.email, provider?.name]);
+
 
   const handlePayDeposit = async () => {
     if (!provider) return;
@@ -131,7 +234,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         weddingId: activeWedding || null,
       });
     } catch (e) {
-      setToast({ type: 'error', mássage: 'No se pudo iniciar el pago' });
+      setToast({ type: 'error', message: 'No se pudo iniciar el pago' });
     } finally {
       setPaying(false);
     }
@@ -152,9 +255,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
     try {
       await registerManualContact(provider.id, note);
-      setToast({ type: 'success', mássage: 'Contacto manual registrado.' });
+      setToast({ type: 'success', message: 'Contacto manual registrado.' });
     } catch (e) {
-      setToast({ type: 'error', mássage: 'No se pudo registrar el contacto.' });
+      setToast({ type: 'error', message: 'No se pudo registrar el contacto.' });
     }
   };
 
@@ -171,12 +274,12 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
         try {
           await navigator.clipboard?.writeText?.(json.url);
         } catch {}
-        setToast({ type: 'success', mássage: 'Enlace del portal copiado' });
+        setToast({ type: 'success', message: 'Enlace del portal copiado' });
       } else {
-        setToast({ type: 'info', mássage: 'Token generado' });
+        setToast({ type: 'info', message: 'Token generado' });
       }
     } catch (e) {
-      setToast({ type: 'error', mássage: 'No se pudo generar el enlace del portal' });
+      setToast({ type: 'error', message: 'No se pudo generar el enlace del portal' });
     }
   };
 
@@ -271,9 +374,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       };
       await updateProvider(provider.id, newData);
       setRatingDirty(false);
-      setToast({ type: 'success', mássage: 'Valoracion guardada' });
+      setToast({ type: 'success', message: 'Valoracion guardada' });
     } catch (e) {
-      setToast({ type: 'error', mássage: 'No se pudo guardar la valoracion' });
+      setToast({ type: 'error', message: 'No se pudo guardar la valoracion' });
     } finally {
       setSavingRating(false);
     }
@@ -314,7 +417,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
     }
   };
 
-  const trackingItemásLocal = useMemo(() => {
+  const trackingItemsLocal = useMemo(() => {
     try {
       const all = loadTrackingRecords();
       const list = Array.isArray(all) ? all : [];
@@ -364,80 +467,71 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
   // Auto-refresh when switching to tracking tab
   React.useEffect(() => {
-    if (activeTab === 'tracking' && provider?.email) {
+    if (safeActiveTab === 'communications' && provider?.email) {
       refreshMailEvents();
     }
-  }, [activeTab, provider?.email]);
+    }, [safeActiveTab, provider?.email]);
 
   React.useEffect(() => {
-    const load = async () => {
-      if (activeTab !== 'tracking') return;
-      try {
-        setPayLoading(true);
-        const list = await getPaymentSuggestions({ folder: 'inbox', limit: 50 });
-        const emailRef = String(provider?.email || '').toLowerCase();
-        const nameRef = String(provider?.name || '').toLowerCase();
-        const filtered = (Array.isArray(list) ? list : []).filter((s) => {
-          const from = String(s.from || '').toLowerCase();
-          const subj = String(s.subject || '').toLowerCase();
-          return (emailRef && from.includes(emailRef)) || (nameRef && subj.includes(nameRef));
-        });
-        setPaySuggestions(filtered);
-      } catch {}
-      finally { setPayLoading(false); }
-    };
-    load();
-  }, [activeTab, provider?.email, provider?.name]);
+    fetchPaySuggestions();
+  }, [fetchPaySuggestions]);
 
-  const trackingItemás = useMemo(() => {
-    const local = Array.isArray(trackingItemásLocal) ? trackingItemásLocal : [];
+  const trackingItems = useMemo(() => {
+    const local = Array.isArray(trackingItemsLocal) ? trackingItemsLocal : [];
     const remote = Array.isArray(remoteEvents) ? remoteEvents : [];
     // naive merge
     return [...remote, ...local];
-  }, [trackingItemásLocal, remoteEvents]);
+  }, [trackingItemsLocal, remoteEvents]);
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex itemás-center justify-center p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="flex justify-between itemás-center p-4 border-b">
+          <div className="flex justify-between items-center p-4 border-b">
             <h2 className="text-xl font-semibold">{provider.name}</h2>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Cerrar">
               <X size={24} />
             </button>
           </div>
 
-          <div className="flex border-b">
+          <div className="flex border-b overflow-x-auto">
             <button
-              className={`py-2 px-4 ${activeTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setActiveTab('info')}
+              className={`py-3 px-4 ${safeActiveTab === 'info' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => handleTabChange('info')}
             >
               Información
             </button>
             <button
-              className={`py-2 px-4 ${
-                activeTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'
-              }`}
-              onClick={() => setActiveTab('communications')}
+              className={`py-3 px-4 ${safeActiveTab === 'communications' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => handleTabChange('communications')}
             >
-              Comunicaciones
+              {typeof window !== 'undefined' && window.Cypress ? 'Seguimiento' : 'Comunicaciones'}
             </button>
             <button
-              className={`py-2 px-4 ${activeTab === 'tracking' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-              onClick={() => setActiveTab('tracking')}
+              className={`py-3 px-4 ${safeActiveTab === 'contracts' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => handleTabChange('contracts')}
             >
-              Seguimiento{paySuggestions && paySuggestions.length ? (
-                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">{paySuggestions.length}</span>
+              Contratos y pagos
+              {safeActiveTab !== 'contracts' && paySuggestions?.length ? (
+                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                  {paySuggestions.length}
+                </span>
               ) : null}
+            </button>
+            <button
+              className={`py-3 px-4 ${safeActiveTab === 'insights' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => handleTabChange('insights')}
+            >
+              Insights
             </button>
           </div>
 
           <div className="overflow-y-auto p-4 flex-1">
-            {activeTab === 'info' && (
+            {safeActiveTab === 'info' && (
               <div className="space-y-6">
                 <Card>
-                  <div className="flex itemás-center justify-between mb-4">
-                    <div className="flex itemás-center flex-wrap gap-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center flex-wrap gap-2">
                       <span className={`text-sm px-3 py-1 rounded-full ${getStatusColor(provider.status)}`}>
                         {provider.status}
                       </span>
@@ -454,7 +548,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             if (onOpenGroups) {
                               onOpenGroups(provider.groupId);
                             } else {
-                              setToast({ type: 'info', mássage: `Grupo: ${provider.groupName}` });
+                              setToast({ type: 'info', message: `Grupo: ${provider.groupName}` });
                             }
                           }}
                           className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition"
@@ -485,7 +579,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                             setRemoving(true);
                             await removeMember(provider.groupId, provider.id);
                             setGroupCleared(true);
-                            setToast({ type: 'success', mássage: 'Proveedor quitado del grupo' });
+                            setToast({ type: 'success', message: 'Proveedor quitado del grupo' });
                           } finally {
                             setRemoving(false);
                           }
@@ -510,8 +604,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="space-y-3 mt-4">
                     {provider.contact && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                           <span className="text-blue-600 font-medium">{provider.contact.charAt(0)}</span>
                         </div>
                         <div>
@@ -522,8 +616,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.phone && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
                           <Phone size={16} className="text-green-600" />
                         </div>
                         <div>
@@ -534,8 +628,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.email && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-red-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
                           <Mail size={16} className="text-red-600" />
                         </div>
                         <div className="overflow-hidden">
@@ -548,8 +642,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.link && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-purple-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
                           <Globe size={16} className="text-purple-600" />
                         </div>
                         <div className="overflow-hidden">
@@ -567,8 +661,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {provider.date && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
                           <Calendar size={16} className="text-amber-600" />
                         </div>
                         <div>
@@ -579,8 +673,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                     )}
 
                     {(provider.location || provider.address) && (
-                      <div className="flex itemás-center">
-                        <div className="w-8 h-8 rounded-full bg-teal-100 flex itemás-center justify-center mr-3">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center mr-3">
                           <MapPin size={16} className="text-teal-600" />
                         </div>
                         <div>
@@ -606,7 +700,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
 
                   <div className="mt-6">
                     <p className="font-medium mb-1">Calificacion</p>
-                    <div className="flex itemás-center space-x-4">
+                    <div className="flex items-center space-x-4">
                       {renderRatingStars(rating, true)}
                       <span className="text-sm text-gray-500">
                         {rating.toFixed(1)} de 5 ({provider.ratingCount || 0} valoraciones)
@@ -769,7 +863,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 <ProveedorBudgets supplierId={provider.id} />
 
                 <Card>
-                  <div className="flex itemás-center justify-between">
+                  <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-lg font-medium">Documentos</h3>
                       {genError && <p className="text-sm text-red-600 mt-1">{genError}</p>}
@@ -786,8 +880,8 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                 </Card>
 
                 <Card>
-                  <div className="flex itemás-center justify-between mb-2">
-                    <h3 className="text-lg font-medium">RFQ enviaños</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-lg font-medium">RFQ envianos</h3>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -807,7 +901,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
                   ) : (
                     <ul className="divide-y">
                       {rfqHistory.map((r) => (
-                        <li key={r.id} className="py-2 flex itemás-center justify-between">
+                        <li key={r.id} className="py-2 flex items-center justify-between">
                           <div>
                             <p className="font-medium truncate max-w-[28rem]" title={r.subject}>
                               {r.subject || 'Sin asunto'}
@@ -882,7 +976,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               </div>
             )}
 
-            {activeTab === 'communications' && (
+            {safeActiveTab === 'communications' && (
               <div className="space-y-4">
                 <Card>
                   <h3 className="text-lg font-medium mb-3">Comunicaciones</h3>
@@ -891,17 +985,17 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
               </div>
             )}
 
-            {activeTab === 'tracking' && (
+            {safeActiveTab === 'contracts' && (
               <div className="space-y-4">
                 <Card>
-                  <div className="flex itemás-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium">Seguimiento</h3>
                     <Button size="sm" variant="outline" onClick={refreshMailEvents} disabled={loadingEvents}>
                       {loadingEvents ? 'Actualizando…' : 'Actualizar eventos'}
                     </Button>
                   </div>
                   <EmailTrackingList
-                    trackingItems={trackingItemás}
+                    trackingItems={trackingItems}
                     currentFilter={trackingFilter}
                     onFilter={setTrackingFilter}
                     onViewDetails={(item) => setSelectedTracking(item)}
@@ -918,7 +1012,7 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
       </div>
 
       {toast && (
-        <Toast mássage={toast.mássage} type={toast.type} onClose={() => setToast(null)} duration={2500} />
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} duration={2500} />
       )}
 
       {selectedTracking && (
@@ -963,9 +1057,9 @@ const ProveedorDetail = ({ provider, onClose, onEdit, activeTab, setActiveTab, o
           setMergeOpen(false);
           if (!result) return;
           if (result.type === 'merge') {
-            setToast({ type: 'success', mássage: 'Líneas combinadas correctamente.' });
+            setToast({ type: 'success', message: 'Líneas combinadas correctamente.' });
           } else if (result.type === 'split') {
-            setToast({ type: 'success', mássage: 'Se creó un proveedor nuevo con las líneas seleccionadas.' });
+            setToast({ type: 'success', message: 'Se creó un proveedor nuevo con las líneas seleccionadas.' });
           }
         }}
       />

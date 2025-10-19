@@ -7,9 +7,12 @@ import PageWrapper from '../components/PageWrapper';
 import Button from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Progress } from '../components/ui/Progress';
+import WeddingModulePermissionsCard from '../components/weddings/WeddingModulePermissionsCard.jsx';
 import { db } from '../firebaseConfig';
+import useWeddingCollection from '../hooks/useWeddingCollection';
 import { useWedding } from '../context/WeddingContext';
 import { performanceMonitor } from '../services/PerformanceMonitor';
+import { updateWeddingModulePermissions } from '../services/WeddingService';
 import {
   EVENT_TYPE_LABELS,
   EVENT_STYLE_OPTIONS,
@@ -47,8 +50,13 @@ export default function BodaDetalle() {
   const [wedding, setWedding] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updatingState, setUpdatingState] = useState(false);
+  const [savingPermissions, setSavingPermissions] = useState(false);
   const navigate = useNavigate();
-  const { activeWedding, setActiveWedding } = useWedding();
+  const { activeWedding, setActiveWedding, activeWeddingPermissions } = useWedding();
+
+  const { data: guests } = useWeddingCollection('guests', id, []);
+  const { data: tasks } = useWeddingCollection('tasks', id, []);
+  const { data: suppliers } = useWeddingCollection('suppliers', id, []);
 
   const DESIGN_ITEMS = [
     { key: 'web', label: 'Página web' },
@@ -86,6 +94,7 @@ export default function BodaDetalle() {
           eventProfile: data.eventProfile || null,
           eventProfileSummary: data.eventProfileSummary || null,
           preferences: data.preferences || {},
+          modulePermissions: data.modulePermissions || {},
         });
         setLoading(false);
       },
@@ -97,7 +106,7 @@ export default function BodaDetalle() {
   if (loading) return <p>Cargando detalle...</p>;
   if (!wedding) return <p>No se encontró la boda.</p>;
 
-  const pendingTasks = (wedding.tasks || []).filter((t) => !t.done).length;
+  const pendingTasks = (Array.isArray(tasks) ? tasks : []).filter((t) => !t?.done).length;
   const isActive = wedding.active !== false;
   const eventTypeValue = typeof wedding.eventType === 'string' ? wedding.eventType.toLowerCase() : 'boda';
   const eventLabel = EVENT_TYPE_LABELS[eventTypeValue] || 'Evento';
@@ -139,6 +148,22 @@ export default function BodaDetalle() {
 
   const hasProfileData =
     guestLabel || formalityLabel || ceremonyLabel || relatedLabels.length > 0 || notes || styleLabel;
+
+  const canEditPermissions = Boolean(activeWeddingPermissions?.manageSettings);
+
+  const handlePermissionsSave = async (nextPermissions) => {
+    if (!id) return;
+    setSavingPermissions(true);
+    try {
+      await updateWeddingModulePermissions(id, nextPermissions);
+      performanceMonitor?.logEvent?.('wedding_permissions_updated', { weddingId: id });
+    } catch (error) {
+      console.error('[BodaDetalle] No se pudieron actualizar los permisos', error);
+      alert('No se pudieron actualizar los permisos. Intenta nuevamente.');
+    } finally {
+      setSavingPermissions(false);
+    }
+  };
 
   const toggleArchive = async () => {
     const nextActive = !isActive;
@@ -253,23 +278,26 @@ export default function BodaDetalle() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
         <Card className="text-center cursor-pointer" onClick={() => navigate('/invitados')}>
           <p className="text-sm text-muted">Invitados</p>
-          <p className="text-2xl font-bold text-[color:var(--color-text)]">
-            {(wedding.guests || []).length}
-          </p>
+          <p className="text-2xl font-bold text-[color:var(--color-text)]">{(Array.isArray(guests) ? guests.length : 0)}</p>
         </Card>
         <Card className="text-center">
           <p className="text-sm text-muted">Tareas pendientes</p>
           <p className="text-2xl font-bold text-[color:var(--color-text)]">{pendingTasks}</p>
         </Card>
-        <Card className="text-center cursor-pointer" onClick={() => navigate('/proveedores')}>
-          <p className="text-sm text-muted">Proveedores</p>
-          <p className="text-2xl font-bold text-[color:var(--color-text)]">
-            {(wedding.suppliers || []).length}
-          </p>
-        </Card>
-      </div>
+      <Card className="text-center cursor-pointer" onClick={() => navigate('/proveedores')}>
+        <p className="text-sm text-muted">Proveedores</p>
+        <p className="text-2xl font-bold text-[color:var(--color-text)]">{(Array.isArray(suppliers) ? suppliers.length : 0)}</p>
+      </Card>
+    </div>
 
-      <div className="mt-6">
+      <WeddingModulePermissionsCard
+        modulePermissions={wedding.modulePermissions}
+        onSave={handlePermissionsSave}
+        canEdit={canEditPermissions}
+        saving={savingPermissions}
+      />
+
+    <div className="mt-6">
         <div className="flex justify-between text-sm mb-1">
           <span>Progreso</span>
           <span className="font-medium">{wedding.progress}%</span>

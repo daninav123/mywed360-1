@@ -6,6 +6,10 @@ import {
   registerAdminSession,
   revokeAdminSession,
 } from '../services/adminSessions.js';
+import { getCookie } from '../utils/cookies.js';
+
+const ADMIN_SESSION_COOKIE = 'admin_session';
+const isProductionEnv = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
 
 // Router para autenticación de administrador
 // Endpoints:
@@ -37,7 +41,8 @@ function minutes(ms) {
 }
 
 function getConfig() {
-  const requireMfa = toBool(process.env.ADMIN_REQUIRE_MFA, true);
+  const isProd = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
+  const requireMfa = isProd ? toBool(process.env.ADMIN_REQUIRE_MFA, true) : true;
   const mfaWindowSec = Number(process.env.ADMIN_MFA_WINDOW_SECONDS || '90');
   const maxAttempts = Number(process.env.ADMIN_LOGIN_MAX_ATTEMPTS || '5');
   const windowMinutes = Number(process.env.ADMIN_LOGIN_WINDOW_MINUTES || '60');
@@ -45,7 +50,8 @@ function getConfig() {
   const sessionTtlMinutes = Number(process.env.ADMIN_SESSION_TTL_MINUTES || '720');
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@lovenda.com';
   const adminName = process.env.ADMIN_NAME || 'Administrador Lovenda';
-  const adminPassword = process.env.ADMIN_PASSWORD || '';
+  // En desarrollo, si no hay contraseña definida, usar un valor por defecto compatible con E2E
+  const adminPassword = process.env.ADMIN_PASSWORD || (process.env.NODE_ENV !== 'production' ? 'AdminPass123!' : '');
   const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || '';
   return {
     requireMfa,
@@ -59,6 +65,30 @@ function getConfig() {
     adminPassword,
     adminPasswordHash,
   };
+}
+
+function setAdminSessionCookie(res, sessionToken, { sessionTtlMinutes }) {
+  if (!res || !sessionToken) return;
+  const ttlMinutes = Number(sessionTtlMinutes || 720);
+  const maxAgeMs = Math.max(ttlMinutes, 1) * 60 * 1000;
+  res.cookie(ADMIN_SESSION_COOKIE, sessionToken, {
+    httpOnly: true,
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    maxAge: maxAgeMs,
+  });
+}
+
+function clearAdminSessionCookie(res) {
+  if (!res) return;
+  res.cookie(ADMIN_SESSION_COOKIE, '', {
+    httpOnly: true,
+    secure: isProductionEnv,
+    sameSite: isProductionEnv ? 'strict' : 'lax',
+    path: '/',
+    expires: new Date(0),
+  });
 }
 
 function getAllowedDomains() {
@@ -164,8 +194,14 @@ router.post('/login', async (req, res) => {
       return res.status(429).json({ code: 'locked', message: 'Se han superado los intentos permitidos', lockedUntil: new Date(stats.lockedUntil).toISOString() });
     }
 
+    // Usuario de dominio permitido pero sin rol admin
+    if (normalized !== cfg.adminEmail) {
+      registerFailedAttempt(normalized);
+      return res.status(401).json({ code: 'role_mismatch', message: 'Tu cuenta no dispone de acceso administrador' });
+    }
+
     // Verificación básica de credenciales
-    if (normalized !== cfg.adminEmail || !simplePasswordCheck(password, cfg)) {
+    if (!simplePasswordCheck(password, cfg)) {
       const after = registerFailedAttempt(normalized);
       const left = Math.max(0, cfg.maxAttempts - after.count);
       const msg = left > 0
@@ -180,7 +216,8 @@ router.post('/login', async (req, res) => {
     if (cfg.requireMfa) {
       const challengeId = genId('mfa');
       const resumeToken = genId('res');
-      const testCode = (process.env.ADMIN_MFA_TEST_CODE || '').trim();
+      // En desarrollo, si no se definió ADMIN_MFA_TEST_CODE, usar 123456 para pruebas E2E deterministas
+      const testCode = (process.env.ADMIN_MFA_TEST_CODE || (process.env.NODE_ENV !== 'production' ? '123456' : '')).trim();
       const code = String(testCode || Math.floor(100000 + Math.random() * 900000)); // 6 dígitos (testCode si existe)
       const expiresAt = now() + (cfg.mfaWindowSec * 1000);
       challenges.set(challengeId, { email: normalized, code, resumeToken, expiresAt });
@@ -190,7 +227,13 @@ router.post('/login', async (req, res) => {
     const profile = buildProfile(normalized, cfg);
     const adminUser = { uid: profile.id, email: profile.email, displayName: profile.name };
     const { sessionId, sessionToken, sessionExpiresAt } = await createAdminSession(profile);
-    return res.json({ profile, adminUser, sessionId, sessionToken, sessionExpiresAt: sessionExpiresAt.toISOString() });
+    setAdminSessionCookie(res, sessionToken, cfg);
+    return res.json({
+      profile,
+      adminUser,
+      sessionId,
+      sessionExpiresAt: sessionExpiresAt.toISOString(),
+    });
   } catch (e) {
     return res.status(500).json({ code: 'login_failed', message: 'No se pudo iniciar sesión' });
   }
@@ -228,7 +271,13 @@ router.post('/login/mfa', async (req, res) => {
     const { sessionId, sessionToken, sessionExpiresAt } = await createAdminSession(profile);
 
     challenges.delete(challengeId);
-    return res.json({ profile, adminUser, sessionId, sessionToken, sessionExpiresAt: sessionExpiresAt.toISOString() });
+    setAdminSessionCookie(res, sessionToken, cfg);
+    return res.json({
+      profile,
+      adminUser,
+      sessionId,
+      sessionExpiresAt: sessionExpiresAt.toISOString(),
+    });
   } catch (e) {
     return res.status(500).json({ code: 'mfa_failed', message: 'No se pudo completar MFA' });
   }
@@ -242,15 +291,20 @@ router.post('/logout', (req, res) => {
       req.headers['x-admin-session'] ||
       req.headers['x-admin-session-token'] ||
       req.headers['x-admin-token'];
-    const token = typeof bodyToken === 'string' && bodyToken.trim() ? bodyToken.trim() : headerToken;
+    const cookieToken = getCookie(req, ADMIN_SESSION_COOKIE);
+    const token =
+      (typeof bodyToken === 'string' && bodyToken.trim() ? bodyToken.trim() : null) ||
+      (typeof headerToken === 'string' && headerToken.trim() ? headerToken.trim() : null) ||
+      (typeof cookieToken === 'string' && cookieToken.trim() ? cookieToken.trim() : null);
     if (token) {
       revokeAdminSession(token);
     }
+    clearAdminSessionCookie(res);
     return res.status(204).send();
   } catch {
+    clearAdminSessionCookie(res);
     return res.json({ success: true });
   }
 });
 
 export default router;
-

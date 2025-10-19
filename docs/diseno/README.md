@@ -35,7 +35,14 @@ Adoptar Figma como herramienta estándar para prototipar el flujo de Plan de Asi
 3. Adjuntar enlaces de Figma y capturas en los tickets.
 4. Tras cada entrega, reflejar cambios en la documentación técnica y backlog.
 
+## Personalización y estilos de boda
+- Consulta `docs/personalizacion/README.md` para conocer los arquetipos activos y preguntas del onboarding.
+- Mantén un frame por estilo principal (boho, clásica urbana, microboda, etc.) con variantes de copy acordes al hub de tono.
+- Documenta en Figma qué componentes o tokens cambian según el perfil para que frontend pueda reutilizarlos.
+- Para la experiencia de personalización continua (mapa de preferencias, StyleMeter, panel IA) sigue la guía en `docs/diseno/personalizacion-continua.md`.
+
 ## Recursos
 - `docs/diseno/export-wizard-mobile.md`: estructuras y notas de interacción.
+- `docs/diseno/personalizacion-continua.md`: blueprint de la experiencia IA continua.
 - `docs/tareas/plan-asientos-export-mobile.md`: backlog técnico asociado.
 - Canal interno de diseño (Slack/Teams) para feedback.

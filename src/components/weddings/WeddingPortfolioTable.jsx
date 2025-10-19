@@ -1,149 +1,314 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 import Button from '../ui/Button';
 import { Card } from '../ui/Card';
+import Input from '../Input';
 import { Progress } from '../ui/Progress';
 
-const ROLE_LABELS = {
-  owner: 'Propietario',
-  planner: 'Planner',
-  assistant: 'Asistente',
-};
+const DATE_FORMATTER = new Intl.DateTimeFormat('es-ES', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
 
-const STATUS_LABELS = {
-  active: 'Activa',
-  archived: 'Archivada',
-};
+const statusOptions = [
+  { id: 'all', label: 'Todas' },
+  { id: 'active', label: 'Solo activas' },
+  { id: 'archived', label: 'Archivadas' },
+  { id: 'upcoming30', label: 'Próximas 30 días' },
+  { id: 'upcoming90', label: 'Próximas 90 días' },
+  { id: 'unsynced', label: 'Sin sincronizar CRM' },
+];
 
-const formatDate = (raw) => {
-  if (!raw) return 'Sin fecha';
+const crmOptions = [
+  { id: 'all', label: 'Todos' },
+  { id: 'synced', label: 'Sincronizado' },
+  { id: 'queued', label: 'En cola' },
+  { id: 'failed', label: 'Con errores' },
+  { id: 'never', label: 'Sin historial' },
+];
+
+const toDateSafe = (value) => {
+  if (!value) return null;
   try {
-    const date = typeof raw === 'string' ? new Date(raw) : raw;
-    if (Number.isNaN(date.getTime())) return 'Sin fecha';
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    if (typeof value?.toDate === 'function') {
+      const d = value.toDate();
+      return isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof value === 'object' && typeof value.seconds === 'number') {
+      const d = new Date(value.seconds * 1000);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    const parsed = new Date(value);
+    return isNaN(parsed.getTime()) ? null : parsed;
   } catch {
-    return 'Sin fecha';
+    return null;
   }
 };
 
-const daysToEvent = (raw) => {
-  const date = typeof raw === 'string' ? new Date(raw) : raw;
-  if (!date || Number.isNaN(date.getTime())) return null;
-  const now = new Date();
-  const diff = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  return diff;
+const humanStatus = (wedding) =>
+  wedding?.active === false ? 'Archivada' : 'Activa';
+
+const normalizeCrmStatus = (wedding) =>
+  String(
+    wedding?.crm?.lastSyncStatus ||
+      wedding?.crmStatus ||
+      wedding?.crm?.status ||
+      ''
+  ).toLowerCase() || 'never';
+
+const CRM_STATUS_LABELS = {
+  synced: 'Sincronizado',
+  success: 'Sincronizado',
+  ok: 'Sincronizado',
+  queued: 'En cola',
+  pending: 'En cola',
+  failed: 'Error',
+  error: 'Error',
+  never: 'Sin historial',
+};
+
+const CRM_STATUS_CLASS = {
+  synced: 'text-emerald-600 bg-emerald-100',
+  success: 'text-emerald-600 bg-emerald-100',
+  ok: 'text-emerald-600 bg-emerald-100',
+  queued: 'text-amber-600 bg-amber-100',
+  pending: 'text-amber-600 bg-amber-100',
+  failed: 'text-rose-600 bg-rose-100',
+  error: 'text-rose-600 bg-rose-100',
+  never: 'text-slate-600 bg-slate-100',
 };
 
 export default function WeddingPortfolioTable({
-  weddings,
-  activeWeddingId,
+  weddings = [],
+  filters,
+  onFiltersChange,
+  onSyncWedding,
+  syncingIds = new Set(),
   onSelectWedding,
-  onToggleArchive,
-  canArchive,
+  ownerOptions = [],
+  plannerOptions = [],
 }) {
-  if (!weddings.length) {
-    return (
-      <Card className="p-6 text-sm text-muted border border-dashed border-soft">
-        No se encontraron bodas con los filtros seleccionados.
-      </Card>
-    );
-  }
+  const handleFilters = (changes) => {
+    if (typeof onFiltersChange === 'function') {
+      onFiltersChange({ ...filters, ...changes });
+    }
+  };
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-soft shadow-sm bg-[var(--color-surface)]">
-      <table className="min-w-full text-sm">
-        <thead className="bg-[var(--color-bg-soft,#f3f4f6)] uppercase text-xs text-muted tracking-wide">
-          <tr>
-            <th className="px-4 py-3 text-left">Boda</th>
-            <th className="px-4 py-3 text-left">Fecha</th>
-            <th className="px-4 py-3 text-left">Ubicación</th>
-            <th className="px-4 py-3 text-left">Rol</th>
-            <th className="px-4 py-3 text-left">Progreso</th>
-            <th className="px-4 py-3 text-left">Estado</th>
-            <th className="px-4 py-3 text-left">Días</th>
-            <th className="px-4 py-3 text-right">Acciones</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-soft text-[color:var(--color-text,#111827)]">
-          {weddings.map((wedding) => {
-            const statusKey = wedding.active === false ? 'archived' : 'active';
-            const days = daysToEvent(wedding.weddingDate);
-            const isActive = wedding.id === activeWeddingId;
-            const progressValue = Number.isFinite(wedding.progress) ? wedding.progress : 0;
-            const canArchiveWedding = typeof canArchive === 'function' ? canArchive(wedding) : false;
+    <Card className="p-4 space-y-4" data-testid="wedding-portfolio-table">
+      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h3 className="text-xl font-semibold text-[color:var(--color-text)]">
+            Portfolio multi-boda
+          </h3>
+          <p className="text-sm text-muted">
+            Usa filtros para comparar progreso y coordinar equipos rápidamente.
+          </p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <Input
+            value={filters.search || ''}
+            onChange={(event) => handleFilters({ search: event.target.value })}
+            placeholder="Buscar por nombre o ubicación..."
+            data-testid="portfolio-search"
+          />
+          <label className="flex flex-col text-xs text-muted">
+            Estado
+            <select
+              className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+              value={filters.status || 'all'}
+              onChange={(event) => handleFilters({ status: event.target.value })}
+              data-testid="portfolio-status"
+            >
+              {statusOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col text-xs text-muted">
+            CRM
+            <select
+              className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+              value={filters.crmStatus || 'all'}
+              onChange={(event) => handleFilters({ crmStatus: event.target.value })}
+              data-testid="portfolio-crm"
+            >
+              {crmOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <label className="flex flex-col text-xs text-muted">
+            Propietario
+            <select
+              className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+              value={filters.ownerId || 'all'}
+              onChange={(event) => handleFilters({ ownerId: event.target.value })}
+              data-testid="portfolio-owner"
+            >
+              <option value="all">Todos</option>
+              {ownerOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex flex-col text-xs text-muted">
+            Planner
+            <select
+              className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+              value={filters.plannerId || 'all'}
+              onChange={(event) => handleFilters({ plannerId: event.target.value })}
+              data-testid="portfolio-planner"
+            >
+              <option value="all">Todos</option>
+              {plannerOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="flex flex-col text-xs text-muted">
+              Fecha desde
+              <input
+                type="date"
+                className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+                value={filters.startDate || ''}
+                onChange={(event) => handleFilters({ startDate: event.target.value })}
+                data-testid="portfolio-start-date"
+              />
+            </label>
+            <label className="flex flex-col text-xs text-muted">
+              Fecha hasta
+              <input
+                type="date"
+                className="mt-1 rounded-md border border-[color:var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm text-[color:var(--color-text)]"
+                value={filters.endDate || ''}
+                onChange={(event) => handleFilters({ endDate: event.target.value })}
+                data-testid="portfolio-end-date"
+              />
+            </label>
+          </div>
+        </div>
+      </header>
 
-            return (
-              <tr
-                key={wedding.id}
-                className={isActive ? 'bg-rose-50/50' : ''}
-              >
-                <td className="px-4 py-3 font-medium">
-                  <div className="flex flex-col">
-                    <Link to={`/bodas/${wedding.id}`} className="text-primary hover:underline">
-                      {wedding.name || 'Boda sin nombre'}
-                    </Link>
-                    <span className="text-xs text-muted">{wedding.id}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">{formatDate(wedding.weddingDate)}</td>
-                <td className="px-4 py-3">{wedding.location || '—'}</td>
-                <td className="px-4 py-3">{ROLE_LABELS[wedding.role] || '—'}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2 min-w-[180px]">
-                    <Progress value={progressValue} className="flex-1 h-2" />
-                    <span className="text-xs font-medium">{progressValue}%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${
-                      statusKey === 'active'
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {STATUS_LABELS[statusKey]}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  {typeof days === 'number' ? (
-                    <span className={days < 0 ? 'text-amber-600 font-medium' : ''}>
-                      {days >= 0 ? `${days} días` : `Hace ${Math.abs(days)} días`}
-                    </span>
-                  ) : (
-                    '—'
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="secondary"
-                      size="xs"
-                      onClick={() => onSelectWedding?.(wedding.id)}
-                      disabled={isActive}
-                    >
-                      {isActive ? 'Seleccionada' : 'Seleccionar'}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      onClick={() => onToggleArchive?.(wedding)}
-                      disabled={!canArchiveWedding}
-                    >
-                      {wedding.active === false ? 'Restaurar' : 'Archivar'}
-                    </Button>
-                  </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-[color:var(--color-border)] text-sm">
+          <thead className="bg-[var(--color-surface)]/70 text-xs uppercase tracking-wide text-muted">
+            <tr>
+              <th className="px-3 py-2 text-left font-semibold">Evento</th>
+              <th className="px-3 py-2 text-left font-semibold">Fecha</th>
+              <th className="px-3 py-2 text-left font-semibold">Estado</th>
+              <th className="px-3 py-2 text-left font-semibold">Progreso</th>
+              <th className="px-3 py-2 text-left font-semibold">Propietarios</th>
+              <th className="px-3 py-2 text-left font-semibold">Planners</th>
+              <th className="px-3 py-2 text-left font-semibold">CRM</th>
+              <th className="px-3 py-2 text-right font-semibold">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[color:var(--color-border)]">
+            {weddings.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-3 py-6 text-center text-sm text-muted">
+                  No hay bodas que coincidan con los filtros seleccionados.
                 </td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            ) : (
+              weddings.map((wedding) => {
+                const dateValue =
+                  toDateSafe(wedding.weddingDate) ||
+                  toDateSafe(wedding.date) ||
+                  toDateSafe(wedding.eventDate);
+                const dateLabel = dateValue
+                  ? DATE_FORMATTER.format(dateValue)
+                  : 'Sin fecha';
+                const statusLabel = humanStatus(wedding);
+                const progress = Number(wedding.progress) || 0;
+                const owners = Array.isArray(wedding.ownerNames)
+                  ? wedding.ownerNames.join(', ')
+                  : Array.isArray(wedding.ownerIds)
+                  ? wedding.ownerIds.join(', ')
+                  : '—';
+                const planners = Array.isArray(wedding.plannerNames)
+                  ? wedding.plannerNames.join(', ')
+                  : Array.isArray(wedding.plannerIds)
+                  ? wedding.plannerIds.join(', ')
+                  : '—';
+                const crmStatus = normalizeCrmStatus(wedding);
+                const crmLabel =
+                  CRM_STATUS_LABELS[crmStatus] || CRM_STATUS_LABELS.never;
+                const crmClass =
+                  CRM_STATUS_CLASS[crmStatus] || CRM_STATUS_CLASS.never;
+                const isSyncing = syncingIds.has
+                  ? syncingIds.has(wedding.id)
+                  : Array.isArray(syncingIds)
+                  ? syncingIds.includes(wedding.id)
+                  : false;
+
+                return (
+                  <tr key={wedding.id} className="text-[color:var(--color-text)]">
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{wedding.name || 'Sin nombre'}</div>
+                      <div className="text-xs text-muted">
+                        {wedding.location || wedding.banquetPlace || 'Ubicación pendiente'}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-sm">{dateLabel}</td>
+                    <td className="px-3 py-2 text-sm">{statusLabel}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{progress}%</span>
+                        <Progress value={progress} className="h-1.5 flex-1" />
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-sm">{owners}</td>
+                    <td className="px-3 py-2 text-sm">{planners}</td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${crmClass}`}
+                      >
+                        {crmLabel}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => onSelectWedding?.(wedding)}
+                          data-testid={`portfolio-open-${wedding.id}`}
+                        >
+                          Ver detalle
+                        </Button>
+                        <Button
+                          size="xs"
+                          onClick={() => onSyncWedding?.(wedding)}
+                          disabled={isSyncing}
+                          data-testid={`portfolio-sync-${wedding.id}`}
+                        >
+                          {isSyncing ? 'Encolando…' : 'Sync CRM'}
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   );
 }
+

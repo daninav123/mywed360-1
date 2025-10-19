@@ -169,30 +169,10 @@ export default function SupplierOnboardingModal({
                 iniciales con estado "Pendiente". Podras ajustarlo mas adelante desde "Configurar
                 servicios".
               </p>
-              {loadingWedding ? (
+              {loadingWedding && (
                 <div className="flex items-center gap-3 text-gray-500">
                   <Loader className="h-5 w-5" />
                   <span>Preparando datos de tu boda...</span>
-                </div>
-              ) : weddingSummary ? (
-                <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
-                  <p className="font-medium">Informacion detectada</p>
-                  <ul className="mt-1 space-y-1">
-                    {weddingSummary.couple && <li>Pareja: {weddingSummary.couple}</li>}
-                    {weddingSummary.date && <li>Fecha: {weddingSummary.date}</li>}
-                    {weddingSummary.guests && <li>Invitados estimados: {weddingSummary.guests}</li>}
-                    {weddingSummary.budget && (
-                      <li>Presupuesto estimado: {weddingSummary.budget} EUR</li>
-                    )}
-                    {weddingSummary.style && <li>Estilo preferido: {weddingSummary.style}</li>}
-                  </ul>
-                </div>
-              ) : (
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-                  <p className="font-medium">No encontramos datos previos</p>
-                  <p className="mt-1">
-                    Puedes completarlos mas adelante desde la ficha de la boda.
-                  </p>
                 </div>
               )}
               <div className="space-y-2">

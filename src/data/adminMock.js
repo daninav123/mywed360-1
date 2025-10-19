@@ -1,31 +1,31 @@
 ﻿export const adminKpis = [
   {
-    id: 'active-users',
-    label: 'Usuarios activos (7 días)',
-    value: 1280,
-    trend: 4.3,
-    testId: 'admin-kpi-active-users',
+    id: 'active-weddings',
+    label: 'Bodas activas',
+    value: 142,
+    trend: 3.1,
+    testId: 'admin-kpi-active-weddings',
   },
   {
-    id: 'new-weddings',
-    label: 'Bodas creadas (30 días)',
-    value: 86,
-    trend: -2.1,
-    testId: 'admin-kpi-new-weddings',
-  },
-  {
-    id: 'conversion',
-    label: 'Conversión signup→boda',
-    value: '42%',
-    trend: 1.2,
-    testId: 'admin-kpi-conversion',
-  },
-  {
-    id: 'estimated-revenue',
-    label: 'Ingresos estimados (30 días)',
+    id: 'revenue-30d',
+    label: 'Facturación (30 días)',
     value: '€ 12.340',
     trend: 5.6,
-    testId: 'admin-kpi-estimated-revenue',
+    testId: 'admin-kpi-revenue-30d',
+  },
+  {
+    id: 'downloads-30d',
+    label: 'Descargas app (30 días)',
+    value: 980,
+    trend: 8.4,
+    testId: 'admin-kpi-downloads-30d',
+  },
+  {
+    id: 'open-alerts',
+    label: 'Alertas activas',
+    value: 4,
+    trend: -1.0,
+    testId: 'admin-kpi-open-alerts',
   },
 ];
 

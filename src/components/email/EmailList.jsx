@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { get as apiGet } from '../../services/apiClient';
 
+const IS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+
 /**
  * Componente que muestra la lista de correos electrónicos en la bandeja
  *
@@ -150,6 +152,7 @@ const EmailList = ({
     const email = emails[index];
     const [insights, setInsights] = useState(null);
     useEffect(() => {
+      if (IS_E2E) return undefined;
       let ignore = false;
       (async () => {
         try {
@@ -246,20 +249,22 @@ const EmailList = ({
   };
 
   return (
-    <List
-      height={height}
-      width="100%"
-      itemCount={emails.length}
-      itemSize={itemHeight}
-      outerElementType="div"
-      className="divide-y divide-gray-200"
-      role="list"
-      aria-label={`Correos en ${folder === 'inbox' ? 'bandeja de entrada' : folder === 'sent' ? 'enviados' : folder === 'trash' ? 'papelera' : folder}`}
-      ref={listRef}
-      itemKey={(index) => emails[index].id}
-    >
-      {Row}
-    </List>
+    <div data-testid="email-list" className="h-full">
+      <List
+        height={height}
+        width="100%"
+        itemCount={emails.length}
+        itemSize={itemHeight}
+        outerElementType="div"
+        className="divide-y divide-gray-200"
+        role="list"
+        aria-label={`Correos en ${folder === 'inbox' ? 'bandeja de entrada' : folder === 'sent' ? 'enviados' : folder === 'trash' ? 'papelera' : folder}`}
+        ref={listRef}
+        itemKey={(index) => emails[index].id}
+      >
+        {Row}
+      </List>
+    </div>
   );
 };
 

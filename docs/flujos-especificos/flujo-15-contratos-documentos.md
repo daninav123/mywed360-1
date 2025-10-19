@@ -1,6 +1,6 @@
 # 15. Contratos y Documentos (estado 2025-10-07)
 
-> Implementado: `ContractTemplates.jsx`, `ContractEditor.jsx`, `DocumentManager.jsx`, `DigitalSignatureModal.jsx`, servicios `documentService.js`, `signatureService.js` (stub), OCR basico en backend.
+> Implementado: `Contratos.jsx` (CRUD y modales integrados), dataset `contractTemplates.js`, servicios `SignatureService.js` (stub), `storageUploadService.js` para adjuntos y hooks `useFirestoreCollection` + `useProveedores` para wiring con proveedores.
 > Pendiente: firma digital integrada (DocuSign/HelloSign), workflows de aprobacion, analitica legal y compliance automatizado.
 
 ## 1. Objetivo y alcance

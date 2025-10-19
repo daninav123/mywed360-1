@@ -96,17 +96,39 @@ function fileExists(relOrAbs) {
 
 function findByBasenameInRoots(basename, roots = ['src', 'backend', 'functions', 'scripts', 'docs']) {
   const found = [];
+  const targetName = path.parse(basename).name;
+  const extensions = ['', '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'];
+  const candidateNames = new Set(
+    extensions.flatMap((ext) => [
+      targetName + ext,
+      basename.endsWith(ext) ? basename : null,
+    ]).filter(Boolean).map((n) => n.toLowerCase())
+  );
+
   for (const r of roots) {
     const baseDir = path.join(ROOT, r);
     if (!fs.existsSync(baseDir)) continue;
     const stack = [baseDir];
     while (stack.length) {
       const d = stack.pop();
-      const entries = fs.readdirSync(d, { withFileTypes: true });
+      let entries;
+      try {
+        entries = fs.readdirSync(d, { withFileTypes: true });
+      } catch (_) {
+        continue;
+      }
       for (const e of entries) {
         const full = path.join(d, e.name);
-        if (e.isDirectory()) stack.push(full);
-        else if (e.isFile() && e.name === basename) found.push(full);
+        if (e.isDirectory()) {
+          stack.push(full);
+          continue;
+        }
+        if (!e.isFile()) continue;
+        const nameLc = e.name.toLowerCase();
+        const stemLc = path.parse(e.name).name.toLowerCase();
+        if (candidateNames.has(nameLc) || candidateNames.has(stemLc)) {
+          found.push(full);
+        }
       }
     }
   }
@@ -169,6 +191,8 @@ function generateMarkdown(modules) {
   lines.push('# Roadmap - Lovenda/MyWed360');
   lines.push('');
   lines.push('> Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.');
+  lines.push('>');
+  lines.push('> Snapshot historico: `docs/roadmap-2025-v2.md` (09/10/2025). Mantén este archivo como referencia principal.');
   lines.push('');
   lines.push('## Resumen ejecutivo');
   lines.push('### Objetivos trimestrales');

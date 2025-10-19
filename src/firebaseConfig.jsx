@@ -1,4 +1,4 @@
-﻿import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, onValue } from 'firebase/database';
@@ -8,8 +8,10 @@ import {
   connectFirestoreEmulator,
   doc,
   setDoc,
-  enableIndexedDbPersistence,
-  enableMultiTabIndexedDbPersistence,
+  getDoc,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  memoryLocalCache,
 } from 'firebase/firestore';
 
 // Configuración de Firebase desde variables de entorno (sin secretos hard-coded)
@@ -72,32 +74,46 @@ let app =
     : null;
 let db =
   FIREBASE_CONFIGURED && app
-    ? initializeFirestore(app, {
-        experimentalForceLongPolling: true,
-        cacheSizeBytes: 50 * 1024 * 1024,
-        ignoreUndefinedProperties: true,
-      })
+    ? (() => {
+        try {
+          return initializeFirestore(app, {
+            experimentalForceLongPolling: true,
+            ignoreUndefinedProperties: true,
+            localCache: persistentLocalCache({
+              tabManager: persistentMultipleTabManager(),
+            }),
+          });
+        } catch (_e1) {
+          try {
+            return initializeFirestore(app, {
+              experimentalForceLongPolling: true,
+              ignoreUndefinedProperties: true,
+              localCache: persistentLocalCache(),
+            });
+          } catch (_e2) {
+            return initializeFirestore(app, {
+              experimentalForceLongPolling: true,
+              ignoreUndefinedProperties: true,
+              localCache: memoryLocalCache(),
+            });
+          }
+        }
+      })()
     : null;
 let auth;
 let analytics;
 
-// Prueba la conexiÃ³n con Firestore con reintentos
-const probarConexionFirestore = async (maxReintentos = 2) => {
-  for (let intento = 0; intento <= maxReintentos; intento++) {
-    try {
-      const docPrueba = doc(db, '_conexion_prueba', 'test');
-      await setDoc(
-        docPrueba,
-        { timestamp: new Date().toISOString(), intento: intento + 1 },
-        { merge: true }
-      );
-      return true;
-    } catch (error) {
-      if (intento === maxReintentos) throw error;
-      await new Promise((resolver) => setTimeout(resolver, 1000 * Math.pow(2, intento)));
-    }
+// Prueba la conexiÃ³n con Firestore sin requerir autenticaciÃ³n (solo lectura)
+const probarConexionFirestore = async () => {
+  try {
+    const docPrueba = doc(db, '_conexion_prueba', 'test');
+    // Solo lectura: las reglas permiten read=if true para colecciones de prueba
+    await getDoc(docPrueba);
+    return true;
+  } catch (_error) {
+    // No propagar: inicializaciÃ³n debe continuar en modo offline si falla
+    return false;
   }
-  return false;
 };
 
 // Listener de estado de conexiÃ³n (opcional)
@@ -149,41 +165,41 @@ const inicializarFirebase = async () => {
       try {
         db = initializeFirestore(app, {
           experimentalForceLongPolling: true,
-          cacheSizeBytes: 50 * 1024 * 1024,
           ignoreUndefinedProperties: true,
+          localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
         });
       } catch (firestoreError) {
-        if (firestoreError?.message?.includes('has already been called')) {
-          db = getFirestore(app);
-          console.warn('â„¹ï¸ Firestore ya estaba inicializado, usando instancia existente');
-        } else {
-          console.error('âŒ Error al inicializar Firestore:', firestoreError);
-          throw new Error(`Error al inicializar Firestore: ${firestoreError.message}`);
+        try {
+          db = initializeFirestore(app, {
+            experimentalForceLongPolling: true,
+            ignoreUndefinedProperties: true,
+            localCache: persistentLocalCache(),
+          });
+        } catch (_e2) {
+          if (firestoreError?.message?.includes('has already been called')) {
+            db = getFirestore(app);
+            console.warn('â„¹ï¸ Firestore ya estaba inicializado, usando instancia existente');
+          } else {
+            try {
+              db = initializeFirestore(app, {
+                experimentalForceLongPolling: true,
+                ignoreUndefinedProperties: true,
+                localCache: memoryLocalCache(),
+              });
+            } catch (_e3) {
+              console.error('âŒ Error al inicializar Firestore:', firestoreError);
+              throw new Error(`Error al inicializar Firestore: ${firestoreError.message}`);
+            }
+          }
         }
       }
     }
 
-    // Persistencia offline
     try {
-      if (typeof enableMultiTabIndexedDbPersistence === 'function') {
-        await enableMultiTabIndexedDbPersistence(db);
-      } else {
-        await enableIndexedDbPersistence(db);
-      }
-    } catch (err) {
-      if (err.code === 'failed-precondition') {
-        console.warn(
-          'No se pudo habilitar multiâ€‘tab (otra pestaÃ±a es dueÃ±a). Intentando modo singleâ€‘tab...'
-        );
-        try {
-          await enableIndexedDbPersistence(db);
-        } catch {}
-      } else if (err.code === 'unimplemented') {
-        console.warn('Este navegador no soporta persistencia offline');
-      } else {
-        console.error('Error al habilitar persistencia offline:', err);
-      }
-    }
+      db && db;
+    } catch (_err) {}
 
     // Emulador (info)
     try {
@@ -194,35 +210,14 @@ const inicializarFirebase = async () => {
       console.warn('No se pudo configurar el emulador:', emulatorError);
     }
 
-    // Probar conexiÃ³n y prueba de escritura
-    try {
-      await probarConexionFirestore();
-      try {
-        const testDoc = doc(db, '_test_connection', 'test');
-        await setDoc(testDoc, { test: new Date().toISOString() }, { merge: true });
-      } catch (writeError) {
-        let errorMsg = 'Error al escribir en Firestore';
-        if (writeError.code === 'permission-denied') {
-          errorMsg = 'Error de permisos: No tienes acceso a la base de datos.';
-        } else if (writeError.code === 'unavailable') {
-          errorMsg = 'Servidor de Firebase no disponible. Verifica tu conexiÃ³n a internet.';
-        } else {
-          errorMsg = `Error al acceder a Firestore: ${writeError.message}`;
-        }
-        if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
-          window.mostrarErrorUsuario(errorMsg, 10000);
-        }
-      }
-    } catch (error) {
-      let errorMsg =
-        'Modo sin conexiÃ³n - Los cambios se sincronizarÃ¡n cuando se recupere la conexiÃ³n';
-      if (error.code === 'unavailable') {
-        errorMsg = 'Firebase no disponible. Verifica tu conexiÃ³n a internet.';
-      } else if (error.message && error.message.includes('network')) {
-        errorMsg = 'Problemas de red al conectar con Firebase.';
-      }
+    // Probar conectividad: solo lectura para no requerir auth
+    const ok = await probarConexionFirestore();
+    if (!ok) {
       if (typeof window !== 'undefined' && window.mostrarErrorUsuario) {
-        window.mostrarErrorUsuario(errorMsg, 10000);
+        window.mostrarErrorUsuario(
+          'Modo sin conexiÃ³n - Los cambios se sincronizarÃ¡n cuando se recupere la conexiÃ³n',
+          10000
+        );
       }
     }
 

@@ -26,6 +26,14 @@
    - Segmentacion por campañas y tipos de mensaje.
    - Exportacion CSV para marketing/soporte (pendiente).
 
+### Propuestas de mejora UI (2025-10)
+- **Barra superior dedicada**: agrupar buscador, filtros (estado, etiquetas IA, sugerencias) y controles de orden en una toolbar fija. Emplear chips o botones segmentados para cambios de estado en un clic y mantener visibles los filtros activos.
+- **Sidebar jerarquica**: reforzar la carpeta activa con fondo destacado, iconos por tipo (inbox, enviados, papelera) y badges circulares para no leidos; encapsular carpetas personalizadas en grupos plegables cuando la lista crezca.
+- **Lista de correos enriquecida**: mostrar tarjetas compactas con jerarquia tipografica (remitente/asunto, extracto atenuado), indicadores de adjuntos y badge “IA recomienda: {carpeta}”; ofrecer densidades “denso” y “comodo” desde la toolbar.
+- **Panel de detalle guidado**: fijar una cabecera con breadcrumb de carpeta, acciones principales (Responder, Reenviar, Mover, Importante) y resaltar sugerencias IA o calendarizaciones; considerar tabs secundarios para comentarios e historial.
+- **Estados y feedback**: usar skeletons para carga, vacios accionables con ilustraciones ligeras y toasts consistentes para operaciones (mover, marcar, borrar). Integrar indicadores de progreso para analisis IA prolongados.
+- **Accesibilidad y atajos**: asegurar contraste AA, ampliar `aria-*` y `data-testid` coherentes, habilitar atajos de teclado (buscar, marcar leido, mover a sugerido) y mantener una paleta diferenciada para elementos asistidos por IA.
+
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/emails/{emailId}`: headers, cuerpo, adjuntos, estado, etiquetas.
 - `weddings/{id}/emailSettings`: configuracion SMTP, dominios verificados, estados de pruebas.

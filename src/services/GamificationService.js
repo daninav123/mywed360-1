@@ -2,8 +2,6 @@
 import { auth } from '../firebaseConfig';
 import { getBackendBase } from '../utils/backendBase';
 
-const FORCE_MOCK_DEFAULT =
-  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
 const base = () => `${getBackendBase()}/api/gamification`;
 const FALLBACK_EMPTY = {
   points: 0,
@@ -70,39 +68,38 @@ const FALLBACK_SAMPLE = {
 };
 
 const shouldUseSampleData = () => {
-  if (FORCE_MOCK_DEFAULT) return true;
   if (typeof window !== 'undefined' && window?.__GAMIFICATION_TEST_SUMMARY__) {
     return true;
   }
   if (typeof window !== 'undefined' && window?.Cypress) return true;
   const flag = import.meta?.env?.VITE_GAMIFICATION_SAMPLE;
-  return flag === '1' || flag === true;
+  if (flag === true) return true;
+  if (flag === false) return false;
+  if (typeof flag === 'string') {
+    const normalized = flag.trim().toLowerCase();
+    return normalized === '1' || normalized === 'true';
+  }
+  return false;
 };
 
 async function getAuthToken() {
+  const user = auth?.currentUser;
+  if (!user?.getIdToken) {
+    throw new Error('GamificationService: autenticación requerida');
+  }
   try {
-    const user = auth?.currentUser;
-    if (user?.getIdToken && !FORCE_MOCK_DEFAULT) {
-      return await user.getIdToken();
-    }
-    if (user && FORCE_MOCK_DEFAULT) {
-      const email = user.email || 'user@local.dev';
-      return `mock-${user.uid || 'anon'}-${email}`;
-    }
-    // Fallback: mock si existe email en localStorage perfil
-    const profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
-    if (profile?.email || profile?.account?.email) {
-      const uid = profile?.uid || 'local';
-      const email = profile?.email || profile?.account?.email;
-      return `mock-${uid}-${email}`;
-    }
-  } catch (_) {}
-  return null;
+    return await user.getIdToken(true);
+  } catch (error) {
+    console.warn('[GamificationService] No se pudo refrescar el token, usando caché:', error);
+    return await user.getIdToken().catch(() => {
+      throw new Error('GamificationService: no se pudo obtener el token de autenticación');
+    });
+  }
 }
 
 async function authHeader(extra = {}) {
   const token = await getAuthToken();
-  return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+  return { ...extra, Authorization: `Bearer ${token}` };
 }
 
 export async function awardPoints(weddingId, eventType, meta = {}, uid) {
@@ -247,9 +244,6 @@ export async function getSummary({ weddingId, uid } = {}) {
   }
 
   const wantsSample = shouldUseSampleData();
-  if (FORCE_MOCK_DEFAULT) {
-    return { ...FALLBACK_SAMPLE };
-  }
 
   try {
     const [statsResult, achievementsResult] = await Promise.allSettled([

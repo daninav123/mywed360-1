@@ -8,6 +8,7 @@
 - Ofrecer un asistente flotante que resuelva dudas y proponga acciones rápidas desde cualquier pantalla.
 - Guardar contexto local (historial corto, notas marcadas como importantes) para consultas posteriores.
 - Sentar las bases para automatizaciones IA futuras (respuesta automática y orquestación de acciones).
+- Actuar como front principal del flujo 2C: proponer ideas sorpresa, registrar contrastes, equilibrar estilos y coordinar follow-ups multicanal.
 
 ## 2. Trigger y rutas
 - Botón flotante (esquina inferior derecha) con icono de chat → abre el `ChatWidget`.
@@ -21,7 +22,9 @@
 2. **Interacción**
    - Mensajes se guardan en `chatMessages`; se limita a 50 mensajes recientes (MVP sin backend).
    - Parser local reconoce comandos básicos (crear tarea, asignar categoría sugerida) aunque muchas acciones solo generan recomendaciones.
-   - Contexto IA: envía `eventType`, estilo, rango invitados y ubicación al backend para ajustar prompts y respuestas.
+   - Contexto IA: envía `eventType`, estilo, rango invitados, ubicación, `weddingProfile`, `specialInterests`, `noGoItems` y `weddingInsights.styleWeights` al backend para ajustar prompts y respuestas.
+   - Propone “packs sorpresa” y contrastes etiquetados (Core / Contraste) con detalles de `zonaAplicacion`, `nivelContraste`, responsable sugerido y presupuesto estimado.
+   - Si detecta `profileGaps`, `style_balance_alert` o `recommendation_conflict`, inicia follow-ups automáticos con CTA para resolverlos (crear tarea, abrir proveedor, ajustar presupuesto).
    - Fallback offline personalizado menciona el tipo de evento y guía rutas manuales.
 3. **Notas importantes**
    - Cada mensaje puede marcarse “⭐ importante”; se guarda en `importantNotes` y dispara evento `mywed360-important-note`.
@@ -31,18 +34,20 @@
 
 ## 4. Persistencia y datos
 - `localStorage`: `chatOpen`, `chatMessages`, `chatSummary`, `importantNotes`.
-- API preferente: `POST /api/ai/parse-dialog` (OpenAI) con fallback heurístico local cuando no hay clave o hay timeout.
-- No hay almacenamiento en Firestore todavía (las conversaciones no se sincronizan entre dispositivos).
+- Firestore planificado: `weddings/{id}/assistant/conversation` con historial truncado, `assistantInsights` para almacenar packs sugeridos, `assistantFollowUps` para pendientes de contraste.
+- API preferente: `POST /api/ai/parse-dialog` (OpenAI) con fallback heurístico local cuando no hay clave o hay timeout. La petición incluye `personalizationContext` (perfil, contrastes, styleWeights).
+- Métricas/memoria adicional: `assistantContrastFollowups` guarda follow-ups abiertos hasta que se resuelven.
 
 ## 5. Reglas de negocio
 - El asistente **no ejecuta** acciones críticas (pagos, cambios permanentes) sin confirmación manual.
 - Para usuarios sin sesión activa se muestra modo “recordatorio” (no se permiten acciones).
-- En modo offline se muestra aviso y el chat entra en solo lectura.
+- En modo offline se muestra aviso y el chat entra en solo lectura.\n- No propone elementos marcados como 
+oGoItems; si el usuario insiste, solicita confirmación adicional y registra la excepción.
 
 ## 6. Estados especiales y errores
 - `loading`: spinner mientras se espera respuesta (tanto local como remota).
 - Error API → toast “No se pudo conectar, prueba de nuevo” y se mantiene el mensaje en la lista.
-- Respuesta offline contextual: menciona el tipo de evento vigente y sugiere rutas manuales cuando la IA no responde.
+- Respuesta offline contextual: menciona el tipo de evento vigente y sugiere rutas manuales cuando la IA no responde.\n- Si el backend devuelve style_balance_alert o ecommendation_conflict, muestra banner con CTA (abrir presupuesto/checklist) y limita nuevas sugerencias contrastantes hasta resolver.
 - Si el usuario borra `localStorage`, se reinicia la conversación (no existe recuperación).
 
 ## 7. Integración con otros flujos (hoy)
@@ -57,9 +62,9 @@
 - Logs locales mediante `window.mywed360Debug` para diagnóstico.
 
 ## 9. Pruebas recomendadas
-- Unitarias: utilidades del widget (parser de comandos, compactación, marcado importante).
+- Unitarias: utilidades del widget (parser de comandos, compactación, marcado importante, calculo de follow-ups y etiqueta de contrastes).
 - Integración: apertura → envío mensaje → marcado importante → comprobar `localStorage`.
-- E2E: flujo ayuda presupuesto (respuestas de fallback) y recuperación tras refrescar pestaña.
+- E2E: flujo ayuda presupuesto (respuestas de fallback), aceptación de contraste (crea tareas/presupuesto) y recuperación tras refrescar pestaña.
 
 
 ## Cobertura E2E implementada
@@ -80,3 +85,9 @@
 - **Integración con flujos**: generación automática de tareas (flujo 14), actualizaciones de proveedores (flujo 5), avisos en notificaciones (flujo 12).
 
 Cuando estas piezas estén listas, se documentarán de nuevo (ver antiguo flujo 24 como referencia de visión).
+
+
+
+
+
+

@@ -31,8 +31,10 @@ import {
 } from 'lucide-react';
 
 import useFinance from '../hooks/useFinance';
+import { useWedding } from '../context/WeddingContext';
 import { fetchWeddingNews } from '../services/blogService';
 import { fetchWall } from '../services/wallService';
+import { getSummary as getGamificationSummary } from '../services/GamificationService';
 
 const INSPIRATION_CATEGORIES = [
   { slug: 'decoracion', label: 'Decoración' },
@@ -44,6 +46,117 @@ const INSPIRATION_CATEGORIES = [
   { slug: 'pastel', label: 'Pasteles' },
   { slug: 'fotografia', label: 'Fotografía' },
 ];
+
+const PROGRESS_STORAGE_KEY = 'mywed360_progress';
+// 2500 coincide con el límite superior del nivel 6 (Experto Wedding) en backend/services/gamificationService.js.
+const PROGRESS_COMPLETION_TARGET = 2500;
+// Diferencia mínima (en puntos porcentuales) para considerar que se va adelantado o retrasado.
+const PROGRESS_DIFF_TOLERANCE = 5;
+const YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
+
+const clampPercent = (value) => {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+};
+
+const readStoredProgress = () => {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const raw = window.localStorage.getItem(PROGRESS_STORAGE_KEY);
+    if (!raw) return 0;
+    const parsed = Number.parseFloat(raw);
+    return clampPercent(parsed);
+  } catch {
+    return 0;
+  }
+};
+
+const writeStoredProgress = (value) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, String(clampPercent(value)));
+  } catch {
+    // Ignorar errores de almacenamiento (modo incógnito, etc.)
+  }
+};
+
+const parseDateLike = (input) => {
+  if (!input) return null;
+  try {
+    if (input instanceof Date) {
+      return Number.isNaN(input.getTime()) ? null : input;
+    }
+    if (typeof input?.toDate === 'function') {
+      const d = input.toDate();
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof input === 'object' && typeof input.seconds === 'number') {
+      const d = new Date(input.seconds * 1000);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof input === 'number') {
+      const d = new Date(input);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof input === 'string') {
+      const trimmed = input.trim();
+      if (!trimmed) return null;
+      const date = new Date(trimmed);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+};
+
+const computeExpectedProgress = (weddingData) => {
+  if (!weddingData) return null;
+  const eventDate =
+    parseDateLike(
+      weddingData.weddingDate ||
+        weddingData.date ||
+        weddingData.eventDate ||
+        weddingData.ceremonyDate
+    ) || null;
+
+  if (!eventDate) return null;
+
+  const planningStartCandidates = [
+    weddingData.planningStart,
+    weddingData.planningStartDate,
+    weddingData.projectStart,
+    weddingData.createdAt,
+    weddingData.creationDate,
+    weddingData.registeredAt,
+    weddingData.created_at,
+    weddingData.updatedAt, // fallback adicional si la boda fue migrada recientemente
+  ];
+
+  let planningStart = null;
+  for (const candidate of planningStartCandidates) {
+    const parsed = parseDateLike(candidate);
+    if (parsed) {
+      planningStart = parsed;
+      break;
+    }
+  }
+
+  if (!planningStart || planningStart >= eventDate) {
+    const fallback = new Date(eventDate.getTime() - YEAR_IN_MS);
+    planningStart = fallback;
+  }
+
+  const now = new Date();
+  if (now <= planningStart) return 0;
+  if (now >= eventDate) return 100;
+
+  const totalSpan = eventDate.getTime() - planningStart.getTime();
+  if (totalSpan <= 0) return 100;
+
+  const elapsed = now.getTime() - planningStart.getTime();
+  return clampPercent(Math.round((elapsed / totalSpan) * 100));
+};
 
 export default function HomePage() {
   // Todo se maneja con modales locales
@@ -58,6 +171,7 @@ export default function HomePage() {
   const [activeModal, setActiveModal] = useState(null);
   // Hook de autenticacin unificado
   const { hasRole, userProfile, currentUser } = useAuth();
+  const { activeWedding, activeWeddingData } = useWedding();
   const navigate = useNavigate();
 
   // Derivados equivalentes al antiguo UserContext
@@ -68,8 +182,161 @@ export default function HomePage() {
     currentUser?.displayName ||
     currentUser?.email?.split('@')[0] ||
     '';
-  const weddingName = localStorage.getItem('mywed360_active_wedding_name') || '';
-  const progress = Number(localStorage.getItem('mywed360_progress') || 0);
+  const [progressPercent, setProgressPercent] = useState(() => readStoredProgress());
+  const [progressLoading, setProgressLoading] = useState(false);
+  const [progressError, setProgressError] = useState(null);
+
+  const expectedProgress = useMemo(
+    () => computeExpectedProgress(activeWeddingData),
+    [activeWeddingData]
+  );
+
+  useEffect(() => {
+    const uid = currentUser?.uid || userProfile?.uid || null;
+    const weddingId = activeWeddingData?.id || activeWedding || null;
+    if (!uid || !weddingId) {
+      setProgressLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setProgressLoading(true);
+
+    (async () => {
+      try {
+        const summary = await getGamificationSummary({ uid, weddingId });
+        const rawPoints = Number(summary?.points ?? summary?.totalPoints ?? 0);
+        const percent =
+          PROGRESS_COMPLETION_TARGET > 0
+            ? clampPercent(Math.round((rawPoints / PROGRESS_COMPLETION_TARGET) * 100))
+            : 0;
+        if (!cancelled) {
+          setProgressPercent(percent);
+          writeStoredProgress(percent);
+          setProgressError(null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.warn('[HomePage] No se pudo obtener el resumen de gamificación.', error);
+          setProgressError(error);
+        }
+      } finally {
+        if (!cancelled) {
+          setProgressLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser?.uid, userProfile?.uid, activeWedding, activeWeddingData?.id]);
+
+  const progressDiff =
+    expectedProgress == null ? null : Math.round(progressPercent - expectedProgress);
+
+  const progressVariant = useMemo(() => {
+    if (progressPercent >= 100) return 'success';
+    if (expectedProgress == null) {
+      return progressPercent >= 80 ? 'primary' : 'destructive';
+    }
+    if (progressDiff !== null && progressDiff > PROGRESS_DIFF_TOLERANCE) {
+      return 'success';
+    }
+    if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
+      return 'destructive';
+    }
+    return 'warning';
+  }, [expectedProgress, progressDiff, progressPercent]);
+
+  const progressStatusText = useMemo(() => {
+    if (progressPercent >= 100) return '¡Progreso completo!';
+    if (expectedProgress == null) {
+      return 'Progreso sin referencia temporal';
+    }
+    if (progressDiff !== null && progressDiff > PROGRESS_DIFF_TOLERANCE) {
+      return 'Vas adelantado al plan previsto';
+    }
+    if (progressDiff !== null && progressDiff < -PROGRESS_DIFF_TOLERANCE) {
+      return 'Vas por detrás del plan. Revisa tus tareas clave.';
+    }
+    return 'Todo en marcha según el calendario';
+  }, [expectedProgress, progressDiff, progressPercent]);
+
+  const resolvedWeddingName = useMemo(() => {
+    if (!activeWeddingData) return '';
+
+    const normalizeName = (value) =>
+      String(value || '')
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const splitComposite = (value) => {
+      if (!value || typeof value !== 'string') return [];
+      const cleaned = value.trim();
+      if (!cleaned) return [];
+      const parts = cleaned
+        .split(/\s*(?:&|y|and|\+|\/)\s*/i)
+        .map((part) => part.trim())
+        .filter(Boolean);
+      return parts.length > 1 ? parts : [cleaned];
+    };
+
+    const rawNames = [];
+    const stringCandidates = [
+      activeWeddingData.coupleName,
+      activeWeddingData.couple,
+      activeWeddingData.brideAndGroom,
+      activeWeddingData.name,
+    ];
+
+    stringCandidates.forEach((value) => {
+      splitComposite(value).forEach((name) => rawNames.push(name));
+    });
+
+    const arrayCandidates = [
+      Array.isArray(activeWeddingData.coupleNames) ? activeWeddingData.coupleNames : [],
+      [activeWeddingData.brideFirstName, activeWeddingData.groomFirstName],
+      [activeWeddingData.bride, activeWeddingData.groom],
+    ];
+
+    arrayCandidates.forEach((arr) => {
+      arr.flat()
+        .filter(Boolean)
+        .forEach((name) => {
+          if (typeof name === 'string') rawNames.push(name.trim());
+        });
+    });
+
+    const seen = new Set();
+    const filtered = [];
+    const displayNameNormalized = displayName ? normalizeName(displayName) : null;
+
+    rawNames.forEach((name) => {
+      const normalized = normalizeName(name);
+      if (!normalized) return;
+      if (displayNameNormalized && normalized === displayNameNormalized) return;
+      if (seen.has(normalized)) return;
+      seen.add(normalized);
+      filtered.push(name.trim());
+    });
+
+    if (filtered.length > 1) return filtered.join(' y ');
+    if (filtered.length === 1) return filtered[0];
+
+    const fallbackString = stringCandidates
+      .map((value) => (typeof value === 'string' ? value.trim() : ''))
+      .find((value) => value.length > 0);
+    return fallbackString || '';
+  }, [activeWeddingData, displayName]);
+  const legacyWeddingName =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('mywed360_active_wedding_name') || ''
+      : '';
+  const weddingName = resolvedWeddingName || legacyWeddingName || displayName;
   const logoUrl = userProfile?.logoUrl || '';
 
   // Datos derivados ya calculados ms arriba
@@ -77,10 +344,21 @@ export default function HomePage() {
   const isPlanner = role === 'planner';
   const galleryRef = useRef(null);
   const [newsPosts, setNewsPosts] = useState([]);
+  const [newsError, setNewsError] = useState(null);
   const [categoryImages, setCategoryImages] = useState([]);
   const { i18n } = useTranslation();
   const lang = normalizeLang(i18n.language);
   const backendBase = getBackendBase();
+
+  useEffect(() => {
+    if (!resolvedWeddingName) return;
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('mywed360_active_wedding_name', resolvedWeddingName);
+    } catch {
+      /* ignore storage errors */
+    }
+  }, [resolvedWeddingName]);
 
   // Visual mode toggle similar a Blog
   const visualMode = useMemo(() => {
@@ -119,6 +397,7 @@ export default function HomePage() {
   // Cargar ltimas noticias (mx 3 por dominio y 4 con imagen)
   useEffect(() => {
     const loadNews = async () => {
+      setNewsError(null);
       const desired = 4;
       let page = 1;
       const results = [];
@@ -172,7 +451,15 @@ export default function HomePage() {
       // Sin fallback a EN: respetar idioma del usuario
 
       // Sin placeholders: solo mantener items con imagen real (ya filtrado arriba)
-      setNewsPosts(results.slice(0, desired));
+      if (results.length >= desired) {
+        setNewsPosts(results.slice(0, desired));
+        setNewsError(null);
+      } else {
+        setNewsPosts([]);
+        setNewsError(
+          'No se pudieron encontrar cuatro noticias con imagen en tu idioma en este momento. Inténtalo más tarde.'
+        );
+      }
     };
     loadNews();
   }, [lang]);
@@ -319,23 +606,12 @@ export default function HomePage() {
         {/* Header */}
         <header className="relative z-10 p-6 flex justify-between items-center flex-wrap gap-4">
           <div className="space-y-1">
-            <h1 className="page-title">
-              Bienvenidos, {weddingName}
-              {weddingName && displayName ? ' y ' : ''}
-              {displayName}
-            </h1>
+            <h1 className="page-title">Bienvenidos, {weddingName}</h1>
             <p className="text-4xl font-bold text-[color:var(--color-text)]">
               Cada detalle hace tu boda inolvidable
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/diseno-web"
-              state={{ focus: 'generator' }}
-              className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-5 py-3 rounded-full shadow-lg hover:shadow-xl transition-transform hover:-translate-y-0.5"
-            >
-              Publica tu sitio
-            </Link>
+          <div className="flex items-center">
             <img
               src={`${import.meta.env.BASE_URL}logo-app.png`}
               alt="Logo de la boda"
@@ -351,19 +627,29 @@ export default function HomePage() {
               <p className="text-sm text-[color:var(--color-text)]/70 mb-2">Progreso de tareas</p>
               <Progress
                 className="h-4 rounded-full w-full"
-                value={progress}
+                value={progressPercent}
                 max={100}
-                variant={
-                  progress >= 100 ? 'success' : progress >= 80 ? 'primary' : 'destructive'
-                }
+                variant={progressVariant}
                 data-testid="home-progress-bar"
               />
               <p
                 className="mt-2 text-sm font-medium text-[color:var(--color-text)]"
                 data-testid="home-progress-label"
               >
-                {progress}% completado
+                {progressPercent}% completado
               </p>
+              <p className="text-xs text-[color:var(--color-text)]/60" data-testid="home-progress-status">
+                {progressStatusText}
+                {expectedProgress != null ? ` · Esperado: ${expectedProgress}%` : ''}
+              </p>
+              {progressLoading && (
+                <p className="text-xs text-[color:var(--color-text)]/40">Actualizando progreso...</p>
+              )}
+              {progressError && !progressLoading && (
+                <p className="text-xs text-[color:var(--color-danger)]">
+                  No pudimos sincronizar el avance. Se muestra el último valor guardado.
+                </p>
+              )}
             </div>
           </Card>
         </section>
@@ -506,6 +792,11 @@ export default function HomePage() {
               ))}
             </div>
           )}
+          {newsError ? (
+            <div className="mt-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              {newsError}
+            </div>
+          ) : null}
         </section>
 
         <Nav active="home" />

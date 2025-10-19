@@ -2,7 +2,7 @@ import React from 'react';
 
 import { categories } from './CalendarComponents.jsx';
 
-// Componente para mostrar la lista de próximas tareas
+// Componente para mostrar la lista de tareas críticas de la semana
 const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete, parentNameMap = {} }) => {
   const sortedTasks = Array.isArray(tasks)
     ? (() => {
@@ -11,21 +11,33 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
         // De-duplicar por id (evita claves duplicadas durante actualizaciones optimistas)
         const byId = new Map();
         tasks.forEach((e) => {
-          if (!e || !(e.start instanceof Date)) return;
+          if (!e) return;
           const key = e.id ?? `${e.title}-${e.start?.toISOString?.() ?? ''}`;
           if (!byId.has(key)) byId.set(key, e);
         });
-        return (
-          Array.from(byId.values())
-            .filter((e) => e && e.start instanceof Date)
-            .sort((a, b) => a.start - b.start)
-            // Mostrar tareas con fin en futuro o inicio desde hoy
-            .filter((e) => {
-              const end = e.end instanceof Date ? e.end : e.start;
-              return (end >= todayStart) || (e.start >= todayStart);
-            })
-            .slice(0, maxItems)
-        );
+        const deduped = Array.from(byId.values());
+        const filtered = deduped.filter((e) => {
+          if (e?.__kind === 'subtask') return true;
+          const start = e?.start instanceof Date ? e.start : null;
+          const end = e?.end instanceof Date ? e.end : start;
+          if (!start) return false;
+          return end >= todayStart || start >= todayStart;
+        });
+        const sorter = (a, b) => {
+          const aIsSub = a?.__kind === 'subtask';
+          const bIsSub = b?.__kind === 'subtask';
+          if (aIsSub && bIsSub) {
+            const aTitle = String(a?.title || a?.name || '').toLowerCase();
+            const bTitle = String(b?.title || b?.name || '').toLowerCase();
+            return aTitle.localeCompare(bTitle);
+          }
+          if (aIsSub) return -1;
+          if (bIsSub) return 1;
+          const aStart = a?.start instanceof Date ? a.start.getTime() : Number.MAX_SAFE_INTEGER;
+          const bStart = b?.start instanceof Date ? b.start.getTime() : Number.MAX_SAFE_INTEGER;
+          return aStart - bStart;
+        };
+        return filtered.sort(sorter).slice(0, maxItems);
       })()
     : [];
 
@@ -43,7 +55,11 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
       map.get(pid).push(st);
     }
     for (const [pid, arr] of map.entries()) {
-      arr.sort((a, b) => a.start - b.start);
+      arr.sort((a, b) => {
+        const aTitle = String(a?.title || a?.name || '').toLowerCase();
+        const bTitle = String(b?.title || b?.name || '').toLowerCase();
+        return aTitle.localeCompare(bTitle);
+      });
     }
     return map;
   })();
@@ -58,9 +74,9 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
   };
 
   return (
-    <div className="rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">
+    <div className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">
       <div className="p-4 border-b border-[color:var(--color-text)]/10">
-        <h2 className="text-xl font-semibold">Próximas Tareas</h2>
+        <h2 className="text-xl font-semibold">Tareas críticas de esta semana</h2>
         <div className="flex flex-wrap gap-2 mt-2">
           {Object.entries(categories).map(([key, cat]) => (
             <div key={key} className="flex items-center text-xs">
@@ -120,14 +136,6 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
                           <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cat.bgColor}30`, color: cat.color, border: `1px solid ${cat.borderColor}` }}>
                             {cat.name}
                           </span>
-                        </div>
-                        <div className="text-xs text-[color:var(--color-text)]/60">
-                          {event.start.toLocaleDateString('es-ES', {
-                            day: 'numeric',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
                         </div>
                         {event.desc && (
                           <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">

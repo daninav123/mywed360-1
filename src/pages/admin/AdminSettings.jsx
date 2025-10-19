@@ -11,6 +11,7 @@ const AdminSettings = () => {
   const [templateContent, setTemplateContent] = useState('');
   const [showFlagConfirm, setShowFlagConfirm] = useState(null);
   const [showSecretModal, setShowSecretModal] = useState(''); // almacena id del secreto
+  const [rotateStep, setRotateStep] = useState(0);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -124,7 +125,7 @@ const AdminSettings = () => {
               <button
                 type="button"
                 data-testid="secret-rotate-button"
-                onClick={() => setShowSecretModal(secret.id)}
+                onClick={() => { setRotateStep(0); setShowSecretModal(secret.id); }}
                 className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
               >
                 Rotar
@@ -206,12 +207,16 @@ const AdminSettings = () => {
           <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
             <p className="text-sm text-[var(--color-text-soft,#6b7280)]">Proceso simulado de rotación en 3 pasos.</p>
             <div className="flex flex-col gap-2 text-sm">
-              <button type="button" data-testid="secret-rotate-step-next" className="rounded-md border border-soft px-3 py-2">
-                Paso siguiente
-              </button>
-              <button type="button" data-testid="secret-rotate-step-next" className="rounded-md border border-soft px-3 py-2">
-                Validar actualización
-              </button>
+              {rotateStep < 2 && (
+                <button
+                  type="button"
+                  data-testid="secret-rotate-step-next"
+                  onClick={() => setRotateStep((s) => s + 1)}
+                  className="rounded-md border border-soft px-3 py-2"
+                >
+                  {rotateStep === 0 ? 'Paso siguiente' : 'Validar actualización'}
+                </button>
+              )}
               <button
                 type="button"
                 data-testid="secret-rotate-confirm"
@@ -222,6 +227,7 @@ const AdminSettings = () => {
                     console.warn('[AdminSettings] rotate secret failed:', e);
                   } finally {
                     setShowSecretModal('');
+                    setRotateStep(0);
                   }
                 }}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)]"

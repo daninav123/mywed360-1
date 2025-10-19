@@ -31,8 +31,11 @@ const CONFIG = {
   // Intervalo para enviar métricas al servidor (ms)
   reportInterval: IS_TEST ? 0 : 60000, // 1 minuto (0 en tests)
 
-  // URL del endpoint para enviar métricas
-  reportUrl: import.meta.env.VITE_METRICS_ENDPOINT || '',
+  // URL del endpoint para enviar métricas (ingesta)
+  // Notas:
+  // - VITE_METRICS_POST_ENDPOINT: endpoint de ingesta (ej: /api/admin/metrics)
+  // - VITE_METRICS_ENDPOINT: endpoint base para lecturas admin (dashboard)
+  reportUrl: import.meta.env.VITE_METRICS_POST_ENDPOINT || '',
 
   // Tamaño máximo de la cola de eventos antes de enviar
   batchSize: 20,

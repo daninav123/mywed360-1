@@ -1,9 +1,9 @@
-# 27. Momentos (Álbum Compartido) — estado 2025-10-13
+# 27. Momentos (Álbum Compartido) — estado 2025-10-15
 
-> Estatus del producto (2025-10-13): **No** (pendiente). Existe definición funcional y técnica completa, sin implementación en código.
+> Estatus del producto (2025-10-15): **Sí (en curso)**. Se ejecuta la experiencia anfitrión/invitados en código (`/momentos`), incluyendo tabs de resumen, moderación, slideshow y descargas; permanecen evoluciones sobre gamificación, slideshow público y automatización de moderación.
 >
 > Alcance: Experiencia anfitrión e invitados para capturar, moderar y compartir fotos del evento mediante una página dedicada (`/momentos`) vinculada a cada boda. Incluye subida multi-dispositivo, revisión, slideshow en vivo y descarga masiva.
-> Pendiente: implementar el modulo completo (frontend, backend y storage), cerrar pipelines de moderacion automatica y lanzar la experiencia publica (QR, slideshow, descargas).
+> Pendiente: robustecer pipelines de moderación automática, gamificación y métricas, además de endurecer observabilidad y experiencia QR pública.
 
 ## 1. Objetivo y alcance
 - Centralizar todas las fotos generadas por invitados y equipo en un único álbum colaborativo vinculado a la boda.
@@ -349,3 +349,5 @@ weddings/{weddingId}
 ---
 
 > Contacto responsable: Equipo Producto Moments (pendiente asignar). Coordinación técnica con squads Frontend (MyWed360 App) y Backend Firebase.
+## Cobertura E2E implementada
+- `cypress/e2e/moments/moments-empty-state.cy.js`: valida el estado de acceso cuando no existe una boda activa antes de cargar Momentos, garantizando que el usuario reciba la guía adecuada antes de habilitar la colaboración.

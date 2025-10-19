@@ -23,12 +23,15 @@ const DEFAULT_BLOCKS = [
   { id: 'disco', name: 'Disco' },
 ];
 
+export const MAX_MOMENTS_PER_BLOCK = 200;
+
 // Estructura inicial por defecto
 const withRecipientDefaults = (list = []) =>
-  (Array.isArray(list) ? list : []).map((item) => ({
-    recipientId: '',
-    recipientName: '',
+  (Array.isArray(list) ? list : []).map((item = {}) => ({
     ...item,
+    recipientId: item.recipientId ?? '',
+    recipientName: item.recipientName ?? '',
+    recipientRole: item.recipientRole ?? '',
   }));
 
 const defaultData = {
@@ -281,13 +284,18 @@ export default function useSpecialMoments() {
 
   const addMoment = useCallback((blockId, moment) => {
     setMoments((prev) => {
+      const currentList = prev[blockId] || [];
+      if (currentList.length >= MAX_MOMENTS_PER_BLOCK) {
+        console.warn('[useSpecialMoments] se alcanzó el límite de momentos para el bloque', blockId);
+        return prev;
+      }
       const next = { ...prev };
       next[blockId] = [
-        ...(prev[blockId] || []),
+        ...currentList,
         {
           // defaults seguros para nuevo modelo
           id: Date.now(),
-          order: (prev[blockId]?.length || 0) + 1,
+          order: currentList.length + 1,
           title: 'Nuevo momento',
           song: '',
           time: '',
@@ -302,6 +310,7 @@ export default function useSpecialMoments() {
           key: '',
           recipientId: '',
           recipientName: '',
+          recipientRole: '',
           ...moment,
         },
       ];
@@ -388,19 +397,39 @@ export default function useSpecialMoments() {
 
       const targetBlock = toBlock || fromBlock;
       const destList = prev[targetBlock] || [];
+      if (destList.length >= MAX_MOMENTS_PER_BLOCK) {
+        console.warn('[useSpecialMoments] no se puede duplicar, bloque completo', targetBlock);
+        return prev;
+      }
 
-      // If duplicating within the same block, insert after the original index; else append
+      const cloned = {
+        ...moment,
+        responsables: Array.isArray(moment.responsables)
+          ? moment.responsables.map((responsable, index) => ({
+              id: responsable?.id ?? `${Date.now()}-${index}`,
+              role: responsable?.role || '',
+              name: responsable?.name || '',
+              contact: responsable?.contact || '',
+            }))
+          : [],
+        suppliers: Array.isArray(moment.suppliers) ? [...moment.suppliers] : [],
+        recipientId: moment.recipientId || '',
+        recipientName: moment.recipientName || '',
+        recipientRole: moment.recipientRole || '',
+      };
+
+      // Si se duplica dentro del mismo bloque, insertar tras el original; si no, al final
       if (targetBlock === fromBlock) {
         const idx = sourceList.findIndex((m) => m.id === momentId);
         if (idx === -1) return prev;
-        const copy = { ...moment, id: Date.now() };
+        const copy = { ...cloned, id: Date.now() };
         const newList = [...sourceList];
         newList.splice(idx + 1, 0, copy);
         const reOrdered = newList.map((m, i) => ({ ...m, order: i + 1 }));
         return { ...prev, [fromBlock]: reOrdered };
       }
 
-      const copy = { ...moment, id: Date.now(), order: destList.length + 1 };
+      const copy = { ...cloned, id: Date.now(), order: destList.length + 1 };
       return { ...prev, [targetBlock]: [...destList, copy] };
     });
   }, []);
@@ -458,5 +487,6 @@ export default function useSpecialMoments() {
     renameBlock,
     removeBlock,
     reorderBlocks,
+    maxMomentsPerBlock: MAX_MOMENTS_PER_BLOCK,
   };
 }

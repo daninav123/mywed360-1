@@ -88,6 +88,12 @@
   - Usuario planner/assistant debe ver bloqueo.
 - **Opcional**: comprobar botón “Saltar” en notas y reinicio con “Cambiar respuestas”.
 
+## Cobertura E2E implementada
+- `cypress/e2e/onboarding/assistant-conversation-happy.cy.js`: flujo feliz completo hasta crear un evento.
+- `cypress/e2e/onboarding/assistant-context-switch.cy.js`: valida cambios de tema/conversación sin perder respuestas previas.
+- `cypress/e2e/onboarding/assistant-followups.cy.js`: comprueba registro de follow-ups y tareas sugeridas.
+- `cypress/e2e/onboarding/create-event-assistant.cy.js`: smoke general del asistente y navegación hacia la ficha de boda.
+
 ## 10. Checklist de despliegue
 - Rutas protegidas (`/crear-evento` y `/crear-evento-asistente`) deben convivir hasta decidir unificar.
 - QA: añadir suites Cypress simulando conversación (incl. branch de errores).

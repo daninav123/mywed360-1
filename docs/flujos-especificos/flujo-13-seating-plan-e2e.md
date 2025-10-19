@@ -40,6 +40,7 @@ Ubicaci贸n de los specs:
 - `cypress/e2e/seating/seating_area_type.cy.js`
 - `cypress/e2e/seating/seating_assign_unassign.cy.js`
 - `cypress/e2e/seating/seating_auto_ai.cy.js`
+- `cypress/e2e/seating/seating-content-flow.cy.js`
 
 ### 1) seating_smoke.cy.js (Smoke general)
 Valida que:
@@ -141,11 +142,19 @@ Notas:
   - Validar guardado/recuperaci贸n de dimensiones al recargar p谩gina (requiere mocks o backend real y datos de usuario).
 
 ## Cobertura E2E implementada
-- `cypress/e2e/seating/seating_smoke.cy.js y cypress/e2e/seating/seating_assign_unassign.cy.js`: validan creaci贸n de salones, asignaci贸n y desasignaci贸n de invitados.
-- `cypress/e2e/seating/seating_capacity_limit.cy.js, cypress/e2e/seating/seating_no_overlap.cy.js y cypress/e2e/seating/seating_obstacles_no_overlap.cy.js`: cubren reglas de capacidad, colisiones y obst谩culos.
-- `cypress/e2e/seating/seating_template_circular.cy.js, cypress/e2e/seating/seating_template_u_l_imperial.cy.js y cypress/e2e/seating/seating_ceremony.cy.js`: ejercitan plantillas y configuraciones especiales.
-- `cypress/e2e/seating/seating_fit.cy.js, cypress/e2e/seating/seating_aisle_min.cy.js y cypress/e2e/seating/seating_toasts.cy.js`: prueban distribuci贸n autom谩tica, pasillos m铆nimos y flujos de brindis.
-- `cypress/e2e/seating/seating_auto_ai.cy.js`: valida la acci贸n de Auto-IA (stub inicial; acepta 茅xito o error controlado).
- - `cypress/e2e/seating/seating_area_type.cy.js`: valida creaci贸n/edici贸n por tipo de 谩rea en el plano.
- - `cypress/e2e/seating/seating_delete_duplicate.cy.js`: valida eliminaci贸n de duplicados en entidades del seating.
+- `cypress/e2e/seating/seating_smoke.cy.js` y `cypress/e2e/seating/seating_assign_unassign.cy.js`: validan creaci髇 de salones, asignaci髇 y desasignaci髇 de invitados.
+- `cypress/e2e/seating/seating_capacity_limit.cy.js`, `cypress/e2e/seating/seating_no_overlap.cy.js` y `cypress/e2e/seating/seating_obstacles_no_overlap.cy.js`: cubren reglas de capacidad, colisiones y obst醕ulos.
+- `cypress/e2e/seating/seating_template_circular.cy.js`, `cypress/e2e/seating/seating_template_u_l_imperial.cy.js` y `cypress/e2e/seating/seating_ceremony.cy.js`: ejercitan plantillas y configuraciones especiales.
+- `cypress/e2e/seating/seating_fit.cy.js`, `cypress/e2e/seating/seating_aisle_min.cy.js` y `cypress/e2e/seating/seating_toasts.cy.js`: prueban distribuci髇 autom醫ica, pasillos m韓imos y flujos de brindis.
+- `cypress/e2e/seating/seating_auto_ai.cy.js`, `cypress/e2e/seating/seating_area_type.cy.js` y `cypress/e2e/seating/seating_delete_duplicate.cy.js`: cubren auto-IA, tipos de 醨eas y deduplicaci髇.
+- `cypress/e2e/seating/seating-content-flow.cy.js`: confirma disponibilidad de contenidos auxiliares vinculados con Momentos.
+- `cypress/e2e/seating/seating-basic.cy.js`, `cypress/e2e/seating/seating-conflicts.cy.js` y `cypress/e2e/seating/seating_ui_panels.cy.js`: smoke b醩ico, resoluci髇 de conflictos y paneles secundarios.
+- `cypress/e2e/seating/seating-export.cy.js`: valida exportaciones PDF/Excel.
+
+## Cobertura y pr贸ximos pasos
+
+- Cobertura actual (UI): generaci贸n, dibujo, undo/redo, Auto-IA (feedback), ceremonia toggle y toasts clave.
+- Pr贸ximos pasos recomendados:
+  - A帽adir un test para asignaci贸n/ desasignaci贸n de invitados con drag & drop y bot贸n 脳.
+  - Validar guardado/recuperaci贸n de dimensiones al recargar p谩gina (requiere mocks o backend real y datos de usuario).
 

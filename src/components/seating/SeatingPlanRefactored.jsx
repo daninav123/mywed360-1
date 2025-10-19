@@ -1,7 +1,7 @@
 /**
  * SeatingPlan refactorizado â€“ Componente principal
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import SeatingPlanToolbar from './SeatingPlanToolbar';
 import SeatingExportWizard from './SeatingExportWizard';
 import SeatingMobileOverlay from './SeatingMobileOverlay';
 import SeatingSmartPanel from './SeatingSmartPanel';
+import SeatingGuestSidebar from './SeatingGuestSidebar';
 import SeatingPlanModals from './SeatingPlanModals';
 import { useWedding } from '../../context/WeddingContext';
 // Importar vía alias estable para permitir vi.mock en tests y usar el hook deshabilitado en test
@@ -100,7 +101,7 @@ const SeatingPlanRefactored = () => {
     templateOpen,
     setTemplateOpen,
     canvasRef,
-    handleSelectTable,
+    handleSelectTable: baseHandleSelectTable,
     handleTableDimensionChange,
     toggleSelectedTableShape,
     setConfigTable,
@@ -167,6 +168,12 @@ const SeatingPlanRefactored = () => {
     executeSmartAction,
     collaborators,
     collaborationStatus,
+    locks,
+    lockEvent,
+    consumeLockEvent,
+    ensureTableLock,
+    releaseTableLocksExcept,
+    collabClientId,
   } = useSeatingPlan();
 
   // Mostrar/ocultar mesas
@@ -183,7 +190,9 @@ const SeatingPlanRefactored = () => {
   const [showSeatNumbers, setShowSeatNumbers] = React.useState(false);
   const [guidedGuestId, setGuidedGuestId] = React.useState(null);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [guestSidebarOpen, setGuestSidebarOpen] = React.useState(true);
   const showSmartPanel = tab === 'banquet';
+  const showGuestSidebar = guestSidebarOpen && !isMobile;
   const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
   // handler para fondo rápido (prompt)
   // Valores seguros para evitar crashes por undefined
@@ -196,10 +205,29 @@ const SeatingPlanRefactored = () => {
       ? hallSize
       : { width: 1800, height: 1200 };
 
+  const exportPreviewSnapshot = useMemo(
+    () => ({
+      tab,
+      hallSize: safeHallSize,
+      tables: safeTables,
+      seats: safeSeats,
+      guestsCount: safeGuests.length,
+      areas: safeAreas,
+    }),
+    [tab, safeHallSize, safeTables, safeSeats, safeGuests, safeAreas]
+  );
+
   const uiPrefsKey = React.useMemo(
     () => `seatingPlan:${activeWedding || 'default'}:ui-prefs`,
     [activeWedding]
   );
+
+  const gridTemplate = React.useMemo(() => {
+    if (showSmartPanel && showGuestSidebar) return 'grid-cols-[18rem_1fr_18rem_20rem_22rem]';
+    if (showSmartPanel) return 'grid-cols-[18rem_1fr_18rem_20rem]';
+    if (showGuestSidebar) return 'grid-cols-[18rem_1fr_20rem_22rem]';
+    return 'grid-cols-[18rem_1fr_20rem]';
+  }, [showSmartPanel, showGuestSidebar]);
 
   const persistUiPrefs = React.useCallback(
     (patch) => {
@@ -276,6 +304,12 @@ const SeatingPlanRefactored = () => {
     return () => window.removeEventListener('resize', updateIsMobile);
   }, []);
 
+  useEffect(() => {
+    if (isMobile) {
+      setGuestSidebarOpen(false);
+    }
+  }, [isMobile]);
+
   // Invitados pendientes sin mesa
   const pendingGuests = React.useMemo(() => {
     try {
@@ -284,6 +318,41 @@ const SeatingPlanRefactored = () => {
       return [];
     }
   }, [safeGuests]);
+
+  const tableLocks = React.useMemo(() => {
+    const map = new Map();
+    if (Array.isArray(locks)) {
+      locks.forEach((lock) => {
+        if (lock.resourceType === 'table') {
+          map.set(String(lock.resourceId), lock);
+        }
+      });
+    }
+    return map;
+  }, [locks]);
+
+  const handleSelectTable = React.useCallback(
+    (id, multi = false) => {
+      const run = async () => {
+        if (id == null) {
+          releaseTableLocksExcept([]);
+          await Promise.resolve(baseHandleSelectTable(null, multi));
+          return;
+        }
+        const ok = await ensureTableLock(id);
+        if (!ok) return;
+        const nextIds = multi
+          ? Array.from(new Set([...(selectedIds || []), id]))
+          : [id];
+        releaseTableLocksExcept(nextIds);
+        await Promise.resolve(baseHandleSelectTable(id, multi));
+      };
+      run().catch((error) => {
+        console.warn('[SeatingPlan] handleSelectTable error:', error);
+      });
+    },
+    [baseHandleSelectTable, ensureTableLock, releaseTableLocksExcept, selectedIds]
+  );
 
   const areaSummary = React.useMemo(() => {
     if (!Array.isArray(safeAreas) || safeAreas.length === 0) return [];
@@ -309,6 +378,22 @@ const SeatingPlanRefactored = () => {
         return a.label.localeCompare(b.label, 'es');
       });
   }, [safeAreas]);
+
+  useEffect(() => {
+    if (!lockEvent) return;
+    if (lockEvent.kind === 'lock-denied' && lockEvent.resourceType === 'table') {
+      toast.warn(
+        `Esta mesa está en edición por ${lockEvent.ownerName || 'otro colaborador'}`
+      );
+    }
+    consumeLockEvent();
+  }, [lockEvent, consumeLockEvent]);
+
+  useEffect(() => {
+    if (tab !== 'banquet') {
+      releaseTableLocksExcept([]);
+    }
+  }, [tab, releaseTableLocksExcept]);
 
   // Invitados asignados a la mesa seleccionada
   const assignedToSelected = React.useMemo(() => {
@@ -461,8 +546,12 @@ const SeatingPlanRefactored = () => {
     async (payload) => {
       if (!payload || !Array.isArray(payload.formats)) return;
       try {
-        await exportAdvancedReport?.(payload);
-        toast.success('Exportación generada correctamente.');
+        const result = await exportAdvancedReport?.(payload);
+        if (result?.exportId) {
+          toast.success('Exportación guardada y lista para descargar.');
+        } else {
+          toast.success('Exportación generada correctamente.');
+        }
       } catch (error) {
         console.error('Error generando exportación avanzada', error);
         toast.error('No se pudo generar la exportación avanzada.');
@@ -1061,6 +1150,8 @@ const SeatingPlanRefactored = () => {
       showSeatNumbers={showSeatNumbers}
       background={background}
       globalMaxSeats={globalMaxSeats}
+      tableLocks={tableLocks}
+      currentClientId={collabClientId}
       validationsEnabled={validationsEnabled}
       suggestions={guidedGuestId ? suggestTablesForGuest?.(guidedGuestId) || null : null}
       focusTableId={focusTableId}
@@ -1162,6 +1253,8 @@ const SeatingPlanRefactored = () => {
             onRedo={redo}
             canUndo={canUndo}
             canRedo={canRedo}
+            drawMode={drawMode}
+            onChangeDrawMode={setDrawMode}
             onExportPDF={exportPDF}
             onExportPNG={exportPNG}
             onExportCSV={exportCSV}
@@ -1247,13 +1340,7 @@ const SeatingPlanRefactored = () => {
             </div>
           </div>
         ) : (
-          <div
-            className={`flex-1 grid ${
-              showSmartPanel
-                ? 'grid-cols-[18rem_1fr_18rem_20rem]'
-                : 'grid-cols-[18rem_1fr_20rem]'
-            } gap-3 px-4 pb-3`}
-          >
+          <div className={`flex-1 grid ${gridTemplate} gap-3 px-4 pb-3`}>
             {/* Canvas primero en el DOM para que cy.get('svg') seleccione el lienzo */}
             <div className="border border-gray-200 rounded-lg overflow-hidden bg-white order-2">
               {renderCanvas('h-full')}
@@ -1273,8 +1360,29 @@ const SeatingPlanRefactored = () => {
                 />
               </div>
             )}
-            {/* Inspector a la derecha */}
-            <div className={`min-h-0 ${showSmartPanel ? 'order-4' : 'order-3'}`}>{renderInspector('h-full')}</div>
+            {/* Inspector */}
+            <div className={`min-h-0 ${showSmartPanel ? 'order-4' : 'order-3'}`}>
+              {renderInspector('h-full')}
+            </div>
+            {showGuestSidebar && (
+              <div className={`min-h-0 ${showSmartPanel ? 'order-5' : 'order-4'}`}>
+                <SeatingGuestSidebar
+                  guests={safeGuests}
+                  pendingGuests={pendingGuests}
+                  recommendations={smartRecommendations}
+                  conflictSuggestions={smartConflictSuggestions}
+                  conflicts={conflicts}
+                  insights={smartInsights}
+                  onAssignRecommendation={handleSmartAssign}
+                  onFocusTable={focusTable}
+                  onExecuteAction={handleSmartAction}
+                  onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+                  listSnapshots={listSnapshots}
+                  loadSnapshot={loadSnapshot}
+                  deleteSnapshot={deleteSnapshot}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1319,12 +1427,28 @@ const SeatingPlanRefactored = () => {
                 </div>
               )}
             </div>
-            <button
-              className={`${isMobile ? 'basis-full mt-1 text-center' : 'ml-auto'} px-2 py-1 border rounded hover:bg-gray-50`}
-              onClick={() => setGuestDrawerOpen(true)}
+            <div
+              className={`${
+                isMobile
+                  ? 'basis-full mt-1 flex items-center justify-between gap-2'
+                  : 'ml-auto flex items-center gap-2'
+              }`}
             >
-              Pendientes: {pendingGuests.length}
-            </button>
+              <button
+                className="px-2 py-1 border rounded hover:bg-gray-50"
+                onClick={() => setGuestDrawerOpen(true)}
+              >
+                Pendientes: {pendingGuests.length}
+              </button>
+              {!isMobile && (
+                <button
+                  className="px-2 py-1 border rounded hover:bg-gray-50 text-xs"
+                  onClick={() => setGuestSidebarOpen((prev) => !prev)}
+                >
+                  {showGuestSidebar ? 'Ocultar Guest Sidebar' : 'Mostrar Guest Sidebar'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1393,6 +1517,10 @@ const SeatingPlanRefactored = () => {
           onClose={() => setExportWizardOpen(false)}
           onGenerateExport={handleGenerateAdvancedExport}
           availableTabs={availableExportTabs}
+          storageKey={
+            activeWedding ? `seatingPlan:${activeWedding}:export-presets` : undefined
+          }
+          previewData={exportPreviewSnapshot}
         />
       </div>
     </DndProvider>

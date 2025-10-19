@@ -20,7 +20,7 @@ export default function EventsCalendar({
   EventComponent,
 }) {
   return (
-    <div className="flex-1 bg-[var(--color-surface)] rounded-xl shadow-md p-6 mt-4 overflow-x-auto">
+    <div className="flex-1 flex flex-col h-full bg-[var(--color-surface)] rounded-xl shadow-md p-6 overflow-x-auto border border-[color:var(--color-text)]/10">
       <h2 className="text-xl font-semibold mb-4">Calendario de Eventos</h2>
 
       <div className="flex justify-between items-center mb-4">

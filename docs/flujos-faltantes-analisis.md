@@ -37,7 +37,7 @@
 - flujo-14-checklist-avanzado.md — Documentado
 - flujo-15-contratos-documentos.md — Documentado
 - flujo-16-asistente-virtual-ia.md — Documentado (concepto) — Implementación pendiente
-- flujo-17-gamificacion-progreso.md — Documentado (concepto) — Implementación pendiente
+- flujo-17-gamificacion-progreso.md — Documentado + Implementado (backend) — Integraciones de UI y recompensas pendientes
 - flujo-18-generador-documentos-legales.md — Documentado (concepto) — Implementación pendiente
 - flujo-19-diseno-invitaciones.md — Documentado
 - flujo-20-email-inbox.md — Documentado
@@ -65,12 +65,11 @@ Los siguientes flujos estaban marcados como “no documentados” y ahora cuenta
 ## Prioridades de documentación (actual)
 
 - Asistente Virtual con IA — Implementación pendiente (flujo-16)
-- Gamificación y Progreso — Implementación pendiente (flujo-17)
 - Generador de Documentos Legales — Implementación pendiente (flujo-18)
 
 ## Resumen ejecutivo
 
-- Cobertura de documentación de flujos: alta en funcionalidad core; conceptual en 16–18.
+- Cobertura de documentación de flujos: alta en funcionalidad core; conceptual en 16 y 18.
 - El índice `docs/FLUJOS-INDICE.md` mantiene el estado tri‑estado (Sí completado / Sí en curso / No pendiente).
 - Siguiente paso recomendado: definir criterios de “completado” por flujo para promover estados cuando cumplan mínimos funcionales.
 

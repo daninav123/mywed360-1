@@ -15,7 +15,7 @@ function parseDate(value) {
 }
 
 async function request(path, body = {}) {
-  const res = await apiPost(path, body, { auth: false });
+  const res = await apiPost(path, body, { auth: false, credentials: 'include' });
   let data = null;
   try {
     data = await res.json();
@@ -55,9 +55,9 @@ export async function verifyAdminMfa(payload) {
 }
 
 export async function logoutAdmin(sessionToken) {
-  if (!sessionToken) return { success: true };
   try {
-    await request(LOGOUT_PATH, { sessionToken });
+    const payload = sessionToken ? { sessionToken } : {};
+    await request(LOGOUT_PATH, payload);
   } catch (error) {
     // Si el backend ya invalidó la sesión, no es crítico para el frontend.
     if (error?.code !== 'admin_request_failed') {
@@ -66,4 +66,3 @@ export async function logoutAdmin(sessionToken) {
   }
   return { success: true };
 }
-

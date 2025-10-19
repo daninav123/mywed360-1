@@ -76,38 +76,39 @@ export default function VerifyEmail() {
     }
   };
 
-  if (!isAuthenticated) return null;
+  // Renderizar siempre la UI para ofrecer instrucciones y permitir feedback
+  // En ausencia de sesión, los botones devolverán errores controlados visibles por el usuario
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[var(--color-bg)] px-4">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-md text-center space-y-4">
-        <h2 className="text-2xl">Verifica tu email</h2>
-        <p className="text-sm text-gray-600">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+      <div className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 text-center shadow-sm">
+        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">Verifica tu email</h2>
+        <p className="text-sm text-[color:var(--color-muted)]">
           Debes verificar tu direccion de correo para continuar usando la aplicacion.
         </p>
         {status ? (
-          <p id={STATUS_ID} role="status" aria-live="polite" className="text-green-600 text-sm">
+          <p id={STATUS_ID} role="status" aria-live="polite" className="text-sm text-[color:var(--color-success)]">
             {status}
           </p>
         ) : null}
         {error ? (
-          <p id={ERROR_ID} role="alert" aria-live="assertive" className="text-red-600 text-sm">
+          <p id={ERROR_ID} role="alert" aria-live="assertive" className="text-sm text-[color:var(--color-danger)]">
             {error}
           </p>
         ) : null}
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <button
             data-testid="resend-verification"
             onClick={handleResend}
             disabled={isSending}
-            className="flex-1 bg-[var(--color-primary)] text-white px-4 py-2 rounded hover:bg-[var(--color-accent)] transition-colors disabled:opacity-70"
+            className="flex-1 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-[color:var(--color-surface)] transition-colors hover:bg-[var(--color-accent)] disabled:opacity-70"
           >
             {isSending ? 'Enviando...' : 'Reenviar verificacion'}
           </button>
           <button
             data-testid="refresh-verification"
             onClick={handleRefresh}
-            className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
+            className="flex-1 rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-[color:var(--color-text)] transition-colors hover:bg-[color:var(--color-primary)]/10"
           >
             Ya verifique
           </button>

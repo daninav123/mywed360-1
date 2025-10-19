@@ -50,13 +50,17 @@ const EmailNotificationBadge = () => {
 
   // Ir a la bandeja de entrada
   const handleClick = () => {
-    navigate('/user/email');
+    try {
+      navigate('/email');
+    } catch (error) {
+      console.error('No se pudo navegar al inbox', error);
+    }
   };
 
   return (
     <button
       onClick={handleClick}
-      className="relative p-2 rounded-full hover:bg-gray-200 focus:outline-none transition-colors"
+      className="relative p-2 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
       aria-label={`${unreadCount} correos sin leer`}
       disabled={loading}
     >

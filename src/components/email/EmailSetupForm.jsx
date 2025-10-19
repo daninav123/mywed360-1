@@ -1,83 +1,94 @@
-﻿import { Check, AlertCircle, Loader2 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { Check, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../ui/Button';
 
+const USERNAME_REGEX = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
+
 /**
- * Componente para configurar el nombre de correo electrónico de usuario
- * Permite seleccionar un nombre de usuario para el dominio @mywed360
- * Incluye validación en tiempo real de disponibilidad
+ * Formulario para seleccionar el alias @mywed360.
+ * Realiza validaciones de formato y consulta disponibilidad en tiempo real.
  */
-const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
+const EmailSetupForm = ({
+  onSave,
+  onCheckAvailability,
+  defaultUsername = '',
+  userId, // mantenido por compatibilidad con props existentes
+}) => {
   const [username, setUsername] = useState(defaultUsername);
-  const [availabilityStatus, setAvailabilityStatus] = useState('idle'); // 'idle', 'checking', 'available', 'unavailable'
+  const [availabilityStatus, setAvailabilityStatus] = useState('idle'); // idle | checking | available | unavailable
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const lastCheckIdRef = useRef(0);
 
-  // Función para comprobar si un nombre de usuario está disponible
-  const checkAvailability = async (value) => {
-    if (!value) {
+  const performAvailabilityCheck = async (value) => {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
       setAvailabilityStatus('idle');
+      setError('');
       return;
     }
 
-    // Validar formato del nombre de usuario
-    const usernameRegex = /^[a-z0-9][a-z0-9._-]{2,29}$/i;
-    if (!usernameRegex.test(value)) {
+    if (!USERNAME_REGEX.test(trimmed)) {
+      setAvailabilityStatus('unavailable');
       setError(
         'El nombre solo puede contener letras, números, puntos, guiones y guiones bajos. Mínimo 3 caracteres.'
       );
-      setAvailabilityStatus('unavailable');
       return;
     }
 
+    const checkId = Date.now();
+    lastCheckIdRef.current = checkId;
     setAvailabilityStatus('checking');
     setError('');
 
     try {
-      // En un entorno real, esto sería una llamada a la API
-      // En este ejemplo simulamos la llamada con un timeout
-      setTimeout(async () => {
-        // Simulamos que algunos nombres están ocupados
-        const takenUsernames = ['admin', 'info', 'soporte', 'ayuda', 'contacto'];
-        const isAvailable = !takenUsernames.includes(value.toLowerCase());
+      let isAvailable = true;
+      if (typeof onCheckAvailability === 'function') {
+        isAvailable = await onCheckAvailability(trimmed);
+      }
 
-        setAvailabilityStatus(isAvailable ? 'available' : 'unavailable');
-        if (!isAvailable) {
-          setError(`El nombre "${value}" ya está en uso. Por favor elige otro.`);
-        }
-      }, 800); // Simular delay de red
-    } catch (error) {
-      console.error('Error al comprobar disponibilidad:', error);
+      if (lastCheckIdRef.current !== checkId) return;
+
+      if (isAvailable) {
+        setAvailabilityStatus('available');
+        setError('');
+      } else {
+        setAvailabilityStatus('unavailable');
+        setError(`El nombre "${trimmed}" ya está en uso. Por favor elige otro.`);
+      }
+    } catch (err) {
+      console.error('Error al comprobar disponibilidad:', err);
+      if (lastCheckIdRef.current !== checkId) return;
       setAvailabilityStatus('unavailable');
-      setError('Error al comprobar disponibilidad. Inténtalo de nuevo más tarde.');
+      setError('No se pudo verificar la disponibilidad. Inténtalo nuevamente.');
     }
   };
 
-  // Efecto para comprobar disponibilidad cuando el usuario escribe
   useEffect(() => {
-    const timer = setTimeout(() => {
-      checkAvailability(username);
-    }, 500); // Debounce de 500ms
-
-    return () => clearTimeout(timer);
+    const handle = setTimeout(() => {
+      void performAvailabilityCheck(username);
+    }, 400);
+    return () => clearTimeout(handle);
   }, [username]);
 
-  // Función para guardar el nombre de correo
   const handleSave = async () => {
-    if (availabilityStatus !== 'available') return;
+    const trimmed = username.trim();
+    if (!trimmed || availabilityStatus !== 'available') return;
 
     setIsSaving(true);
+    setError('');
     try {
-      // En un entorno real, esto sería una llamada a la API para guardar
-      // el nombre de correo asociado al usuario
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulación
-
-      if (onSave) {
-        onSave(username);
+      if (typeof onSave === 'function') {
+        const result = await onSave(trimmed);
+        if (result === false) {
+          setIsSaving(false);
+          return;
+        }
       }
-    } catch (error) {
-      console.error('Error al guardar:', error);
+    } catch (err) {
+      console.error('Error al guardar alias:', err);
       setError('Error al guardar. Inténtalo de nuevo más tarde.');
     } finally {
       setIsSaving(false);
@@ -116,6 +127,8 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
             placeholder="tunombre"
             aria-label="Nombre de usuario para correo"
             disabled={isSaving}
+            autoComplete="off"
+            spellCheck={false}
           />
           <div className="bg-gray-100 px-3 py-2 border-y border-r rounded-r-md text-gray-700 whitespace-nowrap">
             @mywed360
@@ -178,3 +191,4 @@ const EmailSetupForm = ({ onSave, defaultUsername = '', userId }) => {
 };
 
 export default EmailSetupForm;
+

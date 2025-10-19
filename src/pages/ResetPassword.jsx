@@ -69,10 +69,14 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[var(--color-bg)] px-4">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-md space-y-4" noValidate>
-        <h2 className="text-2xl">Restablecer contrasena</h2>
-        <p className="text-sm text-gray-600">
+    <div className="flex items-center justify-center min-h-screen bg-[var(--color-bg)] px-4 py-12">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md space-y-5 rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 shadow-sm"
+        noValidate
+      >
+        <h2 className="text-2xl font-semibold text-[color:var(--color-text)]">Restablecer contrasena</h2>
+        <p className="text-sm text-[color:var(--color-muted)]">
           Introduce tu correo y te enviaremos un enlace para definir una nueva contrasena.
         </p>
         <input
@@ -83,16 +87,16 @@ export default function ResetPassword() {
           ref={emailInputRef}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? ERROR_ID : undefined}
-          className="border p-2 w-full"
+          className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
           data-testid="reset-email"
         />
         {status ? (
-          <p id={STATUS_ID} role="status" aria-live="polite" className="text-green-600 text-sm">
+          <p id={STATUS_ID} role="status" aria-live="polite" className="text-sm text-[color:var(--color-success)]">
             {status}
           </p>
         ) : null}
         {error ? (
-          <p id={ERROR_ID} role="alert" aria-live="assertive" className="text-red-600 text-sm">
+          <p id={ERROR_ID} role="alert" aria-live="assertive" className="text-sm text-[color:var(--color-danger)]">
             {error}
           </p>
         ) : null}

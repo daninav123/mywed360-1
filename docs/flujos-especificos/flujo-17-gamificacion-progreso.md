@@ -50,9 +50,9 @@
 - No se requieren pruebas de render de paneles porque la UI permanece deshabilitada.
 
 ## Cobertura E2E implementada
-- `gamification-progress-happy`: verifica `POST /award`, `GET /stats` y la persistencia en `GET /events`.
-- `gamification-milestone-unlock`: consulta `GET /achievements` y valida el esquema de respuesta.
-- `gamification-history`: garantiza que Home no renderiza paneles ni dispara peticiones autom√°ticas a la API.
+- `cypress/e2e/gamification/gamification-progress-happy.cy.js`: smoke de progreso positivo (award + stats + events).
+- `cypress/e2e/gamification/gamification-milestone-unlock.cy.js`: cubre lectura de logros y esquema esperado.
+- `cypress/e2e/gamification/gamification-history.cy.js`: garantiza que Home no renderiza paneles ni dispara peticiones autom·ticas a la API.
 
 ## 10. Checklist de despliegue
 - Reglas de seguridad para colecciones `gamification`, `achievements`, `gamificationEvents`.
@@ -86,3 +86,5 @@
 - Endpoints o funciones programadas para `stats|achievements|events` accesibles desde servicios internos y QA.
 - Seeds de prueba con bodas en distintos niveles de progreso para probar reglas de puntos.
 - Observabilidad: tableros en DataDog/Looker con agregados de progreso y errores.
+
+

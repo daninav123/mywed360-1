@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "mywed360",
+  "name": "malove-app",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -30,6 +30,7 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "cypress:run:seating": "cypress run --spec \"cypress/e2e/seating/**/*.cy.js\" --config video=false",
+    "cypress:run:proveedores": "cypress run --spec \"cypress/e2e/proveedores_*.cy.js\" --config video=false",
     "cypress:open:seating": "cypress open --e2e --config specPattern=cypress/e2e/seating/**/*.cy.js",
     "cypress:cache:clear:win": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$p=Join-Path $env:LOCALAPPDATA 'Cypress/Cache'; if(Test-Path $p){ Remove-Item -Recurse -Force $p }; Write-Host 'Cypress cache cleared'\"",
     "cypress:install": "cypress install",
@@ -41,6 +42,7 @@
     "ensure:finance": "node scripts/ensureFinanceAll.js",
     "validate:schemas": "node scripts/validateSchemas.js",
     "validate:i18n": "node scripts/validateI18n.js",
+    "validate:roadmap": "node scripts/aggregateRoadmap.js && node scripts/debugSpecDiff.js && node scripts/roadmapCrossCheck.js",
     "nightly": "node scripts/nightlyRunner.js --durationHours=8 --sleepSeconds=180 --stopOnError=false --pushBranch=windows",
     "backfill:mails": "node backend/scripts/backfillMailsToUsers.js --limit=1000",
     "fix:mails:from": "node backend/scripts/fixMailFrom.js",
@@ -51,13 +53,15 @@
     "i18n:sync": "node scripts/syncLocales.js es fr",
     "fix:mojibake": "node scripts/fix-mojibake.js",
     "docs:fix-encoding": "node scripts/fix-mojibake.js",
-    "ci:check": "npm run lint && npm run test:unit && npm run validate:i18n && npm run check:bundle",
+    "ci:check": "npm run lint && npm run test:unit && npm run validate:i18n && npm run check:bundle && npm run validate:roadmap",
     "issues:create": "node scripts/gh-create-issues.js",
     "issues:dry": "cross-env DRY_RUN=1 node scripts/gh-create-issues.js",
     "roadmap:aggregate": "node scripts/aggregateRoadmap.js",
     "roadmap:check": "node scripts/aggregateRoadmap.js && node scripts/roadmapOrder.js --check",
     "roadmap:order": "node scripts/roadmapOrder.js",
-    "roadmap:diff": "node scripts/roadmapCrossCheck.js"
+    "roadmap:diff": "node scripts/roadmapCrossCheck.js",
+    "seed:personalization": "node scripts/seedPersonalizationProfiles.js",
+    "metrics:cleanup": "node scripts/cleanupProjectMetricsEvents.js --days=30"
   },
   "dependencies": {
     "@mui/icons-material": "^7.3.4",

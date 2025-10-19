@@ -14,7 +14,7 @@ Esta guía define convenciones para código, UI y estructura, alineadas con las 
   - Prettier con `printWidth 100`, `singleQuote`, `semi` (ver `.prettierrc.json`).
   - EditorConfig: `utf-8`, `lf`, indent 2 espacios (ver `.editorconfig`).
 - React
-  - Lazy + Suspense para vistas pesadas; `prefetchModule` como en `Home.jsx`.
+  - Lazy + Suspense para vistas pesadas; `prefetchModule` como en `HomeUser.jsx`.
   - Estado local primero, Context cuando cruza múltiples rutas, y URL state para filtros/paginación.
   - Error boundaries para bloques complejos (p. ej. `Tasks.jsx`).
 
@@ -34,9 +34,15 @@ Esta guía define convenciones para código, UI y estructura, alineadas con las 
   - Tokens coherentes: usar variables de Tailwind extendidas en `tailwind.config.js`.
 - Tokens recomendados (Tailwind)
   - Tipografía: `font-sans: Inter`; escala sugerida: `sm, base, lg, xl, 2xl, 3xl`.
-  - Colores: usar paleta `blue` existente + neutrales (`slate/gray`) y estados: `success (#16a34a)`, `warning (#f59e0b)`, `danger (#dc2626)`, `info (#0ea5e9)`.
-  - Radios: `rounded-md` (controles), `rounded-lg` (cards/modals), `rounded-full` (pills/avatars).
-  - Sombras: `shadow-sm` (controles), `shadow` (cards), `shadow-lg` (modals/overlays).
+- Colores: usar paleta `blue` existente + neutrales (`slate/gray`) y estados: `success (#16a34a)`, `warning (#f59e0b)`, `danger (#dc2626)`, `info (#0ea5e9)`.
+- Radios: `rounded-md` (controles), `rounded-lg` (cards/modals), `rounded-full` (pills/avatars).
+- Sombras: `shadow-sm` (controles), `shadow` (cards), `shadow-lg` (modals/overlays).
+- Menú usuario: el botón (esquina superior derecha) muestra `logo-app.png` como avatar por defecto; mantiene `aria-label`/`title` con `app.brandName`. No se ancla el logo en la esquina superior izquierda.
+- Layout responsivo:
+  - Variables CSS (`src/index.css`): `--layout-max-width: 1120px`, `--layout-wide-width: 1280px`, `--layout-padding: clamp(16px, 4vw, 32px)`.
+  - Contenedor estándar: aplica `.layout-container` para vistas de aplicación; mantiene padding fluido en móviles y un `max-width` legible en desktop.
+  - Contenedor ancho: usa `.layout-container-wide` cuando se requiera más espacio horizontal (p. ej. tablas densas, paneles IA).
+  - En móviles, el padding cae automáticamente a 16 px; en pantallas grandes se limita a 32 px, garantizando una experiencia consistente en móviles, tabletas y desktop.
 - Patrones (inspirados en Home/Tasks)
   - Cards con `rounded-lg bg-white dark:bg-slate-900 shadow` y `p-4/6`.
   - Listas de tareas: list/grid responsivo, estados vacíos con `EmptyState` claro y CTA.
@@ -69,7 +75,7 @@ Esta guía define convenciones para código, UI y estructura, alineadas con las 
 ## Sistema Visual Definitivo (Tokens + Utilidades)
 
 - Tokens CSS (definidos en `src/index.css`):
-  - `--color-bg`, `--color-surface`, `--color-text`
+- `--color-bg` (claro: `#F7F1E7`), `--color-surface`, `--color-text`
   - `--color-primary`, `--color-accent`, `--color-success`, `--color-warning`, `--color-danger`, `--color-info`
   - Derivados: `--color-border`, `--color-muted`, `--radius-md`
 - Modo oscuro controlado por clase (`dark`) con equivalentes de todos los tokens.

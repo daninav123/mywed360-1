@@ -209,7 +209,10 @@ const ProveedorList = ({
   const renderSelectionBar = () => {
     if (!selectedCount) return null;
     return (
-      <div className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600">
+      <div
+        className="flex flex-wrap itemás-center gap-2 text-sm text-gray-600"
+        data-cy="selection-bar"
+      >
         <span>{selectedCount} seleccionados</span>
         {typeof onOpenCompare === 'function' && (
           <button
@@ -261,6 +264,7 @@ const ProveedorList = ({
             type="button"
             onClick={onClearSelection}
             className="px-3 py-1 border border-gray-200 rounded-md text-gray-500 hover:bg-gray-100"
+            data-cy="selection-clear"
           >
             Limpiar
           </button>

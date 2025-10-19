@@ -1,6 +1,7 @@
-﻿import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 
+import PageWrapper from '../components/PageWrapper';
 import { Card, Button } from '../components/ui';
 import { useWedding } from '../context/WeddingContext';
 import { db } from '../firebaseConfig';
@@ -48,7 +49,7 @@ export default function BankConnect() {
       setRequisition(ref);
       if (ref?.link) window.open(ref.link, '_blank');
     } catch (e) {
-      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculación' }));
+      setError(t('finance.bank.errorStart', { defaultValue: 'No se pudo iniciar la vinculacion' }));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export default function BankConnect() {
 
   const handleCheck = async () => {
     if (!requisition?.id) {
-      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisición iniciada' }));
+      setError(t('finance.bank.noRequisition', { defaultValue: 'No hay requisicion iniciada' }));
       return;
     }
     try {
@@ -95,24 +96,30 @@ export default function BankConnect() {
     }
   };
 
+  useEffect(() => {
+    loadInstitutions();
+  }, [loadInstitutions]);
+
+  const hasAccounts = useMemo(() => accounts.length > 0, [accounts]);
+
   return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold">
-        {t('finance.bank.title', { defaultValue: 'Vincular cuenta bancaria' })}
-      </h1>
-      <Card className="p-4 space-y-4">
-        <div className="flex gap-3 items-end">
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">
-              {t('finance.bank.country', { defaultValue: 'País' })}
+    <PageWrapper
+      title={t('finance.bank.title', { defaultValue: 'Vincular cuenta bancaria' })}
+      className="layout-container max-w-3xl space-y-6"
+    >
+      <Card className="space-y-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
+          <div className="w-full md:w-36">
+            <label className="mb-1 block text-sm font-medium text-[color:var(--color-muted)]">
+              {t('finance.bank.country', { defaultValue: 'Pais' })}
             </label>
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="border rounded px-2 py-1"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             >
               <option value="ES">
-                {t('finance.bank.countries.es', { defaultValue: 'España' })}
+                {t('finance.bank.countries.es', { defaultValue: 'Espana' })}
               </option>
               <option value="FR">
                 {t('finance.bank.countries.fr', { defaultValue: 'Francia' })}
@@ -128,26 +135,28 @@ export default function BankConnect() {
               </option>
             </select>
           </div>
-          <div className="flex-1">
-            <label className="block text-sm text-gray-700 mb-1">
+
+          <div className="w-full flex-1">
+            <label className="mb-1 block text-sm font-medium text-[color:var(--color-muted)]">
               {t('finance.bank.bankLabel', { defaultValue: 'Banco' })}
             </label>
             <select
               value={selectedInstitution}
               onChange={(e) => setSelectedInstitution(e.target.value)}
-              className="border rounded px-2 py-1 w-full"
+              className="w-full rounded-lg border border-[color:var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[color:var(--color-text)] shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             >
               <option value="">
-                {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un bancoâ€¦' })}
+                {t('finance.bank.selectBankPlaceholder', { defaultValue: 'Selecciona un banco...' })}
               </option>
-              {institutions.map((i) => (
-                <option key={i.id} value={i.id}>
-                  {i.name}
+              {institutions.map((institution) => (
+                <option key={institution.id} value={institution.id}>
+                  {institution.name}
                 </option>
               ))}
             </select>
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex flex-wrap justify-end gap-2">
             <Button variant="outline" onClick={loadInstitutions} disabled={loading}>
               {t('finance.bank.loadBanks', { defaultValue: 'Cargar bancos' })}
             </Button>
@@ -159,12 +168,15 @@ export default function BankConnect() {
             </Button>
           </div>
         </div>
+
         {error && (
-          <div className="text-sm text-red-600">
+          <div className="rounded-lg border border-[color:var(--color-danger)]/40 bg-[color:var(--color-danger)]/10 px-4 py-3 text-sm text-[color:var(--color-danger)]">
             {error}
-            <div className="mt-2 text-xs text-gray-600">
-              {t('finance.bank.requirements.title', { defaultValue: 'Requisitos backend:' })}
-              <ul className="list-disc list-inside">
+            <div className="mt-3 space-y-2 text-xs text-[color:var(--color-muted)]">
+              <p className="font-medium">
+                {t('finance.bank.requirements.title', { defaultValue: 'Requisitos backend:' })}
+              </p>
+              <ul className="list-disc space-y-1 pl-4">
                 <li>
                   {t('finance.bank.requirements.env', {
                     defaultValue:
@@ -177,16 +189,19 @@ export default function BankConnect() {
                   })}
                 </li>
               </ul>
-              {t('finance.bank.alternative', {
-                defaultValue:
-                  'Alternativa temporal: importa movimientos manualmente desde Finanzas â†’ Transacciones â†’ "Importar Banco".',
-              })}
+              <p>
+                {t('finance.bank.alternative', {
+                  defaultValue:
+                    'Alternativa temporal: importa movimientos manualmente desde Finanzas -> Transacciones -> "Importar Banco".',
+                })}
+              </p>
             </div>
           </div>
         )}
+
         {requisition?.id && (
-          <div className="flex gap-2 items-center">
-            <span className="text-sm">
+          <div className="flex flex-col gap-2 rounded-lg border border-[color:var(--color-border)]/70 bg-[var(--color-surface)] px-4 py-3 text-sm text-[color:var(--color-text)] md:flex-row md:items-center md:justify-between">
+            <span>
               {t('finance.bank.requisition', { defaultValue: 'Requisition:' })} {requisition.id}
             </span>
             <Button variant="outline" onClick={handleCheck} disabled={loading}>
@@ -196,16 +211,19 @@ export default function BankConnect() {
         )}
       </Card>
 
-      {accounts.length > 0 && (
-        <Card className="p-4">
-          <h2 className="text-lg font-semibold mb-2">
+      {hasAccounts && (
+        <Card className="space-y-3">
+          <h2 className="text-lg font-semibold text-[color:var(--color-text)]">
             {t('finance.bank.availableAccounts', { defaultValue: 'Cuentas disponibles' })}
           </h2>
-          <ul className="divide-y">
-            {accounts.map((a) => (
-              <li key={a} className="flex items-center justify-between py-2">
-                <span className="text-sm">{a}</span>
-                <Button size="sm" onClick={() => saveAccount(a)}>
+          <ul className="divide-y divide-[color:var(--color-border)]/50">
+            {accounts.map((account) => (
+              <li
+                key={account}
+                className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <span className="text-sm text-[color:var(--color-text)]">{account}</span>
+                <Button size="sm" onClick={() => saveAccount(account)}>
                   {t('finance.bank.useThis', { defaultValue: 'Usar esta cuenta' })}
                 </Button>
               </li>
@@ -213,6 +231,6 @@ export default function BankConnect() {
           </ul>
         </Card>
       )}
-    </div>
+    </PageWrapper>
   );
 }

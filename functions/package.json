@@ -1,6 +1,6 @@
 {
     "name":  "functions",
-    "description":  "Firebase Cloud Functions para myWed360",
+    "description":  "Firebase Cloud Functions para MaLove.APP",
     "scripts":  {
                     "serve":  "firebase emulators:start --only functions",
                     "shell":  "firebase functions:shell",

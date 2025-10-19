@@ -1,0 +1,76 @@
+name: E2E Seating & Proveedores
+
+on:
+  workflow_dispatch:
+    inputs:
+      run:
+        description: "Run E2E seating + proveedores compare"
+        required: false
+        default: true
+        type: boolean
+  push:
+    branches:
+      - windows
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-seating:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.ref_name == 'windows' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create test .env file
+        run: |
+          echo "VITE_FIREBASE_API_KEY=fake" >> .env
+          echo "VITE_FIREBASE_AUTH_DOMAIN=fake" >> .env
+          echo "VITE_FIREBASE_PROJECT_ID=fake" >> .env
+          echo "VITE_FIREBASE_STORAGE_BUCKET=fake" >> .env
+          echo "VITE_FIREBASE_MESSAGING_SENDER_ID=fake" >> .env
+          echo "VITE_FIREBASE_APP_ID=fake" >> .env
+          echo "MAILGUN_API_KEY=fake" >> .env
+          echo "MAILGUN_DOMAIN=fake" >> .env
+
+      - name: Run seating + proveedores compare (start server and Cypress)
+        uses: cypress-io/github-action@v5
+        with:
+          start: npm run start:ci
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 240
+          command: npx cypress run --spec "cypress/e2e/seating/**/*.cy.js,cypress/e2e/proveedores_compare.cy.js" --reporter json --reporter-options output=cypress/reports/e2e-seating.json
+
+      - name: Upload Cypress screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          if-no-files-found: ignore
+
+      - name: Upload Cypress JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-reports
+          path: cypress/reports
+          if-no-files-found: ignore

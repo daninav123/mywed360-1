@@ -17,12 +17,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const router = express.Router();
 
-// Fallback de memoria para entornos E2E/dev cuando Firestore no está disponible
-// Se activa solo bajo devRoutesAllowed(req) (UA cypress / ENABLE_DEV_ROUTES / NODE_ENV!=production)
-const __mem = global.__RSVP_DEV_STORE__ || new Map();
-global.__RSVP_DEV_STORE__ = __mem;
-
-// Mailgun helper (reutiliza configuración como en routes/mail.js)
+// Mailgun helper (reutiliza configuraciÃ³n como en routes/mail.js)
 function createMailgunClients() {
   const MAILGUN_API_KEY = process.env.VITE_MAILGUN_API_KEY || process.env.MAILGUN_API_KEY;
   const MAILGUN_DOMAIN = process.env.VITE_MAILGUN_DOMAIN || process.env.MAILGUN_DOMAIN;
@@ -44,9 +39,9 @@ function createMailgunClients() {
   }
 }
 
-// Helper: localizar invitado por token usando índice rsvpTokens o collectionGroup fallback
+// Helper: localizar invitado por token usando Ã­ndice rsvpTokens o collectionGroup fallback
 async function findGuestRefByToken(token) {
-  // 1) Índice preferido
+  // 1) Ãndice preferido
   const idxRef = db.collection('rsvpTokens').doc(token);
   const idxSnap = await idxRef.get();
   if (idxSnap.exists) {
@@ -69,48 +64,21 @@ router.get('/by-token/:token', async (req, res) => {
   try {
     const { token } = req.params;
     if (!token) return res.status(400).json({ error: 'token-required' });
-    try {
-      const guestRef = await findGuestRefByToken(token);
-      if (guestRef) {
-        const snap = await guestRef.get();
-        const data = snap.data() || {};
-        return res.json({
-          name: data.name || '',
-          status: data.status || 'pending',
-          companions: data.companions ?? data.companion ?? 0,
-          allergens: data.allergens || ''
-        });
-      }
-    } catch (e) {
-      // Ignorar: intentaremos fallback si procede
-    }
-    // Fallback solo en entorno permitido
-    if (devRoutesAllowed(req) && __mem.has(token)) {
-      const d = __mem.get(token) || {};
-      return res.json({
-        name: d.name || '',
-        status: d.status || 'pending',
-        companions: Number(d.companions || 0),
-        allergens: d.allergens || ''
-      });
-    }
-    return res.status(404).json({ error: 'not-found' });
+
+    const guestRef = await findGuestRefByToken(token);
+    if (!guestRef) return res.status(404).json({ error: 'not-found' });
+
+    const snap = await guestRef.get();
+    const data = snap.data() || {};
+    return res.json({
+      name: data.name || '',
+      status: data.status || 'pending',
+      companions: data.companions ?? data.companion ?? 0,
+      allergens: data.allergens || '',
+    });
   } catch (err) {
     logger.error('rsvp-get-by-token', err);
-    // Último recurso: fallback si disponible
-    try {
-      const { token } = req.params;
-      if (devRoutesAllowed(req) && __mem.has(token)) {
-        const d = __mem.get(token) || {};
-        return res.json({
-          name: d.name || '',
-          status: d.status || 'pending',
-          companions: Number(d.companions || 0),
-          allergens: d.allergens || ''
-        });
-      }
-    } catch {}
-    res.status(500).json({ error: 'rsvp-get-failed' });
+    return res.status(500).json({ error: 'rsvp-get-failed' });
   }
 });
 
@@ -118,57 +86,57 @@ router.get('/by-token/:token', async (req, res) => {
 router.put('/by-token/:token', async (req, res) => {
   try {
     const { token } = req.params;
+    if (!token) return res.status(400).json({ error: 'token-required' });
+
     let { status, companions = 0, allergens = '' } = req.body || {};
-    // Validación opcional con Zod si está disponible
     try {
       const zod = await import('zod');
       const z = zod.z;
       const Schema = z.object({
         status: z.enum(['accepted', 'rejected']),
         companions: z.coerce.number().int().min(0).max(20).optional().default(0),
-        allergens: z.string().max(500).optional().default('')
+        allergens: z.string().max(500).optional().default(''),
       });
       const parsed = Schema.parse(req.body || {});
       status = parsed.status;
       companions = parsed.companions;
       allergens = parsed.allergens;
     } catch {
-      // Fallback simple
-      if (!['accepted', 'rejected'].includes(status)) return res.status(400).json({ error: 'invalid-status' });
+      if (!['accepted', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: 'invalid-status' });
+      }
     }
+
+    const guestRef = await findGuestRefByToken(token);
+    if (!guestRef) return res.status(404).json({ error: 'not-found' });
+
+    await guestRef.update({
+      status,
+      companions,
+      companion: companions,
+      allergens,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
     try {
-      const guestRef = await findGuestRefByToken(token);
-      if (!guestRef) throw new Error('not-found');
-      await guestRef.update({
-        status,
-        companions,
-        companion: companions, // compat con seating
-        allergens,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    } catch (e) {
-      // Fallback en memoria si procede
-      if (!devRoutesAllowed(req)) throw e;
-      const cur = __mem.get(token) || { name: 'Invitado', status: 'pending', companions: 0, allergens: '' };
-      __mem.set(token, { ...cur, status, companions: Number(companions || 0), allergens });
-      return res.json({ ok: true });
-    }
+      await incCounter('rsvp_update_status_total', { status }, 1, 'RSVP status updates', ['status']);
+    } catch {}
 
-    // Métrica: actualización de estado RSVP
-    try { await incCounter('rsvp_update_status_total', { status }, 1, 'RSVP status updates', ['status']); } catch {}
-
-    // Actualizar estadísticas agregadas de RSVP de la boda
     try {
       const weddingId = guestRef.parent.parent.id;
-      const coll = await db.collection('weddings').doc(weddingId).collection('guests').select('status', 'companions', 'companion', 'allergens').get();
+      const coll = await db
+        .collection('weddings')
+        .doc(weddingId)
+        .collection('guests')
+        .select('status', 'companions', 'companion', 'allergens')
+        .get();
       let totalInvitations = 0;
       let totalResponses = 0;
       let confirmedAttendees = 0;
       let declinedInvitations = 0;
       let pendingResponses = 0;
       const dietary = { vegetarian: 0, vegan: 0, glutenFree: 0, lactoseIntolerant: 0, other: 0 };
-      coll.forEach(doc => {
+      coll.forEach((doc) => {
         totalInvitations += 1;
         const d = doc.data() || {};
         const st = d.status || 'pending';
@@ -181,7 +149,6 @@ router.put('/by-token/:token', async (req, res) => {
         } else {
           pendingResponses += 1;
         }
-        // Conteo simple de dietas si están normalizadas (best-effort)
         const al = String(d.allergens || '').toLowerCase();
         if (al.includes('vegetarian')) dietary.vegetarian += 1;
         if (al.includes('vegan')) dietary.vegan += 1;
@@ -196,7 +163,7 @@ router.put('/by-token/:token', async (req, res) => {
         declinedInvitations,
         pendingResponses,
         dietaryRestrictions: dietary,
-        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       }, { merge: true });
     } catch (aggErr) {
       logger.warn('rsvp-stats-update-failed', aggErr.message);
@@ -205,14 +172,7 @@ router.put('/by-token/:token', async (req, res) => {
     return res.json({ ok: true });
   } catch (err) {
     logger.error('rsvp-put-by-token', err);
-    // Fallback final si existe memoria
-    try {
-      if (devRoutesAllowed(req)) {
-        const { token } = req.params;
-        if (__mem.has(token)) return res.json({ ok: true });
-      }
-    } catch {}
-    res.status(500).json({ error: 'rsvp-update-failed' });
+    return res.status(500).json({ error: 'rsvp-update-failed' });
   }
 });
 
@@ -253,7 +213,7 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
 router.post('/reminders', requirePlanner, async (req, res) => {
   try {
     let { weddingId, limit = 100, dryRun = true, minIntervalMinutes = 1440, force = false } = req.body || {};
-    // Validación opcional con Zod
+    // ValidaciÃ³n opcional con Zod
     try {
       const zod = await import('zod');
       const z = zod.z;
@@ -274,7 +234,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       if (!weddingId) return res.status(400).json({ error: 'weddingId-required' });
     }
 
-    // Rate limiting por ejecución global del recordatorio
+    // Rate limiting por ejecuciÃ³n global del recordatorio
     const metaRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('remindersMeta');
     const metaSnap = await metaRef.get();
     const now = Date.now();
@@ -346,7 +306,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
               }
             }
           } else {
-            // Fallback: registrar en colección mails (simulación)
+            // Fallback: registrar en colecciÃ³n mails (simulaciÃ³n)
             batch.set(db.collection('mails').doc(), {
               from: 'notificaciones@mywed360.com', to: c.email, subject,
               body: `RSVP: ${rsvpLink}`, html: bodyHtml, date: new Date().toISOString(), folder: 'sent', read: true
@@ -367,7 +327,7 @@ router.post('/reminders', requirePlanner, async (req, res) => {
     batch.set(metaRef, { lastRunAt: admin.firestore.FieldValue.serverTimestamp(), lastCount: attempted }, { merge: true });
     await batch.commit();
 
-    // Métricas de recordatorios
+    // MÃ©tricas de recordatorios
     try {
       await incCounter('rsvp_reminders_total', { type: 'attempted' }, attempted, 'RSVP reminders processed', ['type']);
       await incCounter('rsvp_reminders_total', { type: 'sent' }, sent, 'RSVP reminders processed', ['type']);
@@ -400,57 +360,38 @@ function devRoutesAllowed(req) {
   }
 }
 
-router.post('/dev/create', async (req, res) => {
-  if (!devRoutesAllowed(req)) return res.status(403).json({ error: 'dev-routes-disabled' });
-  try {
-    const { weddingId = 'test-wedding', name = 'Invitado E2E', phone = '', email = '' } = req.body || {};
-    if (!weddingId) return res.status(400).json({ error: 'weddingId-required' });
-    const docId = `rsvp_${uuidv4()}`;
-    const token = uuidv4();
-    // Guardar en memoria siempre como respaldo
-    __mem.set(token, { weddingId, guestId: docId, name, status: 'pending', companions: 0, allergens: '' });
-    // Intento best-effort de persistir en Firestore
-    try {
-      const guestRef = db.collection('weddings').doc(weddingId).collection('guests').doc(docId);
-      await guestRef.set({
-        id: docId,
-        name,
-        phone,
-        email,
-        token,
-        status: 'pending',
-        companions: 0,
-        allergens: '',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-      await db.collection('rsvpTokens').doc(token).set({
-        weddingId,
-        guestId: docId,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    } catch (persistErr) {
-      logger.warn('rsvp-dev-create-firestore-fallback', persistErr?.message || String(persistErr));
-    }
-    const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
-    return res.json({ ok: true, token, link, weddingId, guestId: docId });
-  } catch (err) {
-    logger.error('rsvp-dev-create', err);
-    res.status(500).json({ error: 'rsvp-dev-create-failed' });
-  }
+router.post('/dev/create', (req, res) => {
+
+  logger.warn('rsvp-dev-create disabled: requiere flujo RSVP real');
+
+  return res.status(410).json({
+
+    error: 'dev-endpoint-removed',
+
+    message: 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creación de invitados real.',
+
+  });
+
 });
 
-// Asegurar usuario mock con rol planner para E2E (requiere autenticación opcional)
-router.post('/dev/ensure-planner', optionalAuth, async (req, res) => {
-  if (!devRoutesAllowed(req)) return res.status(403).json({ error: 'dev-routes-disabled' });
-  try {
-    if (!req.user) return res.status(401).json({ error: 'auth-required' });
-    const uid = req.user.uid;
-    await db.collection('users').doc(uid).set({ role: 'planner' }, { merge: true });
-    return res.json({ ok: true, uid, role: 'planner' });
-  } catch (err) {
-    logger.error('rsvp-dev-ensure-planner', err);
-    res.status(500).json({ error: 'rsvp-dev-ensure-planner-failed' });
-  }
+
+
+// Asegurar usuario mock con rol planner para E2E (retirado)
+
+router.post('/dev/ensure-planner', (_req, res) => {
+
+  logger.warn('rsvp-dev-ensure-planner disabled: requiere asignación real de roles');
+
+  return res.status(410).json({
+
+    error: 'dev-endpoint-removed',
+
+    message: 'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.',
+
+  });
+
 });
+
+
+
+

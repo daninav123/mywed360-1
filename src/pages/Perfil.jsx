@@ -279,19 +279,36 @@ function Perfil() {
         )}
       </div>
       <Card className="space-y-4">
-        <h2 className="text-lg font-medium">{t('profile.subscription.type', { defaultValue: 'Tipo de suscripcin' })}</h2>
-        <div className="flex gap-4">
+        <h2 className="text-lg font-medium">
+          {t('profile.subscription.type', { defaultValue: 'Tipo de suscripción' })}
+        </h2>
+        <div className="flex flex-wrap gap-3">
           <Button
+            data-testid="subscription-tier-free"
+            data-active={subscription === 'free'}
+            aria-pressed={subscription === 'free'}
             variant={subscription === 'free' ? 'primary' : 'outline'}
             onClick={() => setSubscription('free')}
           >
             {t('profile.subscription.free', { defaultValue: 'Gratis' })}
           </Button>
           <Button
+            data-testid="subscription-tier-premium"
+            data-active={subscription === 'premium'}
+            aria-pressed={subscription === 'premium'}
             variant={subscription === 'premium' ? 'primary' : 'outline'}
             onClick={() => setSubscription('premium')}
           >
             {t('profile.subscription.premium', { defaultValue: 'Premium' })}
+          </Button>
+          <Button
+            data-testid="subscription-tier-premium-plus"
+            data-active={subscription === 'premium_plus'}
+            aria-pressed={subscription === 'premium_plus'}
+            variant={subscription === 'premium_plus' ? 'primary' : 'outline'}
+            onClick={() => setSubscription('premium_plus')}
+          >
+            {t('profile.subscription.premiumPlus', { defaultValue: 'Premium Plus' })}
           </Button>
         </div>
       </Card>

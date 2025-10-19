@@ -49,6 +49,9 @@ Nota: si trabajas en un entorno compartido evita levantar servidores en puertos 
 - Pruebas E2E (Cypress) y datos de prueba: ver `docs/TESTING.md`.
   - Smoke de Seating: `npm run cypress:run:seating`
   - E2E general: `npm run e2e` (usa `start-server-and-test`)
+- Personalización:
+  - Revisa `docs/personalizacion/README.md` para cargar perfiles de boda y recomendaciones de ejemplo antes de QA (`node scripts/seedPersonalizationProfiles.js`).
+  - Sigue el procedimiento allí descrito para limpiar/sembrar datos cuando cambie la lógica del flujo de descubrimiento.
 
 ## 5) QA rápido (pre-PR)
 

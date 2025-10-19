@@ -45,6 +45,8 @@ const ProveedorCard = ({
   onOpenGroups,
   budgetsOverride,
   hasPending = false,
+  appearance = 'default',
+  disableInlineDetail = false,
 }) => {
   const { userProfile } = useAuth();
   const {
@@ -66,6 +68,19 @@ const ProveedorCard = ({
   const templateService = useMemo(() => new EmailTemplateService(), []);
   const { budgets = [] } = useSupplierBudgets(provider?.id);
   const budgetsToUse = Array.isArray(budgetsOverride) ? budgetsOverride : budgets;
+  const cardAppearanceClasses = useMemo(() => {
+    switch (appearance) {
+      case 'tracking':
+        return 'bg-white/80 border-dashed border-[var(--color-primary)]/40 backdrop-blur-sm';
+      case 'confirmed':
+        return 'bg-emerald-50 border-emerald-200';
+      default:
+        return '';
+    }
+  }, [appearance]);
+  const pendingIndicatorClass = appearance === 'confirmed'
+    ? 'bg-amber-500 shadow-amber-200'
+    : 'bg-red-500 shadow-red-200';
   const budgetInfo = useMemo(() => {
     try {
       const list = Array.isArray(budgetsToUse) ? budgetsToUse : [];
@@ -144,7 +159,7 @@ const ProveedorCard = ({
 
   useEffect(() => {
     refreshTracking();
-  }, [provider?.email]);
+  }, [provider?.email, refreshTracking]);
 
   useEffect(() => {
     if (!autoMessage) return;
@@ -200,6 +215,13 @@ const ProveedorCard = ({
       return '';
     }
   }, []);
+
+  const handleCardClick = useCallback(() => {
+    onViewDetail?.(provider);
+    if (!disableInlineDetail) {
+      setShowDetail(true);
+    }
+  }, [disableInlineDetail, onViewDetail, provider]);
 
   const formatTemplateToHtml = useCallback((text) => {
     if (!text) return '';
@@ -427,11 +449,8 @@ const ProveedorCard = ({
   return (
     <>
       <Card
-        className={`relative transition-all ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
-        onClick={() => {
-          onViewDetail?.(provider);
-          setShowDetail(true);
-        }}
+        className={`relative transition-all cursor-pointer ${cardAppearanceClasses} ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+        onClick={handleCardClick}
       >
         {/* Botón favorito */}
         <button
@@ -450,7 +469,7 @@ const ProveedorCard = ({
 
         {hasPending ? (
           <span
-            className="absolute top-3 right-10 h-2.5 w-2.5 rounded-full bg-red-500 shadow-inner shadow-red-200"
+            className={`absolute top-3 right-10 h-2.5 w-2.5 rounded-full shadow-inner ${pendingIndicatorClass}`}
             title="Pendiente de revisar"
           ></span>
         ) : null}
@@ -618,7 +637,10 @@ const ProveedorCard = ({
           onClick={(e) => e.stopPropagation()}
         >
           <Button
-            onClick={() => (onViewDetail ? onViewDetail(provider) : setShowDetail(true))}
+            onClick={() => {
+              if (onViewDetail) onViewDetail(provider);
+              if (!disableInlineDetail) setShowDetail(true);
+            }}
             variant="ghost"
             size="sm"
             className="flex-1"
@@ -804,7 +826,7 @@ const ProveedorCard = ({
         )}
       </div>
 
-      {showDetail && (
+      {!disableInlineDetail && showDetail && (
         <ProveedorDetail
           provider={provider}
           onClose={() => setShowDetail(false)}
@@ -835,6 +857,8 @@ export default React.memo(ProveedorCard, (prevProps, nextProps) => {
     prevProps.provider.service === nextProps.provider.service &&
     prevProps.provider.status === nextProps.provider.status &&
     prevProps.provider.date === nextProps.provider.date &&
-    prevProps.isSelected === nextProps.isSelected
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.appearance === nextProps.appearance &&
+    prevProps.hasPending === nextProps.hasPending
   );
 });

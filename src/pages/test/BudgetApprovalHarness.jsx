@@ -1,9 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { BudgetService } from '../../services/BudgetService';
 
 /**
  * Harness ligero para validar el flujo de aceptación de presupuestos en E2E.
- * Consume endpoints mockeados por Cypress (`/api/mock/budgets/:wid/:sid` y PUT budget).
+ * Se ha movido a esta carpeta para aislar las dependencias de test.
  */
 const formatStatus = (code) => {
   if (!code) return 'Pendiente';
@@ -44,24 +46,13 @@ export default function BudgetApprovalHarness() {
       setError('');
       setStatus('');
       try {
-        const response = await fetch(
-          `/api/mock/budgets/${encodeURIComponent(weddingId)}/${encodeURIComponent(supplierId)}`
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        const data = await response.json();
-        if (!Array.isArray(data)) {
-          throw new Error('Formato inesperado');
-        }
+        const data = await BudgetService.listSupplierBudgets({ weddingId, supplierId });
         if (active) {
           setBudgets(data);
         }
       } catch (err) {
         if (active) {
-          setError(
-            'No se pudieron cargar los presupuestos simulados. Revisa el stub del test E2E.'
-          );
+          setError('No se pudieron cargar los presupuestos. Revisa la configuración del backend.');
           setBudgets([]);
         }
       } finally {
@@ -82,20 +73,7 @@ export default function BudgetApprovalHarness() {
     setError('');
     setStatus('');
     try {
-      const response = await fetch(
-        `/api/weddings/${encodeURIComponent(
-          weddingId
-        )}/suppliers/${encodeURIComponent(supplierId)}/budget`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'accept', id: budget.id }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const payload = await response.json();
+      const payload = await BudgetService.acceptBudget({ weddingId, supplierId, budgetId: budget.id });
       const nextStatus = formatStatus(payload?.status || 'accepted');
       setStatus(nextStatus);
       setBudgets((prev) =>
@@ -106,7 +84,7 @@ export default function BudgetApprovalHarness() {
         )
       );
     } catch (err) {
-      setError('Ocurrió un error al aceptar el presupuesto simulado.');
+      setError('Ocurrió un error al aceptar el presupuesto.');
     } finally {
       setPendingId(null);
     }

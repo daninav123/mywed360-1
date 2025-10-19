@@ -11,7 +11,7 @@
 
 ## 2. Trigger y rutas
 - Menu inferior -> `Mas` -> bloque **Extras** -> enlace **Diseno Web** (`/diseno-web`, `DisenoWeb.jsx`).
-- CTA en Home (**Publica tu sitio**) hace scroll y preselecciona el generador (`WebGenerator.jsx`).
+- El módulo puede abrirse desde `/diseno-web` con `state.focus="generator"` para posicionar al usuario en el generador.
 - Acceso directo a la vista previa: `/diseno-web/preview` (usa `location.state.focus` para hacer scroll).
 
 ## 3. Paso a paso UX

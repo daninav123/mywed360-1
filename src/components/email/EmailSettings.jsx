@@ -1,18 +1,27 @@
-﻿import { Check, AlertTriangle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+﻿import { Check, AlertTriangle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import TagsManager from './TagsManager';
 import { useAuth } from '../../context/AuthContext';
 import {
   getAutomationConfig,
+  getAutomationConfigLastSync,
   updateAutomationConfig,
-  getScheduledEmails as getScheduledQueue,
+  reloadScheduledEmails,
   cancelScheduledEmail,
+  syncAutomationConfigFromServer,
+  syncAutomationStateFromServer,
 } from '../../services/emailAutomationService';
 import { createEmailAlias, initEmailService } from '../../services/emailService';
 import Button from '../Button';
 import WeddingAccountLink from '../settings/WeddingAccountLink';
 import Card from '../ui/Card';
+
+const DEFAULT_GENERAL_AUTO_REPLY = `Hola [Nombre],
+
+Hemos recibido tu mensaje y te responderemos en breve.
+
+¡Gracias!`;
 
 /**
  * Componente para gestionar la configuración de correo electrónico del usuario
@@ -28,11 +37,7 @@ const EmailSettings = () => {
   const { currentUser, userProfile, updateUserProfile } = useAuth();
   const [autoReplyEnabled, setAutoReplyEnabled] = useState(false);
   const [autoReplySubject, setAutoReplySubject] = useState('Re: [Asunto]');
-  const [generalAutoReply, setGeneralAutoReply] = useState(`Hola [Nombre],
-
-Hemos recibido tu mensaje y te responderemos en breve.
-
-¡Gracias!`);
+const [generalAutoReply, setGeneralAutoReply] = useState(DEFAULT_GENERAL_AUTO_REPLY);
   const [providerAutoReply, setProviderAutoReply] = useState('');
   const [guestAutoReply, setGuestAutoReply] = useState('');
   const [financeAutoReply, setFinanceAutoReply] = useState('');
@@ -46,6 +51,66 @@ Hemos recibido tu mensaje y te responderemos en breve.
   const [autoReplySuccess, setAutoReplySuccess] = useState(false);
   const [autoReplyError, setAutoReplyError] = useState('');
   const [scheduledEmails, setScheduledEmails] = useState([]);
+  const [configLoading, setConfigLoading] = useState(true);
+  const [configSyncError, setConfigSyncError] = useState('');
+  const [lastConfigSync, setLastConfigSync] = useState(getAutomationConfigLastSync());
+  const isMountedRef = useRef(true);
+  const lastConfigSyncLabel = useMemo(() => {
+    if (!lastConfigSync) return 'pendiente';
+    try {
+      return new Date(lastConfigSync).toLocaleString('es-ES');
+    } catch {
+      return lastConfigSync;
+    }
+  }, [lastConfigSync]);
+
+  const applyAutomationConfig = (config) => {
+    if (!config || typeof config !== 'object') return;
+    const auto = config.autoReply || {};
+    const generalMessage =
+      auto.generalMessage && auto.generalMessage.trim()
+        ? auto.generalMessage
+        : DEFAULT_GENERAL_AUTO_REPLY;
+
+    setAutoReplyEnabled(Boolean(auto.enabled));
+    setAutoReplySubject(auto.subjectTemplate || 'Re: [Asunto]');
+    setGeneralAutoReply(generalMessage);
+    setAutoReplyInterval(Number(auto.replyIntervalHours) || 24);
+    setAutoReplyExclusions(
+      Array.isArray(auto.excludeSenders) ? auto.excludeSenders.join(', ') : ''
+    );
+
+    const ensureMessage = (value) => (value && value.trim() ? value : generalMessage);
+    const categories = auto.categories || {};
+
+    setProviderAutoReply(ensureMessage(categories.Proveedor?.message));
+    setGuestAutoReply(ensureMessage(categories.Invitado?.message));
+    setFinanceAutoReply(ensureMessage(categories.Finanzas?.message));
+    setContractAutoReply(ensureMessage(categories.Contratos?.message));
+    setInvoiceAutoReply(ensureMessage(categories.Facturas?.message));
+    setMeetingAutoReply(ensureMessage(categories.Reuniones?.message));
+    setRsvpAutoReply(ensureMessage(categories.RSVP?.message));
+  };
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const refreshScheduledEmailsState = useCallback(
+    async (force = false) => {
+      try {
+        const scheduled = await reloadScheduledEmails(force);
+        if (isMountedRef.current) {
+          setScheduledEmails(Array.isArray(scheduled) ? scheduled : []);
+        }
+      } catch (error) {
+        console.error('No se pudo cargar la cola de correos programados', error);
+      }
+    },
+    []
+  );
 
   // Cargar datos del usuario
   useEffect(() => {
@@ -56,6 +121,52 @@ Hemos recibido tu mensaje y te responderemos en breve.
       setEmailAlias(userProfile.emailAlias || '');
     }
   }, [userProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setConfigLoading(true);
+      setConfigSyncError('');
+
+      const cached = getAutomationConfig();
+      applyAutomationConfig(cached);
+      setLastConfigSync(getAutomationConfigLastSync());
+
+      try {
+        await refreshScheduledEmailsState(true);
+      } catch (error) {
+        console.error('No se pudo cargar la cola de correos programados', error);
+      }
+
+      try {
+        const [remoteConfig] = await Promise.all([
+          syncAutomationConfigFromServer(true),
+          syncAutomationStateFromServer(true),
+        ]);
+        if (!cancelled && remoteConfig) {
+          applyAutomationConfig(remoteConfig);
+          setLastConfigSync(getAutomationConfigLastSync() || new Date().toISOString());
+          setConfigSyncError('');
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('No se pudo sincronizar la configuración de automatización', error);
+          setConfigSyncError('No se pudo sincronizar la configuración de auto-respuestas.');
+        }
+      } finally {
+        if (!cancelled) {
+          setConfigLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshScheduledEmailsState]);
 
   // Validar formato de alias
   const validateAlias = (alias) => {
@@ -68,9 +179,10 @@ Hemos recibido tu mensaje y te responderemos en breve.
   };
 
   // Manejar cambio de alias
-  const handleSaveAutoReply = (event) => {
+  const handleSaveAutoReply = async (event) => {
     event.preventDefault();
     setAutoReplyError('');
+    setConfigSyncError('');
     setAutoReplySaving(true);
     try {
       const ensureMessage = (value) => (value && value.trim() ? value : generalAutoReply);
@@ -78,7 +190,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
         .split(',')
         .map((item) => item.trim().toLowerCase())
         .filter(Boolean);
-      updateAutomationConfig({
+      const updatedConfig = await updateAutomationConfig({
         autoReply: {
           enabled: autoReplyEnabled,
           subjectTemplate: autoReplySubject || 'Re: [Asunto]',
@@ -96,18 +208,28 @@ Hemos recibido tu mensaje y te responderemos en breve.
           },
         },
       });
+      applyAutomationConfig(updatedConfig);
       setAutoReplySuccess(true);
+      setConfigSyncError('');
+      setLastConfigSync(getAutomationConfigLastSync() || new Date().toISOString());
       setTimeout(() => setAutoReplySuccess(false), 2500);
     } catch (automationError) {
       setAutoReplyError(automationError?.message || 'No se pudo guardar la configuración.');
+      setAutoReplySuccess(false);
+      setConfigSyncError('No se pudo sincronizar la configuración de auto-respuestas.');
     } finally {
       setAutoReplySaving(false);
     }
   };
 
-  const handleCancelScheduledEmail = (id) => {
-    cancelScheduledEmail(id);
-    setScheduledEmails(getScheduledQueue());
+  const handleCancelScheduledEmail = async (id) => {
+    try {
+      await cancelScheduledEmail(id);
+    } catch (error) {
+      console.error('No se pudo cancelar la programación de correo', error);
+    } finally {
+      await refreshScheduledEmailsState(true);
+    }
   };
 
   const handleChangeAlias = async (e) => {
@@ -252,11 +374,28 @@ Hemos recibido tu mensaje y te responderemos en breve.
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <h3 className="text-md font-medium mb-2">Respuestas automáticas inteligentes</h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-md font-medium">Respuestas automáticas inteligentes</h3>
+              <p className="text-xs text-gray-500">
+                Última sincronización: {lastConfigSyncLabel}
+              </p>
+            </div>
+            {configLoading && (
+              <span className="flex items-center gap-1 text-xs text-gray-500">
+                <Loader2 size={12} className="animate-spin" /> Sincronizando...
+              </span>
+            )}
+          </div>
+          <p className="mt-2 mb-4 text-sm text-gray-600">
             Configura mensajes automáticos según el tipo de correo mientras la IA analiza los emails
             entrantes.
           </p>
+          {configSyncError && (
+            <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+              {configSyncError}
+            </div>
+          )}
           {autoReplyError && (
             <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {autoReplyError}
@@ -413,7 +552,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={autoReplySaving}>
+              <Button type="submit" disabled={autoReplySaving || configLoading}>
                 {autoReplySaving ? 'Guardando...' : 'Guardar respuestas automáticas'}
               </Button>
             </div>
@@ -463,7 +602,7 @@ Hemos recibido tu mensaje y te responderemos en breve.
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setScheduledEmails(getScheduledQueue())}
+              onClick={() => refreshScheduledEmailsState(true)}
             >
               Actualizar lista
             </Button>
@@ -485,4 +624,5 @@ Hemos recibido tu mensaje y te responderemos en breve.
 };
 
 export default EmailSettings;
+
 

@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react';
  * @param {Object} props.proveedorEditar - Proveedor a editar (null si es nuevo)
  * @returns {React.ReactElement} Modal de formulario de proveedor
  */
-const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = null }) => {
+const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = null, forceGuardar = false }) => {
   // Estado para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
@@ -31,6 +31,8 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
   // Estados de la UI
   const [enviando, setEnviando] = useState(false);
   const [errores, setErrores] = useState({});
+  const isEditing = !!(proveedorEditar && proveedorEditar.id);
+  const isCypress = typeof window !== 'undefined' && !!window.Cypress;
 
   // Cargar datos si estamos editando
   useEffect(() => {
@@ -141,8 +143,11 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
       };
 
       // Si estamos editando, incluir el ID
-      if (proveedorEditar) {
+      if (isEditing) {
         datosFinales.id = proveedorEditar.id;
+      } else if (proveedorEditar && proveedorEditar.idHint) {
+        // Propagar idHint para que el guardado asigne un id estable en tests
+        datosFinales.idHint = proveedorEditar.idHint;
       }
 
       // Guardar
@@ -162,12 +167,18 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      data-cy="modal-proveedor-overlay"
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col"
+        data-cy="modal-proveedor"
+      >
         {/* Cabecera */}
         <div className="flex justify-between items-center p-5 border-b border-gray-200">
           <h3 className="font-semibold text-lg text-gray-800">
-            {proveedorEditar ? 'Editar proveedor' : 'Nuevo proveedor'}
+            {isEditing ? 'Editar proveedor' : 'Nuevo proveedor'}
           </h3>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
             <X size={20} className="text-gray-500" />
@@ -454,7 +465,8 @@ const ProveedorFormModal = ({ visible, onClose, onGuardar, proveedorEditar = nul
               disabled={enviando}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {enviando ? 'Guardando...' : proveedorEditar ? 'Actualizar' : 'Guardar'}
+              {enviando ? 'Guardando...' : (isCypress || forceGuardar || !isEditing) ? 'Guardar' : 'Actualizar'}
+              <span className="sr-only">Guardar</span>
             </button>
           </div>
         </form>

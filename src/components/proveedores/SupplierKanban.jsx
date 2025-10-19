@@ -19,7 +19,7 @@ const columns = [
   { key: 'rechazado', label: 'Rechazado' },
 ];
 
-export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
+export default function SupplierKanban({ proveedores = [], onMove, onClick, showNextAction = false, ...rest }) {
   const grouped = useMemo(() => {
     const map = columns.reduce((acc, col) => {
       acc[col.key] = [];
@@ -47,11 +47,11 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3" {...rest}>
       {columns.map((col) => (
         <div
           key={col.key}
-          className="rounded-lg border bg-white/60 backdrop-blur-sm flex flex-col"
+          className="rounded-2xl border border-dashed border-[color:var(--color-text)]/15 bg-white/75 backdrop-blur-sm flex flex-col shadow-sm"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => handleDrop(e, col.key)}
         >
@@ -71,7 +71,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
                   } catch {}
                 }}
                 onClick={() => onClick?.(prov)}
-                className="rounded border border-gray-200 bg-white p-3 shadow-sm hover:shadow transition cursor-pointer"
+                className="rounded-2xl border border-[color:var(--color-text)]/12 bg-white/85 p-3 shadow-sm hover:shadow-md transition cursor-pointer"
               >
                 <header className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -102,6 +102,11 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
                       {prov.origin}
                     </span>
                   )}
+                  {showNextAction && prov?.proximaAccion && (
+                    <span className="px-2 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-700">
+                      Próxima acción: {prov.proximaAccion}
+                    </span>
+                  )}
                 </div>
                 <footer className="mt-3 flex items-center gap-1 text-xs">
                   <button
@@ -109,7 +114,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
                     className="px-2 py-0.5 border rounded hover:bg-gray-50"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onMove?.(prov, 'por_definir');
+                      onMove?.(prov, 'vacio');
                     }}
                   >
                     Reset
@@ -119,7 +124,7 @@ export default function SupplierKanban({ proveedores = [], onMove, onClick }) {
                     className="px-2 py-0.5 border rounded hover:bg-gray-50"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onMove?.(prov, 'presupuesto');
+                      onMove?.(prov, 'presupuestos');
                     }}
                   >
                     Presupuesto

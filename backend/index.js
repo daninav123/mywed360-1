@@ -76,7 +76,10 @@ import supplierBudgetRouter from './routes/supplier-budget.js';
 import publicWeddingRouter from './routes/public-wedding.js';
 import rsvpRouter from './routes/rsvp.js';
 import automationRouter from './routes/automation.js';
+import automationOrchestratorRouter from './routes/automation-orchestrator.js';
+import emailAutomationRouter from './routes/email-automation.js';
 import legalDocsRouter from './routes/legal-docs.js';
+import plannersRouter from './routes/planners.js';
 import signatureRouter from './routes/signature.js';
 import contactsRouter from './routes/contacts.js';
 import gamificationRouter from './routes/gamification.js';
@@ -93,7 +96,12 @@ import playbackRouter from './routes/playback.js';
 import bankRouter from './routes/bank.js';
 import emailActionsRouter from './routes/email-actions.js';
 import emailsRouter from './routes/emails.js';
+import emailDocsRouter from './routes/email-docs.js';
+import emailFoldersRouter from './routes/email-folders.js';
+import emailTagsRouter from './routes/email-tags.js';
+import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
+import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
  
@@ -101,6 +109,8 @@ import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
 import adminSuppliersRouter from './routes/admin-suppliers.js';
 import adminAuditRouter from './routes/admin-audit.js';
+import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
+import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
 
 
 const { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } = await import('./config.js');
@@ -477,6 +487,9 @@ app.use('/api/mail', requireMailAccess, mailRouter);
 app.use('/api/mail', mailOpsRouter);
 app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
+app.use('/api/email/folders', requireMailAccess, emailFoldersRouter);
+app.use('/api/email/tags', requireMailAccess, emailTagsRouter);
+app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
 
 // IMPORTANTE: Las rutas más específicas (/api/mailgun/events) deben ir ANTES que las generales (/api/mailgun)
@@ -516,24 +529,29 @@ const publicCors = cors({
 app.options('/api/image-proxy', publicCors);
 app.use('/api/image-proxy', publicCors, imageProxyRouter);
 app.options('/api/wedding-news', publicCors);
-app.use('/api/wedding-news', publicCors, optionalAuth, weddingNewsRouter); // Puede ser público
+app.use('/api/wedding-news', publicCors, weddingNewsRouter); // Público, sin verificar token
 // Public wedding site (GET public, POST publish with auth context)
 app.use('/api/public/weddings', optionalAuth, publicWeddingRouter);
 // Presupuestos de proveedores (aceptar/rechazar)
 app.use('/api/weddings', requireAuth, supplierBudgetRouter);
 // Weddings general (autofix permisos, etc.)
 app.use('/api/weddings', requireAuth, weddingsRouter);
+app.use('/api/crm', crmRouter);
 // Supplier portal (public entry by token, handled inside router)
 app.use('/api/supplier-portal', supplierPortalRouter);
 
 // Nuevos módulos transversales
 app.use('/api/automation', automationRouter);
+app.use('/api/automation/orchestrator', automationOrchestratorRouter);
+app.use('/api/email-automation', emailAutomationRouter);
 app.use('/api/legal-docs', requireAuth, legalDocsRouter);
+app.use('/api/planners', requireAuth, plannersRouter);
 app.use('/api/signature', requireAuth, signatureRouter);
 app.use('/api/contacts', requireAuth, contactsRouter);
 app.use('/api/gamification', requireAuth, gamificationRouter);
 app.use('/api/providers', requireAuth, providersRouter);
 app.use('/api/users', requireAuth, usersRouter);
+app.use('/api/project-metrics', requireAuth, projectMetricsRouter);
 if (WHATSAPP_WEBHOOK_IP_ALLOWLIST.length) {
   app.use('/api/whatsapp/webhook/twilio', ipAllowlist(WHATSAPP_WEBHOOK_IP_ALLOWLIST));
 }
@@ -558,6 +576,7 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api/contracts', requireAuth, contractsRouter);
 app.use('/api/payments', paymentsWebhookRouter);
 app.use('/api/health', healthRouter);
+app.use('/health', healthRouter);
 app.use('/api/calendar', calendarFeedRouter);
 app.use('/api/spotify', spotifyRouter);
 app.use('/api/web-vitals', (await import('./routes/web-vitals.js')).default);
@@ -608,20 +627,14 @@ app.get('/api/transactions', async (req, res) => {
   try {
     const { bankId, from, to } = req.query;
 
-    // If no credentials or static token, return mock data
     const { NORDIGEN_SECRET_ID, NORDIGEN_SECRET_KEY } = process.env;
     const STATIC_TOKEN = process.env.NORDIGEN_ACCESS_TOKEN || process.env.GOCARDLESS_ACCESS_TOKEN || process.env.BANK_ACCESS_TOKEN;
     const NORDIGEN_BASE_URL = process.env.NORDIGEN_BASE_URL || 'https://ob.gocardless.com/api/v2';
     if (!NORDIGEN_SECRET_ID && !NORDIGEN_SECRET_KEY && !STATIC_TOKEN) {
-      return res.json([
-        {
-          id: 'txn_demo_1',
-          amount: 120.5,
-          currency: 'EUR',
-          date: '2025-07-01',
-          description: 'Mock transaction 1',
-        },
-      ]);
+      return res.status(500).json({
+        error: 'missing-bank-credentials',
+        message: 'No se encontraron credenciales válidas para el agregador bancario. Configura las variables de entorno requeridas.',
+      });
     }
 
     // 1. Get access token from Nordigen/GoCardless (or use static token if set)
@@ -713,6 +726,12 @@ process.on('unhandledRejection', (reason) => {
 process.on('uncaughtException', (err) => {
   logger.error('UncaughtException:', err);
 });
+
+startEmailSchedulerWorker();
+
+if (process.env.NODE_ENV !== 'test') {
+  startMetricAggregatorWorker();
+}
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {

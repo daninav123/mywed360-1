@@ -1,4 +1,5 @@
 const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
+const ADMIN_SESSION_FLAG_KEY = 'isAdminAuthenticated';
 
 export function getAdminSessionToken() {
   if (typeof window === 'undefined') return null;
@@ -11,24 +12,30 @@ export function getAdminSessionToken() {
 }
 
 export function getAdminHeaders(additional = {}) {
-  const token = getAdminSessionToken();
-  if (!token) return { ...(additional || {}) };
-  return {
-    ...(additional || {}),
-    'X-Admin-Session': token,
-  };
+  return { ...(additional || {}) };
 }
 
 export function hasAdminSession() {
-  return !!getAdminSessionToken();
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(ADMIN_SESSION_FLAG_KEY) === 'true';
+  } catch {
+    return false;
+  }
 }
 
 export function getAdminFetchOptions(init = {}) {
   const base = init ? { ...init } : {};
-  const headers = getAdminHeaders(base.headers || {});
-  if (Object.keys(headers).length) {
-    base.headers = headers;
+  if (!base.headers) {
+    base.headers = {};
+  } else {
+    base.headers = { ...base.headers };
+  }
+  if (!base.credentials) {
+    base.credentials = 'include';
+  }
+  if (base.auth === undefined) {
+    base.auth = false;
   }
   return base;
 }
-

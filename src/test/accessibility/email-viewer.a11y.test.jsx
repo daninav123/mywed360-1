@@ -201,9 +201,10 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
         <EmailList
           emails={mockEmails}
           onSelectEmail={vi.fn()}
-          selectedEmail={null}
+          selectedEmailId={null}
           onDeleteEmail={vi.fn()}
-          onToggleStarred={vi.fn()}
+          onToggleImportant={vi.fn()}
+          hideToolbar
         />,
         { wrapper: TestWrapper }
       );
@@ -217,9 +218,10 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
         <EmailList
           emails={mockEmails}
           onSelectEmail={vi.fn()}
-          selectedEmail={null}
+          selectedEmailId={null}
           onDeleteEmail={vi.fn()}
-          onToggleStarred={vi.fn()}
+          onToggleImportant={vi.fn()}
+          hideToolbar
         />,
         { wrapper: TestWrapper }
       );
@@ -240,9 +242,10 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
         <EmailList
           emails={mockEmails}
           onSelectEmail={vi.fn()}
-          selectedEmail={null}
+          selectedEmailId={null}
           onDeleteEmail={vi.fn()}
-          onToggleStarred={vi.fn()}
+          onToggleImportant={vi.fn()}
+          hideToolbar
         />,
         { wrapper: TestWrapper }
       );
@@ -309,6 +312,5 @@ describe('Pruebas de accesibilidad para visualización de correos', () => {
     });
   });
 });
-
 
 

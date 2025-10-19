@@ -68,7 +68,7 @@ describe('Flujo de envío de correo electrónico', () => {
     cy.get('[data-testid="success-message"]').should('be.visible').and('contain', 'Correo enviado correctamente');
     cy.url().should('include', '/email/inbox');
 
-    cy.get('[data-testid="folder-sent"]').click();
+    cy.get('[data-testid="folder-item"][data-folder="sent"]').click();
     cy.get('[data-testid="email-list"]').should('contain', testEmail.subject);
   });
 });

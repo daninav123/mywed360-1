@@ -34,6 +34,8 @@ const SeatingPlanToolbar = ({
   onRedo,
   canUndo,
   canRedo,
+  drawMode,
+  onChangeDrawMode,
   onExportPDF,
   onExportPNG,
   onExportCSV,
@@ -176,6 +178,27 @@ const SeatingPlanToolbar = ({
       aria-label="Seating toolbar"
     >
       <div className="flex flex-wrap items-center gap-2 p-3">
+        {/* Grupo: Herramientas principales (Navegar / Perímetro) */}
+        <div className="flex items-center gap-1 border-r pr-3">
+          <button
+            type="button"
+            onClick={() => onChangeDrawMode?.('pan')}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${drawMode === 'pan' ? 'bg-gray-100' : ''}`}
+            title="Navegar"
+            aria-pressed={drawMode === 'pan'}
+          >
+            <span className="hidden sm:inline">Navegar</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onChangeDrawMode?.('boundary')}
+            className={`flex items-center gap-1 px-2 py-1 text-sm rounded hover:bg-gray-100 ${drawMode === 'boundary' ? 'bg-gray-100' : ''}`}
+            title="Perímetro"
+            aria-pressed={drawMode === 'boundary'}
+          >
+            <span className="hidden sm:inline">Perímetro</span>
+          </button>
+        </div>
         {/* Grupo: Historial */}
         <div className="flex items-center gap-1 border-r pr-3">
           <button

@@ -1,186 +1,154 @@
-/// <reference types="cypress" />
+/// <reference types="Cypress" />
 
-/**
- * Pruebas de rendimiento para el sistema de correo electrónico
- * 
- * Estas pruebas utilizan Cypress para medir el rendimiento de las operaciones
- * críticas del sistema de correo electrónico.
- */
+const inboxEmails = [
+  {
+    id: 'mail-100',
+    from: 'catering@lovenda.test',
+    to: 'owner.mail@lovenda.test',
+    subject: 'Presupuesto actualizado de catering',
+    date: '2026-05-04T10:15:00Z',
+    read: false,
+    important: true,
+    attachments: [{ name: 'presupuesto.pdf' }],
+  },
+  {
+    id: 'mail-101',
+    from: 'decoracion@lovenda.test',
+    to: 'owner.mail@lovenda.test',
+    subject: 'Ideas de decoración para la ceremonia',
+    date: '2026-05-03T18:40:00Z',
+    read: true,
+    important: false,
+    attachments: [],
+  },
+];
 
-describe('Pruebas de rendimiento para el sistema de correo', () => {
+const searchResults = [
+  {
+    id: 'mail-200',
+    from: 'fotografia@lovenda.test',
+    to: 'owner.mail@lovenda.test',
+    subject: 'Propuesta fotografica premium',
+    date: '2026-05-05T09:00:00Z',
+    read: false,
+    important: false,
+    attachments: [],
+  },
+];
+
+const sentEmails = [
+  {
+    id: 'mail-300',
+    from: 'owner.mail@lovenda.test',
+    to: 'planner@lovenda.test',
+    subject: 'Envio de contrato firmado',
+    date: '2026-05-02T14:25:00Z',
+    read: true,
+    important: false,
+    attachments: [{ name: 'contrato.pdf' }],
+  },
+];
+
+const okEmpty = { success: true, data: [] };
+
+function stubEmailEndpoints() {
+  cy.intercept('GET', '**/api/email/stats**', { statusCode: 200, body: { success: true, data: {} } });
+  cy.intercept('GET', '**/api/email-insights/**', { statusCode: 200, body: { tasks: [], meetings: [], budgets: [], contracts: [] } });
+  cy.intercept('GET', '**/api/email/alias**', { statusCode: 200, body: { success: true, data: { alias: 'wedding.team@lovenda.test' } } });
+  cy.intercept('GET', '**/api/email/templates**', { statusCode: 200, body: okEmpty });
+  cy.intercept('GET', '**/api/email/tags**', { statusCode: 200, body: okEmpty });
+  cy.intercept('GET', '**/api/email/folders**', { statusCode: 200, body: okEmpty });
+
+  cy.intercept('GET', '**/api/email/inbox**', (req) => {
+    req.reply({
+      statusCode: 200,
+      delay: 160,
+      body: { success: true, data: inboxEmails },
+    });
+  }).as('getInbox');
+
+  cy.intercept('GET', '**/api/email/search**', (req) => {
+    const term = new URL(req.url).searchParams.get('q') || '';
+    const filtered = term.toLowerCase().includes('foto') ? searchResults : [];
+    req.reply({
+      statusCode: 200,
+      delay: 80,
+      body: { success: true, data: filtered },
+    });
+  }).as('searchEmails');
+
+  cy.intercept('GET', '**/api/email/sent**', {
+    statusCode: 200,
+    delay: 90,
+    body: { success: true, data: sentEmails },
+  }).as('getSentFolder');
+
+  cy.intercept('PUT', '**/api/email/**', { statusCode: 200, body: { success: true } }).as('emailPutFallback');
+  cy.intercept('POST', '**/api/email/**', { statusCode: 200, body: { success: true } }).as('emailPostFallback');
+  cy.intercept('DELETE', '**/api/email/**', { statusCode: 200, body: { success: true } }).as('emailDeleteFallback');
+  cy.intercept('GET', '**/api/email/**', (req) => {
+    if (req.alias) return;
+    req.reply({ statusCode: 200, body: okEmpty });
+  }).as('emailGetFallback');
+}
+
+describe('Email · comportamiento bajo cargas simuladas', () => {
   beforeEach(() => {
-    // Interceptar solicitudes de red para simular respuestas rápidas en pruebas
-    cy.intercept('GET', '**/api/emails*', { 
-      fixture: 'emails-large-list.json',
-      delay: 50 
-    }).as('getEmails');
+    Cypress.env('STUB_FIRESTORE', true);
+    stubEmailEndpoints();
+    cy.loginToLovenda('owner.mail@lovenda.test');
+  });
 
-    cy.intercept('GET', '**/api/tags*', { 
-      fixture: 'tags-list.json',
-      delay: 20 
-    }).as('getTags');
-
-    cy.intercept('GET', '**/api/folders*', { 
-      fixture: 'folders-list.json',
-      delay: 20 
-    }).as('getFolders');
-
-    // Simular login
-    cy.visit('/');
-    cy.window().then((win) => {
-      win.localStorage.setItem('authUser', JSON.stringify({ 
-        uid: 'test-user-123', 
-        email: 'test@example.com'
-      }));
-      
-      win.localStorage.setItem('userProfile', JSON.stringify({
-        id: 'profile123',
-        userId: 'test-user-123',
-        brideFirstName: 'María',
-        brideLastName: 'García',
-        groomFirstName: 'Juan',
-        groomLastName: 'López',
-        weddingDate: '2025-06-15',
-        emailAlias: 'maria.garcia'
-      }));
+  it('carga la bandeja de entrada dentro del presupuesto simulado', () => {
+    const start = Date.now();
+    cy.navigateToEmailInbox();
+    cy.wait('@getInbox');
+    cy.then(() => {
+      const elapsed = Date.now() - start;
+      expect(elapsed).to.be.greaterThan(150);
+      expect(elapsed).to.be.lessThan(800);
+    });
+    cy.get('[data-testid="email-list-item"]').should('have.length', inboxEmails.length);
+    cy.get('[data-testid="email-list-item"]').first().within(() => {
+      cy.contains('catering@lovenda.test');
+      cy.contains('Presupuesto actualizado de catering');
     });
   });
 
-  it('debe cargar la lista de correos en menos de 1 segundo', () => {
-    // Empezar a contar el tiempo
-    const startTime = performance.now();
-    
-    // Visitar la página de correo
-    cy.visit('/email');
-    
-    // Esperar a que se cargue la lista de correos
-    cy.get('[data-testid="email-list"]', { timeout: 10000 }).should('be.visible');
-    cy.get('[data-testid="email-list-item"]', { timeout: 10000 }).should('have.length.greaterThan', 0);
-    
-    // Medir tiempo de carga
-    cy.window().then(() => {
-      const endTime = performance.now();
-      const loadTime = endTime - startTime;
-      
-      // Registrar el tiempo de carga en la consola
-      cy.log(`Tiempo de carga de la lista de correos: ${loadTime}ms`);
-      
-      // Verificar que el tiempo de carga sea menor a 1000ms
-      expect(loadTime).to.be.lessThan(1000);
-    });
-  });
+  it('filtra correos usando el endpoint de búsqueda nuevo', () => {
+    cy.navigateToEmailInbox();
+    cy.wait('@getInbox');
 
-  it('debe filtrar correos rápidamente', () => {
-    // Visitar la página de correo y esperar que se cargue
-    cy.visit('/email');
-    cy.get('[data-testid="email-list-item"]', { timeout: 10000 }).should('be.visible');
-    
-    // Interceptar la búsqueda para medir su rendimiento
-    cy.intercept('GET', '**/api/emails*', { 
-      fixture: 'emails-search-results.json',
-      delay: 30
-    }).as('searchEmails');
-    
-    // Empezar a contar el tiempo
-    cy.window().then((win) => {
-      win.performance.mark('filter-start');
-    });
-    
-    // Realizar búsqueda
-    cy.get('[data-testid="email-search-input"]').type('presupuesto');
-    
-    // Esperar a que se complete la búsqueda
+    const start = Date.now();
+    cy.get('[data-testid="email-search-input"]', { timeout: 10000 }).type('fotografia');
     cy.wait('@searchEmails');
-    cy.get('[data-testid="email-list-item"]').should('have.length.greaterThan', 0);
-    
-    // Medir tiempo de filtrado
-    cy.window().then((win) => {
-      win.performance.mark('filter-end');
-      win.performance.measure('filter-time', 'filter-start', 'filter-end');
-      const measures = win.performance.getEntriesByName('filter-time');
-      const filterTime = measures[0].duration;
-      
-      // Registrar el tiempo de filtrado en la consola
-      cy.log(`Tiempo de filtrado de correos: ${filterTime}ms`);
-      
-      // Verificar que el tiempo de filtrado sea menor a 500ms
-      expect(filterTime).to.be.lessThan(500);
+    cy.then(() => {
+      const elapsed = Date.now() - start;
+      expect(elapsed).to.be.greaterThan(70);
+      expect(elapsed).to.be.lessThan(600);
     });
+
+    cy.get('[data-testid="email-list-item"]').should('have.length', searchResults.length);
+    cy.get('[data-testid="email-list-item"]').first().should('contain.text', 'Propuesta fotografica premium');
   });
 
-  it('debe abrir correos con adjuntos en menos de 300ms', () => {
-    // Visitar la página de correo y esperar que se cargue
-    cy.visit('/email');
-    cy.get('[data-testid="email-list-item"]', { timeout: 10000 }).should('be.visible');
-    
-    // Interceptar la carga del correo con adjuntos
-    cy.intercept('GET', '**/api/emails/*/attachments', { 
-      fixture: 'email-attachments.json',
-      delay: 20
-    }).as('getAttachments');
-    
-    // Empezar a contar el tiempo
-    cy.window().then((win) => {
-      win.performance.mark('open-email-start');
-    });
-    
-    // Hacer clic en un correo con adjuntos
-    cy.get('[data-testid="email-with-attachment"]').first().click();
-    
-    // Esperar a que se cargue el correo y sus adjuntos
-    cy.wait('@getAttachments');
-    cy.get('[data-testid="email-attachment-list"]').should('be.visible');
-    
-    // Medir tiempo de apertura
-    cy.window().then((win) => {
-      win.performance.mark('open-email-end');
-      win.performance.measure('open-email-time', 'open-email-start', 'open-email-end');
-      const measures = win.performance.getEntriesByName('open-email-time');
-      const openTime = measures[0].duration;
-      
-      // Registrar el tiempo de apertura en la consola
-      cy.log(`Tiempo de apertura de correo con adjuntos: ${openTime}ms`);
-      
-      // Verificar que el tiempo de apertura sea menor a 300ms
-      expect(openTime).to.be.lessThan(300);
-    });
-  });
+  it('permite cambiar a la carpeta de enviados y mostrar los correos correspondientes', () => {
+    cy.navigateToEmailInbox();
+    cy.wait('@getInbox');
 
-  it('debe cambiar entre carpetas rápidamente', () => {
-    // Visitar la página de correo y esperar que se cargue
-    cy.visit('/email');
-    cy.get('[data-testid="email-list-item"]', { timeout: 10000 }).should('be.visible');
-    
-    // Interceptar la carga de correos de otra carpeta
-    cy.intercept('GET', '**/api/emails*', { 
-      fixture: 'emails-sent-folder.json',
-      delay: 30
-    }).as('getSentEmails');
-    
-    // Empezar a contar el tiempo
-    cy.window().then((win) => {
-      win.performance.mark('folder-switch-start');
+    const start = Date.now();
+    cy.get('[data-testid="folder-item"][data-folder="sent"]').click();
+    cy.wait('@getSentFolder');
+    cy.then(() => {
+      const elapsed = Date.now() - start;
+      expect(elapsed).to.be.greaterThan(80);
+      expect(elapsed).to.be.lessThan(700);
     });
-    
-    // Hacer clic en la carpeta "Enviados"
-    cy.get('[data-testid="folder-sent"]').click();
-    
-    // Esperar a que se carguen los correos de la carpeta
-    cy.wait('@getSentEmails');
-    cy.get('[data-testid="email-list-item"]').should('have.length.greaterThan', 0);
-    
-    // Medir tiempo de cambio de carpeta
-    cy.window().then((win) => {
-      win.performance.mark('folder-switch-end');
-      win.performance.measure('folder-switch-time', 'folder-switch-start', 'folder-switch-end');
-      const measures = win.performance.getEntriesByName('folder-switch-time');
-      const switchTime = measures[0].duration;
-      
-      // Registrar el tiempo de cambio de carpeta en la consola
-      cy.log(`Tiempo de cambio de carpeta: ${switchTime}ms`);
-      
-      // Verificar que el tiempo de cambio sea menor a 400ms
-      expect(switchTime).to.be.lessThan(400);
+
+    cy.get('[data-testid="email-list-item"]').should('have.length', sentEmails.length);
+    cy.get('[data-testid="email-list-item"]').first().within(() => {
+      cy.contains('planner@lovenda.test');
+      cy.contains('Envio de contrato firmado');
     });
   });
 });

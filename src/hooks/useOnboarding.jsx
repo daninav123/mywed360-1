@@ -4,27 +4,40 @@ import { useWedding } from '../context/WeddingContext';
 import { useAuth } from './useAuth';
 
 /**
- * Hook personalizado para gestionar el estado del onboarding del usuario
- * @returns {{
- *   showOnboarding: boolean,
- *   onboardingCompleted: boolean,
- *   completeOnboarding: Function
- * }}
+ * Hook personalizado para gestionar el estado del onboarding del usuario.
+ * Se asegura de no activar el tutorial cuando se navega por la web publica.
  */
 export const useOnboarding = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, hasRole } = useAuth();
   const { weddings, activeWedding, weddingsReady } = useWedding();
-  // Si existe flag en localStorage, mostramos onboarding sí o sí
-  const forceFlag =
-    typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
-  const [showOnboarding, setShowOnboarding] = useState(forceFlag);
-  // No eliminamos el flag aquí; se quitará cuando se complete el tutorial.
 
+  const marketingView =
+    typeof window !== 'undefined' && window.__LOVENDA_MARKETING_VIEW__ === true;
+  const ownerLike = hasRole ? hasRole('owner', 'pareja', 'admin') : false;
+  const rawForceFlag =
+    typeof window !== 'undefined' ? localStorage.getItem('forceOnboarding') === '1' : false;
+  const forceFlag = ownerLike && !marketingView && rawForceFlag && Boolean(currentUser?.uid);
+
+  const [showOnboarding, setShowOnboarding] = useState(forceFlag && !marketingView);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Decidir si mostrar onboarding en función del estado del usuario y sus bodas
+  // Decidir si mostrar onboarding en funcion del estado del usuario y sus bodas.
   useEffect(() => {
+    if (marketingView) {
+      setShowOnboarding(false);
+      setOnboardingCompleted(true);
+      setLoading(false);
+      return;
+    }
+
+    if (!ownerLike) {
+      setShowOnboarding(false);
+      setOnboardingCompleted(true);
+      setLoading(false);
+      return;
+    }
+
     if (forceFlag) {
       setShowOnboarding(true);
       setOnboardingCompleted(false);
@@ -40,7 +53,7 @@ export const useOnboarding = () => {
     }
 
     if (!weddingsReady) {
-      // Esperar a que el listado de bodas esté resuelto
+      // Esperar a que el listado de bodas este resuelto.
       setLoading(true);
       return;
     }
@@ -68,16 +81,16 @@ export const useOnboarding = () => {
     }
 
     setLoading(false);
-  }, [forceFlag, currentUser, weddingsReady, weddings, activeWedding]);
+  }, [marketingView, forceFlag, ownerLike, currentUser, weddingsReady, weddings, activeWedding]);
 
-  // Función para marcar el onboarding como completado
   const completeOnboarding = () => {
     setShowOnboarding(false);
     setOnboardingCompleted(true);
-    localStorage.removeItem('forceOnboarding');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('forceOnboarding');
+    }
 
-    // Guardar en localStorage como backup
-    if (currentUser?.uid) {
+    if (currentUser?.uid && typeof window !== 'undefined') {
       const localOnboardingKey = `onboarding_completed_${currentUser.uid}`;
       localStorage.setItem(localOnboardingKey, 'true');
     }

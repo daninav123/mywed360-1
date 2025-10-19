@@ -70,8 +70,9 @@ export default function EmailNotification() {
   }
 
   return (
-    <div
-      className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border-l-4 border-blue-500 animate-bounce-once"
+    <button
+      type="button"
+      className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-50 border-l-4 border-blue-500 animate-bounce-once text-left focus:outline-none focus:ring-2 focus:ring-blue-400"
       onClick={() => {
         try {
           setShowNotification(false);
@@ -129,12 +130,6 @@ export default function EmailNotification() {
           </svg>
         </button>
       </div>
-      <div
-        onClick={() => alert('Funcionalidad de buzón temporalmente no disponible')}
-        className="absolute inset-0 cursor-pointer"
-        aria-hidden="true"
-      />
-
       {/* Estilos para la animación de rebote */}
       <style>{`
         @keyframes bounce-once {
@@ -145,8 +140,7 @@ export default function EmailNotification() {
           animation: bounce-once 1s ease-in-out;
         }
       `}</style>
-    </div>
+    </button>
   );
 }
-
 

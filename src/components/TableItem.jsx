@@ -37,6 +37,10 @@ function TableItem({
   dangerReason = '',
   globalMaxSeats = 0,
   highlightScore = 0,
+  lockedBy = null,
+  lockedColor,
+  lockedIsCurrent = false,
+  eventsDisabled = false,
 }) {
   // Decide qué texto mostrar en cada asiento según el nivel de zoom
   const getLabel = useCallback(
@@ -59,13 +63,16 @@ function TableItem({
     [scale]
   );
   const ref = useRef(null);
+  const isLockedByOther = !!lockedBy && !lockedIsCurrent;
+  const isLockedBySelf = !!lockedBy && lockedIsCurrent;
 
   // drop logic
-  const [{ isOver, client }, drop] = useDrop(
+  const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ItemTypes.GUEST,
-      canDrop: () => table.enabled !== false && !table.guestId,
+      canDrop: () => table.enabled !== false && !table.guestId && !isLockedByOther,
       drop: (item, monitor) => {
+        if (isLockedByOther) return undefined;
         const clientOffset = monitor.getClientOffset();
         if (
           clientOffset &&
@@ -77,7 +84,7 @@ function TableItem({
         }
         onAssignGuest(table.id, item.id);
       },
-      collect: (monitor) => ({ isOver: monitor.isOver(), client: monitor.getClientOffset() }),
+      collect: (monitor) => ({ isOver: monitor.isOver() }),
     }),
     [table.id]
   );
@@ -277,7 +284,7 @@ function TableItem({
   const sizeX = table.shape === 'circle' ? table.diameter || 60 : table.width || 80;
   const sizeY =
     table.shape === 'circle' ? table.diameter || 60 : table.height || table.length || 60;
-  const disabled = table.enabled === false;
+  const disabled = table.enabled === false || table.locked || isLockedByOther;
   const tableColor = disabled
     ? '#e5e7eb'
     : TABLE_TYPE_COLORS[tableType] || TABLE_TYPE_COLORS.round;
@@ -291,11 +298,13 @@ function TableItem({
     backgroundColor: tableColor,
     border: selected
       ? '3px solid #2563eb'
-      : danger
-        ? '2px solid #ef4444'
-        : highlightScore > 0
-          ? '2px solid #10b981'
-          : '2px solid #f59e0b',
+      : isLockedByOther
+        ? `2px dashed ${lockedColor || '#6b7280'}`
+        : danger
+          ? '2px solid #ef4444'
+          : highlightScore > 0
+            ? '2px solid #10b981'
+            : '2px solid #f59e0b',
     borderRadius: table.shape === 'circle' ? '50%' : '6px',
     display: 'flex',
     alignItems: 'center',
@@ -306,9 +315,12 @@ function TableItem({
       ? '0 0 0 3px rgba(37,99,235,0.25)'
       : highlightScore > 0
         ? '0 0 0 3px rgba(16,185,129,0.25)'
-        : 'none',
+        : isLockedBySelf
+          ? `0 0 0 3px ${lockedColor || 'rgba(59,130,246,0.35)'}`
+          : 'none',
     transform: `rotate(${table.angle || 0}deg)`,
     transformOrigin: 'center center',
+    pointerEvents: eventsDisabled ? 'none' : 'auto',
   };
 
   return (
@@ -319,24 +331,33 @@ function TableItem({
       }}
       data-testid={`table-item-${table.id}`}
       style={{ ...style, backgroundColor: isOver ? '#d1fae5' : style.backgroundColor }}
-      onPointerDown={disabled || !canMove || table.locked ? undefined : handlePointerDown}
+      onPointerDown={disabled || !canMove || table.locked || eventsDisabled ? undefined : handlePointerDown}
       onContextMenu={(e) => {
         e.preventDefault();
+        if (isLockedByOther || eventsDisabled) return;
         onToggleEnabled(table.id);
       }}
       onClick={(e) => {
         e.stopPropagation();
+        if (isLockedByOther || eventsDisabled) return;
         onSelect && onSelect(table.id, !!e.shiftKey);
       }}
-      onDoubleClick={() => onOpenConfig(table)}
+      onDoubleClick={() => {
+        if (isLockedByOther || eventsDisabled) return;
+        onOpenConfig(table);
+      }}
       title={danger ? dangerReason || 'Problema de validación' : undefined}
     >
       <button
         onClick={(e) => {
           e.stopPropagation();
+          if (isLockedByOther) return;
           onAssignGuest(table.id, null);
         }}
-        className="absolute top-0 right-0 text-xs px-1 text-red-600"
+        disabled={isLockedByOther}
+        className={`absolute top-0 right-0 text-xs px-1 ${
+          isLockedByOther ? 'text-gray-400 cursor-not-allowed' : 'text-red-600'
+        }`}
       >
         ✖
       </button>
@@ -350,6 +371,26 @@ function TableItem({
           title={dangerReason || 'Problema de validación'}
         >
           !
+        </div>
+      )}
+      {isLockedByOther && (
+        <div
+          className="absolute top-0 left-0 m-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-white flex items-center gap-1"
+          style={{ backgroundColor: lockedColor || '#6b7280', opacity: 0.9, zIndex: 30 }}
+          title={`Bloqueado por ${lockedBy}`}
+        >
+          <span aria-hidden="true">🔒</span>
+          <span>{firstName(lockedBy)}</span>
+        </div>
+      )}
+      {isLockedBySelf && (
+        <div
+          className="absolute top-0 left-0 m-1 px-1 py-0.5 rounded text-[10px] font-semibold text-white flex items-center gap-1"
+          style={{ backgroundColor: lockedColor || '#2563eb', opacity: 0.85, zIndex: 30 }}
+          title="Estás editando esta mesa"
+        >
+          <span aria-hidden="true">🔒</span>
+          <span>Tú</span>
         </div>
       )}
       {/* Badge de ocupación: invitados contabilizados / capacidad (seats) */}
@@ -378,7 +419,12 @@ function TableItem({
           {Math.round(table.angle)}°
         </div>
       )}
-      {disabled && <div className="absolute inset-0 bg-white bg-opacity-50 rounded" />}
+      {disabled && (
+        <div
+          className="absolute inset-0 bg-white bg-opacity-50 rounded pointer-events-none"
+          style={{ zIndex: 10 }}
+        />
+      )}
       {/* seats */}
       {(() => {
         if (seatDots === 0) return null;

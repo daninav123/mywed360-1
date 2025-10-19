@@ -1,4 +1,4 @@
-﻿import {
+import {
   serverTimestamp,
   doc,
   deleteDoc,
@@ -38,7 +38,7 @@ import { useWeddingCollection } from '../../hooks/useWeddingCollection';
 import { useWeddingCollectionGroup } from '../../hooks/useWeddingCollectionGroup';
 import { useUserCollection } from '../../hooks/useUserCollection';
 import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services/WeddingService';
-import masterTimelineTemplate from '../../data/tasks/masterTimelineTemplate.json';
+import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder';
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
 
@@ -46,7 +46,7 @@ const GANTT_UNASSIGNED = '__gantt_unassigned__';
 
 
 // Componente principal Tasks refactorizado
-export default function Tasks() {
+export default function TasksRefactored() {
   // Estados - Inicializacin segura con manejo de errores
 
   // Contexto de boda activa
@@ -884,10 +884,116 @@ export default function Tasks() {
 
   // Tareas Gantt normalizadas y acotadas
   const { uniqueGanttTasks } = useGanttNormalizedTasks(tasksState);
+
+  const authCreationDate = useMemo(() => {
+    try {
+      const raw = auth?.currentUser?.metadata?.creationTime || null;
+      if (!raw) return null;
+      const d = new Date(raw);
+      return Number.isNaN(d.getTime()) ? null : d;
+    } catch (_) {
+      return null;
+    }
+  }, [auth?.currentUser?.metadata?.creationTime]);
+
+  const taskTemporalBounds = useMemo(() => {
+    const tasks = Array.isArray(uniqueGanttTasks) ? uniqueGanttTasks : [];
+    let minStart = null;
+    let maxEnd = null;
+    for (const task of tasks) {
+      if (!task) continue;
+      const start = normalizeAnyDate(task.start || task.startDate || task.date || task.when);
+      if (start && !isNaN(start.getTime())) {
+        if (!minStart || start.getTime() < minStart.getTime()) minStart = start;
+      }
+      const end = normalizeAnyDate(
+        task.end || task.endDate || task.until || task.finish || task.to || null
+      );
+      if (end && !isNaN(end.getTime())) {
+        if (!maxEnd || end.getTime() > maxEnd.getTime()) maxEnd = end;
+      }
+    }
+    return { minStart, maxEnd };
+  }, [uniqueGanttTasks]);
+
+  const ganttProjectStart = useMemo(() => {
+    const candidates = [
+      projectStart,
+      authCreationDate,
+      taskTemporalBounds.minStart,
+    ]
+      .map((candidate) => {
+        if (!candidate) return null;
+        if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
+        const normalized = normalizeAnyDate(candidate);
+        return normalized && !Number.isNaN(normalized.getTime()) ? normalized : null;
+      })
+      .filter(Boolean);
+    if (candidates.length === 0) return null;
+    return candidates.reduce((earliest, current) =>
+      current.getTime() < earliest.getTime() ? current : earliest
+    );
+  }, [projectStart, authCreationDate, taskTemporalBounds]);
+
+  const weddingDateFromMeetings = useMemo(() => {
+    const meetings = Array.isArray(meetingsState) ? meetingsState : [];
+    for (const meeting of meetings) {
+      if (!meeting) continue;
+      const key = String(meeting.id || meeting.autoKey || '').toLowerCase();
+      if (key === 'wedding-day' || key === 'weddingday' || key === 'wedding') {
+        const normalized = normalizeAnyDate(
+          meeting.start || meeting.date || meeting.when || meeting.metadata?.start
+        );
+        if (normalized && !isNaN(normalized.getTime())) return normalized;
+      }
+    }
+    return null;
+  }, [meetingsState]);
+
+  const ganttProjectEnd = useMemo(() => {
+    const candidates = [
+      projectEnd,
+      weddingDateFromMeetings,
+      taskTemporalBounds.maxEnd,
+    ]
+      .map((candidate) => {
+        if (!candidate) return null;
+        if (candidate instanceof Date) return Number.isNaN(candidate.getTime()) ? null : candidate;
+        const normalized = normalizeAnyDate(candidate);
+        return normalized && !Number.isNaN(normalized.getTime()) ? normalized : null;
+      })
+      .filter(Boolean);
+    if (candidates.length === 0) {
+      return ganttProjectStart ? addMonths(ganttProjectStart, 12) : null;
+    }
+    return candidates.reduce((latest, current) =>
+      current.getTime() > latest.getTime() ? current : latest
+    );
+  }, [projectEnd, weddingDateFromMeetings, taskTemporalBounds, ganttProjectStart]);
+
+  const ganttRangeStart = useMemo(() => {
+    const base =
+      ganttProjectStart instanceof Date && !isNaN(ganttProjectStart?.getTime?.())
+        ? ganttProjectStart
+        : new Date();
+    return new Date(base.getTime());
+  }, [ganttProjectStart]);
+
+  const ganttRangeEnd = useMemo(() => {
+    const fallback = addMonths(ganttRangeStart, 12);
+    const candidate =
+      ganttProjectEnd instanceof Date && !isNaN(ganttProjectEnd?.getTime?.())
+        ? new Date(ganttProjectEnd.getTime())
+        : null;
+    if (!candidate) return fallback;
+    if (candidate.getTime() < ganttRangeStart.getTime()) return fallback;
+    return candidate;
+  }, [ganttProjectEnd, ganttRangeStart]);
+
   const ganttTasksBounded = useGanttBoundedTasks(
     uniqueGanttTasks,
-    projectStart,
-    projectEnd,
+    ganttRangeStart,
+    ganttRangeEnd,
     meetingsState
   );
 
@@ -1510,92 +1616,61 @@ export default function Tasks() {
     return Array.isArray(source) ? source : [];
   }, [filtersActive, filteredSubtaskEvents, subtaskEvents]);
 
+  const resolveBlockRange = useCallback((block) => {
+    const range = block?.range && typeof block.range === 'object' ? block.range : null;
+    const startPct =
+      typeof range?.startPct === 'number'
+        ? range.startPct
+        : typeof block?.p0 === 'number'
+        ? block.p0
+        : 0;
+    const endPctRaw =
+      typeof range?.endPct === 'number'
+        ? range.endPct
+        : typeof block?.p1 === 'number'
+        ? block.p1
+        : startPct + 0.2;
+    const endPct = endPctRaw <= startPct ? startPct + 0.2 : endPctRaw;
+    return { startPct, endPct };
+  }, []);
+
+  const buildTemplateMeta = useCallback((block, range, version) => {
+    const adminMeta = block?.admin && typeof block.admin === 'object' ? block.admin : {};
+    const templateKey = String(block?.key || block?.name || '').trim() || null;
+    const adminCategory = adminMeta?.category
+      ? String(adminMeta.category).toUpperCase()
+      : null;
+    return {
+      key: templateKey,
+      version: Number(version) || 1,
+      range,
+      adminEditable: adminMeta?.editable !== false,
+      adminDeletable: adminMeta?.deletable !== false,
+      adminCategory,
+      panelPath: adminMeta?.panelPath || 'admin/timeline',
+    };
+  }, []);
+
   const noTasksScheduled = totalParentCount === 0;
 
   // Accin manual para crear tareas por defecto
   const handleSeedDefaultTasks = useCallback(async () => {
+    if (!activeWedding || !db) return;
     try {
-      if (!activeWedding || !db) return;
       setSeedingDefaults(true);
-      const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '_seed_meta');
-      const seedSnap = await getDoc(seedRef).catch(() => null);
-      if (seedSnap && seedSnap.exists()) {
-        setSeedingDefaults(false);
-        return;
-      }
-      const endBase =
-        projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
-      const startBase =
-        projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-          ? addMonths(projectEnd, -12)
-          : addMonths(endBase, -12);
-      const span = Math.max(1, endBase.getTime() - startBase.getTime());
-      const at = (p) => new Date(startBase.getTime() + span * p);
-
-      const templateBlocks = Array.isArray(masterTimelineTemplate?.blocks)
-        ? masterTimelineTemplate.blocks
-        : [];
-      if (templateBlocks.length === 0) {
-        console.warn('[Tasks] Sin bloques de plantilla, se omite el seed manual');
-        setSeedingDefaults(false);
-        return;
-      }
-      const templateVersion = Number(masterTimelineTemplate?.version || 1);
-
-      const colRef = collection(db, 'weddings', activeWedding, 'tasks');
-      for (const b of templateBlocks) {
-        const safeName = String(b?.name || 'Tarea');
-        const safeP0 = typeof b?.p0 === 'number' ? b.p0 : 0;
-        const safeP1Raw = typeof b?.p1 === 'number' ? b.p1 : safeP0 + 0.2;
-        const safeP1 = safeP1Raw <= safeP0 ? safeP0 + 0.2 : safeP1Raw;
-        const ratioSpan = Math.max(0.05, safeP1 - safeP0);
-        const safeItems = Array.isArray(b?.items) ? b.items : [];
-
-        const parent = {
-          title: safeName,
-          name: safeName,
-          type: 'task',
-          start: at(safeP0),
-          end: at(safeP1),
-          progress: 0,
-          isDisabled: false,
-          createdAt: serverTimestamp(),
-          category: 'OTROS',
-        };
-        const pDoc = await addDoc(colRef, parent);
-        await setDoc(pDoc, { id: pDoc.id }, { merge: true });
-        for (const item of safeItems) {
-          const label = String(item || '').trim() || 'Subtarea';
-          const s = at(safeP0 + Math.random() * ratioSpan * 0.6);
-          const e = at(Math.min(safeP1, safeP0 + 0.4 + Math.random() * ratioSpan * 0.5));
-          const sub = {
-            title: label,
-            name: label,
-            parentId: pDoc.id,
-            weddingId: activeWedding,
-            start: s,
-            end: e.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : e,
-            progress: 0,
-            isDisabled: false,
-            createdAt: serverTimestamp(),
-            category: 'OTROS',
-          };
-          const subCol = collection(db, 'weddings', activeWedding, 'tasks', pDoc.id, 'subtasks');
-          const sDoc = await addDoc(subCol, sub);
-          await setDoc(sDoc, { id: sDoc.id }, { merge: true });
-        }
-      }
-
-      await setDoc(
-        seedRef,
-        { seededAt: serverTimestamp(), version: templateVersion },
-        { merge: true }
-      );
-    } catch (_) {
+      await seedWeddingTasksFromTemplate({
+        db,
+        weddingId: activeWedding,
+        projectEnd,
+        skipIfSeeded: true,
+        forceRefresh: true,
+      });
+    } catch (error) {
+      console.warn('[Tasks] seed defaults failed', error);
     } finally {
       setSeedingDefaults(false);
     }
-  }, [activeWedding, db, projectStart, projectEnd]);
+  }, [activeWedding, db, projectEnd]);
 
   // Seed automÍtico de Bloques A-I (padres + subtareas) si no hay tareas
   useEffect(() => {
@@ -1604,87 +1679,17 @@ export default function Tasks() {
         if (!activeWedding || !db) return;
         const hasAny = Array.isArray(tasksState) && tasksState.length > 0;
         if (hasAny) return;
-
-        // Evitar doble seed con flag en weddings/{id}/tasks/_seed_meta (evita depender de 'config')
-        const seedRef = doc(db, 'weddings', activeWedding, 'tasks', '_seed_meta');
-        const seedSnap = await getDoc(seedRef).catch(() => null);
-        if (seedSnap && seedSnap.exists()) return;
-
-        // Permitir seed aunque an no haya weddingDate: usar fallbacks razonables
-        // Base de fechas para bloques: si hay fecha de boda, usar 12 meses antes como inicio
-        const endBase =
-          projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? projectEnd : new Date();
-        const startBase =
-          projectEnd instanceof Date && !isNaN(projectEnd.getTime())
-            ? addMonths(projectEnd, -12)
-            : addMonths(endBase, -12);
-        const span = Math.max(1, endBase.getTime() - startBase.getTime());
-        const at = (p) => new Date(startBase.getTime() + span * p);
-
-        const templateBlocks = Array.isArray(masterTimelineTemplate?.blocks)
-          ? masterTimelineTemplate.blocks
-          : [];
-        if (templateBlocks.length === 0) {
-          console.warn('[Tasks] Sin bloques de plantilla, se omite el seed inicial');
-          setSeedingDefaults(false);
-          return;
-        }
-
-        const templateVersion = Number(masterTimelineTemplate?.version || 1);
-        const colRef = collection(db, 'weddings', activeWedding, 'tasks');
-        for (const b of templateBlocks) {
-          const safeName = String(b?.name || 'Tarea');
-          const safeP0 = typeof b?.p0 === 'number' ? b.p0 : 0;
-          const safeP1Raw = typeof b?.p1 === 'number' ? b.p1 : safeP0 + 0.2;
-          const safeP1 = safeP1Raw <= safeP0 ? safeP0 + 0.2 : safeP1Raw;
-          const ratioSpan = Math.max(0.05, safeP1 - safeP0);
-          const safeItems = Array.isArray(b?.items) ? b.items : [];
-
-          const parent = {
-            title: safeName,
-            name: safeName,
-            type: 'task',
-            start: at(safeP0),
-            end: at(safeP1),
-            progress: 0,
-            isDisabled: false,
-            createdAt: serverTimestamp(),
-            category: 'OTROS',
-          };
-          const pDoc = await addDoc(colRef, parent);
-          await setDoc(pDoc, { id: pDoc.id }, { merge: true });
-          for (const item of safeItems) {
-            const label = String(item || '').trim() || 'Subtarea';
-            const s = at(safeP0 + Math.random() * ratioSpan * 0.6);
-            const e = at(Math.min(safeP1, safeP0 + 0.4 + Math.random() * ratioSpan * 0.5));
-            const sub = {
-              title: label,
-              name: label,
-              parentId: pDoc.id,
-              weddingId: activeWedding,
-              start: s,
-              end: e.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : e,
-              progress: 0,
-              isDisabled: false,
-              createdAt: serverTimestamp(),
-              category: 'OTROS',
-            };
-            const subCol = collection(db, 'weddings', activeWedding, 'tasks', pDoc.id, 'subtasks');
-            const sDoc = await addDoc(subCol, sub);
-            await setDoc(sDoc, { id: sDoc.id }, { merge: true });
-          }
-        }
-
-        await setDoc(
-          seedRef,
-          { seededAt: serverTimestamp(), version: templateVersion },
-          { merge: true }
-        );
-      } catch (e) {
-        console.warn('[Tasks] Seed de bloques no completado:', e);
+        await seedWeddingTasksFromTemplate({
+          db,
+          weddingId: activeWedding,
+          projectEnd,
+          skipIfSeeded: true,
+        });
+      } catch (error) {
+        console.warn('[Tasks] automatic seed failed', error);
       }
     })();
-  }, [activeWedding, db, projectStart, projectEnd, tasksState, tasksLoading]);
+  }, [activeWedding, db, projectEnd, tasksState]);
   // Toggle rÍpido de completado (lista/fallback)
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
@@ -1705,14 +1710,16 @@ export default function Tasks() {
     [activeWedding]
   );
   const weddingMarkerDate = useMemo(() => {
-    return projectEnd instanceof Date && !isNaN(projectEnd.getTime()) ? new Date(projectEnd) : null;
-  }, [projectEnd]);
+    return ganttRangeEnd instanceof Date && !isNaN(ganttRangeEnd.getTime())
+      ? new Date(ganttRangeEnd)
+      : null;
+  }, [ganttRangeEnd]);
 
   // Ajuste de Gantt (hooks deben estar a nivel superior del componente)
   useGanttSizing({
     uniqueGanttTasks: ganttSizingTasks,
-    projectStart,
-    projectEnd,
+    projectStart: ganttRangeStart,
+    projectEnd: ganttRangeEnd,
     containerRef: ganttContainerRef,
     columnWidthState,
     setColumnWidthState,
@@ -2108,7 +2115,7 @@ export default function Tasks() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6 space-y-6 pb-32">
+    <div className="space-y-6 pb-32">
       <TasksHeader
         onShowAllTasks={() => setShowAllTasks(true)}
         onNewTask={() => {
@@ -2119,7 +2126,7 @@ export default function Tasks() {
         }}
       />
 
-      {/* Componente para el diagrama Gantt */}
+      
       <div className="mt-6 mb-8" ref={ganttContainerRef}>
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="text-xl font-semibold">Planificación a Largo Plazo</h2>
@@ -2186,93 +2193,90 @@ export default function Tasks() {
             )}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          {showEmptyGanttState ? (
-            <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-lg px-4 py-6 text-center">
-              No hay tareas que coincidan con los filtros seleccionados.
-            </div>
-          ) : noTasksScheduled ? (
-            <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-lg px-4 py-6 text-center">
-              Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
-            </div>
-          ) : (
-            <LongTermTasksGantt
-              tasks={ganttTasksToRender}
-              subtasks={ganttSubtasksToRender}
-              projectStart={projectStart || new Date()}
-              projectEnd={projectEnd || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)}
-              containerRef={ganttContainerRef}
-              columnWidth={120}
-              rowHeight={40}
-              showSubtasks={showGanttSubtasks}
-              onParentSelect={(task) => {
-                if (!task || !task.id) {
-                  setSelectedParentId(null);
+        {showEmptyGanttState ? (
+          <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
+            No hay tareas que coincidan con los filtros seleccionados.
+          </div>
+        ) : noTasksScheduled ? (
+          <div className="bg-[var(--color-surface)] rounded-xl shadow-md border border-gray-100 px-6 py-10 text-center text-sm text-gray-500">
+            Aún no hay bloques planificados en el timeline. Importa una plantilla o crea una tarea padre desde la checklist para empezar.
+          </div>
+        ) : (
+          <LongTermTasksGantt
+            tasks={ganttTasksToRender}
+            subtasks={ganttSubtasksToRender}
+            projectStart={ganttRangeStart}
+            projectEnd={ganttRangeEnd}
+            containerRef={ganttContainerRef}
+            columnWidth={120}
+            rowHeight={40}
+            showSubtasks={showGanttSubtasks}
+            extendMonthsAfterEnd={1}
+            onParentSelect={(task) => {
+              if (!task || !task.id) {
+                setSelectedParentId(null);
+                return;
+              }
+              setSelectedParentId(String(task.id));
+            }}
+            onTaskClick={(task) => {
+              if (!task) return;
+              if (handleTaskIntent(task)) return;
+              try {
+                const normalizeDate = (value) => {
+                  if (!value) return null;
+                  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+                  if (typeof value?.toDate === 'function') {
+                    const d = value.toDate();
+                    return Number.isNaN(d.getTime()) ? null : d;
+                  }
+                  try {
+                    const d = new Date(value);
+                    return Number.isNaN(d.getTime()) ? null : d;
+                  } catch {
+                    return null;
+                  }
+                };
+                const eventStart =
+                  normalizeDate(task.start) ||
+                  normalizeDate(task.startDate) ||
+                  normalizeDate(task.when);
+                const eventEnd =
+                  normalizeDate(task.end) ||
+                  normalizeDate(task.endDate) ||
+                  normalizeDate(task.until) ||
+                  normalizeDate(task.finish) ||
+                  normalizeDate(task.to) ||
+                  eventStart;
+                if (!eventStart || !eventEnd) {
+                  console.warn('[Tasks] Gantt task sin fechas válidas al abrir detalle', task);
                   return;
                 }
-                setSelectedParentId(String(task.id));
-              }}
-              onTaskClick={(task) => {
-                if (!task) return;
-                if (handleTaskIntent(task)) return;
-                try {
-                  const normalizeDate = (value) => {
-                    if (!value) return null;
-                    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
-                    if (typeof value?.toDate === 'function') {
-                      const d = value.toDate();
-                      return Number.isNaN(d.getTime()) ? null : d;
-                    }
-                    try {
-                      const d = new Date(value);
-                      return Number.isNaN(d.getTime()) ? null : d;
-                    } catch {
-                      return null;
-                    }
-                  };
-                  const eventStart =
-                    normalizeDate(task.start) ||
-                    normalizeDate(task.startDate) ||
-                    normalizeDate(task.when);
-                  const eventEnd =
-                    normalizeDate(task.end) ||
-                    normalizeDate(task.endDate) ||
-                    normalizeDate(task.until) ||
-                    normalizeDate(task.finish) ||
-                    normalizeDate(task.to) ||
-                    eventStart;
-                  if (!eventStart || !eventEnd) {
-                    console.warn('[Tasks] Gantt task sin fechas válidas al abrir detalle', task);
-                    return;
-                  }
-                  setEditingId(task.id);
-                  setEditingPath(task.__path || null);
-                  setFormData((prev) => ({
-                    ...prev,
-                    title: task.title || '',
-                    desc: task.desc || '',
-                    category: task.category || 'OTROS',
-                    startDate: eventStart.toISOString().slice(0, 10),
-                    startTime: eventStart.toTimeString().slice(0, 5),
-                    endDate: eventEnd.toISOString().slice(0, 10),
-                    endTime: eventEnd.toTimeString().slice(0, 5),
-                    long: task.__kind === 'subtask',
-                    parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
-                    assignee: task.assignee || '',
-                    completed: completedIdSet?.has?.(String(task.id)) || false,
-                  }));
-                  setShowNewTask(true);
-                } catch (error) {
-                  console.error('Error al manejar clic en tarea:', error);
-                }
-              }}
-            />
-          )}
-        </div>
+                setEditingId(task.id);
+                setEditingPath(task.__path || null);
+                setFormData((prev) => ({
+                  ...prev,
+                  title: task.title || '',
+                  desc: task.desc || '',
+                  category: task.category || 'OTROS',
+                  startDate: eventStart.toISOString().slice(0, 10),
+                  startTime: eventStart.toTimeString().slice(0, 5),
+                  endDate: eventEnd.toISOString().slice(0, 10),
+                  endTime: eventEnd.toTimeString().slice(0, 5),
+                  long: task.__kind === 'subtask',
+                  parentTaskId: task.__kind === 'subtask' ? task.parentId || '' : '',
+                  assignee: task.assignee || '',
+                  completed: completedIdSet?.has?.(String(task.id)) || false,
+                }));
+                setShowNewTask(true);
+              } catch (error) {
+                console.error('Error al manejar clic en tarea:', error);
+              }
+            }}
+          />
+        )}
       </div>
-
-      {/* Contenedor responsivo para Calendario y Lista */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row items-stretch gap-6">
         <EventsCalendar
           currentView={currentView}
           setCurrentView={setCurrentView}
@@ -2309,13 +2313,13 @@ export default function Tasks() {
             setShowNewTask(true);
           }}
         />
-        <div className="w-full lg:w-1/3">
+        <div className="w-full lg:w-1/3 flex">
           <TaskList
             tasks={taskListItems}
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
-          onTaskClick={(event) => {
+            onTaskClick={(event) => {
             if (handleTaskIntent(event)) return;
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);
             const eventEnd = event.end instanceof Date ? event.end : new Date(event.end);
@@ -2353,7 +2357,7 @@ export default function Tasks() {
           nestedSubtasks={nestedSubtasks}
         />
       )}
-      {/* Modal: Todas las tareas agrupadas por padre */}
+      
       {showAllTasks && (
         <AllTasksModal
           isOpen={showAllTasks}
@@ -2390,40 +2394,9 @@ export default function Tasks() {
               console.error('Error al abrir tarea desde el modal:', error);
             }
           }}
-          onQuickSchedule={async (st, range) => {
-            try {
-              if (!st?.id || !st?.parentId) return;
-              // Persistencia nested (si hay permisos)
-              try {
-                if (activeWedding && db) {
-                  const ref = doc(
-                    db,
-                    'weddings', activeWedding,
-                    'tasks', String(st.parentId),
-                    'subtasks', String(st.id)
-                  );
-                  await setDoc(
-                    ref,
-                    { start: range.start, end: range.end, mode: 'scheduled', updatedAt: serverTimestamp() },
-                    { merge: true }
-                  );
-                }
-              } catch (_) {}
-              // Fallback local: actualizar subtarea plana para refrescar el modal
-              try {
-                await updateTaskFS(String(st.id), {
-                  start: range.start,
-                  end: range.end,
-                  type: 'subtask',
-                });
-              } catch (_) {}
-              // Recalcular rango del padre
-              try { await computeAndUpdateParentRange(String(st.parentId)); } catch {}
-            } catch (e) { console.warn('quickSchedule error', e); }
-          }}
         />
       )}
-      {/* Modal para nueva tarea */}
+      
       {showNewTask && (
         <TaskForm
           formData={formData}
@@ -2446,9 +2419,4 @@ export default function Tasks() {
     </div>
   );
 }
-
-
-
-
-
 

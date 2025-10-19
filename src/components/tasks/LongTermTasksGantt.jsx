@@ -66,7 +66,7 @@ export default function LongTermTasksGantt({
   const colW = Math.max(60, Number(columnWidth) || 90);
   const HEADER_HEIGHT = 56;
   const BODY_PADDING_TOP = 16;
-  const BODY_PADDING_BOTTOM = 24;
+  const BODY_PADDING_BOTTOM = 12;
 
   const debugEnabled = useMemo(() => {
     try {
@@ -323,6 +323,22 @@ export default function LongTermTasksGantt({
   const scaledWidth = monthsDiff * effectiveColW + endFrac * effectiveColW;
   const contentWidth = Math.max(scaledWidth + effectiveColW * 0.5, availableWidth);
   const horizontalOverflow = scaledWidth > availableWidth + 1;
+
+  const todayMarker = useMemo(() => {
+    try {
+      const today = normalizeAnyDate(new Date());
+      if (!today) return null;
+      if (timelineStart && today < timelineStart) return null;
+      if (timelineEnd && today > timelineEnd) return null;
+      const monthAnchor = new Date(today.getFullYear(), today.getMonth(), 1);
+      const monthsFromStart = diffMonths(monthStart, monthAnchor);
+      const clampedMonths = Math.max(0, monthsFromStart);
+      const left = clampedMonths * effectiveColW + dayFraction(today) * effectiveColW;
+      return { left, date: today };
+    } catch {
+      return null;
+    }
+  }, [monthStart, timelineStart, timelineEnd, effectiveColW]);
 
   // 6) Auto scroll a mes actual
   const scrollRef = useRef(null);
@@ -792,9 +808,9 @@ export default function LongTermTasksGantt({
 
       <div className="w-full flex items-stretch gap-3">
         {/* Columna izquierda fija */}
-        <div className="shrink-0 rounded-lg border border-gray-100 bg-white" style={{ width: leftColumnWidth, minHeight: contentHeight }}>
+        <div className="shrink-0 rounded-lg border border-gray-100 bg-white" style={{ width: leftColumnWidth, height: contentHeight }}>
           <div style={{ height: HEADER_HEIGHT, display: 'flex', alignItems: 'center', padding: '0 10px', borderBottom: '1px solid #eee', fontWeight: 600, color: '#111827' }}>Tarea</div>
-          <div style={{ position: 'relative', minHeight: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
+          <div style={{ position: 'relative', height: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
             {rows.map((row, i) => {
               const isParent = row.kind === 'parent';
               const isSegment = row.kind === 'segment';
@@ -816,6 +832,7 @@ export default function LongTermTasksGantt({
               const riskMeta = RISK_STYLES[riskLevel] || RISK_STYLES.ok;
               const riskTitle = t?.risk?.message || riskMeta.label;
               const parentBg = isParent ? riskMeta.fill : 'transparent';
+              const zebraBg = i % 2 === 0 ? 'rgba(148, 163, 184, 0.08)' : 'transparent';
               return (
                 <div
                   key={`left-${row.kind}-${row.id}-${i}`}
@@ -839,7 +856,7 @@ export default function LongTermTasksGantt({
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    background: parentBg,
+                    background: isParent ? parentBg : zebraBg,
                     borderLeft: isParent ? `3px solid ${riskMeta.accent}` : undefined,
                   }}
                 >
@@ -913,7 +930,7 @@ export default function LongTermTasksGantt({
         <div
           ref={containerRef || scrollRef}
           className="grow overflow-y-hidden mb-4 border border-gray-100 rounded-lg"
-          style={{ minHeight: contentHeight, overflowX: horizontalOverflow ? 'auto' : 'hidden' }}
+          style={{ height: contentHeight, overflowX: horizontalOverflow ? 'auto' : 'hidden' }}
           data-testid="longterm-gantt-scroll"
         >
           {/* Cabecera: años + meses */}
@@ -927,13 +944,77 @@ export default function LongTermTasksGantt({
           </div>
 
           {/* Grid + contenido */}
-          <div style={{ position: 'relative', width: contentWidth, minHeight: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
+          <div style={{ position: 'relative', width: contentWidth, height: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
             {monthLabels.map((m) => (
-              <div key={`bg-${m.key}`} style={{ position: 'absolute', left: m.left, top: 0, bottom: 0, width: effectiveColW, background: m.key % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'transparent' }} />
+              <div
+                key={`bg-${m.key}`}
+                style={{
+                  position: 'absolute',
+                  left: m.left,
+                  top: 0,
+                  bottom: 0,
+                  width: effectiveColW,
+                  background: m.key % 2 === 0 ? 'rgba(15, 23, 42, 0.03)' : 'transparent',
+                }}
+              />
+            ))}
+            {rows.map((row, rowIdx) => (
+              <div
+                key={`row-stripe-${row.id}-${rowIdx}`}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: rowIdx * rowHeight,
+                  height: rowHeight,
+                  background: rowIdx % 2 === 0 ? 'rgba(148, 163, 184, 0.05)' : 'transparent',
+                  pointerEvents: 'none',
+                }}
+              />
             ))}
             {monthLabels.map((m) => (
-              <div key={`grid-${m.key}`} style={{ position: 'absolute', left: m.left, top: 0, bottom: 0, width: 1, background: '#ececec' }} />
+              <div
+                key={`grid-${m.key}`}
+                style={{
+                  position: 'absolute',
+                  left: m.left,
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  background: '#ececec',
+                }}
+              />
             ))}
+            {monthLabels
+              .filter((m) => m.date?.getMonth?.() % 3 === 0)
+              .map((m) => (
+                <div
+                  key={`quarter-${m.key}`}
+                  style={{
+                    position: 'absolute',
+                    left: m.left,
+                    top: 0,
+                    bottom: 0,
+                    width: 2,
+                    background: 'rgba(15, 23, 42, 0.08)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              ))}
+            {todayMarker && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: todayMarker.left,
+                  top: 0,
+                  bottom: 0,
+                  width: 1,
+                  background: 'rgba(37, 99, 235, 0.5)',
+                  pointerEvents: 'none',
+                  zIndex: 11,
+                }}
+              />
+            )}
             {milestoneMarkers.map((milestone) => (
               <div
                 key={milestone.key}

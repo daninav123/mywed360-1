@@ -33,6 +33,12 @@ const ADMIN_NAVIGATION = [
         path: '/admin/broadcast',
         description: 'Comunicaciones masivas y avisos críticos controlados.',
       },
+      {
+        id: 'commerce',
+        label: 'Comerciales',
+        path: '/admin/commerce',
+        description: 'Enlaces de descuento, responsables y facturación generada.',
+      },
     ],
   },
   {
@@ -80,6 +86,12 @@ const ADMIN_NAVIGATION = [
         label: 'Global',
         path: '/admin/settings',
         description: 'Feature flags, secretos y plantillas globales.',
+      },
+      {
+        id: 'task-templates',
+        label: 'Plantillas tareas',
+        path: '/admin/task-templates',
+        description: 'Seed maestro de tareas padre/subtareas y versionado del checklist.',
       },
       {
         id: 'audit',

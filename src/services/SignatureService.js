@@ -7,22 +7,23 @@ const base = () => `${getBackendBase()}/api/signature`;
 async function getAuthToken() {
   try {
     const user = auth?.currentUser;
-    if (user?.getIdToken) {
+    if (!user?.getIdToken) {
+      throw new Error('SignatureService: autenticación requerida');
+    }
+    try {
+      return await user.getIdToken(true);
+    } catch (err) {
+      console.warn('[SignatureService] Error refrescando token, usando cache:', err);
       return await user.getIdToken();
     }
-    const profile = JSON.parse(localStorage.getItem('mywed360Profile') || '{}');
-    if (profile?.email || profile?.account?.email) {
-      const uid = profile?.uid || 'local';
-      const email = profile?.email || profile?.account?.email;
-      return `mock-${uid}-${email}`;
-    }
-  } catch (_) {}
-  return null;
+  } catch (error) {
+    throw new Error(error?.message || 'SignatureService: no se pudo obtener el token de autenticación');
+  }
 }
 
 async function authHeader(extra = {}) {
   const token = await getAuthToken();
-  return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+  return { ...extra, Authorization: `Bearer ${token}` };
 }
 
 export async function createSignatureRequest(weddingId, documentMeta, signers = []) {
@@ -63,4 +64,3 @@ export async function updateSignatureStatus(weddingId, signatureId, updates) {
   if (!res.ok) throw new Error('updateSignatureStatus failed');
   return res.json();
 }
-

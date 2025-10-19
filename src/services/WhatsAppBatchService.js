@@ -1,54 +1,81 @@
-// src/services/WhatsAppBatchService.js
 // Servicio de alto nivel para solicitar al backend la generación de un lote
-// de mensajes de WhatsApp y devolver la lista { phone, message, guestId }
-// Si el backend aún no está implementado, resolvemos con un mock para seguir
-// avanzando en el frontend.
+// de mensajes de WhatsApp y devolver la lista { phone, message, guestId }.
+// Cuando el backend responde con error, propagamos la excepción para que
+// el frontend gestione la incidencia (sin recurrir a mocks silenciosos).
 
-const BASE = import.meta.env.VITE_BACKEND_BASE_URL || import.meta.env.VITE_BACKEND_URL || '';
+import { getBackendBase } from '../utils/backendBase';
+
+async function getAuthToken() {
+  try {
+    const mod = await import('../firebaseConfig');
+    const { auth } = mod;
+    const user = auth?.currentUser;
+    if (user?.getIdToken) {
+      try {
+        const forced = await user.getIdToken(true);
+        if (forced) return forced;
+      } catch {
+        // Ignorar y continuar con el token normal
+      }
+      return await user.getIdToken();
+    }
+  } catch {
+    // Ignorar: el token es opcional
+  }
+  return null;
+}
+
+function buildEndpoint() {
+  const base = getBackendBase();
+  const normalized = base ? base.replace(/\/$/, '') : '';
+  return normalized ? `${normalized}/api/whatsapp/batch` : '/api/whatsapp/batch';
+}
+
+function assertInput({ weddingId, guestIds, messageTemplate }) {
+  if (!weddingId) {
+    throw new Error('weddingId es obligatorio');
+  }
+  if (!Array.isArray(guestIds) || guestIds.length === 0) {
+    throw new Error('guestIds debe ser un array con al menos un elemento');
+  }
+  if (!messageTemplate || typeof messageTemplate !== 'string') {
+    throw new Error('messageTemplate es obligatorio');
+  }
+}
 
 export async function sendBatch({ weddingId, guestIds, messageTemplate }) {
-  // Intenta obtener token Firebase para cabecera Authorization
-  async function getAuthToken() {
-    try {
-      const mod = await import('../firebaseConfig');
-      const { auth } = mod;
-      const u = auth?.currentUser;
-      if (u?.getIdToken) {
-        try {
-          const t = await u.getIdToken(true);
-          if (t) return t;
-        } catch {}
-        return await u.getIdToken();
-      }
-    } catch {}
-    return null;
-  }
-  try {
-    const token = await getAuthToken();
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
-    const base = BASE ? BASE.replace(/\/$/, '') : '';
-    const url = base ? `${base}/api/whatsapp/batch` : '/api/whatsapp/batch';
-    const res = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ weddingId, guestIds, messageTemplate }),
-    });
+  assertInput({ weddingId, guestIds, messageTemplate });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json(); // { batchId, items: [{phone, message, guestId}] }
-  } catch (err) {
-    console.warn('WhatsAppBatchService fallback mock:', err.message);
-    // Fallback mock: simplemente arma mensajes concatenando número y plantilla
-    return {
-      batchId: 'mock-' + Date.now(),
-      items: guestIds.map((id, idx) => ({
-        guestId: id,
-        phone: '+346000000' + String(idx).padStart(2, '0'),
-        message: messageTemplate.replace('{guestName}', `Invitado ${idx + 1}`),
-      })),
-    };
+  const token = await getAuthToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const response = await fetch(buildEndpoint(), {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ weddingId, guestIds, messageTemplate }),
+  });
+
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
   }
+
+  if (!response.ok || (payload && payload.success === false)) {
+    const message =
+      payload?.error ||
+      payload?.message ||
+      `Error creando lote de WhatsApp (HTTP ${response.status})`;
+    throw new Error(message);
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Respuesta inválida del backend de WhatsApp');
+  }
+
+  return payload;
 }

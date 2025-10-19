@@ -4,27 +4,31 @@
 
 /* Variables de color (Claro / Oscuro) */
 :root {
-  --color-bg: #fff9db;
+  --color-bg: #F7F1E7;
   --color-surface: #ffffff;
   --color-text: #1f2937;
-  --color-primary: #8acbff;
-  --color-accent: #ffe4f2;
+  --color-primary: #5ebbff;
+  --color-accent: #5ebbff;
   /* Extended tokens */
   --color-success: #22c55e; /* green-500 */
   --color-warning: #f59e0b; /* amber-500 */
   --color-danger: #ef4444; /* red-500 */
   --color-info: #0ea5e9; /* sky-500 */
   /* Derived tokens */
-  --color-border: rgba(31, 41, 55, 0.15);
-  --color-muted: rgba(31, 41, 55, 0.7);
+  --color-border: rgba(31, 41, 55, 0.14);
+  --color-muted: rgba(31, 41, 55, 0.72);
   --radius-md: 0.75rem;
+  /* Layout tokens */
+  --layout-max-width: 1120px;
+  --layout-wide-width: 1280px;
+  --layout-padding: clamp(16px, 4vw, 32px);
 }
 .dark {
   --color-bg: #1f2937;
   --color-surface: #111827;
   --color-text: #f3f4f6;
-  --color-primary: #2563eb;
-  --color-accent: #db2777;
+  --color-primary: #5ebbff;
+  --color-accent: #5ebbff;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
@@ -95,7 +99,7 @@ input[type='number'] {
   }
 }
 
-/* Utilities semánticas basadas en tokens (para migración gradual) */
+/* Utilities sem?nticas basadas en tokens (para migraci?n gradual) */
 @layer utilities {
   .bg-app {
     background-color: var(--color-bg);
@@ -105,6 +109,18 @@ input[type='number'] {
   }
   .border-primary {
     border-color: var(--color-primary);
+  }
+  .border-success {
+    border-color: var(--color-success);
+  }
+  .border-warning {
+    border-color: var(--color-warning);
+  }
+  .border-danger {
+    border-color: var(--color-danger);
+  }
+  .border-info {
+    border-color: var(--color-info);
   }
   .text-body {
     color: var(--color-text);
@@ -127,6 +143,18 @@ input[type='number'] {
   }
   .hover\:bg-primary-soft:hover {
     background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+  .bg-success-soft {
+    background-color: color-mix(in srgb, var(--color-success) 18%, transparent);
+  }
+  .bg-warning-soft {
+    background-color: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  }
+  .bg-danger-soft {
+    background-color: color-mix(in srgb, var(--color-danger) 18%, transparent);
+  }
+  .bg-info-soft {
+    background-color: color-mix(in srgb, var(--color-info) 18%, transparent);
   }
   .text-primary {
     color: var(--color-primary);
@@ -163,9 +191,9 @@ input[type='number'] {
   }
 }
 
-/* Componentes reutilizables de layout (títulos y pestañas) */
+/* Componentes reutilizables de layout (t?tulos y pesta?as) */
 @layer components {
-  /* Cabecera de página: título a la izquierda, acciones a la derecha */
+  /* Cabecera de p?gina: t?tulo a la izquierda, acciones a la derecha */
   .page-header {
     @apply flex items-center justify-between flex-wrap gap-2 mb-6;
   }
@@ -173,7 +201,7 @@ input[type='number'] {
     @apply flex gap-2;
   }
 
-  /* Navegación de pestañas (referencia: Proveedores) */
+  /* Navegaci?n de pesta?as (referencia: Proveedores) */
   .tabs-nav {
     @apply flex gap-2 border-b;
     border-color: var(--color-border);
@@ -192,4 +220,32 @@ input[type='number'] {
     color: var(--color-primary);
     opacity: 1;
   }
+  /* Contenedores de p?gina responsivos */
+  .layout-container {
+    width: min(100%, var(--layout-max-width));
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--layout-padding);
+    padding-right: var(--layout-padding);
+  }
+  .layout-container-wide {
+    width: min(100%, var(--layout-wide-width));
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--layout-padding);
+    padding-right: var(--layout-padding);
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

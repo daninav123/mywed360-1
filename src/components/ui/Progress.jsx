@@ -4,6 +4,8 @@ function Progress({ value, max = 100, variant = 'primary', className = '' }) {
     switch (variant) {
       case 'success':
         return 'bg-[var(--color-success)]';
+      case 'warning':
+        return 'bg-[var(--color-warning)]';
       case 'destructive':
       case 'danger':
         return 'bg-[var(--color-danger)]';

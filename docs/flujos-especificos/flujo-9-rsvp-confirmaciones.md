@@ -69,6 +69,8 @@
 - `cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js, cypress/e2e/rsvp/rsvp_invalid_token.cy.js y cypress/e2e/rsvp/rsvp_reminders.cy.js`: prueban confirmaciones por enlace, manejo de tokens inválidos y recordatorios automatizados.
 - `cypress/e2e/rsvp/rsvp_confirm.cy.js y cypress/e2e/invitaciones_rsvp.cy.js`: validan la experiencia completa de RSVP y envío de invitaciones digitales.
 
+- `cypress/e2e/rsvp_confirm.cy.js`: smoke legacy del flujo corto `/rsvp/:token` para compatibilidad.
+
 ## 10. Checklist de despliegue
 - Reglas Firestore para colecciones `rsvp`, `rsvpLogs`, `invitations` con seguridad por rol.
 - Configurar `MAILGUN_*`, `WHATSAPP_PROVIDER` (si aplica) y plantillas de email con enlaces tracking.
@@ -81,3 +83,4 @@
 - Tablero de analytics con conversion por canal y motivos de declinacion.
 - Integracion directa con proveedores de catering para menus y alergias.
 - Automatizar mensajes de follow-up tras la boda (agradecimientos).
+

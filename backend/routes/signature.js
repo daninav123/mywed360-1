@@ -1,14 +1,42 @@
 import express from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { createSignatureRequest, listSignatureRequests, updateSignatureStatus, getSignatureStatus } from '../services/signatureService.js';
+import {
+  createSignatureRequest,
+  listSignatureRequests,
+  updateSignatureStatus,
+  getSignatureStatus,
+} from '../services/signatureService.js';
 
 const router = express.Router();
 
-// Crear solicitud de firma digital (stub)
+function buildActor(req) {
+  try {
+    const profile = req.userProfile || {};
+    const user = req.user || {};
+    return {
+      uid: user.uid || profile.uid || null,
+      email: profile.email || user.email || null,
+      name: profile.displayName || profile.name || user.name || user.email || null,
+      role: profile.role || null,
+    };
+  } catch {
+    return { uid: null, email: null, name: null, role: null };
+  }
+}
+
+// Crear solicitud de firma digital con envío real de notificaciones
 router.post('/create', requireAuth, async (req, res) => {
   try {
-    const { weddingId, documentMeta, signers } = req.body || {};
-    const payload = await createSignatureRequest(weddingId, documentMeta, signers || []);
+    const { weddingId, documentMeta, signers, sendEmails, skipEmails } = req.body || {};
+    const payload = await createSignatureRequest(
+      weddingId,
+      documentMeta,
+      signers || [],
+      {
+        actor: buildActor(req),
+        disableEmail: sendEmails === false || skipEmails === true,
+      },
+    );
     res.json({ success: true, request: payload });
   } catch (e) {
     res.status(400).json({ success: false, error: e?.message || 'createSignature error' });

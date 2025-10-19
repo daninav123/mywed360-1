@@ -1,5 +1,8 @@
 ﻿# 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08
 
+> Referencia principal del descubrimiento personalizado: `docs/flujos-especificos/flujo-2-descubrimiento-personalizado.md`.
+> Este documento cubre el wizard legacy de creación rápida. Mantén ambos sincronizados hasta completar la migración.
+
 > Implementado: `src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios `createWedding` y `seedDefaultTasksForWedding`, catálogo `src/config/eventStyles.js`.
 > Pendiente: habilitar opt-in a planner desde Perfil, paneles/alertas para la telemetría del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
 

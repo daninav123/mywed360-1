@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="malove-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5c8d" />
+      <stop offset="100%" stop-color="#ff95b4" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="180" height="180" rx="45" fill="url(#malove-gradient)" />
+  <path d="M75 70h20l15 50 15-50h20l10 70h-20l-5-35-16 35h-10l-16-35-4 35H65l10-70Z" fill="#ffffff" />
+  <path d="M65 140c0-9 7-16 16-16h38c9 0 16 7 16 16v6H65Z" fill="rgba(255,255,255,0.25)" />
+</svg>

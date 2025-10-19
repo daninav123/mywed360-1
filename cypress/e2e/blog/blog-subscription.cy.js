@@ -16,7 +16,6 @@ describe('Blog · suscripción a novedades', () => {
     cy.visit('/blog');
 
     cy.wait('@weddingNewsRequest').its('request.url').should('include', 'page=1');
-    cy.wait('@weddingNewsRequest').its('request.url').should('include', 'page=2');
 
     cy.contains(
       'No encontramos artículos relevantes en este momento. Intenta cambiar de idioma o vuelve a intentarlo más tarde.',

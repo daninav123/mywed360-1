@@ -1,12 +1,13 @@
-# 22. Navegacion y Panel General (estado 2025-10-07)
+﻿# 22. Navegacion y Panel General (estado 2025-10-07)
 
-> Implementado: `Home.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`).
+> Implementado: `HomeUser.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`).
 > Pendiente: unificar dashboard con metricas en vivo, proteger herramientas internas y agregar actividad reciente + estado de sincronizacion.
 
 ## 1. Objetivo y alcance
 - Ofrecer panel de control central con accesos rapidos a modulos y resumen de estado.
 - Gestionar navegacion global, perfil del usuario y recursos de soporte.
 - Facilitar diagnostico en ambientes internos con herramientas de seed (solo dev).
+- Mostrar la “Salud del perfil” y mapa de preferencias (core vs contrastes) aprovechando datos del flujo 2C, guiando a la pareja con CTA proactivos.
 
 ## 2. Trigger y rutas
 - Menú inferior → pestaña **Inicio** (`/home`, `Dashboard.jsx`) como landing por defecto.
@@ -15,8 +16,8 @@
 
 ## 3. Paso a paso UX
 1. Dashboard principal
-   - Widgets configurables (progreso checklist, presupuesto, invitados, timeline, comunicacion).
-   - CTA destacados (crear boda, invitar colaboradores, personalizar sitio, configurar email).
+   - Widgets configurables (progreso checklist, presupuesto, invitados, timeline, comunicacion) más nuevos módulos `Mapa de preferencias` y `Salud del perfil` (StyleMeter, alertas de contraste, gaps).
+   - CTA destacados (crear boda, invitar colaboradores, personalizar sitio, configurar email) complementados con sugerencias IA contextuales (“Confirmar speakeasy”, “Completar perfil”).
    - Estado del plan (free/premium) y banners de actualizacion.
 2. Navegacion secundaria
    - Menu lateral/encabezado con accesos a todos los flujos.
@@ -35,6 +36,7 @@
 
 ## 5. Reglas de negocio
 - Dashboard debe reflejar boda activa (`WeddingContext.activeWeddingId`).
+- Widget `Mapa de preferencias` solo aparece si existe `weddingInsights.styleWeights`; de lo contrario muestra CTA para completar el perfil.
 - Herramientas dev visibles solo en entornos autorizados (flag `VITE_ENABLE_DEV_TOOLS`).
 - Perfil solo editable por owner/planner; assistants ven informacion limitada.
 - Cambios de plan requieren confirmacion y sincronizacion con billing.
@@ -46,14 +48,15 @@
 - Carga inicial muestra skeletons para evitar flash de contenido.
 
 ## 7. Integracion con otros flujos
-- Consume estadisticas de flujos 3,4,6,9,14,17 para widgets.
+- Consume estadísticas de flujos 2C,3,4,5,6,7,9,14,17 para widgets (mapa de preferencias, checklist, presupuesto, comunicación).
 - Accesos directos disparan wizards (Crear boda, Configurar email, Generar sitio web).
+- Widget “Salud del perfil” abre directamente el flujo 2C para resolver `profileGaps`, `style_balance_alert` y contrastes pendientes.
 - Perfil sincroniza preferencias de notificacion (Flujo 12) y gamificacion (Flujo 17).
 - Herramientas dev ayudan a testear flujos de invitados/finanzas.
 
 ## 8. Metricas y monitorizacion
-- Eventos: `dashboard_widget_clicked`, `dashboard_widget_hidden`, `profile_updated`, `more_menu_opened`.
-- Indicadores: recurrencia de visitas al dashboard, widgets mas usados, tasa de conversion de CTA.
+- Eventos: `dashboard_widget_clicked`, `dashboard_widget_hidden`, `profile_updated`, `more_menu_opened`, `dashboard_stylemeter_alert_opened`, `dashboard_preference_pack_clicked`.
+- Indicadores: recurrencia de visitas al dashboard, widgets mas usados, tasa de conversion de CTA, ratio de resolucion de `profileGaps` y tiempo medio en cerrar alertas de contraste.
 - Monitoreo de errores de carga de widgets y latencia en agregados.
 
 ## 9. Pruebas recomendadas
@@ -100,3 +103,6 @@
 - Helper Cypress (`cy.openGlobalSearch()`) que simule atajo; requiere listeners en `GlobalSearch`.
 - Fixtures o MSW para popular `GlobalSearch` y widgets sin depender de Firestore real.
 - Flag `VITE_ENABLE_DEV_TOOLS` expuesto en entorno de prueba para mostrar panel de diagnóstico.
+
+
+

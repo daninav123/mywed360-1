@@ -1,132 +1,70 @@
-# Documentación MyWed360
+# Documentación MaLove.App
 
-## 📋 Índice General
+Bienvenido al repositorio de documentación interna del proyecto. Este índice resume qué encontrar en `docs/` y cómo mantenerse alineado con el estado real del desarrollo.
 
-### 👥 **Para Usuarios Finales**
-- [`manual-usuario.md`](./manual-usuario.md) - Guía completa de uso de la aplicación
+## 📋 Índice rápido
 
-### 🔧 **Para Desarrolladores**
+- [`personalizacion/`](./personalizacion/README.md) · Narrativa de producto, preguntas clave y assets de recomendación.
+- [`flujos-especificos/flujo-2c-personalizacion-continua.md`](./flujos-especificos/flujo-2c-personalizacion-continua.md) · Orquestación IA continua de preferencias y recomendaciones.
+- [`manual-usuario.md`](./manual-usuario.md) · Guía para usuarios finales.
+- [`arquitectura-completa.md`](./arquitectura-completa.md) · Visión técnica y diagramas.
+- [`flujos-usuario.md`](./flujos-usuario.md) · Descripción general de todos los flujos funcionales.
+- [`ROADMAP.md`](./ROADMAP.md) · Fuente canónica de estado, prioridades y métricas.
+- [`TODO.md`](./TODO.md) · Backlog operativo (se actualiza junto al roadmap).
+- [`estimacion-horas-lanzamiento.md`](./estimacion-horas-lanzamiento.md) · Estimaciones (ver notas de vigencia).
+- [`flujos-especificos/`](./flujos-especificos) · 40 documentos con detalle por flujo.
+- [`monitoring/`](./monitoring) · Guías de Prometheus, Alertmanager y tableros Grafana.
+- [`refactoring/`](./refactoring) · Cambios estructurales relevantes (ej. `finance-refactor.md`).
+- [`archive/`](./archive) · Históricos que se mantienen como referencia.
 
-#### **Documentación Principal**
-- [`arquitectura-completa.md`](./arquitectura-completa.md) - Arquitectura técnica y diagramas
-- [`flujos-usuario.md`](./flujos-usuario.md) - Especificación técnica de todos los flujos
-- [`roadmap-2025-v2.md`](./roadmap-2025-v2.md) - Estado actual y roadmap de desarrollo
-- [`estimacion-horas-lanzamiento.md`](./estimacion-horas-lanzamiento.md) - Planificación y estimaciones
+> `docs/roadmap-2025-v2.md` queda como snapshot (09/10/2025). Usa `docs/ROADMAP.md` para decisiones actuales.
 
-#### **Flujos Específicos Detallados**
-- [`flujos-especificos/flujo-3-gestion-invitados.md`](./flujos-especificos/flujo-3-gestion-invitados.md)
-- [`flujos-especificos/flujo-4-invitados-operativa.md`](./flujos-especificos/flujo-4-invitados-operativa.md)
-- [`flujos-especificos/flujo-5-proveedores-ia.md`](./flujos-especificos/flujo-5-proveedores-ia.md)
-- [`flujos-especificos/flujo-5-timeline-tareas.md`](./flujos-especificos/flujo-5-timeline-tareas.md)
-- [`flujos-especificos/flujo-6-presupuesto.md`](./flujos-especificos/flujo-6-presupuesto.md)
-- [`flujos-especificos/flujo-7-comunicacion-emails.md`](./flujos-especificos/flujo-7-comunicacion-emails.md)
-- [`flujos-especificos/flujo-8-diseno-web-personalizacion.md`](./flujos-especificos/flujo-8-diseno-web-personalizacion.md)
-- [`flujos-especificos/flujo-9-rsvp-confirmaciones.md`](./flujos-especificos/flujo-9-rsvp-confirmaciones.md)
-- [`flujos-especificos/flujo-10-gestion-bodas-multiples.md`](./flujos-especificos/flujo-10-gestion-bodas-multiples.md)
-- [`flujos-especificos/flujo-11-protocolo-ceremonias.md`](./flujos-especificos/flujo-11-protocolo-ceremonias.md)
-- [`flujos-especificos/flujo-12-notificaciones-configuracion.md`](./flujos-especificos/flujo-12-notificaciones-configuracion.md)
-- *(Integrado en flujo 4)* [`flujos-especificos/flujo-4-invitados-operativa.md`](./flujos-especificos/flujo-4-invitados-operativa.md)
-- [`flujos-especificos/flujo-14-checklist-avanzado.md`](./flujos-especificos/flujo-14-checklist-avanzado.md)
-- [`flujos-especificos/flujo-15-contratos-documentos.md`](./flujos-especificos/flujo-15-contratos-documentos.md)
-- [`flujos-especificos/flujo-16-asistente-virtual-ia.md`](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
-- [`flujos-especificos/flujo-17-gamificacion-progreso.md`](./flujos-especificos/flujo-17-gamificacion-progreso.md)
-- [`flujos-especificos/flujo-18-generador-documentos-legales.md`](./flujos-especificos/flujo-18-generador-documentos-legales.md)
+## 🎯 Estado del proyecto (resumen)
 
-#### **Documentación Técnica**
-- [`refactoring/finance-refactor.md`](./refactoring/finance-refactor.md) - Refactorización del módulo Finance
-- [`authentication-system.md`](./authentication-system.md) - Sistema de autenticación
-- [`i18n.md`](./i18n.md) - Internacionalización
-- [`deploy-backend.md`](./deploy-backend.md) - Despliegue del backend
-- [`planes-suscripcion.md`](./planes-suscripcion.md) - Planes de suscripción y precios
-- [`sistema-roles-tecnico.md`](./sistema-roles-tecnico.md) - Sistema de roles técnico
-- [`performance-optimizations.md`](./performance-optimizations.md) - Optimizaciones de rendimiento
-- [`lint-accesibilidad.md`](./lint-accesibilidad.md) - Guías de accesibilidad
+- **Core refactorizado** ⇢ Seating Plan, Finance e Invitados cuentan con componentes modulares nuevos y hooks (`useSeatingPlan`, `useFinance`, `useGuests`). Revisar pendientes de colaboración, móviles y exportación en `docs/TODO.md`.
+- **Personalización liderada por IA** ⇢ El perfil de boda captura estilo, prioridades y restricciones; sus datos alimentan recomendaciones en checklist, proveedores, presupuesto y contenido (`docs/personalizacion/README.md` y `docs/flujos-especificos/flujo-2-descubrimiento-personalizado.md`).
+- **IA & automatización** ⇢ Proveedores, emails y diseño web tienen MVP funcional; continúan abiertos pagos Stripe, publicación de sitios y métricas IA (`docs/ROADMAP.md`, secciones 4, 6 y 20).
+- **Protocolo (flujos 11–11E)** ⇢ Documentación funcional completa, implementación marcada como “pendiente” (drag & drop, subcolecciones, alertas).
+- **Notificaciones** ⇢ Centro in-app operativo; push, workers y asistente virtual en curso (`docs/ROADMAP.md` flujo 12 y `TODO` sección “Asistente virtual e IA”).
+- **Seguimiento** ⇢ Incidentes operativos en `docs/incidents/YYYY-MM-DD_task_errors.md`. Ejecutar `scripts/aggregateRoadmap.js` tras actualizar flujos para sincronizar ROADMAP/TODO.
 
-#### **Documentos Históricos**
-- [`archive/seating-plan-refactor.md`](./archive/seating-plan-refactor.md) - Refactorización SeatingPlan (histórico)
-- [`archive/seating-plan-validation-report.md`](./archive/seating-plan-validation-report.md) - Validación SeatingPlan (histórico)
+## ⏱️ Estimaciones
 
-## 🎯 **Estado del Proyecto**
+Las cifras de `docs/estimacion-horas-lanzamiento.md` (agosto 2025) calculan 80–100 h para el MVP. Valida dependencias externas (Stripe, automatizaciones, i18n) antes de reutilizar esos números: varias actividades siguen abiertas.
 
-### ✅ **Completado (100%)**
-- **SeatingPlan**: Refactorizado en 7 componentes modulares + hook useSeatingPlan
-- **Finance**: Refactorizado en 9 componentes modulares + hook useFinance
-- **Invitados**: Refactorizado en 3 componentes modulares + hook useGuests
-- **Sistema de Emails**: Funcional con análisis IA y plantillas automáticas
-- **Búsqueda Global**: GlobalSearch.jsx implementado
-- **Centro de Notificaciones**: NotificationCenter.jsx funcional
-- **Documentación Completa**: 18 flujos específicos documentados
-- **Sistema de Roles**: Owner, Wedding Planner, Ayudante definidos
-- **Planes de Suscripción**: Estructura comercial completa
+## 📊 Métricas útiles
 
-### 🚧 **En Desarrollo**
-- **Diseño Web con IA**: Generación automática por prompts
-- **Sistema de Proveedores**: 85% completado
-- **Timeline y Tareas**: 30% completado
-- **RSVP Avanzado**: Sistema de confirmaciones inteligente
+- **Documentos en `docs/`**: 120+ (40 flujos, 6 guías de monitorización, 4 incidentes, etc.). Usa `rg --files docs` para listar.
+- **Hooks clave**: `src/hooks/useFinance.js`, `src/hooks/useSeatingPlan.js`, `src/hooks/useGuests.js`, `src/hooks/useTranslations.js`.
+- **Consolidación pendiente**: `docs/consolidacion-documentacion.md` detalla los restos del sistema de emails y otros duplicados todavía por limpiar.
 
-### ⏱️ **Estimación para Lanzamiento MVP**
-**80-100 horas (2-3 semanas trabajando 8h/día)**
-
-## 📊 **Métricas del Proyecto**
-
-- **Archivos de documentación**: 23 archivos organizados (18 flujos específicos + documentos técnicos)
-- **Duplicación eliminada**: 17 archivos duplicados del sistema de emails eliminados
-- **Componentes refactorizados**: 3 módulos principales completamente modulares
-- **Hooks personalizados**: 4 hooks implementados (useFinance, useSeatingPlan, useGuests, useTranslations)
-- **Flujos documentados**: 18 flujos específicos completos con estructura de datos
-- **Cobertura funcional**: 95% de funcionalidades principales documentadas
-
-## 🗂️ **Estructura de Carpetas**
+## 🗂️ Árbol base
 
 ```
 docs/
-├── README.md                           # Este archivo
-├── manual-usuario.md                   # Manual para usuarios finales
-├── arquitectura-completa.md            # Arquitectura técnica
-├── roadmap-2025-v2.md                 # Roadmap y estado actual
-├── estimacion-horas-lanzamiento.md    # Planificación desarrollo
-├── flujos-usuario.md                  # Especificación técnica general
-├── planes-suscripcion.md              # Planes comerciales y precios
-├── flujos-especificos/                # Flujos detallados por módulo (18 flujos)
-│   ├── flujo-3-gestion-invitados.md
-│   ├── flujo-4-invitados-operativa.md
-│   ├── flujo-5-proveedores-ia.md
-│   ├── flujo-5-timeline-tareas.md
-│   ├── flujo-6-presupuesto.md
-│   ├── flujo-7-comunicacion-emails.md
-│   ├── flujo-8-diseno-web-personalizacion.md
-│   ├── flujo-9-rsvp-confirmaciones.md
-│   ├── flujo-10-gestion-bodas-multiples.md
-│   ├── flujo-11-protocolo-ceremonias.md
-│   ├── flujo-12-notificaciones-configuracion.md
-│   ├── flujo-14-checklist-avanzado.md
-│   ├── flujo-15-contratos-documentos.md
-│   ├── flujo-16-asistente-virtual-ia.md
-│   ├── flujo-17-gamificacion-progreso.md
-│   └── flujo-18-generador-documentos-legales.md
-├── refactoring/                       # Documentación de refactoring
-│   └── finance-refactor.md
-└── archive/                          # Documentos históricos
-    ├── seating-plan-refactor.md
-    └── seating-plan-validation-report.md
+├── README.md                     # Este índice
+├── ROADMAP.md                    # Estado y prioridades (fuente única)
+├── TODO.md                       # Backlog operativo sincronizado con ROADMAP
+├── arquitectura-completa.md      # Arquitectura
+├── estimacion-horas-lanzamiento.md
+├── flujos-usuario.md
+├── flujos-especificos/           # 40 documentos de flujos
+├── manual-usuario.md
+├── monitoring/
+├── refactoring/
+├── roadmap-2025-v2.md            # Snapshot histórico (09/10/2025)
+└── archive/
 ```
 
-## 🚀 **Próximos Pasos**
+## 🚀 Cómo seguir trabajando
 
-### **Esta Semana**
-1. Implementar generador IA de sitios web con prompts
-2. Desarrollar análisis automático de emails con IA
-3. Completar sistema de roles (Owner/Wedding Planner/Ayudante)
-
-### **Próximo Mes**
-1. Finalizar sistema de contratos y documentos
-2. Implementar checklist avanzado con automatización
-3. Desarrollar sistema de notificaciones inteligentes
-4. Completar funcionalidades de wedding planners
+1. Consulta `docs/ROADMAP.md` para prioridades por flujo y sprint.
+2. Revisa `docs/TODO.md` para entregables operativos y su estado.
+3. Ejecuta `node scripts/aggregateRoadmap.js` tras modificar flujos o el backlog (mantiene consistencia entre ROADMAP y TODO).
+4. Completa las guías en `docs/ENVIRONMENT.md` antes de compartir un `.env` (ver sección “Configuración” para detalles actualizados).
+5. Recuerda que el backend Express se levanta localmente en `http://localhost:4004`; Vite proxy ya apunta a ese puerto salvo que definas `VITE_BACKEND_BASE_URL`.
 
 ---
 
-**Última actualización**: 26 de agosto de 2025  
-**Mantenido por**: Equipo de Desarrollo MyWed360  
-**Documentación**: 18 flujos específicos + 9 documentos técnicos
+**Última actualización**: 13 de octubre de 2025  
+**Contacto**: Equipo de Desarrollo MaLove.APP

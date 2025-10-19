@@ -11,6 +11,13 @@ Componentes clave:
 - Backend externo: `VITE_BACKEND_BASE_URL` (Render) para endpoints REST auxiliares.
 - Integraciones: Mailgun (correo), OpenAI (IA), WhatsApp Business API vía backend.
 
+## Personalización y recomendaciones
+
+- `WeddingContext` expone `weddingProfile` y `weddingInsights` (derivados del flujo 2).
+- Hooks como `useChecklistRecommendations`, `useSupplierSuggestions` y `useBudgetAdvisor` consumen esos datos para mostrar acciones guiadas.
+- El backend IA (`/api/ai/*`) recibe el perfil y devuelve sugerencias que se almacenan como `recommendations` (Firestore) o `insights` (cache local).
+- Eventos analíticos (`recommendation_shown`, `recommendation_applied`) alimentan dashboards y ajustes de prompts.
+
 ## Módulos y Contextos
 
 - `WeddingContext`: control de boda activa y datos compartidos por vistas.

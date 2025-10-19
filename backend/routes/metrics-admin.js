@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
+import admin from 'firebase-admin';
 
 // Admin metrics API
 // Mounted at /api/admin/metrics with ipAllowlist + requireAdmin in index.js
@@ -418,6 +419,98 @@ router.get('/web-vitals', async (req, res) => {
     return res.json({ items, count: items.length, timestamp: Date.now() });
   } catch (e) {
     return res.status(500).json({ error: 'web-vitals-failed' });
+  }
+});
+
+router.post('/backfill', async (req, res) => {
+  try {
+    const { module, weddingId, days } = req.body || {};
+    const mod = String(module || '').trim();
+    if (!mod) return res.status(400).json({ error: 'missing-module' });
+    const limitDays = Math.max(1, Math.min(365, Number(days || 90)));
+    const now = new Date();
+    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const start = new Date(end);
+    start.setUTCDate(start.getUTCDate() - (limitDays - 1));
+    const startTs = new Date(start);
+
+    const db = admin.firestore();
+    const map = new Map();
+    const push = (wid, day, ev) => {
+      const key = `${wid}|${day}`;
+      const cur = map.get(key) || { totals: { events: 0, alerts: 0, errors: 0 }, breakdown: {} };
+      cur.totals.events += 1;
+      if (ev === 'budget_over_threshold') cur.totals.alerts += 1;
+      if (ev.startsWith('error') || ev === 'email_bounced') cur.totals.errors += 1;
+      cur.breakdown[ev] = (cur.breakdown[ev] || 0) + 1;
+      map.set(key, cur);
+    };
+
+    const fmt = (d) => {
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+
+    const q1 = db.collection('projectMetrics_events')
+      .where('module', '==', mod)
+      .where('eventAt', '>=', startTs);
+    const q1Final = weddingId ? q1.where('weddingId', '==', String(weddingId)) : q1;
+    const snap1 = await q1Final.get();
+    for (const doc of snap1.docs) {
+      const d = doc.data() || {};
+      const wid = String(d.weddingId || '').trim();
+      if (!wid) continue;
+      const when = (d.eventAt && typeof d.eventAt.toDate === 'function') ? d.eventAt.toDate() : new Date();
+      const day = fmt(when);
+      if (when < start || when > end) continue;
+      const ev = String(d.event || '').trim();
+      if (!ev) continue;
+      push(wid, day, ev);
+    }
+
+    const q2 = db.collection('projectMetrics_events')
+      .where('module', '==', mod)
+      .where('eventAt', '==', null);
+    const q2Final = weddingId ? q2.where('weddingId', '==', String(weddingId)) : q2;
+    const snap2 = await q2Final.get();
+    for (const doc of snap2.docs) {
+      const d = doc.data() || {};
+      const wid = String(d.weddingId || '').trim();
+      if (!wid) continue;
+      const when = (d.receivedAt && typeof d.receivedAt.toDate === 'function') ? d.receivedAt.toDate() : new Date();
+      const day = fmt(when);
+      if (when < start || when > end) continue;
+      const ev = String(d.event || '').trim();
+      if (!ev) continue;
+      push(wid, day, ev);
+    }
+
+    const updates = Array.from(map.entries());
+    const batches = [];
+    for (let i = 0; i < updates.length; i += 500) {
+      const slice = updates.slice(i, i + 500);
+      const b = db.batch();
+      for (const [key, val] of slice) {
+        const [wid, day] = key.split('|');
+        const ref = db.collection('projectMetrics').doc(wid).collection('modules').doc(mod).collection('daily').doc(day);
+        const totals = val.totals || {};
+        const breakdown = val.breakdown || {};
+        const breakdownMap = {};
+        for (const [k, v] of Object.entries(breakdown)) breakdownMap[k] = v;
+        b.set(ref, { totals, breakdown: breakdownMap, metadata: { computedAt: admin.firestore.FieldValue.serverTimestamp(), version: '2025.10.1' } }, { merge: true });
+      }
+      batches.push(b);
+    }
+    for (const b of batches) {
+      try { await b.commit(); } catch {}
+      await new Promise((r) => setTimeout(r, 200));
+    }
+
+    return res.json({ ok: true, days: limitDays, module: mod, updated: updates.length });
+  } catch (e) {
+    return res.status(500).json({ error: 'backfill-failed' });
   }
 });
 

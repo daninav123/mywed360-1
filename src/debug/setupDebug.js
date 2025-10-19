@@ -1,5 +1,6 @@
 // Configura manejadores globales de errores para registrar fallos inesperados
 import { performanceMonitor } from '../services/PerformanceMonitor';
+const HARD_RELOADS = !!(typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ENABLE_HARD_RELOADS === 'true');
 
 function isViteOutdatedOptimizeError(event) {
   const message = String(event?.message || event?.error?.message || '');
@@ -15,6 +16,7 @@ function isViteOutdatedOptimizeError(event) {
 
 function triggerViteHardReload() {
   if (typeof window === 'undefined') return;
+  if (!HARD_RELOADS) return;
   if (window.__viteForceReloadLock) return;
   const last = Number(window.__viteReloadAt || 0);
   if (Date.now() - last < 4000) return;

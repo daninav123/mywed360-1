@@ -231,7 +231,7 @@ const EmailComposer = ({ isOpen, onClose, initialValues = {}, onSend }) => {
         if (Number.isNaN(scheduleDate.getTime())) {
           throw new Error('Fecha y hora no válidas');
         }
-        scheduleEmailSend({ to, cc, subject, body }, scheduleDate.toISOString());
+        await scheduleEmailSend({ to, cc, subject, body }, scheduleDate.toISOString());
         setSuccess('Correo programado correctamente');
         if (onSend) {
           onSend({ scheduled: true, scheduledAt: scheduleDate.toISOString() });

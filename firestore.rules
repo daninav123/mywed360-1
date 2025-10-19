@@ -327,5 +327,16 @@ service cloud.firestore {
     match /supportTickets/{docId} {
       allow read, write: if false;
     }
+
+    // Project Metrics: lectura para colaboradores de la boda; escritura solo backend (denegada en cliente)
+    match /projectMetrics/{weddingId}/{document=**} {
+      allow read: if isCollaborator(weddingId);
+      allow write: if false;
+    }
+
+    // Cola de eventos de métricas: acceso solo backend (denegado en cliente)
+    match /projectMetrics_events/{docId} {
+      allow read, write: if false;
+    }
   }
 }

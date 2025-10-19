@@ -16,14 +16,20 @@ flowchart TD
     A --> SWQ[SyncService Queue]
   end
 
-  subgraph Backend
+  subgraph Backend Express (Local :4004)
+    E[Express API (Node)] --> D[Firebase Admin SDK]
+    E --> MG[Mailgun]
+    E --> AI[OpenAI/IA Workers]
+  end
+
+  subgraph Firebase
     D --> FS[(Firestore)]
     D --> FAuth[Firebase Auth]
     D --> FStorage[Firebase Storage]
   end
 ```
 
-El frontend (SPA) se comunica directamente con Firebase mediante el SDK. El `Service Worker` provee capacidades offline y caching. `SyncService` mantiene una cola local para sincronizar cambios cuando se restaura la conexión.
+El frontend (SPA) se comunica directamente con Firebase mediante el SDK y, para operaciones propias, utiliza la API Express que corre en `http://localhost:4004` durante el desarrollo. El dev server de Vite proxya automáticamente `/api/*` hacia ese puerto. El `Service Worker` provee capacidades offline y caching. `SyncService` mantiene una cola local para sincronizar cambios cuando se restaura la conexión.
 
 ## Contextos de Usuario
 
@@ -80,10 +86,11 @@ Al trabajar con estos contextos:
 - **React Router** - Navegación
 
 ### Backend
+- **Express (Node 20)** - API propia, listeners webhooks; puerto local por defecto `4004`
 - **Firebase Firestore** - Base de datos NoSQL
 - **Firebase Auth** - Autenticación
 - **Firebase Storage** - Almacenamiento de archivos
-- **Firebase Functions** - Funciones serverless
+- **Firebase Functions** - Funciones serverless (legacy complementario)
 
 ### Herramientas de Desarrollo
 - **ESLint** - Linting de código

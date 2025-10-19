@@ -1,6 +1,6 @@
 import errorLogger from '../utils/errorLogger';
+import { getAdminFetchOptions, getAdminHeaders, getAdminSessionToken } from './adminSession';
 import { apiGet, apiPost, apiPut } from './apiClient';
-import { getAdminHeaders, getAdminSessionToken } from './adminSession';
 
 const ADMIN_BASE_PATH = '/api/admin/dashboard';
 
@@ -12,6 +12,8 @@ const DEFAULT_OVERVIEW = {
   services: [],
   alerts: [],
   tasks: [],
+  newTasks: [],
+  meta: null,
 };
 
 const DEFAULT_METRICS = {
@@ -20,6 +22,26 @@ const DEFAULT_METRICS = {
   iaCosts: [],
   communications: [],
   supportMetrics: null,
+  userStats: {
+    total: 0,
+    active7d: 0,
+    byRole: {
+      owner: 0,
+      planner: 0,
+      assistant: 0,
+    },
+    source: 'fallback',
+  },
+  weddingStats: {
+    total: 0,
+    active: 0,
+    withPlanner: 0,
+    withoutPlanner: 0,
+    source: 'fallback',
+  },
+  acquisition: [],
+  retention: [],
+  engagement: [],
 };
 
 const DEFAULT_INTEGRATIONS = {
@@ -38,16 +60,84 @@ const DEFAULT_SUPPORT = {
   tickets: [],
 };
 
-async function fetchAdminEndpoint(path) {
-  const adminToken = getAdminSessionToken();
-  const headers = adminToken ? getAdminHeaders() : undefined;
+const DEFAULT_DISCOUNTS = {
+  items: [],
+  summary: {
+    totalLinks: 0,
+    totalUses: 0,
+    totalRevenue: 0,
+    currency: 'EUR',
+  },
+};
 
+const ROLE_LABEL_DEFAULTS = {
+  owner: 'Owners',
+  planner: 'Wedding planners',
+  assistant: 'Assistants',
+};
+
+const EMPTY_ROLE_SUMMARY_FILTERS = {
+  allowedStatuses: [],
+  excludedEmailSuffixes: [],
+  excludedEmailPrefixes: [],
+  excludedEmailContains: [],
+  excludedTags: [],
+  excludedBooleanKeys: [],
+};
+
+const DEFAULT_USER_STATS = {
+  total: 0,
+  active7d: 0,
+  byRole: {
+    owner: 0,
+    planner: 0,
+    assistant: 0,
+  },
+  source: 'fallback',
+};
+
+const DEFAULT_WEDDING_STATS = {
+  total: 0,
+  active: 0,
+  withPlanner: 0,
+  withoutPlanner: 0,
+  source: 'fallback',
+};
+
+const normalizeMetricNumber = (value) => (Number.isFinite(value) ? value : 0);
+
+const TASK_TEMPLATE_CACHE_TTL = 60 * 1000;
+let taskTemplatesCache = { templates: null, meta: null, timestamp: 0 };
+
+const normalizeUserStats = (stats) => {
+  if (!stats || typeof stats !== 'object') return { ...DEFAULT_USER_STATS };
+  const byRole = stats.byRole && typeof stats.byRole === 'object' ? stats.byRole : {};
+  return {
+    total: normalizeMetricNumber(stats.total),
+    active7d: normalizeMetricNumber(stats.active7d),
+    byRole: {
+      owner: normalizeMetricNumber(byRole.owner),
+      planner: normalizeMetricNumber(byRole.planner),
+      assistant: normalizeMetricNumber(byRole.assistant),
+    },
+    source: typeof stats.source === 'string' && stats.source ? stats.source : 'fallback',
+  };
+};
+
+const normalizeWeddingStats = (stats) => {
+  if (!stats || typeof stats !== 'object') return { ...DEFAULT_WEDDING_STATS };
+  return {
+    total: normalizeMetricNumber(stats.total),
+    active: normalizeMetricNumber(stats.active),
+    withPlanner: normalizeMetricNumber(stats.withPlanner),
+    withoutPlanner: normalizeMetricNumber(stats.withoutPlanner),
+    source: typeof stats.source === 'string' && stats.source ? stats.source : 'fallback',
+  };
+};
+
+async function fetchAdminEndpoint(path) {
   try {
-    const response = await apiGet(path, {
-      auth: !adminToken,
-      silent: true,
-      headers,
-    });
+    const response = await apiGet(path, getAdminFetchOptions({ auth: false, silent: true }));
 
     let data = null;
     if (response.status !== 204) {
@@ -77,6 +167,105 @@ async function fetchAdminEndpoint(path) {
   }
 }
 
+const createRoleBucket = (label) => ({
+  label,
+  total: 0,
+  real: 0,
+  excluded: {
+    total: 0,
+    byReason: {
+      status: 0,
+      flags: 0,
+      email: 0,
+    },
+  },
+});
+
+const normalizeRoleBucket = (bucket, fallbackLabel) => {
+  if (!bucket || typeof bucket !== 'object') {
+    return createRoleBucket(fallbackLabel);
+  }
+
+  const label =
+    typeof bucket.label === 'string' && bucket.label.trim() ? bucket.label : fallbackLabel;
+  const total = Number.isFinite(bucket.total) ? bucket.total : 0;
+  const real = Number.isFinite(bucket.real) ? bucket.real : 0;
+  const excludedTotal = Number.isFinite(bucket?.excluded?.total)
+    ? bucket.excluded.total
+    : Math.max(total - real, 0);
+  const byReason = bucket?.excluded?.byReason || {};
+
+  return {
+    label,
+    total,
+    real,
+    excluded: {
+      total: excludedTotal,
+      byReason: {
+        status: Number.isFinite(byReason.status) ? byReason.status : 0,
+        flags: Number.isFinite(byReason.flags) ? byReason.flags : 0,
+        email: Number.isFinite(byReason.email) ? byReason.email : 0,
+      },
+    },
+  };
+};
+
+const buildDefaultRoleBuckets = () => ({
+  owner: createRoleBucket(ROLE_LABEL_DEFAULTS.owner),
+  planner: createRoleBucket(ROLE_LABEL_DEFAULTS.planner),
+  assistant: createRoleBucket(ROLE_LABEL_DEFAULTS.assistant),
+});
+
+const normalizeRoleSummary = (raw) => {
+  const safe = raw && typeof raw === 'object' ? raw : {};
+  const filters = safe.filters && typeof safe.filters === 'object' ? safe.filters : {};
+
+  return {
+    generatedAt: typeof safe.generatedAt === 'string' ? safe.generatedAt : null,
+    durationMs: Number.isFinite(safe.durationMs) ? safe.durationMs : null,
+    scanned: Number.isFinite(safe.scanned) ? safe.scanned : 0,
+    totals: {
+      total: Number.isFinite(safe?.totals?.total) ? safe.totals.total : 0,
+      real: Number.isFinite(safe?.totals?.real) ? safe.totals.real : 0,
+      excluded: Number.isFinite(safe?.totals?.excluded) ? safe.totals.excluded : 0,
+    },
+    roles: {
+      owner: normalizeRoleBucket(safe?.roles?.owner, ROLE_LABEL_DEFAULTS.owner),
+      planner: normalizeRoleBucket(safe?.roles?.planner, ROLE_LABEL_DEFAULTS.planner),
+      assistant: normalizeRoleBucket(safe?.roles?.assistant, ROLE_LABEL_DEFAULTS.assistant),
+    },
+    filters: {
+      allowedStatuses: Array.isArray(filters.allowedStatuses) ? filters.allowedStatuses : [],
+      excludedEmailSuffixes: Array.isArray(filters.excludedEmailSuffixes)
+        ? filters.excludedEmailSuffixes
+        : [],
+      excludedEmailPrefixes: Array.isArray(filters.excludedEmailPrefixes)
+        ? filters.excludedEmailPrefixes
+        : [],
+      excludedEmailContains: Array.isArray(filters.excludedEmailContains)
+        ? filters.excludedEmailContains
+        : [],
+      excludedTags: Array.isArray(filters.excludedTags) ? filters.excludedTags : [],
+      excludedBooleanKeys: Array.isArray(filters.excludedBooleanKeys)
+        ? filters.excludedBooleanKeys
+        : [],
+    },
+    source: typeof safe.source === 'string' && safe.source ? safe.source : 'firestore',
+    error: typeof safe.error === 'string' && safe.error ? safe.error : '',
+  };
+};
+
+const buildDefaultRoleSummary = () => ({
+  generatedAt: null,
+  durationMs: null,
+  scanned: 0,
+  totals: { total: 0, real: 0, excluded: 0 },
+  roles: buildDefaultRoleBuckets(),
+  filters: { ...EMPTY_ROLE_SUMMARY_FILTERS },
+  source: 'fallback',
+  error: '',
+});
+
 export const getDashboardData = async () => {
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/overview`);
   if (!data) return DEFAULT_OVERVIEW;
@@ -85,6 +274,8 @@ export const getDashboardData = async () => {
     services: toArray(data.services),
     alerts: toArray(data.alerts),
     tasks: toArray(data.tasks),
+    newTasks: toArray(data.newTasks),
+    meta: data.meta || null,
   };
 };
 
@@ -97,15 +288,32 @@ export const getMetricsData = async () => {
     iaCosts: toArray(data.iaCosts),
     communications: toArray(data.communications),
     supportMetrics: data.supportMetrics ?? null,
+    userStats: normalizeUserStats(data.userStats),
+    weddingStats: normalizeWeddingStats(data.weddingStats),
+    acquisition: toArray(data.acquisition),
+    retention: toArray(data.retention),
+    engagement: toArray(data.engagement),
   };
 };
 
 export const getPortfolioData = async (opts = {}) => {
-  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
+  const params = new URLSearchParams();
+  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 200;
+  params.set('limit', String(limit));
+  if (opts.status) params.set('status', opts.status);
+  if (opts.fromDate) params.set('fromDate', opts.fromDate);
+  if (opts.toDate) params.set('toDate', opts.toDate);
+  if (opts.order) params.set('order', opts.order);
+
+  const query = params.toString();
   const data = await fetchAdminEndpoint(
-    `${ADMIN_BASE_PATH}/portfolio?limit=${encodeURIComponent(limit)}`,
+    `${ADMIN_BASE_PATH}/portfolio${query ? `?${query}` : ''}`,
   );
-  return Array.isArray(data?.items) ? data.items : [];
+
+  return {
+    items: Array.isArray(data?.items) ? data.items : [],
+    meta: data?.meta || null,
+  };
 };
 
 export const getUsersData = async (opts = {}) => {
@@ -114,6 +322,18 @@ export const getUsersData = async (opts = {}) => {
     `${ADMIN_BASE_PATH}/users?limit=${encodeURIComponent(limit)}`,
   );
   return Array.isArray(data?.items) ? data.items : [];
+};
+
+export const getUsersRoleSummary = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/users/role-summary`);
+  if (!data) {
+    return { summary: buildDefaultRoleSummary(), error: 'role_summary_unavailable' };
+  }
+  const summary = normalizeRoleSummary(data);
+  return {
+    summary,
+    error: typeof data?.error === 'string' && data.error ? data.error : summary.error || '',
+  };
 };
 
 export const getIntegrationsData = async () => {
@@ -156,6 +376,20 @@ export const getSupportData = async () => {
   };
 };
 
+export const getDiscountLinks = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/discounts`);
+  if (!data) return DEFAULT_DISCOUNTS;
+  return {
+    items: toArray(data.items),
+    summary: {
+      totalLinks: Number.isFinite(data?.summary?.totalLinks) ? data.summary.totalLinks : 0,
+      totalUses: Number.isFinite(data?.summary?.totalUses) ? data.summary.totalUses : 0,
+      totalRevenue: Number.isFinite(data?.summary?.totalRevenue) ? data.summary.totalRevenue : 0,
+      currency: data?.summary?.currency || 'EUR',
+    },
+  };
+};
+
 // --- Mutations ---
 
 async function postJson(path, body) {
@@ -188,6 +422,64 @@ async function putJson(path, body) {
     throw err;
   }
   return data;
+}
+
+export function invalidateWeddingTemplates() {
+  taskTemplatesCache = { templates: null, meta: null, timestamp: 0 };
+}
+
+export async function getTaskTemplates(options = {}) {
+  const { status = null, limit = null, forceRefresh = false } = options || {};
+  const noFilters = !status && !limit;
+  const now = Date.now();
+  if (
+    !forceRefresh &&
+    noFilters &&
+    taskTemplatesCache.templates &&
+    now - taskTemplatesCache.timestamp < TASK_TEMPLATE_CACHE_TTL
+  ) {
+    return {
+      templates: taskTemplatesCache.templates,
+      meta: taskTemplatesCache.meta || { limit: 20 },
+    };
+  }
+
+  const params = [];
+  if (status) params.push(`status=${encodeURIComponent(status)}`);
+  if (Number.isFinite(limit)) params.push(`limit=${encodeURIComponent(limit)}`);
+  const qs = params.length ? `?${params.join('&')}` : '';
+
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/task-templates${qs}`);
+  const templates = Array.isArray(data?.templates) ? data.templates : [];
+  const meta = data?.meta && typeof data.meta === 'object' ? data.meta : {};
+
+  if (noFilters && !forceRefresh) {
+    taskTemplatesCache = {
+      templates,
+      meta,
+      timestamp: now,
+    };
+  }
+
+  return { templates, meta };
+}
+
+export async function saveTaskTemplateDraft(payload) {
+  const data = await postJson(`${ADMIN_BASE_PATH}/task-templates`, payload || {});
+  invalidateWeddingTemplates();
+  return data;
+}
+
+export async function publishTaskTemplate(id) {
+  if (!id) throw new Error('template_id_required');
+  const data = await postJson(`${ADMIN_BASE_PATH}/task-templates/${encodeURIComponent(id)}/publish`, {});
+  invalidateWeddingTemplates();
+  return data;
+}
+
+export async function previewTaskTemplate(id, options = {}) {
+  if (!id) throw new Error('template_id_required');
+  return await postJson(`${ADMIN_BASE_PATH}/task-templates/${encodeURIComponent(id)}/preview`, options || {});
 }
 
 export async function createAdminTask({ title, priority, dueDate }) {
@@ -234,3 +526,14 @@ export async function retryIntegration(serviceId) {
   const data = await postJson(`${ADMIN_BASE_PATH}/integrations/${encodeURIComponent(serviceId)}/retry`, {});
   return data?.service || null;
 }
+
+export const getHttpMetricsSummary = async (opts = {}) => {
+  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 50;
+  const data = await fetchAdminEndpoint(`/api/admin/metrics/http?limit=${encodeURIComponent(limit)}`);
+  if (!data || typeof data !== 'object') {
+    return { routes: [], totals: { totalRequests: 0, totalErrors: 0, errorRate: 0 }, timestamp: Date.now() };
+  }
+  const totals = data.totals || { totalRequests: 0, totalErrors: 0, errorRate: 0 };
+  const routes = Array.isArray(data.routes) ? data.routes : [];
+  return { routes, totals, timestamp: data.timestamp || Date.now() };
+};

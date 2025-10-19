@@ -1,6 +1,5 @@
 import admin from 'firebase-admin';
-
-const db = admin.firestore();
+import { db } from '../db.js';
 
 const DEFAULT_LEVELS = [
   { level: 1, min: 0, max: 100, name: 'Novato' },

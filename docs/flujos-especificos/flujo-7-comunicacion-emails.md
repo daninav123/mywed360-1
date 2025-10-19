@@ -7,12 +7,17 @@
 > - **Hooks:** `hooks/useEmailMonitoring.js`, `hooks/useEmailUsername.jsx`.
 > El buzón legacy (`pages/Buzon_fixed_complete.jsx`) sigue en el repositorio pero ya no está ruteado.
 >
-> Pendiente/alertas principales: cableado de búsqueda/ordenación secundario en `UnifiedInbox/EmailList.jsx`, sincronización de contadores/unread de carpetas personalizadas con backend, implementación real del `callClassificationAPI` y del procesador de envíos programados (`processScheduledEmails`), onboarding con validaciones DKIM/SPF, persistencia server-side de auto-respuestas y migración definitiva del buzón legacy + actualización de pruebas E2E/VTU a la nueva UI.
+> Pendiente/alertas principales: cableado de busqueda/ordenacion secundario en `UnifiedInbox/EmailList.jsx`, onboarding con validaciones DKIM/SPF, persistencia server-side de auto-respuestas y migracion definitiva del buzon legacy + actualizacion de pruebas E2E/VTU a la nueva UI.
+>
+> Actualizacion 2025-10-14: la bandeja unificada ejecuta `processIncomingEmails` para etiquetado IA/auto-respuestas y arranca el scheduler de programados (`startEmailScheduler`). Los contadores `unread` de carpetas personalizadas se recalculan y sincronizan en cada refresco.
+>
+> Configuracion de respuestas automaticas ahora se sincroniza via `/api/email-automation/config` (Firestore), evitando depender de localStorage.
 
 ## 1. Objetivo y alcance
 - Centralizar recepción y envío de emails vinculados a la boda, con soporte para alias `@mywed360`, plantillas e IA de apoyo.
 - Permitir colaboración interna (comentarios, etiquetado, notas) y disparar acciones en otros módulos (tareas, agenda, proveedores).
 - Ofrecer analítica básica (volumen, aperturas, respuestas) y monitoreo del rendimiento del flujo.
+- Alinear copy, plantillas y automatizaciones con `weddingProfile` y `weddingInsights`, generando mensajes que reflejen el estilo principal y los contrastes aprobados (sin caer en no-go items).
 
 ## 2. Entradas y rutas
 - **Entrada principal:** menú usuario (avatar) → “Buzón de emails” (`/email`, `UnifiedInbox/InboxContainer.jsx`). `EmailNotification` y `EmailNotificationBadge` apuntan al mismo destino.
@@ -22,12 +27,13 @@
 ## 3. Paso a paso UX
 ### 3.1 Onboarding y configuración
 - `pages/EmailSetup.jsx` + `hooks/useEmailUsername.jsx` reservan alias en Firestore (`emailUsernames` + doc del usuario). Validaciones actuales: regex, nombres reservados y verificación de existencia; **no** se validan DKIM/SPF ni se envían pruebas automáticamente.
-- `components/email/EmailSetupForm.jsx` muestra disponibilidad “en vivo”, pero usa una lista estática simulada; debe alinearse con `checkUsernameAvailability` para evitar falsos positivos.
+- `components/email/EmailSetupForm.jsx` consulta `checkUsernameAvailability` en tiempo real y bloquea nombres reservados, aunque aún falta incluir pruebas DKIM/SPF automáticas.
 - `components/email/EmailSettings.jsx` permite:
   - Ver/cambiar alias (`services/emailService.js#createEmailAlias`, best-effort backend).
   - Configurar auto-respuestas por categoría (almacenadas en `localStorage` bajo `mywed360.email.automation.*`; falta persistencia en backend).
-  - Revisar/gestionar la cola de envíos programados (`getScheduledEmails`), aunque no existe job que procese la cola (ver sección de pendientes).
+  - Revisar/gestionar la cola de envios programados (`getScheduledEmails`); el scheduler en cliente (`startEmailScheduler`) se activa al montar `InboxContainer`, pero sigue pendiente exponer estado/errores desde backend y habilitar job server-side.
   - Gestionar etiquetas (`components/email/TagsManager.jsx` + `services/tagService.js`) y listar envíos programados.
+  - Ajustar tono y contenido sugerido por la IA en función de `weddingProfile` (estilo principal, idioma) y `specialInterests`. Las plantillas muestran insignias `Core` o `Contraste` según el contexto del mensaje; si un contraste está marcado `requiresReview`, se bloquea su uso hasta confirmación.
 - `components/email/MailgunTester.jsx` expone pruebas manuales (envío, validación de email, disponibilidad de alias) vía Cloud Functions (`services/mailgunService.js`); sigue desacoplado del wizard principal.
 
 ### 3.2 Operativa diaria
@@ -46,7 +52,7 @@
 - `components/email/EmptyTrashModal.jsx` ya existe con `data-testid` consumibles por Cypress, pero la UI aún no lo utiliza.
 - Composición:
   - `components/email/EmailComposer.jsx` (clásico): valida destinatarios/asunto/cuerpo, limita adjuntos a 10 MB y permite programar envíos (ver limitaciones en automatización). Cuando programa, delega en `emailAutomationService.scheduleEmailSend`.
-  - `components/email/SmartEmailComposer.jsx`: se alimenta de plantillas (`EmailService.getEmailTemplates` → API o `services/emailTemplates.js`) y recomendaciones de `EmailRecommendationService`. Soporta programación y rastrea recomendaciones aplicadas; integra con `ProviderSearchModal`.
+  - `components/email/SmartEmailComposer.jsx`: se alimenta de plantillas (`EmailService.getEmailTemplates` → API o `services/emailTemplates.js`) y recomendaciones de `EmailRecommendationService`. Ajusta tono/copy con `weddingProfile` (ej. estilo, idioma, vibe keywords) y ofrece bloques especiales etiquetados `Core` o `Contraste (zona)`. Soporta programación y rastrea recomendaciones aplicadas; integra con `ProviderSearchModal`.
   - Tanto el modo clásico como el IA refrescan la bandeja y contadores tras enviar; los envíos programados permanecen en cola hasta que exista un job que ejecute `processScheduledEmails` (3.3).
 
 ### 3.3 Automatizaciones y análisis
@@ -55,6 +61,7 @@
   - Procesamiento de entradas (`processIncomingEmails`) con heurística local; **el método `callClassificationAPI` no está implementado**, por lo que la clasificación IA real y el autop responde quedan inoperativos salvo por heurísticas.
   - Cola de envíos programados (`scheduleEmailSend`, `getScheduledEmails`, `processScheduledEmails`). **Falta disparador**: ningún punto del código invoca `processScheduledEmails`, de modo que los correos programados no se envían.
 - `services/EmailRecommendationService.js` + `AIEmailTrackingService` llevan métricas locales para sugerencias IA dentro del Smart Composer.
+  - Inputs clave: `weddingProfile.vibeKeywords`, `specialInterests`, `noGoItems`, estado del flujo 2C (`recommendation_conflict`). Las recomendaciones se etiquetan con `contextTag` (`core`, `contraste`) para rastrear adopción.
 - `components/email/EmailStats.jsx` + `pages/user/EmailStatistics.jsx` muestran métricas (Chart.js) usando `services/emailMetricsService.js` (Firestore `emailMetrics/{userId}`) con fallback a cálculos locales via `services/statsService.js`.
 
 ### 3.4 Gestión de carpetas y papelera
@@ -72,6 +79,7 @@
 - Correos: `services/emailService.js` prioriza backend (`/api/mail/*`). Sin backend, cae a Firestore (`users/{uid}/mails` y colección global `mails`) o memoria/localStorage (`memoryStore.mails`). El campo `folder` se actualiza con `EmailService.setFolder` (cuando se integre) y se usa para determinar `inbox`/`sent`/`trash`/personalizadas. No existe colección `weddings/{id}/emails`.
 - Alias: `hooks/useEmailUsername.jsx` escribe en `emailUsernames/{alias}` y `users/{uid}` (`emailUsername`, `myWed360Email`).
 - Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`mywed360.email.automation.*`, `mywed360.email.automation.schedule`…).
+- Contexto de personalización: se debe sincronizar `emailContext` con resumen del `weddingProfile` (estilo, idioma preferido, contrastes) para renderizar plantillas IA coherentes; hoy solo existe en memoria (`EmailRecommendationService`), pendiente persistir en Firestore (`weddings/{id}/emailContext`).
 - Etiquetas y carpetas personalizadas: `tagService.js` (`mywed360_email_tags_*`) y `folderService.js` (`mywed360_email_folders_{uid}` + `mywed360_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
 - Plantillas: API `/api/email-templates` (via `services/emailTemplatesService.js`); fallback a catálogo estático `services/emailTemplates.js`. No existe sincronización automática con Firestore.
 - Métricas agregadas: Firestore `emailMetrics/{userId}` (+ subcolección `daily`). El cálculo local guarda copia en `localStorage` (`mywed360_email_stats_{userId}`).
@@ -107,10 +115,12 @@
 - **Flujo 6 (Presupuesto/tareas):** `EmailInsights.jsx` dispara eventos (`window.dispatchEvent('mywed360-tasks')`) y botones de acceso rápido a `/tasks` y `/protocolo/timing`.
 - **Flujo 12 (Notificaciones):** `EmailSettings` muestra auto-respuestas por categoría, pero aún no se sincroniza con preferencias globales del módulo de notificaciones (`notificationPreferencesService`).
 - **Flujo 16 (IA Orquestador):** Recomendaciones y tracking IA se alimentan de `AIEmailTrackingService`; falta consolidar con workflows globales.
+- **Flujo 2C (Personalización continua):** `EmailRecommendationService` escucha `weddingInsights` para adaptar copy y dispara eventos `email_contrast_message_sent` y `email_contrast_message_rejected` que alimentan el mapa de preferencias.
 - **Otros:** `GlobalSearch.jsx` enlaza correos; `EmailNotification` informa de nuevos mensajes; `EmailInsights` ofrece enlaces a `Contracts` y `Finance` (cuando los insights incluyen contratos/presupuestos).
 
 ## 8. Métricas y monitorización
 - Instrumentación local via `hooks/useEmailMonitoring.js` → `services/PerformanceMonitor.js` (`email_operation`, `template_cache_*`, `email_feedback_submitted`). Necesita consolidarse con dashboards reales (Grafana/BigQuery mencionados previamente no existen).
+- Nuevos eventos a seguir: `email_personalized_template_used`, `email_contrast_message_sent`, `email_contrast_message_rejected`, `email_no_go_blocked`.
 - `EmailStats.jsx` ofrece gráficos de actividad, aperturas/clicks, distribución por etiquetas/carpeta y contactos frecuentes. Cuando no hay datos en Firestore, calcula con `getMails`. Se recomienda cachear y evitar bloqueos UI.
 - Faltan métricas de entregabilidad reales (rebotes, spam) y correlación con journeys multicanal.
 
@@ -128,6 +138,12 @@
 - `cypress/e2e/email/folders-management.cy.js y cypress/e2e/email/tags-filters.cy.js`: verifican organización por carpetas, etiquetas y filtros avanzados.
 - `cypress/e2e/email/smart-composer.cy.js, cypress/e2e/email/ai-provider-email.cy.js y cypress/e2e/compose_quick_replies.cy.js`: prueban generación asistida por IA y respuestas rápidas.
 - `cypress/e2e/email_inbox_smoke.cy.js`: smoke integral de la bandeja y sincronización en tiempo real.
+- `cypress/e2e/email/read-email-attachments.cy.js`: asegura descarga y previsualización de adjuntos.
+- `cypress/e2e/email/read-email-list.cy.js`: verifica paginación y ordenación del listado principal.
+- `cypress/e2e/email/read-email-open.cy.js`: comprueba estados de lectura y métricas asociadas.
+- `cypress/e2e/email/read-email-unread-status.cy.js`: valida cambios de estado leído/no leído en lista y detalle.
+- `cypress/e2e/email/send-email-attachment.cy.js`: cubre adjuntos en envíos salientes y almacenamiento temporal.
+- `cypress/e2e/email/send-email-validation.cy.js`: revisa validaciones de formulario (destinatarios, asunto, cuerpo) antes de enviar.
 
 ## 10. Checklist de despliegue
 - **Variables de entorno front/back:**
@@ -143,11 +159,11 @@
 
 ## 11. Roadmap / pendientes
 1. **Automatización y backend**
-   - Implementar `callClassificationAPI` (o sustituirlo) y gestionar gracefully la ausencia del endpoint.
-   - Mover la cola de envíos programados a backend + job recurrente; exponer estado/errores al usuario.
+   - Vigilar latencia y fallbacks de ``callClassificationAPI`` (ya cableado via ``processIncomingEmails``) y mantener heuristicas de respaldo cuando el endpoint no responda.
+   - Completar migracion de la cola de envios programados a backend/job recurrente; el scheduler cliente (``startEmailScheduler``) ya corre, pero falta exponer estado/errores al usuario.
    - Persistir auto-respuestas y clasificación en Firestore/REST (no sólo localStorage).
 2. **UX / funcionalidad**
-   - Completar integración de carpetas personalizadas (drag & drop, recuentos unread persistentes) y alinear etiquetas con la nueva UI.
+   - Completar integracion de carpetas personalizadas (drag & drop, alinear etiquetas); los contadores ``unread`` ya se sincronizan automaticamente.
    - Refinar papelera (`trash`): restaurar a la carpeta de origen, exponer métricas/retención y consolidar vaciado backend.
    - Resolver buscador/sort duplicado en `UnifiedInbox/EmailList.jsx` y alinear data-testids con Cypress.
    - Añadir toggle o ruta para acceder al buzón legacy sólo en modo soporte, o removerlo tras migración.
@@ -163,3 +179,9 @@
    - Automatizar pruebas de alias / onboarding (`EmailSetup`) y Mailgun fallback.
 
 Mantener esta lista viva antes de iniciar nuevas implementaciones en Flujo 7.
+
+
+
+
+
+

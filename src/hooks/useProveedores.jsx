@@ -23,6 +23,105 @@ import computeSupplierScore from '../utils/supplierScore';
 const SERVICE_LINES_COLLECTION = "serviceLines";
 const MEETINGS_COLLECTION = "supplierMeetings";
 
+const TAB_ALL = 'todos';
+const TAB_TRACKING = 'seguimiento';
+const TAB_CONFIRMED = 'confirmados';
+const TAB_FAVORITES = 'favoritos';
+
+const TRACKING_STATUS_SET = new Set(
+  [
+    'pendiente',
+    'contactado',
+    'en seguimiento',
+    'seguimiento',
+    'en negociación',
+    'negociación',
+    'en evaluación',
+    'evaluando',
+    'preconfirmado',
+    'pre-confirmado',
+    'por revisar',
+    'por-revisar',
+    'analizando',
+    'exploracion',
+    'exploración',
+    'shortlist',
+    'prospecto',
+    'prospect',
+    'por contactar',
+    'por-contactar',
+    'a revisar',
+  ].map((value) => value.toLowerCase())
+);
+
+const CONFIRMED_STATUS_SET = new Set(
+  [
+    'confirmado',
+    'confirmada',
+    'seleccionado',
+    'seleccionada',
+    'contratado',
+    'contratada',
+    'firmado',
+    'en firma',
+    'en-firma',
+    'firmando',
+    'reservado',
+    'reserva',
+    'cerrado',
+    'ganado',
+    'closed won',
+    'confirming',
+  ].map((value) => value.toLowerCase())
+);
+
+const normalizeStatus = (status) => {
+  if (!status) return '';
+  return String(status).trim().toLowerCase();
+};
+
+const isConfirmedStatus = (status) => {
+  const normalized = normalizeStatus(status);
+  if (!normalized) return false;
+  if (CONFIRMED_STATUS_SET.has(normalized)) return true;
+  return (
+    normalized.includes('confirm') ||
+    normalized.includes('firma') ||
+    normalized.includes('contrat') ||
+    normalized.includes('cerrad') ||
+    normalized.includes('ganad') ||
+    normalized.includes('reserva')
+  );
+};
+
+const isDiscardedStatus = (status) => {
+  const normalized = normalizeStatus(status);
+  if (!normalized) return false;
+  return (
+    normalized.includes('rechaz') ||
+    normalized.includes('descart') ||
+    normalized.includes('cancel') ||
+    normalized.includes('perdid') ||
+    normalized.includes('lost')
+  );
+};
+
+const isTrackingStatus = (status) => {
+  const normalized = normalizeStatus(status);
+  if (!normalized) return true;
+  if (isConfirmedStatus(normalized)) return false;
+  if (isDiscardedStatus(normalized)) return false;
+  if (TRACKING_STATUS_SET.has(normalized)) return true;
+  return (
+    normalized.includes('pend') ||
+    normalized.includes('seguim') ||
+    normalized.includes('negoci') ||
+    normalized.includes('evalu') ||
+    normalized.includes('prospect') ||
+    normalized.includes('shortlist')
+  );
+};
+
 /**
  * @typedef {Object} Provider
  * @property {string} id - ID único del proveedor
@@ -57,7 +156,7 @@ const MEETINGS_COLLECTION = "supplierMeetings";
  * @property {string} statusFilter - Filtro por estado
  * @property {string} dateFrom - Filtro por fecha desde
  * @property {string} dateTo - Filtro por fecha hasta
- * @property {string} tab - Pestaña actual ('all', 'selected', 'contacted')
+ * @property {string} tab - Segmento actual ('todos', 'seguimiento', 'confirmados', 'favoritos')
  * @property {Function} setSearchTerm - Actualizar término de búsqueda
  * @property {Function} setServiceFilter - Actualizar filtro por servicio
  * @property {Function} setStatusFilter - Actualizar filtro por estado
@@ -89,12 +188,17 @@ export const useProveedores = () => {
   const [dateTo, setDateTo] = useState('');
   // Filtro de rating mínimo (0 = cualquiera)
   const [ratingMin, setRatingMin] = useState(0);
-  const [tab, setTab] = useState('contratados'); // 'contratados', 'buscados', 'favoritos'
+  const [tab, setTab] = useState(TAB_ALL);
 
   const { user } = useAuth();
   const userUid = user?.uid || null;
   const { activeWedding } = useWedding();
   const persistTimer = useRef(null);
+  const providersRef = useRef(providers);
+
+  useEffect(() => {
+    providersRef.current = providers;
+  }, [providers]);
 
   const getCollectionPath = useCallback(() => {
     if (activeWedding) return `weddings/${activeWedding}/suppliers`;
@@ -106,8 +210,9 @@ export const useProveedores = () => {
    * Aplicar filtros a los proveedores
    */
   const applyFilters = useCallback(
-    (providersToFilter = providers) => {
-      let filtered = [...providersToFilter];
+    (providersToFilter) => {
+      const source = Array.isArray(providersToFilter) ? providersToFilter : providersRef.current;
+      let filtered = Array.isArray(source) ? [...source] : [];
 
       // Aplicar filtro de búsqueda
       if (searchTerm) {
@@ -147,21 +252,24 @@ export const useProveedores = () => {
         filtered = filtered.filter((p) => p.rating >= ratingMin);
       }
 
-      // Filtrar por pestaña
-      if (tab === 'contratados') {
-        filtered = filtered.filter((p) => ['Confirmado', 'Seleccionado'].includes(p.status));
-      }
-      if (tab === 'buscados') {
-        filtered = filtered.filter((p) => ['Pendiente', 'Contactado'].includes(p.status));
-      }
-      if (tab === 'favoritos') {
-        filtered = filtered.filter((p) => p.favorite);
+      // Filtrar por pestaña/segmento
+      if (tab === TAB_TRACKING) {
+        filtered = filtered.filter((p) => isTrackingStatus(p.status));
+      } else if (tab === TAB_CONFIRMED) {
+        filtered = filtered.filter((p) => isConfirmedStatus(p.status));
+      } else if (tab === TAB_FAVORITES) {
+        filtered = filtered.filter((p) => Boolean(p.favorite));
       }
 
       setFilteredProviders(filtered);
     },
-    [providers, searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]
+    [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab]
   );
+
+  const applyFiltersRef = useRef(applyFilters);
+  useEffect(() => {
+    applyFiltersRef.current = applyFilters;
+  }, [applyFilters]);
 
   /**
    * Cargar proveedores desde Firestore
@@ -286,13 +394,13 @@ export const useProveedores = () => {
       });
 
       setProviders(enrichedProviders);
-      applyFilters(enrichedProviders);
+      applyFiltersRef.current(enrichedProviders);
       setLoading(false);
     } catch (err) {
       console.error('Error al cargar los proveedores:', err);
       try {
         setProviders([]);
-        applyFilters([]);
+        applyFiltersRef.current([]);
       } catch {}
       if (String(err?.message || '').toLowerCase().includes('permission')) {
         setError('No tienes permisos para ver los proveedores de esta boda.');
@@ -301,7 +409,7 @@ export const useProveedores = () => {
       }
       setLoading(false);
     }
-  }, [userUid, getCollectionPath, applyFilters, activeWedding]);
+  }, [userUid, getCollectionPath, activeWedding]);
 
   /**
    * Limpiar todos los filtros
@@ -313,7 +421,7 @@ export const useProveedores = () => {
     setDateFrom('');
     setDateTo('');
     setRatingMin(0);
-    setTab('contratados');
+    setTab(TAB_ALL);
   }, []);
   const getServiceLinesCollection = useCallback(
     (providerId) => {
@@ -345,12 +453,12 @@ export const useProveedores = () => {
             : prov
         );
         try {
-          applyFilters(updated);
+          applyFiltersRef.current(updated);
         } catch {}
         return updated;
       });
     },
-    [applyFilters]
+    [applyFiltersRef]
   );
 
   const addServiceLine = useCallback(
@@ -513,7 +621,7 @@ export const useProveedores = () => {
         };
 
         setProviders((prev) => [newProvider, ...prev]);
-        applyFilters([newProvider, ...providers]);
+        applyFiltersRef.current([newProvider, ...providers]);
         loadProviders();
 
         return newProvider;
@@ -523,7 +631,7 @@ export const useProveedores = () => {
         return null;
       }
     },
-    [user, providers, applyFilters, getCollectionPath, addServiceLine, loadProviders]
+    [user, providers, applyFiltersRef, getCollectionPath, addServiceLine, loadProviders]
   );
 
   /**
@@ -585,7 +693,7 @@ export const useProveedores = () => {
               : p
           );
           try {
-            applyFilters(updated);
+            applyFiltersRef.current(updated);
           } catch {}
           return updated;
         });
@@ -634,7 +742,7 @@ export const useProveedores = () => {
         setLoading(false);
       }
     },
-    [user, getCollectionPath, providers, activeWedding, applyFilters, loadProviders]
+    [user, getCollectionPath, providers, activeWedding, applyFiltersRef, loadProviders]
   );
 
   /**
@@ -655,7 +763,7 @@ export const useProveedores = () => {
       setProviders((prev) => {
         const updated = prev.map((p) => (p.id === providerId ? { ...p, reservations: newReservations } : p));
         try {
-          applyFilters(updated);
+          applyFiltersRef.current(updated);
         } catch {}
         return updated;
       });
@@ -684,7 +792,7 @@ export const useProveedores = () => {
 
       return true;
     },
-    [providers, user, getCollectionPath, applyFilters, addMeetingEntry]
+    [providers, user, getCollectionPath, applyFiltersRef, addMeetingEntry]
   );
 
   const deleteProvider = useCallback(
@@ -700,7 +808,7 @@ export const useProveedores = () => {
 
         // Actualizar estado local
         setProviders((prev) => prev.filter((p) => p.id !== providerId));
-        applyFilters(providers.filter((p) => p.id !== providerId));
+        applyFiltersRef.current(providers.filter((p) => p.id !== providerId));
 
         // Si es el proveedor seleccionado, limpiarlo
         if (selectedProvider && selectedProvider.id === providerId) {
@@ -717,7 +825,7 @@ export const useProveedores = () => {
         return false;
       }
     },
-    [user, providers, selectedProvider, applyFilters, getCollectionPath, loadProviders]
+    [user, providers, selectedProvider, applyFiltersRef, getCollectionPath, loadProviders]
   );
 
   /**
@@ -732,7 +840,7 @@ export const useProveedores = () => {
       setProviders((prev) =>
         prev.map((p) => (p.id === providerId ? { ...p, favorite: newFav } : p))
       );
-      applyFilters(providers.map((p) => (p.id === providerId ? { ...p, favorite: newFav } : p)));
+      applyFiltersRef.current(providers.map((p) => (p.id === providerId ? { ...p, favorite: newFav } : p)));
       // actualizar firestore
       if (user) {
         try {
@@ -746,7 +854,7 @@ export const useProveedores = () => {
         }
       }
     },
-    [providers, user, applyFilters, getCollectionPath]
+    [providers, user, applyFiltersRef, getCollectionPath]
   );
 
   const toggleSelectProvider = useCallback((providerId) => {
@@ -787,6 +895,10 @@ export const useProveedores = () => {
     loadProvidersRef.current();
   }, [userUid, activeWedding]);
 
+  const reloadProviders = useCallback(() => {
+    return loadProvidersRef.current();
+  }, []);
+
   // Hidratar filtros guardados por boda
   useEffect(() => {
     let cancelled = false;
@@ -803,7 +915,6 @@ export const useProveedores = () => {
           if (typeof data.dateFrom === 'string') setDateFrom(data.dateFrom);
           if (typeof data.dateTo === 'string') setDateTo(data.dateTo);
           if (typeof data.ratingMin === 'number') setRatingMin(data.ratingMin);
-          if (typeof data.tab === 'string') setTab(data.tab);
         }
       } catch {}
     })();
@@ -814,8 +925,8 @@ export const useProveedores = () => {
 
   // Aplicar filtros cuando cambien
   useEffect(() => {
-    applyFilters();
-  }, [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, applyFilters]);
+    applyFiltersRef.current();
+  }, [searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab, applyFiltersRef]);
 
   // Persistir filtros (debounce) por boda
   useEffect(() => {
@@ -823,7 +934,7 @@ export const useProveedores = () => {
       clearTimeout(persistTimer.current);
     }
     persistTimer.current = setTimeout(() => {
-      const payload = { searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin, tab };
+      const payload = { searchTerm, serviceFilter, statusFilter, dateFrom, dateTo, ratingMin };
       saveData('supplierFilters', payload, {
         docPath: activeWedding ? `weddings/${activeWedding}` : undefined,
         showNotification: false,
@@ -861,7 +972,7 @@ export const useProveedores = () => {
     setSelectedProvider,
 
     // Acciones
-    loadProviders,
+    loadProviders: reloadProviders,
     addProvider,
     updateProvider,
     deleteProvider,

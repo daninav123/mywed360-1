@@ -5,6 +5,7 @@ import {
   doc as fsDoc,
   getDoc,
   onSnapshot,
+  runTransaction,
   serverTimestamp,
   setDoc,
   Timestamp,
@@ -12,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 
 import { useWedding } from '../context/WeddingContext';
 import { useUserContext } from '../context/UserContext';
@@ -95,16 +96,29 @@ export const useSeatingPlan = () => {
   const [collaborationStatus, setCollaborationStatus] = useState(
     canPersist ? 'connecting' : 'offline'
   );
+  const [locks, setLocks] = useState([]);
+  const locksRef = useRef(new Map());
+  const [lockEvent, setLockEvent] = useState(null);
+  const emitLockEvent = useCallback((event) => {
+    setLockEvent(event);
+  }, []);
+  const consumeLockEvent = useCallback(() => setLockEvent(null), []);
+  const LOCK_TTL_MS = 45000;
+  const LOCK_HEARTBEAT_MS = 15000;
+  const activeLockIntervalsRef = useRef(new Map());
+  const ownedLocksRef = useRef(new Set());
   const [specialMomentsData, setSpecialMomentsData] = useState(null);
   const specialMomentsUnsubRef = useRef(null);
+  const [tab, setTab] = useState('ceremony');
+
   const buildBlocksFromMoments = (moments = {}) => {
-  return Object.keys(moments || {})
-    .filter((key) => key !== 'blocks' && key !== 'migratedFrom' && key !== 'updatedAt')
-    .map((key) => ({
-      id: key,
-      name: key.charAt(0).toUpperCase() + key.slice(1),
-    }));
-};
+    return Object.keys(moments || {})
+      .filter((key) => key !== 'blocks' && key !== 'migratedFrom' && key !== 'updatedAt')
+      .map((key) => ({
+        id: key,
+        name: key.charAt(0).toUpperCase() + key.slice(1),
+      }));
+  };
 
 const normalizeSpecialMoments = (moments = {}) => {
     const normalized = {};
@@ -162,6 +176,152 @@ const normalizeSpecialMoments = (moments = {}) => {
     pendingWritesRef.current[key] = false;
     return fromSelf && hadPending;
   };
+
+  const buildLockDocRef = (type, id) =>
+    fsDoc(db, 'weddings', activeWedding, 'seatingLocks', `${type}-${id}`);
+
+  const clearLockHeartbeat = (key) => {
+    const heartbeat = activeLockIntervalsRef.current.get(key);
+    if (heartbeat) {
+      clearInterval(heartbeat);
+      activeLockIntervalsRef.current.delete(key);
+    }
+  };
+
+  const refreshLockHeartbeat = useCallback(
+    (type, id) => {
+      if (!canPersist || !activeWedding) return;
+      const key = `${type}-${id}`;
+      clearLockHeartbeat(key);
+      const docRef = buildLockDocRef(type, id);
+      const interval = setInterval(() => {
+        updateDoc(docRef, { updatedAt: serverTimestamp() }).catch(() => {});
+      }, LOCK_HEARTBEAT_MS);
+      activeLockIntervalsRef.current.set(key, interval);
+    },
+    [activeWedding, canPersist]
+  );
+
+  const releaseLock = useCallback(
+    async (type, id, { skipState = false } = {}) => {
+      const key = `${type}-${id}`;
+      clearLockHeartbeat(key);
+      if (!skipState) {
+        ownedLocksRef.current.delete(key);
+      }
+      if (!canPersist || !activeWedding) return;
+      try {
+        await runTransaction(db, async (tx) => {
+          const docRef = buildLockDocRef(type, id);
+          const snap = await tx.get(docRef);
+          if (!snap.exists()) return;
+          const data = snap.data() || {};
+          const updatedAt =
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+          const isMine = data.clientId === collabClientIdRef.current;
+          const expired = !updatedAt || Date.now() - updatedAt > LOCK_TTL_MS;
+          if (isMine || expired) {
+            tx.delete(docRef);
+          }
+        });
+      } catch (error) {
+        console.warn('[useSeatingPlan] releaseLock error:', error);
+      }
+    },
+    [activeWedding, canPersist]
+  );
+
+  const acquireLock = useCallback(
+    async (type, id) => {
+      if (!canPersist || !activeWedding) return true;
+      const key = `${type}-${id}`;
+      try {
+        await runTransaction(db, async (tx) => {
+          const docRef = buildLockDocRef(type, id);
+          const snap = await tx.get(docRef);
+          if (snap.exists()) {
+            const data = snap.data() || {};
+            const updatedAt =
+              data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+            const isMine = data.clientId === collabClientIdRef.current;
+            const expired = !updatedAt || Date.now() - updatedAt > LOCK_TTL_MS;
+            if (!expired && !isMine) {
+              throw new Error('occupied');
+            }
+          }
+          tx.set(docRef, {
+            resourceType: type,
+            resourceId: String(id),
+            clientId: collabClientIdRef.current,
+            userId: currentUserId,
+            displayName: currentUserName,
+            color: collaboratorColorRef.current,
+            updatedAt: serverTimestamp(),
+          });
+        });
+        ownedLocksRef.current.add(key);
+        refreshLockHeartbeat(type, id);
+        return true;
+      } catch (_error) {
+        return false;
+      }
+    },
+    [activeWedding, canPersist, currentUserId, currentUserName, refreshLockHeartbeat]
+  );
+
+  const releaseTableLocksExcept = useCallback(
+    (ids = []) => {
+      const keep = new Set(ids.map((value) => `table-${value}`));
+      ownedLocksRef.current.forEach((key) => {
+        if (!key.startsWith('table-')) return;
+        if (!keep.has(key)) {
+          const [, ...rest] = key.split('-');
+          const rawId = rest.join('-');
+          releaseLock('table', rawId);
+        }
+      });
+    },
+    [releaseLock]
+  );
+
+  const ensureTableLock = useCallback(
+    async (tableId) => {
+      if (tableId == null) return true;
+      if (!canPersist || !activeWedding) return true;
+      const key = `table-${tableId}`;
+      const existing = locksRef.current.get(key);
+      if (existing && existing.clientId === collabClientIdRef.current) {
+        refreshLockHeartbeat('table', tableId);
+        return true;
+      }
+      if (existing && existing.clientId && existing.clientId !== collabClientIdRef.current) {
+        const fresh =
+          existing.updatedAt &&
+          Date.now() - existing.updatedAt < LOCK_TTL_MS;
+        if (fresh) {
+          emitLockEvent({
+            kind: 'lock-denied',
+            resourceType: 'table',
+            resourceId: tableId,
+            ownerName: existing.displayName || existing.userId || 'Otro colaborador',
+          });
+          return false;
+        }
+      }
+      const ok = await acquireLock('table', tableId);
+      if (!ok) {
+        const latest = locksRef.current.get(key);
+        emitLockEvent({
+          kind: 'lock-denied',
+          resourceType: 'table',
+          resourceId: tableId,
+          ownerName: latest?.displayName || latest?.userId || 'Otro colaborador',
+        });
+      }
+      return ok;
+    },
+    [acquireLock, activeWedding, canPersist, emitLockEvent, refreshLockHeartbeat]
+  );
 
   const mergeUiPrefs = (patch) => {
     if (!patch || typeof patch !== 'object') return;
@@ -256,8 +416,58 @@ const normalizeSpecialMoments = (moments = {}) => {
     };
   }, [activeWedding, canPersist, currentUserId, currentUserName, tab]);
 
+  useEffect(() => {
+    if (!activeWedding || !canPersist) {
+      locksRef.current = new Map();
+      setLocks([]);
+      return () => {};
+    }
+    const locksCollection = collection(db, 'weddings', activeWedding, 'seatingLocks');
+    const unsubscribe = onSnapshot(
+      locksCollection,
+      (snapshot) => {
+        const now = Date.now();
+        const list = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() || {};
+          const updatedAt =
+            data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : 0;
+          const isExpired = updatedAt && now - updatedAt > LOCK_TTL_MS;
+          if (isExpired && data.clientId !== collabClientIdRef.current) {
+            deleteDoc(docSnap.ref).catch(() => {});
+            return;
+          }
+          list.push({
+            id: docSnap.id,
+            resourceType: data.resourceType || 'table',
+            resourceId:
+              data.resourceId !== undefined && data.resourceId !== null
+                ? String(data.resourceId)
+                : '',
+            clientId: data.clientId,
+            userId: data.userId,
+            displayName: data.displayName,
+            color: data.color,
+            updatedAt,
+          });
+        });
+        const map = new Map();
+        list.forEach((item) =>
+          map.set(`${item.resourceType}-${item.resourceId}`, item)
+        );
+        locksRef.current = map;
+        setLocks(list);
+      },
+      (error) => {
+        console.warn('[useSeatingPlan] locks snapshot error:', error);
+      }
+    );
+    return () => {
+      unsubscribe?.();
+    };
+  }, [activeWedding, canPersist]);
+
   // Estados principales
-  const [tab, setTab] = useState('ceremony');
   const [hallSize, setHallSize] = useState({ width: 1800, height: 1200 });
   const [drawMode, setDrawMode] = useState('pan');
   const [validationsEnabled, setValidationsEnabled] = useState(true);
@@ -284,6 +494,27 @@ const normalizeSpecialMoments = (moments = {}) => {
   const [tablesCeremony, setTablesCeremony] = useState([]);
   const [seatsCeremony, setSeatsCeremony] = useState([]);
   const [tablesBanquet, setTablesBanquet] = useState([]);
+
+  // Auto-guardado local para Banquete cuando no hay persistencia (Cypress/Vitest)
+  useEffect(() => {
+    if (!activeWedding || canPersist) return;
+    try {
+      const cfg = {};
+      if (hallSize && typeof hallSize.width === 'number' && typeof hallSize.height === 'number') {
+        cfg.width = hallSize.width;
+        cfg.height = hallSize.height;
+        if (Number.isFinite(hallSize.aisleMin)) cfg.aisleMin = hallSize.aisleMin;
+      }
+      const payload = {
+        hallSize: Object.keys(cfg).length ? cfg : undefined,
+        globalMaxSeats,
+        background,
+        tables: Array.isArray(tablesBanquet) ? tablesBanquet : [],
+        areas: Array.isArray(areasBanquet) ? areasBanquet : [],
+      };
+      writeLocalState('banquet', payload);
+    } catch (_) {}
+  }, [activeWedding, canPersist, tablesBanquet, areasBanquet, hallSize?.width, hallSize?.height, hallSize?.aisleMin, globalMaxSeats, background]);
 
   // Estados de UI
   const [selectedTable, setSelectedTable] = useState(null);
@@ -314,6 +545,19 @@ const normalizeSpecialMoments = (moments = {}) => {
   const tables = tab === 'ceremony' ? tablesCeremony : tablesBanquet;
   const seats = tab === 'ceremony' ? seatsCeremony : [];
   const setTables = tab === 'ceremony' ? setTablesCeremony : setTablesBanquet;
+
+  useEffect(() => {
+    const keep = [];
+    if (selectedTable && selectedTable.id != null) {
+      keep.push(selectedTable.id);
+    }
+    if (Array.isArray(selectedIds)) {
+      selectedIds.forEach((id) => {
+        if (id != null && !keep.includes(id)) keep.push(id);
+      });
+    }
+    releaseTableLocksExcept(keep);
+  }, [selectedTable?.id, selectedIds, releaseTableLocksExcept]);
 
   useEffect(() => {
     try {
@@ -350,6 +594,12 @@ const normalizeSpecialMoments = (moments = {}) => {
         }
         if (stored.background !== undefined) {
           setBackground(stored.background);
+        }
+        if (Array.isArray(stored.areas)) {
+          setAreasBanquet(stored.areas);
+        }
+        if (Array.isArray(stored.tables)) {
+          setTablesBanquet(stored.tables);
         }
       }
       return;
@@ -440,6 +690,22 @@ const normalizeSpecialMoments = (moments = {}) => {
       unsubscribe?.();
     };
   }, [activeWedding, canPersist]);
+
+  useEffect(() => {
+    return () => {
+      activeLockIntervalsRef.current.forEach((interval) => clearInterval(interval));
+      activeLockIntervalsRef.current.clear();
+      const owned = Array.from(ownedLocksRef.current);
+      ownedLocksRef.current.clear();
+      if (canPersist && activeWedding) {
+        owned.forEach((key) => {
+          const [type, ...rest] = key.split('-');
+          const id = rest.join('-');
+          releaseLock(type, id, { skipState: true });
+        });
+      }
+    };
+  }, [activeWedding, canPersist, releaseLock]);
 
   // Cargar configuración de ceremonia (seats/tables/areas/settings)
   useEffect(() => {
@@ -875,6 +1141,7 @@ const pushHistory = (snapshot) => {
     }
   };
   const deleteTable = (tableId) => {
+    releaseLock('table', tableId);
     if (tab === 'ceremony') setTablesCeremony((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
     else setTablesBanquet((prev) => prev.filter((t) => String(t.id) !== String(tableId)));
   };
@@ -1074,7 +1341,10 @@ const pushHistory = (snapshot) => {
       pushHistory({ type: 'banquet', tables: sanitized, areas: areasBanquet });
     } catch (_) {}
   };
-  const clearBanquetLayout = () => setTablesBanquet([]);
+  const clearBanquetLayout = () => {
+    releaseTableLocksExcept([]);
+    setTablesBanquet([]);
+  };
 
   // Invitados y asientos
   const moveGuest = (guestId, tableId) => {
@@ -1877,7 +2147,7 @@ const smartConflictSuggestions = useMemo(() => {
     } catch (error) { console.error('Error exportando PDF:', error); }
   };
   const exportCSV = async (options = {}) => {
-    const { tabs: selectedTabs } = options;
+    const { tabs: selectedTabs, returnBlob = false, filename } = options || {};
     try {
       const requestedTabs = Array.isArray(selectedTabs) && selectedTabs.length ? selectedTabs : ['banquet', 'ceremony'];
       const rows = [
@@ -1902,15 +2172,30 @@ const smartConflictSuggestions = useMemo(() => {
         }),
       ];
       const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const exportName = filename || `seating-${requestedTabs.join('-')}-${Date.now()}.csv`;
+      if (returnBlob) {
+        return {
+          format: 'csv',
+          blob,
+          mimeType: 'text/csv',
+          filename: exportName,
+        };
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `seating-${requestedTabs.join('-')}-${Date.now()}.csv`;
+      a.download = exportName;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (e) { console.warn('CSV export failed', e); }
+      return { format: 'csv', blob, mimeType: 'text/csv', filename: exportName };
+    } catch (e) {
+      console.warn('CSV export failed', e);
+      if (returnBlob) throw e;
+      return null;
+    }
   };
-  const exportSVG = async () => {
+  const exportSVG = async (options = {}) => {
+    const { returnBlob = false, filename } = options || {};
     try {
       const w = hallSize?.width || 1800;
       const h = hallSize?.height || 1200;
@@ -1934,13 +2219,27 @@ const smartConflictSuggestions = useMemo(() => {
       ].join('');
       const svg = header + body + footer;
       const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const exportName = filename || `seating-${tab}-${Date.now()}.svg`;
+      if (returnBlob) {
+        return {
+          format: 'svg',
+          blob,
+          mimeType: 'image/svg+xml',
+          filename: exportName,
+        };
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `seating-${tab}-${Date.now()}.svg`;
+      a.download = exportName;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (e) { console.warn('SVG export failed', e); }
+      return { format: 'svg', blob, mimeType: 'image/svg+xml', filename: exportName };
+    } catch (e) {
+      console.warn('SVG export failed', e);
+      if (returnBlob) throw e;
+      return null;
+    }
   };
 
   const fetchImageAsDataURL = async (url) => {
@@ -2767,9 +3066,25 @@ const exportDetailedPDF = async (options = {}) => {
     writeDietaryRestrictions();
     writeVipList();
 
-    pdf.save(`seating-report-${Date.now()}.pdf`);
+    const exportName = `seating-report-${Date.now()}.pdf`;
+    if (exportConfig.returnBlob) {
+      const blob = pdf.output('blob');
+      return {
+        format: 'pdf',
+        blob,
+        mimeType: 'application/pdf',
+        filename: exportName,
+      };
+    }
+    pdf.save(exportName);
+    return {
+      format: 'pdf',
+      blob: pdf.output('blob'),
+      mimeType: 'application/pdf',
+      filename: exportName,
+    };
   };
-const exportDetailedSVG = (options) => {
+const exportDetailedSVG = (options = {}) => {
     const {
       tabs: requestedTabs = ['ceremony', 'banquet'],
       config: exportConfig = {},
@@ -2859,12 +3174,27 @@ const exportDetailedSVG = (options) => {
     svgParts.push('</svg>');
     const svgString = svgParts.join('');
     const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const exportName = `seating-advanced-${Date.now()}.svg`;
+    if (exportConfig.returnBlob) {
+      return {
+        format: 'svg',
+        blob,
+        mimeType: 'image/svg+xml',
+        filename: exportName,
+      };
+    }
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = `seating-advanced-${Date.now()}.svg`;
+    anchor.download = exportName;
     anchor.click();
     URL.revokeObjectURL(url);
+    return {
+      format: 'svg',
+      blob,
+      mimeType: 'image/svg+xml',
+      filename: exportName,
+    };
   };
 
   const exportAdvancedReport = async (options = {}) => {
@@ -2873,37 +3203,185 @@ const exportDetailedSVG = (options) => {
       tabs: requestedTabs = ['ceremony', 'banquet'],
       contents = [],
       config: exportConfig = {},
-    } = options;
-    const normalizedTabs = requestedTabs.map((tab) => normalizeTabId(tab));
-    const uniqueFormats = Array.from(new Set(formats));
-    const logoDataUrl = exportConfig.logoUrl ? await fetchImageAsDataURL(exportConfig.logoUrl) : null;
+      snapshot = null,
+    } = options || {};
 
-    const tasks = [];
+    const normalizedTabs = requestedTabs.map((tab) => normalizeTabId(tab));
+    const uniqueFormats = Array.from(new Set(formats)).filter(Boolean);
+    const wantsPersistence = canPersist && !!activeWedding;
+
+    const sanitizedConfig = {
+      orientation: exportConfig.orientation || 'portrait',
+      scale: exportConfig.scale || '1:75',
+      includeMeasures:
+        typeof exportConfig.includeMeasures === 'boolean'
+          ? exportConfig.includeMeasures
+          : true,
+      language: exportConfig.language || 'es',
+      logoUrl: exportConfig.logoUrl || '',
+    };
+
+    const logoDataUrl = sanitizedConfig.logoUrl
+      ? await fetchImageAsDataURL(sanitizedConfig.logoUrl)
+      : null;
+
+    const artifactPromises = [];
+    const artifactConfig = { ...sanitizedConfig, returnBlob: wantsPersistence };
+
+    const toArtifact = (result) => Promise.resolve(result).catch((error) => {
+      console.warn('[useSeatingPlan] export artifact failed', error);
+      if (wantsPersistence) throw error;
+      return null;
+    });
+
     if (uniqueFormats.includes('pdf')) {
-      tasks.push(
-        exportDetailedPDF({
-          tabs: normalizedTabs,
-          contents,
-          config: exportConfig,
-          logoDataUrl,
-        })
+      artifactPromises.push(
+        toArtifact(
+          exportDetailedPDF({
+            tabs: normalizedTabs,
+            contents,
+            config: artifactConfig,
+            logoDataUrl,
+          })
+        )
       );
     }
     if (uniqueFormats.includes('svg')) {
-      tasks.push(
-        Promise.resolve(
+      artifactPromises.push(
+        toArtifact(
           exportDetailedSVG({
             tabs: normalizedTabs,
-            config: exportConfig,
+            config: artifactConfig,
             logoDataUrl,
           })
         )
       );
     }
     if (uniqueFormats.includes('csv')) {
-      tasks.push(exportCSV({ tabs: normalizedTabs }));
+      artifactPromises.push(
+        toArtifact(
+          exportCSV({
+            tabs: normalizedTabs,
+            returnBlob: wantsPersistence,
+          })
+        )
+      );
     }
-    await Promise.all(tasks);
+
+    const resolvedArtifacts = (await Promise.all(artifactPromises))
+      .filter(Boolean)
+      .map((artifact) => (artifact && artifact.blob ? artifact : null))
+      .filter(Boolean);
+
+    const triggerLocalDownload = (artifact) => {
+      try {
+        if (!artifact?.blob) return;
+        const url = URL.createObjectURL(artifact.blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = artifact.filename || `seating-export-${Date.now()}.${artifact.format || 'dat'}`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.warn('[useSeatingPlan] local download failed', error);
+      }
+    };
+
+    if (!wantsPersistence) {
+      resolvedArtifacts.forEach(triggerLocalDownload);
+      return { exported: resolvedArtifacts };
+    }
+
+    const summarySource = snapshot && typeof snapshot === 'object' ? snapshot : null;
+    const summary = summarySource
+      ? Object.fromEntries(
+          Object.entries({
+            tab: summarySource.tab || null,
+            hallWidth: summarySource.hallSize?.width ?? null,
+            hallHeight: summarySource.hallSize?.height ?? null,
+            tables: Array.isArray(summarySource.tables) ? summarySource.tables.length : null,
+            guests: typeof summarySource.guestsCount === 'number' ? summarySource.guestsCount : null,
+            areas: Array.isArray(summarySource.areas) ? summarySource.areas.length : null,
+          }).filter(([, value]) => value !== null && value !== undefined)
+        )
+      : null;
+
+    const exportId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const exportDocRef = fsDoc(db, 'weddings', activeWedding, 'exports', exportId);
+
+    const baseDoc = {
+      type: 'seating-plan',
+      status: 'processing',
+      formats: uniqueFormats,
+      tabs: normalizedTabs,
+      contents,
+      config: sanitizedConfig,
+      createdAt: serverTimestamp(),
+      createdBy: {
+        uid: currentUserId || null,
+        name: currentUserName || null,
+      },
+    };
+    if (summary && Object.keys(summary).length > 0) {
+      baseDoc.summary = summary;
+    }
+
+    await setDoc(exportDocRef, baseDoc);
+
+    const filesMeta = [];
+    try {
+      const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+      const storage = getStorage();
+      const basePath = `weddings/${activeWedding}/exports/${exportId}`;
+
+      for (const artifact of resolvedArtifacts) {
+        if (!artifact?.blob) continue;
+        const storagePath = `${basePath}/${artifact.filename}`;
+        const storageRef = ref(storage, storagePath);
+        await uploadBytes(storageRef, artifact.blob, {
+          contentType: artifact.mimeType || 'application/octet-stream',
+        });
+        const downloadURL = await getDownloadURL(storageRef);
+        filesMeta.push({
+          format: artifact.format || null,
+          filename: artifact.filename || null,
+          storagePath,
+          size: typeof artifact.blob.size === 'number' ? artifact.blob.size : null,
+          contentType: artifact.mimeType || null,
+          downloadURL,
+        });
+      }
+
+      await setDoc(
+        exportDocRef,
+        {
+          status: 'ready',
+          files: filesMeta,
+          completedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error('[useSeatingPlan] exportAdvancedReport upload error', error);
+      await setDoc(
+        exportDocRef,
+        {
+          status: 'failed',
+          error: { message: error?.message || 'upload_failed' },
+          completedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      resolvedArtifacts.forEach(triggerLocalDownload);
+      throw error;
+    }
+
+    resolvedArtifacts.forEach(triggerLocalDownload);
+
+    return {
+      exportId,
+      files: filesMeta,
+    };
   };
 
   // Guardado de configuraciÃ³n
@@ -3198,6 +3676,14 @@ const exportDetailedSVG = (options) => {
     canvasRef,
     wsRef,
 
+    // Colaboración
+    collaborators,
+    collaborationStatus,
+    locks,
+    lockEvent,
+    consumeLockEvent,
+    collabClientId: collabClientIdRef.current,
+
     // Funciones de estado
     setAreas,
     setTables,
@@ -3218,6 +3704,8 @@ const exportDetailedSVG = (options) => {
     addArea,
     updateArea,
     deleteArea,
+    ensureTableLock,
+    releaseTableLocksExcept,
 
     // Historial
     pushHistory,
@@ -3287,9 +3775,6 @@ const exportDetailedSVG = (options) => {
     deleteSnapshot,
 
     // Utilidades
-    collaborators,
-    collaborationStatus,
-    collabClientId: collabClientIdRef.current,
     normalizeId,
   };
 };

@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
+import { BLOG_FALLBACK_POSTS } from '../data/blogFallback';
 import { fetchWeddingNews } from '../services/blogService';
+import { translateText } from '../services/translationService';
 
 const MAX_LOOKAHEAD = 10;
 const MAX_EMPTY_BATCHES = 2;
@@ -11,6 +13,17 @@ const MAX_FETCHES_PER_LOAD = 12;
 const PER_DOMAIN_LIMIT = 3;
 
 const normalizeLang = (lang) => String(lang || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es';
+
+const parseBooleanFlag = (value, defaultValue = false) => {
+  if (value === undefined || value === null) return defaultValue;
+  const normalized = String(value).trim().toLowerCase();
+  if (!normalized) return defaultValue;
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+  return defaultValue;
+};
+
+const ENABLE_STATIC_FALLBACK = parseBooleanFlag(import.meta?.env?.VITE_BLOG_ENABLE_STATIC_FALLBACK, false);
 
 const extractDomain = (url) => {
   try {
@@ -20,7 +33,17 @@ const extractDomain = (url) => {
   }
 };
 
-const isValidArticle = (post) => Boolean(post && post.url);
+const hasHttpImage = (post) => {
+  if (!post?.image) return false;
+  try {
+    const imageUrl = new URL(post.image);
+    return imageUrl.protocol === 'http:' || imageUrl.protocol === 'https:';
+  } catch (error) {
+    return false;
+  }
+};
+
+const isValidArticle = (post) => Boolean(post && post.url && hasHttpImage(post));
 
 const canUseEnglishFallback = () =>
   Boolean(import.meta?.env?.VITE_TRANSLATE_KEY || import.meta?.env?.VITE_ENABLE_EN_FALLBACK);
@@ -135,6 +158,23 @@ function Blog() {
 
     let cancelled = false;
 
+    const translateBatchIfNeeded = async (batch) => {
+      if (!Array.isArray(batch) || lang === 'en') return batch;
+      const translated = [];
+      for (const rawPost of batch) {
+        if (!rawPost) continue;
+        const copy = { ...rawPost };
+        if (copy.title) {
+          copy.title = await translateText(copy.title, lang, '');
+        }
+        if (copy.description) {
+          copy.description = await translateText(copy.description, lang, '');
+        }
+        translated.push(copy);
+      }
+      return translated;
+    };
+
     const loadArticles = async () => {
       setLoading(true);
       setError(null);
@@ -158,19 +198,40 @@ function Blog() {
 
       const tryConsumeBatch = (batch) => {
         if (!Array.isArray(batch) || batch.length === 0) {
+          console.info('[Blog] Batch vacío o no válido');
           emptyBatches += 1;
           return;
         }
         emptyBatches = 0;
 
         batch.forEach((post) => {
-          if (!isValidArticle(post)) return;
-          if (basePosts.some((item) => item.url === post.url || item.id === post.id)) return;
+          if (!isValidArticle(post)) {
+            console.info('[Blog] Descartado artículo inválido', {
+              hasUrl: Boolean(post?.url),
+              hasImage: Boolean(post?.image),
+            });
+            return;
+          }
+          const isFallback = Boolean(post?.__fallback);
+          if (
+            !isFallback &&
+            basePosts.some((item) => item.url === post.url || item.id === post.id)
+          ) {
+            console.info('[Blog] Descartado artículo duplicado', { url: post.url });
+            return;
+          }
           const domain = extractDomain(post.url);
-          if ((domainCounts[domain] || 0) >= PER_DOMAIN_LIMIT) return;
-          domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+          if (!isFallback && (domainCounts[domain] || 0) >= PER_DOMAIN_LIMIT) {
+            console.info('[Blog] Descartado por límite de dominio', { domain });
+            return;
+          }
+          if (!isFallback) {
+            domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+          }
           basePosts.push(post);
         });
+
+        console.info('[Blog] Total de artículos tras procesar batch', basePosts.length);
       };
 
       while (
@@ -181,6 +242,11 @@ function Blog() {
       ) {
         try {
           const batch = await fetchWeddingNews(fetchPage, 50, lang);
+          console.info('[Blog] fetchWeddingNews batch', {
+            page: fetchPage,
+            lang,
+            size: Array.isArray(batch) ? batch.length : -1,
+          });
           consecutiveErrors = 0;
           tryConsumeBatch(batch);
         } catch (err) {
@@ -204,7 +270,12 @@ function Blog() {
         ) {
           try {
             const batch = await fetchWeddingNews(fallbackPage, 50, 'en');
-            tryConsumeBatch(batch);
+            const translatedBatch = await translateBatchIfNeeded(batch);
+            console.info('[Blog] fetchWeddingNews fallback EN batch', {
+              page: fallbackPage,
+              size: Array.isArray(translatedBatch) ? translatedBatch.length : -1,
+            });
+            tryConsumeBatch(translatedBatch);
           } catch (err) {
             console.warn('[Blog] Error fetching EN fallback', err);
           }
@@ -216,6 +287,16 @@ function Blog() {
             fallbackEmpty = 0;
           }
         }
+      }
+
+      if (basePosts.length === baselineLength && ENABLE_STATIC_FALLBACK) {
+        console.info('[Blog] Injecting local fallback posts');
+        const fallbackBatch = BLOG_FALLBACK_POSTS.map((entry, index) => ({
+          ...entry,
+          __fallback: true,
+          id: entry.id || `local-fallback-${index}`,
+        }));
+        tryConsumeBatch(fallbackBatch);
       }
 
       if (cancelled) return;

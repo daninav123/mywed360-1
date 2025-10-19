@@ -1,6 +1,8 @@
-# Roadmap - Lovenda/MyWed360
+﻿# Roadmap - Lovenda/MyWed360
 
 > Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.
+>
+> Snapshot historico: `docs/roadmap-2025-v2.md` (09/10/2025). Mantén este archivo como referencia principal.
 
 ## Resumen ejecutivo
 ### Objetivos trimestrales
@@ -23,32 +25,45 @@
 
 ## Detalle por flujo
 
-## 0. Administración Global (estado 2025-10-08)
+## 0. Administracion Global (estado 2025-10-14)
 
 - **[archivo]** docs\flujos-especificos\flujo-0-administracion-global.md
-- **[conclusion]** parcial
+- **[conclusion]** implementado
 - **[implementado (doc)]**
-  - documentación funcional cerrada; implementación técnica pendiente.
+  - autenticación reforzada, panel operativo con métricas en tiempo real, alertas de integraciones y gestión de tareas administrativas. La documentación de detalle se encuentra en [docs/panel-admin/panel-admin.md](../panel-admin/panel-admin.md).
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/admin/admin-flow.cy.js
+
+## 10. Gesti�n de Bodas M�ltiples (estado 2025-10-07)
+
+- **[archivo]** docs\flujos-especificos\flujo-10-gestion-bodas-multiples.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `Bodas.jsx`, `BodaDetalle.jsx`, `WeddingSelector.jsx`, `WeddingFormModal.jsx`, `useWedding` context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes `MultiWeddingSummary.jsx` y `WeddingPortfolioTable.jsx`, y permisos granulares por boda.
+- **[pendiente (doc)]**
+  - dashboards multi-boda avanzados, permisos granulares por m�dulo y vistas cruzadas consolidadas.
+- **[E2E specs]** 2/2 presentes
+  - [ok] cypress/e2e/weddings/multi-weddings-flow.cy.js
+  - [ok] cypress/e2e/weddings/wedding-team-flow.cy.js
+- **[verificacion de archivos implementados]**
+  - `Bodas.jsx` -> src\pages\Bodas.jsx
+  - `BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
+  - `WeddingSelector.jsx` -> src\components\WeddingSelector.jsx
+  - `WeddingFormModal.jsx` -> src\components\WeddingFormModal.jsx
+  - `useWedding` -> (no encontrado)
+  - `MultiWeddingSummary.jsx` -> src\components\weddings\MultiWeddingSummary.jsx
+  - `WeddingPortfolioTable.jsx` -> src\components\weddings\WeddingPortfolioTable.jsx
 - **[roadmap/pending (doc)]**
-  - - MFA obligatorio (TOTP) para admin.
-  - - Impersonación segura (solo lectura) con trail completo.
-  - - SSO corporativo (SAML/OAuth Enterprise).
-  - - Alertas push/Slack en tiempo real.
-  - - Dashboard dedicado Estado integraciones.
-  - - Reportes automáticos semanales al comité directivo.
-  - - KPI NPS automatizado (encuestas periódicas planners).
+  - - Dashboard multi-boda (res�menes cruzados, comparativas).
+  - - Permisos granulares por m�dulo/colecci�n.
+  - - Filtro de bodas por estado/fecha/owner.
+  - - Sincronizaci�n con planner CRM externo.
+  - - Activity feed y alertas multi-boda.
 - **[checklist despliegue]**
-  - - Crear usuario admin único (`role: admin`, `claims.admin: true`) y habilitar MFA (si disponible) o restringir IP mediante Cloud Armor.
-  - - Variables entorno necesarias: `VITE_ADMIN_ALLOWED_DOMAINS`, `ADMIN_METRICS_REFRESH_MS`, `ADMIN_SUPPORT_EMAIL`, `ADMIN_SUPPORT_PHONE`, `ADMIN_BROADCAST_DRYRUN_LIMIT`, `ADMIN_SESSION_TTL`, `ADMIN_SLACK_WEBHOOK`.
-  - - Desplegar funciones cron `calculateAdminMetrics` (cada hora) y `syncExternalKPIs` (cada 5 min) antes de activar rutas protegidas.
-  - - Crear índices Firestore (`adminMetrics` por `date` desc; `adminAlerts` por `status`+`createdAt`; `adminAuditLogs` por `resourceType`+`createdAt`; `adminBroadcasts` por `status`+`scheduledAt`; `featureFlags` por `domain`+`environment`).
-  - - Configurar bucket `gs://lovenda-admin-snapshots` con retención 90 días y acceso restringido al servicio `admin-reporter`.
-  - - Verificar API keys y scopes de integraciones (Mailgun, Twilio/WhatsApp, OpenAI, pasarela pagos, Zendesk/Intercom) y documentar responsables.
-  - - Actualizar reglas Firestore (`allow read/write: if request.auth.token.admin == true`) y asegurar colecciones particionadas por mes.
-  - - Documentar plan de rotación de claves, runbook de incidentes admin y procedimiento de escalado (N1 soporte, N2 SRE, N3 Dirección).
-  - - Configurar notificaciones Slack/email en `notifyServiceOutage` antes de pasar a producción.
+  - - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
+  - - Seeds y Cloud Functions idempotentes para nuevas bodas.
+  - - Validar UI con >10 bodas (scroll, selector).
+  - - QA de traducciones y copy en wizard.
 
 ## 11. Protocolo y Ceremonias (visión global)
 
@@ -161,53 +176,23 @@
   - - Revisar textos de muestra y traducciones.  
   - - Validar permisos según rol y auditoría (`updatedBy`).
 
-## 14. Checklist Avanzado (estado 2025-10-07)
-
-- **[archivo]** docs\flujos-especificos\flujo-14-checklist-avanzado.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `Checklist.jsx`, `Tasks.jsx`, `TaskSidePanel.jsx`, `SmartChecklist.jsx`, hooks `useWeddingTasksHierarchy`, `useTaskTemplates`, servicios `automationService.js` (basico).
-- **[pendiente (doc)]**
-  - generacion inteligente de checklists, dependencias avanzadas, gamificacion completa y plantillas compartidas por comunidad.
-- **[E2E specs]** 1/1 presentes
-  - [ok] cypress/e2e/tasks/all_subtasks_modal.cy.js
-- **[verificacion de archivos implementados]**
-  - `Checklist.jsx` -> src\pages\Checklist.jsx, src\pages\protocolo\Checklist.jsx
-  - `Tasks.jsx` -> src\pages\Tasks.jsx
-  - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
-  - `SmartChecklist.jsx` -> (no encontrado)
-  - `useWeddingTasksHierarchy` -> (no encontrado)
-  - `useTaskTemplates` -> (no encontrado)
-  - `automationService.js` -> backend\services\automationService.js
-- **[roadmap/pending (doc)]**
-  - - Motor de recomendaciones IA que genere checklist dinamico segun perfil de boda.
-  - - Editor de plantillas colaborativas y marketplace de workflows.
-  - - Dependencias visuales (gantt, grafo) y pronostico de riesgo.
-  - - Gamificacion completa (streaks, objetivos semanales, recompensas).
-  - - Sync bidireccional con calendarios externos (Google/Microsoft).
-- **[checklist despliegue]**
-  - - Reglas Firestore para `tasks`, `checklist`, `taskTemplates`, `taskAutomations`, `checklistStats`.
-  - - Revisar limites de escritura masiva (batch) en seeds y automatizaciones.
-  - - Configurar notificaciones (`MAILGUN_*`, `PUSH_PROVIDER`) para recordatorios.
-  - - Actualizar traducciones y onboarding segun nuevas plantillas.
-
 ## 15. Contratos y Documentos (estado 2025-10-07)
 
 - **[archivo]** docs\flujos-especificos\flujo-15-contratos-documentos.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - `ContractTemplates.jsx`, `ContractEditor.jsx`, `DocumentManager.jsx`, `DigitalSignatureModal.jsx`, servicios `documentService.js`, `signatureService.js` (stub), OCR basico en backend.
+  - `Contratos.jsx` (CRUD y modales integrados), dataset `contractTemplates.js`, servicios `SignatureService.js` (stub), `storageUploadService.js` para adjuntos y hooks `useFirestoreCollection` + `useProveedores` para wiring con proveedores.
 - **[pendiente (doc)]**
   - firma digital integrada (DocuSign/HelloSign), workflows de aprobacion, analitica legal y compliance automatizado.
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/contracts/contracts-flow.cy.js
 - **[verificacion de archivos implementados]**
-  - `ContractTemplates.jsx` -> (no encontrado)
-  - `ContractEditor.jsx` -> (no encontrado)
-  - `DocumentManager.jsx` -> (no encontrado)
-  - `DigitalSignatureModal.jsx` -> (no encontrado)
-  - `documentService.js` -> (no encontrado)
-  - `signatureService.js` -> backend\services\signatureService.js
+  - `Contratos.jsx` -> src\pages\Contratos.jsx
+  - `contractTemplates.js` -> src\data\templates\contractTemplates.js
+  - `SignatureService.js` -> src\services\SignatureService.js, backend\services\signatureService.js
+  - `storageUploadService.js` -> src\services\storageUploadService.js
+  - `useFirestoreCollection` -> src\hooks\useFirestoreCollection.js
+  - `useProveedores` -> src\hooks\useProveedores.jsx
 - **[roadmap/pending (doc)]**
   - - Integracion completa con proveedores de firma digital y verificacion de identidad.
   - - Analitica de clausulas (riesgos, montos, vencimientos) con IA.
@@ -220,32 +205,24 @@
   - - Variables de firma (`DOCUSIGN_*`, `HELLOSIGN_*`) y webhooks configuradas antes de activar.
   - - Revisar plantillas por region y mantener repositorio de versiones legales.
 
-## 17. Gamificacion y Progreso (estado 2025-10-07)
+## 17. Gamificacion y Progreso (estado 2025-10-13)
 
 - **[archivo]** docs\flujos-especificos\flujo-17-gamificacion-progreso.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `GamificationPanel.jsx` en Home (`Dashboard.jsx`) se incrusta en la tarjeta existente de progreso para reutilizar la barra actual, y servicio `GamificationService` con endpoints `award`, `stats`, `achievements` (stub).
-- **[pendiente (doc)]**
-  - niveles, logros, retos semanales, recompensas y panel de analytics completo.
-- **[verificacion de archivos implementados]**
-  - `GamificationPanel.jsx` -> src\components\GamificationPanel.jsx
-  - `Dashboard.jsx` -> src\pages\Dashboard.jsx, src\components\dashboard\Dashboard.jsx
-  - `GamificationService` -> (no encontrado)
-  - `award` -> (no encontrado)
-  - `stats` -> (no encontrado)
-  - `achievements` -> (no encontrado)
+- **[conclusion]** pendiente
+- **[E2E specs]** 3/3 presentes
+  - [ok] cypress/e2e/gamification/gamification-progress-happy.cy.js
+  - [ok] cypress/e2e/gamification/gamification-milestone-unlock.cy.js
+  - [ok] cypress/e2e/gamification/gamification-history.cy.js
 - **[roadmap/pending (doc)]**
-  - - Desafios cooperativos (pareja vs planners) y recompensas canjeables.
-  - - Tienda de recompensas virtuales (plantillas, upgrades) ligada a puntos.
-  - - Comparativas opcionales (leaderboards privados) con controles de privacidad.
-  - - Analitica avanzada de engagement y segmentacion.
-  - - Integracion con programa de referidos y planes premium.
+  - - Disenar integraciones discretas (badges en lista de tareas, indicadores en timeline) sin recurrir a paneles grandes.
+  - - Definir programa de recompensas intercambiables consumiendo los datos existentes.
+  - - Preparar comunicacion a usuarios cuando exista alguna visualizacion ligera o beneficio tangible.
+  - - Analitica avanzada y segmentacion para marketing se mantiene como trabajo futuro.
 - **[checklist despliegue]**
-  - - Reglas Firestore para `gamification`, `achievements`, `gamificationEvents`.
-  - - Configurar limites de escritura y deduplicacion en Cloud Functions.
-  - - Revisar copy motivacional y traducciones.
-  - - Preparar comunicacion a usuarios sobre nuevo sistema y opciones de privacidad.
+  - - Reglas de seguridad para colecciones `gamification`, `achievements`, `gamificationEvents`.
+  - - Limites de escritura y throttling en funciones Cloud/Firestore.
+  - - Documentar contratos de API para consumidores internos.
+  - - Configurar alertas y monitoreo de logs.
 
 ## 18. Generador de Documentos Legales (estado 2025-10-07)
 
@@ -255,6 +232,10 @@
   - formulario `DocumentosLegales.jsx` (consentimiento de uso de imagen) que genera un PDF local con jsPDF.
 - **[pendiente (doc)]**
   - repositorio completo de plantillas, firma electrónica, almacenamiento backend y automatización IA.
+- **[E2E specs]** 3/3 presentes
+  - [ok] cypress/e2e/protocolo/legal-docs-generator.cy.js
+  - [ok] cypress/e2e/protocolo/legal-docs-validation.cy.js
+  - [ok] cypress/e2e/protocolo/legal-docs-versioning.cy.js
 - **[verificacion de archivos implementados]**
   - `DocumentosLegales.jsx` -> src\pages\DocumentosLegales.jsx, src\pages\protocolo\DocumentosLegales.jsx
 - **[checklist despliegue]**
@@ -292,39 +273,6 @@
   - - Actualizar portada/template default por temporada.
   - - Preparar prototipo de la UI “Configuración de pieza” en Figma siguiendo `docs/diseno/flujo-19-panel-configuracion-figma.md` y dejar enlace para revisión.
 
-## 2. Creación de Evento con IA (bodas y eventos afines) · estado 2025-10-08
-
-- **[archivo]** docs\flujos-especificos\flujo-2-creacion-boda-ia.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios `createWedding` y `seedDefaultTasksForWedding`, catálogo `src/config/eventStyles.js`.
-- **[pendiente (doc)]**
-  - habilitar opt-in a planner desde Perfil, telemetría completa del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
-- **[E2E specs]** 1/1 presentes
-  - [ok] cypress/e2e/onboarding/create-event-flow.cy.js
-- **[verificacion de archivos implementados]**
-  - `src/pages/CreateWeddingAI.jsx` -> src\pages\CreateWeddingAI.jsx
-  - `src/pages/AyudaCeremonia.jsx` -> src\pages\AyudaCeremonia.jsx, src\pages\protocolo\AyudaCeremonia.jsx
-  - `src/pages/BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
-  - `src/context/WeddingContext.jsx` -> src\context\WeddingContext.jsx
-  - `createWedding` -> (no encontrado)
-  - `seedDefaultTasksForWedding` -> (no encontrado)
-  - `src/config/eventStyles.js` -> src\config\eventStyles.js
-- **[roadmap/pending (doc)]**
-  - - Implementar opt-in a planner/assistant desde Perfil con flujo dedicado.
-  - - Refactorizar rutas y componentes (`/bodas` → `/eventos`) cuando exista soporte multi-evento en toda la app.
-  - - Instrumentar telemetría y dashboards de adopción segmentados por `eventType`.
-  - - Integrar asistencia IA contextual con prompts específicos por tipo de evento y fallback offline.
-  - - Habilitar CTA «Crear nuevo evento» tras validar multi-evento en producción.
-  - - ✅ 2025-10-08: Wizard multi-evento, servicios y pantallas asociados actualizados para `eventType/eventProfile`.
-  - - ✅ 2025-10-08: Catálogo de estilos centralizado y copy adaptable (`Boda`/`Evento`).
-- **[checklist despliegue]**
-  - - Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.
-  - - Script `scripts/migrate-event-profile.js` para etiquetar eventos legacy con `eventType: 'boda'` y generar `eventProfileSummary` básico antes del switch.
-  - - Revisión de copy/traducciones (`Crear boda`, `Crear evento`) y estilos centralizados (`config/eventStyles.js`).
-  - - Telemetría: preparar dashboard funnel + ratio adopción Paso 2.
-  - - QA: actualizar suites Cypress/E2E con los casos anteriores.
-
 ## 20. Buzon Interno y Estadisticas (estado 2025-10-07)
 
 - **[archivo]** docs\flujos-especificos\flujo-20-email-inbox.md
@@ -333,9 +281,9 @@
   - `Buzon_fixed_complete.jsx` (legacy), `EmailInbox.jsx`, `EmailStatistics.jsx`, componentes `UnifiedInbox/InboxContainer.jsx`, `EmailComposer.jsx`, `EmailSetupForm.jsx`.
 - **[pendiente (doc)]**
   - consolidar experiencia unica, documentar APIs backend, onboarding centralizado y telemetry completa.
-- **[E2E specs]** 6/7 presentes
+- **[E2E specs]** 7/7 presentes
   - [ok] cypress/e2e/email_inbox_smoke.cy.js
-  - [faltante] cypress/e2e/email/read-email.cy.js
+  - [ok] cypress/e2e/email/read-email.cy.js
   - [ok] cypress/e2e/email/send-email.cy.js
   - [ok] cypress/e2e/email/folders-management.cy.js
   - [ok] cypress/e2e/email/tags-filters.cy.js
@@ -378,7 +326,7 @@
   - `PublicWedding.jsx` -> src\pages\PublicWedding.jsx
   - `SeatingPlanPost.jsx` -> src\pages\disenos\SeatingPlanPost.jsx
   - `MomentosEspeciales.jsx` -> src\pages\protocolo\MomentosEspeciales.jsx
-  - `websiteService` -> (no encontrado)
+  - `websiteService` -> src\services\websiteService.js
 - **[roadmap/pending (doc)]**
   - - Editor dedicado en panel con vista previa y control de secciones.
   - - Dominios personalizados y configuracion automatica de SSL.
@@ -391,70 +339,58 @@
   - - Revisar cumplimiento legal (cookies, privacidad) y agregar banner si aplica.
   - - Preparar redireccion 404/410 para bodas archivadas.
 
-## 22. Navegacion y Panel General (estado 2025-10-07)
-
-- **[archivo]** docs\flujos-especificos\flujo-22-dashboard-navegacion.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `Home.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`).
-- **[pendiente (doc)]**
-  - unificar dashboard con metricas en vivo, proteger herramientas internas y agregar actividad reciente + estado de sincronizacion.
-- **[verificacion de archivos implementados]**
-  - `Home.jsx` -> src\pages\Home.jsx
-  - `Dashboard.jsx` -> src\pages\Dashboard.jsx, src\components\dashboard\Dashboard.jsx
-  - `More.jsx` -> src\pages\More.jsx
-  - `Perfil.jsx` -> src\pages\Perfil.jsx
-  - `WidgetContent.jsx` -> src\components\dashboard\WidgetContent.jsx
-  - `DevEnsureFinance.jsx` -> src\pages\DevEnsureFinance.jsx
-  - `DevSeedGuests.jsx` -> src\pages\DevSeedGuests.jsx
-- **[roadmap/pending (doc)]**
-  - - Dashboard modular con edicion drag-and-drop y biblioteca de widgets.
-  - - Activity feed en tiempo real con filtros.
-  - - Buscador global y comandos rapidos.
-  - - Integracion con analytics para recomendaciones personalizadas.
-  - - Panel de salud del sistema (sincronizacion, errores recientes).
-- **[checklist despliegue]**
-  - - Reglas Firestore para `dashboardConfig`, `activityFeed` (cuando se publique).
-  - - Asegurar que herramientas dev esten desactivadas en produccion (`VITE_ENV` check).
-  - - Revisar copy, links de soporte y recursos externos.
-  - - Probar skeleton/loading states con datos grandes.
-
-## 23. Métricas del Sistema (estado 2025-10-07)
+## 23. Metricas del Proyecto (estado 2025-10-14)
 
 - **[archivo]** docs\flujos-especificos\flujo-23-metricas-proyecto.md
-- **[conclusion]** pendiente
-- **[pendiente (doc)]**
-  - dashboard unificado multi-módulo, workers de agregación (`metricAggregatorWorker`/`insightsBackfillTask`) y rutas `/analytics/*`.
-- **[E2E specs]** 2/2 presentes
+- **[conclusion]** desconocido
+- **[E2E specs]** 5/5 presentes
   - [ok] cypress/e2e/performance/email-performance.cy.js
   - [ok] cypress/e2e/finance/finance-analytics.cy.js
+  - [ok] cypress/e2e/gamification/gamification-history.cy.js
+  - [ok] cypress/e2e/budget_flow.cy.js
+  - [ok] cypress/e2e/finance/finance-flow-full.cy.js
 - **[checklist despliegue]**
-  - - Definir APIs reales (`/api/email-metrics`, `/api/project-metrics`) antes de exposición en UI.
-  - - Proteger la ruta futura con permisos (owner/planner/admin).
-  - - Validar visualizaciones con datos reales y asegurar privacidad.
+  - - Backend: exponer `/api/project-metrics` (GET agregados, POST ingest) protegido por roles (owner, planner, admin, soporte) y habilitar `metricAggregatorWorker` en cron. Ver plan detallado en `docs/panel-admin/metricAggregatorWorker-plan.md`.
+  - - Configurar `VITE_METRICS_ENDPOINT` y variables adicionales (`VITE_ENABLE_EMAIL_ANALYZE`, `VITE_ENABLE_FINANCE_ALERTS`, `MAILGUN_*`, `VITE_BANK_API_*`) para garantizar fuentes completas.
+  - - Verificar reglas de seguridad para colecciones citadas (emailMetrics, finance, gamification, analytics/websiteEvents, publicSites, tasks, contracts, inspirationWall, blogCache).
+  - - Asegurar que `performanceMonitor.setUserContext` se invoca desde `useAuth` y `WeddingContext` antes de habilitar reportes multiusuario.
+  - - Documentar en runbook la respuesta a fallos de ingest (reintentos, colas pendientes, mute de alertas).
 
-## 24. Inspiracion Visual Unificada (estado 2025-10-12)
+## 25. Planes y Suscripciones (estado 2025-10-13)
 
-- **[archivo]** docs\flujos-especificos\flujo-24-galeria-inspiracion.md
-- **[conclusion]** pendiente
+- **[archivo]** docs\flujos-especificos\flujo-25-suscripciones.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - documentación estratégica inicial y catálogo de planes en `docs/planes-suscripcion.md`.
+- **[pendiente (doc)]**
+  - implementación técnica del cobro único por boda, automatizaciones de upgrade/downgrade, telemetría operativa y paneles de rentabilidad.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/subscriptions/subscription-flow.cy.js
+- **[verificacion de archivos implementados]**
+  - `docs/planes-suscripcion.md` -> docs\planes-suscripcion.md
 - **[roadmap/pending (doc)]**
-  - - Motor de recomendaciones con IA (clustering por preferencias, estacionalidad y etapa de boda).
-  - - Colecciones tematicas automatizadas y moodboard descargable/PDF.
-  - - Modo offline con cache en IndexedDB/service workers.
-  - - Favoritos colaborativos entre miembros del equipo y notificaciones proactivas.
-  - - Mejora de accesibilidad: focus trap completo, soporte de teclado en lightbox, announcements ARIA.
+  - - Validar con stakeholders la propuesta de valor y límites concretos por plan.
+  - - Mapear el journey completo en herramientas (Miro/Lucidchart) con responsables y SLA por boda.
+  - - Construir dashboard de métricas (upgrades, ticket medio, ratio Premium Plus) integrado con CRM y pasarela.
+  - - Diseñar y testear journeys automáticos (alta, upgrade, rescate post-abandono) antes del lanzamiento.
+  - - Definir estrategia de retención post-boda y cross-sell hacia nuevas bodas o planners.
+  - - Consolidar automatizaciones de rescate (downgrade, reintentos, ofertas personalizadas).
 - **[checklist despliegue]**
-  - - Verificar llaves/API keys para `wallService` y cuotas de peticiones.
-  - - Ajustar reglas Firestore para `favorites` e `inspirationInteractions`.
-  - - Migrar colecciones legacy (`ideasPhotos` en `users/{uid}`) al nuevo esquema `weddings/{id}/inspiration/favorites` asegurando que planners/assistants vean la misma lista.
-  - - Asegurar headers de imagenes externas (`referrerPolicy`, `Cache-Control`).
-  - - Revisar traducciones en `i18n/locales/*/common.json` para etiquetas dinamicas.
-  - - Configurar dashboards de latencia/errores tanto del feed como del guardado de favoritos.
+  - - Configurar claves de pasarela (`STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET`) y variables `VITE_DEFAULT_PLAN`.
+  - - Asegurar reglas Firestore para `weddings/{id}/subscription`, `users/{uid}/weddingPlans` y `subscriptionInvoices`.
+  - - Registrar dominios y webhooks en pasarela de pago (staging/producción).
+  - - Sembrar seeds para QA (`scripts/seedSubscriptions.js`) con bodas en cada plan.
+  - - Documentar FAQ y material de soporte para cada nivel.
+  - - Ejecutar `scripts/aggregateRoadmap.js` tras cambios de flujo para sincronizar ROADMAP/TODO.
 
 ## 26. Blog de Tendencias (estado 2025-10-12)
 
 - **[archivo]** docs\flujos-especificos\flujo-26-blog.md
 - **[conclusion]** pendiente
+- **[E2E specs]** 3/3 presentes
+  - [ok] cypress/e2e/blog/blog-article.cy.js
+  - [ok] cypress/e2e/blog/blog-listing.cy.js
+  - [ok] cypress/e2e/blog/blog-subscription.cy.js
 - **[roadmap/pending (doc)]**
   - - Pagina dedicada con archivo historico y categorias filtrables.
   - - Favoritos o lectura posterior sincronizados con el usuario.
@@ -467,12 +403,14 @@
   - - Revisar copy/traducciones en `i18n` para el encabezado `Blog`.
   - - Validar politica de CORS/Referrer de imagenes externas para evitar bloqueos.
 
-## 27. Momentos (Álbum Compartido) — estado 2025-10-13
+## 27. Momentos (Álbum Compartido) — estado 2025-10-15
 
 - **[archivo]** docs\flujos-especificos\flujo-27-momentos.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - implementar el modulo completo (frontend, backend y storage), cerrar pipelines de moderacion automatica y lanzar la experiencia publica (QR, slideshow, descargas).
+  - robustecer pipelines de moderación automática, gamificación y métricas, además de endurecer observabilidad y experiencia QR pública.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/moments/moments-empty-state.cy.js
 - **[roadmap/pending (doc)]**
   - 1. **MVP interno (Sprint 1-2)**:
   -    - Crear álbum único `momentos` por boda.
@@ -497,6 +435,11 @@
   - `HomePage.jsx` (deriva a `PlannerDashboard.jsx` para planners), `PlannerDashboard.jsx`, `WeddingContext.jsx`, `useFirestoreCollection.js`, `useWeddingCollection.js`, navegación planner en `Nav.jsx`, portfolio multi-boda en `Bodas.jsx`.
 - **[pendiente (doc)]**
   - poblar métricas de alertas/inspiración/blog, sincronizar recuentos con Firestore en tiempo real y reforzar UX cuando no exista boda activa.
+- **[E2E specs]** 4/4 presentes
+  - [ok] cypress/e2e/dashboard/diagnostic-panel.cy.js
+  - [ok] cypress/e2e/dashboard/global-search-shortcuts.cy.js
+  - [ok] cypress/e2e/dashboard/main-navigation.cy.js
+  - [ok] cypress/e2e/dashboard/planner-dashboard.cy.js
 - **[verificacion de archivos implementados]**
   - `HomePage.jsx` -> src\components\HomePage.jsx
   - `PlannerDashboard.jsx` -> src\components\PlannerDashboard.jsx
@@ -507,27 +450,29 @@
   - `Nav.jsx` -> src\components\Nav.jsx
   - `Bodas.jsx` -> src\pages\Bodas.jsx
 
-## 29. Upgrade de Rol (Owner → Assistant → Planner) (estado 2025-10-13)
+## 29. Upgrade de Rol (Owner ? Assistant ? Planner) (estado 2025-10-13)
 
 - **[archivo]** docs\flujos-especificos\flujo-29-upgrade-roles.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - selector de rol en registro (`src/components/auth/RegisterForm.jsx:56`), persistencia local del rol en `useAuth` (`src/hooks/useAuth.jsx:180`, `src/hooks/useAuth.jsx:593`), navegación y dashboard condicionados por rol (`src/components/Nav.jsx:29`, `src/components/HomePage.jsx:77`), vínculos de bodas por rol en `WeddingService` (`src/services/WeddingService.js:144`, `src/services/WeddingService.js:487`, `src/services/WeddingService.js:510`), invitaciones desde `WeddingAccountLink.jsx:59` y aceptación `WeddingAccountLink.jsx:79`.
+  - selector de rol en registro (`src/components/auth/RegisterForm.jsx:56`), persistencia local del rol en `useAuth` (`src/hooks/useAuth.jsx:180`, `src/hooks/useAuth.jsx:593`), navegaci�n y dashboard condicionados por rol (`src/components/Nav.jsx:29`, `src/components/HomePage.jsx:77`), v�nculos de bodas por rol en `WeddingService` (`src/services/WeddingService.js:144`, `src/services/WeddingService.js:487`, `src/services/WeddingService.js:510`), invitaciones desde `WeddingAccountLink.jsx:59` y aceptaci�n `WeddingAccountLink.jsx:79`.
 - **[pendiente (doc)]**
-  - flujo unificado de upgrade con checkout de plan, sincronización Firestore/localStorage del nuevo rol, límites de bodas por plan, degradación automática al expirar el plan y panel de gestión para revertir cambios.
+  - flujo unificado de upgrade con checkout de plan, sincronizaci�n Firestore/localStorage del nuevo rol, l�mites de bodas por plan, degradaci�n autom�tica al expirar el plan y panel de gesti�n para revertir cambios.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/account/role-upgrade-flow.cy.js
 - **[verificacion de archivos implementados]**
-  - `src/components/auth/RegisterForm.jsx:56` -> (no encontrado)
-  - `useAuth` -> (no encontrado)
-  - `src/hooks/useAuth.jsx:180` -> (no encontrado)
-  - `src/hooks/useAuth.jsx:593` -> (no encontrado)
-  - `src/components/Nav.jsx:29` -> (no encontrado)
-  - `src/components/HomePage.jsx:77` -> (no encontrado)
-  - `WeddingService` -> (no encontrado)
-  - `src/services/WeddingService.js:144` -> (no encontrado)
-  - `src/services/WeddingService.js:487` -> (no encontrado)
-  - `src/services/WeddingService.js:510` -> (no encontrado)
-  - `WeddingAccountLink.jsx:59` -> (no encontrado)
-  - `WeddingAccountLink.jsx:79` -> (no encontrado)
+  - `src/components/auth/RegisterForm.jsx:56` -> src\components\auth\RegisterForm.jsx
+  - `useAuth` -> src\hooks\useAuth.jsx
+  - `src/hooks/useAuth.jsx:180` -> src\hooks\useAuth.jsx
+  - `src/hooks/useAuth.jsx:593` -> src\hooks\useAuth.jsx
+  - `src/components/Nav.jsx:29` -> src\components\Nav.jsx
+  - `src/components/HomePage.jsx:77` -> src\components\HomePage.jsx
+  - `WeddingService` -> src\services\WeddingService.js
+  - `src/services/WeddingService.js:144` -> src\services\WeddingService.js
+  - `src/services/WeddingService.js:487` -> src\services\WeddingService.js
+  - `src/services/WeddingService.js:510` -> src\services\WeddingService.js
+  - `WeddingAccountLink.jsx:59` -> src\components\settings\WeddingAccountLink.jsx
+  - `WeddingAccountLink.jsx:79` -> src\components\settings\WeddingAccountLink.jsx
 
 ## 2B. Asistente Conversacional para Crear Bodas/Eventos · estado 2025-10-11
 
@@ -537,12 +482,17 @@
   - `src/pages/CreateWeddingAssistant.jsx`, rutas `/crear-evento-asistente`, servicios `createWedding`, `seedDefaultTasksForWedding`, contexto `WeddingContext`, catálogos `config/eventStyles.js`.
 - **[pendiente (doc)]**
   - telemetría dedicada, iterar prompts/UX, habilitar múltiples rondas IA y consolidar con flujo clásico.
+- **[E2E specs]** 4/4 presentes
+  - [ok] cypress/e2e/onboarding/assistant-conversation-happy.cy.js
+  - [ok] cypress/e2e/onboarding/assistant-context-switch.cy.js
+  - [ok] cypress/e2e/onboarding/assistant-followups.cy.js
+  - [ok] cypress/e2e/onboarding/create-event-assistant.cy.js
 - **[verificacion de archivos implementados]**
   - `src/pages/CreateWeddingAssistant.jsx` -> src\pages\CreateWeddingAssistant.jsx
   - `/crear-evento-asistente` -> (no encontrado)
   - `createWedding` -> (no encontrado)
   - `seedDefaultTasksForWedding` -> (no encontrado)
-  - `WeddingContext` -> (no encontrado)
+  - `WeddingContext` -> src\context\WeddingContext.jsx
   - `config/eventStyles.js` -> src\config\eventStyles.js
 - **[roadmap/pending (doc)]**
   - - Instrumentar eventos para comparar funnels (wizard vs. asistente).
@@ -560,17 +510,79 @@
   - - Revisar copy/traducciones de preguntas y botones (ES/EN en la próxima iteración).
   - - Telemetría pendiente (cuando se integre en analytics).
 
-## 4. Invitados – Plan de Asientos (estado 2025-10-12)
+## 2C. Personalización IA Continua (estado 2025-10-14)
 
-- **[archivo]** docs\flujos-especificos\flujo-4-invitados-operativa.md
+- **[archivo]** docs\flujos-especificos\flujo-2c-personalizacion-continua.md
+- **[conclusion]** desconocido
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/personalization/personalization-preferences.cy.js
+
+## 30. Pagina de inicio (estado 2025-10-13)
+
+- **[archivo]** docs\flujos-especificos\flujo-30-pagina-inicio.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `src/pages/HomeUser.jsx`, `src/components/HomePage.jsx`, `Nav.jsx`, `ProviderSearchModal.jsx`, `useFinance`, servicios `fetchWeddingNews` y `fetchWall`.
+- **[pendiente (doc)]**
+  - reemplazar datos mock/localStorage por origenes reales, unificar con `Dashboard.jsx`, instrumentar telemetria de interaccion y ocultar helpers de desarrollo en produccion.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/home/home-greeting-names.cy.js
+- **[verificacion de archivos implementados]**
+  - `src/pages/HomeUser.jsx` -> src\pages\HomeUser.jsx
+  - `src/components/HomePage.jsx` -> src\components\HomePage.jsx
+  - `Nav.jsx` -> src\components\Nav.jsx
+  - `ProviderSearchModal.jsx` -> src\components\ProviderSearchModal.jsx
+  - `useFinance` -> src\hooks\useFinance.js
+  - `fetchWeddingNews` -> (no encontrado)
+  - `fetchWall` -> (no encontrado)
+- **[roadmap/pending (doc)]**
+  - - Reemplazar fuentes `localStorage` por datos sincronizados (Firestore/REST) y estados compartidos via contextos.
+  - - Unificar Home con `Dashboard.jsx` (Flujo 22) y permitir configuracion de widgets.
+  - - Anadir resumen de actividad reciente y proximos hitos (tareas, pagos, invitados).
+  - - Implementar buscador global accesible (atajo Cmd/Ctrl+K) y recomendaciones IA.
+- **[checklist despliegue]**
+  - - Envolver boton "Rehacer tutorial" tras feature flag (`VITE_ENABLE_DEV_TOOLS` o similar).
+  - - Confirmar traducciones `i18n` para textos nuevos (progress, acciones, cards).
+  - - Asegurar que `fetchWeddingNews` y `fetchWall` cuenten con mocks en ambientes de prueba.
+  - - Verificar estilos CSS variables (`--color-*`) en temas claro/oscuro.
+
+## 31. Estilo Global (estado 2025-10-13)
+
+- **[archivo]** docs\flujos-especificos\flujo-31-estilo-global.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - 
+  - reutilizar `weddings/{id}/branding/main.palette` en los generadores (web, invitaciones, assets), sincronizar cambios de `mywed360Profile` con Firestore sin depender de eventos locales y exponer UI dedicada para editar estilo global dentro de `/perfil`.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/style/style-global.cy.js
+- **[roadmap/pending (doc)]**
+  - - Consumir `branding/main.palette` en `websitePromptBuilder` y en generadores de invitaciones (`ImageGeneratorAI`).  
+  - - Anadir UI declarativa de paleta/tipografias en `/perfil` con preview y guardado directo en Firestore (sin depender de localStorage).  
+  - - Emitir eventos de monitoreo (p.ej. `style_updated`, `palette_saved`) y panel en dashboard admin.  
+  - - Soportar estilos personalizados (valores libres) con normalizacion y mapeo IA.  
+  - - Consolidar tokens CSS (crear `src/styles/tokens.css` referenciado en docs) y documentar proceso de override.  
+  - - Tests e2e para vector editor y para cambios via comandos IA.
+- **[checklist despliegue]**
+  - - Confirmar que `EVENT_STYLE_OPTIONS` coincide con copy publico y traducciones.  
+  - - Verificar reglas de seguridad Firestore para `weddings/{id}/branding`.  
+  - - Asegurar que el bundle incluye `ThemeToggle` y variables CSS sin colisiones.  
+  - - Revisar que asistentes IA reciban contexto (`style`, `guestCount`, `formality`) en `ChatWidget` antes de habilitar nuevas plantillas.
+
+## 4. Invitados – Plan de Asientos (estado 2025-10-16)
+
+- **[archivo]** docs\flujos-especificos\flujo-4-invitados-operativa.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `SeatingPlanRefactored.jsx`, `SeatingPlanCanvas.jsx`, `SeatingPlanSidebar.jsx`, `SeatingPlanToolbar.jsx`, `SeatingPlanModals.jsx`, `SeatingLibraryPanel.jsx`, `SeatingMobileOverlay.jsx`, `SeatingGuestDrawer.jsx`, `SeatingSmartPanel.jsx`, `SeatingGuestSidebar.jsx`, `SeatingExportWizard.jsx` (presets y guardado local).
+  - Hook `useSeatingPlan` (colaboración, locks `seatingLocks`, métricas `/api/metrics/seating`) expuesto en `src/hooks/useSeatingPlan.js`, integrado con `useGuests` y `useSpecialMoments`.
+- **[pendiente (doc)]**
+  - Instrumentar telemetría/triggers desde el nuevo `GuestSidebar` (gamificación, IA) y pulir la experiencia móvil.
+  - Completar gestos táctiles (pinch, double tap) y cerrar la UI definitiva del overlay móvil.
+  - Sincronización bidireccional seating ↔ invitados (`guestInsights`, triggers) con distribución automática de exportes a stakeholders.
 - **[roadmap/pending (doc)]**
   - - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  
-  - - Versionado colaborativo en tiempo real (multi-editor) con presencia visual.  
+  - - Evolucionar la colaboración en tiempo real hacia versionado avanzado (locks y merge multi-editor) con presencia enriquecida.  
   - - Integración con proveedores/venues (ingesta automática de planos y configuraciones).  
-  - - Exportaciones con presets guardados y envío directo a stakeholders.
+  - - Automatizar envío de exportes y reporting multi-sección (PDF ceremonia/banquete + stakeholders).  
   - - Reestructurar el PDF avanzado en secciones dedicadas (mapa de ceremonia, plano de banquete, lista global, invitados por mesa, dietas especiales, VIP de Momentos Especiales).
 - **[checklist despliegue]**
   - - Reglas Firestore: colecciones `seating` y `seatingHistory` (roles y límites).  
@@ -602,12 +614,12 @@
   - `DuplicateDetectorModal.jsx` -> src\components\proveedores\DuplicateDetectorModal.jsx
   - `CompareSelectedModal.jsx` -> src\components\proveedores\CompareSelectedModal.jsx
   - `ProviderSearchDrawer.jsx` -> src\components\proveedores\ProviderSearchDrawer.jsx
-  - `AI` -> (no encontrado)
+  - `AI` -> backend\routes\ai.js
   - `AIBusquedaModal.jsx` -> src\components\proveedores\AIBusquedaModal.jsx
   - `AISearchModal.jsx` -> src\components\proveedores\ai\AISearchModal.jsx
   - `AIEmailModal.jsx` -> src\components\proveedores\ai\AIEmailModal.jsx
   - `aiSuppliersService.js` -> src\services\aiSuppliersService.js
-  - `supplierEventBridge` -> (no encontrado)
+  - `supplierEventBridge` -> src\components\proveedores\SupplierEventBridge.js, src\components\proveedores\SupplierEventBridge.jsx
   - `EmailTrackingList.jsx` -> src\components\proveedores\tracking\EmailTrackingList.jsx
   - `ProviderEmailModal.jsx` -> src\components\proveedores\ProviderEmailModal.jsx
   - `RFQModal.jsx` -> src\components\proveedores\RFQModal.jsx
@@ -629,24 +641,22 @@
 - **[archivo]** docs\flujos-especificos\flujo-5-timeline-tareas.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `SmartChecklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, utilidades `taskAutomations`, `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
+  - `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, componentes `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
 - **[pendiente (doc)]**
   - Motor IA que personaliza un plan de tareas padre/subtareas a partir de una plantilla maestra y matriz de responsabilidades.
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/tasks/all_subtasks_modal.cy.js
 - **[verificacion de archivos implementados]**
-  - `Tasks.jsx` -> src\pages\Tasks.jsx
+  - `Tasks.jsx` -> src\pages\Tasks.css, src\pages\Tasks.jsx, backend\node_modules\firebase-tools\lib\deploy\extensions\tasks.js, functions\node_modules\firebase-functions\lib\v2\providers\tasks.js, functions\node_modules\firebase-functions\lib\v1\providers\tasks.js, functions\node_modules\firebase-functions\lib\common\providers\tasks.js
   - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
   - `Checklist.jsx` -> src\pages\Checklist.jsx, src\pages\protocolo\Checklist.jsx
-  - `SmartChecklist.jsx` -> (no encontrado)
   - `TaskList.jsx` -> src\components\tasks\TaskList.jsx
   - `EventsCalendar.jsx` -> src\components\tasks\EventsCalendar.jsx
   - `LongTermTasksGantt.jsx` -> src\components\tasks\LongTermTasksGantt.jsx
   - `CalendarSync.jsx` -> src\components\tasks\CalendarSync.jsx
-  - `TaskEventBridge.jsx` -> src\components\tasks\TaskEventBridge.jsx
-  - `TaskNotificationWatcher.jsx` -> src\components\tasks\TaskNotificationWatcher.jsx
+  - `TaskEventBridge.jsx` -> src\components\tasks\TaskEventBridge.js, src\components\tasks\TaskEventBridge.jsx
+  - `TaskNotificationWatcher.jsx` -> src\components\tasks\TaskNotificationWatcher.js, src\components\tasks\TaskNotificationWatcher.jsx
   - `useWeddingTasksHierarchy.js` -> src\hooks\useWeddingTasksHierarchy.js
-  - `taskAutomations` -> (no encontrado)
   - `CalendarComponents.jsx` -> src\components\tasks\CalendarComponents.jsx
   - `src/data/tasks/masterTimelineTemplate.json` -> src\data\tasks\masterTimelineTemplate.json
   - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
@@ -658,7 +668,7 @@
   - - Gamificación completa (streaks, objetivos semanales, recompensas).
   - - Sync bidireccional con calendarios externos (Google/Microsoft).
 - **[checklist despliegue]**
-  - - Reglas Firestore actualizadas (`tasks`, `checklist`, `taskAutomations`).
+  - - Reglas Firestore actualizadas (`tasks`, `checklist`, `taskTemplates`) y espacio reservado para `taskAutomations` cuando se active la automatización.
   - - Tokens de calendario protegidos (Cloud Functions) y rotación periódica.
   - - Configurar servicios de notificación (`MAILGUN_*`, `PUSH_PROVIDER`).
   - - Validar performance con >500 tareas y modo Gantt.
@@ -668,23 +678,29 @@
 - **[archivo]** docs\flujos-especificos\flujo-7-comunicacion-emails.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - cableado de búsqueda/ordenación secundario en `UnifiedInbox/EmailList.jsx`, sincronización de contadores/unread de carpetas personalizadas con backend, implementación real del `callClassificationAPI` y del procesador de envíos programados (`processScheduledEmails`), onboarding con validaciones DKIM/SPF, persistencia server-side de auto-respuestas y migración definitiva del buzón legacy + actualización de pruebas E2E/VTU a la nueva UI.
-- **[E2E specs]** 7/8 presentes
+  - cableado de busqueda/ordenacion secundario en `UnifiedInbox/EmailList.jsx`, onboarding con validaciones DKIM/SPF, persistencia server-side de auto-respuestas y migracion definitiva del buzon legacy + actualizacion de pruebas E2E/VTU a la nueva UI.
+- **[E2E specs]** 14/14 presentes
   - [ok] cypress/e2e/email/send-email.cy.js
-  - [faltante] cypress/e2e/email/read-email.cy.js
+  - [ok] cypress/e2e/email/read-email.cy.js
   - [ok] cypress/e2e/email/folders-management.cy.js
   - [ok] cypress/e2e/email/tags-filters.cy.js
   - [ok] cypress/e2e/email/smart-composer.cy.js
   - [ok] cypress/e2e/email/ai-provider-email.cy.js
   - [ok] cypress/e2e/compose_quick_replies.cy.js
   - [ok] cypress/e2e/email_inbox_smoke.cy.js
+  - [ok] cypress/e2e/email/read-email-attachments.cy.js
+  - [ok] cypress/e2e/email/read-email-list.cy.js
+  - [ok] cypress/e2e/email/read-email-open.cy.js
+  - [ok] cypress/e2e/email/read-email-unread-status.cy.js
+  - [ok] cypress/e2e/email/send-email-attachment.cy.js
+  - [ok] cypress/e2e/email/send-email-validation.cy.js
 - **[roadmap/pending (doc)]**
   - 1. **Automatización y backend**
-  -    - Implementar `callClassificationAPI` (o sustituirlo) y gestionar gracefully la ausencia del endpoint.
-  -    - Mover la cola de envíos programados a backend + job recurrente; exponer estado/errores al usuario.
+  -    - Vigilar latencia y fallbacks de ``callClassificationAPI`` (ya cableado via ``processIncomingEmails``) y mantener heuristicas de respaldo cuando el endpoint no responda.
+  -    - Completar migracion de la cola de envios programados a backend/job recurrente; el scheduler cliente (``startEmailScheduler``) ya corre, pero falta exponer estado/errores al usuario.
   -    - Persistir auto-respuestas y clasificación en Firestore/REST (no sólo localStorage).
   - 2. **UX / funcionalidad**
-  -    - Completar integración de carpetas personalizadas (drag & drop, recuentos unread persistentes) y alinear etiquetas con la nueva UI.
+  -    - Completar integracion de carpetas personalizadas (drag & drop, alinear etiquetas); los contadores ``unread`` ya se sincronizan automaticamente.
   -    - Refinar papelera (`trash`): restaurar a la carpeta de origen, exponer métricas/retención y consolidar vaciado backend.
   -    - Resolver buscador/sort duplicado en `UnifiedInbox/EmailList.jsx` y alinear data-testids con Cypress.
   -    - Añadir toggle o ruta para acceder al buzón legacy sólo en modo soporte, o removerlo tras migración.
@@ -741,17 +757,18 @@
   - `RSVPConfirm.jsx`, `AcceptInvitation.jsx`, `RSVPDashboard.jsx`, hooks `useGuests`, servicios `rsvpService.js` y `emailAutomationService.js`.
 - **[pendiente (doc)]**
   - confirmaciones grupales avanzadas, recordatorios automaticos multi-canal, analytics detallados y integracion directa con catering.
-- **[E2E specs]** 5/5 presentes
+- **[E2E specs]** 6/6 presentes
   - [ok] cypress/e2e/rsvp/rsvp_confirm_by_token.cy.js
   - [ok] cypress/e2e/rsvp/rsvp_invalid_token.cy.js
   - [ok] cypress/e2e/rsvp/rsvp_reminders.cy.js
   - [ok] cypress/e2e/rsvp/rsvp_confirm.cy.js
   - [ok] cypress/e2e/invitaciones_rsvp.cy.js
+  - [ok] cypress/e2e/rsvp_confirm.cy.js
 - **[verificacion de archivos implementados]**
   - `RSVPConfirm.jsx` -> src\pages\RSVPConfirm.jsx
   - `AcceptInvitation.jsx` -> src\pages\AcceptInvitation.jsx
   - `RSVPDashboard.jsx` -> src\pages\RSVPDashboard.jsx
-  - `useGuests` -> (no encontrado)
+  - `useGuests` -> src\hooks\useGuests.js
   - `rsvpService.js` -> src\services\rsvpService.js
   - `emailAutomationService.js` -> src\services\emailAutomationService.js
 - **[roadmap/pending (doc)]**
@@ -772,7 +789,7 @@
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
   - integrar la suite en CI, ampliar escenarios edge y automatizar reportes de ejecucion.
-- **[E2E specs]** 14/14 presentes
+- **[E2E specs]** 19/19 presentes
   - [ok] cypress/e2e/seating/seating_smoke.cy.js
   - [ok] cypress/e2e/seating/seating_assign_unassign.cy.js
   - [ok] cypress/e2e/seating/seating_capacity_limit.cy.js
@@ -787,6 +804,11 @@
   - [ok] cypress/e2e/seating/seating_auto_ai.cy.js
   - [ok] cypress/e2e/seating/seating_area_type.cy.js
   - [ok] cypress/e2e/seating/seating_delete_duplicate.cy.js
+  - [ok] cypress/e2e/seating/seating-content-flow.cy.js
+  - [ok] cypress/e2e/seating/seating-basic.cy.js
+  - [ok] cypress/e2e/seating/seating-conflicts.cy.js
+  - [ok] cypress/e2e/seating/seating_ui_panels.cy.js
+  - [ok] cypress/e2e/seating/seating-export.cy.js
 - **[roadmap/pending (doc)]**
   - - Integración en pipeline de CI y reporte automático
   - ### 3) seating_toasts.cy.js (Toasts)
@@ -802,7 +824,7 @@
 - **[implementado (doc)]**
   - `Signup.jsx`, `Login.jsx`, `ResetPassword.jsx`, `VerifyEmail.jsx`, `useAuth.jsx`, `SessionManager.jsx`, `src/context/UserContext.jsx`, componentes `SocialLoginButtons.jsx`, `RegisterForm.jsx`, `PasswordStrengthMeter.jsx`.
 - **[pendiente (doc)]**
-  - instrumentación de métricas (signup/login/reset), refactor de formularios legacy fuera de uso y auditoría de accesibilidad final.
+  - refactor de formularios legacy fuera de uso y auditoría de accesibilidad manual sobre flows secundarios.
 - **[E2E specs]** 5/5 presentes
   - [ok] cypress/e2e/auth/flow1-signup.cy.js
   - [ok] cypress/e2e/auth/flow1-social-login.cy.js
@@ -811,7 +833,7 @@
   - [ok] cypress/e2e/auth/auth-flow.cy.js
 - **[verificacion de archivos implementados]**
   - `Signup.jsx` -> src\pages\Signup.jsx
-  - `Login.jsx` -> src\pages\Login.jsx
+  - `Login.jsx` -> src\pages\Login.jsx, backend\node_modules\firebase-tools\lib\commands\login.js
   - `ResetPassword.jsx` -> src\pages\ResetPassword.jsx
   - `VerifyEmail.jsx` -> src\pages\VerifyEmail.jsx
   - `useAuth.jsx` -> src\hooks\useAuth.jsx
@@ -831,36 +853,6 @@
   - - Configurar correo transactional (Mailgun) para reset/verify.
   - - Alta de credenciales OAuth (Google, Facebook, etc.) en Firebase Console y `.env`.
 
-## flujo-10-gestion-bodas-multiples.md
-
-- **[archivo]** docs\flujos-especificos\flujo-10-gestion-bodas-multiples.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `Bodas.jsx`, `BodaDetalle.jsx`, `WeddingSelector.jsx`, `WeddingFormModal.jsx`, `useWedding` context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes `MultiWeddingSummary.jsx` y `WeddingPortfolioTable.jsx`, y permisos granulares por boda.
-- **[pendiente (doc)]**
-  - dashboards multi-boda avanzados, permisos granulares por mÃ³dulo y vistas cruzadas consolidadas.
-- **[E2E specs]** 1/1 presentes
-  - [ok] cypress/e2e/weddings/multi-weddings-flow.cy.js
-- **[verificacion de archivos implementados]**
-  - `Bodas.jsx` -> src\pages\Bodas.jsx
-  - `BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
-  - `WeddingSelector.jsx` -> src\components\WeddingSelector.jsx
-  - `WeddingFormModal.jsx` -> src\components\WeddingFormModal.jsx
-  - `useWedding` -> (no encontrado)
-  - `MultiWeddingSummary.jsx` -> src\components\weddings\MultiWeddingSummary.jsx
-  - `WeddingPortfolioTable.jsx` -> src\components\weddings\WeddingPortfolioTable.jsx
-- **[roadmap/pending (doc)]**
-  - - Dashboard multi-boda (resÃºmenes cruzados, comparativas).
-  - - Permisos granulares por mÃ³dulo/colecciÃ³n.
-  - - Filtro de bodas por estado/fecha/owner.
-  - - SincronizaciÃ³n con planner CRM externo.
-  - - Activity feed y alertas multi-boda.
-- **[checklist despliegue]**
-  - - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
-  - - Seeds y Cloud Functions idempotentes para nuevas bodas.
-  - - Validar UI con >10 bodas (scroll, selector).
-  - - QA de traducciones y copy en wizard.
-
 ## flujo-12-notificaciones-configuracion.md
 
 - **[archivo]** docs\flujos-especificos\flujo-12-notificaciones-configuracion.md
@@ -878,7 +870,7 @@
   - `NotificationCenter.jsx` -> src\components\NotificationCenter.jsx, src\components\notifications\NotificationCenter.jsx
   - `notificationService.js` -> src\services\notificationService.js, backend\services\notificationService.js
   - `notificationPreferencesService.js` -> src\services\notificationPreferencesService.js
-  - `/api/notification-preferences` -> (no encontrado)
+  - `/api/notification-preferences` -> backend\routes\notification-preferences.js
 - **[roadmap/pending (doc)]**
   - - Centro de notificaciones completo (agrupaciones, búsqueda).
   - - Automation rules UI (if-this-then-that).
@@ -889,15 +881,44 @@
   - - Configurar Mailgun/Twilio/FCM; validar push en navegadores.
   - - Revisar traducciones (todas las opciones en `NotificationSettings` y `NotificationPreferences`).
 
+## flujo-14-checklist-avanzado.md
+
+- **[archivo]** docs\flujos-especificos\flujo-14-checklist-avanzado.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `Checklist.jsx`, `Tasks.jsx`, `TaskSidePanel.jsx`, hook `useWeddingTasksHierarchy`, servicios `automationService.js` (basico).
+- **[pendiente (doc)]**
+  - generacion inteligente de checklists, dependencias avanzadas, gamificacion completa y plantillas compartidas por comunidad.
+- **[E2E specs]** 1/1 presentes
+  - [ok] cypress/e2e/tasks/all_subtasks_modal.cy.js
+- **[verificacion de archivos implementados]**
+  - `Checklist.jsx` -> src\pages\Checklist.jsx, src\pages\protocolo\Checklist.jsx
+  - `Tasks.jsx` -> src\pages\Tasks.css, src\pages\Tasks.jsx, backend\node_modules\firebase-tools\lib\deploy\extensions\tasks.js, functions\node_modules\firebase-functions\lib\v2\providers\tasks.js, functions\node_modules\firebase-functions\lib\v1\providers\tasks.js, functions\node_modules\firebase-functions\lib\common\providers\tasks.js
+  - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
+  - `useWeddingTasksHierarchy` -> src\hooks\useWeddingTasksHierarchy.js
+  - `automationService.js` -> backend\services\automationService.js
+- **[roadmap/pending (doc)]**
+  - - Motor de recomendaciones IA que genere checklist dinamico segun perfil de boda.
+  - - Editor de plantillas colaborativas y marketplace de workflows.
+  - - Dependencias visuales (gantt, grafo) y pronostico de riesgo.
+  - - Gamificacion completa (streaks, objetivos semanales, recompensas).
+  - - Sync bidireccional con calendarios externos (Google/Microsoft).
+- **[checklist despliegue]**
+  - - Reglas Firestore para `tasks`, `checklist`, `taskTemplates`, `checklistStats` y preparación para `taskAutomations`.
+  - - Revisar limites de escritura masiva (batch) en seeds y automatizaciones.
+  - - Configurar notificaciones (`MAILGUN_*`, `PUSH_PROVIDER`) para recordatorios.
+  - - Actualizar traducciones y onboarding segun nuevas plantillas.
+
 ## flujo-16-asistente-virtual-ia.md
 
 - **[archivo]** docs\flujos-especificos\flujo-16-asistente-virtual-ia.md
 - **[conclusion]** pendiente
 - **[pendiente (doc)]**
   - habilitar backend multicanal, reglas configurables, workers dedicados y cobertura E2E especifica.
-- **[E2E specs]** 2/2 presentes
+- **[E2E specs]** 3/3 presentes
   - [ok] cypress/e2e/email/ai-provider-email.cy.js
   - [ok] cypress/e2e/email/smart-composer.cy.js
+  - [ok] cypress/e2e/assistant/chat-fallback-context.cy.js
 - **[roadmap/pending (doc)]**
   - - **Orquestador multicanal** (`AutomationOrchestrator`): ingerir emails, chats, WhatsApp y decidir acciones.
   - - **Reglas configurables**: panel para if/then (ej. “si proveedor responde con presupuesto > X → crear tarea”).
@@ -906,44 +927,144 @@
   - - **Integración con flujos**: generación automática de tareas (flujo 14), actualizaciones de proveedores (flujo 5), avisos en notificaciones (flujo 12).
   - Cuando estas piezas estén listas, se documentarán de nuevo (ver antiguo flujo 24 como referencia de visión).
 - **[checklist despliegue]**
-  - - Clave `OPENAI_API_KEY` solo si el backend `/api/chat-widget` está habilitado.
+  - - Clave `OPENAI_API_KEY` solo si el backend `/api/ai/parse-dialog` (con fallback local contextual) está habilitado.
   - - Revisar políticas de almacenamiento local (GDPR) y permitir al usuario limpiar historial.
   - - En entornos productivos, habilitar tracking de eventos antes de lanzar automatizaciones reales.
+
+## flujo-2-creacion-boda-ia.md
+
+- **[archivo]** docs\flujos-especificos\flujo-2-creacion-boda-ia.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `src/pages/CreateWeddingAI.jsx` (wizard dos pasos), `src/pages/AyudaCeremonia.jsx` (copy dinámico), `src/pages/BodaDetalle.jsx` (perfil de evento), `src/context/WeddingContext.jsx`, servicios `createWedding` y `seedDefaultTasksForWedding`, catálogo `src/config/eventStyles.js`.
+- **[pendiente (doc)]**
+  - habilitar opt-in a planner desde Perfil, paneles/alertas para la telemetría del funnel, refactor de rutas `/bodas`→`/eventos`, integración IA contextual y despliegue del flujo multi-evento para planners.
+- **[E2E specs]** 2/2 presentes
+  - [ok] cypress/e2e/onboarding/create-event-flow.cy.js
+  - [ok] cypress/e2e/onboarding/create-event-cta.cy.js
+- **[verificacion de archivos implementados]**
+  - `src/pages/CreateWeddingAI.jsx` -> src\pages\CreateWeddingAI.jsx
+  - `src/pages/AyudaCeremonia.jsx` -> src\pages\AyudaCeremonia.jsx, src\pages\protocolo\AyudaCeremonia.jsx
+  - `src/pages/BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
+  - `src/context/WeddingContext.jsx` -> src\context\WeddingContext.jsx
+  - `createWedding` -> (no encontrado)
+  - `seedDefaultTasksForWedding` -> (no encontrado)
+  - `src/config/eventStyles.js` -> src\config\eventStyles.js
+- **[roadmap/pending (doc)]**
+  - - Implementar opt-in a planner/assistant desde Perfil con flujo dedicado.
+  - - Refactorizar rutas y componentes (`/bodas` → `/eventos`) cuando exista soporte multi-evento en toda la app.
+  - - Conectar telemetría con dashboards de adopción segmentados por `eventType` y alertas de funnel.
+  - - ✅ 2025-10-13: Asistencia IA contextual con prompts por tipo de evento y fallback offline en ChatWidget.
+  - - ✅ 2025-10-08: Wizard multi-evento, servicios y pantallas asociados actualizados para `eventType/eventProfile`.
+  - - ✅ 2025-10-08: Catálogo de estilos centralizado y copy adaptable (`Boda`/`Evento`).
+  - - ✅ 2025-10-13: CTA «Crear nuevo evento» en header y selector multi-evento habilitado para owners.
+- **[checklist despliegue]**
+  - - Reglas Firestore: permitir escritura de `eventType`, `eventProfile`, `eventProfileSummary` y nuevos campos en `_seed_meta`.
+  - - Script `scripts/migrate-event-profile.js` para etiquetar eventos legacy con `eventType: 'boda'` y generar `eventProfileSummary` básico antes del switch.
+  -   1. Obtener credenciales (`serviceAccount.json`) y ejecutar: `node scripts/migrate-event-profile.js --credentials path/to/serviceAccount.json`.
+  -   2. Verificar en staging que `weddings/{id}` contiene `eventType/eventProfile` normalizados y que cada `users/{uid}/weddings/{id}` refleja `eventProfileSummary`.
+  -   3. Revisar logs de consola (totales migrados) y auditar uno o dos documentos en la consola de Firestore antes de seguir a producción.
+  - - Revisión de copy/traducciones (`Crear boda`, `Crear evento`) y estilos centralizados (`config/eventStyles.js`).
+  - - Telemetría: preparar dashboard funnel + ratio adopción Paso 2.
+  - - QA: actualizar suites Cypress/E2E con los casos anteriores.
+
+## flujo-2-descubrimiento-personalizado.md
+
+- **[archivo]** docs\flujos-especificos\flujo-2-descubrimiento-personalizado.md
+- **[conclusion]** desconocido
+- **[E2E specs]** 2/2 presentes
+  - [ok] cypress/e2e/onboarding/discovery-personalized.cy.js
+  - [ok] cypress/e2e/onboarding/onboarding-mode-selector.cy.js
+
+## flujo-22-dashboard-navegacion.md
+
+- **[archivo]** docs\flujos-especificos\flujo-22-dashboard-navegacion.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `HomeUser.jsx`, `Dashboard.jsx`, `More.jsx`, `Perfil.jsx`, widgets `WidgetContent.jsx`, utilidades de diagnostico (`DevEnsureFinance.jsx`, `DevSeedGuests.jsx`).
+- **[pendiente (doc)]**
+  - unificar dashboard con metricas en vivo, proteger herramientas internas y agregar actividad reciente + estado de sincronizacion.
+- **[verificacion de archivos implementados]**
+  - `HomeUser.jsx` -> src\pages\HomeUser.jsx
+  - `Dashboard.jsx` -> src\pages\Dashboard.jsx, src\components\dashboard\Dashboard.jsx
+  - `More.jsx` -> src\pages\More.jsx
+  - `Perfil.jsx` -> src\pages\Perfil.jsx
+  - `WidgetContent.jsx` -> src\components\dashboard\WidgetContent.jsx
+  - `DevEnsureFinance.jsx` -> src\pages\DevEnsureFinance.jsx
+  - `DevSeedGuests.jsx` -> src\pages\DevSeedGuests.jsx
+- **[roadmap/pending (doc)]**
+  - - Dashboard modular con edicion drag-and-drop y biblioteca de widgets.
+  - - Activity feed en tiempo real con filtros.
+  - - Buscador global y comandos rapidos.
+  - - Integracion con analytics para recomendaciones personalizadas.
+  - - Panel de salud del sistema (sincronizacion, errores recientes).
+- **[checklist despliegue]**
+  - - Reglas Firestore para `dashboardConfig`, `activityFeed` (cuando se publique).
+  - - Asegurar que herramientas dev esten desactivadas en produccion (`VITE_ENV` check).
+  - - Revisar copy, links de soporte y recursos externos.
+  - - Probar skeleton/loading states con datos grandes.
+
+## flujo-24-galeria-inspiracion.md
+
+- **[archivo]** docs\flujos-especificos\flujo-24-galeria-inspiracion.md
+- **[conclusion]** pendiente
+- **[E2E specs]** 4/4 presentes
+  - [ok] cypress/e2e/inspiration/inspiration-gallery.cy.js
+  - [ok] cypress/e2e/inspiration/inspiration-home-gallery.cy.js
+  - [ok] cypress/e2e/inspiration/inspiration-save-board.cy.js
+  - [ok] cypress/e2e/inspiration/inspiration-share.cy.js
+- **[roadmap/pending (doc)]**
+  - - Motor de recomendaciones con IA (clustering por preferencias, estacionalidad y etapa de boda).
+  - - Colecciones tematicas automatizadas y moodboard descargable/PDF.
+  - - Modo offline con cache en IndexedDB/service workers.
+  - - Favoritos colaborativos entre miembros del equipo y notificaciones proactivas.
+  - - Mejora de accesibilidad: focus trap completo, soporte de teclado en lightbox, announcements ARIA.
+- **[checklist despliegue]**
+  - - Verificar llaves/API keys para `wallService` y cuotas de peticiones.
+  - - Ajustar reglas Firestore para `favorites` e `inspirationInteractions`.
+  - - Migrar colecciones legacy (`ideasPhotos` en `users/{uid}`) al nuevo esquema `weddings/{id}/inspiration/favorites` asegurando que planners/assistants vean la misma lista.
+  - - Asegurar headers de imagenes externas (`referrerPolicy`, `Cache-Control`).
+  - - Revisar traducciones en `i18n/locales/*/common.json` para etiquetas dinamicas.
+  - - Configurar dashboards de latencia/errores tanto del feed como del guardado de favoritos.
 
 ## flujo-3-gestion-invitados.md
 
 - **[archivo]** docs\flujos-especificos\flujo-3-gestion-invitados.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - `Invitados.jsx`, `RSVPDashboard.jsx`, `AcceptInvitation.jsx`, `GuestEventBridge.jsx`, componentes de invitados (`GuestList`, `GuestFilters`, `GuestForm`, `GuestBulkGrid`, `ContactsImporter`, `GroupManager`), modales de WhatsApp (`WhatsAppModal`, `WhatsAppSender`, `SaveTheDateModal`, `InviteTemplateModal`), servicios `useGuests`, `SyncService`, `MessageTemplateService`, `whatsappService`, `WhatsAppBatchService`.
+  - `Invitados.jsx`, `RSVPDashboard.jsx`, `AcceptInvitation.jsx`, `GuestEventBridge.jsx`, componentes de invitados (`GuestList`, `GuestFilters`, `GuestForm`, `GuestBulkGrid`, `ContactsImporter`, `GroupManager`), modales de WhatsApp (`WhatsAppModal`, `WhatsAppSender`, `SaveTheDateModal`, `InviteTemplateModal`), servicios `useGuests`, `SyncService`, `MessageTemplateService`, `whatsappService`, `WhatsAppBatchService`, dataset demo (`loadSampleGuests`), modal de check-in con QR/códigos manuales y panel analítico de RSVP.
 - **[pendiente (doc)]**
-  - dashboard analítico de RSVP, check-in en día del evento y sincronización automática con Seating Plan.
-- **[E2E specs]** 1/1 presentes
+  - sincronización completa con Seating Plan (persistencia bidireccional en backend) y automatizaciones IA reactivas a cambios de invitados.
+- **[E2E specs]** 4/4 presentes
   - [ok] cypress/e2e/guests/guests_flow.cy.js
+  - [ok] cypress/e2e/guests/guests_crud.cy.js
+  - [ok] cypress/e2e/guests/guests_import_rsvp.cy.js
+  - [ok] cypress/e2e/guests/guests_messaging.cy.js
 - **[verificacion de archivos implementados]**
   - `Invitados.jsx` -> src\pages\Invitados.jsx
   - `RSVPDashboard.jsx` -> src\pages\RSVPDashboard.jsx
   - `AcceptInvitation.jsx` -> src\pages\AcceptInvitation.jsx
-  - `GuestEventBridge.jsx` -> src\components\guests\GuestEventBridge.jsx
-  - `GuestList` -> (no encontrado)
-  - `GuestFilters` -> (no encontrado)
-  - `GuestForm` -> (no encontrado)
-  - `GuestBulkGrid` -> (no encontrado)
-  - `ContactsImporter` -> (no encontrado)
-  - `GroupManager` -> (no encontrado)
-  - `WhatsAppModal` -> (no encontrado)
-  - `WhatsAppSender` -> (no encontrado)
-  - `SaveTheDateModal` -> (no encontrado)
-  - `InviteTemplateModal` -> (no encontrado)
-  - `useGuests` -> (no encontrado)
-  - `SyncService` -> (no encontrado)
-  - `MessageTemplateService` -> (no encontrado)
-  - `whatsappService` -> (no encontrado)
-  - `WhatsAppBatchService` -> (no encontrado)
+  - `GuestEventBridge.jsx` -> src\components\guests\GuestEventBridge.js, src\components\guests\GuestEventBridge.jsx
+  - `GuestList` -> src\components\guests\GuestList.jsx
+  - `GuestFilters` -> src\components\guests\GuestFilters.jsx
+  - `GuestForm` -> src\components\guests\GuestForm.jsx
+  - `GuestBulkGrid` -> src\components\guests\GuestBulkGrid.jsx
+  - `ContactsImporter` -> src\components\guests\ContactsImporter.jsx
+  - `GroupManager` -> src\components\guests\GroupManager.jsx
+  - `WhatsAppModal` -> src\components\whatsapp\WhatsAppModal.jsx
+  - `WhatsAppSender` -> src\components\whatsapp\WhatsAppSender.jsx
+  - `SaveTheDateModal` -> src\components\whatsapp\SaveTheDateModal.jsx
+  - `InviteTemplateModal` -> src\components\whatsapp\InviteTemplateModal.jsx
+  - `useGuests` -> src\hooks\useGuests.js
+  - `SyncService` -> src\services\SyncService.js
+  - `MessageTemplateService` -> src\services\MessageTemplateService.js
+  - `whatsappService` -> src\services\whatsappService.js, backend\services\whatsappService.js
+  - `WhatsAppBatchService` -> src\services\WhatsAppBatchService.js
+  - `loadSampleGuests` -> (no encontrado)
 - **[roadmap/pending (doc)]**
-  - - Dashboard avanzado (métricas, embudos RSVP, historial de comunicaciones).
-  - - Check-in en el día del evento (lectura QR, actualización en tiempo real).
-  - - Sincronización automática con Seating Plan y con el asistente IA (respuesta/acciones).
+  - - Sincronización completa con Seating Plan (lectura/escritura Firestore y resolución de conflictos entre dispositivos).
+  - - Automatizaciones IA sobre invitados (sugerencias proactivas, mensajes y tareas derivadas de cambios RSVP/check-in).
+  - - Exportaciones y reporting día B (listado de check-in, etiquetas personalizadas y QR individuales).
 - **[checklist despliegue]**
   - - Configurar proveedor WhatsApp y variables (`VITE_BACKEND_BASE_URL`, `VITE_DEFAULT_COUNTRY_CODE`, credenciales).
   - - Reglas Firestore actualizadas (CRUD de `guests` y `rsvp`).
@@ -957,8 +1078,8 @@
 - **[implementado (doc)]**
   - `src/pages/Finance.jsx`, componentes `src/components/finance/BudgetManager.jsx`, `FinanceOverview.jsx`, `FinanceCharts.jsx`, `PaymentSuggestions.jsx`, `TransactionManager.jsx`, hooks `useFinance`, `useSupplierBudgets`, servicios `EmailInsightsService`, `bankService`, `SyncService`.
 - **[pendiente (doc)]**
-  - importaciÃ³n CSV/Excel con mapeo, analÃ­tica predictiva con IA, ampliaciÃ³n de aportaciones colaborativas, reportes exportables y automatizaciÃ³n de alertas avanzadas.
-- **[E2E specs]** 7/7 presentes
+  - analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas.
+- **[E2E specs]** 8/8 presentes
   - [ok] cypress/e2e/finance/finance-flow.cy.js
   - [ok] cypress/e2e/finance/finance-flow-full.cy.js
   - [ok] cypress/e2e/finance/finance-budget.cy.js
@@ -966,32 +1087,46 @@
   - [ok] cypress/e2e/finance/finance-contributions.cy.js
   - [ok] cypress/e2e/finance/finance-analytics.cy.js
   - [ok] cypress/e2e/budget_flow.cy.js
+  - [ok] cypress/e2e/finance/finance-advisor-chat.cy.js
 - **[verificacion de archivos implementados]**
-  - `src/pages/Finance.jsx` -> src\pages\Finance.jsx
+  - `src/pages/Finance.jsx` -> src\pages\Finance.jsx, src\i18n\locales\es\finance.json
   - `src/components/finance/BudgetManager.jsx` -> src\components\finance\BudgetManager.jsx
   - `FinanceOverview.jsx` -> src\components\finance\FinanceOverview.jsx
   - `FinanceCharts.jsx` -> src\components\finance\FinanceCharts.jsx
   - `PaymentSuggestions.jsx` -> src\components\finance\PaymentSuggestions.jsx
   - `TransactionManager.jsx` -> src\components\finance\TransactionManager.jsx
-  - `useFinance` -> (no encontrado)
-  - `useSupplierBudgets` -> (no encontrado)
-  - `EmailInsightsService` -> (no encontrado)
-  - `bankService` -> (no encontrado)
-  - `SyncService` -> (no encontrado)
+  - `useFinance` -> src\hooks\useFinance.js
+  - `useSupplierBudgets` -> src\hooks\useSupplierBudgets.js
+  - `EmailInsightsService` -> src\services\EmailInsightsService.js
+  - `bankService` -> src\services\bankService.js
+  - `SyncService` -> src\services\SyncService.js
 - **[roadmap/pending (doc)]**
-  - - Integracion Open Banking: UI de autenticaciÃ³n, refresco de tokens, categorizaciÃ³n inteligente, reconciliaciÃ³n automÃ¡tica.
-  - - ImportaciÃ³n CSV/Excel con preview y mapeo de columnas (validaciones server-side).
+  - - Integracion Open Banking: UI de autenticacion, refresco de tokens, categorizacion inteligente, reconciliacion automatica.
   - - Reportes descargables (PDF/Excel) listos para proveedores y contabilidad.
   - - Gestion completa de aportaciones (recordatorios, agradecimientos, panel compartido).
-  - - Prediccion de gasto y recomendaciones automaticas basadas en proyecciÃ³n.
+  - - Prediccion de gasto y recomendaciones automaticas basadas en proyeccion.
   - - Automatizacion de pagos programados y conciliacion con contratos.
-  - - Adjuntos en `TransactionForm` aceptan `image/*, application/pdf, .doc, .docx, .xls, .xlsx`. Otros tipos se bloquean en la carga de archivos.
-  - - Entrenamiento y calibraciÃ³n continua del estimador de costos (dataset anonimizado, feedback con `overridden`/`dismissedAt`, segmentaciÃ³n regional) para mantener precisiÃ³n y reducir sesgos.
+  - - Adjuntos en `TransactionForm` aceptan `image/*`, `application/pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`. Otros tipos se bloquean en la carga de archivos.
+  - - Entrenamiento y calibracion continua del consejero conversacional (dataset anonimizado, feedback `advisor_feedback_submitted`, segmentacion regional) para mantener precision y reducir sesgos.
 - **[checklist despliegue]**
-  - - Reglas Firestore actualizadas para `finance/main`, subcolecciÃ³n `transactions` y almacenamiento de adjuntos (`finance/` en Storage).
+  - - Reglas Firestore actualizadas para `finance/main`, subcolección `transactions` y almacenamiento de adjuntos (`finance/` en Storage).
   - - Revisar limites de seguridad en Cloud Functions de exportacion y notificaciones.
   - - Configurar variables `VITE_ENABLE_FINANCE_ALERTS`, `MAILGUN_*`, `VITE_BANK_API_BASE_URL`, `VITE_BANK_API_KEY`, `VITE_EMAIL_INSIGHTS_*`.
   - - Asegurar migracion de bodas antiguas para poblar `finance/main` con nuevas llaves (`alertThresholds`, `contributions`) y mover adjuntos a rutas `finance/`.
   - - Verificar permisos de storage y tokens para Email Insights / Open Banking, y limpiar colas pendientes en `SyncService` antes de despliegue.
 
 Generado automaticamente por scripts/aggregateRoadmap.js. Ejecuta el script cuando cambie la documentacion o los tests.
+""
+## Landing Marketing (estado 2025-10-16)
+
+- **[archivo]** src/pages/marketing/Landing.jsx
+- **[estado]** nuevo
+- **[descripcion]** Landing publica con secciones hero, highlights, features y CTA final. Usa `MarketingLayout` con tokens compartidos, estilos pastel y CTA hacia signup/app.
+- **[pendiente]**
+  - Sustituir foto Unsplash por mockup real del dashboard (desktop + mobile) con blur decorativo.
+  - A�adir seccion de beneficios con iconografia consistente (3-4 columnas) y testimonios.
+  - Incorporar carrusel/logos de confianza y FAQ corta antes del CTA final.
+  - Preparar formulario de demo (nombre + email) con integraci�n backend simulada.
+  - Revisar SEO/Titles/meta description espec�ficos para planners vs parejas.
+- **[notas]** Reutiliza tokens `bg-app`, `border-soft`, CTA principal hacia `/signup` y secundaria a `/app`.
+

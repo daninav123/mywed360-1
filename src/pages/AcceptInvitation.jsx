@@ -24,9 +24,9 @@ export default function AcceptInvitation() {
   }, [code, currentUser, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white rounded shadow p-6 max-w-sm text-center">
-        <p>{status}</p>
+    <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm rounded-2xl border border-[color:var(--color-border)] bg-[var(--color-surface)] px-6 py-8 text-center shadow-sm">
+        <p className="text-[color:var(--color-text)]">{status}</p>
       </div>
     </div>
   );

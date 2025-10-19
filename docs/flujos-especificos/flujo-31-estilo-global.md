@@ -50,6 +50,7 @@
 - El wizard aplica `DEFAULT_STYLE` (`clasico`) cuando el usuario no selecciona nada.  
 - Assistant ignora `ceremonyType` si `eventType !== 'boda'`.  
 - Guardado de paleta requiere boda activa y Firebase inicializado; en caso contrario botones muestran `alert`.
+- **Layout responsive:** el shell usa un contenedor reutilizable (`.layout-container`) con `width: 100%`, centrado mediante `margin: 0 auto` y `max-width: var(--layout-max-width, 1280px)`. Se declaran tokens `--layout-max-width`, `--layout-wide-width` (1440px para vistas densas) y breakpoints `--breakpoint-md: 768px`, `--breakpoint-lg: 1024px`, `--breakpoint-xl: 1440px`. El padding lateral se define como `clamp(16px, 4vw, 24px)` en desktop y cae a 16 px cuando `viewport < --breakpoint-md`; entre `--breakpoint-md` y `--breakpoint-lg` el contenedor reduce su `max-width` a 960 px para mantener legibilidad. Vistas de planner/IA pueden aplicar `--layout-wide-width` siempre que mantengan padding ≥32 px.
 
 ## 6. Estados especiales y errores
 - Falta de estilo => fallback `Clasico` y `Blanco y dorado` en generador web (`sanitizeProfile`).  
@@ -95,3 +96,5 @@
 - `src/components/config/ConfigEventBridge.jsx`: solo escucha evento `mywed360-profile`; algunas pantallas (p.ej. guardado de logo) emiten `mywed360-profile-updated`, por lo que la sincronizacion no siempre corre. Evaluar ampliar listeners.  
 - `src/services/websiteService.js`: `normalizeProfile` no consume `branding/main.palette`, dejando la web sin colores personalizados.  
 - No existe repositorio central de CSS tokens (`docs/diseno/README.md` referencia `src/styles/tokens.css` pero el archivo no existe).
+## Cobertura E2E implementada
+- `cypress/e2e/style/style-global.cy.js`: asegura que el guardado de estilo y paleta desde `/perfil` persista correctamente (incluyendo feedback mediante toasts) incluso cuando se trabaja con Firestore simulado.

@@ -1,3 +1,5 @@
+import { computePermissionOverrides, normalizeModulePermissions } from './weddingModulePermissions';
+
 const ROLE_ALIASES = {
   pareja: 'owner',
   propietario: 'owner',
@@ -77,12 +79,6 @@ export function normalizeWeddingRole(rawRole, fallback = 'owner') {
   return ROLE_ALIASES[normalized] || normalized || fallback;
 }
 
-/**
- * Devuelve un objeto de permisos para el rol indicado.
- * Fusiona con la plantilla base para garantizar que todas las claves existan.
- * @param {string} role
- * @returns {Record<string, boolean>}
- */
 export function permissionsForRole(role) {
   const key = normalizeWeddingRole(role);
   const base = ROLE_PERMISSION_MAP[key] || ROLE_PERMISSION_MAP.owner;
@@ -112,15 +108,19 @@ export function mergePermissions(current = {}, overrides = {}) {
  */
 export function ensureWeddingAccessMetadata(entry = {}, fallbackRole = 'owner') {
   const resolvedRole = normalizeWeddingRole(entry.role || fallbackRole);
-  const permissions =
+  const basePermissions =
     entry.permissions && typeof entry.permissions === 'object'
       ? mergePermissions(permissionsForRole(resolvedRole), entry.permissions)
       : permissionsForRole(resolvedRole);
+  const modulePermissions = normalizeModulePermissions(entry.modulePermissions);
+  const moduleOverrides = computePermissionOverrides(modulePermissions, resolvedRole);
+  const permissions = mergePermissions(basePermissions, moduleOverrides);
 
   return {
     ...entry,
     role: resolvedRole,
     permissions,
+    modulePermissions,
   };
 }
 
@@ -136,4 +136,3 @@ export function hasPermission(permissions, key) {
 }
 
 export const WEDDING_PERMISSION_KEYS = Object.keys(PERMISSION_TEMPLATE);
-

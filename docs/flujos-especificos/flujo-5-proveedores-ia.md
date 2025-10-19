@@ -1,12 +1,13 @@
-# 5. Proveedores con IA (estado 2025-10-07)
+﻿# 5. Proveedores con IA (estado 2025-10-07)
 
-> Implementado: `GestionProveedores.jsx`, `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `SupplierKanban.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, `AI` modals (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`.
+> Implementado: `GestionProveedores.jsx` (panel superior plegable con zona de confirmados), `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, modales IA (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`.
 > Pendiente: scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos.
 
 ## 1. Objetivo y alcance
 - Orquestar el ciclo completo de proveedores (planificación, búsqueda, negociación, contratación) apoyado en IA y contexto del proyecto.
 - Traducir los requerimientos específicos de cada boda en servicios concretos, permitiendo asociar un proveedor a múltiples servicios o dividirlo cuando cubre ámbitos distintos.
-- Integrar tableros para monitorear shortlist ("vistos/buscados"), pipeline operativo y control presupuestario por grupo o servicio.
+- Integrar superficies diferenciadas para monitorizar shortlist (ideas en exploración) y el control presupuestario de confirmados por grupo o servicio.
+- Aprovechar `weddingProfile`, `specialInterests` y `noGoItems` para que la IA proponga opciones alineadas con el estilo core y con los contrastes controlados definidos en el flujo 2C (personalización continua), evitando sugerencias que rompan reglas o presupuesto.
 
 ## 2. Trigger y rutas
 - Menú inferior `Más` bloque **Proveedores** "Gestión de proveedores" (`/proveedores`, `GestionProveedores.jsx`).
@@ -14,30 +15,79 @@
 - Las fichas individuales (`/proveedores/:id`) y el portal externo (`/proveedores/:id/portal`) se abren desde enlaces contextuales dentro del propio módulo.
 - `ProviderSearchDrawer` puede abrirse como overlay desde otras vistas (Timeline, Home, Tasks) para alta rápida o búsqueda IA.
 
-## 3. Paso a paso UX
-- La vista principal se organiza en pestañas visibles **Vistos** (shortlist), **Pipeline** (kanban por línea) y **Contratos** (resumen financiero/documental); la matriz de necesidades se abre como modal desde el header ("Matriz de necesidades"). El header mantiene acciones globales (buscar IA, añadir manualmente, filtros contextuales) accesibles en todo momento.
-1. Planificación de servicios
-   - `ServicesBoard` se muestra dentro del modal "Matriz de necesidades": lista los servicios críticos para la boda, permite marcar cuáles están "por definir" y sugiere combinaciones habituales según tipo de evento sin abandonar la vista principal.
-   - Cada proveedor puede descomponerse en "líneas de servicio" (ej. `Espacio Las Brisas` servicios `Venue` y `Catering`). Un wizard de fusión/separación (`SupplierMergeWizard`) guía el proceso: selecciona líneas implicadas, decide si se crean proveedores independientes, reubica contratos/pagos asociados y registra un histórico de cambios.
-   - `DuplicateDetectorModal` evita crear líneas duplicadas y guía el proceso de fusión.
-   - Cada tarjeta de servicio incluye accesos directos `Buscar`, `IA` y `Añadir` para abrir el drawer, disparar búsqueda inteligente o crear un proveedor nuevo preasignado al servicio seleccionado.
-2. Exploración y shortlist (**Vistos**)
-   - `ProviderSearchDrawer`, `AISearchModal` y `ServicesBoard` (desde el modal de necesidades) lanzan búsquedas IA usando ubicación, presupuesto objetivo y estilo de la boda; los resultados se guardan en la pestaña **Vistos** (`ProveedorList.jsx` en modo shortlist).
-   - `ProveedorFiltro` expone pestañas globales (todos/contratados/contactados/favoritos/vistos) y búsqueda rápida que impacta shortlist y pipeline; los usuarios pueden marcar favoritos desde la propia tarjeta y el filtro se actualiza en tiempo real.
-   - Desde **Vistos** se promueven proveedores a evaluación o se descartan con motivo. `ProveedorForm` permite capturar proveedores offline y, si se encuentra coincidencia, la IA enriquece datos públicos.
-3. Evaluación y negociación
-  - `CompareSelectedModal` contrasta propuestas y notas por servicio; `AIEmailModal` genera correos iniciales (la operativa detallada vive en la página de mail).
-  - Nueva acción **Solicitar y recomendar IA**: envía una solicitud estandarizada a los proveedores seleccionados, registra la actividad de RFQ y resalta en el comparador al proveedor recomendado automáticamente según presupuesto objetivo y requisitos técnicos configurados.
-  - `SupplierKanban` gestiona estados "Por definir  Vistos  Contactados  Presupuesto  Contratado  Rechazado" por línea de servicio, con drag & drop y acciones rápidas.
-   - Las tarjetas de proveedor (`ProveedorCardNuevo`) muestran imagen de cabecera, nombre, servicio principal, estado con etiqueta coloreada, próxima cita y presupuesto estimado; incluyen acciones inline para marcar favorito, abrir menú contextual (editar/eliminar) y abrir detalle al hacer clic en el cuerpo.
-   - `EmailTrackingList` registra cada correo enviado y recibido (IA o manual) y `SupplierEventBridge` enlaza invitaciones/calendarios para mantener historial de citas; ambos se muestran dentro de la pestaña de comunicaciones del detalle.
-   - Las tarjetas muestran un punto rojo de alerta cuando existen correos o citas sin revisar; el indicador se limpia al abrir la ficha o marcar la comunicación como leída.
-   - `GroupCreateModal`, `GroupAllocationModal` y `GroupSuggestions` ayudan a equilibrar presupuestos y detectar huecos sin cobertura.
-4. Contratación y seguimiento
-   - `RFQModal`, `ReservationModal` y `ProviderEmailModal` disparan solicitudes formales; `SupplierEventBridge` alimenta timeline y tareas.
-   - Automatizaciones IA monitorean respuestas de correo y estados de contrato/presupuesto: necesitan detectar `budgetStatus = approved` + `contractStatus = signed` (ya sea por lectura del correo, adjunto reconocido o registro manual en Flujo 15). Si solo llega uno de los dos, se crea alerta "Falta validar presupuesto/contrato" antes de mover la línea.
-   - Los planificadores pueden marcar "Contacto manual registrado" desde `SupplierKanban` o `ProveedorDetalle` para reflejar comunicaciones fuera del módulo de email; esto evita que el pipeline dependa exclusivamente del rastreo automático.
-   - `GestionProveedores` integra las vistas; `ProveedorDetalle` muestra pestañas de información/comunicaciones, detalla qué servicios cubre cada proveedor, enlaza contratos/pagos y aporta un bloque de métricas comparativas (precio medio, ratio de respuesta, satisfacción) calculadas a partir de `supplierInsights`.
+## 3. UX (layout progresivo)
+- **Header global**
+  - La vista mantiene un header fijo con acciones globales (`Añadir proveedor`, apertura del `Panel de servicios`). Desde aquí se lanza `ProviderSearchDrawer`, se accede a fichas (`/proveedores/:id`) y al portal externo (`/proveedores/:id/portal`).
+  - El botón “Panel de servicios” abre `ServicesBoard` con servicios críticos y sugerencias IA (Core/Contraste) más el wizard `SupplierMergeWizard`. Se abre automáticamente únicamente en la primera visita (flag `suppliers_needs_intro_{weddingId|userId}`); a partir de entonces solo se accede manualmente desde el botón correspondiente.
+
+- **Panel superior plegable de búsqueda**
+  - Único bloque de interacción. Arranca desplegado y puede plegarse (“Plegar exploración”). Al cerrarlo queda un botón flotante (“Explorar proveedores”) para reabrirlo sin abandonar la vista.
+  - Contenido:
+    - Campo de búsqueda manual con historial persistido (`searchHistory`). Al ejecutar, la shortlist bajo el mismo panel se actualiza sin navegar.
+    - Contadores rápidos (todos/favoritos) y feedback del último resultado (origen IA/manual, fecha, notas).
+    - Sub-sección **Shortlist guardada**: tarjetas semitransparentes con candidatos “vistos” agrupados por servicio, mostrando match y notas. Desde aquí se puede promover o descartar sin cambiar de pestaña.
+  - Cuando se lanza una búsqueda IA:
+    - El sistema genera un *prompt* compuesto automáticamente a partir del perfil de la boda (`weddingInfo` + `wantedServices`): estilo preferido, tipo de evento, fecha, presupuesto objetivo, localización, número de asistentes, servicios aún pendientes y restricciones (`noGoItems`). 
+    - Ese prompt se envía al proveedor IA (OpenAI / modelo propio) solicitando candidatos contextualizados. El usuario puede modificar el texto base antes de enviar (“Florista Barcelona 2500”, etc.), pero el motor siempre anexa los datos estructurados para mejorar la relevancia.
+    - Las respuestas se normalizan (`mapAIResultToProvider`) y se guardan de forma idempotente en la shortlist, evitando duplicados por email o enlace. Si la IA devuelve información incompleta, se rellenan campos con defaults (email sintético, servicio actual).
+    - En caso de fallo o respuesta vacía, se muestra mensaje en el panel y se mantiene el buscador abierto para ajustes manuales.
+    - Los resultados inmediatos se muestran justo debajo del formulario como tarjetas de “candidato sugerido”: nombre, servicio, snippet y match. Desde ahí el planner puede guardarlo (añade a shortlist) o descartarlo sin salir del panel.
+- **Área principal (scroll)**
+  - El bloque **Servicios** lista cada servicio en tarjetas semitransparentes (pendientes) o sólidas (confirmados). Las tarjetas muestran nombre del servicio, badge “Pendiente/Confirmado” y, en caso de shortlist, el número de candidatos guardados.
+  - Al hacer clic sobre una tarjeta pendiente se abre el modal **Opciones Guardadas**:
+    - Lista todas las alternativas capturadas (shortlist + búsquedas recientes) con acciones rápidas (`Promover`, `Descartar`, `Registrar nota`). 
+    - Pestañas internas: “Candidatos” (ordenados por match), “Historial” (notas y comunicaciones) y “Acciones” (crear proveedor manual preasignado, abrir ficha existente).
+    - CTA contextual para abrir la matriz de necesidades filtrada por el servicio.
+  - El bloque mantiene fondo neutro y, al pie, tarjetas de KPIs (“Servicios confirmados”, “Servicios pendientes”, “Próximo pago”) que reutilizan el mismo patrón de color sólido cuando existe proveedor asignado.
+
+- **Tarjetas de servicios pendientes**
+  - Visual: borde discontinuo y fondo translúcido (`bg-surface/80`). El badge “Pendiente” aparece junto al nombre del servicio.
+  - Shortlist asociada: si existen candidatos guardados, se muestra el contador (`n opciones guardadas`) y el copy invita a revisar opciones.
+  - Confirmación: al detectar un proveedor con palabras clave `confirm/contrat/firm/reserva`, la tarjeta adopta fondo sólido, badge verde “Confirmado” y muestra nombre/estado, presupuesto asignado, gasto y próximo pago.
+  - Acciones rápidas:
+    1. Click → abre el modal “Opciones Guardadas”.
+    2. Cuando está confirmada, la tarjeta incluye botones `Registrar pago`, `Añadir nota` y `Abrir ficha` para llevar el seguimiento sin abandonar la vista.
+    3. Si no hay shortlist, el modal muestra estado vacío con CTA hacia la matriz o una nueva búsqueda.
+
+- **Modal “Opciones Guardadas”**
+  - Se abre al pulsar cualquier tarjeta pendiente del grid de servicios y evita abandonar la vista principal.
+  - **Candidatos**: recoge shortlist + proveedores en seguimiento; incluye acciones `Promover`, `Descartar`, `Registrar nota`, enlace al detalle y marcador de match.
+  - **Historial**: timeline con notas, comunicaciones y cambios de estado para aportar contexto antes de promover.
+  - **Acciones**: accesos rápidos a crear proveedor manual preasignado, reabrir la matriz filtrada y relanzar búsquedas manuales.
+  - Si ya existe un proveedor confirmado, aparece destacado en la cabecera del modal con enlace directo al detalle (`ProveedorDetalle`).
+
+- **Persistencia y shortlist**
+  - `localStorage` conserva `suppliers_search_history_{weddingId|userId}` (chips reutilizables) y `suppliers_needs_intro_{weddingId|userId}` (apertura automática sólo la primera visita).
+  - `useSupplierShortlist` centraliza candidatos guardados: deduplica por email/link, limita historial y alimenta tanto el panel superior como el modal.
+  - Las tarjetas detectan confirmación mediante `isConfirmedStatus` (palabras clave “confirm/contrat/firm/reserva”), lo que activa el estilo sólido y la cabecera de KPIs.
+
+- **Ficha detalle (overlay)**
+  - `ProveedorDetalle` se abre desde cualquier tarjeta. Conserva layout dividido: cabecera fija (avatar, estado global, tags Core/Contraste/Portal), columna central (≈70 %) con pestañas de información/comunicaciones/contratos, y sidebar (≈30 %) con “Resumen financiero”, “Agenda”, checklist y alertas IA (`style_balance_alert`, duplicados, contratos pendientes).
+  - **Información**: datos editables, líneas de servicio (`serviceLines`) con acciones de reasignar, fusionar, cerrar con snapshot en `supplierInsights`, y gestión de adjuntos.
+  - **Comunicaciones**: timeline cronológico de correos (`EmailTrackingList`), mensajes portal y notas manuales con filtros por tipo, búsqueda, CTA de contacto manual y programación de citas. Marcar una entrada como leída limpia indicadores en la lista y en las tarjetas del pipeline.
+  - **Contratos y pagos**: tabla de contratos (monto, estado, fechas) e hitos previstos vs realizados sincronizados con Finance; acciones `Solicitar contrato`, registrar pago, subir evidencia y alertas automáticas por faltas de aprobación/firma.
+  - **Insights**: métricas comparativas (precio medio vs objetivo, ratio de respuesta, satisfacción, SLA), resúmenes IA (“Refuerza estilo core”, “Contraste controlado”, “Riesgo por baja respuesta”), historial global `supplierInsights/{supplierId}` y enlaces a reseñas externas. Alertas `style_balance_alert` sugieren acciones correctivas.
+  - Acciones globales: editar, duplicar, fusionar (`SupplierMergeWizard`), mover a otra boda, abrir portal, generar RFQ, archivar proveedor (requiere líneas cerradas) y registrar contacto manual (`supplier_manual_contact`).
+    - **Estados especiales**
+      - Sin líneas: mostrar empty state con CTA “Añadir línea de servicio”.
+      - Sin agenda: sugerir crear cita (abre `ReservationModal`).
+      - Fallos de sincronización (`supplierEmails`, `supplierInsights`): banner amarillo con opción “Reintentar” o “Marcar revisado manualmente”.
+    - **Integraciones**
+      - Botón `Abrir portal` enlaza `/proveedores/:id/portal` mostrando estado (Borrador/Activo/Público).
+      - `SupplierEventBridge` sincroniza citas con timeline/tareas y actualiza agenda.
+    - **Permisos y seguridad**
+      - Owner/Planner: control total.
+      - Assistant: notas, comunicaciones, registrar tareas, marcar pagos recuperados (sin editar montos ni cerrar contratos).
+      - Invitados externos: sólo vía portal con vistas limitadas; sin acceso a `ProveedorDetalle`.
+    - **Telemetría y alertas**
+      - Eventos emitidos: `supplier_detail_viewed`, `supplier_detail_tab_changed`, `supplier_contact_manual_added`, `supplier_contract_updated`, `supplier_payment_recorded`.
+      - Alertas automáticas: ratio de respuesta <40 % en 7 días → tarea “Reforzar seguimiento”; precio estimado >20 % sobre presupuesto objetivo → alerta en panel financiero.
+  - La pestaña de insights incluye resúmenes IA con mensajes como “Refuerza estilo core” o “Contraste controlado (after-party)”; si se supera el límite de contraste (`style_balance_alert`), destaca proveedores que podrían reducir ese desequilibrio.
+
+## 5. Integración con personalización continua
+- Consumir `weddingInsights.nextBestActions` para priorizar tareas y recomendaciones dentro del módulo.
+- Emitir eventos `supplier_preference_applied` y `supplier_preference_rejected` al confirmar o descartar proveedores sugeridos por contrastes.
+- Panel de “packs sorpresa” (ideas IA) se conecta con el asistente (flujo 16) para presentar a planners opciones curadas según `specialInterests`.
    - Panel lateral "Resumen financiero" expone KPIs agregados (asignado, gastado, presupuestos pendientes, recordatorios, próximo deadline) y aloja filtros globales.
 
 ## 4. Persistencia y datos
@@ -64,12 +114,12 @@
 - Falta de IA (sin API) -> modales muestran fallback para entrada manual.
 - Tracking email deshabilitado -> panel indica "Sin seguimiento activo".
 - Registro bancario fallido -> se muestra alerta y se reintenta tras reautenticación.
-- Conexión perdida -> tabla y kanban pasan a modo lectura.
+- Conexión perdida -> las vistas de tarjetas (exploración/confirmados) pasan a modo lectura y muestran aviso de reconexión.
 
 ## 7. Integración con otros flujos
 - Flujo 3 (Invitados/RSVP) aporta datos de perfil y timing para ajustar plantillas de servicios sugeridos.
 - Flujo 6 sincroniza presupuestos por proveedor y por línea de servicio, además de controlar pagos planificados.
-- Flujo 7 centraliza comunicaciones; las respuestas analizadas por IA actualizan automáticamente el kanban del flujo 5 (a través del [Flujo 16](./flujo-16-asistente-virtual-ia.md)).
+- Flujo 7 centraliza comunicaciones; las respuestas analizadas por IA actualizan automáticamente las tarjetas y KPIs asociados (a través del [Flujo 16](./flujo-16-asistente-virtual-ia.md)).
 - Flujo 14 crea tareas automáticas tras cambios de estado (ej. "revisar propuesta", "confirmar contrato detectado por IA").
 - Flujo 15 genera contratos y documentos desde la ficha del proveedor (con enlaces por servicio).
 - Flujo 17 otorga puntos al confirmar proveedores clave.

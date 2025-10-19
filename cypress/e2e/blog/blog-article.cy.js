@@ -7,6 +7,7 @@
 describe('Blog · detalle de artículo', () => {
   const arrangeNews = () =>
     cy.fixture('blog/articles-page1.json').then((page1) => {
+      cy.wrap(page1.filter((post) => Boolean(post.image) && /^https?:\/\//i.test(post.image))).as('visibleArticles');
       cy.mockWeddingNews({ 1: page1, default: [] });
     });
 
@@ -21,7 +22,9 @@ describe('Blog · detalle de artículo', () => {
     cy.visit('/blog');
     cy.wait('@weddingNewsRequest');
 
-    cy.get('[data-testid="blog-card"]').should('have.length', 4);
+    cy.get('@visibleArticles').then((visibleArticles) => {
+      cy.get('[data-testid="blog-card"]').should('have.length', visibleArticles.length);
+    });
 
     cy.contains('[data-testid="blog-card"] h2', 'Cómo planificar una boda íntima perfecta').should('be.visible');
     cy.contains('[data-testid="blog-card"] span', 'prensa-nupcial.com').should('be.visible');

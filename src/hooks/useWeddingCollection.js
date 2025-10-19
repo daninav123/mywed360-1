@@ -60,7 +60,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
 
   useEffect(() => {
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
-    const ENABLE_LEGACY_FALLBACKS = import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS === 'true';
+    const ENABLE_LEGACY_FALLBACKS = String((import.meta.env && import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS) ?? 'true').toLowerCase() === 'true';
     // Intento de migración automática de invitados antiguos
     async function migrateGuests() {
       if (!ENABLE_LEGACY_FALLBACKS) return; // desactivado por flag
@@ -78,6 +78,7 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
       try {
         const {
           getDocs,
+          getDoc,
           collection: col,
           writeBatch,
           doc: fDoc,
@@ -111,6 +112,35 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
           );
           writes++; // contar escritura
         });
+
+        // 3) Invitados embebidos en weddings/{id} (array legacy 'guests')
+        try {
+          const wedRef = fDoc(db, 'weddings', weddingId);
+          const wedSnap = await getDoc(wedRef);
+          if (wedSnap.exists()) {
+            const data = wedSnap.data() || {};
+            const legacyArray = Array.isArray(data.guests) ? data.guests : [];
+            legacyArray.forEach((g, idx) => {
+              try {
+                const gid = String(g?.id || `legacy-${idx}`);
+                if (!existingIds.has(gid)) {
+                  const payload = {
+                    name: g?.name || g?.fullName || 'Invitado',
+                    phone: g?.phone || '',
+                    address: g?.address || '',
+                    companion: Number(g?.companion ?? g?.companions ?? 0) || 0,
+                    table: g?.table || g?.group || '',
+                    response: g?.response || '',
+                    status: g?.status || 'pending',
+                    createdAt: serverTimestamp(),
+                  };
+                  batch.set(fDoc(destCol, gid), payload, { merge: true });
+                  writes++;
+                }
+              } catch {}
+            });
+          }
+        } catch {}
 
         // Si hay operaciones en cola, confirmamos
         if (writes > 0) {
@@ -167,6 +197,32 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
             writes++; // contar escritura
           }
         });
+
+        // 3) Proveedores embebidos en weddings/{id} (array legacy 'suppliers')
+        try {
+          const wedRef = fDoc(db, 'weddings', weddingId);
+          const wedSnap = await getDoc(wedRef);
+          if (wedSnap.exists()) {
+            const data = wedSnap.data() || {};
+            const legacyArray = Array.isArray(data.suppliers) ? data.suppliers : [];
+            legacyArray.forEach((s, idx) => {
+              try {
+                const sid = String(s?.id || `legacy-${idx}`);
+                if (!existingIds.has(sid)) {
+                  const payload = {
+                    name: s?.name || s?.provider || 'Proveedor',
+                    category: s?.category || s?.type || '',
+                    email: s?.email || '',
+                    phone: s?.phone || '',
+                    createdAt: serverTimestamp(),
+                  };
+                  batch.set(fDoc(destCol, sid), payload, { merge: true });
+                  writes++;
+                }
+              } catch {}
+            });
+          }
+        } catch {}
 
         if (writes > 0) {
           await batch.commit();

@@ -783,7 +783,7 @@ const useGuests = () => {
           phone,
           message,
         });
-        return { success: true, stub: true };
+        return { success: true };
       }
       let link = '';
       try {
@@ -823,7 +823,7 @@ const useGuests = () => {
             message,
           });
         });
-        return { success: true, stub: true, opened: targets.length };
+        return { success: true, opened: targets.length };
       }
       let opened = 0;
       for (const guest of targets) {
@@ -954,11 +954,11 @@ const useGuests = () => {
             try {
               await updateGuest(guest.id, {
                 deliveryChannel,
-                deliveryStatus: 'whatsapp_stub_sent',
+                deliveryStatus: 'whatsapp_sent',
               });
             } catch {}
           }
-          return { success: true, stub: true };
+          return { success: true };
         }
 
         const resp = await apiPost(`/api/whatsapp/send`, payload, { auth: true });
@@ -1044,11 +1044,11 @@ const useGuests = () => {
               .map((guestId) =>
                 updateGuest(guestId, {
                   deliveryChannel,
-                  deliveryStatus: 'whatsapp_stub_sent',
+                  deliveryStatus: 'whatsapp_sent',
                 })
               )
           );
-          return { success: true, stub: true, count: items.length };
+          return { success: true, count: items.length };
         }
 
         const resp = await apiPost(`/api/whatsapp/send-batch`, payload, { auth: true });
@@ -1071,7 +1071,6 @@ const useGuests = () => {
     [activeWedding, guests, testApi, updateGuest, utils]
  );
 
-  const bulkInviteWhatsApp = useCallback(async () => ({ success: true, count: 0 }), []);
   const bulkInviteWhatsAppApi = useCallback(async (options = {}) => {
     try {
       const seen = new Set();
@@ -1139,7 +1138,7 @@ const useGuests = () => {
             .map((guestId) =>
               updateGuest(guestId, {
                 deliveryChannel,
-                deliveryStatus: 'whatsapp_stub_sent',
+                deliveryStatus: 'whatsapp_sent',
               })
             )
         );
@@ -1148,7 +1147,6 @@ const useGuests = () => {
           count: items.length,
           ok: items.length,
           fail: 0,
-          stub: true,
         };
       }
       const resp = await apiPost(`/api/whatsapp/send-batch`, payload, { auth: true });
@@ -1168,6 +1166,35 @@ const useGuests = () => {
       return { success: false, error: String(e?.message || e) };
     }
   }, [activeWedding, guests, testApi, updateGuest, utils]);
+
+  const bulkInviteWhatsApp = useCallback(
+    async (options = {}) => {
+      try {
+        const autoTargetIds =
+          options?.targetIds && Array.isArray(options.targetIds) && options.targetIds.length > 0
+            ? options.targetIds
+            : (guests || [])
+                .map((guest) => guest.id)
+                .filter(Boolean);
+
+        if (!autoTargetIds.length) {
+          return { success: false, error: 'no-targets' };
+        }
+
+        const payloadOptions = {
+          ...options,
+          coupleName: options?.coupleName || coupleName || '',
+          targetIds: autoTargetIds,
+        };
+
+        const result = await bulkInviteWhatsAppApi(payloadOptions);
+        return result;
+      } catch (error) {
+        return { success: false, error: String(error?.message || error) };
+      }
+    },
+    [bulkInviteWhatsAppApi, coupleName, guests],
+  );
   const inviteViaEmail = useCallback(
     async (guest, overrides = {}) => {
       try {
@@ -1218,10 +1245,10 @@ const useGuests = () => {
           if (target.id) {
             await updateGuest(target.id, {
               deliveryChannel: 'email',
-              deliveryStatus: 'email_stub_sent',
+              deliveryStatus: 'email_sent',
             });
           }
-          return { success: true, stub: true };
+          return { success: true };
         }
         const result = await sendMail({
           to: target.email,
@@ -1261,7 +1288,7 @@ const useGuests = () => {
           phone,
           message: text,
         });
-        return { success: true, stub: true };
+        return { success: true };
       }
       const deeplink = waDeeplink(toE164Frontend(phone), text);
       window.open(deeplink, '_blank');

@@ -4,33 +4,41 @@
 
 ## ?? Flujos Espec�ficos Disponibles
 
-0. **Flujo 0**: [Administraci�n Global](./flujos-especificos/flujo-0-administracion-global.md)
-1. **Flujo 3**: [Gesti�n de Invitados](./flujos-especificos/flujo-3-gestion-invitados.md)
-2. **Flujo 4**: [Invitados � Plan de Asientos y Contenido](./flujos-especificos/flujo-4-invitados-operativa.md)
-3. **Flujo 5**: [Proveedores con IA](./flujos-especificos/flujo-5-proveedores-ia.md)
-4. **Flujo 5**: [Timeline y Tareas](./flujos-especificos/flujo-5-timeline-tareas.md)
-5. **Flujo 6**: [Presupuesto](./flujos-especificos/flujo-6-presupuesto.md)
-6. **Flujo 7**: [Comunicaci�n y Emails](./flujos-especificos/flujo-7-comunicacion-emails.md)
-7. **Flujo 8**: [Dise�o Web Personalizaci�n](./flujos-especificos/flujo-8-diseno-web-personalizacion.md)
-8. **Flujo 9**: [RSVP y Confirmaciones](./flujos-especificos/flujo-9-rsvp-confirmaciones.md)
-9. **Flujo 10**: [Gesti�n Bodas M�ltiples](./flujos-especificos/flujo-10-gestion-bodas-multiples.md)
-10. **Flujo 11**: [Protocolo y Ceremonias (overview)](./flujos-especificos/flujo-11-protocolo-ceremonias.md)
-11. **Flujo 11A**: [Momentos Especiales de la Boda](./flujos-especificos/flujo-11a-momentos-especiales.md)
-12. **Flujo 11B**: [Timeline Global del D�a B](./flujos-especificos/flujo-11b-timeline-dia-b.md)
-13. **Flujo 11C**: [Checklist de �ltima Hora](./flujos-especificos/flujo-11c-checklist-ultima-hora.md)
-14. **Flujo 11D**: [Gu�a de Documentaci�n Legal](./flujos-especificos/flujo-11d-guia-documentacion-legal.md)
-15. **Flujo 11E**: [Ayuda a Lecturas y Votos](./flujos-especificos/flujo-11e-ayuda-textos-ceremonia.md)
-16. **Flujo 12**: [Notificaciones y Configuraci�n](./flujos-especificos/flujo-12-notificaciones-configuracion.md)
-17. **Flujo 13**: Integrado en [Flujo 4](./flujos-especificos/flujo-4-invitados-operativa.md)
-18. **Flujo 14**: [Checklist Avanzado](./flujos-especificos/flujo-14-checklist-avanzado.md)
-19. **Flujo 15**: [Contratos y Documentos](./flujos-especificos/flujo-15-contratos-documentos.md)
-20. **Flujo 16**: [Asistente Virtual con IA](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
-21. **Flujo 17**: [Gamificaci�n y Progreso](./flujos-especificos/flujo-17-gamificacion-progreso.md)
-22. **Flujo 18**: [Generador de Documentos Legales](./flujos-especificos/flujo-18-generador-documentos-legales.md)
-23. **Flujo 23**: [M�tricas del Proyecto](./flujos-especificos/flujo-23-metricas-proyecto.md)
-24. **Flujo 28**: [Dashboard Wedding Planner](./flujos-especificos/flujo-28-dashboard-planner.md)
-25. **Flujo 29**: [Upgrade de Rol (Owner→Assistant→Planner)](./flujos-especificos/flujo-29-upgrade-roles.md)
-19. **Flujo 16**: [Orquestador IA de Automatizaciones](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
+- **Flujo 0**: [Administraci�n Global](./flujos-especificos/flujo-0-administracion-global.md)
+- **Flujo 1**: [Registro y Autenticaci�n](./flujos-usuario.md#1-flujo-de-registro-y-autenticaci�n)
+- **Flujo 2**: [Descubrimiento Personalizado de la Boda](./flujos-especificos/flujo-2-descubrimiento-personalizado.md)
+- **Flujo 3**: [Gesti�n de Invitados](./flujos-especificos/flujo-3-gestion-invitados.md)
+- **Flujo 4**: [Invitados � Plan de Asientos y Contenido](./flujos-especificos/flujo-4-invitados-operativa.md)
+- **Flujo 5A**: [Proveedores con IA](./flujos-especificos/flujo-5-proveedores-ia.md)
+- **Flujo 5B**: [Timeline y Tareas](./flujos-especificos/flujo-5-timeline-tareas.md)
+- **Flujo 6**: [Presupuesto](./flujos-especificos/flujo-6-presupuesto.md)
+- **Flujo 7**: [Comunicaci�n y Emails](./flujos-especificos/flujo-7-comunicacion-emails.md)
+- **Flujo 8**: [Dise�o Web Personalizaci�n](./flujos-especificos/flujo-8-diseno-web-personalizacion.md)
+- **Flujo 9**: [RSVP y Confirmaciones](./flujos-especificos/flujo-9-rsvp-confirmaciones.md)
+- **Flujo 10**: [Gesti�n Bodas M�ltiples](./flujos-especificos/flujo-10-gestion-bodas-multiples.md)
+- **Flujo 11**: [Protocolo y Ceremonias (overview)](./flujos-especificos/flujo-11-protocolo-ceremonias.md)
+- **Flujo 11A**: [Momentos Especiales de la Boda](./flujos-especificos/flujo-11a-momentos-especiales.md)
+- **Flujo 11B**: [Timeline Global del D�a B](./flujos-especificos/flujo-11b-timeline-dia-b.md)
+- **Flujo 11C**: [Checklist de �ltima Hora](./flujos-especificos/flujo-11c-checklist-ultima-hora.md)
+- **Flujo 11D**: [Gu�a de Documentaci�n Legal](./flujos-especificos/flujo-11d-guia-documentacion-legal.md)
+- **Flujo 11E**: [Ayuda a Lecturas y Votos](./flujos-especificos/flujo-11e-ayuda-textos-ceremonia.md)
+- **Flujo 12**: [Notificaciones y Configuraci�n](./flujos-especificos/flujo-12-notificaciones-configuracion.md)
+- **Flujo 13**: Integrado en [Flujo 4](./flujos-especificos/flujo-4-invitados-operativa.md)
+- **Flujo 14**: [Checklist Avanzado](./flujos-especificos/flujo-14-checklist-avanzado.md)
+- **Flujo 15**: [Contratos y Documentos](./flujos-especificos/flujo-15-contratos-documentos.md)
+- **Flujo 16**: [Asistente Virtual con IA y Orquestador](./flujos-especificos/flujo-16-asistente-virtual-ia.md)
+- **Flujo 17**: [Gamificaci�n y Progreso](./flujos-especificos/flujo-17-gamificacion-progreso.md)
+- **Flujo 18**: [Generador de Documentos Legales](./flujos-especificos/flujo-18-generador-documentos-legales.md)
+- **Flujo 19**: [Dise�o de Invitaciones](./flujos-especificos/flujo-19-diseno-invitaciones.md)
+- **Flujo 20**: [Email Inbox Global](./flujos-especificos/flujo-20-email-inbox.md)
+- **Flujo 21**: [Sitio P�blico](./flujos-especificos/flujo-21-sitio-publico.md)
+- **Flujo 22**: [Dashboard Wedding Planner](./flujos-especificos/flujo-28-dashboard-planner.md)
+- **Flujo 23**: [M�tricas del Proyecto](./flujos-especificos/flujo-23-metricas-proyecto.md)
+- **Flujo 24**: [Galer�a de Inspiraci�n](./flujos-especificos/flujo-24-galeria-inspiracion.md)
+- **Flujo 25**: [Planes y Suscripciones](./flujos-especificos/flujo-25-suscripciones.md)
+- **Flujo 26**: [Blog e Inspiraci�n Editorial](./flujos-especificos/flujo-26-blog.md)
+- **Flujo 27**: [Momentos y Recuerdos](./flujos-especificos/flujo-27-momentos.md)
+- **Flujo 28**: [Upgrade de Rol (Owner→Assistant→Planner)](./flujos-especificos/flujo-29-upgrade-roles.md)
 
 ---
 
@@ -150,234 +158,56 @@
 - `ResetPasswordForm.jsx`
 - `PasswordStrengthIndicator.jsx`
 
-## 2. Flujo de Creaci�n de Boda (Tutorial IA Conversacional)
+## 2. Flujo de Descubrimiento Personalizado (Onboarding IA)
 
-### 2.1 Tutorial IA - Primera Experiencia
-**Objetivo:** Guiar al usuario novato a trav�s de una conversaci�n natural para crear su boda
+> Referencia detallada en `docs/flujos-especificos/flujo-2-descubrimiento-personalizado.md`.
 
-**Pasos detallados:**
-- [ ] **Detecci�n de usuario nuevo**
-  - Al hacer login por primera vez
-  - No existe ninguna boda asociada al usuario
-  - Redirecci�n autom�tica a `/tutorial-welcome`
-  - Componente: **pendiente** (`AIWeddingTutorial.jsx` a�n no implementado)
+### 2.1 Bienvenida contextual
+**Objetivo:** Presentar al usuario la promesa de acompanamiento personalizado y explicar el uso de sus respuestas.
 
-- [ ] **Bienvenida conversacional**
-  - Avatar de wedding planner IA
-  - Mensaje:  � �Hola! Soy Sofia, tu wedding planner virtual. Te ayudar� a organizar tu boda perfecta. �C�mo te llamas? � 
-  - Input de chat conversacional
-  - Procesamiento de respuesta con OpenAI
+- Triggers principales:
+  - Usuario sin bodas asociadas se redirige a `/onboarding/discovery` tras el login.
+  - Planner o agencia selecciona "Agregar nueva boda" y abre el flujo en modal.
+- UX:
+  - Avatar planner IA + copy empatico (ver `docs/personalizacion/tono-mensajes.md`).
+  - Si el perfil existe, se muestra resumen editable antes de continuar.
 
-- [ ] **Recopilaci�n de datos b�sicos (conversacional)**
-  - IA pregunta de forma natural:
-    -  � �Cu�l es el nombre de tu pareja? � 
-    -  � �Ya tienen fecha para la boda o a�n la est�n decidiendo? � 
-    -  � �Tienen idea de d�nde les gustar�a celebrarla? � 
-    -  � �Cu�ntos invitados aproximadamente esperan? � 
-    -  � �Cu�l es su presupuesto estimado? � 
-  - Cada respuesta se procesa y almacena
-  - IA adapta siguientes preguntas seg�n respuestas
+### 2.2 Captura del perfil de boda
+**Objetivo:** Construir `weddingProfile` con estilo, prioridades y restricciones.
 
-- [ ] **Asignaci�n de email interno de la plataforma**
-  - IA genera email personalizado: `ana.carlos.boda2024@mywed360.com`
-  - Formato: `[nombre].[pareja].boda[a�o]@mywed360.com`
-  - Verificaci�n de disponibilidad del email
-  - Si no est� disponible, a�adir n�mero: `ana.carlos.boda2024.2@mywed360.com`
-  - Presentaci�n al usuario:  � He creado un email especial para tu boda: [email] � 
-  -  � Este email te servir� para toda la comunicaci�n relacionada con tu boda � 
-  - Configuraci�n autom�tica de redirecci�n a email personal
-  - Almacenamiento en perfil de usuario
+- **Datos base:** `eventType`, ubicacion objetivo, rango de fecha, tamano estimado de invitados.
+- **Estilo y vibe:** seleccion multiopcion + texto libre (`stylePrimary`, `styleSecondary`, `vibeKeywords`).
+- **Prioridades:** checklist de areas clave (`priorityAreas`) con ranking corto.
+- **Restricciones:** presupuesto (`budgetRange`), accesibilidad, dietas, rituales especiales.
+- **Momentos destacados:** captura inicial de `specialMoments` con responsable y notas.
+- **Preferencias de comunicacion:** canal preferido e idioma para recomendaciones futuras.
+- Auto-guardado en draft tras cada paso para evitar perdida de informacion.
 
-- [ ] **Creaci�n impl�cita de boda**
-  - Durante la conversaci�n se va creando el documento en Firestore
-  - `/weddings/{weddingId}` se genera autom�ticamente
-  - Datos se van completando progresivamente
-  - Usuario no ve formularios, solo conversaci�n natural
+### 2.3 Confirmacion y recomendaciones iniciales
+**Objetivo:** Mostrar el resumen editable y activar recomendaciones guiadas.
 
-- [ ] **Informaci�n b�sica (Paso 1)**
-  - Nombres de los novios
-  - Fecha de la boda (date picker)
-  - Ubicaci�n principal (autocomplete con Google Places)
-  - Tipo de boda: religiosa, civil, simb�lica
-  - Estilo: cl�sica, moderna, r�stica, etc.
-  - N�mero estimado de invitados
+- Resumen editable con indicadores de confianza (`confidenceScore`).
+- Generacion inicial de:
+  - Checklist sugerido (flujo 14) en estado `suggested`.
+  - Proveedores destacados (flujo 5A) filtrados por estilo/presupuesto.
+  - Plan presupuestario base (flujo 6) con alertas si hay desalineacion.
+  - Contenido generado (flujos 8 y 20) alineado al tono seleccionado.
+- CTA: "Aplicar todo", "Revisar" o "Modificar perfil".
+- Emision de eventos: `recommendation_shown`, `recommendation_applied`, `profile_field_edited`.
 
-- [ ] **Configuraci�n avanzada (Paso 2)**
-  - Presupuesto estimado
-  - Moneda preferida
-  - Idioma de la boda
-  - Zona horaria
-  - C�digo de vestimenta
+### 2.4 Persistencia y servicios
+- `weddings/{id}/weddingProfile` y `weddings/{id}/weddingInsights` (ver `docs/DATA_MODEL.md`).
+- `weddings/{id}/recommendations` almacena destino, origen (IA/manual) y estado (`suggested|applied|dismissed`).
+- Hooks clave: `useWeddingProfile`, `useRecommendationEngine`, `useConfidenceScore`.
+- Backend `/api/ai/parse-dialog` procesa inferencias; fallback local en `RecommendationService`.
 
-- [ ] **Invitar co-organizadores (Paso 3)**
-  - Campo email para invitar pareja
-  - Lista de familiares/amigos organizadores
-  - Definir niveles de acceso por persona
-  - Env�o de invitaciones por email
-
-- [ ] **Establecer permisos (Paso 4)**
-  - Matriz de permisos por rol:
-    - Novio/a: acceso completo
-    - Pareja: acceso completo o limitado
-    - Padres: ver y editar invitados, ver presupuesto
-    - Planner: acceso completo excepto finanzas
-    - Amigos: solo ver lista de invitados
-
-- [ ] **Finalizaci�n**
-  - Resumen de configuraci�n
-  - Creaci�n de documento en Firestore `/weddings/{weddingId}`
-  - Generaci�n de ID �nico de boda
-  - Redirecci�n a dashboard de la boda
-
-**Estructura de datos:**
-```javascript
-// /weddings/{weddingId}
-{
-  id:  � wedding_123 � ,
-  bride: { name:  � Ana � , email:  � ana@email.com �  },
-  groom: { name:  � Carlos � , email:  � carlos@email.com �  },
-  weddingEmail:  � ana.carlos.boda2024@mywed360.com � , // Email interno generado
-  date:  � 2024-06-15 � ,
-  location: {
-    name:  � Hotel Majestic � ,
-    address:  � Calle Mayor 123, Madrid � ,
-    coordinates: { lat: 40.4168, lng: -3.7038 }
-  },
-  type:  � civil � ,
-  style:  � moderna � ,
-  estimatedGuests: 120,
-  budget: 25000,
-  currency:  � EUR � ,
-  language:  � es � ,
-  timezone:  � Europe/Madrid � ,
-  dressCode:  � formal � ,
-  organizers: [
-    { uid:  � user1 � , role:  � bride � , permissions: [ � all � ] },
-    { uid:  � user2 � , role:  � groom � , permissions: [ � all � ] }
-  ],
-  emailSettings: {
-    forwardToPersonal: true,
-    personalEmails: [ � ana@email.com � ,  � carlos@email.com � ],
-    autoReply: {
-      enabled: true,
-      message:  � Gracias por contactarnos sobre nuestra boda. Te responderemos pronto. � 
-    }
-  },
-  createdAt:  � 2024-01-15T10:00:00Z � ,
-  updatedAt:  � 2024-01-15T10:00:00Z � 
-}
-```
-
-### 2.2 Configuraci�n de Momentos de la Boda
-**Objetivo:** Definir los diferentes momentos/ceremonias que componen el d�a de la boda
-
-**Pasos detallados:**
-- [ ] **Definir momentos principales**
-  - Lista predeterminada: ceremonia, c�ctel, banquete, fiesta
-  - Opci�n de a�adir momentos personalizados
-  - Cada momento tiene: nombre, tipo, obligatorio/opcional
-
-- [ ] **Configurar ceremonia**
-  - Tipo: religiosa, civil, simb�lica
-  - Ubicaci�n (puede ser diferente a la principal)
-  - Hora de inicio y duraci�n estimada
-  - Capacidad m�xima
-  - Requisitos especiales (m�sica, decoraci�n)
-
-- [ ] **Configurar c�ctel**
-  - Ubicaci�n (interior/exterior)
-  - Duraci�n
-  - Tipo de servicio: canap�s, buffet, estaciones
-  - Capacidad de pie
-
-- [ ] **Configurar banquete**
-  - Ubicaci�n del sal�n
-  - Hora de inicio
-  - Tipo de servicio: buffet, men� cerrado, estaciones
-  - Distribuci�n de mesas
-  - Capacidad sentada
-
-- [ ] **Configurar fiesta**
-  - Misma ubicaci�n que banquete o diferente
-  - Hora de inicio y fin
-  - Tipo de m�sica/entretenimiento
-  - Barra libre o consumici�n
-
-- [ ] **Eventos adicionales**
-  - Ensayo de ceremonia
-  - Cena de ensayo
-  - Brunch del d�a siguiente
-  - Despedidas de soltero/a
-
-- [ ] **Timeline general**
-  - Vista cronol�gica de todos los eventos
-  - Detecci�n de conflictos de horario
-  - Tiempo de transici�n entre eventos
-  - Coordinaci�n con proveedores
-
-**Estructura de datos:**
-```javascript
-// /weddings/{weddingId}/moments/{momentId}
-{
-  id:  � ceremony_1 � ,
-  name:  � Ceremonia � ,
-  type:  � ceremony � ,
-  required: true,
-  date:  � 2024-06-15 � ,
-  startTime:  � 17:00 � ,
-  duration: 45, // minutos
-  location: {
-    name:  � Iglesia San Miguel � ,
-    address:  � Plaza Mayor 1, Madrid � ,
-    coordinates: { lat: 40.4168, lng: -3.7038 }
-  },
-  capacity: 150,
-  settings: {
-    ceremonyType:  � religious � ,
-    musicRequired: true,
-    decorationStyle:  � classic � ,
-    specialRequirements: [ � altar flowers � ,  � red carpet � ]
-  },
-  vendors: [ � photographer_1 � ,  � musician_1 � ],
-  createdAt:  � 2024-01-15T10:00:00Z � 
-}
-```
-
-### 2.3 Finalizaci�n del Tutorial B�sico
-**Pasos detallados:**
-- [ ] **Resumen de informaci�n recopilada**
-  - IA presenta resumen de datos recopilados
-  -  � Perfecto, ya tengo la informaci�n b�sica de tu boda... � 
-  - Confirmaci�n de datos por parte del usuario
-  - Opci�n de corregir informaci�n
-
-- [ ] **Presentaci�n del dashboard**
-  -  � Ahora te voy a mostrar tu panel de control... � 
-  - Tour guiado por las diferentes secciones
-  - Explicaci�n de qu� puede hacer en cada �rea
-  - �nfasis en que puede empezar por donde prefiera
-
-- [ ] **Elecci�n de siguiente paso**
-  -  � �Por d�nde te gustar�a empezar? � 
-  - Opciones: Invitados, Presupuesto, Proveedores, Plan de Asientos, Timeline
-  - Redirecci�n a mini-tutorial de la secci�n elegida
-  - Posibilidad de cambiar de secci�n en cualquier momento
-
-**Componentes necesarios:**
-- `AIWeddingTutorial.jsx`
-- `ConversationalChat.jsx`
-- `AIWeddingPlanner.jsx`
-- `TutorialDashboard.jsx`
-- `MomentConfiguration.jsx`
-- `TimelineView.jsx`
-
-**APIs/Servicios:**
-- OpenAI API para conversaci�n natural
-- Speech-to-text (opcional)
-- Text-to-speech (opcional)
-- Firestore para almacenamiento progresivo
-- Email service para creaci�n de cuentas internas
-- Domain management para subdominios @mywed360.com
+### 2.5 Metricas y QA
+- Funnel: `discovery_started`, `discovery_completed`, `discovery_abandoned_step`.
+- KPI: porcentaje de perfiles completos, confianza media, ratio de recomendaciones aplicadas.
+- Pruebas:
+  - Unitarias: validacion de campos, normalizacion de datos, calculo de confianza.
+  - Integracion: completar onboarding y verificar datos en Firestore + recomendaciones disponibles.
+  - E2E pendiente: `cypress/e2e/onboarding/discovery-personalized.cy.js`.
 
 ## 3. Flujo de Gesti�n de Invitados
 
@@ -559,3 +389,4 @@
 - **Experiencias IA completadas**: concluir pendientes de los flujos 5a/5b/6/7/8 para que proveedores, tareas, finanzas, emails y sitios web sean 100?% productivos.
 - **Engagement y anal�tica**: priorizar gamificaci�n (17), m�tricas unificadas (23) y mejoras de dashboard (22) para medir adopci�n y mantener usuarios activos.
 - **Documentaci�n legal y contratos**: finalizar los gaps cr�ticos de flujos 15 y 18 para soportar firma electr�nica e integraciones de cumplimiento.
+

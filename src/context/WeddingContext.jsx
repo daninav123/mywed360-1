@@ -3,10 +3,8 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  query,
   serverTimestamp,
   setDoc,
-  where,
 } from 'firebase/firestore';
 import React, {
   createContext,
@@ -18,11 +16,17 @@ import React, {
   useState,
 } from 'react';
 
-import { db, firebaseReady } from '../firebaseConfig';
+import { db, firebaseReady, getFirebaseAuth } from '../firebaseConfig';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 import errorLogger from '../utils/errorLogger';
 import { ensureWeddingAccessMetadata } from '../utils/weddingPermissions';
+import {
+  loadLocalWeddings,
+  LOCAL_WEDDINGS_EVENT,
+  setLocalActiveWedding,
+  upsertLocalWedding,
+} from '../services/localWeddingStore';
 
 const defaultContextValue = {
   weddings: [],
@@ -79,6 +83,12 @@ export function WeddingProvider({ children }) {
   const [weddings, setWeddings] = useState([]);
   const [weddingsReady, setWeddingsReady] = useState(false);
   const [activeWedding, setActiveWeddingState] = useState('');
+  const [localMirror, setLocalMirror] = useState({
+    weddings: [],
+    activeWeddingId: '',
+    uid: '',
+  });
+  const [usingFirestore, setUsingFirestore] = useState(false);
 
   const getLocalProfileUid = useCallback(() => {
     try {
@@ -122,16 +132,75 @@ export function WeddingProvider({ children }) {
     }
   }, [currentUser, getLocalProfileUid, resolveActiveWeddingFromStorage]);
 
-  // Suscribirse a Firestore para planner/owner
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let cancelled = false;
+
+    const uid = currentUser?.uid || getLocalProfileUid() || 'anonymous';
+
+    const readLocal = () => {
+      const { weddings: localWeddings, activeWeddingId } = loadLocalWeddings(uid);
+      if (cancelled) return;
+      setLocalMirror({
+        weddings: Array.isArray(localWeddings) ? localWeddings : [],
+        activeWeddingId: activeWeddingId || '',
+        uid,
+      });
+    };
+
+    readLocal();
+    const handleUpdate = () => readLocal();
+    window.addEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener(LOCAL_WEDDINGS_EVENT, handleUpdate);
+    };
+  }, [currentUser, getLocalProfileUid]);
+
+  useEffect(() => {
+    if (!localMirror.uid) return;
+    if (usingFirestore) return;
+    setWeddings(localMirror.weddings);
+    setWeddingsReady(true);
+    const nextActive =
+      localMirror.activeWeddingId ||
+      (localMirror.weddings.length ? localMirror.weddings[0].id : '');
+    if (nextActive) {
+      setActiveWeddingState(nextActive);
+    } else {
+      setActiveWeddingState('');
+    }
+  }, [localMirror, usingFirestore]);
+
+  // Suscribirse a Firestore usando subcolección users/{uid}/weddings
   useEffect(() => {
     let unsub = null;
     let cancelled = false;
 
+    const applyLocal = (uid) => {
+      const { weddings: localWeddings, activeWeddingId } = loadLocalWeddings(uid);
+      setUsingFirestore(false);
+      setWeddings(localWeddings);
+      setWeddingsReady(true);
+      const nextActive =
+        activeWeddingId || (localWeddings.length ? localWeddings[0].id : '');
+      if (nextActive) {
+        setActiveWeddingState(nextActive);
+      } else {
+        setActiveWeddingState('');
+      }
+    };
+
     const listen = async () => {
-      const uid = currentUser?.uid || getLocalProfileUid();
-      if (!uid) {
+      // Siempre preferir el UID real de Firebase Auth para cumplir reglas de Firestore
+      const activeAuth = (typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null);
+      const authUid = activeAuth?.currentUser?.uid || null;
+      const localUid = authUid || currentUser?.uid || getLocalProfileUid() || 'anonymous';
+      if (!localUid) {
         setWeddings([]);
         setWeddingsReady(true);
+        setActiveWeddingState('');
         return;
       }
 
@@ -141,75 +210,56 @@ export function WeddingProvider({ children }) {
         console.warn('[WeddingContext] firebaseReady rejected', error);
       }
 
-      if (!db) {
-        console.warn('[WeddingContext] Firestore no disponible');
-        setWeddings([]);
-        setWeddingsReady(true);
+      if (!db || !authUid) {
+        applyLocal(localUid);
         return;
       }
 
       try {
-        const plannerQuery = query(
-          collection(db, 'weddings'),
-          where('plannerIds', 'array-contains', uid)
-        );
-        const ownerQuery = query(
-          collection(db, 'weddings'),
-          where('ownerIds', 'array-contains', uid)
-        );
-
-        let plannerDocs = [];
-        let ownerDocs = [];
-
-        const mergeResults = () => {
-          if (cancelled) return;
-          const map = new Map();
-          for (const docSnap of plannerDocs) {
-            const raw = { id: docSnap.id, ...docSnap.data() };
-            const entry = ensureWeddingAccessMetadata(raw, 'planner');
-            map.set(docSnap.id, entry);
-          }
-          for (const docSnap of ownerDocs) {
-            const raw = { id: docSnap.id, ...docSnap.data() };
-            const entry = ensureWeddingAccessMetadata(raw, 'owner');
-            map.set(docSnap.id, entry);
-          }
-          const list = Array.from(map.values());
-          setWeddings(list);
-          setWeddingsReady(true);
-          list.forEach((w) => ensureFinance(w.id));
-          if (!activeWedding && list.length) {
-            setActiveWeddingState(list[0].id);
-          }
-        };
-
-        const unsubPlanner = onSnapshot(
-          plannerQuery,
-          (snap) => {
-            plannerDocs = snap.docs;
-            mergeResults();
+        const subcolRef = collection(db, 'users', authUid, 'weddings');
+        unsub = onSnapshot(
+          subcolRef,
+          async (snap) => {
+            if (cancelled) return;
+            const entries = [];
+            for (const docSnap of snap.docs) {
+              const subData = docSnap.data() || {};
+              const id = docSnap.id;
+              let merged = { id, ...subData };
+              try {
+                const mainRef = doc(db, 'weddings', id);
+                const mainSnap = await getDoc(mainRef);
+                if (mainSnap.exists()) {
+                  const raw = { id, ...mainSnap.data() };
+                  const role = subData.role || 'owner';
+                  merged = ensureWeddingAccessMetadata(raw, role);
+                }
+              } catch (e) {
+                // mantener subData si no es accesible
+              }
+              entries.push(merged);
+              upsertLocalWedding(localUid, merged);
+            }
+            if (cancelled) return;
+            setUsingFirestore(true);
+            setWeddings(entries);
+            setWeddingsReady(true);
+            entries.forEach((w) => ensureFinance(w.id));
+            if (!activeWedding && entries.length) {
+              setActiveWeddingState(entries[0].id);
+              setLocalActiveWedding(localUid, entries[0].id);
+            } else if (activeWedding) {
+              setLocalActiveWedding(localUid, activeWedding);
+            }
           },
           (error) => {
-            console.warn('[WeddingContext] planner snapshot error', error);
+            console.warn('[WeddingContext] users/{uid}/weddings snapshot error', error);
+            applyLocal(localUid);
           }
         );
-        const unsubOwner = onSnapshot(
-          ownerQuery,
-          (snap) => {
-            ownerDocs = snap.docs;
-            mergeResults();
-          },
-          (error) => {
-            console.warn('[WeddingContext] owner snapshot error', error);
-          }
-        );
-        unsub = () => {
-          unsubPlanner();
-          unsubOwner();
-        };
       } catch (error) {
-        console.warn('[WeddingContext] listen weddings failed', error);
-        setWeddingsReady(true);
+        console.warn('[WeddingContext] listen subcollection weddings failed', error);
+        applyLocal(localUid);
       }
     };
 
@@ -310,11 +360,19 @@ export function WeddingProvider({ children }) {
       setActiveWeddingState(nextId);
       if (uid) persistActiveWedding(uid, nextId);
 
+      if (uid) {
+        try {
+          setLocalActiveWedding(uid, nextId);
+        } catch {}
+      }
+
       if (nextId) {
         ensureFinance(nextId);
       }
 
-      if (uid) {
+      const activeAuth = (typeof getFirebaseAuth === 'function' ? getFirebaseAuth() : null);
+      const authUid = activeAuth?.currentUser?.uid || null;
+      if (uid && db && authUid && uid === authUid) {
         try {
           const userRef = doc(db, 'users', uid);
           void setDoc(

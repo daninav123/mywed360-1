@@ -4,6 +4,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { ADMIN_ALLOWED_PATHS } from '../config/adminNavigation';
 import { useAuth } from '../hooks/useAuth';
 import { recordAdminSecurityEvent } from '../services/adminAuditService';
+import { hasAdminSession } from '../services/adminSession';
 
 const normalizePath = (pathname) => {
   if (!pathname) return '/admin';
@@ -40,16 +41,18 @@ const RequireAdmin = () => {
 
     lastReportedRef.current = cacheKey;
 
-    recordAdminSecurityEvent({
-      action: 'ADMIN_ROUTE_BLOCKED',
-      email,
-      outcome: 'denied',
-      reason,
-    }).catch((error) => {
-      if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
-        console.warn('[RequireAdmin] No se pudo registrar el evento de seguridad:', error);
-      }
-    });
+    if (hasAdminSession && typeof hasAdminSession === 'function' && hasAdminSession()) {
+      recordAdminSecurityEvent({
+        action: 'ADMIN_ROUTE_BLOCKED',
+        email,
+        outcome: 'denied',
+        reason,
+      }).catch((error) => {
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+          console.warn('[RequireAdmin] No se pudo registrar el evento de seguridad:', error);
+        }
+      });
+    }
   }, [
     isLoading,
     isAuthenticated,
@@ -75,7 +78,7 @@ const RequireAdmin = () => {
     const email = userProfile?.email || currentUser?.email || 'admin';
     const reason = `route_not_allowed:${normalizedPath}`;
     const cacheKey = `${email}:${reason}`;
-    if (lastReportedRef.current !== cacheKey) {
+    if (lastReportedRef.current !== cacheKey && hasAdminSession && hasAdminSession()) {
       lastReportedRef.current = cacheKey;
       void recordAdminSecurityEvent({
         action: 'ADMIN_ROUTE_RESTRICTED',

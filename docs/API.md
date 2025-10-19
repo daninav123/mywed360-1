@@ -57,6 +57,18 @@ Base: `/api/mail` y `/api/email*` (requiere `Authorization` cuando aplica)
 - `GET /api/email/all`
 - `POST /api/email/:emailId/tag`
 - `DELETE /api/email/:emailId/tag/:tagId`
+- `GET /api/email/folders`
+- `POST /api/email/folders`
+- `PUT /api/email/folders`
+- `DELETE /api/email/folders/:folderId`
+- `GET /api/email/folders/mapping`
+- `PUT /api/email/folders/mapping`
+- `GET /api/email/tags`
+- `POST /api/email/tags`
+- `PUT /api/email/tags`
+- `DELETE /api/email/tags/:tagId`
+- `GET /api/email/tags/mapping`
+- `PUT /api/email/tags/mapping`
 
 ## Notificaciones
 

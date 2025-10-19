@@ -7,17 +7,37 @@ describe('Tareas - Modal "Ver todas las tareas" muestra subtareas', () => {
     const parentTitle = `Padre QA ${Date.now()}`;
     const subTitle = `Sub QA ${Date.now()}`;
 
-    // Ir a Tareas con boda mock inyectada antes de que la app cargue
+    // Ir a Tareas con boda y sesión mock inyectadas antes de que la app cargue
     cy.visit('/tasks', {
       onBeforeLoad: (win) => {
-        win.__MOCK_WEDDING__ = {
-          weddings: [{ id: 'w1', name: 'Demo Wedding' }],
-          activeWedding: { id: 'w1', name: 'Demo Wedding' },
+        const mockWeddingId = 'w1';
+        const mockUser = {
+          uid: 'cypress-test',
+          email: 'usuario.test@lovenda.com',
+          displayName: 'Usuario Test Cypress',
         };
+
+        win.__MOCK_WEDDING__ = {
+          weddings: [{ id: mockWeddingId, name: 'Demo Wedding' }],
+          activeWedding: { id: mockWeddingId, name: 'Demo Wedding' },
+        };
+
+        try {
+          win.localStorage.setItem('userEmail', mockUser.email);
+          win.localStorage.setItem('isLoggedIn', 'true');
+          win.localStorage.setItem('lovenda_user', JSON.stringify(mockUser));
+          win.localStorage.setItem('mywed360_user', JSON.stringify(mockUser));
+          win.localStorage.setItem('MyWed360_user_profile', JSON.stringify(mockUser));
+          win.localStorage.setItem('mywed360_active_wedding', mockWeddingId);
+          win.localStorage.setItem('lovenda_active_wedding', mockWeddingId);
+          win.localStorage.setItem('mywed360_login_email', mockUser.email);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.warn('[tasks E2E] No se pudo hidratar localStorage mock:', error);
+        }
       },
     });
-    // Login simulado tras cargar
-    cy.loginToLovenda();
+
     cy.closeDiagnostic();
 
     // Crear tarea padre (bloque Gantt)

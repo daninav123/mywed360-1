@@ -202,7 +202,7 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
       return { success: true, id: draft.id || 'new-draft-id' };
     });
     EmailService.markAsRead.mockImplementation(async (id) => true);
-    EmailService.moveMail.mockImplementation(async (id, folder) => true);
+    EmailService.moveMail.mockResolvedValue(true);
     EmailService.deleteMail.mockImplementation(async (id) => true);
     EmailService.replyMail.mockImplementation(async (id, content) => {
       return { success: true, id: 'reply-email-id' };
@@ -580,6 +580,5 @@ describe('Flujos avanzados del sistema de correo (E2E)', () => {
     });
   });
 });
-
 
 

@@ -10,17 +10,61 @@ import {
   ChevronDown,
   Sparkles,
   Pause,
+  AlertTriangle,
+  GripVertical,
+  Tag,
+  UserPlus,
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { toast } from 'react-toastify';
 
 import PageWrapper from '../../components/PageWrapper';
 import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
+import Badge from '../../components/ui/Badge';
 import { MUSIC_INSPIRATION } from '../../data/musicInspiration';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
 import useGuests from '../../hooks/useGuests';
 import { post as apiPost } from '../../services/apiClient';
 import * as Playback from '../../services/PlaybackService';
+
+const MOMENT_TYPE_OPTIONS = [
+  { value: 'entrada', label: 'Entrada' },
+  { value: 'lectura', label: 'Lectura' },
+  { value: 'votos', label: 'Votos' },
+  { value: 'anillos', label: 'Intercambio de anillos' },
+  { value: 'baile', label: 'Baile' },
+  { value: 'discurso', label: 'Discurso' },
+  { value: 'corte_pastel', label: 'Corte de pastel' },
+  { value: 'salida', label: 'Salida' },
+  { value: 'otro', label: 'Otro' },
+];
+
+const MOMENT_STATE_OPTIONS = [
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'confirmado', label: 'Confirmado' },
+  { value: 'ensayo', label: 'Ensayo' },
+];
+
+const RECIPIENT_ROLE_OPTIONS = [
+  { value: 'novia', label: 'Novia' },
+  { value: 'novio', label: 'Novio' },
+  { value: 'planner', label: 'Planner' },
+  { value: 'oficiante', label: 'Oficiante / Maestro de ceremonias' },
+  { value: 'familia', label: 'Familiar cercano' },
+  { value: 'amigo', label: 'Amigo/a' },
+  { value: 'proveedor', label: 'Proveedor' },
+];
+
+const STATE_BADGE_TYPE = {
+  pendiente: 'warning',
+  confirmado: 'success',
+  ensayo: 'info',
+};
+
+const RESPONSABLES_LIMIT = 12;
+const SUPPLIERS_LIMIT = 12;
 
 // Tabs pasan a ser dinmicas desde el hook (blocks)
 
@@ -29,14 +73,16 @@ const MomentosEspeciales = () => {
     blocks,
     moments,
     addMoment,
-    updateMoment,
-    removeMoment,
-    reorderMoment,
-    duplicateMoment,
-    addBlock,
-    renameBlock,
-    removeBlock,
-    reorderBlocks,
+  updateMoment,
+  removeMoment,
+  reorderMoment,
+  moveMoment,
+  duplicateMoment,
+  addBlock,
+  renameBlock,
+  removeBlock,
+  reorderBlocks,
+  maxMomentsPerBlock,
 
 } = useSpecialMoments();
 
@@ -58,6 +104,14 @@ const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
   const map = new Map(options.map((option) => [option.value, option.raw]));
   return { options, map };
 }, [guests]);
+const recipientRoleMap = useMemo(
+  () => new Map(RECIPIENT_ROLE_OPTIONS.map((role) => [role.value, role.label])),
+  []
+);
+const [advancedOpen, setAdvancedOpen] = useState({});
+const [actionPanel, setActionPanel] = useState({ momentId: null, mode: null });
+const [actionPanelSelection, setActionPanelSelection] = useState({});
+const [supplierDrafts, setSupplierDrafts] = useState({});
 
 // Estado bsico
   const [activeTab, setActiveTab] = useState('ceremonia');
@@ -225,9 +279,837 @@ const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
     }
   };
 
+  const handleDuplicateSameBlock = useCallback(
+    (moment) => {
+      if ((moments[activeTab]?.length || 0) >= maxMomentsPerBlock) {
+        toast.warning(`Has alcanzado el máximo de ${maxMomentsPerBlock} momentos en esta sección.`);
+        return;
+      }
+      duplicateMoment(activeTab, moment.id, activeTab);
+    },
+    [moments, activeTab, maxMomentsPerBlock, duplicateMoment]
+  );
+
+  const toggleAdvancedSection = useCallback((momentId) => {
+    setAdvancedOpen((prev) => ({ ...prev, [momentId]: !prev[momentId] }));
+  }, []);
+
+  const toggleActionPanelSection = useCallback(
+    (momentId, mode, defaultTarget) => {
+      setActionPanel((prev) => {
+        if (prev.momentId === momentId && prev.mode === mode) {
+          return { momentId: null, mode: null };
+        }
+        return { momentId, mode };
+      });
+      if (defaultTarget) {
+        setActionPanelSelection((prev) => ({ ...prev, [momentId]: defaultTarget }));
+      }
+    },
+    []
+  );
+
+  const closeActionPanel = useCallback(() => {
+    setActionPanel({ momentId: null, mode: null });
+  }, []);
+
+  const handleActionPanelSelection = useCallback((momentId, value) => {
+    setActionPanelSelection((prev) => ({ ...prev, [momentId]: value }));
+  }, []);
+
+  const handleAddResponsible = useCallback(
+    (blockId, moment) => {
+      const current =
+        Array.isArray(moment.responsables) && moment.responsables.length
+          ? moment.responsables.map((resp, index) => ({
+              id: resp?.id || `${moment.id}-${index}`,
+              role: resp?.role || '',
+              name: typeof resp === 'string' ? resp : resp?.name || '',
+              contact: resp?.contact || '',
+            }))
+          : [];
+      if (current.length >= RESPONSABLES_LIMIT) {
+        toast.warning(`Máximo ${RESPONSABLES_LIMIT} responsables por momento.`);
+        return;
+      }
+      const next = [
+        ...current,
+        { id: `${moment.id}-${Date.now()}`, role: '', name: '', contact: '' },
+      ];
+      updateMoment(blockId, moment.id, { ...moment, responsables: next });
+    },
+    [updateMoment]
+  );
+
+  const handleResponsibleChange = useCallback(
+    (blockId, moment, index, patch) => {
+      const current =
+        Array.isArray(moment.responsables) && moment.responsables.length
+          ? moment.responsables.map((resp, idx) => ({
+              id: resp?.id || `${moment.id}-${idx}`,
+              role: resp?.role || '',
+              name: typeof resp === 'string' ? resp : resp?.name || '',
+              contact: resp?.contact || '',
+            }))
+          : [];
+      if (!current[index]) {
+        current[index] = { id: `${moment.id}-${index}`, role: '', name: '', contact: '' };
+      }
+      current[index] = { ...current[index], ...patch };
+      updateMoment(blockId, moment.id, { ...moment, responsables: current });
+    },
+    [updateMoment]
+  );
+
+  const handleRemoveResponsible = useCallback(
+    (blockId, moment, index) => {
+      const current = Array.isArray(moment.responsables) ? [...moment.responsables] : [];
+      const next = current.filter((_, idx) => idx !== index);
+      updateMoment(blockId, moment.id, { ...moment, responsables: next });
+    },
+    [updateMoment]
+  );
+
+  const handleSupplierInputChange = useCallback((momentId, value) => {
+    setSupplierDrafts((prev) => ({ ...prev, [momentId]: value }));
+  }, []);
+
+  const handleAddSupplier = useCallback(
+    (blockId, moment) => {
+      const draftRaw = supplierDrafts[moment.id] || '';
+      const draft = draftRaw.trim();
+      if (!draft) {
+        toast.info('Escribe un proveedor antes de añadirlo.');
+        return;
+      }
+      const current = Array.isArray(moment.suppliers) ? [...moment.suppliers] : [];
+      if (current.length >= SUPPLIERS_LIMIT) {
+        toast.warning(`Máximo ${SUPPLIERS_LIMIT} proveedores por momento.`);
+        return;
+      }
+      if (current.some((supplier) => supplier.toLowerCase() === draft.toLowerCase())) {
+        toast.info('Ese proveedor ya está registrado.');
+        return;
+      }
+      current.push(draft);
+      updateMoment(blockId, moment.id, { ...moment, suppliers: current });
+      setSupplierDrafts((prev) => ({ ...prev, [moment.id]: '' }));
+    },
+    [supplierDrafts, updateMoment]
+  );
+
+  const handleRemoveSupplier = useCallback(
+    (blockId, moment, index) => {
+      const current = Array.isArray(moment.suppliers) ? [...moment.suppliers] : [];
+      const next = current.filter((_, idx) => idx !== index);
+      updateMoment(blockId, moment.id, { ...moment, suppliers: next });
+    },
+    [updateMoment]
+  );
+
+  const orderedMoments = useMemo(() => {
+    const list = Array.isArray(moments[activeTab]) ? [...moments[activeTab]] : [];
+    return list.sort((a, b) => (a.order || 0) - (b.order || 0));
+  }, [moments, activeTab]);
+
+  const computeMomentWarnings = useCallback((moment) => {
+    const warnings = [];
+    const timeValue = typeof moment?.time === 'string' ? moment.time.trim() : '';
+    if (!timeValue) warnings.push('Añade una hora estimada.');
+    const responsablesList = Array.isArray(moment?.responsables)
+      ? moment.responsables.filter((resp) => {
+          if (!resp) return false;
+          if (typeof resp === 'string') return resp.trim().length > 0;
+          return (
+            (resp.name && String(resp.name).trim() !== '') ||
+            (resp.role && String(resp.role).trim() !== '')
+          );
+        })
+      : [];
+    if (!responsablesList.length) warnings.push('Define al menos un responsable.');
+    const needsRecipient = ['lectura', 'discurso', 'votos'].includes(moment?.type);
+    if (needsRecipient && !(moment?.recipientId || moment?.recipientName || moment?.recipientRole)) {
+      warnings.push('Asigna destinatario o rol.');
+    }
+    if (['entrada', 'baile'].includes(moment?.type) && !(moment?.song && String(moment.song).trim())) {
+      warnings.push('Añade una canción.');
+    }
+    return warnings;
+  }, []);
+
+  const blockIssuesCount = useMemo(
+    () => orderedMoments.filter((moment) => computeMomentWarnings(moment).length > 0).length,
+    [orderedMoments, computeMomentWarnings]
+  );
+
+  const handleDragEnd = useCallback(
+    (result) => {
+      if (!result.destination) return;
+      if (result.destination.droppableId !== result.source.droppableId) return;
+      if (result.destination.index === result.source.index) return;
+      const dragged = orderedMoments[result.source.index];
+      if (!dragged) return;
+      moveMoment(activeTab, dragged.id, result.destination.index);
+    },
+    [orderedMoments, moveMoment, activeTab]
+  );
+
+  const handleConfirmAction = useCallback(
+    (moment, mode) => {
+      const targetBlockId = actionPanelSelection[moment.id];
+      if (!targetBlockId) {
+        toast.info('Selecciona una sección destino.');
+        return;
+      }
+      if (mode === 'duplicate') {
+        if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
+          toast.warning(`La sección seleccionada ya tiene ${maxMomentsPerBlock} momentos.`);
+          return;
+        }
+        duplicateMoment(activeTab, moment.id, targetBlockId);
+        toast.success('Momento duplicado correctamente.');
+        closeActionPanel();
+        return;
+      }
+      if (mode === 'move') {
+        if (targetBlockId === activeTab) {
+          toast.info('Selecciona una sección diferente para mover el momento.');
+          return;
+        }
+        if ((moments[targetBlockId]?.length || 0) >= maxMomentsPerBlock) {
+          toast.warning(`La sección seleccionada ya tiene ${maxMomentsPerBlock} momentos.`);
+          return;
+        }
+        duplicateMoment(activeTab, moment.id, targetBlockId);
+        removeMoment(activeTab, moment.id);
+        toast.success('Momento movido a la nueva sección.');
+        setActiveTab(targetBlockId);
+        closeActionPanel();
+      }
+    },
+    [
+      actionPanelSelection,
+      activeTab,
+      closeActionPanel,
+      duplicateMoment,
+      maxMomentsPerBlock,
+      moments,
+      removeMoment,
+      setActiveTab,
+    ]
+  );
+
+  const openActionPanel = useCallback(
+    (momentId, mode) => {
+      const otherBlocks = (blocks || []).filter(
+        (block) => (block.id || block.key) !== activeTab
+      );
+      if (!otherBlocks.length) {
+        toast.info('Crea otra sección para usar esta acción.');
+        return;
+      }
+      const fallback = actionPanelSelection[momentId] || otherBlocks[0].id || otherBlocks[0].key;
+      toggleActionPanelSection(momentId, mode, fallback);
+    },
+    [blocks, activeTab, actionPanelSelection, toggleActionPanelSection]
+  );
+
+  const renderMomentCard = (moment, idx, draggableProvided, draggableSnapshot) => {
+    const warnings = computeMomentWarnings(moment);
+    const responsablesList =
+      Array.isArray(moment.responsables) && moment.responsables.length
+        ? moment.responsables.map((resp, index) => ({
+            id: resp?.id || `${moment.id}-${index}`,
+            role: resp?.role || '',
+            name: typeof resp === 'string' ? resp : resp?.name || '',
+            contact: resp?.contact || '',
+          }))
+        : [];
+    const suppliersList = Array.isArray(moment.suppliers) ? moment.suppliers : [];
+    const supplierDraft = supplierDrafts[moment.id] || '';
+    const isAdvanced = !!advancedOpen[moment.id];
+    const actionMode = actionPanel.momentId === moment.id ? actionPanel.mode : null;
+    const otherBlocks = (blocks || []).filter((block) => (block.id || block.key) !== activeTab);
+    const stateBadgeType = STATE_BADGE_TYPE[moment.state] || 'default';
+    const recipientMode = moment.recipientRole
+      ? 'role'
+      : moment.recipientId
+      ? 'guest'
+      : moment.recipientName
+      ? 'custom'
+      : 'none';
+    const selectedValue =
+      recipientMode === 'guest'
+        ? String(moment.recipientId)
+        : recipientMode === 'custom'
+        ? '__custom'
+        : recipientMode === 'role'
+        ? `__role__${moment.recipientRole}`
+        : '';
+    const selectedGuest =
+      recipientMode === 'guest' && selectedValue ? guestOptionMap.get(selectedValue) : null;
+    const buttonLabel =
+      recipientMode === 'role'
+        ? recipientRoleMap.get(moment.recipientRole) || 'Rol asignado'
+        : selectedGuest?.name || moment.recipientName || 'Destinatario';
+
+    return (
+      <div
+        ref={draggableProvided.innerRef}
+        {...draggableProvided.draggableProps}
+        className={`border rounded-lg bg-white p-3 transition-shadow ${
+          draggableSnapshot.isDragging ? 'shadow-lg ring-2 ring-blue-200 bg-blue-50/80' : ''
+        }`}
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-4">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <div
+                  {...draggableProvided.dragHandleProps}
+                  className="text-gray-400 cursor-grab active:cursor-grabbing"
+                  aria-label="Arrastrar para reordenar"
+                >
+                  <GripVertical size={16} />
+                </div>
+                <input
+                  type="text"
+                  className="w-full flex-1 min-w-[180px] font-medium border-0 border-b border-transparent focus:border-blue-300 focus:ring-0 p-0 pb-1"
+                  value={moment.title || ''}
+                  onChange={(e) =>
+                    updateMoment(activeTab, moment.id, {
+                      ...moment,
+                      title: e.target.value,
+                    })
+                  }
+                  placeholder="Título del momento"
+                />
+                <Badge type={stateBadgeType} className="uppercase tracking-wide">
+                  {moment.state ? moment.state : 'sin estado'}
+                </Badge>
+                {moment.optional && <Badge type="info">Opcional</Badge>}
+                <Badge type="primary">#{idx + 1}</Badge>
+              </div>
+
+              {warnings.length > 0 && (
+                <div className="mt-2 flex items-start gap-2 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-700">
+                  <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
+                  <div className="space-y-0.5">
+                    {warnings.map((warning, warningIdx) => (
+                      <div key={warningIdx}>{warning}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Tipo</div>
+                  <select
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.type || 'otro'}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        type: e.target.value,
+                      })
+                    }
+                  >
+                    {MOMENT_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Ubicación</div>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.location || ''}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        location: e.target.value,
+                      })
+                    }
+                    placeholder="Capilla, jardín, salón..."
+                  />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Estado</div>
+                  <select
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.state || 'pendiente'}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        state: e.target.value,
+                      })
+                    }
+                  >
+                    {MOMENT_STATE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-600">
+                  <input
+                    id={`optional-${moment.id}`}
+                    type="checkbox"
+                    checked={!!moment.optional}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        optional: e.target.checked,
+                      })
+                    }
+                  />
+                  <label htmlFor={`optional-${moment.id}`}>Es opcional</label>
+                </div>
+              </div>
+
+              <div className="mt-3 grid gap-3 md:grid-cols-[minmax(0,2fr),minmax(0,1fr),minmax(0,1fr)]">
+                <div className="min-w-[200px]">
+                  <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                    <Music size={12} /> Canción
+                  </div>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.song || ''}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        song: e.target.value,
+                      })
+                    }
+                    placeholder="Nombre de la canción"
+                  />
+                  {(() => {
+                    const embed = getSpotifyEmbedUrl(moment.song);
+                    if (!embed) return null;
+                    return (
+                      <div className="mt-2">
+                        <iframe
+                          title="Spotify Player"
+                          src={embed}
+                          width="100%"
+                          height="80"
+                          frameBorder="0"
+                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                          loading="lazy"
+                        />
+                        <div className="text-[11px] text-gray-500 mt-1">
+                          Pegaste un enlace de Spotify. Se muestra una vista previa.
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Hora</div>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.time || ''}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        time: e.target.value,
+                      })
+                    }
+                    placeholder="hh:mm"
+                  />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 mb-1">Duración</div>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.duration || ''}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        duration: e.target.value,
+                      })
+                    }
+                    placeholder="ej. 10 min"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1 lg:min-w-[44px]">
+              <button
+                onClick={() => removeMoment(activeTab, moment.id)}
+                className="text-gray-400 hover:text-red-500 p-1"
+                title="Eliminar"
+              >
+                <Trash2 size={16} />
+              </button>
+              <button
+                onClick={() => handleDuplicateSameBlock(moment)}
+                className="text-gray-400 hover:text-blue-500 p-1"
+                title="Duplicar en esta sección"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button
+                onClick={() => openActionPanel(moment.id, 'duplicate')}
+                className="text-gray-400 hover:text-blue-500 p-1 text-[11px]"
+                title="Duplicar en otra sección"
+              >
+                Dup →
+              </button>
+              <button
+                onClick={() => openActionPanel(moment.id, 'move')}
+                className="text-gray-400 hover:text-blue-600 p-1 text-[11px]"
+                title="Mover a otra sección"
+              >
+                Mov →
+              </button>
+              {idx > 0 && (
+                <button
+                  onClick={() => reorderMoment(activeTab, moment.id, 'up')}
+                  className="text-gray-400 hover:text-blue-600 p-1"
+                  title="Mover arriba"
+                >
+                  <ChevronUp size={16} />
+                </button>
+              )}
+              {idx < orderedMoments.length - 1 && (
+                <button
+                  onClick={() => reorderMoment(activeTab, moment.id, 'down')}
+                  className="text-gray-400 hover:text-blue-600 p-1"
+                  title="Mover abajo"
+                >
+                  <ChevronDown size={16} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {(() => {
+            const isOpen = !!recipientPanelsOpen[moment.id];
+            return (
+              <div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setRecipientPanelsOpen((prev) => ({
+                      ...prev,
+                      [moment.id]: !prev[moment.id],
+                    }))
+                  }
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  {isOpen ? 'Ocultar destinatario' : `Destinatario: ${buttonLabel}`}
+                </button>
+                {isOpen && (
+                  <div className="mt-2 space-y-2 rounded border border-gray-200 bg-gray-50 p-3">
+                    <div className="text-xs text-gray-500">
+                      Selecciona a quién va dirigido este momento (opcional)
+                    </div>
+                    <select
+                      className="w-full border rounded px-2 py-1 text-sm"
+                      value={selectedValue}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) {
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientId: '',
+                            recipientName: '',
+                            recipientRole: '',
+                          });
+                        } else if (value === '__custom') {
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientId: '',
+                            recipientRole: '',
+                            recipientName: moment.recipientName || '',
+                          });
+                        } else if (value.startsWith('__role__')) {
+                          const roleValue = value.replace('__role__', '');
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientRole: roleValue,
+                            recipientId: '',
+                            recipientName: '',
+                          });
+                        } else {
+                          const guest = guestOptionMap.get(value);
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientId: value,
+                            recipientRole: '',
+                            recipientName: guest?.name || guest?.email || '',
+                          });
+                        }
+                      }}
+                    >
+                      <option value="">Sin destinatario</option>
+                      <option value="__custom">Especificar manualmente</option>
+                      {RECIPIENT_ROLE_OPTIONS.map((role) => (
+                        <option key={role.value} value={`__role__${role.value}`}>
+                          Rol: {role.label}
+                        </option>
+                      ))}
+                      {recipientOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}{' '}
+                          {option.raw?.table ? `· Mesa ${option.raw.table}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedValue === '__custom' && (
+                      <input
+                        type="text"
+                        className="w-full border rounded px-2 py-1 text-sm"
+                        placeholder="Nombre o rol del destinatario"
+                        value={moment.recipientName || ''}
+                        onChange={(e) =>
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientId: '',
+                            recipientRole: '',
+                            recipientName: e.target.value,
+                          })
+                        }
+                      />
+                    )}
+                    {selectedGuest && (
+                      <div className="text-xs text-gray-500">
+                        Mesa: {selectedGuest.table || selectedGuest.tableId || '—'} · Dieta:{' '}
+                        {selectedGuest.dietaryRestrictions || '—'}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        className="text-xs text-gray-500 hover:text-red-600"
+                        onClick={() =>
+                          updateMoment(activeTab, moment.id, {
+                            ...moment,
+                            recipientId: '',
+                            recipientName: '',
+                            recipientRole: '',
+                          })
+                        }
+                      >
+                        Limpiar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {actionMode && (
+            <div className="rounded border border-gray-200 bg-gray-50 p-3 text-xs text-gray-600">
+              <div className="font-semibold mb-2">
+                {actionMode === 'duplicate' ? 'Duplicar en:' : 'Mover a:'}
+              </div>
+              {otherBlocks.length ? (
+                <>
+                  <select
+                    className="w-full border rounded px-2 py-1 text-sm mb-2"
+                    value={actionPanelSelection[moment.id] || ''}
+                    onChange={(e) => handleActionPanelSelection(moment.id, e.target.value)}
+                  >
+                    {otherBlocks.map((block) => (
+                      <option key={block.id || block.key} value={block.id || block.key}>
+                        {block.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="xs"
+                      onClick={() => handleConfirmAction(moment, actionMode)}
+                      className="text-xs"
+                    >
+                      Confirmar
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      onClick={closeActionPanel}
+                      className="text-xs"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <p>No hay otras secciones disponibles.</p>
+              )}
+            </div>
+          )}
+
+          <div>
+            <button
+              type="button"
+              className="text-xs text-blue-600 hover:underline"
+              onClick={() => toggleAdvancedSection(moment.id)}
+            >
+              {isAdvanced ? 'Ocultar detalles avanzados' : 'Mostrar detalles avanzados'}
+            </button>
+            {isAdvanced && (
+              <div className="mt-2 space-y-3 rounded border border-gray-200 bg-gray-50 p-3">
+                <div>
+                  <div className="flex items-center justify-between text-xs font-semibold text-gray-600">
+                    Responsables
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => handleAddResponsible(activeTab, moment)}
+                      disabled={responsablesList.length >= RESPONSABLES_LIMIT}
+                    >
+                      <UserPlus size={14} className="mr-1" />
+                      Añadir
+                    </Button>
+                  </div>
+                  {responsablesList.length ? (
+                    <div className="mt-2 space-y-2">
+                      {responsablesList.map((responsable, responsableIdx) => (
+                        <div
+                          key={responsable.id || responsableIdx}
+                          className="grid gap-2 md:grid-cols-[1fr,1fr,1fr,auto]"
+                        >
+                          <input
+                            type="text"
+                            className="border rounded px-2 py-1 text-sm"
+                            placeholder="Rol / función"
+                            value={responsable.role || ''}
+                            onChange={(e) =>
+                              handleResponsibleChange(activeTab, moment, responsableIdx, {
+                                role: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            type="text"
+                            className="border rounded px-2 py-1 text-sm"
+                            placeholder="Nombre"
+                            value={responsable.name || ''}
+                            onChange={(e) =>
+                              handleResponsibleChange(activeTab, moment, responsableIdx, {
+                                name: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            type="text"
+                            className="border rounded px-2 py-1 text-sm"
+                            placeholder="Contacto (tel/email)"
+                            value={responsable.contact || ''}
+                            onChange={(e) =>
+                              handleResponsibleChange(activeTab, moment, responsableIdx, {
+                                contact: e.target.value,
+                              })
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="text-xs text-red-500 hover:underline"
+                            onClick={() => handleRemoveResponsible(activeTab, moment, responsableIdx)}
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-xs text-gray-500">
+                      Añade quién se encargará de este momento.
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-gray-600 mb-1">
+                    Requisitos técnicos / notas
+                  </div>
+                  <textarea
+                    rows={3}
+                    className="w-full border rounded px-2 py-1 text-sm"
+                    value={moment.requirements || ''}
+                    onChange={(e) =>
+                      updateMoment(activeTab, moment.id, {
+                        ...moment,
+                        requirements: e.target.value,
+                      })
+                    }
+                    placeholder="Sonido, iluminación, elementos especiales..."
+                  />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold text-gray-600 mb-1">
+                    Proveedores relacionados
+                  </div>
+                  {suppliersList.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {suppliersList.map((supplier, supplierIdx) => (
+                        <span
+                          key={`${moment.id}-supplier-${supplierIdx}`}
+                          className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700"
+                        >
+                          <Tag size={12} className="text-gray-400" />
+                          {supplier}
+                          <button
+                            type="button"
+                            className="text-gray-400 hover:text-red-500"
+                            onClick={() => handleRemoveSupplier(activeTab, moment, supplierIdx)}
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500">
+                      Registra proveedores relevantes para este momento.
+                    </p>
+                  )}
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 border rounded px-2 py-1 text-sm"
+                      placeholder="Nombre o referencia"
+                      value={supplierDraft}
+                      onChange={(e) => handleSupplierInputChange(moment.id, e.target.value)}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleAddSupplier(activeTab, moment)}
+                      disabled={!supplierDraft.trim()}
+                    >
+                      Añadir
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Aadir momento
   const handleAddMoment = () => {
-    const nextOrder = (moments[activeTab]?.length || 0) + 1;
+    const currentCount = moments[activeTab]?.length || 0;
+    if (currentCount >= maxMomentsPerBlock) {
+      toast.warning(`Has alcanzado el máximo de ${maxMomentsPerBlock} momentos en esta sección.`);
+      return;
+    }
+    const nextOrder = currentCount + 1;
     addMoment(activeTab, {
       order: nextOrder,
       title: `Nuevo momento ${nextOrder}`,

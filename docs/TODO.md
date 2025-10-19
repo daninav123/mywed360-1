@@ -13,8 +13,8 @@
 
 #### Frontend y experiencia
 - [x] Implementar wizard 3 pasos (formatos -> contenido -> configuracion) en UI inicial.
-- [ ] Anadir preview en miniatura y guardado de presets.
-- [ ] Conectar con Firestore `exports/{exportId}` y generar archivos (PDF/SVG/CSV).
+- [x] Anadir preview en miniatura y guardado de presets.
+- [x] Conectar con Firestore `exports/{exportId}` y generar archivos (PDF/SVG/CSV).
 - [x] Detectar viewport <=1024 px y activar modo compacto (`isMobile`).
 - [x] Crear minimapa, lista de mesas con barras de capacidad y FAB radial (placeholder).
 - [ ] Ajustar `GuestSidebar` movil (tabs Alertas/Recomendaciones/Staff).
@@ -22,10 +22,10 @@
 
 #### Capacidad, colaboracion y datos
 - [x] Crear biblioteca de plantillas de venue (`VenueTemplates`) y overlays basicos.
-- [ ] Permitir tipos de mesa: redonda, cuadrada, imperial, coctel, auxiliar/staff.
-- [ ] Calcular capacidad sugerida segun dimensiones y bloquear sobrecupo.
-- [ ] Actualizar sidebar para editar ancho/alto/diametro y mostrar alertas.
-- [ ] Implementar locks optimistas `seatingLocks/{resourceId}` y presencia de usuarios.
+- [x] Permitir tipos de mesa: redonda, cuadrada, imperial, coctel, auxiliar/staff.
+- [x] Calcular capacidad sugerida segun dimensiones y bloquear sobrecupo.
+- [x] Actualizar sidebar para editar ancho/alto/diametro y mostrar alertas.
+- [x] Implementar locks optimistas `seatingLocks/{resourceId}` y presencia de usuarios.
 - [ ] Mostrar badges "En edicion", toasts de conflicto y modo enfoque colaborativo.
 - [ ] Registrar eventos de actividad (`lock_acquired`, `conflict_resolved`).
 - [ ] Actualizar servicios para guardar `venueTemplateId`, `poiConfig`, `tableDefaults`, overlays y exportes.
@@ -33,7 +33,7 @@
 - [ ] Actualizar metricas/analytics (`seating_export_generated`, `guest_sidebar_*`, `seating_mobile_mode_enabled`, `seating_collab_lock_acquired`).
 
 #### GuestSidebar y gamificacion
-- [ ] Implementar `GuestSidebar` con secciones (Resumen, Recomendaciones, Conflictos, Staff, Historial).
+- [x] Implementar `GuestSidebar` con secciones (Resumen, Recomendaciones, Conflictos, Staff, Historial).
 - [ ] Integrar triggers de Tasks automaticas (completar seating, resolver conflictos, compartir plano).
 - [ ] Registrar eventos de gamificacion (`layout_ceremony_ready`, `layout_banquet_ready`, `export_generated`, `conflicts_resolved`).
 
@@ -104,23 +104,33 @@
 - [ ] Redactar E2E dedicados para roles ayudantes y miembros de la pareja.
 
 ### Asistente virtual e IA
+- [ ] Calendarizar kickoff cross-funcional (ver `docs/automation/automation-orchestrator-kickoff.md`) y asignar responsables para acta/seguimiento.
 - [ ] Desplegar backend multicanal con orquestador (`AutomationOrchestrator`) para email/chat/WhatsApp.
 - [ ] Disenar reglas configurables (if/then) con panel de administracion y auditoria.
 - [ ] Implementar workers dedicados y colas (`automationLogs`, `automationRules`) para acciones async.
 - [ ] Cubrir el asistente con suite E2E especifica y eventos de telemetria.
 
-### Onboarding eventos (Flujo 2)
-- [x] Instrumentar telemetría del funnel (`event_creation_*`, `event_seed_failed`).
-- [x] Publicar CTA «Crear nuevo evento» en la cabecera y habilitar selector multi-evento para owners.
-- [ ] Ejecutar `scripts/migrate-event-profile.js` en staging y validar `eventProfileSummary`/`eventType`.
-- [ ] Añadir caso Cypress que cubra CTA multi-evento y verifique actualización de `activeWeddingId`.
-- [ ] Construir dashboard funnel con alertas (view → success) usando la nueva telemetría.
+### Descubrimiento personalizado (Flujo 2)
+- [ ] Migrar wizard legacy al nuevo `DiscoveryWizard` con bloques condicionales documentados.
+- [ ] Completar telemetría `discovery_*`, `recommendation_*`, `wedding_profile_updated`.
+- [ ] Implementar recalculo en caliente de `weddingInsights` + cola de recomendaciones.
+- [ ] Construir dashboard funnel (view → completed → recomendaciones aplicadas).
+- [ ] Añadir suites Cypress del flujo completo (creación → confirmación → recomendaciones).
+- [ ] Preparar seeds/fixtures de perfiles representativos y documentarlos en `docs/personalizacion/README.md`.
+
+### Personalización continua (Flujo 2C)
+- [ ] Prototipar mapa de preferencias + StyleMeter en Figma siguiendo `docs/diseno/personalizacion-continua.md`.
+- [ ] Diseñar panel IA/c cards de ideas con micro-feedback y wizard “Algo distinto”.
+- [ ] Mockear widget “Salud del perfil” y flows de alertas.
+- [ ] Storyboard de conversaciones del asistente (packs sorpresa, revisiones).
+- [ ] Validar seeds sembrados (`npm run seed:personalization`) y capturas QA.
 
 ### Momentos (album compartido)
-- [ ] Construir el frontend completo (`Momentos.jsx`, moderacion, slideshow, descargas).
-- [ ] Implementar servicios backend/storage (Firestore, Cloud Storage, Vision API) con moderacion automatica.
-- [ ] Exponer flujo publico QR/token, roles invitados/colaboradores y experiencias responsive.
-- [ ] Preparar pipelines de analitica, export ZIP y gestion legal/privacidad antes del lanzamiento.
+- [ ] Endurecer moderación automática (clasificación Vision, umbrales configurables, override manual rápido).
+- [ ] Publicar slideshow público controlado (token host, autoplay configurable, compatibilidad con `prefers-reduced-motion`).
+- [ ] Completar gamificación (badges invitados, leaderboard planner) y mensajes de agradecimiento automáticos.
+- [ ] Instrumentar métricas (`momentos_upload`, `momentos_moderated`, `momentos_slideshow_opened`) y dashboards de participación.
+- [ ] Fortalecer gestión de tokens/QR (rotación, expiración, revoke) y auditoría de subidas para legal/compliance.
 
 ## Proximos focos (pre-planificacion)
 - [ ] Marketplace de plantillas y assets premium para Seating/Diseno Web.

@@ -4,7 +4,14 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { auth, db } from '../firebaseConfig';
-import { collection, getDocs, query as fbQuery, where as fbWhere, orderBy as fbOrderBy, limit as fbLimit } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  query as fbQuery,
+  where as fbWhere,
+  orderBy as fbOrderBy,
+  limit as fbLimit,
+} from 'firebase/firestore';
 import { get as apiGet, post as apiPost, put as apiPut, del as apiDel } from './apiClient';
 import { getAllTemplates as getAllEmailTemplates } from './emailTemplates';
 
@@ -14,7 +21,7 @@ const BASE =
     import.meta.env &&
     import.meta.env.VITE_BACKEND_BASE_URL) ||
   '';
-// En desarrollo usamos proxy /api incluso si BASE estÃ¡ vacÃ­o; desactivar sÃ³lo en tests
+// En desarrollo usamos proxy /api incluso si BASE está vacío; desactivar sólo en tests
 const IS_TEST =
   (typeof globalThis !== 'undefined' && (globalThis.vi || globalThis.jest)) ||
   (typeof process !== 'undefined' &&
@@ -61,17 +68,151 @@ function chooseMailId(m) {
   return null;
 }
 
+function normalizeAddressArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value
+      .flatMap((entry) => {
+        if (typeof entry === 'string') {
+          return entry
+            .split(/[;,]/)
+            .map((part) => part.trim())
+            .filter(Boolean);
+        }
+        if (entry && typeof entry === 'object') {
+          const email = entry.email || entry.address || entry.value;
+          if (typeof email === 'string') return [email.trim()];
+        }
+        return [];
+      })
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(/[;,]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function applyRecipientNormalization(base, source) {
+  try {
+    const recipientsRaw = normalizeAddressArray(source?.recipients);
+    const toListRaw = normalizeAddressArray(source?.toList);
+    const toRaw = normalizeAddressArray(source?.to);
+    const toAddressRaw = normalizeAddressArray(source?.toAddress);
+    const toArray = toRaw.length
+      ? toRaw
+      : toListRaw.length
+        ? toListRaw
+        : recipientsRaw.length
+          ? recipientsRaw
+          : toAddressRaw;
+    const recipients = recipientsRaw.length ? recipientsRaw : toArray;
+    if (!Array.isArray(base.recipients) || !base.recipients.length) {
+      if (recipients.length) base.recipients = recipients.slice();
+      else if (typeof base.recipients === 'string') base.recipients = normalizeAddressArray(base.recipients);
+      else base.recipients = [];
+    } else {
+      base.recipients = base.recipients.map((item) => String(item || '').trim()).filter(Boolean);
+    }
+    if (!base.recipients.length && recipients.length) {
+      base.recipients = recipients.slice();
+    }
+    const finalToArray = toArray.length ? toArray : base.recipients;
+    base.toList = finalToArray.slice();
+    const primaryCandidate =
+      finalToArray[0] ||
+      (typeof source?.to === 'string' ? source.to.trim() : '') ||
+      (typeof source?.toAddress === 'string' ? source.toAddress.trim() : '') ||
+      (typeof base.to === 'string' ? base.to.trim() : '');
+    base.toAddress = primaryCandidate || null;
+    base.toPrimary = base.toAddress;
+    base.toDisplay = finalToArray.join(', ');
+    base.to = base.toAddress || base.toDisplay || '';
+    if (!Array.isArray(base.recipients) || !base.recipients.length) {
+      base.recipients = base.to ? normalizeAddressArray(base.to) : [];
+    }
+    return base;
+  } catch {
+    return base;
+  }
+}
+
 function normalizeMail(m) {
   try {
     const idRaw = chooseMailId(m);
     const id = String(idRaw || m?.date || Date.now());
     const apiId = String(idRaw || id);
-    return { ...m, id, apiId };
+    const base = { ...m, id, apiId };
+    const rawClassification =
+      (m && typeof m === 'object' && (m.aiClassification || m.classification || m.insights?.classification)) || null;
+    if (rawClassification && typeof rawClassification === 'object') {
+      const tagsArray = Array.isArray(rawClassification.tags)
+        ? rawClassification.tags.map((tag) => (typeof tag === 'string' ? tag : String(tag || ''))).filter(Boolean)
+        : [];
+      const folderValue =
+        typeof rawClassification.folder === 'string' && rawClassification.folder.trim()
+          ? rawClassification.folder.trim()
+          : null;
+      base.aiClassification = {
+        tags: tagsArray,
+        folder: folderValue,
+        source: typeof rawClassification.source === 'string' ? rawClassification.source : rawClassification.source || null,
+        confidence: typeof rawClassification.confidence === 'number' ? rawClassification.confidence : undefined,
+        reason: typeof rawClassification.reason === 'string' ? rawClassification.reason : undefined,
+        updatedAt: rawClassification.updatedAt || rawClassification.createdAt || null,
+      };
+      if (!base.suggestedTags && tagsArray.length) {
+        base.suggestedTags = tagsArray.slice();
+      }
+      if (!base.suggestedFolder && folderValue) {
+        base.suggestedFolder = folderValue;
+      }
+    }
+    applyRecipientNormalization(base, m);
+    return base;
   } catch {
     const id = String(Date.now());
-    return { ...(m || {}), id, apiId: id };
+    const base = { ...(m || {}), id, apiId: id };
+    const rawClassification =
+      (m && typeof m === 'object' && (m.aiClassification || m.classification || m.insights?.classification)) || null;
+    if (rawClassification && typeof rawClassification === 'object') {
+      const tagsArray = Array.isArray(rawClassification.tags)
+        ? rawClassification.tags.map((tag) => (typeof tag === 'string' ? tag : String(tag || ''))).filter(Boolean)
+        : [];
+      const folderValue =
+        typeof rawClassification.folder === 'string' && rawClassification.folder.trim()
+          ? rawClassification.folder.trim()
+          : null;
+      base.aiClassification = {
+        tags: tagsArray,
+        folder: folderValue,
+        source: typeof rawClassification.source === 'string' ? rawClassification.source : rawClassification.source || null,
+        confidence: typeof rawClassification.confidence === 'number' ? rawClassification.confidence : undefined,
+        reason: typeof rawClassification.reason === 'string' ? rawClassification.reason : undefined,
+        updatedAt: rawClassification.updatedAt || rawClassification.createdAt || null,
+      };
+      if (!base.suggestedTags && tagsArray.length) {
+        base.suggestedTags = tagsArray.slice();
+      }
+      if (!base.suggestedFolder && folderValue) {
+        base.suggestedFolder = folderValue;
+      }
+    }
+    applyRecipientNormalization(base, m);
+    return base;
   }
 }
+
+const extractMailArray = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (payload && Array.isArray(payload.data)) return payload.data;
+  if (payload && Array.isArray(payload.items)) return payload.items;
+  return [];
+};
 
 const canUseLocalStorage = () => {
   try {
@@ -342,6 +483,20 @@ const normalizeCustomTemplate = (template) => {
   };
 };
 
+const loadNormalizedCustomTemplates = () => {
+  const raw = loadStoredTemplates();
+  let mutated = false;
+  const normalized = Array.isArray(raw)
+    ? raw.map((tpl) => {
+        const norm = normalizeCustomTemplate(tpl);
+        if (!tpl?.id || tpl.id !== norm.id) mutated = true;
+        return norm;
+      })
+    : [];
+  if (mutated) persistTemplates(normalized);
+  return normalized;
+};
+
 // Fallback: cargar correos directamente desde Firestore del frontend
 async function fetchMailsFromFirestore(folder = 'inbox', userEmail = '') {
   try {
@@ -349,7 +504,7 @@ async function fetchMailsFromFirestore(folder = 'inbox', userEmail = '') {
     const u = auth?.currentUser || null;
     const emailNorm = String(userEmail || u?.email || '').toLowerCase();
 
-    // 1) Intentar subcolecciÃ³n del usuario autenticado
+    // 1) Intentar subcolección del usuario autenticado
     if (u && u.uid) {
       try {
         const sub = collection(db, 'users', u.uid, 'mails');
@@ -365,7 +520,7 @@ async function fetchMailsFromFirestore(folder = 'inbox', userEmail = '') {
       } catch {}
     }
 
-    // 2) ColecciÃ³n global filtrando por to/from
+    // 2) Colección global filtrando por to/from
     try {
       const root = collection(db, 'mails');
       let q = fbQuery(root, fbWhere('folder', '==', folder));
@@ -383,7 +538,7 @@ async function fetchMailsFromFirestore(folder = 'inbox', userEmail = '') {
   return [];
 }
 
-// HeurÃ­sticas bÃ¡sicas de clasificaciÃ³n en cliente (sin IA externa)
+// Heurísticas básicas de clasificación en cliente (sin IA externa)
 function classifyMailClientSide(m) {
   try {
     const txt = `${m.subject || ''} ${m.body || ''}`.toLowerCase();
@@ -393,7 +548,7 @@ function classifyMailClientSide(m) {
       if (t) tags.add(t);
     };
 
-    if (/\brsvp\b|confirmaci[Ã³o]n|asistencia/.test(txt)) add('RSVP');
+    if (/\brsvp\b|confirmaci[óo]n|asistencia/.test(txt)) add('RSVP');
     if (/presupuesto|factura|pago|importe|transferencia|invoice|budget/.test(txt)) {
       add('Finanzas');
       if (folder === 'inbox') folder = 'finance';
@@ -401,8 +556,8 @@ function classifyMailClientSide(m) {
     if (/contrato|firma|acuerdo|sign|docu/.test(txt)) {
       add('Contratos');
     }
-    if (/proveedor|catering|fot[oÃ³]grafo|dj|m[Ãºu]sica|flor|venue/.test(txt)) add('Proveedores');
-    if (/invitaci[Ã³o]n|tarjeta|envelope|sobre/.test(txt)) add('Invitaciones');
+    if (/proveedor|catering|fot[oó]grafo|dj|m[úu]sica|flor|venue/.test(txt)) add('Proveedores');
+    if (/invitaci[óo]n|tarjeta|envelope|sobre/.test(txt)) add('Invitaciones');
     if (/urgente|importante|asap|prisa/.test(txt)) add('Prioridad');
 
     return { ...m, tags: Array.from(tags), folder };
@@ -469,9 +624,26 @@ function resolveMyAddresses() {
   }
 }
 
-// AutenticaciÃ³n se maneja vÃ­a apiClient (opciÃ³n { auth: true })
+// Autenticación se maneja vía apiClient (opción { auth: true })
 
 export async function getMails(folder = 'inbox') {
+  if (!USE_BACKEND) {
+    const stored = loadStoredMails();
+    if (folder === 'all') {
+      const inbox = filterAndNormalizeLocalMails('inbox', stored);
+      const sent = filterAndNormalizeLocalMails('sent', stored);
+      const combined = [...inbox, ...sent];
+      const byId = new Map();
+      combined.forEach((mail) => {
+        if (mail && mail.id) byId.set(mail.id, mail);
+      });
+      return Array.from(byId.values()).sort(
+        (a, b) => new Date(b.date || 0) - new Date(a.date || 0)
+      );
+    }
+    return filterAndNormalizeLocalMails(folder, stored);
+  }
+
   // Carpeta virtual: combinar inbox+sent
   if (folder === 'all') {
     try {
@@ -544,25 +716,27 @@ export async function getMails(folder = 'inbox') {
       if (localFallback.length) return localFallback;
       throw new Error(`getMails ${res.status}`);
     }
-    let list;
+    let parsed;
     try {
-      list = await res.json();
+      parsed = await res.json();
     } catch (parseError) {
       const localParsed = filterAndNormalizeLocalMails(folder, loadStoredMails());
       if (localParsed.length) return localParsed;
       throw parseError;
     }
     try {
-      // ClasificaciÃ³n ligera en cliente (tags sugeridos y carpeta probable)
-      return (Array.isArray(list) ? list : []).map((m) => normalizeMail(classifyMailClientSide(m)));
+      // Clasificación ligera en cliente (tags sugeridos y carpeta probable)
+      const normalizedList = extractMailArray(parsed);
+      return normalizedList.map((m) => normalizeMail(classifyMailClientSide(m)));
     } catch {
-      return (Array.isArray(list) ? list : []).map(normalizeMail);
+      const normalizedList = extractMailArray(parsed);
+      return normalizedList.map(normalizeMail);
     }
   }
   return filterAndNormalizeLocalMails(folder, loadStoredMails());
 }
 
-// Paginado del buzÃ³n desde backend
+// Paginado del buzón desde backend
 export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null } = {}) {
   if (!USE_BACKEND) {
     const items = await getMails(folder);
@@ -643,7 +817,7 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
         }
       }
     }
-    // Fallback si el backend aÃºn no expone /page (404/501)
+    // Fallback si el backend aún no expone /page (404/501)
     if (res.status === 404 || res.status === 501) {
       const all = await getMails(folder);
       // Ordenar por fecha desc
@@ -679,6 +853,10 @@ export async function getMailsPage(folder = 'inbox', { limit = 50, cursor = null
 
 export async function getMail(id) {
   if (!id) throw new Error('mail_id_required');
+  if (!USE_BACKEND) {
+    const stored = findLocalMail(id);
+    return stored ? normalizeMail(stored) : null;
+  }
   if (USE_BACKEND) {
     try {
       const res = await apiGet(`/api/mail/${encodeURIComponent(id)}`, { auth: true });
@@ -700,12 +878,15 @@ export async function getMail(id) {
         if (localFallback) return normalizeMail(localFallback);
         throw parseError;
       }
-      return normalizeMail(data || {});
+      const payload = data && typeof data === 'object' && !Array.isArray(data) && data.data
+        ? data.data
+        : data;
+      return normalizeMail(payload || {});
     } catch (error) {
       const localFallback = findLocalMail(id);
       if (localFallback) return normalizeMail(localFallback);
       if (error && typeof error.status === 'number') throw error;
-      const wrapped = new Error(error?.message || 'Error de conexiÃ³n');
+      const wrapped = new Error(error?.message || 'Error de conexión');
       wrapped.cause = error;
       throw wrapped;
     }
@@ -715,48 +896,49 @@ export async function getMail(id) {
 }
 
 /**
- * Obtener plantillas de correo para usar en selectores/ediciÃ³n.
+ * Obtener plantillas de correo para usar en selectores/edición.
  * Intenta backend si existe; si no, usa las plantillas locales.
  * Devuelve una lista de objetos { name, subject, body }.
  */
 export async function getEmailTemplates() {
-  // Intento backend (tolerante a fallos / endpoint opcional)
-  if (USE_BACKEND) {
+  const mergeLocalTemplates = () => {
+    const customTemplates = loadNormalizedCustomTemplates();
+    let predefined = [];
     try {
-      const res = await apiGet(`/api/email/templates`, { auth: true });
-      if (res.ok) {
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
-        if (Array.isArray(list)) {
-          return list.map((tpl, index) => ({
-            id: tpl.id || tpl.key || tpl.name || `remote_${index}`,
-            name: tpl.name || `Plantilla ${index + 1}`,
-            subject: tpl.subject || '',
-            body: tpl.body || '',
-            system: Boolean(tpl.system),
-          }));
-        }
-      }
+      const all = getAllEmailTemplates();
+      predefined = Object.entries(all).map(([key, value]) =>
+        normalizeSystemTemplate(key, value)
+      );
     } catch {
-      // fallback a locales
+      predefined = [];
     }
+    return [...predefined, ...customTemplates];
+  };
+
+  if (!USE_BACKEND) {
+    return mergeLocalTemplates();
   }
-  const customRaw = loadStoredTemplates();
-  let mutated = false;
-  const customTemplates = customRaw.map((tpl) => {
-    const normalized = normalizeCustomTemplate(tpl);
-    if (!tpl.id || tpl.id !== normalized.id) mutated = true;
-    return normalized;
-  });
-  if (mutated) persistTemplates(customTemplates);
-  let predefined = [];
+
   try {
-    const all = getAllEmailTemplates();
-    predefined = Object.entries(all).map(([key, value]) => normalizeSystemTemplate(key, value));
+    const res = await apiGet(`/api/email/templates`, { auth: true });
+    if (res.ok) {
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      if (Array.isArray(list)) {
+        return list.map((tpl, index) => ({
+          id: tpl.id || tpl.key || tpl.name || `remote_${index}`,
+          name: tpl.name || `Plantilla ${index + 1}`,
+          subject: tpl.subject || '',
+          body: tpl.body || '',
+          system: Boolean(tpl.system),
+        }));
+      }
+    }
   } catch {
-    predefined = [];
+    // Ignorar y usar fallback local
   }
-  return [...predefined, ...customTemplates];
+
+  return mergeLocalTemplates();
 }
 
 export async function getEmailTemplateById(id) {
@@ -769,7 +951,7 @@ export async function saveEmailTemplate(template) {
   if (!template || typeof template !== 'object') {
     throw new Error('template_required');
   }
-  const current = loadStoredTemplates().map(normalizeCustomTemplate);
+  const current = loadNormalizedCustomTemplates();
   const normalized = normalizeCustomTemplate(template);
   const index = current.findIndex((tpl) => tpl.id === normalized.id);
   if (index >= 0) {
@@ -789,7 +971,7 @@ export async function deleteEmailTemplate(id) {
       throw new Error('No se pueden eliminar plantillas del sistema');
     }
   } catch {}
-  const current = loadStoredTemplates().map(normalizeCustomTemplate);
+  const current = loadNormalizedCustomTemplates();
   const filtered = current.filter((tpl) => tpl.id !== id);
   const removed = filtered.length !== current.length;
   if (removed) persistTemplates(filtered);
@@ -807,16 +989,16 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
     return { success: false, error: 'Destinatario es obligatorio' };
   }
   if (!toList.every(isValidEmail)) {
-    return { success: false, error: 'Uno o mÃ¡s destinatarios no son vÃ¡lidos' };
+    return { success: false, error: 'Uno o más destinatarios no son válidos' };
   }
   const ccList = expandRecipients(cc);
   const bccList = expandRecipients(bcc);
   if (![...ccList, ...bccList].every(isValidEmail)) {
-    return { success: false, error: 'Direcciones en CC o BCC no vÃ¡lidas' };
+    return { success: false, error: 'Direcciones en CC o BCC no válidas' };
   }
   const totalRecipients = toList.length + ccList.length + bccList.length;
   if (totalRecipients > MAX_RECIPIENTS) {
-    return { success: false, error: `demasiados destinatarios (mÃ¡ximo ${MAX_RECIPIENTS})` };
+    return { success: false, error: `demasiados destinatarios (máximo ${MAX_RECIPIENTS})` };
   }
   const sanitizedSubject = String(subject || '').trim().slice(0, MAX_SUBJECT_LENGTH);
   const sanitizedBody = sanitizeHtmlBody(body || '');
@@ -825,14 +1007,14 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
   if (oversized) {
     return {
       success: false,
-      error: `El archivo ${oversized.name} supera el tamaÃ±o mÃ¡ximo permitido (10MB)`,
+      error: `El archivo ${oversized.name} supera el tamaño máximo permitido (10MB)`,
     };
   }
   const totalAttachmentSize = processedAttachments.reduce((sum, att) => sum + Number(att.size || 0), 0);
   if (totalAttachmentSize > MAX_ATTACHMENT_SIZE) {
     return {
       success: false,
-      error: 'El tamaÃ±o mÃ¡ximo combinado de adjuntos es de 10MB',
+      error: 'El tamaño máximo combinado de adjuntos es de 10MB',
     };
   }
   const from = resolveCurrentEmail() || `no-reply@${getEmailDomain()}`;
@@ -858,7 +1040,7 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
       const response = await sendMailWithMailgun(payload);
       return response;
     } catch (error) {
-      return { success: false, error: error?.message || 'Error de conexiÃ³n' };
+      return { success: false, error: error?.message || 'Error de conexión' };
     }
   }
 
@@ -878,7 +1060,7 @@ export async function sendMail({ to, cc, bcc, subject, body, attachments } = {})
       });
       return {
         success: false,
-        error: error?.message || 'Error de conexiÃ³n',
+        error: error?.message || 'Error de conexión',
         fallbackId: record.id,
       };
     }
@@ -962,7 +1144,7 @@ export async function markAsRead(id) {
   if (USE_BACKEND) {
     const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/read`, {}, { auth: true, silent: true });
     if (!res.ok) {
-      // Tolerar 404 cuando el mensaje solo existe en la subcolecciÃ³n de usuario
+      // Tolerar 404 cuando el mensaje solo existe en la subcolección de usuario
       if (res.status !== 404) throw new Error(`markAsRead ${res.status}`);
       // Best-effort: marcar localmente y no romper la UI
       updateLocalMail(id, (mail) => ({ ...mail, read: true }));
@@ -988,6 +1170,16 @@ export async function markAsUnread(id) {
     return true;
   }
   updateLocalMail(id, (mail) => ({ ...mail, read: false }));
+  return true;
+}
+
+export async function setMailImportant(id, important = true) {
+  const value = Boolean(important);
+  if (USE_BACKEND) {
+    const res = await apiPost(`/api/mail/${encodeURIComponent(id)}/important`, { value }, { auth: true, silent: true });
+    if (!res.ok) throw new Error(`setMailImportant ${res.status}`);
+  }
+  updateLocalMail(id, (mail) => ({ ...mail, important: value }));
   return true;
 }
 
@@ -1091,21 +1283,59 @@ export async function searchEvents(term = '') {
 }
 
 // Mail operations
-export async function setFolder(id, folder) {
+export async function setFolder(id, folder, options = {}) {
   if (!USE_BACKEND) {
-    updateLocalMail(id, (mail) => ({
-      ...mail,
-      folder: folder || mail.folder,
-    }));
+    updateLocalMail(id, (mail) => {
+      if (!mail) return mail;
+      const prevFolder = mail.folder || 'inbox';
+      let nextFolder = folder || prevFolder;
+      const fallbackFolder = options.fallbackFolder || (mail.trashMeta && mail.trashMeta.previousFolder) || 'inbox';
+      if (options.restore && prevFolder === 'trash') {
+        nextFolder = nextFolder || fallbackFolder || 'inbox';
+      }
+      const next = { ...mail };
+      const trashMeta = { ...(mail.trashMeta || {}) };
+      const nowIso = new Date().toISOString();
+      if (nextFolder === 'trash') {
+        const previousForTrash =
+          prevFolder === 'trash' ? trashMeta.previousFolder || trashMeta.restoredTo || 'inbox' : prevFolder;
+        if (previousForTrash && previousForTrash !== 'trash') {
+          trashMeta.previousFolder = previousForTrash;
+          const prevFolders = Array.isArray(trashMeta.previousFolders)
+            ? trashMeta.previousFolders.slice()
+            : [];
+          if (!prevFolders.includes(previousForTrash)) prevFolders.unshift(previousForTrash);
+          trashMeta.previousFolders = prevFolders.slice(0, 10);
+        }
+        trashMeta.movedAt = nowIso;
+      } else if (prevFolder === 'trash') {
+        trashMeta.restoredAt = nowIso;
+        trashMeta.restoredTo = nextFolder;
+        delete trashMeta.previousFolder;
+        delete trashMeta.movedAt;
+        delete trashMeta.movedBy;
+        if (!Array.isArray(trashMeta.previousFolders) || !trashMeta.previousFolders.length) {
+          delete trashMeta.previousFolders;
+        }
+      }
+
+      next.folder = nextFolder;
+      if (Object.keys(trashMeta).length) next.trashMeta = trashMeta;
+      else delete next.trashMeta;
+      return next;
+    });
     return true;
   }
-  const res = await apiPut(`/api/mail/${encodeURIComponent(id)}/folder`, { folder }, { auth: true });
+  const payload = { folder };
+  if (options.restore) payload.restore = true;
+  if (options.fallbackFolder) payload.fallbackFolder = options.fallbackFolder;
+  const res = await apiPut(`/api/mail/${encodeURIComponent(id)}/folder`, payload, { auth: true });
   if (!res.ok) throw new Error(`setFolder ${res.status}`);
   return true;
 }
 
-export async function moveMail(id, folder) {
-  return setFolder(id, folder);
+export async function moveMail(id, folder, options = {}) {
+  return setFolder(id, folder, options);
 }
 
 export async function emptyTrash() {
@@ -1167,6 +1397,7 @@ const api = {
   moveMail,
   emptyTrash,
   updateMailTags,
+  setMailImportant,
   USE_BACKEND,
   USE_MAILGUN,
   CURRENT_USER,
@@ -1200,3 +1431,9 @@ export function logAIEmailActivity(aiResultId, searchQuery) {
 }
 
 export default api;
+
+
+
+
+
+

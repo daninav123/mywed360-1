@@ -1,17 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import EmailDetail from './EmailDetail';
 import EmailList from './EmailList';
 import { useAuth } from '../../../hooks/useAuth';
 import { useEmailMonitoring } from '../../../hooks/useEmailMonitoring';
-import { post as apiPost } from '../../../services/apiClient';
-import EmailService from '../../../services/emailService';
-import { scheduleEmailSend } from '../../../services/emailAutomationService';
+import { get as apiGet, post as apiPost, del as apiDel } from '../../../services/apiClient';
+import EmailService, { USE_BACKEND } from '../../../services/emailService';
+import { processIncomingEmails, scheduleEmailSend, startEmailScheduler, syncAutomationConfigFromServer } from '../../../services/emailAutomationService';
 import CalendarService from '../../../services/CalendarService';
 import EmailComposer from '../EmailComposer';
 import SmartEmailComposer from '../SmartEmailComposer';
 import EmailFeedbackCollector from '../EmailFeedbackCollector';
 import CalendarIntegration from '../CalendarIntegration';
+import {
+  Inbox as InboxIcon,
+  Send as SendIcon,
+  Trash2 as TrashIcon,
+  Sparkles,
+  Search as SearchIcon,
+  SlidersHorizontal,
+  RefreshCcw,
+  ArrowUpDown,
+  Tag as TagIcon,
+} from 'lucide-react';
 import ProviderSearchModal from '../../ProviderSearchModal';
 import CustomFolders from '../CustomFolders';
 import ManageFoldersModal from '../ManageFoldersModal';
@@ -24,21 +35,58 @@ import {
   assignEmailToFolder,
   removeEmailFromFolder,
   getEmailsInFolder,
+  updateFolderUnreadCount,
 } from '../../../services/folderService';
+
+const IS_CYPRESS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+
+const STATUS_FILTERS = [
+  { id: 'all', label: 'Todos' },
+  { id: 'unread', label: 'No leídos' },
+  { id: 'read', label: 'Leídos' },
+];
+
+const SORT_OPTIONS = [
+  { id: 'date', label: 'Fecha' },
+  { id: 'subject', label: 'Asunto' },
+  { id: 'from', label: 'Remitente' },
+];
+
+const DENSITY_OPTIONS = [
+  { id: 'comfortable', label: 'Cómoda' },
+  { id: 'compact', label: 'Compacta' },
+];
 
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
- * VersiÃ³n completa con todas las correcciones aplicadas para evitar errores de Promise
+ * Versión completa con todas las correcciones aplicadas para evitar errores de Promise
  */
 const InboxContainer = () => {
   const authContext = useAuth();
   const { user } = authContext;
   const { trackOperation } = useEmailMonitoring();
+  const resolvedUserId = user?.uid || 'mock-user';
 
-  // Establecer el contexto de autenticaciÃ³n en EmailService
+  // Establecer el contexto de autenticación en EmailService
   useEffect(() => {
     EmailService?.setAuthContext?.(authContext);
   }, [authContext]);
+
+  useEffect(() => {
+    try {
+      startEmailScheduler({ immediate: true });
+    } catch (schedulerError) {
+      console.warn('InboxContainer: no se pudo iniciar el scheduler de emails', schedulerError);
+    }
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await syncAutomationConfigFromServer();
+      } catch {}
+    })();
+  }, [resolvedUserId]);
 
   useEffect(() => {
     let ignore = false;
@@ -74,34 +122,242 @@ const InboxContainer = () => {
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
   const [calendarEmail, setCalendarEmail] = useState(null);
   const [customFolders, setCustomFolders] = useState([]);
+  const customFoldersRef = useRef([]);
   const [showManageFolders, setShowManageFolders] = useState(false);
   const [showEmptyTrashModal, setShowEmptyTrashModal] = useState(false);
+  const [selectedEmailId, setSelectedEmailId] = useState(null);
+  const [showComposer, setShowComposer] = useState(false);
+  const [composerInitial, setComposerInitial] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
+  const [classificationTagFilter, setClassificationTagFilter] = useState('all');
+  const [showSuggestedOnly, setShowSuggestedOnly] = useState(false);
+  const [sortField, setSortField] = useState('date');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [listDensity, setListDensity] = useState('comfortable');
+  const [viewMode, setViewMode] = useState('list'); // list, detail
   const currentCustomFolderId = folder.startsWith('custom:') ? folder.slice(7) : null;
   const isTrash = folder === 'trash';
-  const manageFoldersList = [
-    { id: 'inbox', name: 'Bandeja de entrada', system: true },
-    { id: 'sent', name: 'Enviados', system: true },
-    { id: 'trash', name: 'Papelera', system: true },
-    ...customFolders.map((folderItem) => ({
-      ...folderItem,
-      system: false,
-    })),
-  ];
+  const systemFolders = useMemo(
+    () => [
+      { id: 'inbox', name: 'Bandeja de entrada', system: true },
+      { id: 'sent', name: 'Enviados', system: true },
+      { id: 'trash', name: 'Papelera', system: true },
+    ],
+    []
+  );
+
+  useEffect(() => {
+    customFoldersRef.current = customFolders;
+  }, [customFolders]);
+  const manageFoldersList = useMemo(
+    () => [
+      ...systemFolders,
+      ...customFolders.map((folderItem) => ({
+        id: folderItem.id,
+        name: folderItem.name || folderItem.id,
+        system: false,
+      })),
+    ],
+    [systemFolders, customFolders]
+  );
+
+  const moveTargetFolders = useMemo(
+    () => [
+      ...systemFolders,
+      ...customFolders.map((folderItem) => ({
+        id: `custom:${folderItem.id}`,
+        name: folderItem.name || folderItem.id,
+        system: false,
+      })),
+    ],
+    [systemFolders, customFolders]
+  );
+
+  const systemSidebarItems = useMemo(
+    () => [
+      {
+        id: 'inbox',
+        label: 'Bandeja de entrada',
+        icon: InboxIcon,
+        badge: inboxCounts.unread > 0 ? inboxCounts.unread : inboxCounts.total,
+        badgeTitle: `${inboxCounts.unread} no leídos · ${inboxCounts.total} totales`,
+        badgeTone: 'bg-blue-600 text-white',
+        ia: iaCounts.inbox,
+      },
+      {
+        id: 'sent',
+        label: 'Enviados',
+        icon: SendIcon,
+        badge: sentCounts.total,
+        badgeTitle: `${sentCounts.total} enviados`,
+        badgeTone: 'bg-gray-700 text-white',
+        ia: iaCounts.sent,
+      },
+      {
+        id: 'trash',
+        label: 'Papelera',
+        icon: TrashIcon,
+        badge: trashCounts.total,
+        badgeTitle: `${trashCounts.total} en papelera`,
+        badgeTone: 'bg-gray-300 text-gray-800',
+        ia: 0,
+      },
+    ],
+    [inboxCounts, sentCounts, trashCounts, iaCounts]
+  );
+
+  const folderNameResolver = useMemo(() => {
+    const map = new Map();
+    manageFoldersList.forEach((folderItem) => {
+      map.set(folderItem.id, folderItem.name);
+      if (!folderItem.system) {
+        map.set(`custom:${folderItem.id}`, folderItem.name);
+      }
+    });
+    map.set('important', 'Importantes');
+    return (folderId) => {
+      if (!folderId) return null;
+      if (map.has(folderId)) return map.get(folderId);
+      if (folderId.startsWith('custom:')) {
+        const raw = folderId.slice(7);
+        return map.get(raw) || map.get(`custom:${raw}`) || raw || null;
+      }
+      return null;
+    };
+  }, [manageFoldersList]);
+
+  const activeFolderLabel = useMemo(() => {
+    if (folder === 'important') {
+      return 'Importantes';
+    }
+    const resolved = folderNameResolver ? folderNameResolver(folder) : null;
+    if (resolved) return resolved;
+    if (folder.startsWith('custom:')) {
+      return folder.slice(7);
+    }
+    if (folder === 'sent') return 'Enviados';
+    if (folder === 'trash') return 'Papelera';
+    return 'Bandeja de entrada';
+  }, [folder, folderNameResolver]);
+
+  const mapSuggestedFolder = useCallback(
+    (suggestion) => {
+      if (!suggestion || typeof suggestion !== 'string') {
+        return { label: null, targetKey: null };
+      }
+      const trimmed = suggestion.trim();
+      if (!trimmed) {
+        return { label: null, targetKey: null };
+      }
+      const lower = trimmed.toLowerCase();
+      if (lower === 'inbox' || lower === 'bandeja de entrada') {
+        return { label: 'Bandeja de entrada', targetKey: 'inbox' };
+      }
+      if (lower === 'sent' || lower === 'enviados') {
+        return { label: 'Enviados', targetKey: 'sent' };
+      }
+      if (lower === 'trash' || lower === 'papelera') {
+        return { label: 'Papelera', targetKey: 'trash' };
+      }
+      const list = customFoldersRef.current || [];
+      const matched = list.find(
+        (folderItem) => (folderItem?.name || '').trim().toLowerCase() === lower
+      );
+      if (matched) {
+        return { label: matched.name || trimmed, targetKey: `custom:${matched.id}` };
+      }
+      return { label: trimmed, targetKey: null };
+    },
+    [customFoldersRef]
+  );
+
+  const filterSummary = useMemo(() => {
+    const parts = [];
+    if (filterStatus === 'unread') {
+      parts.push('solo no leídos');
+    } else if (filterStatus === 'read') {
+      parts.push('solo leídos');
+    }
+    if (classificationTagFilter !== 'all') {
+      parts.push(`etiqueta IA: ${classificationTagFilter}`);
+    }
+    if (showSuggestedOnly) {
+      parts.push('sugerencias activas');
+    }
+    return parts.join(' · ');
+  }, [filterStatus, classificationTagFilter, showSuggestedOnly]);
 
   // Cargar emails al montar el componente
-  const loadCustomFolders = useCallback(() => {
-    if (!user?.uid) {
+  const loadCustomFolders = useCallback(async () => {
+    const effectiveUserId = resolvedUserId;
+    if (!effectiveUserId) {
       setCustomFolders([]);
       return;
     }
+
+    let mergedFolders = [];
     try {
-      const folders = getUserFolders(user.uid);
-      setCustomFolders(Array.isArray(folders) ? folders : []);
+      const stored = getUserFolders(effectiveUserId);
+      mergedFolders = Array.isArray(stored) ? stored : [];
     } catch (folderError) {
-      console.error('Error cargando carpetas personalizadas:', folderError);
-      setCustomFolders([]);
+      console.error('Error leyendo carpetas personalizadas locales:', folderError);
+      mergedFolders = [];
     }
-  }, [user?.uid]);
+
+    try {
+      const res = await apiGet('/api/email/folders', { auth: true, silent: true });
+      if (res?.ok) {
+        const payload = await res.json();
+        const foldersFromApi = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : [];
+        if (foldersFromApi.length) {
+          const byId = new Map(mergedFolders.map((folderItem) => [folderItem.id, folderItem]));
+          foldersFromApi.forEach((folderItem) => {
+            if (!folderItem || !folderItem.id) return;
+            const previous = byId.get(folderItem.id);
+            byId.set(folderItem.id, previous ? { ...previous, ...folderItem } : folderItem);
+          });
+          mergedFolders = Array.from(byId.values());
+        }
+      }
+    } catch (apiError) {
+      console.warn('InboxContainer: no se pudieron obtener carpetas desde API', apiError);
+    }
+
+    let enhancedFolders = mergedFolders;
+    try {
+      const allMailsRaw = await EmailService.getMails('all').catch(() => []);
+      const allMails = Array.isArray(allMailsRaw) ? allMailsRaw : [];
+      const mailById = new Map();
+      allMails.forEach((mail) => {
+        if (mail?.id) {
+          mailById.set(mail.id, mail);
+        }
+      });
+      enhancedFolders = mergedFolders.map((folderItem) => {
+        if (!folderItem?.id) return folderItem;
+        const ids = getEmailsInFolder(effectiveUserId, folderItem.id);
+        const unread = (Array.isArray(ids) ? ids : []).reduce((acc, mailId) => {
+          const mail = mailById.get(mailId);
+          return acc + (mail && !mail.read ? 1 : 0);
+        }, 0);
+        try {
+          updateFolderUnreadCount(effectiveUserId, folderItem.id, unread);
+        } catch (updateError) {
+          console.warn('InboxContainer: no se pudo actualizar unread local', updateError);
+        }
+        return { ...folderItem, unread };
+      });
+    } catch (unreadError) {
+      console.warn('InboxContainer: no se pudieron calcular los unread de carpetas personalizadas', unreadError);
+    }
+
+    setCustomFolders(Array.isArray(enhancedFolders) ? enhancedFolders : []);
+  }, [resolvedUserId]);
 
   const refreshEmails = useCallback(
     async (targetFolder = folder) => {
@@ -112,8 +368,8 @@ const InboxContainer = () => {
           const folderId = targetFolder.slice(7);
           const allMails = await EmailService.getMails('all');
           const ids =
-            user?.uid && folderId
-              ? new Set(getEmailsInFolder(user.uid, folderId))
+            resolvedUserId && folderId
+              ? new Set(getEmailsInFolder(resolvedUserId, folderId))
               : new Set();
           list = (Array.isArray(allMails) ? allMails : []).filter((mail) => {
             if (!mail) return false;
@@ -126,8 +382,48 @@ const InboxContainer = () => {
           list = Array.isArray(res) ? res : [];
         }
 
-        setEmails(Array.isArray(list) ? list : []);
+        let processedList = list;
+        try {
+          const sendMailFn = EmailService?.sendMail || EmailService?.sendEmail;
+          processedList = await processIncomingEmails(list, { sendMail: sendMailFn });
+        } catch (automationError) {
+          console.warn('InboxContainer: no se pudo aplicar automatizaci�n de emails', automationError);
+          processedList = list;
+        }
+
+        const normalizedList = Array.isArray(processedList)
+          ? processedList
+          : Array.isArray(list)
+            ? list
+            : [];
+
+        setEmails(normalizedList);
         setError(null);
+
+        if (targetFolder.startsWith('custom:')) {
+          const folderId = targetFolder.slice(7);
+          if (folderId && resolvedUserId) {
+            const unread = normalizedList.reduce(
+              (acc, mail) => acc + (mail && !mail.read ? 1 : 0),
+              0
+            );
+            try {
+              updateFolderUnreadCount(resolvedUserId, folderId, unread);
+            } catch (updateError) {
+              console.warn('InboxContainer: no se pudo actualizar unread tras refresh', updateError);
+            }
+            setCustomFolders((prev) => {
+              if (!Array.isArray(prev) || !prev.length) return prev;
+              let mutated = false;
+              const next = prev.map((folderItem) => {
+                if (!folderItem || folderItem.id !== folderId) return folderItem;
+                mutated = true;
+                return { ...folderItem, unread };
+              });
+              return mutated ? next : prev;
+            });
+          }
+        }
       } catch (err) {
         console.error('Error cargando emails:', err);
         setError('No se pudieron cargar los emails');
@@ -135,7 +431,7 @@ const InboxContainer = () => {
         setLoading(false);
       }
     },
-    [folder, user?.uid]
+    [folder, resolvedUserId]
   );
 
   // Contadores por carpeta
@@ -158,11 +454,15 @@ const InboxContainer = () => {
         unread: importantList.filter((mail) => !mail?.read).length,
       });
 
-      loadCustomFolders();
+      await loadCustomFolders();
+
+      if (!USE_BACKEND) {
+        setIaCounts({ inbox: 0, sent: 0 });
+        return;
+      }
 
       // IA counts (best-effort, limitado a 50 por carpeta)
       try {
-        const { get: apiGet } = await import('../../../services/apiClient');
         const sample = (arr) => arr.slice(0, 50).map((m) => m.id).filter(Boolean);
         const hasInsights = async (id) => {
           try {
@@ -187,10 +487,6 @@ const InboxContainer = () => {
     } catch {}
   }, [loadCustomFolders]);
 
-  useEffect(() => {
-    loadCustomFolders();
-  }, [loadCustomFolders]);
-
   const refreshAllData = useCallback(async (targetFolder = folder) => {
     try {
       await Promise.all([refreshEmails(targetFolder), refreshCounts()]);
@@ -198,6 +494,14 @@ const InboxContainer = () => {
       console.warn('Error refrescando datos de email:', refreshError);
     }
   }, [folder, refreshEmails, refreshCounts]);
+
+  useEffect(() => {
+    loadCustomFolders();
+  }, [loadCustomFolders]);
+
+  useEffect(() => {
+    refreshAllData(folder);
+  }, [folder, refreshAllData]);
 
   // Inicializar EmailService y refrescar lista (con fallback para Cypress/dev sin usuario Firebase)
   useEffect(() => {
@@ -232,7 +536,7 @@ const InboxContainer = () => {
     };
   }, [user, folder, refreshEmails, refreshCounts]);
 
-  // Marcar email como leÃ­do
+  // Marcar email como leído
   const markAsRead = useCallback(async (emailId) => {
     try {
       await EmailService.markAsRead(emailId);
@@ -240,31 +544,35 @@ const InboxContainer = () => {
       try { await refreshCounts(); } catch {}
     } catch (err) {
       // En algunos entornos el backend puede devolver 404 si el mail solo
-      // existe en la subcolecciÃ³n del usuario. Marcamos localmente y no
+      // existe en la subcolección del usuario. Marcamos localmente y no
       // llenamos la consola de errores para este caso.
       const msg = String(err?.message || '');
       if (/404/.test(msg)) {
         setEmails((prev) => prev.map((e) => (e.id === emailId ? { ...e, read: true } : e)));
       } else {
-        console.error('Error marcando como leÃ­do:', err);
+        console.error('Error marcando como leído:', err);
       }
     }
   }, [refreshCounts]);
 
   const moveEmailToFolder = useCallback(
-    async (emailId, targetFolder) => {
+    async (emailId, targetFolder, options = {}) => {
       if (!emailId || !targetFolder) return;
       try {
+        const effectiveOptions =
+          options && Object.keys(options || {}).length > 0 ? options : undefined;
         if (typeof EmailService.moveMail === 'function') {
-          await EmailService.moveMail(emailId, targetFolder);
+          if (effectiveOptions) await EmailService.moveMail(emailId, targetFolder, effectiveOptions);
+          else await EmailService.moveMail(emailId, targetFolder);
         } else {
-          await EmailService.setFolder(emailId, targetFolder);
+          if (effectiveOptions) await EmailService.setFolder(emailId, targetFolder, effectiveOptions);
+          else await EmailService.setFolder(emailId, targetFolder);
         }
-        if (user?.uid) {
+        if (resolvedUserId) {
           if (targetFolder.startsWith('custom:')) {
-            assignEmailToFolder(user.uid, emailId, targetFolder.slice(7));
+            assignEmailToFolder(resolvedUserId, emailId, targetFolder.slice(7));
           } else {
-            removeEmailFromFolder(user.uid, emailId);
+            removeEmailFromFolder(resolvedUserId, emailId);
           }
         }
         await refreshAllData();
@@ -273,7 +581,7 @@ const InboxContainer = () => {
         throw err;
       }
     },
-    [user?.uid, refreshAllData]
+    [resolvedUserId, refreshAllData]
   );
 
   const deleteEmailForever = useCallback(
@@ -281,9 +589,9 @@ const InboxContainer = () => {
       if (!emailId) return;
       try {
         await EmailService.deleteMail(emailId);
-        if (user?.uid) {
+        if (resolvedUserId) {
           try {
-            removeEmailFromFolder(user.uid, emailId);
+            removeEmailFromFolder(resolvedUserId, emailId);
           } catch {}
         }
         await refreshAllData();
@@ -292,7 +600,7 @@ const InboxContainer = () => {
         throw err;
       }
     },
-    [user?.uid, refreshAllData]
+    [resolvedUserId, refreshAllData]
   );
 
   const handleDeleteEmail = useCallback(
@@ -309,7 +617,7 @@ const InboxContainer = () => {
           setViewMode('list');
         }
       } catch (err) {
-        console.error('Error procesando eliminación de email:', err);
+        console.error('Error procesando eliminaci�n de email:', err);
       }
     },
     [deleteEmailForever, moveEmailToFolder, isTrash, selectedEmailId]
@@ -319,7 +627,16 @@ const InboxContainer = () => {
     async (emailId) => {
       if (!emailId) return;
       try {
-        await moveEmailToFolder(emailId, 'inbox');
+        const email = emails.find((item) => item.id === emailId) || null;
+        const trashMeta = email?.trashMeta || {};
+        const preferredFolder =
+          trashMeta.previousFolder || trashMeta.restoredTo || trashMeta.previousFolders?.[0] || 'inbox';
+        const restoreFolder =
+          preferredFolder && preferredFolder !== 'trash' ? preferredFolder : 'inbox';
+        await moveEmailToFolder(emailId, restoreFolder, {
+          restore: true,
+          fallbackFolder: preferredFolder,
+        });
         if (selectedEmailId === emailId) {
           setSelectedEmailId(null);
           setViewMode('list');
@@ -328,7 +645,26 @@ const InboxContainer = () => {
         console.error('Error restaurando email:', err);
       }
     },
-    [moveEmailToFolder, selectedEmailId]
+    [emails, moveEmailToFolder, selectedEmailId]
+  );
+
+  const handleToggleImportant = useCallback(
+    async (emailId, nextValue) => {
+      if (!emailId) return;
+      const previous = emails;
+      setEmails((prev) =>
+        prev.map((mail) =>
+          mail && mail.id === emailId ? { ...mail, important: Boolean(nextValue) } : mail
+        )
+      );
+      try {
+        await EmailService.setMailImportant(emailId, Boolean(nextValue));
+      } catch (error) {
+        console.error('Error actualizando estado importante:', error);
+        setEmails(previous);
+      }
+    },
+    [emails]
   );
 
   const handleEmptyTrash = useCallback(async () => {
@@ -343,47 +679,108 @@ const InboxContainer = () => {
   }, [refreshAllData]);
 
   const handleCreateFolder = useCallback(
-    (name) => {
-      if (!user?.uid || !name) return null;
+    async (name) => {
+      if (!name) return null;
+      const trimmed = name.trim();
+      if (!trimmed) return null;
+      if (IS_CYPRESS_E2E) {
+        try {
+          const response = await apiPost(
+            '/api/email/folders',
+            { name: trimmed },
+            { auth: true, silent: true }
+          );
+          if (!response?.ok) {
+            throw new Error(`Fallo creando carpeta: ${response?.status}`);
+          }
+          await loadCustomFolders();
+          return true;
+        } catch (apiError) {
+          console.error('Error creando carpeta personalizada (API):', apiError);
+          throw apiError;
+        }
+      }
       try {
-        const created = createCustomFolder(user.uid, name);
-        loadCustomFolders();
+        const created = createCustomFolder(resolvedUserId, trimmed);
+        await loadCustomFolders();
         return created;
       } catch (err) {
         console.error('Error creando carpeta personalizada:', err);
         throw err;
       }
     },
-    [user?.uid, loadCustomFolders]
+    [resolvedUserId, loadCustomFolders]
   );
 
   const handleRenameFolder = useCallback(
-    (folderId, newName) => {
-      if (!user?.uid || !folderId || !newName) return null;
+    async (folderId, newName) => {
+      if (!folderId || !newName) return null;
+      const trimmed = newName.trim();
+      if (!trimmed) return null;
+      if (IS_CYPRESS_E2E) {
+        try {
+          const res = await apiPost(
+            `/api/email/folders/${encodeURIComponent(folderId)}`,
+            { name: trimmed },
+            { auth: true, silent: true }
+          );
+          if (!res?.ok) {
+            throw new Error(`Fallo renombrando carpeta: ${res?.status}`);
+          }
+          await loadCustomFolders();
+          return true;
+        } catch (apiError) {
+          console.error('Error renombrando carpeta personalizada (API):', apiError);
+          throw apiError;
+        }
+      }
       try {
-        const updated = renameCustomFolder(user.uid, folderId, newName);
-        loadCustomFolders();
+        const updated = renameCustomFolder(resolvedUserId, folderId, trimmed);
+        await loadCustomFolders();
         return updated;
       } catch (err) {
         console.error('Error renombrando carpeta personalizada:', err);
         throw err;
       }
     },
-    [user?.uid, loadCustomFolders]
+    [resolvedUserId, loadCustomFolders]
   );
 
   const handleDeleteFolder = useCallback(
-    (folderId) => {
-      if (!user?.uid || !folderId) return false;
+    async (folderId) => {
+      if (!folderId) return false;
+      if (IS_CYPRESS_E2E) {
+        try {
+          const response = await apiDel(`/api/email/folders/${encodeURIComponent(folderId)}`, {
+            auth: true,
+            silent: true,
+          });
+          if (!response?.ok && response?.status !== 204) {
+            throw new Error(`Fallo eliminando carpeta: ${response?.status}`);
+          }
+          await loadCustomFolders();
+          if (folder === `custom:${folderId}`) {
+            setFolder('inbox');
+            setSelectedEmailId(null);
+            await refreshAllData('inbox');
+          } else {
+            await refreshAllData(folder);
+          }
+          return true;
+        } catch (apiError) {
+          console.error('Error eliminando carpeta personalizada (API):', apiError);
+          throw apiError;
+        }
+      }
       try {
-        const result = deleteCustomFolder(user.uid, folderId);
-        loadCustomFolders();
+        const result = deleteCustomFolder(resolvedUserId, folderId);
+        await loadCustomFolders();
         if (folder === `custom:${folderId}`) {
           setFolder('inbox');
           setSelectedEmailId(null);
-          refreshAllData('inbox');
+          await refreshAllData('inbox');
         } else {
-          refreshAllData(folder);
+          await refreshAllData(folder);
         }
         return result;
       } catch (err) {
@@ -391,18 +788,8 @@ const InboxContainer = () => {
         throw err;
       }
     },
-    [user?.uid, loadCustomFolders, folder, refreshAllData]
+    [resolvedUserId, loadCustomFolders, folder, refreshAllData]
   );
-
-  // Estados locales
-  const [selectedEmailId, setSelectedEmailId] = useState(null);
-  const [showComposer, setShowComposer] = useState(false);
-  const [composerInitial, setComposerInitial] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
-  const [sortField, setSortField] = useState('date');
-  const [sortDirection, setSortDirection] = useState('desc');
-  const [viewMode, setViewMode] = useState('list'); // list, detail
 
   const openComposer = useCallback(
     (mode = 'basic', initial = {}) => {
@@ -420,26 +807,75 @@ const InboxContainer = () => {
   // Asegurar que emails siempre sea un array
   const safeEmails = Array.isArray(emails) ? emails : [];
 
+  const decoratedEmails = useMemo(() => {
+    return safeEmails.map((email) => {
+      const classificationTagsSource = Array.isArray(email.suggestedTags) && email.suggestedTags.length
+        ? email.suggestedTags
+        : Array.isArray(email.aiClassification?.tags)
+        ? email.aiClassification.tags
+        : [];
+      const classificationTags = Array.from(
+        new Set(
+          classificationTagsSource
+            .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
+            .filter(Boolean)
+        )
+      );
+      const suggestionRaw = email.suggestedFolder || email.aiClassification?.folder || null;
+      const suggestionInfo = mapSuggestedFolder(suggestionRaw);
+      return {
+        ...email,
+        _classificationTags: classificationTags,
+        _suggestedFolderLabel: suggestionInfo.label,
+        _suggestedFolderTarget: suggestionInfo.targetKey,
+        _hasSuggestion: Boolean(suggestionInfo.label),
+      };
+    });
+  }, [safeEmails, mapSuggestedFolder]);
+
+  const availableClassificationTags = useMemo(() => {
+    const tagSet = new Set();
+    decoratedEmails.forEach((email) => {
+      (email._classificationTags || []).forEach((tag) => {
+        if (tag) tagSet.add(tag);
+      });
+    });
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  }, [decoratedEmails]);
+
   // Email seleccionado
   const selectedEmail = selectedEmailId
-    ? safeEmails.find((email) => email.id === selectedEmailId)
+    ? decoratedEmails.find((email) => email.id === selectedEmailId)
     : null;
 
-  // Filtrar emails segÃºn bÃºsqueda y estado
-  const filteredEmails = safeEmails.filter((email) => {
+  // Filtrar emails según búsqueda, estado y clasificación IA
+  const filteredEmails = decoratedEmails.filter((email) => {
+    const subjectValue = typeof email.subject === 'string' ? email.subject : '';
+    const fromValue = typeof email.from === 'string' ? email.from : '';
+    const bodyValue = typeof email.body === 'string' ? email.body : '';
+
     const matchesSearch =
       !searchTerm ||
-      email.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      email.from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      email.body?.toLowerCase().includes(searchTerm.toLowerCase());
+      subjectValue.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fromValue.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bodyValue.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesFilter =
       filterStatus === 'all' ||
       (filterStatus === 'read' && email.read) ||
       (filterStatus === 'unread' && !email.read);
 
-    return matchesSearch && matchesFilter;
+    const tags = Array.isArray(email._classificationTags) ? email._classificationTags : [];
+    const matchesTag =
+      classificationTagFilter === 'all' ||
+      tags.some((tag) => tag.toLowerCase() === classificationTagFilter.toLowerCase());
+
+    const matchesSuggestion = !showSuggestedOnly || email._hasSuggestion;
+
+    return matchesSearch && matchesFilter && matchesTag && matchesSuggestion;
   });
+
+  const visibleEmailCount = filteredEmails.length;
 
   const sortedEmails = filteredEmails.slice().sort((a, b) => {
     const direction = sortDirection === 'asc' ? 1 : -1;
@@ -475,27 +911,13 @@ const InboxContainer = () => {
       setSelectedEmailId(emailId);
       setViewMode('detail');
 
-      // Marcar como leÃ­do si no lo estÃ¡
+      // Marcar como leído si no lo está
       const email = emails.find((e) => e.id === emailId);
       if (email && !email.read) {
         markAsRead(emailId);
       }
     },
     [safeEmails, markAsRead]
-  );
-
-  const handleSortChange = useCallback(
-    (field) => {
-      setSortField((prevField) => {
-        if (prevField === field) {
-          setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
-          return prevField;
-        }
-        setSortDirection(field === 'date' ? 'desc' : 'asc');
-        return field;
-      });
-    },
-    []
   );
 
   const handleBackToList = useCallback(() => {
@@ -505,6 +927,24 @@ const InboxContainer = () => {
 
     const handleSendEmail = useCallback(
     async (emailData) => {
+      if (!emailData || typeof emailData !== 'object') return;
+
+      if (emailData.scheduled) {
+        trackOperation?.('email_scheduled', {
+          success: true,
+          mode: 'basic',
+          when: emailData.scheduledAt || null,
+        });
+        closeComposer();
+        try {
+          await refreshEmails();
+        } catch {}
+        try {
+          await refreshCounts();
+        } catch {}
+        return;
+      }
+
       try {
         const result = await EmailService.sendEmail(emailData);
 
@@ -543,6 +983,11 @@ const InboxContainer = () => {
       try {
         if (scheduledTime) {
           await scheduleEmailSend(payload, scheduledTime);
+          trackOperation?.('email_scheduled', {
+            success: true,
+            mode: 'smart',
+            when: scheduledTime,
+          });
         } else {
           await EmailService.sendEmail(payload);
         }
@@ -623,97 +1068,233 @@ const InboxContainer = () => {
     [user]
   );
 
-  // Estados de carga y error
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted">Cargando emails...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center text-red-600">
-          <p>Error: {error}</p>
-          <button
-            onClick={refreshEmails}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header con controles */}
-      <div className="bg-surface p-4 border-b shadow-sm">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h1 data-testid="email-title" className="text-2xl font-semibold text-body">{folder === 'inbox' ? 'Recibidos' : 'Enviados'}</h1>
-            <div className="flex items-center space-x-2">
+      <div className="bg-surface border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-[220px] space-y-1">
+              <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted">
+                <SlidersHorizontal size={14} className="text-primary" />
+                Bandeja unificada
+              </p>
+              <h1
+                data-testid="email-title"
+                className="text-2xl font-semibold text-body leading-tight"
+              >
+                {activeFolderLabel}
+              </h1>
+              <p className="text-sm text-muted">
+                {visibleEmailCount}{' '}
+                {visibleEmailCount === 1 ? 'correo visible' : 'correos visibles'}
+                {filterSummary ? ` · ${filterSummary}` : ''}
+                {importantCounts.total
+                  ? ` · Destacados: ${
+                      importantCounts.unread > 0 ? `${importantCounts.unread} sin leer` : importantCounts.total
+                    }`
+                  : ''}
+                {user?.email ? ` · ${user.email}` : ''}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 data-testid="compose-button"
                 onClick={() => openComposer('basic')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
               >
-                Nuevo Email
+                Nuevo email
               </button>
               <button
                 data-testid="compose-button-ai"
                 onClick={() => openComposer('smart')}
-                className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-violet-700"
               >
                 Redactar con IA
               </button>
               <button
-                onClick={refreshEmails}
-                className="px-3 py-2 text-muted hover:text-body transition-colors"
-                title="Actualizar"
+                type="button"
+                onClick={() => {
+                  refreshAllData(folder);
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-soft px-3 py-2 text-sm font-medium text-muted transition hover:bg-gray-100"
+                title="Actualizar bandeja y contadores"
               >
-                ?
+                <RefreshCcw size={16} />
+                <span className="hidden sm:inline">Actualizar</span>
               </button>
             </div>
           </div>
 
-          {/* Barra de bÃºsqueda y filtros */}
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[220px]">
+              <SearchIcon
+                size={16}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              />
               <input
                 type="text"
                 placeholder="Buscar emails..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-soft rounded-lg focus:ring-2 ring-primary focus:border-transparent"
+                data-testid="email-search-input"
+                className="w-full rounded-lg border border-soft bg-white pl-9 pr-3 py-2 text-sm shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-soft rounded-lg focus:ring-2 ring-primary"
+            <div
+              className="flex items-center gap-1 rounded-full bg-gray-100 p-1"
+              role="group"
+              aria-label="Filtro por estado"
             >
-              <option value="all">Todos</option>
-              <option value="unread">No leÃ­dos</option>
-              <option value="read">LeÃ­dos</option>
-            </select>
+              {STATUS_FILTERS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  data-testid={`filter-status-${option.id}`}
+                  onClick={() => setFilterStatus(option.id)}
+                  className={`px-3 py-1.5 text-sm rounded-full transition ${
+                    filterStatus === option.id
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-muted hover:bg-gray-200'
+                  }`}
+                  aria-pressed={filterStatus === option.id}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSuggestedOnly((prev) => !prev)}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm transition ${
+                showSuggestedOnly
+                  ? 'bg-violet-100 text-violet-700'
+                  : 'bg-gray-100 text-muted hover:bg-gray-200'
+              }`}
+              aria-pressed={showSuggestedOnly}
+              data-testid="toggle-suggested-only"
+              title="Mostrar solo correos con sugerencia de IA"
+            >
+              <Sparkles size={16} />
+              Solo sugeridos
+            </button>
           </div>
 
-          {user?.email && (
-            <p className="text-sm text-muted mt-2">
-              Usuario: {user.email} | {filteredEmails.length} emails
-            </p>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <label htmlFor="email-sort" className="hidden text-muted sm:block">
+                Ordenar por
+              </label>
+              <select
+                id="email-sort"
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
+                className="rounded-lg border border-soft px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+                className="inline-flex items-center justify-center rounded-lg border border-soft px-2 py-2 text-muted hover:bg-gray-100"
+                aria-label="Invertir orden"
+              >
+                <ArrowUpDown size={16} />
+              </button>
+            </div>
+
+            <div
+              className="flex items-center gap-1 rounded-full bg-gray-100 p-1"
+              role="group"
+              aria-label="Densidad de lista"
+            >
+              {DENSITY_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => setListDensity(option.id)}
+                  className={`px-3 py-1.5 text-sm rounded-full transition ${
+                    listDensity === option.id
+                      ? 'bg-gray-900 text-white shadow-sm'
+                      : 'text-muted hover:bg-gray-200'
+                  }`}
+                  aria-pressed={listDensity === option.id}
+                  data-testid={`email-density-${option.id}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="ml-auto flex items-center gap-2 text-muted">
+              <span>Totales</span>
+              <span className="font-semibold text-body">{visibleEmailCount}</span>
+            </div>
+          </div>
+
+          {availableClassificationTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 overflow-x-auto pt-1 text-sm text-muted">
+              <span className="flex items-center gap-1 text-xs uppercase tracking-wide">
+                <TagIcon size={14} className="text-primary" />
+                Etiquetas IA
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setClassificationTagFilter('all')}
+                  className={`rounded-full px-3 py-1 text-sm transition ${
+                    classificationTagFilter === 'all'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-gray-100 text-muted hover:bg-gray-200'
+                  }`}
+                  aria-pressed={classificationTagFilter === 'all'}
+                >
+                  Todas
+                </button>
+                {availableClassificationTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setClassificationTagFilter(tag)}
+                    className={`rounded-full px-3 py-1 text-sm transition ${
+                      classificationTagFilter === tag
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-muted hover:bg-gray-200'
+                    }`}
+                    aria-pressed={classificationTagFilter === tag}
+                    title={`Filtrar por etiqueta ${tag}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
-          {/* Herramientas de desarrollo */}
+          {error && (
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              data-testid="email-error-alert"
+            >
+              <span>{error}</span>
+              <button
+                onClick={() => {
+                  refreshAllData(folder);
+                }}
+                className="inline-flex items-center gap-2 rounded bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
+              >
+                Reintentar
+              </button>
+            </div>
+          )}
+
           {!import.meta.env.PROD && (
-            <div className="mt-3">
+            <div className="rounded-md border border-dashed border-gray-300 px-3 py-2 text-xs text-muted">
               <button
                 onClick={async () => {
                   if (analyzing) return;
@@ -768,7 +1349,7 @@ const InboxContainer = () => {
                       }
                       console.log(`[IA] Analizados ${success}/${ids.length} correos en ${folder}`);
                     } else {
-                      console.log(`[IA] AnÃ¡lisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
+                      console.log(`[IA] Análisis backend desactivado (VITE_ENABLE_EMAIL_ANALYZE!=1). Usar panel por-email.`);
                     }
                   } catch (e) {
                     console.error('Error analizando correos', e);
@@ -777,10 +1358,10 @@ const InboxContainer = () => {
                   }
                 }}
                 className={`mt-2 px-3 py-2 text-xs border rounded ${analyzing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-soft'}`}
-                title="Analizar correos (IA) - sÃ³lo en desarrollo"
+                title="Analizar correos (IA) - sólo en desarrollo"
                 disabled={analyzing}
               >
-                {analyzing ? 'Analizandoâ¦' : 'Analizar IA (carpeta actual)'}
+                {analyzing ? 'Analizando...' : 'Analizar IA (carpeta actual)'}
               </button>
             </div>
           )}
@@ -790,67 +1371,54 @@ const InboxContainer = () => {
       {/* Contenido principal */}
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar de carpetas */}
-        <aside className="w-72 border-r bg-surface p-4 flex flex-col" data-testid="email-sidebar">
-          <nav className="space-y-2">
-            <button
-              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
-                folder === 'inbox' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
-              } system-folder`}
-              onClick={() => {
-                setSelectedEmailId(null);
-                setFolder('inbox');
-              }}
-              data-testid="folder-item"
-              title="Bandeja de entrada"
-            >
-              <span className="flex items-center gap-2">Bandeja de entrada {iaCounts.inbox > 0 && (
-                <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.inbox}`}>
-                  IA {iaCounts.inbox}
-                </span>
-              )}</span>
-              <span className="text-xs rounded-full px-2 py-0.5 bg-blue-600 text-white">
-                {inboxCounts.unread > 0 ? `${inboxCounts.unread}/${inboxCounts.total}` : inboxCounts.total}
-              </span>
-            </button>
-            <button
-              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
-                folder === 'sent' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
-              } system-folder`}
-              onClick={() => {
-                setSelectedEmailId(null);
-                setFolder('sent');
-              }}
-              data-testid="folder-item"
-              title="Enviados"
-            >
-              <span className="flex items-center gap-2">Enviados {iaCounts.sent > 0 && (
-                <span className="text-[10px] font-semibold rounded-full bg-violet-100 text-violet-700 px-2 py-px" title={`IA: ${iaCounts.sent}`}>
-                  IA {iaCounts.sent}
-                </span>
-              )}</span>
-              <span className="text-xs rounded-full px-2 py-0.5 bg-gray-700 text-white">
-                {sentCounts.total}
-              </span>
-            </button>
-            <button
-              className={`w-full flex items-center justify-between rounded px-3 py-2 text-left text-sm ${
-                folder === 'trash' ? 'bg-blue-100 text-primary' : 'text-body hover:bg-primary-soft'
-              } system-folder`}
-              onClick={() => {
-                setSelectedEmailId(null);
-                setFolder('trash');
-              }}
-              data-testid="folder-item"
-              title="Papelera"
-            >
-              <span className="flex items-center gap-2">Papelera</span>
-              <span className="text-xs rounded-full px-2 py-0.5 bg-gray-300 text-gray-800">
-                {trashCounts.total}
-              </span>
-            </button>
+        <aside className="w-72 border-r bg-surface p-4 flex flex-col" data-testid="folders-sidebar">
+          <nav className="space-y-1">
+            {systemSidebarItems.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = folder === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`system-folder flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition ${
+                    isActive ? 'bg-blue-50 text-primary ring-1 ring-blue-100' : 'text-muted hover:bg-gray-100'
+                  }`}
+                  onClick={() => {
+                    setSelectedEmailId(null);
+                    setFolder(item.id);
+                  }}
+                  data-testid="folder-item"
+                  data-folder={item.id}
+                  id={item.id === 'sent' ? 'folder-sent' : undefined}
+                  aria-pressed={isActive}
+                  title={item.badgeTitle}
+                >
+                  <span className="flex items-center gap-2">
+                    <IconComponent size={18} className={isActive ? 'text-primary' : 'text-muted'} />
+                    <span className="font-medium">{item.label}</span>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {item.ia > 0 && (
+                      <span className="inline-flex items-center rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-700">
+                        IA {item.ia}
+                      </span>
+                    )}
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${item.badgeTone}`}
+                    >
+                      {item.badge}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
           </nav>
 
-          <div className="mt-6">
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center justify-between text-xs uppercase tracking-wide text-muted">
+              <span>Carpetas personalizadas</span>
+              <span>{customFolders.length}</span>
+            </div>
             <CustomFolders
               folders={customFolders}
               activeFolder={currentCustomFolderId}
@@ -896,11 +1464,10 @@ const InboxContainer = () => {
               selectedEmailId={selectedEmailId}
               loading={loading}
               currentFolder={folder}
-              searchTerm={searchTerm}
-              onSearch={setSearchTerm}
-              sortField={sortField}
-              sortDirection={sortDirection}
-              onSortChange={handleSortChange}
+              onToggleImportant={handleToggleImportant}
+              folderNameResolver={folderNameResolver}
+              error={error}
+              density={listDensity}
             />
           </div>
           <div className="overflow-auto">
@@ -909,10 +1476,14 @@ const InboxContainer = () => {
                 email={selectedEmail}
                 userId={user?.uid}
                 currentFolder={folder}
+                folders={moveTargetFolders}
+                onMoveToFolder={moveEmailToFolder}
+                resolveFolderName={folderNameResolver}
                 onBack={handleBackToList}
                 onDelete={() => handleDeleteEmail(selectedEmail.id)}
                 onDeleteForever={() => handleDeleteEmail(selectedEmail.id, { permanent: true })}
                 onRestore={() => handleRestoreEmail(selectedEmail.id)}
+                onToggleImportant={(value) => handleToggleImportant(selectedEmail.id, value)}
                 onReply={() => {
                   const subj = selectedEmail?.subject ? `Re: ${selectedEmail.subject}` : 'Re:';
                   const to = selectedEmail?.from || '';
@@ -959,7 +1530,7 @@ const InboxContainer = () => {
           />
         ))}
 
-      {/* Botón flotante para búsqueda de proveedores con IA (para tests/E2E) */}
+      {/* Bot�n flotante para b�squeda de proveedores con IA (para tests/E2E) */}
       <button
         data-testid="open-ai-search"
         onClick={() => {
@@ -971,7 +1542,7 @@ const InboxContainer = () => {
         IA Proveedores
       </button>
 
-      {/* Modal de búsqueda IA de proveedores */}
+      {/* Modal de b�squeda IA de proveedores */}
       {showProviderSearch && (
         <ProviderSearchModal
           onClose={() => setShowProviderSearch(false)}
@@ -1022,6 +1593,10 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
+
+
+
+
 
 
 

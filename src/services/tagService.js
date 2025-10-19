@@ -2,12 +2,11 @@
  * Servicio para gestionar etiquetas (tags) de correo
  * Permite crear, eliminar, asignar y filtrar etiquetas para correos
  */
-
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { get as apiGet, put as apiPut } from './apiClient';
+import { USE_BACKEND } from './emailService';
 import { v4 as uuidv4 } from 'uuid';
 
 import { updateMailTags as updateMailTagsBackend } from './emailService';
-import { db } from '../firebaseConfig';
 import { _getStorage, loadJson, saveJson } from '../utils/storage.js';
 
 // Caché en memoria para tests y runtime rápido
@@ -26,6 +25,12 @@ export const SYSTEM_TAGS = [
   { id: 'provider', name: 'Proveedor', color: '#dd6b20' }, // Naranja
 ];
 
+function fireAndForget(promise) {
+  if (promise && typeof promise.then === 'function' && typeof promise.catch === 'function') {
+    promise.catch(() => {});
+  }
+}
+
 /**
  * Obtener todas las etiquetas disponibles para un usuario
  * Incluye tanto etiquetas del sistema como personalizadas
@@ -34,7 +39,7 @@ export const SYSTEM_TAGS = [
  */
 export const getUserTags = (userId) => {
   try {
-    refreshTagsFromCloud(userId);
+    fireAndForget(refreshTagsFromCloud(userId));
   } catch {}
   const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
   try {
@@ -186,10 +191,12 @@ export const deleteTag = (userId, tagId) => {
  * @private
  */
 const saveUserTags = (userId, tags) => {
-  // Sincronizar caché primero
   runtimeCustomTags[userId] = tags;
   const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
   saveJson(storageKey, tags);
+  if (USE_BACKEND) {
+    fireAndForget(mirrorTagsToCloud(userId, tags));
+  }
 };
 
 /**
@@ -220,36 +227,71 @@ const getEmailTagsMapping = (userId) => {
 const saveEmailTagsMapping = (userId, mapping) => {
   const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
   saveJson(storageKey, mapping);
+  if (USE_BACKEND) {
+    fireAndForget(mirrorTagsMappingToCloud(userId, mapping));
+  }
 };
 
 // Refrescos desde nube (no bloqueantes)
+async function mirrorTagsToCloud(userId, tags) {
+  try {
+    if (!USE_BACKEND || !userId) return;
+    await apiPut(
+      '/api/email/tags',
+      { tags: Array.isArray(tags) ? tags : [] },
+      { auth: true, silent: true }
+    );
+  } catch (error) {
+    console.warn('[tagService] sync tags failed', error?.message || error);
+  }
+}
+
+async function mirrorTagsMappingToCloud(userId, mapping) {
+  try {
+    if (!USE_BACKEND || !userId) return;
+    await apiPut(
+      '/api/email/tags/mapping',
+      { mapping: mapping && typeof mapping === 'object' ? mapping : {} },
+      { auth: true, silent: true }
+    );
+  } catch (error) {
+    console.warn('[tagService] sync tags mapping failed', error?.message || error);
+  }
+}
+
 async function refreshTagsFromCloud(userId) {
   try {
-    if (!db || !userId) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailTags');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() || {};
-    if (Array.isArray(data.tags)) {
-      runtimeCustomTags[userId] = data.tags;
+    if (!USE_BACKEND || !userId) return;
+    const res = await apiGet('/api/email/tags', { auth: true, silent: true });
+    if (!res || !res.ok) return;
+    const payload = await res.json();
+    if (payload && Array.isArray(payload.tags)) {
+      runtimeCustomTags[userId] = payload.tags;
       const storageKey = `${TAGS_STORAGE_KEY}_${userId}`;
-      saveJson(storageKey, data.tags);
+      saveJson(storageKey, payload.tags);
     }
-  } catch {}
+    if (payload && payload.mapping && typeof payload.mapping === 'object') {
+      const mappingKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
+      saveJson(mappingKey, payload.mapping);
+    }
+  } catch (error) {
+    console.warn('[tagService] refresh tags failed', error?.message || error);
+  }
 }
 
 async function refreshTagsMappingFromCloud(userId) {
   try {
-    if (!db || !userId) return;
-    const ref = doc(db, 'users', userId, 'settings', 'emailTagsMapping');
-    const snap = await getDoc(ref);
-    if (!snap.exists()) return;
-    const data = snap.data() || {};
-    if (data.mapping && typeof data.mapping === 'object') {
+    if (!USE_BACKEND || !userId) return;
+    const res = await apiGet('/api/email/tags/mapping', { auth: true, silent: true });
+    if (!res || !res.ok) return;
+    const payload = await res.json();
+    if (payload && payload.mapping && typeof payload.mapping === 'object') {
       const storageKey = `${EMAIL_TAGS_MAPPING_KEY}_${userId}`;
-      saveJson(storageKey, data.mapping);
+      saveJson(storageKey, payload.mapping);
     }
-  } catch {}
+  } catch (error) {
+    console.warn('[tagService] refresh tags mapping failed', error?.message || error);
+  }
 }
 
 /**

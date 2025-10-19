@@ -10,6 +10,19 @@ import { getTransactions } from '../services/bankService';
 import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData } from '../services/SyncService';
 import { requestBudgetAdvisor as fetchBudgetAdvisor } from '../services/budgetAdvisorService';
+import { getLocalFinance, updateLocalFinance } from '../services/localWeddingStore';
+
+const resolveLocalUid = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem('MyWed360_user_profile');
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data?.uid || data?.id || null;
+  } catch {
+    return null;
+  }
+};
 
 // Reglas simples de autocategorización por palabras clave/proveedor
 const AUTO_CATEGORY_RULES = [
@@ -231,12 +244,24 @@ export default function useFinance() {
   // Helper: persistir cambios en weddings/{id}/finance/main
   const persistFinanceDoc = useCallback(
     async (patch) => {
-      if (!activeWedding || !firebaseUid) return;
+      if (!activeWedding) return;
+      const localUid = firebaseUid || resolveLocalUid() || 'anonymous';
+      let savedRemotely = false;
+      if (firebaseUid && db) {
+        try {
+          const ref = doc(db, 'weddings', activeWedding, 'finance', 'main');
+          await setDoc(ref, patch, { merge: true });
+          savedRemotely = true;
+        } catch (e) {
+          console.warn('[useFinance] No se pudo persistir finance/main en Firestore:', e);
+        }
+      }
       try {
-        const ref = doc(db, 'weddings', activeWedding, 'finance', 'main');
-        await setDoc(ref, patch, { merge: true });
-      } catch (e) {
-        console.warn('[useFinance] No se pudo persistir finance/main:', e);
+        updateLocalFinance(localUid, activeWedding, patch);
+      } catch (error) {
+        if (!savedRemotely) {
+          console.warn('[useFinance] No se pudo persistir finance/main localmente:', error);
+        }
       }
     },
     [activeWedding, firebaseUid]
@@ -244,6 +269,10 @@ export default function useFinance() {
 
   useEffect(() => {
     if (!activeWedding) {
+      setProviderTemplates((prev) => (prev.length ? [] : prev));
+      return undefined;
+    }
+    if (!db) {
       setProviderTemplates((prev) => (prev.length ? [] : prev));
       return undefined;
     }
@@ -741,49 +770,107 @@ export default function useFinance() {
   // Cargar presupuesto y aportaciones desde weddings/{id}/finance/main
   useEffect(() => {
     if (!activeWedding) return;
+    const localUid = firebaseUid || resolveLocalUid() || 'anonymous';
+    let unsub = null;
+    let cancelled = false;
+
+    const applyLocalFinance = () => {
+      const local = getLocalFinance(localUid, activeWedding);
+      const localBudget = local?.budget || { total: 0, categories: [] };
+      const localSettings = local?.settings || { alertThresholds: { warn: 75, danger: 90 } };
+      const localContributions = local?.contributions || {
+        initA: 0,
+        initB: 0,
+        monthlyA: 0,
+        monthlyB: 0,
+        extras: 0,
+        giftPerGuest: 0,
+        guestCount: 0,
+      };
+
+      setBudget({
+        total: Number(localBudget.total) || 0,
+        categories: Array.isArray(localBudget.categories)
+          ? localBudget.categories.map((c) => ({
+              name: String(c.name || ''),
+              amount: Number(c.amount) || 0,
+              muted: Boolean(c.muted || false),
+              source: c.source ? String(c.source) : undefined,
+            }))
+          : [],
+      });
+      setSettings({
+        alertThresholds: {
+          warn: Number(localSettings.alertThresholds?.warn) || 75,
+          danger: Number(localSettings.alertThresholds?.danger) || 90,
+        },
+      });
+      setContributions({
+        initA: Number(localContributions.initA) || 0,
+        initB: Number(localContributions.initB) || 0,
+        monthlyA: Number(localContributions.monthlyA) || 0,
+        monthlyB: Number(localContributions.monthlyB) || 0,
+        extras: Number(localContributions.extras) || 0,
+        giftPerGuest: Number(localContributions.giftPerGuest) || 0,
+        guestCount: Number(localContributions.guestCount) || 0,
+      });
+      if (local?.aiAdvisor) {
+        const normalized = normalizeAdvisorData(local.aiAdvisor);
+        setAdvisor(normalized);
+        setAdvisorError(null);
+      } else {
+        setAdvisor(null);
+      }
+    };
+
+    if (!db || !firebaseUid) {
+      applyLocalFinance();
+      return;
+    }
+
     const ref = doc(db, 'weddings', activeWedding, 'finance', 'main');
-    const unsub = onSnapshot(
+    unsub = onSnapshot(
       ref,
       (snap) => {
-        if (!snap.exists()) return;
+        if (cancelled) return;
+        if (!snap.exists()) {
+          applyLocalFinance();
+          return;
+        }
         const data = snap.data() || {};
-        if (data.budget && typeof data.budget === 'object') {
-          const b = data.budget || {};
-          setBudget({
-            total: Number(b.total) || 0,
-            categories: Array.isArray(b.categories)
-              ? b.categories.map((c) => ({
-                  name: String(c.name || ''),
-                  amount: Number(c.amount) || 0,
-                  muted: Boolean(c.muted || false),
-                  source: c.source ? String(c.source) : undefined,
-                }))
-              : [],
-          });
-        }
-        // Cargar ajustes (umbrales de alerta)
-        if (data.settings && typeof data.settings === 'object') {
-          const s = data.settings || {};
-          const at = s.alertThresholds || {};
-          setSettings({
-            alertThresholds: {
-              warn: Number(at.warn) || 75,
-              danger: Number(at.danger) || 90,
-            },
-          });
-        }
-        if (data.contributions && typeof data.contributions === 'object') {
-          const c = data.contributions || {};
-          setContributions({
-            initA: Number(c.initA) || 0,
-            initB: Number(c.initB) || 0,
-            monthlyA: Number(c.monthlyA) || 0,
-            monthlyB: Number(c.monthlyB) || 0,
-            extras: Number(c.extras) || 0,
-            giftPerGuest: Number(c.giftPerGuest) || 0,
-            guestCount: Number(c.guestCount) || 0,
-          });
-        }
+        const budgetData = data.budget || {};
+        const settingsData = data.settings || {};
+        const contributionsData = data.contributions || {};
+
+        setBudget({
+          total: Number(budgetData.total) || 0,
+          categories: Array.isArray(budgetData.categories)
+            ? budgetData.categories.map((c) => ({
+                name: String(c.name || ''),
+                amount: Number(c.amount) || 0,
+                muted: Boolean(c.muted || false),
+                source: c.source ? String(c.source) : undefined,
+              }))
+            : [],
+        });
+
+        setSettings({
+          alertThresholds: {
+            warn: Number(settingsData.alertThresholds?.warn) || 75,
+            danger: Number(settingsData.alertThresholds?.danger) || 90,
+          },
+        });
+
+        setContributions({
+          initA: Number(contributionsData.initA) || 0,
+          initB: Number(contributionsData.initB) || 0,
+          monthlyA: Number(contributionsData.monthlyA) || 0,
+          monthlyB: Number(contributionsData.monthlyB) || 0,
+          extras: Number(contributionsData.extras) || 0,
+          giftPerGuest: Number(contributionsData.giftPerGuest) || 0,
+          guestCount: Number(contributionsData.guestCount) || 0,
+        });
+
         if (data.aiAdvisor && typeof data.aiAdvisor === 'object') {
           const normalized = normalizeAdvisorData(data.aiAdvisor);
           setAdvisor(normalized);
@@ -791,13 +878,25 @@ export default function useFinance() {
         } else {
           setAdvisor(null);
         }
+
+        updateLocalFinance(localUid, activeWedding, {
+          budget: budgetData,
+          settings: settingsData,
+          contributions: contributionsData,
+          aiAdvisor: data.aiAdvisor || null,
+        });
       },
       (err) => {
         console.warn('[useFinance] Error leyendo finance/main:', err);
+        applyLocalFinance();
       }
     );
-    return () => unsub();
-  }, [activeWedding]);
+
+    return () => {
+      cancelled = true;
+      if (typeof unsub === 'function') unsub();
+    };
+  }, [activeWedding, firebaseUid]);
 
   useEffect(() => {
     if (!activeWedding) return;

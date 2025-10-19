@@ -6,6 +6,7 @@ import admin from 'firebase-admin';
 import { analyzeEmail } from '../services/emailAnalysis.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { applyEmailInsightsToSystem } from '../services/emailActionRouter.js';
+import { classifyEmailContent } from '../services/emailClassification.js';
 import { extractTextFromAttachment } from '../services/attachmentText.js';
 
 const router = express.Router();
@@ -150,6 +151,7 @@ router.post('/', upload.any(), async (req, res) => {
       }
 
       // Guardar copia bajo subcolecciÃ³n del usuario si podemos resolverlo por email
+      let ownerUid = null;
       try {
         let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
         if (userSnap.empty) {
@@ -157,9 +159,9 @@ router.post('/', upload.any(), async (req, res) => {
           userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
         }
         if (!userSnap.empty) {
-          const uid = userSnap.docs[0].id;
+          ownerUid = userSnap.docs[0].id;
           await db.collection('users')
-            .doc(uid)
+            .doc(ownerUid)
             .collection('mails')
             .doc(mailRef.id)
             .set({
@@ -178,6 +180,18 @@ router.post('/', upload.any(), async (req, res) => {
         console.warn('Could not write inbound mail to user subcollection:', subErr?.message || subErr);
       }
 
+      // Clasificación IA del correo (persistencia en Firestore)
+      try {
+        await classifyEmailContent({
+          subject,
+          body: bodyContent,
+          mailId: mailRef.id,
+          ownerUid,
+        });
+      } catch (clsErr) {
+        console.warn('Could not classify inbound email:', clsErr?.message || clsErr);
+      }
+
       // AnÃ¡lisis IA automÃ¡tico -> extraer texto de adjuntos, guardar insights y generar notificaciones
       try {
         let attachmentsText = [];
@@ -192,27 +206,35 @@ router.post('/', upload.any(), async (req, res) => {
           }
         } catch {}
         const insights = await analyzeEmail({ subject, body: bodyContent, attachments: (req.body?.attachments || []), attachmentsText });
-        await db.collection('emailInsights').doc(mailRef.id).set({
-          ...insights,
-          mailId: mailRef.id,
-          createdAt: date,
-        });
+        await db.collection('emailInsights').doc(mailRef.id).set(
+          {
+            ...insights,
+            mailId: mailRef.id,
+            createdAt: date,
+          },
+          { merge: true }
+        );
 
         let weddingId = (rcpt || '').split('@')[0] || null;
         if (!weddingId || weddingId.length < 8) {
           try {
             // Intentar resolver weddingId desde el propietario del correo
-            let uid = null;
-            let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
-            if (userSnap.empty) {
-              const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
-              userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
-            }
-            if (!userSnap.empty) {
-              uid = userSnap.docs[0].id;
-            } else {
-              const byLogin = await db.collection('users').where('email', '==', rcpt).limit(1).get();
-              if (!byLogin.empty) uid = byLogin.docs[0].id;
+            let uid = ownerUid;
+            if (!uid) {
+              let userSnap = await db.collection('users').where('myWed360Email', '==', rcpt).limit(1).get();
+              if (userSnap.empty) {
+                const legacy = rcpt.replace(/@mywed360\.com$/i, '@mywed360');
+                userSnap = await db.collection('users').where('myWed360Email', '==', legacy).limit(1).get();
+              }
+              if (!userSnap.empty) {
+                uid = userSnap.docs[0].id;
+              } else {
+                const byLogin = await db.collection('users').where('email', '==', rcpt).limit(1).get();
+                if (!byLogin.empty) uid = byLogin.docs[0].id;
+              }
+              if (uid && !ownerUid) {
+                ownerUid = uid;
+              }
             }
             if (uid) {
               const ws = await db.collection('users').doc(uid).collection('weddings').limit(1).get();

@@ -98,7 +98,7 @@ export const useAISearch = () => {
 
       try {
         if (ENABLE_BACKEND_AI) {
-          const res = await apiPost('/api/ai-suppliers', { query, service: inferredService, budget, profile, location }, { auth: true, silent: true });
+          const res = await apiPost('/api/ai/search', { query, service: inferredService, budget, profile, location }, { auth: true, silent: true });
           if (res && res.ok) {
             const data = await res.json();
             if (Array.isArray(data) && data.length) {
@@ -118,7 +118,7 @@ export const useAISearch = () => {
         // Intentar motor de búsqueda real del backend si está configurado (SerpAPI)
         try {
           const q = [query, inferredService, location].filter(Boolean).join(' ');
-          const res2 = await apiGet(`/api/ai/search-suppliers?q=${encodeURIComponent(q)}`, { silent: true });
+          const res2 = await apiGet(`/api/ai/search?q=${encodeURIComponent(q)}`, { silent: true });
           if (res2 && res2.ok) {
             const json = await res2.json();
             const arr = Array.isArray(json?.results) ?json.results : [];

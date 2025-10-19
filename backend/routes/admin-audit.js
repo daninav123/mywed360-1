@@ -34,6 +34,15 @@ router.post('/', async (req, res) => {
       requestId: req?.id || null,
     };
 
+    const softFail = process.env.NODE_ENV !== 'production';
+    if (softFail) {
+      try {
+        await db.collection('adminAuditLogs').add(doc);
+      } catch (_e) {
+        return res.status(204).send();
+      }
+      return res.status(204).send();
+    }
     await db.collection('adminAuditLogs').add(doc);
     return res.status(204).send();
   } catch (error) {

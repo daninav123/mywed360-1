@@ -1,6 +1,6 @@
 # 30. Pagina de inicio (estado 2025-10-13)
 
-> Implementado: `src/pages/Home.jsx`, `src/components/HomePage.jsx`, `Nav.jsx`, `ProviderSearchModal.jsx`, `useFinance`, servicios `fetchWeddingNews` y `fetchWall`.
+> Implementado: `src/pages/HomeUser.jsx`, `src/components/HomePage.jsx`, `Nav.jsx`, `ProviderSearchModal.jsx`, `useFinance`, servicios `fetchWeddingNews` y `fetchWall`.
 > Pendiente: reemplazar datos mock/localStorage por origenes reales, unificar con `Dashboard.jsx`, instrumentar telemetria de interaccion y ocultar helpers de desarrollo en produccion.
 
 ## 1. Objetivo y alcance
@@ -9,19 +9,20 @@
 - Prefetchear los modulos mas usados para reducir el tiempo hasta primer uso tras iniciar sesion.
 
 ## 2. Trigger y rutas
-- Ruta protegida `/home` renderiza `src/pages/Home.jsx` dentro del `MainLayout`.
+- Ruta protegida `/home` renderiza `src/pages/HomeUser.jsx` dentro del `MainLayout`.
 - El router redirige `"/"` y rutas desconocidas a `/home` tras autenticacion (`Navigate to="/home"` en `App.jsx`).
 - Tabs de navegacion (`Nav active="home"`) destacan esta pantalla cuando el usuario selecciona el icono Inicio.
 
 ## 3. Paso a paso UX
 1. **Montaje y prefetch**  
-   - `Home.jsx` ejecuta `prefetchModule` para `UnifiedEmail`, `Proveedores` e `Invitados`.
+   - `HomeUser.jsx` ejecuta `prefetchModule` para `UnifiedEmail`, `Proveedores` e `Invitados`.
    - `HomePage` consulta `useAuth` para personalizar saludo (nombre boda + usuario) y resolver el rol.
-2. **Hero y CTA principal**  
-   - Encabezado muestra mensaje "Bienvenidos" y boton `Publica tu sitio` que redirige a `/diseno-web` con `state.focus="generator"`.
-   - Muestra el logotipo cargado desde `logo-app.png` (assets publicos).
+2. **Hero principal**  
+   - Encabezado muestra mensaje "Bienvenidos" junto al nombre de la boda.
+   - Muestra el logotipo cargado desde `logo-app.png` (assets públicos).
 3. **Progreso**  
-   - Card `Progress` lee `mywed360_progress` desde `localStorage` (0-100) y pinta barra + etiqueta `data-testid`.
+   - Card `Progress` consulta `GamificationService.getSummary` (puntos totales de la boda) y traduce el resultado a un porcentaje 0-100 (`mywed360_progress`) que se guarda como snapshot en `localStorage`.
+   - La barra se colorea según el desfase respecto al plan temporal de la boda (adelantado -> verde, en ritmo -> ámbar, por detrás -> rojo) y muestra el porcentaje esperado para la fecha actual.
 4. **Acciones rapidas**  
    - Tarjetas clicables abren modales para buscar proveedor, anadir invitado, registrar movimiento o crear nota.
    - Cada modal ejecuta la accion principal sin abandonar la Home (crea proveedor en el buscador, inserta invitado, registra movimiento o guarda nota).
@@ -37,7 +38,10 @@
 7. **Blog**  
    - Se consulta `fetchWeddingNews(page, pageSize, lang)` con heuristica que filtra imagenes de portada y limita una noticia por dominio.
    - La seccion debe renderizar exactamente cuatro noticias y todas deben tener imagen valida; se itera sobre paginas sucesivas hasta conseguir cuatro resultados cumpliendo los filtros.
+   - El texto mostrado respeta `i18n.language`; si el backend solo devuelve resultados en ingles, se traducen en segundo plano antes de pintar la tarjeta.
+   - Si no se alcanzan cuatro noticias que cumplan los criterios (imagen + idioma + dominio unico), se oculta el grid y se muestra aviso informando que no hay suficiente contenido disponible.
    - Las tarjetas abren la noticia en nueva pestana y muestran fuente derivada del dominio, siempre garantizando que cada fuente sea distinta.
+   - En entorno local se puede forzar mock con `VITE_BLOG_FORCE_MOCK=1` o `?blogMock=1` para probar el layout con cuatro tarjetas mientras se ajusta el feed real.
 8. **Navegacion inferior**  
    - `Nav` permanece anclado bottom con `active="home"`.
 9. **Fallback planner/assistant vs owner**  
@@ -48,7 +52,7 @@
 
 ## 4. Persistencia y datos
 - `localStorage`
-  - `mywed360_active_wedding_name`, `mywed360_progress`: saludo y progreso.
+  - `mywed360_active_wedding_name`, `mywed360_progress` (snapshot de Gamificación + cálculo temporal): saludo y progreso.
   - `mywed360Guests`: lista de invitados; cada modal de invitado incorpora registros con `id` (timestamp).
   - `lovendaProviders`: proveedores contratados; usado para conteo.
   - `tasksCompleted`, `mywed360Meetings`, `lovendaLongTasks`: fuentes para tareas totales/completadas.
@@ -57,6 +61,7 @@
 - Servicios remotos
   - `fetchWall(page, query)` (Flujo 24) trae imagenes destacadas desde backend/Firestore.
   - `fetchWeddingNews(page, pageSize, lang)` (Flujo 26) consulta agregador de noticias; respeta idioma detectado via `i18n`.
+  - `getSummary` (Gamificación, Flujo 17) expone `totalPoints`/`level` para convertirlos en porcentaje de progreso visible en Home.
 - Contextos/Hooks
   - `useAuth` expone `userProfile`, `currentUser`, `hasRole`.
   - `useFinance` aporta `stats.totalSpent`, `stats.totalBudget` y estado bancario (solo lectura en Home).
@@ -71,7 +76,7 @@
 ## 6. Estados especiales y errores
 - Sin datos en `localStorage` -> cards muestran 0 / placeholders; no hay modos vacios personalizados.
 - Falla en `fetchWall` -> se deja carrusel vacio y se loguea error en consola (sin UI fallback).
-- Falla en `fetchWeddingNews` -> se permiten hasta 3 errores consecutivos; si no hay resultados, se oculta grid.
+- Falla en `fetchWeddingNews` -> se permiten hasta 3 errores consecutivos; si no hay resultados suficientes para llenar los cuatro slots se muestra aviso y se oculta el grid hasta nuevo intento.
 - Modal proveedor depende de `ProviderSearchModal`: errores se comunican mediante el propio modal (fuera del alcance actual).
 - Tras `Rehacer tutorial`, la pagina se recarga para disparar onboarding (Flujo 2).
 
@@ -99,6 +104,9 @@
   2. `home-inspiration-carousel`: stub `fetchWall`, validar render de 8 categorias, desplazamiento y navegacion a `/inspiracion`.
   3. `home-blog-cards`: stub `fetchWeddingNews`, asegurar limite 4, filtro por dominio, presencia de imagen en cada item y apertura en nueva pestana (usar `cy.window().its('open')`).
 
+## Cobertura E2E implementada
+- `cypress/e2e/home/home-greeting-names.cy.js`: smoke de la home (saludos personalizados, quick actions y persistencia local).
+
 ## 10. Checklist de despliegue
 - Envolver boton "Rehacer tutorial" tras feature flag (`VITE_ENABLE_DEV_TOOLS` o similar).
 - Confirmar traducciones `i18n` para textos nuevos (progress, acciones, cards).
@@ -110,7 +118,6 @@
 - Unificar Home con `Dashboard.jsx` (Flujo 22) y permitir configuracion de widgets.
 - Anadir resumen de actividad reciente y proximos hitos (tareas, pagos, invitados).
 - Implementar buscador global accesible (atajo Cmd/Ctrl+K) y recomendaciones IA.
-- Definir estrategia de telemetria y A/B testing para el CTA `Publica tu sitio`.
 
 ## 12. Plan de QA incremental (2025-10-13)
 ### Estado actual verificado

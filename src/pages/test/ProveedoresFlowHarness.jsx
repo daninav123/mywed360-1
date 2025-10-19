@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import Modal from '../../components/Modal';
 import ProviderSearchDrawer from '../../components/proveedores/ProviderSearchDrawer';
 import ProveedorDetalle from '../../components/proveedores/ProveedorDetalle';
 import ProveedorFormModal from '../../components/proveedores/ProveedorFormModal';
@@ -7,7 +8,6 @@ import ServicesBoard from '../../components/proveedores/ServicesBoard';
 import SupplierKanban from '../../components/proveedores/SupplierKanban';
 
 const SECTION_TABS = [
-  { id: 'needs', label: 'Necesidades' },
   { id: 'vistos', label: 'Vistos' },
   { id: 'pipeline', label: 'Pipeline' },
   { id: 'contratos', label: 'Contratos' },
@@ -138,9 +138,21 @@ function normalizeProvider(data, previous = null) {
   };
 }
 
+function formatCurrency(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric === 0) {
+    return numeric === 0 ? '€ 0' : '--';
+  }
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(numeric);
+}
+
 export default function ProveedoresFlowHarness() {
   const [providers, setProviders] = useState(INITIAL_PROVIDERS);
-  const [activeSection, setActiveSection] = useState('needs');
+  const [activeTab, setActiveTab] = useState('vistos');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [aiResult, setAiResult] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -150,6 +162,7 @@ export default function ProveedoresFlowHarness() {
   const [communications, setCommunications] = useState(INITIAL_COMMUNICATIONS);
   const [unreadMap, setUnreadMap] = useState({ 'prov-2': true, 'prov-3': true });
   const [searches, setSearches] = useState([]);
+  const [needsOpen, setNeedsOpen] = useState(false);
 
   const selectedProvider = useMemo(
     () => providers.find((prov) => prov.id === selectedProviderId) || null,
@@ -185,6 +198,32 @@ export default function ProveedoresFlowHarness() {
     [providers]
   );
 
+  const pipelineSummary = useMemo(() => {
+    const asignado = providers.reduce(
+      (total, prov) => total + (parseFloat(prov.presupuestoAsignado || prov.presupuesto) || 0),
+      0
+    );
+    const gastado = providers.reduce(
+      (total, prov) => total + (parseFloat(prov.gastado) || 0),
+      0
+    );
+    const presupPend = providers.filter((prov) =>
+      prov.estado.toLowerCase().includes('presup')
+    ).length;
+    const recordatorios = providers.filter((prov) => !!prov.proximaAccion).length;
+    const deadlines = providers
+      .map((prov) => (prov.fechaLimite ? new Date(prov.fechaLimite) : null))
+      .filter((date) => date instanceof Date && !Number.isNaN(date.getTime()))
+      .sort((a, b) => a - b);
+    return {
+      asignado,
+      gastado,
+      presupPend,
+      recordatorios,
+      proximoDeadline: deadlines.length ? deadlines[0] : null,
+    };
+  }, [providers]);
+
   const handleMoveProvider = (prov, targetKey) => {
     const target = STATUS_MAP[targetKey] || STATUS_MAP.vacio;
     setProviders((prev) =>
@@ -197,6 +236,7 @@ export default function ProveedoresFlowHarness() {
   };
 
   const handleOpenSearch = () => {
+    setNeedsOpen(false);
     setAiResult(null);
     setDrawerOpen(true);
   };
@@ -222,7 +262,6 @@ export default function ProveedoresFlowHarness() {
   const handleGuardarDesdeAI = (resultado) => {
     if (!resultado) return;
     setFormProvider({
-      id: 'prov-ai',
       nombre: resultado.nombre || '',
       servicio: resultado.servicio || '',
       ubicacion: resultado.ubicacion || '',
@@ -232,12 +271,14 @@ export default function ProveedoresFlowHarness() {
       notas: resultado.descripcion || '',
       estado: 'Por definir',
       favorito: false,
+      idHint: 'prov-ai',
     });
     setDrawerOpen(false);
     setFormOpen(true);
   };
 
   const handleOpenFormWithService = (service) => {
+    setNeedsOpen(false);
     setFormProvider({
       nombre: '',
       servicio: service || '',
@@ -249,6 +290,10 @@ export default function ProveedoresFlowHarness() {
   };
 
   const handleSaveProvider = async (data) => {
+    // Usar idHint si no hay id para mantener un identificador estable en tests
+    if (!data.id && data.idHint) {
+      data.id = data.idHint;
+    }
     const previous = providers.find((prov) => prov.id === data.id) || null;
     const next = normalizeProvider(data, previous);
     setProviders((prev) => {
@@ -327,48 +372,74 @@ export default function ProveedoresFlowHarness() {
 
   return (
     <div className="p-6 space-y-6" data-cy="proveedores-flow-harness">
-      <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Flujo de Proveedores - Harness</h1>
-        <p className="text-sm text-gray-600">
-          Este escenario cubre la planificación de servicios, shortlist, pipeline y resumen de
-          contratos para las pruebas E2E.
-        </p>
-        <nav className="flex flex-wrap gap-2" aria-label="Secciones del flujo">
-          {SECTION_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              data-cy={`tab-${tab.id}`}
-              className={`px-3 py-1.5 rounded-md text-sm ${
-                activeSection === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-              onClick={() => setActiveSection(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+      <header
+        className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+        data-cy="proveedores-header"
+      >
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900" data-cy="header-title">
+            Gestión de Proveedores · Harness
+          </h1>
+          <p className="text-sm text-gray-600">
+            Replica la vista con pestañas (Vistos, Pipeline, Contratos), matriz de necesidades y búsqueda IA.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2" data-cy="header-actions">
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            data-cy="action-matriz"
+            onClick={() => setNeedsOpen(true)}
+          >
+            Matriz de necesidades
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-purple-600 hover:bg-purple-700"
+            data-cy="action-buscar-ia"
+            onClick={() => {
+              setNeedsOpen(false);
+              handleOpenSearch();
+            }}
+          >
+            Buscar con IA
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            data-cy="action-anadir"
+            onClick={() => {
+              setNeedsOpen(false);
+              handleOpenFormWithService();
+            }}
+          >
+            Añadir proveedor
+          </button>
+        </div>
       </header>
 
-      {activeSection === 'needs' && (
-        <div className="space-y-4" data-cy="services-board-section">
-          <ServicesBoard
-            proveedores={providers}
-            onOpenSearch={handleOpenSearch}
-            onOpenAI={handleOpenSearch}
-            onOpenNew={handleOpenFormWithService}
-          />
-          {searches.length ? (
-            <div className="text-xs text-gray-500" data-cy="search-history">
-              Últimas bísquedas IA: {searches.slice(-3).join(', ')}
-            </div>
-          ) : null}
-        </div>
-      )}
+      <nav
+        className="border-b border-gray-200 -mb-px flex space-x-6"
+        aria-label="Secciones del flujo"
+      >
+        {SECTION_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            data-cy={`tab-${tab.id}`}
+            className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+              activeTab === tab.id
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
 
-      {activeSection === 'vistos' && (
+      {activeTab === 'vistos' && (
         <section className="space-y-3" data-cy="vistos-section">
           {shortlistProviders.length ? (
             shortlistProviders.map((prov) => (
@@ -414,17 +485,83 @@ export default function ProveedoresFlowHarness() {
         </section>
       )}
 
-      {activeSection === 'pipeline' && (
-        <section data-cy="pipeline-section">
-          <SupplierKanban
-            proveedores={providers}
-            onMove={handleMoveProvider}
-            onClick={(prov) => handleOpenDetail(prov.id)}
-          />
+      {activeTab === 'pipeline' && (
+        <section
+          className="grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-6"
+          data-cy="pipeline-section"
+        >
+          <div className="space-y-6">
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white/70 p-4 flex flex-wrap items-center gap-3">
+              <div>
+                <div className="text-sm font-semibold text-gray-800">
+                  Organiza necesidades y servicios
+                </div>
+                <p className="text-xs text-gray-600 max-w-md">
+                  Usa la matriz para mapear qué servicios están cubiertos y lanza búsquedas IA o altas manuales.
+                </p>
+              </div>
+              <div className="ml-auto">
+                <button
+                  type="button"
+                  className="inline-flex items-center px-3 py-2 border border-blue-600 text-blue-600 text-xs font-medium rounded-md hover:bg-blue-50"
+                  data-cy="pipeline-open-matrix"
+                  onClick={() => setNeedsOpen(true)}
+                >
+                  Abrir matriz de necesidades
+                </button>
+              </div>
+            </div>
+
+            <SupplierKanban
+              proveedores={providers}
+              onMove={handleMoveProvider}
+              onClick={(prov) => handleOpenDetail(prov.id)}
+              showNextAction={true}
+              data-cy="pipeline-kanban"
+            />
+          </div>
+
+          <aside className="bg-white border rounded-lg p-4 h-min sticky top-4 space-y-4" data-cy="pipeline-aside">
+            <div>
+              <div className="text-sm font-semibold mb-2">Resumen financiero</div>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div className="flex justify-between">
+                  <span>Asignado</span>
+                  <span>{formatCurrency(pipelineSummary.asignado)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Gastado</span>
+                  <span>{formatCurrency(pipelineSummary.gastado)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Presupuestos pendientes</span>
+                  <span>{pipelineSummary.presupPend}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Recordatorios</span>
+                  <span>{pipelineSummary.recordatorios}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Próximo deadline</span>
+                  <span>
+                    {pipelineSummary.proximoDeadline
+                      ? pipelineSummary.proximoDeadline.toLocaleDateString('es-ES')
+                      : '--'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {searches.length ? (
+              <div className="border-t pt-3 text-xs text-gray-500" data-cy="search-history">
+                Últimas búsquedas IA: {searches.slice(-3).join(', ')}
+              </div>
+            ) : null}
+          </aside>
         </section>
       )}
 
-      {activeSection === 'contratos' && (
+      {activeTab === 'contratos' && (
         <section
           className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
           data-cy="contratos-section"
@@ -450,6 +587,26 @@ export default function ProveedoresFlowHarness() {
         </section>
       )}
 
+      <Modal
+        open={needsOpen}
+        onClose={() => setNeedsOpen(false)}
+        title="Matriz de necesidades"
+        size="full"
+        className="max-w-4xl"
+      >
+        <div className="space-y-4" data-cy="needs-modal">
+          <p className="text-sm text-gray-600">
+            Ajusta los servicios prioritarios y lanza búsquedas inteligentes sin salir del módulo.
+          </p>
+          <ServicesBoard
+            proveedores={providers}
+            onOpenSearch={() => handleOpenSearch()}
+            onOpenAI={() => handleOpenSearch()}
+            onOpenNew={(service) => handleOpenFormWithService(service)}
+          />
+        </div>
+      </Modal>
+
       <ProviderSearchDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -467,6 +624,7 @@ export default function ProveedoresFlowHarness() {
         }}
         onGuardar={handleSaveProvider}
         proveedorEditar={formProvider}
+        forceGuardar={true}
       />
 
       {selectedProvider ? (

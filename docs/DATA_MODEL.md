@@ -27,6 +27,8 @@ Nota: Este documento consolida estructuras observadas en el código. Ajustar si 
   - `ownerIds`: string[] (UIDs)
   - `plannerIds`: string[] (opcional)
   - `weddingInfo`: objeto (resumen)
+  - `weddingProfile`: objeto (perfil personalizado, ver abajo)
+  - `weddingInsights`: objeto (resúmenes generados, tags IA)
 
 Subcolecciones (por boda, según módulos):
 - `guests`: invitados
@@ -36,10 +38,39 @@ Subcolecciones (por boda, según módulos):
 - `meetings` (opcional): reuniones/eventos de calendario
 - `designs` (opcional): diseños web/invitaciones
 - `seating` (opcional): layouts de mesas/ceremonia
+- `recommendations`: sugerencias generadas (tipo, origen IA, CTA, estado `suggested|applied|dismissed`)
 
 Invitaciones (recomendado):
 - `weddingInvitations`: subcolección `weddings/{weddingId}/weddingInvitations/{code}`
   - `code`, `weddingId`, `email`, `role`, `createdBy`, `createdAt`
+
+#### 2.1 Perfil de boda (`weddingProfile`)
+- `version`: string (semver, ej. `1.0.0`)
+- `discoverySource`: `onboarding|manual|import`
+- `eventType`, `stylePrimary`, `styleSecondary`
+- `vibeKeywords`: string[]
+- `guestCountRange`: `{ min, max }`
+- `budgetRange`: `{ min, max, currency }`
+- `priorityAreas`: string[] (ej. `photography`, `sustainability`)
+- `mustHaveVendors`: string[]
+- `accessibilityNeeds`: string[]
+- `dietaryRestrictions`: string[]
+- `specialMoments`: arreglo de objetos `{ id, title, notes, responsibleRole }`
+- `specialInterests`: arreglo de objetos `{ id, idea, tipo, nivelEntusiasmo, contexto, nivelContraste?, relacionaConStyle?, zonaAplicacion?, requiresReview?, createdBy, createdAt }`
+- `noGoItems`: arreglo de objetos `{ id, descripcion, motivo, registradoPor, createdAt }`
+- `communicationPreferences`: `{ channel, language }`
+- `confidenceScore`: number (0-1)
+- `lastUpdatedBy`, `updatedAt`
+
+#### 2.2 Insights y analítica (`weddingInsights`)
+- `summary`: string (tono humano amigable)
+- `tags`: string[]
+- `nextBestActions`: arreglo (referencias a recomendaciones/CTAs)
+- `lastRecalculatedAt`: timestamp
+- `telemetry`: métricas agregadas (ej. `% recomendaciones aplicadas`)
+- `profileGaps`: arreglo de items `{ categoria, estado, followUpId }`
+- `styleWeights`: `{ coreStyleWeight, contrasteWeight, limites }`
+- `trends`: arreglo de insights anonimizados por arquetipo
 
 ### 3. Estados Auxiliares
 - `tasksCompleted` (documento por boda o por usuario/boda): mapa de ids de tareas completadas

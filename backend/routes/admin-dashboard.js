@@ -1,5 +1,6 @@
 import express from 'express';
 import admin from 'firebase-admin';
+import { z } from 'zod';
 
 import { db } from '../db.js';
 import logger from '../logger.js';
@@ -8,6 +9,7 @@ import { createMailgunClients } from './mail/clients.js';
 const router = express.Router();
 
 const MAX_LIMIT = 200;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const collections = {
   metrics: () => db.collection('adminMetrics'),
@@ -15,6 +17,7 @@ const collections = {
   alerts: () => db.collection('adminAlerts'),
   tasks: () => db.collection('adminTasks'),
   weddings: () => db.collection('weddings'),
+  weddingsGroup: () => db.collectionGroup('weddings'),
   users: () => db.collection('users'),
   incidents: () => db.collection('adminIncidents'),
   featureFlags: () => db.collection('featureFlags'),
@@ -25,6 +28,18 @@ const collections = {
   reports: () => db.collection('adminReports'),
   supportSummary: () => db.collection('adminSupportSummary'),
   supportTickets: () => db.collection('adminTickets'),
+  // Datos operativos reales
+  payments: () => db.collection('payments'),
+  appDownloads: () => db.collection('appDownloads'),
+  appDownloadEvents: () => db.collection('appDownloadEvents'),
+  mobileDownloads: () => db.collection('mobileDownloads'),
+  analyticsAppDownloads: () => db.collection('analyticsAppDownloads'),
+  // Colección compuesta de tareas creadas por usuarios en bodas
+  tasksGroup: () => db.collectionGroup('tasks'),
+  // Plantillas de tareas administrativas
+  taskTemplates: () => db.collection('adminTaskTemplates'),
+  // Descuentos/códigos promocionales
+  discountLinks: () => db.collection('discountLinks'),
 };
 
 function toDate(value) {
@@ -62,8 +77,176 @@ function normalizeNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function formatCurrency(amount, currency = 'EUR') {
+  const numeric = Number(amount);
+  if (!Number.isFinite(numeric)) {
+    return new Intl.NumberFormat('es-ES', { style: 'currency', currency }).format(0);
+  }
+  return new Intl.NumberFormat('es-ES', { style: 'currency', currency }).format(numeric);
+}
+
 function ensureArray(value) {
   return Array.isArray(value) ? value : [];
+}
+
+function normalizeStringValue(value) {
+  if (value == null) return '';
+  return String(value).trim();
+}
+
+// Helpers adicionales
+function stripDiacritics(str) {
+  try {
+    return String(str)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  } catch {
+    return String(str || '').toLowerCase();
+  }
+}
+
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function addDays(d, n) {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+}
+
+async function aggregateDailyRevenue(days = 30) {
+  const out = [];
+  const today = startOfDay(new Date());
+  const since = addDays(today, -Math.max(1, days) + 1);
+  for (let i = 0; i < days; i += 1) {
+    const day = addDays(since, i);
+    const dayEnd = addDays(day, 1);
+    const dayStartTs = admin.firestore.Timestamp.fromDate(day);
+    const dayEndTs = admin.firestore.Timestamp.fromDate(dayEnd);
+    let total = 0;
+    for (const field of ['updatedAt', 'createdAt']) {
+      for (const status of ['paid', 'succeeded']) {
+        try {
+          const docs = await fetchDocuments(
+            () => collections.payments(),
+            [
+              { field: 'status', op: '==', value: status },
+              { field, op: '>=', value: dayStartTs },
+              { field, op: '<', value: dayEndTs },
+            ],
+            1000,
+          );
+          docs.forEach((doc) => {
+            const data = doc.data() || {};
+            const amount = Number(data.amount ?? data.total ?? 0);
+            if (Number.isFinite(amount)) total += amount;
+          });
+        } catch {
+          // best-effort
+        }
+      }
+      if (total > 0) break;
+    }
+    out.push({ date: formatDateOnly(day), value: total });
+  }
+  return out;
+}
+
+async function aggregateDailyActiveUsers(days = 30) {
+  const out = [];
+  const today = startOfDay(new Date());
+  const since = addDays(today, -Math.max(1, days) + 1);
+  for (let i = 0; i < days; i += 1) {
+    const day = addDays(since, i);
+    const dayEnd = addDays(day, 1);
+    const dayStartTs = admin.firestore.Timestamp.fromDate(day);
+    const dayEndTs = admin.firestore.Timestamp.fromDate(dayEnd);
+    let count = 0;
+    try {
+      count = await countDocuments(
+        collections.users,
+        [
+          { field: 'lastLoginAt', op: '>=', value: dayStartTs },
+          { field: 'lastLoginAt', op: '<', value: dayEndTs },
+        ],
+        5000,
+      );
+    } catch {
+      count = 0;
+    }
+    out.push({ date: formatDateOnly(day), value: count });
+  }
+  return out;
+}
+
+function canonicalizeTaskTitle(title) {
+  const base = stripDiacritics(title)
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const stopwords = new Set(['el','la','los','las','de','del','para','por','y','o','un','una','con','en','al','a','que','se','un@','@']);
+  const words = base.split(' ').filter((w) => w && !stopwords.has(w));
+  return words.join(' ').trim();
+}
+
+function toTitleCase(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (t) => t.toUpperCase());
+}
+
+function extractWeddingIdFromPath(pathStr) {
+  try {
+    const parts = String(pathStr || '').split('/');
+    const idx = parts.indexOf('weddings');
+    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+  } catch {}
+  return null;
+}
+
+function applyConstraints(ref, constraints = []) {
+  return constraints.reduce((query, constraint) => {
+    if (!constraint || !constraint.field) return query;
+    const operator = constraint.op || constraint.operator || '==';
+    return query.where(constraint.field, operator, constraint.value);
+  }, ref);
+}
+
+async function fetchDocuments(factory, constraints = [], limit = MAX_LIMIT, selectFields = null) {
+  if (typeof factory !== 'function') return [];
+  let query = applyConstraints(factory(), constraints);
+  if (Array.isArray(selectFields) && selectFields.length) {
+    query = query.select(...selectFields);
+  }
+  if (limit) {
+    query = query.limit(Math.min(limit, MAX_LIMIT));
+  }
+  const snap = await query.get();
+  if (snap.empty) return [];
+  return snap.docs;
+}
+
+async function countDocuments(factory, constraints = [], limit = 1000) {
+  if (typeof factory !== 'function') return 0;
+  try {
+    const aggregation = await applyConstraints(factory(), constraints).count().get();
+    const data = aggregation.data();
+    if (data && typeof data.count === 'number') return data.count;
+  } catch (error) {
+    logger.warn('[admin-dashboard] aggregation count fallback', { message: error?.message });
+  }
+
+  try {
+    const docs = await fetchDocuments(factory, constraints, limit);
+    return docs.length;
+  } catch (error) {
+    logger.warn('[admin-dashboard] countDocuments fallback failed', { message: error?.message });
+    return 0;
+  }
 }
 
 function serverTs() {
@@ -78,13 +261,15 @@ function getActor(req) {
   }
 }
 
-async function writeAudit(req, action, details = {}) {
+async function writeAdminAudit(req, action, details = {}) {
   try {
     await collections.auditLogs().add({
-      action,
+      action: String(action || ''),
       actor: getActor(req),
+      resourceType: details.resourceType || '',
+      resourceId: details.resourceId || '',
+      payload: details.payload || null,
       createdAt: serverTs(),
-      ...details,
     });
   } catch (e) {
     logger.warn('[admin-dashboard] audit write failed', { action, message: e?.message });
@@ -94,40 +279,57 @@ async function writeAudit(req, action, details = {}) {
 function extractKpis(metricsDoc) {
   if (!metricsDoc) return [];
   if (Array.isArray(metricsDoc.kpis) && metricsDoc.kpis.length) {
-    return metricsDoc.kpis.map((kpi, idx) => ({
-      id: kpi.id || `kpi-${idx}`,
-      label: kpi.label || `KPI ${idx + 1}`,
-      value: kpi.value ?? '',
-      trend: typeof kpi.trend === 'number' ? Number(kpi.trend) : null,
-      testId: kpi.testId,
-    }));
+    return metricsDoc.kpis;
   }
 
+  const source = metricsDoc.meta || {};
   const kpis = [];
-  const addKpi = (id, label, value, trend) => {
+
+  const addKpi = (id, label, value, options = {}) => {
     if (value == null) return;
     kpis.push({
       id,
       label,
-      value,
-      trend: typeof trend === 'number' ? trend : null,
+      value: options.formatCurrency ? formatCurrency(value, options.currency) : value,
+      trend: null,
+      testId: options.testId,
     });
   };
 
-  addKpi('active-users', 'Usuarios activos (7 días)', metricsDoc.activeUsers7d, metricsDoc.activeUsersTrend);
-  addKpi('new-weddings', 'Bodas creadas (30 días)', metricsDoc.newWeddings30d, metricsDoc.newWeddingsTrend);
-  addKpi('conversion', 'Conversión signup→boda', metricsDoc.conversionRate, metricsDoc.conversionTrend);
-  addKpi('estimated-revenue', 'Ingresos estimados (30 días)', metricsDoc.estimatedRevenue, metricsDoc.estimatedRevenueTrend);
+  addKpi(
+    'active-weddings',
+    'Bodas activas',
+    source.activeWeddings ?? metricsDoc.activeWeddings ?? metricsDoc.activeWeddingsNow,
+    { testId: 'admin-kpi-active-weddings' },
+  );
+  addKpi(
+    'revenue-30d',
+    'Facturación (30 días)',
+    source.revenue30d ?? metricsDoc.revenue30d ?? metricsDoc.estimatedRevenue,
+    { formatCurrency: true, testId: 'admin-kpi-revenue-30d' },
+  );
+  addKpi(
+    'downloads-30d',
+    'Descargas app (30 días)',
+    source.downloads30d ?? metricsDoc.downloads30d,
+    { testId: 'admin-kpi-downloads-30d' },
+  );
+  addKpi(
+    'open-alerts',
+    'Alertas activas',
+    source.openAlerts ?? metricsDoc.openAlerts,
+    { testId: 'admin-kpi-open-alerts' },
+  );
 
   return kpis;
 }
 
 function defaultKpis() {
   return [
-    { id: 'active-users', testId: 'admin-kpi-active-users', label: 'Usuarios activos (7 días)', value: 0, trend: 0 },
-    { id: 'new-weddings', testId: 'admin-kpi-new-weddings', label: 'Bodas creadas (30 días)', value: 0, trend: 0 },
-    { id: 'conversion', testId: 'admin-kpi-conversion', label: 'Conversión signup→boda', value: '0%', trend: 0 },
-    { id: 'estimated-revenue', testId: 'admin-kpi-estimated-revenue', label: 'Ingresos estimados (30 días)', value: '€0', trend: 0 },
+    { id: 'active-weddings', testId: 'admin-kpi-active-weddings', label: 'Bodas activas', value: 0, trend: null },
+    { id: 'revenue-30d', testId: 'admin-kpi-revenue-30d', label: 'Facturación (30 días)', value: formatCurrency(0), trend: null },
+    { id: 'downloads-30d', testId: 'admin-kpi-downloads-30d', label: 'Descargas app (30 días)', value: 0, trend: null },
+    { id: 'open-alerts', testId: 'admin-kpi-open-alerts', label: 'Alertas activas', value: 0, trend: null },
   ];
 }
 
@@ -336,6 +538,272 @@ function mapSupportTicketDoc(doc) {
   };
 }
 
+async function sumPaymentsLast30d() {
+  if (typeof collections.payments !== 'function') return 0;
+  const sinceDate = new Date(Date.now() - 30 * DAY_MS);
+  const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
+  const seen = new Set();
+  let total = 0;
+
+  const collect = async (field) => {
+    const statuses = ['paid', 'succeeded'];
+    for (const status of statuses) {
+      try {
+        const docs = await fetchDocuments(
+          () => collections.payments(),
+          [
+            { field: 'status', op: '==', value: status },
+            { field, op: '>=', value: sinceTimestamp },
+          ],
+          1000,
+        );
+        docs.forEach((doc) => {
+          if (seen.has(doc.id)) return;
+          const data = doc.data() || {};
+          const amount = Number(data.amount ?? data.total ?? 0);
+          if (Number.isFinite(amount)) {
+            total += amount;
+            seen.add(doc.id);
+          }
+        });
+      } catch (error) {
+        logger.warn('[admin-dashboard] payments aggregation failed', { field, message: error?.message });
+      }
+    }
+  };
+
+  await collect('updatedAt');
+  if (total === 0) {
+    await collect('createdAt');
+  }
+
+  return total;
+}
+
+async function countDownloadsLast30d() {
+  const sinceDate = new Date(Date.now() - 30 * DAY_MS);
+  const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
+  const candidates = [
+    { key: 'appDownloads', fields: ['createdAt', 'timestamp', 'downloadedAt'] },
+    { key: 'appDownloadEvents', fields: ['createdAt', 'timestamp', 'eventAt'] },
+    { key: 'mobileDownloads', fields: ['createdAt', 'updatedAt'] },
+    { key: 'analyticsAppDownloads', fields: ['createdAt', 'eventAt'] },
+  ];
+
+  const ids = new Set();
+
+  for (const candidate of candidates) {
+    const factory = collections[candidate.key];
+    if (typeof factory !== 'function') continue;
+
+    for (const field of candidate.fields) {
+      try {
+        const docs = await fetchDocuments(
+          () => factory(),
+          [{ field, op: '>=', value: sinceTimestamp }],
+          1000,
+        );
+        docs.forEach((doc) => {
+          if (ids.has(doc.id)) return;
+          const data = doc.data() || {};
+          const ts = toDate(data[field]);
+          if (ts && ts >= sinceDate) ids.add(doc.id);
+        });
+      } catch (error) {
+        logger.warn('[admin-dashboard] downloads aggregation failed', {
+          collection: candidate.key,
+          field,
+          message: error?.message,
+        });
+      }
+    }
+  }
+
+  return ids.size;
+}
+
+async function countOpenAlertsRealtime() {
+  try {
+    return await countDocuments(collections.alerts, [{ field: 'resolved', op: '==', value: false }]);
+  } catch (error) {
+    logger.warn('[admin-dashboard] open alerts count fallback', { message: error?.message });
+    return 0;
+  }
+}
+
+async function getNewUserTasks(days = 14, maxResults = 20) {
+  if (typeof collections.tasksGroup !== 'function') return [];
+
+  const windowDays = Math.max(days, 1);
+  const sinceDate = new Date(Date.now() - windowDays * DAY_MS);
+  const sinceTimestamp = admin.firestore.Timestamp.fromDate(sinceDate);
+
+  try {
+    const snap = await collections
+      .tasksGroup()
+      .where('createdAt', '>=', sinceTimestamp)
+      .orderBy('createdAt', 'desc')
+      .limit(1000)
+      .get();
+
+    if (snap.empty) return [];
+
+    const groups = new Map();
+
+    snap.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      const type = String(data.type || 'task').toLowerCase();
+      if (type === 'subtask') return;
+
+      const rawTitle = normalizeStringValue(data.title || data.name || '');
+      if (!rawTitle) return;
+
+      const canonical = canonicalizeTaskTitle(rawTitle);
+      if (!canonical) return;
+
+      const createdAtDate = toDate(data.createdAt);
+      if (!createdAtDate || createdAtDate < sinceDate) return;
+
+      const isTemplateDerived = Boolean(
+        data.templateKey ||
+          data.templateVersion ||
+          data.templateParentKey ||
+          data.templateId,
+      );
+      const hasManualFlag = Boolean(
+        data.createdBy ||
+          data.createdByUid ||
+          data.createdByRole ||
+          data.manual === true ||
+          data.isManual === true ||
+          String(data.source || '').toLowerCase() === 'user' ||
+          String(data.origin || '').toLowerCase() === 'user',
+      );
+      if (isTemplateDerived && !hasManualFlag) return;
+
+      const weddingId = data.weddingId || extractWeddingIdFromPath(docSnap.ref.path);
+
+      const entry =
+        groups.get(canonical) ||
+        {
+          key: canonical,
+          label: toTitleCase(canonical),
+          totalOccurrences: 0,
+          weddingIds: new Set(),
+          sampleTitles: new Set(),
+          lastCreatedAt: null,
+        };
+
+      entry.totalOccurrences += 1;
+      if (weddingId) entry.weddingIds.add(String(weddingId));
+      entry.sampleTitles.add(toTitleCase(rawTitle));
+      if (!entry.lastCreatedAt || createdAtDate > entry.lastCreatedAt) {
+        entry.lastCreatedAt = createdAtDate;
+      }
+
+      groups.set(canonical, entry);
+    });
+
+    const ordered = Array.from(groups.values())
+      .map((entry) => ({
+        key: entry.key,
+        label: entry.label,
+        totalOccurrences: entry.totalOccurrences,
+        totalWeddings: entry.weddingIds.size,
+        sampleTitles: Array.from(entry.sampleTitles).slice(0, 3),
+        lastCreatedAt: entry.lastCreatedAt ? formatDateTime(entry.lastCreatedAt) : null,
+      }))
+      .filter((item) => item.totalOccurrences > 0 && item.totalWeddings > 0)
+      .sort((a, b) => {
+        if (b.totalOccurrences !== a.totalOccurrences) return b.totalOccurrences - a.totalOccurrences;
+        if (b.totalWeddings !== a.totalWeddings) return b.totalWeddings - a.totalWeddings;
+        if (b.lastCreatedAt && a.lastCreatedAt) return b.lastCreatedAt.localeCompare(a.lastCreatedAt);
+        return 0;
+      });
+
+    return ordered.slice(0, Math.max(maxResults, 1));
+  } catch (error) {
+    logger.warn('[admin-dashboard] new user tasks aggregation failed', { message: error?.message });
+    return [];
+  }
+}
+
+async function computeRealtimeOverview() {
+  const now = new Date();
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
+  const thirtyTimestamp = admin.firestore.Timestamp.fromDate(thirtyDaysAgo);
+
+  const totalUsers = await countDocuments(collections.users);
+  const activeUsers30d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: thirtyTimestamp }]);
+  // Weddings raíz y fallback a grupo
+  let totalWeddings = await countDocuments(collections.weddings);
+  if (!totalWeddings) {
+    try { totalWeddings = await countDocuments(collections.weddingsGroup); } catch { totalWeddings = 0; }
+  }
+  let newWeddings30d = await countDocuments(collections.weddings, [{ field: 'createdAt', op: '>=', value: thirtyTimestamp }]);
+  if (!newWeddings30d) {
+    try { newWeddings30d = await countDocuments(collections.weddingsGroup, [{ field: 'createdAt', op: '>=', value: thirtyTimestamp }]); } catch { newWeddings30d = 0; }
+  }
+  let activeWeddings = await countDocuments(collections.weddings, [{ field: 'status', op: '==', value: 'active' }]);
+  if (!activeWeddings) {
+    try { activeWeddings = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch { activeWeddings = 0; }
+  }
+  const revenue30dRaw = await sumPaymentsLast30d();
+  const downloads30d = await countDownloadsLast30d();
+  const openAlerts = await countOpenAlertsRealtime();
+  const newTasks = await getNewUserTasks(14, 20);
+
+  const kpis = [
+    {
+      id: 'active-weddings',
+      label: 'Bodas activas',
+      value: activeWeddings,
+      trend: null,
+      testId: 'admin-kpi-active-weddings',
+    },
+    {
+      id: 'revenue-30d',
+      label: 'Facturación (30 días)',
+      value: formatCurrency(revenue30dRaw),
+      trend: null,
+      testId: 'admin-kpi-revenue-30d',
+    },
+    {
+      id: 'downloads-30d',
+      label: 'Descargas app (30 días)',
+      value: downloads30d,
+      trend: null,
+      testId: 'admin-kpi-downloads-30d',
+    },
+    {
+      id: 'open-alerts',
+      label: 'Alertas activas',
+      value: openAlerts,
+      trend: null,
+      testId: 'admin-kpi-open-alerts',
+    },
+  ];
+
+  return {
+    kpis,
+    services: [],
+    alerts: [],
+    tasks: [],
+    newTasks,
+    meta: {
+      totalUsers,
+      activeUsers30d,
+      totalWeddings,
+      newWeddings30d,
+      activeWeddings,
+      revenue30d: revenue30dRaw,
+      downloads30d,
+      openAlerts,
+      computedAt: now.toISOString(),
+    },
+  };
+}
+
 async function getCollectionDocs(name, opts = {}) {
   try {
     const col = collections[name];
@@ -358,35 +826,38 @@ async function getCollectionDocs(name, opts = {}) {
 
 router.get('/overview', async (_req, res) => {
   try {
-    const [metricsDocs, serviceDocs, alertDocs, taskDocs] = await Promise.all([
+    const [metricsDocs, serviceDocs, alertDocs, taskDocs, realtime] = await Promise.all([
       getCollectionDocs('metrics', { orderBy: 'date', limit: 1 }),
       getCollectionDocs('serviceStatus', { orderBy: 'service', limit: 50 }),
       getCollectionDocs('alerts', { orderBy: 'createdAt', limit: 20 }),
       getCollectionDocs('tasks', { orderBy: 'createdAt', limit: 50 }),
+      computeRealtimeOverview(),
     ]);
 
     const latestMetrics = metricsDocs.length ? metricsDocs[0].data() : null;
-    let kpis = extractKpis(latestMetrics);
-    let services = extractServices(latestMetrics, serviceDocs);
-    let alerts = alertDocs.map(mapAlertDoc);
-    let tasks = taskDocs.map(mapTaskDoc);
-
+    let kpis = realtime?.kpis?.length ? realtime.kpis : extractKpis(latestMetrics);
     if (!kpis.length) kpis = defaultKpis();
+
+    let services = extractServices(latestMetrics, serviceDocs);
     if (!services.length) services = defaultServices();
+
+    let alerts = alertDocs.map(mapAlertDoc);
     if (!alerts.length) alerts = [
       { id: 'al-1', severity: 'high', module: 'Sistema', message: 'Sin datos de métricas (modo demo)', timestamp: formatDateTime(new Date()), resolved: false },
     ];
-    if (!tasks.length) tasks = [
-      { id: 'tk-1', title: 'Revisar reportes semanales', completed: false, priority: 'medium', dueDate: formatDateOnly(new Date()) },
-    ];
+    const tasks = taskDocs.map(mapTaskDoc);
+    const newTasks = Array.isArray(realtime?.newTasks) ? realtime.newTasks : [];
+    const meta = realtime?.meta || latestMetrics?.meta || null;
 
     res.json({
       kpis,
       services,
       alerts,
       tasks,
+      newTasks,
       fetchedAt: new Date().toISOString(),
-      source: latestMetrics ? 'firestore' : 'empty',
+      source: realtime ? 'realtime' : (latestMetrics ? 'firestore' : 'empty'),
+      meta,
     });
   } catch (error) {
     logger.error('[admin-dashboard] overview error', error);
@@ -424,7 +895,11 @@ router.post('/integrations/:id/retry', async (req, res) => {
       incidents: Number.isFinite(data.incidents) ? data.incidents : 0,
     };
 
-    await writeAudit(req, 'ADMIN_INTEGRATION_RETRY', { resourceType: 'integration', resourceId: id, payload: { status: service.status, latency: service.latency } });
+    await writeAdminAudit(req, 'ADMIN_INTEGRATION_RETRY', {
+      resourceType: 'integration',
+      resourceId: id,
+      payload: { status: service.status, latency: service.latency },
+    });
     return res.json({ service });
   } catch (error) {
     logger.error('[admin-dashboard] integrations retry error', error);
@@ -436,16 +911,78 @@ router.get('/metrics', async (_req, res) => {
   try {
     const metricsDocs = await getCollectionDocs('metrics', { orderBy: 'date', limit: 1 });
     const latest = metricsDocs.length ? metricsDocs[0].data() : null;
-    const series = ensureArray(latest?.series);
+    let series = ensureArray(latest?.series);
     const funnel = latest?.funnel || [
       { label: 'Visitantes', value: 0, percentage: '100%' },
       { label: 'Registrados', value: 0, percentage: '0%' },
       { label: 'Bodas activas', value: 0, percentage: '0%' },
     ];
-    const iaCosts = ensureArray(latest?.aiCosts);
+    let iaCosts = ensureArray(latest?.aiCosts);
     const communications = ensureArray(latest?.communications);
     const supportMetrics = latest?.supportMetrics || null;
-    res.json({ series, funnel, iaCosts, communications, supportMetrics });
+    // userStats / weddingStats en tiempo real (best-effort)
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * DAY_MS);
+    const sevenTimestamp = admin.firestore.Timestamp.fromDate(sevenDaysAgo);
+      const usersTotal = await countDocuments(collections.users);
+    const usersActive7d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: sevenTimestamp }]);
+    // Weddings: intentar raíz y luego grupo
+    let weddingsTotal = await countDocuments(collections.weddings);
+    if (!weddingsTotal) {
+      try { weddingsTotal = await countDocuments(collections.weddingsGroup); } catch { weddingsTotal = 0; }
+    }
+    let weddingsActive = await countDocuments(collections.weddings, [{ field: 'status', op: '==', value: 'active' }]);
+    if (!weddingsActive) {
+      try { weddingsActive = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch { weddingsActive = 0; }
+    }
+    // plannerIds puede no existir en subcolecciones; mantener best-effort con raíz
+    const withPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '!=', value: [] }]).catch(() => 0);
+    const withoutPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '==', value: [] }]).catch(() => 0);
+
+    // Completar series/iaCosts con datos reales si no hay documento de métricas
+    if (!Array.isArray(series) || series.length === 0) {
+      try {
+        const usersDaily = await aggregateDailyActiveUsers(30);
+        series = [
+          {
+            id: 'usersActiveDaily',
+            label: 'Usuarios activos (diario)',
+            data: usersDaily,
+          },
+        ];
+      } catch (e) {
+        series = [];
+      }
+    }
+    if (!Array.isArray(iaCosts) || iaCosts.length === 0) {
+      try {
+        const revenueDaily = await aggregateDailyRevenue(30);
+        iaCosts = [
+          {
+            id: 'revenueDaily',
+            label: 'Ingresos diarios',
+            currency: 'EUR',
+            data: revenueDaily,
+          },
+        ];
+      } catch (e) {
+        iaCosts = [];
+      }
+    }
+    const userStats = {
+      total: usersTotal,
+      active7d: usersActive7d,
+      byRole: { owner: 0, planner: 0, assistant: 0 },
+      source: 'realtime',
+    };
+    const weddingStats = {
+      total: weddingsTotal,
+      active: weddingsActive,
+      withPlanner,
+      withoutPlanner,
+      source: 'realtime',
+    };
+    res.json({ series, funnel, iaCosts, communications, supportMetrics, userStats, weddingStats });
   } catch (error) {
     logger.error('[admin-dashboard] metrics error', error);
     res.status(500).json({ error: 'admin_dashboard_metrics_failed' });
@@ -454,15 +991,97 @@ router.get('/metrics', async (_req, res) => {
 
 router.get('/portfolio', async (req, res) => {
   try {
-    const limit = Math.min(Number(req.query.limit) || 100, MAX_LIMIT);
-    const weddingDocs = await getCollectionDocs('weddings', { orderBy: 'eventDate', limit });
-    let weddings = weddingDocs.map(mapWeddingDoc);
-    if (!weddings.length) {
-      weddings = [
-        { id: 'wd-1', couple: 'Pareja Demo', owner: 'owner@lovenda.com', eventDate: formatDateOnly(new Date()), status: 'active', confirmedGuests: 0, signedContracts: 0, lastUpdate: formatDateOnly(new Date()) },
-      ];
+    const limitRaw = Number(req.query.limit);
+    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(limitRaw, 1), 500) : 200;
+
+    const rawStatus = typeof req.query.status === 'string' ? req.query.status.trim().toLowerCase() : '';
+    const statusFilter = rawStatus && rawStatus !== 'all' ? rawStatus : null;
+
+    const parseDateParam = (value) => {
+      if (typeof value !== 'string' || !value.trim()) return null;
+      const date = new Date(value.trim());
+      return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const fromDateInput = parseDateParam(req.query.fromDate || req.query.startDate);
+    const toDateInput = parseDateParam(req.query.toDate || req.query.endDate);
+
+    let query = collections.weddings();
+    if (statusFilter) query = query.where('status', '==', statusFilter);
+
+    if (fromDateInput) {
+      query = query.where('eventDate', '>=', admin.firestore.Timestamp.fromDate(fromDateInput));
     }
-    res.json({ items: weddings, count: weddings.length });
+
+    if (toDateInput) {
+      const endOfDay = new Date(toDateInput.getTime());
+      endOfDay.setHours(23, 59, 59, 999);
+      query = query.where('eventDate', '<=', admin.firestore.Timestamp.fromDate(endOfDay));
+    }
+
+    let orderField = 'eventDate';
+    const orderDirection = String(req.query.order || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc';
+
+    try {
+      query = query.orderBy(orderField, orderDirection);
+    } catch (orderError) {
+      if (!fromDateInput && !toDateInput) {
+        logger.warn('[admin-dashboard] portfolio order fallback', { message: orderError?.message });
+        query = collections.weddings();
+        if (statusFilter) query = query.where('status', '==', statusFilter);
+        orderField = 'createdAt';
+        query = query.orderBy(orderField, orderDirection);
+      } else {
+        throw orderError;
+      }
+    }
+
+    let snap;
+    try {
+      snap = await query.limit(limit).get();
+    } catch (error) {
+      logger.warn('[admin-dashboard] portfolio primary query failed, applying fallback', { message: error?.message });
+      // 1) Fallback a raíz por createdAt
+      try {
+        let fallback = collections.weddings();
+        if (statusFilter) fallback = fallback.where('status', '==', statusFilter);
+        fallback = fallback.orderBy('createdAt', orderDirection);
+        snap = await fallback.limit(limit).get();
+      } catch (e1) {
+        // 2) Fallback a collectionGroup('weddings') por createdAt
+        try {
+          let g = collections.weddingsGroup();
+          if (statusFilter) g = g.where('status', '==', statusFilter);
+          try {
+            g = g.orderBy('createdAt', orderDirection);
+          } catch (eOrder) {
+            // si falla createdAt, probar updatedAt
+            g = collections.weddingsGroup();
+            if (statusFilter) g = g.where('status', '==', statusFilter);
+            g = g.orderBy('updatedAt', orderDirection);
+          }
+          snap = await g.limit(limit).get();
+        } catch (e2) {
+          // Último recurso: lista vacía
+          snap = { empty: true, docs: [] };
+        }
+      }
+    }
+    const items = snap.empty ? [] : snap.docs.map(mapWeddingDoc);
+
+    res.json({
+      items,
+      count: items.length,
+      meta: {
+        status: statusFilter || 'all',
+        order: orderDirection,
+        limit,
+        fromDate: fromDateInput ? formatDateOnly(fromDateInput) : null,
+        toDate: toDateInput ? formatDateOnly(toDateInput) : null,
+        count: items.length,
+        fetchedAt: new Date().toISOString(),
+      },
+    });
   } catch (error) {
     logger.error('[admin-dashboard] portfolio error', error);
     res.status(500).json({ error: 'admin_dashboard_portfolio_failed' });
@@ -610,7 +1229,7 @@ router.post('/tasks', async (req, res) => {
     const ref = await collections.tasks().add(data);
     const doc = await ref.get();
     const task = mapTaskDoc(doc);
-    await writeAudit(req, 'ADMIN_TASK_CREATE', { resourceType: 'adminTask', resourceId: ref.id, payload: { title: t } });
+    await writeAdminAudit(req, 'ADMIN_TASK_CREATE', { resourceType: 'adminTask', resourceId: ref.id, payload: { title: t } });
     return res.status(201).json({ id: ref.id, task });
   } catch (error) {
     logger.error('[admin-dashboard] create task error', error);
@@ -628,7 +1247,7 @@ async function updateTaskHandler(req, res) {
     if (typeof req.body?.title === 'string') patch.title = String(req.body.title).trim();
     patch.updatedAt = serverTs();
     await collections.tasks().doc(id).set(patch, { merge: true });
-    await writeAudit(req, 'ADMIN_TASK_UPDATE', { resourceType: 'adminTask', resourceId: id, payload: patch });
+    await writeAdminAudit(req, 'ADMIN_TASK_UPDATE', { resourceType: 'adminTask', resourceId: id, payload: patch });
     return res.json({ success: true });
   } catch (error) {
     logger.error('[admin-dashboard] update task error', error);
@@ -651,7 +1270,7 @@ router.post('/alerts/:id/resolve', async (req, res) => {
       resolvedBy,
       resolutionNotes: notes || admin.firestore.FieldValue.delete(),
     }, { merge: true });
-    await writeAudit(req, 'ADMIN_ALERT_RESOLVE', { resourceType: 'adminAlert', resourceId: id, payload: { notes } });
+    await writeAdminAudit(req, 'ADMIN_ALERT_RESOLVE', { resourceType: 'adminAlert', resourceId: id, payload: { notes } });
     return res.json({ success: true });
   } catch (error) {
     logger.error('[admin-dashboard] resolve alert error', error);
@@ -673,7 +1292,7 @@ async function updateFlagHandler(req, res) {
     await collections.featureFlags().doc(id).set(patch, { merge: true });
     const doc = await collections.featureFlags().doc(id).get();
     const flag = mapFeatureFlagDoc(doc);
-    await writeAudit(req, 'ADMIN_FLAG_UPDATE', { resourceType: 'featureFlag', resourceId: id, payload: { enabled: patch.enabled } });
+    await writeAdminAudit(req, 'ADMIN_FLAG_UPDATE', { resourceType: 'featureFlag', resourceId: id, payload: { enabled: patch.enabled } });
     return res.json({ success: true, flag });
   } catch (error) {
     logger.error('[admin-dashboard] update flag error', error);
@@ -692,7 +1311,7 @@ router.post('/settings/secrets/:id/rotate', async (req, res) => {
       lastRotatedAt: serverTs(),
       rotatedBy: getActor(req),
     }, { merge: true });
-    await writeAudit(req, 'ADMIN_SECRET_ROTATE', { resourceType: 'secret', resourceId: id });
+    await writeAdminAudit(req, 'ADMIN_SECRET_ROTATE', { resourceType: 'secret', resourceId: id });
     return res.json({ success: true });
   } catch (error) {
     logger.error('[admin-dashboard] rotate secret error', error);
@@ -707,7 +1326,7 @@ router.put('/settings/templates/:id', async (req, res) => {
     const content = typeof req.body?.content === 'string' ? req.body.content : null;
     if (!id || content == null) return res.status(400).json({ error: 'template_id_and_content_required' });
     await collections.templates().doc(id).set({ content, updatedAt: serverTs() }, { merge: true });
-    await writeAudit(req, 'ADMIN_TEMPLATE_SAVE', { resourceType: 'template', resourceId: id });
+    await writeAdminAudit(req, 'ADMIN_TEMPLATE_SAVE', { resourceType: 'template', resourceId: id });
     return res.json({ success: true });
   } catch (error) {
     logger.error('[admin-dashboard] save template error', error);
@@ -735,11 +1354,173 @@ router.post('/broadcasts', async (req, res) => {
     const ref = await collections.broadcasts().add(data);
     const doc = await ref.get();
     const item = mapBroadcastDoc(doc);
-    await writeAudit(req, 'ADMIN_BROADCAST_CREATE', { resourceType: 'broadcast', resourceId: ref.id, payload: { subject: tSubject } });
+    await writeAdminAudit(req, 'ADMIN_BROADCAST_CREATE', { resourceType: 'broadcast', resourceId: ref.id, payload: { subject: tSubject } });
     return res.status(201).json({ id: ref.id, item });
   } catch (error) {
     logger.error('[admin-dashboard] create broadcast error', error);
     return res.status(500).json({ error: 'admin_broadcast_create_failed' });
+  }
+});
+
+// --- Users role summary ---
+router.get('/users/role-summary', async (_req, res) => {
+  const started = Date.now();
+  try {
+    const snap = await collections.users().limit(2000).get();
+    const roles = { owner: 0, planner: 0, assistant: 0 };
+    let scanned = 0;
+    for (const doc of snap.docs) {
+      scanned += 1;
+      const r = String((doc.data() || {}).role || '').toLowerCase();
+      if (r.includes('planner')) roles.planner += 1;
+      else if (r.includes('assistant')) roles.assistant += 1;
+      else roles.owner += 1;
+    }
+    const durationMs = Date.now() - started;
+    return res.json({
+      generatedAt: new Date().toISOString(),
+      durationMs,
+      scanned,
+      totals: { total: scanned, real: scanned, excluded: 0 },
+      roles: {
+        owner: { label: 'Owners', total: roles.owner, real: roles.owner, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+        planner: { label: 'Wedding planners', total: roles.planner, real: roles.planner, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+        assistant: { label: 'Assistants', total: roles.assistant, real: roles.assistant, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+      },
+      filters: { allowedStatuses: [], excludedEmailSuffixes: [], excludedEmailPrefixes: [], excludedEmailContains: [], excludedTags: [], excludedBooleanKeys: [] },
+      source: 'firestore',
+      error: '',
+    });
+  } catch (error) {
+    logger.warn('[admin-dashboard] role-summary error', error);
+    const durationMs = Date.now() - started;
+    return res.json({
+      generatedAt: new Date().toISOString(),
+      durationMs,
+      scanned: 0,
+      totals: { total: 0, real: 0, excluded: 0 },
+      roles: {
+        owner: { label: 'Owners', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+        planner: { label: 'Wedding planners', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+        assistant: { label: 'Assistants', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
+      },
+      filters: { allowedStatuses: [], excludedEmailSuffixes: [], excludedEmailPrefixes: [], excludedEmailContains: [], excludedTags: [], excludedBooleanKeys: [] },
+      source: 'fallback',
+      error: 'role_summary_failed',
+    });
+  }
+});
+
+// --- Discounts ---
+router.get('/discounts', async (_req, res) => {
+  try {
+    const docs = await getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 });
+    const items = docs.map((d) => {
+      const data = d.data() || {};
+      return {
+        id: d.id,
+        code: data.code || d.id,
+        uses: Number(data.uses || 0),
+        revenue: Number(data.revenue || 0),
+        currency: data.currency || 'EUR',
+        status: data.status || 'active',
+        createdAt: formatDateTime(data.createdAt),
+      };
+    });
+    const summary = items.reduce(
+      (acc, it) => {
+        acc.totalLinks += 1;
+        acc.totalUses += it.uses;
+        acc.totalRevenue += it.revenue;
+        return acc;
+      },
+      { totalLinks: 0, totalUses: 0, totalRevenue: 0, currency: 'EUR' },
+    );
+    return res.json({ items, summary });
+  } catch (error) {
+    logger.error('[admin-dashboard] discounts error', error);
+    return res.status(500).json({ error: 'admin_dashboard_discounts_failed' });
+  }
+});
+
+// --- Task Templates CRUD (mínimo) ---
+const TaskTemplateSchema = z.object({
+  version: z.string().min(1).default(() => `v${Date.now()}`),
+  status: z.enum(['draft', 'published', 'archived']).default('draft'),
+  name: z.string().min(1),
+  notes: z.string().optional(),
+  updatedBy: z.string().optional(),
+  blocks: z.array(z.any()).default([]),
+});
+
+router.get('/task-templates', async (req, res) => {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 50, 200);
+    const status = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+    let ref = collections.taskTemplates();
+    if (status) ref = ref.where('status', '==', status);
+    const snap = await ref.orderBy('updatedAt', 'desc').limit(limit).get();
+    const templates = snap.empty
+      ? []
+      : snap.docs.map((d) => ({ id: d.id, ...(d.data() || {}), updatedAt: formatDateTime(d.data()?.updatedAt) }));
+    return res.json({ templates, meta: { limit, status: status || 'all' } });
+  } catch (error) {
+    logger.error('[admin-dashboard] task-templates list error', error);
+    return res.status(500).json({ error: 'task_templates_list_failed' });
+  }
+});
+
+router.post('/task-templates', async (req, res) => {
+  try {
+    const parsed = TaskTemplateSchema.safeParse(req.body || {});
+    if (!parsed.success) return res.status(400).json({ error: 'invalid_template_payload' });
+    const payload = parsed.data;
+    const toSave = {
+      ...payload,
+      updatedAt: serverTs(),
+      updatedBy: getActor(req),
+    };
+    const ref = await collections.taskTemplates().add(toSave);
+    await writeAdminAudit(req, 'ADMIN_TASK_TEMPLATE_SAVE', { resourceType: 'taskTemplate', resourceId: ref.id });
+    return res.status(201).json({ id: ref.id, template: { id: ref.id, ...payload } });
+  } catch (error) {
+    logger.error('[admin-dashboard] task-templates create error', error);
+    return res.status(500).json({ error: 'task_templates_create_failed' });
+  }
+});
+
+router.post('/task-templates/:id/publish', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'template_id_required' });
+    // Archivar otras publicadas y publicar esta
+    const batch = db.batch();
+    const all = await collections.taskTemplates().get();
+    for (const d of all.docs) {
+      const st = (d.data() || {}).status || 'draft';
+      const patch = d.id === id ? { status: 'published' } : (st === 'published' ? { status: 'archived' } : {});
+      if (Object.keys(patch).length) batch.set(d.ref, { ...patch, updatedAt: serverTs(), updatedBy: getActor(req) }, { merge: true });
+    }
+    await batch.commit();
+    await writeAdminAudit(req, 'ADMIN_TASK_TEMPLATE_PUBLISH', { resourceType: 'taskTemplate', resourceId: id });
+    return res.json({ success: true });
+  } catch (error) {
+    logger.error('[admin-dashboard] task-templates publish error', error);
+    return res.status(500).json({ error: 'task_templates_publish_failed' });
+  }
+});
+
+router.post('/task-templates/:id/preview', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'template_id_required' });
+    const doc = await collections.taskTemplates().doc(id).get();
+    if (!doc.exists) return res.status(404).json({ error: 'template_not_found' });
+    const data = doc.data() || {};
+    return res.json({ id, blocks: Array.isArray(data.blocks) ? data.blocks : [], meta: { version: data.version || '', status: data.status || 'draft' } });
+  } catch (error) {
+    logger.error('[admin-dashboard] task-templates preview error', error);
+    return res.status(500).json({ error: 'task_templates_preview_failed' });
   }
 });
 

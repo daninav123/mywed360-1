@@ -48,12 +48,27 @@ const cfg = parsed.success ? parsed.data : {
 
 const isProd = String(cfg.NODE_ENV).toLowerCase() === 'production';
 
+// Always allow known frontend domains even if ALLOWED_ORIGIN is misconfigured.
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:4173',
+  'http://127.0.0.1:4173',
+  'https://mywed360.netlify.app',
+  'https://mywed360.web.app',
+  'https://app.mywed360.com',
+  'https://lovenda.mywed360.com',
+].filter(Boolean);
+
 // Derived values
 const PORT = cfg.PORT ? Number(cfg.PORT) : 4004;
-const ALLOWED_ORIGINS = String(cfg.ALLOWED_ORIGIN)
+const envAllowedOrigins = String(cfg.ALLOWED_ORIGIN || '')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
+const ALLOWED_ORIGINS = Array.from(
+  new Set([...DEFAULT_ALLOWED_ORIGINS, ...envAllowedOrigins])
+);
 
 const RATE_LIMIT_AI = cfg.RATE_LIMIT_AI_MAX
   ? Number(cfg.RATE_LIMIT_AI_MAX)

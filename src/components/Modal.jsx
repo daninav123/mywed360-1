@@ -35,9 +35,9 @@ export default function Modal({
       aria-modal="true"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/40 z-0" />
       <div
-        className={`relative w-full ${sizeClasses[size] || sizeClasses.md} max-h-[90vh] flex flex-col rounded-lg shadow-lg border border-soft bg-[var(--color-surface)] text-[color:var(--color-text)] ${className}`}
+        className={`relative z-10 w-full ${sizeClasses[size] || sizeClasses.md} max-h-[90vh] flex flex-col rounded-lg shadow-lg border border-soft bg-[var(--color-surface)] text-[color:var(--color-text)] ${className}`}
         onClick={(e) => e.stopPropagation()}
         {...rest}
       >

@@ -44,7 +44,9 @@
 
 
 ## Cobertura E2E implementada
-- No hay pruebas end-to-end específicas implementadas para este flujo.
+- `cypress/e2e/protocolo/legal-docs-generator.cy.js`: smoke del generador de documentos con PDF local.
+- `cypress/e2e/protocolo/legal-docs-validation.cy.js`: cubre validaciones del formulario antes de generar el documento.
+- `cypress/e2e/protocolo/legal-docs-versioning.cy.js`: verifica versionado, historial y descarga posterior.
 
 ## 10. Checklist de despliegue
 - Verificar compatibilidad jsPDF en navegadores soportados.
@@ -78,3 +80,5 @@
 - Wrapper sobre jsPDF que permita inyectar stub en Cypress (ej. exportar `createLegalDoc` y mockear).
 - Fuente de fecha actual consistente para historial (usar `Date.now()` pero exponer `Date.now = cy.stub`).
 - Fixtures de datos (`cypress/fixtures/legal-docs.json`) para reutilizar nombres y validar copy.
+
+

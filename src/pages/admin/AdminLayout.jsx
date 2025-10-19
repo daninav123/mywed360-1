@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { ADMIN_ALLOWED_PATHS, ADMIN_NAVIGATION } from '../../config/adminNavigation';
 import { useAuth } from '../../hooks/useAuth';
-import { recordAdminAudit } from '../../services/adminAuditService';
 
 const normalizePath = (pathname) => {
   if (!pathname) return '/admin';
@@ -11,60 +10,74 @@ const normalizePath = (pathname) => {
   return pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
 };
 
+const REFRESH_INTERVAL_MS = 60_000;
+
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, userProfile } = useAuth();
   const lastAuditRef = useRef('');
+  const [lastRefresh, setLastRefresh] = useState(() => new Date());
+  const [showHelp, setShowHelp] = useState(false);
+
+  const supportEmail = useMemo(
+    () =>
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_EMAIL) ||
+      'soporte@lovenda.com',
+    [],
+  );
+  const supportPhone = useMemo(
+    () =>
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_SUPPORT_PHONE) ||
+      '+34 900 000 000',
+    [],
+  );
+  const securityLink = useMemo(
+    () =>
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SECURITY_POLICY_URL) ||
+      'https://lovenda.com/security',
+    [],
+  );
+  const adminVersion = useMemo(
+    () =>
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ADMIN_VERSION) || 'v1.0.0',
+    [],
+  );
 
   const breadcrumbs = useMemo(() => {
     const parts = location.pathname.replace(/^\/admin\/?/, '').split('/').filter(Boolean);
     if (parts.length === 0) {
-      return ['Administración', 'Dashboard'];
+      return ['Administracion', 'Dashboard'];
     }
-    return ['Administración', ...parts];
+    return ['Administracion', ...parts];
+  }, [location.pathname]);
+  const formattedRefreshTime = useMemo(() => {
+    try {
+      return lastRefresh.toLocaleTimeString('es-ES', { hour12: false });
+    } catch {
+      return lastRefresh.toLocaleTimeString();
+    }
+  }, [lastRefresh]);
+
+  useEffect(() => {
+    setLastRefresh(new Date());
   }, [location.pathname]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.Cypress) {
-      return;
+    if (typeof window === 'undefined') {
+      return undefined;
     }
-
-    const email = userProfile?.email;
-    if (!email) {
-      return;
-    }
-
-    const normalized = normalizePath(location.pathname);
-    if (!ADMIN_ALLOWED_PATHS.has(normalized)) {
-      return;
-    }
-
-    const cacheKey = `${email}:${normalized}`;
-    if (lastAuditRef.current === cacheKey) {
-      return;
-    }
-
-    lastAuditRef.current = cacheKey;
-
-    recordAdminAudit('ADMIN_ROUTE_VISIT', {
-      actor: email,
-      resourceType: 'route',
-      metadata: {
-        path: normalized,
-      },
-    }).catch((error) => {
-      if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
-        console.warn('[AdminLayout] No se pudo registrar la visita admin:', error);
-      }
-    });
-  }, [location.pathname, userProfile?.email]);
+    const intervalId = window.setInterval(() => {
+      setLastRefresh(new Date());
+    }, REFRESH_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Error al cerrar sesión admin:', error);
+      console.error('Error al cerrar sesion admin:', error);
     }
     navigate('/admin/login', { replace: true });
   };
@@ -74,7 +87,7 @@ const AdminLayout = () => {
       <div className="flex min-h-screen">
         <aside className="hidden lg:flex lg:w-72 flex-col border-r border-soft bg-surface">
           <div className="px-6 py-5 border-b border-soft">
-            <h2 className="text-lg font-semibold">Lovenda Admin</h2>
+            <h2 className="text-lg font-semibold">MaLove.App Admin</h2>
             <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Control del proyecto</p>
           </div>
           <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
@@ -102,27 +115,40 @@ const AdminLayout = () => {
               </div>
             ))}
           </nav>
-          <div className="px-6 py-4 border-t border-soft text-xs text-[var(--color-text-soft,#6b7280)]">
-            <p>Versión v1.0.0</p>
-            <p>© {new Date().getFullYear()} Lovenda</p>
+          <div className="px-6 py-4 border-t border-soft text-xs text-[var(--color-text-soft,#6b7280)] space-y-1">
+            <p>Version {adminVersion}</p>
+            <a
+              href={securityLink}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[color:var(--color-primary,#6366f1)] hover:underline"
+            >
+              Politicas de seguridad
+            </a>
+            <p>&copy; {new Date().getFullYear()} MaLove.App</p>
           </div>
         </aside>
 
         <main className="flex-1 flex flex-col">
           <header className="border-b border-soft bg-surface">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center gap-2 text-sm text-[var(--color-text-soft,#6b7280)]">
-                {breadcrumbs.map((crumb, index) => (
-                  <React.Fragment key={crumb + '-' + index}>
-                    {index > 0 && <span>/</span>}
-                    <span className={index === breadcrumbs.length - 1 ? 'text-[var(--color-text,#111827)] font-medium' : ''}>
-                      {crumb}
-                    </span>
-                  </React.Fragment>
-                ))}
+            <div className="flex flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm text-[var(--color-text-soft,#6b7280)]">
+                  {breadcrumbs.map((crumb, index) => (
+                    <React.Fragment key={crumb + '-' + index}>
+                      {index > 0 && <span>/</span>}
+                      <span className={index === breadcrumbs.length - 1 ? 'text-[var(--color-text,#111827)] font-medium' : ''}>
+                        {crumb}
+                      </span>
+                    </React.Fragment>
+                  ))}
+                </div>
+                <div className="text-xs text-[var(--color-text-soft,#6b7280)]" data-testid="admin-last-refresh">
+                  Ultima actualizacion {formattedRefreshTime}
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:flex flex-col text-right text-xs text-[var(--color-text-soft,#6b7280)]">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                <span className="flex flex-col text-right text-xs text-[var(--color-text-soft,#6b7280)]">
                   <strong className="text-sm text-[var(--color-text,#111827)]">
                     {userProfile?.name || 'Administrador'}
                   </strong>
@@ -130,11 +156,19 @@ const AdminLayout = () => {
                 </span>
                 <button
                   type="button"
+                  data-testid="admin-help-button"
+                  onClick={() => setShowHelp(true)}
+                  className="rounded-md border border-soft px-3 py-2 text-sm font-medium text-[color:var(--color-primary,#6366f1)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                >
+                  Ayuda
+                </button>
+                <button
+                  type="button"
                   data-testid="admin-logout-button"
                   onClick={handleLogout}
                   className="rounded-md border border-soft px-3 py-2 text-sm font-medium text-[var(--color-text,#111827)] hover:bg-[var(--color-bg-soft,#f3f4f6)]"
                 >
-                  Cerrar sesión
+                  Cerrar sesion
                 </button>
               </div>
             </div>
@@ -146,6 +180,49 @@ const AdminLayout = () => {
           </div>
         </main>
       </div>
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" data-testid="admin-help-modal">
+          <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">Centro de ayuda</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Si necesitas soporte, escribe a{' '}
+                <a className="underline" href={`mailto:${supportEmail}`}>
+                  {supportEmail}
+                </a>{' '}
+                o llama al{' '}
+                <a className="underline" href={`tel:${supportPhone}`}>
+                  {supportPhone}
+                </a>
+                .
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 text-sm">
+              <a
+                href={`mailto:${supportEmail}`}
+                className="rounded-md border border-soft px-3 py-2 text-center hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              >
+                Contactar por email
+              </a>
+              <a
+                href={`tel:${supportPhone}`}
+                className="rounded-md border border-soft px-3 py-2 text-center hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              >
+                Llamar a soporte
+              </a>
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowHelp(false)}
+                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

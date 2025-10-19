@@ -1,0 +1,449 @@
+import React, { useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, CheckCircle2, LogOut } from 'lucide-react';
+
+import MarketingLayout from '../../components/marketing/MarketingLayout';
+import RegisterForm from '../../components/auth/RegisterForm';
+import SocialLoginButtons from '../../components/auth/SocialLoginButtons';
+import { useAuth } from '../../hooks/useAuth';
+
+const DEFAULT_PROVIDERS = ['google', 'facebook', 'apple'];
+
+const Access = ({ defaultMode = 'login' }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const {
+    login,
+    loginWithProvider,
+    register: registerWithEmail,
+    registerWithProvider,
+    availableSocialProviders,
+    getProviderLabel,
+    isAuthenticated,
+    isLoading,
+    logout,
+  } = useAuth();
+
+  const initialMode =
+    location.state?.signupMode === true
+      ? 'signup'
+      : location.state?.signupMode === false
+      ? 'login'
+      : defaultMode;
+  const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'login');
+
+  const savedEmail =
+    typeof window !== 'undefined' ? window.localStorage.getItem('mywed360_login_email') || '' : '';
+
+  const [loginEmail, setLoginEmail] = useState(savedEmail);
+  const [loginPassword, setLoginPassword] = useState('');
+  const [rememberLogin, setRememberLogin] = useState(Boolean(savedEmail));
+  const [loginError, setLoginError] = useState('');
+  const [loginInfo, setLoginInfo] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginBusyProvider, setLoginBusyProvider] = useState(null);
+
+  const loginEmailRef = useRef(null);
+  const loginPasswordRef = useRef(null);
+
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupRole, setSignupRole] = useState('particular');
+  const [signupError, setSignupError] = useState('');
+  const [signupInfo, setSignupInfo] = useState('');
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [signupBusyProvider, setSignupBusyProvider] = useState(null);
+
+  const signupEmailRef = useRef(null);
+  const signupPasswordRef = useRef(null);
+  const signupRoleRef = useRef(null);
+
+  const redirectPath =
+    location?.state?.from?.pathname && location.state.from.pathname !== '/'
+      ? location.state.from.pathname
+      : '/home';
+
+  const providers = useMemo(
+    () => (availableSocialProviders?.length ? availableSocialProviders : DEFAULT_PROVIDERS),
+    [availableSocialProviders]
+  );
+
+  const resetFeedback = () => {
+    setLoginError('');
+    setLoginInfo('');
+    setSignupError('');
+    setSignupInfo('');
+  };
+
+  const handleModeChange = (value) => {
+    resetFeedback();
+    setMode(value);
+  };
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+    setLoginError('');
+    setLoginInfo('');
+
+    const trimmedEmail = loginEmail.trim();
+    if (!trimmedEmail) {
+      setLoginError('Introduce tu correo electronico.');
+      loginEmailRef.current?.focus();
+      return;
+    }
+    if (!loginPassword) {
+      setLoginError('Introduce tu contrasena.');
+      loginPasswordRef.current?.focus();
+      return;
+    }
+
+    setIsLoggingIn(true);
+    try {
+      const result = await login(trimmedEmail, loginPassword);
+      if (result?.success) {
+        if (typeof window !== 'undefined') {
+          if (rememberLogin) {
+            window.localStorage.setItem('mywed360_login_email', trimmedEmail);
+          } else {
+            window.localStorage.removeItem('mywed360_login_email');
+          }
+        }
+        navigate(redirectPath, { replace: true });
+        return;
+      }
+
+      const errorMessage =
+        result?.error ||
+        'No pudimos iniciar sesion con esos datos. Revisa la informacion e intentalo de nuevo.';
+      setLoginError(errorMessage);
+      loginPasswordRef.current?.focus();
+    } catch (error) {
+      setLoginError(error?.message || 'No pudimos iniciar sesion. Intenta nuevamente.');
+      loginPasswordRef.current?.focus();
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleLoginProvider = async (provider) => {
+    setLoginError('');
+    setLoginInfo('');
+    setLoginBusyProvider(provider);
+    try {
+      const label = getProviderLabel?.(provider) || provider;
+      setLoginInfo(`Redirigiendo a ${label}...`);
+      await loginWithProvider(provider);
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      setLoginError(error?.message || 'No pudimos autenticarte con ese proveedor.');
+    } finally {
+      setLoginBusyProvider(null);
+    }
+  };
+
+  const handleSignupSubmit = async (event) => {
+    event.preventDefault();
+    setSignupError('');
+    setSignupInfo('');
+
+    const trimmedEmail = signupEmail.trim();
+    if (!trimmedEmail) {
+      setSignupError('Introduce un correo electronico valido.');
+      signupEmailRef.current?.focus();
+      return;
+    }
+    if (!signupPassword) {
+      setSignupError('Necesitas una contrasena para crear tu cuenta.');
+      signupPasswordRef.current?.focus();
+      return;
+    }
+    if (signupPassword.length < 8) {
+      setSignupError('La contrasena debe tener al menos 8 caracteres.');
+      signupPasswordRef.current?.focus();
+      return;
+    }
+
+    setIsSigningUp(true);
+    try {
+      const result = await registerWithEmail(trimmedEmail, signupPassword, signupRole);
+      if (result?.success) {
+        setSignupInfo('Cuenta creada con exito. Redirigiendo a tu panel...');
+        navigate('/home', { replace: true });
+        return;
+      }
+
+      const errorMessage =
+        result?.error ||
+        'No pudimos crear tu cuenta. Revisa los datos o intenta con otro correo electronico.';
+      setSignupError(errorMessage);
+      signupPasswordRef.current?.focus();
+    } catch (error) {
+      setSignupError(error?.message || 'No pudimos crear tu cuenta. Intenta nuevamente.');
+      signupPasswordRef.current?.focus();
+    } finally {
+      setIsSigningUp(false);
+    }
+  };
+
+  const handleSignupProvider = async (provider) => {
+    setSignupError('');
+    setSignupInfo('');
+    setSignupBusyProvider(provider);
+    try {
+      const label = getProviderLabel?.(provider) || provider;
+      setSignupInfo(`Redirigiendo a ${label} para completar el registro...`);
+      await registerWithProvider(provider, { role: signupRole });
+      navigate('/home', { replace: true });
+    } catch (error) {
+      setSignupError(error?.message || 'No pudimos conectar con ese proveedor.');
+    } finally {
+      setSignupBusyProvider(null);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      resetFeedback();
+      setMode('login');
+    } catch (error) {
+      setLoginError(error?.message || 'No pudimos cerrar tu sesion. Intenta de nuevo.');
+    }
+  };
+
+  const alreadyLoggedIn = isAuthenticated && !isLoading;
+
+  return (
+    <MarketingLayout>
+      <div className="layout-container space-y-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 rounded-full border border-soft bg-surface px-3 py-1 text-xs font-medium text-muted transition hover:text-body"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Volver a inicio
+        </Link>
+
+        <section className="overflow-hidden rounded-3xl border border-soft bg-surface/95 shadow-lg shadow-[var(--color-primary)]/15">
+          <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
+            <div className="space-y-5">
+              <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
+                Bienvenido a MaLove.App
+              </span>
+              <h1 className="text-4xl font-semibold leading-snug text-body md:text-5xl">
+                Gestiona tu boda desde un unico panel.
+              </h1>
+              <p className="text-base text-muted">
+                Accede a tus invitados, tareas, presupuestos y contratos en segundos. Sigue el progreso del evento, coordina proveedores y mantente al tanto de todo tu equipo.
+              </p>
+              <div className="flex flex-wrap gap-2 text-xs text-muted">
+                {['Checklists inteligentes', 'Reportes instantaneos', 'Comunicacion centralizada'].map(
+                  (tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-soft bg-surface px-3 py-1"
+                    >
+                      {tag}
+                    </span>
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-soft bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/20">
+              {alreadyLoggedIn ? (
+                <div className="space-y-6 text-center">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
+                    <CheckCircle2 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-body">Sesion activa</h3>
+                    <p className="mt-2 text-sm text-muted">
+                      Ya tienes tu cuenta MaLove.App abierta. Puedes continuar con tus eventos o cerrar sesion si necesitas entrar con otra cuenta.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Link
+                      to="/home"
+                      className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95"
+                    >
+                      Ir al panel principal
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-4 py-2.5 text-sm font-semibold text-body transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Cerrar sesion
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="rounded-full bg-primary-soft/70 p-1 text-sm font-semibold text-muted">
+                    <div className="flex">
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange('login')}
+                        className={`w-1/2 rounded-full px-4 py-2 transition ${
+                          mode === 'login'
+                            ? 'bg-[var(--color-primary)] text-white shadow'
+                            : 'bg-transparent text-muted hover:text-body'
+                        }`}
+                      >
+                        Iniciar sesion
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange('signup')}
+                        className={`w-1/2 rounded-full px-4 py-2 transition ${
+                          mode === 'signup'
+                            ? 'bg-[var(--color-primary)] text-white shadow'
+                            : 'bg-transparent text-muted hover:text-body'
+                        }`}
+                      >
+                        Crear cuenta
+                      </button>
+                    </div>
+                  </div>
+
+                  {mode === 'login' ? (
+                    <form onSubmit={handleLoginSubmit} className="space-y-4 text-left" noValidate>
+                      <div className="space-y-2">
+                        <label htmlFor="access-login-email" className="text-sm font-medium text-body">
+                          Correo electronico
+                        </label>
+                        <input
+                          id="access-login-email"
+                          type="email"
+                          ref={loginEmailRef}
+                          value={loginEmail}
+                          onChange={(event) => setLoginEmail(event.target.value)}
+                          autoComplete="email"
+                          placeholder="tu@email.com"
+                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          aria-invalid={loginError ? 'true' : 'false'}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="access-login-password" className="text-sm font-medium text-body">
+                          Contrasena
+                        </label>
+                        <input
+                          id="access-login-password"
+                          type="password"
+                          ref={loginPasswordRef}
+                          value={loginPassword}
+                          onChange={(event) => setLoginPassword(event.target.value)}
+                          autoComplete="current-password"
+                          placeholder="Introduce tu contrasena"
+                          className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                          aria-invalid={loginError ? 'true' : 'false'}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-muted">
+                        <label className="inline-flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-soft text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                            checked={rememberLogin}
+                            onChange={(event) => setRememberLogin(event.target.checked)}
+                          />
+                          Recordarme
+                        </label>
+                        <Link to="/reset-password" className="text-[var(--color-primary)] hover:brightness-110">
+                          Olvide mi contrasena
+                        </Link>
+                      </div>
+
+                      {loginError ? (
+                        <p role="alert" className="text-sm text-[var(--color-primary)]">
+                          {loginError}
+                        </p>
+                      ) : null}
+                      {loginInfo ? (
+                        <p role="status" className="text-sm text-[var(--color-primary)]">
+                          {loginInfo}
+                        </p>
+                      ) : null}
+
+                      <button
+                        type="submit"
+                        disabled={isLoggingIn}
+                        className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isLoggingIn ? 'Ingresando...' : 'Entrar en MaLove.App'}
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="space-y-4 text-left">
+                      <RegisterForm
+                        email={signupEmail}
+                        password={signupPassword}
+                        role={signupRole}
+                        onEmailChange={setSignupEmail}
+                        onPasswordChange={setSignupPassword}
+                        onRoleChange={setSignupRole}
+                        onSubmit={handleSignupSubmit}
+                        isSubmitting={isSigningUp}
+                        error={signupError}
+                        emailInputRef={signupEmailRef}
+                        passwordInputRef={signupPasswordRef}
+                        roleSelectRef={signupRoleRef}
+                        errorId="marketing-signup-error"
+                      />
+                      {signupInfo ? (
+                        <p role="status" className="text-sm text-[var(--color-primary)]">
+                          {signupInfo}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
+
+                  <div className="border-t border-soft pt-6">
+                    <SocialLoginButtons
+                      providers={providers}
+                      onProviderClick={mode === 'login' ? handleLoginProvider : handleSignupProvider}
+                      busyProvider={mode === 'login' ? loginBusyProvider : signupBusyProvider}
+                      disabled={mode === 'login' ? isLoggingIn : isSigningUp}
+                    />
+                    <p className="mt-4 text-sm text-muted">
+                      {mode === 'login' ? (
+                        <>
+                          No tienes cuenta?{' '}
+                          <button
+                            type="button"
+                            className="font-semibold text-[var(--color-primary)] hover:brightness-110"
+                            onClick={() => handleModeChange('signup')}
+                          >
+                            Registrate aqui
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          Ya tienes cuenta?{' '}
+                          <button
+                            type="button"
+                            className="font-semibold text-[var(--color-primary)] hover:brightness-110"
+                            onClick={() => handleModeChange('login')}
+                          >
+                            Inicia sesion
+                          </button>
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+    </MarketingLayout>
+  );
+};
+
+export default Access;

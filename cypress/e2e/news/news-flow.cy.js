@@ -11,49 +11,61 @@ describe('Flujo 21 - Noticias del Sector (Blog)', () => {
   });
 
   it('carga artículos de noticias y añade más al hacer scroll', () => {
-    // Primer page (NewsAPI)
-    cy.intercept('GET', 'https://newsapi.org/v2/everything*', {
-      statusCode: 200,
-      body: {
-        articles: Array.from({ length: 10 }).map((_, i) => ({
-          title: `Titular boda ${i + 1}`,
-          description: `Descripción boda ${i + 1}`,
-          url: `https://ejemplo.com/boda-${i + 1}`,
-          urlToImage: null,
-          source: { name: 'Fuente Demo' },
-          publishedAt: new Date().toISOString()
-        }))
-      }
-    }).as('newsPage1');
+    const makeBatch = (prefix) =>
+      Array.from({ length: 10 }).map((_, i) => ({
+        id: `${prefix}-${i + 1}`,
+        title: `${prefix === 'main' ? 'Titular boda' : 'Titular boda extra'} ${i + 1}`,
+        description: `${prefix === 'main' ? 'Descripción boda' : 'Descripción boda extra'} ${i + 1}`,
+        url: `https://medio${prefix === 'main' ? '' : '-extra'}${i + 1}.demo/${prefix}-${i + 1}`,
+        image: `https://imagenes.ejemplo.com/${prefix}-${i + 1}.jpg`,
+        source: prefix === 'main' ? 'Fuente Demo' : 'Fuente Demo 2',
+        published: new Date().toISOString()
+      }));
 
-    cy.visit('/blog');
-    cy.wait('@newsPage1');
+    const callCounts = { total: 0 };
+
+    cy.intercept('GET', '**/api/wedding-news*', (req) => {
+      callCounts.total += 1;
+      const page = Number(req.query.page || '1');
+      const body = page === 1 ? makeBatch('main') : makeBatch('extra');
+      req.reply({ statusCode: 200, body });
+    }).as('weddingNews');
+
+    cy.visit('/blog', {
+      onBeforeLoad(win) {
+        let triggers = 0;
+        const OriginalIO = win.IntersectionObserver;
+        win.IntersectionObserver = class {
+          constructor(cb) {
+            this.cb = cb;
+          }
+          observe() {
+            if (triggers < 1) {
+              triggers += 1;
+              setTimeout(() => this.cb([{ isIntersecting: true }]), 0);
+            }
+          }
+          disconnect() {}
+          unobserve() {}
+          takeRecords() {
+            return [];
+          }
+        };
+        win.__OriginalIO__ = OriginalIO;
+      }
+    });
+    cy.wait('@weddingNews').its('request.url').should('include', 'page=1');
 
     // Debe renderizar 10 artículos
     cy.contains('h2', 'Titular boda 1', { timeout: 10000 }).should('exist');
-    cy.contains('h2', 'Titular boda 10').should('exist');
+    cy.get('[data-testid="blog-card"]').should('have.length', 10);
 
-    // Simular cargas adicionales: intercepts subsecuentes al hacer scroll
-    cy.intercept('GET', 'https://newsapi.org/v2/everything*', {
-      statusCode: 200,
-      body: {
-        articles: Array.from({ length: 10 }).map((_, i) => ({
-          title: `Titular boda extra ${i + 1}`,
-          description: `Descripción boda extra ${i + 1}`,
-          url: `https://ejemplo.com/boda-extra-${i + 1}`,
-          urlToImage: null,
-          source: { name: 'Fuente Demo 2' },
-          publishedAt: new Date().toISOString()
-        }))
-      }
-    }).as('newsMore');
+    cy.wait('@weddingNews', { timeout: 10000 });
 
-    // Scroll para disparar IntersectionObserver
-    cy.scrollTo('bottom');
-    cy.wait('@newsMore');
-
-    // Algún titular extra debería aparecer
-    cy.contains('h2', 'Titular boda extra 1', { timeout: 10000 }).should('exist');
+    // Debe haber más tarjetas tras cargar la siguiente página
+    cy.get('[data-testid="blog-card"]', { timeout: 10000 }).should('have.length', 20);
+    cy.wrap(null).then(() => {
+      expect(callCounts.total).to.be.greaterThan(1);
+    });
   });
 });
-

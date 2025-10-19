@@ -1,14 +1,14 @@
 {
-  "id": "/?app=mywed360-email",
-  "name": "MyWed360 Email",
-  "short_name": "MyWed360",
-  "description": "Correo unificado para tus bodas y proveedores en MyWed360.",
+  "id": "/?app=malove-email",
+  "name": "MaLove.App Email",
+  "short_name": "MaLove.App",
+  "description": "Correo unificado para tus bodas y proveedores en MaLove.App.",
   "lang": "es",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#F7F1E7",
   "theme_color": "#1d4ed8",
   "categories": ["communication", "productivity", "utilities"],
   "icons": [
@@ -40,7 +40,7 @@
     {
       "name": "Configurar correo",
       "short_name": "Setup",
-      "description": "Configurar dirección myWed360",
+      "description": "Configurar dirección MaLove.APP",
       "url": "/email/setup",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
@@ -65,4 +65,3 @@
     ]
   }
 }
-

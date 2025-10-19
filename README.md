@@ -1,6 +1,11 @@
-# MyWed360 – Monorepo (Frontend + Backend + Docs)
+# MaLove.APP – Monorepo (Frontend + Backend + Docs)
 
-MyWed360 – Monorepo (Frontend + Backend + Docs)
+MaLove.APP – Monorepo (Frontend + Backend + Docs)
+
+## Propósito del producto
+
+MaLove.App funciona como wedding planner digital. Capturamos el estilo, prioridades y restricciones únicas de cada boda para guiar a las parejas y planners hacia las mejores decisiones en cada etapa. El perfil de la boda alimenta las recomendaciones del checklist, los proveedores sugeridos, el presupuesto y los contenidos generados por IA.  
+Más detalles y playbooks en `docs/personalizacion/README.md`.
 
 Este repositorio contiene el frontend (React + Vite + Tailwind, PWA), el backend (Express) y documentación operativa. Sirve como punto de entrada para desarrollo local, CI/CD y despliegues.
 
@@ -38,6 +43,7 @@ Resumen de módulos:
 
 4) Documentación clave
    - Arquitectura: `docs/ARCHITECTURE.md`
+   - Personalización y recomendaciones: `docs/personalizacion/README.md`
    - Onboarding: `docs/ONBOARDING.md`
    - API (OpenAPI): `docs/api/openapi.yaml`
    - API (Ejemplos/Próximos endpoints): `docs/api/OPENAPI_NEXT.md`
@@ -72,6 +78,11 @@ Comandos de QA recomendados:
 - Validación de esquemas: `npm run validate:schemas`
 - Presupuesto de bundle: `npm run check:bundle`
 - Health/Coverage: `npm run test:coverage`
+
+- ### Mantenimiento del roadmap / cobertura E2E
+  - `npm run validate:roadmap`: ejecuta `aggregateRoadmap`, `debugSpecDiff` y `roadmapCrossCheck` para asegurar que documentación, tareas y specs físicas están sincronizadas.
+  - `node scripts/debugSpecDiff.js`: compara specs declaradas en la documentación (`roadmap_aggregated.json`) con las tareas de `roadmap.json` y los archivos reales en `cypress/e2e`. Útil para detectar desalineaciones puntuales.
+  - `node scripts/addOrphanSpecsToRoadmap.js`: toma los resultados del cross-check y crea tareas pendientes para cada spec huérfana. Ejecutarlo tras añadir nuevas suites o mover archivos.
 
 Cuándo ejecutarlos:
 - Pre-PR: lint + unit + validate:i18n + validate:schemas + cypress:run:seating

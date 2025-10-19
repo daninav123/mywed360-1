@@ -28,6 +28,7 @@ const chatDebug = (...args) => {
 // --- Configuración de memoria conversacional ---
 const MAX_MESSAGES = 50; // Cuántos mensajes â€œfrescosâ€ mantener en memoria corta
 const SHORT_HISTORY = 6; // Cuántos mensajes recientes se envían a la IA
+const IS_CYPRESS_E2E = typeof window !== 'undefined' && !!window.Cypress;
 
 // Función para normalizar texto de categoría: elimina acentos y convierte a mayúsculas
 const normalizeCategory = (cat = 'OTROS') =>
@@ -48,6 +49,8 @@ const guessCategory = (title = '') => {
 };
 
 export default function ChatWidget() {
+  if (IS_CYPRESS_E2E) return null;
+
   const { user: _user, getIdToken } = useAuth();
   const { activeWeddingData } = useWedding();
   const [open, setOpen] = useState(() => {

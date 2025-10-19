@@ -39,6 +39,7 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 - `SeatingPlanTabs` permite alternar entre Ceremonia y Banquete con indicadores de avance (`ceremonyProgress`, `banquetProgress`) y contadores de elementos (`ceremonyCount`, `banquetCount`). El progreso se visualiza tanto en la pastilla individual como en una barra inferior que actúa de feedback continuo.
 - `SeatingPlanToolbar` centraliza undo/redo, zoom (fit-to-content), exportaciones rápidas, apertura del asistente avanzado y herramientas de alineación/distribución. Desde la misma barra se gestionan snapshots locales (guardar/cargar/borrar), rotaciones, limpieza del layout de banquete, acceso a los modales clave (ceremonia, banquete, espacio, fondos) y, cuando está activo `VITE_ENABLE_AUTO_ASSIGN`, el botón de auto-asignación. También expone toggles dedicados: mostrar/ocultar mesas, rulers, snap a cuadrícula (`gridStep`), numeración de sillas, validaciones en vivo y modal de capacidad global.
 - `SeatingLibraryPanel` ofrece plantillas, capas decorativas, fuentes de invitados y toggles de reglas (snap, grid, numeración). Contiene acciones rápidas para añadir mesas por tipo, abrir el Guest Drawer, cargar plantillas de venue y alternar la visibilidad de elementos (mesas, rulers, números de asiento), además de badges con pendientes por asignar y una leyenda coloreada con el conteo de áreas dibujadas (perímetro, puertas, obstáculos, pasillos, etc.). El bloque de mesas y el control de visibilidad solo aparecen en **Banquete** para evitar ruido en Ceremonia.
+- Barra de estado inferior: muestra zoom, métricas del salón, conflictos activos y los colaboradores conectados en tiempo real (lista con iniciales coloreadas). La presencia se sincroniza vía Firestore (`weddings/{id}/seatingPresence/{clientId}`) y se actualiza automáticamente.
 - `SeatingPlanModals` agrupa el resto de configuraciones: `CeremonyConfigModal`, `BanquetConfigModal`, configuración del espacio (dimensiones/aisles), selector de plantillas (`VenueTemplateSelector`), editor de fondo (`BackgroundModal`) y modal de capacidad global. Cada modal normaliza datos antes de persistirlos vía `useSeatingPlan` (`saveHallDimensions`, `saveBackground`, `applyBanquetTables`), e informa mediante toasts en caso de error o éxito.
 
 ### 3.2 Ceremonia (`tab=ceremony`)
@@ -74,6 +75,7 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 ## 4. Persistencia y datos
 - `weddings/{id}/seating/{tab}`: `tables`, `seats`, `settings`, metadatos de ceremonia y snapshots.  
 - `weddings/{id}/guests`: fuente para `SeatingGuestDrawer` y validaciones de estado RSVP.  
+- `weddings/{id}/seatingLocks/{resourceType-resourceId}`: bloqueos optimistas por recurso con TTL corto para evitar colisiones en edición colaborativa.  
 - `weddings/{id}/seatingHistory`: historial opcional (si está habilitado) para auditoría y deshacer extendido.
 - Snapshots manuales: `localStorage seatingPlan:{weddingId}:snapshot:*` + índice; se conservan por dispositivo.
 
@@ -124,7 +126,7 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 
 ## 11. Roadmap / pendientes
 - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  
-- Versionado colaborativo en tiempo real (multi-editor) con presencia visual.  
+- Colaboración en tiempo real: evolucionar hacia versionado avanzado (locks y merge multi-editor) sobre la presencia y sincronización actuales.  
 - Integración con proveedores/venues (ingesta automática de planos y configuraciones).  
 - Exportaciones con presets guardados y envío directo a stakeholders.
 - Reestructurar el PDF avanzado en secciones dedicadas (mapa de ceremonia, plano de banquete, lista global, invitados por mesa, dietas especiales, VIP de Momentos Especiales).  

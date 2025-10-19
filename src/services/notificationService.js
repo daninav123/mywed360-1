@@ -13,73 +13,47 @@ export const setAuthContext = (context) => {
 };
 
 const BASE = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:4004';
-const TOKEN_STORAGE_KEY = 'mw360_auth_token';
-const FORCE_MOCK_DEFAULT =
-  (import.meta.env.VITE_AUTH_FORCE_MOCK ?? (import.meta.env.DEV ? 'true' : 'false')) === 'true';
-
-const getStoredToken = () => {
-  if (typeof window === 'undefined') return null;
-  try {
-    return window.localStorage.getItem(TOKEN_STORAGE_KEY) || null;
-  } catch {
-    return null;
-  }
-};
-
-const rememberToken = (token) => {
-  if (!token || typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
-  } catch {}
-};
-
-const buildMockToken = (user) => {
-  if (!user) return null;
-  const email = user.email || 'user@local.dev';
-  return `mock-${user.uid || 'anon'}-${email}`;
-};
 
 // Obtiene el token de autenticaciÃ³n del usuario actual (prioriza sistema unificado)
 async function getAuthToken() {
-  try {
-    // 1) Priorizar el sistema de autenticaciÃ³n unificado
-    if (authContext && authContext.getIdToken && !FORCE_MOCK_DEFAULT) {
-      const token = await authContext.getIdToken();
-      if (token) return token;
-    }
-
-    // 2) Fallback: Firebase si estÃ¡ disponible
-    const user = auth.currentUser;
-    if (user && user.getIdToken && !FORCE_MOCK_DEFAULT) {
-      return await user.getIdToken();
-    }
-
-    if ((authContext && authContext.currentUser) || user) {
-      const ctxUser = authContext?.currentUser || user;
-      if (ctxUser) {
-        const email = ctxUser.email || 'user@local.dev';
-        const uid = ctxUser.uid || 'anon';
-        const mockToken = `mock-${uid}-${email}`;
-        rememberToken(mockToken);
-        return mockToken;
+  const sources = [];
+  if (authContext?.getIdToken) {
+    sources.push(async () => {
+      try {
+        return await authContext.getIdToken(true);
+      } catch (err) {
+        console.warn('[notificationService] Error refrescando token (authContext):', err);
+        return await authContext.getIdToken();
       }
-    }
-
-    // 3) Fallback: token mock si tenemos usuario en el contexto
-    if (authContext && authContext.currentUser) {
-      return `mock-${authContext.currentUser.uid}-${authContext.currentUser.email}`;
-    }
-    return null;
-  } catch (error) {
-    console.warn('Error obteniendo token de autenticaciÃ³n:', error);
-    return null;
+    });
   }
+  if (auth?.currentUser?.getIdToken) {
+    sources.push(async () => {
+      try {
+        return await auth.currentUser.getIdToken(true);
+      } catch (err) {
+        console.warn('[notificationService] Error refrescando token (Firebase):', err);
+        return await auth.currentUser.getIdToken();
+      }
+    });
+  }
+
+  for (const resolver of sources) {
+    try {
+      const token = await resolver();
+      if (token) return token;
+    } catch (error) {
+      console.warn('[notificationService] Error obteniendo token de autenticación:', error);
+    }
+  }
+
+  throw new Error('NotificationService: autenticación requerida');
 }
 
 // Devuelve cabeceras con Authorization si hay token
 async function authHeader(base = {}) {
   const token = await getAuthToken();
-  return token ? { ...base, Authorization: `Bearer ${token}` } : base;
+  return { ...base, Authorization: `Bearer ${token}` };
 }
 
 // ==================== PREFERENCIAS DE NOTIFICACIONES ====================
@@ -197,19 +171,8 @@ function mapSubtypeKey(type, subtype) {
 }
 
 export async function getNotifications() {
-  if (FORCE_MOCK_DEFAULT) {
-    const local = loadLocalNotifications();
-    const unreadCount = local.filter((n) => !n.read).length;
-    return { notifications: local, unreadCount };
-  }
-
   try {
     const headers = await authHeader();
-    if (!headers || !headers.Authorization) {
-      const local = loadLocalNotifications();
-      const unreadCount = local.filter((n) => !n.read).length;
-      return { notifications: local, unreadCount };
-    }
     const res = await apiGet('/api/notifications', { headers, silent: true });
     if (!res.ok) throw new Error('Error fetching notifications');
     const arr = await res.json();

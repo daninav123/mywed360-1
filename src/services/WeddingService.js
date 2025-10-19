@@ -28,6 +28,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
+import { seedWeddingTasksFromTemplate } from './taskTemplateSeeder';
+import { syncWeddingWithCRM } from './crmSyncService';
 
 const DEFAULT_EVENT_TYPE = 'boda';
 
@@ -188,7 +190,40 @@ export async function createWedding(uid, extraData = {}) {
       });
     } catch {}
   }
+
+  // Sincronizar con CRM externo (enqueue)
+  try {
+    const crmPayload = {
+      name: base.name || '',
+      eventType,
+      eventDate: base.weddingDate || base.date || null,
+      location: base.location || base.banquetPlace || '',
+      ownerId: uid,
+      plannerIds: Array.isArray(base.plannerIds) ? base.plannerIds : [],
+      createdFrom: base.createdFrom || 'app',
+    };
+    void syncWeddingWithCRM(weddingId, crmPayload).then(() => {
+      try {
+        performanceMonitor?.logEvent?.('wedding_crm_sync_requested', {
+          weddingId,
+          ownerId: uid,
+        });
+      } catch {}
+    });
+  } catch (error) {
+    console.warn('[WeddingService] No se pudo encolar la sincronizaci�n CRM', error);
+  }
+
   return weddingId;
+}
+
+export async function updateWeddingModulePermissions(weddingId, modulePermissions = {}) {
+  if (!weddingId) throw new Error('weddingId requerido');
+  await updateDoc(doc(db, 'weddings', weddingId), {
+    modulePermissions,
+    updatedAt: Timestamp.now(),
+  });
+  return true;
 }
 
 // Helpers internos
@@ -242,118 +277,29 @@ function addMonths(base, delta) {
   }
 }
 
-async function seedDefaultTasksForWedding(weddingId, weddingData) {
-  if (!weddingId) return;
-  // Evitar doble seed
-  const seedRef = doc(db, 'weddings', weddingId, 'tasks', '_seed_meta');
-  const seedSnap = await getDoc(seedRef).catch(() => null);
-  if (seedSnap && seedSnap.exists()) return;
-  const wDate = toDateSafe(weddingData?.weddingDate);
-  const endBase = wDate || new Date();
-  const startBase = wDate ? addMonths(endBase, -12) : new Date(endBase.getFullYear(), endBase.getMonth() - 12, endBase.getDate());
-  const span = Math.max(1, endBase.getTime() - startBase.getTime());
-  const at = (p) => new Date(startBase.getTime() + span * p);
-
-  const blocks = [
-    { key: 'A', name: 'Fundamentos', p0: 0.0, p1: 0.2, items: [
-      'Difundir la noticia y organizar la planificación (perfil, invitar pareja, anillo, presupuesto inicial)',
-      'Crear primera versión de la lista de invitados',
-      'Investigar lugares de celebración y comenzar visitas',
-      'Decidir cortejo nupcial',
-    ]},
-    { key: 'B', name: 'Proveedores Clave', p0: 0.1, p1: 0.8, items: [
-      'Fotografía → contacto inicial pronto, cierre de contrato a mitad del proceso',
-      'Videografía → decisión temprana, reuniones finales hacia el final',
-      'Catering → investigación inicial, prueba de menú, cierre cercano a la boda',
-      'Florista → inspiración y primeras ideas, confirmación en la fase final',
-      'Música → banda/DJ reservados pronto, reunión final más tarde',
-      'Repostería → búsqueda inicial, prueba de sabores meses después, pedido final cerca de la boda',
-    ]},
-    { key: 'C', name: 'Vestuario y Moda', p0: 0.15, p1: 0.9, items: [
-      'Novia → visitas iniciales, decisión intermedia, pruebas finales en los últimos meses',
-      'Novio → compra traje en mitad del proceso, ajustes finales poco antes',
-      'Cortejo → definir vestidos/trajes, confirmar tallas y ajustes finales más tarde',
-    ]},
-    { key: 'D', name: 'Estilo y Detalles', p0: 0.2, p1: 0.95, items: [
-      'Invitaciones digitales y save-the-dates (inicio medio)',
-      'Invitaciones físicas y papelería (fase intermedia)',
-      'Decoración y DIY (se puede trabajar meses antes y ultimar al final)',
-      'Recuerdos y regalos (elección temprana, cierre antes del evento)',
-    ]},
-    { key: 'E', name: 'Organización y Logística', p0: 0.3, p1: 1.0, items: [
-      'Transporte (se puede definir pronto, confirmar al final)',
-      'Extras y básicos del día (ir acumulando, revisión final cercana a la boda)',
-      'Confirmaciones con proveedores (últimas semanas)',
-      'Plan B clima (al final)',
-      'Ensayo general (última fase)',
-    ]},
-    { key: 'F', name: 'Celebraciones y Emociones', p0: 0.4, p1: 0.95, items: [
-      'Eventos adicionales (preboda, brunch…)',
-      'Despedidas (planificación antes, celebración final)',
-      'Votos y discursos (escribir con calma, repasar justo antes)',
-    ]},
-    { key: 'G', name: 'Belleza y Cuidado', p0: 0.6, p1: 0.95, items: [
-      'Reservas peluquería/maquillaje con antelación',
-      'Pruebas intermedias',
-      'Rutinas de cuidado personal (últimos meses)',
-    ]},
-    { key: 'H', name: 'Anillos y Luna de Miel', p0: 0.7, p1: 1.0, items: [
-      'Comprar anillos (se puede hacer pronto, recoger justo antes)',
-      'Planificar luna de miel (elección pronto, reservas intermedias, maletas al final)',
-    ]},
-    { key: 'I', name: 'Después de la Boda', p0: 1.0, p1: 1.05, items: [
-      'Disfrutar inicio del matrimonio',
-      'Organizar álbum y recuerdos',
-    ]},
-  ];
-
-  const colRef = collection(db, 'weddings', weddingId, 'tasks');
-  for (const b of blocks) {
-    const parent = {
-      title: b.name,
-      name: b.name,
-      type: 'task',
-      start: at(b.p0),
-      end: at(b.p1),
-      progress: 0,
-      isDisabled: false,
-      createdAt: Timestamp.now(),
-      category: 'OTROS',
-    };
-    const pDoc = await addDoc(colRef, parent);
-    await setDoc(pDoc, { id: pDoc.id }, { merge: true });
-    for (const item of b.items) {
-      const s = at(b.p0 + Math.random() * (b.p1 - b.p0) * 0.6);
-      const tentativeEnd = at(Math.min(b.p1, b.p0 + 0.4 + Math.random() * (b.p1 - b.p0) * 0.5));
-      const e = tentativeEnd.getTime() < s.getTime() ? new Date(s.getTime() + 3 * 24 * 60 * 60 * 1000) : tentativeEnd;
-      const sub = {
-        title: item,
-        name: item,
-        parentId: pDoc.id,
-        weddingId,
-        start: s,
-        end: e,
-        progress: 0,
-        isDisabled: false,
-        createdAt: Timestamp.now(),
-        category: 'OTROS',
-      };
-      const subCol = collection(db, 'weddings', weddingId, 'tasks', pDoc.id, 'subtasks');
-      const sDoc = await addDoc(subCol, sub);
-      await setDoc(sDoc, { id: sDoc.id }, { merge: true });
-    }
+export async function seedDefaultTasksForWedding(weddingId, weddingData) {
+  if (!weddingId || !db) return;
+  let projectEnd = null;
+  if (weddingData?.eventDate instanceof Timestamp) {
+    projectEnd = weddingData.eventDate.toDate();
+  } else if (weddingData?.eventDate instanceof Date) {
+    projectEnd = weddingData.eventDate;
+  } else if (weddingData?.weddingDate instanceof Timestamp) {
+    projectEnd = weddingData.weddingDate.toDate();
+  } else if (weddingData?.weddingDate instanceof Date) {
+    projectEnd = weddingData.weddingDate;
   }
-  await setDoc(
-    seedRef,
-    {
-      seededAt: Timestamp.now(),
-      version: 1,
-      eventType: weddingData?.eventType || DEFAULT_EVENT_TYPE,
-      guestCountRange: weddingData?.eventProfile?.guestCountRange || null,
-      formalityLevel: weddingData?.eventProfile?.formalityLevel || null,
-    },
-    { merge: true }
-  );
+
+  try {
+    await seedWeddingTasksFromTemplate({
+      db,
+      weddingId,
+      projectEnd,
+      skipIfSeeded: true,
+    });
+  } catch (error) {
+    console.warn('[WeddingService] seed default tasks failed', error);
+  }
 }
 
 /**

@@ -1,5 +1,6 @@
 ﻿/* eslint-disable no-undef */
-import { post } from './apiClient';
+import { get as apiGet, post, put as apiPut, del as apiDel } from './apiClient';
+import { USE_BACKEND } from './emailService';
 
 const CLASSIFICATION_ENDPOINT = '/api/email-insights/classify';
 const SCHEDULER_INTERVAL_MS = 60 * 1000;
@@ -9,11 +10,30 @@ let schedulerKickoffTimeout = null;
 let queueProcessing = false;
 
 const CONFIG_KEY = 'mywed360.email.automation.config';
+const CONFIG_LAST_SYNC_KEY = 'mywed360.email.automation.config.lastSync';
 const STATE_KEY = 'mywed360.email.automation.state';
 const CLASSIFICATION_CACHE_KEY = 'mywed360.email.automation.classification';
 const SCHEDULE_KEY = 'mywed360.email.automation.schedule';
+const CONFIG_ENDPOINT = '/api/email-automation/config';
+const REMOTE_SYNC_TTL_MS = 60 * 1000;
 const CLASSIFICATION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 const REPLY_INTERVAL_DEFAULT = 24; // hours
+const REMOTE_SCHEDULE_ENDPOINT = '/api/email-automation/schedule';
+const REMOTE_PROCESS_ENDPOINT = '/api/email-automation/schedule/process';
+const REMOTE_QUEUE_CACHE_TTL_MS = 30 * 1000;
+const STATE_ENDPOINT = '/api/email-automation/state';
+const STATE_AUTOREPLY_ENDPOINT = '/api/email-automation/state/auto-reply';
+const REMOTE_STATE_TTL_MS = 60 * 1000;
+
+const remoteScheduleCache = {
+  queue: [],
+  history: [],
+  fetchedAt: 0,
+};
+
+let remoteSchedulePromise = null;
+let remoteStatePromise = null;
+let lastRemoteStateSync = 0;
 
 const memoryStorage = new Map();
 const hasLocalStorage = () =>
@@ -47,6 +67,120 @@ const storageRemove = (key) => {
   } catch {}
   memoryStorage.delete(key);
 };
+
+function supportsRemoteScheduler() {
+  return USE_BACKEND === true;
+}
+
+function invalidateRemoteScheduleCache() {
+  remoteScheduleCache.fetchedAt = 0;
+}
+
+async function fetchRemoteSchedule(force = false) {
+  if (!supportsRemoteScheduler()) return null;
+  if (!force && remoteSchedulePromise) {
+    return remoteSchedulePromise;
+  }
+  if (
+    !force &&
+    remoteScheduleCache.fetchedAt &&
+    Date.now() - remoteScheduleCache.fetchedAt < REMOTE_QUEUE_CACHE_TTL_MS
+  ) {
+    return remoteScheduleCache;
+  }
+  remoteSchedulePromise = (async () => {
+    try {
+      const response = await apiGet(REMOTE_SCHEDULE_ENDPOINT, { auth: true, silent: true });
+      if (!response?.ok) {
+        throw new Error(`schedule-fetch-${response?.status || 'unknown'}`);
+      }
+      const json = await response.json();
+      remoteScheduleCache.queue = Array.isArray(json.queue) ? json.queue : [];
+      remoteScheduleCache.history = Array.isArray(json.history) ? json.history : [];
+      remoteScheduleCache.fetchedAt = Date.now();
+      return remoteScheduleCache;
+    } catch (error) {
+      invalidateRemoteScheduleCache();
+      throw error;
+    } finally {
+      remoteSchedulePromise = null;
+    }
+  })();
+  return remoteSchedulePromise;
+}
+
+async function refreshRemoteSchedule(force = false) {
+  if (!supportsRemoteScheduler()) return null;
+  return fetchRemoteSchedule(force).catch((error) => {
+    console.warn('[emailAutomation] remote schedule sync failed', error?.message || error);
+    throw error;
+  });
+}
+
+function getRemoteQueueSnapshot() {
+  return remoteScheduleCache.queue.slice();
+}
+
+function getRemoteHistorySnapshot() {
+  return remoteScheduleCache.history.slice();
+}
+
+async function fetchAutomationStateRemote(force = false) {
+  if (!supportsRemoteScheduler()) return null;
+  if (!force && remoteStatePromise) return remoteStatePromise;
+  if (!force && lastRemoteStateSync && Date.now() - lastRemoteStateSync < REMOTE_STATE_TTL_MS) {
+    return getAutomationState();
+  }
+
+  remoteStatePromise = (async () => {
+    try {
+      const response = await apiGet(STATE_ENDPOINT, { auth: true, silent: true });
+      if (!response?.ok) {
+        throw new Error(`state-fetch-${response?.status || 'unknown'}`);
+      }
+      const payload = await response.json();
+      const merged = deepMerge(DEFAULT_STATE, payload?.state || {});
+      lastRemoteStateSync = Date.now();
+      saveAutomationState(merged);
+      return merged;
+    } catch (error) {
+      lastRemoteStateSync = 0;
+      throw error;
+    } finally {
+      remoteStatePromise = null;
+    }
+  })();
+
+  return remoteStatePromise;
+}
+
+export async function syncAutomationStateFromServer(force = false) {
+  if (!supportsRemoteScheduler()) return getAutomationState();
+  try {
+    return await fetchAutomationStateRemote(force);
+  } catch (error) {
+    console.warn('[emailAutomation] sync state failed', error?.message || error);
+    return getAutomationState();
+  }
+}
+
+async function recordAutoReplyRemote(payload) {
+  if (!supportsRemoteScheduler()) return;
+  try {
+    const body = { ...payload };
+    if (body.classification) {
+      body.classification = {
+        tags: Array.isArray(body.classification.tags) ? body.classification.tags : [],
+        folder: body.classification.folder || null,
+        source: body.classification.source || null,
+      };
+    }
+    await post(STATE_AUTOREPLY_ENDPOINT, body, { auth: true, silent: true });
+    lastRemoteStateSync = 0;
+  } catch (error) {
+    console.warn('[emailAutomation] record auto-reply failed', error?.message || error);
+  }
+}
 
 const DEFAULT_CONFIG = {
   classification: {
@@ -107,6 +241,7 @@ const DEFAULT_CONFIG = {
 const DEFAULT_STATE = {
   lastAutoReplyBySender: {},
   autoRepliesByMail: {},
+  history: [],
 };
 
 const DEFAULT_SCHEDULE = {
@@ -115,6 +250,8 @@ const DEFAULT_SCHEDULE = {
 };
 
 const classificationPromises = new Map();
+let configSyncPromise = null;
+let lastConfigSync = 0;
 
 function deepMerge(base, override) {
   if (!override) return { ...base };
@@ -159,13 +296,91 @@ export function getAutomationConfig() {
   return readJSON(CONFIG_KEY, DEFAULT_CONFIG);
 }
 
-export function saveAutomationConfig(config) {
+export function getAutomationConfigLastSync() {
+  const raw = storageGet(CONFIG_LAST_SYNC_KEY);
+  if (!raw) return null;
+  return raw;
+}
+
+function setAutomationConfigCache(config, { syncTimestamp = null, recordSync = true } = {}) {
   const merged = deepMerge(DEFAULT_CONFIG, config || {});
   writeJSON(CONFIG_KEY, merged);
+  if (recordSync) {
+    try {
+      const ts =
+        typeof syncTimestamp === 'string'
+          ? syncTimestamp
+          : new Date(syncTimestamp || Date.now()).toISOString();
+      storageSet(CONFIG_LAST_SYNC_KEY, ts);
+    } catch {}
+  }
   return merged;
 }
 
-export function updateAutomationConfig(partial = {}) {
+async function persistAutomationConfigRemote(config) {
+  try {
+    const res = await apiPut(CONFIG_ENDPOINT, { config }, { auth: true, silent: true });
+    if (!res.ok) {
+      const error = new Error(`persist-config-failed-${res.status}`);
+      error.status = res.status;
+      throw error;
+    }
+    const payload = await res.json().catch(() => ({}));
+    const remoteConfig = deepMerge(DEFAULT_CONFIG, payload?.config || config || {});
+    const updatedAt = payload?.updatedAt || payload?.syncTimestamp || new Date().toISOString();
+    setAutomationConfigCache(remoteConfig, { syncTimestamp: updatedAt, recordSync: true });
+    lastConfigSync = Date.now();
+    return remoteConfig;
+  } catch (error) {
+    console.warn('[emailAutomation] persist remote config failed', error?.message || error);
+    throw error;
+  }
+}
+
+export async function syncAutomationConfigFromServer(force = false) {
+  if (typeof window === 'undefined') return getAutomationConfig();
+  if (!force && configSyncPromise) return configSyncPromise;
+  if (!force && Date.now() - lastConfigSync < REMOTE_SYNC_TTL_MS) {
+    return getAutomationConfig();
+  }
+
+  configSyncPromise = (async () => {
+    try {
+      const res = await apiGet(CONFIG_ENDPOINT, { auth: true, silent: true });
+      if (!res?.ok) {
+        throw new Error(`fetch-config-failed-${res?.status || 'unknown'}`);
+      }
+      const payload = await res.json().catch(() => ({}));
+      const merged = deepMerge(DEFAULT_CONFIG, payload?.config || {});
+      const updatedAt = payload?.updatedAt || payload?.syncTimestamp || new Date().toISOString();
+      lastConfigSync = Date.now();
+      setAutomationConfigCache(merged, { syncTimestamp: updatedAt, recordSync: true });
+      return merged;
+    } catch (error) {
+      console.warn('[emailAutomation] sync config failed', error?.message || error);
+      return getAutomationConfig();
+    } finally {
+      configSyncPromise = null;
+    }
+  })();
+
+  return configSyncPromise;
+}
+
+export async function saveAutomationConfig(config, options = {}) {
+  const { skipRemote = false } = options || {};
+  const cached = setAutomationConfigCache(config, { recordSync: skipRemote });
+  if (skipRemote || typeof window === 'undefined') {
+    return cached;
+  }
+  try {
+    return await persistAutomationConfigRemote(cached);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateAutomationConfig(partial = {}) {
   const current = getAutomationConfig();
   const merged = deepMerge(current, partial);
   return saveAutomationConfig(merged);
@@ -179,11 +394,11 @@ function saveAutomationState(state) {
   writeJSON(STATE_KEY, state || DEFAULT_STATE);
 }
 
-function getScheduleData() {
+function getScheduleDataLocal() {
   return readJSON(SCHEDULE_KEY, DEFAULT_SCHEDULE);
 }
 
-function saveScheduleData(data) {
+function saveScheduleDataLocal(data) {
   writeJSON(SCHEDULE_KEY, data || DEFAULT_SCHEDULE);
 }
 
@@ -209,6 +424,7 @@ async function getSendMailFn() {
 
 function shouldAutoProcessQueue() {
   try {
+    if (supportsRemoteScheduler()) return false;
     if (typeof window === 'undefined') return false;
     if (window.__LOVENDA_DISABLE_EMAIL_SCHEDULER__) return false;
     if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
@@ -351,6 +567,7 @@ async function callClassificationAPI(mail) {
   if (!mail) return null;
   try {
     const payload = {
+      mailId: mail.id || mail.mailId || mail.messageId || null,
       id:
         mail.id ||
         mail.messageId ||
@@ -397,7 +614,7 @@ async function callClassificationAPI(mail) {
     const result = {
       tags,
       folder,
-      source: 'ai',
+      source: typeof data.source === 'string' ? data.source : 'api',
       createdAt: Date.now(),
     };
     if (typeof data.confidence === 'number') {
@@ -423,6 +640,30 @@ async function callClassificationAPI(mail) {
 function classifyEmail(mail, config) {
   if (!mail || config?.classification?.enabled === false) {
     return null;
+  }
+  if (mail.aiClassification && typeof mail.aiClassification === 'object') {
+    const ai = mail.aiClassification;
+    const tags = Array.isArray(ai.tags)
+      ? ai.tags.map((tag) => (typeof tag === 'string' ? tag.trim() : '')).filter(Boolean)
+      : [];
+    const folder =
+      typeof ai.folder === 'string' && ai.folder.trim()
+        ? ai.folder.trim()
+        : null;
+    if (tags.length || folder) {
+      const cached = {
+        tags,
+        folder,
+        source: typeof ai.source === 'string' ? ai.source : 'ai',
+        createdAt: Date.now(),
+        confidence: typeof ai.confidence === 'number' ? ai.confidence : undefined,
+        reason: typeof ai.reason === 'string' ? ai.reason : undefined,
+      };
+      const cache = getClassificationCache();
+      cache[getMailCacheKey(mail)] = cached;
+      saveClassificationCache(cache);
+      return cached;
+    }
   }
   const cacheKey = getMailCacheKey(mail);
   const cache = getClassificationCache();
@@ -550,9 +791,18 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
   }
   const alreadyReplied = state.autoRepliesByMail?.[mail.id];
   if (alreadyReplied) return false;
-  const lastReply = state.lastAutoReplyBySender?.[senderEmail];
+  const lastReplyEntry = state.lastAutoReplyBySender?.[senderEmail];
+  const lastReplyTsRaw =
+    typeof lastReplyEntry === 'number'
+      ? lastReplyEntry
+      : typeof lastReplyEntry === 'string'
+        ? new Date(lastReplyEntry).getTime()
+        : lastReplyEntry && typeof lastReplyEntry === 'object'
+          ? new Date(lastReplyEntry.repliedAt || lastReplyEntry.date || 0).getTime()
+          : 0;
+  const lastReplyTs = Number.isFinite(lastReplyTsRaw) ? lastReplyTsRaw : 0;
   const intervalHours = Number(config.autoReply.replyIntervalHours || REPLY_INTERVAL_DEFAULT);
-  if (lastReply && Date.now() - lastReply < intervalHours * 60 * 60 * 1000) {
+  if (lastReplyTs && Date.now() - lastReplyTs < intervalHours * 60 * 60 * 1000) {
     return false;
   }
   const category = mapTagToCategory(classification?.tags, classification?.folder);
@@ -580,14 +830,53 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
       body,
     });
     const nextState = { ...state };
-    nextState.autoRepliesByMail = { ...(nextState.autoRepliesByMail || {}), [mail.id]: Date.now() };
+    const repliedAt = new Date().toISOString();
+    nextState.autoRepliesByMail = {
+      ...(nextState.autoRepliesByMail || {}),
+      [mail.id]: {
+        sender: senderEmail,
+        repliedAt,
+      },
+    };
     nextState.lastAutoReplyBySender = {
       ...(nextState.lastAutoReplyBySender || {}),
-      [senderEmail]: Date.now(),
+      [senderEmail]: {
+        mailId: mail.id,
+        repliedAt,
+        subject: mail.subject || null,
+      },
     };
+    const currentHistory = Array.isArray(nextState.history) ? nextState.history : [];
+    const historyEntry = {
+      mailId: mail.id,
+      sender: senderEmail,
+      subject: mail.subject || null,
+      repliedAt,
+    };
+    if (classification && typeof classification === 'object') {
+      historyEntry.classification = {
+        tags: Array.isArray(classification.tags) ? classification.tags.slice(0, 10) : [],
+        folder: classification.folder || null,
+        source: classification.source || null,
+      };
+    }
+    nextState.history = [historyEntry, ...currentHistory].slice(0, 50);
     saveAutomationState(nextState);
     state.autoRepliesByMail = nextState.autoRepliesByMail;
     state.lastAutoReplyBySender = nextState.lastAutoReplyBySender;
+    state.history = nextState.history;
+    recordAutoReplyRemote({
+      mailId: mail.id,
+      sender: senderEmail,
+      subject: mail.subject || null,
+      classification: classification
+        ? {
+            tags: classification.tags || [],
+            folder: classification.folder || null,
+            source: classification.source || null,
+          }
+        : undefined,
+    });
     return true;
   } catch (error) {
     console.warn('[emailAutomation] auto-reply failed', error);
@@ -598,6 +887,9 @@ async function maybeAutoReply(mail, classification, config, state, sendMail) {
 export async function processIncomingEmails(emails = [], options = {}) {
   const list = Array.isArray(emails) ? emails : [];
   if (!list.length) return list;
+  if (supportsRemoteScheduler()) {
+    await syncAutomationStateFromServer();
+  }
   const config = getAutomationConfig();
   const state = getAutomationState();
   const sendMail = options.sendMail;
@@ -630,29 +922,74 @@ export async function processIncomingEmails(emails = [], options = {}) {
 }
 
 export function getScheduledEmails() {
-  return getScheduleData().queue || [];
+  if (supportsRemoteScheduler()) {
+    return getRemoteQueueSnapshot();
+  }
+  const data = getScheduleDataLocal();
+  return Array.isArray(data.queue) ? data.queue : [];
 }
 
 export function getScheduledHistory() {
-  return getScheduleData().history || [];
+  if (supportsRemoteScheduler()) {
+    return getRemoteHistorySnapshot();
+  }
+  const data = getScheduleDataLocal();
+  return Array.isArray(data.history) ? data.history : [];
 }
 
-export function scheduleEmailSend(payload, scheduledAt) {
+export async function reloadScheduledEmails(force = false) {
+  if (supportsRemoteScheduler()) {
+    await refreshRemoteSchedule(force);
+    return getRemoteQueueSnapshot();
+  }
+  const data = getScheduleDataLocal();
+  return Array.isArray(data.queue) ? data.queue : [];
+}
+
+export async function reloadScheduledHistory(force = false) {
+  if (supportsRemoteScheduler()) {
+    await refreshRemoteSchedule(force);
+    return getRemoteHistorySnapshot();
+  }
+  const data = getScheduleDataLocal();
+  return Array.isArray(data.history) ? data.history : [];
+}
+
+export async function scheduleEmailSend(payload, scheduledAt) {
   if (!scheduledAt) throw new Error('scheduledAt requerido');
   const date = new Date(scheduledAt);
   if (Number.isNaN(date.getTime())) {
-    throw new Error('Fecha programada no váÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡lida');
+    throw new Error('Fecha programada no válida');
   }
   if (payload?.attachments && payload.attachments.length) {
-    throw new Error(
-      'La programaciáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚³n con adjuntos no estáÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚¡ soportada todaváÆ’Ã†’áâ€ Ã¢€â„¢áÆ’Ã¢€Å¡áâ€šÃ‚­a'
-    );
+    throw new Error('La programación con adjuntos no está soportada todavía');
   }
   const now = Date.now();
   if (date.getTime() < now + 60 * 1000) {
     throw new Error('La fecha programada debe ser al menos dentro de 1 minuto');
   }
-  const data = getScheduleData();
+  if (supportsRemoteScheduler()) {
+    const response = await post(
+      REMOTE_SCHEDULE_ENDPOINT,
+      {
+        payload,
+        scheduledAt: date.toISOString(),
+      },
+      { auth: true }
+    );
+    if (!response?.ok) {
+      let detail = '';
+      try {
+        detail = await response.text();
+      } catch {}
+      const status = response?.status || 'unknown';
+      throw new Error(detail || `schedule-failed-${status}`);
+    }
+    const json = await response.json().catch(() => ({}));
+    await fetchRemoteSchedule(true).catch(() => {});
+    return json?.id || null;
+  }
+  const data = getScheduleDataLocal();
   const queue = Array.isArray(data.queue) ? data.queue.slice() : [];
   const id = `sched_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   queue.push({
@@ -662,7 +999,7 @@ export function scheduleEmailSend(payload, scheduledAt) {
     createdAt: new Date().toISOString(),
     status: 'scheduled',
   });
-  saveScheduleData({ queue, history: data.history || [] });
+  saveScheduleDataLocal({ queue, history: data.history || [] });
   ensureSchedulerRunning();
   const diff = date.getTime() - Date.now();
   const kickoffDelay = Number.isFinite(diff)
@@ -673,17 +1010,43 @@ export function scheduleEmailSend(payload, scheduledAt) {
 }
 
 export function cancelScheduledEmail(id) {
-  const data = getScheduleData();
+  if (supportsRemoteScheduler()) {
+    return apiDel(`${REMOTE_SCHEDULE_ENDPOINT}/${encodeURIComponent(id)}`, {
+      auth: true,
+      silent: true,
+    })
+      .then(async (response) => {
+        if (!response?.ok) {
+          if (response?.status === 404) return false;
+          let detail = '';
+          try {
+            detail = await response.text();
+          } catch {}
+          const status = response?.status || 'unknown';
+          throw new Error(detail || `cancel-failed-${status}`);
+        }
+        await fetchRemoteSchedule(true).catch(() => {});
+        return true;
+      })
+      .catch((error) => {
+        console.warn('[emailAutomation] cancel schedule failed', error);
+        throw error;
+      });
+  }
+  const data = getScheduleDataLocal();
   const queue = Array.isArray(data.queue) ? data.queue.filter((item) => item.id !== id) : [];
   const history = Array.isArray(data.history) ? data.history : [];
   const removed = queue.length !== (data.queue || []).length;
-  saveScheduleData({ queue, history });
+  saveScheduleDataLocal({ queue, history });
   return removed;
 }
 
 export async function processScheduledEmails(sendMail) {
+  if (supportsRemoteScheduler()) {
+    return { remote: true, processed: 0 };
+  }
   if (typeof sendMail !== 'function') return;
-  const data = getScheduleData();
+  const data = getScheduleDataLocal();
   const queue = Array.isArray(data.queue) ? data.queue.slice() : [];
   const history = Array.isArray(data.history) ? data.history.slice() : [];
   const remaining = [];
@@ -722,7 +1085,7 @@ export async function processScheduledEmails(sendMail) {
     }
   }
   const trimmedHistory = history.slice(-100);
-  saveScheduleData({ queue: remaining, history: trimmedHistory });
+  saveScheduleDataLocal({ queue: remaining, history: trimmedHistory });
   if (remaining.length > 0) {
     ensureSchedulerRunning();
     scheduleQueueProcessing(SCHEDULER_KICKOFF_DELAY_MS);
@@ -730,6 +1093,7 @@ export async function processScheduledEmails(sendMail) {
 }
 
 export function startEmailScheduler(options = {}) {
+  if (supportsRemoteScheduler()) return;
   ensureSchedulerRunning();
   if (options && options.immediate) {
     scheduleQueueProcessing(0);
@@ -740,5 +1104,7 @@ if (shouldAutoProcessQueue()) {
   ensureSchedulerRunning();
   scheduleQueueProcessing(SCHEDULER_KICKOFF_DELAY_MS);
 }
+
+
 
 

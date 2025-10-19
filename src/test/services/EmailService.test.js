@@ -79,32 +79,32 @@ describe('EmailService', () => {
   });
 
   describe('initEmailService', () => {
-    it('devuelve una dirección de email válida basada en el perfil', () => {
-      const email = EmailService.initEmailService(mockProfile);
+    it('devuelve una dirección de email válida basada en el perfil', async () => {
+      const email = await EmailService.initEmailService(mockProfile);
       expect(email).toBe('maria.garcia@test.mywed360.com');
       expect(EmailService.CURRENT_USER).toBe(mockProfile);
       expect(EmailService.CURRENT_USER_EMAIL).toBe('maria.garcia@test.mywed360.com');
     });
 
-    it('usa el emailAlias si está definido', () => {
+    it('usa el emailAlias si está definido', async () => {
       const profileWithAlias = { ...mockProfile, emailAlias: 'miboda' };
-      const email = EmailService.initEmailService(profileWithAlias);
+      const email = await EmailService.initEmailService(profileWithAlias);
       expect(email).toBe('miboda@test.mywed360.com');
     });
 
-    it('usa solo nombre si no hay apellido', () => {
+    it('usa solo nombre si no hay apellido', async () => {
       const profileNoLastName = { ...mockProfile, brideLastName: '' };
-      const email = EmailService.initEmailService(profileNoLastName);
+      const email = await EmailService.initEmailService(profileNoLastName);
       expect(email).toBe('maria@test.mywed360.com');
     });
 
-    it('usa userId si no hay nombre', () => {
+    it('usa userId si no hay nombre', async () => {
       const profileNoName = {
         ...mockProfile,
         brideFirstName: '',
         brideLastName: '',
       };
-      const email = EmailService.initEmailService(profileNoName);
+      const email = await EmailService.initEmailService(profileNoName);
       expect(email).toBe('useruser123@test.mywed360.com');
     });
   });
@@ -165,9 +165,9 @@ describe('EmailService', () => {
   });
 
   describe('sendMail', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       // Inicializar con un usuario
-      EmailService.initEmailService(mockProfile);
+      await EmailService.initEmailService(mockProfile);
     });
 
     it('envía correo utilizando Mailgun cuando está disponible', async () => {
@@ -275,7 +275,7 @@ describe('EmailService', () => {
       await EmailService.markAsRead('email123');
 
       expect(global.fetch).toHaveBeenCalled();
-      expect(global.fetch.mock.calls[0][0]).toContain('/api/emails/email123/read');
+      expect(global.fetch.mock.calls[0][0]).toContain('/api/mail/email123/read');
     });
 
     it('llama a la API del backend para eliminar cuando está disponible', async () => {
@@ -286,7 +286,7 @@ describe('EmailService', () => {
       await EmailService.deleteMail('email123');
 
       expect(global.fetch).toHaveBeenCalled();
-      expect(global.fetch.mock.calls[0][0]).toContain('/api/emails/email123');
+      expect(global.fetch.mock.calls[0][0]).toContain('/api/mail/email123');
       expect(global.fetch.mock.calls[0][1].method).toBe('DELETE');
     });
   });
@@ -392,6 +392,3 @@ describe('EmailService', () => {
     });
   });
 });
-
-
-

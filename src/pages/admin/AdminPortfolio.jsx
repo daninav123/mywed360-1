@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { getPortfolioData } from '../../services/adminDataService';
 
@@ -15,25 +15,31 @@ const AdminPortfolio = () => {
   const [selectedWedding, setSelectedWedding] = useState(null);
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
+  const [meta, setMeta] = useState(null);
 
-  useEffect(() => {
-    const loadPortfolio = async () => {
-      setLoading(true);
-      const data = await getPortfolioData();
-      setPortfolio(data);
+  const loadPortfolio = useCallback(async (filters = {}) => {
+    setLoading(true);
+    try {
+      const { items, meta: responseMeta } = await getPortfolioData(filters);
+      setPortfolio(items);
+      setMeta(responseMeta);
+    } finally {
       setLoading(false);
-    };
-    loadPortfolio();
+    }
   }, []);
 
-  const filtered = useMemo(() => {
-    return portfolio.filter((item) => {
-      const matchStatus = statusFilter ? item.status === statusFilter : true;
-      const matchFrom = fromDate ? item.eventDate >= fromDate : true;
-      const matchTo = toDate ? item.eventDate <= toDate : true;
-      return matchStatus && matchFrom && matchTo;
+  useEffect(() => {
+    loadPortfolio();
+  }, [loadPortfolio]);
+
+  const handleApplyFilters = async () => {
+    if (loading) return;
+    await loadPortfolio({
+      status: statusFilter || undefined,
+      fromDate: fromDate || undefined,
+      toDate: toDate || undefined,
     });
-  }, [portfolio, statusFilter, fromDate, toDate]);
+  };
 
   return (
     <div className="space-y-6">
@@ -82,12 +88,20 @@ const AdminPortfolio = () => {
           <button
             type="button"
             data-testid="portfolio-filter-apply"
+            onClick={handleApplyFilters}
             className="rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
           >
-            Aplicar
+            {loading ? 'Aplicando…' : 'Aplicar'}
           </button>
         </div>
       </header>
+
+      {meta && (
+        <p className="text-xs text-[var(--color-text-soft,#6b7280)]">
+          Mostrando {portfolio.length} de {meta.count ?? portfolio.length} bodas · Orden: {meta.order ?? 'desc'} ·
+          Estado: {meta.status ?? 'all'}
+        </p>
+      )}
 
       {loading ? (
         <div className="rounded-xl border border-soft bg-surface px-4 py-6 text-sm text-[var(--color-text-soft,#6b7280)]">
@@ -108,12 +122,15 @@ const AdminPortfolio = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-soft">
-              {filtered.map((wedding) => (
+              {portfolio.map((wedding) => (
                 <tr key={wedding.id} data-testid="portfolio-row" data-status={wedding.status}>
                   <td className="px-4 py-3 font-medium">{wedding.couple}</td>
                   <td className="px-4 py-3">{wedding.owner}</td>
                   <td className="px-4 py-3">{wedding.eventDate}</td>
-                  <td className="px-4 py-3">{statusLabels[wedding.status] || wedding.status}</td>
+                  <td className="px-4 py-3">
+                    {statusLabels[wedding.status] || wedding.status}
+                    <span className="sr-only"> ({wedding.status})</span>
+                  </td>
                   <td className="px-4 py-3">{wedding.confirmedGuests}</td>
                   <td className="px-4 py-3">{wedding.signedContracts}</td>
                   <td className="px-4 py-3 text-right">
@@ -126,18 +143,11 @@ const AdminPortfolio = () => {
                       >
                         Ver detalle
                       </button>
-                      <button
-                        type="button"
-                        data-testid="portfolio-export-pdf"
-                        className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
-                      >
-                        Exportar PDF
-                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {portfolio.length === 0 && (
                 <tr>
                   <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={7}>
                     No se encontraron bodas con los filtros seleccionados.
@@ -179,6 +189,15 @@ const AdminPortfolio = () => {
                   Información ficticia para la vista previa del panel administrativo.
                 </p>
               </div>
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                data-testid="portfolio-export-pdf"
+                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              >
+                Exportar PDF
+              </button>
             </div>
           </div>
         </div>

@@ -11,6 +11,9 @@ import {
   Flag,
   ArrowLeftRight,
   Calendar,
+  Sparkles,
+  Folder,
+  Clock,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef, memo } from 'react';
 
@@ -31,18 +34,19 @@ import EmailComments from '../EmailComments';
 // Importamos nuestros componentes de iconos personalizados
 
 /**
- * Componente para mostrar el detalle completo de un email
+ * Componente para mostrar el detalle completo de un email.
  *
- * @param {Object} props - Propiedades del componente
- * @param {Object} props.email - Email a mostrar
- * @param {Function} props.onReply - Función para responder al email
- * @param {Function} props.onDelete - Función para eliminar o mover el email
- * @param {Function} props.onDeleteForever - Función para eliminar definitivamente (papelera)
- * @param {Function} props.onBack - Función para volver a la lista
- * @param {Function} props.onMarkRead - Función para marcar como leído
- * @param {Function} props.onRestore - Función para restaurar desde papelera
- * @param {string} props.currentFolder - Carpeta actual para condicionar acciones
- * @returns {JSX.Element} Componente de detalle de email
+ * @param {Object} props
+ * @param {Object} props.email
+ * @param {Function} props.onReply
+ * @param {Function} props.onDelete
+ * @param {Function} props.onDeleteForever
+ * @param {Function} props.onBack
+ * @param {Function} props.onMarkRead
+ * @param {Function} props.onRestore
+ * @param {Function} props.onToggleImportant
+ * @param {string} props.currentFolder
+ * @returns {JSX.Element}
  */
 
 // Constantes para tipos de archivos
@@ -69,8 +73,12 @@ const EmailDetail = ({
   onReplyAll,
   userId,
   onSchedule,
+  resolveFolderName,
   onRestore,
+  onToggleImportant,
   currentFolder = 'inbox',
+  folders = [],
+  onMoveToFolder,
 }) => {
   // Si email es null o undefined, mostrar un mensaje
   if (!email) {
@@ -80,7 +88,12 @@ const EmailDetail = ({
       </div>
     );
   }
-  const [isStarred, setIsStarred] = useState(email?.important || false);
+  const [isStarred, setIsStarred] = useState(Boolean(email?.important));
+  const trashMeta = email?.trashMeta || {};
+  const previousFolderId = trashMeta.previousFolder || trashMeta.restoredTo || null;
+  const originalFolderName =
+    typeof resolveFolderName === 'function' ? resolveFolderName(previousFolderId) : null;
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [isRead, setIsRead] = useState(email?.read || false);
   const [expandedImage, setExpandedImage] = useState(null);
@@ -114,12 +127,21 @@ const EmailDetail = ({
     );
   }
 
+  useEffect(() => {
+    setIsStarred(Boolean(email?.important));
+  }, [email?.id, email?.important]);
+
   // Función para manejar el marcado como importante
   const handleToggleStar = () => {
-    setIsStarred(!isStarred);
-    // Actualizar en el servidor y notificar al componente padre
-    // Esta función debería conectarse con el servicio de email
-    // por ahora solo actualizamos el estado local
+    const nextValue = !isStarred;
+    setIsStarred(nextValue);
+    if (typeof onToggleImportant === 'function') {
+      try {
+        onToggleImportant(nextValue);
+      } catch (error) {
+        console.error('No se pudo actualizar el estado importante', error);
+      }
+    }
   };
 
   // Formatear la fecha completa
@@ -241,114 +263,212 @@ const EmailDetail = ({
   };
 
   const emailCategories = detectCategories(email);
-  const isInTrash = currentFolder === 'trash';
+  const isInTrash = currentFolder === 'trash' || safeRender(email.folder, '') === 'trash';
+  const moveOptions = Array.isArray(folders)
+    ? folders.filter((item) => item?.id && item.id !== currentFolder)
+    : [];
+  const basicFolderLabels = {
+    inbox: 'Bandeja de entrada',
+    sent: 'Enviados',
+    trash: 'Papelera',
+  };
+  const folderLabel =
+    (typeof resolveFolderName === 'function' && resolveFolderName(currentFolder)) ||
+    basicFolderLabels[currentFolder] ||
+    'Bandeja de entrada';
+  const suggestedLabel = safeRender(email?._suggestedFolderLabel, null);
+  const hasSuggestion = Boolean(email?._hasSuggestion && suggestedLabel);
+  const headerSender = safeRender(email?.from, '') || 'Remitente desconocido';
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Barra de herramientas */}
-      <div className="p-4 border-b flex items-center justify-between">
-        <div className="flex items-center">
-          <button onClick={onBack} className="mr-4 text-gray-600 hover:text-gray-900 md:hidden">
-            <ArrowLeft size={20} />
-          </button>
-
-          <Button
-            onClick={onReply}
-            variant="outline"
-            size="sm"
-            className="flex items-center mr-2"
-            aria-label="Responder"
-          >
-            <Reply size={16} className="mr-1" />
-            <span className="hidden sm:inline">Responder</span>
-          </Button>
-
-          {isInTrash ? (
-            <>
-              <Button
-                onClick={() => onRestore?.()}
-                variant="outline"
-                size="sm"
-                className="flex items-center mr-2"
-                data-testid="restore-email-button"
-                aria-label="Restaurar"
-              >
-                <ArrowLeft size={16} className="mr-1" />
-                <span className="hidden sm:inline">Restaurar</span>
-              </Button>
-              <Button
-                onClick={() => (onDeleteForever || onDelete)?.()}
-                variant="danger"
-                size="sm"
-                className="flex items-center mr-2"
-                data-testid="delete-forever-button"
-                aria-label="Eliminar permanentemente"
-              >
-                <Trash size={16} className="mr-1" />
-                <span className="hidden sm:inline">Eliminar permanentemente</span>
-              </Button>
-            </>
-          ) : (
-            <Button
-              onClick={onDelete}
-              variant="outline"
-              size="sm"
-              className="flex items-center mr-2"
-              aria-label="Eliminar"
+      {/* Header resumido */}
+      <div className="border-b bg-surface px-6 py-4 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <button
+              onClick={onBack}
+              className="rounded-full p-1 text-muted transition hover:bg-gray-100 hover:text-body md:hidden"
+              aria-label="Volver a la lista"
             >
-              <Trash size={16} className="mr-1" />
-              <span className="hidden sm:inline">Eliminar</span>
-            </Button>
-          )}
-
-          <button
-            onClick={handleToggleStar}
-            className={`p-1.5 rounded-full hover:bg-gray-100 ${isStarred ? 'text-yellow-500' : 'text-gray-500'}`}
-          >
-            <Star size={20} className={isStarred ? 'fill-yellow-500' : ''} />
-          </button>
-        </div>
-
-        <div className="relative">
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600"
-          >
-            <MoreHorizontal size={20} />
-          </button>
-
-          {showDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
-              <div className="py-1">
-                <button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <Printer size={16} className="mr-2" />
-                  Imprimir
-                </button>
-                <button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <Download size={16} className="mr-2" />
-                  Descargar
-                </button>
-                <button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <ExternalLink size={16} className="mr-2" />
-                  Abrir en nueva ventana
-                </button>
-                <button
-                  className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  onClick={() => {
-                    setShowDropdown(false);
-                    if (onForward) onForward(email);
-                  }}
-                >
-                  <ArrowLeftRight size={16} className="mr-2" />
-                  Reenviar
-                </button>
-                <button className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <Flag size={16} className="mr-2" />
-                  Marcar
-                </button>
+              <ArrowLeft size={20} />
+            </button>
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-muted">
+                <span className="inline-flex items-center gap-1">
+                  <Folder size={14} />
+                  {folderLabel}
+                </span>
+                {currentFolder === 'trash' && originalFolderName && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600">
+                    Origen: {originalFolderName}
+                  </span>
+                )}
+                {hasSuggestion && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-semibold text-violet-700">
+                    <Sparkles size={12} />
+                    {suggestedLabel}
+                  </span>
+                )}
+              </div>
+              <h2
+                className="truncate text-xl font-semibold leading-tight text-body"
+                title={safeRender(email.subject, '(Sin asunto)')}
+              >
+                {safeRender(email.subject, '(Sin asunto)')}
+              </h2>
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+                <span className="font-medium text-body" title={headerSender}>
+                  {headerSender}
+                </span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock size={14} />
+                  {formatFullDate(email.date)}
+                </span>
               </div>
             </div>
-          )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              onClick={onReply}
+              variant="primary"
+              size="sm"
+              className="flex items-center gap-1"
+              aria-label="Responder"
+            >
+              <Reply size={16} />
+              <span>Responder</span>
+            </Button>
+
+            {onSchedule && (
+              <Button
+                onClick={() => onSchedule(email)}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <Calendar size={16} />
+                <span>Agendar</span>
+              </Button>
+            )}
+
+            {isInTrash ? (
+              <>
+                <Button
+                  onClick={() => onRestore?.()}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  data-testid="restore-email-button"
+                  aria-label="Restaurar"
+                >
+                  <ArrowLeft size={16} />
+                  <span>Restaurar</span>
+                </Button>
+                <Button
+                  onClick={() => (onDeleteForever || onDelete)?.()}
+                  variant="danger"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  data-testid="delete-forever-button"
+                  aria-label="Eliminar permanentemente"
+                >
+                  <Trash size={16} />
+                  <span>Eliminar</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={onDelete}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+                aria-label="Eliminar"
+                data-testid="delete-email-button"
+              >
+                <Trash size={16} />
+                <span>Eliminar</span>
+              </Button>
+            )}
+
+            {moveOptions.length > 0 && (
+              <select
+                className="rounded-lg border border-soft px-2 py-1 text-sm text-body focus:outline-none focus:ring-2 focus:ring-primary"
+                defaultValue=""
+                onChange={(event) => {
+                  const targetId = event.target.value;
+                  if (!targetId || targetId === currentFolder) return;
+                  onMoveToFolder?.(email.id, targetId);
+                  event.target.value = '';
+                }}
+                aria-label="Mover correo a otra carpeta"
+              >
+                <option value="" disabled>
+                  Mover a...
+                </option>
+                {moveOptions.map((folderOption) => (
+                  <option key={folderOption.id} value={folderOption.id}>
+                    {folderOption.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            <button
+              onClick={handleToggleStar}
+              className={`rounded-full p-1.5 transition ${
+                isStarred ? 'text-yellow-500' : 'text-gray-300 hover:text-gray-400'
+              }`}
+              aria-label={isStarred ? 'Marcar como no importante' : 'Marcar como importante'}
+            >
+              <Star size={20} className={isStarred ? 'fill-yellow-500' : ''} />
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="rounded-full p-1.5 text-muted transition hover:bg-gray-100"
+                aria-label="Más acciones"
+              >
+                <MoreHorizontal size={20} />
+              </button>
+
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md border bg-white shadow-lg z-10">
+                  <div className="py-1 text-sm">
+                    <button className="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <Printer size={16} className="mr-2" />
+                      Imprimir
+                    </button>
+                    <button className="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <Download size={16} className="mr-2" />
+                      Descargar
+                    </button>
+                    <button className="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <ExternalLink size={16} className="mr-2" />
+                      Abrir en nueva ventana
+                    </button>
+                    <button
+                      className="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      onClick={() => {
+                        setShowDropdown(false);
+                        if (onForward) onForward(email);
+                      }}
+                    >
+                      <ArrowLeftRight size={16} className="mr-2" />
+                      Reenviar
+                    </button>
+                    <button className="flex w-full items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <Flag size={16} className="mr-2" />
+                      Marcar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -362,31 +482,25 @@ const EmailDetail = ({
           </div>
 
           <div className="flex-grow">
-            <div className="flex items-start justify-between">
-              <h1 className="text-xl font-medium mb-2">
-                {safeRender(email.subject, '(Sin asunto)')}
-              </h1>
+            <p className="text-sm text-muted">
+              <span className="font-medium text-body">Asunto:</span>{' '}
+              {safeRender(email.subject, '(Sin asunto)')}
+            </p>
+
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+              <span className="font-medium text-body">{safeRender(email.from, '')}</span>
+              <span className="text-muted">{'>'}</span>
+              <span>{safeRender(email.to, '') || 'N/D'}</span>
             </div>
 
-            <div className="flex flex-wrap items-center mb-1">
-              <span className="font-medium mr-1">{safeRender(email.from, '')}</span>
-              <span className="text-gray-500 text-sm mr-1">para</span>
-              <span className="mr-2">{safeRender(email.to, '')}</span>
-
-              {email.cc && (
-                <>
-                  <span className="text-gray-500 text-sm mr-1">cc:</span>
-                  <span>{email.cc}</span>
-                </>
-              )}
-            </div>
-
-            <div className="text-gray-500 text-sm mb-2">
-              {safeRender(formatFullDate(email.date), '')}
-            </div>
+            {email.cc && (
+              <div className="mt-1 text-xs text-muted">
+                cc: {email.cc}
+              </div>
+            )}
 
             {emailCategories.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {emailCategories.map((category, index) => (
                   <EmailCategoryLabel key={index} name={category.name} color={category.color} />
                 ))}

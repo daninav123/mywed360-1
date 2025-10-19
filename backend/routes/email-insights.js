@@ -3,6 +3,7 @@ import { db } from '../db.js';
 import OpenAI from 'openai';
 import logger from '../logger.js';
 import { extractTextForMail } from '../services/attachmentText.js';
+import { classifyEmailContent } from '../services/emailClassification.js';
 
 const router = express.Router();
 
@@ -77,55 +78,28 @@ function heuristicAnalyze({ subject = '', body = '' }) {
   return { tasks, meetings, budgets, contracts, payments };
 }
 
-// Heurística de clasificación (tags + carpeta sugerida)
-function heuristicClassify({ subject = '', body = '' }) {
-  const text = `${subject}\n${body}`.toLowerCase();
-  const tags = [];
-  let folder = null;
-  try {
-    if (/(presupuesto|budget|factura|pago)/.test(text)) { tags.push('Presupuesto'); folder = folder || 'Finanzas'; }
-    if (/(contrato|firma|acuerdo)/.test(text)) { tags.push('Contrato'); folder = folder || 'Contratos'; }
-    if (/(fot[oó]grafo|catering|m[úu]sica|dj|flor)/.test(text)) { tags.push('Proveedor'); folder = folder || 'Proveedores'; }
-    if (/(invitaci[óo]n|rsvp|confirmaci[óo]n)/.test(text)) { tags.push('Invitación'); folder = folder || 'RSVP'; }
-  } catch {}
-  return { tags: Array.from(new Set(tags)), folder };
-}
-
 // POST /api/email-insights/classify  { subject, body }
 router.post('/classify', async (req, res) => {
-  const { subject = '', body = '' } = req.body || {};
-  if (!subject && !body) return res.status(400).json({ error: 'subject_or_body_required' });
-  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
-  if (apiKey) {
-    try {
-      const openai = new OpenAI({ apiKey, project: process.env.OPENAI_PROJECT_ID });
-      const prompt = `Clasifica el siguiente email en etiquetas y una carpeta sugerida para una app de bodas. Devuelve SOLO JSON con este formato exacto:\n{\n  "tags": ["Presupuesto|Contrato|Proveedor|Invitación"...],\n  "folder": "Finanzas|Contratos|Proveedores|RSVP|..."\n}\nEmail:\nAsunto: ${subject}\nCuerpo: ${body.slice(0, 3000)}`;
-      const completion = await Promise.race([
-        openai.chat.completions.create({
-          model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
-          temperature: 0,
-          messages: [
-            { role: 'system', content: 'Responde solo JSON válido con campos "tags" (array de strings) y "folder" (string o null).' },
-            { role: 'user', content: prompt },
-          ],
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout-openai-classify')), 7000)),
-      ]);
-      const content = completion.choices?.[0]?.message?.content || '';
-      try {
-        const parsed = JSON.parse(content);
-        return res.json({ tags: Array.isArray(parsed.tags) ? parsed.tags : [], folder: parsed.folder || null });
-      } catch {
-        const m = content.match(/\{[\s\S]*\}$/);
-        if (m) {
-          try { const parsed = JSON.parse(m[0]); return res.json({ tags: parsed.tags || [], folder: parsed.folder || null }); } catch {}
-        }
-      }
-    } catch (e) {
-      logger.warn('[email-insights] classify OpenAI fallo:', e?.message || e);
-    }
+  try {
+    const { subject = '', body = '', mailId = '', persist = true, ownerUid = null } = req.body || {};
+    if (!subject && !body) return res.status(400).json({ error: 'subject_or_body_required' });
+
+    const normalizedMailId = typeof mailId === 'string' && mailId.trim() ? mailId.trim() : null;
+    const normalizedOwnerUid = typeof ownerUid === 'string' && ownerUid.trim() ? ownerUid.trim() : null;
+
+    const result = await classifyEmailContent({
+      subject,
+      body,
+      mailId: normalizedMailId,
+      ownerUid: normalizedOwnerUid,
+      persist: persist !== false,
+    });
+
+    return res.json(result);
+  } catch (error) {
+    logger.error('[email-insights] classify falló', error?.message || error);
+    return res.status(500).json({ error: 'classification_failed' });
   }
-  return res.json(heuristicClassify({ subject, body }));
 });
 
 // POST /api/email-insights/analyze
@@ -258,6 +232,3 @@ router.post('/reanalyze/:mailId', async (req, res) => {
     return res.status(500).json({ error: 'internal' });
   }
 });
-
-
-

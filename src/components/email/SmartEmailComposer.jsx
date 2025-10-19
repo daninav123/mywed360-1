@@ -17,6 +17,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
+import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
 import React, { useState, useEffect } from 'react';
 
 import EmailRecommendationsPanel from './EmailRecommendationsPanel';

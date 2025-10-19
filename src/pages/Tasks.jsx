@@ -16,9 +16,11 @@ export default function Tasks() {
   // Simplemente devolvemos el componente refactorizado
   return (
     <ErrorBoundary>
-      {/* Panel de sincronización de calendario (Google) */}
-      <CalendarSync />
-      <TasksRefactored />
+      <div className="layout-container-wide space-y-6 pt-4 md:pt-6">
+        {/* Panel de sincronización de calendario (Google) */}
+        <CalendarSync />
+        <TasksRefactored />
+      </div>
     </ErrorBoundary>
   );
 }

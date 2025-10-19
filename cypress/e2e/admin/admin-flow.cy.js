@@ -56,10 +56,10 @@ describe('Admin - Dashboard', () => {
   });
 
   it('muestra los KPIs principales con sus variaciones', () => {
-    cy.get('[data-testid="admin-kpi-active-users"]').should('exist');
-    cy.get('[data-testid="admin-kpi-new-weddings"]').should('exist');
-    cy.get('[data-testid="admin-kpi-conversion"]').should('exist');
-    cy.get('[data-testid="admin-kpi-estimated-revenue"]').should('exist');
+    cy.get('[data-testid="admin-kpi-active-weddings"]').should('exist');
+    cy.get('[data-testid="admin-kpi-revenue-30d"]').should('exist');
+    cy.get('[data-testid="admin-kpi-downloads-30d"]').should('exist');
+    cy.get('[data-testid="admin-kpi-open-alerts"]').should('exist');
   });
 
   it('presenta el estado de los servicios externos', () => {
@@ -78,12 +78,8 @@ describe('Admin - Dashboard', () => {
     cy.get('@alert').should('have.attr', 'data-status', 'resolved');
   });
 
-  it('gestiona la lista de tareas administrativas', () => {
-    cy.get('[data-testid="admin-task-add"]').click();
-    cy.get('[data-testid="admin-task-modal"]').should('be.visible');
-    cy.get('[data-testid="admin-task-title"]').type('Revisar reportes semanales');
-    cy.get('[data-testid="admin-task-submit"]').click();
-    cy.get('[data-testid="admin-task-item"]').contains('Revisar reportes semanales').should('exist');
+  it('muestra el resumen de tareas nuevas creadas por usuarios', () => {
+    cy.get('[data-testid="admin-new-tasks-card"]').should('exist');
   });
 });
 

@@ -39,6 +39,8 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
     }
   }, [initialData]);
 
+  const isEditing = Boolean(initialData?.id);
+
   // Manejar cambios en los campos
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,7 +104,7 @@ const ProveedorForm = ({ onSubmit, onCancel, initialData }) => {
       {/* Header */}
       <div className="flex justify-between items-center p-4 border-b">
         <h2 className="text-xl font-semibold">
-          {initialData ? 'Editar proveedor' : 'Nuevo proveedor'}
+          {isEditing ? 'Editar proveedor' : 'Nuevo proveedor'}
         </h2>
         <button
           onClick={onCancel}

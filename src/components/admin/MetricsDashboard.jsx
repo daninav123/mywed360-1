@@ -17,11 +17,7 @@ import {
 
 import { get as apiGet } from '../../services/apiClient';
 import { performanceMonitor } from '../../services/PerformanceMonitor';
-import {
-  getAdminFetchOptions,
-  getAdminHeaders,
-  getAdminSessionToken,
-} from '../../services/adminSession';
+import { getAdminFetchOptions } from '../../services/adminSession';
 
 /**
  * Dashboard para visualizar mtricas de rendimiento del sistema
@@ -54,18 +50,8 @@ function MetricsDashboard() {
     error: '#ff0000',
   };
 
-  const buildAdminApiOptions = (extra = {}) => {
-    const token = getAdminSessionToken();
-    const options = { ...(extra || {}) };
-    options.headers = getAdminHeaders(options.headers || {});
-    if (!Object.prototype.hasOwnProperty.call(options, 'auth')) {
-      options.auth = !token;
-    }
-    if (!Object.prototype.hasOwnProperty.call(options, 'silent')) {
-      options.silent = true;
-    }
-    return options;
-  };
+  const buildAdminApiOptions = (extra = {}) =>
+    getAdminFetchOptions({ auth: false, silent: true, ...extra });
 
   // Cargar datos de mtricas al montar el componente
   useEffect(() => {

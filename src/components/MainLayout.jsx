@@ -12,8 +12,6 @@ import TaskNotificationWatcher from '@/components/tasks/TaskNotificationWatcher.
 
 import ChatWidget from './ChatWidget';
 import DarkModeToggle from './DarkModeToggle';
-import DefaultAvatar from './DefaultAvatar';
-import GlobalSearch from './GlobalSearch';
 import Nav from './Nav';
 import NotificationCenter from './NotificationCenter';
 import WeddingSelector from './WeddingSelector';
@@ -30,6 +28,7 @@ import { performanceMonitor } from '../services/PerformanceMonitor';
 
 export default function MainLayout() {
   const { t } = useTranslation();
+  const brandLabel = t('app.brandName', { defaultValue: 'Lovenda' });
   const prefetchNotificaciones = React.useCallback(() => {
     try {
       import('../pages/Notificaciones');
@@ -161,31 +160,39 @@ export default function MainLayout() {
             Crear nuevo evento
           </Button>
         )}
-        {/* Centro de notificaciones y watcher */}
+        {/* Watchers de notificaciones (sin icono visible aquí) */}
         <NotificationWatcher intervalMs={3000} />
         <TaskNotificationWatcher intervalMs={5 * 60 * 1000} />
-        <NotificationCenter />
         {(import.meta.env.PROD || import.meta.env.VITE_SHOW_ROLE_BADGE === 'true') && <RoleBadge />}
-        <div className="hidden md:block">
-          <GlobalSearch />
-        </div>
 
         {/* Avatar y menú de usuario */}
         <div className="relative" data-user-menu>
           <div
             onClick={() => setOpenMenu(!openMenu)}
-            className={`w-10 h-10 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
+            className={`w-12 h-12 rounded-full cursor-pointer transition-all duration-200 hover:ring-2 ${
               openMenu
                 ? 'ring-2 bg-[var(--color-accent)]/20'
                 : 'bg-[var(--color-surface)] hover:bg-[var(--color-accent)]/20'
             } flex items-center justify-center`}
             title={t('navigation.userMenu', { defaultValue: 'Menú de usuario' })}
-            style={{ '--tw-ring-color': 'var(--color-primary)' }}
+            style={{
+              '--tw-ring-color': 'var(--color-primary)',
+              '--tw-ring-offset-color': 'var(--color-bg)'
+            }}
           >
-            <DefaultAvatar className="w-6 h-6 text-[color:var(--color-text)]/70" />
+            <img
+              src={`${import.meta.env.BASE_URL}logo-app.png`}
+              alt={brandLabel}
+              className="h-11 w-11 rounded-full object-contain"
+              loading="lazy"
+            />
           </div>
           {openMenu && (
-            <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text)]/15 rounded-lg shadow-lg p-1 space-y-1 min-w-[200px] z-50">
+            <div className="absolute right-0 mt-2 bg-[var(--color-surface)] border border-[color:var(--color-text)]/15 rounded-lg shadow-lg p-1 space-y-1 min-w-[220px] z-50">
+              <div className="px-2 py-1">
+                <NotificationCenter />
+              </div>
+
               <Link
                 to="/perfil"
                 onClick={() => setOpenMenu(false)}

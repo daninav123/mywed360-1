@@ -45,6 +45,8 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
     validationsEnabled = true,
     globalMaxSeats = 0,
     suggestions = null,
+    tableLocks = new Map(),
+    currentClientId = null,
   },
   _forwardedRef
 ) {
@@ -297,6 +299,15 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               if (found) highlightScore = found.score || 0;
             }
           } catch (_) {}
+          const lockInfo =
+            tableLocks && typeof tableLocks.get === 'function'
+              ? tableLocks.get(String(t.id))
+              : undefined;
+          const lockedBy = lockInfo?.displayName || lockInfo?.userId || null;
+          const lockedColor = lockInfo?.color;
+          const lockedIsCurrent = lockInfo?.clientId === currentClientId;
+          const tableCanMove =
+            canMoveTables && (!lockedBy || lockedIsCurrent);
           return (
             <TableItem
               key={`${t.id}-${idx}`}
@@ -315,7 +326,8 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               onOpenConfig={setConfigTable}
               onSelect={onSelectTable}
               guests={guests}
-              canMove={canMoveTables}
+              eventsDisabled={drawMode === 'boundary'}
+              canMove={tableCanMove}
               selected={
                 (selectedTable && selectedTable.id === t.id) ||
                 (selectedIds && selectedIds.some((id) => String(id) === String(t.id)))
@@ -325,6 +337,9 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               dangerReason={dangerReason}
               globalMaxSeats={globalMaxSeats}
               highlightScore={highlightScore}
+              lockedBy={lockedBy}
+              lockedColor={lockedColor}
+              lockedIsCurrent={lockedIsCurrent}
             />
           );
         })}
