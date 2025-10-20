@@ -4,15 +4,15 @@ function writeJson(p,obj){ const txt = JSON.stringify(obj,null,2)+'+"\n"+'; fs.w
  * Sync i18n locale files with EN as source of truth.
  * - Fills missing keys from EN
  * - Keeps existing translations
- * - Applies minimal curated fixes for ES/FR accents and key labels
- * Usage: node scripts/syncLocales.js [es fr]
+ * - Applies minimal curated fixes for ES accents and key labels
+ * Usage: node scripts/syncLocales.js [es]
  */
 const fs = require('fs');
 const path = require('path');
 
 const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
 const BASE = 'en';
-const TARGETS = process.argv.slice(2).length ? process.argv.slice(2) : ['es', 'fr'];
+const TARGETS = process.argv.slice(2).length ? process.argv.slice(2) : ['es'];
 
 function walkJsonFiles(dir){
   const out=[]; if(!fs.existsSync(dir)) return out;

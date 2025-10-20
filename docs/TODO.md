@@ -52,6 +52,11 @@
 - [ ] Configurar alertas push/Slack en tiempo real y dashboard "Estado integraciones".
 - [ ] Automatizar reportes semanales al comite directivo y KPI NPS planners.
 
+### Multi-boda
+- [ ] Desplegar worker CRM que procese `crmSyncQueue`, con reintentos y actualización de `crm.lastSyncStatus`.
+- [ ] Instrumentar métricas de sincronización y panel en `MultiWeddingSummary` (sincronizadas vs en cola/error).
+- [ ] Añadir suites E2E dedicadas para permisos por módulo y flujos de sincronización CRM.
+
 ### Invitados y RSVP
 - [ ] Completar flujo integral con fixtures estables (alta manual, CSV, filtros, etiquetas, bulk).
 - [ ] Sincronizar estadisticas RSVP `weddings/{id}/rsvp/stats` y panel resumen.

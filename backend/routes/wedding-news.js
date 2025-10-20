@@ -108,7 +108,8 @@ function mapItems(feed, feedUrl) {
   let feedHost = '';
   try { feedHost = new URL(feedUrl).hostname.replace('www.', ''); } catch {}
   const fromGoogleNews = /news\.google\.com$/i.test(feedHost);
-  return (feed.items || []).map((it) => {
+  const items = [];
+  (feed.items || []).forEach((it) => {
     let link = it.link || '';
     try {
       if (typeof link === 'string' && link.includes('news.google.com')) {
@@ -123,6 +124,12 @@ function mapItems(feed, feedUrl) {
     } catch {
       try { sourceHost = new URL(feedUrl).hostname.replace('www.', ''); } catch { sourceHost = 'unknown'; }
     }
+    if (!link || typeof link !== 'string' || !/^https?:\/\//i.test(link)) {
+      return;
+    }
+    if (/^news\.google\.com$/i.test(sourceHost)) {
+      return;
+    }
     // Resolver imagen del item (absoluta si es relativa)
     let rawImage = (
       it.enclosure?.url ||
@@ -136,8 +143,11 @@ function mapItems(feed, feedUrl) {
     if (rawImage && typeof rawImage === 'string') {
       try { absImage = new URL(rawImage, link || feedUrl).toString(); } catch {}
     }
+    if (!absImage || !/^https?:\/\//i.test(absImage)) {
+      return;
+    }
 
-    return {
+    items.push({
       id: it.guid || it.id || it.link,
       title: it.title || '',
       description:
@@ -146,12 +156,13 @@ function mapItems(feed, feedUrl) {
         it.content ||
         (typeof it.description === 'string' ? it.description.replace(/<[^>]+>/g, '') : ''),
       url: link,
-      image: absImage,
+      image: absImage || null,
       source: sourceHost,
       published: it.isoDate || it.pubDate || new Date().toISOString(),
       feedSource: fromGoogleNews ? 'google-news' : feedHost || 'feed',
-    };
+    });
   });
+  return items;
 }
 // Fin mapItems
 
@@ -310,20 +321,6 @@ router.get('/', async (req, res) => {
         } catch {}
         return false;
       };
-      // Si el enlace es de Google News, resolver canonical al medio original
-      try {
-        const h = new URL(finalUrl).hostname;
-        if (/news\.google\.com$/i.test(h)) {
-          try {
-            const r = await axios.get(finalUrl, reqCfg);
-            const html = String(r.data || '');
-            const m = html.match(canonicalRe) || html.match(ogUrlRe);
-            if (m && m[1]) {
-              finalUrl = new URL(m[1], finalUrl).toString();
-            }
-          } catch {}
-        }
-      } catch {}
       if (finalUrl && shouldTryResolve()) {
         try {
           const found = await resolveOgImage(finalUrl);
@@ -332,10 +329,19 @@ router.get('/', async (req, res) => {
       }
       // Asegurar absoluta si es relativa
       try { if (img && !/^https?:\/\//i.test(img)) img = new URL(img, finalUrl).toString(); } catch {}
+      if (!isHttp(img || item.image)) {
+        continue;
+      }
       // Recalcular fuente desde la URL final
-      let sourceHost = item.source;
-      try { sourceHost = new URL(finalUrl).hostname.replace('www.', ''); } catch {}
-      withImages.push({ ...item, url: finalUrl, source: sourceHost, image: img || item.image || null });
+      const finalHost = (() => {
+        try { return new URL(finalUrl).hostname.replace('www.', ''); } catch { return item.source || ''; }
+      })();
+      withImages.push({
+        ...item,
+        url: finalUrl,
+        source: finalHost || item.source || 'unknown',
+        image: img || item.image || null,
+      });
     }
 
     res.status(200).json(withImages);

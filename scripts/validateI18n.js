@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
-const LOCALES = ['en', 'es', 'fr'];
+const LOCALES = ['en', 'es'];
 const BASE = 'en';
 
 function walkJsonFiles(dir) {

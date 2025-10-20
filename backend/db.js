@@ -14,10 +14,11 @@ const envCandidates = [
   path.resolve(__dirname, '..', '.env.local'),
   path.resolve(__dirname, '..', '.env'),
 ];
+const loadedEnvFiles = new Set();
 for (const candidate of envCandidates) {
-  if (fs.existsSync(candidate)) {
-    dotenv.config({ path: candidate });
-    break;
+  if (!loadedEnvFiles.has(candidate) && fs.existsSync(candidate)) {
+    dotenv.config({ path: candidate, override: false });
+    loadedEnvFiles.add(candidate);
   }
 }
 

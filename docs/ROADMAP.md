@@ -1,4 +1,4 @@
-﻿# Roadmap - Lovenda/MyWed360
+# Roadmap - Lovenda/MyWed360
 
 > Documento canonico que integra backlog, plan de sprints y estado por flujo. Actualiza esta fuente unica cuando haya cambios para evitar divergencias.
 >
@@ -39,9 +39,13 @@
 - **[archivo]** docs\flujos-especificos\flujo-10-gestion-bodas-multiples.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - `Bodas.jsx`, `BodaDetalle.jsx`, `WeddingSelector.jsx`, `WeddingFormModal.jsx`, `useWedding` context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes `MultiWeddingSummary.jsx` y `WeddingPortfolioTable.jsx`, y permisos granulares por boda.
+  - Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, y permisos granulares por boda.
+  - Tablero multi-boda con KPIs, filtros avanzados y encolado de sincronizaciones CRM (crmSyncQueue).
+  - Editor de permisos por módulo en BodaDetalle.jsx con persistencia en modulePermissions.
 - **[pendiente (doc)]**
-  - dashboards multi-boda avanzados, permisos granulares por m�dulo y vistas cruzadas consolidadas.
+  - Worker de CRM que procese crmSyncQueue, gestione reintentos y actualice crm.lastSyncStatus.
+  - Activity feed multi-boda y alertas en tiempo real.
+  - Suites E2E dedicadas para permisos por módulo y sincronización CRM.
 - **[E2E specs]** 2/2 presentes
   - [ok] cypress/e2e/weddings/multi-weddings-flow.cy.js
   - [ok] cypress/e2e/weddings/wedding-team-flow.cy.js
@@ -50,7 +54,7 @@
   - `BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
   - `WeddingSelector.jsx` -> src\components\WeddingSelector.jsx
   - `WeddingFormModal.jsx` -> src\components\WeddingFormModal.jsx
-  - `useWedding` -> (no encontrado)
+  - `useWedding` -> src\hooks\useWedding.js
   - `MultiWeddingSummary.jsx` -> src\components\weddings\MultiWeddingSummary.jsx
   - `WeddingPortfolioTable.jsx` -> src\components\weddings\WeddingPortfolioTable.jsx
 - **[roadmap/pending (doc)]**
@@ -567,22 +571,17 @@
   - - Asegurar que el bundle incluye `ThemeToggle` y variables CSS sin colisiones.  
   - - Revisar que asistentes IA reciban contexto (`style`, `guestCount`, `formality`) en `ChatWidget` antes de habilitar nuevas plantillas.
 
-## 4. Invitados – Plan de Asientos (estado 2025-10-16)
+## 4. Invitados – Plan de Asientos (estado 2025-10-12)
 
 - **[archivo]** docs\flujos-especificos\flujo-4-invitados-operativa.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `SeatingPlanRefactored.jsx`, `SeatingPlanCanvas.jsx`, `SeatingPlanSidebar.jsx`, `SeatingPlanToolbar.jsx`, `SeatingPlanModals.jsx`, `SeatingLibraryPanel.jsx`, `SeatingMobileOverlay.jsx`, `SeatingGuestDrawer.jsx`, `SeatingSmartPanel.jsx`, `SeatingGuestSidebar.jsx`, `SeatingExportWizard.jsx` (presets y guardado local).
-  - Hook `useSeatingPlan` (colaboración, locks `seatingLocks`, métricas `/api/metrics/seating`) expuesto en `src/hooks/useSeatingPlan.js`, integrado con `useGuests` y `useSpecialMoments`.
+- **[conclusion]** pendiente
 - **[pendiente (doc)]**
-  - Instrumentar telemetría/triggers desde el nuevo `GuestSidebar` (gamificación, IA) y pulir la experiencia móvil.
-  - Completar gestos táctiles (pinch, double tap) y cerrar la UI definitiva del overlay móvil.
-  - Sincronización bidireccional seating ↔ invitados (`guestInsights`, triggers) con distribución automática de exportes a stakeholders.
+  - 
 - **[roadmap/pending (doc)]**
   - - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  
-  - - Evolucionar la colaboración en tiempo real hacia versionado avanzado (locks y merge multi-editor) con presencia enriquecida.  
+  - - Colaboración en tiempo real: evolucionar hacia versionado avanzado (locks y merge multi-editor) sobre la presencia y sincronización actuales.  
   - - Integración con proveedores/venues (ingesta automática de planos y configuraciones).  
-  - - Automatizar envío de exportes y reporting multi-sección (PDF ceremonia/banquete + stakeholders).  
+  - - Exportaciones con presets guardados y envío directo a stakeholders.
   - - Reestructurar el PDF avanzado en secciones dedicadas (mapa de ceremonia, plano de banquete, lista global, invitados por mesa, dietas especiales, VIP de Momentos Especiales).
 - **[checklist despliegue]**
   - - Reglas Firestore: colecciones `seating` y `seatingHistory` (roles y límites).  
@@ -590,58 +589,12 @@
   - - Validar compresión y consistencia de exportaciones.  
   - - Automatizar backups periódicos de `seating` para auditoría.
 
-## 5. Proveedores con IA (estado 2025-10-07)
-
-- **[archivo]** docs\flujos-especificos\flujo-5-proveedores-ia.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - `GestionProveedores.jsx`, `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `SupplierKanban.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, `AI` modals (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`.
-- **[pendiente (doc)]**
-  - scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos.
-- **[E2E specs]** 3/3 presentes
-  - [ok] cypress/e2e/proveedores_flow.cy.js
-  - [ok] cypress/e2e/proveedores_compare.cy.js
-  - [ok] cypress/e2e/proveedores_smoke.cy.js
-- **[verificacion de archivos implementados]**
-  - `GestionProveedores.jsx` -> src\pages\GestionProveedores.jsx
-  - `ProveedorList.jsx` -> src\components\proveedores\ProveedorList.jsx
-  - `ProveedorCard.jsx` -> src\components\proveedores\ProveedorCard.jsx
-  - `ProveedorDetail.jsx` -> src\components\proveedores\ProveedorDetail.jsx
-  - `SupplierKanban.jsx` -> src\components\proveedores\SupplierKanban.jsx
-  - `GroupAllocationModal.jsx` -> src\components\proveedores\GroupAllocationModal.jsx
-  - `GroupCreateModal.jsx` -> src\components\proveedores\GroupCreateModal.jsx
-  - `GroupSuggestions.jsx` -> src\components\proveedores\GroupSuggestions.jsx
-  - `DuplicateDetectorModal.jsx` -> src\components\proveedores\DuplicateDetectorModal.jsx
-  - `CompareSelectedModal.jsx` -> src\components\proveedores\CompareSelectedModal.jsx
-  - `ProviderSearchDrawer.jsx` -> src\components\proveedores\ProviderSearchDrawer.jsx
-  - `AI` -> backend\routes\ai.js
-  - `AIBusquedaModal.jsx` -> src\components\proveedores\AIBusquedaModal.jsx
-  - `AISearchModal.jsx` -> src\components\proveedores\ai\AISearchModal.jsx
-  - `AIEmailModal.jsx` -> src\components\proveedores\ai\AIEmailModal.jsx
-  - `aiSuppliersService.js` -> src\services\aiSuppliersService.js
-  - `supplierEventBridge` -> src\components\proveedores\SupplierEventBridge.js, src\components\proveedores\SupplierEventBridge.jsx
-  - `EmailTrackingList.jsx` -> src\components\proveedores\tracking\EmailTrackingList.jsx
-  - `ProviderEmailModal.jsx` -> src\components\proveedores\ProviderEmailModal.jsx
-  - `RFQModal.jsx` -> src\components\proveedores\RFQModal.jsx
-  - `ReservationModal.jsx` -> src\components\proveedores\ReservationModal.jsx
-- **[roadmap/pending (doc)]**
-  - - Scoring IA consolidado con métricas históricas por servicio.
-  - - Portal proveedor completo con autenticación, feedback bidireccional y vista del estado por servicio contratado.
-  - - Automatización multi-proveedor (RFQ masivo, recordatorios automáticos) extendida a líneas de servicio combinadas.
-  - - Reportes comparativos y analítica de mercado (incluyendo cobertura de servicios pendientes).
-  - - Integración con marketplaces externos y recomendaciones en sitio público.
-- **[checklist despliegue]**
-  - - Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.
-  - - Reglas Firestore para `suppliers`, subcolección `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.
-  - - Validar límites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.
-  - - QA del tablero y filtros (performance > 500 proveedores).
-
 ## 5b. Timeline y Tareas (estado 2025-10-07)
 
 - **[archivo]** docs\flujos-especificos\flujo-5-timeline-tareas.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, componentes `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
+  - `Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `SmartChecklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, utilidades `taskAutomations`, `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`.
 - **[pendiente (doc)]**
   - Motor IA que personaliza un plan de tareas padre/subtareas a partir de una plantilla maestra y matriz de responsabilidades.
 - **[E2E specs]** 1/1 presentes
@@ -650,6 +603,7 @@
   - `Tasks.jsx` -> src\pages\Tasks.css, src\pages\Tasks.jsx, backend\node_modules\firebase-tools\lib\deploy\extensions\tasks.js, functions\node_modules\firebase-functions\lib\v2\providers\tasks.js, functions\node_modules\firebase-functions\lib\v1\providers\tasks.js, functions\node_modules\firebase-functions\lib\common\providers\tasks.js
   - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
   - `Checklist.jsx` -> src\pages\Checklist.jsx, src\pages\protocolo\Checklist.jsx
+  - `SmartChecklist.jsx` -> (no encontrado)
   - `TaskList.jsx` -> src\components\tasks\TaskList.jsx
   - `EventsCalendar.jsx` -> src\components\tasks\EventsCalendar.jsx
   - `LongTermTasksGantt.jsx` -> src\components\tasks\LongTermTasksGantt.jsx
@@ -657,6 +611,7 @@
   - `TaskEventBridge.jsx` -> src\components\tasks\TaskEventBridge.js, src\components\tasks\TaskEventBridge.jsx
   - `TaskNotificationWatcher.jsx` -> src\components\tasks\TaskNotificationWatcher.js, src\components\tasks\TaskNotificationWatcher.jsx
   - `useWeddingTasksHierarchy.js` -> src\hooks\useWeddingTasksHierarchy.js
+  - `taskAutomations` -> (no encontrado)
   - `CalendarComponents.jsx` -> src\components\tasks\CalendarComponents.jsx
   - `src/data/tasks/masterTimelineTemplate.json` -> src\data\tasks\masterTimelineTemplate.json
   - `TaskSidePanel.jsx` -> src\components\tasks\TaskSidePanel.jsx
@@ -668,7 +623,7 @@
   - - Gamificación completa (streaks, objetivos semanales, recompensas).
   - - Sync bidireccional con calendarios externos (Google/Microsoft).
 - **[checklist despliegue]**
-  - - Reglas Firestore actualizadas (`tasks`, `checklist`, `taskTemplates`) y espacio reservado para `taskAutomations` cuando se active la automatización.
+  - - Reglas Firestore actualizadas (`tasks`, `checklist`, `taskAutomations`).
   - - Tokens de calendario protegidos (Cloud Functions) y rotación periódica.
   - - Configurar servicios de notificación (`MAILGUN_*`, `PUSH_PROVIDER`).
   - - Validar performance con >500 tareas y modo Gantt.
@@ -1071,6 +1026,50 @@
   - - Endpoints habilitados: `/api/whatsapp/send`, `/send-batch`, `/batch`, `/schedule`, `/api/whatsapp/provider-status`, `/api/rsvp/reminders`, `/api/guests/{id}/rsvp-link`.
   - - Revisar traducciones/mensajes de toasts y compatibilidad con modo offline.
 
+## flujo-5-proveedores-ia.md
+
+- **[archivo]** docs\flujos-especificos\flujo-5-proveedores-ia.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - `GestionProveedores.jsx` (panel superior plegable con zona de confirmados), `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, modales IA (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`.
+- **[pendiente (doc)]**
+  - scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos.
+- **[E2E specs]** 3/3 presentes
+  - [ok] cypress/e2e/proveedores_flow.cy.js
+  - [ok] cypress/e2e/proveedores_compare.cy.js
+  - [ok] cypress/e2e/proveedores_smoke.cy.js
+- **[verificacion de archivos implementados]**
+  - `GestionProveedores.jsx` -> src\pages\GestionProveedores.jsx
+  - `ProveedorList.jsx` -> src\components\proveedores\ProveedorList.jsx
+  - `ProveedorCard.jsx` -> src\components\proveedores\ProveedorCard.jsx
+  - `ProveedorDetail.jsx` -> src\components\proveedores\ProveedorDetail.jsx
+  - `GroupAllocationModal.jsx` -> src\components\proveedores\GroupAllocationModal.jsx
+  - `GroupCreateModal.jsx` -> src\components\proveedores\GroupCreateModal.jsx
+  - `GroupSuggestions.jsx` -> src\components\proveedores\GroupSuggestions.jsx
+  - `DuplicateDetectorModal.jsx` -> src\components\proveedores\DuplicateDetectorModal.jsx
+  - `CompareSelectedModal.jsx` -> src\components\proveedores\CompareSelectedModal.jsx
+  - `ProviderSearchDrawer.jsx` -> src\components\proveedores\ProviderSearchDrawer.jsx
+  - `AIBusquedaModal.jsx` -> src\components\proveedores\AIBusquedaModal.jsx
+  - `AISearchModal.jsx` -> src\components\proveedores\ai\AISearchModal.jsx
+  - `AIEmailModal.jsx` -> src\components\proveedores\ai\AIEmailModal.jsx
+  - `aiSuppliersService.js` -> src\services\aiSuppliersService.js
+  - `supplierEventBridge` -> src\components\proveedores\SupplierEventBridge.js, src\components\proveedores\SupplierEventBridge.jsx
+  - `EmailTrackingList.jsx` -> src\components\proveedores\tracking\EmailTrackingList.jsx
+  - `ProviderEmailModal.jsx` -> src\components\proveedores\ProviderEmailModal.jsx
+  - `RFQModal.jsx` -> src\components\proveedores\RFQModal.jsx
+  - `ReservationModal.jsx` -> src\components\proveedores\ReservationModal.jsx
+- **[roadmap/pending (doc)]**
+  - - Scoring IA consolidado con métricas históricas por servicio.
+  - - Portal proveedor completo con autenticación, feedback bidireccional y vista del estado por servicio contratado.
+  - - Automatización multi-proveedor (RFQ masivo, recordatorios automáticos) extendida a líneas de servicio combinadas.
+  - - Reportes comparativos y analítica de mercado (incluyendo cobertura de servicios pendientes).
+  - - Integración con marketplaces externos y recomendaciones en sitio público.
+- **[checklist despliegue]**
+  - - Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.
+  - - Reglas Firestore para `suppliers`, subcolección `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.
+  - - Validar límites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.
+  - - QA del tablero y filtros (performance > 500 proveedores).
+
 ## flujo-6-presupuesto.md
 
 - **[archivo]** docs\flujos-especificos\flujo-6-presupuesto.md
@@ -1078,7 +1077,7 @@
 - **[implementado (doc)]**
   - `src/pages/Finance.jsx`, componentes `src/components/finance/BudgetManager.jsx`, `FinanceOverview.jsx`, `FinanceCharts.jsx`, `PaymentSuggestions.jsx`, `TransactionManager.jsx`, hooks `useFinance`, `useSupplierBudgets`, servicios `EmailInsightsService`, `bankService`, `SyncService`.
 - **[pendiente (doc)]**
-  - analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas.
+  - importación CSV/Excel con mapeo, analítica predictiva con IA, ampliación de aportaciones colaborativas, reportes exportables y automatización de alertas avanzadas.
 - **[E2E specs]** 8/8 presentes
   - [ok] cypress/e2e/finance/finance-flow.cy.js
   - [ok] cypress/e2e/finance/finance-flow-full.cy.js
@@ -1102,6 +1101,7 @@
   - `SyncService` -> src\services\SyncService.js
 - **[roadmap/pending (doc)]**
   - - Integracion Open Banking: UI de autenticacion, refresco de tokens, categorizacion inteligente, reconciliacion automatica.
+  - - Importacion CSV/Excel con preview y mapeo de columnas (validaciones server-side).
   - - Reportes descargables (PDF/Excel) listos para proveedores y contabilidad.
   - - Gestion completa de aportaciones (recordatorios, agradecimientos, panel compartido).
   - - Prediccion de gasto y recomendaciones automaticas basadas en proyeccion.
@@ -1116,17 +1116,3 @@
   - - Verificar permisos de storage y tokens para Email Insights / Open Banking, y limpiar colas pendientes en `SyncService` antes de despliegue.
 
 Generado automaticamente por scripts/aggregateRoadmap.js. Ejecuta el script cuando cambie la documentacion o los tests.
-""
-## Landing Marketing (estado 2025-10-16)
-
-- **[archivo]** src/pages/marketing/Landing.jsx
-- **[estado]** nuevo
-- **[descripcion]** Landing publica con secciones hero, highlights, features y CTA final. Usa `MarketingLayout` con tokens compartidos, estilos pastel y CTA hacia signup/app.
-- **[pendiente]**
-  - Sustituir foto Unsplash por mockup real del dashboard (desktop + mobile) con blur decorativo.
-  - A�adir seccion de beneficios con iconografia consistente (3-4 columnas) y testimonios.
-  - Incorporar carrusel/logos de confianza y FAQ corta antes del CTA final.
-  - Preparar formulario de demo (nombre + email) con integraci�n backend simulada.
-  - Revisar SEO/Titles/meta description espec�ficos para planners vs parejas.
-- **[notas]** Reutiliza tokens `bg-app`, `border-soft`, CTA principal hacia `/signup` y secundaria a `/app`.
-

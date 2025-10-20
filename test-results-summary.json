@@ -1,0 +1,31 @@
+{
+  "date": "2025-10-20T14:57:46.904Z",
+  "results": [
+    {
+      "name": "Básicos",
+      "passing": 3,
+      "failing": 0
+    },
+    {
+      "name": "Simples",
+      "passing": 8,
+      "failing": 0
+    },
+    {
+      "name": "Críticos",
+      "passing": 3,
+      "failing": 3
+    },
+    {
+      "name": "Funcionales",
+      "passing": 10,
+      "failing": 0
+    }
+  ],
+  "totals": {
+    "passing": 24,
+    "failing": 3,
+    "total": 27,
+    "successRate": "88.9"
+  }
+}

@@ -127,6 +127,11 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
 - `cypress/e2e/blog/blog-listing.cy.js`: recorre la vista `/blog`, filtros y paginación con fixtures controladas.
 - `cypress/e2e/blog/blog-subscription.cy.js`: cubre suscripción al blog y mensajes de confirmación/errores.
 
+## Normalización de fuentes cuando el feed proviene de Google News
+- `backend/routes/wedding-news.js` ya filtra los ítems cuyo host final sigue siendo `news.google.com`; solo se devuelven entradas con URL directa al medio original y portada HTTP(s) válida. El campo `source` refleja ese dominio real.
+- El frontend (`Blog.jsx`) vuelve a exigir `post.image` con esquema http/https antes de renderizar cada tarjeta, cumpliendo la regla de “portada válida” descrita arriba.
+- Validación manual: `http://localhost:4004/api/wedding-news` debe listar hosts como `hola.com`, `vanitatis.com`, etc.; si se observa `news.google.com`, revisar el feed correspondiente.
+
 ## 11. Roadmap / pendientes
 - Pagina dedicada con archivo historico y categorias filtrables.
 - Favoritos o lectura posterior sincronizados con el usuario.

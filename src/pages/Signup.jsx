@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import AuthDivider from '../components/auth/AuthDivider';
 import RegisterForm from '../components/auth/RegisterForm';
 import SocialLoginButtons from '../components/auth/SocialLoginButtons';
+import useTranslations from '../hooks/useTranslations';
 import { useAuth } from '../hooks/useAuth';
 import { performanceMonitor } from '../services/PerformanceMonitor';
 
@@ -11,11 +12,6 @@ const FORM_ERROR_ID = 'signup-form-error';
 const SOCIAL_ERROR_ID = 'signup-social-error';
 const INFO_MESSAGE_ID = 'signup-info-message';
 
-const VALIDATION_MESSAGES = {
-  missing_email: 'Introduce tu correo electronico.',
-  missing_password: 'Introduce una contrasena valida.',
-  password_too_short: 'La contrasena debe tener al menos 8 caracteres.',
-};
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -26,6 +22,7 @@ export default function Signup() {
     availableSocialProviders,
     getProviderLabel,
   } = useAuth();
+  const { t } = useTranslations();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,6 +50,43 @@ export default function Signup() {
     return ['google', 'facebook', 'apple'];
   }, [availableSocialProviders]);
 
+  const getValidationMessage = useCallback(
+    (issue) => {
+      switch (issue) {
+        case 'missing_email':
+          return t('authSignup.validation.missingEmail');
+        case 'missing_password':
+          return t('authSignup.validation.missingPassword');
+        case 'password_too_short':
+          return t('authSignup.validation.shortPassword');
+        default:
+          return t('authSignup.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const resolveSignupError = useCallback(
+    (code) => {
+      switch (code) {
+        case 'auth/email-already-in-use':
+        case 'email-already-in-use':
+          return t('authSignup.errors.emailInUse');
+        case 'auth/invalid-email':
+        case 'invalid-email':
+          return t('authSignup.errors.invalidEmail');
+        case 'auth/weak-password':
+        case 'weak-password':
+          return t('authSignup.errors.weakPassword');
+        default:
+          return t('authSignup.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const heroFeatures = t('authSignup.hero.features', { returnObjects: true });
+
   const resetFeedback = () => {
     setFormError('');
     setSocialError('');
@@ -76,10 +110,9 @@ export default function Signup() {
       has_error: issues.length > 0,
     });
 
-    if (issues.length > 0) {
+  if (issues.length > 0) {
       const firstIssue = issues[0];
-      const message = VALIDATION_MESSAGES[firstIssue] || VALIDATION_MESSAGES.missing_email;
-      setFormError(message);
+      setFormError(getValidationMessage(firstIssue));
       if (firstIssue === 'missing_email') {
         emailInputRef.current?.focus();
       } else {
@@ -100,14 +133,13 @@ export default function Signup() {
           ...context,
           user_id: result?.user?.uid || null,
         });
+        setInfoMessage(t('authSignup.successMessage', { defaultValue: 'Account created successfully. Redirecting to your dashboard...' }));
         navigate('/home', { replace: true });
         return;
       }
 
       const errorCode = result?.code || 'unknown';
-      const message =
-        result?.error || 'No pudimos crear tu cuenta. Revisa los datos e intentalo de nuevo.';
-      setFormError(message);
+      setFormError(resolveSignupError(errorCode));
       passwordInputRef.current?.focus();
       performanceMonitor?.logEvent?.('signup_failed', {
         ...context,
@@ -115,8 +147,7 @@ export default function Signup() {
       });
     } catch (error) {
       const errorCode = error?.code || 'exception';
-      const message = error?.message || 'No pudimos crear tu cuenta. Intentalo nuevamente.';
-      setFormError(message);
+      setFormError(resolveSignupError(errorCode));
       performanceMonitor?.logEvent?.('signup_failed', {
         ...context,
         error_code: errorCode,
@@ -140,7 +171,12 @@ export default function Signup() {
       if (result?.success) {
         if (result.pendingRedirect) {
           performanceMonitor?.logEvent?.('social_signup_redirect', context);
-          setInfoMessage(`Continua el registro en la ventana de ${providerName}.`);
+          setInfoMessage(
+            t('authSignup.social.pending', {
+              provider: providerName,
+              defaultValue: `Complete the sign-up flow in the ${providerName} window.`,
+            })
+          );
         } else {
           performanceMonitor?.logEvent?.('social_signup_completed', {
             ...context,
@@ -152,16 +188,14 @@ export default function Signup() {
       }
 
       const errorCode = result?.code || 'unknown';
-      const message = result?.error || `No se pudo completar el registro con ${providerName}.`;
-      setSocialError(message);
+      setSocialError(resolveSignupError(errorCode));
       performanceMonitor?.logEvent?.('social_signup_failed', {
         ...context,
         error_code: errorCode,
       });
     } catch (error) {
       const errorCode = error?.code || 'exception';
-      const message = error?.message || `No se pudo completar el registro con ${providerName}.`;
-      setSocialError(message);
+      setSocialError(resolveSignupError(errorCode));
       performanceMonitor?.logEvent?.('social_signup_failed', {
         ...context,
         error_code: errorCode,
@@ -178,25 +212,27 @@ export default function Signup() {
           <div className="hidden bg-[color:var(--color-primary,#6366f1)]/10 p-10 md:flex md:flex-col md:justify-between md:gap-10">
             <div>
               <h2 className="text-3xl font-bold text-[color:var(--color-primary,#6366f1)]">
-                Bienvenida a Lovenda
+                {t('authSignup.hero.title')}
               </h2>
               <p className="mt-4 text-base text-[color:var(--color-primary-dark,#4338ca)]/80">
-                Centraliza tareas, invitados y proveedores en un solo lugar. Nuestra IA te guiara en cada paso para que tu boda sea perfecta.
+                {t('authSignup.hero.description')}
               </p>
             </div>
-            <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark,#4338ca)]/80">
-              <li>- Timeline inteligente para no olvidar nada.</li>
-              <li>- Automatizaciones de correo y recordatorios para invitados.</li>
-              <li>- Catalogo de proveedores con recomendaciones personalizadas.</li>
-            </ul>
+            {Array.isArray(heroFeatures) && heroFeatures.length > 0 ? (
+              <ul className="space-y-3 text-sm text-[color:var(--color-primary-dark,#4338ca)]/80">
+                {heroFeatures.map((feature, index) => (
+                  <li key={index}>- {feature}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
           <div className="p-8 sm:p-10">
             <h1 className="text-2xl font-semibold text-[color:var(--color-text,#111827)]">
-              Crea tu cuenta
+              {t('authSignup.title')}
             </h1>
             <p className="mt-2 text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              Puedes registrarte con tu correo o usando tu cuenta social favorita.
+              {t('authSignup.subtitle')}
             </p>
 
             <div className="mt-6">
@@ -217,13 +253,14 @@ export default function Signup() {
               />
             </div>
 
-            <AuthDivider label="o continua con" />
+            <AuthDivider />
 
             <SocialLoginButtons
               providers={providers}
               onProviderClick={handleSocialLogin}
               busyProvider={busyProvider}
               disabled={isSubmitting}
+              getProviderLabel={getProviderLabel}
             />
 
             {socialError ? (
@@ -248,12 +285,12 @@ export default function Signup() {
             ) : null}
 
             <p className="mt-6 text-center text-sm text-[color:var(--color-text-soft,#6b7280)]">
-              Ya tienes cuenta?{' '}
+              {t('authSignup.alreadyHaveAccount')}{' '}
               <Link
                 to="/login"
                 className="font-medium text-[color:var(--color-primary,#6366f1)] hover:underline"
               >
-                Inicia sesion
+                {t('authSignup.loginLink')}
               </Link>
             </p>
           </div>

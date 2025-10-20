@@ -28,6 +28,11 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
         progress: 45,
         active: true,
         permissions: { archiveWedding: true },
+        modulePermissions: {
+          guests: { owner: 'manage', planner: 'manage', assistant: 'view' },
+          finance: { owner: 'manage', planner: 'view', assistant: 'none' },
+        },
+        crm: { lastSyncStatus: 'synced' },
       },
       {
         id: 'w2',
@@ -37,6 +42,11 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
         progress: 70,
         active: true,
         permissions: { archiveWedding: true },
+        modulePermissions: {
+          guests: { owner: 'manage', planner: 'manage', assistant: 'view' },
+          finance: { owner: 'manage', planner: 'view', assistant: 'none' },
+        },
+        crm: { lastSyncStatus: 'queued' },
       },
       {
         id: 'w3',
@@ -46,6 +56,11 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
         progress: 100,
         active: false,
         permissions: { archiveWedding: true },
+        modulePermissions: {
+          guests: { owner: 'manage', planner: 'manage', assistant: 'view' },
+          finance: { owner: 'manage', planner: 'view', assistant: 'none' },
+        },
+        crm: { lastSyncStatus: 'failed' },
       },
     ], 'w1');
   });
@@ -53,6 +68,14 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
   it('muestra bodas activas y archivadas desde el stub de datos', () => {
     cy.visit('/bodas');
     cy.closeDiagnostic();
+    cy.intercept('POST', '**/api/crm/sync-weddings/bulk', {
+      statusCode: 200,
+      body: { success: true, queued: ['bulk-stub'] },
+    }).as('crmBulk');
+    cy.intercept('POST', '**/api/crm/sync-wedding', {
+      statusCode: 200,
+      body: { success: true, queueId: 'single-stub' },
+    }).as('crmSingle');
 
     cy.contains(/Mis Bodas/i, { timeout: 10000 }).should('be.visible');
     cy.contains(/\+?\s*Crear nueva boda/i).should('be.visible');
@@ -67,12 +90,33 @@ describe('Flujo 10 - Gestión de bodas múltiples', () => {
     cy.contains('span', 'Activa').should('exist');
 
     cy.contains(/Bodas archivadas/i).click();
-    cy.contains(/Bodas archivadas/i).should('have.class', /bg-blue-50/);
+   cy.contains(/Bodas archivadas/i).should('have.class', /bg-blue-50/);
     cy.contains('Boda Marta', { timeout: 5000 }).should('be.visible');
     cy.contains('span', 'Archivada').should('exist');
 
     cy.contains(/Resumen multi boda/i).click();
-    cy.contains('Bodas activas').should('be.visible');
-    cy.contains('Filtros del portfolio').should('be.visible');
+    cy.get('[data-testid="multi-wedding-summary"]').within(() => {
+      cy.contains('Bodas activas').should('be.visible');
+      cy.contains('Próximas 60 días').should('be.visible');
+      cy.contains('Estado CRM').parent().should('contain', 'Sincronizadas: 1');
+      cy.contains('Estado CRM').parent().should('contain', 'En cola: 1');
+      cy.contains('Estado CRM').parent().should('contain', 'Errores: 1');
+    });
+
+    cy.contains('Sincronizar selección con CRM').should('be.enabled').click();
+    cy.wait('@crmBulk');
+    cy.contains('Sincronizar selección con CRM').should('be.enabled');
+
+    cy.get('[data-testid="wedding-portfolio-table"]').within(() => {
+      cy.contains('Boda Ana').should('be.visible');
+      cy.get('[data-testid="portfolio-sync-w1"]').click();
+    });
+    cy.wait('@crmSingle');
+
+    cy.get('[data-testid="wedding-portfolio-table"]').within(() => {
+      cy.contains('Sincronizado').should('exist');
+      cy.contains('En cola').should('exist');
+      cy.contains('Error').should('exist');
+    });
   });
 });

@@ -1,19 +1,90 @@
-import { CheckCircle, Circle, Trash2, Plus, Music2, Users } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import {
+  CheckCircle,
+  Circle,
+  Clock,
+  Trash2,
+  Plus,
+  Music2,
+  Users,
+  FileText,
+  AlertCircle,
+  AlertTriangle,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Edit2,
+  X,
+  Shield,
+  Settings,
+  Download,
+  Upload,
+  CheckSquare,
+  Square,
+  Flag,
+} from 'lucide-react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import Modal from '../../components/Modal';
 import PageWrapper from '../../components/PageWrapper';
 import { Card } from '../../components/ui';
 import { Button } from '../../components/ui';
+import Badge from '../../components/ui/Badge';
 import { useWedding } from '../../context/WeddingContext';
 import { useProveedores } from '../../hooks/useProveedores';
 import useSpecialMoments from '../../hooks/useSpecialMoments';
+import useChecklist from '../../hooks/useChecklist';
 import CeremonyChecklist from '../../components/protocolo/CeremonyChecklist';
 
 export default function Checklist() {
   const { activeWedding } = useWedding();
+  
+  // Hook del checklist
+  const {
+    items,
+    documents,
+    loading,
+    syncInProgress,
+    updateItem,
+    addCustomItem,
+    removeCustomItem,
+    setItemStatus,
+    setItemNotes,
+    setItemDueDate,
+    toggleItemCritical,
+    getItemDocuments,
+    getChecklistSummary,
+    validateReadiness,
+    CATEGORIES,
+    ITEM_STATUS,
+    STATUS_COLORS,
+    MAX_CUSTOM_ITEMS,
+  } = useChecklist();
+
+  // Estados locales
   const [showAddModal, setShowAddModal] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
+  const [showSummaryPanel, setShowSummaryPanel] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [manualChecks, setManualChecks] = useState(() => [
+    {
+      id: 'manual-check-1',
+      title: 'Regalos para momentos especiales preparados',
+      notes: '',
+      done: false,
+    },
+  ]);
+
+  // Datos del nuevo ítem
+  const [newItemData, setNewItemData] = useState({
+    label: '',
+    category: CATEGORIES.PERSONAL,
+    dueDate: '',
+  });
 
   // Proveedores
   const { providers, loadProviders, loading: providersLoading } = useProveedores();
@@ -36,35 +107,305 @@ export default function Checklist() {
     return { total, withSong };
   }, [moments]);
 
-  // Checkpoints manuales (localStorage por boda)
-  const MANUAL_LS_KEY = useMemo(
-    () => `mywed360_manual_checkpoints_${activeWedding || 'general'}`,
-    [activeWedding]
-  );
-  const [manualChecks, setManualChecks] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(MANUAL_LS_KEY) || '[]');
-    } catch {
-      return [];
+  // Resumen del checklist
+  const summary = useMemo(() => getChecklistSummary(), [getChecklistSummary]);
+  const readiness = useMemo(() => validateReadiness(), [validateReadiness]);
+
+  // Filtrar ítems
+  const filteredItems = useMemo(() => {
+    let filtered = [...items];
+
+    // Filtro por estado
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(item => item.status === filterStatus);
     }
-  });
-  useEffect(() => {
+
+    // Filtro por categoría
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(item => item.category === filterCategory);
+    }
+
+    // Búsqueda por texto
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.label.toLowerCase().includes(term) ||
+        (item.notes && item.notes.toLowerCase().includes(term))
+      );
+    }
+
+    return filtered;
+  }, [items, filterStatus, filterCategory, searchTerm]);
+
+  // Agrupar ítems por categoría
+  const groupedItems = useMemo(() => {
+    const groups = {};
+    Object.values(CATEGORIES).forEach(cat => {
+      groups[cat] = filteredItems.filter(item => item.category === cat);
+    });
+    return groups;
+  }, [filteredItems, CATEGORIES]);
+
+  // Manejar cambio de estado de ítem
+  const handleStatusChange = useCallback((itemId, status) => {
+    setItemStatus(itemId, status);
+    
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      const statusText = {
+        [ITEM_STATUS.PENDING]: 'pendiente',
+        [ITEM_STATUS.IN_PROGRESS]: 'en progreso',
+        [ITEM_STATUS.DONE]: 'completado',
+      };
+      toast.success(`"${item.label}" marcado como ${statusText[status]}`);
+    }
+  }, [setItemStatus, items, ITEM_STATUS]);
+
+  // Añadir nuevo ítem personalizado
+  const handleAddCustomItem = useCallback(() => {
+    const { label, category, dueDate } = newItemData;
+
+    if (!label.trim()) {
+      toast.error('Ingresa un nombre para el ítem');
+      return;
+    }
+
     try {
-      localStorage.setItem(MANUAL_LS_KEY, JSON.stringify(manualChecks || []));
-    } catch {}
-  }, [MANUAL_LS_KEY, manualChecks]);
-  useEffect(() => {
-    if (!Array.isArray(manualChecks) || manualChecks.length) return;
-    setManualChecks([
-      {
-        id: Date.now(),
-        title: 'Regalos para momentos especiales preparados',
-        notes: '',
-        done: false,
-      },
-    ]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      const newItem = addCustomItem(label, category, dueDate || null);
+      toast.success(`Ítem "${label}" añadido`);
+      setShowAddModal(false);
+      setNewItemData({ label: '', category: CATEGORIES.PERSONAL, dueDate: '' });
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }, [newItemData, addCustomItem, CATEGORIES]);
+
+  // Eliminar ítem personalizado
+  const handleRemoveCustomItem = useCallback((itemId) => {
+    const item = items.find(i => i.id === itemId);
+    if (!item) return;
+
+    if (confirm(`¿Eliminar "${item.label}"?`)) {
+      try {
+        removeCustomItem(itemId);
+        toast.success('Ítem eliminado');
+      } catch (error) {
+        toast.error(error.message);
+      }
+    }
+  }, [items, removeCustomItem]);
+
+  // Exportar checklist
+  const handleExport = useCallback(() => {
+    const data = {
+      date: new Date().toISOString(),
+      wedding: activeWedding,
+      items: items,
+      summary: summary,
+      readiness: readiness,
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `checklist_${activeWedding}_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Checklist exportado');
+  }, [items, summary, readiness, activeWedding]);
+
+  // Importar checklist
+  const handleImport = useCallback((event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.items || !Array.isArray(data.items)) {
+          throw new Error('Formato de archivo inválido');
+        }
+
+        // Importar solo ítems personalizados
+        const customItems = data.items.filter(item => item.custom);
+        customItems.forEach(item => {
+          try {
+            addCustomItem(item.label, item.category, item.dueDate);
+          } catch (error) {
+            console.warn(`No se pudo importar: ${item.label}`);
+          }
+        });
+
+        toast.success(`${customItems.length} ítems personalizados importados`);
+      } catch (error) {
+        toast.error('Error al importar el archivo');
+      }
+    };
+    reader.readAsText(file);
+  }, [addCustomItem]);
+
+  // Renderizar badge de estado
+  const renderStatusBadge = useCallback((status) => {
+    const config = {
+      [ITEM_STATUS.PENDING]: { icon: Circle, color: 'text-gray-400' },
+      [ITEM_STATUS.IN_PROGRESS]: { icon: Clock, color: 'text-yellow-500' },
+      [ITEM_STATUS.DONE]: { icon: CheckCircle, color: 'text-green-500' },
+    };
+
+    const { icon: Icon, color } = config[status] || config[ITEM_STATUS.PENDING];
+    return <Icon className={color} size={20} />;
+  }, [ITEM_STATUS]);
+
+  // Renderizar categoría
+  const renderCategoryLabel = useCallback((category) => {
+    const labels = {
+      [CATEGORIES.DOCUMENTATION]: 'Documentación',
+      [CATEGORIES.PROVIDERS]: 'Proveedores',
+      [CATEGORIES.CEREMONY]: 'Ceremonia',
+      [CATEGORIES.CONTINGENCY]: 'Contingencia',
+      [CATEGORIES.PERSONAL]: 'Personal',
+      [CATEGORIES.TECHNICAL]: 'Técnico',
+    };
+    return labels[category] || category;
+  }, [CATEGORIES]);
+
+  // Renderizar ítem del checklist
+  const renderChecklistItem = useCallback((item) => {
+    const isEditing = editingItem === item.id;
+    const itemDocs = getItemDocuments(item.id);
+    const isOverdue = item.dueDate && new Date(item.dueDate) < new Date() && item.status !== ITEM_STATUS.DONE;
+
+    return (
+      <div
+        key={item.id}
+        className={`p-3 rounded-lg border transition-all ${
+          item.status === ITEM_STATUS.DONE ? 'bg-green-50 border-green-200' :
+          isOverdue ? 'bg-red-50 border-red-200' :
+          'bg-white border-gray-200'
+        } hover:shadow-md`}
+      >
+        <div className="flex items-start gap-3">
+          {/* Estado */}
+          <button
+            onClick={() => {
+              const nextStatus = 
+                item.status === ITEM_STATUS.PENDING ? ITEM_STATUS.IN_PROGRESS :
+                item.status === ITEM_STATUS.IN_PROGRESS ? ITEM_STATUS.DONE :
+                ITEM_STATUS.PENDING;
+              handleStatusChange(item.id, nextStatus);
+            }}
+            className="mt-1 flex-shrink-0"
+          >
+            {renderStatusBadge(item.status)}
+          </button>
+
+          {/* Contenido */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <span className={`font-medium ${
+                item.status === ITEM_STATUS.DONE ? 'line-through text-gray-500' : ''
+              }`}>
+                {item.label}
+              </span>
+              {item.critical && (
+                <Badge type="error" size="sm">
+                  <Shield size={12} className="inline mr-1" />
+                  Crítico
+                </Badge>
+              )}
+              {item.custom && (
+                <Badge type="info" size="sm">Personalizado</Badge>
+              )}
+              {itemDocs.length > 0 && (
+                <Badge type="success" size="sm">
+                  <FileText size={12} className="inline mr-1" />
+                  {itemDocs.length}
+                </Badge>
+              )}
+            </div>
+
+            {/* Fecha límite */}
+            {item.dueDate && (
+              <div className="text-sm text-gray-600 mt-1">
+                <Calendar size={14} className="inline mr-1" />
+                Vence: {new Date(item.dueDate).toLocaleDateString('es-ES')}
+                {isOverdue && <span className="text-red-600 ml-2">¡Vencido!</span>}
+              </div>
+            )}
+
+            {/* Notas */}
+            {isEditing ? (
+              <textarea
+                className="w-full mt-2 p-2 border rounded text-sm"
+                placeholder="Añadir notas..."
+                value={item.notes || ''}
+                onChange={(e) => setItemNotes(item.id, e.target.value)}
+                rows={2}
+              />
+            ) : (
+              item.notes && (
+                <div className="text-sm text-gray-600 mt-1">
+                  {item.notes}
+                </div>
+              )
+            )}
+
+            {/* Documentos relacionados */}
+            {itemDocs.length > 0 && (
+              <div className="mt-2">
+                <div className="text-xs text-gray-500 mb-1">Documentos:</div>
+                <div className="flex flex-wrap gap-1">
+                  {itemDocs.map(doc => (
+                    <span key={doc.id} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                      {doc.name || doc.type}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Acciones */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => toggleItemCritical(item.id)}
+              className={`p-1 ${item.critical ? 'text-red-500' : 'text-gray-400'} hover:text-red-600`}
+              title="Marcar como crítico"
+            >
+              <Flag size={16} />
+            </button>
+            <button
+              onClick={() => setEditingItem(isEditing ? null : item.id)}
+              className="p-1 text-gray-400 hover:text-blue-600"
+              title={isEditing ? 'Guardar' : 'Editar'}
+            >
+              {isEditing ? <CheckCircle size={16} /> : <Edit2 size={16} />}
+            </button>
+            {item.custom && (
+              <button
+                onClick={() => handleRemoveCustomItem(item.id)}
+                className="p-1 text-gray-400 hover:text-red-600"
+                title="Eliminar"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }, [
+    editingItem,
+    getItemDocuments,
+    handleStatusChange,
+    handleRemoveCustomItem,
+    renderStatusBadge,
+    setItemNotes,
+    toggleItemCritical,
+    ITEM_STATUS,
+  ]);
 
   // Modal Crear
   const [newCheckpoint, setNewCheckpoint] = useState({ title: '', notes: '' });

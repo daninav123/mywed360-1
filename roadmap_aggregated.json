@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-10-15T02:51:13.528Z",
+  "generatedAt": "2025-10-20T03:04:10.250Z",
   "modules": [
     {
       "filePath": "docs\\flujos-especificos\\flujo-0-administracion-global.md",
@@ -74,7 +74,9 @@
         {
           "ref": "useWedding",
           "basename": "useWedding",
-          "matches": []
+          "matches": [
+            "src\\hooks\\useWedding.js"
+          ]
         },
         {
           "ref": "MultiWeddingSummary.jsx",
@@ -1053,194 +1055,16 @@
       "conclusion": "pendiente"
     },
     {
-      "filePath": "docs\\flujos-especificos\\flujo-5-proveedores-ia.md",
-      "title": "5. Proveedores con IA (estado 2025-10-07)",
-      "implementedLines": [
-        "`GestionProveedores.jsx`, `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `SupplierKanban.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, `AI` modals (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`."
-      ],
-      "pendingLines": [
-        "scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos."
-      ],
-      "roadmapSection": "- Scoring IA consolidado con métricas históricas por servicio.\n- Portal proveedor completo con autenticación, feedback bidireccional y vista del estado por servicio contratado.\n- Automatización multi-proveedor (RFQ masivo, recordatorios automáticos) extendida a líneas de servicio combinadas.\n- Reportes comparativos y analítica de mercado (incluyendo cobertura de servicios pendientes).\n- Integración con marketplaces externos y recomendaciones en sitio público.",
-      "checklistSection": "- Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.\n- Reglas Firestore para `suppliers`, subcolección `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.\n- Validar límites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.\n- QA del tablero y filtros (performance > 500 proveedores).",
-      "e2eSection": "- `cypress/e2e/proveedores_flow.cy.js`: cubre alta y curación de proveedores con IA asistida y validaciones de búsqueda.\n- `cypress/e2e/proveedores_compare.cy.js`: valida la comparativa de proveedores y la generación de shortlist.\n- `cypress/e2e/proveedores_smoke.cy.js`: smoke general del módulo para garantizar accesos y filtros básicos.",
-      "e2eChecks": [
-        {
-          "spec": "cypress/e2e/proveedores_flow.cy.js",
-          "exists": true
-        },
-        {
-          "spec": "cypress/e2e/proveedores_compare.cy.js",
-          "exists": true
-        },
-        {
-          "spec": "cypress/e2e/proveedores_smoke.cy.js",
-          "exists": true
-        }
-      ],
-      "implChecks": [
-        {
-          "ref": "GestionProveedores.jsx",
-          "basename": "GestionProveedores.jsx",
-          "matches": [
-            "src\\pages\\GestionProveedores.jsx"
-          ]
-        },
-        {
-          "ref": "ProveedorList.jsx",
-          "basename": "ProveedorList.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ProveedorList.jsx"
-          ]
-        },
-        {
-          "ref": "ProveedorCard.jsx",
-          "basename": "ProveedorCard.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ProveedorCard.jsx"
-          ]
-        },
-        {
-          "ref": "ProveedorDetail.jsx",
-          "basename": "ProveedorDetail.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ProveedorDetail.jsx"
-          ]
-        },
-        {
-          "ref": "SupplierKanban.jsx",
-          "basename": "SupplierKanban.jsx",
-          "matches": [
-            "src\\components\\proveedores\\SupplierKanban.jsx"
-          ]
-        },
-        {
-          "ref": "GroupAllocationModal.jsx",
-          "basename": "GroupAllocationModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\GroupAllocationModal.jsx"
-          ]
-        },
-        {
-          "ref": "GroupCreateModal.jsx",
-          "basename": "GroupCreateModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\GroupCreateModal.jsx"
-          ]
-        },
-        {
-          "ref": "GroupSuggestions.jsx",
-          "basename": "GroupSuggestions.jsx",
-          "matches": [
-            "src\\components\\proveedores\\GroupSuggestions.jsx"
-          ]
-        },
-        {
-          "ref": "DuplicateDetectorModal.jsx",
-          "basename": "DuplicateDetectorModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\DuplicateDetectorModal.jsx"
-          ]
-        },
-        {
-          "ref": "CompareSelectedModal.jsx",
-          "basename": "CompareSelectedModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\CompareSelectedModal.jsx"
-          ]
-        },
-        {
-          "ref": "ProviderSearchDrawer.jsx",
-          "basename": "ProviderSearchDrawer.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ProviderSearchDrawer.jsx"
-          ]
-        },
-        {
-          "ref": "AI",
-          "basename": "AI",
-          "matches": [
-            "backend\\routes\\ai.js"
-          ]
-        },
-        {
-          "ref": "AIBusquedaModal.jsx",
-          "basename": "AIBusquedaModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\AIBusquedaModal.jsx"
-          ]
-        },
-        {
-          "ref": "AISearchModal.jsx",
-          "basename": "AISearchModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ai\\AISearchModal.jsx"
-          ]
-        },
-        {
-          "ref": "AIEmailModal.jsx",
-          "basename": "AIEmailModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ai\\AIEmailModal.jsx"
-          ]
-        },
-        {
-          "ref": "aiSuppliersService.js",
-          "basename": "aiSuppliersService.js",
-          "matches": [
-            "src\\services\\aiSuppliersService.js"
-          ]
-        },
-        {
-          "ref": "supplierEventBridge",
-          "basename": "supplierEventBridge",
-          "matches": [
-            "src\\components\\proveedores\\SupplierEventBridge.js",
-            "src\\components\\proveedores\\SupplierEventBridge.jsx"
-          ]
-        },
-        {
-          "ref": "EmailTrackingList.jsx",
-          "basename": "EmailTrackingList.jsx",
-          "matches": [
-            "src\\components\\proveedores\\tracking\\EmailTrackingList.jsx"
-          ]
-        },
-        {
-          "ref": "ProviderEmailModal.jsx",
-          "basename": "ProviderEmailModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ProviderEmailModal.jsx"
-          ]
-        },
-        {
-          "ref": "RFQModal.jsx",
-          "basename": "RFQModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\RFQModal.jsx"
-          ]
-        },
-        {
-          "ref": "ReservationModal.jsx",
-          "basename": "ReservationModal.jsx",
-          "matches": [
-            "src\\components\\proveedores\\ReservationModal.jsx"
-          ]
-        }
-      ],
-      "conclusion": "parcial"
-    },
-    {
       "filePath": "docs\\flujos-especificos\\flujo-5-timeline-tareas.md",
       "title": "5b. Timeline y Tareas (estado 2025-10-07)",
       "implementedLines": [
-        "`Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, componentes `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`."
+        "`Tasks.jsx`, `TaskSidePanel.jsx`, `Checklist.jsx`, `SmartChecklist.jsx`, `TaskList.jsx`, `EventsCalendar.jsx`, `LongTermTasksGantt.jsx`, `CalendarSync.jsx`, `TaskEventBridge.jsx`, `TaskNotificationWatcher.jsx`, hook `useWeddingTasksHierarchy.js`, utilidades `taskAutomations`, `CalendarComponents.jsx`, plantilla `src/data/tasks/masterTimelineTemplate.json`, indicadores de riesgo en el Gantt y comentarios colaborativos con menciones y notificaciones en `TaskSidePanel.jsx`."
       ],
       "pendingLines": [
         "Motor IA que personaliza un plan de tareas padre/subtareas a partir de una plantilla maestra y matriz de responsabilidades."
       ],
       "roadmapSection": "- IA que genere plan de tareas padre/subtareas personalizado: mantener una plantilla maestra (`src/data/tasks/masterTimelineTemplate.json`) con todas las tareas padre y subtareas posibles (curada manualmente y alimentada de forma orgánica cuando otras bodas añaden bloques útiles), ingestar datos de la boda (tipo, tamaño, presupuesto, estilo, lead time) y usar un motor híbrido plantillas versionadas + LLM para descartar/adaptar nodos irrelevantes, proponer dependencias, responsables sugeridos y ventanas temporales; entregar el resultado en modo borrador con explicación por bloque y capturar feedback para mejorar los prompts, pesos y la plantilla base.\n- Matriz RACI y asignaciones múltiples con permisos.\n- Auto-priorización según proximidad y criticidad.\n- Panel de riesgos con predicción de retrasos.\n- Gamificación completa (streaks, objetivos semanales, recompensas).\n- Sync bidireccional con calendarios externos (Google/Microsoft).",
-      "checklistSection": "- Reglas Firestore actualizadas (`tasks`, `checklist`, `taskTemplates`) y espacio reservado para `taskAutomations` cuando se active la automatización.\n- Tokens de calendario protegidos (Cloud Functions) y rotación periódica.\n- Configurar servicios de notificación (`MAILGUN_*`, `PUSH_PROVIDER`).\n- Validar performance con >500 tareas y modo Gantt.",
+      "checklistSection": "- Reglas Firestore actualizadas (`tasks`, `checklist`, `taskAutomations`).\n- Tokens de calendario protegidos (Cloud Functions) y rotación periódica.\n- Configurar servicios de notificación (`MAILGUN_*`, `PUSH_PROVIDER`).\n- Validar performance con >500 tareas y modo Gantt.",
       "e2eSection": "- `cypress/e2e/tasks/all_subtasks_modal.cy.js`: recorre creación de bloques, subtareas y actualización de estados dentro del timeline.",
       "e2eChecks": [
         {
@@ -1275,6 +1099,11 @@
             "src\\pages\\Checklist.jsx",
             "src\\pages\\protocolo\\Checklist.jsx"
           ]
+        },
+        {
+          "ref": "SmartChecklist.jsx",
+          "basename": "SmartChecklist.jsx",
+          "matches": []
         },
         {
           "ref": "TaskList.jsx",
@@ -1326,6 +1155,11 @@
           "matches": [
             "src\\hooks\\useWeddingTasksHierarchy.js"
           ]
+        },
+        {
+          "ref": "taskAutomations",
+          "basename": "taskAutomations",
+          "matches": []
         },
         {
           "ref": "CalendarComponents.jsx",
@@ -2248,6 +2082,170 @@
           "ref": "loadSampleGuests",
           "basename": "loadSampleGuests",
           "matches": []
+        }
+      ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-5-proveedores-ia.md",
+      "title": "flujo-5-proveedores-ia.md",
+      "implementedLines": [
+        "`GestionProveedores.jsx` (panel superior plegable con zona de confirmados), `ProveedorList.jsx`, `ProveedorCard.jsx`, `ProveedorDetail.jsx`, `GroupAllocationModal.jsx`, `GroupCreateModal.jsx`, `GroupSuggestions.jsx`, `DuplicateDetectorModal.jsx`, `CompareSelectedModal.jsx`, `ProviderSearchDrawer.jsx`, modales IA (`AIBusquedaModal.jsx`, `AISearchModal.jsx`, `AIEmailModal.jsx`), servicios `aiSuppliersService.js`, `supplierEventBridge`, `EmailTrackingList.jsx`, `ProviderEmailModal.jsx`, `RFQModal.jsx`, `ReservationModal.jsx`."
+      ],
+      "pendingLines": [
+        "scoring inteligente consolidado, portal proveedor completamente funcional, automatización de RFQ multi-proveedor y reportes comparativos."
+      ],
+      "roadmapSection": "- Scoring IA consolidado con métricas históricas por servicio.\n- Portal proveedor completo con autenticación, feedback bidireccional y vista del estado por servicio contratado.\n- Automatización multi-proveedor (RFQ masivo, recordatorios automáticos) extendida a líneas de servicio combinadas.\n- Reportes comparativos y analítica de mercado (incluyendo cobertura de servicios pendientes).\n- Integración con marketplaces externos y recomendaciones en sitio público.",
+      "checklistSection": "- Credenciales `OPENAI_*` / `VITE_OPENAI_*`, `MAILGUN_*`, `SUPPLIER_TRACKING_ENDPOINT` configuradas.\n- Reglas Firestore para `suppliers`, subcolección `serviceLines`, `supplierGroups`, `supplierEmails`, `supplierShortlist`.\n- Validar límites de documentos y seguridad para narrativas IA y almacenamiento de shortlist.\n- QA del tablero y filtros (performance > 500 proveedores).",
+      "e2eSection": "- `cypress/e2e/proveedores_flow.cy.js`: cubre alta y curación de proveedores con IA asistida y validaciones de búsqueda.\n- `cypress/e2e/proveedores_compare.cy.js`: valida la comparativa de proveedores y la generación de shortlist.\n- `cypress/e2e/proveedores_smoke.cy.js`: smoke general del módulo para garantizar accesos y filtros básicos.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/proveedores_flow.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/proveedores_compare.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/proveedores_smoke.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [
+        {
+          "ref": "GestionProveedores.jsx",
+          "basename": "GestionProveedores.jsx",
+          "matches": [
+            "src\\pages\\GestionProveedores.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorList.jsx",
+          "basename": "ProveedorList.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorList.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorCard.jsx",
+          "basename": "ProveedorCard.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorCard.jsx"
+          ]
+        },
+        {
+          "ref": "ProveedorDetail.jsx",
+          "basename": "ProveedorDetail.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProveedorDetail.jsx"
+          ]
+        },
+        {
+          "ref": "GroupAllocationModal.jsx",
+          "basename": "GroupAllocationModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupAllocationModal.jsx"
+          ]
+        },
+        {
+          "ref": "GroupCreateModal.jsx",
+          "basename": "GroupCreateModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupCreateModal.jsx"
+          ]
+        },
+        {
+          "ref": "GroupSuggestions.jsx",
+          "basename": "GroupSuggestions.jsx",
+          "matches": [
+            "src\\components\\proveedores\\GroupSuggestions.jsx"
+          ]
+        },
+        {
+          "ref": "DuplicateDetectorModal.jsx",
+          "basename": "DuplicateDetectorModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\DuplicateDetectorModal.jsx"
+          ]
+        },
+        {
+          "ref": "CompareSelectedModal.jsx",
+          "basename": "CompareSelectedModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\CompareSelectedModal.jsx"
+          ]
+        },
+        {
+          "ref": "ProviderSearchDrawer.jsx",
+          "basename": "ProviderSearchDrawer.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProviderSearchDrawer.jsx"
+          ]
+        },
+        {
+          "ref": "AIBusquedaModal.jsx",
+          "basename": "AIBusquedaModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\AIBusquedaModal.jsx"
+          ]
+        },
+        {
+          "ref": "AISearchModal.jsx",
+          "basename": "AISearchModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ai\\AISearchModal.jsx"
+          ]
+        },
+        {
+          "ref": "AIEmailModal.jsx",
+          "basename": "AIEmailModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ai\\AIEmailModal.jsx"
+          ]
+        },
+        {
+          "ref": "aiSuppliersService.js",
+          "basename": "aiSuppliersService.js",
+          "matches": [
+            "src\\services\\aiSuppliersService.js"
+          ]
+        },
+        {
+          "ref": "supplierEventBridge",
+          "basename": "supplierEventBridge",
+          "matches": [
+            "src\\components\\proveedores\\SupplierEventBridge.js",
+            "src\\components\\proveedores\\SupplierEventBridge.jsx"
+          ]
+        },
+        {
+          "ref": "EmailTrackingList.jsx",
+          "basename": "EmailTrackingList.jsx",
+          "matches": [
+            "src\\components\\proveedores\\tracking\\EmailTrackingList.jsx"
+          ]
+        },
+        {
+          "ref": "ProviderEmailModal.jsx",
+          "basename": "ProviderEmailModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ProviderEmailModal.jsx"
+          ]
+        },
+        {
+          "ref": "RFQModal.jsx",
+          "basename": "RFQModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\RFQModal.jsx"
+          ]
+        },
+        {
+          "ref": "ReservationModal.jsx",
+          "basename": "ReservationModal.jsx",
+          "matches": [
+            "src\\components\\proveedores\\ReservationModal.jsx"
+          ]
         }
       ],
       "conclusion": "parcial"

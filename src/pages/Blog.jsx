@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import PageWrapper from '../components/PageWrapper';
 import Spinner from '../components/Spinner';
-import { BLOG_FALLBACK_POSTS } from '../data/blogFallback';
 import { fetchWeddingNews } from '../services/blogService';
 import { translateText } from '../services/translationService';
 
@@ -13,19 +12,6 @@ const MAX_FETCHES_PER_LOAD = 12;
 const PER_DOMAIN_LIMIT = 3;
 
 const normalizeLang = (lang) => String(lang || 'es').toLowerCase().match(/^[a-z]{2}/)?.[0] || 'es';
-
-const parseBooleanFlag = (value, defaultValue = false) => {
-  if (value === undefined || value === null) return defaultValue;
-  const normalized = String(value).trim().toLowerCase();
-  if (!normalized) return defaultValue;
-  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
-  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
-  return defaultValue;
-};
-
-// En Cypress, desactivar fallbacks para tests controlados
-const isCypressEnv = typeof window !== 'undefined' && !!window.Cypress;
-const ENABLE_STATIC_FALLBACK = isCypressEnv ? false : parseBooleanFlag(import.meta?.env?.VITE_BLOG_ENABLE_STATIC_FALLBACK, false);
 
 const extractDomain = (url) => {
   try {
@@ -46,12 +32,6 @@ const hasHttpImage = (post) => {
 };
 
 const isValidArticle = (post) => Boolean(post && post.url && hasHttpImage(post));
-
-const canUseEnglishFallback = () => {
-  // En Cypress, desactivar fallback en inglés para tests controlados
-  if (isCypressEnv) return false;
-  return Boolean(import.meta?.env?.VITE_TRANSLATE_KEY || import.meta?.env?.VITE_ENABLE_EN_FALLBACK);
-};
 
 const ArticleCard = React.forwardRef(({ post }, ref) => {
   const published = post?.published ? new Date(post.published) : null;
@@ -218,19 +198,31 @@ function Blog() {
             return;
           }
           const isFallback = Boolean(post?.__fallback);
+          const normalizedUrl = String(post.url || '').trim();
           if (
             !isFallback &&
-            basePosts.some((item) => item.url === post.url || item.id === post.id)
+            normalizedUrl &&
+            basePosts.some(
+              (item) =>
+                item.url === normalizedUrl ||
+                item.id === post.id ||
+                (item.url && String(item.url).trim() === normalizedUrl)
+            )
           ) {
             console.info('[Blog] Descartado artículo duplicado', { url: post.url });
             return;
           }
-          const domain = extractDomain(post.url);
-          if (!isFallback && (domainCounts[domain] || 0) >= PER_DOMAIN_LIMIT) {
+          let domain = extractDomain(post.url);
+          const sourceDomain = post?.source ? extractDomain(`https://${post.source}`) : null;
+          if (domain === 'news.google.com' && sourceDomain) {
+            domain = sourceDomain || domain;
+          }
+          const skipDomainLimit = isFallback || domain === 'news.google.com';
+          if (!skipDomainLimit && (domainCounts[domain] || 0) >= PER_DOMAIN_LIMIT) {
             console.info('[Blog] Descartado por límite de dominio', { domain });
             return;
           }
-          if (!isFallback) {
+          if (!skipDomainLimit) {
             domainCounts[domain] = (domainCounts[domain] || 0) + 1;
           }
           basePosts.push(post);
@@ -261,47 +253,6 @@ function Blog() {
         }
         fetchPage += 1;
         fetches += 1;
-      }
-
-      if (basePosts.length === baselineLength && lang !== 'en' && canUseEnglishFallback()) {
-        let fallbackPage = 1;
-        let fallbackFetches = 0;
-        let fallbackEmpty = 0;
-        while (
-          basePosts.length < targetLength &&
-          fallbackPage <= MAX_LOOKAHEAD &&
-          fallbackFetches < MAX_FETCHES_PER_LOAD &&
-          fallbackEmpty <= MAX_EMPTY_BATCHES
-        ) {
-          try {
-            const batch = await fetchWeddingNews(fallbackPage, 50, 'en');
-            const translatedBatch = await translateBatchIfNeeded(batch);
-            console.info('[Blog] fetchWeddingNews fallback EN batch', {
-              page: fallbackPage,
-              size: Array.isArray(translatedBatch) ? translatedBatch.length : -1,
-            });
-            tryConsumeBatch(translatedBatch);
-          } catch (err) {
-            console.warn('[Blog] Error fetching EN fallback', err);
-          }
-          fallbackPage += 1;
-          fallbackFetches += 1;
-          if (basePosts.length === baselineLength) {
-            fallbackEmpty += 1;
-          } else {
-            fallbackEmpty = 0;
-          }
-        }
-      }
-
-      if (basePosts.length === baselineLength && ENABLE_STATIC_FALLBACK) {
-        console.info('[Blog] Injecting local fallback posts');
-        const fallbackBatch = BLOG_FALLBACK_POSTS.map((entry, index) => ({
-          ...entry,
-          __fallback: true,
-          id: entry.id || `local-fallback-${index}`,
-        }));
-        tryConsumeBatch(fallbackBatch);
       }
 
       if (cancelled) return;

@@ -157,7 +157,7 @@ export default function MainLayout() {
             startIcon={<Plus className="w-4 h-4" />}
             className="hidden sm:inline-flex"
           >
-            Crear nuevo evento
+            {t('navigation.createEvent', { defaultValue: 'Crear nuevo evento' })}
           </Button>
         )}
         {/* Watchers de notificaciones (sin icono visible aquí) */}
@@ -211,7 +211,8 @@ export default function MainLayout() {
                   }}
                   className="flex w-full items-center px-3 py-2 text-sm hover:bg-[var(--color-accent)]/20 rounded-md transition-colors"
                 >
-                  <Plus className="w-4 h-4 mr-2" /> Crear nuevo evento
+                  <Plus className="w-4 h-4 mr-2" />{' '}
+                  {t('navigation.createEvent', { defaultValue: 'Crear nuevo evento' })}
                 </button>
               )}
 

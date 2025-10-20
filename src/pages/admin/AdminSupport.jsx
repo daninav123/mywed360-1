@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { getSupportData } from '../../services/adminDataService';
+import { getSupportData, respondToTicket } from '../../services/adminDataService';
 
 const initialSummary = {
   open: 0,
@@ -15,6 +15,45 @@ const AdminSupport = () => {
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [newStatus, setNewStatus] = useState('');
+  const [responding, setResponding] = useState(false);
+
+  const handleSendResponse = async () => {
+    if (!selectedTicket || !responseMessage.trim()) return;
+    
+    setResponding(true);
+    try {
+      await respondToTicket(
+        selectedTicket.id, 
+        responseMessage, 
+        newStatus || undefined
+      );
+      
+      // Actualizar el ticket localmente si se cambió el estado
+      if (newStatus) {
+        setTickets(prev => 
+          prev.map(t => 
+            t.id === selectedTicket.id 
+              ? { ...t, status: newStatus } 
+              : t
+          )
+        );
+        setSelectedTicket(prev => ({ ...prev, status: newStatus }));
+      }
+      
+      // Limpiar el formulario
+      setResponseMessage('');
+      setNewStatus('');
+      
+      alert('Respuesta enviada exitosamente');
+    } catch (error) {
+      console.error('[AdminSupport] Error sending response:', error);
+      alert('Error al enviar la respuesta: ' + error.message);
+    } finally {
+      setResponding(false);
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -81,7 +120,24 @@ const AdminSupport = () => {
           className="mt-4 flex h-36 items-center justify-center rounded-lg border border-dashed border-soft text-xs text-[var(--color-text-soft,#6b7280)]"
           data-testid="support-nps-chart"
         >
-          NPS actual: {summary.nps ?? '—'} (placeholder)
+          {summary.npsDetails ? (
+            <div className="space-y-2">
+              <div className="text-2xl font-bold">
+                NPS: {summary.nps ?? '—'}
+              </div>
+              <div className="text-xs space-y-1">
+                <div>Promotores: {summary.npsDetails.promoters} ({Math.round((summary.npsDetails.promoters / summary.npsDetails.total) * 100)}%)</div>
+                <div>Pasivos: {summary.npsDetails.passives} ({Math.round((summary.npsDetails.passives / summary.npsDetails.total) * 100)}%)</div>
+                <div>Detractores: {summary.npsDetails.detractors} ({Math.round((summary.npsDetails.detractors / summary.npsDetails.total) * 100)}%)</div>
+                <div className="pt-1 border-t">Total respuestas: {summary.npsDetails.total} (últimos 30 días)</div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="text-2xl font-bold">NPS: {summary.nps ?? '—'}</div>
+              <div className="text-xs mt-1">Sin datos de feedback disponibles</div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -122,8 +178,38 @@ const AdminSupport = () => {
                 <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Solicitado por {selectedTicket.requester}</p>
                 <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Estado: {selectedTicket.status}</p>
                 <p className="text-xs text-[var(--color-text-soft,#6b7280)]">Actualizado: {selectedTicket.updatedAt}</p>
-                <div className="rounded-md border border-dashed border-soft p-4 text-xs text-[var(--color-text-soft,#6b7280)]">
-                  Conversación y comentarios (placeholder).
+                <div className="space-y-4 mt-4">
+                  <div className="rounded-md border border-soft p-4">
+                    <h4 className="text-sm font-semibold mb-2">Responder al ticket</h4>
+                    <textarea
+                      value={responseMessage}
+                      onChange={(e) => setResponseMessage(e.target.value)}
+                      placeholder="Escribe tu respuesta..."
+                      className="w-full px-3 py-2 border border-soft rounded-md text-sm"
+                      rows="4"
+                      disabled={responding}
+                    />
+                    <div className="flex items-center gap-3 mt-2">
+                      <select
+                        value={newStatus}
+                        onChange={(e) => setNewStatus(e.target.value)}
+                        className="px-3 py-1 border border-soft rounded-md text-sm"
+                        disabled={responding}
+                      >
+                        <option value="">Mantener estado actual</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="resolved">Resuelto</option>
+                        <option value="closed">Cerrado</option>
+                      </select>
+                      <button
+                        onClick={handleSendResponse}
+                        disabled={!responseMessage.trim() || responding}
+                        className="px-4 py-1 bg-[var(--color-primary,#6366f1)] text-white rounded-md text-sm disabled:opacity-50"
+                      >
+                        {responding ? 'Enviando...' : 'Enviar respuesta'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (

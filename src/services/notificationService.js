@@ -184,14 +184,8 @@ export async function getNotifications() {
     const unreadCount = notifications.filter((n) => !n.read).length;
     return { notifications, unreadCount };
   } catch (error) {
-    // Silenciar 401/primer arranque sin token; devolver vacÃ­o/local
-    try {
-      const local = loadLocalNotifications();
-      const unreadCount = local.filter((n) => !n.read).length;
-      return { notifications: local, unreadCount };
-    } catch {
-      return { notifications: [], unreadCount: 0 };
-    }
+    console.error('Error fetching notifications:', error);
+    throw error;
   }
 }
 
@@ -257,7 +251,7 @@ export async function addNotification(notification) {
     return enriched;
   } catch (error) {
     console.error('Error adding notification:', error);
-    return addLocalNotification(body);
+    throw error;
   }
 }
 
@@ -269,8 +263,7 @@ export async function markNotificationRead(id) {
     return res.json();
   } catch (error) {
     console.error('Error marking notification as read:', error);
-    // Modo fallback: marcar como leÃ­da en localStorage
-    return markLocalNotificationRead(id);
+    throw error;
   }
 }
 
@@ -279,13 +272,10 @@ export async function deleteNotification(id) {
     const headers = await authHeader();
     const res = await apiDel(`/api/notifications/${id}`, { headers });
     if (!res.ok) throw new Error('Error deleting notification');
-    // Eliminar tambiÃ©n de localStorage por si acaso
-    deleteLocalNotification(id);
     return true;
   } catch (error) {
     console.error('Error deleting notification:', error);
-    // Modo fallback: eliminar de localStorage
-    return deleteLocalNotification(id);
+    throw error;
   }
 }
 
@@ -568,72 +558,4 @@ export function generateEmailNotifications(emails) {
     count: unreadEmails.length,
     importantCount: importantUnread.length,
   };
-}
-
-// =============== LOCAL STORAGE FALLBACK ===============
-
-// Funciones helper para almacenamiento local de notificaciones
-function loadLocalNotifications() {
-  try {
-    const notifications = JSON.parse(localStorage.getItem('mywed360_notifications') || '[]');
-    if (!Array.isArray(notifications)) return [];
-    return notifications.map((n) => ({
-      ...n,
-      payload: n && typeof n.payload === 'object' && n.payload !== null ? n.payload : {},
-    }));
-  } catch (e) {
-    console.error('Error loading local notifications:', e);
-    return [];
-  }
-}
-
-function saveLocalNotifications(notifications) {
-  try {
-    localStorage.setItem('mywed360_notifications', JSON.stringify(notifications));
-    return true;
-  } catch (e) {
-    console.error('Error saving local notifications:', e);
-    return false;
-  }
-}
-
-function addLocalNotification(notification) {
-  const notifications = loadLocalNotifications();
-  const newNotification = {
-    ...notification,
-    payload:
-      notification && typeof notification.payload === 'object' && notification.payload !== null
-        ? notification.payload
-        : {},
-    id: `local-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-  };
-
-  notifications.push(newNotification);
-  saveLocalNotifications(notifications);
-
-  window.dispatchEvent(
-    new CustomEvent('mywed360-notif', {
-      detail: { id: newNotification.id },
-    })
-  );
-
-  return newNotification;
-}
-
-function markLocalNotificationRead(id) {
-  const notifications = loadLocalNotifications();
-  const updatedNotifications = notifications.map((notif) =>
-    notif.id === id ? { ...notif, read: true } : notif
-  );
-
-  saveLocalNotifications(updatedNotifications);
-  return updatedNotifications.find((n) => n.id === id) || null;
-}
-
-function deleteLocalNotification(id) {
-  const notifications = loadLocalNotifications();
-  const updatedNotifications = notifications.filter((notif) => notif.id !== id);
-
-  saveLocalNotifications(updatedNotifications);
-  return true;
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, LogOut } from 'lucide-react';
 
@@ -6,6 +6,7 @@ import MarketingLayout from '../../components/marketing/MarketingLayout';
 import RegisterForm from '../../components/auth/RegisterForm';
 import SocialLoginButtons from '../../components/auth/SocialLoginButtons';
 import { useAuth } from '../../hooks/useAuth';
+import useTranslations from '../../hooks/useTranslations';
 
 const DEFAULT_PROVIDERS = ['google', 'facebook', 'apple'];
 
@@ -23,6 +24,7 @@ const Access = ({ defaultMode = 'login' }) => {
     isLoading,
     logout,
   } = useAuth();
+  const { t } = useTranslations();
 
   const initialMode =
     location.state?.signupMode === true
@@ -68,6 +70,95 @@ const Access = ({ defaultMode = 'login' }) => {
     [availableSocialProviders]
   );
 
+  const getLoginValidationMessage = useCallback(
+    (issue) => {
+      switch (issue) {
+        case 'missing_email':
+          return t('authLogin.validation.missingEmail');
+        case 'missing_password':
+          return t('authLogin.validation.missingPassword');
+        default:
+          return t('authLogin.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const resolveLoginError = useCallback(
+    (code) => {
+      switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/invalid-credentials':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+        case 'invalid-credentials':
+        case 'wrong-password':
+          return t('authLogin.errors.invalidCredentials');
+        default:
+          return t('authLogin.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const getSignupValidationMessage = useCallback(
+    (issue) => {
+      switch (issue) {
+        case 'missing_email':
+          return t('authSignup.validation.missingEmail');
+        case 'missing_password':
+          return t('authSignup.validation.missingPassword');
+        case 'password_too_short':
+          return t('authSignup.validation.shortPassword');
+        default:
+          return t('authSignup.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const resolveSignupError = useCallback(
+    (code) => {
+      switch (code) {
+        case 'auth/email-already-in-use':
+        case 'email-already-in-use':
+          return t('authSignup.errors.emailInUse');
+        case 'auth/invalid-email':
+        case 'invalid-email':
+          return t('authSignup.errors.invalidEmail');
+        case 'auth/weak-password':
+        case 'weak-password':
+          return t('authSignup.errors.weakPassword');
+        default:
+          return t('authSignup.errors.generic');
+      }
+    },
+    [t]
+  );
+
+  const loginHero = t('authLogin.hero', { returnObjects: true });
+  const signupHero = t('authSignup.hero', { returnObjects: true });
+  const heroData = mode === 'signup' ? signupHero : loginHero;
+  const heroFeatures = Array.isArray(heroData?.features) ? heroData.features : [];
+  const heroTitle =
+    heroData?.title ||
+    (mode === 'signup'
+      ? t('authSignup.hero.title', { defaultValue: 'Welcome to Lovenda' })
+      : t('authLogin.hero.title', { defaultValue: 'Manage everything from one place' }));
+  const heroDescription =
+    heroData?.description ||
+    (mode === 'signup'
+      ? t('authSignup.hero.description', {
+          defaultValue:
+            'Centralise tasks, guests, and vendors in one place. Our assistant guides you every step.',
+        })
+      : t('authLogin.hero.description', {
+          defaultValue:
+            'Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync.',
+        }));
+  const heroBadge =
+    heroData?.badge || t('app.name', { defaultValue: 'MaLove.App' });
+
   const resetFeedback = () => {
     setLoginError('');
     setLoginInfo('');
@@ -87,12 +178,12 @@ const Access = ({ defaultMode = 'login' }) => {
 
     const trimmedEmail = loginEmail.trim();
     if (!trimmedEmail) {
-      setLoginError('Introduce tu correo electronico.');
+      setLoginError(getLoginValidationMessage('missing_email'));
       loginEmailRef.current?.focus();
       return;
     }
     if (!loginPassword) {
-      setLoginError('Introduce tu contrasena.');
+      setLoginError(getLoginValidationMessage('missing_password'));
       loginPasswordRef.current?.focus();
       return;
     }
@@ -112,13 +203,11 @@ const Access = ({ defaultMode = 'login' }) => {
         return;
       }
 
-      const errorMessage =
-        result?.error ||
-        'No pudimos iniciar sesion con esos datos. Revisa la informacion e intentalo de nuevo.';
-      setLoginError(errorMessage);
+      const loginErrorMessage = resolveLoginError(result?.code || 'unknown');
+      setLoginError(loginErrorMessage);
       loginPasswordRef.current?.focus();
     } catch (error) {
-      setLoginError(error?.message || 'No pudimos iniciar sesion. Intenta nuevamente.');
+      setLoginError(resolveLoginError(error?.code || 'exception'));
       loginPasswordRef.current?.focus();
     } finally {
       setIsLoggingIn(false);
@@ -148,17 +237,17 @@ const Access = ({ defaultMode = 'login' }) => {
 
     const trimmedEmail = signupEmail.trim();
     if (!trimmedEmail) {
-      setSignupError('Introduce un correo electronico valido.');
+      setSignupError(getSignupValidationMessage('missing_email'));
       signupEmailRef.current?.focus();
       return;
     }
     if (!signupPassword) {
-      setSignupError('Necesitas una contrasena para crear tu cuenta.');
+      setSignupError(getSignupValidationMessage('missing_password'));
       signupPasswordRef.current?.focus();
       return;
     }
     if (signupPassword.length < 8) {
-      setSignupError('La contrasena debe tener al menos 8 caracteres.');
+      setSignupError(getSignupValidationMessage('password_too_short'));
       signupPasswordRef.current?.focus();
       return;
     }
@@ -167,18 +256,20 @@ const Access = ({ defaultMode = 'login' }) => {
     try {
       const result = await registerWithEmail(trimmedEmail, signupPassword, signupRole);
       if (result?.success) {
-        setSignupInfo('Cuenta creada con exito. Redirigiendo a tu panel...');
+        setSignupInfo(
+          t('authSignup.successMessage', {
+            defaultValue: 'Account created successfully. Redirecting to your dashboard...',
+          })
+        );
         navigate('/home', { replace: true });
         return;
       }
 
-      const errorMessage =
-        result?.error ||
-        'No pudimos crear tu cuenta. Revisa los datos o intenta con otro correo electronico.';
-      setSignupError(errorMessage);
+      const signupErrorMessage = resolveSignupError(result?.code || 'unknown');
+      setSignupError(signupErrorMessage);
       signupPasswordRef.current?.focus();
     } catch (error) {
-      setSignupError(error?.message || 'No pudimos crear tu cuenta. Intenta nuevamente.');
+      setSignupError(resolveSignupError(error?.code || 'exception'));
       signupPasswordRef.current?.focus();
     } finally {
       setIsSigningUp(false);
@@ -191,11 +282,16 @@ const Access = ({ defaultMode = 'login' }) => {
     setSignupBusyProvider(provider);
     try {
       const label = getProviderLabel?.(provider) || provider;
-      setSignupInfo(`Redirigiendo a ${label} para completar el registro...`);
+      setSignupInfo(
+        t('authSignup.social.pending', {
+          provider: label,
+          defaultValue: `Complete the sign-up flow in the ${label} window.`,
+        })
+      );
       await registerWithProvider(provider, { role: signupRole });
       navigate('/home', { replace: true });
     } catch (error) {
-      setSignupError(error?.message || 'No pudimos conectar con ese proveedor.');
+      setSignupError(resolveSignupError(error?.code || 'exception'));
     } finally {
       setSignupBusyProvider(null);
     }
@@ -207,7 +303,7 @@ const Access = ({ defaultMode = 'login' }) => {
       resetFeedback();
       setMode('login');
     } catch (error) {
-      setLoginError(error?.message || 'No pudimos cerrar tu sesion. Intenta de nuevo.');
+      setLoginError(error?.message || t('authLogin.errors.generic'));
     }
   };
 
@@ -221,33 +317,26 @@ const Access = ({ defaultMode = 'login' }) => {
           className="inline-flex items-center gap-2 rounded-full border border-soft bg-surface px-3 py-1 text-xs font-medium text-muted transition hover:text-body"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          Volver a inicio
+          {t('marketingAccess.backLink', { defaultValue: 'Back to home' })}
         </Link>
 
         <section className="overflow-hidden rounded-3xl border border-soft bg-surface/95 shadow-lg shadow-[var(--color-primary)]/15">
           <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
             <div className="space-y-5">
               <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
-                Bienvenido a MaLove.App
+                {heroBadge}
               </span>
-              <h1 className="text-4xl font-semibold leading-snug text-body md:text-5xl">
-                Gestiona tu boda desde un unico panel.
-              </h1>
-              <p className="text-base text-muted">
-                Accede a tus invitados, tareas, presupuestos y contratos en segundos. Sigue el progreso del evento, coordina proveedores y mantente al tanto de todo tu equipo.
-              </p>
-              <div className="flex flex-wrap gap-2 text-xs text-muted">
-                {['Checklists inteligentes', 'Reportes instantaneos', 'Comunicacion centralizada'].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-soft bg-surface px-3 py-1"
-                    >
-                      {tag}
+              <h1 className="text-4xl font-semibold leading-snug text-body md:text-5xl">{heroTitle}</h1>
+              <p className="text-base text-muted">{heroDescription}</p>
+              {heroFeatures.length > 0 ? (
+                <div className="flex flex-wrap gap-2 text-xs text-muted">
+                  {heroFeatures.map((feature) => (
+                    <span key={feature} className="rounded-full border border-soft bg-surface px-3 py-1">
+                      {feature}
                     </span>
-                  )
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="rounded-3xl border border-soft bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/20">
@@ -257,9 +346,14 @@ const Access = ({ defaultMode = 'login' }) => {
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-body">Sesion activa</h3>
+                    <h3 className="text-xl font-semibold text-body">
+                      {t('authLogin.alreadySignedIn.title', { defaultValue: 'Active session' })}
+                    </h3>
                     <p className="mt-2 text-sm text-muted">
-                      Ya tienes tu cuenta MaLove.App abierta. Puedes continuar con tus eventos o cerrar sesion si necesitas entrar con otra cuenta.
+                      {t('authLogin.alreadySignedIn.description', {
+                        defaultValue:
+                          'Your MaLove.App account is already open. You can keep working on your events or sign out if you need to switch accounts.',
+                      })}
                     </p>
                   </div>
                   <div className="flex flex-col gap-3">
@@ -267,7 +361,7 @@ const Access = ({ defaultMode = 'login' }) => {
                       to="/home"
                       className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95"
                     >
-                      Ir al panel principal
+                      {t('authLogin.alreadySignedIn.primaryCta', { defaultValue: 'Go to dashboard' })}
                     </Link>
                     <button
                       type="button"
@@ -275,7 +369,7 @@ const Access = ({ defaultMode = 'login' }) => {
                       className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-4 py-2.5 text-sm font-semibold text-body transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                     >
                       <LogOut className="h-4 w-4" />
-                      Cerrar sesion
+                      {t('authLogin.alreadySignedIn.secondaryCta', { defaultValue: 'Sign out' })}
                     </button>
                   </div>
                 </div>
@@ -292,7 +386,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        Iniciar sesion
+                        {t('authLogin.toggle.login', { defaultValue: 'Sign in' })}
                       </button>
                       <button
                         type="button"
@@ -303,7 +397,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        Crear cuenta
+                        {t('authLogin.toggle.signup', { defaultValue: 'Create account' })}
                       </button>
                     </div>
                   </div>
@@ -312,7 +406,7 @@ const Access = ({ defaultMode = 'login' }) => {
                     <form onSubmit={handleLoginSubmit} className="space-y-4 text-left" noValidate>
                       <div className="space-y-2">
                         <label htmlFor="access-login-email" className="text-sm font-medium text-body">
-                          Correo electronico
+                          {t('authLogin.emailLabel')}
                         </label>
                         <input
                           id="access-login-email"
@@ -321,7 +415,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginEmail}
                           onChange={(event) => setLoginEmail(event.target.value)}
                           autoComplete="email"
-                          placeholder="tu@email.com"
+                          placeholder={t('authLogin.emailPlaceholder')}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -329,7 +423,7 @@ const Access = ({ defaultMode = 'login' }) => {
 
                       <div className="space-y-2">
                         <label htmlFor="access-login-password" className="text-sm font-medium text-body">
-                          Contrasena
+                          {t('authLogin.passwordLabel')}
                         </label>
                         <input
                           id="access-login-password"
@@ -338,7 +432,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginPassword}
                           onChange={(event) => setLoginPassword(event.target.value)}
                           autoComplete="current-password"
-                          placeholder="Introduce tu contrasena"
+                          placeholder={t('authLogin.passwordPlaceholder')}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -352,10 +446,10 @@ const Access = ({ defaultMode = 'login' }) => {
                             checked={rememberLogin}
                             onChange={(event) => setRememberLogin(event.target.checked)}
                           />
-                          Recordarme
+                          {t('authLogin.rememberMe')}
                         </label>
                         <Link to="/reset-password" className="text-[var(--color-primary)] hover:brightness-110">
-                          Olvide mi contrasena
+                          {t('authLogin.forgotPassword')}
                         </Link>
                       </div>
 
@@ -375,7 +469,7 @@ const Access = ({ defaultMode = 'login' }) => {
                         disabled={isLoggingIn}
                         className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isLoggingIn ? 'Ingresando...' : 'Entrar en MaLove.App'}
+                        {isLoggingIn ? t('authLogin.submitting') : t('authLogin.submit')}
                       </button>
                     </form>
                   ) : (
@@ -409,28 +503,29 @@ const Access = ({ defaultMode = 'login' }) => {
                       onProviderClick={mode === 'login' ? handleLoginProvider : handleSignupProvider}
                       busyProvider={mode === 'login' ? loginBusyProvider : signupBusyProvider}
                       disabled={mode === 'login' ? isLoggingIn : isSigningUp}
+                      getProviderLabel={getProviderLabel}
                     />
                     <p className="mt-4 text-sm text-muted">
                       {mode === 'login' ? (
                         <>
-                          No tienes cuenta?{' '}
+                          {t('authLogin.noAccount')}{' '}
                           <button
                             type="button"
                             className="font-semibold text-[var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('signup')}
                           >
-                            Registrate aqui
+                            {t('authLogin.registerLink')}
                           </button>
                         </>
                       ) : (
                         <>
-                          Ya tienes cuenta?{' '}
+                          {t('authSignup.alreadyHaveAccount')}{' '}
                           <button
                             type="button"
                             className="font-semibold text-[var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('login')}
                           >
-                            Inicia sesion
+                            {t('authSignup.loginLink')}
                           </button>
                         </>
                       )}

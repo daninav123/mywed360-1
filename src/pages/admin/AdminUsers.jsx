@@ -1,6 +1,6 @@
-﻿import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { getUsersData, getUsersRoleSummary } from '../../services/adminDataService';
+import { getUsersData, getUsersRoleSummary, suspendUser } from '../../services/adminDataService';
 
 const ROLE_CARDS = [
   { key: 'owner', label: 'Owners' },
@@ -98,12 +98,24 @@ const AdminUsers = () => {
     setShowSuspendModal(true);
   };
 
-  const confirmSuspend = () => {
-    if (!selectedUser) return;
-    setUsers((prev) =>
-      prev.map((user) => (user.id === selectedUser.id ? { ...user, status: 'disabled' } : user)),
-    );
-    setShowSuspendModal(false);
+  const confirmSuspend = async () => {
+    if (!selectedUser || !suspendReason.trim()) return;
+    
+    try {
+      // Llamar al endpoint real del backend
+      await suspendUser(selectedUser.id, suspendReason);
+      
+      // Actualizar el estado local para reflejar el cambio
+      setUsers((prev) =>
+        prev.map((user) => (user.id === selectedUser.id ? { ...user, status: 'disabled' } : user)),
+      );
+      setShowSuspendModal(false);
+      setSuspendReason('');
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('[AdminUsers] Failed to suspend user', error);
+      alert('Error al suspender el usuario: ' + error.message);
+    }
   };
 
   const renderUsersTable = () => {

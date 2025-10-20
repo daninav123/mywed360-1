@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 
 import ContactsImporter from '../components/guests/ContactsImporter';
 import GuestBulkGrid from '../components/guests/GuestBulkGrid';
@@ -35,6 +35,9 @@ import { toE164, schedule as scheduleWhats } from '../services/whatsappService';
  * - UX mejorada con atajos y paneles dedicados
  */
 function Invitados() {
+  // Detectar si estamos en modo test
+  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MYWED360_TEST_MODE__);
+  
   // Estados para modales
   const [showGuestModal, setShowGuestModal] = useState(false);
   const [editingGuest, setEditingGuest] = useState(null);

@@ -29,7 +29,6 @@ Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este arch
 | 30. Pagina de inicio (estado 2025-10-13) | cypress/e2e/home/home-greeting-names.cy.js | — | OK |
 | 31. Estilo Global (estado 2025-10-13) | cypress/e2e/style/style-global.cy.js | — | OK |
 | 4. Invitados – Plan de Asientos (estado 2025-10-12) | — | — | Sin specs en doc |
-| 5. Proveedores con IA (estado 2025-10-07) | cypress/e2e/proveedores_flow.cy.js<br>cypress/e2e/proveedores_compare.cy.js<br>cypress/e2e/proveedores_smoke.cy.js | — | OK |
 | 5b. Timeline y Tareas (estado 2025-10-07) | cypress/e2e/tasks/all_subtasks_modal.cy.js | — | OK |
 | 7. Comunicaciones y Email (estado 2025-10-13) | cypress/e2e/email/send-email.cy.js<br>cypress/e2e/email/read-email.cy.js<br>cypress/e2e/email/folders-management.cy.js<br>cypress/e2e/email/tags-filters.cy.js<br>cypress/e2e/email/smart-composer.cy.js<br>cypress/e2e/email/ai-provider-email.cy.js<br>cypress/e2e/compose_quick_replies.cy.js<br>cypress/e2e/email_inbox_smoke.cy.js<br>cypress/e2e/email/read-email-attachments.cy.js<br>cypress/e2e/email/read-email-list.cy.js<br>cypress/e2e/email/read-email-open.cy.js<br>cypress/e2e/email/read-email-unread-status.cy.js<br>cypress/e2e/email/send-email-attachment.cy.js<br>cypress/e2e/email/send-email-validation.cy.js | — | OK |
 | 8. Diseno Web y Personalizacion (estado 2025-10-08) | cypress/e2e/web/diseno-web-flow.cy.js | — | OK |
@@ -44,6 +43,7 @@ Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este arch
 | flujo-22-dashboard-navegacion.md | — | — | Sin specs en doc |
 | flujo-24-galeria-inspiracion.md | cypress/e2e/inspiration/inspiration-gallery.cy.js<br>cypress/e2e/inspiration/inspiration-home-gallery.cy.js<br>cypress/e2e/inspiration/inspiration-save-board.cy.js<br>cypress/e2e/inspiration/inspiration-share.cy.js | — | OK |
 | flujo-3-gestion-invitados.md | cypress/e2e/guests/guests_flow.cy.js<br>cypress/e2e/guests/guests_crud.cy.js<br>cypress/e2e/guests/guests_import_rsvp.cy.js<br>cypress/e2e/guests/guests_messaging.cy.js | — | OK |
+| flujo-5-proveedores-ia.md | cypress/e2e/proveedores_flow.cy.js<br>cypress/e2e/proveedores_compare.cy.js<br>cypress/e2e/proveedores_smoke.cy.js | — | OK |
 | flujo-6-presupuesto.md | cypress/e2e/finance/finance-flow.cy.js<br>cypress/e2e/finance/finance-flow-full.cy.js<br>cypress/e2e/finance/finance-budget.cy.js<br>cypress/e2e/finance/finance-transactions.cy.js<br>cypress/e2e/finance/finance-contributions.cy.js<br>cypress/e2e/finance/finance-analytics.cy.js<br>cypress/e2e/budget_flow.cy.js<br>cypress/e2e/finance/finance-advisor-chat.cy.js | — | OK |
 
 _Nota:_ La matriz refleja lo declarado en la documentación de cada flujo (`## Cobertura E2E implementada`). Si el flujo no menciona ninguna spec, aparecerá como “Sin specs en doc”.

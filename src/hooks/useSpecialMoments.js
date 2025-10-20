@@ -471,6 +471,108 @@ export default function useSpecialMoments() {
     });
   }, []);
 
+  // Mover momento entre bloques diferentes (para drag & drop)
+  const moveMomentBetweenBlocks = useCallback((fromBlockId, toBlockId, momentId, toIndex) => {
+    setMoments((prev) => {
+      const sourceList = prev[fromBlockId] || [];
+      const moment = sourceList.find((m) => m.id === momentId);
+      if (!moment) return prev;
+
+      const destList = prev[toBlockId] || [];
+      if (toBlockId !== fromBlockId && destList.length >= MAX_MOMENTS_PER_BLOCK) {
+        console.warn('[useSpecialMoments] no se puede mover, bloque destino completo', toBlockId);
+        return prev;
+      }
+
+      const next = { ...prev };
+      
+      // Remover del bloque origen
+      next[fromBlockId] = sourceList.filter((m) => m.id !== momentId);
+      
+      // Añadir al bloque destino
+      const updatedMoment = { ...moment };
+      if (toBlockId === fromBlockId) {
+        // Mismo bloque, solo reordenar
+        const reordered = [...sourceList];
+        const idx = sourceList.findIndex((m) => m.id === momentId);
+        const [item] = reordered.splice(idx, 1);
+        reordered.splice(toIndex, 0, item);
+        next[fromBlockId] = reordered.map((m, i) => ({ ...m, order: i + 1 }));
+      } else {
+        // Diferente bloque
+        const newList = [...destList];
+        newList.splice(toIndex, 0, updatedMoment);
+        next[toBlockId] = newList.map((m, i) => ({ ...m, order: i + 1 }));
+        next[fromBlockId] = next[fromBlockId].map((m, i) => ({ ...m, order: i + 1 }));
+      }
+      
+      return next;
+    });
+  }, []);
+
+  // Validar un momento y devolver errores
+  const validateMoment = useCallback((moment) => {
+    const errors = [];
+    
+    // Campos críticos para ciertos tipos de momentos
+    if (!moment.title || moment.title.trim() === '') {
+      errors.push('Título es requerido');
+    }
+    
+    // Validar según el tipo
+    if (moment.type === 'entrada' || moment.type === 'salida') {
+      if (!moment.song || moment.song.trim() === '') {
+        errors.push('Música es requerida para entradas y salidas');
+      }
+    }
+    
+    if (moment.type === 'lectura' || moment.type === 'votos') {
+      if (!moment.responsables || moment.responsables.length === 0) {
+        errors.push('Se requiere al menos un responsable para lecturas y votos');
+      }
+    }
+    
+    if (moment.type === 'baile' && moment.key === 'primer_baile') {
+      if (!moment.song || moment.song.trim() === '') {
+        errors.push('Canción del primer baile es requerida');
+      }
+    }
+    
+    // Validar coherencia de tiempos si existen
+    if (moment.time && moment.duration) {
+      const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (!timePattern.test(moment.time)) {
+        errors.push('Formato de hora inválido (use HH:MM)');
+      }
+    }
+    
+    // Validar límites
+    if (moment.responsables && moment.responsables.length > RESPONSABLES_LIMIT) {
+      errors.push(`Máximo ${RESPONSABLES_LIMIT} responsables permitidos`);
+    }
+    
+    if (moment.suppliers && moment.suppliers.length > SUPPLIERS_LIMIT) {
+      errors.push(`Máximo ${SUPPLIERS_LIMIT} proveedores permitidos`);
+    }
+    
+    return errors;
+  }, []);
+
+  // Obtener todos los errores de validación para un bloque
+  const getMomentValidationErrors = useCallback((blockId) => {
+    const blockMoments = moments[blockId] || [];
+    const errors = {};
+    
+    blockMoments.forEach((moment) => {
+      const momentErrors = validateMoment(moment);
+      if (momentErrors.length > 0) {
+        errors[moment.id] = momentErrors;
+      }
+    });
+    
+    return errors;
+  }, [moments, validateMoment]);
+
   return {
     // datos
     blocks,
@@ -481,12 +583,16 @@ export default function useSpecialMoments() {
     updateMoment,
     reorderMoment,
     moveMoment,
+    moveMomentBetweenBlocks,
     duplicateMoment,
     // bloques
     addBlock,
     renameBlock,
     removeBlock,
     reorderBlocks,
+    // validación
+    validateMoment,
+    getMomentValidationErrors,
     maxMomentsPerBlock: MAX_MOMENTS_PER_BLOCK,
   };
 }

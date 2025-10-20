@@ -527,6 +527,34 @@ export async function retryIntegration(serviceId) {
   return data?.service || null;
 }
 
+export async function suspendUser(userId, reason) {
+  if (!userId) throw new Error('user_id_required');
+  if (!reason || typeof reason !== 'string' || !reason.trim()) {
+    throw new Error('suspension_reason_required');
+  }
+  return await postJson(`${ADMIN_BASE_PATH}/users/${encodeURIComponent(userId)}/suspend`, { reason });
+}
+
+export async function respondToTicket(ticketId, message, status) {
+  if (!ticketId) throw new Error('ticket_id_required');
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    throw new Error('response_message_required');
+  }
+  const payload = { message };
+  if (status) payload.status = status;
+  return await postJson(`${ADMIN_BASE_PATH}/support/tickets/${encodeURIComponent(ticketId)}/respond`, payload);
+}
+
+export async function generateReport(type, recipients, dateRange) {
+  if (!type) throw new Error('report_type_required');
+  if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
+    throw new Error('recipients_required');
+  }
+  const payload = { type, recipients };
+  if (dateRange) payload.dateRange = dateRange;
+  return await postJson(`${ADMIN_BASE_PATH}/reports/generate`, payload);
+}
+
 export const getHttpMetricsSummary = async (opts = {}) => {
   const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 50;
   const data = await fetchAdminEndpoint(`/api/admin/metrics/http?limit=${encodeURIComponent(limit)}`);

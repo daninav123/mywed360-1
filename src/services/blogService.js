@@ -1,7 +1,6 @@
 ﻿// blogService.js - noticias de bodas
 
 import { getBackendBase } from '@/utils/backendBase.js';
-import { BLOG_FALLBACK_POSTS } from '@/data/blogFallback.js';
 import { translateText } from './translationService.js';
 
 // Evita spam de peticiones al backend si está caído/no iniciado (reservado para uso futuro)
@@ -11,24 +10,25 @@ const _backoffBackend = (ms = 60_000) => {
   _BACKEND_BACKOFF_UNTIL = Date.now() + ms;
 };
 
+const _candidateBackoff = new Map();
+const DEFAULT_CANDIDATE_BACKOFF = 10 * 60_000;
+
+const candidateKey = (base) => (base === undefined || base === null || base === '' ? '__proxy__' : String(base));
+const candidateAvailable = (base) => Date.now() > (_candidateBackoff.get(candidateKey(base)) || 0);
+const backoffCandidate = (base, ms = DEFAULT_CANDIDATE_BACKOFF) => {
+  _candidateBackoff.set(candidateKey(base), Date.now() + ms);
+};
+const clearCandidateBackoff = (base) => {
+  _candidateBackoff.delete(candidateKey(base));
+};
+
 // Preferimos el agregador backend (RSS) para variedad y fiabilidad.
 // Si se quiere forzar NewsAPI, definir VITE_NEWSAPI_KEY en build.
 const API_KEY = import.meta.env.VITE_NEWSAPI_KEY || '';
-
-function parseStaticFallbackFlag(value) {
-  if (value === undefined || value === null) return undefined;
-  const normalized = String(value).trim().toLowerCase();
-  if (!normalized) return undefined;
-  if (['0', 'false', 'off', 'no'].includes(normalized)) return false;
-  if (['1', 'true', 'on', 'yes'].includes(normalized)) return true;
-  return undefined;
-}
-
 const ENV = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
-const STATIC_FALLBACK_ENABLED =
-  parseStaticFallbackFlag(ENV.VITE_BLOG_ENABLE_STATIC_FALLBACK) ?? false;
-const DISABLE_RENDER_IN_DEV =
-  parseStaticFallbackFlag(ENV.VITE_BLOG_DISABLE_RENDER_DEV) ?? false;
+const DISABLE_RENDER_IN_DEV = ['1', 'true', 'yes', 'on'].includes(
+  String(ENV.VITE_BLOG_DISABLE_RENDER_DEV || '').trim().toLowerCase()
+);
 
 function normalizeLang(lang) {
   if (!lang) return 'es';
@@ -37,7 +37,7 @@ function normalizeLang(lang) {
   return m ? m[0] : 'es';
 }
 
-async function fetchFromBackend({ page, pageSize, language }) {
+async function fetchFromBackend({ page, pageSize, language, skipLocalCandidates = false }) {
   const envBase =
     (typeof import.meta !== 'undefined' &&
       import.meta.env &&
@@ -56,6 +56,15 @@ async function fetchFromBackend({ page, pageSize, language }) {
     'https://mywed360-backend.onrender.com',
   ];
   let candidates = Array.from(new Set(rawCandidates.filter((v) => v !== undefined && v !== null)));
+  if (skipLocalCandidates) {
+    console.info('[blogService] Local backend in backoff, saltando candidatos locales');
+    candidates = candidates.filter(
+      (candidate) =>
+        candidate &&
+        !/^https?:\/\/localhost(?::4004)?$/i.test(candidate) &&
+        candidate !== ''
+    );
+  }
   // En desarrollo podemos desactivar Render con flag explícito, pero por defecto lo dejamos como último recurso real.
   if (import.meta?.env?.DEV && DISABLE_RENDER_IN_DEV) {
     candidates = candidates.filter((b) => !/^https:\/\/mywed360-backend\.onrender\.com$/i.test(b || ''));
@@ -74,6 +83,10 @@ async function fetchFromBackend({ page, pageSize, language }) {
   // Carga perezosa de axios para reducir bundle inicial
   const axios = (await import('axios')).default;
   for (const base of candidates) {
+    if (!candidateAvailable(base)) {
+      console.info('[blogService] candidato wedding-news en backoff', { base });
+      continue;
+    }
     try {
       const url = base ? `${base}/api/wedding-news` : '/api/wedding-news';
       // Adaptive timeout: short for local/same-origin, longer for Render aggregator
@@ -94,15 +107,18 @@ async function fetchFromBackend({ page, pageSize, language }) {
         length: Array.isArray(resp.data) ? resp.data.length : undefined,
       });
       if (resp.status < 400 && Array.isArray(resp.data)) {
+        clearCandidateBackoff(base);
         if (resp.data.length > 0) return resp.data;
         // Si el backend de este candidato devuelve array vacío, probar el siguiente candidato
         continue;
       }
       // Estado no exitoso: marcar como error para posible backoff
       sawError = true;
+      backoffCandidate(base);
     } catch (error) {
       console.warn('[blogService] error al consultar wedding-news', { base, message: error?.message });
       sawError = true;
+      backoffCandidate(base, error?.code === 'ECONNABORTED' ? 2 * 60_000 : DEFAULT_CANDIDATE_BACKOFF);
     }
   }
   // Si hubo errores en candidatos, devolver null para diferenciar de "vacío"
@@ -563,16 +579,18 @@ const scoreMatches = (text, patterns) =>
  */
 export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es') {
   const lang = normalizeLang(language);
-  const rssData = await fetchFromBackend({ page, pageSize, language: lang });
+  const skipLocal = !_backendAvailable();
+  const rssData = await fetchFromBackend({
+    page,
+    pageSize,
+    language: lang,
+    skipLocalCandidates: skipLocal,
+  });
 
   if (rssData === null) {
     console.warn('[blogService] Backend wedding-news unavailable');
     if (_backendAvailable()) {
       _backoffBackend(2 * 60_000);
-    }
-    const fallbackFromBackend = await useStaticFallbackIfAvailable('backend error', page, pageSize, lang);
-    if (fallbackFromBackend) {
-      return fallbackFromBackend;
     }
     if (!API_KEY) {
       return [];
@@ -584,34 +602,17 @@ export async function fetchWeddingNews(page = 1, pageSize = 10, language = 'es')
   }
 
   if (!API_KEY) {
-    const fallbackNoApiKey = await useStaticFallbackIfAvailable('no API key', page, pageSize, lang);
-    if (fallbackNoApiKey) {
-      return fallbackNoApiKey;
-    }
     return [];
   }
 
   try {
     const news = await fetchFromNewsApi(page, pageSize, lang);
     if (!news.length) {
-      const fallbackEmptyNewsApi = await useStaticFallbackIfAvailable(
-        'empty NewsAPI response',
-        page,
-        pageSize,
-        lang
-      );
-      if (fallbackEmptyNewsApi) {
-        return fallbackEmptyNewsApi;
-      }
       return [];
     }
     return maybeTranslatePosts(news.map((entry) => normalizeBlogPost(entry, lang)), lang);
   } catch (error) {
     console.warn('[blogService] NewsAPI fallback failed', error);
-    const fallbackNewsApiError = await useStaticFallbackIfAvailable('NewsAPI error', page, pageSize, lang);
-    if (fallbackNewsApiError) {
-      return fallbackNewsApiError;
-    }
     return [];
   }
 }
@@ -633,65 +634,6 @@ async function maybeTranslatePosts(posts, lang) {
     translated.push(copy);
   }
   return translated;
-}
-
-function appendFallbackMarker(url, cycle, index) {
-  if (!url) return url;
-  try {
-    const parsed = new URL(url);
-    parsed.searchParams.set('ref', `mw360-fallback-${cycle}-${index}`);
-    return parsed.toString();
-  } catch {
-    const suffix = url.includes('?') ? '&' : '?';
-    return `${url}${suffix}ref=mw360-fallback-${cycle}-${index}`;
-  }
-}
-
-async function buildStaticFallback(page, pageSize, lang) {
-  const normalized = BLOG_FALLBACK_POSTS.map((entry) => normalizeBlogPost(entry));
-  const total = normalized.length;
-  if (!total) {
-    return [];
-  }
-  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
-  const safeSize =
-    Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) || total : total;
-  const itemsPerPage = safeSize || total;
-  const offset = (safePage - 1) * itemsPerPage;
-  const expanded = [];
-  for (let i = 0; i < itemsPerPage; i += 1) {
-    const globalIndex = offset + i;
-    const base = normalized[globalIndex % total];
-    const cycle = Math.floor(globalIndex / total);
-    const clone = {
-      ...base,
-      id: `${base.id || 'fallback'}::${cycle}::${i}`,
-      source: base.source || `Fallback ${cycle + 1}`,
-      __fallback: true,
-      fallbackCycle: cycle,
-      fallbackIndex: i,
-    };
-    if (clone.url) {
-      clone.url = appendFallbackMarker(clone.url, cycle, i);
-    }
-    expanded.push(clone);
-  }
-  if (lang && lang !== 'es') {
-    return await maybeTranslatePosts(expanded, lang);
-  }
-  return expanded;
-}
-
-async function useStaticFallbackIfAvailable(reason, page, pageSize, lang) {
-  if (!STATIC_FALLBACK_ENABLED) {
-    return null;
-  }
-  const fallbackPosts = await buildStaticFallback(page, pageSize, lang);
-  if (!fallbackPosts.length) {
-    return null;
-  }
-  console.info(`[blogService] Using local blog fallback (${reason})`, fallbackPosts.length);
-  return fallbackPosts;
 }
 
 // Fin de archivo

@@ -79,124 +79,7 @@ function buildContextSummary(context) {
   return parts.join(', ');
 }
 
-// Función de fallback local para cuando OpenAI no está disponible
-function generateLocalResponse(text, history = [], context = null) {
-  const lowerText = text.toLowerCase();
-  let reply = '';
-  let extracted = {};
-  const subject = describeEvent(context);
-  
-  // Respuestas contextuales basadas en palabras clave
-  if (lowerText.includes('hola') || lowerText.includes('hi') || lowerText.includes('hello')) {
-    reply = `¡Hola! Soy tu asistente de bodas. Aunque tengo algunos problemas técnicos temporales, puedo ayudarte con información básica sobre ${subject}. ¿En qué puedo asistirte?`;
-  } else if (lowerText.includes('invitado') || lowerText.includes('guest')) {
-    reply = `Te puedo ayudar con la gestión de invitados de ${subject}. Puedes añadir invitados manualmente desde la sección de Invitados en el menú principal. ¿Necesitas ayuda con algo específico sobre los invitados?`;
-  } else if (lowerText.includes('presupuesto') || lowerText.includes('dinero') || lowerText.includes('coste') || lowerText.includes('precio')) {
-    reply = `Para gestionar el presupuesto de ${subject}, ve a la sección de Finanzas donde puedes añadir gastos e ingresos. ¿Quieres que te explique cómo funciona el control de presupuesto?`;
-  } else if (lowerText.includes('fecha') || lowerText.includes('cuando') || lowerText.includes('día')) {
-    reply = `Puedes gestionar las fechas importantes de ${subject} en el calendario. ¿Necesitas ayuda para planificar alguna fecha específica?`;
-  } else if (lowerText.includes('proveedor') || lowerText.includes('vendor') || lowerText.includes('fotógrafo') || lowerText.includes('catering')) {
-    reply = `En la sección de Proveedores puedes buscar y gestionar todos los servicios para ${subject}. ¿Buscas algún tipo de proveedor en particular?`;
-  } else if (lowerText.includes('mesa') || lowerText.includes('seating') || lowerText.includes('asiento')) {
-    reply = `El plan de mesas te permite organizar dónde se sentarán los invitados de ${subject}. Puedes acceder desde el menú principal. ¿Necesitas ayuda con la distribución de mesas?`;
-  } else if (lowerText.includes('ayuda') || lowerText.includes('help') || lowerText.includes('cómo')) {
-    reply = `Estoy aquí para ayudarte con ${subject}. Aunque tengo limitaciones técnicas temporales, puedo orientarte sobre:\n\n• Gestión de invitados\n• Control de presupuesto\n• Planificación de fechas\n• Búsqueda de proveedores\n• Organización de mesas\n\n¿En qué área necesitas más ayuda?`;
-  } else if (lowerText.includes('problema') || lowerText.includes('error') || lowerText.includes('no funciona')) {
-    reply = `Entiendo que hay algunos problemas técnicos. Estamos trabajando para solucionarlos. Mientras tanto, puedes usar todas las funciones de la aplicación manualmente desde el menú para avanzar con ${subject}. ¿Hay algo específico que no funcione?`;
-  } else {
-    reply = `Disculpa, tengo algunas limitaciones técnicas temporales y no puedo procesar completamente tu consulta. Sin embargo, puedes:\n\n• Usar el menú principal para navegar\n• Gestionar invitados, presupuesto y fechas manualmente\n• Buscar proveedores en la sección correspondiente\n\n¿Puedes ser más específico sobre lo que necesitas respecto a ${subject}?`;
-  }
-  
-  // Heurística simple: intentar extraer invitados/reuniones en modo local
-  try {
-    const ex = { guests: [], tasks: [], meetings: [], budgetMovements: [], commands: [] };
-    // Invitados
-    const mInv = text.match(/(?:añade|agrega|crea)\s+(?:un|una|al|a\s+)?invitad[oa]\s+([^,.\n]+?)(?:\s+con\s+tel[eé]fono\s+(\+?[\d\s-()]{6,}))?(?:\s|[,.]|$)/i);
-    if (mInv) {
-      const name = (mInv[1] || '').trim();
-      const phone = (mInv[2] || '').trim();
-      if (name) {
-        ex.guests.push({ name, phone });
-        ex.commands.push({ entity: 'guest', action: 'add', payload: { name, phone } });
-        if (!reply) reply = `He añadido al invitado ${name}${phone ? ` (tel. ${phone})` : ''}.`;
-      }
-    }
-    // Reuniones
-    if (/(reuni[óo]n|cita|llamada|meeting)/i.test(text) && /(añade|agrega|program|crea)/i.test(text)) {
-      const now = new Date();
-      let start = null;
-      let end = null;
-      const mHoy = text.match(/\b(hoy|mañana)\b.*?(?:a\s+las\s+)?(\d{1,2})(?::(\d{2}))?/i);
-      if (mHoy) {
-        const base = new Date();
-        if (mHoy[1].toLowerCase() === 'mañana') base.setDate(base.getDate() + 1);
-        const hh = Math.max(0, Math.min(23, parseInt(mHoy[2], 10)));
-        const mm = mHoy[3] ? Math.max(0, Math.min(59, parseInt(mHoy[3], 10))) : 0;
-        base.setHours(hh, mm, 0, 0);
-        start = base;
-        end = new Date(base.getTime() + 60 * 60 * 1000);
-      }
-      const mFecha = text.match(/\bel\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?(?:\s+a\s+las\s+(\d{1,2})(?::(\d{2}))?)?/i);
-      if (!start && mFecha) {
-        const d = parseInt(mFecha[1], 10);
-        const m = parseInt(mFecha[2], 10) - 1;
-        const y = mFecha[3] ? parseInt(mFecha[3], 10) : now.getFullYear();
-        const hh = mFecha[4] ? parseInt(mFecha[4], 10) : 10;
-        const mm = mFecha[5] ? parseInt(mFecha[5], 10) : 0;
-        const base = new Date(y < 100 ? 2000 + y : y, m, d, hh, mm, 0, 0);
-        start = base;
-        end = new Date(base.getTime() + 60 * 60 * 1000);
-      }
-      const titleMatch = text.match(/(?:sobre|para|con)\s+([^\n,.]+)(?:\.|,|$)/i);
-      const title = (titleMatch ? titleMatch[1] : 'Reunión').trim();
-      if (start) {
-        ex.meetings.push({ title, start: start.toISOString(), end: end.toISOString() });
-        ex.commands.push({ entity: 'meeting', action: 'add', payload: { title, start: start.toISOString(), end: end.toISOString() } });
-        if (!reply) reply = `He programado "${title}" el ${start.toLocaleDateString('es-ES')} a las ${start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}.`;
-      }
-    }
-
-    // Movimientos (gasto/ingreso)
-    if (/(gasto|ingreso)/i.test(text)) {
-      const type = /ingreso/i.test(text) ? 'income' : 'expense';
-      const mAmt = text.match(/(\d+[\.,]?\d*)\s*(?:€|eur|euros)?/i);
-      const rawAmt = mAmt ? mAmt[1] : '';
-      const amount = rawAmt ? Number(String(rawAmt).replace(',', '.')) : 0;
-      const mConcept = text.match(/(?:de|en|por)\s+([^\d,.\n]+?)(?:\s+el\s+|\.|,|$)/i);
-      const concept = (mConcept ? mConcept[1] : '').trim() || (type === 'income' ? 'Ingreso' : 'Gasto');
-      let dateStr = new Date().toISOString().slice(0, 10);
-      const mFecha2 = text.match(/\bel\s+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/i);
-      if (mFecha2) {
-        const d = parseInt(mFecha2[1], 10);
-        const m = parseInt(mFecha2[2], 10) - 1;
-        const y = mFecha2[3] ? parseInt(mFecha2[3], 10) : new Date().getFullYear();
-        const dt = new Date(y < 100 ? 2000 + y : y, m, d);
-        dateStr = dt.toISOString().slice(0, 10);
-      }
-      if (amount > 0) {
-        ex.budgetMovements.push({ concept, amount, date: dateStr, type });
-        ex.commands.push({ entity: 'movement', action: 'add', payload: { name: concept, concept, amount, date: dateStr, type } });
-        if (!reply) reply = `${type === 'income' ? 'Ingreso' : 'Gasto'} registrado: ${concept} por ${amount}€`;
-      }
-    }
-
-    // Proveedores: alta simple
-    if (/(proveedor|provider)/i.test(text) && /(a..ade|agrega|crea)/i.test(text)) {
-      const mName = text.match(/proveedor(?:\s+de)?\s+([^,\.\n]+)(?:,|\.|\n|$)/i);
-      const name = (mName ? mName[1] : '').trim();
-      if (name) {
-        ex.commands.push({ entity: 'supplier', action: 'add', payload: { name } });
-        if (!reply) reply = `Proveedor "${name}" añadido.`;
-      }
-    }
-
-    if (ex.guests.length || ex.tasks.length || ex.meetings.length || ex.budgetMovements.length || ex.commands.length) {
-      extracted = ex;
-    }
-  } catch {}
-
-  return { reply, extracted };
-}
+// El modo de fallback local ha sido retirado para exponer fallos de configuración.
 
 // GET /api/ai/debug-env - Endpoint temporal para verificar variables de entorno
 router.get('/debug-env', (req, res) => {
@@ -277,19 +160,11 @@ router.post('/parse-dialog', async (req, res) => {
     : [{ role: 'user', content: text }];
   const contextSummary = buildContextSummary(context);
 
-  // Early fallback: si no hay OPENAI_API_KEY, usar heurística local
   if (!OPENAI_API_KEY) {
-    logger.warn('OPENAI_API_KEY ausente, usando heurística local (early)');
-    const local = generateLocalResponse(text, history, context);
-    return res.json(local);
-  }
-
-  // ---- Fallback local si no hay OPENAI_API_KEY configurada ----
-  if (!OPENAI_API_KEY) {
-    logger.warn('OPENAI_API_KEY ausente, usando heurística local');
-    return res.json({
-      extracted: {},
-      reply: 'Lo siento, la IA no está disponible en este momento. Pero aquí estoy para ayudarte en lo que pueda.'
+    logger.error('OPENAI_API_KEY ausente; parse-dialog no puede ejecutarse');
+    return res.status(503).json({
+      error: 'openai_not_configured',
+      message: 'La integración con OpenAI no está configurada. Proporciona OPENAI_API_KEY en el backend.',
     });
   }
 
@@ -448,16 +323,9 @@ router.post('/parse-dialog', async (req, res) => {
     res.json({ extracted, reply });
   } catch (err) {
     logger.error('❌ parse-dialog error', err);
-    
-    // Fallback inteligente local cuando OpenAI no está disponible
-    const localResponse = generateLocalResponse(text, history, context);
-    
-    // Devuelve 200 para que el frontend no lo trate como fallo de red
-    res.json({
-      error: 'AI parsing failed',
-      details: err?.message || 'unknown',
-      extracted: localResponse.extracted,
-      reply: localResponse.reply
+    res.status(502).json({
+      error: 'openai_request_failed',
+      message: err?.message || 'unknown',
     });
   }
 });
@@ -492,5 +360,6 @@ router.get('/search-suppliers', async (req, res) => {
 });
 
 export default router;
+
 
 

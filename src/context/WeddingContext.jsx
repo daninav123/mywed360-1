@@ -78,14 +78,37 @@ const readSafeJson = (key) => {
 
 export function WeddingProvider({ children }) {
   const { currentUser, userProfile } = useAuth();
-
-  // Estado inicial limpio (sin mocks/stubs)
-  const [weddings, setWeddings] = useState([]);
-  const [weddingsReady, setWeddingsReady] = useState(false);
-  const [activeWedding, setActiveWeddingState] = useState('');
+  
+  // Detectar si estamos en modo test y cargar datos mock
+  const isTestMode = typeof window !== 'undefined' && (window.Cypress || window.__MYWED360_TEST_MODE__);
+  
+  // Cargar bodas mock de localStorage si estamos en tests
+  const loadTestWeddings = () => {
+    if (!isTestMode) return { weddings: [], activeWedding: '' };
+    try {
+      const storedWeddings = window.localStorage.getItem('MyWed360_weddings');
+      const storedActive = window.localStorage.getItem('MyWed360_active_wedding');
+      const weddings = storedWeddings ? JSON.parse(storedWeddings) : [];
+      const activeWedding = storedActive ? JSON.parse(storedActive) : null;
+      return {
+        weddings: Array.isArray(weddings) ? weddings : [],
+        activeWedding: activeWedding?.id || ''
+      };
+    } catch (e) {
+      console.warn('Error loading test weddings:', e);
+      return { weddings: [], activeWedding: '' };
+    }
+  };
+  
+  const testData = loadTestWeddings();
+  
+  // Estado inicial - usar datos de test si están disponibles
+  const [weddings, setWeddings] = useState(testData.weddings);
+  const [weddingsReady, setWeddingsReady] = useState(isTestMode);
+  const [activeWedding, setActiveWeddingState] = useState(testData.activeWedding);
   const [localMirror, setLocalMirror] = useState({
-    weddings: [],
-    activeWeddingId: '',
+    weddings: testData.weddings,
+    activeWeddingId: testData.activeWedding,
     uid: '',
   });
   const [usingFirestore, setUsingFirestore] = useState(false);
@@ -175,6 +198,12 @@ export function WeddingProvider({ children }) {
 
   // Suscribirse a Firestore usando subcolección users/{uid}/weddings
   useEffect(() => {
+    // Si estamos en modo test, no usar Firestore
+    if (isTestMode) {
+      setWeddingsReady(true);
+      return;
+    }
+    
     let unsub = null;
     let cancelled = false;
 

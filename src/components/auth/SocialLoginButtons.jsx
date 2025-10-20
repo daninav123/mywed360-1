@@ -2,6 +2,8 @@ import React from 'react';
 import { FaApple, FaFacebookF, FaGoogle } from 'react-icons/fa';
 import { Loader2 } from 'lucide-react';
 
+import useTranslations from '../../hooks/useTranslations';
+
 const PROVIDER_META = {
   google: {
     label: 'Google',
@@ -25,7 +27,9 @@ export default function SocialLoginButtons({
   onProviderClick,
   busyProvider,
   disabled,
+  getProviderLabel,
 }) {
+  const { t } = useTranslations();
   const availableProviders = providers.filter((provider) => PROVIDER_META[provider]);
 
   if (!availableProviders.length) {
@@ -36,6 +40,11 @@ export default function SocialLoginButtons({
     <div className="grid gap-3" data-testid="social-login-buttons">
       {availableProviders.map((provider) => {
         const { label, Icon, color } = PROVIDER_META[provider];
+        const providerDisplayName = getProviderLabel?.(provider) || label;
+        const buttonLabel = t('authLogin.social.button', {
+          provider: providerDisplayName,
+          defaultValue: `Continue with ${providerDisplayName}`,
+        });
         const isLoading = busyProvider === provider;
         return (
           <button
@@ -51,7 +60,7 @@ export default function SocialLoginButtons({
             ) : (
               <Icon className="h-4 w-4" style={{ color }} />
             )}
-            <span>Continuar con {label}</span>
+            <span>{buttonLabel}</span>
           </button>
         );
       })}

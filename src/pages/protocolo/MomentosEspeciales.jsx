@@ -73,47 +73,91 @@ const MomentosEspeciales = () => {
     blocks,
     moments,
     addMoment,
-  updateMoment,
-  removeMoment,
-  reorderMoment,
-  moveMoment,
-  duplicateMoment,
-  addBlock,
-  renameBlock,
-  removeBlock,
-  reorderBlocks,
-  maxMomentsPerBlock,
+    updateMoment,
+    removeMoment,
+    reorderMoment,
+    moveMoment,
+    moveMomentBetweenBlocks,
+    duplicateMoment,
+    addBlock,
+    renameBlock,
+    removeBlock,
+    reorderBlocks,
+    maxMomentsPerBlock,
+    validateMoment,
+    getMomentValidationErrors,
+  } = useSpecialMoments();
 
-} = useSpecialMoments();
+  const { guests } = useGuests();
+  const [recipientPanelsOpen, setRecipientPanelsOpen] = useState({});
+  const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
+    const list = Array.isArray(guests) ? guests : [];
+    const options = list
+      .map((guest) => {
+        const baseId = guest?.id != null ? String(guest.id) : '';
+        const fallback = guest?.email || guest?.phone || '';
+        const value = baseId || fallback;
+        if (!value) return null;
+        const label = guest?.name || guest?.email || guest?.phone || value;
+        return { value, label, raw: guest };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.label.localeCompare(b.label));
+    const map = new Map(options.map((option) => [option.value, option.raw]));
+    return { options, map };
+  }, [guests]);
+  const recipientRoleMap = useMemo(
+    () => new Map(RECIPIENT_ROLE_OPTIONS.map((role) => [role.value, role.label])),
+    []
+  );
+  const [advancedOpen, setAdvancedOpen] = useState({});
+  const [actionPanel, setActionPanel] = useState({ momentId: null, mode: null });
+  const [actionPanelSelection, setActionPanelSelection] = useState({});
+  const [supplierDrafts, setSupplierDrafts] = useState({});
+  const [dragOverBlock, setDragOverBlock] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [showValidationAlerts, setShowValidationAlerts] = useState(true);
+  const [draggedMoment, setDraggedMoment] = useState(null);
+  const [draggedFromBlock, setDraggedFromBlock] = useState(null);
 
-const { guests } = useGuests();
-const [recipientPanelsOpen, setRecipientPanelsOpen] = useState({});
-const { options: recipientOptions, map: guestOptionMap } = useMemo(() => {
-  const list = Array.isArray(guests) ? guests : [];
-  const options = list
-    .map((guest) => {
-      const baseId = guest?.id != null ? String(guest.id) : '';
-      const fallback = guest?.email || guest?.phone || '';
-      const value = baseId || fallback;
-      if (!value) return null;
-      const label = guest?.name || guest?.email || guest?.phone || value;
-      return { value, label, raw: guest };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.label.localeCompare(b.label));
-  const map = new Map(options.map((option) => [option.value, option.raw]));
-  return { options, map };
-}, [guests]);
-const recipientRoleMap = useMemo(
-  () => new Map(RECIPIENT_ROLE_OPTIONS.map((role) => [role.value, role.label])),
-  []
-);
-const [advancedOpen, setAdvancedOpen] = useState({});
-const [actionPanel, setActionPanel] = useState({ momentId: null, mode: null });
-const [actionPanelSelection, setActionPanelSelection] = useState({});
-const [supplierDrafts, setSupplierDrafts] = useState({});
+  // Validar momentos al cambiar
+  useEffect(() => {
+    if (!showValidationAlerts) return;
+    
+    const allErrors = {};
+    blocks.forEach((block) => {
+      const blockErrors = getMomentValidationErrors(block.id);
+      if (Object.keys(blockErrors).length > 0) {
+        allErrors[block.id] = blockErrors;
+      }
+    });
+    
+    setValidationErrors(allErrors);
+    
+    // Mostrar alertas para errores críticos
+    const criticalErrors = [];
+    Object.entries(allErrors).forEach(([blockId, blockErrors]) => {
+      Object.entries(blockErrors).forEach(([momentId, errors]) => {
+        errors.forEach((error) => {
+          if (error.includes('requerido') || error.includes('requerida')) {
+            const block = blocks.find((b) => b.id === blockId);
+            const moment = moments[blockId]?.find((m) => m.id === parseInt(momentId));
+            if (block && moment) {
+              criticalErrors.push(`${block.name} - ${moment.title}: ${error}`);
+            }
+          }
+        });
+      });
+    });
+    
+    // Solo mostrar alerta una vez si hay errores críticos
+    if (criticalErrors.length > 0 && localStorage.getItem('momentosValidationShown') !== 'true') {
+      toast.warning('Hay campos requeridos sin completar. Revisa las alertas en cada momento.');
+      localStorage.setItem('momentosValidationShown', 'true');
+    }
+  }, [blocks, moments, showValidationAlerts, getMomentValidationErrors]);
 
-// Estado bsico
+  // Estado básico
   const [activeTab, setActiveTab] = useState('ceremonia');
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);

@@ -7,45 +7,6 @@ import logger from '../logger.js';
 
 const router = express.Router();
 
-const DEFAULT_PLANNERS = [
-  {
-    id: 'planner-demo-1',
-    name: 'Maria Lopez',
-    city: 'Madrid',
-    rating: 4.9,
-    weddingsActive: 2,
-    tags: ['boho', 'destination'],
-    email: 'maria.lopez@demo-planners.test',
-    phone: '',
-    website: '',
-    specialties: [],
-  },
-  {
-    id: 'planner-demo-2',
-    name: 'Claudia Vila',
-    city: 'Barcelona',
-    rating: 4.7,
-    weddingsActive: 1,
-    tags: ['urbano', 'moderno'],
-    email: 'claudia.vila@demo-planners.test',
-    phone: '',
-    website: '',
-    specialties: [],
-  },
-  {
-    id: 'planner-demo-3',
-    name: 'Daniel Romero',
-    city: 'Valencia',
-    rating: 4.8,
-    weddingsActive: 3,
-    tags: ['clásico', 'premium'],
-    email: 'daniel.romero@demo-planners.test',
-    phone: '',
-    website: '',
-    specialties: [],
-  },
-];
-
 const COLLECTION =
   process.env.PLANNER_SUGGESTIONS_COLLECTION ||
   process.env.FIRESTORE_PLANNER_COLLECTION ||
@@ -99,9 +60,9 @@ router.get('/suggestions', async (req, res) => {
 
     if (!planners.length) {
       logger.warn(
-        `[planners] Colección "${COLLECTION}" vacía o sin planners publicados. Devolviendo fallback.`,
+        `[planners] Colección "${COLLECTION}" vacía o sin planners publicados.`
       );
-      return res.json(DEFAULT_PLANNERS);
+      return res.json([]);
     }
 
     return res.json(planners);
@@ -110,7 +71,6 @@ router.get('/suggestions', async (req, res) => {
     return res.status(500).json({
       error: 'planner_suggestions_unavailable',
       message: 'No fue posible obtener planners sugeridos.',
-      fallback: DEFAULT_PLANNERS,
     });
   }
 });

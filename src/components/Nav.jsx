@@ -178,7 +178,7 @@ function Nav() {
                 transition={{ type: 'spring', stiffness: 300 }}
                 className={
                   isActive
-                    ? 'text-[var(--color-accent)] font-semibold'
+                    ? 'text-[color:var(--color-surface)] font-semibold drop-shadow-sm'
                     : 'text-[color:var(--color-text)]'
                 }
               >
@@ -186,7 +186,7 @@ function Nav() {
               </motion.span>
               {isActive && (
                 <motion.span
-                  className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-[var(--color-accent)] rounded"
+                  className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-[color:var(--color-surface)] rounded"
                   layoutId="activeUnderline"
                 />
               )}
