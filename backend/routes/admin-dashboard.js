@@ -1517,9 +1517,17 @@ router.get('/portfolio', async (req, res) => {
         data.weddingInfo?.weddingDate ||
         null;
       
-      // Convertir fecha de forma segura
+      // Convertir fecha de forma segura - DEBUG
       let eventDateDate = null;
       try {
+        // Log para ver qué tipo de dato es
+        console.log(`[portfolio] Wedding ${docSnap.id} eventDateRaw:`, {
+          value: eventDateRaw,
+          type: typeof eventDateRaw,
+          hasToDate: eventDateRaw?.toDate !== undefined,
+          constructor: eventDateRaw?.constructor?.name
+        });
+        
         eventDateDate = toDate(eventDateRaw);
       } catch (dateError) {
         console.warn('[portfolio] Error converting event date:', dateError.message, 'for wedding:', docSnap.id);
