@@ -1,5 +1,5 @@
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../firebaseConfig';
 import defaultWeddingTasks from './defaultWeddingTasks';
 import errorLogger from '../utils/errorLogger';
 
