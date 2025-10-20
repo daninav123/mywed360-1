@@ -432,6 +432,21 @@ export const updateDiscountCode = async (id, discountData) => {
   return response.json();
 };
 
+export const generatePartnerToken = async (discountId) => {
+  const response = await apiPost(
+    `/api/partner/generate-token`,
+    { discountId },
+    getAdminFetchOptions({ auth: false, silent: true })
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'generate_token_failed' }));
+    throw new Error(error.error || error.message || 'Error al generar token de partner');
+  }
+  
+  return response.json();
+};
+
 // --- Mutations ---
 
 async function postJson(path, body) {

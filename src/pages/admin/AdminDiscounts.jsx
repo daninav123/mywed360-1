@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { getDiscountLinks, createDiscountCode, updateDiscountCode } from '../../services/adminDataService';
+import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
+import { ExternalLink, Link as LinkIcon } from 'lucide-react';
 
 const DEFAULT_SUMMARY = {
   totalLinks: 0,
@@ -88,11 +89,26 @@ const AdminDiscounts = () => {
     });
   }, [links, statusFilter, query]);
 
-  const handleCopy = async (text) => {
+  const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
+      alert('Copiado al portapapeles');
     } catch (copyError) {
       console.warn('[AdminDiscounts] clipboard copy failed:', copyError);
+      alert('Error al copiar');
+    }
+  };
+
+  const handleGeneratePartnerLink = async (discountId, code) => {
+    if (!confirm(`¿Generar enlace de estadísticas para el código ${code}?`)) return;
+    
+    try {
+      const result = await generatePartnerToken(discountId);
+      await copyToClipboard(result.url);
+      alert(`Enlace generado y copiado:\n${result.url}`);
+    } catch (err) {
+      console.error('[AdminDiscounts] generate partner link failed:', err);
+      alert(err.message || 'Error al generar enlace');
     }
   };
 
@@ -268,11 +284,12 @@ const AdminDiscounts = () => {
               <table className="min-w-full divide-y divide-soft text-sm" data-testid="admin-discounts-table">
                 <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
                   <tr>
-                    <th className="px-4 py-3 text-left">Código</th>
-                    <th className="px-4 py-3 text-left">URL</th>
-                    <th className="px-4 py-3 text-left">Asignado a</th>
+                    <th className="px-4 py-3 text-left">Tipo</th>
+                    <th className="px-4 py-3 text-left">Usos</th>
+                    <th className="px-4 py-3 text-left">Ingresos</th>
                     <th className="px-4 py-3 text-left">Estado</th>
-                    <th className="px-4 py-3 text-right">Usos</th>
+                    <th className="px-4 py-3 text-left">Partner</th>
+                    <th className="px-4 py-3 text-left">Acciones</th>
                     <th className="px-4 py-3 text-right">Facturación</th>
                     <th className="px-4 py-3 text-left">Creado</th>
                     <th className="px-4 py-3 text-left">Último uso</th>

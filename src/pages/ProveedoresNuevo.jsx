@@ -1,4 +1,4 @@
-﻿import { Plus } from 'lucide-react';
+﻿import { Plus, ChevronUp } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -6,11 +6,13 @@ import ProveedorForm from '../components/proveedores/ProveedorForm';
 import ServicesBoard from '../components/proveedores/ServicesBoard';
 import WantedServicesModal from '../components/proveedores/WantedServicesModal';
 import Modal from '../components/Modal';
+import Input from '../components/Input';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import PageWrapper from '../components/PageWrapper';
 
 import { useWedding } from '../context/WeddingContext';
+import useActiveWeddingInfo from '../hooks/useActiveWeddingInfo';
 import useAISearch from '../hooks/useAISearch';
 import useProveedores from '../hooks/useProveedores';
 import useSupplierShortlist from '../hooks/useSupplierShortlist';
@@ -106,25 +108,21 @@ const ServiceOptionsModal = ({ open, card, onClose }) => {
   return (
     <Modal open={open} onClose={onClose} title={`Opciones guardadas · ${card.label}`} size="lg">
       <div className="space-y-6">
-        <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-body">Proveedor confirmado</h3>
-          {confirmed.length ? (
-            confirmed.map((prov) => (
+        {confirmed.length > 0 && (
+          <section className="space-y-2">
+            <h3 className="text-sm font-semibold text-body">Proveedor confirmado</h3>
+            {confirmed.map((prov) => (
               <Card key={prov.id} className="border border-soft bg-surface">
                 <p className="text-sm font-medium text-body">{prov.name}</p>
                 <p className="text-xs text-muted">{prov.status || 'Pendiente'} · {prov.service || card.label}</p>
                 {prov.notes && <p className="mt-2 text-sm text-body/75">{prov.notes}</p>}
               </Card>
-            ))
-          ) : (
-            <Card className="border border-dashed border-soft bg-surface/80">
-              <p className="text-sm text-muted">Aún no hay proveedor confirmado para este servicio.</p>
-            </Card>
-          )}
-        </section>
+            ))}
+          </section>
+        )}
 
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold text-body">Candidatos registrados</h3>
+          <h3 className="text-sm font-semibold text-body">Proveedores contactados</h3>
           {pendingCandidates.length ? (
             pendingCandidates.map((prov) => (
               <Card key={prov.id} className="border border-soft bg-surface">
@@ -172,12 +170,12 @@ const Proveedores = () => {
     useProveedores();
   const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
   const { activeWedding } = useWedding();
+  const { info: weddingProfile } = useActiveWeddingInfo();
   const { loading: aiLoading, error: aiSearchError, searchProviders } = useAISearch();
 
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
-  const [showNeedsModal, setShowNeedsModal] = useState(false);
-  const [showWantedModal, setShowWantedModal] = useState(false);
+  const [servicePanelView, setServicePanelView] = useState(null);
   const [wantedServices, setWantedServices] = useState([]);
   const [searchPanelCollapsed, setSearchPanelCollapsed] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
@@ -225,6 +223,30 @@ const Proveedores = () => {
       }
     } catch {}
   }, [searchHistoryKey]);
+
+  const profileSearchTokens = useMemo(() => {
+    const profile = (weddingProfile && (weddingProfile.weddingInfo || weddingProfile)) || {};
+    const tokens = [];
+    const location =
+      profile.celebrationPlace ||
+      profile.location ||
+      profile.city ||
+      profile.ceremonyLocation ||
+      profile.receptionVenue ||
+      profile.destinationCity ||
+      profile.country ||
+      '';
+    const style = profile.weddingStyle || profile.style || profile.preferences?.style || '';
+    const guestCount =
+      profile.guestCount || profile.guestEstimate || profile.expectedGuests || profile.guests || '';
+    const budget =
+      profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
+    if (location) tokens.push(location);
+    if (style) tokens.push(`${style} style`);
+    if (guestCount) tokens.push(`${guestCount} invitados`);
+    if (budget) tokens.push(`presupuesto ${budget}`);
+    return tokens.filter(Boolean);
+  }, [weddingProfile]);
 
   const registerSearchQuery = useCallback(
     (query) => {
@@ -291,13 +313,47 @@ const Proveedores = () => {
   }, [normalizedWanted, providersSource, shortlist]);
 
   const handleSearchSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
       const trimmed = searchInput.trim();
+      const baseTokens = trimmed ? [trimmed] : [];
+      const enrichedQuery = [...baseTokens, ...profileSearchTokens].join(' ').trim();
+
+      if (!trimmed && !enrichedQuery) {
+        toast.warn('Añade un término o completa tu perfil para mejorar las búsquedas.');
+        return;
+      }
+
       setSearchTerm(trimmed);
-      registerSearchQuery(trimmed);
+      if (trimmed) registerSearchQuery(trimmed);
+
+      if (enrichedQuery) {
+        setSearchDrawerQuery(enrichedQuery);
+        setSearchDrawerOpen(true);
+        setSearchDrawerLoading(true);
+        setSearchDrawerResult(null);
+        try {
+          const results = await searchProviders(enrichedQuery);
+          if (Array.isArray(results) && results.length) {
+            setSearchDrawerResult(results[0]);
+          } else {
+            toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
+          }
+        } catch (err) {
+          console.warn('[Proveedores] searchProviders failed', err);
+          toast.error('No se pudo completar la búsqueda.');
+        } finally {
+          setSearchDrawerLoading(false);
+        }
+      }
     },
-    [registerSearchQuery, searchInput, setSearchTerm]
+    [
+      profileSearchTokens,
+      registerSearchQuery,
+      searchInput,
+      searchProviders,
+      setSearchTerm,
+    ]
   );
 
   const handleClearSearch = useCallback(() => {
@@ -322,10 +378,10 @@ const Proveedores = () => {
           showNotification: false,
         });
         toast.success('Servicios deseados actualizados.');
+        setServicePanelView(null);
       } catch (err) {
         toast.error('No se pudieron guardar los servicios deseados.');
       }
-      setShowWantedModal(false);
     },
     [activeWedding]
   );
@@ -347,11 +403,8 @@ const Proveedores = () => {
 
   const headerActions = (
     <div className="flex flex-wrap gap-2">
-      <Button variant="outline" onClick={() => setShowNeedsModal(true)}>
-        Panel de servicios
-      </Button>
-      <Button variant="outline" onClick={() => setShowWantedModal(true)}>
-        Configurar servicios
+      <Button variant="outline" onClick={() => setServicePanelView('configure')}>
+        Gestionar servicios
       </Button>
       <Button
         onClick={() => {
@@ -367,7 +420,7 @@ const Proveedores = () => {
 
   return (
     <>
-      <PageWrapper title="Gestión de proveedores" actions={headerActions} className="mx-auto max-w-6xl space-y-8">
+      <PageWrapper title="Gestión de proveedores" actions={headerActions} className="layout-container space-y-8">
         {error && (
           <Card className="border border-danger bg-danger-soft text-danger">
             {error}
@@ -375,7 +428,7 @@ const Proveedores = () => {
         )}
 
         {!searchPanelCollapsed ? (
-          <section className="rounded-2xl border border-dashed border-soft bg-surface/95 p-6 space-y-6 shadow-sm">
+          <Card className="space-y-6 border-dashed border-soft">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-xl font-semibold text-body">Exploración y shortlist</h2>
@@ -383,20 +436,25 @@ const Proveedores = () => {
                   Explora proveedores, guarda ideas y revisa tus candidatos pendientes desde este panel.
                 </p>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setSearchPanelCollapsed(true)}>
-                Plegar exploración
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="Plegar exploración"
+                onClick={() => setSearchPanelCollapsed(true)}
+                className="h-8 w-8 justify-center"
+              >
+                <ChevronUp className="h-4 w-4" />
               </Button>
             </div>
 
             <form onSubmit={handleSearchSubmit} className="space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 min-w-[220px]">
-                  <input
+                  <Input
                     type="search"
                     value={searchInput}
                     onChange={(event) => setSearchInput(event.target.value)}
                     placeholder="Buscar por proveedor, servicio o nota"
-                    className="w-full rounded-md border border-soft bg-surface px-4 py-2 text-sm text-body shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -432,16 +490,18 @@ const Proveedores = () => {
             )}
 
             <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
-          </section>
+          </Card>
         ) : (
           <div className="flex justify-center">
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="sm"
+              className="rounded-full"
               onClick={() => setSearchPanelCollapsed(false)}
-              className="px-4 py-2 text-sm font-medium rounded-full border border-soft bg-primary-soft text-primary transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               Explorar proveedores
-            </button>
+            </Button>
           </div>
         )}
 
@@ -505,7 +565,21 @@ const Proveedores = () => {
         </Modal>
       )}
 
-      <Modal open={showNeedsModal} onClose={() => setShowNeedsModal(false)} title="Panel de servicios" size="full" className="max-w-6xl">
+      <Modal
+        open={servicePanelView === 'board'}
+        onClose={() => setServicePanelView(null)}
+        title="Panel de servicios"
+        size="full"
+        className="max-w-6xl"
+      >
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted">
+            Revisa el estado de cada servicio y añade opciones directamente desde este panel.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => setServicePanelView('configure')}>
+            Configurar servicios deseados
+          </Button>
+        </div>
         <ServicesBoard
           proveedores={providers || []}
           onOpenSearch={(service) => {
@@ -529,8 +603,8 @@ const Proveedores = () => {
       </Modal>
 
       <WantedServicesModal
-        open={showWantedModal}
-        onClose={() => setShowWantedModal(false)}
+        open={servicePanelView === 'configure'}
+        onClose={() => setServicePanelView(null)}
         value={wantedServices}
         onSave={handleSaveWantedServices}
       />
@@ -566,12 +640,11 @@ const Proveedores = () => {
           }}
           className="space-y-4"
         >
-          <input
+          <Input
             type="search"
             value={searchDrawerQuery}
             onChange={(event) => setSearchDrawerQuery(event.target.value)}
             placeholder="Ej: Florista Barcelona 2500"
-            className="w-full rounded-md border border-soft bg-surface px-4 py-2 text-sm text-body shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setSearchDrawerOpen(false)}>
@@ -604,3 +677,4 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+

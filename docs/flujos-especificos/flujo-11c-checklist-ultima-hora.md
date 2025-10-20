@@ -17,7 +17,7 @@
 ## 3. Estado actual
 
 ### Implementado hoy
-- Widget compacto dentro de `CeremonyProtocol.jsx`.  
+- Modo compacto (`compact`) para embebidos en paneles laterales o resúmenes.  
 - Vista completa con categorías, cambios de estado, fechas y notas (`CeremonyChecklist.jsx`).  
 - Recupera documentos existentes en Firestore para mostrarlos junto al ítem (`useCeremonyChecklist.js:63-101`).  
 - Permite crear ítems personalizados con IDs generados (`crypto.randomUUID`).  

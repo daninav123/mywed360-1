@@ -43,7 +43,7 @@
 ## 6. Estados especiales
 - **Carga lenta / sin datos**: se muestra placeholder “Cargando timing…” (`Timing.jsx:115`).  
 - **Retrasos**: planner puede marcar bloques como “Ligero retraso” o “Retrasado”; esto habilitará notificaciones push en futuras iteraciones.  
-- **Modo compacto**: cuando `CeremonyTimeline` se renderiza en otras pantallas (ej. `CeremonyProtocol.jsx`), se limita a los tres primeros hitos de cada sección.
+- **Modo compacto**: cuando `CeremonyTimeline` se incrusta en contenedores secundarios (ej. extractos del dashboard), se limita a los tres primeros hitos de cada sección.
 
 ## 7. Integraciones
 - **Flujo 11A**: consume momentos para poblar la sección `moments` de cada bloque.  

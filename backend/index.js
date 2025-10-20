@@ -98,6 +98,7 @@ import emailActionsRouter from './routes/email-actions.js';
 import emailsRouter from './routes/emails.js';
 import emailDocsRouter from './routes/email-docs.js';
 import emailFoldersRouter from './routes/email-folders.js';
+import partnerStatsRouter from './routes/partner-stats.js';
 import emailTagsRouter from './routes/email-tags.js';
 import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
@@ -604,6 +605,10 @@ try {
 } catch (error) {
   console.error('[backend] Failed to load admin dashboard routes:', error.message);
 }
+
+// Partner stats (público, solo requiere token válido)
+app.use('/api/partner', partnerStatsRouter);
+console.log('[backend] Partner stats routes mounted on /api/partner');
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);
 // Rutas de diagnóstico y test (públicas para debugging)

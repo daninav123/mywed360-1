@@ -5,7 +5,6 @@ import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
 // Nota: 'Documentos Legales' se muestra como página independiente en el submenú,
 // por eso NO aparece como pestaña aquí.
 const tabs = [
-  { path: 'resumen', label: 'Resumen' },
   { path: 'momentos-especiales', label: 'Momentos Especiales' },
   { path: 'timing', label: 'Timing' },
   { path: 'checklist', label: 'Checklist' },

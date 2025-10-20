@@ -145,7 +145,6 @@ const PLAN_LIMITS = {
       manualBudget: true,
       supplierDirectory: true,
       supplierContact: true, // Contacto directo con proveedores
-      completeCeremonyProtocol: true,
       basicSeating: true
     }
   },
@@ -180,7 +179,6 @@ const PLAN_LIMITS = {
       automatedBudget: true,
       supplierDirectory: true,
       supplierContact: true,
-      completeCeremonyProtocol: true,
       advancedSeating: true,
       customWebPortal: true,
       pdfExports: true,
@@ -218,7 +216,6 @@ const PLAN_LIMITS = {
       automatedBudget: true,
       supplierDirectory: true,
       supplierContact: true,
-      completeCeremonyProtocol: true,
       advancedSeating: true,
       customWebPortal: true,
       pdfExports: true,
@@ -260,7 +257,6 @@ const PLAN_LIMITS = {
       automatedBudget: true,
       supplierDirectory: true,
       supplierContact: true,
-      completeCeremonyProtocol: true,
       advancedSeating: true,
       customWebPortal: true,
       pdfExports: true,

@@ -19,8 +19,6 @@ export default function More() {
   const pfDisenoWeb = () => prefetchModule('DisenoWeb', () => import('./DisenoWeb'));
   const pfDisenos = () => prefetchModule('DisenosLayout', () => import('./disenos/DisenosLayout'));
   const pfIdeas = () => prefetchModule('Ideas', () => import('./Ideas'));
-  const pfInspiration = () => prefetchModule('Inspiration', () => import('./Inspiration'));
-  const pfBlog = () => prefetchModule('Blog', () => import('./Blog'));
   const pfMomentos = () => prefetchModule('Momentos', () => import('./Momentos'));
 
   // Grouped prefetch on hover/focus/touch
@@ -39,8 +37,6 @@ export default function More() {
     pfDisenoWeb();
     pfDisenos();
     pfIdeas();
-    pfInspiration();
-    pfBlog();
     pfMomentos();
   };
 
@@ -132,12 +128,6 @@ export default function More() {
               onTouchStart={pfProtocoloMenu}
             >
               <Link
-                to="/protocolo/resumen"
-                className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
-              >
-                Resumen ceremonia
-              </Link>
-              <Link
                 to="/protocolo/momentos-especiales"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
@@ -195,12 +185,6 @@ export default function More() {
               </Link>
               <Link to="/ideas" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
                 Ideas
-              </Link>
-              <Link to="/inspiracion" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Galería de Inspiración
-              </Link>
-              <Link to="/blog" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Blog
               </Link>
               <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
                 Momentos

@@ -5,7 +5,7 @@
 > - `Inspiration.jsx` controla el scroll infinito, la personalizacion por tags y el tracking de interacciones.
 > - `InspirationGallery.jsx` renderiza el grid responsivo, el lightbox y la sincronizacion de favoritos.
 > - Servicios `wallService`, `inspirationService` y `SyncService` coordinan el fetch externo, la normalizacion y el almacenamiento local/Firestore.
-> - Prefetch desde `More.jsx` y `PlannerDashboard`, eventos custom (`mywed360-important-note`) y accesibilidad basica (aria-labels, key handlers).
+> - Prefetch desde `PlannerDashboard`, eventos custom (`mywed360-important-note`) y accesibilidad basica (aria-labels, key handlers).
 > - Conector oficial Pinterest/Instagram (`backend/services/socialFeeds.js`) con cache LRU reutilizado por `/api/instagram-wall`.
 
 > Pendiente o incompleto:
@@ -24,7 +24,6 @@ Este flujo describe la experiencia completa de inspiracion visual: desde la prev
 
 ## 2. Trigger y rutas
 - Home: bloque **Galeria de inspiracion** en la parte inferior con carrusel por categoria y CTA `Ver mas` que abre `/inspiracion`.
-- Menu inferior -> `Mas` -> bloque **Extras** -> `Inspiracion` (`/inspiracion` vista completa).
 - Planner Dashboard: tarjeta destacada con CTA `Ver inspiracion` que deep-linkea a la etiqueta detectada como mas relevante.
 - Deep-links contextuales desde checklist, timeline o proveedores (`/inspiracion?tag=decoracion`) y enlaces compartidos.
 
@@ -36,7 +35,7 @@ Este flujo describe la experiencia completa de inspiracion visual: desde la prev
   - `inspirationService`: calcula scores por preferencia, registra interacciones (`trackInteraction`) y expone helpers para merge sin duplicados.
   - Personalización: utiliza `weddingProfile` (vibeKeywords, specialInterests, noGoItems) y `weddingInsights.styleWeights` para etiquetar contenidos como Core o Contraste y ajustar su score.
   - `SyncService`: sincroniza favoritos por boda entre `localStorage inspirationFavorites_{weddingId}` y el documento compartido `weddings/{id}/inspiration/favorites` (campo `items`), limitando a 200 elementos.
-- **Prefetch**: `More.jsx` y `PlannerDashboard` invocan `prefetchModule('inspiration')` y precargan la primera pagina para mejorar tiempo de apertura.
+- **Prefetch**: `PlannerDashboard` invoca `prefetchModule('inspiration')` y precarga la primera pagina para mejorar tiempo de apertura.
 
 ## 4. Paso a paso UX
 1. **Previsualizacion en Home**

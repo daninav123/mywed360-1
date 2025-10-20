@@ -44,6 +44,7 @@ import AdminBroadcast from './pages/admin/AdminBroadcast.jsx';
 import AdminDiscounts from './pages/admin/AdminDiscounts.jsx';
 import AdminReports from './pages/admin/AdminReports.jsx';
 import AdminSupport from './pages/admin/AdminSupport.jsx';
+import PartnerStats from './pages/PartnerStats.jsx';
 import WebEditor from './pages/WebEditor';
 import WeddingSite from './pages/WeddingSite';
 import RequireAdmin from './routes/RequireAdmin.jsx';
@@ -69,7 +70,6 @@ const Contratos = React.lazy(() => import('./pages/Contratos'));
 const DisenoWeb = React.lazy(() => import('./pages/DisenoWeb'));
 // Protocolo
 const ProtocoloLayout = React.lazy(() => import('./pages/protocolo/ProtocoloLayout'));
-const CeremonyProtocol = React.lazy(() => import('./pages/protocolo/CeremonyProtocol'));
 const MomentosEspeciales = React.lazy(() => import('./pages/protocolo/MomentosEspeciales'));
 const ProtocoloTiming = React.lazy(() => import('./pages/protocolo/Timing'));
 const ProtocoloChecklist = React.lazy(() => import('./pages/protocolo/Checklist'));
@@ -240,12 +240,12 @@ function App() {
               <Route path="/precios" element={<MarketingPricing />} />
               <Route path="/pricing" element={<Navigate to="/precios" replace />} />
               <Route path="/acceso" element={<MarketingAccess />} />
-              <Route path="/login" element={<MarketingAccess />} />
-              <Route path="/ingresar" element={<Navigate to="/login" replace />} />
-              <Route path="/signup" element={<MarketingAccess defaultMode="signup" />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/registro" element={<Navigate to="/signup" replace />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/partner/:token" element={<PartnerStats />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route element={<RequireAdmin />}>
                 <Route path="/admin" element={<AdminLayout />}>
@@ -299,8 +299,7 @@ function App() {
 
                   {/* Protocolo */}
                   <Route path="protocolo" element={<ProtocoloLayout />}>
-                    <Route index element={<Navigate to="resumen" replace />} />
-                    <Route path="resumen" element={<CeremonyProtocol />} />
+                    <Route index element={<Navigate to="momentos-especiales" replace />} />
                     <Route path="momentos-especiales" element={<MomentosEspeciales />} />
                     <Route path="timing" element={<ProtocoloTiming />} />
                     <Route path="checklist" element={<ProtocoloChecklist />} />

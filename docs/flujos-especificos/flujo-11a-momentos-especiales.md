@@ -10,7 +10,7 @@
 - Ofrecer inspiración musical asistida por IA y plantillas para duplicar/reordenar momentos.
 
 ## 2. Triggers y rutas
-- Navegación: `Más → Protocolo → Momentos especiales` (pestaña `resumen` redirige cuando corresponde).
+- Navegación: `Más → Protocolo → Momentos especiales`; es la pestaña principal dentro de Protocolo.
 - Acceso rápido desde tareas que contengan “momentos especiales”, “votos”, “lecturas” (ver `TasksRefactored.jsx`).
 - Notificaciones internas pueden enlazar al flujo cuando faltan canciones en bloques críticos.
 

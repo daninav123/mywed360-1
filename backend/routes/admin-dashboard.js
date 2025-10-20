@@ -1416,17 +1416,14 @@ router.get('/users', async (req, res) => {
     console.log(`  ✅ Returning ${items.length} users (source: ${fromAuth ? 'firebase-auth' : 'firestore'})`);
     console.log('  - Sample user:', items[0] || 'none');
     
-    console.log(`  ✅ Role summary: owner=${ownerBucket.real}, planner=${plannerBucket.real}, assistant=${assistantBucket.real}`);
-    
     return res.json({
-      generatedAt: new Date().toISOString(),
-      durationMs: Date.now() - started,
-      scanned: snap.size,
-      totals: { total: scanned, real: totalReal, excluded: totalExcluded },
-      roles: { owner: ownerBucket, planner: plannerBucket, assistant: assistantBucket },
-      filters,
-      source: 'firestore',
-      error: '',
+      items,
+      meta: {
+        count: items.length,
+        limit,
+        status: statusFilter || 'all',
+        source: fromAuth ? 'firebase-auth' : 'firestore',
+      },
     });
   } catch (error) {
     console.error('  ❌ Role summary error:', error.message);

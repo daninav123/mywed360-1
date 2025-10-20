@@ -239,7 +239,8 @@ export default function TasksRefactored() {
       if (category === 'INVITADOS') return '/invitados';
       if (title.includes('invitad') || title.includes('rsvp') || title.includes('lista de invitados') || title.includes('confirmaciones')) return '/invitados';
 
-      if (category === 'CEREMONIA' || title.includes('ceremonia') || title.includes('protocolo')) return '/protocolo/resumen';
+      if (category === 'CEREMONIA' || title.includes('ceremonia') || title.includes('protocolo'))
+        return '/protocolo/momentos-especiales';
 
       // Website / design
       if (title.includes('pagina web') || title.includes('hacer pagina web') || title.includes('crear web') || title.includes('diseno web') || title.includes('wedding site') || title.includes('web boda') || title.includes('diseno-web')) return '/diseno-web';
