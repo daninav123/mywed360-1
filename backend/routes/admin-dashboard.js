@@ -1263,62 +1263,120 @@ router.get('/users', async (req, res) => {
   const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
 
   try {
-    let query;
+    // Intentar primero desde Firestore
+    let items = [];
+    let fromAuth = false;
+    
     try {
-      query = statusFilter
-        ? collections.users().where('status', '==', statusFilter).orderBy('createdAt', 'desc').limit(limit)
-        : collections.users().orderBy('createdAt', 'desc').limit(limit);
-    } catch (error) {
-      logger.warn('[admin-dashboard] users query fallback', { message: error?.message });
-      query = collections.users().orderBy('createdAt', 'desc').limit(limit);
-    }
-
-    const snap = await query.get();
-    if (snap.empty) {
-      return res.json({ items: [], meta: { count: 0, limit, status: statusFilter || 'all', order: 'desc' } });
-    }
-
-    const items = [];
-    for (const docSnap of snap.docs) {
-      const data = docSnap.data() || {};
-      const email =
-        data.email ||
-        data.authEmail ||
-        data.contactEmail ||
-        data.profile?.email ||
-        `${docSnap.id}@example.com`;
-      const role = String(data.role || data.profile?.role || 'owner');
-      const status = String(data.status || (data.disabled ? 'disabled' : 'active'));
-      if (statusFilter && status !== statusFilter) continue;
-
-      const createdAt =
-        formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || '�';
-      const lastAccess =
-        formatDateTime(
-          data.lastAccess ||
-            data.lastLoginAt ||
-            data.lastAccessAt ||
-            data.updatedAt ||
-            data.lastActiveWeddingAt,
-        ) || '�';
-
-      let weddingsCount = Number(
-        data.weddings ?? data.weddingCount ?? data.stats?.weddings ?? 0,
-      );
-      if (!Number.isFinite(weddingsCount) || weddingsCount < 0) weddingsCount = 0;
-      if (weddingsCount === 0) {
-        weddingsCount = await getUserWeddingCount(docSnap.id);
+      let query;
+      try {
+        query = statusFilter
+          ? collections.users().where('status', '==', statusFilter).orderBy('createdAt', 'desc').limit(limit)
+          : collections.users().orderBy('createdAt', 'desc').limit(limit);
+      } catch (error) {
+        logger.warn('[admin-dashboard] users query fallback', { message: error?.message });
+        query = collections.users().orderBy('createdAt', 'desc').limit(limit);
       }
 
-      items.push({
-        id: docSnap.id,
-        email,
-        role,
-        status,
-        lastAccess,
-        weddings: weddingsCount,
-        createdAt,
-      });
+      const snap = await query.get();
+      
+      if (!snap.empty) {
+        for (const docSnap of snap.docs) {
+          const data = docSnap.data() || {};
+          const email =
+            data.email ||
+            data.authEmail ||
+            data.contactEmail ||
+            data.profile?.email ||
+            `${docSnap.id}@example.com`;
+          const role = String(data.role || data.profile?.role || 'owner');
+          const status = String(data.status || (data.disabled ? 'disabled' : 'active'));
+          if (statusFilter && status !== statusFilter) continue;
+
+          const createdAt =
+            formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || '—';
+          const lastAccess =
+            formatDateTime(
+              data.lastAccess ||
+                data.lastLoginAt ||
+                data.lastAccessAt ||
+                data.updatedAt ||
+                data.lastActiveWeddingAt,
+            ) || '—';
+
+          let weddingsCount = Number(
+            data.weddings ?? data.weddingCount ?? data.stats?.weddings ?? 0,
+          );
+          if (!Number.isFinite(weddingsCount) || weddingsCount < 0) weddingsCount = 0;
+          if (weddingsCount === 0) {
+            try {
+              weddingsCount = await getUserWeddingCount(docSnap.id);
+            } catch (err) {
+              logger.warn('[admin-dashboard] getUserWeddingCount failed', { uid: docSnap.id, message: err?.message });
+            }
+          }
+
+          items.push({
+            id: docSnap.id,
+            email,
+            role,
+            status,
+            lastAccess,
+            weddings: weddingsCount,
+            createdAt,
+          });
+        }
+      }
+    } catch (firestoreError) {
+      logger.warn('[admin-dashboard] Firestore users query failed, trying Firebase Auth', { message: firestoreError?.message });
+      fromAuth = true;
+      
+      // Fallback: obtener usuarios desde Firebase Authentication
+      try {
+        const listUsersResult = await admin.auth().listUsers(limit);
+        
+        for (const userRecord of listUsersResult.users) {
+          const status = userRecord.disabled ? 'disabled' : 'active';
+          if (statusFilter && status !== statusFilter) continue;
+          
+          // Intentar obtener datos adicionales de Firestore para cada usuario
+          let weddingsCount = 0;
+          let role = 'owner';
+          let lastAccess = '—';
+          
+          try {
+            const userDoc = await collections.users().doc(userRecord.uid).get();
+            if (userDoc.exists) {
+              const data = userDoc.data();
+              role = String(data.role || data.profile?.role || 'owner');
+              weddingsCount = Number(data.weddings ?? data.weddingCount ?? 0);
+              if (!Number.isFinite(weddingsCount) || weddingsCount < 0) weddingsCount = 0;
+              lastAccess = formatDateTime(
+                data.lastAccess || data.lastLoginAt || data.updatedAt
+              ) || '—';
+            }
+            
+            if (weddingsCount === 0) {
+              weddingsCount = await getUserWeddingCount(userRecord.uid);
+            }
+          } catch (err) {
+            logger.warn('[admin-dashboard] Could not fetch user details from Firestore', { uid: userRecord.uid });
+          }
+
+          items.push({
+            id: userRecord.uid,
+            email: userRecord.email || `${userRecord.uid}@nomail.com`,
+            role,
+            status,
+            lastAccess,
+            weddings: weddingsCount,
+            createdAt: formatDateOnly(userRecord.metadata.creationTime) || '—',
+          });
+        }
+      } catch (authError) {
+        logger.error('[admin-dashboard] Firebase Auth listUsers failed', authError);
+        throw authError;
+      }
     }
 
     return res.json({
@@ -1328,11 +1386,16 @@ router.get('/users', async (req, res) => {
         limit,
         status: statusFilter || 'all',
         order: 'desc',
+        source: fromAuth ? 'firebase-auth' : 'firestore',
       },
     });
   } catch (error) {
     logger.error('[admin-dashboard] users list error', error);
-    return res.status(500).json({ error: 'admin_dashboard_users_failed' });
+    return res.status(500).json({ 
+      error: 'admin_dashboard_users_failed',
+      message: error?.message || 'Unknown error',
+      details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+    });
   }
 });
 
