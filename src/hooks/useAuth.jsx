@@ -961,7 +961,15 @@ export const AuthProvider = ({ children }) => {
           };
         }
 
-        const response = await adminLoginRequest({ email, password });
+        // Llamar directamente al endpoint de login admin
+        const loginResponse = await post('/api/admin/login', { email, password, rememberMe });
+        
+        if (!loginResponse.ok) {
+          const errorData = await loginResponse.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Error al iniciar sesión como administrador');
+        }
+
+        const response = await loginResponse.json();
 
         if (response.requiresMfa) {
           const expiresAtMs = response.expiresAt || Date.now() + 5 * 60 * 1000;
