@@ -58,4 +58,50 @@ class NotificationService {
   }
 }
 
-export default new NotificationService();
+// Instancia singleton del servicio
+const notificationServiceInstance = new NotificationService();
+
+// Exportaciones adicionales para compatibilidad con diferentes módulos
+export const addNotification = async (notification) => {
+  // Función helper para añadir notificaciones
+  // Si tiene weddingId, usa el servicio, sino solo retorna la notificación
+  if (notification.weddingId) {
+    return await notificationServiceInstance.create(notification.weddingId, notification);
+  }
+  // Para notificaciones que no requieren persistencia, solo retornar
+  return { ...notification, id: Date.now().toString() };
+};
+
+export const showNotification = (notification) => {
+  // Mostrar notificación en el navegador (si está soportado)
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(notification.message || 'Notificación', {
+      body: notification.body || notification.message,
+      icon: '/badge-72.png',
+      tag: notification.id || Date.now().toString(),
+    });
+  }
+  
+  // También podríamos emitir un evento personalizado para que otros componentes lo escuchen
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('mywed360:notification', { detail: notification }));
+  }
+  
+  return notification;
+};
+
+export const shouldNotify = (notification) => {
+  // Lógica simple para determinar si se debe mostrar una notificación
+  // Puede ser extendida con preferencias de usuario, quiet hours, etc.
+  if (!notification) return false;
+  
+  // Si el usuario tiene el contexto de auth, verificar preferencias
+  if (authContext?.preferences?.notificationsEnabled === false) {
+    return false;
+  }
+  
+  // Por defecto, permitir notificaciones
+  return true;
+};
+
+export default notificationServiceInstance;
