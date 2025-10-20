@@ -4,7 +4,7 @@ const normalizeLang = (l) =>
     .toLowerCase()
     .match(/^[a-z]{2}/)?.[0] || 'es';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 // import anterior eliminado: useUserContext
@@ -172,7 +172,6 @@ export default function HomePage() {
   // Hook de autenticacin unificado
   const { hasRole, userProfile, currentUser } = useAuth();
   const { activeWedding, activeWeddingData } = useWedding();
-  const navigate = useNavigate();
 
   // Derivados equivalentes al antiguo UserContext
   const role = userProfile?.role || 'particular';
@@ -481,14 +480,6 @@ export default function HomePage() {
   }, []);
   const scrollAmount = 300;
 
-  const handleNavigateFromModal = useCallback(
-    (path) => {
-      setActiveModal(null);
-      navigate(path);
-    },
-    [navigate]
-  );
-
   const scrollPrev = useCallback(() => {
     galleryRef.current?.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
   }, []);
@@ -582,6 +573,32 @@ export default function HomePage() {
   const statsCommon = useMemo(
     () => (role === 'particular' ? statsNovios : statsPlanner),
     [role, statsNovios, statsPlanner]
+  );
+
+  const handleQuickAddProvider = useCallback(
+    (provider) => {
+      try {
+        const existing = JSON.parse(localStorage.getItem('lovendaProviders') || '[]');
+        const normalized = {
+          id: provider.id || Date.now(),
+          name: provider.title || provider.name || 'Proveedor sin nombre',
+          service: provider.service || '',
+          location: provider.location || '',
+          priceRange: provider.priceRange || provider.price || '',
+          link: provider.link || provider.url || '',
+          snippet: provider.snippet || provider.description || '',
+          createdAt: Date.now(),
+        };
+        const updated = [normalized, ...existing].slice(0, 25);
+        localStorage.setItem('lovendaProviders', JSON.stringify(updated));
+        window.dispatchEvent(new Event('mywed360-providers'));
+        toast.success('Proveedor añadido al panel rápido');
+      } catch (error) {
+        console.warn('[HomePage] No se pudo guardar el proveedor seleccionado', error);
+        toast.error('No se pudo guardar el proveedor seleccionado');
+      }
+    },
+    []
   );
 
   if (isPlanner) {
@@ -806,7 +823,7 @@ export default function HomePage() {
       {activeModal === 'proveedor' && (
         <ProviderSearchModal
           onClose={() => setActiveModal(null)}
-          onNavigate={() => handleNavigateFromModal('/proveedores')}
+          onSelectProvider={handleQuickAddProvider}
         />
       )}
 
@@ -860,6 +877,7 @@ export default function HomePage() {
                   localStorage.setItem('mywed360Guests', JSON.stringify(guests));
                   setGuest({ name: '', side: 'novia', contact: '' });
                   setActiveModal(null);
+                  toast.success('Invitado añadido');
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
@@ -926,6 +944,7 @@ export default function HomePage() {
                   localStorage.setItem('quickMovements', JSON.stringify(movs));
                   setNewMovement({ concept: '', amount: 0, date: '', type: 'expense' });
                   setActiveModal(null);
+                  toast.success('Movimiento guardado');
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >
@@ -968,6 +987,7 @@ export default function HomePage() {
                   localStorage.setItem('lovendaNotes', JSON.stringify(notes));
                   setNoteText('');
                   setActiveModal(null);
+                  toast.success('Nota guardada');
                 }}
                 className="px-4 py-2 bg-[var(--color-primary)] text-white rounded"
               >

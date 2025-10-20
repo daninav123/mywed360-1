@@ -187,25 +187,6 @@ export function handleApiError(error, showNotification = null) {
   return null;
 }
 
-/**
- * Hook de React para usar con el cliente API (opcional)
- * Ejemplo de uso con react-query o similar
- */
-export function createApiHook() {
-  return {
-    useApiQuery: (url, options) => {
-      // Implementación con react-query u otra librería
-      // Este es un placeholder para futuras integraciones
-      return {
-        data: null,
-        isLoading: false,
-        error: null,
-        refetch: () => apiGet(url, options),
-      };
-    },
-  };
-}
-
 export default {
   request: apiRequest,
   get: apiGet,

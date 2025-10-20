@@ -1273,9 +1273,66 @@ const useGuests = () => {
     [coupleName, testApi, updateGuest, weddingDateLabel]
   );
   const importFromContacts = useCallback(
-    async () => ({ success: false, error: 'not-implemented' }),
-    []
- );
+    async (file, options = {}) => {
+      try {
+        if (!file) {
+          return { success: false, error: 'no-file-provided' };
+        }
+
+        const { type = 'auto', mapping = {} } = options;
+        const text = await file.text();
+
+        if (!text || !text.trim()) {
+          return { success: false, error: 'empty-file' };
+        }
+
+        // Detectar tipo de archivo
+        let fileType = type;
+        if (fileType === 'auto') {
+          if (file.name?.endsWith('.vcf') || text.includes('BEGIN:VCARD')) {
+            fileType = 'vcf';
+          } else if (file.name?.endsWith('.csv') || text.includes(',')) {
+            fileType = 'csv';
+          } else {
+            return { success: false, error: 'unknown-file-type' };
+          }
+        }
+
+        // Enviar al backend para procesar
+        const endpoint = `/api/contacts/import`;
+        const payload = {
+          weddingId: activeWedding,
+          fileType,
+          content: text,
+          mapping,
+        };
+
+        const response = await apiPost(endpoint, payload, { auth: true });
+        
+        if (response?.imported) {
+          // Recargar lista de invitados
+          await reload();
+          notifyAssistant({ 
+            action: 'contacts_imported', 
+            count: response.imported 
+          });
+          return { 
+            success: true, 
+            imported: response.imported 
+          };
+        }
+
+        return { success: false, error: 'import-failed' };
+      } catch (error) {
+        console.error('[useGuests] importFromContacts error', error);
+        return { 
+          success: false, 
+          error: error?.message || 'import-error' 
+        };
+      }
+    },
+    [activeWedding, apiPost, notifyAssistant, reload]
+  );
   const inviteViaWhatsAppDeeplinkCustom = useCallback(
     async (guest, customMessage) => {
       const phone = utils.phoneClean(guest.phone);
@@ -1346,9 +1403,3 @@ const useGuests = () => {
 };
 
 export default useGuests;
-
-
-
-
-
-

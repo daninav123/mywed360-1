@@ -38,6 +38,16 @@ Subcolecciones (por boda, según módulos):
 - `meetings` (opcional): reuniones/eventos de calendario
 - `designs` (opcional): diseños web/invitaciones
 - `seating` (opcional): layouts de mesas/ceremonia
+- `finance/main`: snapshot financiero por boda
+  - `budget`: `{ total: number, categories: Array<{ id, name, amount, muted?, source?, contrastContext? }> }`
+  - `movements`: `{ id, concept, amount, date, type ('income'|'expense'), category, method?, supplierId?, note? }[]` (legacy mientras se migra a subcolección)
+  - `settings.alertThresholds`: `{ warn: number, danger: number }`
+  - `contributions`: `{ initA, initB, monthlyA, monthlyB, extras, giftPerGuest, guestCount }`
+  - `aiAdvisorChat`: `{ schema: 'v2-chat', messages: Message[], summary?, preferences?, feedback?, lastInteractionAt }`
+  - `styleWeights`, `preferences`, `updatedAt`, `createdAt`, `seedVersion`
+- `finance/main/transactions` (en curso): documentos `{ id, concept, amount, type, status, category, source, bookedAt, dueAt?, attachments[] }` usados por importaciones CSV/Excel y conciliación bancaria
+- `finance/main/rollups` (en curso): documento por periodo `{ month, totals: { income, expense }, variance, generatedAt }` para paneles comparativos
+- `finance/contributions` (planeado): subcolección con pledges individuales `{ id, contributor, amount, status, reminderAt, token }` vinculada a página pública de aportaciones
 - `recommendations`: sugerencias generadas (tipo, origen IA, CTA, estado `suggested|applied|dismissed`)
 
 Invitaciones (recomendado):

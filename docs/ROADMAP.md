@@ -34,41 +34,6 @@
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/admin/admin-flow.cy.js
 
-## 10. Gesti�n de Bodas M�ltiples (estado 2025-10-07)
-
-- **[archivo]** docs\flujos-especificos\flujo-10-gestion-bodas-multiples.md
-- **[conclusion]** parcial
-- **[implementado (doc)]**
-  - Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, y permisos granulares por boda.
-  - Tablero multi-boda con KPIs, filtros avanzados y encolado de sincronizaciones CRM (crmSyncQueue).
-  - Editor de permisos por módulo en BodaDetalle.jsx con persistencia en modulePermissions.
-- **[pendiente (doc)]**
-  - Worker de CRM que procese crmSyncQueue, gestione reintentos y actualice crm.lastSyncStatus.
-  - Activity feed multi-boda y alertas en tiempo real.
-  - Suites E2E dedicadas para permisos por módulo y sincronización CRM.
-- **[E2E specs]** 2/2 presentes
-  - [ok] cypress/e2e/weddings/multi-weddings-flow.cy.js
-  - [ok] cypress/e2e/weddings/wedding-team-flow.cy.js
-- **[verificacion de archivos implementados]**
-  - `Bodas.jsx` -> src\pages\Bodas.jsx
-  - `BodaDetalle.jsx` -> src\pages\BodaDetalle.jsx
-  - `WeddingSelector.jsx` -> src\components\WeddingSelector.jsx
-  - `WeddingFormModal.jsx` -> src\components\WeddingFormModal.jsx
-  - `useWedding` -> src\hooks\useWedding.js
-  - `MultiWeddingSummary.jsx` -> src\components\weddings\MultiWeddingSummary.jsx
-  - `WeddingPortfolioTable.jsx` -> src\components\weddings\WeddingPortfolioTable.jsx
-- **[roadmap/pending (doc)]**
-  - - Dashboard multi-boda (res�menes cruzados, comparativas).
-  - - Permisos granulares por m�dulo/colecci�n.
-  - - Filtro de bodas por estado/fecha/owner.
-  - - Sincronizaci�n con planner CRM externo.
-  - - Activity feed y alertas multi-boda.
-- **[checklist despliegue]**
-  - - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
-  - - Seeds y Cloud Functions idempotentes para nuevas bodas.
-  - - Validar UI con >10 bodas (scroll, selector).
-  - - QA de traducciones y copy en wizard.
-
 ## 11. Protocolo y Ceremonias (visión global)
 
 - **[archivo]** docs\flujos-especificos\flujo-11-protocolo-ceremonias.md
@@ -807,6 +772,27 @@
   - - Variables Firebase (`VITE_FIREBASE_*`, `FIREBASE_SERVICE_ACCOUNT_KEY`).
   - - Configurar correo transactional (Mailgun) para reset/verify.
   - - Alta de credenciales OAuth (Google, Facebook, etc.) en Firebase Console y `.env`.
+
+## flujo-10-gestion-bodas-multiples.md
+
+- **[archivo]** docs\flujos-especificos\flujo-10-gestion-bodas-multiples.md
+- **[conclusion]** parcial
+- **[implementado (doc)]**
+  - Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, tablero multi-boda con KPIs/filtros y encolado CRM (crmSyncQueue), y editor de permisos por módulo en BodaDetalle.jsx (modulePermissions).
+- **[pendiente (doc)]**
+  - worker CRM (procesar crmSyncQueue), activity feed/alertas multi-boda y suites E2E específicas para permisos/CRM.
+- **[E2E specs]** 2/2 presentes
+  - [ok] cypress/e2e/weddings/multi-weddings-flow.cy.js
+  - [ok] cypress/e2e/weddings/wedding-team-flow.cy.js
+- **[roadmap/pending (doc)]**
+  - - Worker CRM (procesamiento y reintentos), métricas de sincronización y alertas multi-boda.
+  - - Activity feed con timeline consolidado y avisos en vivo.
+  - - Suites E2E específicas para permisos por módulo y flujos CRM.
+- **[checklist despliegue]**
+  - - Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).
+  - - Seeds y Cloud Functions idempotentes para nuevas bodas.
+  - - Validar UI con >10 bodas (scroll, selector).
+  - - QA de traducciones y copy en wizard.
 
 ## flujo-12-notificaciones-configuracion.md
 

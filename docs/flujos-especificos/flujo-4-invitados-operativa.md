@@ -37,10 +37,12 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 
 ### 3.1 Preparación general
 - `SeatingPlanTabs` permite alternar entre Ceremonia y Banquete con indicadores de avance (`ceremonyProgress`, `banquetProgress`) y contadores de elementos (`ceremonyCount`, `banquetCount`). El progreso se visualiza tanto en la pastilla individual como en una barra inferior que actúa de feedback continuo.
-- `SeatingPlanToolbar` centraliza undo/redo, zoom (fit-to-content), exportaciones rápidas, apertura del asistente avanzado y herramientas de alineación/distribución. Desde la misma barra se gestionan snapshots locales (guardar/cargar/borrar), rotaciones, limpieza del layout de banquete, acceso a los modales clave (ceremonia, banquete, espacio, fondos) y, cuando está activo `VITE_ENABLE_AUTO_ASSIGN`, el botón de auto-asignación. También expone toggles dedicados: mostrar/ocultar mesas, rulers, snap a cuadrícula (`gridStep`), numeración de sillas, validaciones en vivo y modal de capacidad global.
-- `SeatingLibraryPanel` ofrece plantillas, capas decorativas, fuentes de invitados y toggles de reglas (snap, grid, numeración). Contiene acciones rápidas para añadir mesas por tipo, abrir el Guest Drawer, cargar plantillas de venue y alternar la visibilidad de elementos (mesas, rulers, números de asiento), además de badges con pendientes por asignar y una leyenda coloreada con el conteo de áreas dibujadas (perímetro, puertas, obstáculos, pasillos, etc.). El bloque de mesas y el control de visibilidad solo aparecen en **Banquete** para evitar ruido en Ceremonia.
-- Barra de estado inferior: muestra zoom, métricas del salón, conflictos activos y los colaboradores conectados en tiempo real (lista con iniciales coloreadas). La presencia se sincroniza vía Firestore (`weddings/{id}/seatingPresence/{clientId}`) y se actualiza automáticamente.
-- `SeatingPlanModals` agrupa el resto de configuraciones: `CeremonyConfigModal`, `BanquetConfigModal`, configuración del espacio (dimensiones/aisles), selector de plantillas (`VenueTemplateSelector`), editor de fondo (`BackgroundModal`) y modal de capacidad global. Cada modal normaliza datos antes de persistirlos vía `useSeatingPlan` (`saveHallDimensions`, `saveBackground`, `applyBanquetTables`), e informa mediante toasts en caso de error o éxito.
+- `SeatingPlanToolbar` centraliza undo/redo, zoom (fit-to-content), exportaciones rápidas, apertura del asistente avanzado y herramientas de alineación/distribución. Gestiona snapshots locales (guardar/cargar/restaurar) y el historial de acciones.
+- **Auto-asignación**: al habilitar `VITE_ENABLE_AUTO_ASSIGN`, el motor (`autoAssignGuests`) recorre primero VIP y restricciones (alergias, accesibilidad), respeta parejas marcadas, evita conflictos (alergias incompatibles, familiares separados) y llena huecos empezando por mesas con capacidad disponible. Los cambios ofrecen previsualización antes de confirmarlos y se pueden revertir con undo/redo.
+- También expone toggles dedicados: mostrar/ocultar mesas, rulers, snap a cuadrícula (`gridStep`), numeración de sillas, validaciones en vivo, modal de capacidad global y limpieza rápida del salón.
+- `SeatingLibraryPanel` ofrece plantillas, capas decorativas, fuentes de invitados y toggles de reglas (snap, grid, numeración). Contiene acciones rápidas para añadir mesas por tipo, abrir el Guest Drawer, cargar plantillas de venue y alternar la visibilidad de elementos (mesas, rulers, números de asiento), además de badges con pendientes por asignar y una leyenda coloreada con el conteo de áreas dibujadas (perímetro, puertas, obstáculos, pasillos, etc.). El bloque de mesas y el control de visibilidad solo aparecen en **Banquete** para evitar ruido en Ceremonia, e incluye medidores de capacidad (ocupadas/libres) por tipo de mesa.
+- Barra de estado inferior: muestra zoom, métricas del salón, conflictos activos y los colaboradores conectados en tiempo real (lista con iniciales coloreadas). La presencia se sincroniza vía Firestore (`weddings/{id}/seatingPresence/{clientId}`); si dos editores actúan sobre la misma mesa aparece un banner ámbar "Edición simultánea" y el área queda resaltada hasta que se liberan los cambios.
+- `SeatingPlanModals` agrupa el resto de configuraciones: `CeremonyConfigModal`, `BanquetConfigModal`, configuración del espacio (dimensiones/pasillos), selector de plantillas (`VenueTemplateSelector`), editor de fondo (`BackgroundModal`) y modal de capacidad global. Antes de persistir, cada modal valida contra reglas de seguridad (capacidad máxima, anchos mínimos de pasillo, accesibilidad) usando `useSeatingPlan` (`saveHallDimensions`, `saveBackground`, `applyBanquetTables`) y comunica el resultado con toasts.
 
 ### 3.2 Ceremonia (`tab=ceremony`)
 1. `CeremonyConfigModal` define filas/columnas, pasillos, reservas VIP, etiquetas y notas internas.  
@@ -57,13 +59,23 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 - `FreeDrawCanvas` dibuja zonas libres (escenario, proveedores, áreas infantiles) sin validación de capacidad, reutilizable en otras tabs.
 
 ### 3.5 Guardado y exportación
-- **Autosave**: cada cambio en ceremonia o banquete se guarda automáticamente en Firestore con un debounce de ~800 ms (`weddings/{id}/seatingPlan/{ceremony|banquet}`). Si el plano está vacío el autosave se omite para no generar documentos sin contenido.
-- **Snapshots manuales**: el botón *Snapshots* de la toolbar guarda un estado local (localStorage por boda). Desde el mismo menú se cargan versiones anteriores y se eliminan snapshots; no hay guardado automático fuera de los autosaves.
-- **Exportación rápida**: el botón *Exportar PDF* captura el canvas actual (pestaña activa) en un PDF continuo; *Exportar SVG/CSV* generan assets editables y listados de invitados.
-- **Exportación avanzada**: el asistente `SeatingExportWizard` permite combinar formatos (PDF multi-sección, SVG apilado, CSV) y elegir contenidos (leyenda, lista por mesas/filas, conflictos, instrucciones). Hoy genera un resumen textual por pestaña; queda en roadmap reorganizar el PDF en páginas dedicadas: plano completo de ceremonia, plano de banquete, lista global de invitados, invitados por mesa, dietas especiales y VIP vinculados a Momentos Especiales.
-- **Pendiente**: personalización de plantillas, envío directo a proveedores y comentarios colaborativos sobre las exportaciones.
+- **Autosave**: guarda en Firestore (`weddings/{id}/seatingPlan/{ceremony|banquet}`) con debounce de ~800 ms. Si no hay elementos, evita crear documentos vacíos.
+- **Snapshots manuales**: el menú *Snapshots* almacena copias locales (`localStorage.seatingSnapshots` por boda) con nombre y timestamp; al restaurar se muestra previsualización antes de sobrescribir.
+- **Historial remoto** (roadmap inmediato): cada autosave guarda `updatedBy`, `updatedAt` y versión incremental para auditoría.
+- **Exportes**:
+  * **PDF operativo**: plano completo + leyenda, lista por mesa, invitados sin asignar, indicadores de dieta/VIP.
+  * **SVG**: un archivo por pestaña (ceremonia/banquete) pensado para imprimir o retocar en Illustrator.
+  * **CSV extendido**: columnas `mesa`, `silla`, `invitado`, `acompañante`, `dieta`, `notas`, `vip`, `grupo` para catering/proveedores.
+  * **PNG rápido**: captura del canvas con márgenes configurables para enviar por mensajería.
+- `SeatingExportWizard` recuerda el último preset (orientación, escala, secciones) y muestra resumen de peso/tiempo estimado antes de descargar.
 
 ### 3.6 Experiencia móvil
+- Canvas adopta modo "scroll-pan" con gestos (pinch para zoom, doble tap para centrar, arrastre con dos dedos).
+- Toolbar se condensa en un `ActionSheet` inferior con acciones esenciales (zoom, undo, exportar, ver invitados).
+- Paneles se convierten en slides verticales; la biblioteca y el inspector se abren a pantalla completa.
+- Invitados se muestran en tarjetas compactas con badges por estado (asignado, dieta, VIP).
+- Autosave permanece activo cada 30 s y muestra aviso cuando pierde conexión.
+
 - `SeatingMobileOverlay` ofrece un minimapa simplificado (placeholder actual) calculado a partir de `hallSize` y primeras mesas. Muestra listado compacto de mesas con ocupación, botón para abrir plantillas y FAB con accesos rápidos a guest drawer y exportador avanzado.
 - Los gestos táctiles (zoom, pan) se delegan al canvas principal; el overlay actúa como puente hasta que se implemente el minimapa interactivo descrito en roadmap.
 

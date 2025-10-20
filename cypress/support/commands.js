@@ -244,3 +244,21 @@ Cypress.Commands.add('closeDiagnostic', () => {
     }
   });
 });
+
+/**
+ * Comando para navegar al inbox de email
+ */
+Cypress.Commands.add('navigateToEmailInbox', () => {
+  // Intentar navegar a la ruta de email
+  cy.visit('/email', { failOnStatusCode: false });
+  cy.wait(1000);
+  
+  // Alternativamente, si hay un botón de navegación
+  cy.get('body').then($body => {
+    if ($body.find('[href="/email"]').length) {
+      cy.get('[href="/email"]').first().click();
+    } else if ($body.find('[data-testid="nav-email"]').length) {
+      cy.get('[data-testid="nav-email"]').click();
+    }
+  });
+});

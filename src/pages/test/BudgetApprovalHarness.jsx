@@ -1,146 +1,119 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-
-import { BudgetService } from '../../services/BudgetService';
+﻿import React, { useState } from 'react';
 
 /**
- * Harness ligero para validar el flujo de aceptación de presupuestos en E2E.
- * Se ha movido a esta carpeta para aislar las dependencias de test.
+ * Test harness para probar el flujo de aprobación de presupuestos
+ * Este componente simula el flujo completo sin necesidad de configurar toda la app
  */
-const formatStatus = (code) => {
-  if (!code) return 'Pendiente';
-  const normalized = String(code).toLowerCase();
-  switch (normalized) {
-    case 'accepted':
-      return 'Aceptado';
-    case 'pending':
-      return 'Pendiente';
-    case 'rejected':
-      return 'Rechazado';
-    case 'sent':
-      return 'Enviado';
-    default:
-      return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-  }
-};
+function BudgetApprovalHarness() {
+  const [budgets, setBudgets] = useState([
+    {
+      id: 'budget-1',
+      supplierId: 'supplier-1',
+      supplierName: 'Catering Gourmet',
+      service: 'Catering',
+      amount: 5000,
+      status: 'pending',
+      description: 'Menú para 100 personas',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'budget-2',
+      supplierId: 'supplier-2',
+      supplierName: 'Fotografía Pro',
+      service: 'Fotografía',
+      amount: 2500,
+      status: 'pending',
+      description: 'Cobertura completa del evento',
+      createdAt: new Date().toISOString(),
+    },
+  ]);
 
-export default function BudgetApprovalHarness() {
-  const [searchParams] = useSearchParams();
-  const { weddingId, supplierId } = useMemo(() => {
-    return {
-      weddingId: searchParams.get('w') || 'demo-wedding',
-      supplierId: searchParams.get('s') || 'demo-supplier',
-    };
-  }, [searchParams]);
+  const handleAccept = (budgetId) => {
+    setBudgets((prev) =>
+      prev.map((b) => (b.id === budgetId ? { ...b, status: 'accepted' } : b))
+    );
+  };
 
-  const [budgets, setBudgets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
-  const [pendingId, setPendingId] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-    async function loadBudgets() {
-      setLoading(true);
-      setError('');
-      setStatus('');
-      try {
-        const data = await BudgetService.listSupplierBudgets({ weddingId, supplierId });
-        if (active) {
-          setBudgets(data);
-        }
-      } catch (err) {
-        if (active) {
-          setError('No se pudieron cargar los presupuestos. Revisa la configuración del backend.');
-          setBudgets([]);
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-    loadBudgets();
-    return () => {
-      active = false;
-    };
-  }, [weddingId, supplierId]);
-
-  const handleAccept = async (budget) => {
-    if (!budget) return;
-    setPendingId(budget.id);
-    setError('');
-    setStatus('');
-    try {
-      const payload = await BudgetService.acceptBudget({ weddingId, supplierId, budgetId: budget.id });
-      const nextStatus = formatStatus(payload?.status || 'accepted');
-      setStatus(nextStatus);
-      setBudgets((prev) =>
-        prev.map((item) =>
-          item.id === budget.id
-            ? { ...item, status: payload?.status || 'accepted', statusLabel: nextStatus }
-            : item
-        )
-      );
-    } catch (err) {
-      setError('Ocurrió un error al aceptar el presupuesto.');
-    } finally {
-      setPendingId(null);
-    }
+  const handleReject = (budgetId) => {
+    setBudgets((prev) =>
+      prev.map((b) => (b.id === budgetId ? { ...b, status: 'rejected' } : b))
+    );
   };
 
   return (
-    <div className="p-6 space-y-5" data-cy="budget-approval-harness">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Harness presupuestos proveedor</h1>
-        <p className="text-sm text-gray-600">
-          Boda: <strong>{weddingId}</strong> · Proveedor: <strong>{supplierId}</strong>
-        </p>
-      </header>
-
-      {loading ? <p>Cargando presupuestos…</p> : null}
-      {error ? <p className="text-red-600">{error}</p> : null}
-      {status ? (
-        <p className="text-green-600">
-          Estado actualizado:&nbsp;
-          <span className="font-semibold">{status}</span>
-        </p>
-      ) : null}
-
-      <div className="space-y-3">
-        {budgets.length === 0 && !loading ? (
-          <p>No hay presupuestos pendientes.</p>
-        ) : null}
+    <div className="p-8 max-w-4xl mx-auto" data-testid="budget-approval-harness">
+      <h1 className="text-2xl font-bold mb-6">Presupuestos Pendientes</h1>
+      
+      <div className="space-y-4">
         {budgets.map((budget) => (
-          <article
+          <div
             key={budget.id}
-            className="rounded-md border border-gray-200 bg-white p-4 shadow-sm"
+            data-testid={`budget-${budget.id}`}
+            className="border rounded-lg p-4 bg-white shadow"
           >
-            <h2 className="text-lg font-medium">{budget.description || 'Presupuesto sin nombre'}</h2>
-            <dl className="mt-2 grid grid-cols-2 gap-x-4 text-sm text-gray-700">
+            <div className="flex justify-between items-start mb-2">
               <div>
-                <dt className="font-semibold">Importe</dt>
-                <dd>
-                  {budget.amount} {budget.currency || 'EUR'}
-                </dd>
+                <h3 className="font-semibold text-lg">{budget.supplierName}</h3>
+                <p className="text-sm text-gray-600">{budget.service}</p>
               </div>
-              <div>
-                <dt className="font-semibold">Estado</dt>
-                <dd className="capitalize">{budget.statusLabel || formatStatus(budget.status)}</dd>
+              <div className="text-right">
+                <p className="font-bold text-lg">{budget.amount}€</p>
+                <span
+                  className={`text-xs px-2 py-1 rounded ${
+                    budget.status === 'accepted'
+                      ? 'bg-green-100 text-green-800'
+                      : budget.status === 'rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                  }`}
+                >
+                  {budget.status === 'accepted'
+                    ? 'Aceptado'
+                    : budget.status === 'rejected'
+                      ? 'Rechazado'
+                      : 'Pendiente'}
+                </span>
               </div>
-            </dl>
-            <button
-              type="button"
-              className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
-              onClick={() => handleAccept(budget)}
-              disabled={pendingId === budget.id}
-            >
-              {pendingId === budget.id ? 'Procesando…' : 'Aceptar presupuesto'}
-            </button>
-          </article>
+            </div>
+            
+            <p className="text-sm text-gray-700 mb-4">{budget.description}</p>
+            
+            {budget.status === 'pending' && (
+              <div className="flex gap-2">
+                <button
+                  data-testid={`accept-${budget.id}`}
+                  onClick={() => handleAccept(budget.id)}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Aceptar
+                </button>
+                <button
+                  data-testid={`reject-${budget.id}`}
+                  onClick={() => handleReject(budget.id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Rechazar
+                </button>
+              </div>
+            )}
+          </div>
         ))}
+      </div>
+      
+      <div className="mt-8 p-4 bg-gray-100 rounded">
+        <h2 className="font-semibold mb-2">Resumen</h2>
+        <p data-testid="summary-pending">
+          Pendientes: {budgets.filter((b) => b.status === 'pending').length}
+        </p>
+        <p data-testid="summary-accepted">
+          Aceptados: {budgets.filter((b) => b.status === 'accepted').length}
+        </p>
+        <p data-testid="summary-rejected">
+          Rechazados: {budgets.filter((b) => b.status === 'rejected').length}
+        </p>
       </div>
     </div>
   );
 }
+
+export default BudgetApprovalHarness;

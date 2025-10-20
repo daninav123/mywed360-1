@@ -16,7 +16,7 @@ import {
   sendValidationError,
   sendInternalError,
   sendServiceUnavailable,
-} from '../utils/response.js';
+} from '../utils/apiResponse.js';
 import { requireAdmin } from '../middleware/authMiddleware.js';
 
 // Definir la API key directamente como respaldo si no se encuentra en las variables de entorno
@@ -101,7 +101,7 @@ router.get('/debug-env', requireAdmin, (req, res) => {
   };
   
   logger.info('🔍 Debug env vars requested by admin');
-  return sendSuccess(res, {
+  return sendSuccess(req, res, {
     environment: envVars,
     timestamp: new Date().toISOString()
   });
@@ -143,13 +143,12 @@ router.post('/parse-dialog', async (req, res) => {
       });
       const parsed = schema.safeParse({ text, history, context });
       if (!parsed.success) {
-        const details = parsed.error.issues?.map(i => i.message).join('; ');
-        return sendValidationError(res, 'Invalid payload', details, req);
+        return sendValidationError(req, res, parsed.error.errors);
       }
       ({ text, history, context } = parsed.data);
     } else {
       if (!text || typeof text !== 'string') {
-        return sendValidationError(res, 'text is required', null, req);
+        return sendValidationError(req, res, [{ message: 'text is required' }]);
       }
       if (!Array.isArray(history)) history = [];
       if (!context || typeof context !== 'object') context = null;
@@ -157,7 +156,7 @@ router.post('/parse-dialog', async (req, res) => {
   } catch {}
   logger.info('↪️  parse-dialog recibido', { textLen: text.length, historyLen: history.length });
   if (!text) {
-    return sendValidationError(res, 'text is required', null, req);
+    return sendValidationError(req, res, [{ message: 'text is required' }]);
   }
 
   const historyMessages = Array.isArray(history)
@@ -176,9 +175,9 @@ router.post('/parse-dialog', async (req, res) => {
   if (!OPENAI_API_KEY) {
     logger.error('OPENAI_API_KEY ausente; parse-dialog no puede ejecutarse');
     return sendServiceUnavailable(
+      req,
       res,
-      'La integración con OpenAI no está configurada. Proporciona OPENAI_API_KEY en el backend.',
-      req
+      'La integración con OpenAI no está configurada. Proporciona OPENAI_API_KEY en el backend.'
     );
   }
 
@@ -334,15 +333,15 @@ router.post('/parse-dialog', async (req, res) => {
     }
 
     logger.info('✅ parse-dialog completado', { extractedKeys: Object.keys(extracted), replyLen: reply.length });
-    return sendSuccess(res, { extracted, reply });
+    return sendSuccess(req, res, { extracted, reply });
   } catch (err) {
     logger.error('❌ parse-dialog error', err);
     return sendError(
+      req,
       res,
       'openai_request_failed',
       err?.message || 'Error al procesar la solicitud con OpenAI',
-      502,
-      req
+      502
     );
   }
 });
@@ -351,11 +350,11 @@ router.post('/parse-dialog', async (req, res) => {
 router.get('/search-suppliers', async (req, res) => {
   const q = req.query.q;
   if (!q) {
-    return sendValidationError(res, 'Query parameter "q" is required', null, req);
+    return sendValidationError(req, res, [{ message: 'Query parameter "q" is required' }]);
   }
   const { SERPAPI_API_KEY } = process.env;
   if (!SERPAPI_API_KEY) {
-    return sendServiceUnavailable(res, 'SERPAPI_API_KEY no está configurado', req);
+    return sendServiceUnavailable(req, res, 'SERPAPI_API_KEY no está configurado');
   }
   try {
     const resp = await axios.get('https://serpapi.com/search.json', {
@@ -371,10 +370,10 @@ router.get('/search-suppliers', async (req, res) => {
       link: r.link,
       snippet: r.snippet,
     }));
-    return sendSuccess(res, { results });
+    return sendSuccess(req, res, { results });
   } catch (err) {
     logger.error('Supplier search failed:', err);
-    return sendInternalError(res, err, req);
+    return sendInternalError(req, res, err);
   }
 });
 

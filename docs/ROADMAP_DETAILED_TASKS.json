@@ -1,0 +1,758 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2025-10-20",
+    "description": "Roadmap detallado con tareas pequeñas y ejecutables basado en análisis de gaps",
+    "totalTasks": 150,
+    "estimatedDuration": "10 sprints (20 semanas)"
+  },
+  "sprints": [
+    {
+      "sprint": 1,
+      "name": "Estabilización Crítica",
+      "duration": "2 semanas",
+      "objective": "Resolver bloqueadores de tests y estandarizar APIs",
+      "tasks": [
+        {
+          "id": "S1-T001",
+          "title": "Debugear tests unitarios reglas Firestore",
+          "priority": "CRÍTICO",
+          "estimatedHours": 16,
+          "description": "Investigar y corregir fallos en unit_rules, unit_rules_exhaustive, unit_rules_extended",
+          "blockers": [],
+          "deliverables": ["Tests pasando en CI", "Documentación de fixes aplicados"]
+        },
+        {
+          "id": "S1-T002",
+          "title": "Crear helper respuesta API estándar",
+          "priority": "CRÍTICO",
+          "estimatedHours": 4,
+          "description": "Crear función helper en backend/utils/apiResponse.js con formato { success, data/error, requestId }",
+          "blockers": [],
+          "deliverables": ["backend/utils/apiResponse.js", "Tests unitarios del helper"]
+        },
+        {
+          "id": "S1-T003",
+          "title": "Refactorizar backend/routes/ai.js",
+          "priority": "CRÍTICO",
+          "estimatedHours": 8,
+          "description": "Aplicar formato estándar de respuestas API en todas las rutas de ai.js",
+          "blockers": ["S1-T002"],
+          "deliverables": ["ai.js actualizado", "Tests actualizados"]
+        },
+        {
+          "id": "S1-T004",
+          "title": "Refactorizar backend/routes/guests.js",
+          "priority": "CRÍTICO",
+          "estimatedHours": 6,
+          "description": "Aplicar formato estándar de respuestas API en todas las rutas de guests.js",
+          "blockers": ["S1-T002"],
+          "deliverables": ["guests.js actualizado", "Tests actualizados"]
+        },
+        {
+          "id": "S1-T005",
+          "title": "Proteger endpoint debug",
+          "priority": "ALTA",
+          "estimatedHours": 2,
+          "description": "Añadir requireAdmin a /api/ai/debug-env o desactivar en producción",
+          "blockers": [],
+          "deliverables": ["Middleware aplicado", "Test de autorización"]
+        },
+        {
+          "id": "S1-T006",
+          "title": "Auditar PII en endpoints públicos",
+          "priority": "ALTA",
+          "estimatedHours": 4,
+          "description": "Revisar y filtrar información sensible en /api/guests/:weddingId/:token y similares",
+          "blockers": [],
+          "deliverables": ["Listado de campos filtrados", "Tests de privacidad"]
+        },
+        {
+          "id": "S1-T007",
+          "title": "Fix test E2E rsvp_confirm_by_token",
+          "priority": "CRÍTICO",
+          "estimatedHours": 6,
+          "description": "Debugear y reparar test crítico de confirmación RSVP",
+          "blockers": ["S1-T001"],
+          "deliverables": ["Test pasando", "Seeds estables"]
+        },
+        {
+          "id": "S1-T008",
+          "title": "Fix tests E2E email (send, read, folders)",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Reparar 3 tests críticos de email",
+          "blockers": ["S1-T001"],
+          "deliverables": ["3 tests pasando", "Fixtures actualizados"]
+        },
+        {
+          "id": "S1-T009",
+          "title": "Fix test E2E budget_flow",
+          "priority": "ALTA",
+          "estimatedHours": 6,
+          "description": "Reparar test de flujo de presupuesto",
+          "blockers": ["S1-T001"],
+          "deliverables": ["Test pasando", "Seeds finance estables"]
+        },
+        {
+          "id": "S1-T010",
+          "title": "Fix test E2E guests_flow",
+          "priority": "ALTA",
+          "estimatedHours": 6,
+          "description": "Reparar test de flujo de invitados",
+          "blockers": ["S1-T001"],
+          "deliverables": ["Test pasando", "Seeds guests estables"]
+        }
+      ]
+    },
+    {
+      "sprint": 2,
+      "name": "Completar Seating Plan",
+      "duration": "2 semanas",
+      "objective": "Finalizar módulo Seating con móvil y colaboración",
+      "tasks": [
+        {
+          "id": "S2-T001",
+          "title": "Implementar detección viewport móvil",
+          "priority": "ALTA",
+          "estimatedHours": 4,
+          "description": "Detectar viewport <=1024px y activar modo compacto (isMobile)",
+          "blockers": [],
+          "deliverables": ["Hook useIsMobile", "Context actualizado"]
+        },
+        {
+          "id": "S2-T002",
+          "title": "Crear FAB radial móvil",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Botón de acción flotante con menú radial para acciones principales",
+          "blockers": ["S2-T001"],
+          "deliverables": ["Componente FABRadial", "Estilos responsive"]
+        },
+        {
+          "id": "S2-T003",
+          "title": "Crear panel inferior móvil",
+          "priority": "ALTA",
+          "estimatedHours": 6,
+          "description": "Panel deslizable inferior para herramientas en móvil",
+          "blockers": ["S2-T001"],
+          "deliverables": ["Componente MobileToolPanel"]
+        },
+        {
+          "id": "S2-T004",
+          "title": "Implementar gestos táctiles",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Pinch zoom, double tap, swipe usando react-use-gesture",
+          "blockers": ["S2-T001"],
+          "deliverables": ["Hook useSeatingGestures", "Tests gestos"]
+        },
+        {
+          "id": "S2-T005",
+          "title": "Ajustar GuestSidebar móvil",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Tabs para Alertas/Recomendaciones/Staff en vista móvil",
+          "blockers": ["S2-T001"],
+          "deliverables": ["GuestSidebar responsive", "Tabs funcionales"]
+        },
+        {
+          "id": "S2-T006",
+          "title": "Mostrar badges colaboración",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Indicadores 'En edición' para usuarios activos",
+          "blockers": [],
+          "deliverables": ["Componente CollabBadge", "Integración presencia"]
+        },
+        {
+          "id": "S2-T007",
+          "title": "Toasts de conflicto",
+          "priority": "MEDIA",
+          "estimatedHours": 4,
+          "description": "Notificaciones cuando hay conflictos de edición",
+          "blockers": ["S2-T006"],
+          "deliverables": ["Sistema toasts conflictos"]
+        },
+        {
+          "id": "S2-T008",
+          "title": "Integrar triggers gamificación seating",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Registrar eventos layout_ceremony_ready, layout_banquet_ready, etc.",
+          "blockers": [],
+          "deliverables": ["Eventos registrados", "Tests integración"]
+        },
+        {
+          "id": "S2-T009",
+          "title": "Métricas analytics seating",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Instrumentar seating_export_generated, guest_sidebar_*, etc.",
+          "blockers": [],
+          "deliverables": ["Eventos analytics", "Dashboard básico"]
+        },
+        {
+          "id": "S2-T010",
+          "title": "QA manual seating tablet/iPad",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Testing manual en dispositivos reales",
+          "blockers": ["S2-T001", "S2-T002", "S2-T003", "S2-T004", "S2-T005"],
+          "deliverables": ["Reporte QA", "Issues identificados"]
+        },
+        {
+          "id": "S2-T011",
+          "title": "Reparar 13 tests E2E seating",
+          "priority": "CRÍTICO",
+          "estimatedHours": 20,
+          "description": "Fix todos los tests E2E de seating bloqueados",
+          "blockers": ["S1-T001"],
+          "deliverables": ["13 tests pasando", "CI verde"]
+        }
+      ]
+    },
+    {
+      "sprint": 3,
+      "name": "Unificar Email",
+      "duration": "2 semanas",
+      "objective": "Consolidar sistema de email y migrar de legacy",
+      "tasks": [
+        {
+          "id": "S3-T001",
+          "title": "Resolver búsqueda duplicada UnifiedInbox",
+          "priority": "ALTA",
+          "estimatedHours": 6,
+          "description": "Eliminar código duplicado de búsqueda/sort en EmailList",
+          "blockers": [],
+          "deliverables": ["Código limpio", "Tests actualizados"]
+        },
+        {
+          "id": "S3-T002",
+          "title": "Crear wizard onboarding email",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Wizard con validaciones DKIM/SPF y envío de prueba",
+          "blockers": [],
+          "deliverables": ["Componente EmailOnboarding", "Validaciones backend"]
+        },
+        {
+          "id": "S3-T003",
+          "title": "Persistencia server-side auto-respuestas",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Mover auto-respuestas de localStorage a Firestore",
+          "blockers": [],
+          "deliverables": ["API endpoints", "Migración datos"]
+        },
+        {
+          "id": "S3-T004",
+          "title": "Completar carpetas personalizadas",
+          "priority": "MEDIA",
+          "estimatedHours": 10,
+          "description": "Drag & drop, sincronización etiquetas",
+          "blockers": [],
+          "deliverables": ["DnD funcional", "Sync completo"]
+        },
+        {
+          "id": "S3-T005",
+          "title": "Mejorar papelera emails",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Restaurar a origen, métricas, vaciado backend",
+          "blockers": [],
+          "deliverables": ["Funciones papelera", "Backend route"]
+        },
+        {
+          "id": "S3-T006",
+          "title": "Plan migración buzón legacy",
+          "priority": "ALTA",
+          "estimatedHours": 4,
+          "description": "Documento estrategia migración con backups",
+          "blockers": [],
+          "deliverables": ["Plan migración", "Scripts backup"]
+        },
+        {
+          "id": "S3-T007",
+          "title": "Migrar usuarios a UnifiedInbox",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Ejecutar migración progresiva de usuarios",
+          "blockers": ["S3-T006"],
+          "deliverables": ["Migración ejecutada", "Monitoring activo"]
+        },
+        {
+          "id": "S3-T008",
+          "title": "Toggle acceso buzón legacy",
+          "priority": "MEDIA",
+          "estimatedHours": 4,
+          "description": "Ruta /email-legacy solo para soporte",
+          "blockers": ["S3-T007"],
+          "deliverables": ["Ruta protegida", "Documentación"]
+        },
+        {
+          "id": "S3-T009",
+          "title": "Webhooks Mailgun entrega/aperturas",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Registrar eventos reales de Mailgun en EmailInsights",
+          "blockers": [],
+          "deliverables": ["Webhook handler", "Logs eventos"]
+        },
+        {
+          "id": "S3-T010",
+          "title": "Actualizar tests E2E email",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Migrar todos los tests a nueva UI",
+          "blockers": ["S3-T001", "S3-T007"],
+          "deliverables": ["7 tests actualizados y pasando"]
+        }
+      ]
+    },
+    {
+      "sprint": 4,
+      "name": "Completar Finance",
+      "duration": "2 semanas",
+      "objective": "Finalizar sistema de finanzas con Open Banking",
+      "tasks": [
+        {
+          "id": "S4-T001",
+          "title": "UI autenticación Open Banking",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Flujo completo OAuth con refresh tokens",
+          "blockers": [],
+          "deliverables": ["Componente BankConnect", "OAuth flow"]
+        },
+        {
+          "id": "S4-T002",
+          "title": "Importación CSV/Excel transacciones",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Upload, preview, mapeo columnas, validaciones",
+          "blockers": [],
+          "deliverables": ["Componente TransactionImporter", "Backend parser"]
+        },
+        {
+          "id": "S4-T003",
+          "title": "Generador reportes PDF",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Reportes descargables para proveedores y contabilidad",
+          "blockers": [],
+          "deliverables": ["PDFReportGenerator service", "Templates"]
+        },
+        {
+          "id": "S4-T004",
+          "title": "Generador reportes Excel",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "Export Excel con fórmulas y formato",
+          "blockers": [],
+          "deliverables": ["ExcelReportGenerator service"]
+        },
+        {
+          "id": "S4-T005",
+          "title": "Módulo aportaciones completo",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Recordatorios, agradecimientos, panel compartido",
+          "blockers": [],
+          "deliverables": ["ContributionsModule", "Email templates"]
+        },
+        {
+          "id": "S4-T006",
+          "title": "Predicción gasto con IA",
+          "priority": "MEDIA",
+          "estimatedHours": 20,
+          "description": "Modelo ML para predecir gastos futuros",
+          "blockers": [],
+          "deliverables": ["FinancialPredictionService", "Training pipeline"]
+        },
+        {
+          "id": "S4-T007",
+          "title": "Automatización pagos programados",
+          "priority": "MEDIA",
+          "estimatedHours": 12,
+          "description": "Cron jobs para pagos recurrentes",
+          "blockers": [],
+          "deliverables": ["ScheduledPaymentsWorker", "Queue system"]
+        },
+        {
+          "id": "S4-T008",
+          "title": "Entrenar consejero financiero IA",
+          "priority": "BAJA",
+          "estimatedHours": 24,
+          "description": "Fine-tuning con dataset anonimizado",
+          "blockers": [],
+          "deliverables": ["Modelo entrenado", "Evaluation metrics"]
+        },
+        {
+          "id": "S4-T009",
+          "title": "Reparar 7 tests E2E finance",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Fix todos los tests de finance",
+          "blockers": [],
+          "deliverables": ["7 tests pasando"]
+        }
+      ]
+    },
+    {
+      "sprint": 5,
+      "name": "Sincronización RSVP-Seating",
+      "duration": "2 semanas",
+      "objective": "Integración bidireccional completa",
+      "tasks": [
+        {
+          "id": "S5-T001",
+          "title": "Diseñar arquitectura sincronización",
+          "priority": "CRÍTICO",
+          "estimatedHours": 8,
+          "description": "Documento técnico de arquitectura de sync",
+          "blockers": [],
+          "deliverables": ["Documento arquitectura", "Diagramas flujo"]
+        },
+        {
+          "id": "S5-T002",
+          "title": "Backend API sincronización RSVP→Seating",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Endpoints para actualizar seating desde RSVP",
+          "blockers": ["S5-T001"],
+          "deliverables": ["API endpoints", "Tests unitarios"]
+        },
+        {
+          "id": "S5-T003",
+          "title": "Backend API sincronización Seating→RSVP",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Endpoints para actualizar RSVP desde seating",
+          "blockers": ["S5-T001"],
+          "deliverables": ["API endpoints", "Tests unitarios"]
+        },
+        {
+          "id": "S5-T004",
+          "title": "Resolución de conflictos",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Lógica para manejar conflictos de sincronización",
+          "blockers": ["S5-T002", "S5-T003"],
+          "deliverables": ["ConflictResolver service", "Tests"]
+        },
+        {
+          "id": "S5-T005",
+          "title": "UI indicadores sincronización",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "Badges y estados de sincronización en UI",
+          "blockers": ["S5-T002", "S5-T003"],
+          "deliverables": ["SyncStatusIndicator component"]
+        },
+        {
+          "id": "S5-T006",
+          "title": "Automatizaciones IA invitados",
+          "priority": "MEDIA",
+          "estimatedHours": 20,
+          "description": "Sugerencias automáticas basadas en cambios",
+          "blockers": [],
+          "deliverables": ["GuestAutomationService", "ML pipeline"]
+        },
+        {
+          "id": "S5-T007",
+          "title": "Exportación check-in día B",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Listado check-in, QR individuales, etiquetas",
+          "blockers": [],
+          "deliverables": ["CheckInExporter service", "QR generator"]
+        },
+        {
+          "id": "S5-T008",
+          "title": "Estabilizar fixtures invitados",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "Seeds deterministas para tests E2E",
+          "blockers": [],
+          "deliverables": ["Fixtures estables", "Seed script"]
+        },
+        {
+          "id": "S5-T009",
+          "title": "Consolidar stats RSVP",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Panel resumen con weddings/{id}/rsvp/stats",
+          "blockers": [],
+          "deliverables": ["RSVPStatsPanel component"]
+        },
+        {
+          "id": "S5-T010",
+          "title": "Tests E2E sincronización",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Suite completa de tests integración",
+          "blockers": ["S5-T002", "S5-T003", "S5-T004"],
+          "deliverables": ["Tests E2E passing"]
+        }
+      ]
+    },
+    {
+      "sprint": 6,
+      "name": "Protocolo Subsistemas",
+      "duration": "2 semanas",
+      "objective": "Implementar 11A, 11B, 11C del protocolo",
+      "tasks": [
+        {
+          "id": "S6-T001",
+          "title": "11A: Campos avanzados momentos",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Responsables, suppliers, estado en UI",
+          "blockers": [],
+          "deliverables": ["Form actualizado", "Backend schema"]
+        },
+        {
+          "id": "S6-T002",
+          "title": "11A: Drag&drop momentos",
+          "priority": "ALTA",
+          "estimatedHours": 10,
+          "description": "Reordenamiento con límite 200",
+          "blockers": [],
+          "deliverables": ["DnD funcional", "Validaciones"]
+        },
+        {
+          "id": "S6-T003",
+          "title": "11A: Alertas campos faltantes",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Validación y mensajes guiados",
+          "blockers": ["S6-T001"],
+          "deliverables": ["Sistema validación", "UI alertas"]
+        },
+        {
+          "id": "S6-T004",
+          "title": "11A: Destinatarios por momento",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "Selector invitados/roles por momento",
+          "blockers": ["S6-T001"],
+          "deliverables": ["RecipientSelector component"]
+        },
+        {
+          "id": "S6-T005",
+          "title": "11B: Migrar timing a subcolección",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Mover weddings/{id}/timing a subcolección",
+          "blockers": [],
+          "deliverables": ["Migration script", "Tests"]
+        },
+        {
+          "id": "S6-T006",
+          "title": "11B: Estado editable bloques",
+          "priority": "ALTA",
+          "estimatedHours": 8,
+          "description": "UI para on-time/delayed/slightly-delayed",
+          "blockers": ["S6-T005"],
+          "deliverables": ["BlockStatusEditor component"]
+        },
+        {
+          "id": "S6-T007",
+          "title": "11B: Drag&drop timeline",
+          "priority": "ALTA",
+          "estimatedHours": 10,
+          "description": "Reordenamiento con validación horaria",
+          "blockers": ["S6-T005"],
+          "deliverables": ["TimelineDnD component"]
+        },
+        {
+          "id": "S6-T008",
+          "title": "11B: Alertas automáticas retrasos",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "Sistema de alertas basado en estado",
+          "blockers": ["S6-T006"],
+          "deliverables": ["DelayAlertService"]
+        },
+        {
+          "id": "S6-T009",
+          "title": "11C: Alertas sonoras/push checklist",
+          "priority": "ALTA",
+          "estimatedHours": 10,
+          "description": "Notificaciones para requisitos críticos",
+          "blockers": [],
+          "deliverables": ["Alert system", "Push notifications"]
+        },
+        {
+          "id": "S6-T010",
+          "title": "11C: Sync con notificaciones",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Integración con centro de notificaciones",
+          "blockers": ["S6-T009"],
+          "deliverables": ["Integration complete"]
+        }
+      ]
+    },
+    {
+      "sprint": 7,
+      "name": "Protocolo Legal y Textos",
+      "duration": "2 semanas",
+      "objective": "Implementar 11D y 11E del protocolo",
+      "tasks": [
+        {
+          "id": "S7-T001",
+          "title": "11D: Catálogo legal internacional",
+          "priority": "ALTA",
+          "estimatedHours": 24,
+          "description": "Tipos simbólica/destino, nuevos países",
+          "blockers": [],
+          "deliverables": ["Catálogo en Firestore", "Documentación"]
+        },
+        {
+          "id": "S7-T002",
+          "title": "11D: Variaciones por país",
+          "priority": "ALTA",
+          "estimatedHours": 20,
+          "description": "Bloques, plazos, alertas contextuales",
+          "blockers": ["S7-T001"],
+          "deliverables": ["Country variations", "UI adaptativa"]
+        },
+        {
+          "id": "S7-T003",
+          "title": "11D: Overrides usuario",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "legalSettings/{uid} con preferencias",
+          "blockers": ["S7-T002"],
+          "deliverables": ["User overrides system"]
+        },
+        {
+          "id": "S7-T004",
+          "title": "11D: Instrumentación eventos",
+          "priority": "MEDIA",
+          "estimatedHours": 4,
+          "description": "ceremony_document_guide_opened y similares",
+          "blockers": [],
+          "deliverables": ["Analytics events"]
+        },
+        {
+          "id": "S7-T005",
+          "title": "11D: Catálogo global con versionado",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Sistema de versiones y dependencias",
+          "blockers": ["S7-T001"],
+          "deliverables": ["Versioning system", "Migration tools"]
+        },
+        {
+          "id": "S7-T006",
+          "title": "11E: Tabs adicionales ceremonia",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Votos, discursos segmentados por rol",
+          "blockers": [],
+          "deliverables": ["New tabs", "Role-based views"]
+        },
+        {
+          "id": "S7-T007",
+          "title": "11E: Notas privadas y enlaces",
+          "priority": "MEDIA",
+          "estimatedHours": 8,
+          "description": "Notas, enlaces a momentos, tags",
+          "blockers": ["S7-T006"],
+          "deliverables": ["Notes system", "Link integration"]
+        },
+        {
+          "id": "S7-T008",
+          "title": "11E: Control de versiones textos",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Historial, duplicado, favoritos, export",
+          "blockers": ["S7-T006"],
+          "deliverables": ["Version control", "Export PDF"]
+        },
+        {
+          "id": "S7-T009",
+          "title": "11E: Validaciones textos",
+          "priority": "MEDIA",
+          "estimatedHours": 6,
+          "description": "Título requerido, duplicados, longitud",
+          "blockers": ["S7-T006"],
+          "deliverables": ["Validation system"]
+        },
+        {
+          "id": "S7-T010",
+          "title": "11E: Integración IA textos",
+          "priority": "ALTA",
+          "estimatedHours": 16,
+          "description": "Reescritura, tono, publicación a flujo 21",
+          "blockers": ["S7-T006"],
+          "deliverables": ["AI integration", "Publishing flow"]
+        },
+        {
+          "id": "S7-T011",
+          "title": "11E: Tests E2E ayudantes",
+          "priority": "ALTA",
+          "estimatedHours": 12,
+          "description": "Suite para roles ayudantes y pareja",
+          "blockers": ["S7-T006", "S7-T008"],
+          "deliverables": ["E2E tests passing"]
+        }
+      ]
+    },
+    {
+      "sprint": 8,
+      "name": "Proveedores y Tasks IA",
+      "duration": "2 semanas",
+      "objective": "Scoring IA y motor de tasks personalizado",
+      "tasks": [
+        {
+          "id": "S8-T001",
+          "title": "Scoring IA proveedores",
+          "priority": "ALTA",
+          "estimatedHours": 24,
+          "description": "Sistema de scoring con métricas históricas",
+          "blockers": [],
+          "deliverables": ["SupplierScoringService", "ML model", "Dashboard"]
+        },
+        {
+          "id": "S8-T002",
+          "title": "Portal proveedor completo",
+          "priority": "ALTA",
+          "estimatedHours": 20,
+          "description": "Autenticación, feedback, vista de estado",
+          "blockers": [],
+          "deliverables": ["SupplierPortal pages", "Auth flow"]
+        },
+        {
+          "id": "S8-T003",
+          "title": "Motor IA plan de tasks personalizado",
+          "priority": "CRÍTICO",
+          "estimatedHours": 32,
+          "description": "Generar plan desde plantilla maestra con LLM",
+          "blockers": [],
+          "deliverables": ["TaskPlanningEngine", "Template processor", "Tests"]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalSprints": 8,
+    "totalTasks": 85,
+    "criticalTasks": 12,
+    "highPriorityTasks": 48,
+    "mediumPriorityTasks": 22,
+    "lowPriorityTasks": 3,
+    "estimatedTotalHours": 1180,
+    "estimatedTeamSize": "3-4 developers",
+    "notes": [
+      "Sprint 1 es bloqueador crítico - debe completarse antes de avanzar",
+      "Tests E2E deben pasar antes de considerar features completadas",
+      "Prioridad en estabilización sobre nuevas features",
+      "Documentación técnica debe actualizarse con cada sprint",
+      "Code reviews obligatorios para cambios en módulos core"
+    ]
+  }
+}

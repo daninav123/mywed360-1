@@ -5,6 +5,14 @@ import logger from '../logger.js';
 import mailgunJs from 'mailgun-js';
 import { requirePlanner, optionalAuth } from '../middleware/authMiddleware.js';
 import { incCounter } from '../services/metrics.js';
+import {
+  sendSuccess,
+  sendError,
+  sendValidationError,
+  sendNotFoundError,
+  sendInternalError,
+  sendRateLimitError,
+} from '../utils/apiResponse.js';
 
 if (!admin.apps.length) {
   try {
@@ -63,22 +71,30 @@ async function findGuestRefByToken(token) {
 router.get('/by-token/:token', async (req, res) => {
   try {
     const { token } = req.params;
-    if (!token) return res.status(400).json({ error: 'token-required' });
+    if (!token) {
+      return sendValidationError(req, res, [{ message: 'token is required' }]);
+    }
 
     const guestRef = await findGuestRefByToken(token);
-    if (!guestRef) return res.status(404).json({ error: 'not-found' });
+    if (!guestRef) {
+      return sendNotFoundError(req, res, 'Invitado');
+    }
 
     const snap = await guestRef.get();
     const data = snap.data() || {};
-    return res.json({
+    
+    // Filtrar PII - solo exponer datos necesarios para RSVP público
+    const guestData = {
       name: data.name || '',
       status: data.status || 'pending',
       companions: data.companions ?? data.companion ?? 0,
       allergens: data.allergens || '',
-    });
+    };
+    
+    return sendSuccess(req, res, guestData);
   } catch (err) {
     logger.error('rsvp-get-by-token', err);
-    return res.status(500).json({ error: 'rsvp-get-failed' });
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -86,7 +102,9 @@ router.get('/by-token/:token', async (req, res) => {
 router.put('/by-token/:token', async (req, res) => {
   try {
     const { token } = req.params;
-    if (!token) return res.status(400).json({ error: 'token-required' });
+    if (!token) {
+      return sendValidationError(req, res, [{ message: 'token is required' }]);
+    }
 
     let { status, companions = 0, allergens = '' } = req.body || {};
     try {
@@ -101,14 +119,14 @@ router.put('/by-token/:token', async (req, res) => {
       status = parsed.status;
       companions = parsed.companions;
       allergens = parsed.allergens;
-    } catch {
-      if (!['accepted', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'invalid-status' });
-      }
+    } catch (validationError) {
+      return sendValidationError(req, res, validationError.errors || [{ message: 'invalid-status' }]);
     }
 
     const guestRef = await findGuestRefByToken(token);
-    if (!guestRef) return res.status(404).json({ error: 'not-found' });
+    if (!guestRef) {
+      return sendNotFoundError(req, res, 'Invitado');
+    }
 
     await guestRef.update({
       status,
@@ -169,10 +187,10 @@ router.put('/by-token/:token', async (req, res) => {
       logger.warn('rsvp-stats-update-failed', aggErr.message);
     }
 
-    return res.json({ ok: true });
+    return sendSuccess(req, res, { updated: true });
   } catch (err) {
     logger.error('rsvp-put-by-token', err);
-    return res.status(500).json({ error: 'rsvp-update-failed' });
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -181,11 +199,15 @@ router.put('/by-token/:token', async (req, res) => {
 router.post('/generate-link', requirePlanner, async (req, res) => {
   try {
     const { weddingId, guestId } = req.body || {};
-    if (!weddingId || !guestId) return res.status(400).json({ error: 'weddingId and guestId required' });
+    if (!weddingId || !guestId) {
+      return sendValidationError(req, res, [{ message: 'weddingId and guestId required' }]);
+    }
 
     const guestRef = db.collection('weddings').doc(String(weddingId)).collection('guests').doc(String(guestId));
     const snap = await guestRef.get();
-    if (!snap.exists) return res.status(404).json({ error: 'guest-not-found' });
+    if (!snap.exists) {
+      return sendNotFoundError(req, res, 'Invitado');
+    }
     const data = snap.data() || {};
 
     let token = (data.token || '').toString();
@@ -202,10 +224,10 @@ router.post('/generate-link', requirePlanner, async (req, res) => {
 
     const baseUrl = process.env.FRONTEND_BASE_URL || 'http://localhost:5173';
     const link = `${baseUrl.replace(/\/$/, '')}/rsvp/${token}`;
-    return res.json({ ok: true, token, link, weddingId: String(weddingId), guestId: String(guestId) });
+    return sendSuccess(req, res, { token, link, weddingId: String(weddingId), guestId: String(guestId) });
   } catch (err) {
     logger.error('rsvp-generate-link', err);
-    return res.status(500).json({ error: 'generate-link-failed' });
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -230,18 +252,20 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       dryRun = parsed.dryRun;
       minIntervalMinutes = parsed.minIntervalMinutes;
       force = parsed.force;
-    } catch {
-      if (!weddingId) return res.status(400).json({ error: 'weddingId-required' });
+    } catch (validationError) {
+      if (!weddingId) {
+        return sendValidationError(req, res, [{ message: 'weddingId is required' }]);
+      }
     }
 
-    // Rate limiting por ejecuciÃ³n global del recordatorio
+    // Rate limiting por ejecución global del recordatorio
     const metaRef = db.collection('weddings').doc(weddingId).collection('rsvp').doc('remindersMeta');
     const metaSnap = await metaRef.get();
     const now = Date.now();
     if (!force && metaSnap.exists) {
       const lastRunAt = metaSnap.get('lastRunAt')?.toMillis?.() || 0;
       if (now - lastRunAt < 5 * 60 * 1000) { // 5 min
-        return res.status(429).json({ error: 'too-many-requests', retryAfterSeconds: Math.ceil((5*60*1000 - (now - lastRunAt))/1000) });
+        return sendRateLimitError(req, res);
       }
     }
 
@@ -337,11 +361,11 @@ router.post('/reminders', requirePlanner, async (req, res) => {
       }
     } catch {}
 
-    return res.json({ ok: true, weddingId, attempted, sent, skipped, errors });
+    return sendSuccess(req, res, { weddingId, attempted, sent, skipped, errors });
   } catch (err) {
     logger.error('rsvp-reminders', err);
     try { await incCounter('rsvp_reminders_total', { type: 'failed' }, 1, 'RSVP reminders processed', ['type']); } catch {}
-    res.status(500).json({ error: 'rsvp-reminders-failed', message: err?.message || String(err) });
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -361,37 +385,14 @@ function devRoutesAllowed(req) {
 }
 
 router.post('/dev/create', (req, res) => {
-
   logger.warn('rsvp-dev-create disabled: requiere flujo RSVP real');
-
-  return res.status(410).json({
-
-    error: 'dev-endpoint-removed',
-
-    message: 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creación de invitados real.',
-
-  });
-
+  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/create ha sido retirado. Usa la creación de invitados real.', 410);
 });
 
 
 
 // Asegurar usuario mock con rol planner para E2E (retirado)
-
-router.post('/dev/ensure-planner', (_req, res) => {
-
+router.post('/dev/ensure-planner', (req, res) => {
   logger.warn('rsvp-dev-ensure-planner disabled: requiere asignación real de roles');
-
-  return res.status(410).json({
-
-    error: 'dev-endpoint-removed',
-
-    message: 'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.',
-
-  });
-
+  return sendError(req, res, 'dev-endpoint-removed', 'El endpoint /api/rsvp/dev/ensure-planner ha sido retirado. Configura roles planner reales.', 410);
 });
-
-
-
-

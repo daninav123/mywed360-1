@@ -5,9 +5,10 @@ import logger from '../logger.js';
 import { z, validate } from '../utils/validation.js';
 import {
   sendSuccess,
-  sendNotFound,
+  sendNotFoundError,
   sendInternalError,
-} from '../utils/response.js';
+  sendValidationError,
+} from '../utils/apiResponse.js';
 
 // ------------ Firestore Init -------------
 // Se asume que ya existe inicialización global en otro punto del backend.
@@ -68,10 +69,10 @@ router.post('/:weddingId/invite', validate(inviteParamsSchema, 'params'), valida
     }, { merge: true });
 
     const link = `${process.env.FRONTEND_BASE_URL || 'http://localhost:5173'}/rsvp/${token}`;
-    return sendSuccess(res, { token, link }, 201);
+    return sendSuccess(req, res, { token, link }, 201);
   } catch (err) {
     logger.error('guest-invite-error', err);
-    return sendInternalError(res, err, req);
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -86,7 +87,7 @@ router.get('/:weddingId/:token', validate(getGuestParams, 'params'), async (req,
     const { weddingId, token } = req.params;
     const snap = await db.collection('weddings').doc(weddingId).collection('guests').doc(token).get();
     if (!snap.exists) {
-      return sendNotFound(res, 'Guest not found', req);
+      return sendNotFoundError(req, res, 'Invitado');
     }
     const data = snap.data();
     // Filtrar datos sensibles - solo exponer lo necesario para RSVP público
@@ -96,10 +97,10 @@ router.get('/:weddingId/:token', validate(getGuestParams, 'params'), async (req,
       companions: data.companions,
       allergens: data.allergens,
     };
-    return sendSuccess(res, guestData);
+    return sendSuccess(req, res, guestData);
   } catch (err) {
     logger.error('guest-get-error', err);
-    return sendInternalError(res, err, req);
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -123,10 +124,10 @@ router.put('/:weddingId/:token', validate(updateGuestParams, 'params'), validate
     const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(token);
     await docRef.update({ status, companions, allergens, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
 
-    return sendSuccess(res, { updated: true });
+    return sendSuccess(req, res, { updated: true });
   } catch (err) {
     logger.error('guest-update-error', err);
-    return sendInternalError(res, err, req);
+    return sendInternalError(req, res, err);
   }
 });
 
@@ -143,7 +144,7 @@ router.post('/:weddingId/id/:docId/rsvp-link', validate(rsvpLinkParams, 'params'
     const docRef = db.collection('weddings').doc(weddingId).collection('guests').doc(docId);
     const snap = await docRef.get();
     if (!snap.exists) {
-      return sendNotFound(res, 'Guest not found', req);
+      return sendNotFoundError(req, res, 'Invitado');
     }
 
     let data = snap.data();
@@ -162,10 +163,10 @@ router.post('/:weddingId/id/:docId/rsvp-link', validate(rsvpLinkParams, 'params'
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
-    return sendSuccess(res, { token, link });
+    return sendSuccess(req, res, { token, link });
   } catch (err) {
     logger.error('rsvp-link-error', err);
-    return sendInternalError(res, err, req);
+    return sendInternalError(req, res, err);
   }
 });
 

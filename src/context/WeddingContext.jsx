@@ -442,8 +442,6 @@ export function WeddingProvider({ children }) {
     [activeWedding, currentUser, getLocalProfileUid, persistActiveWedding]
   );
 
-  // Sin exponer info de stub
-
   const contextValue = useMemo(
     () => ({
       weddings,

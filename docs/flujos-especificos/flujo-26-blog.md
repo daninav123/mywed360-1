@@ -53,7 +53,31 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
    - No se muestran tarjetas sin imagen de portada: `Blog.jsx` valida que `post.image` exista y sea http/https antes de renderizarla.
 
 ### Entorno de desarrollo
-- Si el agregador local (`/api/wedding-news`) no entrega cuatro piezas con portada válida, se puede forzar el mock integrado activando `VITE_BLOG_FORCE_MOCK=1` o añadiendo `?blogMock=1` a la URL; así el frontend inyecta cuatro artículos con imágenes de prueba para validar el layout.
+- Si el agregador local (`/api/wedding-news`) no entrega cuatro piezas con portada valida, se puede forzar el mock integrado activando `VITE_BLOG_FORCE_MOCK=1` o anadiendo `?blogMock=1` a la URL; asi el frontend inyecta cuatro articulos demo para validar el layout.
+
+### Estados vacios, errores y degradacion
+- **Home**:
+  - Mientras se cargan articulos se muestran skeletons (clase `blog-skeleton-card`) hasta 4 placeholders.
+  - Si tras recorrer 20 paginas no se consiguen 4 articulos validos:
+    - Se muestra "No hay articulos disponibles" con CTA "Actualizar" que vuelve a invocar `fetchWeddingNews`.
+    - Si `VITE_BLOG_FORCE_MOCK=1` esta activo, se rellenan con contenido mock y se registra un `console.warn('[Blog] No se encontraron articulos con portada valida')`.
+  - Fallos de red -> toast "No pudimos cargar el blog" + boton "Reintentar".
+- **/blog**:
+  - Spinner inicial mientras llega la primera pagina.
+  - Si la pagina actual devuelve vacio, se reintenta hasta 3 veces; luego se emite evento `blog_no_results` y se detiene el IntersectionObserver.
+  - Cuando no existen articulos en el idioma del usuario y tampoco hay fallback permitido, se muestra bloque de sugerencias con enlaces a `/ideas` y `/proveedores`.
+- **Traduccion**:
+  - Si la traduccion falla, el articulo se publica en idioma original con badge "Idioma original" y se registra `blog_translation_failed`.
+
+### Responsive y diseno
+- **Home**:
+  - Grid de 2 columnas (>=768px) y 1 columna en movil; se permite swipe horizontal en pantallas pequenas.
+  - Imagenes altura 160px (movil) / 220px (desktop) con `object-cover`.
+  - Titulos y descripciones usan `line-clamp-2`; en `visualMode` desktop pasan a `line-clamp-3`.
+- **/blog**:
+  - Masonry adaptable: 1 columna <=767px, 2 columnas 768-1279px, 3 columnas >=1280px.
+  - IntersectionObserver usa `rootMargin: "200px"` en movil para anticipar la carga.
+  - Boton "Volver arriba" fijo cuando viewport <600px.
 
 ## 3.1 Pipeline de curacion de contenido
 1. **Agregador RSS backend**
@@ -72,6 +96,7 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
 4. **Validacion de imagen**
    - `hasHttpImage` comprueba que `image` sea URL absoluta HTTP(s).
    - `isLikelyCover` analiza host y path para eliminar logotipos, sprites, placeholders y se asegura de que no sea SVG.
+
    - Si `visualMode` esta activo, se exige resolucion mayor (`minWidth 900`, `minHeight 500`) para un layout mas visual.
 5. **Control de diversidad**
    - `PER_DOMAIN_LIMIT = 1` impide que un mismo dominio aparezca mas de una vez en la seccion.
@@ -80,11 +105,22 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
    - Se cuentan errores consecutivos; tras 3 fallos con resultados parciales se corta el loop y se renderiza lo disponible.
    - Si todas las fuentes fallan y hay `VITE_NEWSAPI_KEY`, se reintenta con NewsAPI; de lo contrario se devuelve lista vacia.
 
+### TTL y gestion de cache
+- RSS cacheado en memoria (`CACHE_TTL_MINUTES = 30`); configurable en config/blogConfig.js.
+- sourceBlockedDomains se guardan con TTL 24h y se planea panel admin para purga manual.
+- Imagenes rotas se registran en blogBrokenImages/{hash} evitando reuso durante 48h.
+
+### Analitica y observabilidad
+- Eventos frontend: blog_home_card_click, blog_home_load_error, blog_listing_page_loaded, blog_scroll_end, blog_no_results, blog_translation_failed.
+- Metricas backend: blog_articles_available{lang,feed}, blog_fetch_duration_ms{feed}, blog_translation_failures_total.
+- Dashboards sugeridos: cobertura por idioma, top fuentes, ratio de errores (feeds sin imagen o caidos).
+
 ## 4. Persistencia y datos
 - `blogService.js` consulta primero el agregador backend (`/api/wedding-news`) con paginado y filtrado por idioma.
 - Si el backend falla o responde vacio y hay `VITE_NEWSAPI_KEY`, emplea NewsAPI y aplica filtros semanticos.
 - Traduce titulo y descripcion a la lengua del usuario mediante `translateText`.
 - No se almacena estado persistente; la lista vive en memoria de la home y se refresca por sesion.
+
 
 ## 5. Reglas de negocio
 - `HomePage` se limita a 4 posts y aplica `PER_DOMAIN_LIMIT = 1` para asegurar cuatro fuentes distintas antes de renderizar.
@@ -92,9 +128,11 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
 - Solo se muestran posts con imagen de portada valida, host permitido y URL publica.
 - Se descartan noticias negativas y prensa rosa mediante patrones `HARD_NEGATIVE_PATTERNS` y `GOSSIP_PATTERNS`; se priorizan las que superan `valueScore > 0`.
 - El idioma visible coincide con `i18n.language`; solo se recurre a ingles cuando `VITE_TRANSLATE_KEY` o `VITE_ENABLE_EN_FALLBACK` habilitan el fallback.
+
 - Los resultados se ordenan por relevancia (score) y luego por orden de llegada dentro de la pagina consultada.
 
 ## 6. Estados especiales y errores
+
 - Errores consecutivos en el fetch: se limita a 3 reintentos y se conserva lo ya obtenido.
 - Home solo muestra tarjetas cuando logra cuatro noticias; de lo contrario se muestra aviso `No se pudieron encontrar cuatro noticias...`.
 - En `/blog`, si el primer batch falla o queda vacio se despliega alerta amarilla con el mensaje de indisponibilidad actual.
@@ -109,6 +147,7 @@ Este flujo cubre la experiencia de noticias/tendencias que aparece en la home y 
 - Eventos sugeridos: `home_blog_loaded`, `home_blog_card_clicked`, `home_blog_visual_mode_toggle`.
 - KPIs: CTR por articulo, ratio de usuarios con noticias cargadas, diversidad de dominios, latencia media del agregador.
 - Pendiente instrumentar alertas cuando el backend RSS falle o NewsAPI alcance limites.
+
 
 ## 9. Pruebas recomendadas
 - Unitarias: filtros de `blogService` (patrones, dominio unico, validacion de imagen).

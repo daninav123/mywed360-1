@@ -15,6 +15,7 @@ Bienvenido al repositorio de documentación interna del proyecto. Este índice r
 - [`flujos-especificos/`](./flujos-especificos) · 40 documentos con detalle por flujo.
 - [`monitoring/`](./monitoring) · Guías de Prometheus, Alertmanager y tableros Grafana.
 - [`refactoring/`](./refactoring) · Cambios estructurales relevantes (ej. `finance-refactor.md`).
+- [`scripts/aggregateRoadmap.md`](./scripts/aggregateRoadmap.md) · Procedimiento para sincronizar ROADMAP/TODO y cobertura E2E.
 - [`archive/`](./archive) · Históricos que se mantienen como referencia.
 
 > `docs/roadmap-2025-v2.md` queda como snapshot (09/10/2025). Usa `docs/ROADMAP.md` para decisiones actuales.

@@ -5,10 +5,24 @@
 
 ## 1. Objetivo y alcance
 - Consolidar configuracion del presupuesto total y por categoria para cada evento (`eventType` = `boda` | `evento`).
-- Registrar gastos, aportaciones y pagos a proveedores con estados de seguimiento, adjuntos y orígenes multicanal (manual, email insights, importacion bancaria).
+- Registrar gastos, aportaciones y pagos a proveedores con estados de seguimiento, adjuntos y origenes multicanal (manual, email insights, importacion bancaria). **Los estados son informativos; la app no ejecuta transferencias ni cobra en nombre del usuario.**
 - Ofrecer visualizaciones en tiempo real que permitan detectar desviaciones, proyecciones de liquidez y oportunidades de ahorro.
 - Auto-categorizar gastos y sugerir proveedores cuando falta informacion, para acelerar el alta masiva.
-- Reflejar automáticamente los gustos y contrastes capturados en `weddingProfile` (`specialInterests`, `noGoItems`) y mantener el equilibrio estilístico-financiero junto con el flujo 2C (personalización continua).
+- Reflejar automaticamente los gustos y contrastes capturados en `weddingProfile` (`specialInterests`, `noGoItems`) y mantener el equilibrio estilistico-financiero junto con el flujo 2C (personalizacion continua).
+
+### Supuestos clave
+- El modulo es contable y opera solo con datos declarados o importados de lectura; cualquier pago real ocurre fuera de la plataforma.
+- Cada boda utiliza una moneda base (`wedding.currency`). Las conversiones mostradas en UI son referenciales y usan tasas guardadas en `exchangeRates`.
+- Se espera un comprobante por transaccion, pero los adjuntos en Storage son opcionales y solo almacenan evidencias (imagen/pdf/doc).
+- Los registros se consideran fiables cuando contienen categoria, proveedor y fecha; la documentacion de pruebas debe cubrir estos campos.
+
+### Fuentes de datos y sincronizacion
+- **UI manual** (`Finance.jsx`): formularios de presupuesto, transacciones y aportaciones. Escrituras a `finance/main` y `transactions`.
+- **Seeds iniciales**: al crear boda se generan categorias base desde proveedores (`wantedServices`) y preferencias (`weddingProfile`).
+- **Email Insights (`PaymentSuggestions`)**: propone movimientos detectados en correo; el planner decide si convertirlos en transaccion.
+- **Importacion bancaria** (`bankService`): integra movimientos de solo lectura (`source=bank`), sin almacenar credenciales.
+- **CSV/Excel** (planificado): importacion asistida con mapeo de columnas; requiere confirmacion manual.
+- **Aportaciones colaborativas**: cantidades ingresadas por owner/planner o invitados (si se expone el portal) para reflejar liquidez.
 
 ## 2. Trigger y rutas
 - Menu inferior → pestaña **Finanzas** (`/finanzas`, `Finance.jsx`) con tabs Presupuesto, Transacciones, Aportaciones y Analisis.
@@ -134,6 +148,12 @@
      - Ningun ajuste se aplica sin confirmacion explicita del usuario.
      - Si un ajuste supera el presupuesto disponible, la IA propone alternativas (recortes, aportaciones extra o cambios de proveedor) antes de permitir la aplicacion.
      - El usuario puede puntuar cada respuesta (pulgar arriba/abajo); ese feedback se almacena en `aiAdvisorChat.feedback` y se envia al dataset nocturno para reentrenar prompts.
+### Ciclo contable recomendado
+1. **Planificacion**: definir presupuesto total, categorias y moneda base; validar tolerancias y seeds iniciales.
+2. **Registro**: capturar gastos, ingresos y aportaciones a medida que ocurren (manual, email, banco o CSV).
+3. **Conciliacion**: revisar sugerencias y movimientos importados, ajustar estados (`pending`, `partial`, `paid`, etc.) y documentar diferencias en `variance`/`notes`.
+4. **Analisis**: usar paneles (`FinanceOverview`, `FinanceCharts`) para revisar desviaciones, proyeccion de liquidez y alertas.
+5. **Cierre**: generar `closingSnapshot`, adjuntar evidencias clave y exportar (cuando la funcionalidad este disponible) o compartir con el equipo financiero.
 ## 4. Persistencia y datos
 - Firestore `weddings/{id}/finance/main`: documento unico con:
   - `budget`: `{ total: number, categories: Array<{ name: string, amount: number, muted: boolean, source?: 'user' | 'advisor' }> }`. El flag `muted` desactiva alertas sin eliminar la categoria.
@@ -144,23 +164,59 @@
   - `preferences`: diccionario opcional con etiquetas inferidas (`cuisineQuality`, `beverageFocus`, `musicMood`, `decorStyle`, etc.).
   - `aiAdvisorChat`: `{ schema: 'v2-chat', messages: Message[], lastInteractionAt, preferences, summary?, feedback? }`.
   - Fechas clave (`weddingTimeline`) derivadas en runtime desde `weddingInfo`.
-- Firestore `weddings/{id}/transactions`: subcoleccion con transacciones normalizadas (`type`, `status`, `amount`, `paidAmount`, `dueDate`, `category`, `provider`, `attachments[]`, `source`, `createdAt`, `meta` opcional).
+- Firestore `weddings/{id}/transactions`: subcoleccion con transacciones normalizadas (`type`, `status`, `amount`, `paidAmount`, `dueDate`, `category`, `provider`, `attachments[]`, `source`, `createdAt`, `meta` opcional). Los campos `status` y `paidAmount` reflejan progreso declarado; no disparan cobros ni pagos automaticos.
 - Adjuntos se guardan como `{ filename, url, storagePath, size, uploadedAt }`. El formulario envia `attachments: { keep: Attachment[], newFiles: File[] }`, y `useFinance` sube los archivos nuevos a `finance/{weddingId}/...` antes de unirlos.
 - Campo `source` acepta `manual`, `email` o `bank` y alimenta metricas, filtros y limpieza de sugerencias.
 - `SyncService` guarda copia local (`movements`), limita a ~200 items y vuelve a sincronizar al recuperar conexion. Tras crear/actualizar se ejecuta `window.dispatchEvent(new Event('mywed360-movements'))` para rehidratar widgets offline.
 - Firestore `weddings/{id}/finance/accounts`: documento opcional con `primaryAccountId` para detectar conexion bancaria.
 - `aiAdvisor`: objeto legado (`finance/main.aiAdvisor`). Se mantiene lectura para migraciones, pero el flujo oficial usa `aiAdvisorChat`.
 - Dataset `aiBudgetAdvisorSessions`: job nocturno agrega sesiones de chat (sin PII) para recalibrar respuestas. Se unifican importes a `EUR`, se agrupan por rango de invitados, preferencias y region, y se registran feedbacks (aceptado, ajustado, descartado con razon). Retencion 12 meses en `storage://datasets/ai-budget-advisor/{YYYY-MM}/sessions.parquet` con metadatos en `adminMetrics/{date}.aiBudgetAdvisorMeta`.
+- `finance_auditLog`: subcoleccion que registra cambios (`field`, `before`, `after`, `userId`, `timestamp`, `source`) para trazabilidad.
+- `finance/reconciliationLogs`: lista opcional de checkpoints periodicos con resumen de ajustes pendientes, responsables y fecha de la proxima revision.
+- `finance_closingSnapshots`: documento/coleccion con totales finales (`realIncome`, `realExpenses`, `variance`, `notes`, `attachments[]`) para compartir post-evento.
+- Webhooks `finance.snapshot.generated` y `finance.alert.triggered` ofrecen exportacion de solo lectura hacia ERPs externos.
+
+### Tipologias de ingresos
+| Tipo | Origen | Campos clave | Particularidades |
+|------|--------|--------------|------------------|
+| Aportaciones fijas | Pareja / familiares | `amount`, `frequency`, `startDate` | Alimentan proyecciones; no generan cargos automaticos. |
+| Aportaciones puntuales | Invitados / sponsors | `amount`, `source`, `note`, `guestId?` | Registro manual o via CSV; vincula invitado cuando aplica. |
+| Reembolsos | Proveedores / seguros | `amount`, `relatedTransactionId`, `notes` | Compensan egresos existentes y recalculan liquidez. |
+| Ingresos externos | Venta merchandising, etc. | `amount`, `category='externalIncome'`, `source` | Se reflejan para balance del evento sin integracion externa. |
+
+### Registro de egresos
+- Cada categoria del presupuesto define `plannedAmount`, `tolerance`, `ownerNotes` y puede mutear alertas puntuales (`muted=true`).
+- Transacciones con pagos fraccionados guardan `installments[]` (monto, fecha, status) para ayudar a conciliacion manual.
+- Las desviaciones se expresan en `variance` (importe) y `variancePercent`; se muestran en `FinanceOverview` y en alertas.
+
+### Conciliacion y cierre
+- Se recomienda documentar cada sesion de conciliacion en `finance/reconciliationLogs` y dejar comentarios sobre movimientos dudosos.
+- Al cerrar el evento se genera `closingSnapshot` (JSON + adjuntos) y se comparte por exportacion (PDF/CSV cuando este disponible).
+- Los snapshots pueden disparar webhooks externos o descargarse desde el panel de administracion (`Docs > Finanzas`).
 
 ## 5. Reglas de negocio
 - Suma de porcentajes por categoria debe igualar 100%; la UI bloquea guardar si no coincide.
 - Gastos no pueden exceder limites negativos; se registra sobrepresupuesto pero nunca se trunca cantidad.
-- Solo owner o planner puede editar presupuesto total; assistants pueden registrar gastos pero no borrar categorias.
+- Solo owner, planner o `financeCollaborator` pueden editar el presupuesto total; assistants tienen lectura (y registro limitado) si reciben permiso especifico.
 - Al actualizar categoria se recalcula `totalBudget` y se disparan hooks de notificacion.
 - Auto-categorización: si no se define categoría o es genérica (`OTROS`), `AUTO_CATEGORY_RULES` infiere una categoría con base en concepto/proveedor.
 - Matching de proveedores por email, dominio o coincidencia en asunto (sugerencias desde correo) y limpieza de la sugerencia una vez registrada la transacción.
 - Conexión bancaria requiere `VITE_BANK_API_BASE_URL` y `VITE_BANK_API_KEY`; sin variables se devuelve lista vacía y se muestra CTA de conexión.
 - `settings.alertThresholds.warn/danger` determinan el cambio de color en barras y la generación de alertas (`FinanceOverview`, `BudgetManager`).
+- `financeAlertService` genera recordatorios cuando una categoria supera la tolerancia, hay transacciones vencidas >7 dias o el saldo proyectado cae por debajo de `liquidityBuffer`.
+
+### Escenarios de proyeccion
+- **Base**: presupuesto inicial + aportaciones confirmadas (confidence medio).
+- **Optimista**: aplica descuentos y aportaciones extra (`optimisticAdjustment`) para evaluar holgura.
+- **Conservador**: baja aportaciones a `confidence=low`, adelanta egresos criticos y refuerza colchones.
+- Variables sensibles: variacion de tipo de cambio, cambios en numero de invitados, renegociaciones con proveedores, aportaciones canceladas.
+- Resultados principales: `burnRate`, `cashOnHand`, `runway` hasta la fecha del evento y curva de liquidez semanal.
+
+### Checklist operativo
+1. Revisar transacciones pendientes y vencidas cada semana (o con la frecuencia definida en `finance/reconciliationLogs`).
+2. Conciliar aportaciones recibidas vs. prometidas y actualizar estados (`expected` → `received`).
+3. Ajustar tolerancias o categorias cuando cambie el alcance del evento o surjan contrastes nuevos.
+4. Generar snapshot previo al evento y otro al cierre para compartir con stakeholders y alimentar exportaciones externas.
 
 ## 6. Estados especiales y errores
 - Si no hay presupuesto configurado se muestra CTA "Configura tu presupuesto".
@@ -193,6 +249,7 @@
   - Nuevos eventos: `budget_contrast_created`, `budget_contrast_rebalanced`, `style_balance_alert`, `budget_contrast_dismissed`.
   - Seguimiento de tiempo desde configuracion hasta primer gasto, porcentaje de usuarios con alertas activas, adopcion de fuentes (`source = email/bank`), ratio de ajustes aceptados vs descartados por la IA y delta medio entre recomendaciones y montos finales aplicados.
   - Telemetria planificada para importaciones CSV (exitosas/fallidas), uso de aportaciones, precision de la proyeccion financiera y satisfaccion con respuestas IA (pulgar arriba/abajo, NPS conversacional).
+  - KPIs derivados: `budgetCoverage` por categoria/global, `liquidityForecast` 30/60/90 dias, `pendingPaymentsCount`, `avgDaysOverdue`, `advisorAdoptionRate`, `dataCompletenessScore`.
 
 ## 9. Pruebas recomendadas
 - Unitarias: `useFinance` (reducers, proyección beta+geométrica, auto-categoría), `BudgetManager` validaciones, `PaymentSuggestions` (parseo correos), `TransactionForm` (transiciones de estado/adjuntos), `bankService` (credenciales faltantes).
@@ -220,4 +277,11 @@
 - Automatizacion de pagos programados y conciliacion con contratos.
 - Adjuntos en `TransactionForm` aceptan `image/*`, `application/pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`. Otros tipos se bloquean en la carga de archivos.
 - Entrenamiento y calibracion continua del consejero conversacional (dataset anonimizado, feedback `advisor_feedback_submitted`, segmentacion regional) para mantener precision y reducir sesgos.
+
+## 12. Riesgos conocidos
+- Dependencia alta de entrada manual → riesgo de datos desactualizados; mitigacion: recordatorios, tareas automaticas y conciliaciones frecuentes.
+- Falta de bloqueo duro para categorias excedidas → se trabaja en modo de aprobacion adicional antes de aplicar ajustes sobrepasados.
+- Importaciones masivas aun sin deduplicacion automatica → requerir revision manual y registros en `reconciliationLogs`.
+- Exposicion a variaciones de tipo de cambio si no se actualizan tasas en `exchangeRates`.
+- Sesgos potenciales del consejero IA → se monitorea `advisor_feedback_submitted` y se recalibran prompts con datasets regionalizados.
 

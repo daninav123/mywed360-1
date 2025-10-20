@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-10-20T03:04:10.250Z",
+  "generatedAt": "2025-10-20T18:59:45.592Z",
   "modules": [
     {
       "filePath": "docs\\flujos-especificos\\flujo-0-administracion-global.md",
@@ -19,81 +19,6 @@
       ],
       "implChecks": [],
       "conclusion": "implementado"
-    },
-    {
-      "filePath": "docs\\flujos-especificos\\flujo-10-gestion-bodas-multiples.md",
-      "title": "10. Gesti�n de Bodas M�ltiples (estado 2025-10-07)",
-      "implementedLines": [
-        "`Bodas.jsx`, `BodaDetalle.jsx`, `WeddingSelector.jsx`, `WeddingFormModal.jsx`, `useWedding` context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes `MultiWeddingSummary.jsx` y `WeddingPortfolioTable.jsx`, y permisos granulares por boda."
-      ],
-      "pendingLines": [
-        "dashboards multi-boda avanzados, permisos granulares por m�dulo y vistas cruzadas consolidadas."
-      ],
-      "roadmapSection": "- Dashboard multi-boda (res�menes cruzados, comparativas).\n- Permisos granulares por m�dulo/colecci�n.\n- Filtro de bodas por estado/fecha/owner.\n- Sincronizaci�n con planner CRM externo.\n- Activity feed y alertas multi-boda.",
-      "checklistSection": "- Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).\n- Seeds y Cloud Functions idempotentes para nuevas bodas.\n- Validar UI con >10 bodas (scroll, selector).\n- QA de traducciones y copy en wizard.",
-      "e2eSection": "- `cypress/e2e/weddings/multi-weddings-flow.cy.js`: valida la vista de bodas activas/archivadas usando datos del stub de Cypress, comprueba la persistencia del `activeWedding` y la disponibilidad del CTA para planners.\n- `cypress/e2e/weddings/wedding-team-flow.cy.js`: valida asignaci�n de roles/miembros y navegaci�n multi-boda.",
-      "e2eChecks": [
-        {
-          "spec": "cypress/e2e/weddings/multi-weddings-flow.cy.js",
-          "exists": true
-        },
-        {
-          "spec": "cypress/e2e/weddings/wedding-team-flow.cy.js",
-          "exists": true
-        }
-      ],
-      "implChecks": [
-        {
-          "ref": "Bodas.jsx",
-          "basename": "Bodas.jsx",
-          "matches": [
-            "src\\pages\\Bodas.jsx"
-          ]
-        },
-        {
-          "ref": "BodaDetalle.jsx",
-          "basename": "BodaDetalle.jsx",
-          "matches": [
-            "src\\pages\\BodaDetalle.jsx"
-          ]
-        },
-        {
-          "ref": "WeddingSelector.jsx",
-          "basename": "WeddingSelector.jsx",
-          "matches": [
-            "src\\components\\WeddingSelector.jsx"
-          ]
-        },
-        {
-          "ref": "WeddingFormModal.jsx",
-          "basename": "WeddingFormModal.jsx",
-          "matches": [
-            "src\\components\\WeddingFormModal.jsx"
-          ]
-        },
-        {
-          "ref": "useWedding",
-          "basename": "useWedding",
-          "matches": [
-            "src\\hooks\\useWedding.js"
-          ]
-        },
-        {
-          "ref": "MultiWeddingSummary.jsx",
-          "basename": "MultiWeddingSummary.jsx",
-          "matches": [
-            "src\\components\\weddings\\MultiWeddingSummary.jsx"
-          ]
-        },
-        {
-          "ref": "WeddingPortfolioTable.jsx",
-          "basename": "WeddingPortfolioTable.jsx",
-          "matches": [
-            "src\\components\\weddings\\WeddingPortfolioTable.jsx"
-          ]
-        }
-      ],
-      "conclusion": "parcial"
     },
     {
       "filePath": "docs\\flujos-especificos\\flujo-11-protocolo-ceremonias.md",
@@ -1558,6 +1483,31 @@
           ]
         }
       ],
+      "conclusion": "parcial"
+    },
+    {
+      "filePath": "docs\\flujos-especificos\\flujo-10-gestion-bodas-multiples.md",
+      "title": "flujo-10-gestion-bodas-multiples.md",
+      "implementedLines": [
+        "Bodas.jsx, BodaDetalle.jsx, WeddingSelector.jsx, WeddingFormModal.jsx, useWedding context, seeding inicial (finanzas/tareas) al crear boda desde planner, componentes MultiWeddingSummary.jsx y WeddingPortfolioTable.jsx, tablero multi-boda con KPIs/filtros y encolado CRM (crmSyncQueue), y editor de permisos por módulo en BodaDetalle.jsx (modulePermissions)."
+      ],
+      "pendingLines": [
+        "worker CRM (procesar crmSyncQueue), activity feed/alertas multi-boda y suites E2E específicas para permisos/CRM."
+      ],
+      "roadmapSection": "- Worker CRM (procesamiento y reintentos), métricas de sincronización y alertas multi-boda.\n- Activity feed con timeline consolidado y avisos en vivo.\n- Suites E2E específicas para permisos por módulo y flujos CRM.",
+      "checklistSection": "- Reglas Firestore para `weddings`, `users/{uid}` (permisos por rol).\n- Seeds y Cloud Functions idempotentes para nuevas bodas.\n- Validar UI con >10 bodas (scroll, selector).\n- QA de traducciones y copy en wizard.",
+      "e2eSection": "- `cypress/e2e/weddings/multi-weddings-flow.cy.js`: valida la vista de bodas activas/archivadas usando datos del stub de Cypress, comprueba la persistencia del `activeWedding` y la disponibilidad del CTA para planners.\n- `cypress/e2e/weddings/wedding-team-flow.cy.js`: valida asignación de roles/miembros y navegación multi-boda.",
+      "e2eChecks": [
+        {
+          "spec": "cypress/e2e/weddings/multi-weddings-flow.cy.js",
+          "exists": true
+        },
+        {
+          "spec": "cypress/e2e/weddings/wedding-team-flow.cy.js",
+          "exists": true
+        }
+      ],
+      "implChecks": [],
       "conclusion": "parcial"
     },
     {
