@@ -9,6 +9,13 @@
 - Integrar superficies diferenciadas para monitorizar shortlist (ideas en exploración) y el control presupuestario de confirmados por grupo o servicio.
 - Aprovechar `weddingProfile`, `specialInterests` y `noGoItems` para que la IA proponga opciones alineadas con el estilo core y con los contrastes controlados definidos en el flujo 2C (personalización continua), evitando sugerencias que rompan reglas o presupuesto.
 
+### Supuestos y alcance operativo
+- El modulo documenta y coordina proveedores; no realiza pagos, firmas legales ni envios de propuestas en nombre del usuario sin aprobacion explicita.
+- Requiere datos base de la boda: `weddingInfo`, `wantedServices`, `weddingProfile`, `budget` (flujo 6) y permisos de usuario (`modulePermissions.proveedores`).
+- La informacion sensible (tarifas, contratos, datos de contacto) se almacena bajo Firestore y Storage con reglas que limitan acceso a bodas activas y roles habilitados.
+- El motor IA usa prompts compuestos con datos descriptivos, nunca envia PII no necesaria (p.ej. telefonos de invitados) y registra cada intercambio en `weddings/{id}/ai/suppliers`.
+- El portal colaborativo expone solo campos explicitamente marcados como compartibles; cualquier carga de documentos queda en revision manual antes de volverse visible al resto del equipo.
+
 ## 2. Trigger y rutas
 - Menú inferior `Más` bloque **Proveedores** "Gestión de proveedores" (`/proveedores`, `GestionProveedores.jsx`).
 - El desplegable del bloque solo lista "Gestión de proveedores" (`/proveedores`) y "Contratos" (`/proveedores/contratos`).
@@ -84,6 +91,29 @@
       - Alertas automáticas: ratio de respuesta <40 % en 7 días → tarea “Reforzar seguimiento”; precio estimado >20 % sobre presupuesto objetivo → alerta en panel financiero.
   - La pestaña de insights incluye resúmenes IA con mensajes como “Refuerza estilo core” o “Contraste controlado (after-party)”; si se supera el límite de contraste (`style_balance_alert`), destaca proveedores que podrían reducir ese desequilibrio.
 
+### Portal colaborativo del proveedor (`/proveedores/:id/portal`)
+- **Acceso y autenticacion**
+  - Invitacion enviada desde la ficha con token firmado (`supplierPortalToken`) que expira a los 14 dias; se puede regenerar en cualquier momento. Opcionalmente se fuerza passphrase adicional.
+  - Roles: `supplierOwner` (edicion total permitida), `supplierStaff` (actualiza hitos, responde mensajes) y `readOnly` (consulta). Los roles se guardan en `supplierPortalAccess`.
+  - Si `SUPPLIER_PORTAL_OAUTH` esta activo, el token se intercambia por login Google/Microsoft; sin OAuth se valida token + passphrase.
+- **Onboarding inicial**
+  1. El proveedor confirma datos basicos compartibles (`publicName`, `phone`, `website`, `primaryContact`).
+  2. Acepta terminos y politica de tratamiento (`supplierPortalAgreements`).
+  3. Selecciona servicios disponibles (subset de `serviceLines` marcadas como `portalShareable=true`) y declara disponibilidad.
+  4. Puede cargar propuesta preliminar (PDF/imagen) que se almacena en `storage://suppliers/{weddingId}/{supplierId}/portal/` con estado `pendingReview`.
+- **Areas del portal**
+  - **Resumen**: estado por servicio, presupuesto objetivo, proximo hito y notas compartidas (`shareWithSupplier=true`). Solo lectura.
+  - **Mensajes**: hilo bidireccional grabado en `supplierEmails` con `source='portal'`. Permite adjuntos hasta 10 MB; cada mensaje genera notificacion interna (`supplier_portal_message`).
+  - **Documentos**: subida de presupuestos, contratos, facturas. Cada archivo crea entrada en `supplierPortalDocuments` con `status=pendingReview` hasta validacion del planner.
+  - **Pagos e hitos**: lista los pagos esperados desde Finance y permite marcar `invoiceSent`, `depositReceived`, `paidExternally`. Los cambios actualizan `serviceLines` y generan comentarios en timeline.
+  - **Feedback**: formulario opcional que registra calificacion y notas en `supplierInsights.feedback`.
+- **Permisos y aprobaciones**
+  - Para cada campo editable existe flag `portalEditableFields` en la ficha; al recibir cambios se crean registros `pendingUpdates` con detalle del campo, valor propuesto y usuario. Un rol interno debe aprobar o rechazar cada item.
+  - La aprobacion aplica el cambio y guarda audit trail en `supplier_auditLog`. El rechazo notifica al proveedor con comentario.
+- **Alertas y recordatorios**
+  - Falta de respuesta >72h → tarea “Dar seguimiento a proveedor” y recordatorio email.
+  - Expiracion de token → banner en vista interna y opcion de reenviar acceso.
+  - Errores de upload → mensaje en portal y log en `supplierPortalErrors`.
 ## 5. Integración con personalización continua
 - Consumir `weddingInsights.nextBestActions` para priorizar tareas y recomendaciones dentro del módulo.
 - Emitir eventos `supplier_preference_applied` y `supplier_preference_rejected` al confirmar o descartar proveedores sugeridos por contrastes.
@@ -91,24 +121,86 @@
    - Panel lateral "Resumen financiero" expone KPIs agregados (asignado, gastado, presupuestos pendientes, recordatorios, próximo deadline) y aloja filtros globales.
 
 ## 4. Persistencia y datos
-- Firestore `weddings/{id}/suppliers/{supplierId}`: datos base, notas, presupuesto objetivo, estado pipeline y banderas globales (favorito, proveedor multi-servicio).
-- Subcolección `serviceLines` (`weddings/{id}/suppliers/{supplierId}/serviceLines/{lineId}`) para cubrir cada servicio asociado: nombre, categoría, presupuesto objetivo, estado, fechas clave.
-- Colecciones auxiliares: `supplierGroups` (agrupaciones, metas), `supplierEmails` (historial de comunicaciones), `supplierRFQ`, `supplierShortlist` (vistos/buscados con fuente y fecha de revisión).
-- Subcolección `supplierMeetings` (citas, recordatorios, enlaces calendario) sincronizada con `ReservationModal` y timeline.
-- Repositorio global `supplierInsights/{supplierId}` agrega métricas históricas entre bodas (ratio de respuesta, precio medio contratado, satisfacción) y enlaces a reseñas; se actualiza al cerrar cada línea de servicio.
-- Logs IA en `weddings/{id}/ai/suppliers/{uuid}` con prompt, respuesta, proveedor, usuario.
-- Integración con `finance` refleja gastos confirmados/estimados por proveedor y por línea de servicio.
+- Firestore `weddings/{id}/suppliers/{supplierId}`
+  - Campos obligatorios: `name`, `primaryContact`, `email`, `phone`, `statusGlobal`, `ownerUserId`, `createdAt`, `updatedAt`.
+  - Campos financieros: `budget = { planned: number, estimated: number, currency, lastSyncedAt }`, `payments = { pending: number, paid: number }`, `financeLink` (path a documento de finanzas relacionado).
+  - Flags y metadatos: `isFavorite`, `isMultiService`, `tags[]`, `portalState` (`draft|active|public`), `source` (`manual|ai|import`), `mergeRootId` (para duplicados), `styleAlignment`.
+  - Auditoria: `audit = { createdBy, updatedBy, lastPortalUpdate }`.
+  - Indices compuestos: `(statusGlobal, isFavorite)`, `(tags, statusGlobal)`, `(portalState, statusGlobal)`.
+- Subcoleccion `serviceLines` (`weddings/{id}/suppliers/{supplierId}/serviceLines/{lineId}`)
+  - Campos clave: `serviceName`, `category`, `status`, `stageHistory[]`, `budget = { planned, negotiated, variance }`, `dates = { requested, proposalReceived, contractSigned, eventDate }`, `kpis = { responseTimeHours, winProbability }`.
+  - Campos de portal: `portalShareable` (bool), `portalEditableFields[]`, `portalNotes`.
+  - Integraciones: `financeTransactionIds[]`, `contractId`, `taskIds[]`.
+  - Indices: `(category, status)`, `(status, budget.planned)`, `(portalShareable, status)`.
+- Colecciones auxiliares bajo `weddings/{id}`:
+  - `supplierGroups/{groupId}`: `{ name, objectiveBudget, currentBudget, services[], ownerId, isLocked }`.
+  - `supplierShortlist/{candidateId}`: `{ supplierId?, rawName, service, matchScore, source, capturedAt, originSearchId, notes, status (pending|saved|discarded) }`.
+  - `supplierEmails/{emailId}`: metadatos del correo (`subject`, `threadId`, `direction`, `status`, `attachments[]`, `source`=`manual|portal|auto`), geeter `syncedAt`.
+  - `supplierRFQ/{rfqId}`: solicitudes enviadas, respuestas, comparaciones.
+  - `supplierMeetings/{meetingId}`: `{ startsAt, endsAt, serviceLineId, location, attendees[], status, followUpTaskId }`.
+  - `supplierPortalAccess/{accessId}`: tokens activos, rol otorgado, expiracion, historial de uso.
+  - `supplierPortalActivity/{activityId}` y `pendingUpdates/{updateId}` para auditar cambios propuestos desde el portal.
+  - `supplierPortalDocuments/{docId}`: metadata de archivos cargados (`filename`, `storagePath`, `status`, `reviewedBy`).
+- Repositorio global `supplierInsights/{supplierId}`
+  - Campos agregados: `avgPriceByCategory`, `winRate`, `responseRate`, `nps`, `feedback[]`, `lastWeddingIds[]`.
+  - `snapshots[]` guarda cierre por boda (`weddingId`, `serviceLineId`, `budget`, `variance`, `savings`, `feedbackScore`, `notes`).
+  - Indices globales: `(category, winRate)`, `(region, responseRate)`.
+- Logs IA `weddings/{id}/ai/suppliers/{uuid}`
+  - Guardan `prompt`, `model`, `response`, `contextHash`, `status`, `latencyMs`, `userId`.
+  - Cruciales para auditoria y replays; TTL 90 dias.
+- Integracion con finanzas
+  - Cada `serviceLine` mantiene `financeLinks = { budgetCategoryId, transactionIds[], forecastRef }`.
+  - `financeSyncState` en proveedor indica ultima sincronizacion (`lastSyncedAt`, `pendingItems[]`).
+  - Cuando se registra pago externo desde portal o ficha, se crea evento `finance.externalPaymentLogged` con payload `{ supplierId, serviceLineId, amount, dueDate }`.
+- Almacenamiento de adjuntos
+  - `storage://suppliers/{weddingId}/{supplierId}/contracts/` para contratos aprobados.
+  - `storage://suppliers/{weddingId}/{supplierId}/portal/` para archivos enviados por proveedor (estatus `pendingReview`).
+  - `storage://suppliers/{weddingId}/{supplierId}/notes/` para archivos referenciales internos.
+- Indices globales adicionales
+  - Firestore requiere `(statusGlobal, budget.planned)` para filtros masivo.
+  - `supplierShortlist` usa `(service, status)` y `(source, capturedAt DESC)`.
+  - `supplierPortalActivity` indexado por `(supplierId, createdAt DESC)` para feeds.
+
+### Calculos y agregados derivados
+- `matchScore` de shortlist combina `styleAlignment` (30%), `budgetFit` (40%), `responseSignal` (20%) y `recency` (10%).
+- `savings = budget.planned - budget.negotiated` (positivo implica ahorro). Este valor se propaga a `FinanceOverview`.
+- `responseRate` y `winRate` se recalculan cada vez que una linea cambia a `contactado`, `presupuesto` o `contratado`.
+- `supplierHealthScore` (0..100) = promedio ponderado de `responseRate`, `winRate`, `feedback`, penalizaciones por atrasos de pago y tareas sin resolver.
+- `portalEngagement` mide interacciones (mensajes, documentos, actualizaciones) en los ultimos 14 dias y se usa para alertas de inactividad.
 
 ## 5. Reglas de negocio
-- Estados válidos por línea de servicio: `por_definir`, `vistos`, `contactado`, `presupuesto`, `contratado`, `rechazado`. El estado global del proveedor refleja el estadio más avanzado entre sus líneas activas.
-- Solo owner/planner pueden eliminar o mover líneas a columnas críticas; assistants gestionan notas y comunicaciones.
-- Detección de duplicados por email, nombre, teléfono y coincidencia de servicio. Al fusionar líneas se solicita confirmación y se preserva histórico.
-- Shortlist **Vistos** requiere etiqueta de origen (IA, manual, recomendado) y fecha de última revisión; las entradas caducadas disparan recordatorios.
-- Automatizaciones IA solo promueven a "contratado" si detectan presupuesto aprobado (`budgetStatus`) y contrato firmado (`contractStatus`). Señales válidas: campos sincronizados desde Flujo 6/15, etiquetas reconocidas en email, adjuntos firmados (PDF con firma). Ante señales inconsistentes se genera tarea "Revisar respuesta".
-- El wizard de fusión/separación preserva contratos, pagos e historiales; si hay facturas vinculadas exige seleccionar a qué línea se reasignan antes de confirmar.
-- Todos los correos y citas quedan registrados (colecciones `supplierEmails` y `supplierMeetings`); si falta correspondencia entre agenda y card se genera alerta para revisión manual.
-- Al cerrar una línea de servicio se persiste un snapshot en `supplierInsights` con métricas agregadas y feedback; se valida que cada proveedor comparta ID global para evitar duplicados.
-- Grupos respetan presupuesto objetivo agregado; avisos cuando se excede por servicio o categoría.
+- Estados validos por linea de servicio: `por_definir`, `vistos`, `contactado`, `presupuesto`, `contratado`, `rechazado`. El estado global del proveedor refleja la etapa mas avanzada entre lineas activas y se calcula cada vez que cambia `serviceLines[].status`.
+
+### Transiciones de pipeline
+| Transicion | Trigger principal | Validaciones |
+|-----------|-------------------|--------------|
+| `por_definir -> vistos` | Creacion de shortlist o alta manual | Requiere `serviceName` y `matchScore` > 0. |
+| `vistos -> contactado` | Envio de correo/llamada registrada (`supplierEmails` o nota) | Debe existir `primaryContact` o `email`. |
+| `contactado -> presupuesto` | Registro de propuesta recibida (portal, email o manual) | Se exige `budget.negotiated` y `proposalReceived` con fecha. |
+| `presupuesto -> contratado` | Aprobacion manual o automatica (flujo 6/15) | Debe haber `contractId` o documento aprobado + `budget.negotiated` <= `budget.planned` (o justificar variance). |
+| `* -> rechazado` | Accion manual o marcaje portal | Obliga a incluir `rejectionReason` y `notes`. |
+| `contratado -> presupuesto/contactado` | Solo manual (rollback) | Solo owner/planner; registra entrada en `stageHistory` con motivo. |
+
+- Automatizaciones IA solo promueven a `contratado` cuando detectan simultaneamente: `budgetStatus='approved'`, contrato firmado (`contractStatus='signed'`) y confirmacion en correo/portal. Si falta alguno, se crea tarea “Revisar respuesta” y el estado se mantiene en `presupuesto`.
+- Cada cambio de estado escribe `stageHistory` (`from`, `to`, `reason`, `actor`, `source`, `timestamp`). Rollbacks requieren motivo y generan alerta en Slack/Email (si esta habilitado `SUPPLIER_ALERTS_WEBHOOK`).
+- Shortlist caduca a los 30 dias sin revision (`capturedAt`). Al caducar, cambia `status` a `stale` y el panel muestra CTA “Volver a revisar”. Se genera recordatorio semanal hasta que se marque como revisado.
+- Deteccion de duplicados compara `email`, `phone`, `website`, `socialHandle` y `normalizedName`. Si se detecta conflicto el sistema abre `DuplicateDetectorModal` y bloquea la promocion hasta decidir fusion o crear registro separado.
+- Wizard de fusion/separacion:
+  - Fusionar requiere elegir proveedor principal (`mergeRootId`) y reasignar `serviceLines`, `contracts`, `financeLinks`, `supplierEmails`.
+  - Separar obliga a definir que lineas migran al nuevo proveedor y recalcula `budget` por cada parte antes de confirmar.
+- Portal y aprobaciones:
+  - Cambios entrantes se almacenan en `pendingUpdates`. Hasta aprobacion no se reflejan en la UI interna (se muestran badges `Pendiente`).
+  - Si un cambio afecta `budget` o `status`, la aprobacion forza recalcular proyecciones en finanzas y enviar evento `supplier_portal_update_approved`.
+- Integridad con finanzas y contratos:
+  - No se permite cerrar (archivar) un proveedor con `finance.pendingPayments > 0` o `contracts` sin firma.
+  - Si una linea pasa a `contratado` pero falta `financeLinks.budgetCategoryId`, se muestra alerta critica y se impide generar pagos automaticos.
+  - Al cancelar (`rechazado`) un proveedor con transacciones vinculadas se requiere reasignar o anular referencias para evitar registros huerfanos.
+- Permisos:
+  - Owner/planner pueden eliminar lineas o proveedores. `financeCollaborator` puede actualizar estados financieros y adjuntos; `assistant` se limita a notas/comunicaciones.
+- Auditoria y correspondencia:
+  - Todo correo registrado en `supplierEmails` debe tener `threadId`. Si en 15 minutos no se encuentra correspondencia con la tarjeta, se crea alerta “Verificar tracking”.
+  - Cada reunion (`supplierMeetings`) debe enlazar `serviceLineId`. Los eventos sin enlace quedan en estado `orphan` y se listan en reportes de saneamiento.
+- Grupos (`supplierGroups`) controlan que `currentBudget` <= `objectiveBudget` (+ tolerancia 5%). Si se excede se genera alerta amarilla y, de superar el 15%, alerta roja con tarea de ajuste.
 
 ## 6. Estados especiales y errores
 - Falta de IA (sin API) -> modales muestran fallback para entrada manual.
@@ -117,19 +209,47 @@
 - Conexión perdida -> las vistas de tarjetas (exploración/confirmados) pasan a modo lectura y muestran aviso de reconexión.
 
 ## 7. Integración con otros flujos
-- Flujo 3 (Invitados/RSVP) aporta datos de perfil y timing para ajustar plantillas de servicios sugeridos.
-- Flujo 6 sincroniza presupuestos por proveedor y por línea de servicio, además de controlar pagos planificados.
-- Flujo 7 centraliza comunicaciones; las respuestas analizadas por IA actualizan automáticamente las tarjetas y KPIs asociados (a través del [Flujo 16](./flujo-16-asistente-virtual-ia.md)).
-- Flujo 14 crea tareas automáticas tras cambios de estado (ej. "revisar propuesta", "confirmar contrato detectado por IA").
-- Flujo 15 genera contratos y documentos desde la ficha del proveedor (con enlaces por servicio).
-- Flujo 17 otorga puntos al confirmar proveedores clave.
-- Flujo 23 consolida métricas globales de proveedores y muestra comparativas históricas en el dashboard de proyecto.
+- **Flujo 3 — Invitados / RSVP**
+  - Provee `guestSegments`, `scheduleConstraints` y `venuePreferences` que se incluyen en prompts IA.
+  - Si cambia el numero de invitados, se recalcula `budget.planned` forzando revisar proveedores de catering/alojamiento.
+- **Flujo 6 — Finanzas**
+  - `useFinance` expone `budgetCategories` y `transactions`; se enlazan via `financeLinks`.
+  - Cuando se registra pago en finanzas se actualiza `serviceLines[].payments` y se marca checkpoint en `stageHistory`.
+  - Fallback: si finanzas esta offline, los cambios quedan en `pendingFinanceSync` y se reintentan cada 15 min.
+- **Flujo 7 — Comunicaciones**
+  - Sincroniza correos enviados/recibidos; el análisis IA (flujo 16) etiqueta intencion (`proposal`, `followup`, `warning`).
+  - Las respuestas detectadas como confirmaciones pueden proponer transición a `presupuesto` o `contratado`.
+- **Flujo 14 — Tareas / Timeline**
+  - Cada transición relevante dispara tarea automática (ej. `supplier_follow_up`, `supplier_contract_review`).
+  - Reservas confirmadas crean hitos en timeline y se sincronizan con `supplierMeetings`.
+- **Flujo 15 — Contratos y documentos**
+  - Desde la ficha se crean contratos (`contractTemplates`). El ID del contrato se guarda en `serviceLines.contractId`.
+  - Estado del contrato (`draft|sent|signed|cancelled`) gobierna si se puede pasar a `contratado`.
+- **Flujo 16 — Asistente IA**
+  - Mismo contexto alimenta sugerencias en chat; respuestas del asistente pueden abrir modales de proveedores o prellenar RFQ.
+- **Flujo 17 — Gamificacion**
+  - Al confirmar proveedores core se emite `supplier_core_confirmed` para otorgar puntos/logros.
+- **Flujo 23 — Metricas proyecto**
+  - Recoge KPIs (`serviceCoverage`, `savingsPercent`, `supplierHealthScore`) y genera comparativas mensuales.
+- **Portal publico / Marketing**
+  - Cuando se publica un proveedor (permiso explicito) se expone en landing publica usando `supplierInsights` filtrado y se redactan blurbs con IA controlada.
 
 ## 8. Métricas y monitorización
-- Eventos: `supplier_ai_search`, `supplier_service_defined`, `supplier_shortlist_added`, `supplier_stage_changed`, `supplier_email_sent`.
-- KPIs: ratio shortlistcontactocontrato por servicio, cobertura de servicios definidos vs requeridos, tiempo medio por etapa, ahorro conseguido vs presupuesto objetivo, variaciones respecto al promedio global del proveedor (`supplierInsights`).
-- Tracking de uso IA (peticiones, aciertos, feedback), efectividad de detección automática de contratos/presupuestos y tasa de comunicaciones pendientes (indicador rojo activo).
-- La analítica IA consolidada vive únicamente en backend (`GET /api/admin/suppliers/analytics`) y se visualiza solo en el dashboard administrativo; la UI del flujo no renderiza métricas IA para los usuarios finales.
+- Eventos rastreados: `supplier_ai_search`, `supplier_service_defined`, `supplier_shortlist_added`, `supplier_shortlist_reviewed`, `supplier_stage_changed`, `supplier_email_sent`, `supplier_portal_message`, `supplier_portal_update_approved`, `supplier_merge_completed`.
+- KPIs clave:
+  - `shortlistToContractRatio = contratados / shortlistRevisada` por servicio y global.
+  - `serviceCoverage = serviciosDefinidos / serviciosRequeridos` (espera >= 90% antes de cierre).
+  - `avgStageTime[stage]` calculado a partir de `stageHistory`.
+  - `savingsPercent = (budget.planned - budget.negotiated) / budget.planned`.
+  - `supplierHealthScore` y `portalEngagement` (ver cálculos en sección 4) usados para ordenar alertas.
+- Monitoreo IA:
+  - `aiSuppliersService` registra `latencyMs`, `success`, `feedbackThumb`. Alertas se disparan si `successRate` cae <85% en 1h o `latencyMs` promedio >6s.
+  - El dataset nocturno cruza prompts vs resultados para recalibrar `matchScore`.
+- Comunicaciones pendientes:
+  - Widget rojo se enciende cuando `supplierEmails` con `direction='inbound'` quedan sin respuesta >48h o cuando existen `pendingUpdates` sin revisar >72h.
+- Analítica administrativa:
+  - `GET /api/admin/suppliers/analytics` agrega datos (por región, categoría, plan). Solo accesible a roles admin.
+  - Exporta CSV con columnas `supplierId`, `category`, `winRate`, `avgNegotiated`, `savings`, `portalEngagement`.
 
 ## 9. Pruebas recomendadas
 - Unitarias: servicio AI (`aiSuppliersService`), detectores de duplicados, reducers de grupos, normalización de líneas de servicio.

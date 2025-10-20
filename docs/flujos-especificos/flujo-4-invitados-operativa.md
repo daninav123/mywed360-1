@@ -47,13 +47,13 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 ### 3.2 Ceremonia (`tab=ceremony`)
 1. `CeremonyConfigModal` define filas/columnas, pasillos, reservas VIP, etiquetas y notas internas.  
 2. `SeatingInspectorPanel` muestra fila activa, ocupación, asientos VIP y atajos de asignación guiada (padrinos/familiares).  
-3. Drag & drop asigna invitados; la agrupación de parejas depende de los datos origen (sin heurística propia).
+3. Drag & drop asigna invitados; la agrupación rápida sugiere parejas, padrinos y familiares cercanos. El inspector advierte si se rompe una reserva VIP o si la fila queda desequilibrada.
 
 ### 3.3 Banquete (`tab=banquet`)
 1. `SeatingPlanCanvas` permite crear/duplicar mesas (round, imperial, cocktail) y ajustar dimensiones/rotación.  
 2. `SeatingGuestDrawer` lista invitados pendientes con filtros (lado, dieta, grupo), buscador y contadores por estado. Permite fijar invitados “en guía” (`guidedGuestId`) para seguimiento rápido, mostrar badges VIP/alergias y alternar entre vista de lista o tarjetas compactas.  
 3. `SeatingPlanSidebar` edita atributos de la mesa (tipo, etiquetas, notas) y avisa cuando se excede capacidad.  
-4. `SeatingSmartPanel` ofrece sugerencias automáticas (VIP, familia, pendientes) y métricas de ocupación.
+4. `SeatingSmartPanel` aplica heurísticas IA/heurísticas: propone ubicaciones por afinidad (familia, lado, grupo), prioriza dietas y accesibilidad, sugiere intercambios cuando detecta mesas sobrecargadas o invitados sin asiento y resume KPIs (personas sin asignar, % de ocupación, conflictos abiertos).
 
 ### 3.4 Zonas libres (`tab=free-draw`)
 - `FreeDrawCanvas` dibuja zonas libres (escenario, proveedores, áreas infantiles) sin validación de capacidad, reutilizable en otras tabs.
@@ -70,71 +70,82 @@ La vista principal (`SeatingPlanRefactored`) agrupa el contexto de DnD, la lógi
 - `SeatingExportWizard` recuerda el último preset (orientación, escala, secciones) y muestra resumen de peso/tiempo estimado antes de descargar.
 
 ### 3.6 Experiencia móvil
-- Canvas adopta modo "scroll-pan" con gestos (pinch para zoom, doble tap para centrar, arrastre con dos dedos).
-- Toolbar se condensa en un `ActionSheet` inferior con acciones esenciales (zoom, undo, exportar, ver invitados).
-- Paneles se convierten en slides verticales; la biblioteca y el inspector se abren a pantalla completa.
-- Invitados se muestran en tarjetas compactas con badges por estado (asignado, dieta, VIP).
-- Autosave permanece activo cada 30 s y muestra aviso cuando pierde conexión.
-
-- `SeatingMobileOverlay` ofrece un minimapa simplificado (placeholder actual) calculado a partir de `hallSize` y primeras mesas. Muestra listado compacto de mesas con ocupación, botón para abrir plantillas y FAB con accesos rápidos a guest drawer y exportador avanzado.
-- Los gestos táctiles (zoom, pan) se delegan al canvas principal; el overlay actúa como puente hasta que se implemente el minimapa interactivo descrito en roadmap.
-
+- Canvas en modo "scroll-pan" con gestos naturales: pinch para zoom, doble tap para centrar, arrastre con dos dedos para pan.
+- Toolbar se condensa en `ActionSheet` inferior con acciones esenciales (zoom, undo/redo, exportar, ver invitados, auto-asignación).
+- Biblioteca e inspector se abren como paneles deslizables a pantalla completa; recuerdan la última pestaña utilizada.
+- Invitados aparecen en tarjetas compactas con badges de estado (asignado, dieta, VIP, restricciones) y acceso rápido a WhatsApp.
+- Autosave sigue activo cada 30 s y muestra aviso "Guardando…" o "Sin conexión" cuando corresponde.
+- `SeatingMobileOverlay` mantiene minimapa simplificado basado en `hallSize` y primeras mesas (placeholder actual) y lista comprimida de mesas con ocupación; botones flotantes permiten abrir el guest drawer y exportador avanzado.
 ### 3.7 Feedback y estados
-- Los guardados exitosos o fallos de autosave muestran toasts (`react-toastify`) disparados desde `useSeatingPlan` (`showNotification` en `SyncService` y callbacks locales).
-- Acciones de exportación, auto-IA y limpieza del layout notifican al usuario con mensajes específicos, diferenciando éxito vs fallback (p.ej. Auto-IA avisando si el backend no responde).
-- Los toggles de validaciones, rulers o numeración modifican inmediatamente el canvas y mantienen estado persistido (localStorage) para evitar sorpresas al recargar.
-
+- Toasts diferenciados (`react-toastify`): verde (éxito), ámbar (alertas), rojo (errores cr críticos).
+- Indicadores visuales: mesas sobrecargadas en rojo, mesas casi llenas en ámbar, segmentos vacíos en gris; badges de invitado muestran dieta, accesibilidad, VIP y conflictos.
+- Autosave y snapshots muestran banners discretos (“Guardando…”, “Cambios guardados”) en barra inferior; si falla el guardado aparece toast rojo + opción “Reintentar”.
+- Acciones intensivas (auto-asignar, limpiar salón, exportar) presentan cuadro de confirmación y resumen de cambios antes de aplicarse.
 ## 4. Persistencia y datos
-- `weddings/{id}/seating/{tab}`: `tables`, `seats`, `settings`, metadatos de ceremonia y snapshots.  
-- `weddings/{id}/guests`: fuente para `SeatingGuestDrawer` y validaciones de estado RSVP.  
-- `weddings/{id}/seatingLocks/{resourceType-resourceId}`: bloqueos optimistas por recurso con TTL corto para evitar colisiones en edición colaborativa.  
-- `weddings/{id}/seatingHistory`: historial opcional (si está habilitado) para auditoría y deshacer extendido.
-- Snapshots manuales: `localStorage seatingPlan:{weddingId}:snapshot:*` + índice; se conservan por dispositivo.
+- `weddings/{id}/seating/{tab}`: `tables`, `seats`, `settings`, metadatos de ceremonia, capas libres y versión.
+- `weddings/{id}/guests`: fuente viva para `SeatingGuestDrawer`, estado RSVP y restricciones (dietas, accesibilidad).
+- `weddings/{id}/seatingLocks/{resourceType-resourceId}`: bloqueos optimistas por recurso con TTL corto; la UI muestra quién está editando.
+- `weddings/{id}/seatingPresence/{clientId}`: presencia en tiempo real para mostrar colaboradores conectados y su área de trabajo.
+- `weddings/{id}/seatingHistory` (opcional): historial extendido para auditoría/deshacer avanzado.
+- Snapshots locales: `localStorage seatingPlan:{weddingId}:snapshot:*` + índice; se conservan por dispositivo y pueden exportarse en JSON (modo DEV).
 
 ## 5. Reglas de negocio
-- Capacidad mesa ≥ invitados asignados; bloqueo cuando se excede.  
-- Un invitado no puede estar en dos asientos simultáneamente (validación en `useSeatingPlan`).  
-- Planner, Owner y Assistant tienen permisos completos para crear, editar, exportar y borrar en seating; el resto de roles quedan en solo lectura.  
-- Versiones antiguas permanecen en solo lectura para trazabilidad.
+- Capacidad mesa ≥ invitados asignados; al sobrepasar se marca conflicto `overbooking` y se impide guardar hasta resolver.
+- Un invitado no puede ocupar dos asientos; `useSeatingPlan` detecta duplicados antes de confirmar arrastre/asignación.
+- Reglas de proximidad: invitados con alergias incompatibles no pueden compartir mesa (configurable); accesibilidad reserva sillas cercanas a pasillos.
+- Roles: planner/owner/assistant pueden editar/exportar; colaboradores invitados entran en modo lectura.
+- Versionado: autosaves guardan versión incremental; snapshots antiguos se abren en modo lectura para comparar antes de restaurar.
+
+### 3.8 Diseño visual y orden
+- Layout mantiene canvas centrado con márgenes laterales de 24 px y paneles con `min-width` 320 px.
+- Grid base de 16 px para espaciado interno; elementos se agrupan por tarjetas con sombras suaves.
+- Paleta: fondo neutro (#F4F5F7), paneles blancos con sombras de 8 px; iconografía consistente con sistema de diseño.
+- Tooltips y toasts usan tipografía compacta para evitar ruido; iconos por estado emplean colores accesibles (AA).
+- Se recomienda cerrar paneles secundarios al trabajar en lienzo pequeño; la UI recuerda última disposición.
 
 ### Validaciones y alertas
-- **Perímetro**: banquet tables y sillas de ceremonia deben permanecer dentro del boundary dibujado.
-- **Obstáculos/Puertas**: se marca conflicto cuando una mesa o silla invade áreas definidas como `obstacle` o `door`.
-- **Pasillos y espaciado**: se exige separación mínima (aisleMin) entre mesas; los conflictos aparecen como `spacing`.
-- **Capacidad**: `overbooking` alerta cuando los invitados asignados superan los asientos configurados.
-- **Resumen visual**: los conflictos se muestran en el sidebar con filtros por tipo y en el smart panel con severidad (crítico/atención); también alimentan las exportaciones avanzadas.
+- **Perímetro** (`out_of_bounds`): mesas y sillas deben permanecer dentro del polígono del salón.
+- **Obstáculos/Puertas** (`obstacle`, `door`): conflicto cuando se invade un área marcada como inaccesible.
+- **Pasillos y espaciado** (`spacing`): controla `aisleMin` y `tableGap`; mesas en rojo cuando no cumplen.
+- **Capacidad** (`overbooking`): invitados > asientos; el panel sugiere mesas con espacio disponible.
+- **Duplicados** (`duplicate_guest`): invita al usuario a saltar al asiento conflictivo y resolver.
+- **Restricciones** (`restriction_mismatch`): dietas o accesibilidad en mesas incompatibles generan alerta ámbar.
+- Los conflictos aparecen en el inspector y en `SeatingSmartPanel` con severidad (crítico/atención). Las exportaciones los incluyen en un anexo para proveedores.
 
 
 ## 6. Estados especiales y errores
-- Sin invitados confirmados → banner “Agrega invitados primero”.  
-- Error de guardado → toast + rollback optimista.  
-- Offline → modo lectura; exportación bloqueada.  
-- Colaboración: no hay edición en tiempo real tipo Google Sheets; cada sesión guarda sobre la anterior. Si varios usuarios trabajan a la vez, prevalece el autosave más reciente, por lo que se recomienda coordinar horarios y usar snapshots/manual save antes de cambios grandes.
-- UX responsive: en pantallas pequeñas se activa `SeatingMobileOverlay` con accesos rápidos a pestañas, filtros y cajón de invitados; en escritorio se favorecen atajos de teclado (1-6 para herramientas, Ctrl/Cmd+Z/Y).
+- Sin invitados confirmados → banner “Agrega invitados primero” y enlace directo a gestión de invitados.
+- Conflictos no resueltos → contador persistente y advertencia al intentar exportar.
+- Error de autosave → toast rojo, rollback optimista y botón “Reintentar”.
+- Modo offline → se permite edición local pero exportes quedan bloqueados; al reconectar se sincroniza y muestra toast verde.
+- Colaboración: cuando otro usuario guarda encima, se muestra notificación “Se publicó una versión más reciente” con opción de cargar diferencias; se recomienda usar snapshots antes de cambios grandes.
+- UX responsive: `SeatingMobileOverlay` ofrece accesos rápidos y atajos táctiles; en desktop se habilitan atajos (1-6 herramientas, Ctrl/Cmd+Z/Y, Shift+Mouse para mover todas las mesas).
 
 ## 7. Integración con otros flujos
-- Flujos 3 y 9 (Gestión de invitados + RSVP) alimentan `weddings/{id}/guests`; cualquier confirmación/cancelación se refleja en el autosave y en las recomendaciones del smart panel.  
-- Flujo 11A (Momentos especiales) aportará el destinatario del momento; esa señal se usa para etiquetar invitados VIP y alimentar la hoja de VIP en la exportación avanzada.  
-- Flujo 11 (Protocolo) comparte la configuración de ceremonia (filas VIP, notas) que se replica en seating y en las exportaciones.  
-- Flujo 14 (Checklist) dispara tareas cuando hay conflictos abiertos o mesas sin asignar.  
-- Flujos 24–26 (Galería/Inspiración/Blog) se integran en comunicaciones externas y pueden adjuntar renders/exports del seating para proveedores o sitio público (Flujo 21).
+- **Guest + RSVP (flujos 3/9)**: confirmaciones liberan o asignan sillas automáticamente; el Smart Panel recalcula prioridades.
+- **Protocolo (flujos 11/11A)**: reservas VIP y notas ceremoniales alimentan seating y se reflejan en exportes.
+- **Checklist (flujo 14)**: genera tareas cuando existen conflictos sin resolver o invitados sin asiento.
+- **Finanzas/Contratos (flujos 6/15)**: catering recibe CSV actualizado tras cada exportación avanzada.
+- **Sitio público y comunicaciones (flujos 21, 24–26)**: pueden adjuntar renders PNG/SVG generados desde seating.
+- **Automatizaciones (flujos 12/16)**: eventos `seating_conflict_detected`, `seating_guest_reassigned` dispararán reglas IA (roadmap).
 
 ## 8. Métricas y monitorización
-- Eventos sugeridos: `seating_template_applied`, `seating_guest_assigned`, `seating_export_triggered`, `seating_conflict_detected`.  
-- KPIs (pendiente): tiempo medio para completar seating, nº de iteraciones por RSVP, % de autosaves exitosos.  
-- Logs locales (`SyncService`) para saber cuándo sincronizar pendientes.
+- Eventos: `seating_template_applied`, `seating_guest_assigned`, `seating_guest_removed`, `seating_conflict_detected`, `seating_autoassign_run`, `seating_export_generated`.
+- KPIs: sillas libres por mesa, ratio VIP asignados, tiempo medio hasta "versión aprobada", número de exportes por preset, veces que se usó auto-assign.
+- Logs: `seatingPresence`, `seatingSnapshots`, `seatingAudit` (roadmap) y métricas IA (`smartPanelSuggestions`).
 
 ## 9. Pruebas recomendadas
-- Unitarias: reducers de `useSeatingPlan`, validaciones de `SeatingGuestDrawer`, helpers de exportación.  
-- Integración: aplicar plantilla → asignar invitados → guardar/exportar → revertir snapshot.  
-- E2E: `cypress/e2e/seating/seating_smoke.cy.js`, `seating_assign_unassign.cy.js`, `seating_capacity_limit.cy.js`, `seating_template_circular.cy.js`, `seating_ui_panels.cy.js` (leyenda de áreas, cajón de invitados y persistencia de toggles).  
-- Nota: `cypress/e2e/seating/seating-content-flow.cy.js` seguirá cubriendo navegación cruzada hasta que se reubique conforme a los nuevos flujos.
+- Unitarias: reducers de `useSeatingPlan`, validaciones de `SeatingGuestDrawer`, heurísticas de `SeatingSmartPanel`, helpers de exportación.
+- Integración: aplicar plantilla → auto-assign → ajustar manualmente → guardar/exportar → restaurar snapshot.
+- E2E sugeridas: `seating_basic`, `seating_conflicts`, `seating_export`, `seating_mobile_overlay` (usar helpers `__SEATING_TEST_HELPERS__`).
+- Nota: habilitar modo `?fixture=seating-demo` y mocks de descarga para pruebas deterministas.
 
 ## 10. Checklist de despliegue
-- Reglas Firestore: colecciones `seating` y `seatingHistory` (roles y límites).  
-- Seeds y límites (mesas, invitados) validados para rendimiento.  
-- Validar compresión y consistencia de exportaciones.  
-- Automatizar backups periódicos de `seating` para auditoría.
+- Revisar reglas Firestore (`seating`, `seatingHistory`, `seatingLocks`, `seatingPresence`).
+- Validar seeds y límites (mesas, invitados) para rendimiento y uso de auto-assign.
+- Testear exportes (PDF/SVG/CSV/PNG) con presets y tamaño de archivos.
+- Verificar experiencia móvil/desktop: márgenes, paneles, persistencia de toggles, contraste.
+- Automatizar backups periódicos de `seating` + `seatingHistory` para auditoría.
 
 ## 11. Roadmap / pendientes
 - Panel lateral inteligente con recomendaciones autónomas y resolución de conflictos por IA.  

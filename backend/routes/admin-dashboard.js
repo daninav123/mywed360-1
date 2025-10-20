@@ -1257,7 +1257,7 @@ router.get('/support', async (_req, res) => {
     logger.error('[admin-dashboard] support error', error);
     res.status(500).json({ error: 'admin_dashboard_support_failed' });
   }
-}
+});
 router.get('/users', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 100, MAX_LIMIT);
   const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
@@ -1292,7 +1292,7 @@ router.get('/users', async (req, res) => {
       if (statusFilter && status !== statusFilter) continue;
 
       const createdAt =
-        formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || '—';
+        formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || 'ï¿½';
       const lastAccess =
         formatDateTime(
           data.lastAccess ||
@@ -1300,7 +1300,7 @@ router.get('/users', async (req, res) => {
             data.lastAccessAt ||
             data.updatedAt ||
             data.lastActiveWeddingAt,
-        ) || '—';
+        ) || 'ï¿½';
 
       let weddingsCount = Number(
         data.weddings ?? data.weddingCount ?? data.stats?.weddings ?? 0,
@@ -1389,8 +1389,8 @@ router.get('/portfolio', async (req, res) => {
         owner:
           data.owner ||
           data.ownerEmail ||
-          (Array.isArray(data.ownerIds) && data.ownerIds.length ? data.ownerIds[0] : '—'),
-        eventDate: eventDateDate ? formatDateOnly(eventDateDate) : '—',
+          (Array.isArray(data.ownerIds) && data.ownerIds.length ? data.ownerIds[0] : 'ï¿½'),
+        eventDate: eventDateDate ? formatDateOnly(eventDateDate) : 'ï¿½',
         status,
         confirmedGuests: Number(
           data.confirmedGuests ??
@@ -1426,7 +1426,7 @@ router.get('/portfolio', async (req, res) => {
   }
 });
 
-);
+
 
 // --- Mutations ---
 

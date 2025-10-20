@@ -431,10 +431,11 @@
     {
       "id": "e2e_assistant_chat-fallback-context_cy_js",
       "title": "E2E: Assistant – Chat Fallback Context",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/assistant/chat-fallback-context.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_auth_auth_flow_cy_js",
@@ -484,26 +485,29 @@
     {
       "id": "e2e_blog_blog-article_cy_js",
       "title": "E2E: Blog – Blog Article",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/blog/blog-article.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_blog_blog-listing_cy_js",
       "title": "E2E: Blog – Blog Listing",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/blog/blog-listing.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_blog_blog-subscription_cy_js",
       "title": "E2E: Blog – Blog Subscription",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/blog/blog-subscription.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_compose_quick_replies_cy_js",
@@ -526,34 +530,35 @@
     {
       "id": "e2e_dashboard_diagnostic-panel_cy_js",
       "title": "E2E: Dashboard – Diagnostic Panel",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/dashboard/diagnostic-panel.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_dashboard_global-search-shortcuts_cy_js",
       "title": "E2E: Dashboard – Global Search Shortcuts",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/dashboard/global-search-shortcuts.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_dashboard_main-navigation_cy_js",
       "title": "E2E: Dashboard – Main Navigation",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/dashboard/main-navigation.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_dashboard_planner-dashboard_cy_js",
       "title": "E2E: Dashboard – Planner Dashboard",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/dashboard/planner-dashboard.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 3"
     },
     {
       "id": "e2e_email_inbox_smoke_cy_js",
@@ -567,50 +572,56 @@
     {
       "id": "e2e_email_read-email-attachments_cy_js",
       "title": "E2E: Email – Read Email Attachments",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/read-email-attachments.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_read-email-list_cy_js",
       "title": "E2E: Email – Read Email List",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/read-email-list.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_read-email-open_cy_js",
       "title": "E2E: Email – Read Email Open",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/read-email-open.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_read-email-unread-status_cy_js",
       "title": "E2E: Email – Read Email Unread Status",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/read-email-unread-status.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_send-email-attachment_cy_js",
       "title": "E2E: Email – Send Email Attachment",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/send-email-attachment.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_send-email-validation_cy_js",
       "title": "E2E: Email – Send Email Validation",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/email/send-email-validation.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_email_smart_composer_cy_js",
@@ -678,42 +689,46 @@
     {
       "id": "e2e_finance_finance-advisor-chat_cy_js",
       "title": "E2E: Finance – Finance Advisor Chat",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/finance/finance-advisor-chat.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_gamification_gamification-history_cy_js",
       "title": "E2E: Gamification – Gamification History",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/gamification/gamification-history.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_gamification_gamification-milestone-unlock_cy_js",
       "title": "E2E: Gamification – Gamification Milestone Unlock",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/gamification/gamification-milestone-unlock.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_gamification_gamification-progress-happy_cy_js",
       "title": "E2E: Gamification – Gamification Progress Happy",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/gamification/gamification-progress-happy.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_guests_guests_crud_cy_js",
       "title": "E2E: Guests – Guests Crud",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/guests/guests_crud.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 2"
     },
     {
       "id": "e2e_guests_guests_flow_cy_js",
@@ -727,26 +742,29 @@
     {
       "id": "e2e_guests_guests_import_rsvp_cy_js",
       "title": "E2E: Guests – Guests Import Rsvp",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/guests/guests_import_rsvp.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code unknown"
     },
     {
       "id": "e2e_guests_guests_messaging_cy_js",
       "title": "E2E: Guests – Guests Messaging",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/guests/guests_messaging.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code unknown"
     },
     {
       "id": "e2e_home_home-greeting-names_cy_js",
       "title": "E2E: Home – Home Greeting Names",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/home/home-greeting-names.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_inspiration_inspiration_flow_cy_js",
@@ -760,26 +778,27 @@
     {
       "id": "e2e_inspiration_inspiration-gallery_cy_js",
       "title": "E2E: Inspiration – Inspiration Gallery",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration/inspiration-gallery.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_inspiration_inspiration-home-gallery_cy_js",
       "title": "E2E: Inspiration – Inspiration Home Gallery",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration/inspiration-home-gallery.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_inspiration_inspiration-save-board_cy_js",
       "title": "E2E: Inspiration – Inspiration Save Board",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration/inspiration-save-board.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_inspiration_inspiration-share_cy_js",
