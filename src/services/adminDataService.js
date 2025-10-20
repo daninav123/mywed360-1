@@ -417,6 +417,21 @@ export const createDiscountCode = async (discountData) => {
   return response.json();
 };
 
+export const updateDiscountCode = async (id, discountData) => {
+  const response = await apiPut(
+    `${ADMIN_BASE_PATH}/discounts/${id}`,
+    discountData,
+    getAdminFetchOptions({ auth: false, silent: true })
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'update_discount_failed' }));
+    throw new Error(error.error || error.message || 'Error al actualizar código de descuento');
+  }
+  
+  return response.json();
+};
+
 // --- Mutations ---
 
 async function postJson(path, body) {
