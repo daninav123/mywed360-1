@@ -104,7 +104,8 @@ import providersRouter from './routes/providers.js';
 import projectMetricsRouter from './routes/project-metrics.js';
 import weddingsRouter from './routes/weddings.js';
 import usersRouter from './routes/users.js';
- 
+import taskTemplatesRouter from './routes/task-templates.js';
+
 import ipAllowlist from './middleware/ipAllowlist.js';
 import adminAuthRouter from './routes/admin-auth.js';
 import adminSuppliersRouter from './routes/admin-suppliers.js';
@@ -481,6 +482,7 @@ if (Number(MAILGUN_WEBHOOK_RATE_LIMIT_MAX) > 0) {
 app.use('/api/mailgun/webhook', mailgunWebhookRouter); // Webhooks de Mailgun (verificación interna)
 app.use('/api/inbound/mailgun', mailgunInboundRouter); // Correos entrantes
 app.use('/api/rsvp', rsvpRouter); // Endpoints públicos por token para RSVP
+app.use('/api/task-templates', taskTemplatesRouter); // Plantillas de tareas (endpoint público para obtener activa)
 
 // Rutas que requieren autenticación específica para correo
 app.use('/api/mail', requireMailAccess, mailRouter);
@@ -586,16 +588,22 @@ app.use('/api/admin', adminAuthRouter);
 app.use('/api/admin/suppliers', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminSuppliersRouter);
 app.use('/api/admin/audit', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminAuditRouter);
 // Admin metrics dashboard API (solo admin) en ruta separada para no bloquear /api/metrics/* públicos
+// Rutas de métricas y dashboard de admin
 try {
-  const { requireAdmin } = await import('./middleware/authMiddleware.js');
   const metricsAdminRouter = (await import('./routes/metrics-admin.js')).default;
   app.use('/api/admin/metrics', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, metricsAdminRouter);
-} catch {}
+  console.log('[backend] Admin metrics routes mounted on /api/admin/metrics');
+} catch (error) {
+  console.error('[backend] Failed to load admin metrics routes:', error.message);
+}
+
 try {
-  const { requireAdmin } = await import('./middleware/authMiddleware.js');
   const adminDashboardRouter = (await import('./routes/admin-dashboard.js')).default;
   app.use('/api/admin/dashboard', ipAllowlist(ADMIN_IP_ALLOWLIST), requireAdmin, adminDashboardRouter);
-} catch {}
+  console.log('[backend] Admin dashboard routes mounted on /api/admin/dashboard');
+} catch (error) {
+  console.error('[backend] Failed to load admin dashboard routes:', error.message);
+}
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);
 // Rutas de diagnóstico y test (públicas para debugging)

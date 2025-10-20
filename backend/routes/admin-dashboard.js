@@ -70,6 +70,22 @@ function formatDateOnly(value) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+function parseDateParam(value, endOfDay = false) {
+  if (!value) return null;
+  try {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    if (endOfDay) {
+      date.setHours(23, 59, 59, 999);
+    } else {
+      date.setHours(0, 0, 0, 0);
+    }
+    return date;
+  } catch {
+    return null;
+  }
+}
+
 function normalizeNumber(value) {
   if (value == null) return null;
   if (typeof value === 'number') return value;
@@ -273,6 +289,23 @@ async function writeAdminAudit(req, action, details = {}) {
     });
   } catch (e) {
     logger.warn('[admin-dashboard] audit write failed', { action, message: e?.message });
+  }
+}
+
+async function getUserWeddingCount(uid) {
+  try {
+    const agg = await db.collection('users').doc(uid).collection('weddings').count().get();
+    const data = agg.data();
+    if (data && typeof data.count === 'number') return data.count;
+  } catch (error) {
+    logger.warn('[admin-dashboard] user wedding count aggregate failed', { uid, message: error?.message });
+  }
+  try {
+    const snap = await db.collection('users').doc(uid).collection('weddings').limit(500).get();
+    return snap.size;
+  } catch (error) {
+    logger.warn('[admin-dashboard] user wedding count fallback failed', { uid, message: error?.message });
+    return 0;
   }
 }
 
@@ -1224,7 +1257,176 @@ router.get('/support', async (_req, res) => {
     logger.error('[admin-dashboard] support error', error);
     res.status(500).json({ error: 'admin_dashboard_support_failed' });
   }
+}
+router.get('/users', async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 100, MAX_LIMIT);
+  const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+
+  try {
+    let query;
+    try {
+      query = statusFilter
+        ? collections.users().where('status', '==', statusFilter).orderBy('createdAt', 'desc').limit(limit)
+        : collections.users().orderBy('createdAt', 'desc').limit(limit);
+    } catch (error) {
+      logger.warn('[admin-dashboard] users query fallback', { message: error?.message });
+      query = collections.users().orderBy('createdAt', 'desc').limit(limit);
+    }
+
+    const snap = await query.get();
+    if (snap.empty) {
+      return res.json({ items: [], meta: { count: 0, limit, status: statusFilter || 'all', order: 'desc' } });
+    }
+
+    const items = [];
+    for (const docSnap of snap.docs) {
+      const data = docSnap.data() || {};
+      const email =
+        data.email ||
+        data.authEmail ||
+        data.contactEmail ||
+        data.profile?.email ||
+        `${docSnap.id}@example.com`;
+      const role = String(data.role || data.profile?.role || 'owner');
+      const status = String(data.status || (data.disabled ? 'disabled' : 'active'));
+      if (statusFilter && status !== statusFilter) continue;
+
+      const createdAt =
+        formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || '—';
+      const lastAccess =
+        formatDateTime(
+          data.lastAccess ||
+            data.lastLoginAt ||
+            data.lastAccessAt ||
+            data.updatedAt ||
+            data.lastActiveWeddingAt,
+        ) || '—';
+
+      let weddingsCount = Number(
+        data.weddings ?? data.weddingCount ?? data.stats?.weddings ?? 0,
+      );
+      if (!Number.isFinite(weddingsCount) || weddingsCount < 0) weddingsCount = 0;
+      if (weddingsCount === 0) {
+        weddingsCount = await getUserWeddingCount(docSnap.id);
+      }
+
+      items.push({
+        id: docSnap.id,
+        email,
+        role,
+        status,
+        lastAccess,
+        weddings: weddingsCount,
+        createdAt,
+      });
+    }
+
+    return res.json({
+      items,
+      meta: {
+        count: items.length,
+        limit,
+        status: statusFilter || 'all',
+        order: 'desc',
+      },
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] users list error', error);
+    return res.status(500).json({ error: 'admin_dashboard_users_failed' });
+  }
 });
+
+router.get('/portfolio', async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 200, MAX_LIMIT);
+  const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+  const order = String(req.query.order || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc';
+  const fromDate = parseDateParam(req.query.fromDate, false);
+  const toDate = parseDateParam(req.query.toDate, true);
+
+  try {
+    const snap = await collections
+      .weddings()
+      .orderBy('updatedAt', order)
+      .limit(limit * 3)
+      .get();
+
+    if (snap.empty) {
+      return res.json({
+        items: [],
+        meta: {
+          count: 0,
+          limit,
+          status: statusFilter || 'all',
+          order,
+        },
+      });
+    }
+
+    const items = [];
+    for (const docSnap of snap.docs) {
+      const data = docSnap.data() || {};
+      const status = String(data.status || (data.active === false ? 'archived' : 'active'));
+      if (statusFilter && status !== statusFilter) continue;
+
+      const eventDateRaw =
+        data.eventDate ||
+        data.weddingDate ||
+        data.date ||
+        data.weddingInfo?.weddingDate ||
+        null;
+      const eventDateDate = toDate(eventDateRaw);
+      if (fromDate && (!eventDateDate || eventDateDate < fromDate)) continue;
+      if (toDate && (!eventDateDate || eventDateDate > toDate)) continue;
+
+      const item = {
+        id: docSnap.id,
+        couple:
+          data.couple ||
+          data.name ||
+          data.title ||
+          data.weddingInfo?.coupleName ||
+          'Boda sin nombre',
+        owner:
+          data.owner ||
+          data.ownerEmail ||
+          (Array.isArray(data.ownerIds) && data.ownerIds.length ? data.ownerIds[0] : '—'),
+        eventDate: eventDateDate ? formatDateOnly(eventDateDate) : '—',
+        status,
+        confirmedGuests: Number(
+          data.confirmedGuests ??
+            data.stats?.confirmedGuests ??
+            data.guestsConfirmed ??
+            0,
+        ),
+        signedContracts: Number(
+          data.signedContracts ??
+            data.contractsSigned ??
+            (Array.isArray(data.contracts) ? data.contracts.length : 0),
+        ),
+      };
+
+      items.push(item);
+      if (items.length >= limit) break;
+    }
+
+    return res.json({
+      items,
+      meta: {
+        count: items.length,
+        limit,
+        status: statusFilter || 'all',
+        order,
+        fromDate: fromDate ? formatDateOnly(fromDate) : null,
+        toDate: toDate ? formatDateOnly(toDate) : null,
+      },
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] portfolio error', error);
+    return res.status(500).json({ error: 'admin_dashboard_portfolio_failed' });
+  }
+});
+
+);
 
 // --- Mutations ---
 
