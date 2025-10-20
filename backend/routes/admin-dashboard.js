@@ -1439,8 +1439,8 @@ router.get('/portfolio', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 200, MAX_LIMIT);
   const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
   const order = String(req.query.order || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc';
-  const fromDate = parseDateParam(req.query.fromDate, false);
-  const toDate = parseDateParam(req.query.toDate, true);
+  const fromDateFilter = parseDateParam(req.query.fromDate, false);
+  const toDateFilter = parseDateParam(req.query.toDate, true);
 
   console.log('🔍 [DEBUG] GET /portfolio endpoint called');
   console.log('  - Limit:', limit);
@@ -1590,8 +1590,8 @@ router.get('/portfolio', async (req, res) => {
         limit,
         status: statusFilter || 'all',
         order,
-        fromDate: fromDate ? formatDateOnly(fromDate) : null,
-        toDate: toDate ? formatDateOnly(toDate) : null,
+        fromDate: fromDateFilter ? formatDateOnly(fromDateFilter) : null,
+        toDate: toDateFilter ? formatDateOnly(toDateFilter) : null,
       },
     });
   } catch (error) {
@@ -1901,8 +1901,8 @@ router.get('/discounts', async (_req, res) => {
         revenue: Number(data.revenue || 0),
         currency: data.currency || 'EUR',
         status: data.status || 'active',
-        createdAt: formatDate(safeToDate(data.createdAt)),
-        updatedAt: formatDate(safeToDate(data.updatedAt)),
+        createdAt: formatDateOnly(safeToDate(data.createdAt)),
+        updatedAt: formatDateOnly(safeToDate(data.updatedAt)),
       };
     });
     const summary = items.reduce(
