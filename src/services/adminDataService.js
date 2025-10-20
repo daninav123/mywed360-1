@@ -1,6 +1,6 @@
 import errorLogger from '../utils/errorLogger';
 import { getAdminFetchOptions, getAdminHeaders, getAdminSessionToken } from './adminSession';
-import { apiGet, apiPost, apiPut } from './apiClient';
+import { get as apiGet, post as apiPost } from './apiClient';
 
 const ADMIN_BASE_PATH = '/api/admin/dashboard';
 
@@ -322,11 +322,23 @@ export const getPortfolioData = async (opts = {}) => {
 };
 
 export const getUsersData = async (opts = {}) => {
+  console.log(' [getUsersData] Called with options:', opts);
   const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
+  console.log(`  - Fetching users with limit: ${limit}`);
+  
   const data = await fetchAdminEndpoint(
     `${ADMIN_BASE_PATH}/users?limit=${encodeURIComponent(limit)}`,
   );
-  return Array.isArray(data?.items) ? data.items : [];
+  
+  console.log('  - Raw data from backend:', data);
+  const items = toArray(data?.items);
+  const meta = toObject(data?.meta);
+  
+  console.log(`  Returning ${items.length} users`);
+  console.log('  - Meta:', meta);
+  console.log('  - First user:', items[0]);
+  
+  return { items, meta };
 };
 
 export const getUsersRoleSummary = async () => {
@@ -383,16 +395,26 @@ export const getSupportData = async () => {
 
 export const getDiscountLinks = async () => {
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/discounts`);
-  if (!data) return DEFAULT_DISCOUNTS;
+  if (!data) return { items: [], summary: DEFAULT_DISCOUNT_SUMMARY };
   return {
     items: toArray(data.items),
-    summary: {
-      totalLinks: Number.isFinite(data?.summary?.totalLinks) ? data.summary.totalLinks : 0,
-      totalUses: Number.isFinite(data?.summary?.totalUses) ? data.summary.totalUses : 0,
-      totalRevenue: Number.isFinite(data?.summary?.totalRevenue) ? data.summary.totalRevenue : 0,
-      currency: data?.summary?.currency || 'EUR',
-    },
+    summary: data.summary || DEFAULT_DISCOUNT_SUMMARY,
   };
+};
+
+export const createDiscountCode = async (discountData) => {
+  const response = await apiPost(
+    `${ADMIN_BASE_PATH}/discounts`,
+    discountData,
+    getAdminFetchOptions({ auth: false, silent: true })
+  );
+  
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'create_discount_failed' }));
+    throw new Error(error.error || error.message || 'Error al crear código de descuento');
+  }
+  
+  return response.json();
 };
 
 // --- Mutations ---

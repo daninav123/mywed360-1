@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { getDiscountLinks } from '../../services/adminDataService';
+import { getDiscountLinks, createDiscountCode } from '../../services/adminDataService';
 
 const DEFAULT_SUMMARY = {
   totalLinks: 0,
@@ -32,6 +32,17 @@ const AdminDiscounts = () => {
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [query, setQuery] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [formData, setFormData] = useState({
+    code: '',
+    url: '',
+    type: 'campaign',
+    maxUses: '',
+    isPermanent: true,
+    assignedTo: { name: '', email: '' },
+    notes: ''
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -81,6 +92,52 @@ const AdminDiscounts = () => {
     }
   };
 
+  const handleCreateDiscount = async (e) => {
+    e.preventDefault();
+    if (creating || !formData.code.trim()) return;
+
+    setCreating(true);
+    try {
+      const discountData = {
+        code: formData.code.trim(),
+        url: formData.url.trim() || undefined,
+        type: formData.type,
+        maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+        assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
+          name: formData.assignedTo.name || null,
+          email: formData.assignedTo.email || null
+        } : null,
+        notes: formData.notes.trim() || undefined
+      };
+
+      const newDiscount = await createDiscountCode(discountData);
+      
+      // Añadir el nuevo descuento a la lista
+      setLinks(prev => [newDiscount, ...prev]);
+      setSummary(prev => ({
+        ...prev,
+        totalLinks: prev.totalLinks + 1
+      }));
+      
+      // Resetear formulario y cerrar modal
+      setFormData({
+        code: '',
+        url: '',
+        type: 'campaign',
+        maxUses: '',
+        isPermanent: true,
+        assignedTo: { name: '', email: '' },
+        notes: ''
+      });
+      setShowCreateModal(false);
+    } catch (err) {
+      console.error('[AdminDiscounts] create failed:', err);
+      alert(err.message || 'Error al crear el código de descuento');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -108,6 +165,13 @@ const AdminDiscounts = () => {
             <option value="agotado">Agotados</option>
             <option value="caducado">Caducados</option>
           </select>
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
+          >
+            + Crear código
+          </button>
         </div>
       </header>
 
@@ -211,6 +275,133 @@ const AdminDiscounts = () => {
             </div>
           </section>
         </>
+      )}
+
+      {/* Modal crear código */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+            <header className="mb-4">
+              <h2 className="text-lg font-semibold">Crear código de descuento</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Genera un nuevo código promocional o enlace comercial
+              </p>
+            </header>
+
+            <form onSubmit={handleCreateDiscount} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Código *</label>
+                <input
+                  type="text"
+                  value={formData.code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                  placeholder="VERANO2025"
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm uppercase"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Tipo</label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                >
+                  <option value="campaign">Campaña</option>
+                  <option value="planner">Planner</option>
+                  <option value="influencer">Influencer</option>
+                  <option value="partner">Partner</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={formData.isPermanent}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isPermanent: e.target.checked }))}
+                  />
+                  Código permanente (sin límite de usos)
+                </label>
+              </div>
+
+              {!formData.isPermanent && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">Máximo de usos</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.maxUses}
+                    onChange={(e) => setFormData(prev => ({ ...prev, maxUses: e.target.value }))}
+                    placeholder="100"
+                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium mb-1">URL personalizada (opcional)</label>
+                <input
+                  type="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://mywed360.com/registro?ref=CODIGO"
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Asignado a (opcional)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={formData.assignedTo.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, name: e.target.value } }))}
+                    placeholder="Nombre"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                  <input
+                    type="email"
+                    value={formData.assignedTo.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, assignedTo: { ...prev.assignedTo, email: e.target.value } }))}
+                    placeholder="Email"
+                    className="rounded-md border border-soft px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Notas (opcional)</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="Detalles adicionales sobre este código..."
+                  rows="2"
+                  className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  disabled={creating}
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating || !formData.code.trim()}
+                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                >
+                  {creating ? 'Creando...' : 'Crear código'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

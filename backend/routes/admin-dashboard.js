@@ -1394,23 +1394,22 @@ router.get('/users', async (req, res) => {
     console.log(`  ✅ Returning ${items.length} users (source: ${fromAuth ? 'firebase-auth' : 'firestore'})`);
     console.log('  - Sample user:', items[0] || 'none');
     
+    console.log(`  ✅ Role summary: owner=${ownerBucket.real}, planner=${plannerBucket.real}, assistant=${assistantBucket.real}`);
+    
     return res.json({
-      items,
-      meta: {
-        count: items.length,
-        limit,
-        status: statusFilter || 'all',
-        order: 'desc',
-        source: fromAuth ? 'firebase-auth' : 'firestore',
-      },
+      generatedAt: new Date().toISOString(),
+      durationMs: Date.now() - started,
+      scanned: snap.size,
+      totals: { total: scanned, real: totalReal, excluded: totalExcluded },
+      roles: { owner: ownerBucket, planner: plannerBucket, assistant: assistantBucket },
+      filters,
+      source: 'firestore',
+      error: '',
     });
   } catch (error) {
-    logger.error('[admin-dashboard] users list error', error);
-    return res.status(500).json({ 
-      error: 'admin_dashboard_users_failed',
-      message: error?.message || 'Unknown error',
-      details: process.env.NODE_ENV === 'development' ? error?.stack : undefined
-    });
+    console.error('  ❌ Role summary error:', error.message);
+    logger.error('[admin-dashboard] users/role-summary error', error);
+    return res.status(500).json({ error: 'admin_dashboard_role_summary_failed', message: error.message });
   }
 });
 
@@ -1421,14 +1420,34 @@ router.get('/portfolio', async (req, res) => {
   const fromDate = parseDateParam(req.query.fromDate, false);
   const toDate = parseDateParam(req.query.toDate, true);
 
+  console.log('🔍 [DEBUG] GET /portfolio endpoint called');
+  console.log('  - Limit:', limit);
+  console.log('  - Status filter:', statusFilter || 'all');
+  console.log('  - Order:', order);
+
   try {
-    const snap = await collections
-      .weddings()
-      .orderBy('updatedAt', order)
-      .limit(limit * 3)
-      .get();
+    // Intentar primero con collectionGroup (subcolecciones users/{uid}/weddings)
+    let snap;
+    try {
+      console.log('  - Attempting collectionGroup query...');
+      snap = await collections
+        .weddingsGroup()
+        .orderBy('updatedAt', order)
+        .limit(limit * 3)
+        .get();
+      console.log(`  - CollectionGroup returned ${snap.size} documents`);
+    } catch (groupError) {
+      console.warn('  - CollectionGroup failed, trying root collection:', groupError.message);
+      snap = await collections
+        .weddings()
+        .orderBy('updatedAt', order)
+        .limit(limit * 3)
+        .get();
+      console.log(`  - Root collection returned ${snap.size} documents`);
+    }
 
     if (snap.empty) {
+      console.log('  ⚠️ No wedding documents found');
       return res.json({
         items: [],
         meta: {
@@ -1487,6 +1506,9 @@ router.get('/portfolio', async (req, res) => {
       if (items.length >= limit) break;
     }
 
+    console.log(`  ✅ Returning ${items.length} weddings`);
+    console.log('  - First wedding:', items[0]);
+    
     return res.json({
       items,
       meta: {
@@ -1499,8 +1521,9 @@ router.get('/portfolio', async (req, res) => {
       },
     });
   } catch (error) {
+    console.error('  ❌ Portfolio endpoint error:', error.message);
     logger.error('[admin-dashboard] portfolio error', error);
-    return res.status(500).json({ error: 'admin_dashboard_portfolio_failed' });
+    return res.status(500).json({ error: 'admin_dashboard_portfolio_failed', message: error.message });
   }
 });
 
@@ -1660,29 +1683,92 @@ router.post('/broadcasts', async (req, res) => {
 // --- Users role summary ---
 router.get('/users/role-summary', async (_req, res) => {
   const started = Date.now();
+  console.log('🔍 [DEBUG] GET /users/role-summary endpoint called');
   try {
+    console.log('  - Querying users collection...');
     const snap = await collections.users().limit(2000).get();
+    console.log(`  - Found ${snap.size} user documents`);
     const roles = { owner: 0, planner: 0, assistant: 0 };
     let scanned = 0;
+    let totalReal = 0;
+    let totalExcluded = 0;
+    
+    const filters = {
+      allowedStatuses: ['active'],
+      excludedEmailSuffixes: ['test.com', 'example.com'],
+      excludedEmailPrefixes: ['test-', 'demo-'],
+      excludedEmailContains: [],
+      excludedTags: ['bot', 'test'],
+      excludedBooleanKeys: ['isTestUser', 'isBot'],
+    };
+    
+    const ownerBucket = { label: 'Owners', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } };
+    const plannerBucket = { label: 'Wedding planners', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } };
+    const assistantBucket = { label: 'Assistants', total: 0, real: 0, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } };
+    
     for (const doc of snap.docs) {
       scanned += 1;
-      const r = String((doc.data() || {}).role || '').toLowerCase();
-      if (r.includes('planner')) roles.planner += 1;
-      else if (r.includes('assistant')) roles.assistant += 1;
-      else roles.owner += 1;
+      const data = doc.data() || {};
+      const email = String(data.email || '').toLowerCase();
+      const status = String(data.status || 'active').toLowerCase();
+      const role = String(data.role || 'owner').toLowerCase();
+      
+      let bucket;
+      if (role.includes('planner')) bucket = plannerBucket;
+      else if (role.includes('assistant')) bucket = assistantBucket;
+      else bucket = ownerBucket;
+      
+      bucket.total += 1;
+      
+      // Verificar si debe ser excluido
+      let isExcluded = false;
+      let excludeReason = null;
+      
+      // Por status
+      if (!filters.allowedStatuses.includes(status)) {
+        isExcluded = true;
+        excludeReason = 'status';
+      }
+      
+      // Por email
+      if (!isExcluded) {
+        const emailExcluded = filters.excludedEmailSuffixes.some(suffix => email.endsWith(suffix)) ||
+                             filters.excludedEmailPrefixes.some(prefix => email.startsWith(prefix));
+        if (emailExcluded) {
+          isExcluded = true;
+          excludeReason = 'email';
+        }
+      }
+      
+      // Por flags
+      if (!isExcluded) {
+        const hasExcludedFlag = filters.excludedBooleanKeys.some(key => data[key] === true);
+        if (hasExcludedFlag) {
+          isExcluded = true;
+          excludeReason = 'flags';
+        }
+      }
+      
+      if (isExcluded) {
+        bucket.excluded.total += 1;
+        if (excludeReason) bucket.excluded.byReason[excludeReason] += 1;
+        totalExcluded += 1;
+      } else {
+        bucket.real += 1;
+        totalReal += 1;
+      }
     }
+    
+    console.log(`  ✅ Role summary: owner=${ownerBucket.real}, planner=${plannerBucket.real}, assistant=${assistantBucket.real}`);
+    
     const durationMs = Date.now() - started;
     return res.json({
       generatedAt: new Date().toISOString(),
       durationMs,
       scanned,
-      totals: { total: scanned, real: scanned, excluded: 0 },
-      roles: {
-        owner: { label: 'Owners', total: roles.owner, real: roles.owner, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
-        planner: { label: 'Wedding planners', total: roles.planner, real: roles.planner, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
-        assistant: { label: 'Assistants', total: roles.assistant, real: roles.assistant, excluded: { total: 0, byReason: { status: 0, flags: 0, email: 0 } } },
-      },
-      filters: { allowedStatuses: [], excludedEmailSuffixes: [], excludedEmailPrefixes: [], excludedEmailContains: [], excludedTags: [], excludedBooleanKeys: [] },
+      totals: { total: scanned, real: totalReal, excluded: totalExcluded },
+      roles: { owner: ownerBucket, planner: plannerBucket, assistant: assistantBucket },
+      filters,
       source: 'firestore',
       error: '',
     });
@@ -1708,8 +1794,10 @@ router.get('/users/role-summary', async (_req, res) => {
 
 // --- Discounts ---
 router.get('/discounts', async (_req, res) => {
+  console.log('🔍 [DEBUG] GET /discounts endpoint called');
   try {
     const docs = await getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 });
+    console.log(`  - Found ${docs.length} discount links`);
     const items = docs.map((d) => {
       const data = d.data() || {};
       return {
@@ -1731,10 +1819,77 @@ router.get('/discounts', async (_req, res) => {
       },
       { totalLinks: 0, totalUses: 0, totalRevenue: 0, currency: 'EUR' },
     );
+    console.log(`  ✅ Returning ${items.length} discount links`);
+    console.log('  - Total revenue:', summary.totalRevenue);
+    
     return res.json({ items, summary });
   } catch (error) {
+    console.error('  ❌ Discounts error:', error.message);
     logger.error('[admin-dashboard] discounts error', error);
-    return res.status(500).json({ error: 'admin_dashboard_discounts_failed' });
+    return res.status(500).json({ error: 'admin_dashboard_discounts_failed', message: error.message });
+  }
+});
+
+// Crear nuevo código de descuento
+router.post('/discounts', async (req, res) => {
+  console.log('🔍 [DEBUG] POST /discounts endpoint called');
+  try {
+    const { code, url, type, maxUses, assignedTo, notes } = req.body || {};
+    
+    if (!code || !code.trim()) {
+      return res.status(400).json({ error: 'code_required' });
+    }
+    
+    const cleanCode = String(code).trim().toUpperCase();
+    const cleanUrl = String(url || '').trim();
+    const cleanType = String(type || 'campaign').trim();
+    const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
+    const maxUsesValue = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
+    
+    // Verificar si ya existe
+    const existing = await collections.discountLinks()
+      .where('code', '==', cleanCode)
+      .limit(1)
+      .get();
+    
+    if (!existing.empty) {
+      return res.status(409).json({ error: 'code_already_exists' });
+    }
+    
+    const newDiscount = {
+      code: cleanCode,
+      url: cleanUrl || `https://mywed360.com/registro?ref=${cleanCode}`,
+      type: cleanType,
+      maxUses: maxUsesValue,
+      usesCount: 0,
+      status: 'activo',
+      revenue: 0,
+      currency: 'EUR',
+      assignedTo: assignedTo ? {
+        id: assignedTo.id || null,
+        name: assignedTo.name || null,
+        email: assignedTo.email || null,
+      } : null,
+      notes: String(notes || '').trim() || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdBy: 'admin',
+    };
+    
+    const docRef = await collections.discountLinks().add(newDiscount);
+    
+    console.log(`  ✅ Created discount code: ${cleanCode} (${isPermanent ? 'permanent' : `max ${maxUsesValue} uses`})`);
+    
+    return res.status(201).json({
+      id: docRef.id,
+      ...newDiscount,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('  ❌ Create discount error:', error.message);
+    logger.error('[admin-dashboard] create discount error', error);
+    return res.status(500).json({ error: 'admin_dashboard_create_discount_failed', message: error.message });
   }
 });
 
