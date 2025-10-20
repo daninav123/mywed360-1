@@ -5,6 +5,14 @@
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
+// Variable para almacenar el contexto de autenticación
+let authContext = null;
+
+// Función para registrar el contexto de autenticación desde useAuth
+export const setAuthContext = (context) => {
+  authContext = context || null;
+};
+
 const NOTIFICATION_TYPES = {
   RSVP_REMINDER: 'rsvp_reminder',
   INFO_UPDATE: 'info_update',

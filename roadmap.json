@@ -897,34 +897,38 @@
     {
       "id": "e2e_onboarding_create-event-cta_cy_js",
       "title": "E2E: Onboarding – Create Event Cta",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/create-event-cta.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_onboarding_discovery-personalized_cy_js",
       "title": "E2E: Onboarding – Discovery Personalized",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/discovery-personalized.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_onboarding_onboarding-mode-selector_cy_js",
       "title": "E2E: Onboarding – Onboarding Mode Selector",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/onboarding-mode-selector.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_personalization_personalization_preferences_cy_js",
       "title": "E2E: Personalización - personalization preferences",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/personalization/personalization-preferences.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_protocolo_ceremony_tabs_flow_cy_js",
@@ -938,10 +942,11 @@
     {
       "id": "e2e_protocolo_legal-docs-generator_cy_js",
       "title": "E2E: Protocolo – Legal Docs Generator",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/protocolo/legal-docs-generator.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_protocolo_legal-docs-validation_cy_js",
