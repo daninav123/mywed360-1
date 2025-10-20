@@ -23,7 +23,9 @@ const parseBooleanFlag = (value, defaultValue = false) => {
   return defaultValue;
 };
 
-const ENABLE_STATIC_FALLBACK = parseBooleanFlag(import.meta?.env?.VITE_BLOG_ENABLE_STATIC_FALLBACK, false);
+// En Cypress, desactivar fallbacks para tests controlados
+const isCypressEnv = typeof window !== 'undefined' && !!window.Cypress;
+const ENABLE_STATIC_FALLBACK = isCypressEnv ? false : parseBooleanFlag(import.meta?.env?.VITE_BLOG_ENABLE_STATIC_FALLBACK, false);
 
 const extractDomain = (url) => {
   try {
@@ -45,8 +47,11 @@ const hasHttpImage = (post) => {
 
 const isValidArticle = (post) => Boolean(post && post.url && hasHttpImage(post));
 
-const canUseEnglishFallback = () =>
-  Boolean(import.meta?.env?.VITE_TRANSLATE_KEY || import.meta?.env?.VITE_ENABLE_EN_FALLBACK);
+const canUseEnglishFallback = () => {
+  // En Cypress, desactivar fallback en inglés para tests controlados
+  if (isCypressEnv) return false;
+  return Boolean(import.meta?.env?.VITE_TRANSLATE_KEY || import.meta?.env?.VITE_ENABLE_EN_FALLBACK);
+};
 
 const ArticleCard = React.forwardRef(({ post }, ref) => {
   const published = post?.published ? new Date(post.published) : null;

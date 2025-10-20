@@ -530,7 +530,6 @@ const EmailSetup = () => {
               {renderDnsCard('dmarc', 'DMARC (opcional)')}
             </div>
           )}
-          </div>
 
           <div className="mt-10 border-t border-[color:var(--color-border)] pt-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
