@@ -352,10 +352,26 @@ const AdminLogin = () => {
               </div>
             )}
             <div className="flex justify-end gap-3 text-sm">
+              <button
+                type="button"
+                onClick={handleCancelMfa}
+                disabled={isVerifyingMfa}
+                className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={isVerifyingMfa || !mfaCode || mfaCode.length < MFA_CODE_LENGTH}
+                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+              >
+                {isVerifyingMfa ? 'Verificando...' : 'Verificar código'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
-  )}
-</div>
-);
   );
 };
 

@@ -961,7 +961,7 @@ export const AuthProvider = ({ children }) => {
           email,
           expiresAt: expiresAtMs,
           resumeToken: response.resumeToken,
-          rememberMe,
+          rememberMe: rememberMe || false,
         });
 
         return {
@@ -972,8 +972,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (!response.profile && !response.adminUser) {
-          throw new Error('La respuesta no incluye información de administrador');
-        }
+        throw new Error('La respuesta no incluye información de administrador');
+      }
 
         const profile = response.profile || {
           id: 'admin-unknown',
