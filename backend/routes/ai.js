@@ -10,6 +10,14 @@ import express from 'express';
 import logger from '../logger.js';
 import axios from 'axios';
 import admin from 'firebase-admin';
+import {
+  sendSuccess,
+  sendError,
+  sendValidationError,
+  sendInternalError,
+  sendServiceUnavailable,
+} from '../utils/response.js';
+import { requireAdmin } from '../middleware/authMiddleware.js';
 
 // Definir la API key directamente como respaldo si no se encuentra en las variables de entorno
 // Soportar variables de entorno tanto OPENAI_API_KEY como VITE_OPENAI_API_KEY
@@ -82,18 +90,18 @@ function buildContextSummary(context) {
 // El modo de fallback local ha sido retirado para exponer fallos de configuración.
 
 // GET /api/ai/debug-env - Endpoint temporal para verificar variables de entorno
-router.get('/debug-env', (req, res) => {
+// PROTEGIDO: Solo admin puede acceder para evitar exposición de información sensible
+router.get('/debug-env', requireAdmin, (req, res) => {
   const envVars = {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? `${process.env.OPENAI_API_KEY.substring(0, 10)}...` : 'NOT_SET',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'SET' : 'NOT_SET',
     NODE_ENV: process.env.NODE_ENV || 'NOT_SET',
-    ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN || 'NOT_SET',
-    MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? `${process.env.MAILGUN_API_KEY.substring(0, 10)}...` : 'NOT_SET',
+    ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN ? 'SET' : 'NOT_SET',
+    MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? 'SET' : 'NOT_SET',
     PORT: process.env.PORT || 'NOT_SET'
   };
   
-  logger.info('🔍 Debug env vars:', envVars);
-  res.json({ 
-    status: 'debug', 
+  logger.info('🔍 Debug env vars requested by admin');
+  return sendSuccess(res, {
     environment: envVars,
     timestamp: new Date().toISOString()
   });
@@ -135,17 +143,22 @@ router.post('/parse-dialog', async (req, res) => {
       });
       const parsed = schema.safeParse({ text, history, context });
       if (!parsed.success) {
-        return res.status(400).json({ error: 'invalid-payload', details: parsed.error.issues?.map(i => i.message).join('; ') });
+        const details = parsed.error.issues?.map(i => i.message).join('; ');
+        return sendValidationError(res, 'Invalid payload', details, req);
       }
       ({ text, history, context } = parsed.data);
     } else {
-      if (!text || typeof text !== 'string') return res.status(400).json({ error: 'text required' });
+      if (!text || typeof text !== 'string') {
+        return sendValidationError(res, 'text is required', null, req);
+      }
       if (!Array.isArray(history)) history = [];
       if (!context || typeof context !== 'object') context = null;
     }
   } catch {}
   logger.info('↪️  parse-dialog recibido', { textLen: text.length, historyLen: history.length });
-  if (!text) return res.status(400).json({ error: 'text required' });
+  if (!text) {
+    return sendValidationError(res, 'text is required', null, req);
+  }
 
   const historyMessages = Array.isArray(history)
     ? history
@@ -162,10 +175,11 @@ router.post('/parse-dialog', async (req, res) => {
 
   if (!OPENAI_API_KEY) {
     logger.error('OPENAI_API_KEY ausente; parse-dialog no puede ejecutarse');
-    return res.status(503).json({
-      error: 'openai_not_configured',
-      message: 'La integración con OpenAI no está configurada. Proporciona OPENAI_API_KEY en el backend.',
-    });
+    return sendServiceUnavailable(
+      res,
+      'La integración con OpenAI no está configurada. Proporciona OPENAI_API_KEY en el backend.',
+      req
+    );
   }
 
   // Forzar inicialización de OpenAI si aún no se ha hecho
@@ -320,23 +334,28 @@ router.post('/parse-dialog', async (req, res) => {
     }
 
     logger.info('✅ parse-dialog completado', { extractedKeys: Object.keys(extracted), replyLen: reply.length });
-    res.json({ extracted, reply });
+    return sendSuccess(res, { extracted, reply });
   } catch (err) {
     logger.error('❌ parse-dialog error', err);
-    res.status(502).json({
-      error: 'openai_request_failed',
-      message: err?.message || 'unknown',
-    });
+    return sendError(
+      res,
+      'openai_request_failed',
+      err?.message || 'Error al procesar la solicitud con OpenAI',
+      502,
+      req
+    );
   }
 });
 
 // GET /api/ai/search-suppliers?q=photographer+Madrid
 router.get('/search-suppliers', async (req, res) => {
   const q = req.query.q;
-  if (!q) return res.status(400).json({ error: 'q required' });
+  if (!q) {
+    return sendValidationError(res, 'Query parameter "q" is required', null, req);
+  }
   const { SERPAPI_API_KEY } = process.env;
   if (!SERPAPI_API_KEY) {
-    return res.status(500).json({ error: 'SERPAPI_API_KEY missing' });
+    return sendServiceUnavailable(res, 'SERPAPI_API_KEY no está configurado', req);
   }
   try {
     const resp = await axios.get('https://serpapi.com/search.json', {
@@ -352,14 +371,11 @@ router.get('/search-suppliers', async (req, res) => {
       link: r.link,
       snippet: r.snippet,
     }));
-    res.json({ results });
+    return sendSuccess(res, { results });
   } catch (err) {
-    console.error('Supplier search failed:', err);
-    res.status(500).json({ error: 'search failed', details: err?.message || 'unknown' });
+    logger.error('Supplier search failed:', err);
+    return sendInternalError(res, err, req);
   }
 });
 
 export default router;
-
-
-

@@ -12,7 +12,11 @@ export function getAdminSessionToken() {
 }
 
 export function getAdminHeaders(additional = {}) {
-  return { ...(additional || {}) };
+  const token = getAdminSessionToken();
+  return { 
+    ...(token && { 'X-Admin-Token': token }),
+    ...(additional || {}) 
+  };
 }
 
 export function hasAdminSession() {
@@ -31,6 +35,11 @@ export function getAdminFetchOptions(init = {}) {
   } else {
     base.headers = { ...base.headers };
   }
+  
+  // Agregar headers de admin si hay sesión
+  const adminHeaders = getAdminHeaders();
+  base.headers = { ...base.headers, ...adminHeaders };
+  
   if (!base.credentials) {
     base.credentials = 'include';
   }

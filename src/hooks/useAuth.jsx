@@ -894,7 +894,12 @@ export const AuthProvider = ({ children }) => {
       try {
         localStorage.setItem(ADMIN_SESSION_FLAG, 'true');
         localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(adminProfile));
-        localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
+        // CRITICAL FIX: Guardar token en lugar de eliminarlo
+        if (sessionToken) {
+          localStorage.setItem(ADMIN_SESSION_TOKEN_KEY, sessionToken);
+        } else {
+          localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
+        }
         localStorage.removeItem('mw360_auth_token');
         if (normalizedExpiry) {
           localStorage.setItem(ADMIN_SESSION_EXPIRES_KEY, normalizedExpiry.toISOString());
