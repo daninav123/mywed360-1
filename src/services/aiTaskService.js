@@ -2,7 +2,7 @@
  * AI Task Service - Sprint 8 - S8-T002
  */
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 class AITaskService {
   async generateSuggestions(weddingData) {

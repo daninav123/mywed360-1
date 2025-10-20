@@ -5,7 +5,7 @@
  */
 
 import { collection, doc, getDoc, setDoc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 /**
  * Categorías de textos

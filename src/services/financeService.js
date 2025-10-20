@@ -5,7 +5,7 @@
  */
 
 import { collection, doc, getDoc, setDoc, updateDoc, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 /**
  * Categorías de gastos predefinidas

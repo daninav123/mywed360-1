@@ -803,10 +803,10 @@
     {
       "id": "e2e_inspiration_inspiration-share_cy_js",
       "title": "E2E: Inspiration – Inspiration Share",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/inspiration/inspiration-share.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_inspiration_smoke_cy_js",
@@ -855,26 +855,26 @@
     {
       "id": "e2e_onboarding_assistant-context-switch_cy_js",
       "title": "E2E: Onboarding – Assistant Context Switch",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/assistant-context-switch.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_onboarding_assistant-conversation-happy_cy_js",
       "title": "E2E: Onboarding – Assistant Conversation Happy",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/assistant-conversation-happy.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_onboarding_assistant-followups_cy_js",
       "title": "E2E: Onboarding – Assistant Followups",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/assistant-followups.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_onboarding_create_event_flow_cy_js",
@@ -888,10 +888,11 @@
     {
       "id": "e2e_onboarding_create-event-assistant_cy_js",
       "title": "E2E: Onboarding – Create Event Assistant",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/onboarding/create-event-assistant.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_onboarding_create-event-cta_cy_js",

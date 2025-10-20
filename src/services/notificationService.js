@@ -1,9 +1,9 @@
-﻿/**
+/**
  * Notification Service - Sprint 7
  */
 
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 const NOTIFICATION_TYPES = {
   RSVP_REMINDER: 'rsvp_reminder',

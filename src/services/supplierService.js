@@ -3,7 +3,7 @@
  */
 
 import { collection, addDoc, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 class SupplierService {
   async add(weddingId, supplier) {

@@ -4,7 +4,7 @@
  */
 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 const LEGAL_TEMPLATES = {
   privacy: {

@@ -5,7 +5,7 @@
  */
 
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, writeBatch, query, where, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 /**
  * Estados de sincronización

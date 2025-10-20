@@ -5,7 +5,7 @@
  */
 
 import { doc, setDoc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { db } from '../firebaseConfig';
 
 /**
  * Definición de achievements/logros
