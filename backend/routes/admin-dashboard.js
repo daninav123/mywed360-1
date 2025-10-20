@@ -1437,17 +1437,22 @@ router.get('/portfolio', async (req, res) => {
   try {
     // Buscar bodas en ambos lugares: colección raíz Y subcolecciones
     const allDocs = [];
+    const seenIds = new Set(); // Para deduplicar
     
-    // 1. Buscar en colección raíz
+    // 1. Buscar en colección raíz (sin orderBy para evitar problemas con updatedAt faltante)
     try {
       console.log('  - Querying root weddings collection...');
       const rootSnap = await collections
         .weddings()
-        .orderBy('updatedAt', order)
         .limit(limit)
         .get();
       console.log(`  - Root collection returned ${rootSnap.size} documents`);
-      rootSnap.docs.forEach(doc => allDocs.push(doc));
+      rootSnap.docs.forEach(doc => {
+        if (!seenIds.has(doc.id)) {
+          allDocs.push(doc);
+          seenIds.add(doc.id);
+        }
+      });
     } catch (rootError) {
       console.warn('  - Root collection failed:', rootError.message);
     }
@@ -1462,23 +1467,29 @@ router.get('/portfolio', async (req, res) => {
         try {
           const userWeddingsSnap = await userDoc.ref
             .collection('weddings')
-            .orderBy('updatedAt', order)
             .limit(10)
             .get();
           
           if (!userWeddingsSnap.empty) {
             console.log(`  - User ${userDoc.id} has ${userWeddingsSnap.size} weddings`);
-            userWeddingsSnap.docs.forEach(doc => allDocs.push(doc));
+            userWeddingsSnap.docs.forEach(doc => {
+              if (!seenIds.has(doc.id)) {
+                allDocs.push(doc);
+                seenIds.add(doc.id);
+              } else {
+                console.log(`  - Skipping duplicate wedding: ${doc.id}`);
+              }
+            });
           }
         } catch (subError) {
-          // Algunos usuarios pueden no tener bodas
+          // Algunos usuarios pueden no tener bodas o no tienen updatedAt
         }
       }
     } catch (usersError) {
       console.warn('  - Subcollections query failed:', usersError.message);
     }
 
-    console.log(`  - Total documents found: ${allDocs.length}`);
+    console.log(`  - Total UNIQUE documents found: ${allDocs.length}`);
 
     if (allDocs.length === 0) {
       console.log('  ⚠️ No wedding documents found');
