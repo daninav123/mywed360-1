@@ -975,42 +975,42 @@ export const AuthProvider = ({ children }) => {
         throw new Error('La respuesta no incluye información de administrador');
       }
 
-        const profile = response.profile || {
-          id: 'admin-unknown',
-          email: ADMIN_EMAIL,
-          name: 'Administrador',
-          role: 'admin',
-          isAdmin: true,
-        };
+      const profile = response.profile || {
+        id: 'admin-unknown',
+        email: ADMIN_EMAIL,
+        name: 'Administrador',
+        role: 'admin',
+        isAdmin: true,
+      };
 
-        const user = response.adminUser || {
-          uid: profile.id || 'admin-unknown',
-          email: profile.email || ADMIN_EMAIL,
-          displayName: profile.name || 'Administrador',
-        };
+      const user = response.adminUser || {
+        uid: profile.id || 'admin-unknown',
+        email: profile.email || ADMIN_EMAIL,
+        displayName: profile.name || 'Administrador',
+      };
 
-        const adminProfile = {
-          ...profile,
-          preferences: profile.preferences || {
-            theme: 'dark',
-            emailNotifications: false,
-          },
-        };
-        const adminUser = { ...user };
+      const adminProfile = {
+        ...profile,
+        preferences: profile.preferences || {
+          theme: 'dark',
+          emailNotifications: false,
+        },
+      };
+      const adminUser = { ...user };
 
-        // Guardar sesión si no requiere MFA
-        if (typeof window !== 'undefined' && response.sessionToken) {
-          const { setAdminSession } = await import('../services/adminSession');
-          setAdminSession(response.sessionToken, rememberMe);
-        }
+      // Guardar sesión si no requiere MFA
+      if (typeof window !== 'undefined' && response.sessionToken) {
+        const { setAdminSession } = await import('../services/adminSession');
+        setAdminSession(response.sessionToken, rememberMe);
+      }
 
-        return finalizeAdminLogin({
-          adminUser,
-          adminProfile,
-          sessionToken: response.sessionToken,
-          sessionExpiresAt: response.sessionExpiresAt,
-          sessionId: response.sessionId,
-        });
+      return finalizeAdminLogin({
+        adminUser,
+        adminProfile,
+        sessionToken: response.sessionToken,
+        sessionExpiresAt: response.sessionExpiresAt,
+        sessionId: response.sessionId,
+      });
       } catch (error) {
         console.error('Error al iniciar sesión admin:', error);
         return {
