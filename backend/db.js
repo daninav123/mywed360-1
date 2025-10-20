@@ -66,19 +66,36 @@ if (!admin.apps.length) {
 
   if (parsedServiceAccount) {
     initOptions.credential = admin.credential.cert(parsedServiceAccount);
-  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS && fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
-    initOptions.credential = admin.credential.applicationDefault();
+  } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    // Resolver ruta relativa o absoluta
+    const credPath = path.isAbsolute(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+      ? process.env.GOOGLE_APPLICATION_CREDENTIALS
+      : path.resolve(__dirname, process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    
+    if (fs.existsSync(credPath)) {
+      const json = JSON.parse(fs.readFileSync(credPath, 'utf8'));
+      initOptions.credential = admin.credential.cert(json);
+      console.log(`✅ Credencial de servicio cargada desde GOOGLE_APPLICATION_CREDENTIALS: ${credPath}`);
+    } else {
+      console.warn(`⚠️  GOOGLE_APPLICATION_CREDENTIALS apunta a archivo no existente: ${credPath}`);
+    }
   } else {
     try {
       const candidates = [
         path.resolve(process.cwd(), 'serviceAccount.json'),
+        path.resolve(process.cwd(), 'serviceAccountKey.json'),
+        path.resolve(__dirname, 'serviceAccountKey.json'),
+        path.resolve(__dirname, 'serviceAccount.json'),
         path.resolve(__dirname, '..', 'serviceAccount.json'),
+        path.resolve(__dirname, '..', 'serviceAccountKey.json'),
       ];
       const svcPath = candidates.find((p) => fs.existsSync(p));
       if (svcPath) {
         const json = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
         initOptions.credential = admin.credential.cert(json);
         console.log(`✅ Credencial de servicio cargada desde ${svcPath}`);
+      } else {
+        console.warn('⚠️  No se encontró archivo de credenciales. Buscados:', candidates);
       }
     } catch (e) {
       console.warn('⚠️  No se pudo cargar serviceAccount.json de fallback:', e?.message);
