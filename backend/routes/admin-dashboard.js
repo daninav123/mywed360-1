@@ -45,17 +45,26 @@ const collections = {
 function toDate(value) {
   try {
     if (!value) return null;
-    if (typeof value.toDate === 'function') return value.toDate();
+    // Verificar que toDate existe y es una función
+    if (value.toDate && typeof value.toDate === 'function') {
+      try {
+        return value.toDate();
+      } catch (e) {
+        console.warn('[toDate] Error calling toDate():', e.message);
+        return null;
+      }
+    }
     if (value instanceof Date) return value;
     if (typeof value === 'number') return new Date(value);
     if (typeof value === 'string') {
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? null : date;
+      const d = new Date(value);
+      return isNaN(d.getTime()) ? null : d;
     }
+    return null;
   } catch (error) {
-    logger.warn('[admin-dashboard] toDate parse error', { value, message: error.message });
+    console.warn('[toDate] Unexpected error:', error.message);
+    return null;
   }
-  return null;
 }
 
 function formatDateTime(value) {
@@ -1471,7 +1480,15 @@ router.get('/portfolio', async (req, res) => {
         data.date ||
         data.weddingInfo?.weddingDate ||
         null;
-      const eventDateDate = toDate(eventDateRaw);
+      
+      // Convertir fecha de forma segura
+      let eventDateDate = null;
+      try {
+        eventDateDate = toDate(eventDateRaw);
+      } catch (dateError) {
+        console.warn('[portfolio] Error converting event date:', dateError.message, 'for wedding:', docSnap.id);
+        eventDateDate = null;
+      }
       if (fromDate && (!eventDateDate || eventDateDate < fromDate)) continue;
       if (toDate && (!eventDateDate || eventDateDate > toDate)) continue;
 
