@@ -1435,27 +1435,52 @@ router.get('/portfolio', async (req, res) => {
   console.log('  - Order:', order);
 
   try {
-    // Intentar primero con collectionGroup (subcolecciones users/{uid}/weddings)
-    let snap;
+    // Buscar bodas en ambos lugares: colección raíz Y subcolecciones
+    const allDocs = [];
+    
+    // 1. Buscar en colección raíz
     try {
-      console.log('  - Attempting collectionGroup query...');
-      snap = await collections
-        .weddingsGroup()
-        .orderBy('updatedAt', order)
-        .limit(limit * 3)
-        .get();
-      console.log(`  - CollectionGroup returned ${snap.size} documents`);
-    } catch (groupError) {
-      console.warn('  - CollectionGroup failed, trying root collection:', groupError.message);
-      snap = await collections
+      console.log('  - Querying root weddings collection...');
+      const rootSnap = await collections
         .weddings()
         .orderBy('updatedAt', order)
-        .limit(limit * 3)
+        .limit(limit)
         .get();
-      console.log(`  - Root collection returned ${snap.size} documents`);
+      console.log(`  - Root collection returned ${rootSnap.size} documents`);
+      rootSnap.docs.forEach(doc => allDocs.push(doc));
+    } catch (rootError) {
+      console.warn('  - Root collection failed:', rootError.message);
+    }
+    
+    // 2. Buscar en subcolecciones users/{uid}/weddings
+    try {
+      console.log('  - Querying users subcollections...');
+      const usersSnap = await collections.users().limit(100).get();
+      console.log(`  - Found ${usersSnap.size} users to check`);
+      
+      for (const userDoc of usersSnap.docs) {
+        try {
+          const userWeddingsSnap = await userDoc.ref
+            .collection('weddings')
+            .orderBy('updatedAt', order)
+            .limit(10)
+            .get();
+          
+          if (!userWeddingsSnap.empty) {
+            console.log(`  - User ${userDoc.id} has ${userWeddingsSnap.size} weddings`);
+            userWeddingsSnap.docs.forEach(doc => allDocs.push(doc));
+          }
+        } catch (subError) {
+          // Algunos usuarios pueden no tener bodas
+        }
+      }
+    } catch (usersError) {
+      console.warn('  - Subcollections query failed:', usersError.message);
     }
 
-    if (snap.empty) {
+    console.log(`  - Total documents found: ${allDocs.length}`);
+
+    if (allDocs.length === 0) {
       console.log('  ⚠️ No wedding documents found');
       return res.json({
         items: [],
@@ -1469,7 +1494,7 @@ router.get('/portfolio', async (req, res) => {
     }
 
     const items = [];
-    for (const docSnap of snap.docs) {
+    for (const docSnap of allDocs) {
       const data = docSnap.data() || {};
       const status = String(data.status || (data.active === false ? 'archived' : 'active'));
       if (statusFilter && status !== statusFilter) continue;
