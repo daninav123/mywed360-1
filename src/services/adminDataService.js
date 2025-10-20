@@ -136,14 +136,19 @@ const normalizeWeddingStats = (stats) => {
 };
 
 async function fetchAdminEndpoint(path) {
+  console.log(`🔍 [adminDataService] Fetching admin endpoint: ${path}`);
   try {
     const response = await apiGet(path, getAdminFetchOptions({ auth: false, silent: true }));
+    console.log(`  - Response status: ${response.status}`);
+    console.log(`  - Response ok: ${response.ok}`);
 
     let data = null;
     if (response.status !== 204) {
       try {
         data = await response.json();
-      } catch {
+        console.log(`  - Data received:`, data);
+      } catch (jsonError) {
+        console.error(`  ❌ Failed to parse JSON:`, jsonError);
         data = null;
       }
     }

@@ -1262,11 +1262,17 @@ router.get('/users', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 100, MAX_LIMIT);
   const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
 
+  console.log('\n🔍 [DEBUG] GET /users endpoint called');
+  console.log('  - Limit:', limit);
+  console.log('  - Status filter:', statusFilter || 'none');
+  console.log('  - Firebase Admin initialized:', !!admin.apps.length);
+  
   try {
     // Intentar primero desde Firestore
     let items = [];
     let fromAuth = false;
     
+    console.log('  - Attempting Firestore query...');
     try {
       let query;
       try {
@@ -1279,6 +1285,7 @@ router.get('/users', async (req, res) => {
       }
 
       const snap = await query.get();
+      console.log(`  - Firestore query result: ${snap.size} users found`);
       
       if (!snap.empty) {
         for (const docSnap of snap.docs) {
@@ -1328,12 +1335,16 @@ router.get('/users', async (req, res) => {
         }
       }
     } catch (firestoreError) {
+      console.error('  ❌ Firestore query failed:', firestoreError.message);
+      console.log('  - Switching to Firebase Auth fallback...');
       logger.warn('[admin-dashboard] Firestore users query failed, trying Firebase Auth', { message: firestoreError?.message });
       fromAuth = true;
       
       // Fallback: obtener usuarios desde Firebase Authentication
       try {
+        console.log('  - Calling admin.auth().listUsers()...');
         const listUsersResult = await admin.auth().listUsers(limit);
+        console.log(`  - Firebase Auth returned ${listUsersResult.users.length} users`);
         
         for (const userRecord of listUsersResult.users) {
           const status = userRecord.disabled ? 'disabled' : 'active';
@@ -1374,11 +1385,15 @@ router.get('/users', async (req, res) => {
           });
         }
       } catch (authError) {
+        console.error('  ❌ Firebase Auth also failed:', authError.message);
         logger.error('[admin-dashboard] Firebase Auth listUsers failed', authError);
         throw authError;
       }
     }
 
+    console.log(`  ✅ Returning ${items.length} users (source: ${fromAuth ? 'firebase-auth' : 'firestore'})`);
+    console.log('  - Sample user:', items[0] || 'none');
+    
     return res.json({
       items,
       meta: {

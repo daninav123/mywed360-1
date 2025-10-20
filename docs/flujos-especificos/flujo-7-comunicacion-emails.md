@@ -47,8 +47,10 @@
   - Eliminación: en carpetas activas se usa `EmailService.moveMail(id, 'trash')`; en `trash` se invoca `EmailService.deleteMail`. Las operaciones limpian asignaciones locales de carpetas personalizadas (`removeEmailFromFolder`) y refrescan conteos globales.
   - `EmptyTrashModal.jsx` delega en el nuevo `EmailService.emptyTrash`, vaciando la carpeta y actualizando la UI tras confirmar.
 - `UnifiedInbox/EmailList.jsx`:
-  - Gestiona selección múltiple y “Eliminar” respetando la carpeta actual (mueve a papelera o elimina permanentemente en `trash`). Añade `data-testid` (`email-list-item`, `empty-folder-message`) para soportar Cypress.
-  - El buscador y orden secundario siguen sin cablearse al contenedor; queda pendiente decidir si se eliminan o se sincronizan con el estado global.
+  - Gestiona selección múltiple y “Eliminar” respetando la carpeta actual (mueve a papelera o elimina permanente en `trash`). Añade `data-testid` (`email-list-item`, `empty-folder-message`) para soportar Cypress.
+  - Búsqueda: `searchTerm` dispara `debouncedSearchEmails` filtrando asunto, remitente y etiquetas en el estado global (`emailStore`). Se sincroniza con la query `?q=` para enlaces compartidos.
+  - Orden secundario: `sortMode` (`recent`, `oldest`, `bySender`) se almacena en estado global y localStorage (`mywed360_email_sort`). Falta cablear el menú de UI (TODO histórico) → ahora se definió que debe leer/escribir este estado.
+  - TODO pendiente: mover la lógica de orden/búsqueda al backend (`GET /api/mail?search=&sort=`) cuando esté disponible.
 - - `UnifiedInbox/EmailDetail.jsx`:
   - Acciones según carpeta: en `trash` aparecen `Restaurar` y `Eliminar permanentemente`; fuera de `trash` se muestran `Mover a carpeta`, `Marcar importante` y `Agregar comentario`.
   - Panel lateral con pestañas:
@@ -66,7 +68,7 @@
 - `services/emailAutomationService.js` gestiona:
   - Configuración de clasificación y auto-respuestas (se migrará a `users/{uid}/emailAutomation` en Firestore). Cada regla guarda `{ category, enabled, subject, body, delayMinutes, cooldownHours, excludedSenders[] }`.
   - Procesamiento de entradas (`processIncomingEmails`): arma payload con preview, etiquetas y `weddingContext`. Si `callClassificationAPI` responde `{ classification, autoReply, confidence }`, aplica acciones; de lo contrario usa heurísticas locales y marca `classificationConfidence="low"`.
-  - Cola de envíos programados (`scheduleEmailSend`, `getScheduledEmails`, `processScheduledEmails`): registra `{ emailId, sendAt, state, attempts }`. El job backend debe ejecutar `processScheduledEmails` cada minuto; tras 3 fallos se marca `failed` y se notifica.
+  - Cola de envíos programados (`scheduleEmailSend`, `getScheduledEmails`, `processScheduledEmails`): registra `{ emailId, sendAt, state, attempts }`. El job backend `emailSchedulerWorker` ejecutará `processScheduledEmails` cada minuto, registrará eventos en `emailScheduledAudit` y expondrá `/api/email/scheduled/status`; tras 3 fallos se marca `failed` y se notifica.
   - Webhooks pendientes: `markEmailDelivered`, `markEmailBounced` (alimentarán métricas y alertas).
 - `services/EmailRecommendationService.js` + `AIEmailTrackingService` llevan métricas locales para sugerencias IA dentro del Smart Composer.
   - Inputs clave: `weddingProfile.vibeKeywords`, `specialInterests`, `noGoItems`, estado del flujo 2C (`recommendation_conflict`). Las recomendaciones se etiquetan con `contextTag` (`core`, `contraste`) para rastrear adopción.
@@ -78,16 +80,17 @@
   - `EmailService.moveMail` (alias de `setFolder`) se usa para mover correos; `EmailService.deleteMail` queda reservado para `trash` y vaciados masivos. `removeEmailFromFolder` limpia mapeos locales cuando se desplaza un correo fuera de una carpeta personalizada.
   - Restaurar desde la papelera devuelve el correo a `inbox` por defecto; todavía no se conserva la carpeta original ni se rehidratan etiquetas personalizadas.
   - Los contadores de carpetas personalizadas dependen de `folderService` en localStorage; no existe sincronización de `unread` ni métricas agregadas en backend.
-- **Pendientes:**
-  - Persistir carpeta de origen y contadores `unread` en backend para soportar restauraciones completas y métricas consistentes.
-  - Añadir UI para mover correos entre carpetas personalizadas desde lista/detalle (drag & drop o `FolderSelectionModal`).
-  - Definir política de retención automática (cron/backend) y registrar métricas de papelera/acciones de limpieza.
+- **Pendientes (diseño acordado):**
+  - Drag & drop de carpetas personalizadas: el objetivo es usar `FolderSelectionModal` + `folderService.reorderFolders()` para reflejar orden en `users/{uid}/emailFolders.order`.
+  - Contadores `unread` en backend: cada movimiento de correo actualizará `emailFolderStats/{folderId}.unread` mediante Cloud Function `onMailUpdated`.
+  - Retención automática: job `emailTrashRetention` ejecutado diariamente purgará correos con `deletedAt` > 30 días y registrará métricas en `emailRetentionAudit`.
+  - UI de mover entre carpetas personalizadas desde lista/detalle (menú contextual + atajos teclado).
 
 ## 4. Persistencia y datos
 - Correos: `services/emailService.js` prioriza backend (`/api/mail/*`). Sin backend, cae a Firestore (`users/{uid}/mails` y colección global `mails`) o memoria/localStorage (`memoryStore.mails`). El campo `folder` se actualiza con `EmailService.setFolder` (cuando se integre) y se usa para determinar `inbox`/`sent`/`trash`/personalizadas. No existe colección `weddings/{id}/emails`.
 - Alias: `hooks/useEmailUsername.jsx` escribe en `emailUsernames/{alias}` y `users/{uid}` (`emailUsername`, `myWed360Email`).
 - Configuración auto-respuesta / clasificación / cola: claves en `localStorage` (`mywed360.email.automation.*`, `mywed360.email.automation.schedule`…).
-- Contexto de personalización: se debe sincronizar `emailContext` con resumen del `weddingProfile` (estilo, idioma preferido, contrastes) para renderizar plantillas IA coherentes; hoy solo existe en memoria (`EmailRecommendationService`), pendiente persistir en Firestore (`weddings/{id}/emailContext`).
+- Contexto de personalización: `emailContext` se persistirá en `weddings/{id}/emailContext` con `{ language, tone, vibeKeywords[], specialInterests[], noGoItems[], contrastNotes[] }`. Se actualizará cuando cambien `weddingInsights` y expondrá versión para cache (`version`).
 - Etiquetas y carpetas personalizadas: `tagService.js` (`mywed360_email_tags_*`) y `folderService.js` (`mywed360_email_folders_{uid}` + `mywed360_email_folder_mapping_{uid}`) almacenan en `localStorage` con espejo opcional a Firestore; la UI principal todavía no consume dichos datos.
 - Plantillas: API `/api/email-templates` (via `services/emailTemplatesService.js`); fallback a catálogo estático `services/emailTemplates.js`. No existe sincronización automática con Firestore.
 - Métricas agregadas: Firestore `emailMetrics/{userId}` (+ subcolección `daily`). El cálculo local guarda copia en `localStorage` (`mywed360_email_stats_{userId}`).
@@ -108,7 +111,7 @@
 | autoReply | { applied: bool, templateId?, delayMinutes? } | Resultado de auto-respuestas. |
 | scheduled | { sendAt?, state?, attempts? } | Solo presente en envios programados. |
 | weddingId | string | Contexto de boda para integraciones cruzadas. |
-| analytics | { opens?, clicks?, lastOpenAt?, lastClickAt? } | Telemetria Mailgun (pendiente). |
+| analytics | { opens: number, clicks: number, bounces: number, complaints: number, lastEventAt: timestamp } | Datos alimentados por webhooks Mailgun para métricas y alertas. |
 | createdAt, updatedAt | timestamp | Auditoria.
 
 ### 4.2 Colecciones colaborativas
@@ -231,25 +234,28 @@
 - **Frontend:** exponer data-testids alineados con Cypress, asegurar que `UnifiedInbox` reemplaza completamente al legacy y limpiar scripts/estilos duplicados antes de release.
 
 ## 11. Roadmap / pendientes
-1. **Automatización y backend**
-   - Vigilar latencia y fallbacks de ``callClassificationAPI`` (ya cableado via ``processIncomingEmails``) y mantener heuristicas de respaldo cuando el endpoint no responda.
-   - Completar migracion de la cola de envíos programados a backend/job recurrente (`emailSchedulerWorker` cada 1 min) que ejecute `processScheduledEmails`, registre logs en `emailScheduledAudit` y exponga API `/api/email/scheduled/status` para UI.
-   - Persistir auto-respuestas y clasificación en Firestore/REST (no sólo localStorage).
-2. **UX / funcionalidad**
-   - Completar integracion de carpetas personalizadas (drag & drop, alinear etiquetas); los contadores ``unread`` ya se sincronizan automaticamente.
-   - Refinar papelera (`trash`): restaurar a la carpeta de origen, exponer métricas/retención y consolidar vaciado backend.
-   - Resolver buscador/sort duplicado en `UnifiedInbox/EmailList.jsx` y alinear data-testids con Cypress.
-   - Añadir toggle o ruta para acceder al buzón legacy sólo en modo soporte, o removerlo tras migración.
-   - Completar experiencia de onboarding: validación DKIM/SPF, envío de correo de prueba, integración con `MailgunTester`.
-3. **Analítica y monitoreo**
-   - Registrar eventos de entrega/aperturas reales (Mailgun webhooks) y mostrar alertas en `EmailInsights`/`EmailStats`.
-   - Integrar métricas con dashboards oficiales (Grafana/BigQuery) y alertas para rebotes.
-4. **Integraciones cruzadas**
-   - Sincronizar preferencias con módulo de notificaciones (Flujo 12) y con workflows IA globales (Flujo 16).
-   - Implementar journeys multicanal (email + push + WhatsApp) y timeline conversacional centralizado.
-5. **Testing**
-   - Actualizar suites Cypress/Vitest al nuevo inbox, añadir cobertura para comentarios, calendar, feedback y envíos programados.
-   - Automatizar pruebas de alias / onboarding (`EmailSetup`) y Mailgun fallback.
+1. **Automatización y backend (Owner: Backend Squad, ETA Q4 2025)**
+   - callClassificationAPI: monitorizar latencia y definir fallback documentado (classificationConfidence='low'). Responsable: Backend Squad / SRE.
+   - emailSchedulerWorker: desplegar cron cada minuto, registrar en emailScheduledAudit y exponer /api/email/scheduled/status. Responsable: Backend Squad.
+   - Persistir auto-respuestas y clasificación en Firestore (users/{uid}/emailAutomation) y APIs REST. Responsable: Backend Squad.
+   - Webhooks markEmailDelivered/markEmailBounced: almacenar en emailDeliverability/{messageId} y disparar alertas. Responsable: Integraciones.
+2. **UX / funcionalidad (Owner: Frontend Squad, ETA Q1 2026)**
+   - Drag & drop y reorder de carpetas personalizadas con sincronización emailFolderStats.
+   - Papelera avanzada: restaurar carpeta original, métricas de retención y vaciado masivo.
+   - Búsqueda/orden integrados en estado global y backend (GET /api/mail).
+   - Toggle de buzón legacy solo soporte y plan de retirada.
+   - Onboarding completo con validación DKIM/SPF y correo de prueba automatizado.
+3. **Analítica y monitoreo (Owner: Data/Analytics, ETA Q1 2026)**
+   - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate, eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
+   - Alertas automáticas: rebotes >5% diario, complained >0.5%, SLA respuesta >24h.
+4. **Integraciones cruzadas (Owner: Orquestador/IA, ETA Q2 2026)**
+   - Consolidar workflows IA (Flujo 16) con etiquetado y borradores state=draft.
+   - Journeys multicanal (email + push + WhatsApp) y timeline conversacional.
+   - Sincronizar preferencias de notificaciones (Flujo 12) con auto-respuestas.
+5. **Testing y QA (Owner: QA Guild, continuo)**
+   - Actualizar suites Cypress/Vitest para Inbox, comentarios, agenda, feedback y programados.
+   - Automatizar pruebas de alias/onboarding y fallback Mailgun.
+   - Añadir cobertura para emailTrashRetention, webhooks de rebote y métricas.
 
 Mantener esta lista viva antes de iniciar nuevas implementaciones en Flujo 7.
 

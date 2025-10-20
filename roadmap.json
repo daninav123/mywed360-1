@@ -951,18 +951,19 @@
     {
       "id": "e2e_protocolo_legal-docs-validation_cy_js",
       "title": "E2E: Protocolo – Legal Docs Validation",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/protocolo/legal-docs-validation.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_protocolo_legal-docs-versioning_cy_js",
       "title": "E2E: Protocolo – Legal Docs Versioning",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/protocolo/legal-docs-versioning.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_protocolo_protocolo_flows_cy_js",
@@ -1012,10 +1013,11 @@
     {
       "id": "e2e_rsvp_confirm_cy_js_1",
       "title": "E2E: General – Rsvp Confirm",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/rsvp_confirm.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_seating_seating_area_type_cy_js",
@@ -1056,50 +1058,53 @@
     {
       "id": "e2e_seating_seating_ui_panels_cy_js",
       "title": "E2E: Seating – Seating Ui Panels",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating_ui_panels.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_seating_seating-basic_cy_js",
       "title": "E2E: Seating – Seating Basic",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating-basic.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_seating_seating-conflicts_cy_js",
       "title": "E2E: Seating – Seating Conflicts",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating-conflicts.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_seating_seating-export_cy_js",
       "title": "E2E: Seating – Seating Export",
-      "status": "pending",
+      "status": "completed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/seating/seating-export.cy.js\"",
-      "attempts": 0
+      "attempts": 1
     },
     {
       "id": "e2e_style_style_global_cy_js",
       "title": "E2E: Estilo global - style global",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/style/style-global.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "e2e_subscriptions_subscription-flow_cy_js",
       "title": "E2E: Subscriptions – Subscription Flow",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/subscriptions/subscription-flow.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 4"
     },
     {
       "id": "e2e_tasks_all_subtasks_modal_cy_js",
@@ -1131,10 +1136,11 @@
     {
       "id": "e2e_weddings_wedding-team-flow_cy_js",
       "title": "E2E: Weddings – Wedding Team Flow",
-      "status": "pending",
+      "status": "failed",
       "priority": 15,
       "command": "npm run cypress:run -- --spec \"cypress/e2e/weddings/wedding-team-flow.cy.js\"",
-      "attempts": 0
+      "attempts": 1,
+      "lastError": "Task process exit code 1"
     },
     {
       "id": "prep_vendors_ia_bootstrap",

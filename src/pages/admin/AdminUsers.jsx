@@ -49,16 +49,32 @@ const AdminUsers = () => {
   const [roleSummaryError, setRoleSummaryError] = useState('');
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getUsersData();
-      setUsers(data);
-    } catch (error) {
-      console.error('[AdminUsers] Failed to load users', error);
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
+    const load = async () => {
+      console.log(' [AdminUsers] Starting to load users...');
+      setLoading(true);
+      try {
+        const data = await getUsersData();
+        console.log('  Data received from backend:', data);
+        console.log('  - Items count:', data.items?.length || 0);
+        console.log('  - First item:', data.items?.[0]);
+        console.log('  - Meta:', data.meta);
+        console.log('  - Role summary:', data.roleSummary);
+        
+        setUsers(data.items || []);
+        setRoleSummary(data.roleSummary || { owner: 0, planner: 0, assistant: 0 });
+        
+        console.log('  - Users state updated:', data.items?.length || 0, 'users');
+      } catch (err) {
+        console.error('  Error loading users:', err);
+        console.error('  - Error message:', err.message);
+        console.error('  - Error stack:', err.stack);
+        setError(err.message || 'Error cargando usuarios');
+      } finally {
+        setLoading(false);
+        console.log('  - Loading finished');
+      }
+    };
+    load();
   }, []);
 
   const fetchRoleSummary = useCallback(async () => {
