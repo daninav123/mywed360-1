@@ -934,83 +934,92 @@ export const AuthProvider = ({ children }) => {
   );
 
   const loginAdmin = useCallback(
-    async (email, password) => {
-      const normalizedEmail = String(email || '').trim().toLowerCase();
-      const userDomain = normalizedEmail.includes('@')
-        ? normalizedEmail.split('@').pop()
-        : '';
+    async (email, password, rememberMe = false) => {
+      try {
+        if (!email || !password) {
+          throw new Error('Email y contraseña son requeridos');
+        }
 
-      if (!normalizedEmail) {
-        return { success: false, error: 'Introduce un email válido' };
-      }
+        const trimmedEmail = String(email).trim().toLowerCase();
+        const normalizedEmail = trimmedEmail.replace(/\s+/g, '');
 
-      if (ADMIN_ALLOWED_DOMAIN_SET.size && !ADMIN_ALLOWED_DOMAIN_SET.has(userDomain)) {
-        return {
-          success: false,
-          error: 'Dominio no autorizado',
-          code: 'domain_not_allowed',
+        if (!normalizedEmail || !normalizedEmail.includes('@')) {
+          return {
+            success: false,
+            error: 'Formato de email no válido',
+            code: 'invalid_email',
+          };
+        }
+
+        const userDomain = normalizedEmail.split('@')[1];
+
+        if (ADMIN_ALLOWED_DOMAIN_SET.size && !ADMIN_ALLOWED_DOMAIN_SET.has(userDomain)) {
+          return {
+            success: false,
+            error: 'Dominio no autorizado',
+            code: 'domain_not_allowed',
+          };
+        }
+
+        const response = await adminLoginRequest({ email, password });
+
+        if (response.requiresMfa) {
+          const expiresAtMs = response.expiresAt || Date.now() + 5 * 60 * 1000;
+          setPendingAdminSession({
+            challengeId: response.challengeId,
+            email,
+            expiresAt: expiresAtMs,
+            resumeToken: response.resumeToken,
+            rememberMe: rememberMe || false,
+          });
+
+          return {
+            success: true,
+            requiresMfa: true,
+            expiresAt: expiresAtMs,
+          };
+        }
+
+        if (!response.profile && !response.adminUser) {
+          throw new Error('La respuesta no incluye información de administrador');
+        }
+
+        const profile = response.profile || {
+          id: 'admin-unknown',
+          email: ADMIN_EMAIL,
+          name: 'Administrador',
+          role: 'admin',
+          isAdmin: true,
         };
-      }
 
-      const response = await adminLoginRequest({ email, password });
+        const user = response.adminUser || {
+          uid: profile.id || 'admin-unknown',
+          email: profile.email || ADMIN_EMAIL,
+          displayName: profile.name || 'Administrador',
+        };
 
-      if (response.requiresMfa) {
-        const expiresAtMs = response.expiresAt || Date.now() + 5 * 60 * 1000;
-        setPendingAdminSession({
-          challengeId: response.challengeId,
-          email,
-          expiresAt: expiresAtMs,
-          resumeToken: response.resumeToken,
-          rememberMe: rememberMe || false,
+        const adminProfile = {
+          ...profile,
+          preferences: profile.preferences || {
+            theme: 'dark',
+            emailNotifications: false,
+          },
+        };
+        const adminUser = { ...user };
+
+        // Guardar sesión si no requiere MFA
+        if (typeof window !== 'undefined' && response.sessionToken) {
+          const { setAdminSession } = await import('../services/adminSession');
+          setAdminSession(response.sessionToken, rememberMe);
+        }
+
+        return finalizeAdminLogin({
+          adminUser,
+          adminProfile,
+          sessionToken: response.sessionToken,
+          sessionExpiresAt: response.sessionExpiresAt,
+          sessionId: response.sessionId,
         });
-
-        return {
-          success: true,
-          requiresMfa: true,
-          expiresAt: expiresAtMs,
-        };
-      }
-
-      if (!response.profile && !response.adminUser) {
-        throw new Error('La respuesta no incluye información de administrador');
-      }
-
-      const profile = response.profile || {
-        id: 'admin-unknown',
-        email: ADMIN_EMAIL,
-        name: 'Administrador',
-        role: 'admin',
-        isAdmin: true,
-      };
-
-      const user = response.adminUser || {
-        uid: profile.id || 'admin-unknown',
-        email: profile.email || ADMIN_EMAIL,
-        displayName: profile.name || 'Administrador',
-      };
-
-      const adminProfile = {
-        ...profile,
-        preferences: profile.preferences || {
-          theme: 'dark',
-          emailNotifications: false,
-        },
-      };
-      const adminUser = { ...user };
-
-      // Guardar sesión si no requiere MFA
-      if (typeof window !== 'undefined' && response.sessionToken) {
-        const { setAdminSession } = await import('../services/adminSession');
-        setAdminSession(response.sessionToken, rememberMe);
-      }
-
-      return finalizeAdminLogin({
-        adminUser,
-        adminProfile,
-        sessionToken: response.sessionToken,
-        sessionExpiresAt: response.sessionExpiresAt,
-        sessionId: response.sessionId,
-      });
       } catch (error) {
         console.error('Error al iniciar sesión admin:', error);
         return {

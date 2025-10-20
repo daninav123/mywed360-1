@@ -236,7 +236,7 @@
 ## 11. Roadmap / pendientes
 1. **Automatización y backend (Owner: Backend Squad, ETA Q4 2025)**
    - ✅ 2025-10-20: callClassificationAPI con monitorización de latencia y fallback documentado (`confidence` + evento `email_classification_api`). Responsable: Backend Squad / SRE.
-   - emailSchedulerWorker: desplegar cron cada minuto, registrar en emailScheduledAudit y exponer /api/email/scheduled/status. Responsable: Backend Squad.
+   - ✅ 2025-10-20: emailSchedulerWorker desplegado con cron, registro `emailScheduledAudit` y endpoint `/api/email/scheduled/status`. Responsable: Backend Squad.
    - Persistir auto-respuestas y clasificación en Firestore (users/{uid}/emailAutomation) y APIs REST. Responsable: Backend Squad.
    - Webhooks markEmailDelivered/markEmailBounced: almacenar en emailDeliverability/{messageId} y disparar alertas. Responsable: Integraciones.
 2. **UX / funcionalidad (Owner: Frontend Squad, ETA Q1 2026)**

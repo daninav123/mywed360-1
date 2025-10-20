@@ -269,6 +269,42 @@ function isCronAuthorized(req) {
   return process.env.NODE_ENV !== 'production';
 }
 
+function toIso(value) {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') {
+    try {
+      return value.toDate().toISOString();
+    } catch {
+      return null;
+    }
+  }
+  if (value instanceof Date) {
+    try {
+      return value.toISOString();
+    } catch {
+      return null;
+    }
+  }
+  if (typeof value === 'string') return value;
+  return null;
+}
+
+async function getStatusCount(queueRef, status) {
+  try {
+    const aggregateSnap = await queueRef.where('status', '==', status).count().get();
+    const data = aggregateSnap.data();
+    if (data && typeof data.count === 'number') return data.count;
+  } catch (error) {
+    try {
+      const snapshot = await queueRef.where('status', '==', status).limit(500).get();
+      return snapshot.size;
+    } catch (fallbackError) {
+      console.warn('[email-automation] count fallback failed', status, fallbackError);
+    }
+  }
+  return null;
+}
+
 router.post('/schedule/process', async (req, res) => {
   if (!isCronAuthorized(req)) {
     return res.status(401).json({ error: 'unauthorized' });
@@ -288,6 +324,75 @@ router.post('/schedule/process', async (req, res) => {
 });
 
 router.use(requireAuth);
+
+router.get('/scheduled/status', async (req, res) => {
+  try {
+    const queueRef = db.collection(QUEUE_COLLECTION);
+
+    const [pendingCount, processingCount, failedCount] = await Promise.all([
+      getStatusCount(queueRef, 'scheduled'),
+      getStatusCount(queueRef, 'processing'),
+      getStatusCount(queueRef, 'failed'),
+    ]);
+
+    const upcomingSnapshot = await queueRef
+      .where('status', '==', 'scheduled')
+      .orderBy('scheduledAt', 'asc')
+      .limit(10)
+      .get();
+
+    const upcoming = upcomingSnapshot.docs.map((doc) => {
+      const data = doc.data() || {};
+      return {
+        id: doc.id,
+        ownerUid: data.ownerUid || null,
+        status: data.status || 'scheduled',
+        attempts: data.attempts || 0,
+        scheduledAt: toIso(data.scheduledAt),
+        createdAt: toIso(data.createdAt),
+        updatedAt: toIso(data.updatedAt),
+      };
+    });
+
+    const auditSnapshot = await db
+      .collection(AUDIT_COLLECTION)
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+
+    let lastRun = null;
+    if (!auditSnapshot.empty) {
+      const doc = auditSnapshot.docs[0];
+      const data = doc.data() || {};
+      lastRun = {
+        id: doc.id,
+        processed: data.processed || 0,
+        successCount: data.successCount || 0,
+        failedCount: data.failedCount || 0,
+        skippedCount: data.skippedCount || 0,
+        durationMs: data.durationMs || null,
+        limit: data.limit || null,
+        startedAt: toIso(data.startedAt),
+        finishedAt: toIso(data.finishedAt),
+        createdAt: toIso(data.createdAt),
+      };
+    }
+
+    return res.json({
+      timestamp: new Date().toISOString(),
+      metrics: {
+        pending: pendingCount,
+        processing: processingCount,
+        failed: failedCount,
+      },
+      upcoming,
+      lastRun,
+    });
+  } catch (error) {
+    console.error('[email-automation] GET /scheduled/status failed', error);
+    return res.status(500).json({ error: 'status-failed' });
+  }
+});
 
 router.get('/state', async (req, res) => {
   try {
