@@ -29,6 +29,7 @@ const AdminLogin = () => {
   const [mfaCode, setMfaCode] = useState('');
   const [mfaError, setMfaError] = useState('');
   const [isVerifyingMfa, setIsVerifyingMfa] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const supportEmail = useMemo(
     () =>
@@ -351,26 +352,10 @@ const AdminLogin = () => {
               </div>
             )}
             <div className="flex justify-end gap-3 text-sm">
-              <button
-                type="button"
-                onClick={handleCancelMfa}
-                className="px-3 py-2 text-[var(--color-text-soft,#6b7280)] hover:underline"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                data-testid="admin-mfa-submit"
-                disabled={isVerifyingMfa}
-                className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-[color:var(--color-on-primary,#ffffff)] hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isVerifyingMfa ? 'Validando...' : 'Validar código'}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
     </div>
+  )}
+</div>
+);
   );
 };
 

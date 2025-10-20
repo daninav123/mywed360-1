@@ -7,6 +7,8 @@ export const QUEUE_COLLECTION = 'emailAutomationQueue';
 export const DEFAULT_PROCESS_LIMIT = 25;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MINUTES = 5;
+const AUDIT_COLLECTION = 'emailScheduledAudit';
+const AUDIT_MAX_ENTRIES = 200;
 
 function toIsoDate(value) {
   if (!value) return null;

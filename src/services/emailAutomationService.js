@@ -1,5 +1,6 @@
 ﻿/* eslint-disable no-undef */
 import { get as apiGet, post, put as apiPut, del as apiDel } from './apiClient';
+import { performanceMonitor } from './PerformanceMonitor';
 import { USE_BACKEND } from './emailService';
 
 const CLASSIFICATION_ENDPOINT = '/api/email-insights/classify';
@@ -24,6 +25,17 @@ const REMOTE_QUEUE_CACHE_TTL_MS = 30 * 1000;
 const STATE_ENDPOINT = '/api/email-automation/state';
 const STATE_AUTOREPLY_ENDPOINT = '/api/email-automation/state/auto-reply';
 const REMOTE_STATE_TTL_MS = 60 * 1000;
+
+const HAS_PERFORMANCE_NOW =
+  typeof performance !== 'undefined' && typeof performance.now === 'function';
+const nowMs = () => (HAS_PERFORMANCE_NOW ? performance.now() : Date.now());
+
+const clampConfidence = (value) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return undefined;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+};
 
 const remoteScheduleCache = {
   queue: [],
@@ -547,11 +559,14 @@ function fallbackClassification(mail) {
       tags.add('Urgente');
     }
 
+    const confidence = tags.size > 0 ? 0.35 : 0.1;
     return {
       tags: Array.from(tags),
       folder,
       source: 'heuristic',
       createdAt: Date.now(),
+      confidence,
+      reason: 'heuristic_rules',
     };
   } catch {
     return {
@@ -559,14 +574,24 @@ function fallbackClassification(mail) {
       folder: null,
       source: 'heuristic',
       createdAt: Date.now(),
+      confidence: 0.05,
+      reason: 'heuristic_rules_error',
     };
   }
 }
 
 async function callClassificationAPI(mail) {
   if (!mail) return null;
+
+  const startedAt = nowMs();
+  let status = 'error';
+  let tagsCount = 0;
+  let folderValue = null;
+  let payload = null;
+  let result = null;
+
   try {
-    const payload = {
+    payload = {
       mailId: mail.id || mail.mailId || mail.messageId || null,
       id:
         mail.id ||
@@ -583,22 +608,29 @@ async function callClassificationAPI(mail) {
       headers: mail.headers || null,
       date: mail.date || mail.receivedAt || null,
     };
+
     const response = await post(CLASSIFICATION_ENDPOINT, payload, {
       auth: true,
       silent: true,
     });
+
     if (!response || !response.ok) {
+      status = 'http_error';
       return null;
     }
+
     let data = null;
     try {
       data = await response.json();
     } catch {
       data = null;
     }
+
     if (!data || typeof data !== 'object') {
+      status = 'invalid_response';
       return null;
     }
+
     const tags = Array.from(
       new Set(
         (Array.isArray(data.tags) ? data.tags : [])
@@ -606,34 +638,65 @@ async function callClassificationAPI(mail) {
           .filter(Boolean)
       )
     );
+
     const folder =
       typeof data.folder === 'string' && data.folder.trim() ? data.folder.trim() : null;
+
     if (!tags.length && !folder) {
+      status = 'empty_classification';
       return null;
     }
-    const result = {
+
+    const confidence =
+      clampConfidence(data.confidence) ??
+      (tags.length > 0 ? 0.75 : 0.5);
+
+    result = {
       tags,
       folder,
       source: typeof data.source === 'string' ? data.source : 'api',
       createdAt: Date.now(),
+      confidence,
     };
-    if (typeof data.confidence === 'number') {
-      result.confidence = data.confidence;
-    }
+
     if (typeof data.reason === 'string' && data.reason.trim()) {
       result.reason = data.reason.trim();
     }
     if (data.extra && typeof data.extra === 'object') {
       result.extra = data.extra;
     }
+
+    tagsCount = result.tags.length;
+    folderValue = result.folder || null;
+    status = 'success';
+
     return result;
   } catch (error) {
+    status = 'exception';
     const isTestEnv =
       typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test';
     if (!isTestEnv) {
       console.warn('[emailAutomation] classification API request failed', error);
     }
+    performanceMonitor?.logError?.('email_classification_api', error, {
+      mailId: payload?.id || payload?.mailId || null,
+    });
     return null;
+  } finally {
+    const durationMs = nowMs() - startedAt;
+    performanceMonitor?.recordTiming?.('email_classification_api', durationMs, {
+      status,
+      tags: tagsCount,
+      folder: folderValue || 'none',
+    });
+
+    if (status !== 'success') {
+      performanceMonitor?.logEvent?.('email_classification_fallback', {
+        status,
+        mailId: payload?.id || payload?.mailId || null,
+        durationMs,
+      });
+    }
   }
 }
 
@@ -693,6 +756,11 @@ function classifyEmail(mail, config) {
         createdAt: Date.now(),
         source: 'ai',
       };
+      const mergedConfidence =
+        clampConfidence(aiResult.confidence) ?? clampConfidence(heuristic?.confidence);
+      if (typeof mergedConfidence === 'number') {
+        result.confidence = mergedConfidence;
+      }
       if (!result.tags.length && heuristic?.tags?.length) {
         result.tags = heuristic.tags;
       }

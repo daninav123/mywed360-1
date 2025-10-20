@@ -1830,6 +1830,65 @@ router.get('/discounts', async (_req, res) => {
   }
 });
 
+// Actualizar código de descuento existente
+router.put('/discounts/:id', async (req, res) => {
+  console.log('🔍 [DEBUG] PUT /discounts/:id endpoint called');
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'discount_id_required' });
+    
+    const { url, type, maxUses, assignedTo, notes, status } = req.body || {};
+    
+    const discountRef = collections.discountLinks().doc(id);
+    const discountDoc = await discountRef.get();
+    
+    if (!discountDoc.exists) {
+      return res.status(404).json({ error: 'discount_not_found' });
+    }
+    
+    const updateData = {};
+    
+    if (url !== undefined) updateData.url = String(url || '').trim();
+    if (type !== undefined) updateData.type = String(type || 'campaign').trim();
+    if (status !== undefined) updateData.status = String(status).trim();
+    if (notes !== undefined) updateData.notes = String(notes || '').trim() || null;
+    
+    // maxUses: null = permanente, número = limitado
+    if (maxUses !== undefined) {
+      const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
+      updateData.maxUses = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
+    }
+    
+    if (assignedTo !== undefined) {
+      updateData.assignedTo = assignedTo ? {
+        id: assignedTo.id || null,
+        name: assignedTo.name || null,
+        email: assignedTo.email || null,
+      } : null;
+    }
+    
+    updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    updateData.updatedBy = 'admin';
+    
+    await discountRef.update(updateData);
+    
+    const updated = await discountRef.get();
+    const data = updated.data();
+    
+    console.log(`  ✅ Updated discount code: ${data.code}`);
+    
+    return res.json({
+      id: updated.id,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('  ❌ Update discount error:', error.message);
+    logger.error('[admin-dashboard] update discount error', error);
+    return res.status(500).json({ error: 'admin_dashboard_update_discount_failed', message: error.message });
+  }
+});
+
 // Crear nuevo código de descuento
 router.post('/discounts', async (req, res) => {
   console.log('🔍 [DEBUG] POST /discounts endpoint called');
