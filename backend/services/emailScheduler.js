@@ -7,7 +7,7 @@ export const QUEUE_COLLECTION = 'emailAutomationQueue';
 export const DEFAULT_PROCESS_LIMIT = 25;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MINUTES = 5;
-const AUDIT_COLLECTION = 'emailScheduledAudit';
+export const AUDIT_COLLECTION = 'emailScheduledAudit';
 const AUDIT_MAX_ENTRIES = 200;
 
 function toIsoDate(value) {
@@ -41,7 +41,12 @@ function toIsoDate(value) {
  * @param {Date} [options.now=new Date()] - Fecha de referencia para filtrar programados (solo para tests).
  * @returns {Promise<{processed:number,dryRun:boolean,results:Array}>}
  */
-export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT, dryRun = false, now = new Date() } = {}) {
+export async function processScheduledEmailQueue({
+  limit = DEFAULT_PROCESS_LIMIT,
+  dryRun = false,
+  now = new Date(),
+} = {}) {
+  const startedAt = Date.now();
   const queueRef = db.collection(QUEUE_COLLECTION);
   const dueSnapshot = await queueRef
     .where('status', '==', 'scheduled')
@@ -51,6 +56,9 @@ export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT
     .get();
 
   const results = [];
+  let successCount = 0;
+  let failedCount = 0;
+  let skippedCount = 0;
 
   for (const doc of dueSnapshot.docs) {
     const baseData = doc.data() || {};
@@ -82,6 +90,7 @@ export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT
 
     if (!transactionData) {
       results.push({ id: doc.id, status: 'skipped' });
+      skippedCount += 1;
       continue;
     }
 
@@ -97,6 +106,7 @@ export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT
         failedAt: FieldValue.serverTimestamp(),
       });
       results.push({ id: doc.id, status: 'failed', error: 'invalid_payload' });
+      failedCount += 1;
       continue;
     }
 
@@ -131,6 +141,7 @@ export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT
         status: 'sent',
         messageId: sendResult.messageId || null,
       });
+      successCount += 1;
     } catch (error) {
       const nextStatus = attempts >= MAX_ATTEMPTS ? 'failed' : 'scheduled';
       const update = {
@@ -152,6 +163,44 @@ export async function processScheduledEmailQueue({ limit = DEFAULT_PROCESS_LIMIT
         status: nextStatus,
         error: error?.message || 'send_failed',
       });
+
+      if (nextStatus === 'failed') {
+        failedCount += 1;
+      } else {
+        skippedCount += 1;
+      }
+    }
+  }
+
+  if (!dryRun && results.length) {
+    try {
+      const durationMs = Date.now() - startedAt;
+      await db.collection(AUDIT_COLLECTION).add({
+        processed: results.length,
+        successCount,
+        failedCount,
+        skippedCount,
+        limit,
+        durationMs,
+        startedAt: new Date(startedAt).toISOString(),
+        finishedAt: new Date().toISOString(),
+        createdAt: FieldValue.serverTimestamp(),
+      });
+
+      const auditSnapshot = await db
+        .collection(AUDIT_COLLECTION)
+        .orderBy('createdAt', 'desc')
+        .offset(AUDIT_MAX_ENTRIES)
+        .limit(50)
+        .get();
+
+      if (!auditSnapshot.empty) {
+        const batch = db.batch();
+        auditSnapshot.docs.forEach((item) => batch.delete(item.ref));
+        await batch.commit();
+      }
+    } catch (auditError) {
+      console.warn('[email-scheduler] No se pudo registrar el audit log', auditError);
     }
   }
 

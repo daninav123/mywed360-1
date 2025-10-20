@@ -952,40 +952,26 @@ export const AuthProvider = ({ children }) => {
         };
       }
 
-      try {
-        const response = await loginAdminRequest({
-          email: normalizedEmail,
-          password,
+      const response = await adminLoginRequest({ email, password });
+
+      if (response.requiresMfa) {
+        const expiresAtMs = response.expiresAt || Date.now() + 5 * 60 * 1000;
+        setPendingAdminSession({
+          challengeId: response.challengeId,
+          email,
+          expiresAt: expiresAtMs,
+          resumeToken: response.resumeToken,
+          rememberMe,
         });
 
-        if (response.requiresMfa) {
-          const expiresDate =
-            response.expiresAt instanceof Date
-              ? response.expiresAt
-              : response.expiresAt
-              ? new Date(response.expiresAt)
-              : null;
-          const expiresAtMs =
-            expiresDate && !Number.isNaN(expiresDate.getTime())
-              ? expiresDate.getTime()
-              : Date.now() + 60_000;
+        return {
+          success: true,
+          requiresMfa: true,
+          expiresAt: expiresAtMs,
+        };
+      }
 
-          setPendingAdminSession({
-            challengeId: response.challengeId,
-            resumeToken: response.resumeToken,
-            email: normalizedEmail,
-            issuedAt: Date.now(),
-            expiresAt: expiresAtMs,
-          });
-
-          return {
-            success: true,
-            requiresMfa: true,
-            expiresAt: expiresAtMs,
-          };
-        }
-
-        if (!response.profile && !response.adminUser) {
+      if (!response.profile && !response.adminUser) {
           throw new Error('La respuesta no incluye información de administrador');
         }
 
@@ -1011,6 +997,12 @@ export const AuthProvider = ({ children }) => {
           },
         };
         const adminUser = { ...user };
+
+        // Guardar sesión si no requiere MFA
+        if (typeof window !== 'undefined' && response.sessionToken) {
+          const { setAdminSession } = await import('../services/adminSession');
+          setAdminSession(response.sessionToken, rememberMe);
+        }
 
         return finalizeAdminLogin({
           adminUser,
@@ -1079,6 +1071,12 @@ export const AuthProvider = ({ children }) => {
           email: adminProfile.email || ADMIN_EMAIL,
           displayName: adminProfile.name || 'Administrador Lovenda',
         };
+
+        // Guardar sesión con preferencia de "recordar"
+        if (typeof window !== 'undefined' && response.sessionToken) {
+          const { setAdminSession } = await import('../services/adminSession');
+          setAdminSession(response.sessionToken, pendingAdminSession.rememberMe || false);
+        }
 
         setPendingAdminSession(null);
 

@@ -3,7 +3,12 @@ import { FieldValue } from 'firebase-admin/firestore';
 
 import { db } from '../db.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { DEFAULT_PROCESS_LIMIT, QUEUE_COLLECTION, processScheduledEmailQueue } from '../services/emailScheduler.js';
+import {
+  DEFAULT_PROCESS_LIMIT,
+  QUEUE_COLLECTION,
+  AUDIT_COLLECTION,
+  processScheduledEmailQueue,
+} from '../services/emailScheduler.js';
 
 const router = express.Router();
 
