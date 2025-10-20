@@ -45,7 +45,13 @@ const collections = {
 function toDate(value) {
   try {
     if (!value) return null;
-    // Verificar que toDate existe y es una función
+    
+    // 1. Objeto con _seconds (Timestamp serializado de Firestore)
+    if (value._seconds !== undefined) {
+      return new Date(value._seconds * 1000);
+    }
+    
+    // 2. Timestamp de Firestore con método toDate()
     if (value.toDate && typeof value.toDate === 'function') {
       try {
         return value.toDate();
@@ -54,12 +60,19 @@ function toDate(value) {
         return null;
       }
     }
+    
+    // 3. Ya es un objeto Date
     if (value instanceof Date) return value;
+    
+    // 4. Timestamp Unix (número)
     if (typeof value === 'number') return new Date(value);
+    
+    // 5. String ISO (YYYY-MM-DD o ISO 8601)
     if (typeof value === 'string') {
       const d = new Date(value);
       return isNaN(d.getTime()) ? null : d;
     }
+    
     return null;
   } catch (error) {
     console.warn('[toDate] Unexpected error:', error.message);
