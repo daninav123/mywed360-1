@@ -30,6 +30,7 @@ import {
   verifyAdminMfa as verifyAdminMfaRequest,
   logoutAdmin as logoutAdminRequest,
 } from '../services/adminAuthClient';
+import { apiPost } from '../services/apiClient';
 import errorLogger from '../utils/errorLogger';
 import { getBackendBase } from '../utils/backendBase';
 import { mapAuthError } from '../utils/authErrorMapper';
@@ -962,7 +963,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Llamar directamente al endpoint de login admin
-        const loginResponse = await post('/api/admin/login', { email, password, rememberMe });
+        const loginResponse = await apiPost('/api/admin/login', { email, password, rememberMe });
         
         if (!loginResponse.ok) {
           const errorData = await loginResponse.json().catch(() => ({}));
