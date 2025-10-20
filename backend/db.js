@@ -59,12 +59,19 @@ if (RAW_SERVICE_ACCOUNT) {
 }
 
 if (!admin.apps.length) {
+  console.log('🔍 [db.js] Initializing Firebase Admin...');
+  console.log('  - parsedServiceAccount exists:', !!parsedServiceAccount);
+  console.log('  - GOOGLE_APPLICATION_CREDENTIALS:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
+  
   // Build init options dynamically to avoid passing invalid credential
   const initOptions = {
     projectId: process.env.VITE_FIREBASE_PROJECT_ID || (parsedServiceAccount && parsedServiceAccount.project_id),
   };
+  
+  console.log('  - Project ID:', initOptions.projectId);
 
   if (parsedServiceAccount) {
+    console.log('  ✅ Using parsed service account from env var');
     initOptions.credential = admin.credential.cert(parsedServiceAccount);
   } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     // Resolver ruta relativa o absoluta
@@ -89,20 +96,31 @@ if (!admin.apps.length) {
         path.resolve(__dirname, '..', 'serviceAccount.json'),
         path.resolve(__dirname, '..', 'serviceAccountKey.json'),
       ];
+      
+      console.log('  - Searching for service account file in candidates...');
+      candidates.forEach((c, i) => {
+        const exists = fs.existsSync(c);
+        console.log(`    ${i + 1}. ${exists ? '✓' : '✗'} ${c}`);
+      });
+      
       const svcPath = candidates.find((p) => fs.existsSync(p));
       if (svcPath) {
         const json = JSON.parse(fs.readFileSync(svcPath, 'utf8'));
         initOptions.credential = admin.credential.cert(json);
-        console.log(`✅ Credencial de servicio cargada desde ${svcPath}`);
+        console.log(`  ✅ Credencial de servicio cargada desde ${svcPath}`);
       } else {
-        console.warn('⚠️  No se encontró archivo de credenciales. Buscados:', candidates);
+        console.error('  ❌ No se encontró archivo de credenciales en ninguna ubicación');
+        console.error('  - Candidates checked:', candidates);
       }
     } catch (e) {
-      console.warn('⚠️  No se pudo cargar serviceAccount.json de fallback:', e?.message);
+      console.error('  ❌ Error al cargar serviceAccount.json:', e?.message);
+      console.error('  - Stack:', e?.stack);
     }
   }
 
+  console.log('  - Initializing admin app with credential:', !!initOptions.credential);
   admin.initializeApp(initOptions);
+  console.log('  ✅ Firebase Admin initialized successfully');
 
   if (process.env.FIRESTORE_EMULATOR_HOST) {
     console.log(`⚙️  Using Firestore emulator at ${process.env.FIRESTORE_EMULATOR_HOST}`);
