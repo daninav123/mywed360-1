@@ -1546,8 +1546,8 @@ router.get('/portfolio', async (req, res) => {
         console.warn('[portfolio] Error converting event date:', dateError.message, 'for wedding:', docSnap.id);
         eventDateDate = null;
       }
-      if (fromDate && (!eventDateDate || eventDateDate < fromDate)) continue;
-      if (toDate && (!eventDateDate || eventDateDate > toDate)) continue;
+      if (fromDateFilter && (!eventDateDate || eventDateDate < fromDateFilter)) continue;
+      if (toDateFilter && (!eventDateDate || eventDateDate > toDateFilter)) continue;
 
       const item = {
         id: docSnap.id,
