@@ -61,6 +61,33 @@ class NotificationService {
 // Instancia singleton del servicio
 const notificationServiceInstance = new NotificationService();
 
+// Preferencias de notificación por defecto
+export const DEFAULT_NOTIFICATION_PREFS = {
+  email: {
+    newMessage: true,
+    replies: true,
+    mentions: true,
+  },
+  tasks: {
+    assigned: true,
+    dueDate: true,
+    completed: true,
+  },
+  rsvp: {
+    newResponse: true,
+    reminders: true,
+  },
+  system: {
+    updates: true,
+    security: true,
+  },
+  quietHours: {
+    enabled: false,
+    start: '22:00',
+    end: '08:00',
+  },
+};
+
 // Exportaciones adicionales para compatibilidad con diferentes módulos
 export const addNotification = async (notification) => {
   // Función helper para añadir notificaciones
@@ -72,7 +99,73 @@ export const addNotification = async (notification) => {
   return { ...notification, id: Date.now().toString() };
 };
 
+export const getNotifications = async (weddingId) => {
+  // Obtener notificaciones pendientes
+  if (!weddingId) {
+    // Si no hay weddingId, retornar array vacío
+    return [];
+  }
+  try {
+    return await notificationServiceInstance.getPending(weddingId);
+  } catch (error) {
+    console.error('Error obteniendo notificaciones:', error);
+    return [];
+  }
+};
+
+export const getNotificationPrefs = () => {
+  // Obtener preferencias de notificación desde localStorage
+  try {
+    const stored = localStorage.getItem('mywed360_notification_prefs');
+    if (stored) {
+      return { ...DEFAULT_NOTIFICATION_PREFS, ...JSON.parse(stored) };
+    }
+  } catch (error) {
+    console.error('Error cargando preferencias:', error);
+  }
+  return DEFAULT_NOTIFICATION_PREFS;
+};
+
+export const saveNotificationPrefs = (prefs) => {
+  // Guardar preferencias de notificación en localStorage
+  try {
+    localStorage.setItem('mywed360_notification_prefs', JSON.stringify(prefs));
+    return true;
+  } catch (error) {
+    console.error('Error guardando preferencias:', error);
+    return false;
+  }
+};
+
+export const isQuietHoursActive = () => {
+  // Verificar si estamos en quiet hours
+  const prefs = getNotificationPrefs();
+  if (!prefs.quietHours?.enabled) return false;
+  
+  try {
+    const now = new Date();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const { start, end } = prefs.quietHours;
+    
+    // Si quiet hours cruza medianoche
+    if (start > end) {
+      return currentTime >= start || currentTime < end;
+    }
+    // Quiet hours normal
+    return currentTime >= start && currentTime < end;
+  } catch (error) {
+    console.error('Error verificando quiet hours:', error);
+    return false;
+  }
+};
+
 export const showNotification = (notification) => {
+  // Verificar quiet hours
+  if (isQuietHoursActive()) {
+    console.log('Notificación silenciada por quiet hours');
+    return notification;
+  }
+  
   // Mostrar notificación en el navegador (si está soportado)
   if ('Notification' in window && Notification.permission === 'granted') {
     new Notification(notification.message || 'Notificación', {
@@ -95,8 +188,20 @@ export const shouldNotify = (notification) => {
   // Puede ser extendida con preferencias de usuario, quiet hours, etc.
   if (!notification) return false;
   
+  // Verificar quiet hours
+  if (isQuietHoursActive()) return false;
+  
   // Si el usuario tiene el contexto de auth, verificar preferencias
   if (authContext?.preferences?.notificationsEnabled === false) {
+    return false;
+  }
+  
+  // Verificar preferencias específicas por tipo
+  const prefs = getNotificationPrefs();
+  const notifType = notification.type || 'system';
+  const category = notification.category || 'updates';
+  
+  if (prefs[notifType]?.[category] === false) {
     return false;
   }
   
