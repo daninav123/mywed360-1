@@ -1800,6 +1800,26 @@ router.get('/discounts', async (_req, res) => {
     console.log(`  - Found ${docs.length} discount links`);
     const items = docs.map((d) => {
       const data = d.data() || {};
+      
+      // Función helper para convertir timestamps de forma segura
+      const safeToDate = (value) => {
+        if (!value) return null;
+        if (value.toDate && typeof value.toDate === 'function') {
+          try {
+            return value.toDate();
+          } catch (e) {
+            console.warn('Error converting timestamp:', e);
+            return null;
+          }
+        }
+        if (value instanceof Date) return value;
+        if (typeof value === 'string' || typeof value === 'number') {
+          const d = new Date(value);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+      };
+      
       return {
         id: d.id,
         code: data.code || d.id,
@@ -1807,7 +1827,8 @@ router.get('/discounts', async (_req, res) => {
         revenue: Number(data.revenue || 0),
         currency: data.currency || 'EUR',
         status: data.status || 'active',
-        createdAt: formatDateTime(data.createdAt),
+        createdAt: formatDate(safeToDate(data.createdAt)),
+        updatedAt: formatDate(safeToDate(data.updatedAt)),
       };
     });
     const summary = items.reduce(
