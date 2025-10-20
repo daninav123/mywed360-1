@@ -31,10 +31,17 @@ export default defineConfig(({ mode }) => {
         : [])
     ],
     server: {
-      host: '0.0.0.0', // Escuchar en todas las interfaces de red
+      host: 'localhost', // Cambiar de 0.0.0.0 a localhost para evitar errores WebSocket
       // Puerto de desarrollo
       port: 5173,
       strictPort: true,
+      // Configuración HMR para evitar errores WebSocket
+      hmr: {
+        protocol: 'ws',
+        host: 'localhost',
+        port: 5173,
+        clientPort: 5173,
+      },
       // Proxy para API backend
       proxy: {
         '/api': {
