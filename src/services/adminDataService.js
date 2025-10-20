@@ -1,6 +1,6 @@
 import errorLogger from '../utils/errorLogger';
 import { getAdminFetchOptions, getAdminHeaders, getAdminSessionToken } from './adminSession';
-import { get as apiGet, post as apiPost, put as apiPut } from './apiClient';
+import { apiGet, apiPost, apiPut } from './apiClient';
 
 const ADMIN_BASE_PATH = '/api/admin/dashboard';
 
