@@ -18,6 +18,7 @@ const STATE_COLLECTION = 'emailAutomationState';
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_SENDER_ENTRIES = 200;
 const MAX_MAIL_ENTRIES = 500;
+const MAX_CLASSIFICATION_ENTRIES = 200;
 
 const DEFAULT_STATE_DOC = {
   lastAutoReplyBySender: {},
@@ -136,10 +137,34 @@ function sanitizeStateDoc(data = {}) {
   const lastAutoReplyBySender = pruneMapByDate(source.lastAutoReplyBySender || {}, MAX_SENDER_ENTRIES);
   const autoRepliesByMail = pruneMapByDate(source.autoRepliesByMail || {}, MAX_MAIL_ENTRIES);
   const history = sanitizeHistory(source.history || []);
+  const classifications = (() => {
+    const map = source.classifications || {};
+    if (!map || typeof map !== 'object') return {};
+    const entries = Object.entries(map)
+      .map(([key, value]) => {
+        if (!key || typeof key !== 'string') return null;
+        if (!value || typeof value !== 'object') return null;
+        return [
+          key,
+          {
+            tags: Array.isArray(value.tags) ? value.tags.filter((tag) => typeof tag === 'string') : [],
+            folder: typeof value.folder === 'string' ? value.folder : null,
+            confidence: typeof value.confidence === 'number' ? value.confidence : null,
+            reason: typeof value.reason === 'string' ? value.reason : null,
+            source: typeof value.source === 'string' ? value.source : null,
+            updatedAt: value.updatedAt?.toDate?.()?.toISOString?.() || value.updatedAt || null,
+          },
+        ];
+      })
+      .filter(Boolean)
+      .slice(-MAX_CLASSIFICATION_ENTRIES);
+    return Object.fromEntries(entries);
+  })();
   return {
     lastAutoReplyBySender,
     autoRepliesByMail,
     history,
+    classifications,
     updatedAt: source.updatedAt?.toDate?.()?.toISOString?.() || source.updatedAt || null,
   };
 }
@@ -476,6 +501,85 @@ router.post('/state/auto-reply', async (req, res) => {
   } catch (error) {
     console.error('[email-automation] POST /state/auto-reply failed', error);
     return res.status(500).json({ error: 'internal-error' });
+  }
+});
+
+router.post('/classification', async (req, res) => {
+  try {
+    const uid = getUserId(req);
+    if (!uid) return res.status(401).json({ success: false, error: 'auth-required' });
+
+    const mailId = typeof req.body?.mailId === 'string' ? req.body.mailId.trim() : '';
+    if (!mailId) {
+      return res.status(400).json({ success: false, error: 'mailId-required' });
+    }
+
+    const classificationPayload = req.body?.classification || {};
+    const tags = Array.isArray(classificationPayload.tags)
+      ? classificationPayload.tags.filter((tag) => typeof tag === 'string' && tag.trim()).map((tag) => tag.trim())
+      : [];
+    const folder = typeof classificationPayload.folder === 'string' ? classificationPayload.folder.trim() : null;
+    const confidence =
+      typeof classificationPayload.confidence === 'number' && Number.isFinite(classificationPayload.confidence)
+        ? Math.min(Math.max(classificationPayload.confidence, 0), 1)
+        : null;
+    const reason =
+      typeof classificationPayload.reason === 'string' && classificationPayload.reason.trim()
+        ? classificationPayload.reason.trim()
+        : null;
+    const source =
+      typeof classificationPayload.source === 'string' && classificationPayload.source.trim()
+        ? classificationPayload.source.trim()
+        : null;
+
+    if (!tags.length && !folder) {
+      return res.status(400).json({ success: false, error: 'classification-empty' });
+    }
+
+    const entry = {
+      tags,
+      folder,
+      confidence,
+      reason,
+      source,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
+
+    const docRef = getStateDocRef(uid);
+
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(docRef);
+      const data = snap.exists ? snap.data() || {} : DEFAULT_STATE_DOC;
+      const existing = data.classifications && typeof data.classifications === 'object' ? { ...data.classifications } : {};
+      existing[mailId] = entry;
+
+      const ordered = Object.entries(existing)
+        .map(([key, value]) => ({
+          key,
+          value,
+          ts: value.updatedAt?.toDate?.()?.getTime?.() || value.updatedAt || value._ts || Date.now(),
+        }))
+        .sort((a, b) => b.ts - a.ts)
+        .slice(0, MAX_CLASSIFICATION_ENTRIES)
+        .reduce((acc, item) => {
+          acc[item.key] = item.value;
+          return acc;
+        }, {});
+
+      tx.set(
+        docRef,
+        {
+          classifications: ordered,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('[email-automation] POST /classification failed', error);
+    return res.status(500).json({ success: false, error: 'classification-failed' });
   }
 });
 

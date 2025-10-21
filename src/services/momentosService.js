@@ -107,7 +107,7 @@ const nowPlusHours = (hours) => {
 };
 
 const buildAlbumDefaults = (overridesSettings = {}) => ({
-  name: 'Momentos',
+  name: 'Galería de recuerdos',
   slug: 'momentos-principal',
   status: 'active',
   settings: {

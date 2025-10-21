@@ -59,7 +59,7 @@
    - Objetivo: comprender la identidad y prioridades de cada boda para proponer ajustes personalizados (aumentar o reducir partidas, reasignar porcentajes, sugerir proveedores o tareas) sin romper el presupuesto total ni las metas financieras.
    - Experiencia de chat:
      1. Al abrir el panel se carga `AdvisorChat` con el historial persistido (`finance/main.aiAdvisorChat.messages`) y un mensaje de bienvenida con sugerencias de entrada (por ejemplo, "Que parte quieres priorizar?").
-     2. Cada mensaje del usuario se guarda con `role="user"` y se env�a, junto con el contexto financiero completo, a la Cloud Function `POST /api/ai/budget-advisor/chat`.
+     2. Cada mensaje del usuario se guarda con `role="user"` y se envia, junto con el contexto financiero completo, a la Cloud Function `POST /api/ai/budget-advisor/chat`.
      3. La respuesta de la IA incluye:
         - `message`: texto conversacional (Markdown simple) que explica recomendaciones, dudas y trade-offs.
         - `adjustments`: lista normalizada de propuestas (ej. `{ category: "Catering", deltaPercent: 8, rationale: "Incluir jamon iberico y barra libre premium", tradeOff: [{ category: "Decoracion", deltaPercent: -3 }] }`).
@@ -220,18 +220,18 @@
 
 ## 6. Estados especiales y errores
 - Si no hay presupuesto configurado se muestra CTA "Configura tu presupuesto".
-- Importacion CSV: botones visibles pero deshabilitados; pendiente de implementación (mostrar aviso “Próximamente� when hovered).
+- Importacion CSV: botones visibles pero deshabilitados; pendiente de implementacion (mostrar aviso "Proximamente" when hovered).
 - Errores Firestore -> toast y rollback optimista.
 - Alertas de red (`offline`) muestran banner con modo solo lectura.
-- Sugerencias de email: si `VITE_EMAIL_INSIGHTS_*` falta o la API responde error, se registra `console.warn`, se muestra mensaje “No se pudieron cargar las sugerencias� y no se reintenta automáticamente.
+- Sugerencias de email: si `VITE_EMAIL_INSIGHTS_*` falta o la API responde error, se registra `console.warn`, se muestra mensaje "No se pudieron cargar las sugerencias" y no se reintenta automaticamente.
 - Importación bancaria:
-  - Sin `finance/accounts.primaryAccountId`: CTA “Conectar banco� (`hasBankAccount=false`).
-  - Con ID pero sin variables `VITE_BANK_API_*`: se mantiene CTA y se avisa en consola (estado “conexión pendiente�).
+  - Sin `finance/accounts.primaryAccountId`: CTA "Conectar banco" (`hasBankAccount=false`).
+  - Con ID pero sin variables `VITE_BANK_API_*`: se mantiene CTA y se avisa en consola (estado "conexion pendiente").
   - Errores HTTP → `hasBankAccount=false`, toast genérico y `console.warn`, sin bloquear la vista.
 
 ## Alertas de presupuesto
 - Umbrales: `settings.alertThresholds.warn` (75 % por defecto) colorea progreso en ámbar y agrega la categoría a la tarjeta de alertas; `danger` (90 % por defecto) cambia a rojo y marca el estado como crítico.
-- Visualización: `FinanceOverview` renderiza la tarjeta “Alertas de Presupuesto� listando cada categoría sobre los umbrales con enlace a Transacciones filtrado por categoría y tipo de gasto. Los chips de estado por categoría usan los mismos colores.
+- Visualizacion: `FinanceOverview` renderiza la tarjeta "Alertas de Presupuesto" listando cada categoria sobre los umbrales con enlace a Transacciones filtrado por categoria y tipo de gasto. Los chips de estado por categoria usan los mismos colores.
 - `BudgetManager` replica la lógica de colores en las barras de progreso para mantener consistencia visual, pero no muestra mensajes adicionales.
 - `BudgetAlerts.jsx` quedó obsoleto y no se monta en `Finance.jsx`; el comportamiento oficial es el de `FinanceOverview`.
 

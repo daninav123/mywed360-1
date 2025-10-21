@@ -23,7 +23,7 @@ const readableSize = (bytes = 0) => {
 
 /**
  * UploadWidget
- * Permite subir imágenes a Momentos con selección de escena y progreso por archivo.
+ * Permite subir imágenes a la galería de recuerdos con selección de escena y progreso por archivo.
  */
 export default function UploadWidget({
   weddingId,
@@ -158,7 +158,7 @@ export default function UploadWidget({
     <div className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${className}`}>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">Subir momentos</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Subir fotos</h3>
           <p className="text-sm text-gray-500">
             Arrastra tus fotos o selecciónalas manualmente. Se suben en la escena seleccionada.
           </p>

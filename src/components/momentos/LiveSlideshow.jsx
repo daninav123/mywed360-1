@@ -50,7 +50,7 @@ export default function LiveSlideshow({
             <div className="flex items-center justify-between text-sm">
               <div className="space-y-1">
                 <p className="uppercase tracking-wide text-xs text-white/70">
-                  {current.scene || 'Momentos'}
+                  {current.scene || 'Recuerdos'}
                 </p>
                 {current.guestName && (
                   <p className="font-medium">Cortesía de {current.guestName}</p>

@@ -21,6 +21,7 @@ const CLASSIFICATION_TTL = 12 * 60 * 60 * 1000; // 12 hours
 const REPLY_INTERVAL_DEFAULT = 24; // hours
 const REMOTE_SCHEDULE_ENDPOINT = '/api/email-automation/schedule';
 const REMOTE_PROCESS_ENDPOINT = '/api/email-automation/schedule/process';
+const CLASSIFICATION_RECORD_ENDPOINT = '/api/email-automation/classification';
 const REMOTE_QUEUE_CACHE_TTL_MS = 30 * 1000;
 const STATE_ENDPOINT = '/api/email-automation/state';
 const STATE_AUTOREPLY_ENDPOINT = '/api/email-automation/state/auto-reply';

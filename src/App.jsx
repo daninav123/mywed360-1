@@ -264,6 +264,7 @@ function App() {
                   <Route path="commerce" element={<AdminDiscounts />} />
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="support" element={<AdminSupport />} />
+                  <Route path="task-templates" element={<AdminTaskTemplates />} />
                 </Route>
               </Route>
 

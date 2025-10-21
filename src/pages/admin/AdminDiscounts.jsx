@@ -44,6 +44,7 @@ const AdminDiscounts = () => {
     type: 'campaign',
     maxUses: '',
     isPermanent: true,
+    discountPercentage: '',
     assignedTo: { name: '', email: '' },
     notes: '',
     status: 'activo'
@@ -123,6 +124,7 @@ const AdminDiscounts = () => {
         url: formData.url.trim() || undefined,
         type: formData.type,
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+        discountPercentage: parseFloat(formData.discountPercentage) || 0,
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
           name: formData.assignedTo.name || null,
           email: formData.assignedTo.email || null
@@ -158,6 +160,7 @@ const AdminDiscounts = () => {
         url: formData.url.trim() || undefined,
         type: formData.type,
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
+        discountPercentage: parseFloat(formData.discountPercentage) || 0,
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
           name: formData.assignedTo.name || null,
           email: formData.assignedTo.email || null
@@ -191,6 +194,7 @@ const AdminDiscounts = () => {
       type: discount.type || 'campaign',
       maxUses: discount.maxUses || '',
       isPermanent: !discount.maxUses,
+      discountPercentage: discount.discountPercentage || '',
       assignedTo: {
         name: discount.assignedTo?.name || '',
         email: discount.assignedTo?.email || ''
@@ -208,6 +212,7 @@ const AdminDiscounts = () => {
       type: 'campaign',
       maxUses: '',
       isPermanent: true,
+      discountPercentage: '',
       assignedTo: { name: '', email: '' },
       notes: '',
       status: 'activo'
@@ -284,13 +289,14 @@ const AdminDiscounts = () => {
               <table className="min-w-full divide-y divide-soft text-sm" data-testid="admin-discounts-table">
                 <thead className="bg-[var(--color-bg-soft,#f3f4f6)] text-xs uppercase text-[var(--color-text-soft,#6b7280)]">
                   <tr>
+                    <th className="px-4 py-3 text-left">Código</th>
                     <th className="px-4 py-3 text-left">Tipo</th>
+                    <th className="px-4 py-3 text-left">% Desc.</th>
                     <th className="px-4 py-3 text-left">Usos</th>
                     <th className="px-4 py-3 text-left">Ingresos</th>
                     <th className="px-4 py-3 text-left">Estado</th>
                     <th className="px-4 py-3 text-left">Partner</th>
                     <th className="px-4 py-3 text-left">Acciones</th>
-                    <th className="px-4 py-3 text-right">Facturación</th>
                     <th className="px-4 py-3 text-left">Creado</th>
                     <th className="px-4 py-3 text-left">Último uso</th>
                     <th className="px-4 py-3" />
@@ -321,18 +327,9 @@ const AdminDiscounts = () => {
                           ) : null}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col leading-tight">
-                          <span>{link.assignedTo?.name || '—'}</span>
-                          <span className="text-xs text-[var(--color-text-soft,#6b7280)]">
-                            {TYPE_LABELS[link.assignedTo?.type] || link.assignedTo?.type || 'N/A'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 capitalize">{STATUS_LABELS[link.status] || link.status || '—'}</td>
-                      <td className="px-4 py-3 text-right">{link.usageCount ?? 0}</td>
-                      <td className="px-4 py-3 text-right">
-                        {formatCurrency(link.totalRevenue, link.currency || summary.currency)}
+                      <td className="px-4 py-3 text-right">{link.uses || 0}</td>
+                      <td className="px-4 py-3 text-right font-medium text-green-600">
+                        {formatCurrency(link.revenue, link.currency || summary.currency)}
                       </td>
                       <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.createdAt || '—'}</td>
                       <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.lastUsedAt || '—'}</td>
@@ -398,6 +395,24 @@ const AdminDiscounts = () => {
                   <option value="partner">Partner</option>
                   <option value="other">Otro</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Porcentaje de descuento *</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData(prev => ({ ...prev, discountPercentage: e.target.value }))}
+                    placeholder="10"
+                    className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
+                    required
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
+                </div>
               </div>
 
               <div>
@@ -540,6 +555,23 @@ const AdminDiscounts = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium mb-1">Porcentaje de descuento</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData(prev => ({ ...prev, discountPercentage: e.target.value }))}
+                    placeholder="10"
+                    className="w-full rounded-md border border-soft px-3 py-2 pr-8 text-sm"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
+                </div>
+              </div>
+
+              <div>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
@@ -613,26 +645,4 @@ const AdminDiscounts = () => {
                     setShowEditModal(false);
                     setEditingDiscount(null);
                     resetForm();
-                  }}
-                  disabled={updating}
-                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={updating}
-                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
-                >
-                  {updating ? 'Actualizando...' : 'Guardar cambios'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default AdminDiscounts;
+    

@@ -94,12 +94,6 @@ const ADMIN_NAVIGATION = [
         description: 'Seed maestro de tareas padre/subtareas y versionado del checklist.',
       },
       {
-        id: 'audit',
-        label: 'Auditoría',
-        path: '/admin/audit',
-        description: 'Registro de acciones administrativas y trail de seguridad.',
-      },
-      {
         id: 'support',
         label: 'Soporte',
         path: '/admin/support',

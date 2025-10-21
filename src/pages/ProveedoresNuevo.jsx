@@ -48,6 +48,10 @@ const isConfirmedStatus = (status) => {
   return CONFIRMED_KEYWORDS.some((keyword) => normalized.includes(keyword));
 };
 
+const SEARCH_PAGE_SIZE = 6;
+const DEFAULT_PROVIDER_IMAGE =
+  'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=800&q=60';
+
 const ShortlistList = ({ items, loading, error }) => {
   if (loading) {
     return (
@@ -185,6 +189,12 @@ const Proveedores = () => {
   const [searchDrawerQuery, setSearchDrawerQuery] = useState('');
   const [searchDrawerLoading, setSearchDrawerLoading] = useState(false);
   const [searchDrawerResult, setSearchDrawerResult] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchResultsQuery, setSearchResultsQuery] = useState('');
+  const [searchResultsPage, setSearchResultsPage] = useState(1);
+  const [searchResultsLoading, setSearchResultsLoading] = useState(false);
+  const [searchResultsError, setSearchResultsError] = useState(null);
+  const [searchCompleted, setSearchCompleted] = useState(false);
 
   useEffect(() => {
     loadProviders();
@@ -312,53 +322,94 @@ const Proveedores = () => {
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label, 'es'));
   }, [normalizedWanted, providersSource, shortlist]);
 
-  const handleSearchSubmit = useCallback(
-    async (event) => {
-      event.preventDefault();
-      const trimmed = searchInput.trim();
+  const performSearch = useCallback(
+    async (rawQuery, { saveHistory = false, silent = false } = {}) => {
+      const trimmed = (rawQuery || '').trim();
       const baseTokens = trimmed ? [trimmed] : [];
       const enrichedQuery = [...baseTokens, ...profileSearchTokens].join(' ').trim();
 
       if (!trimmed && !enrichedQuery) {
-        toast.warn('Añade un término o completa tu perfil para mejorar las búsquedas.');
+        if (!silent) toast.warn('Añade un término o completa tu perfil para mejorar las búsquedas.');
         return;
       }
 
       setSearchTerm(trimmed);
-      if (trimmed) registerSearchQuery(trimmed);
+      if (trimmed && saveHistory) registerSearchQuery(trimmed);
 
-      if (enrichedQuery) {
-        setSearchDrawerQuery(enrichedQuery);
-        setSearchDrawerOpen(true);
-        setSearchDrawerLoading(true);
-        setSearchDrawerResult(null);
-        try {
-          const results = await searchProviders(enrichedQuery);
-          if (Array.isArray(results) && results.length) {
-            setSearchDrawerResult(results[0]);
-          } else {
-            toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
-          }
-        } catch (err) {
-          console.warn('[Proveedores] searchProviders failed', err);
-          toast.error('No se pudo completar la búsqueda.');
-        } finally {
-          setSearchDrawerLoading(false);
+      setSearchResultsLoading(true);
+      setSearchResultsError(null);
+      setSearchResults([]);
+      setSearchResultsQuery(trimmed || enrichedQuery);
+      setSearchResultsPage(1);
+      setSearchCompleted(true);
+      setSearchDrawerOpen(false);
+      setSearchDrawerResult(null);
+
+      try {
+        const results = await searchProviders(enrichedQuery || trimmed);
+        const safeResults = Array.isArray(results) ? results : [];
+        setSearchResults(safeResults);
+        if (!safeResults.length && !silent) {
+          toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
         }
+      } catch (err) {
+        console.warn('[Proveedores] searchProviders failed', err);
+        setSearchResultsError(err);
+        if (!silent) toast.error('No se pudo completar la búsqueda.');
+      } finally {
+        setSearchResultsLoading(false);
       }
     },
-    [
-      profileSearchTokens,
-      registerSearchQuery,
-      searchInput,
-      searchProviders,
-      setSearchTerm,
-    ]
+    [profileSearchTokens, registerSearchQuery, searchProviders, setSearchTerm]
   );
+
+  const totalSearchPages = useMemo(() => {
+    if (!searchResults.length) return 0;
+    return Math.max(1, Math.ceil(searchResults.length / SEARCH_PAGE_SIZE));
+  }, [searchResults]);
+
+  const paginatedResults = useMemo(() => {
+    if (!searchResults.length) return [];
+    const start = (searchResultsPage - 1) * SEARCH_PAGE_SIZE;
+    return searchResults.slice(start, start + SEARCH_PAGE_SIZE);
+  }, [searchResults, searchResultsPage]);
+
+  useEffect(() => {
+    if (!searchResults.length) {
+      setSearchResultsPage(1);
+      return;
+    }
+    if (searchResultsPage > totalSearchPages) {
+      setSearchResultsPage(totalSearchPages);
+    }
+  }, [searchResults, searchResultsPage, totalSearchPages]);
+
+  const handleSearchSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      await performSearch(searchInput, { saveHistory: true });
+    },
+    [performSearch, searchInput]
+  );
+
+  const handlePrevSearchPage = useCallback(() => {
+    setSearchResultsPage((prev) => Math.max(1, prev - 1));
+  }, []);
+
+  const handleNextSearchPage = useCallback(() => {
+    setSearchResultsPage((prev) => Math.min(totalSearchPages || 1, prev + 1));
+  }, [totalSearchPages]);
 
   const handleClearSearch = useCallback(() => {
     setSearchInput('');
     setSearchTerm('');
+    setSearchResults([]);
+    setSearchResultsQuery('');
+    setSearchResultsPage(1);
+    setSearchResultsError(null);
+    setSearchCompleted(false);
+    setSearchDrawerOpen(false);
+    setSearchDrawerResult(null);
   }, [setSearchTerm]);
 
   const handleOpenServiceModal = useCallback((card) => {
@@ -368,6 +419,16 @@ const Proveedores = () => {
   const handleCloseServiceModal = useCallback(() => {
     setServiceModal({ open: false, card: null });
   }, []);
+
+  const handleSelectSearchResult = useCallback(
+    (result) => {
+      if (!result) return;
+      setSearchDrawerResult(result);
+      setSearchDrawerQuery(result.name || searchResultsQuery || '');
+      setSearchDrawerOpen(true);
+    },
+    [searchResultsQuery]
+  );
 
   const handleSaveWantedServices = useCallback(
     async (list) => {
@@ -490,6 +551,118 @@ const Proveedores = () => {
             )}
 
             <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
+
+            {(searchResultsLoading || searchCompleted) && (
+              <section className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-body">Resultados de búsqueda</h3>
+                    {searchResultsQuery && (
+                      <p className="text-xs text-muted">Consulta: {searchResultsQuery}</p>
+                    )}
+                  </div>
+                </div>
+
+                {searchResultsLoading ? (
+                  <Card className="border border-soft bg-surface text-sm text-muted">
+                    Buscando proveedores…
+                  </Card>
+                ) : searchResultsError ? (
+                  <Card className="border border-danger bg-danger-soft text-sm text-danger">
+                    {searchResultsError?.message || 'No se pudo completar la búsqueda.'}
+                  </Card>
+                ) : searchResults.length === 0 ? (
+                  <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
+                    No encontramos resultados con los filtros actuales.
+                  </Card>
+                ) : (
+                  <>
+                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {paginatedResults.map((result) => (
+                        <Card
+                          key={result.id}
+                          className="border border-soft bg-surface overflow-hidden flex flex-col gap-3"
+                        >
+                          <div className="h-36 w-full overflow-hidden rounded-md">
+                            <img
+                              src={result.image || DEFAULT_PROVIDER_IMAGE}
+                              alt={`Imagen de ${result.name || 'proveedor'}`}
+                              className="h-full w-full object-cover"
+                              onError={(event) => {
+                                event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h4 className="text-base font-semibold text-body">{result.name || 'Proveedor sugerido'}</h4>
+                                <p className="text-xs text-muted">{result.service || 'Servicio'}</p>
+                              </div>
+                              {result.match != null && (
+                                <span className="rounded-full bg-primary-soft px-2 py-0.5 text-xs font-semibold text-primary">
+                                  Match {Math.round(result.match)}
+                                </span>
+                              )}
+                            </div>
+                            {result.location && (
+                              <p className="text-xs text-muted">Ubicación · {result.location}</p>
+                            )}
+                            {result.priceRange && (
+                              <p className="text-xs text-muted">Precio estimado · {result.priceRange}</p>
+                            )}
+                            {result.snippet && (
+                              <p className="text-sm text-body/75">{result.snippet}</p>
+                            )}
+                          </div>
+                          <div className="mt-auto flex items-center justify-between gap-3">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSelectSearchResult(result)}
+                            >
+                              Ver detalles
+                            </Button>
+                            {result.source && (
+                              <span className="text-[10px] uppercase tracking-wide text-muted">
+                                {result.source}
+                              </span>
+                            )}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+
+                    {totalSearchPages > 1 && (
+                      <div className="flex items-center justify-between gap-3 pt-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handlePrevSearchPage}
+                          disabled={searchResultsPage === 1}
+                        >
+                          Anterior
+                        </Button>
+                        <span className="text-xs text-muted">
+                          Página {searchResultsPage} de {totalSearchPages}
+                        </span>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleNextSearchPage}
+                          disabled={searchResultsPage === totalSearchPages}
+                        >
+                          Siguiente
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </section>
+            )}
           </Card>
         ) : (
           <div className="flex justify-center">
@@ -595,9 +768,9 @@ const Proveedores = () => {
             setShowNewProviderForm(true);
           }}
           onOpenAI={(service) => {
-            setSearchDrawerQuery(service || '');
-            setSearchDrawerResult(null);
-            setSearchDrawerOpen(true);
+            const base = service || '';
+            setSearchInput(base);
+            performSearch(base, { saveHistory: true });
           }}
         />
       </Modal>
@@ -677,4 +850,5 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
 

@@ -424,9 +424,9 @@
 - **[archivo]** docs\flujos-especificos\flujo-29-upgrade-roles.md
 - **[conclusion]** parcial
 - **[implementado (doc)]**
-  - selector de rol en registro (`src/components/auth/RegisterForm.jsx:56`), persistencia local del rol en `useAuth` (`src/hooks/useAuth.jsx:180`, `src/hooks/useAuth.jsx:593`), navegaci�n y dashboard condicionados por rol (`src/components/Nav.jsx:29`, `src/components/HomePage.jsx:77`), v�nculos de bodas por rol en `WeddingService` (`src/services/WeddingService.js:144`, `src/services/WeddingService.js:487`, `src/services/WeddingService.js:510`), invitaciones desde `WeddingAccountLink.jsx:59` y aceptaci�n `WeddingAccountLink.jsx:79`.
+  - selector de rol en registro (`src/components/auth/RegisterForm.jsx:56`), persistencia local del rol en `useAuth` (`src/hooks/useAuth.jsx:180`, `src/hooks/useAuth.jsx:593`), navegacion y dashboard condicionados por rol (`src/components/Nav.jsx:29`, `src/components/HomePage.jsx:77`), vinculos de bodas por rol en `WeddingService` (`src/services/WeddingService.js:144`, `src/services/WeddingService.js:487`, `src/services/WeddingService.js:510`), invitaciones desde `WeddingAccountLink.jsx:59` y aceptacion `WeddingAccountLink.jsx:79`.
 - **[pendiente (doc)]**
-  - flujo unificado de upgrade con checkout de plan, sincronizaci�n Firestore/localStorage del nuevo rol, l�mites de bodas por plan, degradaci�n autom�tica al expirar el plan y panel de gesti�n para revertir cambios.
+  - flujo unificado de upgrade con checkout de plan, sincronizacion Firestore/localStorage del nuevo rol, limites de bodas por plan, degradacion automatica al expirar el plan y panel de gestion para revertir cambios.
 - **[E2E specs]** 1/1 presentes
   - [ok] cypress/e2e/account/role-upgrade-flow.cy.js
 - **[verificacion de archivos implementados]**

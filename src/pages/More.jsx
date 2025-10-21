@@ -168,7 +168,7 @@ export default function More() {
           >
             <Layers size={32} className="text-primary mb-2" />
             <h2 className="font-semibold mb-1">Extras</h2>
-            <p className="text-sm text-muted">Diseño web, ideas y Momentos colaborativos</p>
+            <p className="text-sm text-muted">Diseño web, ideas y recuerdos colaborativos</p>
           </button>
           {openMenu === 'extras' && (
             <div
@@ -187,7 +187,7 @@ export default function More() {
                 Ideas
               </Link>
               <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Momentos
+                Galería de recuerdos
               </Link>
             </div>
           )}
