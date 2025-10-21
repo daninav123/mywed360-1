@@ -66,6 +66,11 @@ const AdminTaskTemplates = () => {
   
   // Vista visual
   const [viewMode, setViewMode] = useState('json'); // 'json' | 'visual'
+  const [editingBlock, setEditingBlock] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
+  const [showAddSubtaskModal, setShowAddSubtaskModal] = useState(false);
+  const [selectedBlockForAdd, setSelectedBlockForAdd] = useState(null);
+  const [newSubtask, setNewSubtask] = useState({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
 
   const nextSuggestedVersion = useMemo(() => {
     if (!templates.length) return 1;
@@ -291,6 +296,68 @@ const AdminTaskTemplates = () => {
     return userTasks.filter(task => task.count >= minOccurrences);
   }, [userTasks, minOccurrences]);
 
+  const handleSaveBlockEdit = (blockIndex, field, value) => {
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      blocks[blockIndex][field] = value;
+      setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
+      setEditingBlock(null);
+    } catch (e) {
+      console.error('Error saving block edit:', e);
+    }
+  };
+
+  const handleSaveItemEdit = (blockIndex, itemIndex, field, value) => {
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      blocks[blockIndex].items[itemIndex][field] = value;
+      setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
+      setEditingItem(null);
+    } catch (e) {
+      console.error('Error saving item edit:', e);
+    }
+  };
+
+  const handleAddSubtask = () => {
+    if (!selectedBlockForAdd || !newSubtask.title.trim()) return;
+    
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      const block = blocks[selectedBlockForAdd];
+      
+      if (!block.items) block.items = [];
+      
+      block.items.push({
+        title: newSubtask.title,
+        startPct: parseFloat(newSubtask.startPct) / 100,
+        endPct: parseFloat(newSubtask.endPct) / 100,
+        priority: newSubtask.priority,
+        category: block.admin?.category || 'OTROS',
+        tags: [],
+        checklist: []
+      });
+      
+      setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
+      setShowAddSubtaskModal(false);
+      setSelectedBlockForAdd(null);
+      setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
+    } catch (e) {
+      console.error('Error adding subtask:', e);
+    }
+  };
+
+  const handleDeleteItem = (blockIndex, itemIndex) => {
+    if (!confirm('¿Eliminar esta subtarea?')) return;
+    
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      blocks[blockIndex].items.splice(itemIndex, 1);
+      setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
+    } catch (e) {
+      console.error('Error deleting item:', e);
+    }
+  };
+
   const renderVisualView = () => {
     if (!selectedTemplate) {
       return (
@@ -332,7 +399,25 @@ const AdminTaskTemplates = () => {
                 >
                   {/* Cabecera - Tarea Padre */}
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 rounded-t-lg">
-                    <h3 className="font-semibold text-white text-sm">{blockName}</h3>
+                    <div className="flex items-center justify-between">
+                      {editingBlock === `${blockIndex}-name` ? (
+                        <input
+                          type="text"
+                          defaultValue={blockName}
+                          onBlur={(e) => handleSaveBlockEdit(blockIndex, 'name', e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleSaveBlockEdit(blockIndex, 'name', e.target.value)}
+                          autoFocus
+                          className="bg-white text-gray-900 px-2 py-1 rounded text-sm w-full"
+                        />
+                      ) : (
+                        <h3 
+                          className="font-semibold text-white text-sm cursor-pointer hover:bg-blue-700 px-2 py-1 rounded"
+                          onClick={() => setEditingBlock(`${blockIndex}-name`)}
+                        >
+                          {blockName} ✏️
+                        </h3>
+                      )}
+                    </div>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-xs bg-blue-400 text-white px-2 py-0.5 rounded">
                         {category}
@@ -341,13 +426,46 @@ const AdminTaskTemplates = () => {
                         {items.length} subtarea{items.length !== 1 ? 's' : ''}
                       </span>
                     </div>
-                    <div className="text-xs text-blue-100 mt-1">
-                      📅 {(block.startPct * 100).toFixed(0)}% - {(block.endPct * 100).toFixed(0)}%
+                    <div className="text-xs text-blue-100 mt-1 flex items-center gap-2">
+                      {editingBlock === `${blockIndex}-timing` ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            defaultValue={(block.startPct * 100).toFixed(0)}
+                            onBlur={(e) => handleSaveBlockEdit(blockIndex, 'startPct', parseFloat(e.target.value) / 100)}
+                            className="bg-white text-gray-900 px-1 py-0.5 rounded w-12 text-xs"
+                          />
+                          <span className="text-white">-</span>
+                          <input
+                            type="number"
+                            defaultValue={(block.endPct * 100).toFixed(0)}
+                            onBlur={(e) => handleSaveBlockEdit(blockIndex, 'endPct', parseFloat(e.target.value) / 100)}
+                            className="bg-white text-gray-900 px-1 py-0.5 rounded w-12 text-xs"
+                          />
+                          <span className="text-white">%</span>
+                        </div>
+                      ) : (
+                        <span 
+                          className="cursor-pointer hover:bg-blue-700 px-2 py-0.5 rounded"
+                          onClick={() => setEditingBlock(`${blockIndex}-timing`)}
+                        >
+                          📅 {(block.startPct * 100).toFixed(0)}% - {(block.endPct * 100).toFixed(0)}% ✏️
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   {/* Subtareas */}
                   <div className="p-3 space-y-2 max-h-96 overflow-y-auto">
+                    <button
+                      onClick={() => {
+                        setSelectedBlockForAdd(blockIndex);
+                        setShowAddSubtaskModal(true);
+                      }}
+                      className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-xs text-gray-500 hover:border-blue-500 hover:text-blue-600 transition"
+                    >
+                      + Añadir Subtarea
+                    </button>
                     {items.length === 0 ? (
                       <div className="text-center py-6 text-gray-400 text-sm">
                         Sin subtareas
@@ -360,13 +478,33 @@ const AdminTaskTemplates = () => {
                         return (
                           <div
                             key={itemIndex}
-                            className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition"
+                            className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition relative group"
                           >
+                            <button
+                              onClick={() => handleDeleteItem(blockIndex, itemIndex)}
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-red-500 text-white rounded px-2 py-0.5 text-xs hover:bg-red-600"
+                            >
+                              🗑️
+                            </button>
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-gray-900 truncate">
-                                  {itemTitle}
-                                </p>
+                                {editingItem === `${blockIndex}-${itemIndex}-title` ? (
+                                  <input
+                                    type="text"
+                                    defaultValue={itemTitle}
+                                    onBlur={(e) => handleSaveItemEdit(blockIndex, itemIndex, 'title', e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSaveItemEdit(blockIndex, itemIndex, 'title', e.target.value)}
+                                    autoFocus
+                                    className="text-sm font-medium text-gray-900 w-full border rounded px-2 py-1"
+                                  />
+                                ) : (
+                                  <p 
+                                    className="text-sm font-medium text-gray-900 truncate cursor-pointer hover:bg-gray-200 px-2 py-1 rounded"
+                                    onClick={() => setEditingItem(`${blockIndex}-${itemIndex}-title`)}
+                                  >
+                                    {itemTitle} ✏️
+                                  </p>
+                                )}
                                 {item.assigneeSuggestion && (
                                   <p className="text-xs text-gray-500 mt-1">
                                     👤 {item.assigneeSuggestion}
@@ -460,19 +598,36 @@ const AdminTaskTemplates = () => {
 
         {/* Leyenda */}
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <h4 className="text-sm font-semibold mb-2">Leyenda:</h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold">Leyenda:</h4>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setViewMode('json')}
+                className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+              >
+                💻 Ver JSON
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="text-xs px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded disabled:opacity-50"
+              >
+                {saving ? 'Guardando...' : '💾 Guardar Cambios'}
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-600">
             <div>
-              <span className="font-medium">% Timeline:</span> Posición en el planning (0% = inicio, 100% = boda)
+              <span className="font-medium">✏️ Click para editar:</span> Nombre y timing de tareas
             </div>
             <div>
-              <span className="font-medium">Categorías:</span> Agrupación temática de tareas
+              <span className="font-medium">+ Añadir:</span> Nueva subtarea a cualquier bloque
             </div>
             <div>
-              <span className="font-medium">👤 Sugerencia:</span> Rol recomendado para la tarea
+              <span className="font-medium">🗑️ Eliminar:</span> Aparece al hacer hover sobre subtarea
             </div>
             <div>
-              <span className="font-medium">Checklist:</span> Pasos a seguir dentro de la subtarea
+              <span className="font-medium">💾 Guardar:</span> Persiste cambios en la plantilla
             </div>
           </div>
         </div>
@@ -896,6 +1051,98 @@ const AdminTaskTemplates = () => {
       </div>
           )}
         </>
+      )}
+
+      {/* Modal para añadir subtarea */}
+      {showAddSubtaskModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Añadir Subtarea</h3>
+              <button
+                onClick={() => {
+                  setShowAddSubtaskModal(false);
+                  setSelectedBlockForAdd(null);
+                  setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-1">Título de la subtarea *</label>
+                <input
+                  type="text"
+                  value={newSubtask.title}
+                  onChange={(e) => setNewSubtask(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Ej: Reservar fotógrafo"
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Inicio (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={newSubtask.startPct}
+                    onChange={(e) => setNewSubtask(prev => ({ ...prev, startPct: e.target.value }))}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Fin (%)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={newSubtask.endPct}
+                    onChange={(e) => setNewSubtask(prev => ({ ...prev, endPct: e.target.value }))}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Prioridad</label>
+                <select
+                  value={newSubtask.priority}
+                  onChange={(e) => setNewSubtask(prev => ({ ...prev, priority: e.target.value }))}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                >
+                  <option value="low">Baja</option>
+                  <option value="medium">Media</option>
+                  <option value="high">Alta</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setShowAddSubtaskModal(false);
+                  setSelectedBlockForAdd(null);
+                  setNewSubtask({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
+                }}
+                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddSubtask}
+                disabled={!newSubtask.title.trim()}
+                className="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Añadir Subtarea
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
