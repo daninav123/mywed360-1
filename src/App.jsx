@@ -31,6 +31,8 @@ import RSVPDashboard from './pages/RSVPDashboard';
 import SupplierPortal from './pages/SupplierPortal';
 import Tasks from './pages/Tasks';
 import VerifyEmail from './pages/VerifyEmail.jsx';
+import Login from './pages/Login.jsx';
+import Signup from './pages/Signup.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
