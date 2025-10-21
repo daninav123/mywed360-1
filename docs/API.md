@@ -70,6 +70,14 @@ Base: `/api/mail` y `/api/email*` (requiere `Authorization` cuando aplica)
 - `GET /api/email/tags/mapping`
 - `PUT /api/email/tags/mapping`
 
+### Automatización de email
+- `GET /api/email-automation/config` — obtiene configuración (Firestore `emailAutomationConfig/{uid}`).
+- `PUT /api/email-automation/config` — actualiza auto-respuestas y preferencias.
+- `POST /api/email-automation/state/auto-reply` — registra auto-respuestas aplicadas por usuario.
+- `POST /api/email-automation/classification` — persiste clasificación IA/heurística para un correo.
+- `GET /api/email-automation/scheduled/status` — métricas y próximos envíos programados.
+- `POST /api/mailgun/webhooks/deliverability` — ingesta de eventos Mailgun (`emailDeliverability/{messageId}`).
+
 ## Notificaciones
 
 - `GET /api/notifications`

@@ -53,6 +53,27 @@ router.get('/:token', async (req, res) => {
       });
     }
 
+    // Verificar fechas de validez
+    const now = new Date();
+    if (discountData.validFrom) {
+      const validFrom = new Date(discountData.validFrom);
+      if (now < validFrom) {
+        return res.status(403).json({
+          error: 'not_started',
+          message: `Este código estará disponible desde el ${validFrom.toLocaleDateString('es-ES')}`
+        });
+      }
+    }
+    if (discountData.validUntil) {
+      const validUntil = new Date(discountData.validUntil);
+      if (now > validUntil) {
+        return res.status(403).json({
+          error: 'expired',
+          message: `Este código expiró el ${validUntil.toLocaleDateString('es-ES')}`
+        });
+      }
+    }
+
     // Buscar todos los pagos que usaron este código
     const paymentsSnapshot = await db.collection('payments')
       .where('discountCode', '==', discountData.code)
@@ -106,6 +127,8 @@ router.get('/:token', async (req, res) => {
       code: discountData.code,
       type: discountData.type || 'campaign',
       assignedTo: discountData.assignedTo || { name: 'Partner', email: '' },
+      validFrom: discountData.validFrom || null,
+      validUntil: discountData.validUntil || null,
       stats: {
         total: {
           revenue: totalRevenue,

@@ -186,8 +186,6 @@ const Proveedores = () => {
   const [searchInput, setSearchInput] = useState('');
   const [serviceModal, setServiceModal] = useState({ open: false, card: null });
   const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
-  const [searchDrawerQuery, setSearchDrawerQuery] = useState('');
-  const [searchDrawerLoading, setSearchDrawerLoading] = useState(false);
   const [searchDrawerResult, setSearchDrawerResult] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [searchResultsQuery, setSearchResultsQuery] = useState('');
@@ -423,9 +421,7 @@ const Proveedores = () => {
   const handleSelectSearchResult = useCallback(
     (result) => {
       if (!result) return;
-      setSearchDrawerResult(result);
-      setSearchDrawerQuery(result.name || searchResultsQuery || '');
-      setSearchDrawerOpen(true);
+      setSearchDrawerResult(result);      setSearchDrawerOpen(true);
     },
     [searchResultsQuery]
   );
@@ -786,62 +782,82 @@ const Proveedores = () => {
         open={searchDrawerOpen}
         onClose={() => {
           setSearchDrawerOpen(false);
-          setSearchDrawerQuery('');
           setSearchDrawerResult(null);
         }}
-        title="Buscar proveedor"
+        title={
+          searchDrawerResult?.name
+            ? `Detalle del proveedor · ${searchDrawerResult.name}`
+            : 'Detalle del proveedor'
+        }
         size="lg"
       >
-        <form
-          onSubmit={async (event) => {
-            event.preventDefault();
-            const query = searchDrawerQuery.trim();
-            if (!query) return;
-            setSearchDrawerLoading(true);
-            try {
-              const results = await searchProviders(query);
-              if (Array.isArray(results) && results.length) {
-                setSearchDrawerResult(results[0]);
-              } else {
-                setSearchDrawerResult(null);
-              }
-            } catch (err) {
-              toast.error('No se pudo completar la búsqueda.');
-            } finally {
-              setSearchDrawerLoading(false);
-            }
-          }}
-          className="space-y-4"
-        >
-          <Input
-            type="search"
-            value={searchDrawerQuery}
-            onChange={(event) => setSearchDrawerQuery(event.target.value)}
-            placeholder="Ej: Florista Barcelona 2500"
-          />
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setSearchDrawerOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={aiLoading || searchDrawerLoading}>
-              Buscar
-            </Button>
+        {searchDrawerResult ? (
+          <div className="space-y-4">
+            <div className="h-48 w-full overflow-hidden rounded-lg">
+              <img
+                src={searchDrawerResult.image || DEFAULT_PROVIDER_IMAGE}
+                alt={`Imagen de ${searchDrawerResult.name || 'proveedor'}`}
+                className="h-full w-full object-cover"
+                onError={(event) => {
+                  event.currentTarget.src = DEFAULT_PROVIDER_IMAGE;
+                }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm text-muted">
+                {searchDrawerResult.service || 'Servicio desconocido'}
+              </p>
+              {searchDrawerResult.location && (
+                <p className="text-sm text-muted">Ubicación: {searchDrawerResult.location}</p>
+              )}
+              {searchDrawerResult.priceRange && (
+                <p className="text-sm text-muted">Precio estimado: {searchDrawerResult.priceRange}</p>
+              )}
+              {searchDrawerResult.aiSummary && (
+                <p className="text-sm text-body/75">{searchDrawerResult.aiSummary}</p>
+              )}
+              {searchDrawerResult.snippet && (
+                <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
+              )}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {Array.isArray(searchDrawerResult.tags) &&
+                  searchDrawerResult.tags.slice(0, 8).map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-soft bg-surface px-2 py-0.5 text-xs text-muted"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+              </div>
+            </div>
+
+            <div className="space-y-1 text-sm text-muted">
+              {searchDrawerResult.email && <p>Correo: {searchDrawerResult.email}</p>}
+              {searchDrawerResult.phone && <p>Teléfono: {searchDrawerResult.phone}</p>}
+            </div>
+
+            <div className="flex justify-end gap-2">
+              {searchDrawerResult.link && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    window.open(searchDrawerResult.link, '_blank', 'noopener,noreferrer')
+                  }
+                >
+                  Abrir enlace
+                </Button>
+              )}
+              <Button type="button" onClick={() => setSearchDrawerOpen(false)}>
+                Cerrar
+              </Button>
+            </div>
           </div>
-        </form>
-
-        {aiSearchError && (
-          <Card className="mt-4 border border-danger bg-danger-soft text-danger text-sm">
-            {aiSearchError}
-          </Card>
-        )}
-
-        {searchDrawerResult && (
-          <Card className="mt-4 border border-soft bg-surface space-y-2">
-            <h3 className="text-sm font-semibold text-body">{searchDrawerResult.name}</h3>
-            <p className="text-xs text-muted">{searchDrawerResult.service || 'Servicio'}</p>
-            {searchDrawerResult.snippet && (
-              <p className="text-sm text-body/75">{searchDrawerResult.snippet}</p>
-            )}
+        ) : (
+          <Card className="border border-soft bg-surface text-sm text-muted">
+            Selecciona un proveedor de la lista para ver más detalles.
           </Card>
         )}
       </Modal>
@@ -850,5 +866,8 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
+
+
 
 

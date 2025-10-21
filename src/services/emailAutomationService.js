@@ -195,6 +195,25 @@ async function recordAutoReplyRemote(payload) {
   }
 }
 
+async function recordClassificationRemote(mail, classification) {
+  if (!supportsRemoteScheduler()) return;
+  try {
+    await post(
+      CLASSIFICATION_RECORD_ENDPOINT,
+      {
+        mailId: mail.id || mail.mailId || mail.messageId || null,
+        classification,
+        sender: mail.from || null,
+        subject: mail.subject || null,
+      },
+      { auth: true, silent: true },
+    );
+  } catch (error) {
+    console.warn('[emailAutomation] record classification failed', error?.message || error);
+  }
+}
+
+
 const DEFAULT_CONFIG = {
   classification: {
     enabled: true,
@@ -774,6 +793,9 @@ function classifyEmail(mail, config) {
     }
     cache[cacheKey] = result;
     saveClassificationCache(cache);
+    if (result) {
+      Promise.resolve(recordClassificationRemote(mail, result)).catch(() => {});
+    }
     classificationPromises.delete(cacheKey);
     return result;
   })();

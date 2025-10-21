@@ -45,6 +45,8 @@ const AdminDiscounts = () => {
     maxUses: '',
     isPermanent: true,
     discountPercentage: '',
+    validFrom: '',
+    validUntil: '',
     assignedTo: { name: '', email: '' },
     notes: '',
     status: 'activo'
@@ -125,6 +127,8 @@ const AdminDiscounts = () => {
         type: formData.type,
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
+        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
+        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
           name: formData.assignedTo.name || null,
           email: formData.assignedTo.email || null
@@ -161,6 +165,8 @@ const AdminDiscounts = () => {
         type: formData.type,
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
+        validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
+        validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
           name: formData.assignedTo.name || null,
           email: formData.assignedTo.email || null
@@ -195,6 +201,8 @@ const AdminDiscounts = () => {
       maxUses: discount.maxUses || '',
       isPermanent: !discount.maxUses,
       discountPercentage: discount.discountPercentage || '',
+      validFrom: discount.validFrom ? new Date(discount.validFrom).toISOString().split('T')[0] : '',
+      validUntil: discount.validUntil ? new Date(discount.validUntil).toISOString().split('T')[0] : '',
       assignedTo: {
         name: discount.assignedTo?.name || '',
         email: discount.assignedTo?.email || ''
@@ -213,6 +221,8 @@ const AdminDiscounts = () => {
       maxUses: '',
       isPermanent: true,
       discountPercentage: '',
+      validFrom: '',
+      validUntil: '',
       assignedTo: { name: '', email: '' },
       notes: '',
       status: 'activo'

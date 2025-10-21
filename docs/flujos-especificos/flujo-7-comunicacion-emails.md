@@ -119,6 +119,7 @@ svp). |
 - emailComments/{emailId}/{commentId}: { authorId, body, mentions[], createdAt, type? }. Solo roles internos pueden leer/escribir.
 - emailFeedback/{emailId}/{feedbackId}: { userId, score (-1|0|1), note, createdAt, source }.
 - emailDrafts/{draftId} (backend planeado): guarda borradores IA/automatizaciones con state=draft.
+- emailAutomationState/{uid}.classifications: mapa limitado (≤200) con `{ tags[], folder, confidence, reason, source, updatedAt }`, actualizado vía `/api/email-automation/classification`.
 
 ### 4.3 Carpetas y etiquetas
 - users/{uid}/emailFolders/{folderId}: { name, color, unreadCount, system }.

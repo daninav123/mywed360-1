@@ -21,6 +21,9 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 import { db, firebaseReady } from '../firebaseConfig';
 import { performanceMonitor } from './PerformanceMonitor';
 
+export const GALLERY_COMPRESSION_THRESHOLD_BYTES = 30 * 1024 * 1024 * 1024; // 30 GB
+export const GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT = 30; // días permitidos tras el evento
+
 const DEFAULT_ALBUM_ID = 'momentos';
 const DEFAULT_SCENES = [
   { id: 'ceremonia', label: 'Ceremonia' },
@@ -29,6 +32,35 @@ const DEFAULT_SCENES = [
   { id: 'postboda', label: 'Postboda' },
   { id: 'otros', label: 'Otros' },
 ];
+
+const parseDateValue = (value) => {
+  if (!value) return null;
+  if (value instanceof Date) return new Date(value.getTime());
+  if (value instanceof Timestamp) return value.toDate();
+  if (typeof value.toDate === 'function') {
+    try {
+      return value.toDate();
+    } catch {
+      /* noop */
+    }
+  }
+  const asDate = new Date(value);
+  if (Number.isNaN(asDate.getTime())) return null;
+  return asDate;
+};
+
+const addDays = (base, days) => {
+  if (!base) return null;
+  const result = new Date(base.getTime());
+  result.setDate(result.getDate() + Number(days || 0));
+  return result;
+};
+
+const toTimestamp = (value) => {
+  if (!value) return null;
+  if (value instanceof Timestamp) return value;
+  return Timestamp.fromDate(value);
+};
 
 const DEFAULT_SETTINGS = {
   moderationMode: 'manual',
@@ -55,6 +87,94 @@ const DEFAULT_COUNTERS = {
   rejectedPhotos: 0,
   guestContributors: 0,
   badgesGranted: 0,
+  totalBytes: 0,
+  optimizedBytes: 0,
+};
+
+const loadImageElement = (file) =>
+  new Promise((resolve, reject) => {
+    try {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+      image.onerror = (error) => {
+        URL.revokeObjectURL(url);
+        reject(error);
+      };
+      image.src = url;
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+const optimizeImageFile = async (
+  file,
+  { maxEdge = 2560, quality = 0.82 } = {}
+) => {
+  if (!file || !(file.type || '').startsWith('image/')) return null;
+  if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+  try {
+    let bitmap = null;
+    let width = 0;
+    let height = 0;
+
+    if (typeof window.createImageBitmap === 'function') {
+      try {
+        bitmap = await window.createImageBitmap(file);
+        width = bitmap.width;
+        height = bitmap.height;
+      } catch {
+        bitmap = null;
+      }
+    }
+
+    if (!bitmap) {
+      const image = await loadImageElement(file);
+      width = image.width;
+      height = image.height;
+      bitmap = image;
+    }
+
+    if (!width || !height) return null;
+
+    const maxDimension = Math.max(width, height);
+    const ratio = maxDimension > maxEdge ? maxEdge / maxDimension : 1;
+    const targetWidth = Math.max(1, Math.round(width * ratio));
+    const targetHeight = Math.max(1, Math.round(height * ratio));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
+
+    if (bitmap && typeof bitmap.close === 'function') {
+      try {
+        bitmap.close();
+      } catch {
+        /* noop */
+      }
+    }
+
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', quality)
+    );
+    if (!blob || blob.size >= file.size) return null;
+
+    const filenameBase = file.name ? file.name.replace(/\.[^/.]+$/, '') : 'foto';
+    const optimizedFile = new File([blob], `${filenameBase}.jpg`, {
+      type: blob.type || 'image/jpeg',
+      lastModified: Date.now(),
+    });
+
+    return { file: optimizedFile, wasCompressed: true };
+  } catch (error) {
+    console.warn('[momentosService] optimizeImageFile no pudo comprimir', error);
+    return null;
+  }
 };
 
 const ensureFirebase = async () => {
@@ -110,6 +230,15 @@ const buildAlbumDefaults = (overridesSettings = {}) => ({
   name: 'Galería de recuerdos',
   slug: 'momentos-principal',
   status: 'active',
+  eventDate: null,
+  uploadWindow: {
+    closesAt: null,
+    closedAt: null,
+    compressionThresholdBytes: GALLERY_COMPRESSION_THRESHOLD_BYTES,
+    compressionActive: false,
+    lastCompressionAt: null,
+    lastTokenAt: null,
+  },
   settings: {
     ...DEFAULT_SETTINGS,
     ...overridesSettings,
@@ -121,6 +250,36 @@ const buildAlbumDefaults = (overridesSettings = {}) => ({
     expiresAt: null,
   },
 });
+
+const resolveAlbumEventDate = (album) =>
+  parseDateValue(
+    album?.eventDate ||
+      album?.weddingDate ||
+      album?.settings?.eventDate ||
+      album?.settings?.weddingDate ||
+      album?.eventDateValue ||
+      album?.timelineDate ||
+      album?.coreInfo?.weddingDate
+  );
+
+const resolveUploadWindow = (album) => {
+  const eventDate = resolveAlbumEventDate(album);
+  const closesAtFromAlbum = parseDateValue(album?.uploadWindow?.closesAt);
+  const closesAt =
+    closesAtFromAlbum ||
+    (eventDate ? addDays(eventDate, GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT) : null);
+  const threshold =
+    album?.uploadWindow?.compressionThresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
+  const totalBytes = album?.counters?.totalBytes || 0;
+  const compressionActive =
+    Boolean(album?.uploadWindow?.compressionActive) || totalBytes >= threshold;
+  return {
+    eventDate,
+    closesAt,
+    thresholdBytes: threshold,
+    compressionActive,
+  };
+};
 
 const calculateHighlightScore = (photo, album) => {
   const reasons = [];
@@ -200,18 +359,46 @@ export const ensureMomentosAlbum = async (weddingId, overrides = {}) => {
     return { id: albumRef.id, ...snapshot.data() };
   }
 
-  const payload = buildAlbumDefaults(overrides.settings || {});
+  const {
+    settings: overridesSettings = {},
+    counters: overridesCounters = {},
+    uploadWindow: overridesUploadWindow = {},
+    eventDate: overridesEventDate,
+    weddingDate: overridesWeddingDate,
+    ...restOverrides
+  } = overrides || {};
+
+  const payload = buildAlbumDefaults(overridesSettings);
+  const eventDateCandidate = parseDateValue(overridesEventDate || overridesWeddingDate);
+  const eventDateTimestamp = eventDateCandidate ? toTimestamp(eventDateCandidate) : null;
+  const closesAtCandidate = overridesUploadWindow?.closesAt
+    ? parseDateValue(overridesUploadWindow.closesAt)
+    : eventDateCandidate
+    ? addDays(eventDateCandidate, GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT)
+    : null;
+
   await setDoc(
     albumRef,
     {
       ...payload,
-      ...overrides,
+      ...restOverrides,
+      eventDate: eventDateTimestamp || payload.eventDate,
+      uploadWindow: {
+        ...payload.uploadWindow,
+        ...overridesUploadWindow,
+        compressionThresholdBytes:
+          overridesUploadWindow?.compressionThresholdBytes ||
+          payload.uploadWindow.compressionThresholdBytes,
+        closesAt: closesAtCandidate
+          ? toTimestamp(closesAtCandidate)
+          : payload.uploadWindow.closesAt,
+      },
       settings: {
         ...payload.settings,
-        ...(overrides.settings || {}),
-        scenes: normalizeScenes(overrides.settings?.scenes || payload.settings.scenes),
+        ...overridesSettings,
+        scenes: normalizeScenes(overridesSettings?.scenes || payload.settings.scenes),
       },
-      counters: { ...payload.counters, ...(overrides.counters || {}) },
+      counters: { ...payload.counters, ...overridesCounters },
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       lastActivityAt: serverTimestamp(),
