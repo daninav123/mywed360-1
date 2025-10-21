@@ -55,6 +55,7 @@
 - La fecha de la boda (`weddingDate`) marca el calendario de la galería. Las subidas están permitidas desde la planificación y se cierran automáticamente **30 días después del evento** (`uploadWindow.closesAt`). El cierre se refleja en la UI y bloquea nuevas subidas.
 - `createGuestToken` recorta la caducidad de cada enlace/QR a la fecha de cierre efectiva. Si la ventana expiró no se generan nuevos tokens y los invitados visualizan un estado “Galería cerrada”.
 - Se controlan los volúmenes mediante `counters.totalBytes` y `counters.optimizedBytes`. A partir de **30 GB** se activa compresión cliente (JPEG ~0.82, máx. 2560 px) antes de subir a Firebase Storage, registrando en los metadatos si la foto fue optimizada.
+- Hosts e invitados ven un contador con los **días restantes** para aportar fotos; cuando la ventana está activa, la vista anfitrión muestra la fecha límite más el contador, y el portal público recuerda a los invitados cuánto tiempo queda.
 - Hosts e invitados reciben mensajes contextuales: progreso de almacenamiento, activación de compresión y fecha límite de aportaciones. Los hosts pueden reabrir la galería ajustando la fecha del evento.
 - Todos los recursos se almacenan en Firebase Storage bajo `weddings/{weddingId}/albums/momentos/`. La retención mínima cubre desde la fecha del evento; la purga definitiva queda supeditada a las políticas legales/contractuales vigentes.
 - **Servicios compartidos**:

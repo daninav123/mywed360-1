@@ -51,6 +51,8 @@ export default function MomentosGuest() {
   const [errorMessage, setErrorMessage] = useState('');
   const uploadState = useMemo(() => (album ? getGalleryUploadState(album) : null), [album]);
   const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
+  const remainingDays =
+    typeof uploadState?.remainingDays === 'number' ? uploadState.remainingDays : null;
 
   useEffect(() => {
     let unsubscribeAlbum = null;
@@ -227,6 +229,11 @@ export default function MomentosGuest() {
                 La galería admite nuevas fotos hasta {formatDate(uploadState.closesAt)}.
               </p>
             )}
+            {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
+              <p className="text-xs text-slate-400">
+                Te quedan {remainingDays === 1 ? '1 día' : `${remainingDays} días`} para compartir recuerdos.
+              </p>
+            )}
             {uploadState?.compressionActive && (
               <p className="text-xs text-slate-400">
                 Las fotos se optimizarán automáticamente para no ocupar tanto espacio.
@@ -309,6 +316,11 @@ export default function MomentosGuest() {
             Sube hasta {remainingUploads !== null ? `${remainingUploads} fotos adicionales` : 'todas las fotos que quieras'}.
             El anfitrión revisará y las compartirá con el grupo.
           </p>
+          {uploadState?.isWindowOpen && remainingDays !== null && remainingDays >= 0 && (
+            <p className="text-xs text-slate-400">
+              Aún tienes {remainingDays === 1 ? '1 día' : `${remainingDays} días`} para enviar tus mejores fotos.
+            </p>
+          )}
           {uploadState?.closesAt && (
             <p className="text-xs text-slate-400">
               Disponible hasta {formatDate(uploadState.closesAt)}.

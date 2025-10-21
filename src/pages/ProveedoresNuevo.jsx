@@ -335,7 +335,7 @@ const Proveedores = () => {
       if (trimmed && saveHistory) registerSearchQuery(trimmed);
 
       setSearchResultsLoading(true);
-      setSearchResultsError(null);\n    setSearchResultsLoading(false);
+      setSearchResultsError(null);
       setSearchResults([]);
       setSearchResultsQuery(trimmed || enrichedQuery);
       setSearchResultsPage(1);
@@ -404,10 +404,12 @@ const Proveedores = () => {
     setSearchResults([]);
     setSearchResultsQuery('');
     setSearchResultsPage(1);
-    setSearchResultsError(null);\n    setSearchResultsLoading(false);
+    setSearchResultsError(null);
+    setSearchResultsLoading(false);
     setSearchCompleted(false);
     setSearchDrawerOpen(false);
     setSearchDrawerResult(null);
+    setResultsUsedFallback(false);
   }, [setSearchTerm]);
 
   const handleOpenServiceModal = useCallback((card) => {
@@ -558,6 +560,12 @@ const Proveedores = () => {
                     )}
                   </div>
                 </div>
+
+                {resultsUsedFallback && !searchResultsLoading && !searchResultsError && searchResults.length > 0 && (
+                  <Card className="border border-soft bg-primary-soft/20 text-xs text-primary">
+                    Mostramos sugerencias de referencia porque la búsqueda en vivo no respondió.
+                  </Card>
+                )}
 
                 {searchResultsLoading ? (
                   <Card className="border border-soft bg-surface text-sm text-muted">
@@ -867,6 +875,8 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
+
 
 
 

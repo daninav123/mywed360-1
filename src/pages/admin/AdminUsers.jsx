@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { getUsersData, getUsersRoleSummary, suspendUser } from '../../services/adminDataService';
+import { getUsersData, getUsersRoleSummary, suspendUser, reactivateUser } from '../../services/adminDataService';
 
 const ROLE_CARDS = [
   { key: 'owner', label: 'Owners' },
@@ -41,10 +41,14 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showSuspendModal, setShowSuspendModal] = useState(false);
+  const [showReactivateModal, setShowReactivateModal] = useState(false);
   const [suspendReason, setSuspendReason] = useState('');
+  const [reactivateNotes, setReactivateNotes] = useState('');
+  const [isSuspending, setIsSuspending] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('list');
-  const [roleSummary, setRoleSummary] = useState(() => createEmptyRoleSummary());
+  const [error, setError] = useState('');
+  const [roleSummary, setRoleSummary] = useState(createEmptyRoleSummary());
   const [loadingRoleSummary, setLoadingRoleSummary] = useState(true);
   const [roleSummaryError, setRoleSummaryError] = useState('');
 
@@ -116,14 +120,13 @@ const AdminUsers = () => {
 
   const confirmSuspend = async () => {
     if (!selectedUser || !suspendReason.trim()) return;
+    setIsSuspending(true);
     
     try {
-      // Llamar al endpoint real del backend
       await suspendUser(selectedUser.id, suspendReason);
       
-      // Actualizar el estado local para reflejar el cambio
       setUsers((prev) =>
-        prev.map((user) => (user.id === selectedUser.id ? { ...user, status: 'disabled' } : user)),
+        prev.map((user) => (user.id === selectedUser.id ? { ...user, status: 'disabled', isSuspended: true } : user)),
       );
       setShowSuspendModal(false);
       setSuspendReason('');
@@ -131,6 +134,35 @@ const AdminUsers = () => {
     } catch (error) {
       console.error('[AdminUsers] Failed to suspend user', error);
       alert('Error al suspender el usuario: ' + error.message);
+    } finally {
+      setIsSuspending(false);
+    }
+  };
+
+  const openReactivateModal = (user) => {
+    setSelectedUser(user);
+    setReactivateNotes('');
+    setShowReactivateModal(true);
+  };
+
+  const confirmReactivate = async () => {
+    if (!selectedUser) return;
+    setIsReactivating(true);
+    
+    try {
+      await reactivateUser(selectedUser.id, reactivateNotes);
+      
+      setUsers((prev) =>
+        prev.map((user) => (user.id === selectedUser.id ? { ...user, status: 'active', isSuspended: false } : user)),
+      );
+      setShowReactivateModal(false);
+      setReactivateNotes('');
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('[AdminUsers] Failed to reactivate user', error);
+      alert('Error al reactivar el usuario: ' + error.message);
+    } finally {
+      setIsReactivating(false);
     }
   };
 
@@ -167,7 +199,16 @@ const AdminUsers = () => {
                 <td className="px-4 py-3">{user.weddings}</td>
                 <td className="px-4 py-3">{user.createdAt}</td>
                 <td className="px-4 py-3 text-right">
-                  {user.status !== 'disabled' && (
+                  {user.status === 'disabled' || user.isSuspended ? (
+                    <button
+                      type="button"
+                      data-testid="admin-user-reactivate"
+                      onClick={() => openReactivateModal(user)}
+                      className="rounded-md border border-green-500 bg-green-50 px-3 py-1 text-xs text-green-700 hover:bg-green-100"
+                    >
+                      Reactivar
+                    </button>
+                  ) : (
                     <button
                       type="button"
                       data-testid="admin-user-suspend"
@@ -186,25 +227,26 @@ const AdminUsers = () => {
     );
   };
 
-  const summaryData = roleSummary ?? createEmptyRoleSummary();
-
-  const renderRoleSummary = () => (
-    <div
-      className="space-y-4 rounded-xl border border-soft bg-surface p-4 shadow-sm"
-      data-testid="admin-users-role-summary"
-    >
-      {loadingRoleSummary ? (
-        <div className="text-sm text-[var(--color-text-soft,#6b7280)]">Cargando resumen de roles...</div>
-      ) : (
-        <>
-          {roleSummaryError ? (
-            <div className="rounded-md border border-soft bg-[var(--color-bg-soft,#fff7ed)] px-3 py-2 text-xs text-[color:var(--color-text,#b45309)]">
-              {roleSummaryError}
-            </div>
-          ) : null}
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {ROLE_CARDS.map(({ key, label }) => {
-              const bucket = summaryData.roles?.[key] || {
+  const renderRoleSummary = () => {
+    const summaryData = roleSummary ?? createEmptyRoleSummary();
+    
+    return (
+      <div
+        className="space-y-4 rounded-xl border border-soft bg-surface p-4 shadow-sm"
+        data-testid="admin-users-role-summary"
+      >
+        {loadingRoleSummary ? (
+          <div className="text-sm text-[var(--color-text-soft,#6b7280)]">Cargando resumen de roles...</div>
+        ) : (
+          <>
+            {roleSummaryError ? (
+              <div className="rounded-md border border-soft bg-[var(--color-bg-soft,#fff7ed)] px-3 py-2 text-xs text-[color:var(--color-text,#b45309)]">
+                {roleSummaryError}
+              </div>
+            ) : null}
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {ROLE_CARDS.map(({ key, label }) => {
+                const bucket = summaryData.roles?.[key] || {
                 label,
                 total: 0,
                 real: 0,
@@ -295,7 +337,8 @@ const AdminUsers = () => {
         </>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">

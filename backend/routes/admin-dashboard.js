@@ -2049,23 +2049,24 @@ router.post('/users/:id/suspend', async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body || {};
+    
     if (!id) return res.status(400).json({ error: 'user_id_required' });
     if (!reason || typeof reason !== 'string' || !reason.trim()) {
       return res.status(400).json({ error: 'suspension_reason_required' });
     }
     
-    const userRef = collections.users().doc(id);
+    const userRef = db.collection('users').doc(id);
     const userDoc = await userRef.get();
+    
     if (!userDoc.exists) {
       return res.status(404).json({ error: 'user_not_found' });
     }
     
     await userRef.set({
-      status: 'disabled',
-      suspendedAt: serverTs(),
-      suspendedBy: getActor(req),
+      isSuspended: true,
       suspensionReason: reason.trim(),
-      previousStatus: userDoc.data().status || 'active'
+      suspendedAt: serverTs(),
+      suspendedBy: getActor(req)
     }, { merge: true });
     
     await writeAdminAudit(req, 'ADMIN_USER_SUSPEND', {
@@ -2076,8 +2077,53 @@ router.post('/users/:id/suspend', async (req, res) => {
     
     return res.json({ success: true });
   } catch (error) {
-    logger.error('[admin-dashboard] suspend user error', error);
+    logger.error('[admin-dashboard] user suspend error', error);
     return res.status(500).json({ error: 'user_suspend_failed' });
+  }
+});
+
+// --- User Reactivation ---
+router.post('/users/:id/reactivate', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body || {};
+    
+    if (!id) return res.status(400).json({ error: 'user_id_required' });
+    
+    const userRef = db.collection('users').doc(id);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      return res.status(404).json({ error: 'user_not_found' });
+    }
+    
+    const userData = userDoc.data();
+    if (!userData.isSuspended) {
+      return res.status(400).json({ error: 'user_not_suspended' });
+    }
+    
+    await userRef.set({
+      isSuspended: false,
+      suspensionReason: null,
+      reactivatedAt: serverTs(),
+      reactivatedBy: getActor(req),
+      reactivationNotes: notes ? String(notes).trim() : null
+    }, { merge: true });
+    
+    await writeAdminAudit(req, 'ADMIN_USER_REACTIVATE', {
+      resourceType: 'user',
+      resourceId: id,
+      payload: { 
+        previousReason: userData.suspensionReason || null,
+        notes: notes || null 
+      }
+    });
+    
+    logger.info(`[admin-dashboard] User ${id} reactivated by ${getActor(req)}`);
+    return res.json({ success: true });
+  } catch (error) {
+    logger.error('[admin-dashboard] user reactivate error', error);
+    return res.status(500).json({ error: 'user_reactivate_failed' });
   }
 });
 

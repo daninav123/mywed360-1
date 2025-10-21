@@ -89,6 +89,12 @@ export default function AlbumOverview({
   const thresholdBytes =
     uploadState?.thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
   const compressionActive = Boolean(uploadState?.compressionActive);
+  const remainingDays =
+    typeof uploadState?.remainingDays === 'number' ? uploadState.remainingDays : null;
+  const remainingLabel =
+    remainingDays !== null && remainingDays >= 0
+      ? ` (${remainingDays === 1 ? '1 día restante' : `${remainingDays} días restantes`})`
+      : '';
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [qrError, setQrError] = useState(null);
   const scenes = getAlbumScenes(album);
@@ -245,7 +251,7 @@ export default function AlbumOverview({
               Ventana de aportaciones:{' '}
               <strong>
                 {uploadState.isWindowOpen
-                  ? `activa hasta ${formatDate(uploadState.closesAt)}`
+                  ? `activa hasta ${formatDate(uploadState.closesAt)}${remainingLabel}`
                   : `cerrada desde ${formatDate(uploadState.closesAt)}`}
               </strong>
             </span>

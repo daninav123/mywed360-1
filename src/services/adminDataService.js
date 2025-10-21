@@ -589,7 +589,14 @@ export async function suspendUser(userId, reason) {
   if (!reason || typeof reason !== 'string' || !reason.trim()) {
     throw new Error('suspension_reason_required');
   }
-  return await postJson(`${ADMIN_BASE_PATH}/users/${encodeURIComponent(userId)}/suspend`, { reason });
+  const payload = { reason: reason.trim() };
+  return await postJson(`${ADMIN_BASE_PATH}/users/${encodeURIComponent(userId)}/suspend`, payload);
+}
+
+export async function reactivateUser(userId, notes = '') {
+  if (!userId) throw new Error('user_id_required');
+  const payload = { notes: notes ? String(notes).trim() : '' };
+  return await postJson(`${ADMIN_BASE_PATH}/users/${encodeURIComponent(userId)}/reactivate`, payload);
 }
 
 export async function respondToTicket(ticketId, message, status) {
