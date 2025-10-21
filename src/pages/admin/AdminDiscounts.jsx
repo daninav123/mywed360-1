@@ -305,39 +305,44 @@ const AdminDiscounts = () => {
                 <tbody className="divide-y divide-soft">
                   {filtered.map((link) => (
                     <tr key={link.id}>
-                      <td className="px-4 py-3 font-medium">{link.code}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={link.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="truncate text-[color:var(--color-primary,#6366f1)] hover:underline"
-                          >
-                            {link.url || '—'}
-                          </a>
-                          {link.url ? (
-                            <button
-                              type="button"
-                              onClick={() => handleCopy(link.url)}
-                              className="text-xs text-[var(--color-text-soft,#6b7280)] hover:text-[var(--color-primary,#6366f1)]"
-                            >
-                              Copiar
-                            </button>
-                          ) : null}
-                        </div>
+                      <td className="px-4 py-3 font-medium font-mono">{link.code}</td>
+                      <td className="px-4 py-3 capitalize">{TYPE_LABELS[link.type] || link.type || '—'}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-blue-600">
+                        {link.discountPercentage ? `${link.discountPercentage}%` : '—'}
                       </td>
                       <td className="px-4 py-3 text-right">{link.uses || 0}</td>
                       <td className="px-4 py-3 text-right font-medium text-green-600">
                         {formatCurrency(link.revenue, link.currency || summary.currency)}
                       </td>
-                      <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.createdAt || '—'}</td>
-                      <td className="px-4 py-3 text-[var(--color-text-soft,#6b7280)]">{link.lastUsedAt || '—'}</td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                            link.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {STATUS_LABELS[link.status] || link.status || 'active'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
                         <button
-                          type="button"
+                          onClick={() => handleGeneratePartnerLink(link.id, link.code)}
+                          className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-sm"
+                          title="Generar enlace de estadísticas"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Generar
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 space-x-2">
+                        <button
+                          onClick={() => copyToClipboard(link.code)}
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                        >
+                          Copiar
+                        </button>
+                        <button
                           onClick={() => openEditModal(link)}
-                          className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                          className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
                         >
                           Editar
                         </button>
@@ -346,7 +351,7 @@ const AdminDiscounts = () => {
                   ))}
                   {filtered.length === 0 && (
                     <tr>
-                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={9}>
+                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={8}>
                         No se encontraron enlaces con los filtros aplicados.
                       </td>
                     </tr>
@@ -645,4 +650,26 @@ const AdminDiscounts = () => {
                     setShowEditModal(false);
                     setEditingDiscount(null);
                     resetForm();
-    
+                  }}
+                  disabled={updating}
+                  className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={updating}
+                  className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
+                >
+                  {updating ? 'Actualizando...' : 'Guardar cambios'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AdminDiscounts;
