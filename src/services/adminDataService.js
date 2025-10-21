@@ -643,3 +643,13 @@ export const getUserTasksAnalysis = async (opts = {}) => {
     meta: data.meta || { totalWeddings: 0, totalUniqueTasks: 0 },
   };
 };
+
+export const exportPortfolioPDF = async (filters = {}, format = 'summary') => {
+  const payload = { filters, format };
+  const response = await apiPost(`${ADMIN_BASE_PATH}/portfolio/export-pdf`, payload, getAdminFetchOptions({ auth: false }));
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'export_failed' }));
+    throw new Error(error.error || 'portfolio_export_failed');
+  }
+  return response.json();
+};

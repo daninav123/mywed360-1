@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { getPortfolioData } from '../../services/adminDataService';
+import { getPortfolioData, exportPortfolioPDF } from '../../services/adminDataService';
 
 const statusLabels = {
   draft: 'Borrador',
@@ -16,6 +16,7 @@ const AdminPortfolio = () => {
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
   const [meta, setMeta] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   const loadPortfolio = useCallback(async (filters = {}) => {
     setLoading(true);
@@ -39,6 +40,40 @@ const AdminPortfolio = () => {
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
     });
+  };
+
+  const handleExportPDF = async () => {
+    if (exporting) return;
+    setExporting(true);
+    
+    try {
+      const filters = {
+        status: statusFilter || undefined,
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        limit: 200,
+      };
+      
+      const result = await exportPortfolioPDF(filters, 'summary');
+      
+      // Descargar como JSON (temporal hasta implementar PDF real)
+      const blob = new Blob([JSON.stringify(result.pdfContent, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `portfolio-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert(`✅ Portfolio exportado: ${result.total} bodas`);
+    } catch (error) {
+      console.error('[AdminPortfolio] Export error:', error);
+      alert('Error al exportar portfolio: ' + error.message);
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -194,9 +229,11 @@ const AdminPortfolio = () => {
               <button
                 type="button"
                 data-testid="portfolio-export-pdf"
-                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)]"
+                onClick={handleExportPDF}
+                disabled={exporting}
+                className="rounded-md border border-soft px-3 py-1 text-xs hover:bg-[var(--color-bg-soft,#f3f4f6)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Exportar PDF
+                {exporting ? 'Exportando...' : '📄 Exportar Portfolio (JSON)'}
               </button>
             </div>
           </div>

@@ -2222,6 +2222,91 @@ router.post('/reports/generate', async (req, res) => {
   }
 });
 
+// --- Export Portfolio to PDF ---
+router.post('/portfolio/export-pdf', async (req, res) => {
+  try {
+    const { filters = {}, format = 'summary' } = req.body || {};
+    
+    logger.info('[admin-dashboard] Portfolio PDF export requested', { filters, format });
+    
+    // Obtener bodas con los filtros aplicados
+    const limit = Math.min(Number(filters.limit) || 200, 500);
+    const statusFilter = typeof filters.status === 'string' ? filters.status.trim() : '';
+    const order = String(filters.order || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc';
+    
+    let query = db.collection('weddings');
+    if (statusFilter) {
+      query = query.where('status', '==', statusFilter);
+    }
+    
+    const snap = await query.orderBy('weddingDate', order).limit(limit).get();
+    
+    const weddings = snap.docs.map(d => {
+      const data = d.data() || {};
+      return {
+        id: d.id,
+        coupleName: data.coupleName || 'Sin nombre',
+        weddingDate: data.weddingDate?.toDate?.() || null,
+        status: data.status || 'unknown',
+        venue: data.venue || null,
+        guestCount: data.guestCount || 0,
+        budget: data.budget?.total || 0,
+        plannerName: data.plannerName || null,
+      };
+    });
+    
+    // Generar contenido del PDF (formato simple)
+    const pdfContent = {
+      title: 'Portfolio de Bodas - MyWed360',
+      generatedAt: new Date().toISOString(),
+      filters: { status: statusFilter || 'all', order, limit },
+      total: weddings.length,
+      weddings: format === 'detailed' ? weddings : weddings.map(w => ({
+        coupleName: w.coupleName,
+        weddingDate: w.weddingDate ? w.weddingDate.toISOString().split('T')[0] : 'Sin fecha',
+        status: w.status,
+        guestCount: w.guestCount,
+      })),
+    };
+    
+    // TODO: Integrar con puppeteer o pdfkit para generar PDF real
+    // Por ahora devolvemos JSON que el cliente puede descargar
+    
+    const exportId = `portfolio-${Date.now()}`;
+    const exportRecord = {
+      id: exportId,
+      type: 'portfolio',
+      format,
+      filters,
+      totalWeddings: weddings.length,
+      requestedBy: getActor(req),
+      createdAt: serverTs(),
+      status: 'completed',
+    };
+    
+    await db.collection('exports').doc(exportId).set(exportRecord);
+    
+    await writeAdminAudit(req, 'ADMIN_PORTFOLIO_EXPORT', {
+      resourceType: 'export',
+      resourceId: exportId,
+      payload: { filters, format, total: weddings.length }
+    });
+    
+    logger.info(`[admin-dashboard] Portfolio export ${exportId} completed with ${weddings.length} weddings`);
+    
+    return res.json({
+      success: true,
+      exportId,
+      downloadUrl: `/api/admin/dashboard/portfolio/export/${exportId}/download`,
+      pdfContent, // Temporal: devolver JSON hasta implementar PDF real
+      total: weddings.length,
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] portfolio export error', error);
+    return res.status(500).json({ error: 'portfolio_export_failed', message: error.message });
+  }
+});
+
 // --- Task Templates CRUD (mínimo) ---
 const TaskTemplateSchema = z.object({
   version: z.string().min(1).default(() => `v${Date.now()}`),
