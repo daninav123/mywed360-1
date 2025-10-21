@@ -9,7 +9,7 @@ setLine(45, "const DisenosLogo = React.lazy(() => import('./pages/disenos/Logo')
 setLine(50, "const DisenosVectorEditor = React.lazy(() => import('./pages/disenos/VectorEditor'));");
 setLine(51, "const MisDisenos = React.lazy(() => import('./pages/disenos/MisDisenos'));");
 // Replace route usages
-setLine(161, "                {/* Diseños */}");
+setLine(161, "                {/* DiseÃ±os */}");
 setLine(162, "                <Route path=\"disenos\" element={<DisenosLayout />}>");
 setLine(164, "                  <Route path=\"invitaciones\" element={<DisenosInvitaciones />} />");
 setLine(165, "                  <Route path=\"invitacion-vector\" element={<DisenosInvitaciones />} />");

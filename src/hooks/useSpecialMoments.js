@@ -42,7 +42,7 @@ const defaultData = {
         id: 1,
         order: 1,
         title: 'Entrada Novio',
-        song: 'Canon in D � Pachelbel',
+        song: 'Canon in D - Pachelbel',
         time: '', // Hora (hh:mm)
         duration: '', // Duración (min) o texto corto
         type: 'entrada', // entrada | lectura | votos | anillos | baile | corte_pastel | discurso | otro
@@ -58,7 +58,7 @@ const defaultData = {
         id: 2,
         order: 2,
         title: 'Entrada Novia',
-        song: 'Bridal Chorus � Wagner',
+        song: 'Bridal Chorus - Wagner',
         time: '',
         duration: '',
         type: 'entrada',

@@ -106,7 +106,8 @@
 | subject, bodyHtml, bodyText | string | Contenido renderizable o plano. |
 | attachments[] | { name, size, mimeType, url, storagePath } | Adjuntos vinculados en Storage. |
 | folder | string | inbox, sent, 	rash, custom:{id}. |
-| labels[] | string | Etiquetas internas (ej. provider, svp). |
+| labels[] | string | Etiquetas internas (ej. provider, 
+svp). |
 | status | { read: bool, flagged: bool, important: bool } | Estados visibles en UI. |
 | autoReply | { applied: bool, templateId?, delayMinutes? } | Resultado de auto-respuestas. |
 | scheduled | { sendAt?, state?, attempts? } | Solo presente en envios programados. |
@@ -126,8 +127,9 @@
 - olderService y 	agService mantienen espejo local (mywed360_email_*) mientras se consolida backend.
 
 ### 4.4 Eventos derivados
-- emailEvents/{eventId}: { emailId, weddingId, title, startAt, endAt, location, attendees[], status, taskId? } (creados desde CalendarIntegration.jsx).
-- emailPortalSync (planeado) almacenara preferencia de notificaciones cruzadas.
+- `emailEvents/{eventId}`: `{ emailId, weddingId, title, startAt, endAt, location, attendees[], status, taskId? }` (creados desde CalendarIntegration.jsx).
+- `emailPortalSync` (planeado) almacenara preferencia de notificaciones cruzadas.
+- `emailDeliverability/{messageId}`: eventos Mailgun (`events[]`, `counts.*`, `lastStatus`, `lastRecipient`, `lastEventAt`) alimentados por los webhooks de entregabilidad.
 ## 5. Reglas de negocio vigentes y pendientes
 - **Implementadas:** 
   - Validación de alias (regex + lista reservada) y verificación de unicidad Firestore.
@@ -198,7 +200,7 @@
   - `replyTimeMedian > 24h` → crear tarea de seguimiento.
   - `deliverySuccess` cayendo >10% semana contra semana → levantar incidente.
 - `EmailStats.jsx` consume `emailMetrics` y, sin datos, recurre a `getMails` + cache local; evitar bloqueos aplicando paginación y memoización.
-- Métricas de entregabilidad: los webhooks de Mailgun (`delivered`, `failed`, `opened`, `clicked`, `complained`) se almacenarán en `emailDeliverability/{messageId}` con TTL 90 días y se exportarán a BigQuery/Grafana. Alertas: rebotes >5% diarios → incidente, `complained` >0.5% → pausar campañas.
+- Métricas de entregabilidad: los webhooks de Mailgun (`delivered`, `failed`, `opened`, `clicked`, `complained`) se almacenan en `emailDeliverability/{messageId}` con TTL 90 días y se exportarán a BigQuery/Grafana. Alertas: rebotes >5% diarios → incidente, `complained` >0.5% → pausar campañas.
 
 ## 9. Pruebas y cobertura
 - **Unitarias / integración (Vitest):**
@@ -238,7 +240,7 @@
    - ✅ 2025-10-20: callClassificationAPI con monitorización de latencia y fallback documentado (`confidence` + evento `email_classification_api`). Responsable: Backend Squad / SRE.
    - ✅ 2025-10-20: emailSchedulerWorker desplegado con cron, registro `emailScheduledAudit` y endpoint `/api/email/scheduled/status`. Responsable: Backend Squad.
    - Persistir auto-respuestas y clasificación en Firestore (users/{uid}/emailAutomation) y APIs REST. Responsable: Backend Squad.
-   - Webhooks markEmailDelivered/markEmailBounced: almacenar en emailDeliverability/{messageId} y disparar alertas. Responsable: Integraciones.
+   - ? 2025-10-20: Webhooks markEmailDelivered/markEmailBounced registrando `emailDeliverability/{messageId}` y alimentando alertas. Responsable: Integraciones.
 2. **UX / funcionalidad (Owner: Frontend Squad, ETA Q1 2026)**
    - Drag & drop y reorder de carpetas personalizadas con sincronización emailFolderStats.
    - Papelera avanzada: restaurar carpeta original, métricas de retención y vaciado masivo.
@@ -246,7 +248,8 @@
    - Toggle de buzón legacy solo soporte y plan de retirada.
    - Onboarding completo con validación DKIM/SPF y correo de prueba automatizado.
 3. **Analítica y monitoreo (Owner: Data/Analytics, ETA Q1 2026)**
-   - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate, eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
+   - Dashboard Grafana/BigQuery con KPIs (deliverySuccess, openRate, 
+eplyTimeMedian, utoReplyCoverage, iaAdoption, cleanupRate).
    - Alertas automáticas: rebotes >5% diario, complained >0.5%, SLA respuesta >24h.
 4. **Integraciones cruzadas (Owner: Orquestador/IA, ETA Q2 2026)**
    - Consolidar workflows IA (Flujo 16) con etiquetado y borradores state=draft.

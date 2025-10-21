@@ -14,7 +14,7 @@ router.post('/events', optionalAuth, async (req, res) => {
     const rawEvent = req.body || {};
     const normalized = normalizeAutomationEvent(rawEvent);
 
-    // Persistencia opcional para depuración / workers futuros.
+    // Persistencia opcional para depuraciÃ³n / workers futuros.
     if (process.env.AUTOMATION_ORCHESTRATOR_PERSIST === '1') {
       persistRawEvent(normalized).catch((error) => {
         // No bloquear el flujo si falla el guardado best-effort.
@@ -40,4 +40,4 @@ router.get('/health', (_req, res) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
-export default router;
+export default router;

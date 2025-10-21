@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
  * y prevenir el error "Objects are not valid as a React child (found: [object Promise])"
  *
  * @param {Object} props
- * @param {Function} props.render - Función que puede retornar una Promesa o contenido JSX
+ * @param {Function} props.render - FunciÃ³n que puede retornar una Promesa o contenido JSX
  * @param {React.ReactNode} props.fallback - Contenido a mostrar mientras se resuelve la Promesa
  * @param {React.ReactNode} props.errorFallback - Contenido a mostrar si hay error
  */
@@ -19,7 +19,7 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
         setIsLoading(true);
         setError(null);
 
-        // Ejecutar la función de renderizado
+        // Ejecutar la funciÃ³n de renderizado
         const result = render();
 
         // Si es una Promesa, esperarla
@@ -50,14 +50,14 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
     return fallback;
   }
 
-  // Asegurar que siempre retornamos contenido válido para React
+  // Asegurar que siempre retornamos contenido vÃ¡lido para React
   if (content === null || content === undefined) {
     return null;
   }
 
-  // Si el contenido es una Promesa (no debería pasar, pero por seguridad)
+  // Si el contenido es una Promesa (no deberÃ­a pasar, pero por seguridad)
   if (content && typeof content.then === 'function') {
-    console.warn('SafeRenderer: Se detectó una Promesa no resuelta, retornando fallback');
+    console.warn('SafeRenderer: Se detectÃ³ una Promesa no resuelta, retornando fallback');
     return fallback || null;
   }
 
@@ -66,7 +66,7 @@ const SafeRenderer = ({ render, fallback = null, errorFallback = null }) => {
 
 /**
  * Hook para manejar funciones que pueden retornar Promesas de manera segura
- * @param {Function} asyncFunction - Función que puede retornar una Promesa
+ * @param {Function} asyncFunction - FunciÃ³n que puede retornar una Promesa
  * @param {any} defaultValue - Valor por defecto mientras se resuelve
  */
 export const useSafeAsync = (asyncFunction, defaultValue = null) => {
@@ -104,9 +104,9 @@ export const useSafeAsync = (asyncFunction, defaultValue = null) => {
 };
 
 /**
- * Función utilitaria para asegurar que una función nunca retorne una Promesa en JSX
- * @param {Function} fn - Función a ejecutar
- * @param {any} fallback - Valor de fallback si la función retorna una Promesa
+ * FunciÃ³n utilitaria para asegurar que una funciÃ³n nunca retorne una Promesa en JSX
+ * @param {Function} fn - FunciÃ³n a ejecutar
+ * @param {any} fallback - Valor de fallback si la funciÃ³n retorna una Promesa
  */
 export const safeExecute = (fn, fallback = '') => {
   try {
@@ -114,7 +114,7 @@ export const safeExecute = (fn, fallback = '') => {
 
     // Si es una Promesa, retornar el fallback
     if (result && typeof result.then === 'function') {
-      console.warn('safeExecute: Función retornó una Promesa, usando fallback');
+      console.warn('safeExecute: FunciÃ³n retornÃ³ una Promesa, usando fallback');
       return fallback;
     }
 

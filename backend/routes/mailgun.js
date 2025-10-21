@@ -1,7 +1,9 @@
+import crypto from 'crypto';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import mailgun from 'mailgun-js';
+import { recordDeliverabilityEvent } from '../services/emailDeliverability.js';
 
 // Asegura variables de entorno disponibles en Render o local
 dotenv.config();
@@ -21,6 +23,7 @@ const router = express.Router();
 
 // Habilitar CORS basico para tests desde frontend
 router.use(cors({ origin: true }));
+router.use(express.urlencoded({ extended: true }));
 
 function getMailgunConfig() {
   const apiKey = process.env.MAILGUN_API_KEY || process.env.VITE_MAILGUN_API_KEY || '';
@@ -234,6 +237,74 @@ router.all('/test', async (req, res) => {
       message: err.message,
       stack: err.stack
     });
+  }
+});
+
+function getSignatureField(body, key) {
+  return (
+    body[`signature[${key}]`] ||
+    (body.signature && body.signature[key]) ||
+    body[`signature_${key}`] ||
+    null
+  );
+}
+
+function verifyWebhookSignature(body) {
+  const signingKey =
+    process.env.MAILGUN_WEBHOOK_SIGNING_KEY || process.env.VITE_MAILGUN_WEBHOOK_SIGNING_KEY || '';
+  if (!signingKey) return true;
+
+  const timestamp = getSignatureField(body, 'timestamp') || body.timestamp;
+  const token = getSignatureField(body, 'token') || body.token;
+  const signature = getSignatureField(body, 'signature') || body.signature;
+  if (!timestamp || !token || !signature) return false;
+
+  const digest = crypto.createHmac('sha256', signingKey).update(`${timestamp}${token}`).digest('hex');
+  return digest === signature;
+}
+
+router.post('/webhooks/deliverability', async (req, res) => {
+  try {
+    if (!verifyWebhookSignature(req.body || {})) {
+      return res.status(401).json({ error: 'invalid-signature' });
+    }
+
+    const body = req.body || {};
+    const timestampSeconds = Number(body.timestamp || getSignatureField(body, 'timestamp'));
+    const timestampMs = Number.isFinite(timestampSeconds) ? timestampSeconds * 1000 : Date.now();
+
+    const payload = {
+      event: body.event || body['event'],
+      timestamp: timestampMs,
+      recipient: body.recipient || body['recipient'],
+      severity: body.severity || null,
+      reason:
+        body.reason ||
+        body.description ||
+        body['reject-reason'] ||
+        body['delivery-status']?.message ||
+        null,
+      code: body.code || body['delivery-status']?.code || null,
+      message: body.message || body.error || null,
+      storage: body.storage || null,
+      signatureId: getSignatureField(body, 'signature') || null,
+      'message-id':
+        body['message-id'] ||
+        (body['Message-Id'] ? body['Message-Id'] : null) ||
+        body.messageId ||
+        body['mail-headers']?.['message-id'] ||
+        null,
+    };
+
+    const recordResult = await recordDeliverabilityEvent(payload);
+    if (!recordResult.recorded) {
+      return res.status(202).json({ ok: false, reason: recordResult.reason || 'not-recorded' });
+    }
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('[mailgun] webhook error', error);
+    return res.status(500).json({ error: 'webhook-failed' });
   }
 });
 
