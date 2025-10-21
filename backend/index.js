@@ -66,6 +66,7 @@ import mailgunWebhookRouter from './routes/mailgun-webhook.js';
 import mailgunTestRouter from './routes/mailgun.js';
 import diagnosticRouter from './routes/diagnostic.js';
 import simpleTestRouter from './routes/simple-test.js';
+import testHelpersRouter from './routes/test-helpers.js';
 import emailTemplatesRouter from './routes/email-templates.js';
 import logger from './logger.js';
 import instagramWallRouter from './routes/instagram-wall.js';
@@ -616,6 +617,7 @@ app.use('/api/email-actions', requireAuth, emailActionsRouter);
 // Rutas de diagnóstico y test (públicas para debugging)
 app.use('/api/diagnostic', diagnosticRouter);
 app.use('/api/test', simpleTestRouter);
+app.use('/api/test', testHelpersRouter); // Test helpers para E2E (solo en desarrollo)
 app.use('/api/metrics', metricsSeatingRouter);
 
 app.get('/', (_req, res) => {
