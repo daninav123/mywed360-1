@@ -487,18 +487,60 @@ export const uploadMomentPhoto = async ({
   await ensureFirebase();
 
   const storage = getStorage();
+  const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
+  const albumSnap = await getDoc(albumRef);
+  const albumData = albumSnap.exists() ? albumSnap.data() || {} : {};
+  const { eventDate, closesAt, thresholdBytes } = resolveUploadWindow(albumData);
+  const now = new Date();
+
+  if (closesAt && now > closesAt) {
+    if (!albumData?.uploadWindow?.closedAt) {
+      await updateDoc(albumRef, {
+        'uploadWindow.closedAt': serverTimestamp(),
+      }).catch(() => {});
+    }
+    throw new Error(
+      'El periodo de aportaciones ya finalizó. Contacta con la pareja anfitriona para solicitar acceso.'
+    );
+  }
+
+  const existingBytes = albumData?.counters?.totalBytes || 0;
+  const threshold = thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
+  const shouldCompress =
+    existingBytes >= threshold || existingBytes + file.size > threshold;
+
+  const originalFile = file;
+  let workingFile = file;
+  let compressionApplied = false;
+
+  if (shouldCompress) {
+    const optimized = await optimizeImageFile(file);
+    if (optimized?.file && optimized.file.size < file.size) {
+      workingFile = optimized.file;
+      compressionApplied = true;
+    }
+  }
+
   const photoId = generateId();
-  const ext = (file.name && file.name.split('.').pop()) || 'jpg';
-  const storagePath = `weddings/${weddingId}/albums/${albumId}/photos/${photoId}.${ext}`;
+  const workingExt =
+    (workingFile.name && workingFile.name.split('.').pop()) ||
+    (originalFile.name && originalFile.name.split('.').pop()) ||
+    'jpg';
+  const normalizedExt = workingExt.toLowerCase() || 'jpg';
+  const storagePath = `weddings/${weddingId}/albums/${albumId}/photos/${photoId}.${normalizedExt}`;
   const storageRef = ref(storage, storagePath);
 
-  const uploadTask = uploadBytesResumable(storageRef, file, {
-    contentType: file.type || `image/${ext}`,
+  const uploadTask = uploadBytesResumable(storageRef, workingFile, {
+    contentType: workingFile.type || `image/${normalizedExt}`,
     customMetadata: {
       uploader: metadata?.uploaderId || '',
       weddingId,
       albumId,
       scene: metadata?.scene || 'otro',
+      originalFilename: originalFile.name || '',
+      originalSize: String(originalFile.size || 0),
+      storedSize: String(workingFile.size || 0),
+      compression: compressionApplied ? 'true' : 'false',
     },
   });
 
@@ -556,9 +598,14 @@ export const uploadMomentPhoto = async ({
           updatedAt: serverTimestamp(),
           highlight: metadata?.highlight || { score: 0, reasons: [] },
           upload: {
-            filename: file.name,
-            size: file.size,
-            contentType: file.type || null,
+            filename: originalFile.name,
+            storedFilename: `${photoId}.${normalizedExt}`,
+            sizeOriginal: originalFile.size,
+            sizeStored: workingFile.size,
+            contentTypeOriginal: originalFile.type || null,
+            contentTypeStored: workingFile.type || null,
+            compressed: compressionApplied,
+            compressionThresholdBytes: threshold,
           },
           urls: {
             original: downloadUrl,
@@ -568,12 +615,29 @@ export const uploadMomentPhoto = async ({
         };
 
         await setDoc(photoRef, payload);
-        const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
-        await updateDoc(albumRef, {
+        const albumUpdates = {
           'counters.totalPhotos': increment(1),
           'counters.pendingPhotos': increment(1),
+          'counters.totalBytes': increment(originalFile.size || 0),
+          'counters.optimizedBytes': increment(workingFile.size || 0),
           lastActivityAt: serverTimestamp(),
-        }).catch(() => {});
+        };
+
+        if (shouldCompress) {
+          albumUpdates['uploadWindow.compressionActive'] = true;
+          albumUpdates['uploadWindow.lastCompressionAt'] = serverTimestamp();
+        }
+        if (threshold && !albumData?.uploadWindow?.compressionThresholdBytes) {
+          albumUpdates['uploadWindow.compressionThresholdBytes'] = threshold;
+        }
+        if (eventDate && !albumData?.eventDate) {
+          albumUpdates.eventDate = toTimestamp(eventDate);
+        }
+        if (eventDate && !albumData?.uploadWindow?.closesAt && closesAt) {
+          albumUpdates['uploadWindow.closesAt'] = toTimestamp(closesAt);
+        }
+
+        await updateDoc(albumRef, albumUpdates).catch(() => {});
 
         if (metadata?.tokenId) {
           const tokenRef = doc(
@@ -641,7 +705,9 @@ export const uploadMomentPhoto = async ({
           weddingId,
           albumId,
           scene,
-          size: file.size,
+          size: workingFile.size,
+          originalSize: originalFile.size,
+          compressed: compressionApplied,
         });
 
         resolve({

@@ -109,28 +109,52 @@ const PartnerStats = () => {
           </p>
         </div>
 
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex items-center justify-between mb-4">
+        {/* Código y tipo */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 mt-1">
-                Código: <span className="font-mono font-semibold text-indigo-600">{data.code}</span>
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                Código: <span className="text-purple-600">{data.code}</span>
+              </h2>
+              <p className="text-gray-600 capitalize">
+                Tipo: {data.type}
               </p>
+              {data.assignedTo && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Asignado a: {data.assignedTo.name || data.assignedTo.email}
+                </p>
+              )}
             </div>
             <div className="text-right">
-              {data.assignedTo?.name && (
-                <p className="text-lg font-semibold text-gray-900">{data.assignedTo.name}</p>
-              )}
-              {data.assignedTo?.email && (
-                <p className="text-sm text-gray-600">{data.assignedTo.email}</p>
+              {data.maxUses && (
+                <p className="text-sm text-gray-600">
+                  Límite de usos: <span className="font-semibold">{data.maxUses}</span>
+                </p>
               )}
             </div>
           </div>
-          {data.maxUses && (
+
+          {/* Fechas de validez */}
+          {(data.validFrom || data.validUntil) && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                Usos: <span className="font-semibold">{data.stats.total.uses}</span> / {data.maxUses}
-              </p>
+              <div className="flex items-center gap-4 text-sm">
+                {data.validFrom && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-green-600" />
+                    <span className="text-gray-600">
+                      Válido desde: <span className="font-semibold text-gray-900">{formatDate(data.validFrom)}</span>
+                    </span>
+                  </div>
+                )}
+                {data.validUntil && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-red-600" />
+                    <span className="text-gray-600">
+                      Válido hasta: <span className="font-semibold text-gray-900">{formatDate(data.validUntil)}</span>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
