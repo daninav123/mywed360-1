@@ -412,10 +412,57 @@ const AdminUsers = () => {
                 type="button"
                 data-testid="admin-user-suspend-confirm"
                 onClick={confirmSuspend}
-                disabled={!suspendReason.trim()}
+                disabled={!suspendReason.trim() || isSuspending}
                 className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-3 py-2 text-[color:var(--color-on-primary,#ffffff)] disabled:opacity-60"
               >
-                Confirmar
+                {isSuspending ? 'Suspendiendo...' : 'Confirmar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReactivateModal && selectedUser && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4"
+          data-testid="admin-user-reactivate-modal"
+        >
+          <div className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold">Reactivar cuenta</h2>
+              <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+                Estás reactivando la cuenta {selectedUser.email}. Puedes añadir notas opcionales.
+              </p>
+              {selectedUser.suspensionReason && (
+                <div className="mt-2 rounded-md bg-yellow-50 border border-yellow-200 px-3 py-2 text-xs">
+                  <strong>Motivo de suspensión:</strong> {selectedUser.suspensionReason}
+                </div>
+              )}
+            </div>
+            <textarea
+              data-testid="admin-user-reactivate-notes"
+              rows={3}
+              value={reactivateNotes}
+              onChange={(event) => setReactivateNotes(event.target.value)}
+              className="w-full rounded-md border border-soft px-3 py-2 text-sm"
+              placeholder="Notas sobre la reactivación (opcional)"
+            />
+            <div className="flex justify-end gap-3 text-sm">
+              <button
+                type="button"
+                onClick={() => setShowReactivateModal(false)}
+                className="px-3 py-2 text-[var(--color-text-soft,#6b7280)]"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                data-testid="admin-user-reactivate-confirm"
+                onClick={confirmReactivate}
+                disabled={isReactivating}
+                className="rounded-md bg-green-600 px-3 py-2 text-white hover:bg-green-700 disabled:opacity-60"
+              >
+                {isReactivating ? 'Reactivando...' : 'Reactivar Usuario'}
               </button>
             </div>
           </div>
@@ -426,5 +473,3 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
-
-
