@@ -36,7 +36,7 @@ import Signup from './pages/Signup.jsx';
 import AdminLogin from './pages/admin/AdminLogin.jsx';
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-import AdminMetrics from './pages/admin/AdminMetrics.jsx';
+import AdminMetrics from './pages/admin/AdminMetricsComplete.jsx';
 import AdminPortfolio from './pages/admin/AdminPortfolio.jsx';
 import AdminUsers from './pages/admin/AdminUsers.jsx';
 import AdminIntegrations from './pages/admin/AdminIntegrations.jsx';
