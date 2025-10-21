@@ -616,9 +616,23 @@ export const getHttpMetricsSummary = async (opts = {}) => {
   const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 50;
   const data = await fetchAdminEndpoint(`/api/admin/metrics/http?limit=${encodeURIComponent(limit)}`);
   if (!data || typeof data !== 'object') {
-    return { routes: [], totals: { totalRequests: 0, totalErrors: 0, errorRate: 0 }, timestamp: Date.now() };
+    return { summary: null, requests: [], meta: { limit, source: 'unavailable' } };
   }
-  const totals = data.totals || { totalRequests: 0, totalErrors: 0, errorRate: 0 };
-  const routes = Array.isArray(data.routes) ? data.routes : [];
-  return { routes, totals, timestamp: data.timestamp || Date.now() };
+  return {
+    summary: toObject(data.summary),
+    requests: toArray(data.requests),
+    meta: { limit, source: data.source || 'real' },
+  };
+};
+
+export const getUserTasksAnalysis = async (opts = {}) => {
+  const limit = Number.isFinite(opts.limit) ? Number(opts.limit) : 100;
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/task-templates/user-tasks/analysis?limit=${limit}`);
+  if (!data || typeof data !== 'object') {
+    return { tasks: [], meta: { totalWeddings: 0, totalUniqueTasks: 0 } };
+  }
+  return {
+    tasks: toArray(data.tasks),
+    meta: data.meta || { totalWeddings: 0, totalUniqueTasks: 0 },
+  };
 };

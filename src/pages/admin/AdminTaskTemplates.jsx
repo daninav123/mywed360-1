@@ -5,6 +5,7 @@ import {
   saveTaskTemplateDraft,
   publishTaskTemplate,
   previewTaskTemplate,
+  getUserTasksAnalysis,
 } from '../../services/adminDataService';
 
 const EMPTY_FORM = {
@@ -55,6 +56,13 @@ const AdminTaskTemplates = () => {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  
+  // Análisis de tareas de usuarios
+  const [showUserTasks, setShowUserTasks] = useState(false);
+  const [userTasks, setUserTasks] = useState([]);
+  const [userTasksMeta, setUserTasksMeta] = useState({});
+  const [loadingUserTasks, setLoadingUserTasks] = useState(false);
+  const [minOccurrences, setMinOccurrences] = useState(3);
 
   const nextSuggestedVersion = useMemo(() => {
     if (!templates.length) return 1;
@@ -263,15 +271,158 @@ const AdminTaskTemplates = () => {
     };
   }, [selectedTemplate]);
 
+  const loadUserTasks = async () => {
+    setLoadingUserTasks(true);
+    try {
+      const data = await getUserTasksAnalysis({ limit: 100 });
+      setUserTasks(data.tasks || []);
+      setUserTasksMeta(data.meta || {});
+    } catch (err) {
+      console.error('Error loading user tasks:', err);
+    } finally {
+      setLoadingUserTasks(false);
+    }
+  };
+
+  const filteredUserTasks = useMemo(() => {
+    return userTasks.filter(task => task.count >= minOccurrences);
+  }, [userTasks, minOccurrences]);
+
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold">Plantillas de tareas</h1>
-        <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-          Gestiona el seed de tareas padre y subtareas aplicado a cada nueva boda. Puedes editar en JSON, guardar
-          versiones de borrador y publicar la vigente.
-        </p>
+      <header className="flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Plantillas de tareas</h1>
+          <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
+            Gestiona el seed de tareas padre y subtareas aplicado a cada nueva boda.
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            setShowUserTasks(!showUserTasks);
+            if (!showUserTasks && userTasks.length === 0) {
+              loadUserTasks();
+            }
+          }}
+          className="rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+        >
+          {showUserTasks ? '← Volver al Editor' : '📊 Ver Tareas de Usuarios'}
+        </button>
       </header>
+
+      {showUserTasks ? (
+        <div className="space-y-4">
+          <div className="rounded-lg border border-soft bg-surface p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold">Tareas Creadas por Usuarios</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Analiza las tareas más repetidas que los usuarios añaden manualmente para considerar incluirlas en el seed.
+                </p>
+              </div>
+              <button
+                onClick={loadUserTasks}
+                disabled={loadingUserTasks}
+                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold hover:bg-gray-50 disabled:opacity-50"
+              >
+                {loadingUserTasks ? 'Analizando...' : '🔄 Actualizar'}
+              </button>
+            </div>
+
+            {userTasksMeta.totalWeddings > 0 && (
+              <div className="mb-4 grid grid-cols-3 gap-4">
+                <div className="rounded-lg bg-blue-50 p-3">
+                  <div className="text-xs text-gray-600">Bodas Analizadas</div>
+                  <div className="text-2xl font-bold text-blue-600">{userTasksMeta.totalWeddings}</div>
+                </div>
+                <div className="rounded-lg bg-green-50 p-3">
+                  <div className="text-xs text-gray-600">Tareas Únicas</div>
+                  <div className="text-2xl font-bold text-green-600">{userTasksMeta.totalUniqueTasks}</div>
+                </div>
+                <div className="rounded-lg bg-purple-50 p-3">
+                  <div className="text-xs text-gray-600">Filtradas (≥{minOccurrences})</div>
+                  <div className="text-2xl font-bold text-purple-600">{filteredUserTasks.length}</div>
+                </div>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">
+                Mostrar solo tareas con mínimo de apariciones:
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={minOccurrences}
+                onChange={(e) => setMinOccurrences(Number(e.target.value))}
+                className="w-64"
+              />
+              <span className="ml-2 text-sm font-semibold">{minOccurrences}</span>
+            </div>
+
+            {loadingUserTasks ? (
+              <div className="text-center py-8 text-gray-500">Analizando tareas de usuarios...</div>
+            ) : filteredUserTasks.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No se encontraron tareas con al menos {minOccurrences} apariciones
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Título</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Apariciones</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categorías</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duración Prom.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredUserTasks.map((task, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm">{task.title}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                            task.isSubtask ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            {task.isSubtask ? 'Subtarea' : 'Padre'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-bold text-purple-600">{task.count}×</td>
+                        <td className="px-4 py-3 text-sm">
+                          {task.categories.length > 0 ? task.categories.join(', ') : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          {task.avgDuration ? `${task.avgDuration} días` : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <button
+                            onClick={() => {
+                              const textToCopy = task.isSubtask
+                                ? `{ "title": "${task.title}", "startPct": 0, "endPct": 0.05 }`
+                                : `{\n  "name": "${task.title}",\n  "startPct": 0,\n  "endPct": 0.2,\n  "admin": { "category": "${task.categories[0] || 'OTROS'}" },\n  "items": []\n}`;
+                              navigator.clipboard.writeText(textToCopy);
+                              alert('JSON copiado al portapapeles. Pégalo en el editor JSON.');
+                            }}
+                            className="text-blue-600 hover:text-blue-800 font-medium text-xs"
+                          >
+                            📋 Copiar JSON
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div></div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="space-y-4">
