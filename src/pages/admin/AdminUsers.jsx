@@ -48,6 +48,7 @@ const AdminUsers = () => {
   const [isReactivating, setIsReactivating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('list');
   const [roleSummary, setRoleSummary] = useState(createEmptyRoleSummary());
   const [loadingRoleSummary, setLoadingRoleSummary] = useState(true);
   const [roleSummaryError, setRoleSummaryError] = useState('');
