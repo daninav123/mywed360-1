@@ -387,7 +387,7 @@ const InboxContainer = () => {
           const sendMailFn = EmailService?.sendMail || EmailService?.sendEmail;
           processedList = await processIncomingEmails(list, { sendMail: sendMailFn });
         } catch (automationError) {
-          console.warn('InboxContainer: no se pudo aplicar automatizaci�n de emails', automationError);
+          console.warn('InboxContainer: no se pudo aplicar automatizacion de emails', automationError);
           processedList = list;
         }
 
@@ -617,7 +617,7 @@ const InboxContainer = () => {
           setViewMode('list');
         }
       } catch (err) {
-        console.error('Error procesando eliminaci�n de email:', err);
+        console.error('Error procesando eliminacion de email:', err);
       }
     },
     [deleteEmailForever, moveEmailToFolder, isTrash, selectedEmailId]
@@ -1530,7 +1530,7 @@ const InboxContainer = () => {
           />
         ))}
 
-      {/* Bot�n flotante para b�squeda de proveedores con IA (para tests/E2E) */}
+      {/* Boton flotante para busqueda de proveedores con IA (para tests/E2E) */}
       <button
         data-testid="open-ai-search"
         onClick={() => {
@@ -1542,7 +1542,7 @@ const InboxContainer = () => {
         IA Proveedores
       </button>
 
-      {/* Modal de b�squeda IA de proveedores */}
+      {/* Modal de busqueda IA de proveedores */}
       {showProviderSearch && (
         <ProviderSearchModal
           onClose={() => setShowProviderSearch(false)}

@@ -396,6 +396,7 @@ const AdminDiscounts = () => {
                   <option value="planner">Planner</option>
                   <option value="influencer">Influencer</option>
                   <option value="partner">Partner</option>
+                  <option value="other">Otro</option>
                 </select>
               </div>
 

@@ -1557,8 +1557,8 @@ router.get('/portfolio', async (req, res) => {
         owner:
           data.owner ||
           data.ownerEmail ||
-          (Array.isArray(data.ownerIds) && data.ownerIds.length ? data.ownerIds[0] : '�'),
-        eventDate: eventDateDate ? formatDateOnly(eventDateDate) : '�',
+          (Array.isArray(data.ownerIds) && data.ownerIds.length ? data.ownerIds[0] : 'N/A'),
+        eventDate: eventDateDate ? formatDateOnly(eventDateDate) : 'N/A',
         status,
         confirmedGuests: Number(
           data.confirmedGuests ??

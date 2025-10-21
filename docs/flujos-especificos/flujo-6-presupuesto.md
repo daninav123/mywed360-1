@@ -37,7 +37,7 @@
    - Cuando existen `specialInterests` con `nivelContraste` distinto de `complementa`, se crean partidas etiquetadas `Contraste` vinculadas a su `zonaAplicacion`; incluyen nota de contexto y un enlace rápido al mapa de preferencias.
    - Si un contraste supera el límite tolerado (`style_balance_alert` del flujo 2C) el asistente sugiere redistribuir presupuesto core o mover la idea a inspiración.
    - Tooltip con orientaciones financieras basicas cuando el owner indica que no conoce el presupuesto.
-   - Panel `Consejero IA` accesible mediante el bot�n `Abrir consejero`. Abre un chat lateral persistente (`AdvisorChat`) donde la pareja conversa en lenguaje natural sobre prioridades y dudas, con historial por boda y atajos para aplicar ajustes sin salir del presupuesto.
+   - Panel `Consejero IA` accesible mediante el boton `Abrir consejero`. Abre un chat lateral persistente (`AdvisorChat`) donde la pareja conversa en lenguaje natural sobre prioridades y dudas, con historial por boda y atajos para aplicar ajustes sin salir del presupuesto.
 2. Registro y control de gastos
    - Formulario de transaccion con concepto, monto, categoria, proveedor (matching automático), metodo de pago, adjuntos y seguimiento (`paidAmount`, `dueDate`).
    - Estados soportados:
@@ -58,15 +58,15 @@
 5. Consejero IA conversacional de presupuesto
    - Objetivo: comprender la identidad y prioridades de cada boda para proponer ajustes personalizados (aumentar o reducir partidas, reasignar porcentajes, sugerir proveedores o tareas) sin romper el presupuesto total ni las metas financieras.
    - Experiencia de chat:
-     1. Al abrir el panel se carga `AdvisorChat` con el historial persistido (`finance/main.aiAdvisorChat.messages`) y un mensaje de bienvenida con sugerencias de entrada (por ejemplo, "�Que parte quieres priorizar?").
+     1. Al abrir el panel se carga `AdvisorChat` con el historial persistido (`finance/main.aiAdvisorChat.messages`) y un mensaje de bienvenida con sugerencias de entrada (por ejemplo, "Que parte quieres priorizar?").
      2. Cada mensaje del usuario se guarda con `role="user"` y se env�a, junto con el contexto financiero completo, a la Cloud Function `POST /api/ai/budget-advisor/chat`.
      3. La respuesta de la IA incluye:
         - `message`: texto conversacional (Markdown simple) que explica recomendaciones, dudas y trade-offs.
         - `adjustments`: lista normalizada de propuestas (ej. `{ category: "Catering", deltaPercent: 8, rationale: "Incluir jamon iberico y barra libre premium", tradeOff: [{ category: "Decoracion", deltaPercent: -3 }] }`).
-        - `questions`: follow-ups cuando la IA necesita mas datos (p.ej. "�Quereis mantener el proveedor de fotografia actual?").
+        - `questions`: follow-ups cuando la IA necesita mas datos (p.ej. "Quereis mantener el proveedor de fotografia actual?").
         - `insights`: notas destacadas, alertas o enlaces directos a proveedores y tareas.
      4. El panel renderiza cada ajuste con botones `Aplicar`, `Aplicar parcialmente` (abre popover para tunear el porcentaje o importe) y `Descartar`. Al aceptar un ajuste se actualiza el presupuesto (`source: 'advisor'`), se recalculan totales y se agrega un mensaje de confirmacion del sistema en el hilo.
-     5. La IA soporta simulaciones: si el usuario pregunta "�Que pasa si bajo fotografia 5%?", se genera una respuesta comparativa sin tocar los datos hasta que el usuario elija una accion.
+     5. La IA soporta simulaciones: si el usuario pregunta "Que pasa si bajo fotografia 5%?", se genera una respuesta comparativa sin tocar los datos hasta que el usuario elija una accion.
    - Payload enviado al endpoint:
      ```jsonc
      {
@@ -126,8 +126,8 @@
          "zonaAplicacion": "after-party",
          "nivelContraste": "contraste_controlado"
        },
-       "questions": [
-         "�Quereis mantener el proveedor de fotografia actual o explorar opciones mas ajustadas?"
+        "questions": [
+         "Quereis mantener el proveedor de fotografia actual o explorar opciones mas ajustadas?"
        ],
        "insights": [
          "El proveedor 'Delicias Ibericas' tiene disponibilidad y pedidos minimos compatibles con la fecha."

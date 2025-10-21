@@ -211,7 +211,7 @@ export async function createWedding(uid, extraData = {}) {
       } catch {}
     });
   } catch (error) {
-    console.warn('[WeddingService] No se pudo encolar la sincronizaci�n CRM', error);
+    console.warn('[WeddingService] No se pudo encolar la sincronizacion CRM', error);
   }
 
   return weddingId;

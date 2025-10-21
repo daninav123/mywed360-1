@@ -51,7 +51,7 @@ export default function MomentosGuest() {
           ALBUM_ID
         );
       } catch (error) {
-        console.error('Validación de token Momentos', error);
+        console.error('Validación de token de la galería de recuerdos', error);
         setErrorMessage(error?.message || 'Este enlace ya no es válido.');
         setStatus('error');
       }
@@ -115,11 +115,11 @@ export default function MomentosGuest() {
       ...prev.slice(0, 4),
     ]);
     if (nextCount === 1) {
-      toast.success('🏅 ¡Logro desbloqueado! Primer momento compartido ✨');
+      toast.success('🏅 ¡Logro desbloqueado! Primer recuerdo compartido ✨');
     } else if (nextCount === 3) {
       toast.success('🎉 ¡Eres un colaborador entusiasta! Sigue compartiendo recuerdos.');
     } else if (nextCount === 5) {
-      toast.success('🌟 ¡Momentos Estrella! Tus fotos darán vida al slideshow.');
+      toast.success('🌟 ¡Recuerdos Estrella! Tus fotos darán vida al slideshow.');
     } else {
       toast.success('Foto enviada correctamente');
     }
@@ -134,7 +134,7 @@ export default function MomentosGuest() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-8 space-y-3 text-center">
           <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-sm text-slate-600">Preparando tu espacio para compartir Momentos…</p>
+          <p className="text-sm text-slate-600">Preparando tu espacio para compartir recuerdos…</p>
         </div>
       </div>
     );
@@ -144,7 +144,7 @@ export default function MomentosGuest() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
         <div className="bg-white border border-red-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
-          <h1 className="text-xl font-semibold text-red-600">No pudimos abrir Momentos</h1>
+          <h1 className="text-xl font-semibold text-red-600">No pudimos abrir la galería de recuerdos</h1>
           <p className="text-sm text-slate-600">{errorMessage}</p>
           <p className="text-xs text-slate-400">
             Si crees que es un error, ponte en contacto con la pareja anfitriona para solicitar un nuevo enlace.
@@ -163,7 +163,7 @@ export default function MomentosGuest() {
         >
           <header className="space-y-2 text-center">
             <p className="text-sm uppercase tracking-wide text-blue-500 font-semibold">
-              Momentos compartidos
+              Recuerdos compartidos
             </p>
             <h1 className="text-2xl font-semibold text-slate-800">
               ¡Gracias por capturar recuerdos!
@@ -239,7 +239,7 @@ export default function MomentosGuest() {
       <div className="max-w-3xl mx-auto space-y-6">
         <header className="bg-white border border-slate-200 rounded-2xl shadow-sm px-6 py-5 space-y-2">
           <p className="text-xs uppercase tracking-wide text-blue-500 font-semibold">
-            Momentos colaborativos
+            Recuerdos colaborativos
           </p>
           <h1 className="text-xl font-semibold text-slate-800">
             Hola, {guestName || 'Invitado'} 👋

@@ -124,8 +124,8 @@ export default function Momentos() {
           .catch((error) => console.error('listenGuestProgress error', error));
       })
       .catch((error) => {
-        console.error('Error inicializando Momentos', error);
-        toast.error('No se pudo cargar Momentos. Revisa tu conexión o permisos.');
+        console.error('Error inicializando la galería de recuerdos', error);
+        toast.error('No se pudo cargar la galería de recuerdos. Revisa tu conexión o permisos.');
         setLoadingAlbum(false);
       });
 
@@ -197,7 +197,7 @@ export default function Momentos() {
   const handleReject = async (photo) => {
     const reason =
       typeof window !== 'undefined'
-        ? window.prompt('Motivo del rechazo', 'No cumple con la guía de Momentos')
+      ? window.prompt('Motivo del rechazo', 'No cumple con la guía de la galería')
         : 'Rechazado';
     if (reason === null) return;
     try {
@@ -248,7 +248,7 @@ export default function Momentos() {
 
   if (!weddingsReady) {
     return (
-      <PageWrapper title="Momentos">
+      <PageWrapper title="Galería de recuerdos">
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
           Cargando bodas...
         </div>
@@ -258,9 +258,9 @@ export default function Momentos() {
 
   if (!activeWedding) {
     return (
-      <PageWrapper title="Momentos">
+      <PageWrapper title="Galería de recuerdos">
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
-          Selecciona una boda para gestionar Momentos.
+          Selecciona una boda para gestionar la galería de recuerdos.
         </div>
       </PageWrapper>
     );
@@ -268,7 +268,7 @@ export default function Momentos() {
 
   if (loadingAlbum && !album) {
     return (
-      <PageWrapper title="Momentos">
+      <PageWrapper title="Galería de recuerdos">
         <div className="border border-gray-200 rounded-lg p-6 text-center text-gray-500">
           Preparando tu álbum colaborativo...
         </div>
@@ -283,7 +283,7 @@ export default function Momentos() {
   };
 
   return (
-    <PageWrapper title="Momentos">
+    <PageWrapper title="Galería de recuerdos">
       <PageTabs value={activeTab} onChange={setActiveTab} options={TABS} className="mb-6" />
 
       {activeTab === 'overview' && (
@@ -293,7 +293,7 @@ export default function Momentos() {
             albumId={ALBUM_ID}
             scenes={scenes}
             uploader={uploaderInfo}
-            onUploaded={() => toast.success('Foto subida a Momentos')}
+            onUploaded={() => toast.success('Foto subida a la galería')}
           />
           <AlbumOverview
             album={album}
@@ -326,7 +326,7 @@ export default function Momentos() {
             <div>
               <h3 className="text-lg font-semibold text-gray-800">Presentación en vivo</h3>
               <p className="text-sm text-gray-500">
-                Conecta una pantalla secundaria y deja que los momentos fluyan automáticamente.
+                Conecta una pantalla secundaria y deja que los recuerdos fluyan automáticamente.
               </p>
             </div>
             <div className="text-sm text-gray-500">

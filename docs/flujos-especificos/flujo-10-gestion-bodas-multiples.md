@@ -77,7 +77,7 @@
 
 ## 9. Pruebas recomendadas
 - Unitarias: context `useWedding`, reducers, creación/archivado.
-- Integración: crear boda �?' seeds en finanzas/tareas �?' alternar �?' verificar dashboards cargan y permisos por módulo se aplican.
+- Integracion: crear boda -> seeds en finanzas/tareas -> alternar -> verificar dashboards cargan y permisos por modulo se aplican.
 - E2E: planner crea segunda boda, alterna, archiva, sincroniza CRM y valida restricciones por módulo.
 
 
