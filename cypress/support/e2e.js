@@ -1,4 +1,5 @@
 import './commands';
+import './commands-real-integration';
 import { setupAllInterceptors } from './interceptors';
 
 // Configuración global para todos los tests
