@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
@@ -654,29 +654,6 @@ const AdminDiscounts = () => {
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
                   <p className="text-xs text-gray-500 mt-1">Opcional: hasta cuándo es válido</p>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Fecha inicio validez</label>
-                  <input
-                    type="date"
-                    value={formData.validFrom}
-                    onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
-                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: desde cuándo es válido</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
-                  <input
-                    type="date"
-                    value={formData.validUntil}
-                    onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
-                    className="w-full rounded-md border border-soft px-3 py-2 text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: hasta cuándo es válido</p>
-                </div>
-              </div>
                 </div>
               </div>
 
