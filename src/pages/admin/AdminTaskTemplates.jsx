@@ -56,6 +56,7 @@ const AdminTaskTemplates = () => {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+  const [validationWarnings, setValidationWarnings] = useState([]);
   
   // Análisis de tareas de usuarios
   const [showUserTasks, setShowUserTasks] = useState(false);
@@ -193,6 +194,7 @@ const AdminTaskTemplates = () => {
   const handleSaveDraft = async () => {
     setError(null);
     setMessage(null);
+    setValidationWarnings([]);
     let parsedBlocks;
     try {
       parsedBlocks = JSON.parse(form.blocksJson || '[]');
@@ -214,6 +216,12 @@ const AdminTaskTemplates = () => {
         blocks: parsedBlocks,
       };
       const result = await saveTaskTemplateDraft(payload);
+      
+      // Mostrar warnings si existen
+      if (result?.validation?.warnings?.length > 0) {
+        setValidationWarnings(result.validation.warnings);
+      }
+      
       const { items } = await loadTemplates({ forceRefresh: true, silent: true });
       const targetId = result?.id || payload.id || (items[0]?.id ?? null);
       if (targetId) {
@@ -224,7 +232,17 @@ const AdminTaskTemplates = () => {
       }
       setMessage('Borrador guardado correctamente.');
     } catch (saveError) {
-      setError(saveError?.message || 'No se pudo guardar la plantilla.');
+      // Manejar errores de validación de dependencias
+      if (saveError?.response?.data?.error === 'invalid_dependencies') {
+        const details = saveError.response.data.details || [];
+        const warnings = saveError.response.data.warnings || [];
+        setError(`Errores de dependencias:\n${details.join('\n')}`);
+        if (warnings.length > 0) {
+          setValidationWarnings(warnings);
+        }
+      } else {
+        setError(saveError?.message || 'No se pudo guardar la plantilla.');
+      }
     } finally {
       setSaving(false);
     }
@@ -241,13 +259,30 @@ const AdminTaskTemplates = () => {
     setPublishing(true);
     setError(null);
     setMessage(null);
+    setValidationWarnings([]);
     try {
-      await publishTaskTemplate(form.id);
+      const result = await publishTaskTemplate(form.id);
+      
+      // Mostrar warnings si existen
+      if (result?.validation?.warnings?.length > 0) {
+        setValidationWarnings(result.validation.warnings);
+      }
+      
       const { items } = await loadTemplates({ forceRefresh: true, silent: true });
       selectTemplate(form.id, items);
       setMessage('Versión publicada correctamente.');
     } catch (publishError) {
-      setError(publishError?.message || 'No se pudo publicar la plantilla.');
+      // Manejar errores de validación de dependencias
+      if (publishError?.response?.data?.error === 'cannot_publish_invalid_dependencies') {
+        const details = publishError.response.data.details || [];
+        const warnings = publishError.response.data.warnings || [];
+        setError(`No se puede publicar: Errores de dependencias:\n${details.join('\n')}`);
+        if (warnings.length > 0) {
+          setValidationWarnings(warnings);
+        }
+      } else {
+        setError(publishError?.message || 'No se pudo publicar la plantilla.');
+      }
     } finally {
       setPublishing(false);
     }
@@ -1128,10 +1163,27 @@ const AdminTaskTemplates = () => {
               </div>
 
               {error ? (
-                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 whitespace-pre-wrap">
                   {error}
                 </div>
               ) : null}
+              
+              {validationWarnings.length > 0 && (
+                <div className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-xs">
+                  <div className="font-semibold text-orange-900 mb-2">⚠️ Advertencias de Validación:</div>
+                  <ul className="space-y-1 text-orange-800">
+                    {validationWarnings.map((warning, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <span className="text-orange-600">•</span>
+                        <span>{warning}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-2 text-xs text-orange-700">
+                    Estas advertencias no impiden guardar/publicar, pero deberías revisarlas.
+                  </div>
+                </div>
+              )}
               {message ? (
                 <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700">
                   {message}

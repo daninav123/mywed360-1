@@ -2442,6 +2442,113 @@ const TaskTemplateSchema = z.object({
   blocks: z.array(z.any()).default([]),
 });
 
+// Funciones de validación de dependencias
+function flattenTasks(blocks) {
+  const tasks = [];
+  if (!Array.isArray(blocks)) return tasks;
+  
+  blocks.forEach((block, blockIndex) => {
+    const items = Array.isArray(block.items) ? block.items : [];
+    items.forEach((item, itemIndex) => {
+      tasks.push({
+        blockIndex,
+        itemIndex,
+        blockName: block.name || block.title || `Bloque ${blockIndex + 1}`,
+        itemTitle: item.title || `Tarea ${itemIndex + 1}`,
+        item,
+        dependsOn: item.dependsOn || []
+      });
+    });
+  });
+  
+  return tasks;
+}
+
+function findTask(tasks, dep) {
+  return tasks.find(
+    t => t.blockIndex === dep.blockIndex && t.itemIndex === dep.itemIndex
+  );
+}
+
+function detectCycle(tasks, currentTask, visited = new Set()) {
+  const taskKey = `${currentTask.blockIndex}-${currentTask.itemIndex}`;
+  
+  if (visited.has(taskKey)) {
+    return true; // Ciclo detectado
+  }
+  
+  visited.add(taskKey);
+  
+  for (const dep of currentTask.dependsOn || []) {
+    const depTask = findTask(tasks, dep);
+    if (depTask && detectCycle(tasks, depTask, new Set(visited))) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+function validateDependencies(blocks) {
+  const errors = [];
+  const warnings = [];
+  
+  if (!Array.isArray(blocks)) {
+    return { valid: true, errors: [], warnings: [] };
+  }
+  
+  const allTasks = flattenTasks(blocks);
+  
+  for (const task of allTasks) {
+    const taskLabel = `"${task.itemTitle}" (Bloque: ${task.blockName})`;
+    
+    // 1. Verificar referencias válidas
+    for (const dep of task.dependsOn || []) {
+      const depTask = findTask(allTasks, dep);
+      if (!depTask) {
+        errors.push(`${taskLabel} depende de una tarea inexistente (Bloque ${dep.blockIndex}, Ítem ${dep.itemIndex})`);
+      }
+    }
+    
+    // 2. Detectar ciclos
+    if (detectCycle(allTasks, task)) {
+      errors.push(`Ciclo detectado en dependencias de ${taskLabel}`);
+    }
+    
+    // 3. Validación temporal (warnings, no errores críticos)
+    const taskStartPct = task.item.startPct;
+    const taskEndPct = task.item.endPct;
+    
+    if (typeof taskStartPct === 'number' && typeof taskEndPct === 'number') {
+      for (const dep of task.dependsOn || []) {
+        const depTask = findTask(allTasks, dep);
+        if (depTask) {
+          const depEndPct = depTask.item.endPct;
+          if (typeof depEndPct === 'number' && taskStartPct < depEndPct) {
+            warnings.push(
+              `${taskLabel} empieza antes de que termine su dependencia "${depTask.itemTitle}". ` +
+              `Considera ajustar: Tarea empieza en ${(taskStartPct * 100).toFixed(0)}%, dependencia termina en ${(depEndPct * 100).toFixed(0)}%`
+            );
+          }
+        }
+      }
+    }
+    
+    // 4. Prevenir auto-dependencia
+    for (const dep of task.dependsOn || []) {
+      if (dep.blockIndex === task.blockIndex && dep.itemIndex === task.itemIndex) {
+        errors.push(`${taskLabel} no puede depender de sí misma`);
+      }
+    }
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
 router.get('/task-templates', async (req, res) => {
   try {
     const limit = Math.min(Number(req.query.limit) || 50, 200);
@@ -2464,6 +2571,17 @@ router.post('/task-templates', async (req, res) => {
     const parsed = TaskTemplateSchema.safeParse(req.body || {});
     if (!parsed.success) return res.status(400).json({ error: 'invalid_template_payload' });
     const payload = parsed.data;
+    
+    // Validar dependencias
+    const validation = validateDependencies(payload.blocks);
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        error: 'invalid_dependencies',
+        details: validation.errors,
+        warnings: validation.warnings
+      });
+    }
+    
     const toSave = {
       ...payload,
       updatedAt: serverTs(),
@@ -2471,7 +2589,15 @@ router.post('/task-templates', async (req, res) => {
     };
     const ref = await collections.taskTemplates().add(toSave);
     await writeAdminAudit(req, 'ADMIN_TASK_TEMPLATE_SAVE', { resourceType: 'taskTemplate', resourceId: ref.id });
-    return res.status(201).json({ id: ref.id, template: { id: ref.id, ...payload } });
+    
+    // Incluir warnings en la respuesta (informativo)
+    return res.status(201).json({ 
+      id: ref.id, 
+      template: { id: ref.id, ...payload },
+      validation: {
+        warnings: validation.warnings
+      }
+    });
   } catch (error) {
     logger.error('[admin-dashboard] task-templates create error', error);
     return res.status(500).json({ error: 'task_templates_create_failed' });
@@ -2482,6 +2608,22 @@ router.post('/task-templates/:id/publish', async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: 'template_id_required' });
+    
+    // Validar dependencias antes de publicar
+    const doc = await collections.taskTemplates().doc(id).get();
+    if (!doc.exists) return res.status(404).json({ error: 'template_not_found' });
+    
+    const data = doc.data() || {};
+    const validation = validateDependencies(data.blocks);
+    
+    if (!validation.valid) {
+      return res.status(400).json({ 
+        error: 'cannot_publish_invalid_dependencies',
+        details: validation.errors,
+        warnings: validation.warnings
+      });
+    }
+    
     // Archivar otras publicadas y publicar esta
     const batch = db.batch();
     const all = await collections.taskTemplates().get();
@@ -2492,7 +2634,13 @@ router.post('/task-templates/:id/publish', async (req, res) => {
     }
     await batch.commit();
     await writeAdminAudit(req, 'ADMIN_TASK_TEMPLATE_PUBLISH', { resourceType: 'taskTemplate', resourceId: id });
-    return res.json({ success: true });
+    
+    return res.json({ 
+      success: true,
+      validation: {
+        warnings: validation.warnings
+      }
+    });
   } catch (error) {
     logger.error('[admin-dashboard] task-templates publish error', error);
     return res.status(500).json({ error: 'task_templates_publish_failed' });
