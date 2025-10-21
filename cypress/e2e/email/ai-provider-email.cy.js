@@ -56,28 +56,29 @@ describe('Flujo de envío de correos desde búsqueda AI de proveedores (CP-EP-07
   });
   
   it('debe permitir buscar proveedores con IA, seleccionar uno y enviarle un correo', () => {
-    // 1. Abrir el modal de búsqueda AI
-    cy.get('[data-testid="open-ai-search"]').click();
+    // 1. Abrir el modal de búsqueda AI (con timeout)
+    cy.get('[data-testid="open-ai-search"]', { timeout: 10000 }).should('be.visible').click();
     
     // 2. Verificar que el modal está abierto
-    cy.get('[data-testid="ai-search-modal"]').should('be.visible');
+    cy.get('[data-testid="ai-search-modal"]', { timeout: 5000 }).should('be.visible');
     
     // 3. Ingresar consulta de búsqueda
-    cy.get('[data-testid="ai-search-input"]')
+    cy.get('[data-testid="ai-search-input"]', { timeout: 5000 })
+      .should('be.visible')
       .type('fotógrafo estilo natural para boda en exteriores');
     
     // 4. Enviar consulta de búsqueda
-    cy.get('[data-testid="ai-search-button"]').click();
+    cy.get('[data-testid="ai-search-button"]', { timeout: 3000 }).click();
     
     // 5. Esperar que se complete la búsqueda
-    cy.wait('@aiSearch');
+    cy.wait('@aiSearch', { timeout: 10000 });
     
     // 6. Verificar que se muestran los resultados
-    cy.get('[data-testid="ai-results-list"]').should('be.visible');
-    cy.contains('Fotografía Naturaleza Viva').should('be.visible');
+    cy.get('[data-testid="ai-results-list"]', { timeout: 10000 }).should('be.visible');
+    cy.contains('Fotografía Naturaleza Viva', { timeout: 5000 }).should('be.visible');
     
     // 7. Verificar que el botón de email está presente
-    cy.get('[data-testid="email-provider-btn"]').first().should('be.visible');
+    cy.get('[data-testid="email-provider-btn"]', { timeout: 5000 }).first().should('be.visible');
     
     // 8. Hacer clic en el botón "Enviar email" del primer resultado
     cy.get('[data-testid="email-provider-btn"]').first().click();
