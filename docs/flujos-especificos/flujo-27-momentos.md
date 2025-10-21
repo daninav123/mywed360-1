@@ -3,7 +3,7 @@
 > Estatus del producto (2025-10-15): **Sí (en curso)**. Se ejecuta la experiencia anfitrión/invitados en código (`/momentos`), rebautizada en UI como **Galería de recuerdos**, con generación de código QR descargable, ventana de aportaciones acotada (hasta 30 días posteriores al evento) y compresión automática tras superar 30&nbsp;GB. Siguen pendientes evoluciones sobre gamificación, slideshow público y automatización de moderación.
 >
 > Alcance: Experiencia anfitrión e invitados para capturar, moderar y compartir fotos del evento mediante una página dedicada (`/momentos`) vinculada a cada boda. Incluye subida multi-dispositivo, revisión, slideshow en vivo, descarga masiva y distribución del enlace/QR listo para imprimir.
-> Pendiente: robustecer pipelines de moderación automática, gamificación y métricas, además de endurecer observabilidad y experiencia QR pública.
+> Pendiente: reforzar métricas y observabilidad, además de endurecer la experiencia QR pública.
 
 ## 1. Objetivo y alcance
 - Centralizar todas las fotos generadas por invitados y equipo en un único álbum colaborativo vinculado a la boda.
@@ -31,6 +31,7 @@
 ## 4. Arquitectura y piezas clave
 - **Frontend (React)**:
   - `pages/Momentos.jsx`: controlador principal, tabs `Resumen`, `Moderación`, `Slideshow`, `Descargas` y sincronización con la fecha de la boda para cerrar/aperturar la galería.
+  - `pages/MomentosPublic.jsx`: experiencia pública mobile-first con tarjetas de momentos y subida directa (foto/video) por escena.
   - `components/momentos/AlbumOverview.jsx`: totales, actividad reciente, QR descargable/imprimible y estado de almacenamiento (umbral 30&nbsp;GB).
   - `components/momentos/HighlightRail.tsx`: carrusel con auto-highlights sugeridos y botones aprobar/descartar rápidos.
   - `components/momentos/UploadWidget.jsx`: dropzone, preview, extracción mínima de metadatos y compresión cliente automática cuando la boda supera 30&nbsp;GB.
@@ -45,7 +46,7 @@
   - **Cloud Functions**:
     - `generateGuestToken`: crea token firmado (`albumAccessToken`) y QR.
     - `processMomentUpload`: trigger `onFinalize` optimiza (resize 2560px, 720p video), genera thumb y actualiza Firestore.
-    - `moderationAutoLabel`: llama Vision API opcional (detección contenido sensible).
+    - `momentosModerationWorker`: job recurrente que usa Cloud Vision SafeSearch para etiquetar contenido sensible (`moderation.auto.status`) y rechazar automáticamente fotos que superen el umbral configurado.
     - `computeHighlights`: programa que recalcula `highlight.score` y motivos cada X minutos según heurísticas (nitidez, sonrisas, escena prioritaria, engagement temprano).
     - `queueZipExport`: arma ZIP en bucket temporal, firma URL de descarga.
   - **Callable APIs**: `createAlbum`, `updateAlbumSettings`, `submitPhoto`, `updateModeration`, `requestDownload`.
@@ -56,6 +57,7 @@
 - `createGuestToken` recorta la caducidad de cada enlace/QR a la fecha de cierre efectiva. Si la ventana expiró no se generan nuevos tokens y los invitados visualizan un estado “Galería cerrada”.
 - Se controlan los volúmenes mediante `counters.totalBytes` y `counters.optimizedBytes`. A partir de **30 GB** se activa compresión cliente (JPEG ~0.82, máx. 2560 px) antes de subir a Firebase Storage, registrando en los metadatos si la foto fue optimizada.
 - Hosts e invitados ven un contador con los **días restantes** para aportar fotos; cuando la ventana está activa, la vista anfitrión muestra la fecha límite más el contador, y el portal público recuerda a los invitados cuánto tiempo queda.
+- Tras **365 días** desde la fecha del evento, la plataforma automatiza la limpieza: se elimina el contenido del álbum de Firebase Storage y se archiva el registro manteniendo un resumen mínimo.
 - Hosts e invitados reciben mensajes contextuales: progreso de almacenamiento, activación de compresión y fecha límite de aportaciones. Los hosts pueden reabrir la galería ajustando la fecha del evento.
 - Todos los recursos se almacenan en Firebase Storage bajo `weddings/{weddingId}/albums/momentos/`. La retención mínima cubre desde la fecha del evento; la purga definitiva queda supeditada a las políticas legales/contractuales vigentes.
 - **Servicios compartidos**:

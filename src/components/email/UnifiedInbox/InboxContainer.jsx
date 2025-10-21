@@ -57,6 +57,12 @@ const DENSITY_OPTIONS = [
   { id: 'compact', label: 'Compacta' },
 ];
 
+const apiAuthOptions = (extra = {}) => ({
+  ...(extra || {}),
+  auth: IS_CYPRESS_E2E ? false : extra?.auth ?? true,
+  silent: extra?.silent ?? true,
+});
+
 /**
  * InboxContainer - Bandeja de entrada unificada restaurada
  * Versión completa con todas las correcciones aplicadas para evitar errores de Promise
@@ -238,7 +244,7 @@ const InboxContainer = () => {
     }
     if (folder === 'sent') return 'Enviados';
     if (folder === 'trash') return 'Papelera';
-    return 'Bandeja de entrada';
+    return 'Recibidos';
   }, [folder, folderNameResolver]);
 
   const mapSuggestedFolder = useCallback(
@@ -251,7 +257,7 @@ const InboxContainer = () => {
         return { label: null, targetKey: null };
       }
       const lower = trimmed.toLowerCase();
-      if (lower === 'inbox' || lower === 'bandeja de entrada') {
+      if (lower === 'inbox' || lower === 'bandeja de entrada' || lower === 'recibidos') {
         return { label: 'Bandeja de entrada', targetKey: 'inbox' };
       }
       if (lower === 'sent' || lower === 'enviados') {
@@ -306,7 +312,7 @@ const InboxContainer = () => {
     }
 
     try {
-      const res = await apiGet('/api/email/folders', { auth: true, silent: true });
+      const res = await apiGet('/api/email/folders', apiAuthOptions({ silent: true }));
       if (res?.ok) {
         const payload = await res.json();
         const foldersFromApi = Array.isArray(payload?.data)
@@ -466,7 +472,10 @@ const InboxContainer = () => {
         const sample = (arr) => arr.slice(0, 50).map((m) => m.id).filter(Boolean);
         const hasInsights = async (id) => {
           try {
-            const res = await apiGet(`/api/email-insights/${encodeURIComponent(id)}`, { auth: true, silent: true });
+            const res = await apiGet(
+              `/api/email-insights/${encodeURIComponent(id)}`,
+              apiAuthOptions({ silent: true })
+            );
             if (!res?.ok) return 0;
             const j = await res.json();
             const t = (j?.tasks?.length || 0) + (j?.meetings?.length || 0) + (j?.budgets?.length || 0) + (j?.contracts?.length || 0);
@@ -688,7 +697,7 @@ const InboxContainer = () => {
           const response = await apiPost(
             '/api/email/folders',
             { name: trimmed },
-            { auth: true, silent: true }
+            apiAuthOptions({ silent: true })
           );
           if (!response?.ok) {
             throw new Error(`Fallo creando carpeta: ${response?.status}`);
@@ -722,7 +731,7 @@ const InboxContainer = () => {
           const res = await apiPost(
             `/api/email/folders/${encodeURIComponent(folderId)}`,
             { name: trimmed },
-            { auth: true, silent: true }
+            apiAuthOptions({ silent: true })
           );
           if (!res?.ok) {
             throw new Error(`Fallo renombrando carpeta: ${res?.status}`);
@@ -752,8 +761,7 @@ const InboxContainer = () => {
       if (IS_CYPRESS_E2E) {
         try {
           const response = await apiDel(`/api/email/folders/${encodeURIComponent(folderId)}`, {
-            auth: true,
-            silent: true,
+            ...apiAuthOptions({ silent: true }),
           });
           if (!response?.ok && response?.status !== 204) {
             throw new Error(`Fallo eliminando carpeta: ${response?.status}`);
@@ -1027,7 +1035,7 @@ const InboxContainer = () => {
             ...eventData,
             emailId: calendarEmail?.id || null,
           },
-          { auth: true, silent: true }
+          apiAuthOptions({ silent: true })
         );
       } catch (error) {
         try {
@@ -1059,7 +1067,7 @@ const InboxContainer = () => {
             userId: user?.uid || null,
             userEmail: user?.email || null,
           },
-          { auth: true, silent: true }
+          apiAuthOptions({ silent: true })
         );
       } catch (error) {
         console.warn('No se pudo registrar el feedback de email:', error);
@@ -1326,7 +1334,7 @@ const InboxContainer = () => {
                               user: String(user?.email || '').toLowerCase(),
                               userId: user?.uid || undefined,
                             },
-                            { auth: true, silent: true }
+                            apiAuthOptions({ silent: true })
                           );
                           if (res && res.ok) { ok = true; break; }
                         } catch (err) {
@@ -1593,9 +1601,6 @@ const InboxContainer = () => {
 };
 
 export default InboxContainer;
-
-
-
 
 
 

@@ -11,6 +11,13 @@ import { get as apiGet } from '../../../services/apiClient';
 
 import { safeRender, safeMap } from '../../../utils/promiseSafeRenderer';
 
+const IS_CYPRESS = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+const apiOptions = (extra = {}) => ({
+  ...(extra || {}),
+  auth: IS_CYPRESS ? false : extra?.auth ?? true,
+  silent: extra?.silent ?? true,
+});
+
 /**
  * Renderiza la lista de correos con controles básicos y estados enriquecidos.
  *
@@ -380,7 +387,10 @@ function InsightsBadge({ id }) {
     (async () => {
       try {
         if (!id) return;
-        const res = await apiGet(`/api/email-insights/${encodeURIComponent(id)}`, { auth: true, silent: true });
+        const res = await apiGet(
+          `/api/email-insights/${encodeURIComponent(id)}`,
+          apiOptions({ silent: true })
+        );
         if (!res.ok) return;
         const json = await res.json();
         if (ignore) return;
@@ -402,6 +412,5 @@ function InsightsBadge({ id }) {
 }
 
 export default EmailList;
-
 
 

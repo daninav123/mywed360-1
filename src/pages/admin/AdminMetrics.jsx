@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts';
 
-import { getMetricsData, getHttpMetricsSummary } from '../../services/adminDataService';
+import { getMetricsData, getHttpMetricsSummary, getProductMetrics, getTechnicalMetrics, getEconomicMetrics } from '../../services/adminDataService';
 
-const ranges = [
-  { label: 'Últimos 7 días', value: '7' },
-  { label: 'Últimos 30 días', value: '30' },
-  { label: 'Últimos 90 días', value: '90' },
+const TABS = [
+  { id: 'resumen', label: '📊 Resumen', icon: '📊' },
+  { id: 'producto', label: '📱 Producto', icon: '📱' },
+  { id: 'economicas', label: '💰 Económicas', icon: '💰' },
+  { id: 'tecnicas', label: '⚙️ Técnicas', icon: '⚙️' },
+  { id: 'soporte', label: '🎫 Soporte', icon: '🎫' },
 ];
 
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+
 const AdminMetrics = () => {
-  const [range, setRange] = useState('30');
+  const [activeTab, setActiveTab] = useState('resumen');
   const [loading, setLoading] = useState(true);
+  
+  // Datos principales
   const [series, setSeries] = useState([]);
   const [funnel, setFunnel] = useState(null);
   const [iaCosts, setIaCosts] = useState([]);
@@ -21,78 +27,71 @@ const AdminMetrics = () => {
   const [retentionData, setRetentionData] = useState(null);
   const [userStats, setUserStats] = useState(null);
   const [weddingStats, setWeddingStats] = useState(null);
+  
+  // Métricas adicionales
+  const [productMetrics, setProductMetrics] = useState(null);
+  const [technicalMetrics, setTechnicalMetrics] = useState(null);
+  const [economicMetrics, setEconomicMetrics] = useState(null);
 
   useEffect(() => {
     const loadMetrics = async () => {
       setLoading(true);
-      const data = await getMetricsData();
-      setSeries(data.series || []);
-      setFunnel(data.funnel);
-      setIaCosts(data.iaCosts || []);
-      setConversionMetrics(data.conversionMetrics);
-      setRecurringRevenue(data.recurringRevenue);
-      setRetentionData(data.retentionData);
-      setUserStats(data.userStats);
-      setWeddingStats(data.weddingStats);
       try {
-        const http = await getHttpMetricsSummary();
-        setHttpSummary(http);
-      } catch {}
+        const [mainData, productData, technicalData, economicData, httpData] = await Promise.all([
+          getMetricsData(),
+          getProductMetrics(),
+          getTechnicalMetrics(),
+          getEconomicMetrics(),
+          getHttpMetricsSummary().catch(() => null)
+        ]);
+        
+        setSeries(mainData.series || []);
+        setFunnel(mainData.funnel);
+        setIaCosts(mainData.iaCosts || []);
+        setConversionMetrics(mainData.conversionMetrics);
+        setRecurringRevenue(mainData.recurringRevenue);
+        setRetentionData(mainData.retentionData);
+        setUserStats(mainData.userStats);
+        setWeddingStats(mainData.weddingStats);
+        
+        setProductMetrics(productData);
+        setTechnicalMetrics(technicalData);
+        setEconomicMetrics(economicData);
+        setHttpSummary(httpData);
+      } catch (error) {
+        console.error('[AdminMetrics] Error loading metrics:', error);
+      }
       setLoading(false);
     };
     loadMetrics();
   }, []);
 
+  // Renderizar tabs
+  const renderTabs = () => (
+    <div className="border-b border-gray-200">
+      <div className="flex gap-1 overflow-x-auto">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-3 text-sm font-medium whitespace-nowrap transition ${
+              activeTab === tab.id
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900 hover:border-b-2 hover:border-gray-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h1 className="text-xl font-semibold">Métricas globales</h1>
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="text-sm text-[var(--color-text-soft,#6b7280)]">
-            Rango
-            <select
-              data-testid="metrics-range-selector"
-              value={range}
-              onChange={(event) => setRange(event.target.value)}
-              className="ml-2 rounded-md border border-soft px-3 py-2 text-sm"
-            >
-              {ranges.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            data-testid="metrics-export-csv"
-            className="rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
-          >
-            Exportar CSV
-          </button>
-          <button
-            type="button"
-            data-testid="metrics-export-json"
-            className="rounded-md border border-soft px-3 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
-          >
-            Exportar JSON
-          </button>
-          {httpSummary?.totals && (
-            <div
-              className="text-xs text-[var(--color-text-soft,#6b7280)]"
-              data-testid="metrics-http-summary"
-            >
-              {`Req ${httpSummary.totals.totalRequests} | Err ${httpSummary.totals.totalErrors} | Rate ${
-                typeof httpSummary.totals.errorRate === 'number'
-                  ? ((httpSummary.totals.errorRate <= 1
-                      ? httpSummary.totals.errorRate * 100
-                      : httpSummary.totals.errorRate
-                    ).toFixed(1) + '%')
-                  : httpSummary.totals.errorRate
-              }`}
-            </div>
-          )}
-        </div>
+      <header>
+        <h1 className="text-xl font-semibold mb-4">Métricas MyWed360</h1>
+        {renderTabs()}
       </header>
 
       {loading ? (

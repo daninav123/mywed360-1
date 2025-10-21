@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { uploadMomentPhoto } from '@/services/momentosService';
@@ -34,10 +34,21 @@ export default function UploadWidget({
   metadataBuilder = null,
   disabled = false,
   className = '',
+  initialScene = null,
+  lockedScene = false,
 }) {
   const defaultScene =
     scenes.length && scenes[0]?.id ? scenes[0].id : 'otros';
-  const [scene, setScene] = useState(defaultScene);
+  const resolvedInitialScene = useMemo(() => {
+    if (!initialScene) return defaultScene;
+    const match = scenes.find((item) => item.id === initialScene);
+    return match ? match.id : defaultScene;
+  }, [defaultScene, initialScene, scenes]);
+
+  const [scene, setScene] = useState(resolvedInitialScene);
+  useEffect(() => {
+    setScene(resolvedInitialScene);
+  }, [resolvedInitialScene]);
   const [queue, setQueue] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
@@ -50,11 +61,16 @@ export default function UploadWidget({
 
   const handleFiles = useCallback(
     async (fileList) => {
-      const files = Array.from(fileList || []).filter((file) =>
-        (file.type || '').startsWith('image/')
-      );
+      const files = Array.from(fileList || []).filter((file) => {
+        const type = String(file.type || '').toLowerCase();
+        if (type.startsWith('image/')) return true;
+        if (type.startsWith('video/')) return true;
+        const name = String(file.name || '').toLowerCase();
+        return ['.jpg', '.jpeg', '.png', '.heic', '.webp', '.mp4', '.mov', '.m4v', '.heif']
+          .some((ext) => name.endsWith(ext));
+      });
       if (!files.length) {
-        toast.warn('Selecciona imágenes para subir');
+        toast.warn('Selecciona fotos o videos compatibles para subir');
         return;
       }
 
@@ -156,20 +172,26 @@ export default function UploadWidget({
 
   return (
     <div className={`bg-white border border-gray-200 rounded-lg p-4 shadow-sm ${className}`}>
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">Subir fotos</h3>
-          <p className="text-sm text-gray-500">
-            Arrastra tus fotos o selecciónalas manualmente. Se suben en la escena seleccionada.
-          </p>
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Subir fotos o videos</h3>
+            <p className="text-sm text-gray-500">
+              Arrastra tus archivos o selecciónalos manualmente. Se guardarán en la escena elegida.
+            </p>
+          </div>
+          <div className="text-right min-w-[160px]">
+            <span className="text-xs uppercase tracking-wide text-gray-400 block">
+              Escena activa
+            </span>
+            {lockedScene ? (
+              <div className="mt-1 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                {scenes.find((item) => item.id === scene)?.label || scene}
+              </div>
+            ) : (
+              <SceneSelector scenes={scenes} value={scene} onChange={setScene} />
+            )}
+          </div>
         </div>
-        <div className="text-right">
-          <span className="text-xs uppercase tracking-wide text-gray-400 block">
-            Escena activa
-          </span>
-          <SceneSelector scenes={scenes} value={scene} onChange={setScene} />
-        </div>
-      </div>
 
       <div
         onDragOver={(event) => {
@@ -192,7 +214,7 @@ export default function UploadWidget({
           ref={inputRef}
           type="file"
           multiple
-          accept="image/*"
+          accept="image/*,video/*"
           className="hidden"
           onChange={onInputChange}
           disabled={disabled}
@@ -208,7 +230,7 @@ export default function UploadWidget({
           </button>
         </p>
         <p className="text-xs text-gray-400">
-          Sólo imágenes · Se aplican límites de tamaño según configuración ({DEFAULT_SETTINGS?.maxFileSizeMb || 25} MB).
+          Fotos y videos compatibles · Se aplican límites de tamaño según configuración ({DEFAULT_SETTINGS?.maxFileSizeMb || 25} MB).
         </p>
       </div>
 

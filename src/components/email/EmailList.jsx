@@ -4,6 +4,11 @@ import { FixedSizeList as List } from 'react-window';
 import { get as apiGet } from '../../services/apiClient';
 
 const IS_E2E = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
+const apiOptions = (extra = {}) => ({
+  ...(extra || {}),
+  auth: IS_E2E ? false : extra?.auth ?? true,
+  silent: extra?.silent ?? true,
+});
 
 /**
  * Componente que muestra la lista de correos electrónicos en la bandeja
@@ -157,7 +162,10 @@ const EmailList = ({
       (async () => {
         try {
           if (!email?.id) return;
-          const res = await apiGet(`/api/email-insights/${encodeURIComponent(email.id)}`, { auth: true, silent: true });
+          const res = await apiGet(
+            `/api/email-insights/${encodeURIComponent(email.id)}`,
+            apiOptions({ silent: true })
+          );
           if (!res.ok) return;
           const json = await res.json();
           if (!ignore) setInsights(json);

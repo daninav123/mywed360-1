@@ -175,7 +175,14 @@ const Proveedores = () => {
   const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
-  const { searchProviders } = useAISearch();
+  const {
+    results: aiResults,
+    loading: aiLoading,
+    error: aiError,
+    usedFallback: aiUsedFallback,
+    searchProviders: runAISearch,
+    clearResults: clearAISearch,
+  } = useAISearch();
 
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
@@ -187,11 +194,8 @@ const Proveedores = () => {
   const [serviceModal, setServiceModal] = useState({ open: false, card: null });
   const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
   const [searchDrawerResult, setSearchDrawerResult] = useState(null);
-  const [searchResults, setSearchResults] = useState([]);
   const [searchResultsQuery, setSearchResultsQuery] = useState('');
   const [searchResultsPage, setSearchResultsPage] = useState(1);
-  const [searchResultsLoading, setSearchResultsLoading] = useState(false);
-  const [searchResultsError, setSearchResultsError] = useState(null);
   const [searchCompleted, setSearchCompleted] = useState(false);
 
   useEffect(() => {
@@ -334,9 +338,6 @@ const Proveedores = () => {
       setSearchTerm(trimmed);
       if (trimmed && saveHistory) registerSearchQuery(trimmed);
 
-      setSearchResultsLoading(true);
-      setSearchResultsError(null);
-      setSearchResults([]);
       setSearchResultsQuery(trimmed || enrichedQuery);
       setSearchResultsPage(1);
       setSearchCompleted(true);
@@ -344,43 +345,39 @@ const Proveedores = () => {
       setSearchDrawerResult(null);
 
       try {
-        const results = await searchProviders(enrichedQuery || trimmed);
+        const results = await runAISearch(enrichedQuery || trimmed);
         const safeResults = Array.isArray(results) ? results : [];
-        setSearchResults(safeResults);
         if (!safeResults.length && !silent) {
           toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
         }
       } catch (err) {
         console.warn('[Proveedores] searchProviders failed', err);
-        setSearchResultsError(err);
         if (!silent) toast.error('No se pudo completar la búsqueda.');
-      } finally {
-        setSearchResultsLoading(false);
       }
     },
-    [profileSearchTokens, registerSearchQuery, searchProviders, setSearchTerm]
+    [profileSearchTokens, registerSearchQuery, runAISearch, setSearchTerm]
   );
 
   const totalSearchPages = useMemo(() => {
-    if (!searchResults.length) return 0;
-    return Math.max(1, Math.ceil(searchResults.length / SEARCH_PAGE_SIZE));
-  }, [searchResults]);
+    if (!aiResults.length) return 0;
+    return Math.max(1, Math.ceil(aiResults.length / SEARCH_PAGE_SIZE));
+  }, [aiResults]);
 
   const paginatedResults = useMemo(() => {
-    if (!searchResults.length) return [];
+    if (!aiResults.length) return [];
     const start = (searchResultsPage - 1) * SEARCH_PAGE_SIZE;
-    return searchResults.slice(start, start + SEARCH_PAGE_SIZE);
-  }, [searchResults, searchResultsPage]);
+    return aiResults.slice(start, start + SEARCH_PAGE_SIZE);
+  }, [aiResults, searchResultsPage]);
 
   useEffect(() => {
-    if (!searchResults.length) {
+    if (!aiResults.length) {
       setSearchResultsPage(1);
       return;
     }
     if (searchResultsPage > totalSearchPages) {
       setSearchResultsPage(totalSearchPages);
     }
-  }, [searchResults, searchResultsPage, totalSearchPages]);
+  }, [aiResults, searchResultsPage, totalSearchPages]);
 
   const handleSearchSubmit = useCallback(
     async (event) => {
@@ -401,16 +398,13 @@ const Proveedores = () => {
   const handleClearSearch = useCallback(() => {
     setSearchInput('');
     setSearchTerm('');
-    setSearchResults([]);
+    clearAISearch();
     setSearchResultsQuery('');
     setSearchResultsPage(1);
-    setSearchResultsError(null);
-    setSearchResultsLoading(false);
     setSearchCompleted(false);
     setSearchDrawerOpen(false);
     setSearchDrawerResult(null);
-    setResultsUsedFallback(false);
-  }, [setSearchTerm]);
+  }, [clearAISearch, setSearchTerm]);
 
   const handleOpenServiceModal = useCallback((card) => {
     setServiceModal({ open: true, card });
@@ -420,13 +414,11 @@ const Proveedores = () => {
     setServiceModal({ open: false, card: null });
   }, []);
 
-  const handleSelectSearchResult = useCallback(
-    (result) => {
-      if (!result) return;
-      setSearchDrawerResult(result);      setSearchDrawerOpen(true);
-    },
-    [searchResultsQuery]
-  );
+  const handleSelectSearchResult = useCallback((result) => {
+    if (!result) return;
+    setSearchDrawerResult(result);
+    setSearchDrawerOpen(true);
+  }, []);
 
   const handleSaveWantedServices = useCallback(
     async (list) => {
@@ -550,7 +542,7 @@ const Proveedores = () => {
 
             <ShortlistList items={shortlist} loading={shortlistLoading} error={shortlistError} />
 
-            {(searchResultsLoading || searchCompleted) && (
+            {(aiLoading || searchCompleted) && (
               <section className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="space-y-1">
@@ -561,21 +553,21 @@ const Proveedores = () => {
                   </div>
                 </div>
 
-                {resultsUsedFallback && !searchResultsLoading && !searchResultsError && searchResults.length > 0 && (
+                {aiUsedFallback && !aiLoading && !aiError && aiResults.length > 0 && (
                   <Card className="border border-soft bg-primary-soft/20 text-xs text-primary">
                     Mostramos sugerencias de referencia porque la búsqueda en vivo no respondió.
                   </Card>
                 )}
 
-                {searchResultsLoading ? (
+                {aiLoading ? (
                   <Card className="border border-soft bg-surface text-sm text-muted">
                     Buscando proveedores…
                   </Card>
-                ) : searchResultsError ? (
+                ) : aiError ? (
                   <Card className="border border-danger bg-danger-soft text-sm text-danger">
-                    {searchResultsError?.message || 'No se pudo completar la búsqueda.'}
+                    {aiError?.message || 'No se pudo completar la búsqueda.'}
                   </Card>
-                ) : searchResults.length === 0 ? (
+                ) : aiResults.length === 0 ? (
                   <Card className="border border-dashed border-soft bg-surface/80 text-sm text-muted">
                     No encontramos resultados con los filtros actuales.
                   </Card>
@@ -875,12 +867,4 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
-
-
-
-
-
-
-
-
 

@@ -80,6 +80,7 @@ const ProtocoloAyuda = React.lazy(() => import('./pages/protocolo/AyudaCeremonia
 const DocumentosLegales = React.lazy(() => import('./pages/protocolo/DocumentosLegales'));
 const Momentos = React.lazy(() => import('./pages/Momentos'));
 const MomentosGuest = React.lazy(() => import('./pages/MomentosGuest'));
+const MomentosPublic = React.lazy(() => import('./pages/MomentosPublic'));
 // (dedupe) WebEditor ya importado arriba
 // Seating Plan interactivo
 const SeatingPlan = React.lazy(() => import('./pages/SeatingPlan.jsx'));
@@ -275,6 +276,7 @@ function App() {
               <Route path="invitation/:code" element={<AcceptInvitation />} />
               <Route path="rsvp/:token" element={<RSVPConfirm />} />
               <Route path="momentos/invitados" element={<MomentosGuest />} />
+              <Route path="momentos/recuerdos" element={<MomentosPublic />} />
               {/* Rutas de test públicas para E2E (duplicadas también en layout protegido) */}
               <Route path="test/proveedores-flow" element={<ProveedoresFlowHarness />} />
               <Route path="test/proveedores-smoke" element={<ProveedoresSmoke />} />
@@ -409,4 +411,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,3 +1,4 @@
+import 'cypress-file-upload';
 const stubRemoved = (name) => {
   throw new Error(`[Cypress ${name}] Helper retirado: ya no se permiten stubs. Actualiza la prueba para preparar datos reales.`);
 };

@@ -113,6 +113,8 @@ import adminSuppliersRouter from './routes/admin-suppliers.js';
 import adminAuditRouter from './routes/admin-audit.js';
 import { startEmailSchedulerWorker } from './workers/emailSchedulerWorker.js';
 import { startMetricAggregatorWorker } from './workers/metricAggregatorWorker.js';
+import { startMomentosCleanupWorker } from './workers/momentosCleanupWorker.js';
+import { startMomentosModerationWorker } from './workers/momentosModerationWorker.js';
 
 
 const { PORT, ALLOWED_ORIGINS, RATE_LIMIT_AI_MAX, RATE_LIMIT_GLOBAL_MAX, CORS_EXPOSE_HEADERS, ADMIN_IP_ALLOWLIST, WHATSAPP_WEBHOOK_RATE_LIMIT_MAX, MAILGUN_WEBHOOK_RATE_LIMIT_MAX, WHATSAPP_WEBHOOK_IP_ALLOWLIST, MAILGUN_WEBHOOK_IP_ALLOWLIST } = await import('./config.js');
@@ -744,6 +746,8 @@ startEmailSchedulerWorker();
 
 if (process.env.NODE_ENV !== 'test') {
   startMetricAggregatorWorker();
+  startMomentosCleanupWorker();
+  startMomentosModerationWorker();
 }
 
 if (process.env.NODE_ENV !== 'test') {

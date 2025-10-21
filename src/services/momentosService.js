@@ -23,6 +23,7 @@ import { performanceMonitor } from './PerformanceMonitor';
 
 export const GALLERY_COMPRESSION_THRESHOLD_BYTES = 30 * 1024 * 1024 * 1024; // 30 GB
 export const GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT = 30; // días permitidos tras el evento
+export const GALLERY_RETENTION_DAYS_AFTER_EVENT = 365; // limpieza automática 1 año después
 
 const DEFAULT_ALBUM_ID = 'momentos';
 const DEFAULT_SCENES = [
@@ -238,6 +239,9 @@ const buildAlbumDefaults = (overridesSettings = {}) => ({
     compressionActive: false,
     lastCompressionAt: null,
     lastTokenAt: null,
+    cleanupAt: null,
+    cleanedAt: null,
+    cleanupStatus: 'scheduled',
   },
   settings: {
     ...DEFAULT_SETTINGS,
@@ -273,11 +277,25 @@ const resolveUploadWindow = (album) => {
   const totalBytes = album?.counters?.totalBytes || 0;
   const compressionActive =
     Boolean(album?.uploadWindow?.compressionActive) || totalBytes >= threshold;
+  const cleanupAtFromAlbum = parseDateValue(album?.uploadWindow?.cleanupAt);
+  const cleanupAt =
+    cleanupAtFromAlbum ||
+    (eventDate
+      ? addDays(eventDate, GALLERY_RETENTION_DAYS_AFTER_EVENT)
+      : closesAt
+      ? addDays(
+          closesAt,
+          Math.max(GALLERY_RETENTION_DAYS_AFTER_EVENT - GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT, 0)
+        )
+      : null);
+  const cleanupStatus = album?.uploadWindow?.cleanupStatus || 'scheduled';
   return {
     eventDate,
     closesAt,
     thresholdBytes: threshold,
     compressionActive,
+    cleanupAt,
+    cleanupStatus,
   };
 };
 
@@ -376,6 +394,16 @@ export const ensureMomentosAlbum = async (weddingId, overrides = {}) => {
     : eventDateCandidate
     ? addDays(eventDateCandidate, GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT)
     : null;
+  const cleanupAtCandidate = overridesUploadWindow?.cleanupAt
+    ? parseDateValue(overridesUploadWindow.cleanupAt)
+    : eventDateCandidate
+    ? addDays(eventDateCandidate, GALLERY_RETENTION_DAYS_AFTER_EVENT)
+    : closesAtCandidate
+    ? addDays(
+        closesAtCandidate,
+        Math.max(GALLERY_RETENTION_DAYS_AFTER_EVENT - GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT, 0)
+      )
+    : null;
 
   await setDoc(
     albumRef,
@@ -392,6 +420,11 @@ export const ensureMomentosAlbum = async (weddingId, overrides = {}) => {
         closesAt: closesAtCandidate
           ? toTimestamp(closesAtCandidate)
           : payload.uploadWindow.closesAt,
+        cleanupAt: cleanupAtCandidate
+          ? toTimestamp(cleanupAtCandidate)
+          : payload.uploadWindow.cleanupAt,
+        cleanupStatus:
+          overridesUploadWindow?.cleanupStatus || payload.uploadWindow.cleanupStatus || 'scheduled',
       },
       settings: {
         ...payload.settings,
@@ -514,7 +547,7 @@ export const uploadMomentPhoto = async ({
   let compressionApplied = false;
 
   if (shouldCompress) {
-    const optimized = await optimizeImageFile(file);
+    const optimized = await optimizeImageFile(file, { maxEdge: 1920, quality: 0.86 });
     if (optimized?.file && optimized.file.size < file.size) {
       workingFile = optimized.file;
       compressionApplied = true;
@@ -611,6 +644,13 @@ export const uploadMomentPhoto = async ({
             original: downloadUrl,
             optimized: downloadUrl,
             thumb: downloadUrl,
+          },
+          moderation: {
+            auto: {
+              status: 'queued',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+            },
           },
         };
 
@@ -1051,13 +1091,20 @@ export const getAlbumEventDate = (album) => resolveAlbumEventDate(album || {});
 
 export const getGalleryUploadState = (album, now = new Date()) => {
   const safeAlbum = album || {};
-  const { eventDate, closesAt, thresholdBytes, compressionActive } =
-    resolveUploadWindow(safeAlbum);
+  const {
+    eventDate,
+    closesAt,
+    thresholdBytes,
+    compressionActive,
+    cleanupAt,
+    cleanupStatus,
+  } = resolveUploadWindow(safeAlbum);
   const totalBytes = safeAlbum?.counters?.totalBytes || 0;
   const optimizedBytes = safeAlbum?.counters?.optimizedBytes || 0;
   const threshold = thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
   const windowOpen = !closesAt || now <= closesAt;
   const remainingMillis = closesAt ? closesAt.getTime() - now.getTime() : null;
+  const cleanupMillis = cleanupAt ? cleanupAt.getTime() - now.getTime() : null;
   const percentageUsed = threshold
     ? Math.min(100, Math.round((totalBytes / threshold) * 100))
     : null;
@@ -1065,6 +1112,8 @@ export const getGalleryUploadState = (album, now = new Date()) => {
   return {
     eventDate,
     closesAt,
+    cleanupAt,
+    cleanupStatus,
     isWindowOpen: windowOpen,
     totalBytes,
     optimizedBytes,
@@ -1074,6 +1123,10 @@ export const getGalleryUploadState = (album, now = new Date()) => {
     remainingMillis,
     remainingDays:
       remainingMillis !== null ? Math.ceil(remainingMillis / (1000 * 60 * 60 * 24)) : null,
+    cleanupMillis,
+    cleanupDue: cleanupAt ? now >= cleanupAt : false,
+    cleanupDaysRemaining:
+      cleanupMillis !== null ? Math.ceil(cleanupMillis / (1000 * 60 * 60 * 24)) : null,
     percentageUsed,
     now,
   };
@@ -1100,9 +1153,17 @@ export const syncAlbumEventDate = async (
     updates['uploadWindow.closesAt'] = toTimestamp(
       addDays(parsedEventDate, GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT)
     );
+    updates['uploadWindow.cleanupAt'] = toTimestamp(
+      addDays(parsedEventDate, GALLERY_RETENTION_DAYS_AFTER_EVENT)
+    );
+    if ((currentData?.uploadWindow?.cleanupStatus || 'scheduled') !== 'completed') {
+      updates['uploadWindow.cleanupStatus'] = 'scheduled';
+    }
   } else {
     updates.eventDate = deleteField();
     updates['uploadWindow.closesAt'] = deleteField();
+    updates['uploadWindow.cleanupAt'] = deleteField();
+    updates['uploadWindow.cleanupStatus'] = deleteField();
   }
 
   if (!currentData?.uploadWindow?.compressionThresholdBytes) {
@@ -1125,7 +1186,7 @@ export const buildGuestShareUrl = ({ baseUrl, token, weddingId }) => {
     baseUrl ||
     (typeof window !== 'undefined' ? window.location.origin : 'https://mywed360.app');
   const normalized = origin.replace(/\/$/, '');
-  return `${normalized}/momentos/invitados?w=${encodeURIComponent(
+  return `${normalized}/momentos/recuerdos?w=${encodeURIComponent(
     weddingId
   )}&token=${encodeURIComponent(token)}`;
 };

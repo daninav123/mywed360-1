@@ -409,7 +409,7 @@
       "categoryStatus": "Budget Status by Categories",
       "progress": "Progress"
     },
-  "budget": {
+    "budget": {
       "title": "Budget Management",
       "subtitle": "Organize and control your budget by categories",
       "newCategory": "New category",
@@ -865,77 +865,185 @@
       }
     }
   },
-"email": {
-  "email": "Email",
-  "emails": "Emails",
-  "inbox": "Inbox",
-  "sent": "Sent",
-  "drafts": "Drafts",
-  "trash": "Trash",
-  "compose": "Compose",
-  "reply": "Reply",
-  "forward": "Forward",
-  "delete": "Delete",
-  "archive": "Archive",
-  "markAsRead": "Mark as Read",
-  "markAsUnread": "Mark as Unread",
-  "subject": "Subject",
-  "from": "From",
-  "to": "To",
-  "cc": "CC",
-  "bcc": "BCC",
-  "attachments": "Attachments",
-  "send": "Send",
-  "saveDraft": "Save Draft",
-  "emailSettings": "Email Settings",
-  "emailSignature": "Email Signature"
-},
-"dates": {
-  "today": "Today",
-  "yesterday": "Yesterday",
-  "tomorrow": "Tomorrow",
-  "thisWeek": "This week",
-  "nextWeek": "Next week",
-  "thisMonth": "This month",
-  "nextMonth": "Next month",
-  "selectDate": "Select date",
-  "dateFormat": "mm/dd/yyyy",
-  "timeFormat": "HH:mm"
-},
-"status": {
-  "active": "Active",
-  "inactive": "Inactive",
-  "pending": "Pending",
-  "approved": "Approved",
-  "rejected": "Rejected",
-  "completed": "Completed",
-  "cancelled": "Cancelled",
-  "draft": "Draft",
-  "published": "Published"
-},
-"inspiration": {
-  "alt": "inspiración",
-  "altWithTags": "inspiración: {{tags}}",
-  "aria": "Imagen de inspiración",
-  "ariaWithTags": "Imagen de inspiración: {{tags}}",
-  "addFav": "Añadir a favoritos",
-  "removeFav": "Quitar de favoritos"
-},
-"compose": {
-  "toField": "Recipient field",
-  "subjectField": "Subject field",
-  "ccField": "CC field",
-  "bccField": "BCC field",
-  "insertQuickReply": "Insert suggested reply"
-},
-"common": {
-  "all": "All",
-  "none": "None",
-  "show": "Show",
-  "hide": "Hide",
-  "view": "View",
-  "cancel": "Cancel",
-  "delete": "Delete",
-  "duplicate": "Duplicate"
-}
+  "email": {
+    "email": "Email",
+    "emails": "Emails",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "drafts": "Drafts",
+    "trash": "Trash",
+    "compose": "Compose",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "archive": "Archive",
+    "markAsRead": "Mark as Read",
+    "markAsUnread": "Mark as Unread",
+    "subject": "Subject",
+    "from": "From",
+    "to": "To",
+    "cc": "CC",
+    "bcc": "BCC",
+    "attachments": "Attachments",
+    "send": "Send",
+    "saveDraft": "Save Draft",
+    "emailSettings": "Email Settings",
+    "emailSignature": "Email Signature"
+  },
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "nextMonth": "Next month",
+    "selectDate": "Select date",
+    "dateFormat": "mm/dd/yyyy",
+    "timeFormat": "HH:mm"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published"
+  },
+  "inspiration": {
+    "alt": "inspiración",
+    "altWithTags": "inspiración: {{tags}}",
+    "aria": "Imagen de inspiración",
+    "ariaWithTags": "Imagen de inspiración: {{tags}}",
+    "addFav": "Añadir a favoritos",
+    "removeFav": "Quitar de favoritos"
+  },
+  "compose": {
+    "toField": "Recipient field",
+    "subjectField": "Subject field",
+    "ccField": "CC field",
+    "bccField": "BCC field",
+    "insertQuickReply": "Insert suggested reply"
+  },
+  "common": {
+    "all": "All",
+    "none": "None",
+    "show": "Show",
+    "hide": "Hide",
+    "view": "View",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "duplicate": "Duplicate"
+  },
+  "pages": {
+    "momentos": {
+      "title": "Galería de recuerdos",
+      "tabs": {
+        "overview": "Resumen",
+        "moderation": "Moderación",
+        "slideshow": "Slideshow",
+        "downloads": "Descargas"
+      },
+      "loading": {
+        "weddings": "Cargando bodas...",
+        "selectWedding": "Selecciona una boda para gestionar la galería de recuerdos.",
+        "preparing": "Preparando tu álbum colaborativo..."
+      },
+      "banners": {
+        "contributionsClosed": "La ventana de aportaciones cerró el {{date}}. Ajusta la fecha de la boda o solicita soporte si necesitas reabrir la galería.",
+        "compressionActive": "Hemos superado los 30 GB de espacio. Las nuevas fotos se comprimen automáticamente para optimizar el almacenamiento en Firebase."
+      },
+      "toasts": {
+        "loadError": "No se pudo cargar la galería de recuerdos. Revisa tu conexión o permisos.",
+        "tokenCreated": "Nuevo enlace generado",
+        "tokenError": "No se pudo generar el enlace, reinténtalo más tarde.",
+        "approved": "Foto aprobada",
+        "approveError": "No se pudo aprobar la foto",
+        "rejected": "Foto rechazada",
+        "rejectError": "No se pudo rechazar la foto",
+        "reset": "La foto volvió a pendiente",
+        "resetError": "No se pudo revertir el estado",
+        "scenesSaved": "Escenas actualizadas",
+        "scenesError": "No se pudieron guardar las escenas",
+        "uploadSuccess": "Foto subida a la galería"
+      },
+      "prompts": {
+        "rejectTitle": "Motivo del rechazo",
+        "rejectDefault": "No cumple con la guía de la galería",
+        "rejectFallback": "Rechazado"
+      },
+      "slideshow": {
+        "title": "Presentación en vivo",
+        "description": "Conecta una pantalla secundaria y deja que los recuerdos fluyan automáticamente.",
+        "stats": "{{count}} fotos aprobadas · {{scenes}} escenas cubiertas"
+      },
+      "uploader": {
+        "hostFallback": "Anfitrión"
+      }
+    },
+    "momentosGuest": {
+      "badge": "Recuerdos colaborativos",
+      "greeting": "Hola, {{name}} 👋",
+      "remainingUploadsSingle": "Sube hasta 1 foto adicional.",
+      "remainingUploads": "Sube hasta {{count}} fotos adicionales.",
+      "remainingUploadsUnlimited": "Sube todas las fotos que quieras.",
+      "description": "El anfitrión revisará y las compartirá con el grupo.",
+      "window": {
+        "daysLeft": "Aún tienes {{count, plural, one {1 día} other {{count} días}} para enviar tus mejores fotos.",
+        "deadline": "Disponible hasta {{date}}.",
+        "compression": "Las fotos nuevas se optimizan automáticamente para ahorrar espacio."
+      },
+      "status": {
+        "loading": "Cargando galería...",
+        "loadingMessage": "Preparando tu espacio para compartir recuerdos…",
+        "errorTitle": "No pudimos abrir la galería de recuerdos",
+        "errorAction": "Si crees que es un error, contacta con la pareja anfitriona para solicitar un nuevo enlace.",
+        "closedTitle": "La galería está cerrada",
+        "closedDescription": "El periodo para subir fotos terminó.",
+        "closedDescriptionWithDate": "El periodo para subir fotos terminó el {{date}}.",
+        "closedHelp": "Si todavía tienes recuerdos que compartir, avisa a la pareja anfitriona para reabrir el enlace.",
+        "welcomeTitle": "¡Gracias por capturar recuerdos!",
+        "welcomeDescription": "Sube tus fotos favoritas del evento. El anfitrión podrá revisarlas y mostrarlas en el slideshow en vivo.",
+        "uploadTitle": "Tus progresos",
+        "tip": "Tip: las fotos se agrupan por escena (ceremonia, banquete, fiesta…) para ayudar al anfitrión.",
+        "uploadedSummary": "Has compartido {{count}} {{count, plural, one {foto} other {fotos}}}. ¡Gracias por sumar a los recuerdos!",
+        "recentUploads": "Las fotos aprobadas aparecerán en el slideshow del evento y en la galería final. El anfitrión avisará cuando estén listas."
+      },
+      "form": {
+        "nameLabel": "Nombre completo",
+        "namePlaceholder": "Ej. Laura G.",
+        "emailLabel": "Correo electrónico (opcional)",
+        "emailPlaceholder": "Te avisaremos cuando tus fotos estén destacadas",
+        "termsLabel": "Acepto compartir mis fotos con la pareja anfitriona y confirmo que tengo permiso para hacerlo.",
+        "submit": "Comenzar a subir fotos"
+      },
+      "progress": {
+        "title": "Tus progresos",
+        "sceneLabel": "Escena: {{scene}} · {{size}} KB",
+        "status": "En revisión"
+      },
+      "toasts": {
+        "nameRequired": "Indica tu nombre para personalizar tus aportaciones",
+        "termsRequired": "Debes aceptar la política de privacidad",
+        "windowClosed": "Esta galería ya no acepta nuevas fotos.",
+        "achievementFirst": "🏅 ¡Logro desbloqueado! Primer recuerdo compartido ✨",
+        "achievementEnthusiast": "🎉 ¡Eres un colaborador entusiasta! Sigue compartiendo recuerdos.",
+        "achievementStar": "🌟 ¡Recuerdos Estrella! Tus fotos darán vida al slideshow.",
+        "upload": "Foto enviada correctamente"
+      },
+      "errors": {
+        "incompleteLink": "El enlace está incompleto. Solicita un nuevo QR al anfitrión.",
+        "invalidLink": "Este enlace ya no es válido."
+      },
+      "scenes": {
+        "other": "Otros"
+      },
+      "uploader": {
+        "guestFallback": "Invitado"
+      }
+    }
+  }
 }
