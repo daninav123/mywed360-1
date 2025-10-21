@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 
 import PageWrapper from '@/components/PageWrapper';
 import PageTabs from '@/components/ui/PageTabs';
-import UploadWidget from '@/components/momentos/UploadWidget';
+import MediaGallery from '@/components/momentos/MediaGallery';
 import AlbumOverview from '@/components/momentos/AlbumOverview';
 import ModerationBoard from '@/components/momentos/ModerationBoard';
 import DownloadBundle from '@/components/momentos/DownloadBundle';
@@ -224,8 +224,6 @@ export default function Momentos() {
     () => (album ? getGalleryUploadState(album) : null),
     [album]
   );
-  const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
-
   const handleCreateToken = async () => {
     if (!activeWedding) return;
     try {
@@ -340,12 +338,6 @@ export default function Momentos() {
     );
   }
 
-  const uploaderInfo = {
-    uid: currentUser?.uid || null,
-    displayName: currentUser?.displayName || currentUser?.email || 'Anfitrión',
-    type: 'host',
-  };
-
   return (
     <PageWrapper title="Galería de recuerdos">
       <PageTabs value={activeTab} onChange={setActiveTab} options={TABS} className="mb-6" />
@@ -364,14 +356,6 @@ export default function Momentos() {
               Hemos superado los 30&nbsp;GB de espacio. Las nuevas fotos se comprimen automáticamente para optimizar el almacenamiento en Firebase.
             </div>
           )}
-          <UploadWidget
-            weddingId={activeWedding}
-            albumId={ALBUM_ID}
-            scenes={scenes}
-            uploader={uploaderInfo}
-            onUploaded={() => toast.success('Foto subida a la galería')}
-            disabled={uploadsClosed}
-          />
           <AlbumOverview
             album={album}
             photos={approvedPhotos}
@@ -381,6 +365,7 @@ export default function Momentos() {
             guestProgress={guestProgress}
             onCreateToken={handleCreateToken}
           />
+          <MediaGallery photos={photos} scenes={scenes} />
           <SceneManager scenes={scenes} onSave={handleScenesSave} />
         </div>
       )}

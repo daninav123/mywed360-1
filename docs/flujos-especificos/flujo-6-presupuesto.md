@@ -144,10 +144,18 @@
      - `Message`: `{ id, role, content, createdAt, adjustments?, insights?, satisfaction? }`.
      - Las preferencias inferidas (ej. `cuisineQuality`, `beverageFocus`, `musicMood`, `decorStyle`) se guardan en `preferences` y se comparten con Flujo 5 y 17.
      - Cuando el hilo supera 15 turnos, se genera `summary` (texto) y el backend recibe un historial truncado para optimizar costes.
-   - Controles y seguridad:
-     - Ningun ajuste se aplica sin confirmacion explicita del usuario.
-     - Si un ajuste supera el presupuesto disponible, la IA propone alternativas (recortes, aportaciones extra o cambios de proveedor) antes de permitir la aplicacion.
-     - El usuario puede puntuar cada respuesta (pulgar arriba/abajo); ese feedback se almacena en `aiAdvisorChat.feedback` y se envia al dataset nocturno para reentrenar prompts.
+    - Controles y seguridad:
+      - Ningun ajuste se aplica sin confirmacion explicita del usuario.
+      - Si un ajuste supera el presupuesto disponible, la IA propone alternativas (recortes, aportaciones extra o cambios de proveedor) antes de permitir la aplicacion.
+      - El usuario puede puntuar cada respuesta (pulgar arriba/abajo); ese feedback se almacena en `aiAdvisorChat.feedback` y se envia al dataset nocturno para reentrenar prompts.
+
+### Ajustes de interfaz planificados (2025-10)
+- **Resumen**: se reemplazará el mosaico actual por una franja ligera (presupuesto total, gastado, disponible y proyección) con hasta tres alertas clave. Las recomendaciones predictivas pasarán a tarjetas plegables “Ver sugerencias IA” y se sumarán accesos directos hacia Presupuesto y Aportaciones.
+- **Transacciones**: la cabecera se organizará en dos columnas (filtros y totales mensuales a la izquierda; tarjetas de acciones rápidas a la derecha) y las secciones “Transacciones desde email” y “Conecta tu banco” quedarán dentro de un acordeón “Fuentes automáticas” para mantener la tabla como foco.
+- **Presupuesto**: el editor del presupuesto total y el estado del consejero aparecerán antes de la tabla en una columna lateral; las categorías se mostrarán colapsadas por defecto y se expandirán por grupo.
+- **Aportaciones**: los datos agregados (recaudado vs. objetivo) se concentrarán en un encabezado compacto; el botón de recargar invitados solo se mostrará cuando haya desfase de datos.
+- **Análisis**: se sustituirá la carga simultánea de gráficos por un selector (“Ver tendencia”, “Comparar proveedores”) que renderice únicamente la visual elegida; los dos gráficos más consultados podrán exponerse como mini indicadores dentro del Resumen.
+
 ### Ciclo contable recomendado
 1. **Planificacion**: definir presupuesto total, categorias y moneda base; validar tolerancias y seeds iniciales.
 2. **Registro**: capturar gastos, ingresos y aportaciones a medida que ocurren (manual, email, banco o CSV).

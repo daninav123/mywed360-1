@@ -44,6 +44,43 @@ export default function MomentosPublic() {
   const [startedUpload, setStartedUpload] = useState(false);
   const [recentUploads, setRecentUploads] = useState([]);
 
+  const storageKey = useMemo(() => {
+    if (!tokenDoc?.id) return null;
+    return `momentos-public-${tokenDoc.id}`;
+  }, [tokenDoc?.id]);
+
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (!raw) return;
+      const stored = JSON.parse(raw);
+      if (stored?.guestName) setGuestName(stored.guestName);
+      if (stored?.guestEmail) setGuestEmail(stored.guestEmail);
+      if (stored?.acceptedTerms) setAcceptedTerms(Boolean(stored.acceptedTerms));
+    } catch (error) {
+      console.warn('[MomentosPublic] no se pudo leer preferencias almacenadas', error);
+    }
+  }, [storageKey]);
+
+  const persistGuestPrefs = useCallback(
+    (next = {}) => {
+      if (!storageKey) return;
+      try {
+        const payload = {
+          guestName: next.guestName ?? guestName,
+          guestEmail: next.guestEmail ?? guestEmail,
+          acceptedTerms:
+            typeof next.acceptedTerms === 'boolean' ? next.acceptedTerms : acceptedTerms,
+        };
+        window.localStorage.setItem(storageKey, JSON.stringify(payload));
+      } catch (error) {
+        console.warn('[MomentosPublic] no se pudo guardar preferencias', error);
+      }
+    },
+    [acceptedTerms, guestEmail, guestName, storageKey]
+  );
+
   useEffect(() => {
     let unsubscribeAlbum = null;
     const initialize = async () => {
@@ -130,7 +167,11 @@ export default function MomentosPublic() {
       return;
     }
     setSelectedScene(scene);
-    setStartedUpload(false);
+    if (acceptedTerms && guestEmail && guestName) {
+      setStartedUpload(true);
+    } else {
+      setStartedUpload(false);
+    }
   };
 
   const handleStart = (event) => {
@@ -143,6 +184,7 @@ export default function MomentosPublic() {
       toast.warn('Debes aceptar la política de privacidad');
       return;
     }
+    persistGuestPrefs({ guestName: guestName.trim(), guestEmail, acceptedTerms: true });
     setStartedUpload(true);
   };
 

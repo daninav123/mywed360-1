@@ -1,8 +1,14 @@
-﻿import { AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 import React from 'react';
 
-import { Card } from '../ui';
-import StatCard from './StatCard';
+import { Card, Button } from '../ui';
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
 
@@ -26,7 +32,6 @@ export default function FinanceOverview({
   budgetUsage = [],
   thresholds = { warn: 75, danger: 90 },
   onNavigate,
-  isLoading = false,
   transactions = [],
   projection = null,
   predictiveInsights = null,
@@ -58,6 +63,7 @@ export default function FinanceOverview({
   const effectiveTotal =
     expectedIncome > 0 ? expectedIncome : totalBudget > 0 ? totalBudget : fallbackTotal;
   const budgetPercent = effectiveTotal > 0 ? (totalSpent / effectiveTotal) * 100 : 0;
+  const availableAmount = effectiveTotal - totalSpent;
 
   const safeStats = {
     totalBudget,
@@ -65,36 +71,28 @@ export default function FinanceOverview({
     totalIncome: toFinite(stats?.totalIncome),
     currentBalance: toFinite(stats?.currentBalance),
     expectedIncome,
-    budgetUsagePercentage: toFinite(stats?.budgetUsagePercentage),
   };
 
-  const handleNavigate = (filters) => {
-    if (typeof onNavigate === 'function') {
-      onNavigate({ tab: 'transactions', filters });
+  const handleNavigate = (payload) => {
+    if (typeof onNavigate !== 'function') return;
+    if (payload?.tab) {
+      onNavigate(payload);
+    } else {
+      onNavigate({ tab: 'transactions', filters: payload });
     }
   };
-
-  const clickableCardProps = (filters) => ({
-    role: 'button',
-    tabIndex: 0,
-    className:
-      'p-6 cursor-pointer transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/40',
-    onClick: () => handleNavigate(filters),
-    onKeyDown: (event) => handleAccessibleClick(event, () => handleNavigate(filters)),
-  });
 
   const alertCategories = safeBudget.filter(
     (cat) => !cat.muted && toFinite(cat.percentage) >= warnThreshold
   );
+  const limitedAlerts = alertCategories.slice(0, 3);
 
-  // Build monthly series for sparklines and deltas (last 12 months)
   const monthly = React.useMemo(() => {
     const arr = Array.isArray(transactions) ? transactions : [];
     const months = [];
     const mapInc = new Map();
     const mapExp = new Map();
     const now = new Date();
-    // prepare last 12 keys
     for (let i = 11; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -107,7 +105,7 @@ export default function FinanceOverview({
       const d = new Date(tx.date);
       if (Number.isNaN(d.getTime())) continue;
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      if (!mapInc.has(key)) continue; // outside 12m window
+      if (!mapInc.has(key)) continue;
       const amount = Number(tx.amount) || 0;
       if (tx.type === 'income') mapInc.set(key, mapInc.get(key) + Math.max(0, amount));
       else if (tx.type === 'expense') mapExp.set(key, mapExp.get(key) + Math.max(0, amount));
@@ -119,256 +117,330 @@ export default function FinanceOverview({
       if (!series || series.length < 2) return { value: 0, trend: 'neutral' };
       const last = series[series.length - 1];
       const prev = series[series.length - 2];
-      if (prev === 0) return { value: last === 0 ? 0 : 100, trend: last > 0 ? 'up' : 'neutral' };
+      if (prev === 0)
+        return {
+          value: last === 0 ? 0 : 100,
+          trend: last > 0 ? 'up' : last < 0 ? 'down' : 'neutral',
+        };
       const pct = ((last - prev) / Math.abs(prev)) * 100;
       return { value: Math.abs(pct), trend: last > prev ? 'up' : last < prev ? 'down' : 'neutral' };
     };
     return {
-      months,
-      income,
-      expense,
-      balance,
       deltaIncome: computeDelta(income),
       deltaExpense: computeDelta(expense),
       deltaBalance: computeDelta(balance),
     };
   }, [transactions]);
 
+  const projectedBalance =
+    projection && Number.isFinite(Number(projection?.projectedBalance))
+      ? Number(projection.projectedBalance)
+      : safeStats.currentBalance;
+
+  const heroStats = [
+    {
+      id: 'total',
+      label: t('finance.overview.totalBudget', { defaultValue: 'Presupuesto total' }),
+      value: formatCurrency(effectiveTotal),
+      tone: 'primary',
+      hint:
+        expectedIncome > 0
+          ? t('finance.overview.expectedIncome', {
+              defaultValue: 'Incluye ingresos esperados',
+            })
+          : t('finance.overview.configuredBudget', {
+              defaultValue: 'Según presupuesto configurado',
+            }),
+    },
+    {
+      id: 'spent',
+      label: t('finance.overview.totalSpent', { defaultValue: 'Total gastado' }),
+      value: formatCurrency(safeStats.totalSpent),
+      tone: 'danger',
+      hint: `${budgetPercent.toFixed(1)}% ${t('finance.overview.ofBudget', {
+        defaultValue: 'del presupuesto',
+      })}`,
+      delta: monthly.deltaExpense,
+    },
+    {
+      id: 'available',
+      label: t('finance.overview.available', { defaultValue: 'Disponible' }),
+      value: formatCurrency(Math.max(availableAmount, 0)),
+      tone: availableAmount >= 0 ? 'success' : 'danger',
+      hint:
+        availableAmount >= 0
+          ? t('finance.overview.clearBalance', { defaultValue: 'Saldo libre estimado' })
+          : t('finance.overview.overBudget', { defaultValue: 'Sobre el presupuesto' }),
+    },
+    {
+      id: 'projection',
+      label: t('finance.overview.projection', { defaultValue: 'Proyección' }),
+      value: formatCurrency(projectedBalance),
+      tone: projectedBalance >= 0 ? 'success' : 'warning',
+      hint:
+        projection?.confidenceInterval != null
+          ? `${t('finance.overview.confidence', { defaultValue: 'Confianza' })}: ${Math.round(
+              projection.confidenceInterval * 100
+            )}%`
+          : t('finance.overview.currentBalance', { defaultValue: 'Balance actual' }),
+      delta: monthly.deltaBalance,
+    },
+  ];
+
+  const [insightsOpen, setInsightsOpen] = React.useState(false);
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          {...clickableCardProps({ typeFilter: 'expense' })}
-          aria-label={t('finance.overview.totalBudget', { defaultValue: 'Presupuesto Total' })}
-          title={t('finance.overview.totalBudget', { defaultValue: 'Presupuesto Total' })}
-          value={formatCurrency(effectiveTotal)}
-          icon={<TrendingUp className="w-5 h-5" />}
-          tone="primary"
-          loading={isLoading}
-          tooltip={t('finance.overview.totalBudget', { defaultValue: 'Presupuesto Total' })}
-          sparklineData={monthly.expense}
-        />
-
-        <StatCard
-          {...clickableCardProps({ typeFilter: 'expense' })}
-          aria-label={t('finance.overview.totalSpent', { defaultValue: 'Total Gastado' })}
-          title={t('finance.overview.totalSpent', { defaultValue: 'Total Gastado' })}
-          value={
-            <span className="text-[color:var(--color-danger)]">
-              {formatCurrency(safeStats.totalSpent)}
-            </span>
-          }
-          subtitle={`${budgetPercent.toFixed(1)}% ${t('finance.overview.ofBudget', { defaultValue: 'del presupuesto' })}`}
-          icon={<TrendingDown className="w-5 h-5" />}
-          tone="danger"
-          loading={isLoading}
-          tooltip={t('finance.overview.totalSpent', { defaultValue: 'Total Gastado' })}
-          deltaValue={monthly.deltaExpense.value}
-          deltaTrend={monthly.deltaExpense.trend}
-          deltaLabel={t('finance.overview.vsPrevMonth', { defaultValue: 'vs. mes anterior' })}
-          sparklineData={monthly.expense}
-        />
-
-        <StatCard
-          aria-label={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
-          title={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
-          value={
-            <span
-              className={
-                safeStats.currentBalance >= 0
-                  ? 'text-[color:var(--color-success)]'
-                  : 'text-[color:var(--color-danger)]'
-              }
+      <Card className="p-6 bg-[var(--color-surface)]/70 border-soft shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {heroStats.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-lg border border-[color:var(--color-text)]/10 bg-white/75 dark:bg-[var(--color-surface)]/90 p-4 shadow-sm flex flex-col gap-1"
             >
-              {formatCurrency(safeStats.currentBalance)}
-            </span>
-          }
-          icon={
-            safeStats.currentBalance >= 0 ? (
-              <CheckCircle className="w-5 h-5" />
-            ) : (
-              <AlertTriangle className="w-5 h-5" />
-            )
-          }
-          tone={safeStats.currentBalance >= 0 ? 'success' : 'danger'}
-          loading={isLoading}
-          tooltip={t('finance.overview.currentBalance', { defaultValue: 'Balance Actual' })}
-          deltaValue={monthly.deltaBalance.value}
-          deltaTrend={monthly.deltaBalance.trend}
-          deltaLabel={t('finance.overview.vsPrevMonth', { defaultValue: 'vs. mes anterior' })}
-          sparklineData={monthly.balance}
-        />
-
-        <StatCard
-          {...clickableCardProps({ typeFilter: 'income' })}
-          aria-label={t('finance.overview.expectedIncome', { defaultValue: 'Ingresos Esperados' })}
-          title={t('finance.overview.expectedIncome', { defaultValue: 'Ingresos Esperados' })}
-          value={
-            <span className="text-[color:var(--color-success)]">
-              {formatCurrency(safeStats.expectedIncome)}
-            </span>
-          }
-          icon={<TrendingUp className="w-5 h-5" />}
-          tone="success"
-          loading={isLoading}
-          tooltip={t('finance.overview.expectedIncome', { defaultValue: 'Ingresos Esperados' })}
-          deltaValue={monthly.deltaIncome.value}
-          deltaTrend={monthly.deltaIncome.trend}
-          deltaLabel={t('finance.overview.vsPrevMonth', { defaultValue: 'vs. mes anterior' })}
-          sparklineData={monthly.income}
-        />
-      </div>
-
-      {predictiveInsights && (
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-semibold text-[color:var(--color-text)]">
-                {t('finance.overview.predictiveTitle', { defaultValue: 'Analítica predictiva' })}
-              </h3>
-              <p className="text-sm text-[color:var(--color-text)]/60">
-                {t('finance.overview.predictiveSubtitle', {
-                  defaultValue: 'Basado en la media móvil de los últimos seis meses.',
-                })}
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                {item.label}
               </p>
-            </div>
-            {predictiveInsights.netTrend && (
-              <span
-                className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  predictiveInsights.netTrend.direction === 'up'
-                    ? 'bg-[var(--color-success)]/15 text-[var(--color-success)]'
-                    : predictiveInsights.netTrend.direction === 'down'
-                      ? 'bg-[var(--color-danger)]/15 text-[var(--color-danger)]'
-                      : 'bg-[color:var(--color-text)]/10 text-[color:var(--color-text)]/70'
+              <p
+                className={`text-2xl font-semibold ${
+                  item.tone === 'danger'
+                    ? 'text-[color:var(--color-danger)]'
+                    : item.tone === 'success'
+                    ? 'text-[color:var(--color-success)]'
+                    : item.tone === 'warning'
+                    ? 'text-[color:var(--color-warning)]'
+                    : 'text-[color:var(--color-text)]'
                 }`}
               >
-                {predictiveInsights.netTrend.direction === 'up'
-                  ? t('finance.overview.trendUp', { defaultValue: 'Tendencia positiva' })
-                  : predictiveInsights.netTrend.direction === 'down'
-                    ? t('finance.overview.trendDown', { defaultValue: 'Tendencia negativa' })
-                    : t('finance.overview.trendFlat', { defaultValue: 'Tendencia estable' })}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div className="p-4 rounded-lg bg-[var(--color-danger)]/10 border border-[color:var(--color-danger)]/30">
-              <p className="text-xs text-[color:var(--color-danger)]/80 uppercase tracking-wide">
-                {t('finance.overview.burnRate', { defaultValue: 'Burn rate mensual' })}
+                {item.value}
               </p>
-              <p className="text-lg font-semibold text-[color:var(--color-danger)]">
-                {formatCurrency(predictiveInsights.burnRate || 0)}
-              </p>
-              <p className="text-xs text-[color:var(--color-text)]/60">
-                {t('finance.overview.avgExpense', {
-                  defaultValue: 'Ingreso neto promedio mensual',
-                })}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30">
-              <p className="text-xs text-[color:var(--color-warning)]/80 uppercase tracking-wide">
-                {t('finance.overview.monthsToZero', {
-                  defaultValue: 'Meses hasta agotar presupuesto',
-                })}
-              </p>
-              <p className="text-lg font-semibold text-[color:var(--color-warning)]">
-                {formatMonths(predictiveInsights.monthsToZero)}
-              </p>
-              {predictiveInsights.projectedZeroDate && (
-                <p className="text-xs text-[color:var(--color-text)]/60">
-                  {t('finance.overview.estimatedDate', { defaultValue: 'Estimado:' })}{' '}
-                  {predictiveInsights.projectedZeroDate}
-                </p>
+              {item.delta && (
+                <span
+                  className={`text-xs ${
+                    item.delta.trend === 'up'
+                      ? 'text-[color:var(--color-success)]'
+                      : item.delta.trend === 'down'
+                      ? 'text-[color:var(--color-danger)]'
+                      : 'text-[color:var(--color-text)]/60'
+                  }`}
+                >
+                  {item.delta.trend === 'up'
+                    ? t('finance.overview.delta.up', {
+                        defaultValue: '+{{value}} % vs. mes anterior',
+                        value: item.delta.value.toFixed(1),
+                      })
+                    : item.delta.trend === 'down'
+                    ? t('finance.overview.delta.down', {
+                        defaultValue: '-{{value}} % vs. mes anterior',
+                        value: item.delta.value.toFixed(1),
+                      })
+                    : t('finance.overview.delta.flat', {
+                        defaultValue: 'Sin cambios vs. mes anterior',
+                      })}
+                </span>
               )}
+              <span className="text-xs text-[color:var(--color-text)]/60">{item.hint}</span>
             </div>
-            <div className="p-4 rounded-lg bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30">
-              <p className="text-xs text-[color:var(--color-success)]/80 uppercase tracking-wide">
-                {t('finance.overview.forecastSurplus', {
-                  defaultValue: 'Saldo proyectado día de la boda',
+          ))}
+        </div>
+      </Card>
+
+      <div className="flex flex-wrap gap-3">
+        <Button
+          variant="ghost"
+          className="inline-flex items-center gap-2 text-sm px-3 py-2 border border-[color:var(--color-primary)]/40 text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary)]/10"
+          onClick={() => handleNavigate({ tab: 'budget' })}
+        >
+          <TrendingUp size={16} />
+          {t('finance.overview.quickAccessBudget', { defaultValue: 'Ir a presupuesto' })}
+        </Button>
+        <Button
+          variant="ghost"
+          className="inline-flex items-center gap-2 text-sm px-3 py-2 border border-[color:var(--color-success)]/40 text-[color:var(--color-success)] hover:bg-[color:var(--color-success)]/10"
+          onClick={() => handleNavigate({ tab: 'contributions' })}
+        >
+          <CheckCircle size={16} />
+          {t('finance.overview.quickAccessContributions', { defaultValue: 'Ver aportaciones' })}
+        </Button>
+        <Button
+          variant="ghost"
+          className="inline-flex items-center gap-2 text-sm px-3 py-2 border border-[color:var(--color-text)]/20 text-[color:var(--color-text)]/80 hover:bg-[color:var(--color-text)]/5"
+          onClick={() => handleNavigate({ tab: 'transactions' })}
+        >
+          <TrendingDown size={16} />
+          {t('finance.overview.quickAccessTransactions', {
+            defaultValue: 'Revisar transacciones',
+          })}
+        </Button>
+      </div>
+
+      {projection && (
+        <Card className="p-6 bg-[var(--color-accent)]/5 border-[color:var(--color-accent)]/20 space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-sm font-semibold text-[color:var(--color-text)]">
+                {t('finance.overview.projectionTitle', { defaultValue: 'Proyección financiera' })}
+              </h3>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.overview.projectionHint', {
+                  defaultValue:
+                    'Estimaciones basadas en aportaciones, pagos pendientes y regalos previstos.',
+                })}
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="rounded-md border border-[color:var(--color-success)]/30 bg-[color:var(--color-success)]/10 p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-success)]/70">
+                {t('finance.overview.projectedAtWedding', {
+                  defaultValue: 'Balance el día de la boda',
                 })}
               </p>
               <p className="text-lg font-semibold text-[color:var(--color-success)]">
-                {formatCurrency(predictiveInsights.forecastSurplus || 0)}
+                {formatCurrency(projection.summary?.projectedAtWedding ?? projectedBalance)}
               </p>
             </div>
-            <div className="p-4 rounded-lg bg-[color:var(--color-primary)]/10 border border-[color:var(--color-primary)]/30">
-              <p className="text-xs text-[color:var(--color-primary)]/80 uppercase tracking-wide">
-                {t('finance.overview.recommendedSaving', {
-                  defaultValue: 'Ahorro mensual recomendado',
+            <div className="rounded-md border border-[color:var(--color-warning)]/30 bg-[color:var(--color-warning)]/10 p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-warning)]/70">
+                {t('finance.overview.minBalance', { defaultValue: 'Punto de balance mínimo' })}
+              </p>
+              <p className="text-lg font-semibold text-[color:var(--color-warning)]">
+                {formatCurrency(projection.summary?.minProjectedBalance ?? 0)}
+              </p>
+              {projection.summary?.minProjectedBalanceDate && (
+                <p className="text-xs text-[color:var(--color-text)]/60">
+                  {projection.summary.minProjectedBalanceDate}
+                </p>
+              )}
+            </div>
+            <div className="rounded-md border border-[color:var(--color-text)]/15 bg-[color:var(--color-text)]/5 p-3">
+              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                {t('finance.overview.totalProjectedGifts', {
+                  defaultValue: 'Regalos proyectados',
                 })}
               </p>
-              <p className="text-lg font-semibold text-[color:var(--color-primary)]">
-                {formatCurrency(predictiveInsights.recommendedMonthlySaving || 0)}
+              <p className="text-lg font-semibold text-[color:var(--color-text)]">
+                {formatCurrency(projection.summary?.totalProjectedGifts ?? 0)}
               </p>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {predictiveInsights.categoriesAtRisk?.length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
-                  {t('finance.overview.categoriesAtRisk', {
-                    defaultValue: 'Categorías en riesgo',
-                  })}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {predictiveInsights.categoriesAtRisk.map((cat) => (
-                    <span
-                      key={cat.name}
-                      className="px-3 py-1 text-xs rounded-full bg-[var(--color-danger)]/10 text-[color:var(--color-danger)] border border-[color:var(--color-danger)]/30"
-                    >
-                      {cat.name} · {cat.percentage?.toFixed(1)}% ·{' '}
-                      {formatCurrency(cat.remaining || 0)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {predictiveInsights.upcomingPayments?.length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
-                  {t('finance.overview.upcomingPayments', {
-                    defaultValue: 'Pagos próximos',
-                  })}
-                </h4>
-                <ul className="space-y-2 text-xs text-[color:var(--color-text)]/80">
-                  {predictiveInsights.upcomingPayments.map((payment, idx) => (
-                    <li
-                      key={`${payment.concept}-${idx}`}
-                      className="flex items-center justify-between gap-2 border-b border-[color:var(--color-text)]/10 pb-1"
-                    >
-                      <div className="truncate">
-                        <p className="font-medium truncate">{payment.concept}</p>
-                        <p className="text-[color:var(--color-text)]/60">
-                          {payment.dueDate} ·{' '}
-                          {payment.provider ||
-                            t('finance.overview.noProvider', {
-                              defaultValue: 'Proveedor sin asignar',
-                            })}
-                        </p>
-                      </div>
-                      <span className="whitespace-nowrap font-semibold">
-                        {formatCurrency(payment.outstanding)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         </Card>
       )}
 
-      {alertCategories.length > 0 && (
+      {predictiveInsights && (
+        <Card className="overflow-hidden border-soft bg-[var(--color-surface)]/80 backdrop-blur">
+          <button
+            type="button"
+            onClick={() => setInsightsOpen((prev) => !prev)}
+            className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-[color:var(--color-primary)]/5 transition"
+          >
+            <div>
+              <p className="text-sm font-semibold text-[color:var(--color-text)]">
+                {t('finance.overview.aiInsights', { defaultValue: 'Sugerencias predictivas' })}
+              </p>
+              <p className="text-xs text-[color:var(--color-text)]/60">
+                {t('finance.overview.aiInsightsHint', {
+                  defaultValue: 'Recomendaciones breves basadas en tus movimientos recientes.',
+                })}
+              </p>
+            </div>
+            {insightsOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+          </button>
+          {insightsOpen && (
+            <div className="px-6 pb-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {predictiveInsights.recommendedMonthlySaving != null && (
+                  <div className="rounded-lg border border-[color:var(--color-primary)]/30 bg-[color:var(--color-primary)]/10 p-4">
+                    <p className="text-xs uppercase tracking-wide text-[color:var(--color-primary)]/70">
+                      {t('finance.overview.recommendedSaving', {
+                        defaultValue: 'Ahorro mensual recomendado',
+                      })}
+                    </p>
+                    <p className="text-lg font-semibold text-[color:var(--color-primary)]">
+                      {formatCurrency(predictiveInsights.recommendedMonthlySaving || 0)}
+                    </p>
+                  </div>
+                )}
+                {predictiveInsights.cashflowRisk && (
+                  <div className="rounded-lg border border-[color:var(--color-warning)]/40 bg-[color:var(--color-warning)]/10 p-4">
+                    <p className="text-xs uppercase tracking-wide text-[color:var(--color-warning)]/70">
+                      {t('finance.overview.cashflowRisk', { defaultValue: 'Riesgo de liquidez' })}
+                    </p>
+                    <p className="text-sm text-[color:var(--color-warning)]">
+                      {predictiveInsights.cashflowRisk}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {predictiveInsights.categoriesAtRisk?.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
+                      {t('finance.overview.categoriesAtRisk', {
+                        defaultValue: 'Categorías en riesgo',
+                      })}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {predictiveInsights.categoriesAtRisk.map((cat) => (
+                        <span
+                          key={cat.name}
+                          className="px-3 py-1 text-xs rounded-full bg-[var(--color-danger)]/10 text-[color:var(--color-danger)] border border-[color:var(--color-danger)]/30"
+                        >
+                          {cat.name} · {cat.percentage?.toFixed(1)}% ·{' '}
+                          {formatCurrency(cat.remaining || 0)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {predictiveInsights.upcomingPayments?.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-[color:var(--color-text)] mb-2">
+                      {t('finance.overview.upcomingPayments', {
+                        defaultValue: 'Pagos próximos',
+                      })}
+                    </h4>
+                    <ul className="space-y-2 text-xs text-[color:var(--color-text)]/80">
+                      {predictiveInsights.upcomingPayments.map((payment, idx) => (
+                        <li
+                          key={`${payment.concept}-${idx}`}
+                          className="flex items-center justify-between gap-2 border-b border-[color:var(--color-text)]/10 pb-1"
+                        >
+                          <div className="truncate">
+                            <p className="font-medium truncate">{payment.concept}</p>
+                            <p className="text-[color:var(--color-text)]/60">
+                              {payment.dueDate} ·{' '}
+                              {payment.provider ||
+                                t('finance.overview.noProvider', {
+                                  defaultValue: 'Proveedor sin asignar',
+                                })}
+                            </p>
+                          </div>
+                          <span className="whitespace-nowrap font-semibold">
+                            {formatCurrency(payment.outstanding)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {limitedAlerts.length > 0 && (
         <Card className="p-4 border-[color:var(--color-warning)]/30 bg-[var(--color-warning)]/10">
           <div className="flex items-start space-x-3">
             <AlertTriangle className="w-5 h-5 text-[color:var(--color-warning)] mt-0.5" />
             <div>
               <h3 className="font-medium text-[color:var(--color-warning)]">
-                {t('finance.alerts.budget', { defaultValue: 'Alertas de Presupuesto' })}
+                {t('finance.alerts.budget', { defaultValue: 'Alertas de presupuesto' })}
               </h3>
               <div className="mt-2 space-y-1">
-                {alertCategories.map((cat, index) => {
+                {limitedAlerts.map((cat, index) => {
                   const action = () =>
                     handleNavigate({ categoryFilter: cat.name, typeFilter: 'expense' });
                   return (
@@ -384,7 +456,9 @@ export default function FinanceOverview({
                       {toFinite(cat.percentage).toFixed(1)}%{' '}
                       {t('finance.overview.used', { defaultValue: 'utilizado' })}
                       {toFinite(cat.percentage) >= 100 &&
-                        ` ${t('finance.overview.exceededNote', { defaultValue: '(Presupuesto excedido!)' })}`}
+                        ` ${t('finance.overview.exceededNote', {
+                          defaultValue: '(Presupuesto excedido)',
+                        })}`}
                     </p>
                   );
                 })}
@@ -397,110 +471,69 @@ export default function FinanceOverview({
       <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-4">
           {t('finance.overview.categoryStatus', {
-            defaultValue: 'Estado del Presupuesto por Categor€)as',
+            defaultValue: 'Estado del presupuesto por categorías',
           })}
         </h3>
         <div className="space-y-3">
-          {safeBudget.map((category, index) => {
-            const percentage = toFinite(category.percentage);
-            const action = () =>
-              handleNavigate({ categoryFilter: category.name, typeFilter: 'expense' });
-            return (
-              <div
-                key={index}
-                className="flex items-center justify-between rounded-lg px-2 py-1 hover:bg-[var(--color-accent)]/10"
-                role="button"
-                tabIndex={0}
-                onClick={action}
-                onKeyDown={(event) => handleAccessibleClick(event, action)}
-              >
-                <div className="flex-1 pr-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-[color:var(--color-text)]/80">
-                      {category.name}
-                    </span>
-                    <span className="text-sm text-[color:var(--color-text)]/60">
-                      {formatCurrency(category.spent)} / {formatCurrency(category.amount)}
-                    </span>
-                  </div>
-                  <div className="w-full rounded-full h-2 bg-[color:var(--color-text)]/10">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        percentage >= 100
-                          ? 'bg-[var(--color-danger)]'
-                          : percentage >= warnThreshold
-                            ? 'bg-[var(--color-warning)]'
-                            : 'bg-[var(--color-success)]'
-                      }`}
-                      style={{ width: `${Math.min(percentage, 100)}%` }}
-                    />
-                  </div>
-                </div>
+          {safeBudget.length === 0 ? (
+            <p className="text-sm text-[color:var(--color-text)]/60">
+              {t('finance.overview.noBudget', {
+                defaultValue: 'Todavía no has configurado categorías de presupuesto.',
+              })}
+            </p>
+          ) : (
+            safeBudget.map((category, index) => {
+              const percentage = toFinite(category.percentage);
+              const action = () =>
+                handleNavigate({ categoryFilter: category.name, typeFilter: 'expense' });
+              return (
                 <div
-                  className={`ml-3 px-2 py-1 rounded-full text-xs font-medium ${getBudgetStatusColor(percentage)}`}
+                  key={index}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 hover:bg-[var(--color-accent)]/10 transition"
+                  role="button"
+                  tabIndex={0}
+                  onClick={action}
+                  onKeyDown={(event) => handleAccessibleClick(event, action)}
                 >
-                  <div className="flex items-center space-x-1">
-                    {getBudgetIcon(percentage)}
-                    <span>{percentage.toFixed(0)}%</span>
+                  <div className="flex-1 pr-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-[color:var(--color-text)]/80">
+                        {category.name}
+                      </span>
+                      <span className="text-sm text-[color:var(--color-text)]/60">
+                        {formatCurrency(category.spent)} / {formatCurrency(category.amount)}
+                      </span>
+                    </div>
+                    <div className="w-full rounded-full h-2 bg-[color:var(--color-text)]/10">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          percentage >= 100
+                            ? 'bg-[var(--color-danger)]'
+                            : percentage >= warnThreshold
+                              ? 'bg-[var(--color-warning)]'
+                              : 'bg-[var(--color-success)]'
+                        }`}
+                        style={{ width: `${Math.min(percentage, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={`ml-3 px-2 py-1 rounded-full text-xs font-medium ${getBudgetStatusColor(
+                      percentage
+                    )}`}
+                  >
+                    <div className="flex items-center space-x-1">
+                      {getBudgetIcon(percentage)}
+                      <span>{percentage.toFixed(0)}%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </Card>
-
-      {projection?.summary && (
-        <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-          <h3 className="text-lg font-semibold text-[color:var(--color-text)] mb-3">
-            {t('finance.overview.projectionTitle', { defaultValue: 'Proyección financiera' })}
-          </h3>
-          <p className="text-sm text-[color:var(--color-text)]/70 mb-4">
-            {t('finance.overview.projectionHint', {
-              defaultValue:
-                'Estimaciones basadas en aportaciones configuradas, regalos esperados e importes pendientes.',
-            })}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div className="bg-[var(--color-success)]/10 border border-[color:var(--color-success)]/30 rounded-md p-3">
-              <p className="text-xs uppercase tracking-wide text-[color:var(--color-success)]/80">
-                {t('finance.overview.projectedAtWedding', { defaultValue: 'Balance el día de la boda' })}
-              </p>
-              <p className="text-lg font-semibold text-[color:var(--color-success)]">
-                {formatCurrency(projection.summary.projectedAtWedding ?? 0)}
-              </p>
-            </div>
-            <div className="bg-[var(--color-warning)]/10 border border-[color:var(--color-warning)]/30 rounded-md p-3">
-              <p className="text-xs uppercase tracking-wide text-[color:var(--color-warning)]/80">
-                {t('finance.overview.minBalance', { defaultValue: 'Punto de balance mínimo' })}
-              </p>
-              <p className="text-lg font-semibold text-[color:var(--color-warning)]">
-                {formatCurrency(projection.summary.minProjectedBalance ?? 0)}
-              </p>
-              {projection.summary.minProjectedBalanceDate && (
-                <p className="text-xs text-[color:var(--color-text)]/60">
-                  {t('finance.overview.onDate', { defaultValue: 'en' })}{' '}
-                  {projection.summary.minProjectedBalanceDate}
-                </p>
-              )}
-            </div>
-            <div className="bg-[var(--color-text)]/5 border border-[color:var(--color-text)]/15 rounded-md p-3">
-              <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/70">
-                {t('finance.overview.riskDays', { defaultValue: 'Días en riesgo' })}
-              </p>
-              <p className="text-lg font-semibold text-[color:var(--color-text)]">
-                {projection.summary.riskDays ?? 0}
-              </p>
-              <p className="text-xs text-[color:var(--color-text)]/60">
-                {t('finance.overview.totalProjectedGifts', {
-                  defaultValue: 'Regalos proyectados:',
-                })}{' '}
-                {formatCurrency(projection.summary.totalProjectedGifts ?? 0)}
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
     </div>
   );
 }
+

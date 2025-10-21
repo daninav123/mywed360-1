@@ -282,6 +282,32 @@ export default function LongTermTasksGantt({
     return map;
   }, [normalizedSubtasks]);
 
+  const datasetBounds = useMemo(() => {
+    let min = null;
+    let max = null;
+
+    const track = (value) => {
+      if (!value) return;
+      const date = value instanceof Date ? value : normalizeAnyDate(value);
+      if (!date || Number.isNaN(date.getTime())) return;
+      if (!min || date < min) min = date;
+      if (!max || date > max) max = date;
+    };
+
+    const scanTasks = Array.isArray(normalizedTasks) ? normalizedTasks : [];
+    scanTasks.forEach((task) => {
+      track(task?.start ?? task?.startDate ?? task?.date ?? task?.when);
+      track(task?.end ?? task?.endDate ?? task?.until ?? task?.finish ?? task?.to ?? task?.start);
+    });
+
+    normalizedSubtasks.forEach((subtask) => {
+      track(subtask.start);
+      track(subtask.end);
+    });
+
+    return { min, max };
+  }, [normalizedTasks, normalizedSubtasks]);
+
   // 4) Fechas base
   const registrationDate = useMemo(() => {
     const ps = normalizeAnyDate(projectStart);
@@ -301,11 +327,29 @@ export default function LongTermTasksGantt({
     return normalizeAnyDate(raw);
   }, [projectEnd, markerDate]);
 
-  const timelineStart = registrationDate;
-  const timelineEnd = useMemo(
-    () => (weddingBaseDate ? addMonths(weddingBaseDate, extendMonthsAfterEnd) : addMonths(registrationDate, 24)),
-    [weddingBaseDate, registrationDate, extendMonthsAfterEnd]
-  );
+  const timelineStart = useMemo(() => {
+    const fallback = registrationDate ? new Date(registrationDate) : new Date();
+    const earliest = datasetBounds.min;
+    if (earliest && earliest < fallback) {
+      return new Date(earliest);
+    }
+    return fallback;
+  }, [registrationDate, datasetBounds]);
+
+  const baseTimelineEnd = useMemo(() => {
+    if (weddingBaseDate) return addMonths(weddingBaseDate, extendMonthsAfterEnd);
+    const anchor = timelineStart || registrationDate || new Date();
+    return addMonths(anchor, 24);
+  }, [weddingBaseDate, extendMonthsAfterEnd, timelineStart, registrationDate]);
+
+  const timelineEnd = useMemo(() => {
+    const latest = datasetBounds.max;
+    if (latest && baseTimelineEnd) {
+      return latest > baseTimelineEnd ? new Date(latest) : baseTimelineEnd;
+    }
+    if (latest) return new Date(latest);
+    return baseTimelineEnd;
+  }, [baseTimelineEnd, datasetBounds]);
 
   // 5) Escala mensual
   const monthStart = new Date(timelineStart.getFullYear(), timelineStart.getMonth(), 1);
@@ -317,12 +361,10 @@ export default function LongTermTasksGantt({
   const totalMonths = Math.max(1, diffMonths(monthStart, endMonthStart) + 1);
   const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
   const availableWidth = Math.max(360, viewportWidth - leftColumnWidth - 120);
-  const baseWidth = monthsDiff * colW + endFrac * colW;
-  const shrinkFactor = baseWidth > availableWidth ? Math.max(availableWidth / baseWidth, 0.2) : 1;
-  const effectiveColW = colW * shrinkFactor;
+  const effectiveColW = colW;
   const scaledWidth = monthsDiff * effectiveColW + endFrac * effectiveColW;
   const contentWidth = Math.max(scaledWidth + effectiveColW * 0.5, availableWidth);
-  const horizontalOverflow = scaledWidth > availableWidth + 1;
+  const horizontalOverflow = contentWidth > availableWidth + 1;
 
   const todayMarker = useMemo(() => {
     try {
@@ -1214,4 +1256,3 @@ export default function LongTermTasksGantt({
     </div>
   );
 }
-

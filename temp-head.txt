@@ -1,9 +1,0 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { fetchWeddingNews } from '../services/blogService';
-import Spinner from '../components/Spinner';
-import { getBackendBase } from '@/utils/backendBase.js';
-import PageWrapper from '../components/PageWrapper';
-
-export default function Blog() {
-  const { i18n } = useTransla
