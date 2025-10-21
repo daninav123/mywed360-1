@@ -649,3 +649,18 @@ export const exportPortfolioPDF = async (filters = {}, format = 'summary') => {
   }
   return response.json();
 };
+
+export const getProductMetrics = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/metrics/product`);
+  return data || { featureAdoption: {}, newRegistrations: {} };
+};
+
+export const getTechnicalMetrics = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/metrics/technical`);
+  return data || { performance: {}, uptime: 0, errorRate: 0 };
+};
+
+export const getEconomicMetrics = async () => {
+  const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/metrics/economic`);
+  return data || { cac: 0, ltv: 0, cacLtvRatio: 0 };
+};

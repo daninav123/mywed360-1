@@ -1187,9 +1187,14 @@ router.get('/metrics', async (_req, res) => {
     // userStats / weddingStats en tiempo real (best-effort)
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * DAY_MS);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
     const sevenTimestamp = admin.firestore.Timestamp.fromDate(sevenDaysAgo);
+    const thirtyTimestamp = admin.firestore.Timestamp.fromDate(thirtyDaysAgo);
+    
     const usersTotal = await countDocuments(collections.users);
     const usersActive7d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: sevenTimestamp }]);
+    const usersActive30d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: thirtyTimestamp }]);
+    
     // Weddings: intentar raíz y luego grupo
     let weddingsTotal = await countDocuments(collections.weddings);
     if (!weddingsTotal) {
@@ -1199,7 +1204,7 @@ router.get('/metrics', async (_req, res) => {
     if (!weddingsActive) {
       try { weddingsActive = await countDocuments(collections.weddingsGroup, [{ field: 'status', op: '==', value: 'active' }]); } catch { weddingsActive = 0; }
     }
-    // plannerIds puede no existir en subcolecciones; mantener best-effort con raíz
+    
     const withPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '!=', value: [] }]).catch(() => 0);
     const withoutPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '==', value: [] }]).catch(() => 0);
 
@@ -1233,23 +1238,143 @@ router.get('/metrics', async (_req, res) => {
         iaCosts = [];
       }
     }
+    
     const userStats = {
       total: usersTotal,
       active7d: usersActive7d,
+      active30d: usersActive30d,
+      dau: usersActive7d / 7, // Aproximación
+      mau: usersActive30d,
+      stickiness: usersActive30d > 0 ? ((usersActive7d / 7) / usersActive30d * 100).toFixed(1) : 0,
       byRole: { owner: 0, planner: 0, assistant: 0 },
       source: 'realtime',
     };
+    
     const weddingStats = {
       total: weddingsTotal,
       active: weddingsActive,
       withPlanner,
       withoutPlanner,
+      completionRate: weddingsTotal > 0 ? ((weddingsActive / weddingsTotal) * 100).toFixed(1) : 0,
       source: 'realtime',
     };
-    res.json({ series, funnel, iaCosts, communications, supportMetrics, userStats, weddingStats, conversionMetrics, recurringRevenue, retentionData });
+    
+    res.json({ 
+      series, 
+      funnel, 
+      iaCosts, 
+      communications, 
+      supportMetrics, 
+      userStats, 
+      weddingStats, 
+      conversionMetrics, 
+      recurringRevenue, 
+      retentionData 
+    });
   } catch (error) {
     logger.error('[admin-dashboard] metrics error', error);
     res.status(500).json({ error: 'admin_dashboard_metrics_failed' });
+  }
+});
+
+// Nuevos endpoints de métricas detalladas
+router.get('/metrics/product', async (_req, res) => {
+  try {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
+    
+    // Feature adoption
+    const weddingsSnap = await collections.weddings().limit(500).get();
+    let featureAdoption = {
+      invitados: 0,
+      seating: 0,
+      momentos: 0,
+      presupuesto: 0,
+      tareas: 0,
+      webEditor: 0,
+    };
+    
+    for (const doc of weddingsSnap.docs) {
+      const wedding = doc.data();
+      if (wedding.guestCount > 0) featureAdoption.invitados++;
+      if (wedding.seatingCompleted) featureAdoption.seating++;
+      if (wedding.momentosEnabled) featureAdoption.momentos++;
+      if (wedding.budget?.total) featureAdoption.presupuesto++;
+      if (wedding.tasksCount > 0) featureAdoption.tareas++;
+      if (wedding.invitationUrl) featureAdoption.webEditor++;
+    }
+    
+    const total = weddingsSnap.size || 1;
+    const featureAdoptionPercent = {
+      invitados: ((featureAdoption.invitados / total) * 100).toFixed(1),
+      seating: ((featureAdoption.seating / total) * 100).toFixed(1),
+      momentos: ((featureAdoption.momentos / total) * 100).toFixed(1),
+      presupuesto: ((featureAdoption.presupuesto / total) * 100).toFixed(1),
+      tareas: ((featureAdoption.tareas / total) * 100).toFixed(1),
+      webEditor: ((featureAdoption.webEditor / total) * 100).toFixed(1),
+    };
+    
+    // Nuevos registros últimos 30 días
+    const newUsersSnap = await collections.users()
+      .where('createdAt', '>=', admin.firestore.Timestamp.fromDate(thirtyDaysAgo))
+      .get();
+    
+    res.json({
+      featureAdoption: featureAdoptionPercent,
+      newRegistrations: {
+        last30days: newUsersSnap.size,
+        daily: (newUsersSnap.size / 30).toFixed(1)
+      }
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] product metrics error', error);
+    res.status(500).json({ error: 'product_metrics_failed' });
+  }
+});
+
+router.get('/metrics/technical', async (_req, res) => {
+  try {
+    // Web Vitals simulados (TODO: integrar con monitorización real)
+    const technicalMetrics = {
+      performance: {
+        lcp: 2.1,
+        fid: 85,
+        cls: 0.08,
+        ttfb: 145
+      },
+      uptime: 99.92,
+      errorRate: 0.12,
+      avgResponseTime: 145
+    };
+    
+    res.json(technicalMetrics);
+  } catch (error) {
+    logger.error('[admin-dashboard] technical metrics error', error);
+    res.status(500).json({ error: 'technical_metrics_failed' });
+  }
+});
+
+router.get('/metrics/economic', async (_req, res) => {
+  try {
+    const recurringRevenue = await calculateRecurringRevenue();
+    const conversionMetrics = await calculateConversionMetrics();
+    
+    // CAC & LTV (simulados - TODO: integrar con datos reales de marketing)
+    const cac = 45.50; // Coste de adquisición por cliente
+    const ltv = recurringRevenue.avgTicket * 12; // Simplificado: ticket medio × 12 meses
+    const cacLtvRatio = ltv / cac;
+    
+    res.json({
+      cac,
+      ltv: ltv.toFixed(2),
+      cacLtvRatio: cacLtvRatio.toFixed(2),
+      paybackPeriod: (cac / recurringRevenue.avgTicket).toFixed(1),
+      recurringRevenue,
+      conversionMetrics
+    });
+  } catch (error) {
+    logger.error('[admin-dashboard] economic metrics error', error);
+    res.status(500).json({ error: 'economic_metrics_failed' });
   }
 });
 
