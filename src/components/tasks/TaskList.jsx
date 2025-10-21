@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { categories } from './CalendarComponents.jsx';
+import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.js';
 
 // Componente para mostrar la lista de tareas críticas de la semana
-const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete, parentNameMap = {} }) => {
+const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete, parentNameMap = {}, dependencyStatuses = new Map() }) => {
   const sortedTasks = Array.isArray(tasks)
     ? (() => {
         const todayStart = new Date();
@@ -106,21 +107,26 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
               {items.map((event) => {
                 const cat = categories[event.category] || categories.OTROS;
                 const isCompleted = completedSet ? completedSet.has(String(event.id)) : false;
+                const depStatus = dependencyStatuses.get(String(event.id));
+                const isBlocked = depStatus?.isBlocked || false;
+                
                 return (
                   <div
                     key={event.id}
-                    className="p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                    className={`p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer ${isBlocked && !isCompleted ? 'opacity-60' : ''}`}
                     onClick={() => onTaskClick(event)}
                     style={{
-                      borderColor: cat.borderColor,
-                      backgroundColor: `${cat.bgColor}40`,
+                      borderColor: isBlocked && !isCompleted ? '#ef4444' : cat.borderColor,
+                      backgroundColor: isBlocked && !isCompleted ? '#fee2e2' : `${cat.bgColor}40`,
                     }}
+                    title={isBlocked ? 'Tarea bloqueada por dependencias' : ''}
                   >
                     <div className="flex items-start">
                       <div className="mr-2 flex items-center">
                         <input
                           type="checkbox"
                           checked={isCompleted}
+                          disabled={isBlocked && !isCompleted}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => {
                             e.stopPropagation();
@@ -128,6 +134,7 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
                               onToggleComplete(String(event.id), e.target.checked);
                             }
                           }}
+                          className={isBlocked && !isCompleted ? 'cursor-not-allowed opacity-50' : ''}
                         />
                       </div>
                       <div className="flex-1">
@@ -136,6 +143,7 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
                           <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cat.bgColor}30`, color: cat.color, border: `1px solid ${cat.borderColor}` }}>
                             {cat.name}
                           </span>
+                          {depStatus && <DependencyIndicator depStatus={depStatus} />}
                         </div>
                         {event.desc && (
                           <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">
@@ -145,6 +153,11 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
                         {event.assignee && (
                           <div className="text-xs text-[color:var(--color-text)]/60 mt-1">
                             Asignado a: {event.assignee}
+                          </div>
+                        )}
+                        {depStatus && depStatus.allDeps.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-gray-200">
+                            <DependencyTooltip depStatus={depStatus} />
                           </div>
                         )}
                       </div>

@@ -1,13 +1,12 @@
-﻿import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 import useActiveWeddingInfo from './useActiveWeddingInfo';
 import { useAuth } from './useAuth';
 import { post as apiPost, get as apiGet } from '../services/apiClient';
 
-// Utils
 const slugify = (value) =>
   !value
-    ?''
+    ? ''
     : String(value)
         .toLowerCase()
         .trim()
@@ -27,14 +26,18 @@ const guessServiceFromQuery = (query) => {
 };
 
 const ensureMatchScore = (match, index) => {
-  if (typeof match === 'number' && !Number.isNaN(match)) return Math.max(0, Math.min(100, Math.round(match)));
+  if (typeof match === 'number' && !Number.isNaN(match)) {
+    return Math.max(0, Math.min(100, Math.round(match)));
+  }
   return Math.max(60, 95 - index * 5);
 };
 
 const generateAISummary = (item, query) => {
   const highlights = [];
   const queryWords = query.toLowerCase().split(' ');
-  if (item.tags?.some((tag) => queryWords.includes(tag.toLowerCase()))) highlights.push('Coincide con tus preferencias clave.');
+  if (item.tags?.some((tag) => queryWords.includes(tag.toLowerCase()))) {
+    highlights.push('Coincide con tus preferencias clave.');
+  }
   if (item.price) highlights.push(`Rango de precio estimado: ${item.price}.`);
   if (item.location) highlights.push(`Ubicado en ${item.location}.`);
   return highlights.join(' ');
@@ -52,23 +55,129 @@ const normalizeResult = (item, index, query, source) => {
   const image = item?.image || '';
   const email = item?.email || '';
   const phone = item?.phone || '';
-  const tags = Array.isArray(item?.tags) ?item.tags : [];
-  const keywords = Array.isArray(item?.keywords) ?item.keywords : [];
+  const tags = Array.isArray(item?.tags) ? item.tags : [];
+  const keywords = Array.isArray(item?.keywords) ? item.keywords : [];
   const baseId = slugify(item?.id || link || `${name}-${location}`);
-  const id = baseId ?`${baseId}-${index}` : `ai-provider-${index}`;
-  return { id, name, service, snippet, image, location, priceRange, price: priceRange, tags, keywords, match, aiSummary, link, email, phone, source, raw: item };
+  const id = baseId ? `${baseId}-${index}` : `ai-provider-${index}`;
+
+  return {
+    id,
+    name,
+    service,
+    snippet,
+    image,
+    location,
+    priceRange,
+    price: priceRange,
+    tags,
+    keywords,
+    match,
+    aiSummary,
+    link,
+    email,
+    phone,
+    source,
+    raw: item,
+  };
 };
 
 const generateDemoResults = (query) => {
   const demoDatabase = [
-    { id: '1', name: 'Fotografia Naturaleza Viva', service: 'Fotografia', snippet: 'Estudio especializado en fotografia de bodas con estilo natural y documental. Capturamos los momentos mas emotivos y espontaneos.', image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60', location: 'Madrid', price: '1200 EUR - 2500 EUR', tags: ['natural', 'documental', 'exterior', 'luz natural'], keywords: ['fotografo', 'natural', 'documental', 'boda'] },
-    { id: '2', name: 'Lente Azul Fotografia', service: 'Fotografia', snippet: 'Más de 10 años de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.', image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60', location: 'Barcelona', price: '1500 EUR - 3000 EUR', tags: ['playa', 'exterior', 'naturaleza'], keywords: ['fotografo', 'boda', 'playa', 'experiencia'] },
-    { id: '3', name: 'Catering Delicious Moments', service: 'Catering', snippet: 'Catering con opciones vegetarianas, veganas y alergias. Especialistas en eventos de 50 a 200 personas.', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60', location: 'Madrid', price: '70 EUR - 120 EUR por persona', tags: ['vegetariano', 'vegano', 'buffet'], keywords: ['catering', 'buffet', 'evento'] },
-    { id: '4', name: 'DJ Sounds & Lights', service: 'Musica', snippet: 'DJ con equipo profesional de sonido e iluminacion. Amplia experiencia en bodas y eventos corporativos.', image: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60', location: 'Valencia', price: '800 EUR - 1500 EUR', tags: ['dj', 'musica', 'iluminacion'], keywords: ['dj', 'musica', 'evento'] },
-    { id: '5', name: 'Flores del Jardin', service: 'Flores', snippet: 'Floristeria artesanal especializada en decoracion vintage y boho. Trabajamos con producto local de temporada.', image: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60', location: 'Sevilla', price: '500 EUR - 1500 EUR', tags: ['flores', 'decoracion', 'boho'], keywords: ['flores', 'decoracion', 'boda'] },
+    {
+      id: '1',
+      name: 'Fotografia Naturaleza Viva',
+      service: 'Fotografia',
+      snippet:
+        'Estudio especializado en fotografia de bodas con estilo natural y documental. Capturamos los momentos mas emotivos y espontaneos.',
+      image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=500&q=60',
+      location: 'Madrid',
+      price: '1200 EUR - 2500 EUR',
+      tags: ['natural', 'documental', 'exterior', 'luz natural'],
+      keywords: ['fotografo', 'natural', 'documental', 'boda'],
+    },
+    {
+      id: '2',
+      name: 'Lente Azul Fotografia',
+      service: 'Fotografia',
+      snippet:
+        'Mas de 10 anos de experiencia en bodas en playa y espacios naturales. Paquetes personalizados para cada pareja.',
+      image: 'https://images.unsplash.com/photo-1508435234994-67cfd7690508?auto=format&fit=crop&w=500&q=60',
+      location: 'Barcelona',
+      price: '1500 EUR - 3000 EUR',
+      tags: ['playa', 'exterior', 'naturaleza'],
+      keywords: ['fotografo', 'boda', 'playa', 'experiencia'],
+    },
+    {
+      id: '3',
+      name: 'Catering Delicious Moments',
+      service: 'Catering',
+      snippet:
+        'Catering con opciones vegetarianas, veganas y alergias. Especialistas en eventos de 50 a 200 personas.',
+      image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=500&q=60',
+      location: 'Madrid',
+      price: '70 EUR - 120 EUR por persona',
+      tags: ['vegetariano', 'vegano', 'buffet'],
+      keywords: ['catering', 'buffet', 'evento'],
+    },
+    {
+      id: '4',
+      name: 'DJ Sounds & Lights',
+      service: 'Musica',
+      snippet:
+        'DJ con equipo profesional de sonido e iluminacion. Amplia experiencia en bodas y eventos corporativos.',
+      image: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?auto=format&fit=crop&w=500&q=60',
+      location: 'Valencia',
+      price: '800 EUR - 1500 EUR',
+      tags: ['dj', 'musica', 'iluminacion'],
+      keywords: ['dj', 'musica', 'evento'],
+    },
+    {
+      id: '5',
+      name: 'Flores del Jardin',
+      service: 'Flores',
+      snippet:
+        'Floristeria artesanal especializada en decoracion vintage y boho. Trabajamos con producto local de temporada.',
+      image: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=60',
+      location: 'Sevilla',
+      price: '500 EUR - 1500 EUR',
+      tags: ['flores', 'decoracion', 'boho'],
+      keywords: ['flores', 'decoracion', 'boda'],
+    },
   ];
-  return demoDatabase.map((item, index) => normalizeResult({ ...item, priceRange: item.price, match: ensureMatchScore(item.match, index), aiSummary: generateAISummary(item, query) }, index, query, 'ai-demo'));
+
+  return demoDatabase.map((item, index) =>
+    normalizeResult(
+      {
+        ...item,
+        priceRange: item.price,
+        match: ensureMatchScore(item.match, index),
+        aiSummary: generateAISummary(item, query),
+      },
+      index,
+      query,
+      'ai-demo'
+    )
+  );
 };
+
+const rawBackendFlag =
+  import.meta?.env?.VITE_ENABLE_AI_SUPPLIERS ??
+  import.meta?.env?.VITE_AI_SUPPLIERS ??
+  import.meta?.env?.VITE_AI_SUPPLIERS_ENABLED;
+
+const ENABLE_BACKEND_AI =
+  rawBackendFlag === undefined ||
+  rawBackendFlag === null ||
+  String(rawBackendFlag).trim() === ''
+    ? true
+    : String(rawBackendFlag)
+        .trim()
+        .match(/^(1|true|on|enabled)$/i);
+
+const ENABLE_DEMO_FALLBACK =
+  (import.meta?.env?.VITE_AI_SUPPLIERS_DEMO || import.meta?.env?.VITE_SUPPLIERS_AI_DEMO || '')
+    .toString()
+    .match(/^(1|true|on)$/i);
 
 export const useAISearch = () => {
   const [results, setResults] = useState([]);
@@ -82,74 +191,135 @@ export const useAISearch = () => {
   const searchProviders = useCallback(
     async (query, opts = {}) => {
       if (!query?.trim() || !user) return [];
+
       setLoading(true);
       setLastQuery(query);
       setError(null);
       setUsedFallback(false);
 
-      // Contexto de boda para backend y fallback
       const profile = (weddingDoc && (weddingDoc.weddingInfo || weddingDoc)) || {};
-      const location = profile.celebrationPlace || profile.location || profile.city || profile.ceremonyLocation || profile.receptionVenue || '';
-      const budget = profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
+      const location =
+        profile.celebrationPlace ||
+        profile.location ||
+        profile.city ||
+        profile.ceremonyLocation ||
+        profile.receptionVenue ||
+        '';
+      const budget =
+        profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
       const inferredService = (opts && opts.service) || guessServiceFromQuery(query);
+      const allowFallback = opts?.allowFallback ?? Boolean(ENABLE_DEMO_FALLBACK);
 
-      // Habilitar backend sólo si la variable de entorno lo indica
-      const ENABLE_BACKEND_AI = true;
+      let lastError = null;
 
       try {
         if (ENABLE_BACKEND_AI) {
-          const res = await apiPost('/api/ai/search', { query, service: inferredService, budget, profile, location }, { auth: true, silent: true });
-          if (res && res.ok) {
-            const data = await res.json();
-            if (Array.isArray(data) && data.length) {
-              const normalized = data
+          const res = await apiPost(
+            '/api/ai-suppliers',
+            { query, service: inferredService, budget, profile, location },
+            { auth: true, silent: true }
+          );
+          if (res?.ok) {
+            const data = await res.json().catch(() => null);
+            const arr = Array.isArray(data) ? data : [];
+            if (arr.length) {
+              const normalized = arr
                 .filter((item) => item && (item.title || item.name))
-                .map((item, index) => normalizeResult({ ...item, name: item.name || item.title, service: item.service || inferredService, priceRange: item.priceRange, snippet: item.snippet }, index, query, 'ai-backend'));
+                .map((item, index) =>
+                  normalizeResult(
+                    {
+                      ...item,
+                      name: item.name || item.title,
+                      service: item.service || inferredService,
+                      priceRange: item.priceRange || item.price,
+                      snippet: item.snippet,
+                    },
+                    index,
+                    query,
+                    'ai-backend'
+                  )
+                );
               if (normalized.length) {
                 const refined = refineResults(normalized, { service: inferredService, location });
                 setResults(refined);
-                setUsedFallback(false);
                 setLoading(false);
                 return refined;
               }
             }
+          } else {
+            const payload = await res.json().catch(() => null);
+            const message =
+              (payload && (payload.error || payload.message)) ||
+              `La busqueda IA respondio ${res?.status || 'desconocido'}`;
+            throw new Error(message);
           }
         }
-        // Intentar motor de búsqueda real del backend si está configurado (SerpAPI)
-        try {
-          const q = [query, inferredService, location].filter(Boolean).join(' ');
-          const res2 = await apiGet(`/api/ai/search?q=${encodeURIComponent(q)}`, { silent: true });
-          if (res2 && res2.ok) {
-            const json = await res2.json();
-            const arr = Array.isArray(json?.results) ?json.results : [];
-            if (arr.length) {
-              const normalized = arr.map((item, index) => normalizeResult({
-                name: item.title,
-                title: item.title,
-                link: item.link,
-                snippet: item.snippet,
-                service: inferredService,
-                location,
-              }, index, query, 'web-search'));
-              const refined = refineResults(normalized, { service: inferredService, location });
-              setResults(refined);
-              setUsedFallback(false);
-              setLoading(false);
-              return refined;
-            }
-          }
-        } catch {}
       } catch (backendError) {
         console.warn('Fallo consultando ai-suppliers', backendError);
+        lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
       }
 
-      // Fallback local inmediato
-      const demoResults = generateDemoResults(query);
-      const refined = refineResults(demoResults, { service: inferredService, location });
-      setResults(refined);
-      setUsedFallback(true);
+      try {
+        const q = [query, inferredService, location].filter(Boolean).join(' ');
+        const res2 = await apiGet(`/api/ai/search-suppliers?q=${encodeURIComponent(q)}`, {
+          silent: true,
+        });
+        if (res2?.ok) {
+          const json = await res2.json().catch(() => null);
+          const arr = Array.isArray(json?.results) ? json.results : [];
+          if (arr.length) {
+            const normalized = arr.map((item, index) =>
+              normalizeResult(
+                {
+                  name: item.title || item.name,
+                  title: item.title || item.name,
+                  link: item.link,
+                  snippet: item.snippet,
+                  service: inferredService,
+                  location,
+                },
+                index,
+                query,
+                'web-search'
+              )
+            );
+            const refined = refineResults(normalized, { service: inferredService, location });
+            setResults(refined);
+            setLoading(false);
+            return refined;
+          }
+        } else if (res2) {
+          const payload = await res2.json().catch(() => null);
+          const message =
+            (payload && (payload.error || payload.message)) ||
+            `El buscador externo respondio ${res2.status}`;
+          lastError = lastError || new Error(message);
+        }
+      } catch (searchErr) {
+        console.warn('Fallo consultando search-suppliers', searchErr);
+        if (!lastError) {
+          lastError = searchErr instanceof Error ? searchErr : new Error(String(searchErr || 'Error'));
+        }
+      }
+
+      if (allowFallback) {
+        const demoResults = generateDemoResults(query);
+        const refined = refineResults(demoResults, { service: inferredService, location });
+        setResults(refined);
+        setUsedFallback(true);
+        setLoading(false);
+        return refined;
+      }
+
+      setResults([]);
+      setUsedFallback(false);
+      if (lastError) {
+        setError(lastError);
+      } else {
+        setError(new Error('No se encontraron resultados para esta busqueda.'));
+      }
       setLoading(false);
-      return refined;
+      return [];
     },
     [user, weddingDoc]
   );
@@ -166,20 +336,18 @@ export const useAISearch = () => {
 
 export default useAISearch;
 
-// Refinado: servicio estricto y ubicación estricta si hay matches; si no, blando por zona
 function refineResults(list, ctx) {
   const serviceRef = String(ctx?.service || '').toLowerCase();
   const locRef = String(ctx?.location || '').toLowerCase();
   if (!Array.isArray(list) || (!serviceRef && !locRef)) return list || [];
 
   let byService = serviceRef
-    ?(list || []).filter((it) => {
+    ? (list || []).filter((it) => {
         const service = String(it?.service || '').toLowerCase();
         return includesWord(service, serviceRef) || includesWord(serviceRef, service);
       })
     : (list || []).slice();
 
-  // Si el filtro de servicio no produce coincidencias (p. ej., servicio no reconocido), usar la lista completa
   if (serviceRef && byService.length === 0) {
     byService = (list || []).slice();
   }
@@ -188,17 +356,18 @@ function refineResults(list, ctx) {
     const src = it || {};
     const service = String(src.service || '').toLowerCase();
     const location = String(src.location || '').toLowerCase();
-    const base = typeof src.match === 'number' ?src.match : 60;
-    const serviceMatch = serviceRef && service ?includesWord(service, serviceRef) || includesWord(serviceRef, service) : false;
-    const locMatch = locRef && location ?location.includes(locRef) || locRef.includes(location) : false;
+    const base = typeof src.match === 'number' ? src.match : 60;
+    const serviceMatch =
+      serviceRef && service ? includesWord(service, serviceRef) || includesWord(serviceRef, service) : false;
+    const locMatch = locRef && location ? location.includes(locRef) || locRef.includes(location) : false;
     let boost = 0;
-    if (serviceRef) boost += serviceMatch ?10 : -5;
-    if (locRef) boost += locMatch ?15 : -10;
+    if (serviceRef) boost += serviceMatch ? 10 : -5;
+    if (locRef) boost += locMatch ? 15 : -10;
     const match = Math.max(0, Math.min(100, Math.round(base + boost)));
     let aiSummary = src.aiSummary || '';
     if (locRef && locMatch && !/zona|\bubicaci[óo]n|\bdisponible/i.test(aiSummary)) {
       const humanLoc = ctx.location || '';
-      aiSummary = (aiSummary ?aiSummary + ' ' : '') + `Disponible en la zona de ${humanLoc}.`;
+      aiSummary = (aiSummary ? aiSummary + ' ' : '') + `Disponible en la zona de ${humanLoc}.`;
     }
     return { ...src, match, aiSummary };
   });
@@ -208,8 +377,11 @@ function refineResults(list, ctx) {
       const lx = String(x.location || '').toLowerCase();
       return lx.includes(locRef) || locRef.includes(lx);
     });
-    if (strictLoc.length > 0) return strictLoc.sort((a, b) => (b.match || 0) - (a.match || 0));
+    if (strictLoc.length > 0) {
+      return strictLoc.sort((a, b) => (b.match || 0) - (a.match || 0));
+    }
   }
+
   return scored.sort((a, b) => (b.match || 0) - (a.match || 0));
 }
 
@@ -222,4 +394,3 @@ function includesWord(haystack, needle) {
   const nw = n.split(/[\s,/-]+/);
   return hw.some((w) => nw.includes(w));
 }
-

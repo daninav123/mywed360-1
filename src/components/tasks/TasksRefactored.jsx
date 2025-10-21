@@ -20,6 +20,7 @@ import EventsCalendar from './EventsCalendar.jsx';
 import { useGanttSizing } from './hooks/useGanttSizing.js';
 import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks.js';
 import { useSafeEvents } from './hooks/useSafeEvents.js';
+import { useTaskDependencies } from './hooks/useTaskDependencies.js';
 import LongTermTasksGantt from './LongTermTasksGantt.jsx';
 import AllTasksModal from './AllTasksModal.jsx';
 import TaskForm from './TaskForm.jsx';
@@ -1691,11 +1692,39 @@ export default function TasksRefactored() {
       }
     })();
   }, [activeWedding, db, projectEnd, tasksState]);
-  // Toggle rÍpido de completado (lista/fallback)
+  
+  // Hook de dependencias entre tareas
+  const allTasksForDeps = useMemo(() => {
+    const combined = [
+      ...(Array.isArray(tasksState) ? tasksState : []),
+      ...(Array.isArray(subtaskEvents) ? subtaskEvents : [])
+    ];
+    return combined;
+  }, [tasksState, subtaskEvents]);
+
+  const { 
+    isTaskBlocked, 
+    getTaskDependencyStatus, 
+    getUnblockedTasks,
+    blockedTasksMap 
+  } = useTaskDependencies(allTasksForDeps, completedIdSet);
+
+  // Estado para notificaciones de desbloqueo
+  const [unlockNotification, setUnlockNotification] = useState(null);
+
+  // Toggle rápido de completado con detección de desbloqueos
   const toggleCompleteById = useCallback(
     async (id, nextCompleted) => {
       try {
         if (!activeWedding || !id) return;
+        
+        if (nextCompleted && isTaskBlocked(id)) {
+          const depStatus = getTaskDependencyStatus(id);
+          const missingNames = depStatus.missingDeps.map(d => d.taskTitle).join(', ');
+          alert(`🔒 No puedes completar esta tarea aún.\n\nDebes completar primero: ${missingNames}`);
+          return;
+        }
+        
         const compRef = doc(db, 'weddings', activeWedding, 'tasksCompleted', String(id));
         if (nextCompleted) {
           await setDoc(
@@ -1703,18 +1732,25 @@ export default function TasksRefactored() {
             { id: String(id), taskId: String(id), completedAt: serverTimestamp() },
             { merge: true }
           );
+          
+          const unblocked = getUnblockedTasks(id);
+          if (unblocked.length > 0) {
+            const unblockedNames = unblocked.map(t => t.title).join(', ');
+            setUnlockNotification({
+              message: `🎉 ¡Excelente! Ahora puedes trabajar en: ${unblockedNames}`,
+              timestamp: Date.now()
+            });
+            
+            setTimeout(() => setUnlockNotification(null), 6000);
+            console.log('[Dependencies] Tareas desbloqueadas:', unblocked);
+          }
         } else {
           await deleteDoc(compRef).catch(() => {});
         }
       } catch (_) {}
     },
-    [activeWedding]
+    [activeWedding, isTaskBlocked, getTaskDependencyStatus, getUnblockedTasks]
   );
-  const weddingMarkerDate = useMemo(() => {
-    return ganttRangeEnd instanceof Date && !isNaN(ganttRangeEnd.getTime())
-      ? new Date(ganttRangeEnd)
-      : null;
-  }, [ganttRangeEnd]);
 
   // Ajuste de Gantt (hooks deben estar a nivel superior del componente)
   useGanttSizing({
@@ -2320,6 +2356,7 @@ export default function TasksRefactored() {
             completedSet={completedIdSet}
             onToggleComplete={(id, val) => toggleCompleteById(id, val)}
             parentNameMap={parentNameMap}
+            dependencyStatuses={blockedTasksMap}
             onTaskClick={(event) => {
             if (handleTaskIntent(event)) return;
             const eventStart = event.start instanceof Date ? event.start : new Date(event.start);

@@ -345,7 +345,10 @@ const Proveedores = () => {
       setSearchDrawerResult(null);
 
       try {
-        const results = await runAISearch(enrichedQuery || trimmed);
+        const results = await runAISearch(enrichedQuery || trimmed, {
+          service: trimmed,
+          allowFallback: false,
+        });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {
           toast.info('No encontramos coincidencias directas. Ajusta la búsqueda o actualiza tu perfil.');
@@ -867,4 +870,3 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
-
