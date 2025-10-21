@@ -225,6 +225,9 @@ const AdminTaskTemplates = () => {
     }
   };
 
+  // Alias para el botón de guardar en vista visual
+  const handleSave = handleSaveDraft;
+
   const handlePublish = async () => {
     if (!form.id) {
       setError('Guarda la plantilla antes de publicarla.');
