@@ -851,10 +851,26 @@ export const createGuestToken = async (
   } = {}
 ) => {
   await ensureFirebase();
+
+  const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
+  const albumSnap = await getDoc(albumRef);
+  const albumData = albumSnap.exists() ? albumSnap.data() || {} : {};
+  const { closesAt } = resolveUploadWindow(albumData);
+  const nowDate = new Date();
+  if (closesAt && nowDate > closesAt) {
+    throw new Error('El periodo para subir recuerdos ya finalizó. Genera un nuevo QR cuando habilites la galería nuevamente.');
+  }
+
   const tokensRef = collection(db, 'weddings', weddingId, 'albums', albumId, 'tokens');
   const tokenId = generateId();
   const tokenSecret = generateToken(24);
-  const expiresAt = nowPlusHours(ttlHours);
+  let expiresAt = nowPlusHours(ttlHours);
+  if (closesAt) {
+    const currentExpiry = expiresAt?.toDate?.() || null;
+    if (!currentExpiry || closesAt.getTime() < currentExpiry.getTime()) {
+      expiresAt = toTimestamp(closesAt);
+    }
+  }
   await setDoc(doc(tokensRef, tokenId), {
     type,
     status: 'active',
@@ -867,10 +883,10 @@ export const createGuestToken = async (
     sceneTargets,
   });
 
-  const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
   await updateDoc(albumRef, {
     'qrCode.latestTokenId': tokenId,
     'qrCode.expiresAt': expiresAt,
+    'uploadWindow.lastTokenAt': serverTimestamp(),
     updatedAt: serverTimestamp(),
   }).catch(() => {});
 
@@ -911,6 +927,16 @@ export const validateGuestToken = async (
   if (data.maxUsages && data.usedCount >= data.maxUsages) {
     throw new Error('El enlace alcanzó su límite de subidas');
   }
+
+  const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
+  const albumSnap = await getDoc(albumRef);
+  const albumData = albumSnap.exists() ? albumSnap.data() || {} : {};
+  const { closesAt } = resolveUploadWindow(albumData);
+  const nowDate = new Date();
+  if (closesAt && nowDate > closesAt) {
+    throw new Error('La galería ya no acepta nuevas fotos (periodo finalizado)');
+  }
+
   return { id: docSnap.id, ...data };
 };
 
@@ -1021,6 +1047,75 @@ export const recordActivity = async (
   );
 };
 
+export const getAlbumEventDate = (album) => resolveAlbumEventDate(album || {});
+
+export const getGalleryUploadState = (album, now = new Date()) => {
+  const safeAlbum = album || {};
+  const { eventDate, closesAt, thresholdBytes, compressionActive } =
+    resolveUploadWindow(safeAlbum);
+  const totalBytes = safeAlbum?.counters?.totalBytes || 0;
+  const optimizedBytes = safeAlbum?.counters?.optimizedBytes || 0;
+  const threshold = thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
+  const windowOpen = !closesAt || now <= closesAt;
+  const remainingMillis = closesAt ? closesAt.getTime() - now.getTime() : null;
+  const percentageUsed = threshold
+    ? Math.min(100, Math.round((totalBytes / threshold) * 100))
+    : null;
+
+  return {
+    eventDate,
+    closesAt,
+    isWindowOpen: windowOpen,
+    totalBytes,
+    optimizedBytes,
+    thresholdBytes: threshold,
+    compressionActive: compressionActive || totalBytes >= threshold,
+    shouldCompressNext: totalBytes >= threshold,
+    remainingMillis,
+    remainingDays:
+      remainingMillis !== null ? Math.ceil(remainingMillis / (1000 * 60 * 60 * 24)) : null,
+    percentageUsed,
+    now,
+  };
+};
+
+export const syncAlbumEventDate = async (
+  weddingId,
+  { albumId = DEFAULT_ALBUM_ID, eventDate } = {}
+) => {
+  if (!weddingId) throw new Error('weddingId es requerido');
+  if (typeof eventDate === 'undefined') return null;
+  await ensureFirebase();
+
+  const albumRef = doc(db, 'weddings', weddingId, 'albums', albumId);
+  const currentSnap = await getDoc(albumRef);
+  if (!currentSnap.exists()) return null;
+  const currentData = currentSnap.data() || {};
+
+  const updates = {};
+  const parsedEventDate = parseDateValue(eventDate);
+
+  if (parsedEventDate) {
+    updates.eventDate = toTimestamp(parsedEventDate);
+    updates['uploadWindow.closesAt'] = toTimestamp(
+      addDays(parsedEventDate, GALLERY_UPLOAD_WINDOW_DAYS_AFTER_EVENT)
+    );
+  } else {
+    updates.eventDate = deleteField();
+    updates['uploadWindow.closesAt'] = deleteField();
+  }
+
+  if (!currentData?.uploadWindow?.compressionThresholdBytes) {
+    updates['uploadWindow.compressionThresholdBytes'] = GALLERY_COMPRESSION_THRESHOLD_BYTES;
+  }
+
+  if (!Object.keys(updates).length) return { id: albumRef.id, ...currentData };
+
+  await updateDoc(albumRef, updates).catch(() => {});
+  const refreshed = await getDoc(albumRef);
+  return refreshed.exists() ? { id: albumRef.id, ...refreshed.data() } : null;
+};
+
 export const getAlbumScenes = (album) =>
   normalizeScenes(album?.settings?.scenes || DEFAULT_SETTINGS.scenes);
 
@@ -1063,6 +1158,9 @@ export default {
   getDownloadLinks,
   markPhotoReaction,
   recordActivity,
+  getAlbumEventDate,
+  getGalleryUploadState,
+  syncAlbumEventDate,
   getAlbumScenes,
   buildGuestShareUrl,
   summarizeByScene,

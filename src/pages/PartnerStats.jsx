@@ -97,47 +97,33 @@ const PartnerStats = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Estadísticas de Partner
-          </h1>
-          <p className="text-gray-600">
-            Panel de seguimiento de tu código promocional
-          </p>
-        </div>
-
-        {/* Código y tipo */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                Código: <span className="text-purple-600">{data.code}</span>
-              </h2>
-              <p className="text-gray-600 capitalize">
-                Tipo: {data.type}
+              <h1 className="text-3xl font-bold text-gray-900">
+                Panel de Partner
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Código: <span className="font-mono font-semibold text-indigo-600">{data.code}</span>
               </p>
-              {data.assignedTo && (
-                <p className="text-sm text-gray-500 mt-2">
-                  Asignado a: {data.assignedTo.name || data.assignedTo.email}
-                </p>
-              )}
             </div>
             <div className="text-right">
-              {data.maxUses && (
-                <p className="text-sm text-gray-600">
-                  Límite de usos: <span className="font-semibold">{data.maxUses}</span>
-                </p>
+              {data.assignedTo?.name && (
+                <p className="text-lg font-semibold text-gray-900">{data.assignedTo.name}</p>
+              )}
+              {data.assignedTo?.email && (
+                <p className="text-sm text-gray-600">{data.assignedTo.email}</p>
               )}
             </div>
           </div>
-
+          
           {/* Fechas de validez */}
           {(data.validFrom || data.validUntil) && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-4 text-sm flex-wrap">
                 {data.validFrom && (
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-green-600" />

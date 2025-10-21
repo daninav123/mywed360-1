@@ -15,10 +15,13 @@ import {
   ensureMomentosAlbum,
   getDownloadLinks,
   getAlbumScenes,
+  getGalleryUploadState,
+  getAlbumEventDate,
   listenAlbum,
   listenGuestProgress,
   listenGuestTokens,
   listenPhotos,
+  syncAlbumEventDate,
   summarizeByScene,
   updateAlbumSettings,
   updatePhotoStatus,
@@ -54,8 +57,24 @@ function resolveShareUrl(token, weddingId) {
   });
 }
 
+const normalizeWeddingDate = (value) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+};
+
+const formatDate = (date) =>
+  date
+    ? date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '';
+
 export default function Momentos() {
-  const { activeWedding, weddingsReady } = useWedding();
+  const { activeWedding, weddingsReady, activeWeddingData } = useWedding();
   const { currentUser } = useAuth();
 
   const [album, setAlbum] = useState(null);
@@ -66,6 +85,23 @@ export default function Momentos() {
   const [shareUrl, setShareUrl] = useState('');
   const [loadingAlbum, setLoadingAlbum] = useState(false);
 
+  const weddingEventDate = useMemo(() => {
+    if (!activeWeddingData) return null;
+    return (
+      normalizeWeddingDate(
+        activeWeddingData.weddingDate ||
+          activeWeddingData.date ||
+          activeWeddingData.eventDate ||
+          null
+      ) || null
+    );
+  }, [
+    activeWeddingData?.weddingDate,
+    activeWeddingData?.date,
+    activeWeddingData?.eventDate,
+  ]);
+  const weddingEventDateKey = weddingEventDate ? weddingEventDate.toISOString() : null;
+
   useEffect(() => {
     if (!activeWedding) return undefined;
     let unsubAlbum = null;
@@ -74,7 +110,9 @@ export default function Momentos() {
     let unsubGuestProgress = null;
     setLoadingAlbum(true);
 
-    ensureMomentosAlbum(activeWedding)
+    ensureMomentosAlbum(activeWedding, {
+      eventDate: weddingEventDate || undefined,
+    })
       .then(() => {
         listenAlbum(
           activeWedding,
@@ -137,7 +175,28 @@ export default function Momentos() {
         unsubGuestProgress && unsubGuestProgress();
       } catch {}
     };
-  }, [activeWedding]);
+  }, [activeWedding, weddingEventDateKey]);
+
+  useEffect(() => {
+    if (!activeWedding || !album) return;
+    const albumEventDate = getAlbumEventDate(album);
+    const albumDateKey = albumEventDate
+      ? albumEventDate.toISOString().slice(0, 10)
+      : null;
+    const weddingDateKey = weddingEventDate
+      ? weddingEventDate.toISOString().slice(0, 10)
+      : null;
+
+    if (!weddingEventDate && !albumEventDate) return;
+    if (albumDateKey === weddingDateKey) return;
+
+    syncAlbumEventDate(activeWedding, {
+      albumId: ALBUM_ID,
+      eventDate: weddingEventDate ? weddingEventDate : null,
+    }).catch((error) => {
+      console.warn('[Momentos] syncAlbumEventDate error', error);
+    });
+  }, [activeWedding, album?.id, weddingEventDateKey]);
 
   const pendingPhotos = useMemo(
     () => photos.filter((photo) => (photo.status || 'pending') === 'pending'),
@@ -161,6 +220,11 @@ export default function Momentos() {
 
   const scenes = getAlbumScenes(album);
   const sceneSummary = summarizeByScene(approvedPhotos);
+  const uploadState = useMemo(
+    () => (album ? getGalleryUploadState(album) : null),
+    [album]
+  );
+  const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
 
   const handleCreateToken = async () => {
     if (!activeWedding) return;
@@ -174,7 +238,7 @@ export default function Momentos() {
       toast.success('Nuevo enlace generado');
     } catch (error) {
       console.error('createGuestToken', error);
-      toast.error('No se pudo generar el enlace, reinténtalo más tarde.');
+      toast.error(error?.message || 'No se pudo generar el enlace, reinténtalo más tarde.');
     }
   };
 
@@ -288,12 +352,25 @@ export default function Momentos() {
 
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          {uploadState && !uploadState.isWindowOpen && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              La ventana de aportaciones cerró el{' '}
+              <strong>{formatDate(uploadState.closesAt)}</strong>. Ajusta la fecha de la boda o
+              solicita soporte si necesitas reabrir la galería.
+            </div>
+          )}
+          {uploadState?.compressionActive && uploadState.isWindowOpen && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+              Hemos superado los 30&nbsp;GB de espacio. Las nuevas fotos se comprimen automáticamente para optimizar el almacenamiento en Firebase.
+            </div>
+          )}
           <UploadWidget
             weddingId={activeWedding}
             albumId={ALBUM_ID}
             scenes={scenes}
             uploader={uploaderInfo}
             onUploaded={() => toast.success('Foto subida a la galería')}
+            disabled={uploadsClosed}
           />
           <AlbumOverview
             album={album}

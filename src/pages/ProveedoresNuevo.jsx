@@ -175,7 +175,7 @@ const Proveedores = () => {
   const { shortlist, loading: shortlistLoading, error: shortlistError } = useSupplierShortlist();
   const { activeWedding } = useWedding();
   const { info: weddingProfile } = useActiveWeddingInfo();
-  const { loading: aiLoading, error: aiSearchError, searchProviders } = useAISearch();
+  const { searchProviders } = useAISearch();
 
   const [showNewProviderForm, setShowNewProviderForm] = useState(false);
   const [newProviderInitial, setNewProviderInitial] = useState(null);
@@ -335,7 +335,7 @@ const Proveedores = () => {
       if (trimmed && saveHistory) registerSearchQuery(trimmed);
 
       setSearchResultsLoading(true);
-      setSearchResultsError(null);
+      setSearchResultsError(null);\n    setSearchResultsLoading(false);
       setSearchResults([]);
       setSearchResultsQuery(trimmed || enrichedQuery);
       setSearchResultsPage(1);
@@ -404,7 +404,7 @@ const Proveedores = () => {
     setSearchResults([]);
     setSearchResultsQuery('');
     setSearchResultsPage(1);
-    setSearchResultsError(null);
+    setSearchResultsError(null);\n    setSearchResultsLoading(false);
     setSearchCompleted(false);
     setSearchDrawerOpen(false);
     setSearchDrawerResult(null);
@@ -757,6 +757,7 @@ const Proveedores = () => {
               setSearchInput(service);
               setSearchTerm(service);
               registerSearchQuery(service);
+              performSearch(service, { saveHistory: true });
             }
           }}
           onOpenNew={(service) => {
@@ -866,6 +867,8 @@ const Proveedores = () => {
 };
 
 export default Proveedores;
+
+
 
 
 

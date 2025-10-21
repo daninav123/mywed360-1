@@ -1,8 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import QRCode from 'qrcode';
 
 import HighlightRail from './HighlightRail';
-import { getAlbumScenes } from '@/services/momentosService';
+import {
+  getAlbumScenes,
+  getGalleryUploadState,
+  GALLERY_COMPRESSION_THRESHOLD_BYTES,
+} from '@/services/momentosService';
 
 const StatCard = ({ label, value, accent = 'primary' }) => {
   const accentClass =
@@ -37,6 +42,19 @@ const CoverageBar = ({ label, value, total }) => {
       </div>
     </div>
   );
+};
+
+const formatBytes = (bytes = 0) => {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = bytes;
+  let idx = 0;
+  while (size >= 1024 && idx < units.length - 1) {
+    size /= 1024;
+    idx += 1;
+  }
+  const precision = idx === 0 ? 0 : size < 10 ? 1 : 0;
+  return `${size.toFixed(precision)} ${units[idx]}`;
 };
 
 const badgeLabels = {
