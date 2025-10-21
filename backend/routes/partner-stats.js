@@ -80,7 +80,7 @@ router.get('/:token', async (req, res) => {
       .where('status', 'in', ['paid', 'succeeded', 'completed'])
       .get();
 
-    const now = new Date();
+    // Usar la variable 'now' ya declarada arriba
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
 
