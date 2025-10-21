@@ -15,6 +15,20 @@ const TABS = [
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
+// KPICard component (fuera del componente principal para ser accesible por todos los tabs)
+const KPICard = ({ title, value, subtitle, color = 'gray' }) => {
+  const bgClass = color === 'gray' ? 'bg-white' : `bg-${color}-50`;
+  const textClass = color === 'gray' ? 'text-gray-900' : `text-${color}-700`;
+  
+  return (
+    <div className={`rounded-lg border p-4 ${bgClass}`}>
+      <p className="text-xs text-gray-600">{title}</p>
+      <p className={`text-2xl font-bold ${textClass}`}>{value}</p>
+      {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+    </div>
+  );
+};
+
 const AdminMetricsComplete = () => {
   const [activeTab, setActiveTab] = useState('resumen');
   const [loading, setLoading] = useState(true);
@@ -40,14 +54,6 @@ const AdminMetricsComplete = () => {
     };
     loadAll();
   }, []);
-
-  const KPICard = ({ title, value, subtitle, color = 'gray' }) => (
-    <div className={`rounded-lg border bg-${color}-50 p-4`}>
-      <p className="text-xs text-gray-600">{title}</p>
-      <p className={`text-2xl font-bold text-${color}-700`}>{value}</p>
-      {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
