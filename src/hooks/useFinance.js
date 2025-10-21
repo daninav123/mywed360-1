@@ -987,6 +987,21 @@ export default function useFinance() {
     [budget.categories, budget.total, persistFinanceDoc]
   );
 
+  const setBudgetCategories = useCallback(
+    (nextCategories) => {
+      if (!Array.isArray(nextCategories)) return;
+      const sanitized = nextCategories.map((cat) => ({
+        ...cat,
+        amount: Number(cat?.amount) || 0,
+      }));
+      setBudget((prev) => ({ ...prev, categories: sanitized }));
+      persistFinanceDoc({
+        budget: { total: budget.total, categories: sanitized },
+      });
+    },
+    [budget.total, persistFinanceDoc]
+  );
+
   const updateBudgetCategory = useCallback(
     (index, updates) => {
       const nextCategories = budget.categories.map((cat, idx) =>
@@ -1856,6 +1871,7 @@ export default function useFinance() {
     updateContributions,
     loadGuestCount,
     addBudgetCategory,
+    setBudgetCategories,
     updateBudgetCategory,
     removeBudgetCategory,
     requestBudgetAdvisor,

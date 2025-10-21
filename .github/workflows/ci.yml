@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   push:
@@ -35,8 +35,15 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Unit tests (Vitest)
-        run: npm run test:unit
+      - name: Install Firebase CLI for emulator
+        run: npm install -g firebase-tools
+
+      - name: Unit tests (Vitest - without emulator)
+        run: npm run test:unit -- --exclude='**/firestore.rules*.test.js'
+        
+      - name: Start Firestore Emulator & Run Rules Tests
+        run: |
+          npx firebase emulators:exec --only firestore "npm run test:unit -- src/__tests__/firestore.rules"
 
       - name: Validate i18n
         run: npm run validate:i18n

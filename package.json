@@ -26,6 +26,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:rules": "vitest run tests/firestore.rules.test.js",
+    "test:rules:emulator": "node scripts/test-with-emulator.js",
+    "test:rules:all": "FIRESTORE_RULES_TESTS=true vitest run src/__tests__/firestore.rules",
     "test:coverage:html": "vitest run --coverage --reporter html",
     "test:email-coverage": "node scripts/email-coverage-report.js",
     "cypress:open": "cypress open",

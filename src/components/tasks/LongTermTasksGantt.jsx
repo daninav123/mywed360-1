@@ -382,7 +382,9 @@ export default function LongTermTasksGantt({
     }
   }, [monthStart, timelineStart, timelineEnd, effectiveColW]);
 
-  // 6) Auto scroll a mes actual
+  const todayMarkerLeft = todayMarker && typeof todayMarker.left === 'number' ? todayMarker.left : null;
+
+  // 6) Auto scroll al día actual (centrar vista en "hoy")
   const scrollRef = useRef(null);
   const monthStartKey = monthStart.getTime();
   const timelineEndKey = timelineEnd.getTime();
@@ -390,24 +392,60 @@ export default function LongTermTasksGantt({
 
   useEffect(() => {
     autoScrollDoneRef.current = false;
-  }, [monthStartKey, timelineEndKey, horizontalOverflow]);
+  }, [monthStartKey, timelineEndKey, horizontalOverflow, contentWidth, todayMarkerLeft]);
 
   useEffect(() => {
     if (autoScrollDoneRef.current) return;
-    const el = (containerRef && containerRef.current) || (scrollRef && scrollRef.current);
+    const el =
+      (containerRef && containerRef.current) ||
+      (scrollRef && scrollRef.current);
     if (!el) return;
-    const today = new Date();
-    if (today < monthStart || today > timelineEnd) return;
-    const m = diffMonths(monthStart, today);
-    if (!horizontalOverflow) {
-      el.scrollLeft = 0;
+
+    const tryScroll = () => {
+      const viewportWidth = el.clientWidth || 0;
+      if (viewportWidth <= 0) return false;
+
+      const scrollableWidth = el.scrollWidth || contentWidth || viewportWidth;
+      const maxScroll = Math.max(0, scrollableWidth - viewportWidth);
+      if (maxScroll <= 0) {
+        el.scrollLeft = 0;
+        autoScrollDoneRef.current = true;
+        return true;
+      }
+
+      if (todayMarkerLeft == null) {
+        autoScrollDoneRef.current = true;
+        return true;
+      }
+
+      const targetLeft = Math.max(
+        0,
+        Math.min(maxScroll, todayMarkerLeft - viewportWidth * 0.5)
+      );
+
+      if (typeof el.scrollTo === 'function') {
+        el.scrollTo({ left: targetLeft, behavior: 'auto' });
+      } else {
+        el.scrollLeft = targetLeft;
+      }
+
       autoScrollDoneRef.current = true;
-      return;
-    }
-    const left = Math.max(0, m * effectiveColW - el.clientWidth * 0.5);
-    el.scrollTo({ left, behavior: 'auto' });
-    autoScrollDoneRef.current = true;
-  }, [containerRef, monthStart, timelineEnd, effectiveColW, horizontalOverflow, monthStartKey, timelineEndKey]);
+      return true;
+    };
+
+    if (tryScroll()) return;
+
+    const raf =
+      typeof requestAnimationFrame === 'function'
+        ? requestAnimationFrame(() => {
+            tryScroll();
+          })
+        : null;
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [containerRef, todayMarkerLeft, contentWidth, horizontalOverflow]);
 
   // 7) Segmentar padres por huecos de subtareas
   const parentTasks = useMemo(() => {

@@ -32,16 +32,52 @@ Guía consolidada para ejecutar y mantener las suites de pruebas de MyWed360. Co
 - **Pipeline completo (sin abrir navegador)**: `npm run e2e`
 - **Seleccionar subset**: `npx cypress run --spec "cypress/e2e/finance/**/*.cy.js"`
 
-## 3. Unit & integration tests
+## 3. Unit Tests (Vitest)
 
-- **Frontend**: `npm run test:unit` (Vitest). Cobertura actual incluye hooks (`useGuests`, `useSeatingPlan`, `useTranslations`) y servicios (`GamificationService`, `NotificationService`). añade noches tests para nuevos hooks/servicios.
-- **Firestore rules**: `src/__tests__/firestore.rules.extended.test.js` (emulador). Ejecuta con:
-  ```
-  set FIRESTORE_EMULATOR_HOST=localhost:8080
-  npm run test:unit -- src/__tests__/firestore.rules.extended.test.js
-  ```
-  Requiere `firebase emulators:start --only firestore` en otra terminal.
-- **Backend**: `npm run test:backend` (siempre establece `STRIPE_TEST_DISABLE_SIGNATURE=true` y `ADMIN_MFA_TEST_CODE=123456` para evitar dependencias externas).
+### Tests Regulares
+
+Cobertura actual incluye hooks (`useGuests`, `useSeatingPlan`, `useTranslations`) y servicios (`GamificationService`, `NotificationService`). Añade nuevos tests para nuevos hooks/servicios.
+
+```bash
+# Ejecutar todos los tests unitarios (excepto rules)
+npm run test:unit
+
+# Ejecutar con coverage
+npm run test:coverage
+```
+
+### Tests de Firestore Rules (Requieren Emulador)
+
+Los tests de reglas de Firestore (`firestore.rules.*.test.js`) requieren el emulador activo:
+
+```bash
+# Opción 1: Script automático (recomendado)
+npm run test:rules:emulator
+
+# Opción 2: Usar firebase emulators:exec
+firebase emulators:exec --only firestore "npm run test:rules:all"
+
+# Opción 3: Manual - Iniciar emulador y correr tests
+# Terminal 1:
+firebase emulators:start --only firestore
+
+# Terminal 2 (Windows):
+set FIRESTORE_EMULATOR_HOST=localhost:8080
+npm run test:rules:all
+
+# Terminal 2 (Linux/Mac):
+FIRESTORE_EMULATOR_HOST=localhost:8080 npm run test:rules:all
+```
+
+**Nota importante:** Por defecto, los tests de rules se **saltan automáticamente** si no hay emulador activo. Esto es intencional para permitir CI/desarrollo sin depender del emulador. Si quieres forzar su ejecución, usa las opciones anteriores.
+
+### Tests Backend
+
+```bash
+npm run test:backend
+```
+
+Siempre establece `STRIPE_TEST_DISABLE_SIGNATURE=true` y `ADMIN_MFA_TEST_CODE=123456` para evitar dependencias externas.
 
 ## 4. Flags y helpers de test
 

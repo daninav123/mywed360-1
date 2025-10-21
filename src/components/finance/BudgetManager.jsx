@@ -22,6 +22,7 @@ export default function BudgetManager({
   budgetUsage,
   onUpdateBudget,
   onAddCategory,
+  onReallocateCategories,
   onUpdateCategory,
   onRemoveCategory,
   alertThresholds = { warn: 75, danger: 90 },
@@ -51,6 +52,166 @@ export default function BudgetManager({
   const advisorTips = Array.isArray(effectiveAdvisor?.globalTips)
     ? effectiveAdvisor.globalTips
     : [];
+
+  const categories = Array.isArray(budget?.categories) ? budget.categories : [];
+  const computedTotal = Number(budget?.total);
+  const categoriesTotal = categories.reduce(
+    (sum, cat) => sum + (Number(cat?.amount) || 0),
+    0
+  );
+  const totalBudgetValue =
+    Number.isFinite(computedTotal) && computedTotal > 0 ? computedTotal : categoriesTotal;
+  const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
+
+  const distributeDecrease = (amounts, indices, delta) => {
+    let remaining = delta;
+    let adjustable = indices.filter((idx) => amounts[idx] > 0);
+
+    while (remaining > 0 && adjustable.length) {
+      const totalAdjustable = adjustable.reduce((sum, idx) => sum + amounts[idx], 0);
+      if (totalAdjustable <= 0) break;
+
+      let remainder = remaining;
+      const plan = new Map();
+      adjustable.forEach((idx) => {
+        const currentAmount = amounts[idx];
+        if (currentAmount <= 0) {
+          plan.set(idx, 0);
+          return;
+        }
+        const deduction = Math.min(
+          currentAmount,
+          Math.floor((remaining * currentAmount) / totalAdjustable)
+        );
+        plan.set(idx, deduction);
+        remainder -= deduction;
+      });
+
+      if (remainder > 0) {
+        const sorted = [...adjustable].sort(
+          (a, b) =>
+            (amounts[b] - (plan.get(b) || 0)) - (amounts[a] - (plan.get(a) || 0))
+        );
+        let pointer = 0;
+        while (remainder > 0 && sorted.length) {
+          const idx = sorted[pointer % sorted.length];
+          if ((amounts[idx] - (plan.get(idx) || 0)) <= 0) {
+            sorted.splice(pointer % sorted.length, 1);
+            continue;
+          }
+          plan.set(idx, (plan.get(idx) || 0) + 1);
+          remainder -= 1;
+          pointer += 1;
+        }
+      }
+
+      let totalDeducted = 0;
+      plan.forEach((deduction, idx) => {
+        if (deduction <= 0) return;
+        const applied = Math.min(amounts[idx], deduction);
+        amounts[idx] = Math.max(0, amounts[idx] - applied);
+        totalDeducted += applied;
+      });
+
+      remaining -= totalDeducted;
+      adjustable = adjustable.filter((idx) => amounts[idx] > 0);
+      if (totalDeducted === 0) break;
+    }
+
+    return remaining;
+  };
+
+  const distributeIncrease = (amounts, indices, delta) => {
+    let remaining = delta;
+    if (!indices.length) return remaining;
+
+    let adjustable = indices.slice();
+    while (remaining > 0 && adjustable.length) {
+      const totalWeights = adjustable.reduce((sum, idx) => sum + amounts[idx], 0);
+      let remainder = remaining;
+      const plan = new Map();
+
+      if (totalWeights === 0) {
+        const base = Math.floor(remaining / adjustable.length);
+        adjustable.forEach((idx) => {
+          plan.set(idx, base);
+          remainder -= base;
+        });
+      } else {
+        adjustable.forEach((idx) => {
+          const weight = amounts[idx];
+          const addition = Math.floor((remaining * weight) / totalWeights);
+          plan.set(idx, addition);
+          remainder -= addition;
+        });
+      }
+
+      if (remainder > 0) {
+        const sorted = [...adjustable].sort(
+          (a, b) => (amounts[a] || 0) - (amounts[b] || 0)
+        );
+        let pointer = 0;
+        while (remainder > 0 && sorted.length) {
+          const idx = sorted[pointer % sorted.length];
+          plan.set(idx, (plan.get(idx) || 0) + 1);
+          remainder -= 1;
+          pointer += 1;
+        }
+      }
+
+      let totalAdded = 0;
+      plan.forEach((addition, idx) => {
+        if (addition <= 0) return;
+        amounts[idx] += addition;
+        totalAdded += addition;
+      });
+
+      remaining -= totalAdded;
+      if (totalAdded === 0) break;
+    }
+
+    return remaining;
+  };
+
+  const handleAllocationChange = (index, targetCents) => {
+    if (!onReallocateCategories || !categories.length) return;
+
+    const safeTarget = Math.max(0, Math.min(targetCents, totalBudgetCents));
+    const currentAmountCents = Math.max(
+      0,
+      Math.round((Number(categories[index]?.amount) || 0) * 100)
+    );
+    if (safeTarget === currentAmountCents) return;
+
+    const nextAmounts = categories.map((cat, idx) => {
+      const base = Number(cat?.amount) || 0;
+      const cents = Math.max(0, Math.round(base * 100));
+      return idx === index ? safeTarget : cents;
+    });
+    const otherIndices = categories
+      .map((_, idx) => idx)
+      .filter((idx) => idx !== index);
+    const delta = safeTarget - currentAmountCents;
+
+    if (delta > 0) {
+      const leftover = distributeDecrease(nextAmounts, otherIndices, delta);
+      if (leftover > 0) {
+        nextAmounts[index] = Math.max(0, nextAmounts[index] - leftover);
+      }
+    } else {
+      const leftover = distributeIncrease(nextAmounts, otherIndices, -delta);
+      if (leftover > 0) {
+        nextAmounts[index] = Math.max(0, nextAmounts[index] + leftover);
+      }
+    }
+
+    const nextCategories = nextAmounts.map((amountCents, idx) => ({
+      ...categories[idx],
+      amount: Number((amountCents / 100).toFixed(2)),
+    }));
+
+    onReallocateCategories(nextCategories);
+  };
 
   const formatTimestamp = (value) => {
     if (!value) return null;
@@ -287,10 +448,15 @@ export default function BudgetManager({
       </Card>
 
       <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-        <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10">
+        <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10 flex flex-wrap items-center justify-between gap-3">
           <h3 className="text-lg font-medium text-[color:var(--color-text)]">
             {t('finance.budget.categoriesTitle', { defaultValue: 'categorías de presupuesto' })}
           </h3>
+          {budgetUsage.length > 0 && (
+            <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
+              {t('finance.budget.addCategory', { defaultValue: 'Añadir categoría' })}
+            </Button>
+          )}
         </div>
         {advisorScenarios.length > 0 && (
           <div className="px-6 py-4 bg-[var(--color-primary)]/5 border-b border-[var(--color-primary)]/20 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -358,23 +524,47 @@ export default function BudgetManager({
             </Button>
           </div>
         ) : (
-          <div className="divide-y divide-[color:var(--color-text)]/10">
+          <div className="px-6 py-5 space-y-5">
             {budgetUsage.map((category, index) => {
-              const usagePercent = Math.min(Math.max(Number(category.percentage) || 0, 0), 999);
-              const barWidth = Math.min(usagePercent, 100);
+              const rawCategory = categories[index] || {};
+              const assignedAmountRaw = Number(
+                rawCategory?.amount ?? category.amount ?? 0
+              );
+              const assignedAmount = Number.isFinite(assignedAmountRaw) ? assignedAmountRaw : 0;
+              const assignedCents = Math.max(0, Math.round(assignedAmount * 100));
+              const spentAmount = Number(category.spent) || 0;
+              const remaining = Number(category.remaining) || 0;
+              const percentageValue = Number(category.percentage);
+              const usageBase = Number.isFinite(percentageValue)
+                ? percentageValue
+                : assignedAmount > 0
+                  ? (spentAmount / assignedAmount) * 100
+                  : spentAmount > 0
+                    ? 999
+                    : 0;
+              const usagePercent = Math.min(Math.max(usageBase, 0), 999);
+              const progressPercent = Math.min(usagePercent, 100);
               const barColor =
                 usagePercent >= (alertThresholds.danger || 90)
                   ? 'bg-[var(--color-danger)]'
                   : usagePercent >= (alertThresholds.warn || 75)
                     ? 'bg-[var(--color-warning)]'
                     : 'bg-[var(--color-success)]';
-              const remaining = Number(category.remaining) || 0;
+              const allocationPercent =
+                totalBudgetValue > 0 ? (assignedAmount / totalBudgetValue) * 100 : 0;
+              const sliderMax = Math.max(totalBudgetCents, assignedCents, 0);
+              const sliderStep = Math.max(1, Math.round(sliderMax / 1000));
+              const sliderValue = Math.min(sliderMax, assignedCents);
+              const sliderDisabled = sliderMax === 0 || !onReallocateCategories;
               const sourceTag =
                 typeof category.source === 'string' && category.source.toLowerCase() === 'advisor';
 
               return (
-                <div key={index} className="p-6">
-                  <div className="flex items-start justify-between mb-4 gap-4">
+                <div
+                  key={category.name || index}
+                  className="rounded-xl border border-[color:var(--color-text)]/10 bg-white/70 shadow-sm p-5 space-y-4"
+                >
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-lg font-semibold text-[color:var(--color-text)]">
@@ -399,7 +589,7 @@ export default function BudgetManager({
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                    <div className="flex items-center gap-2 flex-wrap justify-end text-xs">
                       <button
                         type="button"
                         className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
@@ -437,42 +627,68 @@ export default function BudgetManager({
                       </button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-[color:var(--color-text)]/70">
-                        {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
-                      </p>
-                      <p className="text-lg font-semibold text-[color:var(--color-text)]">
-                        {formatCurrency(category.amount)}
-                      </p>
+                  <div className="space-y-3">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                      <div className={`flex-1 ${sliderDisabled ? 'opacity-60' : ''}`}>
+                        <input
+                          type="range"
+                          min={0}
+                          max={sliderMax}
+                          step={sliderStep}
+                          value={sliderValue}
+                          onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
+                          disabled={sliderDisabled}
+                          className="w-full accent-[var(--color-primary)]"
+                          aria-label={`Reasignar presupuesto para ${category.name}`}
+                        />
+                      </div>
+                      <div className="min-w-[140px] text-right">
+                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                          {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
+                        </p>
+                        <p className="text-lg font-semibold text-[color:var(--color-text)]">
+                          {formatCurrency(assignedAmount)}
+                        </p>
+                        <p className="text-xs text-[color:var(--color-text)]/70">
+                          {allocationPercent.toFixed(1)}% del total
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-[color:var(--color-text)]/70">
-                        {t('finance.budget.spent', { defaultValue: 'Gastado' })}
-                      </p>
-                      <p className="text-lg font-semibold text-[color:var(--color-danger)]">
-                        {formatCurrency(category.spent)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-[color:var(--color-text)]/70">
-                        {t('finance.budget.remaining', { defaultValue: 'Restante' })}
-                      </p>
-                      <p className="text-lg font-semibold">
-                        {formatCurrency(remaining)}
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
-                      <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
-                      <span>{usagePercent}%</span>
-                    </div>
-                    <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
-                      <div
-                        className={`${barColor} h-3 rounded-full transition-all duration-300`}
-                        style={{ width: `${barWidth}%` }}
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                          {t('finance.budget.spent', { defaultValue: 'Gastado' })}
+                        </p>
+                        <p className="text-base font-semibold text-[color:var(--color-danger)]">
+                          {formatCurrency(spentAmount)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                          {t('finance.budget.remaining', { defaultValue: 'Restante' })}
+                        </p>
+                        <p
+                          className={`text-base font-semibold ${
+                            remaining < 0
+                              ? 'text-[var(--color-danger)]'
+                              : 'text-[color:var(--color-text)]'
+                          }`}
+                        >
+                          {formatCurrency(remaining)}
+                        </p>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between text-xs text-[color:var(--color-text)]/70 mb-1">
+                          <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
+                          <span>{Math.min(usagePercent, 999).toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
+                          <div
+                            className={`${barColor} h-3 rounded-full transition-all duration-300`}
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

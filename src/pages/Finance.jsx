@@ -60,6 +60,7 @@ function Finance() {
     updateContributions,
     loadGuestCount,
     addBudgetCategory,
+    setBudgetCategories,
     updateBudgetCategory,
     removeBudgetCategory,
     requestBudgetAdvisor,
@@ -254,6 +255,7 @@ function Finance() {
               budgetUsage={budgetUsage}
               onUpdateBudget={handleUpdateTotalBudget}
               onAddCategory={addBudgetCategory}
+              onReallocateCategories={setBudgetCategories}
               onUpdateCategory={updateBudgetCategory}
               onRemoveCategory={removeBudgetCategory}
               alertThresholds={settings?.alertThresholds}
