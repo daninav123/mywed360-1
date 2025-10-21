@@ -44,8 +44,9 @@ router.get('/:token', async (req, res) => {
     const discountDoc = discountSnapshot.docs[0];
     const discountData = discountDoc.data();
     
-    // Verificar que esté activo
-    if (discountData.status !== 'active') {
+    // Verificar que esté activo (soporta 'active' y 'activo')
+    const status = (discountData.status || '').toLowerCase();
+    if (status !== 'active' && status !== 'activo') {
       return res.status(403).json({
         error: 'inactive',
         message: 'Este código de descuento está desactivado'
