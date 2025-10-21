@@ -7,8 +7,6 @@ import PaymentSuggestions from '../components/finance/PaymentSuggestions.jsx';
 import TransactionManager from '../components/finance/TransactionManager';
 import PageWrapper from '../components/PageWrapper';
 import PageTabs from '../components/ui/PageTabs';
-import { Card, Button } from '../components/ui';
-import { ChevronDown, ChevronRight } from 'lucide-react';
 
 // Lazy load analytics charts to reduce initial bundle
 const FinanceCharts = React.lazy(() => import('../components/finance/FinanceCharts'));
