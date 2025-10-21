@@ -63,6 +63,9 @@ const AdminTaskTemplates = () => {
   const [userTasksMeta, setUserTasksMeta] = useState({});
   const [loadingUserTasks, setLoadingUserTasks] = useState(false);
   const [minOccurrences, setMinOccurrences] = useState(3);
+  
+  // Vista visual
+  const [viewMode, setViewMode] = useState('json'); // 'json' | 'visual'
 
   const nextSuggestedVersion = useMemo(() => {
     if (!templates.length) return 1;
@@ -288,6 +291,195 @@ const AdminTaskTemplates = () => {
     return userTasks.filter(task => task.count >= minOccurrences);
   }, [userTasks, minOccurrences]);
 
+  const renderVisualView = () => {
+    if (!selectedTemplate) {
+      return (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
+          <p className="text-gray-500">Selecciona una plantilla para ver su estructura visual</p>
+        </div>
+      );
+    }
+
+    let blocks = [];
+    try {
+      blocks = JSON.parse(form.blocksJson);
+      if (!Array.isArray(blocks)) blocks = [];
+    } catch {
+      blocks = [];
+    }
+
+    if (blocks.length === 0) {
+      return (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
+          <p className="text-gray-500">Esta plantilla no tiene bloques definidos</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="overflow-x-auto">
+          <div className="inline-flex gap-4 pb-4" style={{ minWidth: '100%' }}>
+            {blocks.map((block, blockIndex) => {
+              const items = Array.isArray(block.items) ? block.items : [];
+              const blockName = block.name || block.title || `Bloque ${blockIndex + 1}`;
+              const category = block.admin?.category || 'OTROS';
+              
+              return (
+                <div
+                  key={blockIndex}
+                  className="flex-shrink-0 w-80 rounded-lg border border-gray-200 bg-white shadow-sm"
+                >
+                  {/* Cabecera - Tarea Padre */}
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 rounded-t-lg">
+                    <h3 className="font-semibold text-white text-sm">{blockName}</h3>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs bg-blue-400 text-white px-2 py-0.5 rounded">
+                        {category}
+                      </span>
+                      <span className="text-xs text-blue-100">
+                        {items.length} subtarea{items.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <div className="text-xs text-blue-100 mt-1">
+                      📅 {(block.startPct * 100).toFixed(0)}% - {(block.endPct * 100).toFixed(0)}%
+                    </div>
+                  </div>
+
+                  {/* Subtareas */}
+                  <div className="p-3 space-y-2 max-h-96 overflow-y-auto">
+                    {items.length === 0 ? (
+                      <div className="text-center py-6 text-gray-400 text-sm">
+                        Sin subtareas
+                      </div>
+                    ) : (
+                      items.map((item, itemIndex) => {
+                        const itemTitle = item.title || item.name || item.label || `Subtarea ${itemIndex + 1}`;
+                        const itemCategory = item.category || category;
+                        
+                        return (
+                          <div
+                            key={itemIndex}
+                            className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:bg-gray-100 transition"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {itemTitle}
+                                </p>
+                                {item.assigneeSuggestion && (
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    👤 {item.assigneeSuggestion}
+                                  </p>
+                                )}
+                                {item.tags && item.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {item.tags.map((tag, tagIdx) => (
+                                      <span
+                                        key={tagIdx}
+                                        className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded"
+                                      >
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {item.priority && (
+                                <span
+                                  className={`text-xs px-2 py-0.5 rounded font-medium ${
+                                    item.priority === 'high'
+                                      ? 'bg-red-100 text-red-700'
+                                      : item.priority === 'medium'
+                                        ? 'bg-yellow-100 text-yellow-700'
+                                        : 'bg-green-100 text-green-700'
+                                  }`}
+                                >
+                                  {item.priority}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* Timeline visual */}
+                            {typeof item.startPct === 'number' && typeof item.endPct === 'number' && (
+                              <div className="mt-2">
+                                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-blue-500"
+                                    style={{
+                                      marginLeft: `${(item.startPct - block.startPct) / (block.endPct - block.startPct) * 100}%`,
+                                      width: `${((item.endPct - item.startPct) / (block.endPct - block.startPct)) * 100}%`,
+                                    }}
+                                  />
+                                </div>
+                                <div className="text-xs text-gray-500 mt-1">
+                                  {(item.startPct * 100).toFixed(0)}% → {(item.endPct * 100).toFixed(0)}%
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Checklist */}
+                            {item.checklist && item.checklist.length > 0 && (
+                              <div className="mt-2 pt-2 border-t border-gray-200">
+                                <p className="text-xs text-gray-600 font-medium mb-1">Checklist:</p>
+                                <ul className="text-xs text-gray-600 space-y-0.5">
+                                  {item.checklist.slice(0, 3).map((check, checkIdx) => (
+                                    <li key={checkIdx} className="flex items-start gap-1">
+                                      <span>•</span>
+                                      <span className="flex-1">{check.label || check}</span>
+                                    </li>
+                                  ))}
+                                  {item.checklist.length > 3 && (
+                                    <li className="text-gray-400">
+                                      +{item.checklist.length - 3} más
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {/* Footer con estadísticas */}
+                  <div className="border-t border-gray-200 px-4 py-2 bg-gray-50 rounded-b-lg">
+                    <div className="flex items-center justify-between text-xs text-gray-600">
+                      <span>Duración: {((block.endPct - block.startPct) * 100).toFixed(0)}%</span>
+                      {block.admin?.editable !== false && (
+                        <span className="text-green-600">✏️ Editable</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Leyenda */}
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <h4 className="text-sm font-semibold mb-2">Leyenda:</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-600">
+            <div>
+              <span className="font-medium">% Timeline:</span> Posición en el planning (0% = inicio, 100% = boda)
+            </div>
+            <div>
+              <span className="font-medium">Categorías:</span> Agrupación temática de tareas
+            </div>
+            <div>
+              <span className="font-medium">👤 Sugerencia:</span> Rol recomendado para la tarea
+            </div>
+            <div>
+              <span className="font-medium">Checklist:</span> Pasos a seguir dentro de la subtarea
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex items-start justify-between">
@@ -297,17 +489,19 @@ const AdminTaskTemplates = () => {
             Gestiona el seed de tareas padre y subtareas aplicado a cada nueva boda.
           </p>
         </div>
-        <button
-          onClick={() => {
-            setShowUserTasks(!showUserTasks);
-            if (!showUserTasks && userTasks.length === 0) {
-              loadUserTasks();
-            }
-          }}
-          className="rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
-        >
-          {showUserTasks ? '← Volver al Editor' : '📊 Ver Tareas de Usuarios'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setShowUserTasks(!showUserTasks);
+              if (!showUserTasks && userTasks.length === 0) {
+                loadUserTasks();
+              }
+            }}
+            className="rounded-md bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+          >
+            {showUserTasks ? '← Volver' : '📊 Análisis'}
+          </button>
+        </div>
       </header>
 
       {showUserTasks ? (
@@ -421,10 +615,57 @@ const AdminTaskTemplates = () => {
           </div>
         </div>
       ) : (
-        <div></div>
-      )}
+        <>
+          {/* Toggle de vista */}
+          <div className="flex items-center gap-2 border-b border-gray-200 pb-4">
+            <button
+              onClick={() => setViewMode('visual')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
+                viewMode === 'visual'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              📊 Vista Visual
+            </button>
+            <button
+              onClick={() => setViewMode('json')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
+                viewMode === 'json'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              💻 Editor JSON
+            </button>
+          </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          {viewMode === 'visual' ? (
+            <div className="space-y-4">
+              {/* Selector de plantilla en vista visual */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4">
+                <label className="block text-sm font-medium mb-2">Plantilla seleccionada:</label>
+                <select
+                  value={selectedId || ''}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    if (id) selectTemplate(id);
+                  }}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                >
+                  <option value="">-- Selecciona una plantilla --</option>
+                  {templates.map((tpl) => (
+                    <option key={tpl.id} value={tpl.id}>
+                      {tpl.name || `Versión ${tpl.version}`} - {STATUS_LABELS[tpl.status] || tpl.status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {renderVisualView()}
+            </div>
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <aside className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase text-[var(--color-text-soft,#6b7280)]">
@@ -653,6 +894,9 @@ const AdminTaskTemplates = () => {
           ) : null}
         </section>
       </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
