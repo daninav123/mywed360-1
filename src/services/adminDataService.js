@@ -395,11 +395,7 @@ export const getSupportData = async () => {
 
 export const getDiscountLinks = async () => {
   const data = await fetchAdminEndpoint(`${ADMIN_BASE_PATH}/discounts`);
-  if (!data) return { items: [], summary: DEFAULT_DISCOUNT_SUMMARY };
-  return {
-    items: toArray(data.items),
-    summary: data.summary || DEFAULT_DISCOUNT_SUMMARY,
-  };
+  return data || { items: [], summary: { total: 0, active: 0, expired: 0, totalUses: 0, totalRevenue: 0 } };
 };
 
 export const createDiscountCode = async (discountData) => {
