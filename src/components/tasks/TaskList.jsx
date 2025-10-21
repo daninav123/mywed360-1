@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { categories } from './CalendarComponents.jsx';
-import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.js';
+import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.jsx';
 
 // Componente para mostrar la lista de tareas críticas de la semana
 const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete, parentNameMap = {}, dependencyStatuses = new Map() }) => {

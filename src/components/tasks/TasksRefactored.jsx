@@ -20,7 +20,7 @@ import EventsCalendar from './EventsCalendar.jsx';
 import { useGanttSizing } from './hooks/useGanttSizing.js';
 import { useGanttNormalizedTasks, useGanttBoundedTasks } from './hooks/useGanttTasks.js';
 import { useSafeEvents } from './hooks/useSafeEvents.js';
-import { useTaskDependencies } from './hooks/useTaskDependencies.js';
+import { useTaskDependencies } from './hooks/useTaskDependencies.jsx';
 import LongTermTasksGantt from './LongTermTasksGantt.jsx';
 import AllTasksModal from './AllTasksModal.jsx';
 import TaskForm from './TaskForm.jsx';

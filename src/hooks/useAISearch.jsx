@@ -174,11 +174,6 @@ const ENABLE_BACKEND_AI =
         .trim()
         .match(/^(1|true|on|enabled)$/i);
 
-const ENABLE_DEMO_FALLBACK =
-  (import.meta?.env?.VITE_AI_SUPPLIERS_DEMO || import.meta?.env?.VITE_SUPPLIERS_AI_DEMO || '')
-    .toString()
-    .match(/^(1|true|on)$/i);
-
 export const useAISearch = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -208,7 +203,7 @@ export const useAISearch = () => {
       const budget =
         profile.budget || profile.estimatedBudget || profile.totalBudget || profile.presupuesto || '';
       const inferredService = (opts && opts.service) || guessServiceFromQuery(query);
-      const allowFallback = opts?.allowFallback ?? Boolean(ENABLE_DEMO_FALLBACK);
+      const allowFallback = opts?.allowFallback === true;
 
       let lastError = null;
 
