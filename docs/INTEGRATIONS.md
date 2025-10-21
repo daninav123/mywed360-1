@@ -7,7 +7,7 @@
 
 ## Mailgun
 - Uso: envío de emails (notificaciones/boletines)
-- Vars: `VITE_MAILGUN_API_KEY` (solo en backend si es posible), dominio `mg.mywed360.com`
+- Vars: `VITE_MAILGUN_API_KEY` (solo en backend si es posible), dominio `mg.malove.app`
 - Región EU habilitada en pruebas
 
 ## OpenAI

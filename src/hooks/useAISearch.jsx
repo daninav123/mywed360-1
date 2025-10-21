@@ -81,6 +81,30 @@ const normalizeResult = (item, index, query, source) => {
   };
 };
 
+const mapBackendErrorMessage = (payload, status, fallbackMessage) => {
+  const code = payload?.error || payload?.code;
+  const detail = payload?.details || payload?.message || '';
+  switch (code) {
+    case 'openai_failed':
+      return (
+        'La busqueda de proveedores por IA no esta disponible. Configura OPENAI_API_KEY en el backend o habilita un motor alternativo.'
+      );
+    case 'openai_invalid_response':
+      return 'El servicio de IA devolvio un formato invalido. Intenta de nuevo mas tarde o revisa los logs del backend.';
+    case 'openai_request_failed':
+      return 'No se pudo contactar con OpenAI. Verifica tus credenciales y la conectividad.';
+    case 'serp_unavailable':
+      return 'El motor de respaldo (SerpAPI) no esta configurado. Proporciona SERPAPI_API_KEY para habilitarlo.';
+    case 'rate_limited':
+      return 'Se supero el limite de peticiones permitidas. Intentalo de nuevo en unos minutos.';
+    default:
+      if (detail) return detail;
+      if (fallbackMessage) return fallbackMessage;
+      if (status) return `Error ${status}`;
+      return 'No se pudo completar la busqueda.';
+  }
+};
+
 const generateDemoResults = (query) => {
   const demoDatabase = [
     {
@@ -243,10 +267,14 @@ export const useAISearch = () => {
             }
           } else {
             const payload = await res.json().catch(() => null);
-            const message =
-              (payload && (payload.error || payload.message)) ||
-              `La busqueda IA respondio ${res?.status || 'desconocido'}`;
-            throw new Error(message);
+            const message = mapBackendErrorMessage(
+              payload,
+              res?.status,
+              `La busqueda IA respondio ${res?.status || 'desconocido'}`
+            );
+            const err = new Error(message);
+            if (payload?.error) err.code = payload.error;
+            throw err;
           }
         }
       } catch (backendError) {
@@ -285,10 +313,15 @@ export const useAISearch = () => {
           }
         } else if (res2) {
           const payload = await res2.json().catch(() => null);
-          const message =
-            (payload && (payload.error || payload.message)) ||
-            `El buscador externo respondio ${res2.status}`;
-          lastError = lastError || new Error(message);
+          const message = mapBackendErrorMessage(
+            payload,
+            res2.status,
+            `El buscador externo respondio ${res2.status}`
+          );
+          const err = new Error(message);
+          if (payload?.error) err.code = payload.error;
+          if (!lastError) lastError = err;
+          else if (!lastError.message || lastError.message === payload?.error) lastError = err;
         }
       } catch (searchErr) {
         console.warn('Fallo consultando search-suppliers', searchErr);
@@ -308,11 +341,12 @@ export const useAISearch = () => {
 
       setResults([]);
       setUsedFallback(false);
-      if (lastError) {
-        setError(lastError);
-      } else {
-        setError(new Error('No se encontraron resultados para esta busqueda.'));
-      }
+      const finalError =
+        lastError ||
+        new Error(
+          'No se encontraron resultados para esta busqueda. Configura los servicios de IA o un motor de respaldo para continuar.'
+        );
+      setError(finalError);
       setLoading(false);
       return [];
     },

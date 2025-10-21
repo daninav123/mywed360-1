@@ -119,7 +119,7 @@ export async function sendMailAndPersist({
     profile?.myWed360Email ||
     profile?.email ||
     process.env.DEFAULT_EMAIL_SENDER ||
-    'no-reply@mywed360.com';
+    'no-reply@malove.app';
 
   const primaryRecipient = recipients[0];
   const ccList = normalizeAddressList(cc);

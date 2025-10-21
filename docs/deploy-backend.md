@@ -9,8 +9,8 @@
   - NODE_ENV=production
   - ALLOWED_ORIGIN=https://tu-frontend (o http://localhost:5173 en dev)
   - MAILGUN_API_KEY
-  - MAILGUN_DOMAIN (p.ej. mywed360.com)
-  - MAILGUN_SENDING_DOMAIN (p.ej. mg.mywed360.com)
+  - MAILGUN_DOMAIN (p.ej. malove.app)
+  - MAILGUN_SENDING_DOMAIN (p.ej. mg.malove.app)
   - MAILGUN_EU_REGION=true | false (true si usas región EU)
   - OPENAI_API_KEY (opcional; si no existe, endpoints AI devolverán 500/simulado)
 
@@ -42,7 +42,7 @@
 - Eventos Mailgun: `GET https://<backend>/api/mailgun/events→recipient=tu@correo.com&event=delivered&limit=10`.
 - Envío de prueba: `POST https://<backend>/api/mail/test-personal-email` con JSON:
   {
-     – from – :  – usuario@mywed360.com – ,
+     – from – :  – usuario@malove.app – ,
      – to – :  – destino@dominio.com – ,
      – subject – :  – Prueba – ,
      – message – :  – Hola – 

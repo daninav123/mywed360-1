@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 /**
- * Servicio de integración con Mailgun para correos myWed360 (actualizado)
+ * Servicio de integración con Mailgun para correos MaLove.App (actualizado)
  * Este servicio gestiona todas las interacciones con Mailgun a través de
  * Firebase Cloud Functions por seguridad (no expone API keys en el frontend):
  * - Envío de correos
@@ -10,7 +10,7 @@
  */
 
 // Variables de configuración
-const DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'mywed360.com';
+const DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'malove.app';
 const FUNCTIONS_URL =
   import.meta.env.VITE_FIREBASE_FUNCTIONS_URL ||
   'https://us-central1-mywed360.cloudfunctions.net';

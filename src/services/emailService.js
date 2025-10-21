@@ -4,7 +4,7 @@ const IS_BROWSER = typeof window !== 'undefined';
 const IS_CYPRESS = typeof window !== 'undefined' && typeof window.Cypress !== 'undefined';
 
 export const BASE = import.meta.env.VITE_BACKEND_BASE_URL || '';
-export const MAILGUN_DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'mywed360.com';
+export const MAILGUN_DOMAIN = import.meta.env.VITE_MAILGUN_DOMAIN || 'malove.app';
 export const MAILGUN_API_KEY = import.meta.env.VITE_MAILGUN_API_KEY || '';
 export const USE_MAILGUN = import.meta.env.VITE_USE_MAILGUN === 'true';
 export const USE_BACKEND =
@@ -15,10 +15,10 @@ export const MAX_ATTACHMENT_SIZE_MB = Number(import.meta.env.VITE_MAX_ATTACHMENT
 export let CURRENT_USER = null;
 export let CURRENT_USER_EMAIL = '';
 
-const MAIL_STORAGE_KEY = 'mywed360_mails';
-const TEMPLATE_STORAGE_KEY = 'mywed360_email_templates';
-const DRAFT_STORAGE_KEY = 'mywed360_email_drafts';
-const INIT_MARKER_KEY = 'mywed360.email.init';
+const MAIL_STORAGE_KEY = 'malove_mails';
+const TEMPLATE_STORAGE_KEY = 'malove_email_templates';
+const DRAFT_STORAGE_KEY = 'malove_email_drafts';
+const INIT_MARKER_KEY = 'malove.email.init';
 
 let authContextRef = null;
 const HAS_FILE = typeof File !== 'undefined';
