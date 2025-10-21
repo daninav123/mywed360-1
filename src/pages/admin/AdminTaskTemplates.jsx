@@ -71,6 +71,11 @@ const AdminTaskTemplates = () => {
   const [showAddSubtaskModal, setShowAddSubtaskModal] = useState(false);
   const [selectedBlockForAdd, setSelectedBlockForAdd] = useState(null);
   const [newSubtask, setNewSubtask] = useState({ title: '', startPct: 0, endPct: 0, priority: 'medium' });
+  
+  // Estado para gestión de dependencias
+  const [showDependenciesModal, setShowDependenciesModal] = useState(false);
+  const [editingDepsTask, setEditingDepsTask] = useState(null); // { blockIndex, itemIndex }
+  const [selectedDependencies, setSelectedDependencies] = useState([]);
 
   const nextSuggestedVersion = useMemo(() => {
     if (!templates.length) return 1;
@@ -337,7 +342,8 @@ const AdminTaskTemplates = () => {
         priority: newSubtask.priority,
         category: block.admin?.category || 'OTROS',
         tags: [],
-        checklist: []
+        checklist: [],
+        dependsOn: [] // Campo para dependencias
       });
       
       setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
@@ -358,6 +364,95 @@ const AdminTaskTemplates = () => {
       setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
     } catch (e) {
       console.error('Error deleting item:', e);
+    }
+  };
+
+  // Gestión de dependencias
+  const openDependenciesModal = (blockIndex, itemIndex) => {
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      const task = blocks[blockIndex]?.items?.[itemIndex];
+      if (!task) return;
+      
+      setEditingDepsTask({ blockIndex, itemIndex });
+      setSelectedDependencies(task.dependsOn || []);
+      setShowDependenciesModal(true);
+    } catch (e) {
+      console.error('Error opening dependencies modal:', e);
+    }
+  };
+
+  const toggleDependency = (depBlockIndex, depItemIndex) => {
+    const depId = `${depBlockIndex}-${depItemIndex}`;
+    const exists = selectedDependencies.some(
+      d => d.blockIndex === depBlockIndex && d.itemIndex === depItemIndex
+    );
+
+    if (exists) {
+      setSelectedDependencies(prev => 
+        prev.filter(d => !(d.blockIndex === depBlockIndex && d.itemIndex === depItemIndex))
+      );
+    } else {
+      try {
+        const blocks = JSON.parse(form.blocksJson);
+        const depBlock = blocks[depBlockIndex];
+        const depItem = depBlock?.items?.[depItemIndex];
+        
+        if (depBlock && depItem) {
+          setSelectedDependencies(prev => [...prev, {
+            blockIndex: depBlockIndex,
+            itemIndex: depItemIndex,
+            blockName: depBlock.name || depBlock.title || `Bloque ${depBlockIndex + 1}`,
+            itemTitle: depItem.title || `Tarea ${depItemIndex + 1}`
+          }]);
+        }
+      } catch (e) {
+        console.error('Error toggling dependency:', e);
+      }
+    }
+  };
+
+  const saveDependencies = () => {
+    if (!editingDepsTask) return;
+    
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      const task = blocks[editingDepsTask.blockIndex]?.items?.[editingDepsTask.itemIndex];
+      
+      if (task) {
+        task.dependsOn = selectedDependencies;
+        setForm(prev => ({ ...prev, blocksJson: JSON.stringify(blocks, null, 2) }));
+        setShowDependenciesModal(false);
+        setEditingDepsTask(null);
+        setSelectedDependencies([]);
+      }
+    } catch (e) {
+      console.error('Error saving dependencies:', e);
+    }
+  };
+
+  const getAllTasksForDependencies = () => {
+    try {
+      const blocks = JSON.parse(form.blocksJson);
+      const allTasks = [];
+      
+      blocks.forEach((block, blockIndex) => {
+        const items = Array.isArray(block.items) ? block.items : [];
+        items.forEach((item, itemIndex) => {
+          allTasks.push({
+            blockIndex,
+            itemIndex,
+            blockName: block.name || block.title || `Bloque ${blockIndex + 1}`,
+            itemTitle: item.title || `Tarea ${itemIndex + 1}`,
+            isCurrentTask: editingDepsTask?.blockIndex === blockIndex && 
+                          editingDepsTask?.itemIndex === itemIndex
+          });
+        });
+      });
+      
+      return allTasks;
+    } catch (e) {
+      return [];
     }
   };
 
@@ -558,6 +653,26 @@ const AdminTaskTemplates = () => {
                                 </div>
                               </div>
                             )}
+
+                            {/* Dependencias */}
+                            <div className="mt-3 pt-2 border-t border-gray-200 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                {item.dependsOn && item.dependsOn.length > 0 ? (
+                                  <div className="flex items-center gap-1 text-xs text-orange-600">
+                                    <span>🔒</span>
+                                    <span>Depende de {item.dependsOn.length} tarea(s)</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-400">Sin dependencias</span>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => openDependenciesModal(blockIndex, itemIndex)}
+                                className="text-xs px-2 py-1 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded transition"
+                              >
+                                🔗 Gestionar
+                              </button>
+                            </div>
 
                             {/* Checklist */}
                             {item.checklist && item.checklist.length > 0 && (
@@ -1142,6 +1257,109 @@ const AdminTaskTemplates = () => {
                 className="px-4 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Añadir Subtarea
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Gestión de Dependencias */}
+      {showDependenciesModal && editingDepsTask && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">
+                🔗 Gestionar Dependencias
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Selecciona las tareas que deben completarse antes de esta tarea
+              </p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="space-y-3">
+                {getAllTasksForDependencies().map((task, idx) => {
+                  const isSelected = selectedDependencies.some(
+                    d => d.blockIndex === task.blockIndex && d.itemIndex === task.itemIndex
+                  );
+                  
+                  return (
+                    <label
+                      key={idx}
+                      className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition ${
+                        task.isCurrentTask
+                          ? 'bg-gray-100 border-gray-300 opacity-50 cursor-not-allowed'
+                          : isSelected
+                            ? 'bg-purple-50 border-purple-300'
+                            : 'bg-white border-gray-200 hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        disabled={task.isCurrentTask}
+                        onChange={() => toggleDependency(task.blockIndex, task.itemIndex)}
+                        className="mt-0.5 h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs text-gray-500 font-medium">
+                          {task.blockName}
+                        </div>
+                        <div className="text-sm text-gray-900 mt-0.5">
+                          {task.itemTitle}
+                        </div>
+                        {task.isCurrentTask && (
+                          <div className="text-xs text-gray-400 mt-1">
+                            (Tarea actual - no puede depender de sí misma)
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  );
+                })}
+
+                {getAllTasksForDependencies().length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    No hay otras tareas disponibles
+                  </div>
+                )}
+              </div>
+
+              {selectedDependencies.length > 0 && (
+                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <h3 className="text-sm font-medium text-orange-900 mb-2">
+                    📋 Resumen de Dependencias:
+                  </h3>
+                  <ul className="text-sm text-orange-800 space-y-1">
+                    {selectedDependencies.map((dep, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <span className="text-orange-600">→</span>
+                        <span className="font-medium">{dep.blockName}</span>
+                        <span className="text-orange-600">:</span>
+                        <span>{dep.itemTitle}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowDependenciesModal(false);
+                  setEditingDepsTask(null);
+                  setSelectedDependencies([]);
+                }}
+                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveDependencies}
+                className="px-4 py-2 text-sm bg-purple-600 text-white hover:bg-purple-700 rounded transition"
+              >
+                Guardar Dependencias
               </button>
             </div>
           </div>
