@@ -3,7 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import UploadWidget from '@/components/momentos/UploadWidget';
-import { getAlbumScenes, listenAlbum, validateGuestToken } from '@/services/momentosService';
+import {
+  getAlbumScenes,
+  getGalleryUploadState,
+  listenAlbum,
+  validateGuestToken,
+} from '@/services/momentosService';
 import { firebaseReady } from '@/firebaseConfig';
 
 const ALBUM_ID = 'momentos';
@@ -17,6 +22,18 @@ const slugifyGuest = (value = '') =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '') || 'invitado';
+
+const formatDate = (dateLike) => {
+  if (!dateLike) return '';
+  const date =
+    dateLike instanceof Date ? dateLike : new Date(dateLike?.toDate ? dateLike.toDate() : dateLike);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 
 export default function MomentosGuest() {
   const [searchParams] = useSearchParams();
@@ -32,6 +49,8 @@ export default function MomentosGuest() {
   const [uploadedCount, setUploadedCount] = useState(0);
   const [recentUploads, setRecentUploads] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const uploadState = useMemo(() => (album ? getGalleryUploadState(album) : null), [album]);
+  const uploadsClosed = uploadState ? !uploadState.isWindowOpen : false;
 
   useEffect(() => {
     let unsubscribeAlbum = null;
@@ -65,6 +84,16 @@ export default function MomentosGuest() {
       } catch {}
     };
   }, [tokenParam, weddingId]);
+
+  useEffect(() => {
+    if (!uploadState) return;
+    if (uploadState.isWindowOpen) return;
+    if (status === 'error') return;
+    setStatus('closed');
+    setErrorMessage(
+      `La galería dejó de aceptar fotos el ${formatDate(uploadState.closesAt)}.`
+    );
+  }, [uploadState, status]);
 
   const scenes = useMemo(() => {
     const base = getAlbumScenes(album);
@@ -102,6 +131,11 @@ export default function MomentosGuest() {
     }
     if (!acceptedTerms) {
       toast.warn('Debes aceptar la política de privacidad');
+      return;
+    }
+    if (uploadsClosed) {
+      toast.warn('Esta galería ya no acepta nuevas fotos.');
+      setStatus('closed');
       return;
     }
     setStatus('upload');
@@ -154,6 +188,23 @@ export default function MomentosGuest() {
     );
   }
 
+  if (status === 'closed') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+        <div className="bg-white border border-amber-100 rounded-xl shadow-sm px-6 py-8 max-w-md text-center space-y-3">
+          <h1 className="text-xl font-semibold text-amber-600">La galería está cerrada</h1>
+          <p className="text-sm text-slate-600">
+            {errorMessage ||
+              `El periodo para subir fotos terminó${uploadState?.closesAt ? ` el ${formatDate(uploadState.closesAt)}` : ''}.`}
+          </p>
+          <p className="text-xs text-slate-400">
+            Si todavía tienes recuerdos que compartir, avisa a la pareja anfitriona para que reabra el enlace.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (status === 'welcome') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -171,6 +222,16 @@ export default function MomentosGuest() {
             <p className="text-sm text-slate-500">
               Sube tus fotos favoritas del evento. El anfitrión podrá revisarlas y mostrarlas en el slideshow en vivo.
             </p>
+            {uploadState?.closesAt && (
+              <p className="text-xs text-slate-400">
+                La galería admite nuevas fotos hasta {formatDate(uploadState.closesAt)}.
+              </p>
+            )}
+            {uploadState?.compressionActive && (
+              <p className="text-xs text-slate-400">
+                Las fotos se optimizarán automáticamente para no ocupar tanto espacio.
+              </p>
+            )}
           </header>
 
           <div className="space-y-4">
@@ -248,6 +309,16 @@ export default function MomentosGuest() {
             Sube hasta {remainingUploads !== null ? `${remainingUploads} fotos adicionales` : 'todas las fotos que quieras'}.
             El anfitrión revisará y las compartirá con el grupo.
           </p>
+          {uploadState?.closesAt && (
+            <p className="text-xs text-slate-400">
+              Disponible hasta {formatDate(uploadState.closesAt)}.
+            </p>
+          )}
+          {uploadState?.compressionActive && (
+            <p className="text-xs text-slate-400">
+              Las fotos nuevas se optimizan automáticamente para ahorrar espacio.
+            </p>
+          )}
         </header>
 
         <UploadWidget
@@ -257,6 +328,7 @@ export default function MomentosGuest() {
           uploader={uploader}
           metadataBuilder={metadataBuilder}
           onUploaded={handleUploaded}
+          disabled={uploadsClosed}
         />
 
         <section className="bg-white border border-slate-200 rounded-xl shadow-sm px-6 py-5 space-y-3">

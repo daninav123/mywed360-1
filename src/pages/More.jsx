@@ -2,11 +2,13 @@ import { Users, Briefcase, Clock, Layers } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 
+import useTranslations from '../hooks/useTranslations';
 import { prefetchModule } from '../utils/prefetch';
 // PushService import removed; push controls moved out to Notification Center
 
 export default function More() {
   const [openMenu, setOpenMenu] = useState(null);
+  const { t } = useTranslations();
   // Push controls removed from this page to avoid duplication
 
   // Prefetch helpers
@@ -46,7 +48,7 @@ export default function More() {
     <div className="p-4 md:p-6 space-y-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Más</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('pages.more.title')}</h1>
       </div>
 
       {/* Tiles */}
@@ -57,8 +59,10 @@ export default function More() {
             className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
           >
             <Users size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">Invitados</h2>
-            <p className="text-sm text-muted">Gestiona invitados y seating plan.</p>
+            <h2 className="font-semibold mb-1">{t('pages.more.sections.guests.title')}</h2>
+            <p className="text-sm text-muted">
+              {t('pages.more.sections.guests.description')}
+            </p>
           </button>
           {openMenu === 'invitados' && (
             <div
@@ -68,13 +72,13 @@ export default function More() {
               onTouchStart={pfInvitadosMenu}
             >
               <Link to="/invitados" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Gestión de invitados
+                {t('pages.more.sections.guests.links.guests')}
               </Link>
               <Link
                 to="/invitados/seating"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Plan de asientos
+                {t('pages.more.sections.guests.links.seating')}
               </Link>
             </div>
           )}
@@ -86,8 +90,10 @@ export default function More() {
             className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
           >
             <Briefcase size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">Proveedores</h2>
-            <p className="text-sm text-muted">Gestiona proveedores y contratos.</p>
+            <h2 className="font-semibold mb-1">{t('pages.more.sections.providers.title')}</h2>
+            <p className="text-sm text-muted">
+              {t('pages.more.sections.providers.description')}
+            </p>
           </button>
           {openMenu === 'proveedores' && (
             <div
@@ -97,13 +103,13 @@ export default function More() {
               onTouchStart={pfProveedoresMenu}
             >
               <Link to="/proveedores" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Gestión de proveedores
+                {t('pages.more.sections.providers.links.providers')}
               </Link>
               <Link
                 to="/proveedores/contratos"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Contratos
+                {t('pages.more.sections.providers.links.contracts')}
               </Link>
             </div>
           )}
@@ -115,9 +121,9 @@ export default function More() {
             className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
           >
             <Clock size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">Protocolo</h2>
+            <h2 className="font-semibold mb-1">{t('pages.more.sections.protocol.title')}</h2>
             <p className="text-sm text-muted">
-              Momentos especiales, Timing, Checklist y Documentos legales
+              {t('pages.more.sections.protocol.description')}
             </p>
           </button>
           {openMenu === 'protocolo' && (
@@ -131,31 +137,31 @@ export default function More() {
                 to="/protocolo/momentos-especiales"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Momentos especiales
+                {t('pages.more.sections.protocol.links.specialMoments')}
               </Link>
               <Link
                 to="/protocolo/timing"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Timing
+                {t('pages.more.sections.protocol.links.timing')}
               </Link>
               <Link
                 to="/protocolo/checklist"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Checklist
+                {t('pages.more.sections.protocol.links.checklist')}
               </Link>
               <Link
                 to="/protocolo/ayuda-ceremonia"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Ayuda Ceremonia
+                {t('pages.more.sections.protocol.links.ceremonyHelp')}
               </Link>
               <Link
                 to="/protocolo/documentos"
                 className="block px-4 py-2 hover:bg-[var(--color-accent)]/10"
               >
-                Documentos
+                {t('pages.more.sections.protocol.links.documents')}
               </Link>
             </div>
           )}
@@ -167,8 +173,10 @@ export default function More() {
             className="bg-[var(--color-surface)] border border-soft p-4 rounded shadow hover:shadow-md flex flex-col text-left w-full"
           >
             <Layers size={32} className="text-primary mb-2" />
-            <h2 className="font-semibold mb-1">Extras</h2>
-            <p className="text-sm text-muted">Diseño web, ideas y recuerdos colaborativos</p>
+            <h2 className="font-semibold mb-1">{t('pages.more.sections.extras.title')}</h2>
+            <p className="text-sm text-muted">
+              {t('pages.more.sections.extras.description')}
+            </p>
           </button>
           {openMenu === 'extras' && (
             <div
@@ -178,16 +186,16 @@ export default function More() {
               onTouchStart={pfExtrasMenu}
             >
               <Link to="/diseno-web" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Diseño Web
+                {t('pages.more.sections.extras.links.web')}
               </Link>
               <Link to="/disenos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Diseños
+                {t('pages.more.sections.extras.links.designs')}
               </Link>
               <Link to="/ideas" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Ideas
+                {t('pages.more.sections.extras.links.ideas')}
               </Link>
               <Link to="/momentos" className="block px-4 py-2 hover:bg-[var(--color-accent)]/10">
-                Galería de recuerdos
+                {t('pages.more.sections.extras.links.moments')}
               </Link>
             </div>
           )}

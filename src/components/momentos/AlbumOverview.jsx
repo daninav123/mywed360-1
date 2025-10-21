@@ -57,6 +57,15 @@ const formatBytes = (bytes = 0) => {
   return `${size.toFixed(precision)} ${units[idx]}`;
 };
 
+const formatDate = (date) =>
+  date
+    ? date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      })
+    : 'sin definir';
+
 const badgeLabels = {
   primerMomento: 'Primer momento',
   momentoEntusiasta: 'Colaborador entusiasta',
@@ -74,6 +83,14 @@ export default function AlbumOverview({
   onCopyShareUrl,
 }) {
   const counters = album?.counters || {};
+  const uploadState = useMemo(() => getGalleryUploadState(album), [album]);
+  const totalBytes =
+    uploadState?.totalBytes !== undefined ? uploadState.totalBytes : counters.totalBytes || 0;
+  const thresholdBytes =
+    uploadState?.thresholdBytes || GALLERY_COMPRESSION_THRESHOLD_BYTES;
+  const compressionActive = Boolean(uploadState?.compressionActive);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const [qrError, setQrError] = useState(null);
   const scenes = getAlbumScenes(album);
 
   const sceneCoverage = useMemo(() => {
@@ -107,9 +124,97 @@ export default function AlbumOverview({
     }
   };
 
+  const handleDownloadQr = () => {
+    if (!qrDataUrl) {
+      toast.error('Genera el QR antes de descargarlo.');
+      return;
+    }
+    if (typeof document === 'undefined') return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    link.download = 'galeria-recuerdos-qr.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handlePrintQr = () => {
+    if (!qrDataUrl) {
+      toast.error('Genera el QR antes de imprimirlo.');
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    const printWindow = window.open('', '_blank', 'width=480,height=640');
+    if (!printWindow) {
+      toast.error('No se pudo abrir la ventana de impresión.');
+      return;
+    }
+    printWindow.document.write(`<!DOCTYPE html>
+      <html lang="es">
+        <head>
+          <meta charset="utf-8" />
+          <title>QR Galería de recuerdos</title>
+          <style>
+            body { font-family: Arial, sans-serif; text-align: center; padding: 24px; color: #1f2937; }
+            h1 { font-size: 22px; margin-bottom: 8px; }
+            p { font-size: 14px; margin: 12px 0; }
+            img { max-width: 320px; width: 100%; height: auto; margin: 16px auto; }
+            .note { font-size: 12px; color: #4b5563; }
+          </style>
+        </head>
+        <body>
+          <h1>Galería de recuerdos</h1>
+          <p>Escanea este código para subir tus fotos del evento.</p>
+          <img src="${qrDataUrl}" alt="Código QR Galería de recuerdos" />
+          <p class="note">${shareUrl}</p>
+        </body>
+      </html>`);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      try {
+        printWindow.print();
+      } catch {
+        /* noop */
+      }
+      try {
+        printWindow.close();
+      } catch {
+        /* noop */
+      }
+    }, 300);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!shareUrl) {
+      setQrDataUrl('');
+      setQrError(null);
+      return undefined;
+    }
+    QRCode.toDataURL(shareUrl, { width: 320, margin: 2 })
+      .then((dataUrl) => {
+        if (!cancelled) {
+          setQrDataUrl(dataUrl);
+          setQrError(null);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error('[AlbumOverview] Error generando QR', error);
+          setQrError('No se pudo generar el código QR');
+          setQrDataUrl('');
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shareUrl]);
+
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <section className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <StatCard label="Fotos totales" value={counters.totalPhotos || photos.length} />
         <StatCard
           label="Pendientes"
@@ -126,7 +231,47 @@ export default function AlbumOverview({
           value={counters.rejectedPhotos || 0}
           accent={counters.rejectedPhotos ? 'danger' : 'primary'}
         />
+        <StatCard
+          label="Espacio usado"
+          value={formatBytes(totalBytes)}
+          accent={compressionActive ? 'warning' : 'primary'}
+        />
       </section>
+
+      {uploadState && (
+        <section className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm space-y-3">
+          <div className="flex flex-col gap-2 text-sm text-gray-700 md:flex-row md:items-center md:justify-between">
+            <span>
+              Ventana de aportaciones:{' '}
+              <strong>
+                {uploadState.isWindowOpen
+                  ? `activa hasta ${formatDate(uploadState.closesAt)}`
+                  : `cerrada desde ${formatDate(uploadState.closesAt)}`}
+              </strong>
+            </span>
+            <span>
+              Compresión automática:{' '}
+              <strong>{uploadState.compressionActive ? 'activada' : 'desactivada'}</strong>
+            </span>
+          </div>
+          <div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Uso de almacenamiento</span>
+              <span>
+                {formatBytes(totalBytes)} / {formatBytes(thresholdBytes)}
+              </span>
+            </div>
+            <div className="mt-1 h-2 rounded-full bg-gray-200">
+              <div
+                className={`h-full rounded-full ${
+                  uploadState.compressionActive ? 'bg-amber-500' : 'bg-blue-500'
+                }`}
+                style={{ width: `${Math.min(100, uploadState.percentageUsed || 0)}%` }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
@@ -219,22 +364,68 @@ export default function AlbumOverview({
         </div>
 
         {shareUrl ? (
-          <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <input
-              type="text"
-              readOnly
-              value={shareUrl}
-              className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-gray-50"
-            />
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="px-3 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-100"
-            >
-              Copiar enlace
-            </button>
-          </div>
-        ) : null}
+          <>
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
+              <input
+                type="text"
+                readOnly
+                value={shareUrl}
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-gray-50"
+              />
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="px-3 py-2 rounded-md border border-gray-300 text-sm hover:bg-gray-100"
+              >
+                Copiar enlace
+              </button>
+            </div>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              <div className="flex items-center gap-4">
+                {qrDataUrl ? (
+                  <img
+                    src={qrDataUrl}
+                    alt="Código QR de la galería de recuerdos"
+                    className="h-32 w-32 rounded-lg border border-gray-200 bg-white p-2 shadow-sm"
+                  />
+                ) : (
+                  <div className="flex h-32 w-32 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 text-xs text-gray-400">
+                    {qrError ? 'No se pudo generar el QR' : 'Generando QR…'}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2 text-sm text-gray-600 max-w-md">
+                <p>
+                  Imprime el QR para colocarlo en el evento o compártelo por chat. Tus invitados
+                  podrán subir fotos al instante sin iniciar sesión.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadQr}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={!qrDataUrl}
+                  >
+                    Descargar PNG
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePrintQr}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={!qrDataUrl}
+                  >
+                    Imprimir cartel
+                  </button>
+                </div>
+                {qrError && <p className="text-xs text-red-500">{qrError}</p>}
+              </div>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-gray-500">
+            Genera un enlace para obtener el QR que podrán escanear los invitados.
+          </p>
+        )}
 
         {!!tokens.length && (
           <div className="border border-gray-100 rounded-md">
