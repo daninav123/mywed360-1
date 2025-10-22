@@ -209,33 +209,33 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
               </h2>
               
               <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
-                <span>Capacidad: {selectedTable.capacity}</span>
+                <span>{t('seatingMobile.tableDetail.capacity', { defaultValue: 'Capacidad' })}: {selectedTable.capacity}</span>
                 <span>•</span>
                 <span>Ocupación: {selectedTable.guests?.length || 0}</span>
               </div>
 
               {selectedTable.guests?.length > 0 ? (
                 <div className="space-y-2 mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Invitados</h3>
+                  <h3 className="font-semibold text-gray-900 mb-3">{t('seatingMobile.tableDetail.guestsHeading', { defaultValue: 'Invitados' })}</h3>
                   {selectedTable.guests.map(guest => (
                     <div
                       key={guest.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                     >
                       <span className="text-gray-900">{guest.name}</span>
-                      <button className="text-red-600 text-sm">Quitar</button>
+                      <button className="text-red-600 text-sm">{t('seatingMobile.actions.remove', { defaultValue: 'Quitar' })}</button>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8">No hay invitados asignados</p>
+                <p className="text-gray-500 text-center py-8">{t('seatingMobile.tableDetail.noGuests', { defaultValue: 'No hay invitados asignados' })}</p>
               )}
 
               <button
                 onClick={() => setSelectedTable(null)}
                 className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium"
               >
-                Cerrar
+                {t('seatingMobile.actions.close', { defaultValue: 'Cerrar' })}
               </button>
             </div>
           </div>

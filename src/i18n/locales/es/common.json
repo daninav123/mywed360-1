@@ -1336,5 +1336,39 @@
         "action": "Mantén este ritmo de gasto"
       }
     }
+  },
+  "seatingMobile": {
+    "header": {
+      "title": "Seating plan"
+    },
+    "search": {
+      "placeholder": "Buscar mesas o invitados..."
+    },
+    "stats": {
+      "tables": "Mesas",
+      "guests": "Invitados",
+      "pending": "Pendientes"
+    },
+    "tables": {
+      "moreGuests": "+{{count}} invitados más",
+      "empty": "Mesa vacía",
+      "assignedGuests": "{{count}} invitados asignados",
+      "occupancyLabel": "ocupación"
+    },
+    "pending": {
+      "title": "Invitados pendientes ({{count}})",
+      "moreGuests": "+{{count}} invitados más"
+    },
+    "actions": {
+      "assign": "Asignar",
+      "remove": "Quitar",
+      "close": "Cerrar"
+    },
+    "tableDetail": {
+      "capacity": "Capacidad",
+      "occupancy": "Ocupación",
+      "guestsHeading": "Invitados",
+      "noGuests": "No hay invitados asignados"
+    }
   }
 }

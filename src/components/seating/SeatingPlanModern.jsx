@@ -17,6 +17,7 @@ import SeatingInspectorFloating from './SeatingInspectorFloating';
 // Componentes Fase 3 (Premium)
 import ThemeToggle from './ThemeToggle';
 import ConfettiCelebration from './ConfettiCelebration';
+import QuickAddTableButton from './QuickAddTableButton';
 
 // Componentes existentes (reutilizados)
 import SeatingPlanCanvas from './SeatingPlanCanvas';
@@ -155,18 +156,33 @@ export default function SeatingPlanModern() {
 
   // Handler para añadir mesa
   const handleAddTable = useCallback(() => {
-    const newTable = {
-      id: `table-${Date.now()}`,
-      x: (hallSize?.width || 1800) / 2 - 50,
-      y: (hallSize?.height || 1200) / 2 - 50,
-      width: 100,
-      height: 100,
-      shape: 'circle',
-      capacity: 8,
-      number: (tables?.length || 0) + 1,
-    };
-    addTable(newTable);
-    toast.success('Mesa añadida');
+    try {
+      if (!addTable) {
+        toast.error('La función addTable no está disponible');
+        console.error('addTable no está en useSeatingPlan');
+        return;
+      }
+      
+      const newTable = {
+        id: `table-${Date.now()}`,
+        x: (hallSize?.width || 1800) / 2 - 50,
+        y: (hallSize?.height || 1200) / 2 - 50,
+        width: 100,
+        height: 100,
+        shape: 'circle',
+        capacity: 8,
+        seats: 8,
+        number: (tables?.length || 0) + 1,
+        name: `Mesa ${(tables?.length || 0) + 1}`,
+      };
+      
+      console.log('Añadiendo mesa:', newTable);
+      addTable(newTable);
+      toast.success('✨ Mesa añadida - Arrástrala para posicionarla');
+    } catch (error) {
+      console.error('Error añadiendo mesa:', error);
+      toast.error('Error al añadir mesa: ' + error.message);
+    }
   }, [addTable, hallSize, tables]);
 
   // Handler para duplicar mesa
