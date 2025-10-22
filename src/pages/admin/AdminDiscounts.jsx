@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { getDiscountLinks, createDiscountCode, updateDiscountCode, generatePartnerToken } from '../../services/adminDataService';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
@@ -1025,20 +1025,20 @@ const AdminDiscounts = () => {
         </>
       )}
 
-      {/* Modal crear cÃ³digo */}
+      {/* Modal crear código */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
             <header className="mb-4">
-              <h2 className="text-lg font-semibold">Crear cÃ³digo de descuento</h2>
+              <h2 className="text-lg font-semibold">Crear código de descuento</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-                Genera un nuevo cÃ³digo promocional o enlace comercial
+                Genera un nuevo código promocional o enlace comercial
               </p>
             </header>
 
             <form onSubmit={handleCreateDiscount} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">CÃ³digo *</label>
+                <label className="block text-sm font-medium mb-1">Código *</label>
                 <input
                   type="text"
                   value={formData.code}
@@ -1056,7 +1056,7 @@ const AdminDiscounts = () => {
                   onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 >
-                  <option value="campaign">CampaÃ±a</option>
+                  <option value="campaign">Campaña</option>
                   <option value="planner">Planner</option>
                   <option value="influencer">Influencer</option>
                   <option value="partner">Partner</option>
@@ -1089,13 +1089,13 @@ const AdminDiscounts = () => {
                     checked={formData.isPermanent}
                     onChange={(e) => setFormData(prev => ({ ...prev, isPermanent: e.target.checked }))}
                   />
-                  CÃ³digo permanente (sin lÃ­mite de usos)
+                  Código permanente (sin límite de usos)
                 </label>
               </div>
 
               {!formData.isPermanent && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">MÃ¡ximo de usos</label>
+                  <label className="block text-sm font-medium mb-1">Máximo de usos</label>
                   <input
                     type="number"
                     min="1"
@@ -1116,7 +1116,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validFrom: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: desde cuÃ¡ndo es vÃ¡lido</p>
+                  <p className="text-xs text-gray-500 mt-1">Opcional: desde cuándo es válido</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Fecha fin validez</label>
@@ -1126,7 +1126,7 @@ const AdminDiscounts = () => {
                     onChange={(e) => setFormData(prev => ({ ...prev, validUntil: e.target.value }))}
                     className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Opcional: hasta cuÃ¡ndo es vÃ¡lido</p>
+                  <p className="text-xs text-gray-500 mt-1">Opcional: hasta cuándo es válido</p>
                 </div>
               </div>
 
@@ -1166,12 +1166,11 @@ const AdminDiscounts = () => {
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="Detalles adicionales sobre este cÃ³digo..."
+                  placeholder="Detalles adicionales sobre este código..."
                   rows="2"
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />
               </div>
-
 
               <CommissionRulesEditor
                 value={formData.commissionRules}
@@ -1200,7 +1199,7 @@ const AdminDiscounts = () => {
                   disabled={creating || !formData.code.trim()}
                   className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)] disabled:opacity-50"
                 >
-                  {creating ? 'Creando...' : 'Crear cÃ³digo'}
+                  {creating ? 'Creando...' : 'Crear código'}
                 </button>
               </div>
             </form>
@@ -1208,14 +1207,14 @@ const AdminDiscounts = () => {
         </div>
       )}
 
-      {/* Modal editar cÃ³digo */}
+      {/* Modal editar código */}
       {showEditModal && editingDiscount && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl bg-surface p-6 shadow-xl">
             <header className="mb-4">
-              <h2 className="text-lg font-semibold">Editar cÃ³digo: {editingDiscount.code}</h2>
+              <h2 className="text-lg font-semibold">Editar código: {editingDiscount.code}</h2>
               <p className="text-sm text-[var(--color-text-soft,#6b7280)]">
-                Modifica los detalles del cÃ³digo promocional
+                Modifica los detalles del código promocional
               </p>
             </header>
 
@@ -1405,7 +1404,6 @@ const AdminDiscounts = () => {
 };
 
 export default AdminDiscounts;
-
 
 
 
