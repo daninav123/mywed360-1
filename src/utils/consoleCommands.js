@@ -72,6 +72,12 @@ class ConsoleCommands {
       checkEmails: () => this.checkEmails(),
       checkAI: () => this.checkAI(),
       checkFirebase: () => this.checkFirebase(),
+      
+      // Diagnóstico específico de sesión admin
+      checkAdminSession: () => this.checkAdminSession(),
+      testAdminRestore: () => this.testAdminRestore(),
+      showAdminStorage: () => this.showAdminStorage(),
+      clearAdminSession: () => this.clearAdminSession(),
 
       // Gestión de errores
       errors: () => this.showErrors(),
@@ -334,6 +340,12 @@ DIAGNÓSTICOS:
 • mywed.checkAI()       - Diagnosticar chat IA
 • mywed.checkFirebase() - Diagnosticar Firebase
 
+SESIÓN ADMIN 🔐:
+• mywed.checkAdminSession()  - Diagnóstico completo de sesión admin
+• mywed.testAdminRestore()   - Simular restauración de sesión
+• mywed.showAdminStorage()   - Ver todo el localStorage admin
+• mywed.clearAdminSession()  - Limpiar sesión admin
+
 ERRORES:
 • mywed.errors()        - Mostrar errores recientes
 • mywed.clearErrors()   - Limpiar todos los errores
@@ -350,10 +362,12 @@ UTILIDADES:
 • mywed.diagnostic      - Acceso directo al servicio de diagnóstico
 
 EJEMPLOS DE USO:
-• mywed.checkEmails()   // Verificar por qué no cargan los emails
-• mywed.checkAI()       // Verificar por qué no funciona el chat IA
-• mywed.errors()        // Ver todos los errores
-• mywed.copyErrors()    // Copiar errores para enviar al desarrollador
+• mywed.checkAdminSession()  // ¿Por qué pide contraseña cada vez?
+• mywed.testAdminRestore()   // Simular restauración paso a paso
+• mywed.checkEmails()        // Verificar por qué no cargan los emails
+• mywed.checkAI()            // Verificar por qué no funciona el chat IA
+• mywed.errors()             // Ver todos los errores
+• mywed.copyErrors()         // Copiar errores para enviar al desarrollador
 
 💡 Todos los comandos devuelven promesas y pueden usarse con await
 💡 Los resultados se muestran tanto en consola como se devuelven como objetos
@@ -363,6 +377,298 @@ EJEMPLOS DE USO:
   reloadApp() {
     console.log('🔄 Recargando aplicación...');
     window.location.reload();
+  }
+
+  // ========================================
+  // DIAGNÓSTICO DE SESIÓN ADMIN
+  // ========================================
+
+  checkAdminSession() {
+    console.group('🔐 DIAGNÓSTICO COMPLETO DE SESIÓN ADMIN');
+    
+    const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
+    const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
+    const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
+    const ADMIN_SESSION_EXPIRES_KEY = 'MyWed360_admin_session_expires';
+    const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+    
+    // 1. Verificar existencia de claves
+    console.log('\n📦 1. CLAVES EN LOCALSTORAGE:');
+    const keys = {
+      isAdminAuthenticated: localStorage.getItem(ADMIN_SESSION_FLAG),
+      adminProfile: localStorage.getItem(ADMIN_PROFILE_KEY),
+      sessionToken: localStorage.getItem(ADMIN_SESSION_TOKEN_KEY),
+      sessionExpires: localStorage.getItem(ADMIN_SESSION_EXPIRES_KEY),
+      sessionId: localStorage.getItem(ADMIN_SESSION_ID_KEY),
+    };
+    
+    console.table({
+      'Flag Autenticado': { existe: !!keys.isAdminAuthenticated, valor: keys.isAdminAuthenticated },
+      'Perfil Admin': { existe: !!keys.adminProfile, tamaño: keys.adminProfile?.length || 0 },
+      'Token Sesión': { existe: !!keys.sessionToken, tamaño: keys.sessionToken?.length || 0 },
+      'Expira En': { existe: !!keys.sessionExpires, valor: keys.sessionExpires },
+      'Session ID': { existe: !!keys.sessionId, valor: keys.sessionId },
+    });
+    
+    // 2. Parsear y validar valores
+    console.log('\n🔍 2. VALIDACIÓN DE VALORES:');
+    
+    let profile = null;
+    try {
+      if (keys.adminProfile) {
+        profile = JSON.parse(keys.adminProfile);
+        console.log('✅ Profile parseado correctamente:', profile);
+      } else {
+        console.error('❌ No hay perfil guardado');
+      }
+    } catch (e) {
+      console.error('❌ Error parseando profile:', e);
+    }
+    
+    // 3. Validar timestamp de expiración
+    console.log('\n⏰ 3. VALIDACIÓN DE EXPIRACIÓN:');
+    if (keys.sessionExpires) {
+      const rawExpires = keys.sessionExpires;
+      console.log('Valor raw:', rawExpires);
+      console.log('Tipo:', typeof rawExpires);
+      
+      const timestamp = parseInt(rawExpires, 10);
+      console.log('Timestamp parseado:', timestamp);
+      console.log('¿Es número válido?:', !isNaN(timestamp));
+      
+      if (!isNaN(timestamp)) {
+        const expiresAt = new Date(timestamp);
+        const now = Date.now();
+        const diff = timestamp - now;
+        const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const diffHours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        
+        console.log('Fecha de expiración:', expiresAt.toLocaleString());
+        console.log('Fecha actual:', new Date(now).toLocaleString());
+        console.log('Tiempo restante:', `${diffDays} días, ${diffHours} horas`);
+        
+        if (timestamp <= now) {
+          console.error('❌ LA SESIÓN HA EXPIRADO');
+        } else {
+          console.log('✅ Sesión válida');
+        }
+      } else {
+        console.error('❌ Timestamp inválido - NO se puede parsear');
+      }
+    } else {
+      console.error('❌ No hay fecha de expiración guardada');
+    }
+    
+    // 4. Verificar role del profile
+    console.log('\n👤 4. VALIDACIÓN DE ROL:');
+    if (profile) {
+      console.log('Role en profile:', profile.role);
+      if (profile.role === 'admin') {
+        console.log('✅ Role admin correcto');
+      } else {
+        console.error('❌ Role NO es admin:', profile.role);
+      }
+    } else {
+      console.error('❌ No se puede validar role (profile no existe)');
+    }
+    
+    // 5. Resumen final
+    console.log('\n📊 5. RESUMEN:');
+    const hasFlag = !!keys.isAdminAuthenticated;
+    const hasProfile = !!keys.adminProfile;
+    const hasToken = !!keys.sessionToken;
+    const hasExpires = !!keys.sessionExpires;
+    const profileValid = profile && profile.role === 'admin';
+    const sessionValid = keys.sessionExpires && 
+      !isNaN(parseInt(keys.sessionExpires, 10)) && 
+      parseInt(keys.sessionExpires, 10) > Date.now();
+    
+    const issues = [];
+    if (!hasFlag) issues.push('Falta flag de autenticación');
+    if (!hasProfile) issues.push('Falta perfil admin');
+    if (!hasToken) issues.push('Falta token de sesión');
+    if (!hasExpires) issues.push('Falta fecha de expiración');
+    if (!profileValid) issues.push('Profile inválido o role incorrecto');
+    if (!sessionValid) issues.push('Sesión expirada o timestamp inválido');
+    
+    if (issues.length === 0) {
+      console.log('✅ TODO CORRECTO - La sesión debería restaurarse');
+    } else {
+      console.error('❌ PROBLEMAS DETECTADOS:');
+      issues.forEach(issue => console.error(`   • ${issue}`));
+    }
+    
+    console.groupEnd();
+    
+    return {
+      hasFlag,
+      hasProfile,
+      hasToken,
+      hasExpires,
+      profileValid,
+      sessionValid,
+      issues,
+      keys,
+      profile,
+    };
+  }
+
+  testAdminRestore() {
+    console.group('🧪 TEST DE RESTAURACIÓN DE SESIÓN ADMIN');
+    
+    const ADMIN_SESSION_FLAG = 'isAdminAuthenticated';
+    const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
+    const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
+    const ADMIN_SESSION_EXPIRES_KEY = 'MyWed360_admin_session_expires';
+    const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
+    
+    console.log('Simulando función restoreAdminSession()...\n');
+    
+    try {
+      const isAdminSession = localStorage.getItem(ADMIN_SESSION_FLAG);
+      const rawProfile = localStorage.getItem(ADMIN_PROFILE_KEY);
+      const storedToken = localStorage.getItem(ADMIN_SESSION_TOKEN_KEY);
+      
+      console.log('PASO 1: Verificar flag y profile');
+      if (!isAdminSession || !rawProfile) {
+        console.error('❌ FALLO: isAdminSession o rawProfile falta');
+        console.log('isAdminSession:', isAdminSession);
+        console.log('rawProfile:', !!rawProfile);
+        console.groupEnd();
+        return false;
+      }
+      console.log('✅ Flag y profile existen');
+      
+      console.log('\nPASO 2: Parsear profile');
+      const profile = JSON.parse(rawProfile);
+      if (!profile || profile.role !== 'admin') {
+        console.error('❌ FALLO: Profile inválido o role no es admin');
+        console.log('profile:', profile);
+        console.groupEnd();
+        return false;
+      }
+      console.log('✅ Profile válido:', profile);
+      
+      console.log('\nPASO 3: Leer y parsear expiración');
+      const rawExpires = localStorage.getItem(ADMIN_SESSION_EXPIRES_KEY);
+      const sessionId = localStorage.getItem(ADMIN_SESSION_ID_KEY);
+      
+      console.log('rawExpires:', rawExpires);
+      console.log('sessionId:', sessionId);
+      
+      let expiresAt = null;
+      if (rawExpires) {
+        const timestamp = parseInt(rawExpires, 10);
+        console.log('timestamp parseado:', timestamp);
+        console.log('¿Es número?:', !isNaN(timestamp));
+        
+        if (!isNaN(timestamp)) {
+          expiresAt = new Date(timestamp);
+          console.log('expiresAt creado:', expiresAt);
+          console.log('expiresAt.toLocaleString():', expiresAt.toLocaleString());
+        }
+      }
+      
+      console.log('\nPASO 4: Verificar si expiró');
+      if (expiresAt && expiresAt.getTime() <= Date.now()) {
+        console.error('❌ FALLO: Sesión expirada');
+        console.log('expiresAt:', expiresAt.getTime());
+        console.log('now:', Date.now());
+        console.log('diff:', expiresAt.getTime() - Date.now());
+        console.groupEnd();
+        return false;
+      }
+      console.log('✅ Sesión NO expirada');
+      
+      console.log('\nPASO 5: Crear adminUser object');
+      const adminUser = {
+        uid: profile.id || 'admin-local',
+        email: profile.email || 'admin@lovenda.com',
+        displayName: profile.name || 'Administrador Lovenda',
+      };
+      console.log('adminUser creado:', adminUser);
+      
+      console.log('\n✅ ¡RESTAURACIÓN EXITOSA!');
+      console.log('La sesión DEBERÍA restaurarse correctamente');
+      console.log('\nDatos que se setearían:');
+      console.log('- currentUser:', adminUser);
+      console.log('- userProfile:', profile);
+      console.log('- adminSessionToken:', storedToken ? 'exists' : 'null');
+      console.log('- adminSessionExpiry:', expiresAt);
+      console.log('- adminSessionId:', sessionId);
+      
+      console.groupEnd();
+      return true;
+      
+    } catch (error) {
+      console.error('❌ ERROR EN RESTAURACIÓN:', error);
+      console.error('Stack:', error.stack);
+      console.groupEnd();
+      return false;
+    }
+  }
+
+  showAdminStorage() {
+    console.group('💾 CONTENIDO COMPLETO DE LOCALSTORAGE (ADMIN)');
+    
+    const adminKeys = Object.keys(localStorage).filter(key => 
+      key.includes('admin') || 
+      key.includes('Admin') || 
+      key.includes('isAuthenticated') ||
+      key.includes('MyWed360_admin')
+    );
+    
+    console.log(`Total de claves relacionadas con admin: ${adminKeys.length}\n`);
+    
+    adminKeys.forEach(key => {
+      const value = localStorage.getItem(key);
+      console.group(key);
+      console.log('Valor:', value);
+      console.log('Longitud:', value?.length || 0);
+      console.log('Tipo:', typeof value);
+      
+      // Intentar parsear JSON
+      if (value && (value.startsWith('{') || value.startsWith('['))) {
+        try {
+          const parsed = JSON.parse(value);
+          console.log('Parseado:', parsed);
+        } catch (e) {
+          console.log('No es JSON válido');
+        }
+      }
+      
+      console.groupEnd();
+    });
+    
+    console.groupEnd();
+    
+    return adminKeys.map(key => ({
+      key,
+      value: localStorage.getItem(key),
+      length: localStorage.getItem(key)?.length || 0,
+    }));
+  }
+
+  clearAdminSession() {
+    console.log('🧹 Limpiando sesión admin de localStorage...');
+    
+    const keys = [
+      'isAdminAuthenticated',
+      'MyWed360_admin_profile',
+      'MyWed360_admin_session_token',
+      'MyWed360_admin_session_expires',
+      'MyWed360_admin_session_id',
+    ];
+    
+    keys.forEach(key => {
+      localStorage.removeItem(key);
+      console.log(`✅ Eliminado: ${key}`);
+    });
+    
+    console.log('\n✅ Sesión admin limpiada completamente');
+    console.log('Recarga la página para volver al login');
+    
+    return true;
   }
 }
 
