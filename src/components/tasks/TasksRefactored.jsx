@@ -383,15 +383,33 @@ export default function TasksRefactored() {
     };
   }, []);
   const [columnWidthState, setColumnWidthState] = useState(65);
+  const ganttZoomMetaRef = useRef({
+    fromStorage: false,
+    persistReady: false,
+    initialFitApplied: false,
+  });
   const [ganttZoom, setGanttZoom] = useState(() => {
-    if (typeof window === 'undefined') return 1;
+    let fromStorage = false;
+    let value = 1;
+    if (typeof window === 'undefined') {
+      ganttZoomMetaRef.current.fromStorage = false;
+      ganttZoomMetaRef.current.persistReady = false;
+      return value;
+    }
     try {
       const raw = window.localStorage?.getItem?.(GANTT_ZOOM_STORAGE_KEY);
-      if (!raw) return 1;
-      return clampZoomValue(Number(raw));
+      if (raw) {
+        const parsed = Number(raw);
+        if (Number.isFinite(parsed)) {
+          value = clampZoomValue(parsed);
+          fromStorage = true;
+        }
+      }
     } catch {
-      return 1;
     }
+    ganttZoomMetaRef.current.fromStorage = fromStorage;
+    ganttZoomMetaRef.current.persistReady = fromStorage;
+    return value;
   });
   const [ganttPreSteps, setGanttPreSteps] = useState(0);
   const [ganttViewDate, setGanttViewDate] = useState(null);
@@ -401,6 +419,7 @@ export default function TasksRefactored() {
   const [projectEnd, setProjectEnd] = useState(null);
 
   useEffect(() => {
+    if (!ganttZoomMetaRef.current.persistReady) return;
     if (typeof window === 'undefined') return;
     try {
       window.localStorage?.setItem?.(GANTT_ZOOM_STORAGE_KEY, String(ganttZoom));
@@ -1125,6 +1144,19 @@ export default function TasksRefactored() {
     if (fitZoomObserved >= 1) return GANTT_ZOOM_MIN;
     return Math.min(1, Math.max(GANTT_ZOOM_FLOOR, fitZoomObserved));
   }, [fitZoomObserved]);
+  useEffect(() => {
+    if (ganttZoomMetaRef.current.fromStorage) {
+      ganttZoomMetaRef.current.persistReady = true;
+      return;
+    }
+    if (ganttZoomMetaRef.current.initialFitApplied) return;
+    if (!minZoomAllowed || !Number.isFinite(minZoomAllowed)) return;
+    const normalized = Math.round(minZoomAllowed * 1000) / 1000;
+    const tolerance = Math.max(0.0001, minZoomAllowed * 0.02);
+    ganttZoomMetaRef.current.initialFitApplied = true;
+    ganttZoomMetaRef.current.persistReady = true;
+    setGanttZoom((prev) => (Math.abs(prev - normalized) < tolerance ? prev : normalized));
+  }, [minZoomAllowed]);
   useEffect(() => {
     const enforceTolerance = Math.max(0.0005, minZoomAllowed * 0.05);
     if (ganttZoom < minZoomAllowed - enforceTolerance) {
