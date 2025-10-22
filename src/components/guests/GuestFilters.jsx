@@ -1,11 +1,10 @@
 import { Search, Filter, Plus, MessageSquare } from 'lucide-react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import wh from '../../utils/whDebug';
 import { Button } from '../ui';
 import { Input } from '../ui';
-import InviteTemplateModal from '../whatsapp/InviteTemplateModal';
 
 /**
  * Componente de filtros y acciones para la lista de invitados
@@ -22,10 +21,8 @@ const GuestFilters = React.memo(
     onAddGuest,
     onOpenSaveTheDate,
     onBulkInvite,
-    onOpenManualBatch,
     guestCount = 0,
     isLoading = false,
-    coupleName = '',
   }) => {
     const { t, wedding } = useTranslations();
 
@@ -72,24 +69,6 @@ const GuestFilters = React.memo(
       }
       onBulkInvite?.();
     }, [guestCount, onBulkInvite]);
-
-    const handleOpenManualBatch = useCallback(() => {
-      wh('UI – ManualBatch open', { guestCount });
-      if (guestCount === 0) {
-        alert('No hay invitados para enviar invitaciones');
-        return;
-      }
-      onOpenManualBatch?.();
-    }, [guestCount, onOpenManualBatch]);
-
-    const [showTemplateModal, setShowTemplateModal] = useState(false);
-
-    const handleEditTemplate = useCallback(() => {
-      try {
-        wh('UI – EditTemplate open');
-      } catch {}
-      setShowTemplateModal(true);
-    }, []);
 
     return (
       <>
@@ -188,29 +167,8 @@ const GuestFilters = React.memo(
               Invitaciones masivas (API)
             </Button>
 
-            <Button variant="outline" onClick={handleEditTemplate} disabled={isLoading}>
-              Editar mensaje (API)
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={handleOpenManualBatch}
-              disabled={isLoading || guestCount === 0}
-              title="Crear un lote manual con la plantilla actual"
-            >
-              Lote manual (API)
-            </Button>
           </div>
         </div>
-        <InviteTemplateModal
-          open={showTemplateModal}
-          onClose={() => setShowTemplateModal(false)}
-          onSaved={() => {
-            setShowTemplateModal(false);
-            alert('Plantilla actualizada');
-          }}
-          coupleName={coupleName}
-        />
       </>
     );
   }

@@ -136,28 +136,25 @@ const Access = ({ defaultMode = 'login' }) => {
     [t]
   );
 
-  const loginHero = t('authLogin.hero', { returnObjects: true });
-  const signupHero = t('authSignup.hero', { returnObjects: true });
-  const heroData = mode === 'signup' ? signupHero : loginHero;
-  const heroFeatures = Array.isArray(heroData?.features) ? heroData.features : [];
+  const heroCopy = t(`marketingAccess.hero.${mode}`, { returnObjects: true });
+  const heroBadge = t('marketingAccess.hero.badge', { defaultValue: 'Lovenda Access' });
+  const heroFeatures = Array.isArray(heroCopy?.features) ? heroCopy.features : [];
   const heroTitle =
-    heroData?.title ||
+    heroCopy?.title ||
     (mode === 'signup'
-      ? t('authSignup.hero.title', { defaultValue: 'Welcome to Lovenda' })
-      : t('authLogin.hero.title', { defaultValue: 'Manage everything from one place' }));
+      ? t('marketingAccess.hero.signup.title', { defaultValue: 'Welcome to Lovenda' })
+      : t('marketingAccess.hero.login.title', { defaultValue: 'Manage everything from one place' }));
   const heroDescription =
-    heroData?.description ||
+    heroCopy?.description ||
     (mode === 'signup'
-      ? t('authSignup.hero.description', {
+      ? t('marketingAccess.hero.signup.description', {
           defaultValue:
             'Centralise tasks, guests, and vendors in one place. Our assistant guides you every step.',
         })
-      : t('authLogin.hero.description', {
+      : t('marketingAccess.hero.login.description', {
           defaultValue:
             'Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync.',
         }));
-  const heroBadge =
-    heroData?.badge || t('app.name', { defaultValue: 'MaLove.App' });
 
   const resetFeedback = () => {
     setLoginError('');
@@ -218,13 +215,13 @@ const Access = ({ defaultMode = 'login' }) => {
     setLoginError('');
     setLoginInfo('');
     setLoginBusyProvider(provider);
+    const label = getProviderLabel?.(provider) || provider;
     try {
-      const label = getProviderLabel?.(provider) || provider;
-      setLoginInfo(`Redirigiendo a ${label}...`);
+      setLoginInfo(t('marketingAccess.social.redirect', { provider: label, defaultValue: `Redirecting to ${label}...` }));
       await loginWithProvider(provider);
       navigate(redirectPath, { replace: true });
     } catch (error) {
-      setLoginError(error?.message || 'No pudimos autenticarte con ese proveedor.');
+      setLoginError(error?.message || t('marketingAccess.errors.provider', { provider: label, defaultValue: `We could not authenticate with ${label}.` }));
     } finally {
       setLoginBusyProvider(null);
     }
@@ -257,7 +254,7 @@ const Access = ({ defaultMode = 'login' }) => {
       const result = await registerWithEmail(trimmedEmail, signupPassword, signupRole);
       if (result?.success) {
         setSignupInfo(
-          t('authSignup.successMessage', {
+          t('marketingAccess.signup.successMessage', {
             defaultValue: 'Account created successfully. Redirecting to your dashboard...',
           })
         );
@@ -283,7 +280,7 @@ const Access = ({ defaultMode = 'login' }) => {
     try {
       const label = getProviderLabel?.(provider) || provider;
       setSignupInfo(
-        t('authSignup.social.pending', {
+        t('marketingAccess.signup.socialPending', {
           provider: label,
           defaultValue: `Complete the sign-up flow in the ${label} window.`,
         })
@@ -347,12 +344,12 @@ const Access = ({ defaultMode = 'login' }) => {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-body">
-                      {t('authLogin.alreadySignedIn.title', { defaultValue: 'Active session' })}
+                      {t('marketingAccess.loggedIn.title', { defaultValue: 'Active session' })}
                     </h3>
                     <p className="mt-2 text-sm text-muted">
-                      {t('authLogin.alreadySignedIn.description', {
+                      {t('marketingAccess.loggedIn.description', {
                         defaultValue:
-                          'Your MaLove.App account is already open. You can keep working on your events or sign out if you need to switch accounts.',
+                          'Your Lovenda account is already open. Continue with your events or sign out if you need to switch accounts.',
                       })}
                     </p>
                   </div>
@@ -361,7 +358,7 @@ const Access = ({ defaultMode = 'login' }) => {
                       to="/home"
                       className="inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95"
                     >
-                      {t('authLogin.alreadySignedIn.primaryCta', { defaultValue: 'Go to dashboard' })}
+                      {t('marketingAccess.loggedIn.primaryCta', { defaultValue: 'Go to dashboard' })}
                     </Link>
                     <button
                       type="button"
@@ -369,7 +366,7 @@ const Access = ({ defaultMode = 'login' }) => {
                       className="inline-flex items-center justify-center gap-2 rounded-md border border-soft px-4 py-2.5 text-sm font-semibold text-body transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
                     >
                       <LogOut className="h-4 w-4" />
-                      {t('authLogin.alreadySignedIn.secondaryCta', { defaultValue: 'Sign out' })}
+                      {t('marketingAccess.loggedIn.secondaryCta', { defaultValue: 'Sign out' })}
                     </button>
                   </div>
                 </div>
@@ -386,7 +383,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        {t('authLogin.toggle.login', { defaultValue: 'Sign in' })}
+                        {t('marketingAccess.toggle.login', { defaultValue: 'Sign in' })}
                       </button>
                       <button
                         type="button"
@@ -397,7 +394,7 @@ const Access = ({ defaultMode = 'login' }) => {
                             : 'bg-transparent text-muted hover:text-body'
                         }`}
                       >
-                        {t('authLogin.toggle.signup', { defaultValue: 'Create account' })}
+                        {t('marketingAccess.toggle.signup', { defaultValue: 'Create account' })}
                       </button>
                     </div>
                   </div>
@@ -406,7 +403,7 @@ const Access = ({ defaultMode = 'login' }) => {
                     <form onSubmit={handleLoginSubmit} className="space-y-4 text-left" noValidate>
                       <div className="space-y-2">
                         <label htmlFor="access-login-email" className="text-sm font-medium text-body">
-                          {t('authLogin.emailLabel')}
+                          {t('marketingAccess.loginForm.emailLabel', { defaultValue: 'Email' })}
                         </label>
                         <input
                           id="access-login-email"
@@ -415,7 +412,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginEmail}
                           onChange={(event) => setLoginEmail(event.target.value)}
                           autoComplete="email"
-                          placeholder={t('authLogin.emailPlaceholder')}
+                          placeholder={t('marketingAccess.loginForm.emailPlaceholder', { defaultValue: 'your@email.com' })}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -423,7 +420,7 @@ const Access = ({ defaultMode = 'login' }) => {
 
                       <div className="space-y-2">
                         <label htmlFor="access-login-password" className="text-sm font-medium text-body">
-                          {t('authLogin.passwordLabel')}
+                          {t('marketingAccess.loginForm.passwordLabel', { defaultValue: 'Password' })}
                         </label>
                         <input
                           id="access-login-password"
@@ -432,7 +429,7 @@ const Access = ({ defaultMode = 'login' }) => {
                           value={loginPassword}
                           onChange={(event) => setLoginPassword(event.target.value)}
                           autoComplete="current-password"
-                          placeholder={t('authLogin.passwordPlaceholder')}
+                          placeholder={t('marketingAccess.loginForm.passwordPlaceholder', { defaultValue: 'Your password' })}
                           className="w-full rounded-md border border-soft bg-surface px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                           aria-invalid={loginError ? 'true' : 'false'}
                         />
@@ -446,10 +443,10 @@ const Access = ({ defaultMode = 'login' }) => {
                             checked={rememberLogin}
                             onChange={(event) => setRememberLogin(event.target.checked)}
                           />
-                          {t('authLogin.rememberMe')}
+                          {t('marketingAccess.loginForm.rememberMe', { defaultValue: 'Remember me' })}
                         </label>
                         <Link to="/reset-password" className="text-[var(--color-primary)] hover:brightness-110">
-                          {t('authLogin.forgotPassword')}
+                          {t('marketingAccess.loginForm.forgotPassword', { defaultValue: 'Forgot password?' })}
                         </Link>
                       </div>
 
@@ -469,11 +466,12 @@ const Access = ({ defaultMode = 'login' }) => {
                         disabled={isLoggingIn}
                         className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        {isLoggingIn ? t('authLogin.submitting') : t('authLogin.submit')}
+                        {isLoggingIn ? t('marketingAccess.loginForm.submitting', { defaultValue: 'Signing in…' }) : t('marketingAccess.loginForm.submit', { defaultValue: 'Sign in' })}
                       </button>
                     </form>
                   ) : (
                     <div className="space-y-4 text-left">
+                      <p className="text-sm text-muted">{t('marketingAccess.signup.info', { defaultValue: 'Complete the form to create your account.' })}</p>
                       <RegisterForm
                         email={signupEmail}
                         password={signupPassword}
@@ -508,24 +506,24 @@ const Access = ({ defaultMode = 'login' }) => {
                     <p className="mt-4 text-sm text-muted">
                       {mode === 'login' ? (
                         <>
-                          {t('authLogin.noAccount')}{' '}
+                          {t('marketingAccess.switch.noAccount', { defaultValue: 'Do not have an account?' })}{' '}
                           <button
                             type="button"
                             className="font-semibold text-[var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('signup')}
                           >
-                            {t('authLogin.registerLink')}
+                            {t('marketingAccess.switch.registerLink', { defaultValue: 'Create one' })}
                           </button>
                         </>
                       ) : (
                         <>
-                          {t('authSignup.alreadyHaveAccount')}{' '}
+                          {t('marketingAccess.switch.alreadyHaveAccount', { defaultValue: 'Already have an account?' })}{' '}
                           <button
                             type="button"
                             className="font-semibold text-[var(--color-primary)] hover:brightness-110"
                             onClick={() => handleModeChange('login')}
                           >
-                            {t('authSignup.loginLink')}
+                            {t('marketingAccess.switch.loginLink', { defaultValue: 'Sign in' })}
                           </button>
                         </>
                       )}
