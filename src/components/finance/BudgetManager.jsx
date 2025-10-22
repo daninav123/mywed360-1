@@ -21,6 +21,9 @@ export default function BudgetManager({
   budget,
   budgetUsage,
   stats,
+  benchmarks,
+  onApplyBenchmark,
+  onCaptureSnapshot,
   onUpdateBudget,
   onAddCategory,
   onReallocateCategories,
@@ -42,6 +45,14 @@ export default function BudgetManager({
   const [newCategory, setNewCategory] = useState({ name: '', amount: '' });
   const [showAdvisorModal, setShowAdvisorModal] = useState(false);
   const [localAdvisorLoading, setLocalAdvisorLoading] = useState(false);
+  const benchmarkState = benchmarks || {};
+  const benchmarkSampleSize = benchmarkState.sampleSize || benchmarkState.total?.count || 0;
+  const benchmarkConfidence = benchmarkState.confidence || 'very-low';
+  const benchmarkAverage = Number(benchmarkState.total?.avg) || 0;
+  const benchmarkApply =
+    typeof onApplyBenchmark === 'function' ? onApplyBenchmark : () => {};
+  const captureSnapshot =
+    typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
   const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
   const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
     ? effectiveAdvisor.scenarios
@@ -512,6 +523,13 @@ const distributeIncrease = (amounts, indices, delta) => {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
+            leftIcon={<CheckCircle size={16} />}
+            onClick={captureSnapshot}
+          >
+            {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
+          </Button>
+          <Button
+            variant="outline"
             leftIcon={
               advisorLoading || localAdvisorLoading ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -529,6 +547,51 @@ const distributeIncrease = (amounts, indices, delta) => {
           </Button>
         </div>
       </div>
+
+      {benchmarkState.loading && (
+        <div className="rounded-lg border border-dashed border-indigo-200 bg-indigo-50/60 px-4 py-2 text-sm text-indigo-700">
+          {t('finance.benchmarks.loading', {
+            defaultValue: 'Calculando sugerencias de presupuesto…',
+          })}
+        </div>
+      )}
+
+      {!benchmarkState.loading && benchmarkSampleSize > 0 && (
+        <div className="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-indigo-700">
+              {t('finance.benchmarks.title', {
+                defaultValue: 'Sugerencias de presupuesto basadas en bodas similares',
+              })}
+            </p>
+            <p className="text-xs text-indigo-600">
+              {t('finance.benchmarks.subtitle', {
+                defaultValue:
+                  'Basado en {{count}} presupuestos confirmados. Media estimada: {{average}} · Confianza: {{confidence}}.',
+                count: benchmarkSampleSize,
+                average: formatCurrency(benchmarkAverage),
+                confidence: benchmarkConfidence,
+              })}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => benchmarkApply('p50')}
+            >
+              {t('finance.benchmarks.applyMedian', { defaultValue: 'Aplicar mediana (p50)' })}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => benchmarkApply('p75')}
+            >
+              {t('finance.benchmarks.applyP75', { defaultValue: 'Aplicar percentil 75' })}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -778,7 +841,8 @@ const distributeIncrease = (amounts, indices, delta) => {
                 ? totalBudgetCents
                 : Math.max(categoriesTotalCents, assignedCents * 2, sliderMin + 10000);
               const sliderMax = Math.max(dynamicSliderBaseline, assignedCents, sliderMin + 10000);
-              const sliderStep = Math.max(1, Math.round(sliderMax / 1000));
+              const sliderStep =
+                sliderMax >= 5000 ? 5000 : Math.max(1, Math.round(sliderMax / 100));
               const sliderValue = Math.min(sliderMax, Math.max(sliderMin, assignedCents));
               const sliderDisabled = !onReallocateCategories;
               const sourceTag =
@@ -851,7 +915,33 @@ const distributeIncrease = (amounts, indices, delta) => {
                     </p>
                   )}
                   <div className="flex flex-wrap items-center gap-3 text-[11px]">
-                    <div className={`flex-1 min-w-[220px] ${sliderDisabled ? 'opacity-60' : ''}`}>
+                    <div className={`flex items-center gap-2 flex-1 min-w-[240px] ${sliderDisabled ? 'opacity-60' : ''}`}>
+                      <input
+                        type="number"
+                        min={(sliderMin / 100).toFixed(2)}
+                        step="0.01"
+                        defaultValue={assignedAmount.toFixed(2)}
+                        onBlur={(event) => {
+                          const raw = parseFloat(String(event.target.value).replace(',', '.'));
+                          if (Number.isNaN(raw)) {
+                            event.target.value = (sliderValue / 100).toFixed(2);
+                            return;
+                          }
+                          const cents = Math.round(raw * 100);
+                          const clamped = Math.max(sliderMin, Math.min(sliderMax, cents));
+                          handleAllocationChange(index, clamped);
+                          event.target.value = (clamped / 100).toFixed(2);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                        }}
+                        disabled={sliderDisabled}
+                        key={`${category.name || index}-${sliderValue}`}
+                        className="w-28 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-sm shadow-sm"
+                      />
                       <input
                         type="range"
                         min={sliderMin}

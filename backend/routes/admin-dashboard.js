@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import admin from 'firebase-admin';
 import { z } from 'zod';
 
@@ -6,6 +6,60 @@ import { db } from '../db.js';
 import logger from '../logger.js';
 import { createMailgunClients } from './mail/clients.js';
 import { normalizeCommissionRules } from '../utils/commission.js';
+
+const toSafeNumber = (value, fallback = 0) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+};
+
+const estimateCommissionFromRules = (rules, revenueValue) => {
+  if (!rules || !Array.isArray(rules.periods) || rules.periods.length === 0) return 0;
+  const revenue = toSafeNumber(revenueValue);
+  const tiers = [];
+
+  for (const period of rules.periods) {
+    if (!period || !Array.isArray(period.tiers)) continue;
+    for (const tier of period.tiers) {
+      if (tier) tiers.push(tier);
+    }
+  }
+
+  if (!tiers.length) return 0;
+
+  const pickTier = (predicate) =>
+    tiers
+      .filter(predicate)
+      .reduce((best, tier) => {
+        if (!best) return tier;
+        return toSafeNumber(tier.minRevenue) >= toSafeNumber(best.minRevenue) ? tier : best;
+      }, null);
+
+  let chosen = pickTier((tier) => {
+    const min = toSafeNumber(tier.minRevenue);
+    const max =
+      tier.maxRevenue === null || tier.maxRevenue === undefined
+        ? Infinity
+        : toSafeNumber(tier.maxRevenue, Infinity);
+    return revenue >= min && revenue <= max;
+  });
+
+  if (!chosen) {
+    chosen = pickTier((tier) => revenue >= toSafeNumber(tier.minRevenue));
+  }
+
+  if (!chosen) {
+    chosen = tiers.reduce((best, tier) => {
+      if (!best) return tier;
+      return toSafeNumber(tier.minRevenue) >= toSafeNumber(best.minRevenue) ? tier : best;
+    }, null);
+  }
+
+  if (!chosen) return 0;
+
+  const percentage = toSafeNumber(chosen.percentage);
+  const fixedAmount = toSafeNumber(chosen.fixedAmount);
+  return revenue * percentage + fixedAmount;
+};
 
 const router = express.Router();
 
@@ -35,11 +89,11 @@ const collections = {
   appDownloadEvents: () => db.collection('appDownloadEvents'),
   mobileDownloads: () => db.collection('mobileDownloads'),
   analyticsAppDownloads: () => db.collection('analyticsAppDownloads'),
-  // Colección compuesta de tareas creadas por usuarios en bodas
+  // ColecciÃ³n compuesta de tareas creadas por usuarios en bodas
   tasksGroup: () => db.collectionGroup('tasks'),
   // Plantillas de tareas administrativas
   taskTemplates: () => db.collection('adminTaskTemplates'),
-  // Descuentos/códigos promocionales
+  // Descuentos/cÃ³digos promocionales
   discountLinks: () => db.collection('discountLinks'),
 };
 
@@ -52,7 +106,7 @@ function toDate(value) {
       return new Date(value._seconds * 1000);
     }
     
-    // 2. Timestamp de Firestore con método toDate()
+    // 2. Timestamp de Firestore con mÃ©todo toDate()
     if (value.toDate && typeof value.toDate === 'function') {
       try {
         return value.toDate();
@@ -65,7 +119,7 @@ function toDate(value) {
     // 3. Ya es un objeto Date
     if (value instanceof Date) return value;
     
-    // 4. Timestamp Unix (número)
+    // 4. Timestamp Unix (nÃºmero)
     if (typeof value === 'number') return new Date(value);
     
     // 5. String ISO (YYYY-MM-DD o ISO 8601)
@@ -360,13 +414,13 @@ function extractKpis(metricsDoc) {
   );
   addKpi(
     'revenue-30d',
-    'Facturación (30 días)',
+    'FacturaciÃ³n (30 dÃ­as)',
     source.revenue30d ?? metricsDoc.revenue30d ?? metricsDoc.estimatedRevenue,
     { formatCurrency: true, testId: 'admin-kpi-revenue-30d' },
   );
   addKpi(
     'downloads-30d',
-    'Descargas app (30 días)',
+    'Descargas app (30 dÃ­as)',
     source.downloads30d ?? metricsDoc.downloads30d,
     { testId: 'admin-kpi-downloads-30d' },
   );
@@ -383,8 +437,8 @@ function extractKpis(metricsDoc) {
 function defaultKpis() {
   return [
     { id: 'active-weddings', testId: 'admin-kpi-active-weddings', label: 'Bodas activas', value: 0, trend: null },
-    { id: 'revenue-30d', testId: 'admin-kpi-revenue-30d', label: 'Facturación (30 días)', value: formatCurrency(0), trend: null },
-    { id: 'downloads-30d', testId: 'admin-kpi-downloads-30d', label: 'Descargas app (30 días)', value: 0, trend: null },
+    { id: 'revenue-30d', testId: 'admin-kpi-revenue-30d', label: 'FacturaciÃ³n (30 dÃ­as)', value: formatCurrency(0), trend: null },
+    { id: 'downloads-30d', testId: 'admin-kpi-downloads-30d', label: 'Descargas app (30 dÃ­as)', value: 0, trend: null },
     { id: 'open-alerts', testId: 'admin-kpi-open-alerts', label: 'Alertas activas', value: 0, trend: null },
   ];
 }
@@ -418,10 +472,10 @@ function extractServices(metricsDoc, servicesDocs) {
 
 function defaultServices() {
   return [
-    { id: 'firebase', name: 'Firebase', status: 'operational', latency: '—', incidents: 0 },
-    { id: 'mailgun', name: 'Mailgun', status: 'operational', latency: '—', incidents: 0 },
-    { id: 'whatsapp', name: 'WhatsApp', status: 'operational', latency: '—', incidents: 0 },
-    { id: 'openai', name: 'OpenAI', status: 'operational', latency: '—', incidents: 0 },
+    { id: 'firebase', name: 'Firebase', status: 'operational', latency: 'â€”', incidents: 0 },
+    { id: 'mailgun', name: 'Mailgun', status: 'operational', latency: 'â€”', incidents: 0 },
+    { id: 'whatsapp', name: 'WhatsApp', status: 'operational', latency: 'â€”', incidents: 0 },
+    { id: 'openai', name: 'OpenAI', status: 'operational', latency: 'â€”', incidents: 0 },
   ];
 }
 
@@ -441,7 +495,7 @@ function mapTaskDoc(doc) {
   const data = doc.data() || {};
   return {
     id: doc.id,
-    title: data.title || data.name || 'Tarea sin título',
+    title: data.title || data.name || 'Tarea sin tÃ­tulo',
     completed: Boolean(data.completed),
     priority: data.priority || null,
     dueDate: formatDateOnly(data.dueDate),
@@ -762,7 +816,7 @@ async function calculateRealNPS() {
   }
 }
 
-// Calcular métricas de conversión owners -> planners
+// Calcular mÃ©tricas de conversiÃ³n owners -> planners
 async function calculateConversionMetrics() {
   try {
     const usersSnap = await collections.users().get();
@@ -846,7 +900,7 @@ async function calculateRecurringRevenue() {
   }
 }
 
-// Calcular métricas de retención
+// Calcular mÃ©tricas de retenciÃ³n
 async function calculateRetentionMetrics(days = 30) {
   try {
     const startDate = new Date(Date.now() - days * DAY_MS);
@@ -992,7 +1046,7 @@ async function computeRealtimeOverview() {
 
   const totalUsers = await countDocuments(collections.users);
   const activeUsers30d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: thirtyTimestamp }]);
-  // Weddings raíz y fallback a grupo
+  // Weddings raÃ­z y fallback a grupo
   let totalWeddings = await countDocuments(collections.weddings);
   if (!totalWeddings) {
     try { totalWeddings = await countDocuments(collections.weddingsGroup); } catch { totalWeddings = 0; }
@@ -1020,14 +1074,14 @@ async function computeRealtimeOverview() {
     },
     {
       id: 'revenue-30d',
-      label: 'Facturación (30 días)',
+      label: 'FacturaciÃ³n (30 dÃ­as)',
       value: formatCurrency(revenue30dRaw),
       trend: null,
       testId: 'admin-kpi-revenue-30d',
     },
     {
       id: 'downloads-30d',
-      label: 'Descargas app (30 días)',
+      label: 'Descargas app (30 dÃ­as)',
       value: downloads30d,
       trend: null,
       testId: 'admin-kpi-downloads-30d',
@@ -1100,7 +1154,7 @@ router.get('/overview', async (_req, res) => {
 
     let alerts = alertDocs.map(mapAlertDoc);
     if (!alerts.length) alerts = [
-      { id: 'al-1', severity: 'high', module: 'Sistema', message: 'Sin datos de métricas (modo demo)', timestamp: formatDateTime(new Date()), resolved: false },
+      { id: 'al-1', severity: 'high', module: 'Sistema', message: 'Sin datos de mÃ©tricas (modo demo)', timestamp: formatDateTime(new Date()), resolved: false },
     ];
     const tasks = taskDocs.map(mapTaskDoc);
     const newTasks = Array.isArray(realtime?.newTasks) ? realtime.newTasks : [];
@@ -1122,7 +1176,7 @@ router.get('/overview', async (_req, res) => {
   }
 });
 
-// Reintentar conexión de un servicio de integraciones
+// Reintentar conexiÃ³n de un servicio de integraciones
 router.post('/integrations/:id/retry', async (req, res) => {
   try {
     const { id } = req.params;
@@ -1178,7 +1232,7 @@ router.get('/metrics', async (_req, res) => {
     const communications = ensureArray(latest?.communications);
     const supportMetrics = latest?.supportMetrics || null;
     
-    // Métricas avanzadas en tiempo real
+    // MÃ©tricas avanzadas en tiempo real
     const [conversionMetrics, recurringRevenue, retentionData] = await Promise.all([
       calculateConversionMetrics(),
       calculateRecurringRevenue(),
@@ -1196,7 +1250,7 @@ router.get('/metrics', async (_req, res) => {
     const usersActive7d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: sevenTimestamp }]);
     const usersActive30d = await countDocuments(collections.users, [{ field: 'lastLoginAt', op: '>=', value: thirtyTimestamp }]);
     
-    // Weddings: intentar raíz y luego grupo
+    // Weddings: intentar raÃ­z y luego grupo
     let weddingsTotal = await countDocuments(collections.weddings);
     if (!weddingsTotal) {
       try { weddingsTotal = await countDocuments(collections.weddingsGroup); } catch { weddingsTotal = 0; }
@@ -1209,7 +1263,7 @@ router.get('/metrics', async (_req, res) => {
     const withPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '!=', value: [] }]).catch(() => 0);
     const withoutPlanner = await countDocuments(collections.weddings, [{ field: 'plannerIds', op: '==', value: [] }]).catch(() => 0);
 
-    // Completar series/iaCosts con datos reales si no hay documento de métricas
+    // Completar series/iaCosts con datos reales si no hay documento de mÃ©tricas
     if (!Array.isArray(series) || series.length === 0) {
       try {
         const usersDaily = await aggregateDailyActiveUsers(30);
@@ -1244,7 +1298,7 @@ router.get('/metrics', async (_req, res) => {
       total: usersTotal,
       active7d: usersActive7d,
       active30d: usersActive30d,
-      dau: usersActive7d / 7, // Aproximación
+      dau: usersActive7d / 7, // AproximaciÃ³n
       mau: usersActive30d,
       stickiness: usersActive30d > 0 ? ((usersActive7d / 7) / usersActive30d * 100).toFixed(1) : 0,
       byRole: { owner: 0, planner: 0, assistant: 0 },
@@ -1278,7 +1332,7 @@ router.get('/metrics', async (_req, res) => {
   }
 });
 
-// Nuevos endpoints de métricas detalladas
+// Nuevos endpoints de mÃ©tricas detalladas
 router.get('/metrics/product', async (_req, res) => {
   try {
     const now = new Date();
@@ -1315,7 +1369,7 @@ router.get('/metrics/product', async (_req, res) => {
       webEditor: ((featureAdoption.webEditor / total) * 100).toFixed(1),
     };
     
-    // Nuevos registros últimos 30 días
+    // Nuevos registros Ãºltimos 30 dÃ­as
     const newUsersSnap = await collections.users()
       .where('createdAt', '>=', admin.firestore.Timestamp.fromDate(thirtyDaysAgo))
       .get();
@@ -1335,7 +1389,7 @@ router.get('/metrics/product', async (_req, res) => {
 
 router.get('/metrics/technical', async (_req, res) => {
   try {
-    // Web Vitals simulados (TODO: integrar con monitorización real)
+    // Web Vitals simulados (TODO: integrar con monitorizaciÃ³n real)
     const technicalMetrics = {
       performance: {
         lcp: 2.1,
@@ -1361,8 +1415,8 @@ router.get('/metrics/economic', async (_req, res) => {
     const conversionMetrics = await calculateConversionMetrics();
     
     // CAC & LTV (simulados - TODO: integrar con datos reales de marketing)
-    const cac = 45.50; // Coste de adquisición por cliente
-    const ltv = recurringRevenue.avgTicket * 12; // Simplificado: ticket medio × 12 meses
+    const cac = 45.50; // Coste de adquisiciÃ³n por cliente
+    const ltv = recurringRevenue.avgTicket * 12; // Simplificado: ticket medio Ã— 12 meses
     const cacLtvRatio = ltv / cac;
     
     res.json({
@@ -1392,12 +1446,12 @@ router.get('/support', async (_req, res) => {
     
     // Actualizar NPS con datos reales si existen
     if (npsData) {
-      if (!summary) summary = { open: 0, pending: 0, resolved: 0, slaAverage: '—', updatedAt: formatDateTime(new Date()) };
+      if (!summary) summary = { open: 0, pending: 0, resolved: 0, slaAverage: 'â€”', updatedAt: formatDateTime(new Date()) };
       summary.nps = npsData.score;
       summary.npsDetails = npsData;
     }
     
-    if (!summary) summary = { open: 0, pending: 0, resolved: 0, slaAverage: '—', nps: null, updatedAt: formatDateTime(new Date()) };
+    if (!summary) summary = { open: 0, pending: 0, resolved: 0, slaAverage: 'â€”', nps: null, updatedAt: formatDateTime(new Date()) };
     if (!tickets.length) tickets = [];
     
     res.json({ summary, tickets });
@@ -1410,7 +1464,7 @@ router.get('/users', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 100, MAX_LIMIT);
   const statusFilter = typeof req.query.status === 'string' ? req.query.status.trim() : '';
 
-  console.log('\n🔍 [DEBUG] GET /users endpoint called');
+  console.log('\nðŸ” [DEBUG] GET /users endpoint called');
   console.log('  - Limit:', limit);
   console.log('  - Status filter:', statusFilter || 'none');
   console.log('  - Firebase Admin initialized:', !!admin.apps.length);
@@ -1449,7 +1503,7 @@ router.get('/users', async (req, res) => {
           if (statusFilter && status !== statusFilter) continue;
 
           const createdAt =
-            formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || '—';
+            formatDateOnly(data.createdAt || data.created_at || docSnap.createTime) || 'â€”';
           const lastAccess =
             formatDateTime(
               data.lastAccess ||
@@ -1457,7 +1511,7 @@ router.get('/users', async (req, res) => {
                 data.lastAccessAt ||
                 data.updatedAt ||
                 data.lastActiveWeddingAt,
-            ) || '—';
+            ) || 'â€”';
 
           let weddingsCount = Number(
             data.weddings ?? data.weddingCount ?? data.stats?.weddings ?? 0,
@@ -1483,7 +1537,7 @@ router.get('/users', async (req, res) => {
         }
       }
     } catch (firestoreError) {
-      console.error('  ❌ Firestore query failed:', firestoreError.message);
+      console.error('  âŒ Firestore query failed:', firestoreError.message);
       console.log('  - Switching to Firebase Auth fallback...');
       logger.warn('[admin-dashboard] Firestore users query failed, trying Firebase Auth', { message: firestoreError?.message });
       fromAuth = true;
@@ -1501,7 +1555,7 @@ router.get('/users', async (req, res) => {
           // Intentar obtener datos adicionales de Firestore para cada usuario
           let weddingsCount = 0;
           let role = 'owner';
-          let lastAccess = '—';
+          let lastAccess = 'â€”';
           
           try {
             const userDoc = await collections.users().doc(userRecord.uid).get();
@@ -1512,7 +1566,7 @@ router.get('/users', async (req, res) => {
               if (!Number.isFinite(weddingsCount) || weddingsCount < 0) weddingsCount = 0;
               lastAccess = formatDateTime(
                 data.lastAccess || data.lastLoginAt || data.updatedAt
-              ) || '—';
+              ) || 'â€”';
             }
             
             if (weddingsCount === 0) {
@@ -1529,17 +1583,17 @@ router.get('/users', async (req, res) => {
             status,
             lastAccess,
             weddings: weddingsCount,
-            createdAt: formatDateOnly(userRecord.metadata.creationTime) || '—',
+            createdAt: formatDateOnly(userRecord.metadata.creationTime) || 'â€”',
           });
         }
       } catch (authError) {
-        console.error('  ❌ Firebase Auth also failed:', authError.message);
+        console.error('  âŒ Firebase Auth also failed:', authError.message);
         logger.error('[admin-dashboard] Firebase Auth listUsers failed', authError);
         throw authError;
       }
     }
 
-    console.log(`  ✅ Returning ${items.length} users (source: ${fromAuth ? 'firebase-auth' : 'firestore'})`);
+    console.log(`  âœ… Returning ${items.length} users (source: ${fromAuth ? 'firebase-auth' : 'firestore'})`);
     console.log('  - Sample user:', items[0] || 'none');
     
     return res.json({
@@ -1552,7 +1606,7 @@ router.get('/users', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('  ❌ Role summary error:', error.message);
+    console.error('  âŒ Role summary error:', error.message);
     logger.error('[admin-dashboard] users/role-summary error', error);
     return res.status(500).json({ error: 'admin_dashboard_role_summary_failed', message: error.message });
   }
@@ -1565,17 +1619,17 @@ router.get('/portfolio', async (req, res) => {
   const fromDateFilter = parseDateParam(req.query.fromDate, false);
   const toDateFilter = parseDateParam(req.query.toDate, true);
 
-  console.log('🔍 [DEBUG] GET /portfolio endpoint called');
+  console.log('ðŸ” [DEBUG] GET /portfolio endpoint called');
   console.log('  - Limit:', limit);
   console.log('  - Status filter:', statusFilter || 'all');
   console.log('  - Order:', order);
 
   try {
-    // Buscar bodas en ambos lugares: colección raíz Y subcolecciones
+    // Buscar bodas en ambos lugares: colecciÃ³n raÃ­z Y subcolecciones
     const allDocs = [];
     const seenIds = new Set(); // Para deduplicar
     
-    // 1. Buscar en colección raíz (sin orderBy para evitar problemas con updatedAt faltante)
+    // 1. Buscar en colecciÃ³n raÃ­z (sin orderBy para evitar problemas con updatedAt faltante)
     try {
       console.log('  - Querying root weddings collection...');
       const rootSnap = await collections
@@ -1628,7 +1682,7 @@ router.get('/portfolio', async (req, res) => {
     console.log(`  - Total UNIQUE documents found: ${allDocs.length}`);
 
     if (allDocs.length === 0) {
-      console.log('  ⚠️ No wedding documents found');
+      console.log('  âš ï¸ No wedding documents found');
       return res.json({
         items: [],
         meta: {
@@ -1656,7 +1710,7 @@ router.get('/portfolio', async (req, res) => {
       // Convertir fecha de forma segura - DEBUG
       let eventDateDate = null;
       try {
-        // Log para ver qué tipo de dato es
+        // Log para ver quÃ© tipo de dato es
         console.log(`[portfolio] Wedding ${docSnap.id} eventDateRaw:`, {
           value: eventDateRaw,
           type: typeof eventDateRaw,
@@ -1703,7 +1757,7 @@ router.get('/portfolio', async (req, res) => {
       if (items.length >= limit) break;
     }
 
-    console.log(`  ✅ Returning ${items.length} weddings`);
+    console.log(`  âœ… Returning ${items.length} weddings`);
     console.log('  - First wedding:', items[0]);
     
     return res.json({
@@ -1718,7 +1772,7 @@ router.get('/portfolio', async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('  ❌ Portfolio endpoint error:', error.message);
+    console.error('  âŒ Portfolio endpoint error:', error.message);
     logger.error('[admin-dashboard] portfolio error', error);
     return res.status(500).json({ error: 'admin_dashboard_portfolio_failed', message: error.message });
   }
@@ -1880,7 +1934,7 @@ router.post('/broadcasts', async (req, res) => {
 // --- Users role summary ---
 router.get('/users/role-summary', async (_req, res) => {
   const started = Date.now();
-  console.log('🔍 [DEBUG] GET /users/role-summary endpoint called');
+  console.log('ðŸ” [DEBUG] GET /users/role-summary endpoint called');
   try {
     console.log('  - Querying users collection...');
     const snap = await collections.users().limit(2000).get();
@@ -1956,7 +2010,7 @@ router.get('/users/role-summary', async (_req, res) => {
       }
     }
     
-    console.log(`  ✅ Role summary: owner=${ownerBucket.real}, planner=${plannerBucket.real}, assistant=${assistantBucket.real}`);
+    console.log(`  âœ… Role summary: owner=${ownerBucket.real}, planner=${plannerBucket.real}, assistant=${assistantBucket.real}`);
     
     const durationMs = Date.now() - started;
     return res.json({
@@ -1991,14 +2045,14 @@ router.get('/users/role-summary', async (_req, res) => {
 
 // --- Discounts ---
 router.get('/discounts', async (_req, res) => {
-  console.log('🔍 [DEBUG] GET /discounts endpoint called');
+  console.log('ðŸ” [DEBUG] GET /discounts endpoint called');
   try {
     const docs = await getCollectionDocs('discountLinks', { orderBy: 'createdAt', limit: 500 });
     console.log(`  - Found ${docs.length} discount links`);
     const items = docs.map((d) => {
       const data = d.data() || {};
       
-      // Función helper para convertir timestamps de forma segura
+      // FunciÃ³n helper para convertir timestamps de forma segura
       const safeToDate = (value) => {
         if (!value) return null;
         if (value.toDate && typeof value.toDate === 'function') {
@@ -2021,6 +2075,10 @@ router.get('/discounts', async (_req, res) => {
         data.commissionRules || null,
         { defaultCurrency: data.currency || 'EUR' },
       );
+
+      const commissionEstimate = commissionRules
+        ? estimateCommissionFromRules(commissionRules, Number(data.revenue || 0))
+        : 0;
 
       const createdAt = safeToDate(data.createdAt);
       const updatedAt = safeToDate(data.updatedAt);
@@ -2045,6 +2103,7 @@ router.get('/discounts', async (_req, res) => {
         assignedTo: data.assignedTo || null,
         notes: data.notes || null,
         commissionRules,
+        commissionEstimate,
         createdAt: createdAt ? formatDateOnly(createdAt) : null,
         updatedAt: updatedAt ? formatDateOnly(updatedAt) : null,
       };
@@ -2054,16 +2113,39 @@ router.get('/discounts', async (_req, res) => {
         acc.totalLinks += 1;
         acc.totalUses += it.uses;
         acc.totalRevenue += it.revenue;
+        if (it.commissionRules && it.commissionRules.periods?.length) {
+          acc.commission.total += toSafeNumber(it.commissionEstimate);
+          acc.commission.configured += 1;
+        } else {
+          acc.commission.missing += 1;
+        }
         return acc;
       },
-      { totalLinks: 0, totalUses: 0, totalRevenue: 0, currency: 'EUR' },
+      {
+        totalLinks: 0,
+        totalUses: 0,
+        totalRevenue: 0,
+        currency: 'EUR',
+        commission: {
+          total: 0,
+          configured: 0,
+          missing: 0,
+        },
+      },
     );
-    console.log(`  ✅ Returning ${items.length} discount links`);
+    summary.currency = items[0]?.currency || summary.currency || 'EUR';
+    summary.commission.currency = summary.currency;
+    summary.commission.average = summary.commission.configured
+      ? summary.commission.total / Math.max(summary.commission.configured, 1)
+      : 0;
+    summary.commission.total = Number(summary.commission.total.toFixed(2));
+    summary.commission.average = Number(summary.commission.average.toFixed(2));
+    console.log(`  âœ… Returning ${items.length} discount links`);
     console.log('  - Total revenue:', summary.totalRevenue);
     
     return res.json({ items, summary });
   } catch (error) {
-    console.error('  ❌ Discounts error:', error.message);
+    console.error('  âŒ Discounts error:', error.message);
     logger.error('[admin-dashboard] discounts error', error);
     return res.status(500).json({ error: 'admin_dashboard_discounts_failed', message: error.message });
   }
@@ -2230,9 +2312,9 @@ router.put('/discounts/:id', async (req, res) => {
     return res.status(500).json({ error: 'admin_dashboard_update_discount_failed', message: error.message });
   }
 });
-// Crear nuevo código de descuento
+// Crear nuevo cÃ³digo de descuento
 router.post('/discounts', async (req, res) => {
-  console.log('🔍 [DEBUG] POST /discounts endpoint called');
+  console.log('ðŸ” [DEBUG] POST /discounts endpoint called');
     try {
       const {
         code,
@@ -2305,7 +2387,7 @@ router.post('/discounts', async (req, res) => {
     
     const docRef = await collections.discountLinks().add(newDiscount);
     
-    console.log(`  ✅ Created discount code: ${cleanCode} (${isPermanent ? 'permanent' : `max ${maxUsesValue} uses`})`);
+    console.log(`  âœ… Created discount code: ${cleanCode} (${isPermanent ? 'permanent' : `max ${maxUsesValue} uses`})`);
     
     return res.status(201).json({
       id: docRef.id,
@@ -2314,7 +2396,7 @@ router.post('/discounts', async (req, res) => {
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('  ❌ Create discount error:', error.message);
+    console.error('  âŒ Create discount error:', error.message);
     logger.error('[admin-dashboard] create discount error', error);
     return res.status(500).json({ error: 'admin_dashboard_create_discount_failed', message: error.message });
   }
@@ -2425,7 +2507,7 @@ router.post('/support/tickets/:id/respond', async (req, res) => {
       createdAt: serverTs()
     };
     
-    // Añadir respuesta a la subcolección de conversación
+    // AÃ±adir respuesta a la subcolecciÃ³n de conversaciÃ³n
     await ticketRef.collection('responses').add(responseData);
     
     // Actualizar estado del ticket si se proporciona
@@ -2475,8 +2557,8 @@ router.post('/reports/generate', async (req, res) => {
     
     const reportRef = await collections.reports().add(reportData);
     
-    // TODO: Aquí se integraría con un servicio de generación de PDF
-    // Por ahora marcamos como completado después de un pequeño delay
+    // TODO: AquÃ­ se integrarÃ­a con un servicio de generaciÃ³n de PDF
+    // Por ahora marcamos como completado despuÃ©s de un pequeÃ±o delay
     setTimeout(async () => {
       await reportRef.set({
         status: 'completed',
@@ -2583,7 +2665,7 @@ router.post('/portfolio/export-pdf', async (req, res) => {
   }
 });
 
-// --- Task Templates CRUD (mínimo) ---
+// --- Task Templates CRUD (mÃ­nimo) ---
 const TaskTemplateSchema = z.object({
   version: z.string().min(1).default(() => `v${Date.now()}`),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
@@ -2593,7 +2675,7 @@ const TaskTemplateSchema = z.object({
   blocks: z.array(z.any()).default([]),
 });
 
-// Funciones de validación de dependencias
+// Funciones de validaciÃ³n de dependencias
 function flattenTasks(blocks) {
   const tasks = [];
   if (!Array.isArray(blocks)) return tasks;
@@ -2653,11 +2735,11 @@ function validateDependencies(blocks) {
   for (const task of allTasks) {
     const taskLabel = `"${task.itemTitle}" (Bloque: ${task.blockName})`;
     
-    // 1. Verificar referencias válidas
+    // 1. Verificar referencias vÃ¡lidas
     for (const dep of task.dependsOn || []) {
       const depTask = findTask(allTasks, dep);
       if (!depTask) {
-        errors.push(`${taskLabel} depende de una tarea inexistente (Bloque ${dep.blockIndex}, Ítem ${dep.itemIndex})`);
+        errors.push(`${taskLabel} depende de una tarea inexistente (Bloque ${dep.blockIndex}, Ãtem ${dep.itemIndex})`);
       }
     }
     
@@ -2666,7 +2748,7 @@ function validateDependencies(blocks) {
       errors.push(`Ciclo detectado en dependencias de ${taskLabel}`);
     }
     
-    // 3. Validación temporal (warnings, no errores críticos)
+    // 3. ValidaciÃ³n temporal (warnings, no errores crÃ­ticos)
     const taskStartPct = task.item.startPct;
     const taskEndPct = task.item.endPct;
     
@@ -2688,7 +2770,7 @@ function validateDependencies(blocks) {
     // 4. Prevenir auto-dependencia
     for (const dep of task.dependsOn || []) {
       if (dep.blockIndex === task.blockIndex && dep.itemIndex === task.itemIndex) {
-        errors.push(`${taskLabel} no puede depender de sí misma`);
+        errors.push(`${taskLabel} no puede depender de sÃ­ misma`);
       }
     }
   }
@@ -2813,3 +2895,4 @@ router.post('/task-templates/:id/preview', async (req, res) => {
 });
 
 export default router;
+

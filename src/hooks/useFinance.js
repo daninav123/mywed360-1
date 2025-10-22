@@ -1,4 +1,4 @@
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { transactionSchema, transactionUpdateSchema } from '@/schemas/transaction.js';
@@ -11,6 +11,11 @@ import { uploadEmailAttachments } from '../services/storageUploadService';
 import { saveData } from '../services/SyncService';
 import { requestBudgetAdvisor as fetchBudgetAdvisor } from '../services/budgetAdvisorService';
 import { getLocalFinance, updateLocalFinance } from '../services/localWeddingStore';
+import {
+  normalizeBudgetCategoryKey,
+  normalizeBudgetCategoryName,
+  computeGuestBucket as computeGuestBucketUtil,
+} from '../utils/budgetCategories';
 
 const resolveLocalUid = () => {
   if (typeof window === 'undefined') return null;
@@ -55,21 +60,13 @@ const AUTO_CATEGORY_RULES = [
       'save the date',
     ],
   },
-  {
-    cat: 'Luna de miel',
-    keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'],
-  },
+{
+  cat: 'Luna de miel',
+  keywords: ['vuelo', 'viaje', 'luna de miel', 'airbnb', 'booking', 'hotel'],
+},
 ];
 
-const normalizeCategoryName = (value) => {
-  if (!value) return '';
-  return String(value)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/gi, ' ')
-    .trim()
-    .toLowerCase();
-};
+const normalizeCategoryName = (value) => normalizeBudgetCategoryName(value);
 
 const dedupeServiceList = (list = []) => {
   const seen = new Set();
@@ -129,6 +126,10 @@ const parseMoneyValue = (value, fallback = 0) => {
   const num = Number(sanitized);
   return Number.isFinite(num) ? num : fallback;
 };
+
+const resolveCategoryKey = (value) => normalizeBudgetCategoryKey(value);
+
+const computeGuestBucket = (guestCount) => computeGuestBucketUtil(guestCount);
 
 const normalizeAdvisorTimestamp = (value) => {
   if (!value) return null;
@@ -1037,6 +1038,127 @@ export default function useFinance() {
     [budget.categories, budget.total, persistFinanceDoc]
   );
 
+  const captureBudgetSnapshot = useCallback(
+    async ({ status = 'confirmed', source = 'manual' } = {}) => {
+      if (!activeWedding || !db) {
+        return { success: false, reason: 'no_active_wedding' };
+      }
+      try {
+        const categories = Array.isArray(budget.categories) ? budget.categories : [];
+        if (!categories.length) {
+          return { success: false, reason: 'empty_categories' };
+        }
+
+        const normalizedCategories = categories
+          .map((cat) => {
+            const amount = parseMoneyValue(cat?.amount, 0);
+            const key = resolveCategoryKey(cat?.name || '');
+            if (!key || amount <= 0) return null;
+            return {
+              key,
+              name: cat?.name?.trim() || key,
+              amount,
+            };
+          })
+          .filter(Boolean);
+
+        if (!normalizedCategories.length) {
+          return { success: false, reason: 'normalized_empty' };
+        }
+
+        const totalBudget =
+          parseMoneyValue(budget.total, 0) ||
+          normalizedCategories.reduce((sum, entry) => sum + entry.amount, 0);
+        if (totalBudget <= 0) {
+          return { success: false, reason: 'total_budget_zero' };
+        }
+
+        const weddingCountry =
+          activeWeddingData?.countryCode ||
+          activeWeddingData?.country ||
+          activeWeddingData?.region ||
+          'global';
+        const regionKey = normalizeCategoryName(weddingCountry) || 'global';
+        const guestCount =
+          contributions?.guestCount ||
+          activeWeddingData?.guestCount ||
+          0;
+        const guestBucket = computeGuestBucket(guestCount);
+
+        const normalizedHash = normalizedCategories
+          .map((entry) => `${entry.key}:${Math.round(entry.amount * 100)}`)
+          .sort()
+          .join('|');
+
+        const nowIso = new Date().toISOString();
+        const snapshotPayload = {
+          status,
+          snapshotId: nowIso,
+          capturedAt: nowIso,
+          capturedAtTs: serverTimestamp(),
+          currency:
+            activeWeddingData?.currency ||
+            settings?.currency ||
+            contributions?.currency ||
+            'EUR',
+          wedding: {
+            id: activeWedding,
+            guestCount,
+            country: weddingCountry,
+            region:
+              activeWeddingData?.province ||
+              activeWeddingData?.state ||
+              activeWeddingData?.city ||
+              '',
+            style: activeWeddingData?.style || null,
+            type: activeWeddingData?.eventType || activeWeddingData?.type || 'boda',
+          },
+          totals: {
+            budget: totalBudget,
+            spent: Number(stats?.totalSpent) || 0,
+            expectedIncome: Number(expectedIncome) || 0,
+          },
+          categories: normalizedCategories,
+          regionKey,
+          guestBucket,
+          meta: {
+            version: 1,
+            source,
+            normalizedHash,
+            updatedAt: serverTimestamp(),
+          },
+        };
+
+        const snapshotId = nowIso.replace(/[:.]/g, '-');
+        await setDoc(
+          doc(db, 'weddings', activeWedding, 'budgetSnapshots', snapshotId),
+          snapshotPayload
+        );
+        await setDoc(
+          doc(db, 'budgetSnapshots', activeWedding),
+          snapshotPayload,
+          { merge: true }
+        );
+
+        return { success: true, snapshotId };
+      } catch (error) {
+        console.error('[useFinance] captureBudgetSnapshot failed', error);
+        return { success: false, error: error?.message || 'snapshot_failed' };
+      }
+    },
+    [
+      activeWedding,
+      activeWeddingData,
+      budget.categories,
+      budget.total,
+      contributions,
+      expectedIncome,
+      settings?.currency,
+      stats?.totalSpent,
+      db,
+    ]
+  );
+
   const requestBudgetAdvisor = useCallback(async () => {
     if (!activeWedding) {
       throw new Error('No hay una boda activa seleccionada.');
@@ -1865,6 +1987,8 @@ export default function useFinance() {
     advisorLoading,
     advisorError,
     transactions,
+    activeWedding,
+    activeWeddingData,
 
     // Cálculos
     stats,
@@ -1896,6 +2020,7 @@ export default function useFinance() {
     importBankTransactions,
     importTransactionsBulk,
     exportFinanceReport,
+    captureBudgetSnapshot,
 
     // Utilidades
     clearError: () => setError(null),

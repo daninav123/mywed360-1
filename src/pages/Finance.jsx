@@ -13,9 +13,11 @@ const FinanceCharts = React.lazy(() => import('../components/finance/FinanceChar
 import useFinance from '../hooks/useFinance';
 import useProveedores from '../hooks/useProveedores';
 import useTranslations from '../hooks/useTranslations';
+import useBudgetBenchmarks from '../hooks/useBudgetBenchmarks';
 import { useLocation } from 'react-router-dom';
 import Modal from '../components/Modal';
 import TransactionForm from '../components/finance/TransactionForm';
+import { normalizeBudgetCategoryKey } from '../utils/budgetCategories';
 
 function Finance() {
   const { t } = useTranslations();
@@ -47,6 +49,8 @@ function Finance() {
     advisorLoading,
     advisorError,
     transactions,
+    activeWedding,
+    activeWeddingData,
 
     // Cálculos
     stats,
@@ -74,6 +78,7 @@ function Finance() {
     importBankTransactions,
     importTransactionsBulk,
     exportFinanceReport,
+    captureBudgetSnapshot,
     clearError,
   } = useFinance();
 
@@ -114,6 +119,55 @@ function Finance() {
     if (typeof newTotal === 'string') newTotal = Number(newTotal);
     if (Number.isNaN(newTotal) || newTotal < 0) return;
     updateTotalBudget(newTotal);
+  };
+
+  const benchmarkData = useBudgetBenchmarks({
+    country: activeWeddingData?.countryCode || activeWeddingData?.country,
+    region: activeWeddingData?.province || activeWeddingData?.state || activeWeddingData?.city,
+    guestCount: contributions?.guestCount || activeWeddingData?.guestCount,
+    enabled: Boolean(activeWedding),
+  });
+
+  const handleApplyBenchmark = (strategy = 'p50') => {
+    if (!benchmarkData || typeof benchmarkData.applySuggestion !== 'function') return;
+    const suggestions = benchmarkData.applySuggestion(strategy).filter((entry) => entry.amount > 0);
+    if (!suggestions.length) return;
+
+    const existing = Array.isArray(budget?.categories) ? [...budget.categories] : [];
+    const map = new Map(
+      existing.map((cat) => [normalizeBudgetCategoryKey(cat?.name || ''), { ...cat }])
+    );
+
+    suggestions.forEach((suggestion) => {
+      const key = normalizeBudgetCategoryKey(suggestion.key);
+      if (!key || suggestion.amount <= 0) return;
+      const current = map.get(key);
+      if (current) {
+        if (!Number(current.amount)) {
+          current.amount = suggestion.amount;
+        }
+      } else {
+        const label = suggestion.key
+          .split('-')
+          .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+          .join(' ');
+        map.set(key, {
+          name: label,
+          amount: suggestion.amount,
+          muted: false,
+        });
+      }
+    });
+
+    const nextCategories = Array.from(map.values());
+    setBudgetCategories(nextCategories);
+  };
+
+  const handleCaptureSnapshot = async () => {
+    const result = await captureBudgetSnapshot({ status: 'confirmed', source: 'manual' });
+    if (!result?.success && result?.error) {
+      console.warn('[Finance] captureBudgetSnapshot failed', result.error);
+    }
   };
 
   return (
@@ -254,6 +308,9 @@ function Finance() {
               budget={budget}
               budgetUsage={budgetUsage}
               stats={stats}
+              benchmarks={benchmarkData}
+              onApplyBenchmark={handleApplyBenchmark}
+              onCaptureSnapshot={handleCaptureSnapshot}
               onUpdateBudget={handleUpdateTotalBudget}
               onAddCategory={addBudgetCategory}
               onReallocateCategories={setBudgetCategories}

@@ -1,26 +1,27 @@
-# 🎉 Tests E2E con Integración Real - Reporte Final de Éxito
+# 🎯 Tests E2E con Integración Real - Estado Actual
 
-**Fecha:** 20 de Enero, 2025 (Actualizado)  
-**Estado:** ✅ **100% COMPLETADO Y VERIFICADO**
+**Fecha:** 22 de Octubre, 2025 (actualizado)  
+**Estado:** ⚠️ **En progreso** — 10 suites `*-real.cy.js` ejecutan integraciones reales; el resto continúa en modo legacy con interceptores.
 
 ---
 
-## 📊 Resultados Finales
+## 📊 Resumen de Cobertura (Integración Real)
 
-### Tests Ejecutados y Aprobados
+| Módulo | Suites `*-real.cy.js` | Cobertura funcional | Notas clave |
+|--------|----------------------|---------------------|-------------|
+| **Auth** | `auth/auth-flow-real.cy.js`<br>`critical/auth-real.cy.js` | Login persistente, rutas protegidas, smoke crítico | Falta migrar `flow1-*` (signup, social, password reset) |
+| **Dashboard** | `critical/dashboard-real.cy.js`<br>`dashboard/main-navigation-real.cy.js`<br>`dashboard/global-search-shortcuts-real.cy.js` | Navegación planner, shortcuts globales, smoke crítico | `planner-dashboard.cy.js` sigue legacy |
+| **Guests** | `critical/guests-real.cy.js` | CRUD invitados sobre Firestore | Resto de suites `guests/*.cy.js` usan mocks |
+| **Email** | `email/email-critical-real.cy.js`<br>`email/send-email-real.cy.js`<br>`email/read-email-real.cy.js`<br>`email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales | Suites de AI, validaciones y adjuntos permanecen mock |
 
-| Módulo | Tests | Pasando | Fallando | % Éxito |
-|--------|-------|---------|----------|---------|
-| **Auth** | 5 | ✅ 5 | 0 | 100% |
-| **Dashboard Critical** | 10 | ✅ 10 | 0 | 100% |
-| **Dashboard Navigation** | 8 | ✅ 8 | 0 | 100% |
-| **Global Search & Shortcuts** | 9 | ✅ 9 | 0 | 100% |
-| **Guests** | 7 | ✅ 7 | 0 | 100% |
-| **Email Critical** | 10 | ✅ 10 | 0 | 100% |
-| **Email - Send** | 6 | ✅ 6 | 0 | 100% |
-| **Email - Read** | 9 | ✅ 9 | 0 | 100% |
-| **Email - Folders** | 9 | ✅ 9 | 0 | 100% |
-| **TOTAL** | **73** | **✅ 73** | **0** | **100%** |
+---
+
+## 🚧 Módulos Pendientes
+
+- **Blog, Contracts, Finance, Seating, Admin y otros flujos específicos** — sin suites `*-real` todavía; únicamente existen specs legacy con interceptores.
+- **Onboarding/RSVP/Tasks/etc.** — documentados como cubiertos pero sólo cuentan con pruebas mockeadas.
+
+La meta sigue siendo migrar todas las suites mencionadas en la documentación a versiones `*-real.cy.js` y retirar interceptores por defecto una vez completada la transición.
 
 ---
 
@@ -286,13 +287,12 @@ npx cypress run --spec "cypress/e2e/**/*-real.cy.js"
 
 ---
 
-## ✅ Criterios de Éxito Cumplidos
+## ✅ Criterios de Éxito (estado parcial)
 
-1. ✅ **Sin mocks ni stubs** - Integración 100% real con Firebase y Backend
-2. ✅ **Todos los tests pasan** - 32/32 tests con exit code 0
-3. ✅ **Backend y Frontend funcionando** - Puertos 4004 y 5173 operativos
-4. ✅ **Tests reproducibles** - Se pueden ejecutar múltiples veces sin fallar
-5. ✅ **Documentación completa** - Este reporte + commits descriptivos
+- ✅ **Integración real sin mocks** en las suites `*-real.cy.js` listadas arriba.
+- ✅ **Infraestructura operativa** — frontend (`5173`) y backend (`4004`) necesarios para dichas suites.
+- ⚠️ **Cobertura incompleta** — la mayoría de flows documentados siguen bajo suites legacy con interceptores.
+- ⚠️ **Documentación** — este reporte y la matriz de cobertura deben revisarse tras cada migración adicional.
 
 ---
 
@@ -325,13 +325,6 @@ npx cypress run --spec "cypress/e2e/**/*-real.cy.js"
 
 ## 🏆 Conclusión
 
-**Los tests E2E con integración real están 100% funcionales.**
+Las suites `*-real.cy.js` para Auth, Dashboard, Guests y Email funcionan con integraciones reales y sirven como base comprobada para la migración. Sin embargo, la mayoría de los flujos descritos en la documentación aún dependen de pruebas legacy con interceptores.
 
-Todos los tests críticos pasan sin errores usando:
-- ✅ Firebase Auth real
-- ✅ Firestore real  
-- ✅ Backend API real
-- ✅ Frontend Vite real
-- ✅ Sin mocks, sin stubs, sin datos simulados
-
-**¡Misión Cumplida! 🎉**
+**Siguiente objetivo:** Migrar el resto de las suites a variantes `*-real.cy.js`, actualizar la documentación asociada y retirar gradualmente los mocks globales.

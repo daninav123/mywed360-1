@@ -15,6 +15,25 @@ if (!admin.apps?.length) {
 }
 const db = admin.firestore();
 
+const BUDGET_CATEGORY_ALIASES = new Map([
+  [
+    'catering',
+    ['banquete', 'comida', 'restauracion', 'restauración', 'menu', 'menú', 'meal', 'banqueteria'],
+  ],
+  ['photo', ['fotografia', 'fotografía', 'foto', 'photos', 'fotografos', 'fotógrafos']],
+  ['video', ['video', 'vídeo', 'filmacion', 'filmación', 'videografo']],
+  ['music', ['musica', 'música', 'dj', 'band', 'orquesta', 'sonido']],
+  ['flowers', ['flores', 'floristeria', 'floristería', 'decor floral', 'floral']],
+  ['venue', ['lugar', 'espacio', 'salon', 'salón', 'venue']],
+  ['planner', ['wedding planner', 'planificador', 'coordinacion', 'coordinación']],
+  ['beauty', ['maquillaje', 'peluqueria', 'peluquería', 'beauty', 'estética', 'estetica']],
+  ['stationery', ['papeleria', 'papelería', 'invitaciones', 'invitacion', 'seatings']],
+  ['lighting', ['luces', 'iluminacion', 'iluminación', 'sonido e iluminación']],
+  ['transport', ['transporte', 'autobus', 'autobús', 'bus', 'coche']],
+  ['cake', ['tarta', 'pastel', 'postre']],
+  ['decor', ['decoracion', 'decoración', 'ambientacion', 'ambientación']],
+]);
+
 // ----- CORS estricto para Functions -----
 const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:5173',
@@ -1579,6 +1598,144 @@ exports.validateEmail = functions.https.onRequest((request, response) => {
   });
 });
 
+
+const normalizeBudgetCategoryKey = (value) => {
+  if (!value) return '';
+  const normalized = String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/gi, ' ')
+    .trim()
+    .toLowerCase();
+  if (!normalized) return '';
+  for (const [key, aliases] of BUDGET_CATEGORY_ALIASES.entries()) {
+    if (key === normalized) return key;
+    if (aliases.includes(normalized)) return key;
+  }
+  return normalized;
+};
+
+const computeGuestBucket = (guestCount) => {
+  const count = Number(guestCount) || 0;
+  if (count <= 0) return '0-0';
+  const size = 50;
+  const start = Math.floor((count - 1) / size) * size + 1;
+  const end = start + size - 1;
+  return `${start}-${end}`;
+};
+
+const percentile = (sortedValues, p) => {
+  if (!sortedValues.length) return 0;
+  const pos = (sortedValues.length - 1) * p;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sortedValues[base + 1] !== undefined) {
+    return sortedValues[base] + rest * (sortedValues[base + 1] - sortedValues[base]);
+  }
+  return sortedValues[base];
+};
+
+const computeStatsFromValues = (values) => {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const sum = sorted.reduce((acc, value) => acc + value, 0);
+  return {
+    avg: sum / sorted.length,
+    p50: percentile(sorted, 0.5),
+    p75: percentile(sorted, 0.75),
+    count: sorted.length,
+  };
+};
+
+exports.aggregateBudgetBenchmarks = functions.firestore
+  .document('budgetSnapshots/{weddingId}')
+  .onWrite(async (change) => {
+    const snap = change.after.exists ? change.after.data() : null;
+    if (!snap || snap.status !== 'confirmed') {
+      return null;
+    }
+
+    const regionKey =
+      (snap.regionKey ||
+        normalizeBudgetCategoryKey(snap?.wedding?.country) ||
+        'global').toLowerCase();
+    const guestBucket = snap.guestBucket || computeGuestBucket(snap?.wedding?.guestCount);
+
+    const confirmedSnapshots = await db
+      .collection('budgetSnapshots')
+      .where('status', '==', 'confirmed')
+      .where('regionKey', '==', regionKey)
+      .where('guestBucket', '==', guestBucket)
+      .get();
+
+    if (confirmedSnapshots.empty) {
+      await db
+        .collection('budgetBenchmarks')
+        .doc(`${regionKey}_${guestBucket}`)
+        .set({
+          region: regionKey,
+          guestBucket,
+          count: 0,
+          total: { avg: 0, p50: 0, p75: 0, count: 0 },
+          categories: {},
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      return null;
+    }
+
+    const totalValues = [];
+    const categoryMap = new Map();
+
+    confirmedSnapshots.forEach((docSnap) => {
+      const data = docSnap.data();
+      const totalAmount = Number(data?.totals?.budget) || 0;
+      if (totalAmount > 0 && totalAmount < 500000) {
+        totalValues.push(totalAmount);
+      }
+
+      const categories = Array.isArray(data?.categories) ? data.categories : [];
+      categories.forEach((category) => {
+        const amount = Number(category?.amount) || 0;
+        if (amount <= 0 || amount > 500000) return;
+        const key = normalizeBudgetCategoryKey(category?.key || category?.name);
+        if (!key) return;
+        if (!categoryMap.has(key)) categoryMap.set(key, []);
+        categoryMap.get(key).push(amount);
+      });
+    });
+
+    const totalStats = computeStatsFromValues(totalValues) || {
+      avg: 0,
+      p50: 0,
+      p75: 0,
+      count: 0,
+    };
+
+    const categoriesPayload = {};
+    categoryMap.forEach((values, key) => {
+      if (values.length < 3) return;
+      const stats = computeStatsFromValues(values);
+      if (!stats) return;
+      categoriesPayload[key] = stats;
+    });
+
+    await db
+      .collection('budgetBenchmarks')
+      .doc(`${regionKey}_${guestBucket}`)
+      .set(
+        {
+          region: regionKey,
+          guestBucket,
+          count: totalStats.count,
+          total: totalStats,
+          categories: categoriesPayload,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+    return null;
+  });
 
 // Scheduled cleanup for webhook idempotency markers (TTL simulation)
 exports.cleanupWebhookDedup = functions.pubsub
