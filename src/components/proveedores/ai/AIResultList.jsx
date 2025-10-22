@@ -8,6 +8,35 @@ import Card from '../../../components/ui/Card';
  * @typedef {import('../../../hooks/useAISearch').AISearchResult} AISearchResult
  */
 
+// Imágenes por tipo de servicio
+const SERVICE_IMAGES = {
+  fotografia: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
+  fotografo: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=800&q=60',
+  video: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=60',
+  videografia: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=800&q=60',
+  catering: 'https://images.unsplash.com/photo-1530023367847-a683933f4177?auto=format&fit=crop&w=800&q=60',
+  flores: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=60',
+  florista: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=60',
+  decoracion: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=60',
+  musica: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=60',
+  dj: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=800&q=60',
+  vestido: 'https://images.unsplash.com/photo-1595751949310-d6e4b2961b28?auto=format&fit=crop&w=800&q=60',
+  peluqueria: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=60',
+  maquillaje: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=800&q=60',
+  pastel: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=60',
+  tarta: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=60',
+  invitaciones: 'https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&w=800&q=60',
+  default: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=60'
+};
+
+// Función para obtener imagen según el servicio
+const getServiceImage = (service) => {
+  if (!service) return SERVICE_IMAGES.default;
+  const normalized = service.toLowerCase().trim();
+  const key = Object.keys(SERVICE_IMAGES).find(k => normalized.includes(k));
+  return SERVICE_IMAGES[key] || SERVICE_IMAGES.default;
+};
+
 /**
  * Componente que muestra los resultaños de búsqueda con IA de proveedores.
  * Presenta una lista de resultaños con porcentaje de coincidencia, acciones rápidas
@@ -148,11 +177,17 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
 
           <div className="flex flex-col md:flex-row gap-4">
             {/* Imagen */}
-            {result.image && (
-              <div className="w-full md:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md">
-                <img src={result.image} alt={result.name} className="w-full h-full object-cover" />
-              </div>
-            )}
+            <div className="w-full md:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+              <img 
+                src={result.image || getServiceImage(result.service)} 
+                alt={result.name} 
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.src = SERVICE_IMAGES.default;
+                }}
+              />
+            </div>
 
             {/* Contenido principal */}
             <div className="flex-1">
