@@ -1187,9 +1187,19 @@ export default function LongTermTasksGantt({
 
       <div className="w-full flex items-stretch gap-3">
         {/* Columna izquierda fija */}
-        <div className="shrink-0 rounded-lg border border-gray-100 bg-white" style={{ width: leftColumnWidth, height: contentHeight }}>
+        <div
+          className="shrink-0 rounded-lg border border-gray-100 bg-white"
+          style={{ width: leftColumnWidth, height: contentHeight, overflow: 'hidden' }}
+        >
           <div style={{ height: HEADER_HEIGHT, display: 'flex', alignItems: 'center', padding: '0 10px', borderBottom: '1px solid #eee', fontWeight: 600, color: '#111827' }}>Tarea</div>
-          <div style={{ position: 'relative', height: bodyHeight, paddingTop: BODY_PADDING_TOP, paddingBottom: BODY_PADDING_BOTTOM }}>
+          <div
+            style={{
+              position: 'relative',
+              height: bodyHeight,
+              paddingTop: BODY_PADDING_TOP,
+              paddingBottom: Math.max(0, BODY_PADDING_BOTTOM - 6),
+            }}
+          >
             {rows.map((row, i) => {
               const isParent = row.kind === 'parent';
               const isSegment = row.kind === 'segment';
@@ -1231,7 +1241,7 @@ export default function LongTermTasksGantt({
                     cursor: 'pointer',
                     color: '#111827',
                     fontSize: 13,
-                    borderBottom: '1px dashed #f0f0f0',
+                    borderBottom: i === rows.length - 1 ? 'none' : '1px dashed #f0f0f0',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',

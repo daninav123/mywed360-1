@@ -146,7 +146,14 @@ function Invitados() {
         p2 = 'pareja2';
       }
 
-      const coupleName = p1 && p2 ? `${p1} y ${p2}` : p1 || p2 || 'nuestra boda';
+      const connectorRaw = t('guests.saveTheDate.connector', { defaultValue: 'and' }) || 'and';
+      const connector = connectorRaw.trim() || 'and';
+
+      const primaryName = p1 || p2 || 'nosotros';
+      const secondaryName = p1 && p2 ? p2 : '';
+      const p2Suffix = secondaryName ? ` ${connector} ${secondaryName}` : '';
+
+      const coupleName = secondaryName ? `${primaryName}${p2Suffix}` : primaryName || 'nuestra boda';
 
       const dateRaw =
         wi.weddingDate || wi.date || wList.weddingDate || wList.date || wi.ceremonyDate || '';
@@ -174,8 +181,8 @@ function Invitados() {
       const message = t('guests.saveTheDate.message', {
         defaultValue:
           'Hola somos {{p1}}{{p2,select, undefined|| y {{p2}} other|| y {{p2}}}}, tenemos un notición súper importante que compartir contigo. ¡Nos casamos! Resérvate el {{date}} porque queremos contar contigo.',
-        p1,
-        p2: p2 || undefined,
+        p1: primaryName,
+        p2Suffix,
         date: fechaFmt,
       });
 
@@ -1606,5 +1613,4 @@ function Invitados() {
 }
 
 export default Invitados;
-
 
