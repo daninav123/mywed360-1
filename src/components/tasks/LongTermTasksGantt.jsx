@@ -46,7 +46,7 @@ const RISK_STYLES = {
   },
 };
 
-const MIN_GANTT_COLUMN_WIDTH = 0.5;
+const MIN_GANTT_COLUMN_WIDTH = 0.1;
 
 export default function LongTermTasksGantt({
   containerRef,

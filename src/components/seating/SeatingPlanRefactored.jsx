@@ -240,10 +240,15 @@ const SeatingPlanRefactored = () => {
   const [isMobile, setIsMobile] = React.useState(false);
   const [guestSidebarOpen, setGuestSidebarOpen] = React.useState(true);
   const [showAdvancedTools, setShowAdvancedTools] = React.useState(true);
+  const [showLibraryPanel, setShowLibraryPanel] = React.useState(true);
+  const [showInspectorPanel, setShowInspectorPanel] = React.useState(true);
+  const [showSmartPanelPinned, setShowSmartPanelPinned] = React.useState(true);
   const [onboardingPrefs, setOnboardingPrefs] = React.useState(() =>
     createDefaultOnboardingState()
   );
-  const showSmartPanel = tab === 'banquet';
+  const [showOverview, setShowOverview] = React.useState(true);
+  const smartPanelEligible = tab === 'banquet';
+  const showSmartPanel = smartPanelEligible && showSmartPanelPinned;
   const showGuestSidebar = guestSidebarOpen && !isMobile;
   const [ceremonyActiveRow, setCeremonyActiveRow] = React.useState(0);
   // handler para fondo rápido (prompt)
@@ -274,12 +279,15 @@ const SeatingPlanRefactored = () => {
     [activeWedding]
   );
 
-  const gridTemplate = React.useMemo(() => {
-    if (showSmartPanel && showGuestSidebar) return 'grid-cols-[18rem_1fr_18rem_20rem_22rem]';
-    if (showSmartPanel) return 'grid-cols-[18rem_1fr_18rem_20rem]';
-    if (showGuestSidebar) return 'grid-cols-[18rem_1fr_20rem_22rem]';
-    return 'grid-cols-[18rem_1fr_20rem]';
-  }, [showSmartPanel, showGuestSidebar]);
+  const gridColumns = React.useMemo(() => {
+    const cols = [];
+    if (showLibraryPanel) cols.push('18rem');
+    cols.push('1fr');
+    if (showSmartPanel && !isMobile) cols.push('18rem');
+    if (showInspectorPanel) cols.push('20rem');
+    if (showGuestSidebar) cols.push('22rem');
+    return cols.join(' ');
+  }, [showLibraryPanel, showSmartPanel, showInspectorPanel, showGuestSidebar, isMobile]);
 
   const persistUiPrefs = React.useCallback(
     (patch) => {
@@ -322,6 +330,18 @@ const SeatingPlanRefactored = () => {
       if (Object.prototype.hasOwnProperty.call(data, 'showAdvancedTools')) {
         setShowAdvancedTools(!!data.showAdvancedTools);
       }
+      if (Object.prototype.hasOwnProperty.call(data, 'showLibraryPanel')) {
+        setShowLibraryPanel(data.showLibraryPanel !== false);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'showInspectorPanel')) {
+        setShowInspectorPanel(data.showInspectorPanel !== false);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'showSmartPanelPinned')) {
+        setShowSmartPanelPinned(data.showSmartPanelPinned !== false);
+      }
+      if (Object.prototype.hasOwnProperty.call(data, 'showOverview')) {
+        setShowOverview(data.showOverview !== false);
+      }
       if (Object.prototype.hasOwnProperty.call(data, 'onboarding')) {
         const next = sanitizeOnboardingState(data.onboarding);
         setOnboardingPrefs((prev) => (onboardingStatesEqual(prev, next) ? prev : next));
@@ -335,6 +355,10 @@ const SeatingPlanRefactored = () => {
       showSeatNumbers,
       showTables,
       showAdvancedTools,
+      showLibraryPanel,
+      showInspectorPanel,
+      showSmartPanelPinned,
+      showOverview,
       onboarding: onboardingPrefs,
     });
   }, [
@@ -342,6 +366,10 @@ const SeatingPlanRefactored = () => {
     showSeatNumbers,
     showTables,
     showAdvancedTools,
+    showLibraryPanel,
+    showInspectorPanel,
+    showSmartPanelPinned,
+    showOverview,
     onboardingPrefs,
     persistUiPrefs,
   ]);
@@ -596,6 +624,26 @@ const SeatingPlanRefactored = () => {
       }
     },
     [handleCompleteOnboardingStep]
+  );
+
+  const handleToggleLibraryPanel = React.useCallback(
+    () => setShowLibraryPanel((prev) => !prev),
+    []
+  );
+
+  const handleToggleInspectorPanel = React.useCallback(
+    () => setShowInspectorPanel((prev) => !prev),
+    []
+  );
+
+  const handleToggleSmartPanel = React.useCallback(
+    () => setShowSmartPanelPinned((prev) => !prev),
+    []
+  );
+
+  const handleToggleGuestPanel = React.useCallback(
+    () => setGuestSidebarOpen((prev) => !prev),
+    []
   );
 
   const handleResetOnboarding = React.useCallback(() => {
@@ -1314,29 +1362,71 @@ const SeatingPlanRefactored = () => {
     [assignGuestToCeremonySeat, ceremonyRows, ceremonyActiveRow]
   );
 
-  const libraryPanel = (
-    <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <SeatingLibraryPanel
-        tab={tab}
-        drawMode={drawMode}
-        onDrawModeChange={setDrawMode}
-        onOpenTemplates={handleOpenTemplates}
-        showTables={showTables}
-        onToggleShowTables={toggleShowTables}
-        showRulers={showRulers}
-        onToggleRulers={() => setShowRulers((v) => !v)}
-        snapToGrid={snapToGrid}
-        onToggleSnap={() => setSnapToGrid((v) => !v)}
-        showSeatNumbers={showSeatNumbers}
-        onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
-        gridStep={gridStep}
-        onAddTable={addTable}
-        onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-        pendingCount={pendingGuests.length}
-        areaSummary={areaSummary}
-      />
-    </div>
-  );
+  const renderLibraryPanel = (wrapperClassName = 'h-full') =>
+    showLibraryPanel ? (
+      <div
+        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
+      >
+        <SeatingLibraryPanel
+          tab={tab}
+          drawMode={drawMode}
+          onDrawModeChange={setDrawMode}
+          onOpenTemplates={handleOpenTemplates}
+          showTables={showTables}
+          onToggleShowTables={toggleShowTables}
+          showRulers={showRulers}
+          onToggleRulers={() => setShowRulers((v) => !v)}
+          snapToGrid={snapToGrid}
+          onToggleSnap={() => setSnapToGrid((v) => !v)}
+          showSeatNumbers={showSeatNumbers}
+          onToggleSeatNumbers={() => setShowSeatNumbers((v) => !v)}
+          gridStep={gridStep}
+          onAddTable={addTable}
+          onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+          pendingCount={pendingGuests.length}
+          areaSummary={areaSummary}
+        />
+      </div>
+    ) : null;
+
+  const renderSmartPanel = (wrapperClassName = 'h-full') =>
+    showSmartPanel ? (
+      <div
+        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
+      >
+        <SeatingSmartPanel
+          recommendations={smartRecommendations}
+          conflictSuggestions={smartConflictSuggestions}
+          insights={smartInsights}
+          onAssign={handleSmartAssign}
+          onFocusTable={focusTable}
+          onExecuteAction={handleSmartAction}
+        />
+      </div>
+    ) : null;
+
+  const renderGuestPanel = (wrapperClassName = 'h-full') =>
+    showGuestSidebar ? (
+      <div
+        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
+      >
+        <SeatingGuestSidebar
+          guests={safeGuests}
+          pendingGuests={pendingGuests}
+          recommendations={smartRecommendations}
+          conflictSuggestions={smartConflictSuggestions}
+          conflicts={conflicts}
+          insights={smartInsights}
+          onAssignRecommendation={handleSmartAssign}
+          onFocusTable={focusTable}
+          onExecuteAction={handleSmartAction}
+          onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+          listSnapshots={listSnapshots}
+          loadSnapshot={loadSnapshot}
+          deleteSnapshot={deleteSnapshot}
+        />
+      </div>
+    ) : null;
 
   const renderCanvas = (className = 'h-full') => (
     <SeatingPlanCanvas
@@ -1390,30 +1480,33 @@ const SeatingPlanRefactored = () => {
     />
   );
 
-  const renderInspector = (className = 'h-full') => (
-    <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <SeatingInspectorPanel
-        selectedTable={selectedTable}
-        tab={tab}
-        globalMaxSeats={globalMaxSeats}
-        ceremonyRows={ceremonyRows}
-        ceremonyActiveRow={ceremonyActiveRow}
-        onSelectCeremonyRow={setCeremonyActiveRow}
-        onAssignCeremonyGuest={handleAssignGuestToCeremonyRow}
-        ceremonySuggestions={ceremonySuggestions}
-        ceremonySettings={ceremonySettings}
-        guests={safeGuests}
-        onTableDimensionChange={handleTableDimensionChange}
-        onConfigureTable={handleConfigureTable}
-        duplicateTable={duplicateTable}
-        deleteTable={deleteTable}
-        toggleTableLocked={toggleTableLocked}
-        assignedGuests={assignedToSelected}
-        onUnassignGuest={handleUnassignGuest}
-        className={className}
-      />
-    </div>
-  );
+  const renderInspector = (wrapperClassName = 'h-full', panelClassName = 'h-full') =>
+    showInspectorPanel ? (
+      <div
+        className={`rounded-3xl border border-slate-200 bg-white shadow-sm ${wrapperClassName}`}
+      >
+        <SeatingInspectorPanel
+          selectedTable={selectedTable}
+          tab={tab}
+          globalMaxSeats={globalMaxSeats}
+          ceremonyRows={ceremonyRows}
+          ceremonyActiveRow={ceremonyActiveRow}
+          onSelectCeremonyRow={setCeremonyActiveRow}
+          onAssignCeremonyGuest={handleAssignGuestToCeremonyRow}
+          ceremonySuggestions={ceremonySuggestions}
+          ceremonySettings={ceremonySettings}
+          guests={safeGuests}
+          onTableDimensionChange={handleTableDimensionChange}
+          onConfigureTable={handleConfigureTable}
+          duplicateTable={duplicateTable}
+          deleteTable={deleteTable}
+          toggleTableLocked={toggleTableLocked}
+          assignedGuests={assignedToSelected}
+          onUnassignGuest={handleUnassignGuest}
+          className={panelClassName}
+        />
+      </div>
+    ) : null;
 
   // Auto IA eliminado en la toolbar (feature desactivada en UI)
 
@@ -1446,104 +1539,143 @@ const SeatingPlanRefactored = () => {
           />
         </div>
 
-        {/* Summary */}
-        <div className="flex-shrink-0 px-4 pt-3">
-          <SeatingPlanSummary
-            totalGuests={safeGuests.length}
-            totalPersons={seatingProgress.totalPersons}
-            assignedPersons={seatingProgress.assignedPersons}
-            pendingGuests={pendingGuests.length}
-            tableCount={safeTables.length}
-            seatCapacity={seatingProgress.enabledSeats}
-            globalCapacity={Number.isFinite(globalMaxSeats) ? globalMaxSeats : 0}
-            ceremonyProgress={seatingProgress.ceremonyProgress}
-            banquetProgress={seatingProgress.banquetProgress}
-            areaSummary={areaSummary}
-            onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-          />
-        </div>
+        {showOverview ? (
+          <>
+            {/* Summary */}
+            <div className="flex-shrink-0 px-4 pt-3">
+              <SeatingPlanSummary
+                totalGuests={safeGuests.length}
+                totalPersons={seatingProgress.totalPersons}
+                assignedPersons={seatingProgress.assignedPersons}
+                pendingGuests={pendingGuests.length}
+                tableCount={safeTables.length}
+                seatCapacity={seatingProgress.enabledSeats}
+                globalCapacity={Number.isFinite(globalMaxSeats) ? globalMaxSeats : 0}
+                ceremonyProgress={seatingProgress.ceremonyProgress}
+                banquetProgress={seatingProgress.banquetProgress}
+                areaSummary={areaSummary}
+                onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+              />
+            </div>
 
-        {/* Quick Actions */}
-        <div className="flex-shrink-0 px-4 pb-3">
-          <SeatingPlanQuickActions
-            tab={tab}
-            pendingCount={pendingGuests.length}
-            hasTables={safeTables.length > 0}
-            hasGuests={safeGuests.length > 0}
-            onAddTable={tab === 'banquet' ? addTable : undefined}
-            onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-            onAutoAssign={handleAutoAssignClick}
-            onOpenTemplates={handleOpenTemplates}
-            onOpenSpaceConfig={handleOpenSpaceConfig}
-            onOpenCeremonyConfig={handleOpenCeremonyConfig}
-            onOpenBanquetConfig={handleOpenBanquetConfig}
-            onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
-            onOpenExport={() => setExportWizardOpen(true)}
-            onToggleAdvancedTools={(open) => setShowAdvancedTools(!!open)}
-            advancedOpen={showAdvancedTools}
-            onboarding={{
-              activeStep: onboardingActiveStep,
-              completed: {
-                space: !!onboardingPrefs.steps.spaceConfigured,
-                guests: !!onboardingPrefs.steps.guestsImported,
-                assign: !!onboardingPrefs.steps.firstAssignment,
-              },
-            }}
-            onboardingDismissed={onboardingPrefs.dismissed}
-            onResetOnboarding={handleResetOnboarding}
-          />
-        </div>
+            {/* Quick Actions */}
+            <div className="flex-shrink-0 px-4 pb-3">
+              <SeatingPlanQuickActions
+                tab={tab}
+                pendingCount={pendingGuests.length}
+                hasTables={safeTables.length > 0}
+                hasGuests={safeGuests.length > 0}
+                onAddTable={tab === 'banquet' ? addTable : undefined}
+                onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
+                onAutoAssign={handleAutoAssignClick}
+                onOpenTemplates={handleOpenTemplates}
+                onOpenSpaceConfig={handleOpenSpaceConfig}
+                onOpenCeremonyConfig={handleOpenCeremonyConfig}
+                onOpenBanquetConfig={handleOpenBanquetConfig}
+                onFitToContent={() => window.dispatchEvent(new Event('seating-fit'))}
+                onOpenExport={() => setExportWizardOpen(true)}
+                onToggleAdvancedTools={(open) => setShowAdvancedTools(!!open)}
+                advancedOpen={showAdvancedTools}
+                onboarding={{
+                  activeStep: onboardingActiveStep,
+                  completed: {
+                    space: !!onboardingPrefs.steps.spaceConfigured,
+                    guests: !!onboardingPrefs.steps.guestsImported,
+                    assign: !!onboardingPrefs.steps.firstAssignment,
+                  },
+                }}
+                onboardingDismissed={onboardingPrefs.dismissed}
+                onResetOnboarding={handleResetOnboarding}
+                onHideOverview={() => setShowOverview(false)}
+                panels={{
+                  library: showLibraryPanel,
+                  inspector: showInspectorPanel,
+                  smart: showSmartPanelPinned,
+                  guest: guestSidebarOpen,
+                }}
+                smartPanelAvailable={smartPanelEligible}
+                guestPanelAvailable={!isMobile}
+                onToggleLibraryPanel={handleToggleLibraryPanel}
+                onToggleInspectorPanel={handleToggleInspectorPanel}
+                onToggleSmartPanel={handleToggleSmartPanel}
+                onToggleGuestPanel={handleToggleGuestPanel}
+              />
+            </div>
 
-        {showOnboardingChecklist ? (
-          <div className="flex-shrink-0 px-4 pb-3">
-            <SeatingPlanOnboardingChecklist
-              currentStep={onboardingActiveStep}
-              progress={onboardingProgress}
-              steps={[
-                {
-                  id: 'space',
-                  title: 'Configura el espacio',
-                  description: 'Define dimensiones, fondo o dibuja zonas clave del salon.',
-                  done: onboardingPrefs.steps.spaceConfigured,
-                  actionLabel: 'Configurar espacio',
-                  onAction: () => {
-                    handleOpenSpaceConfig();
-                  },
-                  onMarkDone: () => handleCompleteOnboardingStep('spaceConfigured'),
-                },
-                {
-                  id: 'guests',
-                  title: 'Cargar invitados',
-                  description: 'Importa tu lista o revisa los pendientes por asignar.',
-                  done: onboardingPrefs.steps.guestsImported,
-                  actionLabel: safeGuests.length > 0 ? 'Ver invitados' : 'Importar invitados',
-                  onAction: () => {
-                    setGuestDrawerOpen(true);
-                  },
-                  onMarkDone: () => handleCompleteOnboardingStep('guestsImported'),
-                },
-                {
-                  id: 'assign',
-                  title: 'Asigna mesas',
-                  description: 'Ubica a cada invitado en una mesa o fila de ceremonia.',
-                  done: onboardingPrefs.steps.firstAssignment,
-                  actionLabel:
-                    seatingProgress.assignedPersons > 0 ? 'Revisar asignaciones' : 'Asignar ahora',
-                  onAction: () => {
-                    if (pendingGuests.length > 0) {
-                      setGuidedGuestId(pendingGuests[0]?.id || null);
-                      setGuestDrawerOpen(true);
-                    } else {
-                      handleAutoAssignClick();
-                    }
-                  },
-                  onMarkDone: () => handleCompleteOnboardingStep('firstAssignment'),
-                },
-              ]}
-              onDismiss={handleDismissOnboarding}
-            />
+            {showOnboardingChecklist ? (
+              <div className="flex-shrink-0 px-4 pb-3">
+                <SeatingPlanOnboardingChecklist
+                  currentStep={onboardingActiveStep}
+                  progress={onboardingProgress}
+                  steps={[
+                    {
+                      id: 'space',
+                      title: 'Configura el espacio',
+                      description: 'Define dimensiones, fondo o dibuja zonas clave del salon.',
+                      done: onboardingPrefs.steps.spaceConfigured,
+                      actionLabel: 'Configurar espacio',
+                      onAction: () => {
+                        handleOpenSpaceConfig();
+                      },
+                      onMarkDone: () => handleCompleteOnboardingStep('spaceConfigured'),
+                    },
+                    {
+                      id: 'guests',
+                      title: 'Cargar invitados',
+                      description: 'Importa tu lista o revisa los pendientes por asignar.',
+                      done: onboardingPrefs.steps.guestsImported,
+                      actionLabel: safeGuests.length > 0 ? 'Ver invitados' : 'Importar invitados',
+                      onAction: () => {
+                        setGuestDrawerOpen(true);
+                      },
+                      onMarkDone: () => handleCompleteOnboardingStep('guestsImported'),
+                    },
+                    {
+                      id: 'assign',
+                      title: 'Asigna mesas',
+                      description: 'Ubica a cada invitado en una mesa o fila de ceremonia.',
+                      done: onboardingPrefs.steps.firstAssignment,
+                      actionLabel:
+                        seatingProgress.assignedPersons > 0 ? 'Revisar asignaciones' : 'Asignar ahora',
+                      onAction: () => {
+                        if (pendingGuests.length > 0) {
+                          setGuidedGuestId(pendingGuests[0]?.id || null);
+                          setGuestDrawerOpen(true);
+                        } else {
+                          handleAutoAssignClick();
+                        }
+                      },
+                      onMarkDone: () => handleCompleteOnboardingStep('firstAssignment'),
+                    },
+                  ]}
+                  onDismiss={() => {
+                    handleDismissOnboarding();
+                  }}
+                />
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="flex-shrink-0 px-4 pt-3 pb-3">
+            <div className="flex items-center justify-between rounded-3xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  Panel superior oculto
+                </p>
+                <p className="text-sm text-slate-600">
+                  Simplificamos la vista para centrarte en el lienzo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowOverview(true)}
+                className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
+              >
+                Mostrar panel
+              </button>
+            </div>
           </div>
-        ) : null}
+        )}
 
         {/* Toolbar */}
         {showAdvancedTools ? (
@@ -1620,7 +1752,7 @@ const SeatingPlanRefactored = () => {
             </div>
           </div>
         ) : null}
-        {/* Cuerpo principal: Biblioteca (izqda) Â· Canvas (centro) Â· Inspector (dcha) */}
+        {/* Cuerpo principal */}
         {isMobile ? (
           <div className="flex-1 flex flex-col gap-4 px-4 pb-6">
             <SeatingMobileOverlay
@@ -1632,77 +1764,27 @@ const SeatingPlanRefactored = () => {
               onOpenTemplates={handleOpenTemplates}
               onOpenExportWizard={() => setExportWizardOpen(true)}
             />
-            <div className="max-h-60 overflow-y-auto">{libraryPanel}</div>
+            {renderLibraryPanel('max-h-60 overflow-y-auto')}
             <div className="min-h-[55vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderCanvas('h-[55vh]')}
             </div>
-            {showSmartPanel && (
-              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <SeatingSmartPanel
-                  recommendations={smartRecommendations}
-                  conflictSuggestions={smartConflictSuggestions}
-                  insights={smartInsights}
-                  onAssign={handleSmartAssign}
-                  onFocusTable={focusTable}
-                  onExecuteAction={handleSmartAction}
-                />
-              </div>
-            )}
-            <div className="max-h-60 overflow-y-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
-              {renderInspector('max-h-60 overflow-y-auto')}
-            </div>
+            {renderSmartPanel('overflow-hidden')}
+            {renderInspector('max-h-60 overflow-y-auto', 'max-h-60 overflow-y-auto')}
           </div>
         ) : (
-          <div className={`flex-1 grid ${gridTemplate} gap-3 px-4 pb-3`}>
-            {/* Canvas primero en el DOM para que cy.get('svg') seleccione el lienzo */}
-            <div className="order-2 rounded-3xl border border-slate-200 bg-white shadow-sm">
+          <div
+            className="flex-1 grid gap-4 px-4 pb-6"
+            style={{ gridTemplateColumns: gridColumns }}
+          >
+            {renderLibraryPanel()}
+            <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
               {renderCanvas('h-full')}
             </div>
-            {/* Biblioteca a la izquierda (order-1) */}
-            <div className="min-h-0 order-1">{libraryPanel}</div>
-            {/* Panel inteligente opcional mantiene su posicion relativa */}
-            {showSmartPanel && (
-              <div className="order-3 min-h-0">
-                <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <SeatingSmartPanel
-                    recommendations={smartRecommendations}
-                    conflictSuggestions={smartConflictSuggestions}
-                    insights={smartInsights}
-                    onAssign={handleSmartAssign}
-                    onFocusTable={focusTable}
-                    onExecuteAction={handleSmartAction}
-                  />
-                </div>
-              </div>
-            )}
-            {/* Inspector */}
-            <div className={`min-h-0 ${showSmartPanel ? 'order-4' : 'order-3'}`}>
-              {renderInspector('h-full')}
-            </div>
-            {showGuestSidebar && (
-              <div className={`min-h-0 ${showSmartPanel ? 'order-5' : 'order-4'}`}>
-                <div className="h-full rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <SeatingGuestSidebar
-                    guests={safeGuests}
-                    pendingGuests={pendingGuests}
-                    recommendations={smartRecommendations}
-                    conflictSuggestions={smartConflictSuggestions}
-                    conflicts={conflicts}
-                    insights={smartInsights}
-                    onAssignRecommendation={handleSmartAssign}
-                    onFocusTable={focusTable}
-                    onExecuteAction={handleSmartAction}
-                    onOpenGuestDrawer={() => setGuestDrawerOpen(true)}
-                    listSnapshots={listSnapshots}
-                    loadSnapshot={loadSnapshot}
-                    deleteSnapshot={deleteSnapshot}
-                  />
-                </div>
-              </div>
-            )}
+            {renderSmartPanel()}
+            {renderInspector('h-full', 'h-full')}
+            {renderGuestPanel()}
           </div>
         )}
-
         {/* Barra inferior de estado */}
         <div className={`flex-shrink-0 px-4 pb-4 ${isMobile ? 'pt-2' : ''}`}>
           <div

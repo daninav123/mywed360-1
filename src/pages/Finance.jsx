@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
@@ -317,6 +317,7 @@ function Finance() {
               budgetUsage={budgetUsage}
               stats={stats}
               benchmarks={benchmarkData}
+              guestCount={contributions?.guestCount || activeWeddingData?.guestCount || 0}
               onApplyBenchmark={handleApplyBenchmark}
               onCaptureSnapshot={handleCaptureSnapshot}
               onUpdateBudget={handleUpdateTotalBudget}

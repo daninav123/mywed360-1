@@ -1685,10 +1685,12 @@ exports.aggregateBudgetBenchmarks = functions.firestore
 
     const totalValues = [];
     const categoryMap = new Map();
+    const categoryPerGuestMap = new Map();
 
     confirmedSnapshots.forEach((docSnap) => {
       const data = docSnap.data();
       const totalAmount = Number(data?.totals?.budget) || 0;
+      const guestCount = Number(data?.wedding?.guestCount) || 0;
       if (totalAmount > 0 && totalAmount < 500000) {
         totalValues.push(totalAmount);
       }
@@ -1701,6 +1703,11 @@ exports.aggregateBudgetBenchmarks = functions.firestore
         if (!key) return;
         if (!categoryMap.has(key)) categoryMap.set(key, []);
         categoryMap.get(key).push(amount);
+        if (guestCount > 0) {
+          const perGuest = amount / guestCount;
+          if (!categoryPerGuestMap.has(key)) categoryPerGuestMap.set(key, []);
+          categoryPerGuestMap.get(key).push(perGuest);
+        }
       });
     });
 
@@ -1716,7 +1723,11 @@ exports.aggregateBudgetBenchmarks = functions.firestore
       if (values.length < 3) return;
       const stats = computeStatsFromValues(values);
       if (!stats) return;
-      categoriesPayload[key] = stats;
+      const perGuestValues = categoryPerGuestMap.get(key) || [];
+      const perGuestStats = perGuestValues.length >= 3 ? computeStatsFromValues(perGuestValues) : null;
+      categoriesPayload[key] = perGuestStats
+        ? { ...stats, perGuest: perGuestStats }
+        : { ...stats };
     });
 
     await db

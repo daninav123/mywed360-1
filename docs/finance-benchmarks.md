@@ -57,7 +57,7 @@ Capturar los presupuestos reales de cada boda una vez que quedan “cerrados” 
    - El hook devuelve:
      ```ts
      {
-       categories: Record<string, { avg: number; p50: number; p75: number; count: number }>;
+       categories: Record<string, { avg: number; p50: number; p75: number; count: number; perGuest?: { avg: number; p50: number; p75: number; count: number } }>;
        total: { avg: number; p50: number; p75: number; count: number };
        sampleSize: number;
        confidence: 'low' | 'medium' | 'high';
@@ -84,3 +84,4 @@ Capturar los presupuestos reales de cada boda una vez que quedan “cerrados” 
 - Añadir un panel administrativo que muestre los benchmarks por región y permita depurar outliers manualmente.
 - Generar alertas cuando un presupuesto queda muy por debajo del rango p25- p75 (posible error de carga).
 - Investigar cómo utilizar los mismos datos para sugerir incrementos cuando se eleva el número de invitados.
+- Cuando existe un hist�rico de al menos 10 eventos para la categor�a de catering, la fila del presupuesto muestra la media por invitado (\perGuest.avg\).

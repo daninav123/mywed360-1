@@ -43,15 +43,19 @@ import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder'
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
 const GANTT_ZOOM_STORAGE_KEY = 'mywed360_gantt_zoom';
-const GANTT_ZOOM_MIN = 0.01;
+const GANTT_ZOOM_MIN = 0.001;
 const GANTT_ZOOM_MAX = 2.4;
 const GANTT_ZOOM_STEP = 0.05;
 const GANTT_EXTEND_MONTHS = 1;
+const GANTT_ZOOM_FLOOR = 0.0001;
+const GANTT_COLUMN_WIDTH_MIN = 0.1;
 
-const clampZoomValue = (value) => {
+const clampZoomValue = (value, { min = GANTT_ZOOM_MIN, max = GANTT_ZOOM_MAX } = {}) => {
   const numeric = typeof value === 'number' ? value : Number(value);
-  if (!Number.isFinite(numeric)) return 1;
-  return Math.min(GANTT_ZOOM_MAX, Math.max(GANTT_ZOOM_MIN, numeric));
+  const safeMin = Math.min(max, Math.max(min, GANTT_ZOOM_FLOOR));
+  const safeMax = Math.max(safeMin, max);
+  if (!Number.isFinite(numeric)) return safeMin;
+  return Math.min(safeMax, Math.max(safeMin, numeric));
 };
 
 // Funcin helper para cargar datos de Firestore de forma segura con fallbacks
@@ -1039,18 +1043,101 @@ export default function TasksRefactored() {
 
   const zoomedColumnWidth = useMemo(() => {
     const base = Math.max(1, Number(columnWidthState) || 90);
-    const width = Math.max(0.5, base * ganttZoom);
-    const normalized = Math.round(width * 100) / 100;
-    return Math.max(0.5, Math.min(360, normalized));
+    const width = Math.max(GANTT_COLUMN_WIDTH_MIN, base * ganttZoom);
+    const normalized = Math.round(width * 1000) / 1000;
+    return Math.max(GANTT_COLUMN_WIDTH_MIN, Math.min(360, normalized));
   }, [columnWidthState, ganttZoom]);
+  const [fitZoomObserved, setFitZoomObserved] = useState(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const root = ganttContainerRef?.current;
+    if (!root) return;
+    const scrollEl = root.querySelector('[data-testid="longterm-gantt-scroll"]');
+    if (!scrollEl) return;
+
+    let frame = null;
+    const evaluate = () => {
+      frame = null;
+      try {
+        const viewport = scrollEl.clientWidth || 0;
+        const content = scrollEl.scrollWidth || 0;
+        const base = Math.max(1, Number(columnWidthState) || 90);
+        const colWidth = Math.max(GANTT_COLUMN_WIDTH_MIN, Number(zoomedColumnWidth) || base);
+        if (viewport <= 0 || content <= 0 || base <= 0 || colWidth <= 0) return;
+        const units = content / colWidth;
+        if (!Number.isFinite(units) || units <= 0) return;
+        const targetColumnWidth = viewport / units;
+        if (!Number.isFinite(targetColumnWidth) || targetColumnWidth <= 0) return;
+        const ratio = targetColumnWidth / base;
+        const ratioWithSlack = ratio > 0 ? ratio * 0.985 : ratio;
+        if (!Number.isFinite(ratio) || ratio <= 0) return;
+        const normalized = Math.min(
+          1,
+          clampZoomValue(ratioWithSlack, { min: GANTT_ZOOM_FLOOR, max: GANTT_ZOOM_MAX })
+        );
+        setFitZoomObserved((prev) =>
+          prev !== null && Math.abs(prev - normalized) < 0.001 ? prev : normalized
+        );
+      } catch (_) {}
+    };
+    const schedule = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(evaluate);
+    };
+
+    schedule();
+
+    let ro;
+    if (typeof ResizeObserver !== 'undefined') {
+      try {
+        ro = new ResizeObserver(() => schedule());
+        ro.observe(scrollEl);
+      } catch (_) {}
+    }
+    const onWindowResize = () => schedule();
+    window.addEventListener('resize', onWindowResize);
+
+    return () => {
+      if (frame !== null && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(frame);
+      }
+      window.removeEventListener('resize', onWindowResize);
+      if (ro) {
+        try {
+          ro.disconnect();
+        } catch (_) {}
+      }
+    };
+  }, [
+    ganttContainerRef,
+    columnWidthState,
+    zoomedColumnWidth,
+    ganttZoom,
+    ganttTimelineMonths,
+    showGanttSubtasks,
+    ganttRangeStart,
+    ganttRangeEnd,
+  ]);
+  const minZoomAllowed = useMemo(() => {
+    if (!fitZoomObserved || !Number.isFinite(fitZoomObserved) || fitZoomObserved <= 0) {
+      return GANTT_ZOOM_MIN;
+    }
+    if (fitZoomObserved >= 1) return GANTT_ZOOM_MIN;
+    return Math.min(1, Math.max(GANTT_ZOOM_FLOOR, fitZoomObserved));
+  }, [fitZoomObserved]);
+  useEffect(() => {
+    if (ganttZoom < minZoomAllowed - 0.001) {
+      setGanttZoom(minZoomAllowed);
+    }
+  }, [ganttZoom, minZoomAllowed]);
   const handleZoomChange = useCallback((next) => {
-    const clamped = clampZoomValue(next);
+    const clamped = clampZoomValue(next, { min: minZoomAllowed });
     const normalized = Math.round(clamped * 100) / 100;
     setGanttZoom((prev) => {
       if (Math.abs(prev - normalized) < 0.001) return prev;
       return normalized;
     });
-  }, []);
+  }, [minZoomAllowed]);
   const handleZoomIn = useCallback(() => {
     handleZoomChange(ganttZoom + GANTT_ZOOM_STEP);
   }, [ganttZoom, handleZoomChange]);
@@ -1065,26 +1152,17 @@ export default function TasksRefactored() {
     [handleZoomChange]
   );
   const zoomPercent = Math.round(ganttZoom * 100);
-  const isZoomMin = ganttZoom <= GANTT_ZOOM_MIN + 0.001;
+  const zoomMinTolerance = Math.max(0.0005, minZoomAllowed * 0.05);
+  const isZoomMin = ganttZoom <= minZoomAllowed + zoomMinTolerance;
   const isZoomMax = ganttZoom >= GANTT_ZOOM_MAX - 0.001;
-  const computeFitZoom = useCallback(() => {
-    if (!ganttTimelineMonths || !Number.isFinite(Number(columnWidthState))) return null;
-    const containerWidth = ganttContainerRef?.current?.clientWidth || 0;
-    if (containerWidth <= 0) return null;
-    const base = Math.max(1, Number(columnWidthState));
-    const totalWidth = base * ganttTimelineMonths;
-    if (!Number.isFinite(totalWidth) || totalWidth <= 0) return null;
-    const ratio = containerWidth / totalWidth;
-    if (!Number.isFinite(ratio) || ratio <= 0) return null;
-    return clampZoomValue(ratio);
-  }, [ganttTimelineMonths, columnWidthState, ganttContainerRef]);
-  const fitZoomValue = computeFitZoom();
-  const isFitApplied = fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < 0.01;
+  const fitZoomValue = minZoomAllowed;
+  const fitTolerance = fitZoomValue != null ? Math.max(0.0025, fitZoomValue * 0.1) : 0.01;
+  const isFitApplied =
+    fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < fitTolerance;
   const handleFitToScreen = useCallback(() => {
-    const fit = computeFitZoom();
-    if (fit === null) return;
-    handleZoomChange(fit);
-  }, [computeFitZoom, handleZoomChange]);
+    if (fitZoomValue == null) return;
+    handleZoomChange(fitZoomValue);
+  }, [fitZoomValue, handleZoomChange]);
 
   const ganttTasksBounded = useGanttBoundedTasks(
     uniqueGanttTasks,
@@ -2322,9 +2400,9 @@ export default function TasksRefactored() {
               </button>
               <input
                 type="range"
-                min={GANTT_ZOOM_MIN}
+                min={minZoomAllowed}
                 max={GANTT_ZOOM_MAX}
-                step={0.01}
+                step={0.0001}
                 value={ganttZoom}
                 onChange={(e) => handleZoomSlider(e.target.value)}
                 className="w-24 accent-indigo-500"

@@ -41,8 +41,6 @@ beforeAll(async () => {
       completed: false,
     });
 
-    const seeded = await adminDb.doc('weddings/w1').get();
-    console.log('seeded wedding', seeded.data());
 });
 }, 60000);
 
@@ -81,8 +79,7 @@ describe('Reglas de Firestore - bodas', () => {
     const ctx = getContext('assistant1');
     const db = ctx.firestore();
     const weddingRef = db.doc('weddings/w1');
-    const snap = await assertSucceeds(weddingRef.get());
-    console.log('assistant snapshot', snap.data());
+    await assertSucceeds(weddingRef.get());
     await assertFails(weddingRef.set({ title: 'No allowed' }, { merge: true }));
   });
 
@@ -114,7 +111,7 @@ describe('Colecciones de diagnóstico', () => {
     const ctx = getContext(null); // no autenticado
     const db = ctx.firestore();
     const ref = db.doc('_conexion_prueba/test');
-    await assertSucceeds(ref.set({ ok: true }));
+    await assertFails(ref.set({ ok: true }));
     await assertSucceeds(ref.get());
   });
 
@@ -122,7 +119,7 @@ describe('Colecciones de diagnóstico', () => {
     const ctx = getContext(null);
     const db = ctx.firestore();
     const ref = db.doc('_test_connection/test');
-    await assertSucceeds(ref.set({ ok: true }));
+    await assertFails(ref.set({ ok: true }));
     await assertSucceeds(ref.get());
   });
 });

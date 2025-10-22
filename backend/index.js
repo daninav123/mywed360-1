@@ -101,6 +101,7 @@ import emailDocsRouter from './routes/email-docs.js';
 import emailFoldersRouter from './routes/email-folders.js';
 import emailValidationRouter from './routes/email-validation.js';
 import partnerStatsRouter from './routes/partner-stats.js';
+import appStoreWebhookRouter from './routes/app-store-webhook.js';
 import emailTagsRouter from './routes/email-tags.js';
 import crmRouter from './routes/crm.js';
 import providersRouter from './routes/providers.js';
@@ -614,6 +615,10 @@ try {
 // Partner stats (público, solo requiere token válido)
 app.use('/api/partner', partnerStatsRouter);
 console.log('[backend] Partner stats routes mounted on /api/partner');
+
+// App Store webhooks (público, recibe notificaciones de Apple)
+app.use('/api/app-store', appStoreWebhookRouter);
+console.log('[backend] App Store webhook routes mounted on /api/app-store');
 app.use('/api/bank', requireAuth, bankRouter);
 app.use('/api/email-actions', requireAuth, emailActionsRouter);
 // Rutas de diagnóstico y test (públicas para debugging)

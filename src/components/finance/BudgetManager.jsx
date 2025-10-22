@@ -14,6 +14,7 @@ import React, { useState, useEffect } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
+import { normalizeBudgetCategoryKey } from '../../utils/budgetCategories';
 import Modal from '../Modal';
 import { Card, Button } from '../ui';
 
@@ -24,13 +25,12 @@ export default function BudgetManager({
   benchmarks,
   onApplyBenchmark,
   onCaptureSnapshot,
+  guestCount = 0,
   onUpdateBudget,
   onAddCategory,
   onReallocateCategories,
   onUpdateCategory,
   onRemoveCategory,
-  alertThresholds = { warn: 75, danger: 90 },
-  onUpdateSettings,
   advisor = null,
   onRequestAdvisor,
   advisorLoading = false,
@@ -53,6 +53,7 @@ export default function BudgetManager({
     typeof onApplyBenchmark === 'function' ? onApplyBenchmark : () => {};
   const captureSnapshot =
     typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
+  const currentGuestCount = Number(guestCount) || 0;
   const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
   const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
     ? effectiveAdvisor.scenarios
@@ -74,68 +75,14 @@ export default function BudgetManager({
   const statsTotalBudget = Number(stats?.totalBudget);
   const statsExpectedBudget = Number(stats?.expectedIncome);
   const statsTotalSpent = Number(stats?.totalSpent);
-  const totalBudgetValue =
     [computedTotal, statsTotalBudget, statsExpectedBudget, categoriesTotal].find(
       (value) => Number.isFinite(value) && value > 0
     ) || 0;
-  const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
-  const hasGlobalBudget = totalBudgetCents > 0;
-  const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
 
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';
     return (Math.round(value * 100) / 100).toFixed(2);
-  };
-
-  const baselineTotal = Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
-  const [totalDraft, setTotalDraft] = useState(formatTotalInput(baselineTotal));
-  const [totalDraftDirty, setTotalDraftDirty] = useState(false);
-  const [totalDraftError, setTotalDraftError] = useState('');
-
-  useEffect(() => {
-    if (!totalDraftDirty) {
-      setTotalDraft(formatTotalInput(baselineTotal));
-      setTotalDraftError('');
-    }
-  }, [baselineTotal, totalDraftDirty]);
-
-  const parseTotalDraft = (value) => {
-    if (value == null) return Number.NaN;
-    if (typeof value === 'number') return value;
-    let raw = String(value).trim();
-    if (!raw) return Number.NaN;
-    raw = raw.replace(/[^0-9.,-]/g, '');
-    const commaIndex = raw.lastIndexOf(',');
-    const dotIndex = raw.lastIndexOf('.');
-    if (commaIndex > dotIndex) {
-      const integerPart = raw
-        .slice(0, commaIndex)
-        .replace(/[^0-9-]/g, '')
-        .replace(/\./g, '');
-      const decimalPart = raw.slice(commaIndex + 1).replace(/[^0-9]/g, '');
-      const normalized = `${integerPart}.${decimalPart}`;
-      const num = Number(normalized);
-      return Number.isFinite(num) ? num : Number.NaN;
-    }
-    raw = raw.replace(/,/g, '');
-    const parts = raw.split('.');
-    if (parts.length > 2) {
-      const decimal = parts.pop();
-      const integer = parts.join('').replace(/[^0-9-]/g, '');
-      const normalized = `${integer}.${decimal}`;
-      const num = Number(normalized);
-      return Number.isFinite(num) ? num : Number.NaN;
-    }
-    const num = Number(raw);
-    return Number.isFinite(num) ? num : Number.NaN;
-  };
-
-  const parsedDraftValue = parseTotalDraft(totalDraft);
-  const isDraftValid = Number.isFinite(parsedDraftValue) && parsedDraftValue >= 0;
-  const draftMatchesBaseline =
-    isDraftValid && Math.abs(parsedDraftValue - baselineTotal) < 0.005;
-
-  const handleTotalDraftChange = (event) => {
+  };  const handleTotalDraftChange = (event) => {
     setTotalDraftDirty(true);
     setTotalDraft(event.target.value);
     setTotalDraftError('');
@@ -502,7 +449,6 @@ const distributeIncrease = (amounts, indices, delta) => {
   );
   const totalBudgeted =
     totalBudgetedRaw > 0 ? totalBudgetedRaw : totalBudgetValue;
-  const totalSpent =
     statsTotalSpent > 0
       ? statsTotalSpent
       : budgetUsage.reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
@@ -629,95 +575,6 @@ const distributeIncrease = (amounts, indices, delta) => {
             </p>
           </div>
         </div>
-
-        <div className="mt-6 space-y-2">
-          <label className="block text-sm font-medium text-[color:var(--color-text)]/80">
-              {t('finance.budget.totalBudgetInput', { defaultValue: 'Presupuesto total (€)' })}
-          </label>
-          <div className="flex flex-wrap items-center gap-2">
-            <input
-              type="text"
-              inputMode="decimal"
-              value={totalDraft}
-              onChange={handleTotalDraftChange}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  applyTotalDraft();
-                }
-              }}
-              className="w-full md:w-48 px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
-              placeholder="0.00"
-            />
-            <Button
-              onClick={applyTotalDraft}
-              disabled={!onUpdateBudget || !isDraftValid || draftMatchesBaseline}
-            >
-              {t('app.save', { defaultValue: 'Guardar' })}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              leftIcon={<RefreshCw size={16} />}
-              onClick={resetTotalDraft}
-              disabled={!totalDraftDirty && !totalDraftError}
-            >
-              {t('app.reset', { defaultValue: 'Restablecer' })}
-            </Button>
-          </div>
-          {totalDraftError && (
-            <p className="text-xs text-[color:var(--color-danger)]">{totalDraftError}</p>
-          )}
-          {!hasGlobalBudget && (
-            <div className="rounded-md border border-[color:var(--color-warning)]/40 bg-[var(--color-warning)]/15 px-3 py-2 text-sm text-[color:var(--color-text)]/80">
-              Define un presupuesto total para activar la reasignación proporcional entre categorías.
-            </div>
-          )}
-        </div>
-
-        {onUpdateSettings && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-3">
-              <p className="text-sm font-medium text-[color:var(--color-text)]/70">
-                Umbrales de alertas (globales)
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm text-[color:var(--color-text)]/70 mb-1">
-                Aviso (en riesgo) %
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={alertThresholds.warn}
-                onChange={(e) => onUpdateSettings?.({ warn: Number(e.target.value) })}
-                className="w-full px-3 py-2 border rounded-md border-[color:var(--color-text)]/20"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-[color:var(--color-text)]/70 mb-1">
-                {t('finance.budget.thresholds.danger', { defaultValue: 'Crítico (exceso) %' })}
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={alertThresholds.danger}
-                onChange={(e) => onUpdateSettings?.({ danger: Number(e.target.value) })}
-                className="w-full px-3 py-2 border rounded-md border-[color:var(--color-text)]/20"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6">
-          <div className="flex justify-between text-sm text-[color:var(--color-text)]/70 mb-2">
-            <span>
-              {t('finance.budget.overallProgress', { defaultValue: 'Progreso del presupuesto' })}
-            </span>
-            <span>{budget.total > 0 ? ((totalSpent / budget.total) * 100).toFixed(1) : 0}%</span>
-          </div>
           <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-300 ${totalSpent > budget.total ? 'bg-[var(--color-danger)]' : totalSpent > budget.total * 0.8 ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}
@@ -838,6 +695,20 @@ const distributeIncrease = (amounts, indices, delta) => {
                 ? totalBudgetCents
                 : Math.max(categoriesTotalCents, assignedCents * 2, sliderMin + 10000);
               const sliderMax = Math.max(dynamicSliderBaseline, assignedCents, sliderMin + 10000);
+              const categoryKey = normalizeBudgetCategoryKey(category.name);
+              const benchmarkCategory = benchmarkState.categories?.[categoryKey];
+              const perGuestStats = benchmarkCategory?.perGuest;
+              const showPerGuest =
+                categoryKey === 'catering' &&
+                perGuestStats &&
+                Number(perGuestStats?.count || 0) >= 10 &&
+                Number(perGuestStats?.avg || 0) > 0;
+              const perGuestHint = showPerGuest
+                ? t('finance.budget.perGuestHint', {
+                    value: formatCurrency(perGuestStats.avg),
+                    count: perGuestStats.count,
+                  })
+                : null;
               const sliderStep =
                 sliderMax >= 5000 ? 5000 : Math.max(1, Math.round(sliderMax / 100));
               const sliderValue = Math.min(sliderMax, Math.max(sliderMin, assignedCents));
@@ -854,6 +725,11 @@ const distributeIncrease = (amounts, indices, delta) => {
                     <span className="text-sm font-semibold text-[color:var(--color-text)]">
                       {category.name}
                     </span>
+                    {perGuestHint && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                        {perGuestHint}
+                      </span>
+                    )}
                     {sourceTag && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
                         <Sparkles size={10} />

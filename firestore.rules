@@ -93,7 +93,20 @@ service cloud.firestore {
       allow delete: if isOwnerOrPlanner(weddingId);
 
       function isAddingSelfAsPlanner() {
-        return false;
+        return request.auth != null &&
+          request.resource.data.diff(resource.data).addedKeys().hasOnly(['plannerIds']) &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(['plannerIds']) &&
+          request.resource.data.diff(resource.data).removedKeys().hasOnly(['plannerIds']) &&
+          (request.resource.data.plannerIds is list) &&
+          request.auth.uid in request.resource.data.plannerIds &&
+          (
+            !(resource.data.plannerIds is list) ||
+            (
+              resource.data.plannerIds.hasOnly(request.resource.data.plannerIds) &&
+              request.resource.data.plannerIds.size() == resource.data.plannerIds.size() + 1 &&
+              !(request.auth.uid in resource.data.plannerIds)
+            )
+          );
       }
     }
 

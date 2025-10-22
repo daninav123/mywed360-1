@@ -28,6 +28,23 @@ const STATUS_DOT = {
 const iconWrapperBase =
   'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-700';
 
+function PanelToggle({ label, active, onClick, disabled }) {
+  const base =
+    'inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition';
+  const className = disabled
+    ? `${base} cursor-not-allowed border-slate-200 text-slate-300`
+    : active
+      ? `${base} border-slate-900 bg-slate-100 text-slate-900 hover:border-slate-900`
+      : `${base} border-slate-300 text-slate-500 hover:border-slate-400 hover:text-slate-900`;
+
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} className={className}>
+      <span className={`h-2 w-2 rounded-full ${active ? 'bg-slate-900' : 'bg-slate-300'}`} />
+      {label}
+    </button>
+  );
+}
+
 function resolveStatus(step, onboarding) {
   if (!step || !onboarding) return 'default';
   if (onboarding.completed?.[step]) return 'done';
@@ -54,6 +71,14 @@ export default function SeatingPlanQuickActions({
   onboarding = null,
   onboardingDismissed = false,
   onResetOnboarding,
+  onHideOverview,
+  panels = {},
+  smartPanelAvailable = true,
+  guestPanelAvailable = true,
+  onToggleLibraryPanel,
+  onToggleInspectorPanel,
+  onToggleSmartPanel,
+  onToggleGuestPanel,
 }) {
   const isBanquet = tab === 'banquet';
 
@@ -134,6 +159,13 @@ export default function SeatingPlanQuickActions({
     },
   ].filter(Boolean);
 
+  const panelState = panels || {};
+  const hasPanelToggles =
+    typeof onToggleLibraryPanel === 'function' ||
+    typeof onToggleInspectorPanel === 'function' ||
+    typeof onToggleSmartPanel === 'function' ||
+    typeof onToggleGuestPanel === 'function';
+
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
@@ -152,15 +184,26 @@ export default function SeatingPlanQuickActions({
             </button>
           ) : null}
         </div>
-        {typeof onToggleAdvancedTools === 'function' ? (
-          <button
-            type="button"
-            onClick={() => onToggleAdvancedTools(!advancedOpen)}
-            className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
-          >
-            {advancedOpen ? 'Ocultar toolbar avanzada' : 'Mostrar toolbar avanzada'}
-          </button>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {typeof onHideOverview === 'function' ? (
+            <button
+              type="button"
+              onClick={onHideOverview}
+              className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-400 hover:text-slate-900"
+            >
+              Ocultar panel
+            </button>
+          ) : null}
+          {typeof onToggleAdvancedTools === 'function' ? (
+            <button
+              type="button"
+              onClick={() => onToggleAdvancedTools(!advancedOpen)}
+              className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900"
+            >
+              {advancedOpen ? 'Ocultar toolbar avanzada' : 'Mostrar toolbar avanzada'}
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -201,6 +244,46 @@ export default function SeatingPlanQuickActions({
           );
         })}
       </div>
+
+      {hasPanelToggles ? (
+        <div className="mt-6 border-t border-slate-200 pt-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Paneles visibles</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {typeof onToggleLibraryPanel === 'function' ? (
+              <PanelToggle
+                label="Biblioteca"
+                active={!!panelState.library}
+                onClick={onToggleLibraryPanel}
+                disabled={false}
+              />
+            ) : null}
+            {typeof onToggleInspectorPanel === 'function' ? (
+              <PanelToggle
+                label="Inspector"
+                active={!!panelState.inspector}
+                onClick={onToggleInspectorPanel}
+                disabled={false}
+              />
+            ) : null}
+            {typeof onToggleSmartPanel === 'function' ? (
+              <PanelToggle
+                label="Panel inteligente"
+                active={!!panelState.smart}
+                onClick={onToggleSmartPanel}
+                disabled={!smartPanelAvailable}
+              />
+            ) : null}
+            {typeof onToggleGuestPanel === 'function' ? (
+              <PanelToggle
+                label="Invitados"
+                active={!!panelState.guest}
+                onClick={onToggleGuestPanel}
+                disabled={!guestPanelAvailable}
+              />
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

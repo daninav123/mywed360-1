@@ -221,6 +221,7 @@
       "warn": "Aviso (en riesgo) %",
       "danger": "Crítico (exceso) %"
     },
+    "perGuestHint": "≈ {{value}} / invitado ({{count}} eventos)",
     "modal": {
       "editTitle": "Editar categoría",
       "newTitle": "Nueva categoría",
