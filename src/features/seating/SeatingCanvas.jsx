@@ -1,8 +1,11 @@
-import React, { forwardRef, memo, useRef, useMemo } from 'react';
+import React, { forwardRef, memo, useRef, useMemo, useState } from 'react';
 
 import ChairItem from '../../components/ChairItem';
 import FreeDrawCanvas from '../../components/FreeDrawCanvas';
 import TableItem from '../../components/TableItem';
+import TableWithPhysics from '../../components/seating/TableWithPhysics';
+import SnapGuides from '../../components/seating/SnapGuides';
+import SelectionMarquee from '../../components/seating/SelectionMarquee';
 
 /**
  * SeatingCanvas
@@ -52,6 +55,13 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
   _forwardedRef
 ) {
   const containerRef = useRef(null);
+  
+  // FASE 1: Estados para Physics, Snap Guides y Selección Múltiple
+  const [draggingTableId, setDraggingTableId] = useState(null);
+  const [snapGuides, setSnapGuides] = useState([]);
+  const [marqueeStart, setMarqueeStart] = useState(null);
+  const [marqueeEnd, setMarqueeEnd] = useState(null);
+  
   // Helpers locales de validación
   const getTableBox = (table) => {
     if (!table) return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
@@ -309,14 +319,39 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           const lockedIsCurrent = lockInfo?.clientId === currentClientId;
           const tableCanMove =
             canMoveTables && (!lockedBy || lockedIsCurrent);
-          return (
+          
+          const isSelected = 
+            (selectedTable && selectedTable.id === t.id) ||
+            (selectedIds && selectedIds.some((id) => String(id) === String(t.id)));
+          const isDragging = draggingTableId === t.id;
+          
+          // Wrapped table con physics
+          const tableElement = (
             <TableItem
               key={`${t.id}-${idx}`}
               table={t}
               scale={scale}
               offset={offset}
               containerRef={containerRef}
-              onMove={moveTable}
+              onMove={(id, newX, newY) => {
+                // Calcular snap guides mientras se mueve
+                const threshold = 10;
+                const guides = [];
+                tables.forEach(other => {
+                  if (other.id === id) return;
+                  // Guía vertical
+                  if (Math.abs(other.x - newX) < threshold) {
+                    guides.push({ type: 'vertical', position: other.x });
+                  }
+                  // Guía horizontal
+                  if (Math.abs(other.y - newY) < threshold) {
+                    guides.push({ type: 'horizontal', position: other.y });
+                  }
+                });
+                setSnapGuides(guides);
+                setDraggingTableId(id);
+                moveTable(id, newX, newY);
+              }}
               onAssignGuest={onAssignGuest}
               onAssignGuestSeat={(tableId, seatIndex, guestId) =>
                 onAssignGuestSeat
@@ -329,10 +364,7 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               guests={guests}
               eventsDisabled={drawMode === 'boundary'}
               canMove={tableCanMove}
-              selected={
-                (selectedTable && selectedTable.id === t.id) ||
-                (selectedIds && selectedIds.some((id) => String(id) === String(t.id)))
-              }
+              selected={isSelected}
               showNumbers={showSeatNumbers}
               danger={danger}
               dangerReason={dangerReason}
@@ -343,6 +375,19 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
               lockedIsCurrent={lockedIsCurrent}
               designFocusMode={designFocusMode}
             />
+          );
+          
+          // FASE 1: Envolver con TableWithPhysics para bounce effect
+          return (
+            <TableWithPhysics
+              key={`physics-${t.id}-${idx}`}
+              table={t}
+              isSelected={isSelected}
+              isDragging={isDragging}
+              onSelect={() => onSelectTable && onSelectTable(t)}
+            >
+              {tableElement}
+            </TableWithPhysics>
           );
         })}
 
@@ -408,6 +453,24 @@ const SeatingCanvas = forwardRef(function SeatingCanvas(
           });
           return lines;
         })()}
+      
+      {/* FASE 1: Snap Guides - Líneas de alineación animadas */}
+      {tab === 'banquet' && snapGuides.length > 0 && (
+        <SnapGuides 
+          guides={snapGuides} 
+          canvasWidth={hallSize?.width || 2000}
+          canvasHeight={hallSize?.height || 1500}
+        />
+      )}
+      
+      {/* FASE 1: Selection Marquee - Selección múltiple */}
+      {marqueeStart && marqueeEnd && (
+        <SelectionMarquee
+          start={marqueeStart}
+          end={marqueeEnd}
+          visible={true}
+        />
+      )}
     </div>
   );
 });
