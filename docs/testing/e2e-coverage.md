@@ -1,16 +1,11 @@
-﻿# Matriz de Cobertura E2E
-
-Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este archivo ejecutando el script cuando cambie la documentación o los tests.
-
-> **Actualización 2025-10-22:** Actualmente sólo 10 suites `*-real.cy.js` ejecutan integraciones reales (Auth, Dashboard, Guests y Email). El resto de suites listadas a continuación siguen dependiendo de interceptores/mocks legacy. Mientras se completa la migración, utiliza la tabla siguiente únicamente como referencia documental y consulta la sección "Cobertura con integración real" para conocer qué flujos ya se validan con datos reales.
-
-## Cobertura con integración real (2025-10-22)
+﻿## Cobertura con integración real (2025-10-22)
 
 | Módulo | Suites `*-real.cy.js` | Alcance cubierto |
 |--------|----------------------|------------------|
-| Auth | `cypress/e2e/auth/auth-flow-real.cy.js`<br>`cypress/e2e/auth/flow1-signup-real.cy.js`<br>`cypress/e2e/auth/flow1-password-reset-real.cy.js`<br>`cypress/e2e/auth/flow1-verify-email-real.cy.js`<br>`cypress/e2e/critical/auth-real.cy.js` | Login persistente, rutas protegidas, smoke crítico |
+| Auth | `cypress/e2e/auth/auth-flow-real.cy.js`<br>`cypress/e2e/auth/flow1-signup-real.cy.js`<br>`cypress/e2e/auth/flow1-social-login-real.cy.js`<br>`cypress/e2e/auth/flow1-password-reset-real.cy.js`<br>`cypress/e2e/auth/flow1-verify-email-real.cy.js`<br>`cypress/e2e/critical/auth-real.cy.js` | Login persistente, social login (manejo real de errores), rutas protegidas, signup, reset y verificación de email con Firebase real |
 | Dashboard | `cypress/e2e/critical/dashboard-real.cy.js`<br>`cypress/e2e/dashboard/main-navigation-real.cy.js`<br>`cypress/e2e/dashboard/global-search-shortcuts-real.cy.js` | Navegación planner, atajos globales, panel crítico |
 | Guests | `cypress/e2e/critical/guests-real.cy.js` | CRUD de invitados en Firestore real |
+| Email | `cypress/e2e/email/email-critical-real.cy.js`<br>`cypress/e2e/email/send-email-real.cy.js`<br>`cypress/e2e/email/read-email-real.cy.js`<br>`cypress/e2e/email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales |
 | Email | `cypress/e2e/email/email-critical-real.cy.js`<br>`cypress/e2e/email/send-email-real.cy.js`<br>`cypress/e2e/email/read-email-real.cy.js`<br>`cypress/e2e/email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales |
 
 ---
