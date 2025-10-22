@@ -619,6 +619,14 @@ export const AuthProvider = ({ children }) => {
       unsubscribe = onAuthStateChanged(activeAuth, (firebaseUser) => {
         console.log('[useAuth] Firebase auth state changed:', firebaseUser?.email || 'No user');
 
+        // ✅ Verificar sesión admin PRIMERO (prioridad sobre Firebase user)
+        const adminRestored = restoreAdminSession();
+        if (adminRestored) {
+          console.log('[useAuth] Sesión admin restaurada, ignorando usuario Firebase');
+          setLoading(false);
+          return;
+        }
+
         if (firebaseUser) {
           const user = {
             uid: firebaseUser.uid,
@@ -642,8 +650,7 @@ export const AuthProvider = ({ children }) => {
           } catch {}
         } else {
           console.log('[useAuth] No hay usuario autenticado');
-          const adminRestored = restoreAdminSession();
-          const mockRestored = adminRestored ? true : restoreMockSession();
+          const mockRestored = restoreMockSession();
 
           if (!mockRestored) {
             setCurrentUser(null);
