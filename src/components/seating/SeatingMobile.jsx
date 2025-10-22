@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Search, Users, Plus, Grid, List } from 'lucide-react';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Interfaz móvil optimizada para Seating Plan
@@ -43,7 +44,7 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
           <Menu className="w-6 h-6" />
         </button>
 
-        <h1 className="text-lg font-semibold">Seating Plan</h1>
+        <h1 className="text-lg font-semibold">{t('seatingMobile.header.title', { defaultValue: 'Seating plan' })}</h1>
 
         <div className="flex items-center gap-2">
           <button
@@ -63,7 +64,7 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar mesas o invitados..."
+            placeholder={t('seatingMobile.search.placeholder', { defaultValue: 'Buscar mesas o invitados...' })}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm"
           />
         </div>
@@ -73,15 +74,15 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
       <div className="bg-white px-4 py-3 border-b border-gray-200">
         <div className="grid grid-cols-3 gap-2 text-center text-sm">
           <div>
-            <p className="text-gray-600">Mesas</p>
+            <p className="text-gray-600">{t('seatingMobile.stats.tables', { defaultValue: 'Mesas' })}</p>
             <p className="font-semibold text-lg">{tables.length}</p>
           </div>
           <div>
-            <p className="text-gray-600">Invitados</p>
+            <p className="text-gray-600">{t('seatingMobile.stats.guests', { defaultValue: 'Invitados' })}</p>
             <p className="font-semibold text-lg">{guests.length}</p>
           </div>
           <div>
-            <p className="text-gray-600">Pendientes</p>
+            <p className="text-gray-600">{t('seatingMobile.stats.pending', { defaultValue: 'Pendientes' })}</p>
             <p className="font-semibold text-lg text-orange-600">
               {unassignedGuests.length}
             </p>
@@ -120,7 +121,7 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-400">Mesa vacía</p>
+                  <p className="text-sm text-gray-400">{t('seatingMobile.tables.empty', { defaultValue: 'Mesa vacía' })}</p>
                 )}
               </div>
             ))}
@@ -137,14 +138,14 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900">{table.name}</h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      {table.guests?.length || 0} invitados asignados
+                      {t('seatingMobile.tables.assignedGuests', { count: table.guests?.length || 0, defaultValue: '{{count}} invitados asignados' })}
                     </p>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900">
                       {table.guests?.length || 0}/{table.capacity || 0}
                     </div>
-                    <div className="text-xs text-gray-500">ocupación</div>
+                    <div className="text-xs text-gray-500">{t('seatingMobile.tables.occupancyLabel', { defaultValue: 'ocupación' })}</div>
                   </div>
                 </div>
               </div>
@@ -158,7 +159,7 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
             <div className="flex items-center gap-2 mb-3">
               <Users className="w-5 h-5 text-orange-600" />
               <h3 className="font-semibold text-orange-900">
-                Invitados Pendientes ({unassignedGuests.length})
+                {t('seatingMobile.pending.title', { count: unassignedGuests.length, defaultValue: 'Invitados pendientes ({{count}})' })}
               </h3>
             </div>
             <div className="space-y-2">
@@ -172,7 +173,7 @@ const SeatingMobile = ({ tables = [], guests = [], onAssignGuest, onUpdateTable 
                     onClick={() => onAssignGuest?.(guest.id)}
                     className="text-blue-600 text-sm font-medium"
                   >
-                    Asignar
+                    {t('seatingMobile.actions.assign', { defaultValue: 'Asignar' })}
                   </button>
                 </div>
               ))}

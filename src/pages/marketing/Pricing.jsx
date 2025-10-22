@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, HeartHandshake, Users, CheckCircle2, Crown } from 'lucide-react';
+import { Sparkles, HeartHandshake, Users, CheckCircle2, Crown, Loader2 } from 'lucide-react';
 
 import MarketingLayout from '../../components/marketing/MarketingLayout';
 import useTranslations from '../../hooks/useTranslations';
+import { useStripeCheckout, PRODUCT_IDS } from '../../hooks/useStripeCheckout';
 
 const formatEuro = (value, minimumFractionDigits = 0) =>
   new Intl.NumberFormat('es-ES', {
@@ -14,6 +15,14 @@ const formatEuro = (value, minimumFractionDigits = 0) =>
 
 const Pricing = () => {
   const { t } = useTranslations();
+  const { startCheckout, isLoading, error } = useStripeCheckout();
+  const [loadingPlan, setLoadingPlan] = useState(null);
+
+  const handlePurchase = async (productId, planKey) => {
+    setLoadingPlan(planKey);
+    await startCheckout(productId);
+    setLoadingPlan(null);
+  };
 
   const featureHighlights = useMemo(
     () => [
@@ -162,6 +171,21 @@ const Pricing = () => {
   return (
     <MarketingLayout>
       <div className="layout-container space-y-16">
+        {error && (
+          <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-red-800">Error al procesar el pago</h3>
+                <p className="mt-1 text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <section className="rounded-3xl border border-soft bg-surface px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 md:px-12 md:py-14">
           <div className="grid gap-10 md:grid-cols-[1.35fr,0.65fr] md:items-center">
             <div>
@@ -263,9 +287,29 @@ const Pricing = () => {
                     ))}
                   </ul>
 
-                  <Link to={plan.link} className={buttonClasses}>
-                    {plan.cta}
-                  </Link>
+                  {plan.key === 'free' ? (
+                    <Link to={plan.link} className={buttonClasses}>
+                      {plan.cta}
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => handlePurchase(
+                        plan.key === 'weddingPass' ? PRODUCT_IDS.weddingPass : PRODUCT_IDS.weddingPassPlus,
+                        plan.key
+                      )}
+                      disabled={loadingPlan === plan.key}
+                      className={buttonClasses}
+                    >
+                      {loadingPlan === plan.key ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Procesando...
+                        </span>
+                      ) : (
+                        plan.cta
+                      )}
+                    </button>
+                  )}
                 </article>
               );
             })}
@@ -309,12 +353,42 @@ const Pricing = () => {
                   ))}
                 </ul>
 
-                <Link
-                  to="/signup?role=planner"
-                  className="mt-8 inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
-                >
-                  {plannerCta}
-                </Link>
+                <div className="mt-8 space-y-3">
+                  <button
+                    onClick={() => handlePurchase(
+                      PRODUCT_IDS[`${plan.key}Monthly`],
+                      `${plan.key}_monthly`
+                    )}
+                    disabled={loadingPlan === `${plan.key}_monthly`}
+                    className="w-full inline-flex items-center justify-center rounded-md bg-[var(--color-primary)] text-white px-5 py-3 text-sm font-semibold transition-colors hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                  >
+                    {loadingPlan === `${plan.key}_monthly` ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Procesando...
+                      </span>
+                    ) : (
+                      <>Plan Mensual ({formatEuro(plan.monthlyPrice, 2)}/mes)</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handlePurchase(
+                      PRODUCT_IDS[`${plan.key}Annual`],
+                      `${plan.key}_annual`
+                    )}
+                    disabled={loadingPlan === `${plan.key}_annual`}
+                    className="w-full inline-flex items-center justify-center rounded-md border border-[var(--color-primary)]/45 px-5 py-3 text-sm font-semibold text-body transition-colors hover:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+                  >
+                    {loadingPlan === `${plan.key}_annual` ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Procesando...
+                      </span>
+                    ) : (
+                      <>Plan Anual (Ahorra 15%)</>
+                    )}
+                  </button>
+                </div>
               </article>
             ))}
           </div>
