@@ -22,7 +22,6 @@ const GuestFilters = React.memo(
     onAddGuest,
     onOpenSaveTheDate,
     onBulkInvite,
-    onOpenBulkAdd,
     onOpenManualBatch,
     onOpenRsvpSummary,
     onBulkTableReassign,
@@ -34,8 +33,6 @@ const GuestFilters = React.memo(
     onSendSelectedBroadcast,
     showApiButtons = true,
     coupleName = '',
-    onLoadSamples,
-    onOpenCheckIn,
   }) => {
     const { t, wedding } = useTranslations();
 
@@ -197,33 +194,6 @@ const GuestFilters = React.memo(
               title="Enviar SAVE THE DATE por WhatsApp"
             >
               Enviar SAVE THE DATE
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => onLoadSamples?.()}
-              disabled={isLoading}
-              data-testid="guest-load-samples"
-            >
-              Cargar ejemplos
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => onOpenBulkAdd?.()}
-              disabled={isLoading}
-              data-testid="guest-open-bulk"
-            >
-              Alta masiva
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => onOpenCheckIn?.()}
-              disabled={isLoading}
-              data-testid="guest-open-checkin"
-            >
-              Check-in día B
             </Button>
 
             <Button

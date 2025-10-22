@@ -1087,5 +1087,144 @@
         "guestFallback": "Invitado"
       }
     }
+  },
+  "pricing": {
+    "hero": {
+      "badge": "Modelo por boda",
+      "title": "Planes claros para cada evento.",
+      "description": "Pagos únicos en euros para parejas y paquetes flexibles para planners. Cada licencia permanece activa hasta 30 días después de la fecha del evento y puedes extenderla cuando lo necesites.",
+      "benefitsTitle": "Beneficios clave",
+      "benefits": [
+        "Licencias en modo lectura automático tras la fecha límite del evento.",
+        "Packs de planners con 1 mes de prueba y control de cuota disponible.",
+        "Alertas 30 / 7 / 1 días antes de expirar para mantener todo bajo control."
+      ],
+      "cta": "Crear cuenta gratuita",
+      "highlights": {
+        "payPerEvent": {
+          "title": "Pagos por evento",
+          "description": "Activa solo lo que necesitas para cada boda. Sin renovaciones automáticas."
+        },
+        "collaboration": {
+          "title": "Colaboración controlada",
+          "description": "Invita ayudantes y proveedores con permisos claros y seguimiento de acciones."
+        },
+        "syncStatus": {
+          "title": "Estado sincronizado",
+          "description": "Los webhooks de Stripe mantienen licencias y packs al día con alertas internas."
+        }
+      }
+    },
+    "sections": {
+      "couples": {
+        "label": "Parejas",
+        "title": "Planes para parejas",
+        "description": "Cada compra habilita una boda completa hasta 30 días después del evento. Añade una extensión para seguir trabajando si necesitas más tiempo."
+      },
+      "planners": {
+        "label": "Planners",
+        "title": "Paquetes para planners",
+        "description": "Todos los packs incluyen 1 mes de prueba gratuita. Elige 12 cuotas mensuales o pago único anual con 15 % de descuento. Las cuotas disponibles se actualizan automáticamente con Stripe."
+      },
+      "needHelp": {
+        "title": "¿Necesitas ayuda para elegir el plan adecuado?",
+        "description": "Te ayudamos a configurar licencias, automatizaciones y reportes según tu operación. Agenda una sesión y diseña un rollout acorde a tu ritmo.",
+        "cta": "Hablar con un especialista"
+      },
+      "quickStart": {
+        "title": "Lista para usar en minutos.",
+        "description": "Crea tu cuenta, conecta Stripe y activa tus licencias de inmediato. El sistema notificará las renovaciones y podrás mantener bodas cerradas en modo lectura cuando terminen.",
+        "primaryCta": "Crear cuenta gratuita",
+        "secondaryCta": "Centro de acceso"
+      }
+    },
+    "couplePlans": {
+      "free": {
+        "name": "Free",
+        "priceLabel": "Gratis",
+        "priceSuffix": "por boda",
+        "description": "Organiza una boda íntima o prueba la plataforma sin coste.",
+        "features": [
+          "1 boda activa con hasta 80 invitados",
+          "Seating plan básico y control de presupuesto",
+          "Directorio de proveedores y anuncios visibles",
+          "Plantillas esenciales y soporte estándar"
+        ],
+        "cta": "Crear cuenta gratuita"
+      },
+      "weddingPass": {
+        "name": "Wedding Pass",
+        "priceSuffix": "pago único por boda",
+        "description": "Desbloquea todas las herramientas premium para tu evento sin suscripciones anuales.",
+        "features": [
+          "Invitados y proveedores ilimitados",
+          "Contacto directo con proveedores y protocolo completo",
+          "Hasta 50 diseños web y soporte prioritario",
+          "Plantillas premium para planificación avanzada"
+        ],
+        "cta": "Comprar Wedding Pass"
+      },
+      "weddingPassPlus": {
+        "name": "Wedding Pass Plus",
+        "priceSuffix": "pago único por boda",
+        "description": "La opción más completa para bodas premium y trabajo colaborativo con ayudantes.",
+        "features": [
+          "Todo lo incluido en Wedding Pass",
+          "Elimina la marca en invitaciones, PDFs y pantallas",
+          "Biblioteca completa de diseños y galería de recuerdos",
+          "1 ayudante con acceso completo a la boda"
+        ],
+        "cta": "Elegir Wedding Pass Plus"
+      }
+    },
+    "plannerPlans": {
+      "cta": "Empezar prueba gratuita",
+      "pack5": {
+        "name": "Planner Pack 5",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Hasta 5 bodas activas simultáneas con herramientas profesionales.",
+        "annualDescription": "{{amount}} pago único anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Prioridad en el directorio y soporte prioritario",
+          "Gestiona y reasigna licencias según tus clientes"
+        ]
+      },
+      "pack15": {
+        "name": "Planner Pack 15",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Pensado para planners en crecimiento con múltiples proyectos en paralelo.",
+        "annualDescription": "{{amount}} pago único anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "Analytics por cliente y visibilidad extendida",
+          "Prioridad en directorio y soporte prioritario"
+        ]
+      },
+      "teams40": {
+        "name": "Teams 40",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "Equipos que coordinan muchas bodas y requieren colaboración avanzada.",
+        "annualDescription": "{{amount}} pago único anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "40 bodas activas al año natural",
+          "Incluye 3 perfiles adicionales con acceso limitado",
+          "Dashboard consolidado y colaboración avanzada"
+        ]
+      },
+      "teamsUnlimited": {
+        "name": "Teams Ilimitado",
+        "monthlySuffix": "/ mes (12 pagos)",
+        "description": "La solución definitiva con bodas y perfiles ilimitados para agencias grandes.",
+        "annualDescription": "{{amount}} pago único anual (15 % de descuento).",
+        "features": [
+          "1 mes de prueba gratuita",
+          "White-label completo y dominio personalizado",
+          "Soporte dedicado 24/7 y formación personalizada",
+          "Acceso API y acompañamiento experto"
+        ]
+      }
+    }
   }
 }
