@@ -1,4 +1,4 @@
-# Matriz de Cobertura E2E
+﻿# Matriz de Cobertura E2E
 
 Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este archivo ejecutando el script cuando cambie la documentación o los tests.
 
@@ -63,7 +63,7 @@ Generado automáticamente por `scripts/aggregateRoadmap.js`. Actualiza este arch
 | flujo-5-proveedores-ia.md | cypress/e2e/proveedores_flow.cy.js<br>cypress/e2e/proveedores_compare.cy.js<br>cypress/e2e/proveedores_smoke.cy.js | — | Legacy (mocks) |
 | flujo-6-presupuesto.md | cypress/e2e/finance/finance-flow.cy.js<br>cypress/e2e/finance/finance-flow-full.cy.js<br>cypress/e2e/finance/finance-budget.cy.js<br>cypress/e2e/finance/finance-transactions.cy.js<br>cypress/e2e/finance/finance-contributions.cy.js<br>cypress/e2e/finance/finance-analytics.cy.js<br>cypress/e2e/budget_flow.cy.js<br>cypress/e2e/finance/finance-advisor-chat.cy.js | — | Legacy (mocks) |
 
-_Nota:_ La matriz legacy refleja lo declarado en la documentación de cada flujo (`## Cobertura E2E implementada`). Si el flujo no menciona ninguna spec, aparecerá como �Sin specs en doc�. Todas estas suites (sin sufijo `-real.cy.js`) dependen de interceptores y mocks hasta completar la migración.
+_Nota:_ La matriz legacy refleja lo declarado en la documentación de cada flujo (`## Cobertura E2E implementada`). Si el flujo no menciona ninguna spec, aparecerá como �Sin specs en doc�. Todas estas suites (sin sufijo `-real.cy.js`) dependen de interceptores y mocks hasta completar la migración.
 
 
 

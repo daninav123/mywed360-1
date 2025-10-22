@@ -1,4 +1,4 @@
-# Progreso de Migración E2E - Tests con Integración Real
+﻿# Progreso de Migración E2E - Tests con Integración Real
 
 **Última actualización:** 2025-10-22
 

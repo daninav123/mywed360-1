@@ -1,4 +1,4 @@
-# 🎉 Tests E2E con Integración Real - Reporte Final de Éxito
+﻿# 🎉 Tests E2E con Integración Real - Reporte Final de Éxito
 
 **Fecha:** 22 de Enero, 2025 (Última actualización)  
 **Estado:** ✅ **100% COMPLETADO Y VERIFICADO - 86 TESTS**
@@ -35,7 +35,7 @@
 
 | Módulo | Suites `*-real.cy.js` | Cobertura funcional | Notas clave |
 |--------|----------------------|---------------------|-------------|
-| **Auth** | `auth/auth-flow-real.cy.js`<br>`auth/flow1-signup-real.cy.js`<br>`auth/flow1-password-reset-real.cy.js`<br>`auth/flow1-verify-email-real.cy.js`<br>`critical/auth-real.cy.js` | Login persistente, rutas protegidas, signup, reset y verificación de email con Firebase real | Pendiente: `flow1-social-login-real.cy.js` (OAuth real) |
+| **Auth** | `auth/auth-flow-real.cy.js`<br>`auth/flow1-signup-real.cy.js`<br>`auth/flow1-password-reset-real.cy.js`<br>`auth/flow1-verify-email-real.cy.js`<br>`critical/auth-real.cy.js` | Login persistente, rutas protegidas, signup, reset y verificación de email con Firebase real | `flow1-social-login-real.cy.js` valida manejo real de errores cuando OAuth no est� configurado. |
 | **Dashboard** | `critical/dashboard-real.cy.js`<br>`dashboard/main-navigation-real.cy.js`<br>`dashboard/global-search-shortcuts-real.cy.js` | Navegación planner, shortcuts globales, smoke crítico | `planner-dashboard.cy.js` sigue legacy |
 | **Guests** | `critical/guests-real.cy.js` | CRUD invitados sobre Firestore | Resto de suites `guests/*.cy.js` usan mocks |
 | **Email** | `email/email-critical-real.cy.js`<br>`email/send-email-real.cy.js`<br>`email/read-email-real.cy.js`<br>`email/folders-management-real.cy.js` | Composer, lectura, carpetas y smoke crítico con backend/Mailgun reales | Suites de AI, validaciones y adjuntos permanecen mock |
@@ -354,3 +354,4 @@ npx cypress run --spec "cypress/e2e/**/*-real.cy.js"
 Las suites `*-real.cy.js` para Auth, Dashboard, Guests y Email funcionan con integraciones reales y sirven como base comprobada para la migración. Sin embargo, la mayoría de los flujos descritos en la documentación aún dependen de pruebas legacy con interceptores.
 
 **Siguiente objetivo:** Migrar el resto de las suites a variantes `*-real.cy.js`, actualizar la documentación asociada y retirar gradualmente los mocks globales.
+
