@@ -1290,5 +1290,51 @@
     "errors": {
       "provider": "No pudimos autenticarte con {{provider}}."
     }
+  },
+  "budgetPrediction": {
+    "header": {
+      "title": "Predicción IA",
+      "subtitle": "Análisis inteligente de tu presupuesto"
+    },
+    "actions": {
+      "analyzing": "Analizando...",
+      "refresh": "Actualizar predicción"
+    },
+    "metrics": {
+      "riskLabel": "Nivel de riesgo",
+      "confidence": "Confianza",
+      "spent": "Gastado",
+      "projected": "Proyectado",
+      "dailyRate": "Gasto diario",
+      "daysRemaining": "Días restantes"
+    },
+    "sections": {
+      "recommendations": "Recomendaciones",
+      "categoryAnalysis": "Análisis por categoría"
+    },
+    "emptyState": {
+      "title": "Predicciones IA disponibles próximamente",
+      "description": "Necesitas al menos 5 transacciones para generar predicciones. Actualmente tienes {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Se proyecta un exceso de €{{amount}}",
+        "action": "Considera revisar gastos discrecionales"
+      },
+      "highDailyRate": {
+        "message": "Tu tasa de gasto diaria es alta",
+        "action": "Intenta espaciar más las compras grandes"
+      },
+      "onTrack": {
+        "message": "¡Vas muy bien con el presupuesto!",
+        "action": "Mantén este ritmo de gasto"
+      }
+    }
   }
 }

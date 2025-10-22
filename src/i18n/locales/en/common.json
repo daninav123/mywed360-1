@@ -1290,5 +1290,51 @@
     "errors": {
       "provider": "We could not authenticate with {{provider}}."
     }
+  },
+  "budgetPrediction": {
+    "header": {
+      "title": "AI budget prediction",
+      "subtitle": "Intelligent analysis of your budget"
+    },
+    "actions": {
+      "analyzing": "Analyzing...",
+      "refresh": "Update prediction"
+    },
+    "metrics": {
+      "riskLabel": "Risk level",
+      "confidence": "Confidence",
+      "spent": "Spent",
+      "projected": "Projected",
+      "dailyRate": "Daily spend",
+      "daysRemaining": "Days remaining"
+    },
+    "sections": {
+      "recommendations": "Recommendations",
+      "categoryAnalysis": "Category analysis"
+    },
+    "emptyState": {
+      "title": "AI predictions available soon",
+      "description": "You need at least 5 transactions to generate predictions. You currently have {{count}}."
+    },
+    "riskLabels": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "recommendations": {
+      "projectedOverage": {
+        "message": "Projected overage of €{{amount}}",
+        "action": "Consider reviewing discretionary expenses"
+      },
+      "highDailyRate": {
+        "message": "Your daily spending rate is high",
+        "action": "Try spacing large purchases further apart"
+      },
+      "onTrack": {
+        "message": "You're on track with the budget!",
+        "action": "Keep this spending pace"
+      }
+    }
   }
 }
