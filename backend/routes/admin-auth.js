@@ -303,6 +303,7 @@ router.post('/login', async (req, res) => {
       profile,
       adminUser,
       sessionId,
+      sessionToken, // ✅ Agregado para persistencia en localStorage
       sessionExpiresAt: sessionExpiresAt.toISOString(),
       deviceId: toBool(rememberMe, false) ? deviceId : undefined,
       trustedDevice: isTrusted,
@@ -366,6 +367,7 @@ router.post('/login/mfa', async (req, res) => {
       profile,
       adminUser,
       sessionId,
+      sessionToken, // ✅ Agregado para persistencia en localStorage
       sessionExpiresAt: sessionExpiresAt.toISOString(),
       deviceId: rememberMe ? deviceId : undefined,
       trustedDevice: true,
