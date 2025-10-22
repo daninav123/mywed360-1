@@ -4,8 +4,16 @@ import { setupAllInterceptors } from './interceptors';
 
 // Configuración global para todos los tests
 beforeEach(() => {
-  // Setup interceptors para cada test
-  setupAllInterceptors();
+  // Solo usar interceptors en tests sin sufijo -real.cy.js
+  const specName = Cypress.spec.name || '';
+  const isRealIntegrationTest = specName.includes('-real.cy.js');
+  
+  if (!isRealIntegrationTest) {
+    // Setup interceptors solo para tests legacy (sin -real)
+    setupAllInterceptors();
+  } else {
+    cy.log('⚡ Modo integración real: SIN mocks ni interceptors');
+  }
   
   // Configurar timeouts más largos para componentes lazy
   cy.intercept('GET', '**/*.js', (req) => {

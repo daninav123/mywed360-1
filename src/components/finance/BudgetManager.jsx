@@ -524,8 +524,9 @@ export default function BudgetManager({
             </Button>
           </div>
         ) : (
-          <div className="px-6 py-5 space-y-5">
-            {budgetUsage.map((category, index) => {
+          <div className="px-5 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {budgetUsage.map((category, index) => {
               const rawCategory = categories[index] || {};
               const assignedAmountRaw = Number(
                 rawCategory?.amount ?? category.amount ?? 0
@@ -562,48 +563,48 @@ export default function BudgetManager({
               return (
                 <div
                   key={category.name || index}
-                  className="rounded-xl border border-[color:var(--color-text)]/10 bg-white/70 shadow-sm p-5 space-y-4"
+                  className="rounded-lg border border-[color:var(--color-text)]/10 bg-white/80 shadow-sm p-3 space-y-2"
                 >
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-lg font-semibold text-[color:var(--color-text)]">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h4 className="text-base font-semibold text-[color:var(--color-text)]">
                           {category.name}
                         </h4>
                         {sourceTag && (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-                            <Sparkles size={12} />
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                            <Sparkles size={11} />
                             Consejero
                           </span>
                         )}
                         {usagePercent >= 100 && (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                            <AlertTriangle size={12} />
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                            <AlertTriangle size={11} />
                             Excedido
                           </span>
                         )}
                       </div>
                       {category.description && (
-                        <p className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                        <p className="text-xs text-[color:var(--color-text)]/60">
                           {category.description}
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 flex-wrap justify-end text-xs">
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end text-[11px]">
                       <button
                         type="button"
-                        className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
+                        className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition"
                         onClick={handleOpenAdvisor}
                         disabled={advisorLoading || localAdvisorLoading}
                       >
                         {(advisorLoading || localAdvisorLoading) ? (
-                          <Loader2 size={14} className="animate-spin" />
+                          <Loader2 size={12} className="animate-spin" />
                         ) : (
-                          <Sparkles size={14} />
+                          <Sparkles size={12} />
                         )}
                         Consejero
                       </button>
-                      <label className="flex items-center gap-1 text-xs text-[color:var(--color-text)]/70">
+                      <label className="flex items-center gap-1 text-[11px] text-[color:var(--color-text)]/70">
                         <input
                           type="checkbox"
                           checked={Boolean(category.muted)}
@@ -616,19 +617,19 @@ export default function BudgetManager({
                         onClick={() => handleEditCategory(category, index)}
                         className="text-[var(--color-primary)] hover:brightness-110 p-1"
                       >
-                        <Edit3 size={16} />
+                        <Edit3 size={14} />
                       </button>
                       <button
                         aria-label="Eliminar categoría"
                         onClick={() => handleDeleteCategory(index, category.name)}
                         className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  <div className="space-y-1.5">
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
                       <div className={`flex-1 ${sliderDisabled ? 'opacity-60' : ''}`}>
                         <input
                           type="range"
@@ -643,32 +644,32 @@ export default function BudgetManager({
                         />
                       </div>
                       <div className="min-w-[140px] text-right">
-                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
                         </p>
-                        <p className="text-lg font-semibold text-[color:var(--color-text)]">
+                        <p className="text-base font-semibold text-[color:var(--color-text)]">
                           {formatCurrency(assignedAmount)}
                         </p>
-                        <p className="text-xs text-[color:var(--color-text)]/70">
+                        <p className="text-[11px] text-[color:var(--color-text)]/70">
                           {allocationPercent.toFixed(1)}% del total
                         </p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.spent', { defaultValue: 'Gastado' })}
                         </p>
-                        <p className="text-base font-semibold text-[color:var(--color-danger)]">
+                        <p className="text-sm font-semibold text-[color:var(--color-danger)]">
                           {formatCurrency(spentAmount)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-[color:var(--color-text)]/60">
+                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
                           {t('finance.budget.remaining', { defaultValue: 'Restante' })}
                         </p>
                         <p
-                          className={`text-base font-semibold ${
+                          className={`text-sm font-semibold ${
                             remaining < 0
                               ? 'text-[var(--color-danger)]'
                               : 'text-[color:var(--color-text)]'
@@ -678,13 +679,13 @@ export default function BudgetManager({
                         </p>
                       </div>
                       <div>
-                        <div className="flex items-center justify-between text-xs text-[color:var(--color-text)]/70 mb-1">
+                        <div className="flex items-center justify-between text-[11px] text-[color:var(--color-text)]/70 mb-1">
                           <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
                           <span>{Math.min(usagePercent, 999).toFixed(1)}%</span>
                         </div>
-                        <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
+                        <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-1.5">
                           <div
-                            className={`${barColor} h-3 rounded-full transition-all duration-300`}
+                            className={`${barColor} h-1.5 rounded-full transition-all duration-300`}
                             style={{ width: `${progressPercent}%` }}
                           />
                         </div>
@@ -694,6 +695,7 @@ export default function BudgetManager({
                 </div>
               );
             })}
+            </div>
           </div>
         )}
       </Card>

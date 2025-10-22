@@ -61,21 +61,6 @@ const AUTO_CATEGORY_RULES = [
   },
 ];
 
-const LEGACY_DEFAULT_CATEGORY_KEYS = new Set([
-  'venue',
-  'lugar',
-  'espacio',
-  'catering',
-  'fotografia',
-  'fotos',
-  'flores',
-  'musica',
-  'vestido',
-  'vestidos',
-  'transporte',
-  'otros',
-]);
-
 const normalizeCategoryName = (value) => {
   if (!value) return '';
   return String(value)
@@ -914,18 +899,6 @@ export default function useFinance() {
     if (!normalizedDesired.length) return;
 
     const currentCategories = Array.isArray(budget.categories) ? budget.categories : [];
-    const hasCategories = currentCategories.length > 0;
-
-    const isLegacyTemplate =
-      hasCategories &&
-      currentCategories.length <= LEGACY_DEFAULT_CATEGORY_KEYS.size &&
-      currentCategories.every((cat) => {
-        const key = normalizeCategoryName(cat?.name);
-        const amount = Number(cat?.amount) || 0;
-        return LEGACY_DEFAULT_CATEGORY_KEYS.has(key) && amount === 0;
-      });
-
-    if (hasCategories && !isLegacyTemplate) return;
 
     const nextCategories = normalizedDesired.map(({ name, key }) => {
       const existing = currentCategories.find(

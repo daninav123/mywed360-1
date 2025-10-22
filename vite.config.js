@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
         : [])
     ],
     server: {
-      host: 'localhost', // Cambiar de 0.0.0.0 a localhost para evitar errores WebSocket
+      host: '0.0.0.0', // Escuchar en todas las interfaces (IPv4 + IPv6)
       // Puerto de desarrollo
       port: 5173,
       strictPort: true,

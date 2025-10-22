@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { db } from '../db.js';
 import logger from '../logger.js';
 import { createMailgunClients } from './mail/clients.js';
+import { normalizeCommissionRules } from '../utils/commission.js';
 
 const router = express.Router();
 
@@ -2016,15 +2017,36 @@ router.get('/discounts', async (_req, res) => {
         return null;
       };
       
+      const commissionRules = normalizeCommissionRules(
+        data.commissionRules || null,
+        { defaultCurrency: data.currency || 'EUR' },
+      );
+
+      const createdAt = safeToDate(data.createdAt);
+      const updatedAt = safeToDate(data.updatedAt);
+      const validFrom = safeToDate(data.validFrom);
+      const validUntil = safeToDate(data.validUntil);
+
       return {
         id: d.id,
         code: data.code || d.id,
+        url: data.url || null,
+        type: data.type || 'campaign',
         uses: Number(data.uses || 0),
+        maxUses: data.maxUses ?? null,
         revenue: Number(data.revenue || 0),
         currency: data.currency || 'EUR',
         status: data.status || 'active',
-        createdAt: formatDateOnly(safeToDate(data.createdAt)),
-        updatedAt: formatDateOnly(safeToDate(data.updatedAt)),
+        discountPercentage: Number.isFinite(Number(data.discountPercentage))
+          ? Number(data.discountPercentage)
+          : 0,
+        validFrom: validFrom ? validFrom.toISOString() : null,
+        validUntil: validUntil ? validUntil.toISOString() : null,
+        assignedTo: data.assignedTo || null,
+        notes: data.notes || null,
+        commissionRules,
+        createdAt: createdAt ? formatDateOnly(createdAt) : null,
+        updatedAt: updatedAt ? formatDateOnly(updatedAt) : null,
       };
     });
     const summary = items.reduce(
@@ -2047,35 +2069,80 @@ router.get('/discounts', async (_req, res) => {
   }
 });
 
-// Actualizar código de descuento existente
+// Actualizar codigo de descuento existente
 router.put('/discounts/:id', async (req, res) => {
-  console.log('🔍 [DEBUG] PUT /discounts/:id endpoint called');
+  console.log('?? [DEBUG] PUT /discounts/:id endpoint called');
   try {
     const { id } = req.params;
     if (!id) return res.status(400).json({ error: 'discount_id_required' });
-    
-    const { url, type, maxUses, assignedTo, notes, status } = req.body || {};
-    
+
+    const {
+      url,
+      type,
+      maxUses,
+      assignedTo,
+      notes,
+      status,
+      discountPercentage,
+      validFrom,
+      validUntil,
+      currency: bodyCurrency,
+      commissionRules: rawCommissionRules,
+    } = req.body || {};
+
     const discountRef = collections.discountLinks().doc(id);
     const discountDoc = await discountRef.get();
-    
+
     if (!discountDoc.exists) {
       return res.status(404).json({ error: 'discount_not_found' });
     }
-    
+
+    const currentData = discountDoc.data() || {};
     const updateData = {};
-    
+
     if (url !== undefined) updateData.url = String(url || '').trim();
     if (type !== undefined) updateData.type = String(type || 'campaign').trim();
     if (status !== undefined) updateData.status = String(status).trim();
     if (notes !== undefined) updateData.notes = String(notes || '').trim() || null;
-    
-    // maxUses: null = permanente, número = limitado
+
+    if (discountPercentage !== undefined) {
+      const parsedDiscount = Number(discountPercentage);
+      updateData.discountPercentage = Number.isFinite(parsedDiscount) ? parsedDiscount : 0;
+    }
+
+    if (validFrom !== undefined) {
+      if (!validFrom) {
+        updateData.validFrom = null;
+      } else {
+        const fromDate = new Date(validFrom);
+        updateData.validFrom = Number.isNaN(fromDate.getTime()) ? null : fromDate;
+      }
+    }
+
+    if (validUntil !== undefined) {
+      if (!validUntil) {
+        updateData.validUntil = null;
+      } else {
+        const untilDate = new Date(validUntil);
+        updateData.validUntil = Number.isNaN(untilDate.getTime()) ? null : untilDate;
+      }
+    }
+
+    let cleanCurrency = null;
+    if (bodyCurrency !== undefined) {
+      cleanCurrency = typeof bodyCurrency === 'string' && bodyCurrency.trim()
+        ? bodyCurrency.trim().toUpperCase()
+        : null;
+      if (cleanCurrency) {
+        updateData.currency = cleanCurrency;
+      }
+    }
+
     if (maxUses !== undefined) {
       const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
       updateData.maxUses = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
     }
-    
+
     if (assignedTo !== undefined) {
       updateData.assignedTo = assignedTo ? {
         id: assignedTo.id || null,
@@ -2083,44 +2150,115 @@ router.put('/discounts/:id', async (req, res) => {
         email: assignedTo.email || null,
       } : null;
     }
-    
+
+    if (rawCommissionRules !== undefined) {
+      if (rawCommissionRules === null) {
+        updateData.commissionRules = null;
+      } else {
+        const normalizedCommission = normalizeCommissionRules(
+          rawCommissionRules,
+          { defaultCurrency: cleanCurrency || currentData.currency || 'EUR' },
+        );
+        if (!normalizedCommission) {
+          return res.status(400).json({ error: 'invalid_commission_rules' });
+        }
+        updateData.commissionRules = normalizedCommission;
+        if (normalizedCommission.currency
+          && normalizedCommission.currency !== (updateData.currency || currentData.currency || 'EUR')) {
+          updateData.currency = normalizedCommission.currency;
+        }
+      }
+    }
+
     updateData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
     updateData.updatedBy = 'admin';
-    
+
     await discountRef.update(updateData);
-    
+
     const updated = await discountRef.get();
-    const data = updated.data();
-    
-    console.log(`  ✅ Updated discount code: ${data.code}`);
-    
+    const data = updated.data() || {};
+
+    const toDateSafe = (value) => {
+      if (!value) return null;
+      if (value.toDate && typeof value.toDate === 'function') {
+        try {
+          return value.toDate();
+        } catch {
+          return null;
+        }
+      }
+      if (value instanceof Date) return value;
+      if (typeof value === 'string' || typeof value === 'number') {
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+      }
+      return null;
+    };
+
+    const commissionRules = normalizeCommissionRules(
+      data.commissionRules || null,
+      { defaultCurrency: data.currency || 'EUR' },
+    );
+
+    console.log(  OK. Updated discount code: );
+
     return res.json({
       id: updated.id,
-      ...data,
+      code: data.code || updated.id,
+      url: data.url || null,
+      type: data.type || 'campaign',
+      uses: Number(data.uses || 0),
+      maxUses: data.maxUses ?? null,
+      revenue: Number(data.revenue || 0),
+      currency: data.currency || 'EUR',
+      status: data.status || 'active',
+      discountPercentage: Number.isFinite(Number(data.discountPercentage))
+        ? Number(data.discountPercentage)
+        : 0,
+      validFrom: toDateSafe(data.validFrom)?.toISOString() || null,
+      validUntil: toDateSafe(data.validUntil)?.toISOString() || null,
+      assignedTo: data.assignedTo || null,
+      notes: data.notes || null,
+      commissionRules,
+      partnerToken: data.partnerToken || null,
+      createdAt: toDateSafe(data.createdAt)?.toISOString() || null,
       updatedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('  ❌ Update discount error:', error.message);
+    console.error('  ERROR Update discount error:', error.message);
     logger.error('[admin-dashboard] update discount error', error);
     return res.status(500).json({ error: 'admin_dashboard_update_discount_failed', message: error.message });
   }
 });
-
 // Crear nuevo código de descuento
 router.post('/discounts', async (req, res) => {
   console.log('🔍 [DEBUG] POST /discounts endpoint called');
-  try {
-    const { code, url, type, maxUses, assignedTo, notes } = req.body || {};
+    try {
+      const {
+        code,
+        url,
+        type,
+        maxUses,
+        assignedTo,
+        notes,
+        currency: bodyCurrency,
+        commissionRules: rawCommissionRules,
+      } = req.body || {};
     
     if (!code || !code.trim()) {
       return res.status(400).json({ error: 'code_required' });
     }
     
-    const cleanCode = String(code).trim().toUpperCase();
-    const cleanUrl = String(url || '').trim();
-    const cleanType = String(type || 'campaign').trim();
-    const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
-    const maxUsesValue = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
+      const cleanCode = String(code).trim().toUpperCase();
+      const cleanUrl = String(url || '').trim();
+      const cleanType = String(type || 'campaign').trim();
+      const isPermanent = maxUses === null || maxUses === undefined || maxUses === 0;
+      const maxUsesValue = isPermanent ? null : Math.max(1, Number(maxUses) || 1);
+
+      const normalizedCommissionRules = normalizeCommissionRules(rawCommissionRules, { defaultCurrency: 'EUR' });
+      const cleanCurrency = typeof bodyCurrency === 'string' && bodyCurrency.trim()
+        ? bodyCurrency.trim().toUpperCase()
+        : (normalizedCommissionRules?.currency || 'EUR');
     
     // Verificar si ya existe
     const existing = await collections.discountLinks()
@@ -2139,18 +2277,19 @@ router.post('/discounts', async (req, res) => {
       maxUses: maxUsesValue,
       usesCount: 0,
       status: 'activo',
-      revenue: 0,
-      currency: 'EUR',
-      assignedTo: assignedTo ? {
-        id: assignedTo.id || null,
-        name: assignedTo.name || null,
-        email: assignedTo.email || null,
-      } : null,
-      notes: String(notes || '').trim() || null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdBy: 'admin',
-    };
+        revenue: 0,
+        currency: cleanCurrency,
+        assignedTo: assignedTo ? {
+          id: assignedTo.id || null,
+          name: assignedTo.name || null,
+          email: assignedTo.email || null,
+        } : null,
+        notes: String(notes || '').trim() || null,
+        commissionRules: normalizedCommissionRules || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: 'admin',
+      };
     
     const docRef = await collections.discountLinks().add(newDiscount);
     

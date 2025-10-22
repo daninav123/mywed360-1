@@ -121,10 +121,106 @@ db.collection('payments')
    - Icono: CreditCard (naranja)
    - Puede ser > usuarios únicos (compras repetidas)
 
+5. **Comisión Generada**
+   - Muestra la remuneración del comercial según las reglas configuradas
+   - Combina porcentaje sobre facturación y bonus fijos
+   - Indica el tramo aplicado y bonificaciones extras (si las hay)
+
 **Tabla de usuarios:**
 - Últimos 50 usuarios (ordenados por fecha DESC)
 - Columnas: Email, Importe, Fecha
 - Sin datos personales sensibles (solo email)
+
+### Configuracion de comisiones
+
+#### Objetivo
+- Cada enlace comercial puede definir remuneraciones basadas en porcentaje sobre facturacion y bonus fijos.
+- El partner ve la comision generada (no la facturacion bruta), con el detalle de periodos y tramos aplicados.
+
+#### Campos nuevos en `discountLinks`
+
+```json
+commissionRules: {
+  "currency": "EUR",
+  "periods": [
+    {
+      "id": "year_1",
+      "label": "Primer anio",
+      "startMonth": 0,
+      "endMonth": 12,
+      "tiers": [
+        {
+          "id": "base",
+          "label": "Base",
+          "minRevenue": 0,
+          "maxRevenue": 12000,
+          "percentage": 0.10,
+          "fixedAmount": 0
+        },
+        {
+          "id": "plus_12k",
+          "label": "Plus 12k",
+          "minRevenue": 12000,
+          "maxRevenue": null,
+          "percentage": 0.12,
+          "fixedAmount": 250
+        }
+      ]
+    },
+    {
+      "id": "recurring",
+      "label": "Usuarios recurrentes",
+      "startMonth": 12,
+      "endMonth": null,
+      "tiers": [
+        {
+          "id": "base",
+          "label": "Base",
+          "minRevenue": 0,
+          "maxRevenue": null,
+          "percentage": 0.05,
+          "fixedAmount": 0
+        }
+      ]
+    }
+  ]
+}
+```
+
+`startMonth` y `endMonth` usan meses relativos al alta del enlace (0 = activacion, 12 = primer aniversario). El calculo toma el total de facturacion del periodo, busca el tramo (`minRevenue` / `maxRevenue`) que corresponde y aplica `comision = revenue * percentage + fixedAmount`.
+
+#### Respuesta API `/api/partner/:token`
+- `stats.total.commission`: importe total y monedas.
+- `stats.total.commission.breakdown`: lista por periodo con `label`, `revenueEvaluated`, `percentageApplied`, `fixedApplied`, `tierId`.
+- `stats.lastMonth.commission`: comision generada durante el mes completo anterior.
+
+#### Edicion desde `/admin/discounts`
+- Modal de creacion/edicion incluye panel "Comisiones" con:
+  - selector de moneda (por defecto la del enlace).
+  - tabla de periodos (nombre, mes inicio, mes fin) con posibilidad de anadir/eliminar.
+  - formulario interno para definir tramos (min, max opcional, % y fijo).
+- Validaciones clave:
+  - porcentaje entre 0 y 1 (interfaz acepta 0-100 y convierte a decimal).
+  - montos fijos >= 0.
+  - `startMonth` < `endMonth` cuando hay limite.
+  - al menos un periodo con un tramo.
+
+#### Ejemplos operativos
+1. **10 % primer anio, 5 % recurrente**  
+   - Periodo `year_1` con tramo base 10 %.  
+   - Periodo `recurring` con tramo base 5 %.
+
+2. **Plus fijo al superar minimo**  
+   - Anadir tramo con `minRevenue` igual al umbral y `fixedAmount` con el bonus (el porcentaje puede permanecer igual o subir).
+
+3. **Porcentaje por tramos**  
+   - Definir varios tramos con distintos `minRevenue` y `maxRevenue` dentro del mismo periodo; el algoritmo toma el tramo con `minRevenue` mas alto que no exceda la facturacion acumulada.
+
+#### Consideraciones de calculo
+- Si no hay `commissionRules`, el panel muestra `comision = 0` y un mensaje "Enlace sin reglas configuradas".
+- Facturacion se calcula a partir de los pagos `paid|succeeded|completed`.
+- Los calculos se basan en fechas UTC; se redondea a dos decimales antes de enviar al frontend.
+- Cada respuesta incluye `debug.commissionPayments` (conteo de pagos evaluados) para auditoria.
 
 #### Integración en Panel Admin
 
