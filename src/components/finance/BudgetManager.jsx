@@ -6,7 +6,6 @@ import {
   Target,
   Sparkles,
   Loader2,
-  RefreshCw,
   Info,
   CheckCircle,
 } from 'lucide-react';
