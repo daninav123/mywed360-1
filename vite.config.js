@@ -42,6 +42,20 @@ export default defineConfig(({ mode }) => {
         port: 5173,
         clientPort: 5173,
       },
+      // Ignorar archivos que no necesitan recargar el frontend
+      watch: {
+        ignored: [
+          '**/node_modules/**',
+          '**/backend/**',
+          '**/docs/**',
+          '**/dist/**',
+          '**/.git/**',
+          '**/logs/**',
+          '**/*.log',
+          '**/scripts/**',
+          '**/cypress/**',
+        ],
+      },
       // Proxy para API backend
       proxy: {
         '/api': {
