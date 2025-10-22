@@ -42,7 +42,7 @@ const stats = [
 const AppOverview = () => {
   return (
     <MarketingLayout>
-      <section className="rounded-3xl border border-soft bg-surface/90 p-10 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="rounded-3xl border border-soft bg-white/95 p-10 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="grid gap-10 lg:grid-cols-[1.6fr,1fr] lg:items-start">
           <div>
             <h1 className="text-3xl font-semibold text-body md:text-4xl">
@@ -56,7 +56,7 @@ const AppOverview = () => {
               {stats.map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-2xl border border-[var(--color-primary)]/35 bg-primary-soft p-4 text-body"
+                  className="rounded-2xl border border-soft bg-white p-4 text-body shadow-sm shadow-[var(--color-primary)]/10"
                 >
                   <p className="text-2xl font-semibold text-[var(--color-primary)]">{item.value}</p>
                   <p className="text-xs font-medium uppercase tracking-widest text-muted">{item.label}</p>
@@ -64,7 +64,7 @@ const AppOverview = () => {
               ))}
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-2xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] p-8 text-white">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--color-primary)]/45 bg-[var(--color-primary)] p-8 text-white shadow-sm shadow-[var(--color-primary)]/20">
             <p className="text-sm uppercase tracking-[0.2em] text-white/70">MaLove.App Workspace</p>
             <h2 className="mt-4 text-2xl font-semibold">Un ecosistema conectado</h2>
             <p className="mt-4 text-sm text-white/80">
@@ -100,7 +100,7 @@ const AppOverview = () => {
           {modules.map((module) => (
             <article
               key={module.title}
-              className="rounded-2xl border border-soft bg-surface/85 p-6 shadow-sm shadow-[var(--color-primary)]/10 transition-shadow hover:shadow-md hover:shadow-[var(--color-primary)]/20"
+              className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10 transition-transform hover:-translate-y-1 hover:shadow-md hover:shadow-[var(--color-primary)]/20"
             >
               <h3 className="text-lg font-semibold text-body">{module.title}</h3>
               <p className="mt-3 text-sm text-muted">{module.description}</p>
@@ -109,7 +109,7 @@ const AppOverview = () => {
         </div>
       </section>
 
-      <section className="mt-16 rounded-3xl border border-soft bg-surface/90 p-10 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="mt-16 rounded-3xl border border-soft bg-white/95 p-10 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="grid gap-8 md:grid-cols-[1.4fr,0.6fr] md:items-center">
           <div>
             <h2 className="text-2xl font-semibold text-body md:text-3xl">
@@ -134,7 +134,7 @@ const AppOverview = () => {
               </li>
             </ul>
           </div>
-          <div className="rounded-2xl border border-[var(--color-primary)]/35 bg-primary-soft p-6">
+          <div className="rounded-2xl border border-soft bg-white p-6 shadow-sm shadow-[var(--color-primary)]/10">
             <h3 className="text-lg font-semibold text-body">Acceso inmediato</h3>
             <p className="mt-3 text-sm text-muted">
               Todas las cuentas incluyen prueba gratuita y demo guiada con nuestro equipo de onboarding.

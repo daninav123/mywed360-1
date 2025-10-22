@@ -267,6 +267,10 @@ export const useAISearch = () => {
             }
           } else {
             const payload = await res.json().catch(() => null);
+            console.debug('[useAISearch] ai-suppliers backend respondió error', {
+              status: res?.status,
+              payload,
+            });
             const message = mapBackendErrorMessage(
               payload,
               res?.status,
@@ -279,6 +283,7 @@ export const useAISearch = () => {
         }
       } catch (backendError) {
         console.warn('Fallo consultando ai-suppliers', backendError);
+        console.debug('[useAISearch] ai-suppliers excepción', backendError?.message, backendError);
         lastError = backendError instanceof Error ? backendError : new Error(String(backendError || 'Error'));
       }
 

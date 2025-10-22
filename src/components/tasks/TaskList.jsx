@@ -1,76 +1,132 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { categories } from './CalendarComponents.jsx';
 import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.jsx';
 
-// Componente para mostrar la lista de tareas críticas de la semana
-const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComplete, parentNameMap = {}, dependencyStatuses = new Map() }) => {
-  const sortedTasks = Array.isArray(tasks)
-    ? (() => {
-        const todayStart = new Date();
-        todayStart.setHours(0, 0, 0, 0);
-        // De-duplicar por id (evita claves duplicadas durante actualizaciones optimistas)
-        const byId = new Map();
-        tasks.forEach((e) => {
-          if (!e) return;
-          const key = e.id ?? `${e.title}-${e.start?.toISOString?.() ?? ''}`;
-          if (!byId.has(key)) byId.set(key, e);
-        });
-        const deduped = Array.from(byId.values());
-        const filtered = deduped.filter((e) => {
-          if (e?.__kind === 'subtask') return true;
-          const start = e?.start instanceof Date ? e.start : null;
-          const end = e?.end instanceof Date ? e.end : start;
-          if (!start) return false;
-          return end >= todayStart || start >= todayStart;
-        });
-        const sorter = (a, b) => {
-          const aIsSub = a?.__kind === 'subtask';
-          const bIsSub = b?.__kind === 'subtask';
-          if (aIsSub && bIsSub) {
-            const aTitle = String(a?.title || a?.name || '').toLowerCase();
-            const bTitle = String(b?.title || b?.name || '').toLowerCase();
-            return aTitle.localeCompare(bTitle);
-          }
-          if (aIsSub) return -1;
-          if (bIsSub) return 1;
-          const aStart = a?.start instanceof Date ? a.start.getTime() : Number.MAX_SAFE_INTEGER;
-          const bStart = b?.start instanceof Date ? b.start.getTime() : Number.MAX_SAFE_INTEGER;
-          return aStart - bStart;
-        };
-        return filtered.sort(sorter).slice(0, maxItems);
-      })()
-    : [];
+const DEFAULT_PAGE_SIZE = 6;
 
-  // Separar subtareas de reuniones/eventos
-  const subtaskItems = sortedTasks.filter((e) => e.__kind === 'subtask');
-  const meetingItems = sortedTasks.filter((e) => e.__kind !== 'subtask');
+// Lista lateral con subtareas críticas y reuniones próximas
+export default function TaskList({
+  tasks,
+  onTaskClick,
+  maxItems = DEFAULT_PAGE_SIZE,
+  completedSet,
+  onToggleComplete,
+  parentNameMap = {},
+  dependencyStatuses = new Map(),
+}) {
+  const todayStart = useMemo(() => {
+    const base = new Date();
+    base.setHours(0, 0, 0, 0);
+    return base;
+  }, []);
 
-  // Agrupar subtareas por parentId
-  const groupedByParent = (() => {
-    const map = new Map();
-    for (const st of subtaskItems) {
-      const pid = String(st.parentId || '');
-      if (!pid) continue;
-      if (!map.has(pid)) map.set(pid, []);
-      map.get(pid).push(st);
-    }
-    for (const [pid, arr] of map.entries()) {
-      arr.sort((a, b) => {
+  const [pageSize, setPageSize] = useState(() => Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE));
+  const [page, setPage] = useState(0);
+
+  useEffect(() => {
+    setPageSize(Math.max(1, Number(maxItems) || DEFAULT_PAGE_SIZE));
+  }, [maxItems]);
+
+  const sortedTasks = useMemo(() => {
+    if (!Array.isArray(tasks)) return [];
+    const dedup = new Map();
+    tasks.forEach((task) => {
+      if (!task) return;
+      const key = task.id ?? `${task.title}-${task.start?.toISOString?.() ?? ''}`;
+      if (!dedup.has(key)) dedup.set(key, task);
+    });
+
+    const filtered = Array.from(dedup.values()).filter((task) => {
+      if (!task) return false;
+      if (task.__kind === 'subtask') return true;
+      const start =
+        task?.start instanceof Date
+          ? task.start
+          : task?.start
+          ? new Date(task.start)
+          : null;
+      const end =
+        task?.end instanceof Date
+          ? task.end
+          : task?.end
+          ? new Date(task.end)
+          : start;
+
+      if (!start) return false;
+      const completed = completedSet ? completedSet.has(String(task.id)) : Boolean(task.completed);
+      if (!completed && end instanceof Date && end < todayStart) return true;
+      return !end || end >= todayStart || start >= todayStart;
+    });
+
+    return filtered.sort((a, b) => {
+      const aIsSub = a?.__kind === 'subtask';
+      const bIsSub = b?.__kind === 'subtask';
+      if (aIsSub && bIsSub) {
         const aTitle = String(a?.title || a?.name || '').toLowerCase();
         const bTitle = String(b?.title || b?.name || '').toLowerCase();
         return aTitle.localeCompare(bTitle);
-      });
+      }
+      if (aIsSub) return -1;
+      if (bIsSub) return 1;
+      const aStart = a?.start instanceof Date ? a.start.getTime() : Number.MAX_SAFE_INTEGER;
+      const bStart = b?.start instanceof Date ? b.start.getTime() : Number.MAX_SAFE_INTEGER;
+      return aStart - bStart;
+    });
+  }, [tasks, completedSet, todayStart]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedTasks.length / pageSize));
+
+  useEffect(() => {
+    setPage(0);
+  }, [pageSize, sortedTasks.length]);
+
+  useEffect(() => {
+    if (page > totalPages - 1) {
+      setPage(0);
     }
+  }, [page, totalPages]);
+
+  const startIndex = page * pageSize;
+  const pagedTasks = sortedTasks.slice(startIndex, startIndex + pageSize);
+
+  const subtaskItems = pagedTasks.filter((task) => task?.__kind === 'subtask');
+  const meetingItems = pagedTasks.filter((task) => task?.__kind !== 'subtask');
+
+  const groupedSubtasks = useMemo(() => {
+    const map = new Map();
+    subtaskItems.forEach((task) => {
+      const pid = String(task.parentId || '');
+      if (!pid) return;
+      if (!map.has(pid)) map.set(pid, []);
+      map.get(pid).push(task);
+    });
+    map.forEach((list) =>
+      list.sort((a, b) =>
+        String(a?.title || a?.name || '').toLowerCase().localeCompare(
+          String(b?.title || b?.name || '').toLowerCase()
+        )
+      )
+    );
     return map;
-  })();
+  }, [subtaskItems]);
+
+  const isTaskOverdue = (task, completed) => {
+    const end =
+      task?.end instanceof Date
+        ? task.end
+        : task?.end
+        ? new Date(task.end)
+        : task?.start instanceof Date
+        ? task.start
+        : null;
+    return !completed && end instanceof Date && end < todayStart;
+  };
 
   const scrollToGanttParent = (parentId) => {
     try {
       const el = document.getElementById(`gantt-row-parent-${parentId}`);
-      if (el && typeof el.scrollIntoView === 'function') {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-      }
+      if (el?.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } catch {}
   };
 
@@ -87,66 +143,99 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
           ))}
         </div>
       </div>
+
       <div className="p-4 space-y-4 flex-1 overflow-y-auto">
-        {/* Subtareas agrupadas por bloque padre */}
-        {Array.from(groupedByParent.entries()).map(([pid, items]) => {
+        {Array.from(groupedSubtasks.entries()).map(([pid, items]) => {
           const parentName = parentNameMap[pid] || 'Bloque';
           return (
             <div key={`group-${pid}`} className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-[color:var(--color-text)]/80">{parentName}</div>
+                <div className="text-sm font-semibold text-[color:var(--color-text)]/80">
+                  {parentName}
+                </div>
                 <button
                   type="button"
                   className="text-xs text-indigo-600 hover:underline"
                   onClick={() => scrollToGanttParent(pid)}
-                  title="Ver bloque en Gantt"
                 >
                   Ver en Gantt
                 </button>
               </div>
               {items.map((event) => {
                 const cat = categories[event.category] || categories.OTROS;
-                const isCompleted = completedSet ? completedSet.has(String(event.id)) : false;
+                const completed = completedSet ? completedSet.has(String(event.id)) : false;
                 const depStatus = dependencyStatuses.get(String(event.id));
                 const isBlocked = depStatus?.isBlocked || false;
-                
+                const isOverdue = isTaskOverdue(event, completed);
+
+                const containerClasses = [
+                  'p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer',
+                  isBlocked && !completed ? 'opacity-60' : '',
+                  isOverdue ? 'border-red-400 bg-red-50/80' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+
+                const containerStyle = isOverdue
+                  ? { borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)' }
+                  : {
+                      borderColor: isBlocked && !completed ? '#ef4444' : cat.borderColor,
+                      backgroundColor:
+                        isBlocked && !completed ? '#fee2e2' : `${cat.bgColor}40`,
+                    };
+
                 return (
                   <div
                     key={event.id}
-                    className={`p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer ${isBlocked && !isCompleted ? 'opacity-60' : ''}`}
+                    className={containerClasses}
                     onClick={() => onTaskClick(event)}
-                    style={{
-                      borderColor: isBlocked && !isCompleted ? '#ef4444' : cat.borderColor,
-                      backgroundColor: isBlocked && !isCompleted ? '#fee2e2' : `${cat.bgColor}40`,
-                    }}
-                    title={isBlocked ? 'Tarea bloqueada por dependencias' : ''}
+                    style={containerStyle}
+                    title={isBlocked ? 'Tarea bloqueada por dependencias' : undefined}
                   >
                     <div className="flex items-start">
                       <div className="mr-2 flex items-center">
                         <input
                           type="checkbox"
-                          checked={isCompleted}
-                          disabled={isBlocked && !isCompleted}
+                          checked={completed}
+                          disabled={isBlocked && !completed}
                           onClick={(e) => e.stopPropagation()}
                           onChange={(e) => {
                             e.stopPropagation();
-                            if (typeof onToggleComplete === 'function') {
-                              onToggleComplete(String(event.id), e.target.checked);
-                            }
+                            onToggleComplete?.(String(event.id), e.target.checked);
                           }}
-                          className={isBlocked && !isCompleted ? 'cursor-not-allowed opacity-50' : ''}
+                          className={isBlocked && !completed ? 'cursor-not-allowed opacity-50' : ''}
                         />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <div className="font-medium">{event.title}</div>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ backgroundColor: `${cat.bgColor}30`, color: cat.color, border: `1px solid ${cat.borderColor}` }}>
+                          <div className={`font-medium ${isOverdue ? 'text-red-700' : ''}`}>
+                            {event.title}
+                          </div>
+                          <span
+                            className="text-[10px] px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: `${cat.bgColor}30`,
+                              color: cat.color,
+                              border: `1px solid ${cat.borderColor}`,
+                            }}
+                          >
                             {cat.name}
                           </span>
+                          {isOverdue && (
+                            <span className="text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                              Vencida
+                            </span>
+                          )}
                           {depStatus && <DependencyIndicator depStatus={depStatus} />}
                         </div>
                         {event.desc && (
-                          <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">
+                          <div
+                            className={`text-sm mt-1 line-clamp-2 ${
+                              isOverdue
+                                ? 'text-red-700/90'
+                                : 'text-[color:var(--color-text)]/70'
+                            }`}
+                          >
                             {event.desc}
                           </div>
                         )}
@@ -169,38 +258,52 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
           );
         })}
 
-        {/* Reuniones/eventos próximos (no subtareas) */}
         {meetingItems.map((event) => {
           const cat = categories[event.category] || categories.OTROS;
-          const isCompleted = completedSet ? completedSet.has(String(event.id)) : false;
+          const completed = completedSet ? completedSet.has(String(event.id)) : false;
+          const isOverdue = isTaskOverdue(event, completed);
+
+          const containerClasses = [
+            'p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer',
+            isOverdue ? 'border-red-400 bg-red-50/80' : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
+
+          const containerStyle = isOverdue
+            ? { borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)' }
+            : { borderColor: cat.borderColor, backgroundColor: `${cat.bgColor}40` };
+
           return (
             <div
               key={event.id}
-              className="p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+              className={containerClasses}
               onClick={() => onTaskClick(event)}
-              style={{
-                borderColor: cat.borderColor,
-                backgroundColor: `${cat.bgColor}40`,
-              }}
+              style={containerStyle}
             >
               <div className="flex items-start">
                 <div className="mr-2 flex items-center">
                   <input
                     type="checkbox"
-                    checked={isCompleted}
+                    checked={completed}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
                       e.stopPropagation();
-                      if (typeof onToggleComplete === 'function') {
-                        onToggleComplete(String(event.id), e.target.checked);
-                      }
+                      onToggleComplete?.(String(event.id), e.target.checked);
                     }}
                   />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium mb-1">{event.title}</div>
+                  <div className={`font-medium mb-1 ${isOverdue ? 'text-red-700' : ''}`}>
+                    {event.title}
+                  </div>
+                  {isOverdue && (
+                    <span className="inline-flex items-center text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full mb-1">
+                      Vencida
+                    </span>
+                  )}
                   <div className="text-xs text-[color:var(--color-text)]/60">
-                    {event.start.toLocaleDateString('es-ES', {
+                    {event.start?.toLocaleDateString?.('es-ES', {
                       day: 'numeric',
                       month: 'short',
                       hour: '2-digit',
@@ -208,7 +311,11 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
                     })}
                   </div>
                   {event.desc && (
-                    <div className="text-sm text-[color:var(--color-text)]/70 mt-1 line-clamp-2">
+                    <div
+                      className={`text-sm mt-1 line-clamp-2 ${
+                        isOverdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
+                      }`}
+                    >
                       {event.desc}
                     </div>
                   )}
@@ -223,14 +330,38 @@ const TaskList = ({ tasks, onTaskClick, maxItems = 8, completedSet, onToggleComp
           );
         })}
 
-        {sortedTasks.length === 0 && (
+        {pagedTasks.length === 0 && (
           <div className="text-center py-4 text-[color:var(--color-text)]/60">
             No hay próximas tareas programadas
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="px-4 py-3 border-t border-[color:var(--color-text)]/10 flex items-center justify-between text-sm bg-[var(--color-surface)]">
+          <span className="text-[color:var(--color-text)]/60">
+            Página {Math.min(page, totalPages - 1) + 1} de {totalPages}
+          </span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-sm hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+              disabled={page <= 0}
+            >
+              Anterior
+            </button>
+            <button
+              type="button"
+              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-sm hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
+              disabled={page >= totalPages - 1}
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default TaskList;
+}
