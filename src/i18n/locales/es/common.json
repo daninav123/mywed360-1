@@ -1229,13 +1229,34 @@
   },
   "marketingAccess": {
     "backLink": "Volver al inicio",
+    "hero": {
+      "badge": "Centro de acceso",
+      "login": {
+        "title": "Gestiona todo desde un solo lugar",
+        "description": "Accede a invitados, tareas, presupuesto y documentos al instante. Mantén a tu equipo sincronizado en cada boda.",
+        "features": [
+          "Un panel para tareas, presupuesto y seating",
+          "Invita colaboradores con permisos controlados",
+          "Actualizaciones en tiempo real desde web y móvil"
+        ]
+      },
+      "signup": {
+        "title": "Bienvenido a Lovenda",
+        "description": "Centraliza la planificación, automatiza recordatorios y deja que nuestro asistente te guíe paso a paso.",
+        "features": [
+          "Onboarding guiado por nuestro asistente de planificación",
+          "Plantillas para presupuesto, invitados y proveedores",
+          "Licencias con Stripe y activación inmediata"
+        ]
+      }
+    },
     "toggle": {
       "login": "Iniciar sesión",
       "signup": "Crear cuenta"
     },
     "loggedIn": {
       "title": "Sesión activa",
-      "description": "Tu cuenta ya está abierta. Continúa con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
+      "description": "Tu cuenta de Lovenda ya está abierta. Continúa con tus eventos o cierra sesión si necesitas cambiar de cuenta.",
       "primaryCta": "Ir al panel",
       "secondaryCta": "Cerrar sesión"
     },
@@ -1249,7 +1270,7 @@
       "submit": "Iniciar sesión",
       "submitting": "Iniciando sesión…"
     },
-    "signupForm": {
+    "signup": {
       "info": "Completa el formulario para crear tu cuenta.",
       "successMessage": "Cuenta creada con éxito. Redirigiendo al panel…",
       "socialPending": "Completa el flujo de alta en la ventana de {{provider}}."
@@ -1259,6 +1280,9 @@
       "registerLink": "Crea una",
       "alreadyHaveAccount": "¿Ya tienes cuenta?",
       "loginLink": "Iniciar sesión"
+    },
+    "social": {
+      "redirect": "Redirigiendo a {{provider}}..."
     },
     "errors": {
       "provider": "No pudimos autenticarte con {{provider}}."

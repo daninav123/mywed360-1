@@ -1229,6 +1229,27 @@
   },
   "marketingAccess": {
     "backLink": "Back to home",
+    "hero": {
+      "badge": "Lovenda Access",
+      "login": {
+        "title": "Manage everything from one place",
+        "description": "Access your guests, tasks, budgets, and documents in seconds. Keep your team in sync across every event.",
+        "features": [
+          "One dashboard for tasks, budget, and seating",
+          "Invite collaborators with controlled permissions",
+          "Real-time updates across desktop and mobile"
+        ]
+      },
+      "signup": {
+        "title": "Welcome to Lovenda",
+        "description": "Centralise planning, automate reminders, and let our assistant guide you every step of the way.",
+        "features": [
+          "Onboarding guided by our planning assistant",
+          "Templates for budgets, guests, and suppliers",
+          "Stripe-powered licensing with instant activation"
+        ]
+      }
+    },
     "toggle": {
       "login": "Sign in",
       "signup": "Create account"
@@ -1249,7 +1270,7 @@
       "submit": "Sign in",
       "submitting": "Signing in…"
     },
-    "signupForm": {
+    "signup": {
       "info": "Complete the form to create your account.",
       "successMessage": "Account created successfully. Redirecting to your dashboard…",
       "socialPending": "Complete the sign-up flow in the {{provider}} window."
@@ -1259,6 +1280,9 @@
       "registerLink": "Create one",
       "alreadyHaveAccount": "Already have an account?",
       "loginLink": "Sign in"
+    },
+    "social": {
+      "redirect": "Redirecting to {{provider}}..."
     },
     "errors": {
       "provider": "We could not authenticate with {{provider}}."

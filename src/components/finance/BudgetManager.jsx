@@ -9,7 +9,7 @@ import {
   Info,
   CheckCircle,
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -71,41 +71,46 @@ export default function BudgetManager({
   const hasGlobalBudget = totalBudgetCents > 0;
   const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
   const thresholds = alertThresholds || { warn: 75, danger: 90 };
-  const categoriesSignature = useMemo(() => {
-    const list = Array.isArray(budget?.categories) ? budget.categories : [];
-    if (!list.length) return '';
-    const normalized = list
-      .map((cat) => ({
-        key: normalizeBudgetCategoryKey(cat?.name || ''),
-        amount: Number(cat?.amount) || 0,
-      }))
-      .sort((a, b) => a.key.localeCompare(b.key));
-    return JSON.stringify(normalized);
-  }, [budget?.categories]);
-
-
-  const captureSnapshot = typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
+  const captureSnapshot =
+    typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : null;
   useEffect(() => {
-    if (typeof captureSnapshot !== 'function') return undefined;
-    if (!categoriesSignature) return undefined;
-    if (lastSnapshotSignatureRef.current === categoriesSignature) return undefined;
-  
-    if (autoSaveTimeoutRef.current) {
-      clearTimeout(autoSaveTimeoutRef.current);
+    const list = Array.isArray(budget?.categories) ? budget.categories : [];
+
+    if (!captureSnapshot) {
+      return undefined;
     }
+
+    if (!list.length) {
+      lastSnapshotSignatureRef.current = '';
+      return undefined;
+    }
+
+    const signature = JSON.stringify(
+      list
+        .map((cat) => ({
+          key: normalizeBudgetCategoryKey(cat?.name || ''),
+          amount: Number(cat?.amount) || 0,
+        }))
+        .sort((a, b) => a.key.localeCompare(b.key))
+    );
+
+    if (!signature || lastSnapshotSignatureRef.current === signature) {
+      return undefined;
+    }
+
     autoSaveTimeoutRef.current = setTimeout(() => {
       captureSnapshot({ status: 'confirmed', source: 'auto' });
-      lastSnapshotSignatureRef.current = categoriesSignature;
+      lastSnapshotSignatureRef.current = signature;
       autoSaveTimeoutRef.current = null;
     }, 1500);
-  
+
     return () => {
       if (autoSaveTimeoutRef.current) {
         clearTimeout(autoSaveTimeoutRef.current);
         autoSaveTimeoutRef.current = null;
       }
     };
-  }, [categoriesSignature, captureSnapshot]);
+  }, [captureSnapshot, budget?.categories]);
   const currentGuestCount = Number(guestCount) || 0;
   const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
   const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)

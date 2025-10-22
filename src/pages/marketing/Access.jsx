@@ -277,8 +277,8 @@ const Access = ({ defaultMode = 'login' }) => {
     setSignupError('');
     setSignupInfo('');
     setSignupBusyProvider(provider);
+    const label = getProviderLabel?.(provider) || provider;
     try {
-      const label = getProviderLabel?.(provider) || provider;
       setSignupInfo(
         t('marketingAccess.signup.socialPending', {
           provider: label,
