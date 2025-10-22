@@ -33,7 +33,7 @@ service cloud.firestore {
       return value == null ||
              (value is list &&
              value.size() <= maxItems &&
-             value.where(item => item is string && item.size() <= maxLen).size() == value.size());
+             value.all(item, item is string && item.size() <= maxLen));
     }
 
     function _hasField(obj, field) {

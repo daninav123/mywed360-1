@@ -358,6 +358,10 @@
       "createFirst": "Create first category",
       "category": "Category",
       "overallProgress": "Budget progress",
+      "advisor": "Advisor",
+      "advisorShort": "AI",
+      "muteShort": "Mute",
+      "exceeded": "Exceeded",
       "muteAlerts": "Mute alerts",
       "thresholds": {
         "warn": "Warning (at risk) %",

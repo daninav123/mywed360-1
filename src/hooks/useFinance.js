@@ -131,6 +131,20 @@ const resolveCategoryKey = (value) => normalizeBudgetCategoryKey(value);
 
 const computeGuestBucket = (guestCount) => computeGuestBucketUtil(guestCount);
 
+const extractCategoryNames = (list = []) =>
+  Array.from(
+    new Set(
+      (Array.isArray(list) ? list : [])
+        .map((entry) => {
+          if (!entry) return '';
+          if (typeof entry === 'string') return entry.trim();
+          if (entry && typeof entry === 'object' && entry.name) return String(entry.name).trim();
+          return '';
+        })
+        .filter(Boolean)
+    )
+  );
+
 const normalizeAdvisorTimestamp = (value) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
@@ -285,6 +299,23 @@ export default function useFinance() {
       }
     },
     [activeWedding, firebaseUid]
+  );
+
+  const syncProviderTemplatesWithCategories = useCallback(
+    async (categoriesList) => {
+      const names = extractCategoryNames(categoriesList);
+      setProviderTemplates((prev) => (arraysShallowEqual(prev, names) ? prev : names));
+      if (!activeWedding) return;
+      try {
+        await saveData('wantedServices', names, {
+          docPath: `weddings/${activeWedding}`,
+          showNotification: false,
+        });
+      } catch (error) {
+        console.warn('[useFinance] No se pudieron sincronizar wantedServices', error);
+      }
+    },
+    [activeWedding]
   );
 
   useEffect(() => {

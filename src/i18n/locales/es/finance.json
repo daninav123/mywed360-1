@@ -213,6 +213,10 @@
     "createFirst": "Crear primera categoría",
     "category": "categoría",
     "overallProgress": "Progreso del presupuesto",
+    "advisor": "Consejero",
+    "advisorShort": "IA",
+    "muteShort": "Silenciar",
+    "exceeded": "Excedido",
     "thresholds": {
       "warn": "Aviso (en riesgo) %",
       "danger": "Crítico (exceso) %"

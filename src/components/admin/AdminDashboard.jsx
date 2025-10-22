@@ -277,6 +277,14 @@ const AdminDashboard = () => {
                         <Typography variant="caption" color="textSecondary">
                           Latencia: {service.latency || '—'} · Incidentes: {service.incidents ?? 0}
                         </Typography>
+                        {service.note ? (
+                          <Typography
+                            variant="caption"
+                            color={service.status === 'operational' ? 'textSecondary' : 'error.main'}
+                          >
+                            {service.note}
+                          </Typography>
+                        ) : null}
                       </Box>
                       <Chip
                         size="small"

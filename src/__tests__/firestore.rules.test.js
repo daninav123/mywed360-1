@@ -43,10 +43,12 @@ beforeAll(async () => {
       completed: false,
     });
   });
-});
+}, 60000);
 
 afterAll(async () => {
-  await testEnv.cleanup();
+  if (testEnv) {
+    await testEnv.cleanup();
+  }
 });
 
 const getContext = (uid) => {

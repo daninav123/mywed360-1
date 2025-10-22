@@ -42,6 +42,17 @@ import { migrateFlatSubtasksToNested, fixParentBlockDates } from '../../services
 import { seedWeddingTasksFromTemplate } from '../../services/taskTemplateSeeder';
 
 const GANTT_UNASSIGNED = '__gantt_unassigned__';
+const GANTT_ZOOM_STORAGE_KEY = 'mywed360_gantt_zoom';
+const GANTT_ZOOM_MIN = 0.05;
+const GANTT_ZOOM_MAX = 2.4;
+const GANTT_ZOOM_STEP = 0.05;
+const GANTT_EXTEND_MONTHS = 1;
+
+const clampZoomValue = (value) => {
+  const numeric = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numeric)) return 1;
+  return Math.min(GANTT_ZOOM_MAX, Math.max(GANTT_ZOOM_MIN, numeric));
+};
 
 // Funcin helper para cargar datos de Firestore de forma segura con fallbacks
 
@@ -308,7 +319,8 @@ export default function TasksRefactored() {
         </div>
       </div>
     );
-  }
+}
+
 
   // Etiqueta de mes para el calendario (EJ: "septiembre 2025")
   const monthLabel = useMemo(() => {
@@ -367,12 +379,29 @@ export default function TasksRefactored() {
     };
   }, []);
   const [columnWidthState, setColumnWidthState] = useState(65);
+  const [ganttZoom, setGanttZoom] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    try {
+      const raw = window.localStorage?.getItem?.(GANTT_ZOOM_STORAGE_KEY);
+      if (!raw) return 1;
+      return clampZoomValue(Number(raw));
+    } catch {
+      return 1;
+    }
+  });
   const [ganttPreSteps, setGanttPreSteps] = useState(0);
   const [ganttViewDate, setGanttViewDate] = useState(null);
   const [ganttViewMode, setGanttViewMode] = useState('month');
   // Rango del proyecto: inicio = fecha de registro, fin = fecha de boda
   const [projectStart, setProjectStart] = useState(null);
   const [projectEnd, setProjectEnd] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage?.setItem?.(GANTT_ZOOM_STORAGE_KEY, String(ganttZoom));
+    } catch (_) {}
+  }, [ganttZoom]);
   // Calcular fechas de proyecto: registro (inicio) y boda (fin + 1 mes)// Crear/actualizar automaticamente la cita del Dï½a de la boda en el calendario (solo meetings)// Ocultar completamente la lista izquierda del Gantt
   // Exponer helpers en modo debug para correccin in-situ
   useEffect(() => {
@@ -399,6 +428,53 @@ export default function TasksRefactored() {
 
   // Ref para medir el contenedor del Gantt y ajustar el ancho de columna
   const ganttContainerRef = useRef(null);
+  const zoomedColumnWidth = useMemo(() => {
+    const base = Math.max(12, Number(columnWidthState) || 90);
+    const width = Math.round(base * ganttZoom);
+    return Math.max(12, Math.min(360, width));
+  }, [columnWidthState, ganttZoom]);
+  const handleZoomChange = useCallback((next) => {
+    const clamped = clampZoomValue(next);
+    const normalized = Math.round(clamped * 100) / 100;
+    setGanttZoom((prev) => {
+      if (Math.abs(prev - normalized) < 0.001) return prev;
+      return normalized;
+    });
+  }, []);
+  const handleZoomIn = useCallback(() => {
+    handleZoomChange(ganttZoom + GANTT_ZOOM_STEP);
+  }, [ganttZoom, handleZoomChange]);
+  const handleZoomOut = useCallback(() => {
+    handleZoomChange(ganttZoom - GANTT_ZOOM_STEP);
+  }, [ganttZoom, handleZoomChange]);
+  const handleZoomSlider = useCallback(
+    (value) => {
+      const numeric = typeof value === 'number' ? value : Number(value);
+      handleZoomChange(numeric);
+    },
+    [handleZoomChange]
+  );
+  const zoomPercent = Math.round(ganttZoom * 100);
+  const isZoomMin = ganttZoom <= GANTT_ZOOM_MIN + 0.001;
+  const isZoomMax = ganttZoom >= GANTT_ZOOM_MAX - 0.001;
+  const computeFitZoom = useCallback(() => {
+    if (!ganttTimelineMonths || !Number.isFinite(Number(columnWidthState))) return null;
+    const containerWidth = ganttContainerRef?.current?.clientWidth || 0;
+    if (containerWidth <= 0) return null;
+    const base = Math.max(1, Number(columnWidthState));
+    const totalWidth = base * ganttTimelineMonths;
+    if (!Number.isFinite(totalWidth) || totalWidth <= 0) return null;
+    const ratio = containerWidth / totalWidth;
+    if (!Number.isFinite(ratio) || ratio <= 0) return null;
+    return clampZoomValue(ratio);
+  }, [ganttTimelineMonths, columnWidthState, ganttContainerRef]);
+  const fitZoomValue = computeFitZoom();
+  const isFitApplied = fitZoomValue !== null && Math.abs(fitZoomValue - ganttZoom) < 0.01;
+  const handleFitToScreen = useCallback(() => {
+    const fit = computeFitZoom();
+    if (fit === null) return;
+    handleZoomChange(fit);
+  }, [computeFitZoom, handleZoomChange]);
 
   // Manejar eventos de calendario externos// FunciÃ’Â³n para aÃ’Â±adir una reuniÃ’Â³n
   const addMeeting = useCallback(
@@ -991,6 +1067,23 @@ export default function TasksRefactored() {
     if (candidate.getTime() < ganttRangeStart.getTime()) return fallback;
     return candidate;
   }, [ganttProjectEnd, ganttRangeStart]);
+
+  const ganttTimelineMonths = useMemo(() => {
+    if (!(ganttRangeStart instanceof Date) || Number.isNaN(ganttRangeStart?.getTime?.()))
+      return null;
+    if (!(ganttRangeEnd instanceof Date) || Number.isNaN(ganttRangeEnd?.getTime?.())) return null;
+    const startMonth = new Date(ganttRangeStart.getFullYear(), ganttRangeStart.getMonth(), 1);
+    const endMonth = new Date(ganttRangeEnd.getFullYear(), ganttRangeEnd.getMonth(), 1);
+    const afterEnd = new Date(
+      endMonth.getFullYear(),
+      endMonth.getMonth() + 1 + GANTT_EXTEND_MONTHS,
+      1
+    );
+    const diff =
+      (afterEnd.getFullYear() - startMonth.getFullYear()) * 12 +
+      (afterEnd.getMonth() - startMonth.getMonth());
+    return Math.max(1, diff);
+  }, [ganttRangeStart, ganttRangeEnd]);
 
   const ganttTasksBounded = useGanttBoundedTasks(
     uniqueGanttTasks,
@@ -2215,6 +2308,47 @@ export default function TasksRefactored() {
               <option value="warning">Solo atención</option>
               <option value="ok">Solo en curso</option>
             </select>
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+              <span className="font-medium text-gray-500">Zoom</span>
+              <button
+                type="button"
+                className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
+                onClick={handleZoomOut}
+                disabled={isZoomMin}
+                aria-label="Reducir zoom del timeline"
+              >
+                -
+              </button>
+              <input
+                type="range"
+                min={GANTT_ZOOM_MIN}
+                max={GANTT_ZOOM_MAX}
+                step={GANTT_ZOOM_STEP}
+                value={ganttZoom}
+                onChange={(e) => handleZoomSlider(e.target.value)}
+                className="w-24 accent-indigo-500"
+                aria-label="Zoom horizontal del Gantt"
+              />
+              <button
+                type="button"
+                className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
+                onClick={handleZoomIn}
+                disabled={isZoomMax}
+                aria-label="Aumentar zoom del timeline"
+              >
+                +
+              </button>
+              <button
+                type="button"
+                className="h-8 px-3 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:hover:bg-transparent"
+                onClick={handleFitToScreen}
+                disabled={fitZoomValue === null || isFitApplied}
+                aria-label="Ajustar zoom para mostrar todo el Gantt"
+              >
+                Ajustar
+              </button>
+              <span className="w-12 text-right tabular-nums text-gray-500">{zoomPercent}%</span>
+            </div>
             {filtersActive && (
               <button
                 type="button"
@@ -2245,10 +2379,10 @@ export default function TasksRefactored() {
             projectStart={ganttRangeStart}
             projectEnd={ganttRangeEnd}
             containerRef={ganttContainerRef}
-            columnWidth={120}
+            columnWidth={zoomedColumnWidth}
             rowHeight={40}
             showSubtasks={showGanttSubtasks}
-            extendMonthsAfterEnd={1}
+            extendMonthsAfterEnd={GANTT_EXTEND_MONTHS}
             onParentSelect={(task) => {
               if (!task || !task.id) {
                 setSelectedParentId(null);
@@ -2457,4 +2591,3 @@ export default function TasksRefactored() {
     </div>
   );
 }
-

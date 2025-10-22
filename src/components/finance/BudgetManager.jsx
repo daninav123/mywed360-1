@@ -804,8 +804,8 @@ const distributeIncrease = (amounts, indices, delta) => {
             </Button>
           </div>
         ) : (
-          <div className="px-5 py-4">
-            <div className="space-y-2.5">
+          <div className="px-5 py-3">
+            <div className="space-y-1.5">
               {budgetUsage.map((category, index) => {
               const rawCategory = categories[index] || {};
               const assignedAmountRaw = Number(
@@ -851,156 +851,135 @@ const distributeIncrease = (amounts, indices, delta) => {
               return (
                 <div
                   key={category.name || index}
-                  className="rounded-lg border border-[color:var(--color-text)]/10 bg-white/80 shadow-sm p-3 space-y-1.5"
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-[color:var(--color-text)]/10 bg-white/85 px-3 py-2 text-[11px] shadow-sm"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 flex-wrap min-w-[200px]">
-                      <h4 className="text-base font-semibold text-[color:var(--color-text)]">
-                        {category.name}
-                      </h4>
-                      {sourceTag && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-                          <Sparkles size={11} />
-                          Consejero
-                        </span>
-                      )}
-                      {usagePercent >= 100 && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                          <AlertTriangle size={11} />
-                          Excedido
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-wrap justify-end text-[11px]">
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition"
-                        onClick={handleOpenAdvisor}
-                        disabled={advisorLoading || localAdvisorLoading}
-                      >
-                        {(advisorLoading || localAdvisorLoading) ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Sparkles size={12} />
-                        )}
-                        Consejero
-                      </button>
-                      <label className="flex items-center gap-1 text-[11px] text-[color:var(--color-text)]/70">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(category.muted)}
-                          onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
-                        />
-                        Silenciar alertas
-                      </label>
-                      <button
-                        aria-label="Editar categoría"
-                        onClick={() => handleEditCategory(category, index)}
-                        className="text-[var(--color-primary)] hover:brightness-110 p-1"
-                      >
-                        <Edit3 size={14} />
-                      </button>
-                      <button
-                        aria-label="Eliminar categoría"
-                        onClick={() => handleDeleteCategory(index, category.name)}
-                        className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
+                  <div className="flex items-center gap-1 min-w-[150px]">
+                    <span className="text-sm font-semibold text-[color:var(--color-text)]">
+                      {category.name}
+                    </span>
+                    {sourceTag && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
+                        <Sparkles size={10} />
+                        {t('finance.budget.advisor', { defaultValue: 'Consejero' })}
+                      </span>
+                    )}
+                    {usagePercent >= 100 && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-danger)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--color-danger)]">
+                        <AlertTriangle size={10} />
+                        {t('finance.budget.exceeded', { defaultValue: 'Excedido' })}
+                      </span>
+                    )}
                   </div>
-                  {category.description && (
-                    <p className="text-xs text-[color:var(--color-text)]/60">
-                      {category.description}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-3 text-[11px]">
-                    <div className={`flex items-center gap-2 flex-1 min-w-[240px] ${sliderDisabled ? 'opacity-60' : ''}`}>
-                      <input
-                        type="number"
-                        min={(sliderMin / 100).toFixed(2)}
-                        step="0.01"
-                        defaultValue={assignedAmount.toFixed(2)}
-                        onBlur={(event) => {
-                          const raw = parseFloat(String(event.target.value).replace(',', '.'));
-                          if (Number.isNaN(raw)) {
-                            event.target.value = (sliderValue / 100).toFixed(2);
-                            return;
-                          }
-                          const cents = Math.round(raw * 100);
-                          const clamped = Math.max(sliderMin, Math.min(sliderMax, cents));
-                          handleAllocationChange(index, clamped);
-                          event.target.value = (clamped / 100).toFixed(2);
-                        }}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') {
-                            event.preventDefault();
-                            event.currentTarget.blur();
-                          }
-                        }}
-                        disabled={sliderDisabled}
-                        key={`${category.name || index}-${sliderValue}`}
-                        className="w-28 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-sm shadow-sm"
-                      />
-                      <input
-                        type="range"
-                        min={sliderMin}
-                        max={sliderMax}
-                        step={sliderStep}
-                        value={sliderValue}
-                        onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
-                        disabled={sliderDisabled}
-                        className="w-full accent-[var(--color-primary)]"
-                        aria-label={`Reasignar presupuesto para ${category.name}`}
-                      />
-                    </div>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <div className="min-w-[120px]">
-                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
-                          {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
-                        </p>
-                        <p className="text-sm font-semibold text-[color:var(--color-text)]">
-                          {formatCurrency(assignedAmount)}
-                        </p>
-                        <p className="text-[10px] text-[color:var(--color-text)]/60">
-                          {allocationPercent.toFixed(1)}% del total
-                        </p>
-                      </div>
-                      <div className="min-w-[110px]">
-                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
-                          {t('finance.budget.spent', { defaultValue: 'Gastado' })}
-                        </p>
-                        <p className="text-sm font-semibold text-[color:var(--color-danger)]">
-                          {formatCurrency(spentAmount)}
-                        </p>
-                      </div>
-                      <div className="min-w-[110px]">
-                        <p className="text-[10px] uppercase tracking-wide text-[color:var(--color-text)]/60">
-                          {t('finance.budget.remaining', { defaultValue: 'Restante' })}
-                        </p>
-                        <p
-                          className={`text-sm font-semibold ${
-                            remaining < 0
-                              ? 'text-[var(--color-danger)]'
-                              : 'text-[color:var(--color-text)]'
-                          }`}
-                        >
-                          {formatCurrency(remaining)}
-                        </p>
-                      </div>
-                    </div>
+
+                  <div className={`flex items-center gap-1.5 ${sliderDisabled ? 'opacity-60' : ''}`}>
+                    <input
+                      type="number"
+                      min={(sliderMin / 100).toFixed(2)}
+                      step="0.01"
+                      defaultValue={assignedAmount.toFixed(2)}
+                      onBlur={(event) => {
+                        const raw = parseFloat(String(event.target.value).replace(',', '.'));
+                        if (Number.isNaN(raw)) {
+                          event.target.value = (sliderValue / 100).toFixed(2);
+                          return;
+                        }
+                        const cents = Math.round(raw * 100);
+                        const clamped = Math.max(sliderMin, Math.min(sliderMax, cents));
+                        handleAllocationChange(index, clamped);
+                        event.target.value = (clamped / 100).toFixed(2);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          event.currentTarget.blur();
+                        }
+                      }}
+                      disabled={sliderDisabled}
+                      key={`${category.name || index}-${sliderValue}`}
+                      className="w-20 rounded-md border border-[color:var(--color-text)]/20 px-2 py-1 text-xs shadow-sm"
+                    />
                   </div>
-                  <div className="w-full">
-                    <div className="flex items-center justify-between text-[10px] text-[color:var(--color-text)]/70">
-                      <span>{t('finance.budget.progress', { defaultValue: 'Progreso' })}</span>
-                      <span>{Math.min(usagePercent, 999).toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-1">
+
+                  <div className={`flex flex-1 min-w-[180px] flex-col ${sliderDisabled ? 'opacity-60' : ''}`}>
+                    <input
+                      type="range"
+                      min={sliderMin}
+                      max={sliderMax}
+                      step={sliderStep}
+                      value={sliderValue}
+                      onChange={(e) => handleAllocationChange(index, Number(e.target.value))}
+                      disabled={sliderDisabled}
+                      className="w-full accent-[var(--color-primary)]"
+                      aria-label={`Reasignar presupuesto para ${category.name}`}
+                    />
+                    <div className="mt-1 h-[4px] w-full rounded-full bg-[color:var(--color-text)]/10">
                       <div
-                        className={`${barColor} h-1 rounded-full transition-all duration-300`}
+                        className={`${barColor} h-full rounded-full transition-all duration-300`}
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 text-[10px] text-[color:var(--color-text)]/70">
+                    <span className="min-w-[110px] text-right">
+                      <span className="font-semibold text-[color:var(--color-text)]">
+                        {formatCurrency(assignedAmount)}
+                      </span>{' '}
+                      · {allocationPercent.toFixed(1)}%
+                    </span>
+                    <span className="min-w-[90px] text-right font-semibold text-[color:var(--color-danger)]">
+                      {formatCurrency(spentAmount)}
+                    </span>
+                    <span
+                      className={`min-w-[90px] text-right font-semibold ${
+                        remaining < 0
+                          ? 'text-[var(--color-danger)]'
+                          : 'text-[color:var(--color-text)]'
+                      }`}
+                    >
+                      {formatCurrency(remaining)}
+                    </span>
+                    <span className="min-w-[54px] text-right">
+                      {Math.min(usagePercent, 999).toFixed(1)}%
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">
+                    <label className="inline-flex items-center gap-1">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(category.muted)}
+                        onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
+                      />
+                      {t('finance.budget.muteShort', { defaultValue: 'Silenciar' })}
+                    </label>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md border border-[var(--color-primary)]/40 px-2 py-1 text-[11px] font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/10"
+                      onClick={handleOpenAdvisor}
+                      disabled={advisorLoading || localAdvisorLoading}
+                    >
+                      {(advisorLoading || localAdvisorLoading) ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Sparkles size={12} />
+                      )}
+                      {t('finance.budget.advisorShort', { defaultValue: 'AI' })}
+                    </button>
+                    <button
+                      aria-label="Editar categoría"
+                      onClick={() => handleEditCategory(category, index)}
+                      className="text-[var(--color-primary)] hover:brightness-110 p-1"
+                    >
+                      <Edit3 size={14} />
+                    </button>
+                    <button
+                      aria-label="Eliminar categoría"
+                      onClick={() => handleDeleteCategory(index, category.name)}
+                      className="text-[color:var(--color-danger)] hover:brightness-110 p-1"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
               );

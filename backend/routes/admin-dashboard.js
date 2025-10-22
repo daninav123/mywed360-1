@@ -97,6 +97,130 @@ const collections = {
   discountLinks: () => db.collection('discountLinks'),
 };
 
+const LIVE_STATUS_TTL_MS = 3 * 60 * 1000;
+const serviceStatusCache = new Map();
+
+const truncateNote = (value) => {
+  if (!value) return '';
+  const normalized = String(value).trim();
+  return normalized.length > 200 ? `${normalized.slice(0, 197)}…` : normalized;
+};
+
+async function getCachedServiceStatus(key, provider) {
+  const cached = serviceStatusCache.get(key);
+  const now = Date.now();
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+  try {
+    const value = await provider();
+    serviceStatusCache.set(key, { value, expiresAt: now + LIVE_STATUS_TTL_MS });
+    return value;
+  } catch (error) {
+    logger.warn(`[admin-dashboard] service status check failed for ${key}`, { message: error?.message });
+    const fallback = {
+      id: key,
+      name: key,
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(error?.message || 'unknown error'),
+      lastCheckedAt: new Date().toISOString(),
+    };
+    serviceStatusCache.set(key, { value: fallback, expiresAt: now + LIVE_STATUS_TTL_MS });
+    return fallback;
+  }
+}
+
+async function fetchOpenAIStatus() {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
+  const projectId = process.env.OPENAI_PROJECT_ID || process.env.VITE_OPENAI_PROJECT_ID;
+  const startedAt = Date.now();
+  const timestamp = new Date().toISOString();
+
+  if (!apiKey) {
+    return {
+      id: 'openai',
+      name: 'OpenAI',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: 'OPENAI_API_KEY no está configurada',
+      lastCheckedAt: timestamp,
+    };
+  }
+
+  try {
+    const headers = {
+      Authorization: `Bearer ${apiKey}`,
+    };
+    if (projectId) {
+      headers['OpenAI-Project'] = projectId;
+    }
+    const response = await fetch('https://api.openai.com/v1/models', {
+      method: 'GET',
+      headers,
+    });
+    const elapsed = Date.now() - startedAt;
+
+    if (response.ok) {
+      return {
+        id: 'openai',
+        name: 'OpenAI',
+        status: 'operational',
+        latency: `${elapsed}ms`,
+        incidents: 0,
+        note: '',
+        lastCheckedAt: timestamp,
+      };
+    }
+
+    let rawBody = '';
+    try {
+      rawBody = await response.text();
+    } catch {}
+
+    let note = `OpenAI respondió ${response.status}`;
+    if (rawBody) {
+      try {
+        const parsed = JSON.parse(rawBody);
+        note = parsed?.error?.message || parsed?.message || note;
+      } catch {
+        note = rawBody;
+      }
+    }
+
+    const status = response.status === 401 || response.status === 403 ? 'down' : 'degraded';
+
+    return {
+      id: 'openai',
+      name: 'OpenAI',
+      status,
+      latency: status === 'operational' ? `${elapsed}ms` : null,
+      incidents: status === 'operational' ? 0 : 1,
+      note: truncateNote(note),
+      lastCheckedAt: timestamp,
+    };
+  } catch (error) {
+    return {
+      id: 'openai',
+      name: 'OpenAI',
+      status: 'down',
+      latency: null,
+      incidents: 1,
+      note: truncateNote(error?.message),
+      lastCheckedAt: timestamp,
+    };
+  }
+}
+
+async function computeLiveServiceOverrides() {
+  const overrides = [];
+  const openaiStatus = await getCachedServiceStatus('openai', fetchOpenAIStatus);
+  if (openaiStatus) overrides.push(openaiStatus);
+  return overrides;
+}
+
 function toDate(value) {
   try {
     if (!value) return null;
@@ -477,6 +601,35 @@ function defaultServices() {
     { id: 'whatsapp', name: 'WhatsApp', status: 'operational', latency: 'â€”', incidents: 0 },
     { id: 'openai', name: 'OpenAI', status: 'operational', latency: 'â€”', incidents: 0 },
   ];
+}
+
+function mergeServiceOverrides(baseList, overrides) {
+  const base = Array.isArray(baseList) ? baseList.slice() : [];
+  if (!Array.isArray(overrides) || overrides.length === 0) return base;
+
+  const overrideMap = new Map();
+  overrides.forEach((service) => {
+    if (service && service.id) {
+      overrideMap.set(service.id, service);
+    }
+  });
+
+  const merged = base.map((service) => {
+    const override = overrideMap.get(service.id);
+    if (!override) return service;
+    return {
+      ...service,
+      ...override,
+    };
+  });
+
+  overrideMap.forEach((service, id) => {
+    if (!merged.some((item) => item.id === id)) {
+      merged.push(service);
+    }
+  });
+
+  return merged;
 }
 
 function mapAlertDoc(doc) {
@@ -1151,6 +1304,8 @@ router.get('/overview', async (_req, res) => {
 
     let services = extractServices(latestMetrics, serviceDocs);
     if (!services.length) services = defaultServices();
+    const liveOverrides = await computeLiveServiceOverrides();
+    services = mergeServiceOverrides(services, liveOverrides);
 
     let alerts = alertDocs.map(mapAlertDoc);
     if (!alerts.length) alerts = [
