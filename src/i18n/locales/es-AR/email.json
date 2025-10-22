@@ -1,0 +1,25 @@
+{
+  "email": {
+    "title": "Correo electrónico",
+    "inbox": "Bandeja de entrada",
+    "compose": "Redactar",
+    "sent": "Enviados",
+    "drafts": "Borradores",
+    "trash": "Papelera",
+    "searchPlaceholder": "Buscar correos...",
+    "noEmails": "No hay correos",
+    "form": {
+      "to": "Para",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "attachments": "Adjuntos"
+    },
+    "messages": {
+      "sent": "Correo enviado correctamente",
+      "saved": "Borrador guardado",
+      "deleted": "Correo eliminado",
+      "error": "Error al enviar el correo"
+    }
+  },
+  "_note": "Translate from es/email.json"
+}

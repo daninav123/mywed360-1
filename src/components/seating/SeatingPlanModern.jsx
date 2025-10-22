@@ -157,10 +157,21 @@ export default function SeatingPlanModern() {
   // Handler para añadir mesa
   const handleAddTable = useCallback(() => {
     try {
+      console.log('[handleAddTable] Estado antes de añadir:');
+      console.log('- tab:', tab);
+      console.log('- tables.length:', tables?.length || 0);
+      console.log('- addTable disponible:', !!addTable);
+      
       if (!addTable) {
         toast.error('La función addTable no está disponible');
         console.error('addTable no está en useSeatingPlan');
         return;
+      }
+      
+      // Asegurar que estamos en tab banquet
+      if (tab !== 'banquet') {
+        console.warn('[handleAddTable] No estamos en banquet, cambiando...');
+        setTab('banquet');
       }
       
       const newTable = {
@@ -176,14 +187,29 @@ export default function SeatingPlanModern() {
         name: `Mesa ${(tables?.length || 0) + 1}`,
       };
       
-      console.log('Añadiendo mesa:', newTable);
+      console.log('[handleAddTable] Añadiendo mesa:', newTable);
       addTable(newTable);
       toast.success('✨ Mesa añadida - Arrástrala para posicionarla');
+      
+      // Verificar estado después
+      setTimeout(() => {
+        console.log('[handleAddTable] Estado después (async check):');
+        console.log('- tables.length:', tables?.length || 0);
+      }, 100);
     } catch (error) {
-      console.error('Error añadiendo mesa:', error);
+      console.error('[handleAddTable] Error:', error);
       toast.error('Error al añadir mesa: ' + error.message);
     }
-  }, [addTable, hallSize, tables]);
+  }, [addTable, hallSize, tables, tab, setTab]);
+  
+  // Debug: Detectar cambios en tables
+  useEffect(() => {
+    console.log('[SeatingPlanModern] tables cambió:', {
+      length: tables?.length || 0,
+      tab,
+      tables: tables?.map(t => ({ id: t.id, name: t.name, x: t.x, y: t.y }))
+    });
+  }, [tables, tab]);
 
   // Handler para duplicar mesa
   const handleDuplicate = useCallback((tableId) => {

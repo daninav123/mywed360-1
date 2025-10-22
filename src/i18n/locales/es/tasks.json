@@ -1,0 +1,38 @@
+{
+  "tasks": {
+    "title": "Tareas",
+    "newTask": "Nueva tarea",
+    "editTask": "Editar tarea",
+    "deleteTask": "Eliminar tarea",
+    "viewTask": "Ver tarea",
+    "searchPlaceholder": "Buscar tareas...",
+    "noTasks": "No hay tareas",
+    "createFirst": "Crear primera tarea",
+    "status": {
+      "pending": "Pendiente",
+      "in_progress": "En progreso",
+      "completed": "Completada",
+      "cancelled": "Cancelada"
+    },
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "form": {
+      "title": "Título",
+      "description": "Descripción",
+      "assignee": "Asignado a",
+      "dueDate": "Fecha límite",
+      "category": "Categoría",
+      "tags": "Etiquetas"
+    },
+    "messages": {
+      "created": "Tarea creada correctamente",
+      "updated": "Tarea actualizada correctamente",
+      "deleted": "Tarea eliminada correctamente",
+      "error": "Error al procesar la tarea"
+    }
+  }
+}

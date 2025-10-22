@@ -5,6 +5,11 @@ import { initReactI18next } from 'react-i18next';
 import enCommon from './locales/en/common.json';
 import esCommon from './locales/es/common.json';
 import esFinance from './locales/es/finance.json';
+import esTasks from './locales/es/tasks.json';
+import esSeating from './locales/es/seating.json';
+import esEmail from './locales/es/email.json';
+import esAdmin from './locales/es/admin.json';
+import esMarketing from './locales/es/marketing.json';
 import esMxCommon from './locales/es-MX/common.json';
 import esArCommon from './locales/es-AR/common.json';
 
@@ -15,19 +20,50 @@ export const AVAILABLE_LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
 ];
 
-const SPANISH_BUNDLE = { common: esCommon, finance: esFinance };
-
-const resources = {
-  en: createResource(enCommon, undefined, {}),
-  es: SPANISH_BUNDLE,
-  'es-MX': createResource(esMxCommon || esCommon, esFinance),
-  'es-AR': createResource(esArCommon || esCommon, esFinance),
+const SPANISH_BUNDLE = { 
+  common: esCommon, 
+  finance: esFinance,
+  tasks: esTasks,
+  seating: esSeating,
+  email: esEmail,
+  admin: esAdmin,
+  marketing: esMarketing
 };
 
-function createResource(commonBundle, financeBundle, fallbackFinance = {}) {
+const resources = {
+  en: createResource(enCommon, undefined, {
+    tasks: esTasks,
+    seating: esSeating,
+    email: esEmail,
+    admin: esAdmin,
+    marketing: esMarketing,
+  }),
+  es: SPANISH_BUNDLE,
+  'es-MX': createResource(esMxCommon || esCommon, esFinance, {
+    tasks: esTasks,
+    seating: esSeating,
+    email: esEmail,
+    admin: esAdmin,
+    marketing: esMarketing,
+  }),
+  'es-AR': createResource(esArCommon || esCommon, esFinance, {
+    tasks: esTasks,
+    seating: esSeating,
+    email: esEmail,
+    admin: esAdmin,
+    marketing: esMarketing,
+  }),
+};
+
+function createResource(commonBundle, financeBundle, fallbackBundles = {}) {
   return {
     common: commonBundle,
-    finance: financeBundle ?? fallbackFinance,
+    finance: financeBundle ?? fallbackBundles.finance ?? {},
+    tasks: fallbackBundles.tasks ?? {},
+    seating: fallbackBundles.seating ?? {},
+    email: fallbackBundles.email ?? {},
+    admin: fallbackBundles.admin ?? {},
+    marketing: fallbackBundles.marketing ?? {},
   };
 }
 
@@ -47,7 +83,7 @@ i18n
       lookupLocalStorage: 'i18nextLng',
     },
     defaultNS: 'common',
-    ns: ['common', 'finance'],
+    ns: ['common', 'finance', 'tasks', 'seating', 'email', 'admin', 'marketing'],
     fallbackNS: ['common'],
     interpolation: { escapeValue: false },
     react: { useSuspense: false },

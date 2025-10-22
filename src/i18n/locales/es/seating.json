@@ -1,0 +1,30 @@
+{
+  "seating": {
+    "title": "Distribución de Mesas",
+    "newTable": "Nueva mesa",
+    "editTable": "Editar mesa",
+    "deleteTable": "Eliminar mesa",
+    "assignGuests": "Asignar invitados",
+    "autoAssign": "Asignación automática",
+    "noTables": "No hay mesas configuradas",
+    "createFirst": "Crear primera mesa",
+    "form": {
+      "tableName": "Nombre de la mesa",
+      "capacity": "Capacidad",
+      "shape": "Forma",
+      "notes": "Notas"
+    },
+    "shapes": {
+      "round": "Redonda",
+      "rectangular": "Rectangular",
+      "square": "Cuadrada"
+    },
+    "messages": {
+      "created": "Mesa creada correctamente",
+      "updated": "Mesa actualizada correctamente",
+      "deleted": "Mesa eliminada correctamente",
+      "assigned": "Invitados asignados correctamente",
+      "error": "Error al procesar la mesa"
+    }
+  }
+}

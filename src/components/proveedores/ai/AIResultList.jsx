@@ -29,11 +29,23 @@ const SERVICE_IMAGES = {
   default: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=60'
 };
 
+// Función para normalizar texto (quitar acentos)
+const normalizeText = (text) => {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // Elimina diacríticos
+};
+
 // Función para obtener imagen según el servicio
 const getServiceImage = (service) => {
   if (!service) return SERVICE_IMAGES.default;
-  const normalized = service.toLowerCase().trim();
-  const key = Object.keys(SERVICE_IMAGES).find(k => normalized.includes(k));
+  const normalized = normalizeText(service);
+  const key = Object.keys(SERVICE_IMAGES).find(k => {
+    const normalizedKey = normalizeText(k);
+    return normalized.includes(normalizedKey) || normalizedKey.includes(normalized);
+  });
   return SERVICE_IMAGES[key] || SERVICE_IMAGES.default;
 };
 
@@ -148,6 +160,12 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
   // Usar daños reales si están disponibles, o los daños de demástración
   const displayResults = results.length > 0 ? results : (usedFallback ? demoResults : []);
 
+  // DEBUG: Ver qué resultados llegan
+  if (displayResults.length > 0) {
+    console.log('[AIResultList] Resultados a mostrar:', displayResults);
+    console.log('[AIResultList] Primer resultado - image:', displayResults[0]?.image, 'service:', displayResults[0]?.service);
+  }
+
   return (
     <div className="space-y-6" data-testid="ai-results-list">
       {usedFallback && query && (
@@ -179,11 +197,19 @@ const AIResultList = ({ results = [], isLoading, onSelect, query, error, usedFal
             {/* Imagen */}
             <div className="w-full md:w-32 h-32 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
               <img 
-                src={result.image || getServiceImage(result.service)} 
+                src={(() => {
+                  // Usar imagen del resultado si existe y no es vacía, sino usar placeholder según servicio
+                  const imgSrc = (result.image && result.image.trim()) 
+                    ? result.image 
+                    : getServiceImage(result.service);
+                  console.log('[AIResultList] Cargando imagen para', result.name, '- URL:', imgSrc, '- Service:', result.service);
+                  return imgSrc;
+                })()} 
                 alt={result.name} 
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
+                  console.error('[AIResultList] Error cargando imagen para', result.name, '- intentando default');
                   e.currentTarget.src = SERVICE_IMAGES.default;
                 }}
               />
