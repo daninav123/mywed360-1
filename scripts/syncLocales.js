@@ -13,15 +13,9 @@ const path = require('path');
 
 const LOCALES_DIR = path.resolve(process.cwd(), 'src/i18n/locales');
 const BASE_LOCALE = 'en';
+const DEFAULT_TARGETS = ['es', 'es-MX', 'es-AR'];
 const TARGET_LOCALES =
-  process.argv.slice(2).length > 0 ? process.argv.slice(2) : detectLocales();
-
-function detectLocales() {
-  return fs
-    .readdirSync(LOCALES_DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name !== BASE_LOCALE)
-    .map((entry) => entry.name);
-}
+  process.argv.slice(2).length > 0 ? process.argv.slice(2) : DEFAULT_TARGETS;
 
 function readJson(filePath) {
   let raw = fs.readFileSync(filePath, 'utf8');

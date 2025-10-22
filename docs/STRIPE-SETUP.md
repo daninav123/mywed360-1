@@ -1,5 +1,7 @@
 # Configuración de Stripe para MyWed360
 
+> **Modelo vigente:** Licencias por boda (octubre 2025). Cada boda se activa con un pago único. Los planners compran paquetes de licencias con modalidad mensual (12 cuotas) o anual (15% descuento).
+
 ## 📋 Índice
 
 1. [Crear cuenta de Stripe](#1-crear-cuenta-de-stripe)
@@ -14,7 +16,7 @@
 
 ## 1. Crear Cuenta de Stripe
 
-1. Registrate en [https://dashboard.stripe.com/register](https://dashboard.stripe.com/register)
+1. Regístrate en [https://dashboard.stripe.com/register](https://dashboard.stripe.com/register)
 2. Completa la verificación de cuenta
 3. Activa tu cuenta (necesitarás datos fiscales para producción)
 
@@ -38,86 +40,160 @@
 
 ## 3. Crear Productos y Precios
 
-### 3.1. Planes para Parejas
+### 3.1. Planes para Parejas (Pago Único)
 
-#### Plan Anual (35 EUR/año)
+#### Wedding Pass (50 EUR)
 ```
 1. Ve a https://dashboard.stripe.com/test/products/create
-2. Product name: Anual - MyWed360
-3. Description: Plan anual para parejas con funcionalidades completas
-4. Pricing model: Recurring
-5. Price: 35 EUR
-6. Billing period: Yearly
-7. Click "Save product"
-8. COPIA el Price ID (empieza con price_) → STRIPE_PRICE_COUPLE_ANNUAL
-```
-
-#### Plan Plus (55 EUR/año)
-```
-1. Product name: Plus - MyWed360
-2. Description: Plan premium sin marca y con ayudante
-3. Pricing model: Recurring
-4. Price: 55 EUR
-5. Billing period: Yearly
+2. Product name: Wedding Pass - MyWed360
+3. Description: Pago único por boda con funcionalidades completas
+4. Pricing model: One-time
+5. Price: 50 EUR
 6. Click "Save product"
-7. COPIA el Price ID → STRIPE_PRICE_COUPLE_PLUS
+7. COPIA el Price ID (empieza con price_) → STRIPE_PRICE_WEDDING_PASS
 ```
 
-#### Boda Plus (20 EUR pago único)
+#### Wedding Pass Plus (85 EUR)
 ```
-1. Product name: Boda Plus - MyWed360
-2. Description: Elimina marca MyWed360 de un evento específico
+1. Product name: Wedding Pass Plus - MyWed360
+2. Description: Pago único premium sin marca y con ayudante
 3. Pricing model: One-time
-4. Price: 20 EUR
+4. Price: 85 EUR
 5. Click "Save product"
-6. COPIA el Price ID → STRIPE_PRICE_EVENT_PLUS
+6. COPIA el Price ID → STRIPE_PRICE_WEDDING_PASS_PLUS
 ```
 
-### 3.2. Planes para Wedding Planners
-
-#### Wedding Planner 1 (120 EUR/año)
+#### Extensión post-boda (15 EUR)
 ```
-1. Product name: Wedding Planner 1 - MyWed360
-2. Description: Hasta 5 bodas simultáneas
+1. Product name: Extensión post-boda - MyWed360
+2. Description: 90 días extra de acceso editable
+3. Pricing model: One-time
+4. Price: 15 EUR
+5. Click "Save product"
+6. COPIA el Price ID → STRIPE_PRICE_POST_WEDDING_EXTENSION
+```
+
+---
+
+### 3.2. Paquetes para Wedding Planners
+
+> **Importante:** Cada pack necesita DOS precios: uno mensual (con trial) y uno anual (con descuento).
+
+#### Planner Pack 5
+
+**Versión Mensual (41,67 EUR/mes)**
+```
+1. Product name: Planner Pack 5 - MyWed360
+2. Description: Hasta 5 bodas activas - Pago mensual
 3. Pricing model: Recurring
-4. Price: 120 EUR
-5. Billing period: Yearly
-6. Click "Save product"
-7. COPIA el Price ID → STRIPE_PRICE_PLANNER_1
+4. Price: 41.67 EUR
+5. Billing period: Monthly
+6. Add a free trial: YES → Trial period: 30 days
+7. Click "Save product"
+8. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK5_MONTHLY
 ```
 
-#### Wedding Planner 2 (200 EUR/año)
+**Versión Anual (425 EUR - 15% descuento)**
 ```
-1. Product name: Wedding Planner 2 - MyWed360
-2. Description: Hasta 10 bodas simultáneas
-3. Pricing model: Recurring
-4. Price: 200 EUR
-5. Billing period: Yearly
-6. Click "Save product"
-7. COPIA el Price ID → STRIPE_PRICE_PLANNER_2
-```
-
-#### Teams Wedding Planner (800 EUR/año)
-```
-1. Product name: Teams Wedding Planner - MyWed360
-2. Description: Hasta 40 bodas anuales con equipo
-3. Pricing model: Recurring
-4. Price: 800 EUR
-5. Billing period: Yearly
-6. Click "Save product"
-7. COPIA el Price ID → STRIPE_PRICE_PLANNER_TEAMS
+1. En el mismo producto "Planner Pack 5", click "Add another price"
+2. Pricing model: One-time
+3. Price: 425 EUR
+4. Description: Pago anual (15% descuento vs mensual)
+5. Click "Save price"
+6. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK5_ANNUAL
 ```
 
-#### Teams Wedding Planner Ilimitado (1500 EUR/año)
+#### Planner Pack 15
+
+**Versión Mensual (112,50 EUR/mes)**
 ```
-1. Product name: Teams Wedding Planner Ilimitado - MyWed360
-2. Description: Bodas ilimitadas, perfiles ilimitados, white-label completo
+1. Product name: Planner Pack 15 - MyWed360
+2. Description: Hasta 15 bodas activas - Pago mensual
 3. Pricing model: Recurring
-4. Price: 1500 EUR
-5. Billing period: Yearly
-6. Click "Save product"
-7. COPIA el Price ID → STRIPE_PRICE_PLANNER_UNLIMITED
+4. Price: 112.50 EUR
+5. Billing period: Monthly
+6. Add a free trial: YES → Trial period: 30 days
+7. Click "Save product"
+8. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK15_MONTHLY
 ```
+
+**Versión Anual (1.147,50 EUR)**
+```
+1. Add another price al producto "Planner Pack 15"
+2. Pricing model: One-time
+3. Price: 1147.50 EUR
+4. Description: Pago anual (15% descuento)
+5. Click "Save price"
+6. COPIA el Price ID → STRIPE_PRICE_PLANNER_PACK15_ANNUAL
+```
+
+#### Teams 40
+
+**Versión Mensual (266,67 EUR/mes)**
+```
+1. Product name: Teams 40 - MyWed360
+2. Description: 40 bodas activas por año + equipo
+3. Pricing model: Recurring
+4. Price: 266.67 EUR
+5. Billing period: Monthly
+6. Add a free trial: YES → Trial period: 30 days
+7. Click "Save product"
+8. COPIA el Price ID → STRIPE_PRICE_TEAMS40_MONTHLY
+```
+
+**Versión Anual (2.720 EUR)**
+```
+1. Add another price al producto "Teams 40"
+2. Pricing model: One-time
+3. Price: 2720 EUR
+4. Description: Pago anual (15% descuento)
+5. Click "Save price"
+6. COPIA el Price ID → STRIPE_PRICE_TEAMS40_ANNUAL
+```
+
+#### Teams Ilimitado
+
+**Versión Mensual (416,67 EUR/mes)**
+```
+1. Product name: Teams Ilimitado - MyWed360
+2. Description: Bodas y perfiles ilimitados con white-label
+3. Pricing model: Recurring
+4. Price: 416.67 EUR
+5. Billing period: Monthly
+6. Add a free trial: YES → Trial period: 30 days
+7. Click "Save product"
+8. COPIA el Price ID → STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY
+```
+
+**Versión Anual (4.250 EUR)**
+```
+1. Add another price al producto "Teams Ilimitado"
+2. Pricing model: One-time
+3. Price: 4250 EUR
+4. Description: Pago anual (15% descuento)
+5. Click "Save price"
+6. COPIA el Price ID → STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL
+```
+
+---
+
+### 3.3. Resumen de Productos a Crear
+
+| Producto | Tipo | Precio | Price ID a copiar |
+|----------|------|--------|-------------------|
+| **Wedding Pass** | One-time | 50 EUR | `STRIPE_PRICE_WEDDING_PASS` |
+| **Wedding Pass Plus** | One-time | 85 EUR | `STRIPE_PRICE_WEDDING_PASS_PLUS` |
+| **Extensión post-boda** | One-time | 15 EUR | `STRIPE_PRICE_POST_WEDDING_EXTENSION` |
+| **Planner Pack 5 (Mensual)** | Recurring | 41,67 EUR/mes + trial 30d | `STRIPE_PRICE_PLANNER_PACK5_MONTHLY` |
+| **Planner Pack 5 (Anual)** | One-time | 425 EUR | `STRIPE_PRICE_PLANNER_PACK5_ANNUAL` |
+| **Planner Pack 15 (Mensual)** | Recurring | 112,50 EUR/mes + trial 30d | `STRIPE_PRICE_PLANNER_PACK15_MONTHLY` |
+| **Planner Pack 15 (Anual)** | One-time | 1.147,50 EUR | `STRIPE_PRICE_PLANNER_PACK15_ANNUAL` |
+| **Teams 40 (Mensual)** | Recurring | 266,67 EUR/mes + trial 30d | `STRIPE_PRICE_TEAMS40_MONTHLY` |
+| **Teams 40 (Anual)** | One-time | 2.720 EUR | `STRIPE_PRICE_TEAMS40_ANNUAL` |
+| **Teams Ilimitado (Mensual)** | Recurring | 416,67 EUR/mes + trial 30d | `STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY` |
+| **Teams Ilimitado (Anual)** | One-time | 4.250 EUR | `STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL` |
+
+**Total:** 11 Price IDs a configurar (3 para parejas + 8 para planners)
 
 ---
 
@@ -140,6 +216,7 @@ Selecciona estos eventos:
 ✓ customer.subscription.created
 ✓ customer.subscription.updated
 ✓ customer.subscription.deleted
+✓ customer.subscription.trial_will_end
 ✓ invoice.payment_succeeded
 ✓ invoice.payment_failed
 ```
@@ -180,14 +257,22 @@ STRIPE_SECRET_KEY=sk_test_51...
 STRIPE_PUBLISHABLE_KEY=pk_test_51...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Price IDs (copia desde el dashboard)
-STRIPE_PRICE_COUPLE_ANNUAL=price_1...
-STRIPE_PRICE_COUPLE_PLUS=price_1...
-STRIPE_PRICE_EVENT_PLUS=price_1...
-STRIPE_PRICE_PLANNER_1=price_1...
-STRIPE_PRICE_PLANNER_2=price_1...
-STRIPE_PRICE_PLANNER_TEAMS=price_1...
-STRIPE_PRICE_PLANNER_UNLIMITED=price_1...
+# Price IDs - Parejas (pago único)
+STRIPE_PRICE_WEDDING_PASS=price_1...
+STRIPE_PRICE_WEDDING_PASS_PLUS=price_1...
+STRIPE_PRICE_POST_WEDDING_EXTENSION=price_1...
+
+# Price IDs - Planners (mensual con trial)
+STRIPE_PRICE_PLANNER_PACK5_MONTHLY=price_1...
+STRIPE_PRICE_PLANNER_PACK15_MONTHLY=price_1...
+STRIPE_PRICE_TEAMS40_MONTHLY=price_1...
+STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY=price_1...
+
+# Price IDs - Planners (anual con descuento)
+STRIPE_PRICE_PLANNER_PACK5_ANNUAL=price_1...
+STRIPE_PRICE_PLANNER_PACK15_ANNUAL=price_1...
+STRIPE_PRICE_TEAMS40_ANNUAL=price_1...
+STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL=price_1...
 ```
 
 ### .env (frontend)
@@ -232,40 +317,9 @@ Usa estas tarjetas en modo test:
 | Insuficientes fondos | `4000 0000 0000 9995` | Fondos insuficientes |
 
 **Datos adicionales:**
-- Fecha de expiración: Cualquier fecha futura (ej: 12/25)
+- Fecha de expiración: Cualquier fecha futura (ej: 12/30)
 - CVC: Cualquier 3 dígitos (ej: 123)
 - ZIP: Cualquier código postal válido
-
-### 6.3. Flujo de Prueba Completo
-
-1. **Crear checkout:**
-   ```bash
-   curl -X POST http://localhost:4004/api/stripe/create-checkout-session \
-     -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "productId": "couple_annual",
-       "successUrl": "http://localhost:5173/success",
-       "cancelUrl": "http://localhost:5173/cancel"
-     }'
-   ```
-
-2. **Completar pago:**
-   - Abre la URL devuelta en `session.url`
-   - Usa la tarjeta de prueba `4242 4242 4242 4242`
-   - Completa el pago
-
-3. **Verificar webhook:**
-   - El webhook debería recibir `checkout.session.completed`
-   - El pago se guarda en Firestore → `payments/`
-   - El usuario se actualiza con la suscripción
-
-4. **Verificar en la base de datos:**
-   ```javascript
-   // En Firebase Console → Firestore
-   users/{userId}/subscription → Debe tener productId, subscriptionId, status
-   payments/ → Debe haber un documento con el pago
-   ```
 
 ---
 
@@ -284,114 +338,41 @@ Usa estas tarjetas en modo test:
 1. Obtén las claves live de [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys)
 2. **Recrea todos los productos** en modo live (los de test no se transfieren)
 3. Actualiza el webhook con la URL de producción
-4. Actualiza las variables de entorno en tu servidor:
-
-```bash
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_... # (el de producción)
-STRIPE_PRICE_COUPLE_ANNUAL=price_... # (price IDs de producción)
-# ... todos los demás price IDs
-```
-
-### 7.3. Variables de Entorno en Render
-
-Si usas Render para el backend:
-
-1. Ve a tu servicio → Environment
-2. Añade las variables una por una:
-   ```
-   STRIPE_SECRET_KEY=sk_live_...
-   STRIPE_PUBLISHABLE_KEY=pk_live_...
-   STRIPE_WEBHOOK_SECRET=whsec_...
-   # ... price IDs
-   ```
-3. Click "Save Changes"
-4. El servicio se redesplegará automáticamente
-
-### 7.4. Monitoreo
-
-- Dashboard de pagos: [https://dashboard.stripe.com/payments](https://dashboard.stripe.com/payments)
-- Webhooks logs: [https://dashboard.stripe.com/webhooks](https://dashboard.stripe.com/webhooks)
-- Métricas: [https://dashboard.stripe.com/dashboard](https://dashboard.stripe.com/dashboard)
+4. Actualiza las variables de entorno en tu servidor
 
 ---
 
-## 8. Endpoints Disponibles
+## 8. Checklist de Implementación
 
-### Backend API
+### Desarrollo
 
-```
-POST   /api/stripe/create-checkout-session    # Crear sesión de pago
-POST   /api/stripe/create-portal-session      # Portal de cliente
-GET    /api/stripe/subscription                # Obtener suscripción del usuario
-POST   /api/stripe/cancel-subscription         # Cancelar suscripción
-GET    /api/stripe/products/:type              # Listar productos (couples/planners)
-POST   /api/stripe/webhook                     # Webhook de Stripe (interno)
-GET    /api/stripe/test                        # Verificar configuración
-```
+- [ ] Cuenta de Stripe creada
+- [ ] Claves de test copiadas al .env
+- [ ] 3 productos de parejas creados (Wedding Pass, Plus, Extensión)
+- [ ] 4 packs de planners creados (Pack 5, Pack 15, Teams 40, Unlimited)
+- [ ] 8 Price IDs de planners copiados (4 monthly + 4 annual)
+- [ ] Webhook configurado (Stripe CLI o ngrok)
+- [ ] Webhook secret copiado al .env
+- [ ] Backend reiniciado
+- [ ] Endpoint `/api/stripe/test` devuelve "configured"
+- [ ] Test de checkout completado con tarjeta 4242...
+- [ ] Pago visible en Firestore (`weddingLicenses` o `plannerPacks`)
 
-### Frontend (a implementar)
+### Producción
 
-```
-/pricing                  # Página de planes
-/checkout/:productId      # Proceso de checkout
-/subscription/success     # Pago exitoso
-/subscription/cancel      # Pago cancelado
-/account/subscription     # Gestión de suscripción
-```
-
----
-
-## 9. Troubleshooting
-
-### Error: "No such price"
-
-**Causa:** El Price ID en el .env no existe o es de otro modo (test/live).
-
-**Solución:**
-1. Verifica que estás en el modo correcto (test/live)
-2. Ve al dashboard de productos y copia el Price ID correcto
-3. Actualiza el .env y reinicia el backend
-
-### Error: "No signatures found matching the expected signature"
-
-**Causa:** El webhook secret es incorrecto o el request no viene de Stripe.
-
-**Solución:**
-1. Verifica que `STRIPE_WEBHOOK_SECRET` esté correctamente configurado
-2. Si usas Stripe CLI, usa el secret que te da el comando `stripe listen`
-3. Si usas ngrok, asegúrate de que la URL del webhook apunte a tu ngrok URL
-
-### Webhook no recibe eventos
-
-**Causa:** El webhook no está configurado o la URL es incorrecta.
-
-**Solución:**
-1. Verifica que el webhook esté activo en el dashboard
-2. Comprueba los logs del webhook en Stripe Dashboard
-3. Si usas localhost, usa Stripe CLI o ngrok
-4. Verifica que el endpoint esté accesible:
-   ```bash
-   curl -X POST https://tu-url/api/stripe/webhook
-   ```
-
-### Pagos no aparecen en Firestore
-
-**Causa:** El webhook no procesa correctamente o hay un error en el código.
-
-**Solución:**
-1. Revisa los logs del backend:
-   ```bash
-   # Busca errores de stripe-webhook
-   tail -f logs/app.log | grep stripe
-   ```
-2. Verifica que el metadata del checkout incluya `userId` y `productId`
-3. Comprueba los permisos de Firestore
+- [ ] Cuenta de Stripe activada
+- [ ] Datos fiscales completados
+- [ ] Cuenta bancaria vinculada
+- [ ] 11 productos recreados en modo live
+- [ ] Price IDs live copiados
+- [ ] Webhook de producción configurado
+- [ ] Variables de entorno actualizadas en servidor
+- [ ] Test de pago real completado
+- [ ] Monitoreo configurado
 
 ---
 
-## 10. Recursos
+## 9. Recursos
 
 - **Documentación de Stripe:** [https://stripe.com/docs](https://stripe.com/docs)
 - **API Reference:** [https://stripe.com/docs/api](https://stripe.com/docs/api)
@@ -399,39 +380,8 @@ GET    /api/stripe/test                        # Verificar configuración
 - **Testing Guide:** [https://stripe.com/docs/testing](https://stripe.com/docs/testing)
 - **Dashboard:** [https://dashboard.stripe.com/](https://dashboard.stripe.com/)
 - **Stripe CLI:** [https://stripe.com/docs/stripe-cli](https://stripe.com/docs/stripe-cli)
+- **Documento de referencia:** `docs/planes-suscripcion.md`
 
 ---
 
-## 11. Checklist de Implementación
-
-### Desarrollo
-
-- [ ] Cuenta de Stripe creada
-- [ ] Claves de test copiadas
-- [ ] 7 productos creados en modo test
-- [ ] Price IDs copiados al .env
-- [ ] Webhook configurado (Stripe CLI o ngrok)
-- [ ] Webhook secret copiado al .env
-- [ ] Backend reiniciado
-- [ ] Test de checkout completado exitosamente
-- [ ] Pago visible en Firestore
-- [ ] Usuario actualizado con suscripción
-
-### Producción
-
-- [ ] Cuenta de Stripe activada
-- [ ] Datos fiscales completados
-- [ ] Cuenta bancaria vinculada
-- [ ] 7 productos recreados en modo live
-- [ ] Price IDs live copiados
-- [ ] Webhook de producción configurado
-- [ ] Variables de entorno actualizadas en servidor
-- [ ] Test de pago real completado
-- [ ] Monitoreo configurado
-- [ ] Emails de confirmación funcionando
-
----
-
-**🎉 ¡Listo! Tu integración de Stripe está completa.**
-
-Para cualquier duda, revisa la [documentación oficial de Stripe](https://stripe.com/docs) o abre un issue en el repositorio.
+**🎉 ¡Listo! Tu integración de Stripe con el modelo de licencias por boda está completa.**

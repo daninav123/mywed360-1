@@ -149,7 +149,7 @@ const Landing = () => {
 
   return (
     <MarketingLayout>
-      <section className="layout-container grid gap-12 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
+      <section className="layout-container grid gap-12 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1.15fr,0.85fr] lg:items-center">
         <div>
           <div className="flex items-center gap-3">
             <img src="/logo-app.svg"
@@ -189,7 +189,7 @@ const Landing = () => {
             {heroHighlights.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-soft bg-surface/80 p-4 shadow-sm backdrop-blur"
+                className="rounded-2xl border border-soft bg-white p-4 shadow-sm shadow-[var(--color-primary)]/10"
               >
                 <p className="text-2xl font-semibold text-[var(--color-primary)]">{item.value}</p>
                 <p className="text-sm text-muted">{item.label}</p>
@@ -200,7 +200,7 @@ const Landing = () => {
         <div className="relative">
           <div className="absolute -left-10 -right-6 -top-10 bottom-8 rounded-[2.75rem] bg-primary-soft blur-3xl" />
           <div className="relative space-y-4">
-            <div className="rounded-[1.75rem] border border-soft bg-surface/95 p-6 shadow-xl shadow-[var(--color-primary)]/15">
+            <div className="rounded-[1.75rem] border border-soft bg-white/95 p-6 shadow-xl shadow-[var(--color-primary)]/15">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">Resumen general</p>
@@ -211,14 +211,14 @@ const Landing = () => {
                 </span>
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-2xl border border-soft bg-surface p-4 shadow-sm">
+                <div className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm">
                   <p className="text-sm text-muted">Invitados confirmados</p>
                   <p className="mt-2 text-2xl font-semibold text-body">132</p>
                   <div className="mt-3 h-2.5 w-full rounded-full bg-primary-soft">
                     <div className="h-full w-3/4 rounded-full bg-[var(--color-primary)]" />
                   </div>
                 </div>
-                <div className="rounded-2xl border border-soft bg-surface p-4 shadow-sm">
+                <div className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm">
                   <p className="text-sm text-muted">Presupuesto ejecutado</p>
                   <p className="mt-2 text-2xl font-semibold text-body">$18.4k</p>
                   <div className="mt-3 flex items-center gap-2 text-xs text-muted">
@@ -226,7 +226,7 @@ const Landing = () => {
                     4 facturas pendientes
                   </div>
                 </div>
-                <div className="rounded-2xl border border-soft bg-surface p-4 shadow-sm md:col-span-2">
+                <div className="rounded-2xl border border-soft bg-white/95 p-4 shadow-sm md:col-span-2">
                   <p className="text-sm text-muted">Tareas criticas esta semana</p>
                   <ul className="mt-3 space-y-2 text-sm">
                     <li className="flex items-center gap-3 rounded-lg bg-primary-soft/35 px-3 py-2 text-body">
@@ -255,7 +255,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24">
+      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-semibold text-body">Todo lo que necesitas en un solo lugar</h2>
           <p className="mt-4 text-lg text-muted">
@@ -266,7 +266,7 @@ const Landing = () => {
           {features.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-2xl border border-soft bg-surface/90 p-6 shadow-sm shadow-[var(--color-primary)]/10 backdrop-blur"
+              className="rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
             >
               <h3 className="text-lg font-semibold text-body">{feature.title}</h3>
               <p className="mt-3 text-sm text-muted">{feature.description}</p>
@@ -275,7 +275,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 rounded-3xl border border-soft bg-surface/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+      <section className="layout-container mt-24 rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
           <div>
             <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
@@ -293,7 +293,7 @@ const Landing = () => {
               {plannerHighlights.map((item) => (
                 <article
                   key={item.title}
-                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-surface p-4 shadow-sm shadow-[var(--color-primary)]/10"
+                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white p-4 shadow-sm shadow-[var(--color-primary)]/10"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
                     {item.icon}
@@ -338,7 +338,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 space-y-10">
+      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="text-center">
           <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
             Beneficios clave
@@ -352,7 +352,7 @@ const Landing = () => {
           {benefitItems.map((benefit) => (
             <article
               key={benefit.title}
-              className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-surface/90 p-5 shadow-sm shadow-[var(--color-primary)]/10"
+              className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-5 shadow-sm shadow-[var(--color-primary)]/10"
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">
                 {benefit.icon}
@@ -364,7 +364,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 space-y-10">
+      <section className="layout-container mt-24 space-y-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15">
         <div className="grid gap-10 lg:grid-cols-[1.3fr,0.7fr] lg:items-center">
           <div>
             <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
@@ -378,7 +378,7 @@ const Landing = () => {
               {testimonials.map((testimonial) => (
                 <article
                   key={testimonial.name}
-                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-surface/90 p-6 shadow-sm shadow-[var(--color-primary)]/10"
+                  className="flex h-full flex-col gap-3 rounded-2xl border border-soft bg-white/95 p-6 shadow-sm shadow-[var(--color-primary)]/10"
                 >
                   <Quote className="h-5 w-5 text-[var(--color-primary)]" />
                   <p className="text-sm text-body">{testimonial.quote}</p>
@@ -390,7 +390,7 @@ const Landing = () => {
               ))}
             </div>
           </div>
-          <div className="rounded-3xl border border-soft bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/15">
+          <div className="rounded-3xl border border-soft bg-white/95 p-6 shadow-lg shadow-[var(--color-primary)]/15">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted">Confian en MaLove.App</p>
             <div className="mt-6 grid gap-6 text-center text-sm font-medium text-muted sm:grid-cols-2">
               {trustLogos.map((brand) => (
@@ -406,7 +406,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="layout-container mt-24 grid gap-10 lg:grid-cols-[1fr,1fr]">
+      <section className="layout-container mt-24 grid gap-10 rounded-3xl border border-soft bg-white/95 px-6 py-10 shadow-lg shadow-[var(--color-primary)]/15 lg:grid-cols-[1fr,1fr]">
         <div>
           <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
             Preguntas frecuentes
@@ -416,7 +416,7 @@ const Landing = () => {
             {faqItems.map((faq) => (
               <details
                 key={faq.question}
-                className="group rounded-2xl border border-soft bg-surface/90 p-5 shadow-sm shadow-[var(--color-primary)]/10 open:ring-1 open:ring-[var(--color-primary)]/20"
+                className="group rounded-2xl border border-soft bg-white/95 p-5 shadow-sm shadow-[var(--color-primary)]/10 open:ring-1 open:ring-[var(--color-primary)]/20"
               >
                 <summary className="flex cursor-pointer items-center justify-between text-base font-semibold text-body">
                   {faq.question}
@@ -429,7 +429,7 @@ const Landing = () => {
             ))}
           </div>
         </div>
-        <div className="rounded-3xl border border-soft bg-surface/90 p-8 shadow-lg shadow-[var(--color-primary)]/15">
+        <div className="rounded-3xl border border-soft bg-white/95 p-8 shadow-lg shadow-[var(--color-primary)]/15">
           <h3 className="text-2xl font-semibold text-body">Solicita una demo personalizada</h3>
           <p className="mt-3 text-sm text-muted">
             Cuentanos sobre tu operacion y agenda una videollamada con nuestro equipo. Recibiras recomendaciones basadas en tu flujo actual y una guia de configuracion rapida.

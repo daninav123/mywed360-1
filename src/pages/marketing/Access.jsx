@@ -314,13 +314,13 @@ const Access = ({ defaultMode = 'login' }) => {
       <div className="layout-container space-y-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 rounded-full border border-soft bg-surface px-3 py-1 text-xs font-medium text-muted transition hover:text-body"
+          className="inline-flex items-center gap-2 rounded-full border border-soft bg-white/95 px-3 py-1 text-xs font-medium text-muted transition hover:text-body"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           {t('marketingAccess.backLink', { defaultValue: 'Back to home' })}
         </Link>
 
-        <section className="overflow-hidden rounded-3xl border border-soft bg-surface/95 shadow-lg shadow-[var(--color-primary)]/15">
+        <section className="overflow-hidden rounded-3xl border border-soft bg-white/95 shadow-lg shadow-[var(--color-primary)]/15">
           <div className="grid gap-10 p-8 lg:grid-cols-[1fr,0.85fr] lg:items-start lg:p-12">
             <div className="space-y-5">
               <span className="rounded-full bg-primary-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary)]">
@@ -331,7 +331,7 @@ const Access = ({ defaultMode = 'login' }) => {
               {heroFeatures.length > 0 ? (
                 <div className="flex flex-wrap gap-2 text-xs text-muted">
                   {heroFeatures.map((feature) => (
-                    <span key={feature} className="rounded-full border border-soft bg-surface px-3 py-1">
+                    <span key={feature} className="rounded-full border border-soft bg-white/95 px-3 py-1">
                       {feature}
                     </span>
                   ))}
@@ -339,7 +339,7 @@ const Access = ({ defaultMode = 'login' }) => {
               ) : null}
             </div>
 
-            <div className="rounded-3xl border border-soft bg-surface p-6 shadow-lg shadow-[var(--color-primary)]/20">
+            <div className="rounded-3xl border border-soft bg-white p-6 shadow-lg shadow-[var(--color-primary)]/20">
               {alreadyLoggedIn ? (
                 <div className="space-y-6 text-center">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-[var(--color-primary)]">

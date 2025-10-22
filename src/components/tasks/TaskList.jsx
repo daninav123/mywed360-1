@@ -3,9 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { categories } from './CalendarComponents.jsx';
 import { DependencyIndicator, DependencyTooltip } from './hooks/useTaskDependencies.jsx';
 
-const DEFAULT_PAGE_SIZE = 6;
+const DEFAULT_PAGE_SIZE = 4;
 
-// Lista lateral con subtareas críticas y reuniones próximas
 export default function TaskList({
   tasks,
   onTaskClick,
@@ -41,19 +40,15 @@ export default function TaskList({
       if (!task) return false;
       if (task.__kind === 'subtask') return true;
       const start =
-        task?.start instanceof Date
-          ? task.start
-          : task?.start
-          ? new Date(task.start)
-          : null;
+        task?.start instanceof Date ? task.start : task?.start ? new Date(task.start) : null;
       const end =
         task?.end instanceof Date
           ? task.end
           : task?.end
           ? new Date(task.end)
           : start;
-
       if (!start) return false;
+
       const completed = completedSet ? completedSet.has(String(task.id)) : Boolean(task.completed);
       if (!completed && end instanceof Date && end < todayStart) return true;
       return !end || end >= todayStart || start >= todayStart;
@@ -82,9 +77,7 @@ export default function TaskList({
   }, [pageSize, sortedTasks.length]);
 
   useEffect(() => {
-    if (page > totalPages - 1) {
-      setPage(0);
-    }
+    if (page > totalPages - 1) setPage(0);
   }, [page, totalPages]);
 
   const startIndex = page * pageSize;
@@ -132,11 +125,11 @@ export default function TaskList({
 
   return (
     <div className="flex-1 rounded-xl shadow-md overflow-hidden h-full flex flex-col bg-[var(--color-surface)] text-[color:var(--color-text)] border border-[color:var(--color-text)]/10">
-      <div className="p-4 border-b border-[color:var(--color-text)]/10">
-        <h2 className="text-xl font-semibold">Tareas críticas de esta semana</h2>
-        <div className="flex flex-wrap gap-2 mt-2">
+      <div className="px-4 py-3 border-b border-[color:var(--color-text)]/10">
+        <h2 className="text-lg font-semibold">Tareas críticas de esta semana</h2>
+        <div className="flex flex-wrap gap-2 mt-1 text-[10px] text-[color:var(--color-text)]/60">
           {Object.entries(categories).map(([key, cat]) => (
-            <div key={key} className="flex items-center text-xs">
+            <div key={key} className="flex items-center">
               <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: cat.color }} />
               {cat.name}
             </div>
@@ -144,7 +137,7 @@ export default function TaskList({
         </div>
       </div>
 
-      <div className="p-4 space-y-4 flex-1 overflow-y-auto">
+      <div className="px-3 py-3 space-y-3 flex-1 overflow-y-auto">
         {Array.from(groupedSubtasks.entries()).map(([pid, items]) => {
           const parentName = parentNameMap[pid] || 'Bloque';
           return (
@@ -166,17 +159,17 @@ export default function TaskList({
                 const completed = completedSet ? completedSet.has(String(event.id)) : false;
                 const depStatus = dependencyStatuses.get(String(event.id));
                 const isBlocked = depStatus?.isBlocked || false;
-                const isOverdue = isTaskOverdue(event, completed);
+                const overdue = isTaskOverdue(event, completed);
 
-                const containerClasses = [
+                const cardClasses = [
                   'p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer',
                   isBlocked && !completed ? 'opacity-60' : '',
-                  isOverdue ? 'border-red-400 bg-red-50/80' : '',
+                  overdue ? 'border-red-400 bg-red-50/80' : '',
                 ]
                   .filter(Boolean)
                   .join(' ');
 
-                const containerStyle = isOverdue
+                const cardStyle = overdue
                   ? { borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)' }
                   : {
                       borderColor: isBlocked && !completed ? '#ef4444' : cat.borderColor,
@@ -187,9 +180,9 @@ export default function TaskList({
                 return (
                   <div
                     key={event.id}
-                    className={containerClasses}
+                    className={cardClasses}
                     onClick={() => onTaskClick(event)}
-                    style={containerStyle}
+                    style={cardStyle}
                     title={isBlocked ? 'Tarea bloqueada por dependencias' : undefined}
                   >
                     <div className="flex items-start">
@@ -207,8 +200,8 @@ export default function TaskList({
                         />
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className={`font-medium ${isOverdue ? 'text-red-700' : ''}`}>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <div className={`font-medium ${overdue ? 'text-red-700' : ''}`}>
                             {event.title}
                           </div>
                           <span
@@ -221,7 +214,7 @@ export default function TaskList({
                           >
                             {cat.name}
                           </span>
-                          {isOverdue && (
+                          {overdue && (
                             <span className="text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
                               Vencida
                             </span>
@@ -230,17 +223,15 @@ export default function TaskList({
                         </div>
                         {event.desc && (
                           <div
-                            className={`text-sm mt-1 line-clamp-2 ${
-                              isOverdue
-                                ? 'text-red-700/90'
-                                : 'text-[color:var(--color-text)]/70'
+                            className={`text-[13px] mt-1 line-clamp-2 ${
+                              overdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
                             }`}
                           >
                             {event.desc}
                           </div>
                         )}
                         {event.assignee && (
-                          <div className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                          <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
                             Asignado a: {event.assignee}
                           </div>
                         )}
@@ -261,25 +252,25 @@ export default function TaskList({
         {meetingItems.map((event) => {
           const cat = categories[event.category] || categories.OTROS;
           const completed = completedSet ? completedSet.has(String(event.id)) : false;
-          const isOverdue = isTaskOverdue(event, completed);
+          const overdue = isTaskOverdue(event, completed);
 
-          const containerClasses = [
+          const cardClasses = [
             'p-3 border rounded-lg hover:shadow-md transition-shadow cursor-pointer',
-            isOverdue ? 'border-red-400 bg-red-50/80' : '',
+            overdue ? 'border-red-400 bg-red-50/80' : '',
           ]
             .filter(Boolean)
             .join(' ');
 
-          const containerStyle = isOverdue
+          const cardStyle = overdue
             ? { borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.12)' }
             : { borderColor: cat.borderColor, backgroundColor: `${cat.bgColor}40` };
 
           return (
             <div
               key={event.id}
-              className={containerClasses}
+              className={cardClasses}
               onClick={() => onTaskClick(event)}
-              style={containerStyle}
+              style={cardStyle}
             >
               <div className="flex items-start">
                 <div className="mr-2 flex items-center">
@@ -294,15 +285,15 @@ export default function TaskList({
                   />
                 </div>
                 <div className="flex-1">
-                  <div className={`font-medium mb-1 ${isOverdue ? 'text-red-700' : ''}`}>
+                  <div className={`font-medium mb-0.5 ${overdue ? 'text-red-700' : ''}`}>
                     {event.title}
                   </div>
-                  {isOverdue && (
+                  {overdue && (
                     <span className="inline-flex items-center text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full mb-1">
                       Vencida
                     </span>
                   )}
-                  <div className="text-xs text-[color:var(--color-text)]/60">
+                  <div className="text-[11px] text-[color:var(--color-text)]/60">
                     {event.start?.toLocaleDateString?.('es-ES', {
                       day: 'numeric',
                       month: 'short',
@@ -312,15 +303,15 @@ export default function TaskList({
                   </div>
                   {event.desc && (
                     <div
-                      className={`text-sm mt-1 line-clamp-2 ${
-                        isOverdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
+                      className={`text-[13px] mt-1 line-clamp-2 ${
+                        overdue ? 'text-red-700/90' : 'text-[color:var(--color-text)]/70'
                       }`}
                     >
                       {event.desc}
                     </div>
                   )}
                   {event.assignee && (
-                    <div className="text-xs text-[color:var(--color-text)]/60 mt-1">
+                    <div className="text-[11px] text-[color:var(--color-text)]/60 mt-1">
                       Asignado a: {event.assignee}
                     </div>
                   )}
@@ -331,7 +322,7 @@ export default function TaskList({
         })}
 
         {pagedTasks.length === 0 && (
-          <div className="text-center py-4 text-[color:var(--color-text)]/60">
+          <div className="text-center py-6 text-[color:var(--color-text)]/60 text-sm">
             No hay próximas tareas programadas
           </div>
         )}
@@ -345,7 +336,7 @@ export default function TaskList({
           <div className="flex gap-2">
             <button
               type="button"
-              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-sm hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-xs hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => setPage((prev) => Math.max(0, prev - 1))}
               disabled={page <= 0}
             >
@@ -353,7 +344,7 @@ export default function TaskList({
             </button>
             <button
               type="button"
-              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-sm hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-2 py-1 rounded border border-[color:var(--color-text)]/20 text-xs hover:bg-[color:var(--color-text)]/10 disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => setPage((prev) => Math.min(totalPages - 1, prev + 1))}
               disabled={page >= totalPages - 1}
             >

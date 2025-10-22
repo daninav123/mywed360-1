@@ -1,149 +1,244 @@
 /**
  * Configuración de productos y precios de Stripe
- * Basado en docs/planes-suscripcion.md
+ * Basado en docs/planes-suscripcion.md - Modelo de licencias por boda (octubre 2025)
  */
 
 export const STRIPE_PRODUCTS = {
-  // Planes para Parejas
+  // Planes para Parejas (pago único por boda)
   couples: {
     free: {
       id: 'free',
-      name: 'Básico (Free)',
+      name: 'Free',
       price: 0,
       currency: 'EUR',
       type: 'free',
       interval: null,
       features: [
-        '1 evento',
-        'Invitados hasta 80',
+        '1 boda',
+        'Hasta 80 invitados',
         'Seating plan básico',
         'Gestión de finanzas',
         'Directorio de proveedores',
+        'Publicidad visible',
       ],
     },
-    annual: {
-      id: 'couple_annual',
-      name: 'Anual',
-      price: 3500, // 35 EUR en centavos
-      currency: 'EUR',
-      type: 'subscription',
-      interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_COUPLE_ANNUAL, // Se configura en Stripe
-      features: [
-        'Todo lo del plan Free',
-        'Sin límite de invitados',
-        'Contacto directo con proveedores',
-        'Protocolo completo de ceremonia',
-        'Hasta 50 diseños web',
-        'Soporte prioritario',
-      ],
-    },
-    plus: {
-      id: 'couple_plus',
-      name: 'Plus',
-      price: 5500, // 55 EUR en centavos
-      currency: 'EUR',
-      type: 'subscription',
-      interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_COUPLE_PLUS,
-      features: [
-        'Todo lo del plan Anual',
-        'Sin marca MyWed360',
-        '1 ayudante con acceso gratuito',
-        'Invitaciones digitales premium',
-        'Seating plan impreso sin marca',
-      ],
-    },
-    eventPlus: {
-      id: 'event_plus',
-      name: 'Boda Plus',
-      price: 2000, // 20 EUR en centavos
+    weddingPass: {
+      id: 'wedding_pass',
+      name: 'Wedding Pass',
+      price: 5000, // 50 EUR en centavos
       currency: 'EUR',
       type: 'one_time',
       interval: null,
-      stripePriceId: process.env.STRIPE_PRICE_EVENT_PLUS,
+      stripePriceId: process.env.STRIPE_PRICE_WEDDING_PASS,
       features: [
-        'Sin marca MyWed360',
-        'Compatible con cualquier plan',
-        'Pago único por evento',
+        'Todo lo de Free',
+        'Invitados ilimitados',
+        'Contacto directo con proveedores',
+        'Protocolo completo',
+        '50 diseños web',
+        'Soporte prioritario',
+        'Plantillas premium',
       ],
+      validityDays: 30, // Vigencia: fecha_boda + 30 días
+    },
+    weddingPassPlus: {
+      id: 'wedding_pass_plus',
+      name: 'Wedding Pass Plus',
+      price: 8500, // 85 EUR en centavos
+      currency: 'EUR',
+      type: 'one_time',
+      interval: null,
+      stripePriceId: process.env.STRIPE_PRICE_WEDDING_PASS_PLUS,
+      features: [
+        'Todo lo de Wedding Pass',
+        'Sin marca MyWed360',
+        'Biblioteca completa de diseños',
+        'Editor web premium',
+        'Galería de recuerdos',
+        '1 ayudante con acceso completo',
+      ],
+      validityDays: 30,
+      whiteLabel: true,
+    },
+    postWeddingExtension: {
+      id: 'post_wedding_extension',
+      name: 'Extensión post-boda',
+      price: 1500, // 15 EUR en centavos
+      currency: 'EUR',
+      type: 'one_time',
+      interval: null,
+      stripePriceId: process.env.STRIPE_PRICE_POST_WEDDING_EXTENSION,
+      features: [
+        '90 días extra de acceso editable',
+        'Compatible con cualquier plan',
+      ],
+      validityDays: 90,
     },
   },
 
-  // Planes para Wedding Planners
+  // Paquetes para Wedding Planners (suscripción con trial de 30 días)
   planners: {
-    planner1: {
-      id: 'planner_1',
-      name: 'Wedding Planner 1',
-      price: 12000, // 120 EUR en centavos
+    pack5Monthly: {
+      id: 'planner_pack5_monthly',
+      name: 'Planner Pack 5 (Mensual)',
+      price: 4167, // 41,67 EUR en centavos
       currency: 'EUR',
       type: 'subscription',
-      interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_PLANNER_1,
+      interval: 'month',
+      stripePriceId: process.env.STRIPE_PRICE_PLANNER_PACK5_MONTHLY,
+      trialDays: 30,
       features: [
-        'Hasta 5 bodas simultáneas',
-        'Priorización en el sistema',
-        'Clientes acceden a funciones premium',
+        'Hasta 5 bodas activas simultáneas',
         'Herramientas profesionales',
+        'Priorización en directorio',
         'Soporte prioritario',
+        '2 colaboradores por cliente',
       ],
       maxWeddings: 5,
+      totalCost: 50000, // 500 EUR total (12 cuotas)
     },
-    planner2: {
-      id: 'planner_2',
-      name: 'Wedding Planner 2',
-      price: 20000, // 200 EUR en centavos
+    pack5Annual: {
+      id: 'planner_pack5_annual',
+      name: 'Planner Pack 5 (Anual)',
+      price: 42500, // 425 EUR en centavos (15% descuento)
       currency: 'EUR',
-      type: 'subscription',
+      type: 'one_time',
       interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_PLANNER_2,
+      stripePriceId: process.env.STRIPE_PRICE_PLANNER_PACK5_ANNUAL,
       features: [
-        'Hasta 10 bodas simultáneas',
-        'Todo de Wedding Planner 1',
-        'Analytics avanzados',
-        'Reportes detallados por cliente',
+        'Hasta 5 bodas activas simultáneas',
+        'Herramientas profesionales',
+        'Priorización en directorio',
+        'Soporte prioritario',
+        '2 colaboradores por cliente',
+        '15% descuento vs mensual',
       ],
-      maxWeddings: 10,
+      maxWeddings: 5,
+      discount: 15,
     },
-    teams: {
-      id: 'planner_teams',
-      name: 'Teams Wedding Planner',
-      price: 80000, // 800 EUR en centavos
+    pack15Monthly: {
+      id: 'planner_pack15_monthly',
+      name: 'Planner Pack 15 (Mensual)',
+      price: 11250, // 112,50 EUR en centavos
       currency: 'EUR',
       type: 'subscription',
-      interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_PLANNER_TEAMS,
+      interval: 'month',
+      stripePriceId: process.env.STRIPE_PRICE_PLANNER_PACK15_MONTHLY,
+      trialDays: 30,
       features: [
-        'Hasta 40 bodas anuales',
-        '1 perfil principal',
-        '3 perfiles extra',
-        'Dashboard consolidado',
+        'Hasta 15 bodas activas simultáneas',
+        'Analytics por cliente',
+        'Priorización extendida',
+        'Soporte prioritario',
+        '2 colaboradores por cliente',
+      ],
+      maxWeddings: 15,
+      totalCost: 135000, // 1.350 EUR total
+    },
+    pack15Annual: {
+      id: 'planner_pack15_annual',
+      name: 'Planner Pack 15 (Anual)',
+      price: 114750, // 1.147,50 EUR en centavos
+      currency: 'EUR',
+      type: 'one_time',
+      interval: 'year',
+      stripePriceId: process.env.STRIPE_PRICE_PLANNER_PACK15_ANNUAL,
+      features: [
+        'Hasta 15 bodas activas simultáneas',
+        'Analytics por cliente',
+        'Priorización extendida',
+        'Soporte prioritario',
+        '2 colaboradores por cliente',
+        '15% descuento vs mensual',
+      ],
+      maxWeddings: 15,
+      discount: 15,
+    },
+    teams40Monthly: {
+      id: 'teams40_monthly',
+      name: 'Teams 40 (Mensual)',
+      price: 26667, // 266,67 EUR en centavos
+      currency: 'EUR',
+      type: 'subscription',
+      interval: 'month',
+      stripePriceId: process.env.STRIPE_PRICE_TEAMS40_MONTHLY,
+      trialDays: 30,
+      features: [
+        '40 bodas activas por año natural',
+        '1 perfil principal + 3 adicionales',
+        'Dashboard consolidado de equipo',
         'Colaboración avanzada',
+        'Soporte dedicado',
       ],
       maxWeddings: 40,
       maxUsers: 4,
+      totalCost: 320000, // 3.200 EUR total
     },
-    unlimited: {
-      id: 'planner_unlimited',
-      name: 'Teams Wedding Planner Ilimitado',
-      price: 150000, // 1500 EUR en centavos
+    teams40Annual: {
+      id: 'teams40_annual',
+      name: 'Teams 40 (Anual)',
+      price: 272000, // 2.720 EUR en centavos
+      currency: 'EUR',
+      type: 'one_time',
+      interval: 'year',
+      stripePriceId: process.env.STRIPE_PRICE_TEAMS40_ANNUAL,
+      features: [
+        '40 bodas activas por año natural',
+        '1 perfil principal + 3 adicionales',
+        'Dashboard consolidado de equipo',
+        'Colaboración avanzada',
+        'Soporte dedicado',
+        '15% descuento vs mensual',
+      ],
+      maxWeddings: 40,
+      maxUsers: 4,
+      discount: 15,
+    },
+    unlimitedMonthly: {
+      id: 'teams_unlimited_monthly',
+      name: 'Teams Ilimitado (Mensual)',
+      price: 41667, // 416,67 EUR en centavos
       currency: 'EUR',
       type: 'subscription',
-      interval: 'year',
-      stripePriceId: process.env.STRIPE_PRICE_PLANNER_UNLIMITED,
+      interval: 'month',
+      stripePriceId: process.env.STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY,
+      trialDays: 30,
       features: [
         'Bodas ilimitadas',
-        'Perfiles de planners ilimitados',
+        'Perfiles ilimitados',
         'White-label completo',
-        'Personalización completa de la interfaz',
-        'Dominio personalizado opcional',
-        'Todas las funcionalidades premium',
+        'Dominio personalizado',
         'Soporte dedicado 24/7',
-        'Integración API personalizada',
-        'Formación y onboarding personalizado',
+        'Formación personalizada',
+        'Acceso API configurado',
       ],
-      maxWeddings: -1, // Ilimitado
-      maxUsers: -1, // Ilimitado
+      maxWeddings: -1,
+      maxUsers: -1,
+      totalCost: 500000, // 5.000 EUR total
+      whiteLabel: true,
+    },
+    unlimitedAnnual: {
+      id: 'teams_unlimited_annual',
+      name: 'Teams Ilimitado (Anual)',
+      price: 425000, // 4.250 EUR en centavos
+      currency: 'EUR',
+      type: 'one_time',
+      interval: 'year',
+      stripePriceId: process.env.STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL,
+      features: [
+        'Bodas ilimitadas',
+        'Perfiles ilimitados',
+        'White-label completo',
+        'Dominio personalizado',
+        'Soporte dedicado 24/7',
+        'Formación personalizada',
+        'Acceso API configurado',
+        '15% descuento vs mensual',
+      ],
+      maxWeddings: -1,
+      maxUsers: -1,
+      discount: 15,
+      whiteLabel: true,
     },
   },
 };
