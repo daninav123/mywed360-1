@@ -1126,15 +1126,17 @@ export default function TasksRefactored() {
     return Math.min(1, Math.max(GANTT_ZOOM_FLOOR, fitZoomObserved));
   }, [fitZoomObserved]);
   useEffect(() => {
-    if (ganttZoom < minZoomAllowed - 0.001) {
+    const enforceTolerance = Math.max(0.0005, minZoomAllowed * 0.05);
+    if (ganttZoom < minZoomAllowed - enforceTolerance) {
       setGanttZoom(minZoomAllowed);
     }
   }, [ganttZoom, minZoomAllowed]);
   const handleZoomChange = useCallback((next) => {
     const clamped = clampZoomValue(next, { min: minZoomAllowed });
-    const normalized = Math.round(clamped * 100) / 100;
+    const normalized = Math.round(clamped * 1000) / 1000;
+    const tolerance = Math.max(0.0001, minZoomAllowed * 0.02);
     setGanttZoom((prev) => {
-      if (Math.abs(prev - normalized) < 0.001) return prev;
+      if (Math.abs(prev - normalized) < tolerance) return prev;
       return normalized;
     });
   }, [minZoomAllowed]);

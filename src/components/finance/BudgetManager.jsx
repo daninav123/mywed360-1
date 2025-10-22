@@ -82,28 +82,28 @@ export default function BudgetManager({
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';
     return (Math.round(value * 100) / 100).toFixed(2);
-  };  const handleTotalDraftChange = (event) => {
-    setTotalDraftDirty(true);
-    setTotalDraft(event.target.value);
-    setTotalDraftError('');
+  };  const handleChange = (event) => {
+    setDirty(true);
+    set(event.target.value);
+    setError('');
   };
 
-  const applyTotalDraft = () => {
-    const normalized = parseTotalDraft(totalDraft);
+  const apply = () => {
+    const normalized = parse();
     if (!Number.isFinite(normalized) || normalized < 0) {
-      setTotalDraftError('Introduce un número válido mayor o igual a 0.');
+      setError('Introduce un número válido mayor o igual a 0.');
       return;
     }
-    setTotalDraft(formatTotalInput(normalized));
-    setTotalDraftDirty(false);
-    setTotalDraftError('');
+    set(formatTotalInput(normalized));
+    setDirty(false);
+    setError('');
     onUpdateBudget?.(normalized);
   };
 
-  const resetTotalDraft = () => {
-    setTotalDraftDirty(false);
-    setTotalDraft(formatTotalInput(baselineTotal));
-    setTotalDraftError('');
+  const reset = () => {
+    setDirty(false);
+    set(formatTotalInput(baselineTotal));
+    setError('');
   };
 
 /**
@@ -443,228 +443,6 @@ const distributeIncrease = (amounts, indices, delta) => {
     }
   };
 
-  const totalBudgetedRaw = budget.categories.reduce(
-    (sum, cat) => sum + (Number(cat.amount) || 0),
-    0
-  );
-  const totalBudgeted =
-    totalBudgetedRaw > 0 ? totalBudgetedRaw : totalBudgetValue;
-    statsTotalSpent > 0
-      ? statsTotalSpent
-      : budgetUsage.reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center flex-wrap gap-3">
-        <div>
-          <h2 className="text-xl font-semibold text-[color:var(--color-text)]">
-            {t('finance.budget.title', { defaultValue: 'Gestión de presupuesto' })}
-          </h2>
-          <p className="text-sm text-[color:var(--color-text)]/70">
-            {t('finance.budget.subtitle', {
-              defaultValue: 'Organiza y controla el presupuesto por categorías',
-            })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            leftIcon={<CheckCircle size={16} />}
-            onClick={captureSnapshot}
-          >
-            {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
-          </Button>
-          <Button
-            variant="outline"
-            leftIcon={
-              advisorLoading || localAdvisorLoading ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Sparkles size={16} />
-              )
-            }
-            onClick={handleOpenAdvisor}
-            disabled={advisorLoading || localAdvisorLoading}
-          >
-            Abrir consejero
-          </Button>
-          <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-            {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
-          </Button>
-        </div>
-      </div>
-
-      {benchmarkState.loading && (
-        <div className="rounded-lg border border-dashed border-indigo-200 bg-indigo-50/60 px-4 py-2 text-sm text-indigo-700">
-          {t('finance.benchmarks.loading', {
-            defaultValue: 'Calculando sugerencias de presupuesto…',
-          })}
-        </div>
-      )}
-
-      {!benchmarkState.loading && benchmarkSampleSize > 0 && (
-        <div className="rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-indigo-700">
-              {t('finance.benchmarks.title', {
-                defaultValue: 'Sugerencias de presupuesto basadas en bodas similares',
-              })}
-            </p>
-            <p className="text-xs text-indigo-600">
-              {t('finance.benchmarks.subtitle', {
-                defaultValue:
-                  'Basado en {{count}} presupuestos confirmados. Media estimada: {{average}} · Confianza: {{confidence}}.',
-                count: benchmarkSampleSize,
-                average: formatCurrency(benchmarkAverage),
-                confidence: benchmarkConfidence,
-              })}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => benchmarkApply('p50')}
-            >
-              {t('finance.benchmarks.applyMedian', { defaultValue: 'Aplicar mediana (p50)' })}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => benchmarkApply('p75')}
-            >
-              {t('finance.benchmarks.applyP75', { defaultValue: 'Aplicar percentil 75' })}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <Card className="p-6 bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-primary)]/15 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-[var(--color-primary)]" />
-            </div>
-            <p className="text-sm font-medium text-[color:var(--color-text)]/70">
-              {t('finance.budget.totalBudget', { defaultValue: 'Presupuesto Total' })}
-            </p>
-            <p className="text-2xl font-bold text-[color:var(--color-text)]">
-              {formatCurrency(totalBudgetValue || 0)}
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-success)]/15 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-[color:var(--color-success)]" />
-            </div>
-            <p className="text-sm font-medium text-[color:var(--color-text)]/70">
-              {t('finance.budget.budgeted', { defaultValue: 'Presupuestado' })}
-            </p>
-            <p className="text-2xl font-bold text-[color:var(--color-success)]">
-              {formatCurrency(totalBudgeted)}
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-[var(--color-danger)]/15 rounded-full mx-auto mb-3">
-              <Target className="w-6 h-6 text-[color:var(--color-danger)]" />
-            </div>
-            <p className="text-sm font-medium text-[color:var(--color-text)]/70">
-              {t('finance.budget.spent', { defaultValue: 'Gastado' })}
-            </p>
-            <p className="text-2xl font-bold text-[color:var(--color-danger)]">
-              {formatCurrency(totalSpent)}
-            </p>
-          </div>
-        </div>
-          <div className="w-full bg-[color:var(--color-text)]/10 rounded-full h-3">
-            <div
-              className={`h-3 rounded-full transition-all duration-300 ${totalSpent > budget.total ? 'bg-[var(--color-danger)]' : totalSpent > budget.total * 0.8 ? 'bg-[var(--color-warning)]' : 'bg-[var(--color-success)]'}`}
-              style={{ width: `${Math.min((totalSpent / budget.total) * 100, 100)}%` }}
-            />
-          </div>
-        </div>
-      </Card>
-
-      <Card className="overflow-hidden bg-[var(--color-surface)]/80 backdrop-blur-md border-soft">
-        <div className="px-6 py-4 border-b border-[color:var(--color-text)]/10 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-lg font-medium text-[color:var(--color-text)]">
-            {t('finance.budget.categoriesTitle', { defaultValue: 'categorías de presupuesto' })}
-          </h3>
-          {budgetUsage.length > 0 && (
-            <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-              {t('finance.budget.addCategory', { defaultValue: 'Añadir categoría' })}
-            </Button>
-          )}
-        </div>
-        {advisorScenarios.length > 0 && (
-          <div className="px-6 py-4 bg-[var(--color-primary)]/5 border-b border-[var(--color-primary)]/20 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 text-[var(--color-primary)]">
-                <Sparkles size={18} />
-                <span className="text-sm font-semibold">
-                  {selectedScenario?.label || 'Consejero IA listo'}
-                </span>
-                {effectiveAdvisor?.requestedAt && (
-                  <span className="text-xs text-[color:var(--color-text)]/60">
-                    Actualizado {formatTimestamp(effectiveAdvisor.requestedAt)}
-                  </span>
-                )}
-              </div>
-              {selectedScenario?.summary && (
-                <p className="text-sm text-[color:var(--color-text)]/80">{selectedScenario.summary}</p>
-              )}
-              {advisorTips.length > 0 && (
-                <ul className="text-xs text-[color:var(--color-text)]/70 list-disc pl-5 space-y-1">
-                  {advisorTips.slice(0, 3).map((tip, idx) => (
-                    <li key={idx}>{tip}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 min-w-[200px]">
-              <Button
-                variant="ghost"
-                className="justify-start"
-                leftIcon={<Info size={16} />}
-                onClick={handleOpenAdvisor}
-                disabled={advisorLoading || localAdvisorLoading}
-              >
-                Ver escenarios
-              </Button>
-              <button
-                type="button"
-                className="inline-flex items-center justify-center gap-2 text-xs font-medium px-3 py-1.5 rounded-md border border-[var(--color-primary)]/40 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 disabled:opacity-60 disabled:cursor-not-allowed"
-                onClick={handleRefreshAdvisor}
-                disabled={advisorLoading || localAdvisorLoading}
-              >
-                {(advisorLoading || localAdvisorLoading) ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <RefreshCw size={14} />
-                )}
-                Actualizar consejero
-              </button>
-            </div>
-          </div>
-        )}
-        {advisorError && (
-          <div className="px-6 py-3 text-sm text-[color:var(--color-danger)] bg-[var(--color-danger)]/10 border-b border-[var(--color-danger)]/30">
-            {advisorError}
-          </div>
-        )}
-        {budgetUsage.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-[color:var(--color-text)]/70 mb-4">
-              {t('finance.budget.empty', { defaultValue: 'No hay categorías de presupuesto' })}
-            </p>
-            <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
-              {t('finance.budget.createFirst', { defaultValue: 'Crear primera categoría' })}
-            </Button>
-          </div>
-        ) : (
-          <div className="px-5 py-3">
-            <div className="space-y-1.5">
-              {budgetUsage.map((category, index) => {
-              const rawCategory = categories[index] || {};
               const assignedAmountRaw = Number(
                 rawCategory?.amount ?? category.amount ?? 0
               );

@@ -45,6 +45,7 @@ Este documento consolida los flujos técnicos añadidos recientemente: Seating P
 - Canvas: encabezado fijo con datos clave, controles fuera del lienzo y toasts discretos en la esquina inferior.
 - Iconografia: seleccionar 6-8 iconos outline uniformes (mismo tamano, sin mezclar rellenos).
 - Estados vacios: componentes dedicados con ilustracion minimal y CTA central; ocultar bloques que ya no aplican (ej. onboarding completado).
+- Toggles de panel: Quick Actions expone switches para Biblioteca, Inspector, Invitados y Panel inteligente, persistidos en `uiPrefsKey`.
 
 ### E2E relevantes de Seating
 - Ubicación: `cypress/e2e/seating/`

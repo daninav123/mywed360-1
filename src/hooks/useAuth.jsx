@@ -895,15 +895,16 @@ export const AuthProvider = ({ children }) => {
       try {
         localStorage.setItem(ADMIN_SESSION_FLAG, 'true');
         localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(adminProfile));
-        // CRITICAL FIX: Guardar token en lugar de eliminarlo
+        // Guardar token
         if (sessionToken) {
           localStorage.setItem(ADMIN_SESSION_TOKEN_KEY, sessionToken);
         } else {
           localStorage.removeItem(ADMIN_SESSION_TOKEN_KEY);
         }
         localStorage.removeItem('mw360_auth_token');
+        // Guardar expiry como timestamp numérico (no ISO string)
         if (normalizedExpiry) {
-          localStorage.setItem(ADMIN_SESSION_EXPIRES_KEY, normalizedExpiry.toISOString());
+          localStorage.setItem(ADMIN_SESSION_EXPIRES_KEY, String(normalizedExpiry.getTime()));
         } else {
           localStorage.removeItem(ADMIN_SESSION_EXPIRES_KEY);
         }
@@ -912,6 +913,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           localStorage.removeItem(ADMIN_SESSION_ID_KEY);
         }
+        console.log('[useAuth] Sesión admin persistida en localStorage');
       } catch (storageError) {
         console.warn('[useAuth] No se pudo persistir la sesión admin:', storageError);
       }
@@ -1016,12 +1018,6 @@ export const AuthProvider = ({ children }) => {
         };
         const adminUser = { ...user };
 
-        // Guardar sesión si no requiere MFA
-        if (typeof window !== 'undefined' && response.sessionToken) {
-          const { setAdminSession } = await import('../services/adminSession');
-          setAdminSession(response.sessionToken, rememberMe);
-        }
-
         return finalizeAdminLogin({
           adminUser,
           adminProfile,
@@ -1093,12 +1089,6 @@ export const AuthProvider = ({ children }) => {
           email: adminProfile.email || ADMIN_EMAIL,
           displayName: adminProfile.name || 'Administrador Lovenda',
         };
-
-        // Guardar sesión con preferencia de "recordar"
-        if (typeof window !== 'undefined' && response.sessionToken) {
-          const { setAdminSession } = await import('../services/adminSession');
-          setAdminSession(response.sessionToken, shouldRemember);
-        }
 
         setPendingAdminSession(null);
 

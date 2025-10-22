@@ -1,7 +1,9 @@
 const ADMIN_SESSION_TOKEN_KEY = 'MyWed360_admin_session_token';
 const ADMIN_SESSION_FLAG_KEY = 'isAdminAuthenticated';
 const ADMIN_REMEMBER_ME_KEY = 'MyWed360_admin_remember_me';
-const ADMIN_SESSION_EXPIRY_KEY = 'MyWed360_admin_session_expiry';
+const ADMIN_SESSION_EXPIRY_KEY = 'MyWed360_admin_session_expires'; // Cambio: 'expires' no 'expiry'
+const ADMIN_PROFILE_KEY = 'MyWed360_admin_profile';
+const ADMIN_SESSION_ID_KEY = 'MyWed360_admin_session_id';
 
 export function getAdminSessionToken() {
   if (typeof window === 'undefined') return null;
@@ -23,19 +25,29 @@ export function getAdminSessionToken() {
   }
 }
 
-export function setAdminSession(token, rememberMe = false) {
+export function setAdminSession(token, rememberMe = false, profile = null, sessionId = null, expiresAt = null) {
   if (typeof window === 'undefined' || !token) return;
   try {
     window.localStorage.setItem(ADMIN_SESSION_TOKEN_KEY, token);
     window.localStorage.setItem(ADMIN_SESSION_FLAG_KEY, 'true');
     window.localStorage.setItem(ADMIN_REMEMBER_ME_KEY, rememberMe ? 'true' : 'false');
     
-    // Si "recordar sesión", expira en 30 días; si no, en 8 horas
-    const expiryDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 8 * 60 * 60 * 1000;
-    const expiryTime = Date.now() + expiryDuration;
+    // Si "recordar sesión", expira en 30 días; si no, en 12 horas
+    const expiryDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 12 * 60 * 60 * 1000;
+    const expiryTime = expiresAt ? new Date(expiresAt).getTime() : (Date.now() + expiryDuration);
     window.localStorage.setItem(ADMIN_SESSION_EXPIRY_KEY, String(expiryTime));
     
-    console.log(`[adminSession] Sesión guardada (recordar: ${rememberMe}, expira en: ${rememberMe ? '30 días' : '8 horas'})`);
+    // Guardar perfil si se proporciona
+    if (profile) {
+      window.localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(profile));
+    }
+    
+    // Guardar sessionId si se proporciona
+    if (sessionId) {
+      window.localStorage.setItem(ADMIN_SESSION_ID_KEY, sessionId);
+    }
+    
+    console.log(`[adminSession] Sesión guardada (recordar: ${rememberMe}, expira: ${new Date(expiryTime).toLocaleString()})`);
   } catch (error) {
     console.warn('[adminSession] No se pudo guardar la sesión admin:', error);
   }
@@ -48,6 +60,8 @@ export function clearAdminSession() {
     window.localStorage.removeItem(ADMIN_SESSION_FLAG_KEY);
     window.localStorage.removeItem(ADMIN_REMEMBER_ME_KEY);
     window.localStorage.removeItem(ADMIN_SESSION_EXPIRY_KEY);
+    window.localStorage.removeItem(ADMIN_PROFILE_KEY);
+    window.localStorage.removeItem(ADMIN_SESSION_ID_KEY);
     console.log('[adminSession] Sesión admin eliminada');
   } catch (error) {
     console.warn('[adminSession] No se pudo eliminar la sesión admin:', error);
