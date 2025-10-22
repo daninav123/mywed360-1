@@ -99,6 +99,7 @@ import emailActionsRouter from './routes/email-actions.js';
 import emailsRouter from './routes/emails.js';
 import emailDocsRouter from './routes/email-docs.js';
 import emailFoldersRouter from './routes/email-folders.js';
+import emailValidationRouter from './routes/email-validation.js';
 import partnerStatsRouter from './routes/partner-stats.js';
 import emailTagsRouter from './routes/email-tags.js';
 import crmRouter from './routes/crm.js';
@@ -495,6 +496,7 @@ app.use('/api/mail', mailStatsRouter);
 app.use('/api/mail', mailSearchRouter);
 app.use('/api/email/folders', requireMailAccess, emailFoldersRouter);
 app.use('/api/email/tags', requireMailAccess, emailTagsRouter);
+app.use('/api/email/validate', requireAuth, emailValidationRouter); // Validación DKIM/SPF
 app.use('/api/email', emailDocsRouter);
 app.use('/api/email-templates', optionalAuth, emailTemplatesRouter); // Plantillas de email
 
