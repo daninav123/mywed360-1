@@ -441,6 +441,51 @@ const DEFAULT_SUMMARY = {
 const formatCurrency = (value = 0, currency = 'EUR') =>
   new Intl.NumberFormat('es-ES', { style: 'currency', currency }).format(Number(value) || 0);
 
+const summarizeCommissionRules = (rules) => {
+  if (!rules || !Array.isArray(rules.periods) || rules.periods.length === 0) {
+    return {
+      label: 'Sin reglas',
+      description: 'Este enlace no tiene comisiones configuradas. Usa el modal de edición para añadirlas.',
+      hasRules: false,
+    };
+  }
+
+  const currency = rules.currency || 'EUR';
+  const detailParts = [];
+  const periodParts = [];
+
+  rules.periods.slice(0, 2).forEach((period, index) => {
+    if (!period || !Array.isArray(period.tiers) || period.tiers.length === 0) return;
+    const tier = period.tiers[0];
+    const label = period.label || `Periodo ${index + 1}`;
+    const percentageValue = Number(tier.percentage * 100);
+    const percentageLabel = Number.isFinite(percentageValue)
+      ? `${percentageValue % 1 === 0 ? percentageValue.toFixed(0) : percentageValue.toFixed(2)}%`
+      : '0%';
+    const fixedLabel = tier.fixedAmount
+      ? formatCurrency(tier.fixedAmount, currency)
+      : null;
+    const entry = fixedLabel ? `${percentageLabel} + ${fixedLabel}` : percentageLabel;
+    detailParts.push(`${label}: ${entry}`);
+    periodParts.push(`${label}: ${entry}`);
+  });
+
+  const hidden = Math.max(0, rules.periods.length - periodParts.length);
+  let label = periodParts.join(' | ');
+  if (!label) {
+    label = `${rules.periods.length} periodo${rules.periods.length > 1 ? 's' : ''}`;
+  }
+  if (hidden > 0) {
+    label += ` (+${hidden})`;
+  }
+
+  return {
+    label,
+    description: `Moneda ${currency}. ${detailParts.join(' | ') || 'Revisa el detalle para conocer los tramos.'}`,
+    hasRules: true,
+  };
+};
+
 const STATUS_LABELS = {
   activo: 'Activo',
   agotado: 'Agotado',
@@ -480,6 +525,8 @@ const AdminDiscounts = () => {
     status: 'activo',
     commissionRules: defaultCommissionState(),
   });
+  const [formError, setFormError] = useState('');
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -545,181 +592,119 @@ const AdminDiscounts = () => {
   };
 
   const handleCreateDiscount = async (e) => {
-
     e.preventDefault();
-
     if (creating || !formData.code.trim()) return;
 
+    setFormError('');
 
+    let commissionPayload = null;
+    try {
+      commissionPayload = buildCommissionPayload(formData.commissionRules);
+    } catch (validationError) {
+      setFormError(validationError.message || 'Error al validar las reglas de comision.');
+      return;
+    }
 
     setCreating(true);
-
     try {
-
-      const commissionPayload = buildCommissionPayload(formData.commissionRules);
-
-
-
       const discountData = {
-
         code: formData.code.trim(),
-
         url: formData.url.trim() || undefined,
-
         type: formData.type,
-
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
-
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
-
         validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
-
         validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-
           name: formData.assignedTo.name || null,
-
           email: formData.assignedTo.email || null
-
         } : null,
-
         notes: formData.notes.trim() || undefined,
-
         commissionRules: commissionPayload,
-
       };
 
-
-
       if (commissionPayload && commissionPayload.currency) {
-
         discountData.currency = commissionPayload.currency;
-
       }
-
-
 
       const newDiscount = await createDiscountCode(discountData);
 
-
-
       setLinks(prev => [newDiscount, ...prev]);
-
       setSummary(prev => ({
-
         ...prev,
-
         totalLinks: prev.totalLinks + 1
-
       }));
 
-
-
       resetForm();
-
       setShowCreateModal(false);
-
     } catch (err) {
-
       console.error('[AdminDiscounts] create failed:', err);
-
-      alert(err.message || 'Error al crear el codigo de descuento');
-
+      setFormError(err.message || 'Error al crear el codigo de descuento');
     } finally {
-
       setCreating(false);
-
     }
-
   };
 
 
 
   const handleEditDiscount = async (e) => {
-
     e.preventDefault();
-
     if (updating || !editingDiscount) return;
 
+    setEditError('');
+
+    let commissionPayload = null;
+    try {
+      commissionPayload = buildCommissionPayload(formData.commissionRules);
+    } catch (validationError) {
+      setEditError(validationError.message || 'Error al validar las reglas de comision.');
+      return;
+    }
 
     setUpdating(true);
 
     try {
-
-      const commissionPayload = buildCommissionPayload(formData.commissionRules);
-
-
       const discountData = {
-
         url: formData.url.trim() || undefined,
-
         type: formData.type,
-
         maxUses: formData.isPermanent ? null : (parseInt(formData.maxUses) || 1),
-
         discountPercentage: parseFloat(formData.discountPercentage) || 0,
-
         validFrom: formData.validFrom ? new Date(formData.validFrom).toISOString() : null,
-
         validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
-
         assignedTo: formData.assignedTo.name || formData.assignedTo.email ? {
-
           name: formData.assignedTo.name || null,
-
           email: formData.assignedTo.email || null
-
         } : null,
-
         notes: formData.notes.trim() || undefined,
-
         status: formData.status,
-
         commissionRules: commissionPayload,
-
       };
 
-
       if (commissionPayload && commissionPayload.currency) {
-
         discountData.currency = commissionPayload.currency;
-
       }
-
 
       const updatedDiscount = await updateDiscountCode(editingDiscount.id, discountData);
 
-
       setLinks(prev => prev.map(link =>
-
         link.id === editingDiscount.id ? updatedDiscount : link
-
       ));
 
-
       resetForm();
-
       setShowEditModal(false);
-
       setEditingDiscount(null);
-
     } catch (err) {
-
       console.error('[AdminDiscounts] update failed:', err);
-
-      alert(err.message || 'Error al actualizar el codigo de descuento');
-
+      setEditError(err.message || 'Error al actualizar el codigo de descuento');
     } finally {
-
       setUpdating(false);
-
     }
-
   };
 
 
   const openEditModal = (discount) => {
+    setFormError('');
+    setEditError('');
     setEditingDiscount(discount);
     setFormData({
       code: discount.code,
@@ -756,6 +741,8 @@ const AdminDiscounts = () => {
       status: 'activo',
       commissionRules: defaultCommissionState(),
     });
+    setFormError('');
+    setEditError('');
   };
 
   return (
@@ -787,7 +774,10 @@ const AdminDiscounts = () => {
           </select>
           <button
             type="button"
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              resetForm();
+              setShowCreateModal(true);
+            }}
             className="rounded-md bg-[color:var(--color-primary,#6366f1)] px-4 py-2 text-sm font-semibold text-white hover:bg-[color:var(--color-primary-dark,#4f46e5)]"
           >
             + Crear código
@@ -833,64 +823,80 @@ const AdminDiscounts = () => {
                     <th className="px-4 py-3 text-left">% Desc.</th>
                     <th className="px-4 py-3 text-left">Usos</th>
                     <th className="px-4 py-3 text-left">Ingresos</th>
+                    <th className="px-4 py-3 text-left">Comision</th>
                     <th className="px-4 py-3 text-left">Estado</th>
                     <th className="px-4 py-3 text-left">Partner</th>
                     <th className="px-4 py-3 text-left">Acciones</th>
-                    <th className="px-4 py-3 text-left">Creado</th>
-                    <th className="px-4 py-3 text-left">Último uso</th>
-                    <th className="px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-soft">
-                  {filtered.map((link) => (
-                    <tr key={link.id}>
-                      <td className="px-4 py-3 font-medium font-mono">{link.code}</td>
-                      <td className="px-4 py-3 capitalize">{TYPE_LABELS[link.type] || link.type || '—'}</td>
-                      <td className="px-4 py-3 text-right font-semibold text-blue-600">
-                        {link.discountPercentage ? `${link.discountPercentage}%` : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-right">{link.uses || 0}</td>
-                      <td className="px-4 py-3 text-right font-medium text-green-600">
-                        {formatCurrency(link.revenue, link.currency || summary.currency)}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            link.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}
+                  {filtered.map((link) => {
+                    const commissionInfo = summarizeCommissionRules(link.commissionRules);
+                    return (
+                      <tr key={link.id}>
+                        <td className="px-4 py-3 font-medium font-mono">{link.code}</td>
+                        <td className="px-4 py-3 capitalize">{TYPE_LABELS[link.type] || link.type || '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold text-blue-600">
+                          {link.discountPercentage ? `${link.discountPercentage}%` : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-right">{link.uses || 0}</td>
+                        <td className="px-4 py-3 text-right font-medium text-green-600">
+                          {formatCurrency(link.revenue, link.currency || summary.currency)}
+                        </td>
+                        <td
+                          className="px-4 py-3 text-sm"
+                          title={commissionInfo.description}
                         >
-                          {STATUS_LABELS[link.status] || link.status || 'active'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleGeneratePartnerLink(link.id, link.code)}
-                          className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-sm"
-                          title="Generar enlace de estadísticas"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Generar
-                        </button>
-                      </td>
-                      <td className="px-4 py-3 space-x-2">
-                        <button
-                          onClick={() => copyToClipboard(link.code)}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
-                        >
-                          Copiar
-                        </button>
-                        <button
-                          onClick={() => openEditModal(link)}
-                          className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
-                        >
-                          Editar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                          <span
+                            className={
+                              commissionInfo.hasRules
+                                ? 'inline-flex rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700'
+                                : 'text-xs text-[var(--color-text-soft,#6b7280)]'
+                            }
+                          >
+                            {commissionInfo.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                              link.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {STATUS_LABELS[link.status] || link.status || 'active'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => handleGeneratePartnerLink(link.id, link.code)}
+                            className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-medium text-sm"
+                            title="Generar enlace de estadisticas"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            Generar
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 space-x-2">
+                          <button
+                            onClick={() => copyToClipboard(link.code)}
+                            className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          >
+                            Copiar
+                          </button>
+                          <button
+                            onClick={() => openEditModal(link)}
+                            className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
+                          >
+                            Editar
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {filtered.length === 0 && (
                     <tr>
-                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={8}>
+                      <td className="px-4 py-6 text-center text-sm text-[var(--color-text-soft,#6b7280)]" colSpan={9}>
                         No se encontraron enlaces con los filtros aplicados.
                       </td>
                     </tr>
@@ -1056,17 +1062,17 @@ const AdminDiscounts = () => {
                 disabled={creating}
               />
 
-
-              <CommissionRulesEditor
-                value={formData.commissionRules}
-                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
-                disabled={updating}
-              />
+              {formError && (
+                <p className="text-sm text-red-600">{formError}</p>
+              )}
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    resetForm();
+                  }}
                   disabled={creating}
                   className="rounded-md border border-soft px-4 py-2 text-sm hover:bg-[var(--color-bg-soft,#f3f4f6)]"
                 >
@@ -1241,6 +1247,16 @@ const AdminDiscounts = () => {
                   className="w-full rounded-md border border-soft px-3 py-2 text-sm"
                 />
               </div>
+
+              <CommissionRulesEditor
+                value={formData.commissionRules}
+                onChange={(next) => setFormData(prev => ({ ...prev, commissionRules: next }))}
+                disabled={updating}
+              />
+
+              {editError && (
+                <p className="text-sm text-red-600">{editError}</p>
+              )}
 
               <div className="flex justify-end gap-3 pt-2">
                 <button

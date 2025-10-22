@@ -20,6 +20,7 @@ import { Card, Button } from '../ui';
 export default function BudgetManager({
   budget,
   budgetUsage,
+  stats,
   onUpdateBudget,
   onAddCategory,
   onReallocateCategories,
@@ -59,8 +60,13 @@ export default function BudgetManager({
     (sum, cat) => sum + (Number(cat?.amount) || 0),
     0
   );
+  const statsTotalBudget = Number(stats?.totalBudget);
+  const statsExpectedBudget = Number(stats?.expectedIncome);
+  const statsTotalSpent = Number(stats?.totalSpent);
   const totalBudgetValue =
-    Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
+    [computedTotal, statsTotalBudget, statsExpectedBudget, categoriesTotal].find(
+      (value) => Number.isFinite(value) && value > 0
+    ) || 0;
   const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
   const hasGlobalBudget = totalBudgetCents > 0;
   const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
@@ -84,9 +90,33 @@ export default function BudgetManager({
 
   const parseTotalDraft = (value) => {
     if (value == null) return Number.NaN;
-    const normalized = String(value).replace(/\s+/g, '').replace(',', '.');
-    if (normalized === '') return Number.NaN;
-    return Number(normalized);
+    if (typeof value === 'number') return value;
+    let raw = String(value).trim();
+    if (!raw) return Number.NaN;
+    raw = raw.replace(/[^0-9.,-]/g, '');
+    const commaIndex = raw.lastIndexOf(',');
+    const dotIndex = raw.lastIndexOf('.');
+    if (commaIndex > dotIndex) {
+      const integerPart = raw
+        .slice(0, commaIndex)
+        .replace(/[^0-9-]/g, '')
+        .replace(/\./g, '');
+      const decimalPart = raw.slice(commaIndex + 1).replace(/[^0-9]/g, '');
+      const normalized = `${integerPart}.${decimalPart}`;
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : Number.NaN;
+    }
+    raw = raw.replace(/,/g, '');
+    const parts = raw.split('.');
+    if (parts.length > 2) {
+      const decimal = parts.pop();
+      const integer = parts.join('').replace(/[^0-9-]/g, '');
+      const normalized = `${integer}.${decimal}`;
+      const num = Number(normalized);
+      return Number.isFinite(num) ? num : Number.NaN;
+    }
+    const num = Number(raw);
+    return Number.isFinite(num) ? num : Number.NaN;
   };
 
   const parsedDraftValue = parseTotalDraft(totalDraft);
@@ -455,8 +485,16 @@ const distributeIncrease = (amounts, indices, delta) => {
     }
   };
 
-  const totalBudgeted = budget.categories.reduce((sum, cat) => sum + (Number(cat.amount) || 0), 0);
-  const totalSpent = budgetUsage.reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
+  const totalBudgetedRaw = budget.categories.reduce(
+    (sum, cat) => sum + (Number(cat.amount) || 0),
+    0
+  );
+  const totalBudgeted =
+    totalBudgetedRaw > 0 ? totalBudgetedRaw : totalBudgetValue;
+  const totalSpent =
+    statsTotalSpent > 0
+      ? statsTotalSpent
+      : budgetUsage.reduce((sum, cat) => sum + (Number(cat.spent) || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -502,7 +540,7 @@ const distributeIncrease = (amounts, indices, delta) => {
               {t('finance.budget.totalBudget', { defaultValue: 'Presupuesto Total' })}
             </p>
             <p className="text-2xl font-bold text-[color:var(--color-text)]">
-              {formatCurrency(budget.total)}
+              {formatCurrency(totalBudgetValue || 0)}
             </p>
           </div>
           <div className="text-center">
@@ -531,7 +569,7 @@ const distributeIncrease = (amounts, indices, delta) => {
 
         <div className="mt-6 space-y-2">
           <label className="block text-sm font-medium text-[color:var(--color-text)]/80">
-            {t('finance.budget.totalBudgetInput', { defaultValue: 'Presupuesto total (€)' })}
+              {t('finance.budget.totalBudgetInput', { defaultValue: 'Presupuesto total (€)' })}
           </label>
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -569,8 +607,7 @@ const distributeIncrease = (amounts, indices, delta) => {
           )}
           {!hasGlobalBudget && (
             <div className="rounded-md border border-[color:var(--color-warning)]/40 bg-[var(--color-warning)]/15 px-3 py-2 text-sm text-[color:var(--color-text)]/80">
-              Define un presupuesto total para activar la reasignación entre categorías. Los
-              deslizadores permanecen bloqueados mientras el total sea 0.
+              Define un presupuesto total para activar la reasignación proporcional entre categorías.
             </div>
           )}
         </div>

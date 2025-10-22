@@ -119,6 +119,7 @@ Este documento describe el panel de administración que ya está implementado en
 
 ### 2.6 Comerciales (`/admin/commerce`, `src/pages/admin/AdminDiscounts.jsx`)
 - Resumen numérico con total de enlaces, usos acumulados y facturación agregada.
+- Métricas agregadas de comisiones: tarjeta destacando `comisión total generada`, `media por enlace` y `enlaces sin reglas` para detectar huecos en la configuración comercial (los tres valores llegan en la respuesta de `GET /api/admin/dashboard/discounts` bajo `summary.commission`).
 - Filtros interactivos por estado (activo/agotado/caducado) y buscador por código, URL o responsable.
 - Tabla con columnas Código, URL (copiable), Asignado a (nombre + tipo), Estado, Usos, Facturación, Creado, Último uso.
 - Datos desde `GET /api/admin/dashboard/discounts` (`discountLinks` en Firestore); si no hay datos se muestran ejemplos demo.
@@ -193,7 +194,7 @@ Este documento describe el panel de administración que ya está implementado en
 | `POST /api/admin/dashboard/settings/secrets/:id/rotate` | Rotar secreto | Marca `lastRotatedAt` y `rotatedBy`.
 | `PUT /api/admin/dashboard/settings/templates/:id` | Guardar plantilla | Actualiza contenido + `updatedAt`.
 | `GET /api/admin/dashboard/broadcasts` / `POST /api/admin/dashboard/broadcasts` | Broadcast | Lista envíos (`adminBroadcasts`), crea nuevo (estado `Pendiente`) y audita `ADMIN_BROADCAST_CREATE`.
-| `GET /api/admin/dashboard/discounts` | Comerciales | Devuelve enlaces de descuento con métricas agregadas (total enlaces, usos y facturación). |
+| `GET /api/admin/dashboard/discounts` | Comerciales | Devuelve enlaces de descuento con métricas agregadas (total enlaces, usos, facturación) y resumen de comisiones (total, media por enlace y enlaces sin reglas configuradas). |
 | `GET /api/admin/dashboard/reports` | Reportes | Lee `adminReports` (si vacío seed demo).
 | `GET /api/admin/dashboard/audit` | Auditoría | Devuelve registros de `adminAuditLogs` (ordenados por `createdAt`).
 | `GET /api/admin/dashboard/support` | Soporte | Resume `adminSupportSummary` + tickets (`adminTickets`).

@@ -253,6 +253,7 @@ function Finance() {
             <BudgetManager
               budget={budget}
               budgetUsage={budgetUsage}
+              stats={stats}
               onUpdateBudget={handleUpdateTotalBudget}
               onAddCategory={addBudgetCategory}
               onReallocateCategories={setBudgetCategories}

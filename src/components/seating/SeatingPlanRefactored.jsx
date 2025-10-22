@@ -536,9 +536,8 @@ const SeatingPlanRefactored = () => {
         nextSteps.firstAssignment = true;
         changed = true;
       }
-      const allCompleted =
-        nextSteps.spaceConfigured && nextSteps.guestsImported && nextSteps.firstAssignment;
-      const nextDismissed = allCompleted ? true : prev.dismissed;
+      const actualCompleted = hasConfiguredSpace && hasGuestsImported && hasAssignedGuests;
+      const nextDismissed = actualCompleted ? true : prev.dismissed;
       if (!changed && nextDismissed === prev.dismissed) {
         return prev;
       }

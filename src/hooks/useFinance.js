@@ -96,6 +96,40 @@ const arraysShallowEqual = (a = [], b = []) => {
   return true;
 };
 
+const parseMoneyValue = (value, fallback = 0) => {
+  if (value == null) return fallback;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  const raw = String(value).trim();
+  if (!raw) return fallback;
+  let sanitized = raw.replace(/[^0-9.,-]/g, '');
+  const commaIndex = sanitized.lastIndexOf(',');
+  const dotIndex = sanitized.lastIndexOf('.');
+
+  if (commaIndex > dotIndex) {
+    const integerPart = sanitized
+      .slice(0, commaIndex)
+      .replace(/[^0-9-]/g, '')
+      .replace(/\./g, '');
+    const decimalPart = sanitized.slice(commaIndex + 1).replace(/[^0-9]/g, '');
+    const normalized = `${integerPart}.${decimalPart}`;
+    const num = Number(normalized);
+    return Number.isFinite(num) ? num : fallback;
+  }
+
+  sanitized = sanitized.replace(/,/g, '');
+  const parts = sanitized.split('.');
+  if (parts.length > 2) {
+    const decimal = parts.pop();
+    const integer = parts.join('').replace(/[^0-9-]/g, '');
+    const normalized = `${integer}.${decimal}`;
+    const num = Number(normalized);
+    return Number.isFinite(num) ? num : fallback;
+  }
+
+  const num = Number(sanitized);
+  return Number.isFinite(num) ? num : fallback;
+};
+
 const normalizeAdvisorTimestamp = (value) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
@@ -774,11 +808,11 @@ export default function useFinance() {
       };
 
       setBudget({
-        total: Number(localBudget.total) || 0,
+        total: parseMoneyValue(localBudget.total, 0),
         categories: Array.isArray(localBudget.categories)
           ? localBudget.categories.map((c) => ({
               name: String(c.name || ''),
-              amount: Number(c.amount) || 0,
+              amount: parseMoneyValue(c.amount, 0),
               muted: Boolean(c.muted || false),
               source: c.source ? String(c.source) : undefined,
             }))
@@ -828,11 +862,11 @@ export default function useFinance() {
         const contributionsData = data.contributions || {};
 
         setBudget({
-          total: Number(budgetData.total) || 0,
+          total: parseMoneyValue(budgetData.total, 0),
           categories: Array.isArray(budgetData.categories)
             ? budgetData.categories.map((c) => ({
                 name: String(c.name || ''),
-                amount: Number(c.amount) || 0,
+                amount: parseMoneyValue(c.amount, 0),
                 muted: Boolean(c.muted || false),
                 source: c.source ? String(c.source) : undefined,
               }))
@@ -950,7 +984,8 @@ export default function useFinance() {
       if (!name || budget.categories.find((c) => c.name === name)) {
         return { success: false, error: 'Categoría ya existe o nombre inválido' };
       }
-      const nextCategories = [...budget.categories, { name, amount }];
+      const parsedAmount = parseMoneyValue(amount, 0);
+      const nextCategories = [...budget.categories, { name, amount: parsedAmount }];
       setBudget((prev) => ({ ...prev, categories: nextCategories }));
       persistFinanceDoc({
         budget: { total: budget.total, categories: nextCategories },
@@ -965,7 +1000,7 @@ export default function useFinance() {
       if (!Array.isArray(nextCategories)) return;
       const sanitized = nextCategories.map((cat) => ({
         ...cat,
-        amount: Number(cat?.amount) || 0,
+        amount: parseMoneyValue(cat?.amount, 0),
       }));
       setBudget((prev) => ({ ...prev, categories: sanitized }));
       persistFinanceDoc({
@@ -977,9 +1012,12 @@ export default function useFinance() {
 
   const updateBudgetCategory = useCallback(
     (index, updates) => {
-      const nextCategories = budget.categories.map((cat, idx) =>
-        idx === index ? { ...cat, ...updates } : cat
-      );
+      const nextCategories = budget.categories.map((cat, idx) => {
+        if (idx !== index) return cat;
+        const nextAmount =
+          updates.amount != null ? parseMoneyValue(updates.amount, 0) : parseMoneyValue(cat.amount, 0);
+        return { ...cat, ...updates, amount: nextAmount };
+      });
       setBudget((prev) => ({ ...prev, categories: nextCategories }));
       persistFinanceDoc({
         budget: { total: budget.total, categories: nextCategories },
@@ -1198,7 +1236,7 @@ export default function useFinance() {
 
   const updateTotalBudget = useCallback(
     (newTotal) => {
-      const total = Number(newTotal) || 0;
+      const total = parseMoneyValue(newTotal, 0);
       setBudget((prev) => ({ ...prev, total }));
       persistFinanceDoc({ budget: { total, categories: budget.categories } });
       return { success: true };
