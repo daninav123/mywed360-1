@@ -68,6 +68,7 @@ useEffect(() => {
   autoSaveTimeoutRef.current = setTimeout(() => {
     captureSnapshot({ status: 'confirmed', source: 'auto' });
     lastSnapshotSignatureRef.current = categoriesSignature;
+    autoSaveTimeoutRef.current = null;
   }, 1500);
 
   return () => {
@@ -106,7 +107,6 @@ useEffect(() => {
   const totalBudgetCents = Math.max(0, Math.round(totalBudgetValue * 100));
   const hasGlobalBudget = totalBudgetCents > 0;
   const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
-  const baselineTotal = Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
   const thresholds = alertThresholds || { warn: 75, danger: 90 };
   const categoriesSignature = useMemo(() => {
     const list = Array.isArray(budget?.categories) ? budget.categories : [];
@@ -504,13 +504,6 @@ const distributeIncrease = (amounts, indices, delta) => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            leftIcon={<CheckCircle size={16} />}
-            onClick={captureSnapshot}
-          >
-            {t('finance.benchmarks.saveSnapshot', { defaultValue: 'Guardar presupuesto' })}
-          </Button>
           <Button leftIcon={<Plus size={16} />} onClick={handleAddCategory}>
             {t('finance.budget.newCategory', { defaultValue: 'Nueva categoría' })}
           </Button>

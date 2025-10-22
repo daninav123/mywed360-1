@@ -347,7 +347,7 @@ const Proveedores = () => {
       try {
         const results = await runAISearch(enrichedQuery || trimmed, {
           service: trimmed,
-          allowFallback: true,
+          allowFallback: false,
         });
         const safeResults = Array.isArray(results) ? results : [];
         if (!safeResults.length && !silent) {

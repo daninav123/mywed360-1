@@ -340,7 +340,7 @@ export const useAISearch = () => {
 
       if (allowFallback) {
         const demoResults = generateDemoResults(query);
-        const refined = refineResults(demoResults, { service: inferredService, location });
+        const refined = refineResults(demoResults, { service: inferredService, location, isDemoMode: true });
         setResults(refined);
         setUsedFallback(true);
         setLoading(false);
@@ -376,6 +376,7 @@ export default useAISearch;
 function refineResults(list, ctx) {
   const serviceRef = String(ctx?.service || '').toLowerCase();
   const locRef = String(ctx?.location || '').toLowerCase();
+  const isDemoMode = ctx?.isDemoMode === true;
   if (!Array.isArray(list) || (!serviceRef && !locRef)) return list || [];
 
   let byService = serviceRef
@@ -385,7 +386,8 @@ function refineResults(list, ctx) {
       })
     : (list || []).slice();
 
-  if (serviceRef && byService.length === 0) {
+  // En modo demo, si quedan muy pocos resultados, mostrar todos
+  if (serviceRef && (byService.length === 0 || (isDemoMode && byService.length < 3))) {
     byService = (list || []).slice();
   }
 
