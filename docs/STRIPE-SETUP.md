@@ -63,16 +63,6 @@
 6. COPIA el Price ID → STRIPE_PRICE_WEDDING_PASS_PLUS
 ```
 
-#### Extensión post-boda (15 EUR)
-```
-1. Product name: Extensión post-boda - MaLoveApp
-2. Description: 90 días extra de acceso editable
-3. Pricing model: One-time
-4. Price: 15 EUR
-5. Click "Save product"
-6. COPIA el Price ID → STRIPE_PRICE_POST_WEDDING_EXTENSION
-```
-
 ---
 
 ### 3.2. Paquetes para Wedding Planners
@@ -183,7 +173,6 @@
 |----------|------|--------|-------------------|
 | **Wedding Pass** | One-time | 50 EUR | `STRIPE_PRICE_WEDDING_PASS` |
 | **Wedding Pass Plus** | One-time | 85 EUR | `STRIPE_PRICE_WEDDING_PASS_PLUS` |
-| **Extensión post-boda** | One-time | 15 EUR | `STRIPE_PRICE_POST_WEDDING_EXTENSION` |
 | **Planner Pack 5 (Mensual)** | Recurring | 41,67 EUR/mes + trial 30d | `STRIPE_PRICE_PLANNER_PACK5_MONTHLY` |
 | **Planner Pack 5 (Anual)** | One-time | 425 EUR | `STRIPE_PRICE_PLANNER_PACK5_ANNUAL` |
 | **Planner Pack 15 (Mensual)** | Recurring | 112,50 EUR/mes + trial 30d | `STRIPE_PRICE_PLANNER_PACK15_MONTHLY` |
@@ -193,7 +182,7 @@
 | **Teams Ilimitado (Mensual)** | Recurring | 416,67 EUR/mes + trial 30d | `STRIPE_PRICE_TEAMS_UNLIMITED_MONTHLY` |
 | **Teams Ilimitado (Anual)** | One-time | 4.250 EUR | `STRIPE_PRICE_TEAMS_UNLIMITED_ANNUAL` |
 
-**Total:** 11 Price IDs a configurar (3 para parejas + 8 para planners)
+**Total:** 10 Price IDs a configurar (2 para parejas + 8 para planners)
 
 ---
 
@@ -348,7 +337,7 @@ Usa estas tarjetas en modo test:
 
 - [ ] Cuenta de Stripe creada
 - [ ] Claves de test copiadas al .env
-- [ ] 3 productos de parejas creados (Wedding Pass, Plus, Extensión)
+- [ ] 2 productos de parejas creados (Wedding Pass, Plus)
 - [ ] 4 packs de planners creados (Pack 5, Pack 15, Teams 40, Unlimited)
 - [ ] 8 Price IDs de planners copiados (4 monthly + 4 annual)
 - [ ] Webhook configurado (Stripe CLI o ngrok)

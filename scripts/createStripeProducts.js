@@ -146,13 +146,6 @@ async function main() {
       'STRIPE_PRICE_WEDDING_PASS_PLUS'
     );
 
-    await createCoupleProduct(
-      'Extensión post-boda',
-      1500,
-      '90 días extra de acceso editable',
-      'STRIPE_PRICE_POST_WEDDING_EXTENSION'
-    );
-
     // Productos para Planners
     console.log('\n💼 CREANDO PRODUCTOS PARA PLANNERS\n');
     console.log('─────────────────────────────────────────────────\n');
@@ -206,7 +199,6 @@ async function main() {
     console.log('Parejas:');
     console.log(`  STRIPE_PRICE_WEDDING_PASS=${priceIds.STRIPE_PRICE_WEDDING_PASS}`);
     console.log(`  STRIPE_PRICE_WEDDING_PASS_PLUS=${priceIds.STRIPE_PRICE_WEDDING_PASS_PLUS}`);
-    console.log(`  STRIPE_PRICE_POST_WEDDING_EXTENSION=${priceIds.STRIPE_PRICE_POST_WEDDING_EXTENSION}`);
     
     console.log('\nPlanners (Mensual):');
     console.log(`  STRIPE_PRICE_PLANNER_PACK5_MONTHLY=${priceIds.STRIPE_PRICE_PLANNER_PACK5_MONTHLY}`);

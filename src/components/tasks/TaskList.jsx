@@ -23,8 +23,7 @@ export default function TaskList({
 
   const calendarExtras = useMemo(() => {
     if (!containerHeight) return 0;
-    const base = Math.round(containerHeight * 0.24);
-    return Math.max(96, Math.min(180, base));
+    return Math.round(containerHeight * 0.11);
   }, [containerHeight]);
 
   const totalTargetHeight = useMemo(() => {
@@ -41,9 +40,9 @@ export default function TaskList({
       setPageSize(explicit);
       return;
     }
-    const HEADER_RESERVE = 110;
-    const FOOTER_RESERVE = 64;
-    const CARD_APPROX = 115;
+    const HEADER_RESERVE = 120;
+    const FOOTER_RESERVE = 72;
+    const CARD_APPROX = 122;
     const available = Math.max(CARD_APPROX, totalTargetHeight - HEADER_RESERVE - FOOTER_RESERVE);
     const computed = Math.max(1, Math.floor(available / CARD_APPROX));
     setPageSize(Math.max(1, Math.min(explicit, computed)));

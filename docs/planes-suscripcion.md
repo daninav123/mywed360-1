@@ -5,9 +5,8 @@
 ## 🎯 Principios generales
 - Una licencia = una boda activa (`weddingId`).
 - Vigencia estándar: `valid_until = weddingDate + 30 días`.
-- Tras la fecha de vigencia la boda pasa a modo lectura (sin edición) y muestra upsell para extensión.
-- Existe un complemento de “Extensión post-boda” que añade 90 días extra de acceso editable.
-- Los planners operan con paquetes de licencias que pueden pagarse en mensualidades (12 cuotas) o en un único pago anual (15 % de descuento), siempre con un mes de prueba gratuita.
+- Tras la fecha de vigencia la boda pasa a modo lectura (sin edición).
+- Los planners operan con paquetes de licencias que pueden pagarse en mensualidades (12 cuotas) o en un único pago anual (15 % de descuento), siempre con un mes de prueba gratuita.
 
 ---
 
@@ -27,10 +26,6 @@
 - **Precio:** 85 € por boda
 - **Incluye:** todo lo de Wedding Pass + eliminación total de marca en invitaciones/PDF/pantallas, biblioteca completa de diseños, editor web premium, galería de recuerdos y 1 ayudante con acceso completo a esa boda.
 - **Uso ideal:** bodas premium o eventos donde la imagen y la colaboración externa son clave.
-
-### Extensión post-boda (complemento)
-- **Precio:** 15 € por boda
-- **Función:** añade 90 días extra de acceso editable tras `valid_until`. Se adquiere sólo cuando la boda está en modo lectura.
 
 ---
 

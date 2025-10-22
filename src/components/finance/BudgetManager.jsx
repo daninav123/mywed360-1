@@ -10,7 +10,7 @@ import {
   Info,
   CheckCircle,
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 import useTranslations from '../../hooks/useTranslations';
 import { formatCurrency } from '../../utils/formatUtils';
@@ -47,6 +47,8 @@ export default function BudgetManager({
   const [newCategory, setNewCategory] = useState({ name: '', amount: '' });
   const [showAdvisorModal, setShowAdvisorModal] = useState(false);
   const [localAdvisorLoading, setLocalAdvisorLoading] = useState(false);
+  const autoSaveTimeoutRef = useRef(null);
+  const lastSnapshotSignatureRef = useRef('');
   const benchmarkState = benchmarks || {};
   const benchmarkSampleSize = benchmarkState.sampleSize || benchmarkState.total?.count || 0;
   const benchmarkConfidence = benchmarkState.confidence || 'very-low';
@@ -55,6 +57,26 @@ export default function BudgetManager({
     typeof onApplyBenchmark === 'function' ? onApplyBenchmark : () => {};
   const captureSnapshot =
     typeof onCaptureSnapshot === 'function' ? onCaptureSnapshot : () => {};
+useEffect(() => {
+  if (typeof captureSnapshot !== 'function') return undefined;
+  if (!categoriesSignature) return undefined;
+  if (lastSnapshotSignatureRef.current === categoriesSignature) return undefined;
+
+  if (autoSaveTimeoutRef.current) {
+    clearTimeout(autoSaveTimeoutRef.current);
+  }
+  autoSaveTimeoutRef.current = setTimeout(() => {
+    captureSnapshot({ status: 'confirmed', source: 'auto' });
+    lastSnapshotSignatureRef.current = categoriesSignature;
+  }, 1500);
+
+  return () => {
+    if (autoSaveTimeoutRef.current) {
+      clearTimeout(autoSaveTimeoutRef.current);
+      autoSaveTimeoutRef.current = null;
+    }
+  };
+}, [categoriesSignature, captureSnapshot]);
   const currentGuestCount = Number(guestCount) || 0;
   const effectiveAdvisor = advisor && typeof advisor === 'object' ? advisor : null;
   const advisorScenarios = Array.isArray(effectiveAdvisor?.scenarios)
@@ -86,6 +108,17 @@ export default function BudgetManager({
   const categoriesTotalCents = Math.max(0, Math.round(categoriesTotal * 100));
   const baselineTotal = Number.isFinite(computedTotal) && computedTotal >= 0 ? computedTotal : categoriesTotal;
   const thresholds = alertThresholds || { warn: 75, danger: 90 };
+  const categoriesSignature = useMemo(() => {
+    const list = Array.isArray(budget?.categories) ? budget.categories : [];
+    if (!list.length) return '';
+    const normalized = list
+      .map((cat) => ({
+        key: normalizeBudgetCategoryKey(cat?.name || ''),
+        amount: Number(cat?.amount) || 0,
+      }))
+      .sort((a, b) => a.key.localeCompare(b.key));
+    return JSON.stringify(normalized);
+  }, [budget?.categories]);
 
   const formatTotalInput = (value) => {
     if (!Number.isFinite(value)) return '';
@@ -646,27 +679,6 @@ const distributeIncrease = (amounts, indices, delta) => {
                   </div>
 
                   <div className="flex items-center gap-1 text-[10px] text-[color:var(--color-text)]/70">
-                    <label className="inline-flex items-center gap-1">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(category.muted)}
-                        onChange={(e) => onUpdateCategory(index, { muted: e.target.checked })}
-                      />
-                      {t('finance.budget.muteShort', { defaultValue: 'Silenciar' })}
-                    </label>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 rounded-md border border-[var(--color-primary)]/40 px-2 py-1 text-[11px] font-semibold text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/10"
-                      onClick={handleOpenAdvisor}
-                      disabled={advisorLoading || localAdvisorLoading}
-                    >
-                      {(advisorLoading || localAdvisorLoading) ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <Sparkles size={12} />
-                      )}
-                      {t('finance.budget.advisorShort', { defaultValue: 'AI' })}
-                    </button>
                     <button
                       aria-label="Editar categoría"
                       onClick={() => handleEditCategory(category, index)}
@@ -870,13 +882,13 @@ const distributeIncrease = (amounts, indices, delta) => {
               type="text"
               value={newCategory.name}
               onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-              placeholder={t('finance.budget.modal.namePlaceholder', { defaultValue: 'e.g. Catering, Music, Flowers…' })}
+              placeholder={t('finance.budget.modal.namePlaceholder', { defaultValue: 'e.g. Catering, Music, Flowers...' })}
               className="w-full px-3 py-2 border border-[color:var(--color-text)]/20 rounded-md focus:ring-2 focus:ring-[color:var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] text-[color:var(--color-text)]"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-[color:var(--color-text)]/80 mb-1">
-              Presupuesto asignado (€)
+              {t('finance.budget.modal.amountLabel', { defaultValue: 'Assigned budget (€)' })}
             </label>
             <input
               type="number"

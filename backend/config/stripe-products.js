@@ -60,20 +60,6 @@ export const STRIPE_PRODUCTS = {
       validityDays: 30,
       whiteLabel: true,
     },
-    postWeddingExtension: {
-      id: 'post_wedding_extension',
-      name: 'Extensión post-boda',
-      price: 1500, // 15 EUR en centavos
-      currency: 'EUR',
-      type: 'one_time',
-      interval: null,
-      stripePriceId: process.env.STRIPE_PRICE_POST_WEDDING_EXTENSION,
-      features: [
-        '90 días extra de acceso editable',
-        'Compatible con cualquier plan',
-      ],
-      validityDays: 90,
-    },
   },
 
   // Paquetes para Wedding Planners (suscripción con trial de 30 días)
