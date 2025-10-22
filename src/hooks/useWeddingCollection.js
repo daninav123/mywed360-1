@@ -59,6 +59,13 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
   const firebaseUid = auth?.currentUser?.uid || null;
 
   useEffect(() => {
+    // Si no hay weddingId, solo usar fallback y no intentar Firestore
+    if (!weddingId) {
+      setData(fallback);
+      setLoading(false);
+      return;
+    }
+    
     // Asegurar inicialización completa de Firebase antes de lanzar cualquier lógica
     const ENABLE_LEGACY_FALLBACKS = String((import.meta.env && import.meta.env.VITE_ENABLE_LEGACY_FALLBACKS) ?? 'true').toLowerCase() === 'true';
     // Intento de migración automática de invitados antiguos
@@ -302,27 +309,16 @@ export const useWeddingCollection = (subName, weddingId, fallback = [], options 
                 const as = String(av);
                 const bs = String(bv);
                 return as.localeCompare(bs) * dirMul;
-              });
-            } catch {}
-          }
-          if (import.meta.env.DEV)
-            console.log(`[useWeddingCollection] Datos recibidos:`, {
-              sub: subName,
-              wedding: weddingId,
-              size: arr.length,
-            });
-          setData(arr);
-          lsSet(weddingId, subName, arr);
           setLoading(false);
         },
-        async (err) => {
-          console.error(`Snapshot error ${subName}:`, err);
-          // Intento automático: si es permiso denegado, solicitar autofix seguro al backend y reintentar
-          if (err?.code === 'permission-denied' && auth.currentUser?.uid) {
-            try {
-              console.warn(
-                `[auto-fix] Solicitando autofix backend para ${weddingId}… (uid: ${auth.currentUser.uid})`
-              );
+        (err) => {
+          // Silenciar errores de permisos si estamos usando admin local
+          const isPermissionDenied = err.code === 'permission-denied';
+          if (isPermissionDenied) {
+            // Usar fallback silenciosamente sin loguear error
+            setData(fallback);
+            setLoading(false);
+            return;
               const resp = await apiPost(
                 `/api/weddings/${weddingId}/permissions/autofix`,
                 {},

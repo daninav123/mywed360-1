@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, AlertTriangle, CheckCircle, Sparkles, Calendar } from 'lucide-react';
 import Button from '../ui/Button';
 import { post } from '../../services/apiClient';
+import useTranslations from '../../hooks/useTranslations';
 
 /**
  * Predicción IA de gastos futuros basada en histórico
@@ -10,6 +11,7 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
   const [predicting, setPredicting] = useState(false);
   const [prediction, setPrediction] = useState(null);
   const [showAdvice, setShowAdvice] = useState(false);
+  const { t } = useTranslations();
 
   useEffect(() => {
     if (transactions.length >= 5) {
@@ -111,8 +113,13 @@ const BudgetPrediction = ({ transactions = [], budget = {}, weddingDate }) => {
     if (projectedOverage > 0) {
       recommendations.push({
         type: 'warning',
-        message: `Se proyecta un exceso de €${projectedOverage.toFixed(2)}`,
-        action: 'Considera revisar gastos discrecionales'
+        message: t('budgetPrediction.recommendations.projectedOverage.message', {
+          amount: projectedOverage.toFixed(2),
+          defaultValue: 'Se proyecta un exceso de €{{amount}}',
+        }),
+        action: t('budgetPrediction.recommendations.projectedOverage.action', {
+          defaultValue: 'Considera revisar gastos discrecionales',
+        }),
       });
     }
 

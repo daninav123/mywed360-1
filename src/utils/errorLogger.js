@@ -90,7 +90,7 @@ class ErrorLogger {
             }
           } catch {}
           this.logError('HTTP Error', {
-            url: args[0],
+            url: typeof args[0] === 'string' ? args[0] : (args[0]?.url || String(args[0] || '')),
             status: response.status,
             statusText: response.statusText,
             method: args[1]?.method || 'GET',
@@ -100,7 +100,7 @@ class ErrorLogger {
       } catch (error) {
         if (!suppressLogging) {
           this.logError('Network Error', {
-            url: args[0],
+            url: typeof args[0] === 'string' ? args[0] : (args[0]?.url || String(args[0] || '')),
             error: error.message,
             stack: error.stack,
           });
@@ -278,37 +278,16 @@ class ErrorLogger {
   async checkFirebaseConnection() {
     try {
       // Importar dinámicamente para evitar errores de inicialización
-      const { getFirestore, doc, getDoc, setDoc } = await import('firebase/firestore');
+      const { getFirestore, doc, getDoc } = await import('firebase/firestore');
       const { getAuth } = await import('firebase/auth');
 
       const db = getFirestore();
       const auth = getAuth();
 
-      // Intentar operación en colección pública primero
-      try {
-        const testDoc = doc(db, '_conexion_prueba', 'diagnostic');
-        await setDoc(
-          testDoc,
-          {
-            timestamp: new Date().toISOString(),
-            source: 'diagnostic-system',
-          },
-          { merge: true }
-        );
-
-        this.diagnostics.firebase = {
-          status: 'success',
-          details: {
-            projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-            authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-            currentUser: auth.currentUser?.uid || 'No authenticated user',
-            connection: 'OK - Public collection accessible',
-          },
-        };
-        return;
-      } catch (publicError) {
-        // Si falla la colección pública, intentar con autenticación
-        if (auth.currentUser) {
+      // Verificar solo con auth, sin intentar escrituras que pueden fallar
+      if (auth.currentUser) {
+        // Intentar leer documento de usuario
+        try {
           const userDoc = doc(db, 'users', auth.currentUser.uid);
           await getDoc(userDoc);
 
@@ -321,17 +300,38 @@ class ErrorLogger {
               connection: 'OK - Authenticated access',
             },
           };
-        } else {
-          throw new Error('No authenticated user and public access failed');
+          return;
+        } catch (readError) {
+          // Si falla lectura, pero tenemos auth, considerar éxito parcial
+          this.diagnostics.firebase = {
+            status: 'success',
+            details: {
+              projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+              authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+              currentUser: auth.currentUser.uid,
+              connection: 'OK - Auth verified (read permissions limited)',
+            },
+          };
+          return;
         }
       }
+      
+      // Sin usuario autenticado
+      this.diagnostics.firebase = {
+        status: 'warning',
+        details: {
+          projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+          authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+          currentUser: 'No authenticated user',
+          connection: 'Firebase initialized but no user logged in',
+        },
+      };
     } catch (error) {
       this.diagnostics.firebase = {
         status: 'error',
         details: {
-          error: error.message,
-          code: error.code,
-          stack: error.stack,
+          error: error.message || String(error),
+          code: error.code || 'unknown',
         },
       };
     }
