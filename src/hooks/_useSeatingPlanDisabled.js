@@ -1166,19 +1166,47 @@ const pushHistory = (snapshot) => {
   };
 
   const addTable = (table = {}) => {
-    const typeHint =
-      table.tableType ||
-      (table.shape === 'circle' ? 'round' : inferTableType(table));
-    const base = createTableFromType(typeHint, {
-      ...table,
-      id: Date.now(),
-      autoCapacity: table.autoCapacity ?? true,
-    });
-    const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
-    if (tab === 'ceremony') {
-      setTablesCeremony((prev) => [...prev, sanitized]);
-    } else {
-      setTablesBanquet((prev) => [...prev, sanitized]);
+    try {
+      console.log('[addTable] Input:', table);
+      console.log('[addTable] Current tab:', tab);
+      
+      const typeHint =
+        table.tableType ||
+        (table.shape === 'circle' ? 'round' : inferTableType(table));
+      
+      const base = createTableFromType(typeHint, {
+        ...table,
+        id: table.id || Date.now(),
+        autoCapacity: table.autoCapacity ?? true,
+      });
+      
+      const sanitized = sanitizeTable(base, { forceAuto: base.autoCapacity });
+      console.log('[addTable] Sanitized table:', sanitized);
+      
+      if (tab === 'ceremony') {
+        setTablesCeremony((prev) => {
+          const newTables = [...prev, sanitized];
+          console.log('[addTable] New ceremony tables:', newTables);
+          return newTables;
+        });
+      } else {
+        setTablesBanquet((prev) => {
+          const newTables = [...prev, sanitized];
+          console.log('[addTable] New banquet tables:', newTables);
+          console.log('[addTable] Previous count:', prev.length, '→ New count:', newTables.length);
+          return newTables;
+        });
+      }
+      
+      // Añadir al historial
+      try {
+        pushHistory();
+      } catch (e) {
+        console.warn('[addTable] Error pushing to history:', e);
+      }
+    } catch (error) {
+      console.error('[addTable] Error:', error);
+      throw error;
     }
   };
 
