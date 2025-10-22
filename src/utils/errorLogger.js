@@ -286,7 +286,7 @@ class ErrorLogger {
 
       // Verificar solo con auth, sin intentar escrituras que pueden fallar
       if (auth.currentUser) {
-        // Intentar leer documento de usuario
+        // Intentar leer documento de usuario (lectura simple, menos propensa a errores)
         try {
           const userDoc = doc(db, 'users', auth.currentUser.uid);
           await getDoc(userDoc);
@@ -297,25 +297,12 @@ class ErrorLogger {
               projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
               authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
               currentUser: auth.currentUser.uid,
-              connection: 'OK - Authenticated access',
-            },
-          };
-          return;
-        } catch (readError) {
-          // Si falla lectura, pero tenemos auth, considerar éxito parcial
-          this.diagnostics.firebase = {
-            status: 'success',
-            details: {
-              projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-              authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-              currentUser: auth.currentUser.uid,
-              connection: 'OK - Auth verified (read permissions limited)',
+              connection: 'OK - Auth verified',
             },
           };
           return;
         }
       }
-      
       // Sin usuario autenticado
       this.diagnostics.firebase = {
         status: 'warning',
