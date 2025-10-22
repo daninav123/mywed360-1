@@ -3,6 +3,7 @@
 import BudgetManager from '../components/finance/BudgetManager';
 import ContributionSettings from '../components/finance/ContributionSettings';
 import FinanceOverview from '../components/finance/FinanceOverview';
+import FinanceCashflowTimeline from '../components/finance/FinanceCashflowTimeline';
 import PaymentSuggestions from '../components/finance/PaymentSuggestions.jsx';
 import TransactionManager from '../components/finance/TransactionManager';
 import PageWrapper from '../components/PageWrapper';
@@ -226,6 +227,12 @@ function Finance() {
               transactions={transactions}
               projection={projection}
               predictiveInsights={predictiveInsights}
+            />
+            <FinanceCashflowTimeline
+              monthlySeries={monthlySeries}
+              predictiveInsights={predictiveInsights}
+              stats={stats}
+              budget={budget}
             />
           </div>
         )}

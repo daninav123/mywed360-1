@@ -369,6 +369,28 @@
         "name": "Category name"
       }
     },
+    "benchmarks": {
+      "title": "Budget suggestions based on similar weddings",
+      "subtitle": "Based on {{count}} confirmed budgets. Average estimate: {{average}} · Confidence: {{confidence}}.",
+      "loading": "Calculating budget suggestions…",
+      "applyMedian": "Apply median (p50)",
+      "applyP75": "Apply percentile 75",
+      "saveSnapshot": "Save budget"
+    },
+    "cashflow": {
+      "title": "Cashflow timeline",
+      "subtitle": "Upcoming payments and projected balance",
+      "remaining": "Budget remaining",
+      "burnRate": "Monthly burn rate",
+      "monthsToZero": "{{months}} months until depletion",
+      "upcoming": "Upcoming payments (45 days)",
+      "noUpcoming": "No pending payments in the next weeks.",
+      "netTimeline": "Net monthly flow (6 months)",
+      "legend": "Income - Expense",
+      "noHistory": "We need more history to estimate the trend.",
+      "income": "Income",
+      "expense": "Expenses"
+    },
     "contributions": {
       "title": "Contributions Setup",
       "subtitle": "Configure contributions and estimate expected income",

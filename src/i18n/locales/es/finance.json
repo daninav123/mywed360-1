@@ -222,5 +222,27 @@
       "newTitle": "Nueva categoría",
       "name": "Nombre de la categoría"
     }
+  },
+  "benchmarks": {
+    "title": "Sugerencias de presupuesto basadas en bodas similares",
+    "subtitle": "Basado en {{count}} presupuestos confirmados. Media estimada: {{average}} · Confianza: {{confidence}}.",
+    "loading": "Calculando sugerencias de presupuesto…",
+    "applyMedian": "Aplicar mediana (p50)",
+    "applyP75": "Aplicar percentil 75",
+    "saveSnapshot": "Guardar presupuesto"
+  },
+  "cashflow": {
+    "title": "Cronograma de caja",
+    "subtitle": "Próximos pagos y balance proyectado",
+    "remaining": "Presupuesto restante",
+    "burnRate": "Burn rate mensual",
+    "monthsToZero": "{{months}} meses hasta agotar",
+    "upcoming": "Pagos próximos (45 días)",
+    "noUpcoming": "Sin pagos pendientes en las próximas semanas.",
+    "netTimeline": "Flujo neto mensual (6 meses)",
+    "legend": "Ingreso - Gasto",
+    "noHistory": "Necesitamos más historial para calcular la tendencia.",
+    "income": "Ingresos",
+    "expense": "Gastos"
   }
 }
